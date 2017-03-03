@@ -2,8 +2,7 @@
 
    模仿微博照片选择器,支持多选、选原图和视频的图片选择器，同时有3Dtouch预览功能,长按拖动改变顺序.通过相机拍照录制视频  - 支持ios8.0 以上
 
-   <img src="http://wx4.sinaimg.cn/mw690/ade10dedgy1fd9sv9phs5j20qo1bftj8.jpg" width="320" height="480">
-   <img src="http://wx4.sinaimg.cn/mw690/ade10dedgy1fd9sv87c1ij20qo1bfdl3.jpg" width="320" height="480">
+   <img src="http://wx4.sinaimg.cn/mw690/ade10dedgy1fd9sv9phs5j20qo1bftj8.jpg" width="414" height="667">
 
 ## 一. 安装
 
