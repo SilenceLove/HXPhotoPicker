@@ -40,7 +40,7 @@
     NSLog(@"%ld - %ld - %ld",allList.count,photos.count,videos.count);
 }
 
-- (void)photoViewUpdateFrame:(CGRect)frame
+- (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view
 {
     NSLog(@"%@",NSStringFromCGRect(frame));
 }

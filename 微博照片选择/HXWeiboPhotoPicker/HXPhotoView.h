@@ -13,7 +13,7 @@
 
 - (void)photoViewChangeComplete:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)isOriginal;
 
-- (void)photoViewUpdateFrame:(CGRect)frame;
+- (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view;
 
 @end
 

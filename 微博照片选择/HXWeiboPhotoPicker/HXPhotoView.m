@@ -320,8 +320,8 @@
         CGFloat newHeight = numOfLinesNew * itemW + Spacing * (numOfLinesNew - 1);
         self.frame = CGRectMake(x, y, width, newHeight);
         self.numOfLinesOld = numOfLinesNew;
-        if ([self.delegate respondsToSelector:@selector(photoViewUpdateFrame:)]) {
-            [self.delegate photoViewUpdateFrame:self.frame];
+        if ([self.delegate respondsToSelector:@selector(photoViewUpdateFrame:WithView:)]) {
+            [self.delegate photoViewUpdateFrame:self.frame WithView:self];
         }
     }
 }
