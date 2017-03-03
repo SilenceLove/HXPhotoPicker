@@ -2,14 +2,14 @@
 
    模仿微博照片选择器,支持多选、选原图和视频的图片选择器，同时有3Dtouch预览功能,长按拖动改变顺序.通过相机拍照录制视频  - 支持ios8.0 以上
 
-   <img src="https://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/d15641ec563550d1c528313ba75abf46_2.png" width="320" height="480">
-   <img src="https://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/122849ae312dc181ecd312c426843c38_1.png" width="320" height="480">
+   <img src="http://wx4.sinaimg.cn/mw690/ade10dedgy1fd9sv9phs5j20qo1bftj8.jpg" width="320" height="480">
+   <img src="http://wx4.sinaimg.cn/mw690/ade10dedgy1fd9sv87c1ij20qo1bfdl3.jpg" width="320" height="480">
 
 ## 一. 安装
 
-   手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
-       只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
-       选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
+      手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
+         只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
+         选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
 
 ## 二. 例子
 ### Demo1
