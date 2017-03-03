@@ -3,7 +3,6 @@
    模仿微博照片选择器,支持多选、选原图和视频的图片选择器，同时有3Dtouch预览功能,长按拖动改变顺序.通过相机拍照录制视频  - 支持ios8.0 以上
 
    <img src="https://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/d15641ec563550d1c528313ba75abf46_2.png" width="320" height="480">
-   <img src="https://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/37b5ca9ae12fb14070823e567837d9ca_0.png" width="320" height="480"> 
    <img src="https://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/122849ae312dc181ecd312c426843c38_1.png" width="320" height="480">
 
 ## 一. 安装
@@ -65,8 +64,8 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 ## 三. 更多 
 
-   具体代码看请下载项目
-   发现的哪里有不好或不对的地方麻烦请联系我,大家一起讨论一起学习进步... 
-   QQ : 294005139
-   QQ群 : 531895229
+      具体代码看请下载项目
+      发现的哪里有不好或不对的地方麻烦请联系我,大家一起讨论一起学习进步... 
+      QQ : 294005139
+      QQ群 : 531895229
 
