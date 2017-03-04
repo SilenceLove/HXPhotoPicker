@@ -2,7 +2,7 @@
 
 仿微博照片选择器,支持GIF图片、多选、选原图和视频的图片选择器，同时有3Dtouch预览功能,长按拖动改变顺序.通过相机拍照录制视频  - 支持ios8.0 以上
 
-<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdawsmp58fj20jg0yigrn.jpg" width="270" height="480">                         <img src="http://wx3.sinaimg.cn/mw690/ade10dedgy1fdawq4q6hag209j0gwnpf.gif" width="270" height="480"> 
+<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdawsmp58fj20jg0yigrn.jpg" width="270" height="480"> 
 
 ## · 特性
 
