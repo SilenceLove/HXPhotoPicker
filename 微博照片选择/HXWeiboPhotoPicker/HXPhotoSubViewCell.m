@@ -74,7 +74,11 @@
 - (void)setModel:(HXPhotoModel *)model
 {
     _model = model;
-    self.imageView.image = model.thumbPhoto;
+    if (model.thumbPhoto) {
+        self.imageView.image = model.thumbPhoto;
+    }else {
+        self.imageView.image = model.previewPhoto;
+    }
     self.videoTime.text = model.videoTime;
     self.gifIcon.hidden = YES;
     if (model.type == HXPhotoModelMediaTypeCamera) {
