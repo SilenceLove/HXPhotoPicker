@@ -2,9 +2,9 @@
 
 仿微博照片选择器,支持GIF图片、多选、选原图和视频的图片选择器，同时有3Dtouch预览功能,长按拖动改变顺序.通过相机拍照录制视频  - 支持ios8.0 以上
 
-<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdawsmp58fj20jg0yigrn.jpg" width="270" height="480"> 
+<img src="http://wx2.sinaimg.cn/mw690/ade10dedgy1fdax4y00xsj20qo1bfgvt.jpg" width="270" height="480"> 
 
-## · 特性
+## 一.  特性
 
 - [x] 查看/选择GIF图片
 - [x] 照片、视频可同时多选/原图
@@ -13,13 +13,13 @@
 - [x] 自定义相机拍照/录制视频
 - [x] 自定义转场动画
 
-## 一.  安装
+## 二.  安装
 
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
 
-## 二.  例子
+## 三.  例子
 - Demo1
 ```objc
 // 懒加载 照片管理类
@@ -70,7 +70,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 - (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view
 
 ```
-## 三.  更多 
+## 四.  更多 
 
 - 具体代码看请下载项目
  
