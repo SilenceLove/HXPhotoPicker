@@ -1,7 +1,5 @@
 # HXWeiboPhotoPicker - 仿微博照片选择器
 
-仿微博照片选择器,支持GIF图片、多选、选原图和视频的图片选择器，同时有3Dtouch预览功能,长按拖动改变顺序.通过相机拍照录制视频  - 支持ios8.0 以上
-
 <img src="http://wx2.sinaimg.cn/mw690/ade10dedgy1fdax4y00xsj20qo1bfgvt.jpg" width="270" height="480"> 
 
 ## 一.  特性
@@ -19,7 +17,13 @@
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
 
-## 三.  例子
+## 三.  要求
+
+- iOS8及以上系统可使用. ARC环境.
+- 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置两个info.plist文件。                                              Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description。
+- 使用的是PhotoKit库获取照片资源
+
+## 四.  例子
 - Demo1
 ```objc
 // 懒加载 照片管理类
@@ -70,12 +74,16 @@ photoView.backgroundColor = [UIColor whiteColor];
 - (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view
 
 ```
-## 四.  更多 
+## 五.  更多 
 
-- 具体代码看请下载项目
+- 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
+
+- 如果您有什么好的建议也可以给我提一个issue
+
+- 具体代码看请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
  
 - 发现的哪里有不好或不对的地方麻烦请联系我,大家一起讨论一起学习进步... 
  
 - QQ : 294005139<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
   
-- [有兴趣可以加下刚刚创建的群](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26)
+- [有兴趣可以加下刚刚创建的QQ群:531895229](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) 
