@@ -21,7 +21,6 @@
 
 - iOS8及以上系统可使用. ARC环境.
 - 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置两个info.plist文件。                                              Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description。
-- 使用的是PhotoKit库获取照片资源
 
 ## 四.  例子
 - Demo1
@@ -78,11 +77,9 @@ photoView.backgroundColor = [UIColor whiteColor];
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 
-- 如果您有什么好的建议也可以给我提一个issue
+- 如果您有什么好的建议也可以提issue,大家一起讨论一起学习进步...
 
 - 具体代码看请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
- 
-- 发现的哪里有不好或不对的地方麻烦请联系我,大家一起讨论一起学习进步... 
  
 - QQ : 294005139<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
   
