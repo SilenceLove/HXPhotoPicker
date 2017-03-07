@@ -10,14 +10,14 @@
 #import <Photos/Photos.h>
 
 typedef enum : NSUInteger {
-    HXPhotoModelMediaTypePhoto = 0,
-    HXPhotoModelMediaTypeLivePhoto,
-    HXPhotoModelMediaTypePhotoGif,
-    HXPhotoModelMediaTypeVideo,
-    HXPhotoModelMediaTypeAudio,
-    HXPhotoModelMediaTypeCameraPhoto,
-    HXPhotoModelMediaTypeCameraVideo,
-    HXPhotoModelMediaTypeCamera
+    HXPhotoModelMediaTypePhoto = 0, // 照片
+    HXPhotoModelMediaTypeLivePhoto, // 预留的为以后支持LivePhoto做准备
+    HXPhotoModelMediaTypePhotoGif,  // gif图
+    HXPhotoModelMediaTypeVideo,     // 视频
+    HXPhotoModelMediaTypeAudio,     // 预留
+    HXPhotoModelMediaTypeCameraPhoto,   // 通过相机拍的照片
+    HXPhotoModelMediaTypeCameraVideo,   // 通过相机录制的视频
+    HXPhotoModelMediaTypeCamera         // 跳转相机
 } HXPhotoModelMediaType;
 
 @interface HXPhotoModel : NSObject
@@ -107,6 +107,9 @@ typedef enum : NSUInteger {
  当前图片所在相册的下标
  */
 @property (assign, nonatomic) NSInteger currentAlbumIndex;
+
+
+/*** 以下属性是使用HXPhotoView时自定义转场动画时所需要的属性 ***/
 
 /**
  选完点下一步之后在collectionView上的图片数组下标

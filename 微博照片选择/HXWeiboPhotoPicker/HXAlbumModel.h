@@ -8,6 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
+
+/**
+ *  每个相册的模型
+ */
+
 @interface HXAlbumModel : NSObject
 
 /**

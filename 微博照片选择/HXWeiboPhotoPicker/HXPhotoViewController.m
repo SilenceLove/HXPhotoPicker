@@ -14,7 +14,7 @@
 #import "HXVideoPreviewViewController.h"
 #import "HXCameraViewController.h"
 #import "UIView+HXExtension.h"
-@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate>
+@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate>
 {
     CGRect _originalFrame;
 }
@@ -42,7 +42,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setup];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didSelectedPhoto:) name:@"HXPhotoPickerSelectedPhotoNotification" object:nil];
     
     [self getObjs];
     // 获取当前应用对照片的访问授权状态
@@ -314,6 +313,7 @@
 {
     HXPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cellId" forIndexPath:indexPath];
     HXPhotoModel *model = self.objs[indexPath.item];
+    cell.delegate = self;
     cell.model = model;
     
     if (model.type != HXPhotoModelMediaTypeCamera) {
@@ -626,14 +626,12 @@
 
 
 /**
- cell选中通知
+ cell选中代理
  
- @param noti cell
+ @param
  */
-- (void)didSelectedPhoto:(NSNotification *)noti
+- (void)cellDidSelectedBtnClick:(HXPhotoViewCell *)cell Model:(HXPhotoModel *)model
 {
-    HXPhotoViewCell *cell = noti.userInfo[@"cell"];
-    HXPhotoModel *model = noti.userInfo[@"model"];
     if (!cell.selectBtn.selected) { // 弹簧果冻动画效果
         if (self.manager.selectedList.count == self.manager.maxNum) {
             [self.view showImageHUDText:[NSString stringWithFormat:@"最多只能选择%ld个",self.manager.maxNum]];
@@ -1033,11 +1031,6 @@
 - (void)didAlbumsBgViewClick
 {
     [self pushAlbumList:self.titleBtn];
-}
-
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

@@ -9,6 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
 
+/**
+ *  使用说明: 如果只使用选择图片的功能,就只用跳转此控制器. 照片管理类必须在跳转前赋值
+ *  选择的照片/视频通过代理返回
+ */
+
+
 @protocol HXPhotoViewControllerDelegate <NSObject>
 
 /**
@@ -29,7 +35,7 @@
 @end
 
 @interface HXPhotoViewController : UIViewController
-@property (strong, nonatomic) HXPhotoManager *manager;
+@property (strong, nonatomic) HXPhotoManager *manager; // 照片管理类必须在跳转前赋值
 @property (weak, nonatomic) id<HXPhotoViewControllerDelegate> delegate;
 @property (weak, nonatomic, readonly) UICollectionView *collectionView;
 @property (strong, nonatomic, readonly) NSIndexPath *currentIndexPath;

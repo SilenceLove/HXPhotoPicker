@@ -8,6 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
+
+/*
+ *  工具类
+ */
+
 @interface HXPhotoTools : NSObject
 /**
  获取视频的时长
@@ -37,16 +42,24 @@
  */
 + (void)FetchPhotosBytes:(NSArray *)photos completion:(void (^)(NSString *totalBytes))completion;
 
+/**
+ 获取指定字符串的宽度
+
+ @param text 需要计算的字符串
+ @param height 高度大小
+ @param fontSize 字体大小
+ @return 宽度大小
+ */
 + (CGFloat)getTextWidth:(NSString *)text withHeight:(CGFloat)height fontSize:(CGFloat)fontSize;
 
 /**
  根据PHAsset对象获取照片信息 带返回错误的block
  
- @param asset <#asset description#>
- @param size <#size description#>
- @param resizeMode <#resizeMode description#>
- @param completion <#completion description#>
- @param error <#error description#>
+ @param asset 照片的PHAsset对象
+ @param size 指定请求的大小
+ @param resizeMode 请求模式
+ @param completion 完成后的block
+ @param error 失败后的block
  */
 + (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
 

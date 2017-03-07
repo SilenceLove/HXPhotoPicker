@@ -12,11 +12,14 @@
 #import "HXPhotoModel.h"
 #import "HXPhotoTools.h"
 
+/**
+ *  照片选择的管理类, 使用照片选择时必须先懒加载此类,然后赋值给对应的对象
+ */
 
 typedef enum : NSUInteger {
-    HXPhotoManagerSelectedTypePhoto = 0,
-    HXPhotoManagerSelectedTypeVideo,
-    HXPhotoManagerSelectedTypePhotoAndVideo
+    HXPhotoManagerSelectedTypePhoto = 0, // 只选择图片
+    HXPhotoManagerSelectedTypeVideo, // 只选择视频
+    HXPhotoManagerSelectedTypePhotoAndVideo // 图片和视频一起
 } HXPhotoManagerSelectedType;
 
 @interface HXPhotoManager : NSObject

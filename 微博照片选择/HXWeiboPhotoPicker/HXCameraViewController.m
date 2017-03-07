@@ -12,6 +12,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "HXPhotoTools.h"
 #import "UIView+HXExtension.h"
+#import "UIImage+HXExtension.h"
 #import "HXVideoPresentTransition.h"
 @interface HXCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate>
 //捕获设备，通常是前置摄像头，后置摄像头，麦克风（音频输入）
@@ -775,6 +776,9 @@
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
     if (self.changePhotoBtn.selected) {
         model.type = HXPhotoModelMediaTypeCameraPhoto;
+        if (self.imageView.image.imageOrientation != UIImageOrientationUp) {
+            self.imageView.image = [self.imageView.image normalizedImage];
+        }
         model.thumbPhoto = self.imageView.image;
         model.imageSize = self.imageView.image.size;
         model.previewPhoto = self.imageView.image;

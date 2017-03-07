@@ -9,9 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "HXPhotoModel.h"
 
+@class HXPhotoViewCell;
 @protocol HXPhotoViewCellDelegate <NSObject>
 
-- (void)didCameraClick;
+//- (void)didCameraClick;
+- (void)cellDidSelectedBtnClick:(HXPhotoViewCell *)cell Model:(HXPhotoModel *)model;
 
 @end
 

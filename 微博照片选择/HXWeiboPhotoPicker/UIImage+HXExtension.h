@@ -11,4 +11,5 @@
 @interface UIImage (HXExtension)
 + (UIImage *)animatedGIFWithData:(NSData *)data;
 - (UIImage *)animatedImageByScalingAndCroppingToSize:(CGSize)size;
+- (UIImage *)normalizedImage;
 @end

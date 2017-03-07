@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
+
 @protocol HXPhotoPreviewViewControllerDelegate <NSObject>
 
 - (void)didSelectedClick:(HXPhotoModel *)model AddOrDelete:(BOOL)state;

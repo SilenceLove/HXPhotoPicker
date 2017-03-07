@@ -96,9 +96,12 @@
 
 - (void)didSelectClick:(UIButton *)button
 {
-    NSDictionary *dic = @{@"model":self.model,
-                          @"cell" : self};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoPickerSelectedPhotoNotification" object:nil userInfo:dic];
+    if ([self.delegate respondsToSelector:@selector(cellDidSelectedBtnClick:Model:)]) {
+        [self.delegate cellDidSelectedBtnClick:self Model:self.model];
+    }
+//    NSDictionary *dic = @{@"model":self.model,
+//                          @"cell" : self};
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoPickerSelectedPhotoNotification" object:nil userInfo:dic];
 }
 
 - (void)setModel:(HXPhotoModel *)model
