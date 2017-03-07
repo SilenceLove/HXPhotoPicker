@@ -38,6 +38,7 @@
 }
 
 - (IBAction)goAlbum:(id)sender {
+    self.camera.on = NO;
     self.manager.photoMaxNum = self.photoText.text.integerValue;
     self.manager.videoMaxNum = self.videoText.text.integerValue;
     self.manager.rowCount = self.columnText.text.integerValue;
