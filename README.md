@@ -2,6 +2,9 @@
 
 <img src="http://wx2.sinaimg.cn/mw690/ade10dedgy1fdax4y00xsj20qo1bfgvt.jpg" width="270" height="480"> 
 
+## 更新历史
+- 2017-03-07 解决通过相机拍照时照片旋转90°的问题
+
 ## 一.  特性
 
 - [x] 查看/选择GIF图片
