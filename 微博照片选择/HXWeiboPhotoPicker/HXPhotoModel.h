@@ -30,7 +30,7 @@ typedef enum : NSUInteger {
 /**
  视频AVAsset对象
  */
-//@property (strong, nonatomic) AVAsset *avAsset;
+@property (strong, nonatomic) AVAsset *avAsset;
 @property (strong, nonatomic) AVPlayerItem *playerItem;
 
 /**
@@ -83,12 +83,10 @@ typedef enum : NSUInteger {
  */
 @property (assign, nonatomic) NSInteger albumListIndex;
 
-
 /**
  图片宽高
  */
 @property (assign, nonatomic) CGSize imageSize;
-
 
 /**
  缩小之后的图片宽高

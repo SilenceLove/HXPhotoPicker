@@ -204,7 +204,7 @@
         }else if (asset.mediaType == PHAssetMediaTypeVideo) {
             photoModel.type = HXPhotoModelMediaTypeVideo;
             [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-                photoModel.videoURL = asset;
+                photoModel.avAsset = asset;
             }];
             //            [[PHImageManager defaultManager] requestPlayerItemForVideo:asset options:nil resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
             //                photoModel.playerItem = playerItem;
