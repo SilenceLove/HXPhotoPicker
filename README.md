@@ -2,10 +2,11 @@
 
 <img src="http://wx2.sinaimg.cn/mw690/ade10dedgy1fdax4y00xsj20qo1bfgvt.jpg" width="270" height="480"> 
 
-## 更新历史
+## 一.  更新历史
 - 2017-03-07 解决通过相机拍照时照片旋转90°的问题
 - 2017-03-08 解决拍照之后,在浏览大图时选中图片,列表界面Cell没有选中的问题
-## 一.  特性
+
+## 二.  特性
 
 - [x] 查看/选择GIF图片
 - [x] 照片、视频可同时多选/原图
@@ -14,18 +15,18 @@
 - [x] 自定义相机拍照/录制视频
 - [x] 自定义转场动画
 
-## 二.  安装
+## 三.  安装
 
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
 
-## 三.  要求
+## 四.  要求
 
 - iOS8及以上系统可使用. ARC环境.
 - 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置两个info.plist文件。                                              Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description。
 
-## 四.  例子
+## 五.  例子
 - Demo1
 ```objc
 // 懒加载 照片管理类
@@ -76,7 +77,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 - (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view
 
 ```
-## 五.  更多 
+## 六.  更多 
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 
