@@ -171,7 +171,7 @@
             return;
         }
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-            if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
                 if (self.manager.videoMaxNum > 0) {
                     if (!self.manager.selectTogether) { // 是否支持图片视频同时选择
                         if (self.manager.selectedVideos.count > 0 ) {
@@ -200,7 +200,7 @@
                 return;
             }
         }
-        if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+        if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             [self.manager.selectedPhotos addObject:model];
         }else if (model.type == HXPhotoModelMediaTypeVideo) {
             [self.manager.selectedVideos addObject:model];
@@ -222,7 +222,7 @@
         int i = 0;
         for (HXPhotoModel *subModel in self.manager.selectedList) {
             if ([subModel.asset.localIdentifier isEqualToString:model.asset.localIdentifier]) {
-                if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+                if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
                     [self.manager.selectedPhotos removeObject:subModel];
                 }else if (model.type == HXPhotoModelMediaTypeVideo) {
                     [self.manager.selectedVideos removeObject:subModel];
@@ -298,7 +298,7 @@
         max = YES;
     }
     if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             if (self.manager.videoMaxNum > 0) {
                 if (!self.manager.selectTogether) { // 是否支持图片视频同时选择
                     if (self.manager.selectedVideos.count > 0 ) {

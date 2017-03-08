@@ -346,11 +346,26 @@
     }
     CGRect rect = CGRectMake(0, 0, previewingContext.sourceView.frame.size.width, previewingContext.sourceView.frame.size.height);
     previewingContext.sourceRect = rect;
-    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         HXPhotoPreviewViewController *showVC = [[HXPhotoPreviewViewController alloc] init];
         showVC.preferredContentSize = model.endImageSize;
         showVC.modelList = self.photos;
-        showVC.index = model.photoIndex;
+        NSInteger index = 0;
+        if (model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            if (self.albumModel.index == 0) {
+                if (self.manager.cameraPhotos.count > 0) {
+                    index = model.photoIndex + self.manager.cameraPhotos.count;
+                }else {
+                    index = model.photoIndex;
+                }
+            }else {
+                index = model.photoIndex;
+            }
+        }else {
+            index = model.photoIndex;
+        }
+        
+        showVC.index = index;
         showVC.delegate = self;
         showVC.manager = self.manager;
         showVC.collectionView.hidden = YES;
@@ -389,7 +404,7 @@
         [vc.playVideo play];
         vc.playBtn.selected = YES;
         [vc selectClick];
-    }else if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+    }else if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)viewControllerToCommit;
         [vc selectClick];
     }
@@ -400,7 +415,7 @@
 {
     self.currentIndexPath = indexPath;
     HXPhotoModel *model = self.objs[indexPath.item];
-    if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+    if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
         vc.modelList = self.photos;
         NSInteger index = 0;
@@ -480,7 +495,7 @@
             if (!self.manager.selectTogether) {
                 if (self.manager.selectedList.count > 0) {
                     HXPhotoModel *phMd = self.manager.selectedList.firstObject;
-                    if (phMd.type == HXPhotoModelMediaTypePhoto || (phMd.type == HXPhotoModelMediaTypePhotoGif || phMd.type == HXPhotoModelMediaTypeCameraPhoto)) {
+                    if ((phMd.type == HXPhotoModelMediaTypePhoto || phMd.type == HXPhotoModelMediaTypeLivePhoto) || (phMd.type == HXPhotoModelMediaTypePhotoGif || phMd.type == HXPhotoModelMediaTypeCameraPhoto)) {
                         [self.manager.selectedCameraPhotos insertObject:model atIndex:0];
                         [self.manager.selectedPhotos addObject:model];
                         [self.manager.selectedList addObject:model];
@@ -619,7 +634,22 @@
     }else { // 取消选中
         self.albumModel.selectedCount--;
     }
-    [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:model.albumListIndex inSection:0]]];
+    NSInteger index = 0;
+    if (self.albumModel.index == 0) {
+        if (self.manager.cameraList.count > 0) {
+            if (model.type != HXPhotoModelMediaTypeCameraPhoto && model.type != HXPhotoModelMediaTypeCameraVideo) {
+                index = model.albumListIndex + self.manager.cameraList.count;
+            }else {
+                index = model.albumListIndex;
+            }
+        }else {
+            index = model.albumListIndex;
+        }
+    }else {
+        index = model.albumListIndex;
+    }
+
+    [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
     // 改变 预览、原图 按钮的状态
     [self changeButtonClick:model];
 }
@@ -627,8 +657,6 @@
 
 /**
  cell选中代理
- 
- @param
  */
 - (void)cellDidSelectedBtnClick:(HXPhotoViewCell *)cell Model:(HXPhotoModel *)model
 {
@@ -639,7 +667,7 @@
             return;
         }
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-            if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
                 if (self.manager.videoMaxNum > 0) {
                     if (!self.manager.selectTogether) { // 是否支持图片视频同时选择
                         if (self.manager.selectedVideos.count > 0 ) {
@@ -702,7 +730,7 @@
     BOOL selected = cell.selectBtn.selected;
     
     if (selected) { // 选中之后需要做的
-        if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) { // 为图片时
+        if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) { // 为图片时
             [self.manager.selectedPhotos addObject:model];
         }else if (model.type == HXPhotoModelMediaTypeVideo) { // 为视频时
             [self.manager.selectedVideos addObject:model];
@@ -722,7 +750,7 @@
     }else { // 取消选中之后的
         int i = 0;
         for (HXPhotoModel *subModel in self.manager.selectedList) {
-            if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeVideo) {
+            if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeLivePhoto)) {
                 if ([subModel.asset.localIdentifier isEqualToString:model.asset.localIdentifier]) {
                     if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
                         [self.manager.selectedPhotos removeObject:subModel];
@@ -770,7 +798,7 @@
                 BOOL isVideo = NO, isPhoto = NO;
                 for (HXPhotoModel *model in self.manager.selectedList) {
                     // 循环判断选中的数组中有没有视频或者图片
-                    if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+                    if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
                         isPhoto = YES;
                     }else if (model.type == HXPhotoModelMediaTypeVideo) {
                         isVideo = YES;

@@ -107,7 +107,7 @@
     HXPhotoModel *model = self.dataList[indexPath.item];
     if (model.type == HXPhotoModelMediaTypeCamera) {
         [self goPhotoViewController];
-    }else if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+    }else if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
         vc.selectedComplete = YES;
         vc.modelList = self.photos;
@@ -150,7 +150,7 @@
     HXPhotoModel *model = self.dataList[indexPath.item];
     [self.manager deleteSpecifiedModel:model];
     
-    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         [self.photos removeObject:model];
     }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
         [self.videos removeObject:model];
@@ -190,7 +190,7 @@
 {
     int i = 0, j = 0, k = 0;
     for (HXPhotoModel *model in self.manager.endSelectedList) {
-        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             model.endIndex = i++;
         }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
             model.endIndex = j++;

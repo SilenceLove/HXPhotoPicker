@@ -88,7 +88,7 @@
         self.deleteBtn.hidden = NO;
     }
     
-    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             self.gifIcon.hidden = NO;
         }

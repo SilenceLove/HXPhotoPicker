@@ -113,7 +113,7 @@
     [navBar pushNavigationItem:navItem animated:NO];
     self.beginGestureScale = 1.0f;
     self.effectiveScale = 1.0f;
-    navItem.title = @"随手拍";
+    navItem.title = @"拍摄";
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [leftBtn setImage:[UIImage imageNamed:@"camera_close@2x.png"] forState:UIControlStateNormal];
     [leftBtn setImage:[UIImage imageNamed:@"camera_close_highlighted@2x.png"] forState:UIControlStateHighlighted];

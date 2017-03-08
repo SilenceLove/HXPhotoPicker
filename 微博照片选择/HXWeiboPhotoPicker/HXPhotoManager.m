@@ -198,6 +198,9 @@
             }else {
                 photoModel.type = HXPhotoModelMediaTypePhoto;
             }
+            if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+                NSLog(@"%lu",(unsigned long)asset.mediaSubtypes);
+            }
             photoModel.photoIndex = photoIndex;
             [photoAy addObject:photoModel];
             photoIndex++;
