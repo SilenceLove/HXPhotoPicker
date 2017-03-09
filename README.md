@@ -27,6 +27,7 @@
 
 - iOS8及以上系统可使用. ARC环境.
 - 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置两个info.plist文件。                                              Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description。
+- 相机拍照功能请使用真机调试
 
 ## 五.  例子
 - Demo1
