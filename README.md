@@ -86,7 +86,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 
 - 如果您有什么好的建议也可以提issue,大家一起讨论一起学习进步...
 
-- 具体代码看请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
+- 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
  
 - QQ : 294005139<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
   
