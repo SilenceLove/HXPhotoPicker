@@ -261,7 +261,7 @@
     [self.videos removeAllObjects];
     int i = 0, j = 0, k = 0;
     for (HXPhotoModel *model in self.manager.endSelectedList) {
-        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             model.endIndex = i++;
             [self.photos addObject:model];
         }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {

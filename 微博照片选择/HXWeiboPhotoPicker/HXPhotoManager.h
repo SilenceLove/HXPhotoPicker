@@ -50,6 +50,17 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) NSString *photosTotalBtyes;
 @property (copy, nonatomic) NSString *endPhotosTotalBtyes;
 
+
+/**
+ 是否开启查看GIF图片功能 - 默认开启
+ */
+@property (assign, nonatomic) BOOL lookGifPhoto;
+
+/**
+ 是否开启查看LivePhoto功能呢 - 默认开启
+ */
+@property (assign, nonatomic) BOOL lookLivePhoto;
+
 /**
  当选择类型为 HXPhotoManagerSelectedTypePhotoAndVideo 时 此属性为YES时 选择的视频会跟图片分开排  反之  视频和图片混合在一起排
  */

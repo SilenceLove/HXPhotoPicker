@@ -30,6 +30,11 @@
 + (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion;
 
 /**
+ 根据PHAsset对象获取LivePhoto
+ */
++ (void)FetchLivePhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size Completion:(void(^)(PHLivePhoto *livePhoto, NSDictionary *info))completion;
+
+/**
  获取图片NSData
 
  @param asset 图片对象

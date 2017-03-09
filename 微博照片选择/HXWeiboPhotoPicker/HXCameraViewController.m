@@ -71,6 +71,8 @@
 @property (assign, nonatomic) NSInteger videoTime;
 @property (weak, nonatomic) UIView *maskViewO;
 @property (weak, nonatomic) UIView *maskViewT;
+
+@property (strong, nonatomic) UIImageView *focusIcon;
 @end
 
 @implementation HXCameraViewController
@@ -304,6 +306,12 @@
     maskViewT.frame = CGRectMake(0, self.backView.frame.size.height / 2, self.backView.frame.size.width, self.backView.frame.size.height / 2);
     [self.backView addSubview:maskViewT];
     self.maskViewT = maskViewT;
+    
+    self.focusIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"camera_ Focusing@2x.png"]];
+    self.focusIcon.frame = CGRectMake(0, 0, self.focusIcon.image.size.width, self.focusIcon.image.size.height);
+    self.focusIcon.hidden = YES;
+    [self.backView addSubview:self.focusIcon];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         if (self.session) {
             [self.session startRunning];
@@ -615,17 +623,18 @@
         
         [self.device unlockForConfiguration];
         //设置对焦动画
-//        _focusView.center = point;
-//        _focusView.hidden = NO;
-//        [UIView animateWithDuration:0.3 animations:^{
-//            _focusView.transform = CGAffineTransformMakeScale(1.25, 1.25);
-//        }completion:^(BOOL finished) {
-//            [UIView animateWithDuration:0.5 animations:^{
-//                _focusView.transform = CGAffineTransformIdentity;
-//            } completion:^(BOOL finished) {
-//                _focusView.hidden = YES;
-//            }];
-//        }];
+        self.focusIcon.center = point;
+        self.focusIcon.hidden = NO;
+        [UIView animateWithDuration:0.2 animations:^{
+            self.focusIcon.transform = CGAffineTransformMakeScale(1.25, 1.25);
+        }completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.2 animations:^{
+                self.focusIcon.transform = CGAffineTransformIdentity;
+            } completion:^(BOOL finished) {
+                self.focusIcon.hidden = YES;
+            }];
+        }];
+        
     }
 }
 

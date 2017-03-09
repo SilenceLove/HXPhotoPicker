@@ -14,11 +14,13 @@
 #import "HXVideoPreviewViewController.h"
 #import "HXCameraViewController.h"
 #import "UIView+HXExtension.h"
+
+static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate>
 {
     CGRect _originalFrame;
 }
-@property (weak, nonatomic) UICollectionView *collectionView;
+
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (copy, nonatomic) NSArray *albums;
 @property (weak, nonatomic) HXAlbumListView *albumView;
@@ -230,16 +232,15 @@
     flowLayout.minimumInteritemSpacing = spacing;
     flowLayout.minimumLineSpacing = spacing;
     
-    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, width, heght) collectionViewLayout:flowLayout];
-    collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, 50 + spacing, 0);
-    collectionView.scrollIndicatorInsets = collectionView.contentInset;
-    collectionView.dataSource = self;
-    collectionView.delegate = self;
-    collectionView.alwaysBounceVertical = YES;
-    collectionView.backgroundColor = [UIColor whiteColor];
-    [collectionView registerClass:[HXPhotoViewCell class] forCellWithReuseIdentifier:@"cellId"];
-    [self.view addSubview:collectionView];
-    self.collectionView = collectionView;
+    self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, width, heght) collectionViewLayout:flowLayout];
+    self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, 50 + spacing, 0);
+    self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
+    self.collectionView.dataSource = self;
+    self.collectionView.delegate = self;
+    self.collectionView.alwaysBounceVertical = YES;
+    self.collectionView.backgroundColor = [UIColor whiteColor];
+    [self.collectionView registerClass:[HXPhotoViewCell class] forCellWithReuseIdentifier:PhotoViewCellId];
+    [self.view addSubview:self.collectionView];
     
     HXPhotoBottomView *bottomView = [[HXPhotoBottomView alloc] initWithFrame:CGRectMake(0, heght - 50, width, 50)];
     bottomView.delegate = self;
@@ -253,8 +254,8 @@
     bottomView.originalBtn.selected = self.manager.isOriginal;
     if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
         bottomView.hidden = YES;
-        collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0,  spacing, 0);
-        collectionView.scrollIndicatorInsets = collectionView.contentInset;
+        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0,  spacing, 0);
+        self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
     }
     [self.view addSubview:bottomView];
     self.bottomView = bottomView;
@@ -299,11 +300,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
-{
-    return 1;
-}
-
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     return self.objs.count;
@@ -311,16 +307,18 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    HXPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cellId" forIndexPath:indexPath];
+    HXPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:PhotoViewCellId forIndexPath:indexPath];
     HXPhotoModel *model = self.objs[indexPath.item];
     cell.delegate = self;
     cell.model = model;
-    
-    if (model.type != HXPhotoModelMediaTypeCamera) {
-        if ([self respondsToSelector:@selector(traitCollection)]) {
-            if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
-                if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-                    [self registerForPreviewingWithDelegate:self sourceView:cell];
+    if (!cell.firstRegisterPreview) {
+        if (model.type != HXPhotoModelMediaTypeCamera) {
+            if ([self respondsToSelector:@selector(traitCollection)]) {
+                if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
+                    if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+                        [self registerForPreviewingWithDelegate:self sourceView:cell];
+                        cell.firstRegisterPreview = YES;
+                    }
                 }
             }
         }
@@ -730,6 +728,9 @@
     BOOL selected = cell.selectBtn.selected;
     
     if (selected) { // 选中之后需要做的
+        if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+            [cell startLivePhoto];
+        }
         if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) { // 为图片时
             [self.manager.selectedPhotos addObject:model];
         }else if (model.type == HXPhotoModelMediaTypeVideo) { // 为视频时
@@ -748,11 +749,14 @@
         [self.manager.selectedList addObject:model];
         self.albumModel.selectedCount++;
     }else { // 取消选中之后的
+        if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+            [cell stopLivePhoto];
+        }
         int i = 0;
         for (HXPhotoModel *subModel in self.manager.selectedList) {
             if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeLivePhoto)) {
                 if ([subModel.asset.localIdentifier isEqualToString:model.asset.localIdentifier]) {
-                    if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+                    if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
                         [self.manager.selectedPhotos removeObject:subModel];
                     }else if (model.type == HXPhotoModelMediaTypeVideo) {
                         [self.manager.selectedVideos removeObject:subModel];
@@ -781,6 +785,27 @@
     }
     // 改变 预览、原图 按钮的状态
     [self changeButtonClick:model];
+}
+
+/**
+ cell改变livephoto的状态
+
+ @param model 模型
+ */
+- (void)cellChangeLivePhotoState:(HXPhotoModel *)model
+{
+    for (HXPhotoModel *PHModel in self.manager.selectedList) {
+        if ([model.asset.localIdentifier isEqualToString:PHModel.asset.localIdentifier]) {
+            PHModel.isCloseLivePhoto = model.isCloseLivePhoto;
+            break;
+        }
+    }
+    for (HXPhotoModel *PHModel in self.manager.selectedPhotos) {
+        if ([model.asset.localIdentifier isEqualToString:PHModel.asset.localIdentifier]) {
+            PHModel.isCloseLivePhoto = model.isCloseLivePhoto;
+            break;
+        }
+    }
 }
 
 

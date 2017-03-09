@@ -15,6 +15,7 @@
 @property (weak, nonatomic) UIImageView *videoIcon;
 @property (weak, nonatomic) UILabel *videoTime;
 @property (weak, nonatomic) UIImageView *gifIcon;
+@property (weak, nonatomic) UIImageView *liveIcon;
 @end
 
 @implementation HXPhotoSubViewCell
@@ -41,6 +42,11 @@
     [deleteBtn addTarget:self action:@selector(didDeleteClick) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:deleteBtn];
     self.deleteBtn = deleteBtn;
+    
+    UIImageView *liveIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
+    liveIcon.frame = CGRectMake(5, 5, liveIcon.image.size.width, liveIcon.image.size.height);
+    [self.contentView addSubview:liveIcon];
+    self.liveIcon = liveIcon;
     
     UIView *bottomView = [[UIView alloc] init];
     bottomView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
@@ -81,6 +87,7 @@
     }
     self.videoTime.text = model.videoTime;
     self.gifIcon.hidden = YES;
+    self.liveIcon.hidden = YES;
     if (model.type == HXPhotoModelMediaTypeCamera) {
         self.deleteBtn.hidden = YES;
         self.bottomView.hidden = YES;
@@ -91,6 +98,8 @@
     if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             self.gifIcon.hidden = NO;
+        }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+            self.liveIcon.hidden = NO;
         }
         self.bottomView.hidden = YES;
     }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {

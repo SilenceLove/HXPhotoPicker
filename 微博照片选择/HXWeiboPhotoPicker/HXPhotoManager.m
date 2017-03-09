@@ -37,6 +37,8 @@
 
 - (void)setup
 {
+    self.lookLivePhoto = YES;
+    self.lookGifPhoto = YES;
     self.selectTogether = YES;
     self.maxNum = 10;
     self.photoMaxNum = 9;
@@ -190,16 +192,18 @@
                 if ([model.asset.localIdentifier isEqualToString:photoModel.asset.localIdentifier]) {
                     photoModel.selected = YES;
                 }
+                photoModel.isCloseLivePhoto = model.isCloseLivePhoto;
             }
         }
         if (asset.mediaType == PHAssetMediaTypeImage) {
             if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
-                photoModel.type = HXPhotoModelMediaTypePhotoGif;
+                photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
             }else {
-                photoModel.type = HXPhotoModelMediaTypePhoto;
-            }
-            if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
-                NSLog(@"%lu",(unsigned long)asset.mediaSubtypes);
+                if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+                    photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                }else {
+                    photoModel.type = HXPhotoModelMediaTypePhoto;
+                }
             }
             photoModel.photoIndex = photoIndex;
             [photoAy addObject:photoModel];
@@ -277,7 +281,7 @@
         [self.endSelectedCameraList removeObject:model];
         [self.endSelectedVideos removeObject:model];
         
-    }else if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+    }else if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         
         [self.endSelectedPhotos removeObject:model];
         
@@ -308,7 +312,7 @@
             [self.endSelectedCameraList addObject:model];
             [self.endSelectedVideos addObject:model];
             
-        }else if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
+        }else if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             
             [self.endSelectedPhotos addObject:model];
             

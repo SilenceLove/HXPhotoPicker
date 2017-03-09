@@ -73,6 +73,12 @@
     UISwitch *sw = (UISwitch *)sender;
     self.manager.selectTogether = sw.on;
 }
+- (IBAction)isLookGIFPhoto:(UISwitch *)sender {
+    self.manager.lookGifPhoto = sender.on;
+}
+- (IBAction)isLookLivePhoto:(UISwitch *)sender {
+    self.manager.lookLivePhoto = sender.on;
+}
 
 /*
 #pragma mark - Navigation

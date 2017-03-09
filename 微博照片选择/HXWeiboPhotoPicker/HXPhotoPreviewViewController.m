@@ -17,6 +17,7 @@
 @property (strong, nonatomic) UILabel *titleLb;
 @property (strong, nonatomic) UIButton *selectedBtn;
 @property (strong, nonatomic) UIButton *rightBtn;
+@property (strong, nonatomic) HXPhotoPreviewViewCell *livePhotoCell;
 @end
 
 @implementation HXPhotoPreviewViewController
@@ -100,6 +101,9 @@
 
 - (void)dismissClick
 {
+    if (self.livePhotoCell) {
+        [self.livePhotoCell stopLivePhoto];
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -124,6 +128,22 @@
     HXPhotoModel *model = self.modelList[currentIndex];
     self.selectedBtn.selected = model.selected;
     self.index = currentIndex;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    HXPhotoModel *model = self.modelList[self.index];
+    if (model.isCloseLivePhoto) {
+        return;
+    }
+    if (self.livePhotoCell) {
+        [self.livePhotoCell stopLivePhoto];
+    }
+    if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+        HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+        [cell startLivePhoto];
+        self.livePhotoCell = cell;
+    }
 }
 
 - (UILabel *)titleLb
@@ -325,6 +345,20 @@
     }
     if ([self.delegate respondsToSelector:@selector(previewDidNextClick)]) {
         [self.delegate previewDidNextClick];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    HXPhotoModel *model = self.modelList[self.index];
+    if (model.isCloseLivePhoto) {
+        return;
+    }
+    if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+        HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+        [cell startLivePhoto];
+        self.livePhotoCell = cell;
     }
 }
 

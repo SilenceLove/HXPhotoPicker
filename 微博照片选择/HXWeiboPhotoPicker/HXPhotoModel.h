@@ -94,6 +94,16 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) CGSize endImageSize;
 
 /**
+ livePhoto
+ */
+@property (strong, nonatomic) PHLivePhoto *livePhoto;
+
+/**
+ 判断当前照片 是否关闭了livePhoto功能
+ */
+@property (assign, nonatomic) BOOL isCloseLivePhoto;
+
+/**
  拍照之后的唯一标示
  */
 @property (copy, nonatomic) NSString *cameraIdentifier;

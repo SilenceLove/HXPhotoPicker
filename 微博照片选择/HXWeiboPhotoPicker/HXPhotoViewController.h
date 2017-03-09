@@ -37,7 +37,7 @@
 @interface HXPhotoViewController : UIViewController
 @property (strong, nonatomic) HXPhotoManager *manager; // 照片管理类必须在跳转前赋值
 @property (weak, nonatomic) id<HXPhotoViewControllerDelegate> delegate;
-@property (weak, nonatomic, readonly) UICollectionView *collectionView;
+@property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic, readonly) NSIndexPath *currentIndexPath;
 @property (assign, nonatomic) BOOL isPreview;
 @property (strong, nonatomic, readonly) HXAlbumModel *albumModel;

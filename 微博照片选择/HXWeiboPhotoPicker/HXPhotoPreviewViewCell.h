@@ -8,7 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "HXPhotoModel.h"
+#import <PhotosUI/PhotosUI.h>
 @interface HXPhotoPreviewViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (weak, nonatomic, readonly) UIImageView *imageView;
+@property (strong, nonatomic, readonly) PHLivePhotoView *livePhotoView;
+@property (assign, nonatomic) BOOL isAnimating;
+- (void)startLivePhoto;
+- (void)stopLivePhoto;
 @end

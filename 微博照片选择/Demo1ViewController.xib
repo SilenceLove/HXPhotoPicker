@@ -34,7 +34,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GVr-SR-yKM">
-                    <rect key="frame" x="137" y="371" width="46" height="30"/>
+                    <rect key="frame" x="137" y="400" width="46" height="30"/>
                     <state key="normal" title="去选择"/>
                     <connections>
                         <action selector="goAlbum:" destination="-1" eventType="touchUpInside" id="toX-Qf-Odj"/>
@@ -142,6 +142,30 @@
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits"/>
                 </textField>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uo2-wH-iLW">
+                    <rect key="frame" x="141.33333333333334" y="305" width="51" height="31"/>
+                    <connections>
+                        <action selector="isLookGIFPhoto:" destination="-1" eventType="valueChanged" id="YgF-Cf-gD6"/>
+                    </connections>
+                </switch>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="是否查看GIF图" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UdD-l1-uRs">
+                    <rect key="frame" x="16" y="310" width="112.66666666666666" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G22-e3-GWm">
+                    <rect key="frame" x="174" y="341" width="51" height="31"/>
+                    <connections>
+                        <action selector="isLookLivePhoto:" destination="-1" eventType="valueChanged" id="W0q-x0-SUC"/>
+                    </connections>
+                </switch>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="是否查看LivePhoto" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FO2-nE-uvu">
+                    <rect key="frame" x="16" y="346" width="145.33333333333334" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
@@ -156,10 +180,13 @@
                 <constraint firstItem="PU4-xi-L3Y" firstAttribute="leading" secondItem="tCx-T3-1aZ" secondAttribute="leading" id="HuM-x3-Jj7"/>
                 <constraint firstItem="GVr-SR-yKM" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="IFx-IU-Ifz"/>
                 <constraint firstItem="9jQ-H1-sTM" firstAttribute="centerY" secondItem="7Mt-a3-Hfi" secondAttribute="centerY" id="MTG-z2-z2R"/>
-                <constraint firstItem="GVr-SR-yKM" firstAttribute="top" secondItem="V0L-lP-zUa" secondAttribute="bottom" constant="71" id="NU9-NF-AUy"/>
+                <constraint firstItem="FO2-nE-uvu" firstAttribute="leading" secondItem="UdD-l1-uRs" secondAttribute="leading" id="NOi-3a-5FE"/>
+                <constraint firstItem="GVr-SR-yKM" firstAttribute="top" secondItem="V0L-lP-zUa" secondAttribute="bottom" constant="100" id="NU9-NF-AUy"/>
                 <constraint firstItem="V0L-lP-zUa" firstAttribute="leading" secondItem="oWk-ig-UBd" secondAttribute="leading" id="Nsx-BY-T1W"/>
                 <constraint firstItem="hke-Ah-e8L" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="16" id="PA6-a4-kJh"/>
                 <constraint firstItem="PU4-xi-L3Y" firstAttribute="top" secondItem="tCx-T3-1aZ" secondAttribute="bottom" constant="20" id="RFZ-js-5u2"/>
+                <constraint firstItem="uo2-wH-iLW" firstAttribute="leading" secondItem="UdD-l1-uRs" secondAttribute="trailing" constant="12.67" id="Rpx-Ua-W7c"/>
+                <constraint firstItem="G22-e3-GWm" firstAttribute="leading" secondItem="FO2-nE-uvu" secondAttribute="trailing" constant="12.67" id="U0e-xt-tu5"/>
                 <constraint firstItem="hke-Ah-e8L" firstAttribute="top" secondItem="z5f-Bj-h52" secondAttribute="bottom" constant="32" id="UOQ-Ot-dBc"/>
                 <constraint firstItem="oWk-ig-UBd" firstAttribute="leading" secondItem="6WJ-MC-BV3" secondAttribute="leading" id="V9F-ui-o93"/>
                 <constraint firstItem="7Mt-a3-Hfi" firstAttribute="top" secondItem="PU4-xi-L3Y" secondAttribute="bottom" constant="20" id="Vjs-GZ-y4O"/>
@@ -168,9 +195,11 @@
                 <constraint firstItem="V0L-lP-zUa" firstAttribute="centerY" secondItem="ge9-kO-A60" secondAttribute="centerY" id="YNI-oz-9aN"/>
                 <constraint firstItem="oWk-ig-UBd" firstAttribute="centerY" secondItem="hke-Ah-e8L" secondAttribute="centerY" id="Z1T-hR-97x"/>
                 <constraint firstItem="z5f-Bj-h52" firstAttribute="top" secondItem="4Ji-aQ-K5g" secondAttribute="bottom" constant="30" id="aGb-gw-J23"/>
+                <constraint firstItem="uo2-wH-iLW" firstAttribute="centerY" secondItem="UdD-l1-uRs" secondAttribute="centerY" id="aWh-nP-oZC"/>
                 <constraint firstItem="4Ji-aQ-K5g" firstAttribute="top" secondItem="GIg-T5-JGa" secondAttribute="bottom" constant="26" id="aho-ZH-9g8"/>
                 <constraint firstItem="z5f-Bj-h52" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="16" id="bMk-fh-rKs"/>
                 <constraint firstItem="3LS-gI-lTu" firstAttribute="centerY" secondItem="GIg-T5-JGa" secondAttribute="centerY" id="cpO-wu-Ngn"/>
+                <constraint firstItem="UdD-l1-uRs" firstAttribute="leading" secondItem="ge9-kO-A60" secondAttribute="leading" id="dLZ-pq-7pG"/>
                 <constraint firstItem="tew-4n-KbA" firstAttribute="leading" secondItem="GIg-T5-JGa" secondAttribute="trailing" constant="30" id="fPR-hR-DMg"/>
                 <constraint firstItem="9jQ-H1-sTM" firstAttribute="leading" secondItem="7Mt-a3-Hfi" secondAttribute="trailing" constant="5" id="gIX-Pi-4Pb"/>
                 <constraint firstItem="tew-4n-KbA" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="80" id="jH9-pf-MOP"/>
@@ -182,7 +211,10 @@
                 <constraint firstItem="tCx-T3-1aZ" firstAttribute="leading" secondItem="3LS-gI-lTu" secondAttribute="leading" id="uSx-Lc-nPq"/>
                 <constraint firstItem="3LS-gI-lTu" firstAttribute="leading" secondItem="tew-4n-KbA" secondAttribute="trailing" constant="20" id="ugf-b9-kNh"/>
                 <constraint firstItem="GIg-T5-JGa" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="80" id="wLD-lB-1mJ"/>
+                <constraint firstItem="G22-e3-GWm" firstAttribute="centerY" secondItem="FO2-nE-uvu" secondAttribute="centerY" id="xoK-hi-HMO"/>
+                <constraint firstItem="FO2-nE-uvu" firstAttribute="top" secondItem="UdD-l1-uRs" secondAttribute="bottom" constant="15" id="xqG-ia-wpU"/>
                 <constraint firstItem="ge9-kO-A60" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="16" id="y1g-O5-wpX"/>
+                <constraint firstItem="UdD-l1-uRs" firstAttribute="top" secondItem="ge9-kO-A60" secondAttribute="bottom" constant="15" id="zLp-ch-2HM"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="-158" y="-208.5"/>

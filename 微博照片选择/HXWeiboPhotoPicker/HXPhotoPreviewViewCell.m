@@ -9,10 +9,11 @@
 #import "HXPhotoPreviewViewCell.h"
 #import "HXPhotoTools.h"
 #import "UIImage+HXExtension.h"
-@interface HXPhotoPreviewViewCell ()<UIScrollViewDelegate>
+@interface HXPhotoPreviewViewCell ()<UIScrollViewDelegate,PHLivePhotoViewDelegate>
 @property (weak, nonatomic) UIScrollView *scrollView;
 @property (weak, nonatomic) UIImageView *imageView;
 @property (assign, nonatomic) CGPoint imageCenter;
+@property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @end
 
 @implementation HXPhotoPreviewViewCell
@@ -59,6 +60,47 @@
     self.imageView = imageView;
 }
 
+- (void)livePhotoView:(PHLivePhotoView *)livePhotoView willBeginPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle
+{
+    self.isAnimating = YES;
+}
+
+- (void)livePhotoView:(PHLivePhotoView *)livePhotoView didEndPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle
+{
+    [self stopLivePhoto];
+}
+
+- (void)startLivePhoto
+{
+    if (self.isAnimating) {
+        return;
+    }
+    self.livePhotoView = [[PHLivePhotoView alloc] init];
+    self.livePhotoView.clipsToBounds = YES;
+    self.livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
+    self.livePhotoView.frame = self.imageView.frame;
+    self.livePhotoView.delegate = self;
+    [self.scrollView addSubview:self.livePhotoView];
+    if (self.model.livePhoto) {
+        self.livePhotoView.livePhoto = self.model.livePhoto;
+        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+    }else {
+        __weak typeof(self) weakSelf = self;
+        [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 2, self.model.endImageSize.height * 2) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+            weakSelf.model.livePhoto = livePhoto;
+            weakSelf.livePhotoView.livePhoto = livePhoto;
+            [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        }];
+    }
+}
+
+- (void)stopLivePhoto
+{
+    self.isAnimating = NO;
+    [self.livePhotoView stopPlayback];
+    [self.livePhotoView removeFromSuperview];
+}
+
 - (void)setModel:(HXPhotoModel *)model
 {
     _model = model;
@@ -82,7 +124,6 @@
     }
     _imageView.frame = CGRectMake(0, 0, w, h);
     _imageView.center = CGPointMake(width / 2, height / 2);
-    
     if (model.type == HXPhotoModelMediaTypePhotoGif) {
         if (model.gifImage) {
             self.imageView.image = model.gifImage;
@@ -131,6 +172,9 @@
 
 #pragma mark - 返回需要缩放的控件
 - (nullable UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+    if (self.isAnimating) {
+        [self stopLivePhoto];
+    }
     return self.imageView;
 }
 

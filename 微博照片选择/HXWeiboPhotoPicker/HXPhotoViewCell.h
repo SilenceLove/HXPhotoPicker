@@ -14,13 +14,17 @@
 
 //- (void)didCameraClick;
 - (void)cellDidSelectedBtnClick:(HXPhotoViewCell *)cell Model:(HXPhotoModel *)model;
-
+- (void)cellChangeLivePhotoState:(HXPhotoModel *)model;
 @end
 
 @interface HXPhotoViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXPhotoViewCellDelegate> delegate;
+@property (assign, nonatomic) BOOL firstRegisterPreview;
 @property (strong, nonatomic) HXPhotoModel *model;
-@property (weak, nonatomic, readonly) UIImageView *imageView;
-@property (weak, nonatomic, readonly) UIView *maskView;
-@property (weak, nonatomic, readonly) UIButton *selectBtn;
+@property (weak, nonatomic) UIImageView *imageView;
+@property (weak, nonatomic) UIView *maskView;
+@property (weak, nonatomic) UIButton *selectBtn;
+
+- (void)startLivePhoto;
+- (void)stopLivePhoto;
 @end
