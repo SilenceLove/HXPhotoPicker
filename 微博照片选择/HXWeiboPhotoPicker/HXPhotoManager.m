@@ -8,6 +8,7 @@
 
 #import "HXPhotoManager.h"
 
+#define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
 @interface HXPhotoManager ()
 @property (strong, nonatomic) NSMutableArray *albums;
 @property (strong, nonatomic) NSMutableArray *allPhotos;
@@ -199,8 +200,12 @@
             if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
                 photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
             }else {
-                if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
-                    photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                if (iOS9Later) {
+                    if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+                        photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                    }else {
+                        photoModel.type = HXPhotoModelMediaTypePhoto;
+                    }
                 }else {
                     photoModel.type = HXPhotoModelMediaTypePhoto;
                 }
