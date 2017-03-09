@@ -1,11 +1,11 @@
 # HXWeiboPhotoPicker - 仿微博照片选择器
 
-<img src="http://wx2.sinaimg.cn/mw690/ade10dedgy1fdax4y00xsj20qo1bfgvt.jpg" width="270" height="480"> 
+<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> 
 
 ## 一.  更新历史
 - 2017-03-07 修复通过相机拍照时照片旋转90°的问题
 - 2017-03-08 修复拍照之后,在浏览大图时选中图片,列表界面Cell没有选中的问题
-- 2017-03-09 添加查看 LivePhoto 功能、是否查看GIF图和LivePhoto的开关,修复Cell重复注册3DTouch功能导致内存一直增加问题
+- 2017-03-09 添加查看 LivePhoto 功能、是否查看GIF图和LivePhoto的控制开关,修复Cell重复注册3DTouch功能导致内存一直增加问题
 
 ## 二.  特性
 
