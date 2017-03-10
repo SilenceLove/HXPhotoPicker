@@ -19,7 +19,7 @@
     }
     HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110) imageName:@"alert_failed_icon@2x.png" text:text];
     hud.alpha = 0;
-    hud.tag = 9999;
+    hud.tag = 1008611;
     [self addSubview:hud];
     hud.center = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
     [UIView animateWithDuration:0.25 animations:^{
@@ -32,7 +32,7 @@
 {
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
-        if (view.tag == 9999) {
+        if (view.tag == 1008611) {
             [UIView animateWithDuration:0.25 animations:^{
                 view.alpha = 0;
             } completion:^(BOOL finished) {

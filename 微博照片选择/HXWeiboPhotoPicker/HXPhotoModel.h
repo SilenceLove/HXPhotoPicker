@@ -11,7 +11,7 @@
 
 typedef enum : NSUInteger {
     HXPhotoModelMediaTypePhoto = 0, // 照片
-    HXPhotoModelMediaTypeLivePhoto, // 预留的为以后支持LivePhoto做准备
+    HXPhotoModelMediaTypeLivePhoto, // LivePhoto
     HXPhotoModelMediaTypePhotoGif,  // gif图
     HXPhotoModelMediaTypeVideo,     // 视频
     HXPhotoModelMediaTypeAudio,     // 预留
@@ -52,6 +52,11 @@ typedef enum : NSUInteger {
  GIF照片
  */
 @property (strong, nonatomic) UIImage *gifImage;
+
+/**
+ 照片数据
+ */
+@property (strong, nonatomic) NSData *imageData;
 
 /**
  视频时长

@@ -73,6 +73,13 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 {
     if (self.manager.goCamera) {
         self.manager.goCamera = NO;
+        if (!self.manager.openCamera) {
+            return;
+        }
+        if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [self.view showImageHUDText:@"此设备不支持相机!"];
+            return;
+        }
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
@@ -218,10 +225,12 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.navigationItem.titleView = titleBtn;
     self.title = @"相机胶卷";
     self.titleBtn = titleBtn;
-    HXPhotoModel *model = [[HXPhotoModel alloc] init];
-    model.type = HXPhotoModelMediaTypeCamera;
-    model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
-    self.objs = [NSMutableArray arrayWithObject:model];
+    if (self.manager.openCamera) {
+        HXPhotoModel *model = [[HXPhotoModel alloc] init];
+        model.type = HXPhotoModelMediaTypeCamera;
+        model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
+        self.objs = [NSMutableArray arrayWithObject:model];
+    }
     
     CGFloat width = self.view.frame.size.width;
     CGFloat heght = self.view.frame.size.height;
@@ -455,6 +464,10 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         self.navigationController.delegate = vc;
         [self.navigationController pushViewController:vc animated:YES];
     }else if (model.type == HXPhotoModelMediaTypeCamera) {
+        if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [self.view showImageHUDText:@"此设备不支持相机!"];
+            return;
+        }
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
@@ -560,13 +573,14 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         }
     }
     [self.manager.cameraList addObject:model];
-    [self.objs insertObject:model atIndex:1];
+    NSInteger cameraIndex = self.manager.openCamera ? 1 : 0;
+    [self.objs insertObject:model atIndex:cameraIndex];
     
     int index = 0;
     for (NSInteger i = self.manager.cameraPhotos.count - 1; i >= 0; i--) {
         HXPhotoModel *photoMD = self.manager.cameraPhotos[i];
         photoMD.photoIndex = index;
-        photoMD.albumListIndex = index + 1;
+        photoMD.albumListIndex = index + cameraIndex;
         index++;
     }
     index = 0;
@@ -578,7 +592,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     index = 0;
     for (NSInteger i = self.manager.cameraList.count - 1; i>= 0; i--) {
         HXPhotoModel *photoMD = self.manager.cameraList[i];
-        photoMD.albumListIndex = index + 1;
+        photoMD.albumListIndex = index + cameraIndex;
         index++;
     }
     [self.collectionView reloadData];

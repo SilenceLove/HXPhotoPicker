@@ -15,10 +15,56 @@
 
 @implementation Demo2ViewController
 
+/**
+    HXPhotoManager 照片管理类的属性介绍
+ 
+    是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
+    outerCamera;
+
+
+    是否打开相机功能
+    openCamera;
+
+
+    是否开启查看GIF图片功能 - 默认开启
+    lookGifPhoto;
+
+
+    是否开启查看LivePhoto功能呢 - 默认开启
+    lookLivePhoto;
+
+
+    是否一开始就进入相机界面
+    goCamera;
+
+
+    最大选择数 默认10 - 建议必填
+    maxNum;
+
+
+    图片最大选择数 默认9 - 建议必填
+    photoMaxNum;
+
+
+    视频最大选择数  默认1
+    videoMaxNum;
+
+
+    图片和视频是否能够同时选择 默认支持
+    selectTogether;
+
+
+    相册列表每行多少个照片 默认4个
+    rowCount;
+ 
+ */
+
 - (HXPhotoManager *)manager
 {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
+//        _manager.openCamera = NO;
+//        _manager.outerCamera = YES;
     }
     return _manager;
 }

@@ -19,6 +19,9 @@
 @property (weak, nonatomic) IBOutlet UITextField *photoText;
 @property (weak, nonatomic) IBOutlet UITextField *videoText;
 @property (weak, nonatomic) IBOutlet UITextField *columnText;
+@property (weak, nonatomic) IBOutlet UISwitch *addCamera;
+@property (weak, nonatomic) IBOutlet UISwitch *outerCamera;
+
 @end
 
 @implementation Demo1ViewController
@@ -73,11 +76,21 @@
     UISwitch *sw = (UISwitch *)sender;
     self.manager.selectTogether = sw.on;
 }
+
 - (IBAction)isLookGIFPhoto:(UISwitch *)sender {
     self.manager.lookGifPhoto = sender.on;
 }
+
 - (IBAction)isLookLivePhoto:(UISwitch *)sender {
     self.manager.lookLivePhoto = sender.on;
+}
+
+- (IBAction)outerCamera:(id)sender {
+}
+
+- (IBAction)addCamera:(id)sender {
+    UISwitch *sw = (UISwitch *)sender;
+    self.manager.openCamera = sw.on;
 }
 
 /*

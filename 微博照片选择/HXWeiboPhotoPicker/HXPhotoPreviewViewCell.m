@@ -125,11 +125,12 @@
     _imageView.frame = CGRectMake(0, 0, w, h);
     _imageView.center = CGPointMake(width / 2, height / 2);
     if (model.type == HXPhotoModelMediaTypePhotoGif) {
-        if (model.gifImage) {
-            self.imageView.image = model.gifImage;
+        if (model.imageData) {
+            self.imageView.image = [UIImage animatedGIFWithData:model.imageData];
         }else {
             __weak typeof(self) weakSelf = self;
             [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+                model.imageData = imageData;
                 UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
                 weakSelf.imageView.image = gifImage;
                 model.gifImage = gifImage;

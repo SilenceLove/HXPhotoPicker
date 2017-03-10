@@ -73,6 +73,7 @@
 @property (weak, nonatomic) UIView *maskViewT;
 
 @property (strong, nonatomic) UIImageView *focusIcon;
+@property (strong, nonatomic) UISlider *zoomSlider;
 @end
 
 @implementation HXCameraViewController
@@ -306,6 +307,10 @@
     maskViewT.frame = CGRectMake(0, self.backView.frame.size.height / 2, self.backView.frame.size.width, self.backView.frame.size.height / 2);
     [self.backView addSubview:maskViewT];
     self.maskViewT = maskViewT;
+    
+//    self.zoomSlider = [[UISlider alloc] init];
+//    self.zoomSlider =
+//    [self.backView addSubview:self.zoomSlider];
     
     self.focusIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"camera_ Focusing@2x.png"]];
     self.focusIcon.frame = CGRectMake(0, 0, self.focusIcon.image.size.width, self.focusIcon.image.size.height);

@@ -52,6 +52,16 @@ typedef enum : NSUInteger {
 
 
 /**
+ 是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
+ */
+@property (assign, nonatomic) BOOL outerCamera;
+
+/**
+ 是否打开相机功能
+ */
+@property (assign, nonatomic) BOOL openCamera;
+
+/**
  是否开启查看GIF图片功能 - 默认开启
  */
 @property (assign, nonatomic) BOOL lookGifPhoto;

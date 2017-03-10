@@ -38,6 +38,8 @@
 
 - (void)setup
 {
+    self.outerCamera = NO;
+    self.openCamera = YES;
     self.lookLivePhoto = YES;
     self.lookGifPhoto = YES;
     self.selectTogether = YES;
@@ -183,11 +185,12 @@
     NSMutableArray *videoAy = [NSMutableArray array];
     NSMutableArray *objAy = [NSMutableArray array];
     NSInteger photoIndex = 0, videoIndex = 0, albumIndex = 0;
+    NSInteger cameraIndex = self.openCamera ? 1 : 0;
     for (NSInteger i = result.count - 1 ; i >= 0 ; i--) {
         PHAsset *asset = result[i];
         HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
         photoModel.asset = asset;
-        photoModel.albumListIndex = albumIndex + 1;
+        photoModel.albumListIndex = albumIndex + cameraIndex;
         if (self.selectedList.count > 0) {
             for (HXPhotoModel *model in self.selectedList) {
                 if ([model.asset.localIdentifier isEqualToString:photoModel.asset.localIdentifier]) {
@@ -231,23 +234,28 @@
         photoModel.currentAlbumIndex = index;
         [objAy addObject:photoModel];
     }
-    HXPhotoModel *model = [[HXPhotoModel alloc] init];
-    model.type = HXPhotoModelMediaTypeCamera;
-    if (photoAy.count == 0) {
-        model.thumbPhoto = [UIImage imageNamed:@"compose_photo_video@2x.png"];
-    }else if (videoAy.count == 0) {
-        model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
-    }else {
-        model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
+    if (self.openCamera) {
+        HXPhotoModel *model = [[HXPhotoModel alloc] init];
+        model.type = HXPhotoModelMediaTypeCamera;
+        if (photoAy.count == 0) {
+            model.thumbPhoto = [UIImage imageNamed:@"compose_photo_video@2x.png"];
+        }else if (videoAy.count == 0) {
+            model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
+        }else {
+            model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
+        }
+        [objAy insertObject:model atIndex:0];
     }
-    [objAy insertObject:model atIndex:0];
     if (index == 0) {
         if (self.cameraList.count > 0) {
             NSInteger listCount = self.cameraList.count;
+            if (self.outerCamera) {
+                listCount = self.cameraList.count - 1;
+            }
             for (int i = 0; i < self.cameraList.count; i++) {
                 HXPhotoModel *phMD = self.cameraList[i];
                 phMD.albumListIndex = listCount--;
-                [objAy insertObject:phMD atIndex:1];
+                [objAy insertObject:phMD atIndex:cameraIndex];
             }
             NSInteger photoCount = self.cameraPhotos.count - 1;
             for (int i = 0; i < self.cameraPhotos.count; i++) {

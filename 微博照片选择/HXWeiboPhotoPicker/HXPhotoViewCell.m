@@ -174,6 +174,9 @@
 
 - (void)didSelectClick:(UIButton *)button
 {
+    if (self.model.type == HXPhotoModelMediaTypeCamera) {
+        return;
+    }
     if ([self.delegate respondsToSelector:@selector(cellDidSelectedBtnClick:Model:)]) {
         [self.delegate cellDidSelectedBtnClick:self Model:self.model];
     }
