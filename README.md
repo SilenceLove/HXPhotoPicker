@@ -32,10 +32,8 @@
 
 ## 五.  例子
 
+- HXPhotoManager 照片管理类相关属性介绍
 ```
-
-HXPhotoManager 照片管理类相关属性介绍
- 
 是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
 outerCamera;
 
@@ -65,7 +63,6 @@ selectTogether;
 
 相册列表每行多少个照片 默认4个
 rowCount;
-
 ```
 
 - Demo1
