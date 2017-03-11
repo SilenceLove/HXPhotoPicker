@@ -74,6 +74,7 @@
 
 @property (strong, nonatomic) UIImageView *focusIcon;
 @property (strong, nonatomic) UISlider *zoomSlider;
+@property (strong, nonatomic) NSURL *clipVideoURL;
 @end
 
 @implementation HXCameraViewController
@@ -793,9 +794,16 @@
         if (self.imageView.image.imageOrientation != UIImageOrientationUp) {
             self.imageView.image = [self.imageView.image normalizedImage];
         }
+        self.imageView.image = [self.imageView.image clipImage];
         model.thumbPhoto = self.imageView.image;
         model.imageSize = self.imageView.image.size;
         model.previewPhoto = self.imageView.image;
+        
+        model.cameraIdentifier = [self videoOutFutFileName];
+        if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
+            [self.delegate cameraDidNextClick:model];
+        }
+        [self dismiss];
     }else {
         [self.timer invalidate];
         self.timer = nil;
@@ -803,23 +811,165 @@
             [self.view showImageHUDText:@"录制时间不能少于3秒"];
             return;
         }
-        model.type = HXPhotoModelMediaTypeCameraVideo;
         [self.playerLayer.player pause];
-        MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:self.videoURL] ;
-        player.shouldAutoplay = NO;
-        UIImage  *image = [player thumbnailImageAtTime:1.0 timeOption:MPMovieTimeOptionNearestKeyFrame];
-        NSString *videoTime = [HXPhotoTools getNewTimeFromDurationSecond:self.videoTime];
-        model.videoURL = self.videoURL;
-        model.videoTime = videoTime;
-        model.thumbPhoto = image;
-        model.imageSize = image.size;
-        model.previewPhoto = image;
+        __weak typeof(self) weakSelf = self;
+        [self.view showLoadingHUDText:@"处理中"];
+        self.view.userInteractionEnabled = NO;
+        [self clipVideoCompleted:^{
+            weakSelf.view.userInteractionEnabled = YES;
+            model.type = HXPhotoModelMediaTypeCameraVideo;
+            MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:weakSelf.videoURL] ;
+            player.shouldAutoplay = NO;
+            UIImage  *image = [player thumbnailImageAtTime:1.0 timeOption:MPMovieTimeOptionNearestKeyFrame];
+            NSString *videoTime = [HXPhotoTools getNewTimeFromDurationSecond:weakSelf.videoTime];
+            model.videoURL = weakSelf.clipVideoURL;
+            model.videoTime = videoTime;
+            model.thumbPhoto = image;
+            model.imageSize = [image clipImage].size;
+            model.previewPhoto = image;
+            model.cameraIdentifier = [weakSelf videoOutFutFileName];
+            [weakSelf.view handleLoading];
+            if ([weakSelf.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
+                [weakSelf.delegate cameraDidNextClick:model];
+            }
+            [weakSelf dismiss];
+        } failed:^{
+            weakSelf.view.userInteractionEnabled = YES;
+            [weakSelf.view handleLoading];
+            [weakSelf.view showImageHUDText:@"处理失败,请重试!"];
+        }];
+        
     }
-    model.cameraIdentifier = [self videoOutFutFileName];
-    if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
-        [self.delegate cameraDidNextClick:model];
+}
+
+- (void)clipVideoCompleted:(void(^)())completed failed:(void(^)())failed
+{
+    AVAsset *asset = [AVAsset assetWithURL:self.videoURL];
+    
+    AVMutableComposition *mixComposition = [[AVMutableComposition alloc] init];
+    
+    AVMutableCompositionTrack *videoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
+                                                                        preferredTrackID:kCMPersistentTrackID_Invalid];
+    NSError *error = nil;
+    [videoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
+                        ofTrack:[[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0]
+                         atTime:kCMTimeZero
+                          error:&error];
+    
+    // 3.1 AVMutableVideoCompositionInstruction 视频轨道中的一个视频，可以缩放、旋转等
+    AVMutableVideoCompositionInstruction *mainInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    mainInstruction.timeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
+    
+    AVMutableVideoCompositionLayerInstruction *videolayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoTrack];
+    AVAssetTrack *videoAssetTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    UIImageOrientation videoAssetOrientation_  = UIImageOrientationUp;
+    BOOL isVideoAssetPortrait_  = NO;
+    CGAffineTransform videoTransform = videoAssetTrack.preferredTransform;
+    if (videoTransform.a == 0 && videoTransform.b == 1.0 && videoTransform.c == -1.0 && videoTransform.d == 0) {
+        videoAssetOrientation_ = UIImageOrientationRight;
+        isVideoAssetPortrait_ = YES;
     }
-    [self dismiss];
+    if (videoTransform.a == 0 && videoTransform.b == -1.0 && videoTransform.c == 1.0 && videoTransform.d == 0) {
+        videoAssetOrientation_ =  UIImageOrientationLeft;
+        isVideoAssetPortrait_ = YES;
+    }
+    if (videoTransform.a == 1.0 && videoTransform.b == 0 && videoTransform.c == 0 && videoTransform.d == 1.0) {
+        videoAssetOrientation_ =  UIImageOrientationUp;
+    }
+    if (videoTransform.a == -1.0 && videoTransform.b == 0 && videoTransform.c == 0 && videoTransform.d == -1.0) {
+        videoAssetOrientation_ = UIImageOrientationDown;
+    }
+    CGFloat videoWidth = videoAssetTrack.naturalSize.width;
+    CGFloat videoHeight = videoAssetTrack.naturalSize.height;
+    CGAffineTransform t1;
+    CGAffineTransform t2;
+    if(isVideoAssetPortrait_){
+        if (videoAssetOrientation_ == UIImageOrientationRight) {
+            t1 = CGAffineTransformTranslate(videoTransform, -(videoWidth / 2 - videoHeight / 2), 0);
+            [videolayerInstruction setTransform:t1 atTime:kCMTimeZero];
+        }else if (videoAssetOrientation_ == UIImageOrientationLeft) {
+            t1 = CGAffineTransformScale(videoTransform, 1, 1);
+            t2 = CGAffineTransformTranslate(t1, -(videoWidth / 2 - videoHeight - videoHeight / 4), 0);
+            [videolayerInstruction setTransform:t2 atTime:kCMTimeZero];
+        }
+    } else {
+        if (videoAssetOrientation_ == UIImageOrientationUp) {
+            t1 = CGAffineTransformScale(videoTransform, 1.77778, 1.77778);
+            t2 = CGAffineTransformTranslate(t1, videoHeight / 2 - videoWidth / 2, 0);
+            [videolayerInstruction setTransform:t2 atTime:kCMTimeZero];
+        }else {
+            t1 = CGAffineTransformScale(videoTransform, 1.77778, 1.77778);
+            t2 = CGAffineTransformTranslate(t1, videoHeight / 2 - videoWidth / 2, -(videoHeight / 16 * 7));
+            [videolayerInstruction setTransform:t2 atTime:kCMTimeZero];
+        }
+    }
+    [videolayerInstruction setOpacity:0.0 atTime:asset.duration];
+
+    mainInstruction.layerInstructions = [NSArray arrayWithObjects:videolayerInstruction,nil];
+
+    AVMutableVideoComposition *mainCompositionInst = [AVMutableVideoComposition videoComposition];
+    
+    CGSize naturalSize;
+    if(isVideoAssetPortrait_){
+        naturalSize = CGSizeMake(videoAssetTrack.naturalSize.height, videoAssetTrack.naturalSize.width);
+    } else {
+        naturalSize = videoAssetTrack.naturalSize;
+    }
+    
+    float renderWidth, renderHeight;
+    renderWidth = naturalSize.width;
+    renderHeight = naturalSize.height;
+    mainCompositionInst.renderSize = CGSizeMake(renderWidth, renderWidth);
+    mainCompositionInst.instructions = [NSArray arrayWithObject:mainInstruction];
+    mainCompositionInst.frameDuration = CMTimeMake(1, 30);
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:
+                             [NSString stringWithFormat:@"FinalVideo-%d.mov",arc4random() % 1000]];
+    self.clipVideoURL = [NSURL fileURLWithPath:myPathDocs];
+    
+    AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition
+                                                                      presetName:AVAssetExportPresetHighestQuality];
+    exporter.outputURL = self.clipVideoURL;
+    exporter.outputFileType = AVFileTypeQuickTimeMovie;
+    exporter.shouldOptimizeForNetworkUse = YES;
+    exporter.videoComposition = mainCompositionInst;
+    [exporter exportAsynchronouslyWithCompletionHandler:^{
+        switch (exporter.status) {
+            case AVAssetExportSessionStatusUnknown:
+                NSLog(@"未知");
+                break;
+            case AVAssetExportSessionStatusWaiting:
+                break;
+            case AVAssetExportSessionStatusExporting:
+                break;
+            case AVAssetExportSessionStatusCompleted:
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (completed) {
+                        completed();
+                        NSLog(@"成功");
+                    }
+                });
+            }
+                break;
+            case AVAssetExportSessionStatusFailed:
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed();
+                        NSLog(@"失败");
+                    }
+                });
+            }
+                break;
+            case AVAssetExportSessionStatusCancelled:
+                break;
+            default:
+                break;
+        }
+    }];
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{

@@ -163,16 +163,27 @@
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-            if (self.photos.count > 0 && self.videos.count > 0) {
-                vc.type = HXCameraTypePhotoAndVideo;
-            }else if (self.videos.count > 0) {
+            if (self.videos.count >= self.manager.videoMaxNum && self.photos.count < self.manager.photoMaxNum) {
+                vc.type = HXCameraTypePhoto;
+            }else if (self.photos.count >= self.manager.photoMaxNum && self.videos.count < self.manager.videoMaxNum) {
                 vc.type = HXCameraTypeVideo;
+            }else if (self.photos.count + self.videos.count >= self.manager.maxNum) {
+                [[self viewController:self].view showImageHUDText:@"已达最大数!"];
+                return;
             }else {
                 vc.type = HXCameraTypePhotoAndVideo;
             }
         }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
+            if (self.photos.count >= self.manager.photoMaxNum) {
+                [[self viewController:self].view showImageHUDText:@"照片已达最大数"];
+                return;
+            }
             vc.type = HXCameraTypePhoto;
         }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+            if (self.videos.count >= self.manager.videoMaxNum) {
+                [[self viewController:self].view showImageHUDText:@"视频已达最大数!"];
+                return;
+            }
             vc.type = HXCameraTypeVideo;
         }
        [[self viewController:self] presentViewController:vc animated:YES completion:nil];

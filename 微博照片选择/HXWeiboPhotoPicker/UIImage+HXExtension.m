@@ -113,4 +113,17 @@
     UIGraphicsEndImageContext();
     return normalizedImage;
 }
+
+- (UIImage *)clipImage
+{
+    CGFloat width = self.size.width;
+    CGFloat height = self.size.height;
+    
+    CGRect rect = CGRectMake(0, height / 2 - width / 2, width, width);
+    CGImageRef imageRef = self.CGImage;
+    CGImageRef imagePartRef = CGImageCreateWithImageInRect(imageRef, rect);
+    UIImage *image = [UIImage imageWithCGImage:imagePartRef];
+    CGImageRelease(imagePartRef);
+    return image;
+}
 @end
