@@ -345,7 +345,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         self.previewImg.image = model.previewPhoto;
     }else {
         __weak typeof(self) weakSelf = self;
-        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) deliveryMode:0 completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.previewImg.image = image;
         } error:^(NSDictionary *info) {
             weakSelf.previewImg.image = model.thumbPhoto;
@@ -378,9 +378,6 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         showVC.collectionView.hidden = YES;
         self.navigationController.delegate = showVC;
         [showVC.view addSubview:self.previewImg];
-        if (!model.previewPhoto) {
-            [NSThread sleepForTimeInterval:0.25];
-        }
         return showVC;
     }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo){
         HXVideoPreviewViewController *showVC = [[HXVideoPreviewViewController alloc] init];

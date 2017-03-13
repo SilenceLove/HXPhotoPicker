@@ -57,7 +57,7 @@
     }];
 }
 
-+ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error
++ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error
 {
     static PHImageRequestID requestID = -1;
     
@@ -69,13 +69,16 @@
     
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.networkAccessAllowed = YES;
-    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.deliveryMode = deliveryMode;
     option.synchronous = NO;
-    option.resizeMode = resizeMode;
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+ 
+    option.progressHandler = ^(double progress, NSError *__nullable error, BOOL *stop, NSDictionary *__nullable info) {
+        
+    };
     
     requestID = [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        BOOL downloadFinined = ![info objectForKey:PHImageErrorKey];
         if (downloadFinined && completion && result) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 completion(result,info);

@@ -114,16 +114,29 @@
     return normalizedImage;
 }
 
-- (UIImage *)clipImage
+- (UIImage *)clipImage:(CGFloat)scale
 {
     CGFloat width = self.size.width;
     CGFloat height = self.size.height;
     
-    CGRect rect = CGRectMake(0, height / 2 - width / 2, width, width);
+    CGRect rect = CGRectMake((width - width / scale) / 2, height / 2 - width / scale / 2, width / scale, width / scale);
     CGImageRef imageRef = self.CGImage;
     CGImageRef imagePartRef = CGImageCreateWithImageInRect(imageRef, rect);
     UIImage *image = [UIImage imageWithCGImage:imagePartRef];
     CGImageRelease(imagePartRef);
     return image;
 }
+
+- (UIImage *)scaleImagetoScale:(float)scaleSize
+{
+    
+    UIGraphicsBeginImageContext(CGSizeMake(self.size.width * scaleSize, self.size.height * scaleSize));
+                                
+    [self drawInRect:CGRectMake(0, 0, self.size.width * scaleSize, self.size.height * scaleSize)];
+    UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return scaledImage;
+}
+
 @end

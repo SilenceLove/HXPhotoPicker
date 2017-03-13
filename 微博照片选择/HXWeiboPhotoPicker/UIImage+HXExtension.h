@@ -12,5 +12,6 @@
 + (UIImage *)animatedGIFWithData:(NSData *)data;
 - (UIImage *)animatedImageByScalingAndCroppingToSize:(CGSize)size;
 - (UIImage *)normalizedImage;
-- (UIImage *)clipImage;
+- (UIImage *)clipImage:(CGFloat)scale;
+- (UIImage *)scaleImagetoScale:(float)scaleSize;
 @end

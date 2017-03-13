@@ -62,10 +62,10 @@
  
  @param asset 照片的PHAsset对象
  @param size 指定请求的大小
- @param resizeMode 请求模式
+ @param deliveryMode 请求模式
  @param completion 完成后的block
  @param error 失败后的block
  */
-+ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
++ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
 
 @end

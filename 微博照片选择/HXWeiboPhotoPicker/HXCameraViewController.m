@@ -75,6 +75,7 @@
 @property (strong, nonatomic) UIImageView *focusIcon;
 @property (strong, nonatomic) UISlider *zoomSlider;
 @property (strong, nonatomic) NSURL *clipVideoURL;
+@property (assign, nonatomic) BOOL first;
 @end
 
 @implementation HXCameraViewController
@@ -387,7 +388,7 @@
 {
     AVCaptureConnection *conntion = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
     if (!conntion) {
-        NSLog(@"拍照失败!");
+        [self.view showImageHUDText:@"照片失败"];
         return;
     }
     [self.imageOutput captureStillImageAsynchronouslyFromConnection:conntion completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
@@ -396,6 +397,9 @@
         }
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
         self.imageView.image = [UIImage imageWithData:imageData];
+        if (self.effectiveScale > 1) {
+            self.imageView.transform = CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale);
+        }
         self.imageView.hidden = NO;
         [self hideClick];
     }];
@@ -515,9 +519,14 @@
     NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
     for ( AVCaptureDevice *device in devices )
         if ( device.position == position ){
-            [device lockForConfiguration:nil];
-            [device setFlashMode:AVCaptureFlashModeAuto];
-            [device unlockForConfiguration];
+            if (!self.first) {
+                self.first = YES;
+                [device lockForConfiguration:nil];
+                if ([device hasFlash]) {
+                    [device setFlashMode:AVCaptureFlashModeAuto];
+                }
+                [device unlockForConfiguration];
+            }
             return device;
         }
     return nil;
@@ -537,12 +546,14 @@
     }
     if (allTouchesAreOnThePreviewLayer ) {
         self.effectiveScale = self.beginGestureScale * recognizer.scale;
+        CGFloat maxScaleAndCropFactor = [[self.imageOutput connectionWithMediaType:AVMediaTypeVideo] videoMaxScaleAndCropFactor];
+        if (maxScaleAndCropFactor > 5.0f) {
+            maxScaleAndCropFactor = 5.0f;
+        }
         if (self.effectiveScale < 1.0){
             self.effectiveScale = 1.0;
         }
-        NSLog(@"%f-------------->%f------------recognizerScale%f",self.effectiveScale,self.beginGestureScale,recognizer.scale);
-        CGFloat maxScaleAndCropFactor = [[self.imageOutput connectionWithMediaType:AVMediaTypeVideo] videoMaxScaleAndCropFactor];
-        NSLog(@"%f",maxScaleAndCropFactor);
+        
         if (self.effectiveScale > maxScaleAndCropFactor)
             self.effectiveScale = maxScaleAndCropFactor;
         [CATransaction begin];
@@ -723,6 +734,8 @@
         [self.session beginConfiguration];
         [self.session removeOutput:self.imageOutput];
         if ([self.session canAddOutput:self.videoOutPut]) {
+            self.effectiveScale = 1.0f;
+            [self.previewLayer setAffineTransform:CGAffineTransformIdentity];
             [self.session addOutput:self.videoOutPut];
         }
         [self.session commitConfiguration];
@@ -794,10 +807,16 @@
         if (self.imageView.image.imageOrientation != UIImageOrientationUp) {
             self.imageView.image = [self.imageView.image normalizedImage];
         }
-        self.imageView.image = [self.imageView.image clipImage];
-        model.thumbPhoto = self.imageView.image;
-        model.imageSize = self.imageView.image.size;
-        model.previewPhoto = self.imageView.image;
+        UIImage *image;
+        if (self.effectiveScale > 1) {
+            image = [self.imageView.image scaleImagetoScale:self.effectiveScale];
+        }else {
+            image = self.imageView.image;
+        }
+        image = [image clipImage:self.effectiveScale];
+        model.thumbPhoto = image;
+        model.imageSize = image.size;
+        model.previewPhoto = image;
         
         model.cameraIdentifier = [self videoOutFutFileName];
         if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
@@ -825,7 +844,7 @@
             model.videoURL = weakSelf.clipVideoURL;
             model.videoTime = videoTime;
             model.thumbPhoto = image;
-            model.imageSize = [image clipImage].size;
+            model.imageSize = [image clipImage:self.effectiveScale].size;
             model.previewPhoto = image;
             model.cameraIdentifier = [weakSelf videoOutFutFileName];
             [weakSelf.view handleLoading];
@@ -938,7 +957,6 @@
     [exporter exportAsynchronouslyWithCompletionHandler:^{
         switch (exporter.status) {
             case AVAssetExportSessionStatusUnknown:
-                NSLog(@"未知");
                 break;
             case AVAssetExportSessionStatusWaiting:
                 break;
@@ -949,7 +967,6 @@
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (completed) {
                         completed();
-                        NSLog(@"成功");
                     }
                 });
             }
@@ -959,7 +976,6 @@
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (failed) {
                         failed();
-                        NSLog(@"失败");
                     }
                 });
             }
