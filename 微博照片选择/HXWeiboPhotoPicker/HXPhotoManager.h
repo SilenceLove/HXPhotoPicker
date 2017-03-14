@@ -82,17 +82,17 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL goCamera;
 
 /**
- 最大选择数 默认10 - 建议必填
+ 最大选择数 默认10 - 必填
  */
 @property (assign, nonatomic) NSInteger maxNum;
 
 /**
- 图片最大选择数 默认9 - 建议必填
+ 图片最大选择数 默认9 - 必填
  */
 @property (assign, nonatomic) NSInteger photoMaxNum;
 
 /**
- 视频最大选择数 // 默认1
+ 视频最大选择数 // 默认1 - 必填
  */
 @property (assign, nonatomic) NSInteger videoMaxNum;
 
