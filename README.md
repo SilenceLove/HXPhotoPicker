@@ -123,7 +123,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 // 获取照片资源
 [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-    // 小图  - 这个字段会一直都值
+    // 小图  - 这个字段会一直有值
     model.thumbPhoto;
 
     // 大图  - 这个字段有可能没有值, 只有当查看过大图之后才会有值 - 如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
