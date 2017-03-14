@@ -1,17 +1,12 @@
 # HXWeiboPhotoPicker - 仿微博照片选择器
+[![Platform](http://img.shields.io/badge/platform-ios-blue.svg?style=flat
+             )](https://developer.apple.com/iphone/index.action)
+[![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
+[![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
 <img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> 
 
-## 一.  更新历史
-
-- 2017-03-07  修复通过相机拍照时照片旋转90°的问题
-- 2017-03-08  修复拍照之后,在浏览大图时选中图片,列表界面Cell没有选中的问题
-- 2017-03-09  添加查看 LivePhoto 功能、是否查看GIF图和LivePhoto的控制开关,修复Cell重复注册3DTouch功能导致内存一直增加问题
-- 2017-03-10  添加控制是否开启相机功能的开关 以及 控制相机功能是否内/外置开关.
-- 2017-03-11  通过相机拍照和录制视频之后的长照片、长视频裁剪成正方形以及修复一些小问题
-- 2017-03-13  修复自定义相机bug、优化相机照片访问权限问题
-
-## 二.  特性
+## 一.  特性 - Features
 
 - [x] 查看/选择GIF图片
 - [x] 照片、视频可同时多选/原图
@@ -21,19 +16,19 @@
 - [x] 自定义转场动画
 - [x] 查看/选择LivePhoto IOS9以上才有用
 
-## 三.  安装
+## 二.  安装 - Installation
 
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
 
-## 四.  要求
+## 三.  要求 - Requirements
 
-- iOS8及以上系统可使用. ARC环境.
+- iOS8及以上系统可使用. ARC环境. - iOS 8 or later. Requires ARC
 - 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置两个info.plist文件。                                              Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description。
 - 相机拍照功能请使用真机调试
 
-## 五.  例子
+## 四.  例子 - Examples
 
 - HXPhotoManager 照片管理类相关属性介绍
 ```
@@ -191,7 +186,16 @@ photoView.backgroundColor = [UIColor whiteColor];
     }
 }];
 ```
-## 六.  更多 
+## 五.  更新历史 - Update History
+
+- 2017-03-07  修复通过相机拍照时照片旋转90°的问题
+- 2017-03-08  修复拍照之后,在浏览大图时选中图片,列表界面Cell没有选中的问题
+- 2017-03-09  添加查看 LivePhoto 功能、是否查看GIF图和LivePhoto的控制开关,修复Cell重复注册3DTouch功能导致内存一直增加问题
+- 2017-03-10  添加控制是否开启相机功能的开关 以及 控制相机功能是否内/外置开关.
+- 2017-03-11  通过相机拍照和录制视频之后的长照片、长视频裁剪成正方形以及修复一些小问题
+- 2017-03-13  修复自定义相机bug、优化相机照片访问权限问题
+
+## 六.  更多 - More
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 
