@@ -27,4 +27,6 @@
 @property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
+- (instancetype)initWithManager:(HXPhotoManager *)manager;
++ (instancetype)photoManager:(HXPhotoManager *)manager;
 @end

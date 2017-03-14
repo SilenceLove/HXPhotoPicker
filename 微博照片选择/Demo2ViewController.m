@@ -76,7 +76,8 @@
     self.navigationController.navigationBar.translucent = NO;
     self.automaticallyAdjustsScrollViewInsets = YES;
     CGFloat width = self.view.frame.size.width;
-    HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(12, 100, width - 24, 0) WithManager:self.manager];
+    HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
+    photoView.frame = CGRectMake(12, 100, width - 24, 0);
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:photoView];

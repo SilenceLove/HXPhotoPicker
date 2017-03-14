@@ -17,7 +17,7 @@
 
 #define Spacing 3 // 每个item的间距
 #define LineNum 3 // 每行个数
-@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate>
+@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
@@ -57,9 +57,24 @@
     return _addModel;
 }
 
++ (instancetype)photoManager:(HXPhotoManager *)manager
+{
+    return [[self alloc] initWithManager:manager];
+}
+
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager
 {
     self = [super initWithFrame:frame];
+    if (self) {
+        self.manager = manager;
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithManager:(HXPhotoManager *)manager
+{
+    self = [super init];
     if (self) {
         self.manager = manager;
         [self setup];
@@ -160,6 +175,12 @@
             [[self viewController:self].view showImageHUDText:@"此设备不支持相机!"];
             return;
         }
+        AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+        if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"无法使用相机" message:@"请在设置-隐私-相机中允许访问相机" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置", nil];
+            [alert show];
+            return;
+        }
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
@@ -188,10 +209,22 @@
         }
        [[self viewController:self] presentViewController:vc animated:YES completion:nil];
     }else if (buttonIndex == 1){
+        if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"无法访问照片" message:@"请在设置-隐私-照片中允许访问照片" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置", nil];
+            [alert show];
+            return;
+        }
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
         vc.manager = self.manager;
         vc.delegate = self;
         [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
 }
 

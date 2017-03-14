@@ -16,7 +16,7 @@
 #import "UIView+HXExtension.h"
 
 static NSString *PhotoViewCellId = @"PhotoViewCellId";
-@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate>
+@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate,UIAlertViewDelegate>
 {
     CGRect _originalFrame;
 }
@@ -37,17 +37,39 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
 @property (strong, nonatomic) UIImageView *previewImg;
 @property (strong, nonatomic) NSTimer *timer;
+@property (strong, nonatomic) UILabel *authorizationLb;
 @end
 
 @implementation HXPhotoViewController
 
+- (UILabel *)authorizationLb
+{
+    if (!_authorizationLb) {
+        _authorizationLb = [[UILabel alloc] initWithFrame:CGRectMake(0, 200, self.view.frame.size.width, 100)];
+        _authorizationLb.text = @"无法访问照片\n请点击这里前往设置中允许访问照片";
+        _authorizationLb.textAlignment = NSTextAlignmentCenter;
+        _authorizationLb.numberOfLines = 0;
+        _authorizationLb.textColor = [UIColor blackColor];
+        _authorizationLb.font = [UIFont systemFontOfSize:15];
+        _authorizationLb.userInteractionEnabled = YES;
+        [_authorizationLb addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(goSetup)]];
+    }
+    return _authorizationLb;
+}
+
+- (void)goSetup
+{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setup];
-    
     [self getObjs];
+    
     // 获取当前应用对照片的访问授权状态
     if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
+        [self.view addSubview:self.authorizationLb];
         self.timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange:) userInfo:nil repeats:YES];
     }if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
         [self goCameraVC];
@@ -64,6 +86,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
         [timer invalidate];
         self.timer = nil;
+        [self.authorizationLb removeFromSuperview];
         [self goCameraVC];
         [self getObjs];
     }
@@ -80,6 +103,12 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             [self.view showImageHUDText:@"此设备不支持相机!"];
             return;
         }
+        AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+        if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"无法使用相机" message:@"请在设置-隐私-相机中允许访问相机" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置", nil];
+            [alert show];
+            return;
+        }
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
@@ -90,6 +119,13 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             vc.type = HXCameraTypeVideo;
         }
         [self presentViewController:vc animated:YES completion:nil];
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
 }
 
@@ -112,6 +148,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                 weakSelf.objs = [NSMutableArray arrayWithArray:Objs];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     weakSelf.albumView.list = albums;
+                    if (model.albumName.length == 0) {
+                        model.albumName = @"相机胶卷";
+                    }
                     [weakSelf.titleBtn setTitle:model.albumName forState:UIControlStateNormal];
                     weakSelf.title = model.albumName;
                     CATransition *transition = [CATransition animation];
@@ -225,12 +264,6 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.navigationItem.titleView = titleBtn;
     self.title = @"相机胶卷";
     self.titleBtn = titleBtn;
-    if (self.manager.openCamera) {
-        HXPhotoModel *model = [[HXPhotoModel alloc] init];
-        model.type = HXPhotoModelMediaTypeCamera;
-        model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
-        self.objs = [NSMutableArray arrayWithObject:model];
-    }
     
     CGFloat width = self.view.frame.size.width;
     CGFloat heght = self.view.frame.size.height;
@@ -292,6 +325,10 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
  */
 - (void)cancelClick
 {
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
     [self.manager.selectedList removeAllObjects];
     [self.manager.selectedPhotos removeAllObjects];
     [self.manager.selectedVideos removeAllObjects];
@@ -463,6 +500,12 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     }else if (model.type == HXPhotoModelMediaTypeCamera) {
         if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
             [self.view showImageHUDText:@"此设备不支持相机!"];
+            return;
+        }
+        AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+        if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"无法使用相机" message:@"请在设置-隐私-相机中允许访问相机" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置", nil];
+            [alert show];
             return;
         }
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];

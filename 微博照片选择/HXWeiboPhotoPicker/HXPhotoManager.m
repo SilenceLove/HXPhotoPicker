@@ -237,7 +237,7 @@
     if (self.openCamera) {
         HXPhotoModel *model = [[HXPhotoModel alloc] init];
         model.type = HXPhotoModelMediaTypeCamera;
-        if (photoAy.count == 0) {
+        if (photoAy.count == 0 && videoAy.count != 0) {
             model.thumbPhoto = [UIImage imageNamed:@"compose_photo_video@2x.png"];
         }else if (videoAy.count == 0) {
             model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
