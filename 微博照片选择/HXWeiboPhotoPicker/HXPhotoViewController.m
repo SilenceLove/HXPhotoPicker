@@ -71,7 +71,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
         [self.view addSubview:self.authorizationLb];
         self.timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange:) userInfo:nil repeats:YES];
-    }if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+    }else{
         [self goCameraVC];
     }
 }
