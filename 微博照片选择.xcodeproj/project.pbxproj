@@ -68,6 +68,7 @@
 		7B269E7D1E56FC3400AB813D /* HXPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E7C1E56FC3400AB813D /* HXPhotoView.m */; };
 		7B269E801E56FC9D00AB813D /* HXPhotoSubViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E7F1E56FC9D00AB813D /* HXPhotoSubViewCell.m */; };
 		7B269E831E56FE9400AB813D /* HXCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E821E56FE9400AB813D /* HXCollectionView.m */; };
+		7B342F7C1E7BB82800E7BD99 /* HXPhotoConst.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B342F7B1E7BB82800E7BD99 /* HXPhotoConst.m */; };
 		7B4F44F21E6FB12D00E85EA7 /* compose_live_photo_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B4F44EA1E6FB12D00E85EA7 /* compose_live_photo_background@2x.png */; };
 		7B4F44F31E6FB12D00E85EA7 /* compose_live_photo_background@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B4F44EB1E6FB12D00E85EA7 /* compose_live_photo_background@3x.png */; };
 		7B4F44F41E6FB12D00E85EA7 /* compose_live_photo_close_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B4F44EC1E6FB12D00E85EA7 /* compose_live_photo_close_icon@2x.png */; };
@@ -170,6 +171,8 @@
 		7B269E7F1E56FC9D00AB813D /* HXPhotoSubViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoSubViewCell.m; sourceTree = "<group>"; };
 		7B269E811E56FE9400AB813D /* HXCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCollectionView.h; sourceTree = "<group>"; };
 		7B269E821E56FE9400AB813D /* HXCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCollectionView.m; sourceTree = "<group>"; };
+		7B342F7A1E7BB82800E7BD99 /* HXPhotoConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoConst.h; sourceTree = "<group>"; };
+		7B342F7B1E7BB82800E7BD99 /* HXPhotoConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoConst.m; sourceTree = "<group>"; };
 		7B4F44EA1E6FB12D00E85EA7 /* compose_live_photo_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "compose_live_photo_background@2x.png"; sourceTree = "<group>"; };
 		7B4F44EB1E6FB12D00E85EA7 /* compose_live_photo_background@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "compose_live_photo_background@3x.png"; sourceTree = "<group>"; };
 		7B4F44EC1E6FB12D00E85EA7 /* compose_live_photo_close_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "compose_live_photo_close_icon@2x.png"; sourceTree = "<group>"; };
@@ -402,6 +405,8 @@
 				7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */,
 				7BB604501E5D693A00EBA520 /* HXVideoPresentTransition.h */,
 				7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */,
+				7B342F7A1E7BB82800E7BD99 /* HXPhotoConst.h */,
+				7B342F7B1E7BB82800E7BD99 /* HXPhotoConst.m */,
 			);
 			path = HXWeiboPhotoPicker;
 			sourceTree = "<group>";
@@ -554,6 +559,7 @@
 				7B269E0E1E56961500AB813D /* Demo2ViewController.m in Sources */,
 				7BB604521E5D693A00EBA520 /* HXVideoPresentTransition.m in Sources */,
 				7B7E3EA21E4B0586002234EE /* HXPhotoViewCell.m in Sources */,
+				7B342F7C1E7BB82800E7BD99 /* HXPhotoConst.m in Sources */,
 				7B578EB11E5590A40090BD74 /* UIView+HXExtension.m in Sources */,
 				7B7E3E7B1E4AACD1002234EE /* main.m in Sources */,
 				7B7E3EA51E4B0D6F002234EE /* HXAlbumListView.m in Sources */,

@@ -207,19 +207,22 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (void)setup
 {
     if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
+        self.manager.maxNum = self.manager.photoMaxNum;
         if (self.manager.endCameraVideos.count > 0) {
             [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraVideos];
             [self.manager.endCameraVideos removeAllObjects];
         }
     }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+        self.manager.maxNum = self.manager.videoMaxNum;
         if (self.manager.endCameraPhotos.count > 0) {
-            [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraVideos];
-            [self.manager.endCameraVideos removeAllObjects];
+            [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraPhotos];
+            [self.manager.endCameraPhotos removeAllObjects];
         }
-    }
-    // 防错
-    if (self.manager.videoMaxNum + self.manager.photoMaxNum != self.manager.maxNum) {
-        self.manager.maxNum = self.manager.videoMaxNum + self.manager.photoMaxNum;
+    }else {
+        // 防错
+        if (self.manager.videoMaxNum + self.manager.photoMaxNum != self.manager.maxNum) {
+            self.manager.maxNum = self.manager.videoMaxNum + self.manager.photoMaxNum;
+        }
     }
     // 上次选择的所有记录
     self.manager.selectedList = [NSMutableArray arrayWithArray:self.manager.endSelectedList];

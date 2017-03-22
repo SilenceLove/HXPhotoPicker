@@ -358,6 +358,7 @@
     return _maskView;
 }
 
+
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
     if (operation == UINavigationControllerOperationPush) {
         return [HXTransition transitionWithType:HXTransitionTypePush VcType:HXTransitionVcTypeVideo];

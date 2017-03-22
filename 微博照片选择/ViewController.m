@@ -62,7 +62,7 @@
         [self.navigationController pushViewController:vc animated:YES];
     }else {
         Demo3ViewController *vc = [[Demo3ViewController alloc] init];
-        vc.title = @"Demo1";
+        vc.title = @"Demo3";
         [self.navigationController pushViewController:vc animated:YES];
     }
 }

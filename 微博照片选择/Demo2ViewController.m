@@ -91,7 +91,7 @@
      
     // 获取图片资源
     [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-        // 小图  - 这个字段会一直都值
+        // 小图  - 这个字段会一直有值
         model.thumbPhoto;
         
         // 大图  - 这个字段有可能没有值, 只有当查看过大图之后才会有值 - 如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
@@ -106,12 +106,12 @@
         // isCloseLivePhoto 判断当前图片是否关闭了 livePhoto 功能 YES-关闭 NO-开启
         model.isCloseLivePhoto;
         
-        // 获取imageData - 通过相册获取时有用
+        // 获取imageData - 通过相册获取时有用 / 通过相机拍摄的无效
         [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
             NSLog(@"%@",imageData);
         }];
         
-        // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用
+        // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
         CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
         [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
             NSLog(@"%@",image);
