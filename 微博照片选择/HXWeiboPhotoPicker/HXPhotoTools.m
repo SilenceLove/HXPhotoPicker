@@ -93,11 +93,11 @@
     }];
 }
 
-+ (void)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void (^)(NSData *, NSDictionary *))completion
++ (PHImageRequestID)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void (^)(NSData *, NSDictionary *))completion
 {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
     option.networkAccessAllowed = YES;
-    [[PHImageManager defaultManager] requestImageDataForAsset:asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+    return [[PHImageManager defaultManager] requestImageDataForAsset:asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
         if (imageData) {
             if (completion) completion(imageData,info);
         }
@@ -217,6 +217,24 @@
     CGSize newSize = [text boundingRectWithSize:CGSizeMake(MAXFLOAT, height) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontSize]} context:nil].size;
     
     return newSize.width;
+}
+
++ (NSArray<UIImage *> *)fetchOriginalForSelectedPhoto:(NSArray *)photos
+{
+    NSMutableArray *images = [NSMutableArray array];
+    [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
+        [images addObject:model.previewPhoto];
+    }];
+    return images;
+}
+
++ (NSArray<NSData *> *)fetchImageDataForSelectedPhoto:(NSArray *)photos
+{
+    NSMutableArray *imageDatas = [NSMutableArray array];
+    [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
+        [imageDatas addObject:model.imageData];
+    }];
+    return imageDatas;
 }
 
 

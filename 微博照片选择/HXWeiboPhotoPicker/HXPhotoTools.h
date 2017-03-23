@@ -14,6 +14,24 @@
  */
 
 @interface HXPhotoTools : NSObject
+
+/**
+ 根据已选照片数组返回原图数组
+
+ @param photos 选中照片数组
+ @return 原图数组
+ */
+//+ (NSArray<UIImage *> *)fetchOriginalForSelectedPhoto:(NSArray *)photos;
+
+/**
+ 根据已选照片数组返回imageData数组
+ 
+ @param photos 选中照片数组
+ @return imageData数组
+ */
+//+ (NSArray<NSData *> *)fetchImageDataForSelectedPhoto:(NSArray *)photos;
+
+
 /**
  获取视频的时长
  */
@@ -40,7 +58,7 @@
  @param asset 图片对象
  @param completion 返回结果
  */
-+ (void)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void(^)(NSData *imageData, NSDictionary *info))completion;
++ (PHImageRequestID)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void(^)(NSData *imageData, NSDictionary *info))completion;
 
 /**
  获取数组里面图片的大小

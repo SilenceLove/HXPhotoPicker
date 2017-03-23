@@ -772,6 +772,22 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                 return;
             }
         }
+//        if (!model.imageData) {
+//            [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+//                model.imageData = imageData;
+//            }];
+//        }
+//        if (!model.previewPhoto) {
+//            [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:PHImageManagerMaximumSize deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+//                model.previewPhoto = image;
+//            } error:^(NSDictionary *info) {
+//                model.previewPhoto = model.thumbPhoto;
+//            }];
+//        }
+//        // 这里加个延迟  防止可能照片过大导致获取时间过长  可以屏蔽这段代码 按自己的需求来
+//        if (!model.imageData || !model.previewPhoto) {
+//            [NSThread sleepForTimeInterval:0.25];
+//        }
         cell.maskView.hidden = NO;
         CAKeyframeAnimation *anim = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
         anim.duration = 0.25;

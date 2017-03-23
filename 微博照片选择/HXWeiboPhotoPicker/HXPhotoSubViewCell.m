@@ -80,10 +80,10 @@
 - (void)setModel:(HXPhotoModel *)model
 {
     _model = model;
-    if (model.thumbPhoto) {
-        self.imageView.image = model.thumbPhoto;
-    }else {
+    if (model.previewPhoto) {
         self.imageView.image = model.previewPhoto;
+    }else {
+        self.imageView.image = model.thumbPhoto;
     }
     self.videoTime.text = model.videoTime;
     self.gifIcon.hidden = YES;

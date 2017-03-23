@@ -209,11 +209,6 @@
         }
        [[self viewController:self] presentViewController:vc animated:YES completion:nil];
     }else if (buttonIndex == 1){
-        if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"无法访问照片" message:@"请在设置-隐私-照片中允许访问照片" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置", nil];
-            [alert show];
-            return;
-        }
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
         vc.manager = self.manager;
         vc.delegate = self;
