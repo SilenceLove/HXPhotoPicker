@@ -14,6 +14,7 @@
 @property (weak, nonatomic) UIImageView *imageView;
 @property (assign, nonatomic) CGPoint imageCenter;
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
+@property (strong, nonatomic) UIImage *gifImage;
 @end
 
 @implementation HXPhotoPreviewViewCell
@@ -101,9 +102,24 @@
     [self.livePhotoView removeFromSuperview];
 }
 
+- (void)startGifImage
+{
+    self.imageView.image = self.gifImage;
+}
+
+- (void)stopGifImage
+{
+    if (self.model.previewPhoto) {
+        self.imageView.image = self.model.previewPhoto;
+    }else {
+        self.imageView.image = self.gifImage.images.firstObject;
+    }
+}
+
 - (void)setModel:(HXPhotoModel *)model
 {
     _model = model;
+    self.gifImage = nil;
     [self.scrollView setZoomScale:1.0 animated:NO];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -125,34 +141,34 @@
     _imageView.frame = CGRectMake(0, 0, w, h);
     _imageView.center = CGPointMake(width / 2, height / 2);
     if (model.type == HXPhotoModelMediaTypePhotoGif) {
-        if (model.imageData) {
-            self.imageView.image = model.gifImage;
+        __weak typeof(self) weakSelf = self;
+            [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+                if (gifImage.images.count == 0) {
+                    weakSelf.imageView.image = gifImage;
+                }else {
+                    weakSelf.imageView.image = gifImage.images.firstObject;
+                }
+                strongSelf.gifImage = gifImage;
+            }];
+    }else {
+        
+        if (model.previewPhoto) {
+            self.imageView.image = model.previewPhoto;
         }else {
             __weak typeof(self) weakSelf = self;
-            [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                model.imageData = imageData;
-                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
-                weakSelf.imageView.image = gifImage;
-                model.gifImage = gifImage;
-            }];
-        }
-    }else {
-        CGFloat scale = [UIScreen mainScreen].scale;
-        __weak typeof(self) weakSelf = self;
-        if (imgHeight > imgWidth / 9 * 17) {
-            [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width * scale, height * scale) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-                model.previewPhoto = image;
-                weakSelf.imageView.image = image;
-            }];
-        }else {
-            if (model.previewPhoto) {
-                self.imageView.image = model.previewPhoto;
-            }else {
-                [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * scale, model.endImageSize.height * scale) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+            if (imgHeight > imgWidth / 9 * 17) {
+                [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width, height) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
                     model.previewPhoto = image;
                     weakSelf.imageView.image = image;
                 }];
-            }
+            }else {
+                [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                    model.previewPhoto = image;
+                    weakSelf.imageView.image = image;
+                }];
+                }
         }
     }
 }

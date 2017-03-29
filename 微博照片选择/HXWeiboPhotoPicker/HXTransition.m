@@ -121,6 +121,9 @@
         HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)fromVC;
         model = vc.modelList[vc.index];
         HXPhotoPreviewViewCell *previewCell = (HXPhotoPreviewViewCell *)[vc.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:vc.index inSection:0]];
+        if (model.type == HXPhotoModelMediaTypePhotoGif) {
+            [previewCell stopGifImage];
+        }
         tempView = previewCell.imageView;
     }else {
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)fromVC;

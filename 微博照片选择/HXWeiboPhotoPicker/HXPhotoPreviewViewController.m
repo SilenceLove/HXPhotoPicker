@@ -143,6 +143,9 @@
         HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
         [cell startLivePhoto];
         self.livePhotoCell = cell;
+    }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
+        HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+        [cell startGifImage];
     }
 }
 
@@ -359,6 +362,10 @@
         HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
         [cell startLivePhoto];
         self.livePhotoCell = cell;
+    }
+    if (model.type == HXPhotoModelMediaTypePhotoGif) {
+        HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+        [cell startGifImage];
     }
 }
 

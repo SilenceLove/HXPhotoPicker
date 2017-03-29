@@ -16,4 +16,6 @@
 @property (assign, nonatomic) BOOL isAnimating;
 - (void)startLivePhoto;
 - (void)stopLivePhoto;
+- (void)startGifImage;
+- (void)stopGifImage;
 @end
