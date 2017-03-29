@@ -102,6 +102,11 @@
     [self.livePhotoView removeFromSuperview];
 }
 
+- (void)fetchPhoto
+{
+    
+}
+
 - (void)startGifImage
 {
     self.imageView.image = self.gifImage;
@@ -112,7 +117,7 @@
     if (self.model.previewPhoto) {
         self.imageView.image = self.model.previewPhoto;
     }else {
-        self.imageView.image = self.gifImage.images.firstObject;
+        self.imageView.image = self.model.thumbPhoto;
     }
 }
 
@@ -153,7 +158,6 @@
                 strongSelf.gifImage = gifImage;
             }];
     }else {
-        
         if (model.previewPhoto) {
             self.imageView.image = model.previewPhoto;
         }else {
@@ -168,7 +172,7 @@
                     model.previewPhoto = image;
                     weakSelf.imageView.image = image;
                 }];
-                }
+            }
         }
     }
 }

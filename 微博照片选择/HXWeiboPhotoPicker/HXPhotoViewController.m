@@ -385,11 +385,12 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         self.previewImg.image = model.previewPhoto;
     }else {
         __weak typeof(self) weakSelf = self;
-        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) deliveryMode:0 completion:^(UIImage *image, NSDictionary *info) {
+        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5) deliveryMode:0 completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.previewImg.image = image;
         } error:^(NSDictionary *info) {
             weakSelf.previewImg.image = model.thumbPhoto;
         }];
+        [NSThread sleepForTimeInterval:0.2];
     }
     CGRect rect = CGRectMake(0, 0, previewingContext.sourceView.frame.size.width, previewingContext.sourceView.frame.size.height);
     previewingContext.sourceRect = rect;
