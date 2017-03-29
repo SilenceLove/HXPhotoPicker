@@ -865,6 +865,11 @@
 {
     AVAsset *asset = [AVAsset assetWithURL:self.videoURL];
     
+    AVAssetTrack *audioTrack;
+    if ([[asset tracksWithMediaType:AVMediaTypeAudio] count] != 0) {
+        audioTrack = [asset tracksWithMediaType:AVMediaTypeAudio][0];
+    }
+    
     AVMutableComposition *mixComposition = [[AVMutableComposition alloc] init];
     
     AVMutableCompositionTrack *videoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
@@ -875,12 +880,24 @@
                          atTime:kCMTimeZero
                           error:&error];
     
+    if (audioTrack != nil) {
+        AVMutableCompositionTrack *compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio
+                                                                            preferredTrackID:kCMPersistentTrackID_Invalid];
+        [compositionAudioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
+                                       ofTrack:audioTrack
+                                        atTime:kCMTimeZero
+                                         error:&error];
+    }
+    
     // 3.1 AVMutableVideoCompositionInstruction 视频轨道中的一个视频，可以缩放、旋转等
     AVMutableVideoCompositionInstruction *mainInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
     mainInstruction.timeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
     
     AVMutableVideoCompositionLayerInstruction *videolayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoTrack];
-    AVAssetTrack *videoAssetTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    AVAssetTrack *videoAssetTrack;
+    if ([[asset tracksWithMediaType:AVMediaTypeVideo] count] != 0) {
+        videoAssetTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    }
     UIImageOrientation videoAssetOrientation_  = UIImageOrientationUp;
     BOOL isVideoAssetPortrait_  = NO;
     CGAffineTransform videoTransform = videoAssetTrack.preferredTransform;
