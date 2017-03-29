@@ -115,15 +115,26 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 - 关于通过 HXPhotoModel 获取照片/视频信息的使用介绍 具体代码还是请下载Demo
 ```
+// 获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
+[HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+    NSLog(@"%@",images);
+}];
+    
+// 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
+[HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
+    NSLog(@"%ld",imageDatas.count);
+}];
+
+
 // 获取照片资源
 [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
     // 小图  - 这个字段会一直有值
     model.thumbPhoto;
 
-    // 大图  - 这个字段有可能没有值, 只有当查看过大图之后才会有值 - 如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
+    // 大图  - 这个字段没有值  - 如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
     model.previewPhoto;
 
-    // imageData  - 这个字段有可能没有值, 只有当查看过gif图片之后才会有值 - 通过相机拍照的这个字段没有值
+    // imageData  - 这个字段没有值
     model.imageData;
 
     // livePhoto  - 这个字段只有当查看过livePhoto之后才会有值
@@ -195,7 +206,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 - 2017-03-11    通过相机拍照和录制视频之后的长照片、长视频裁剪成正方形以及修复一些小问题
 - 2017-03-13    修复自定义相机bug、优化相机照片访问权限问题
 - 2017-03-22    修复最大数限制问题
-- 2017-03-29    解决裁剪视频时声音丢失问题、优化快速滑动内存问题
+- 2017-03-29    解决裁剪视频时声音丢失问题、优化了快速滑动内存问题、添加获取选中数组里面图片的原图和imageData的方法
 
 ## 六.  更多 - More
 
