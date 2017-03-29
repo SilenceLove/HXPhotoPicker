@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
-
+#import "HXPhotoModel.h"
 /*
  *  工具类
  */
@@ -19,17 +19,15 @@
  根据已选照片数组返回原图数组
 
  @param photos 选中照片数组
- @return 原图数组
  */
-//+ (NSArray<UIImage *> *)fetchOriginalForSelectedPhoto:(NSArray *)photos;
++ (void)fetchOriginalForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
 
 /**
  根据已选照片数组返回imageData数组
  
  @param photos 选中照片数组
- @return imageData数组
  */
-//+ (NSArray<NSData *> *)fetchImageDataForSelectedPhoto:(NSArray *)photos;
++ (void)fetchImageDataForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<NSData *> *imageDatas))completion;
 
 
 /**

@@ -62,17 +62,17 @@
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)toVC;
         model = vc.model;
     }
-    if (model.previewPhoto) {
-        [self pushAnim:transitionContext Image:model.previewPhoto Model:model FromVC:fromVC ToVC:toVC];
-    }else {
+    //if (model.previewPhoto) {
+        //[self pushAnim:transitionContext Image:model.previewPhoto Model:model FromVC:fromVC ToVC:toVC];
+    //}else {
         __weak typeof(self) weakSelf = self;
         [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
-            model.previewPhoto = image;
+            //model.previewPhoto = image;
             [weakSelf pushAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC];
         } error:^(NSDictionary *info) {
             [weakSelf pushAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC];
         }];
-    }
+    //}
 }
 
 - (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(HXPhotoViewController *)fromVC ToVC:(UIViewController *)toVC

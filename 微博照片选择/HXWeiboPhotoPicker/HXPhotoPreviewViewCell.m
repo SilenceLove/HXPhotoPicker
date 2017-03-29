@@ -15,6 +15,8 @@
 @property (assign, nonatomic) CGPoint imageCenter;
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @property (strong, nonatomic) UIImage *gifImage;
+@property (assign, nonatomic) PHImageRequestID requestID;
+@property (assign, nonatomic) PHImageRequestID longRequestId;
 @end
 
 @implementation HXPhotoPreviewViewCell
@@ -23,6 +25,8 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+        self.requestID = 0;
+        self.longRequestId = 0;
         [self setup];
     }
     return self;
@@ -102,9 +106,32 @@
     [self.livePhotoView removeFromSuperview];
 }
 
-- (void)fetchPhoto
+- (void)fetchLongPhoto
 {
-    
+    [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+    CGFloat width = self.frame.size.width;
+    CGFloat height = self.frame.size.height;
+    CGFloat imgWidth = self.model.imageSize.width;
+    CGFloat imgHeight = self.model.imageSize.height;
+    PHImageRequestID requestID;
+    __weak typeof(self) weakSelf = self;
+    if (imgHeight > imgWidth / 9 * 17) {
+        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(width, height) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+            weakSelf.imageView.image = image;
+        } error:^(NSDictionary *info) {
+            weakSelf.imageView.image = weakSelf.model.thumbPhoto;
+        }];
+    }else {
+        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2, _model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+            weakSelf.imageView.image = image;
+        } error:^(NSDictionary *info) {
+            weakSelf.imageView.image = weakSelf.model.thumbPhoto;
+        }];
+    }
+    if (self.longRequestId != requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
+        self.longRequestId = requestID;
+    }
 }
 
 - (void)startGifImage
@@ -125,6 +152,7 @@
 {
     _model = model;
     self.gifImage = nil;
+    [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
     [self.scrollView setZoomScale:1.0 animated:NO];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -158,22 +186,27 @@
                 strongSelf.gifImage = gifImage;
             }];
     }else {
-        if (model.previewPhoto) {
-            self.imageView.image = model.previewPhoto;
-        }else {
+        //if (model.previewPhoto) {
+            //self.imageView.image = model.previewPhoto;
+        //}else {
             __weak typeof(self) weakSelf = self;
+        PHImageRequestID requestID;
             if (imgHeight > imgWidth / 9 * 17) {
-                [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width, height) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-                    model.previewPhoto = image;
+                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width / 2, height / 2) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                    //model.previewPhoto = image;
                     weakSelf.imageView.image = image;
                 }];
             }else {
-                [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-                    model.previewPhoto = image;
+                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width, model.endImageSize.height) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                    //model.previewPhoto = image;
                     weakSelf.imageView.image = image;
                 }];
             }
+        if (self.requestID != requestID) {
+            [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         }
+        self.requestID = requestID;
+        //}
     }
 }
 

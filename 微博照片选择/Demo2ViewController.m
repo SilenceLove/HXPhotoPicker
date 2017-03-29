@@ -83,10 +83,23 @@
     [self.view addSubview:photoView];
 }
 
-- (void)photoViewChangeComplete:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)isOriginal
+- (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal
 {
     NSLog(@"%ld - %ld - %ld",allList.count,photos.count,videos.count);
     
+    /*  获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
+    [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+        NSLog(@"%@",images);
+    }];
+     */
+    
+    /* 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
+    [HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
+        NSLog(@"%ld",imageDatas.count);
+    }];
+    
+     */
+     
     /*
      
     // 获取图片资源
@@ -94,10 +107,10 @@
         // 小图  - 这个字段会一直有值
         model.thumbPhoto;
         
-        // 大图  - 这个字段有可能没有值, 只有当查看过大图之后才会有值 - 如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
+        // 大图  - 这个字段没有值,  如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
         model.previewPhoto;
         
-        // imageData  - 这个字段有可能没有值, 只有当查看过gif图片之后才会有值 - 通过相机拍照的这个字段没有值
+        // imageData  - 这个字段没有值
         model.imageData;
         
         // livePhoto  - 这个字段只有当查看过livePhoto之后才会有值

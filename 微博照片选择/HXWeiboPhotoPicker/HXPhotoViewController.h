@@ -25,7 +25,7 @@
  @param videos 视频对象 - 之前选择的所有视频
  @param original 是否原图
  */
-- (void)photoViewControllerDidNext:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)original;
+- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original;
 
 /**
  点击取消执行的代理

@@ -136,4 +136,7 @@ typedef enum : NSUInteger {
  */
 @property (assign, nonatomic) NSInteger endCollectionIndex;
 
+@property (assign, nonatomic) NSInteger fetchOriginalIndex;
+@property (assign, nonatomic) NSInteger fetchImageDataIndex;
+
 @end

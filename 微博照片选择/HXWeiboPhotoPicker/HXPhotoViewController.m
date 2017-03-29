@@ -381,9 +381,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     HXPhotoModel *model = self.objs[index.item];
     self.previewImg = [[UIImageView alloc] init];
     self.previewImg.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);
-    if (model.previewPhoto) {
-        self.previewImg.image = model.previewPhoto;
-    }else {
+    //if (model.previewPhoto) {
+        //self.previewImg.image = model.previewPhoto;
+    //}else {
         __weak typeof(self) weakSelf = self;
         [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5) deliveryMode:0 completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.previewImg.image = image;
@@ -391,7 +391,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             weakSelf.previewImg.image = model.thumbPhoto;
         }];
         [NSThread sleepForTimeInterval:0.2];
-    }
+    //}
     CGRect rect = CGRectMake(0, 0, previewingContext.sourceView.frame.size.width, previewingContext.sourceView.frame.size.height);
     previewingContext.sourceRect = rect;
     if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {

@@ -193,7 +193,11 @@
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
     }else {
         __weak typeof(self) weakSelf = self;
-        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width * 2, width *2) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+        CGSize size = CGSizeMake(width * 2, width * 2);
+        //if (model.endImageSize.height > model.endImageSize.width * 20) {
+            //size = CGSizeMake(model.imageSize.width, [UIScreen mainScreen].bounds.size.height);
+        //}
+        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
             model.thumbPhoto = image;
         }];

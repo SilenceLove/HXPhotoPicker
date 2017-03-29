@@ -18,4 +18,5 @@
 - (void)stopLivePhoto;
 - (void)startGifImage;
 - (void)stopGifImage;
+- (void)fetchLongPhoto;
 @end

@@ -15,7 +15,7 @@
 @protocol HXPhotoViewDelegate <NSObject>
 
 // 代理返回 选择、移动顺序、删除之后的图片以及视频
-- (void)photoViewChangeComplete:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)isOriginal;
+- (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal;
 
 // 当view更新高度时调用
 - (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view;
