@@ -223,42 +223,56 @@
 
 + (void)fetchOriginalForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void (^)(NSArray<UIImage *> *))completion
 {
-    NSMutableArray *images = [NSMutableArray array];
-    [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-        model.fetchOriginalIndex = idx;
-        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-            [self sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                if (completion) {
-                    completion(array);
-                }
-            }];
-        }else if (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
-            [self FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                model.previewPhoto = [UIImage imageWithData:imageData];
-                [self sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                    if (completion) {
-                        completion(array);
-                    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        __block NSMutableArray *images = [NSMutableArray array];
+        __weak typeof(self) weakSelf = self;
+        [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            model.fetchOriginalIndex = idx;
+            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (completion) {
+                            completion(array);
+                        }
+                    });
                 }];
-            }];
-        }else {
-            [self FetchPhotoForPHAsset:model.asset Size:PHImageManagerMaximumSize deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
-                model.previewPhoto = image;
-                [self sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                    if (completion) {
-                        completion(array);
-                    }
+            }else if (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
+                [strongSelf FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+                    model.previewPhoto = [UIImage imageWithData:imageData];
+                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(array);
+                            }
+                        });
+                    }];
                 }];
-            } error:^(NSDictionary *info) {
-                model.previewPhoto = model.thumbPhoto;
-                [self sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                    if (completion) {
-                        completion(array);
+            }else {
+                [strongSelf FetchPhotoForPHAsset:model.asset Size:PHImageManagerMaximumSize deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+                    if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                        model.previewPhoto = image;
+                        [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if (completion) {
+                                    completion(array);
+                                }
+                            });
+                        }];
                     }
+                } error:^(NSDictionary *info) {
+                    model.previewPhoto = model.thumbPhoto;
+                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(array);
+                            }
+                        });
+                    }];
                 }];
-            }];
-        }
-    }];
+            }
+        }];
+    });
 }
 
 + (void)sortImageForModel:(HXPhotoModel *)model total:(NSInteger)total images:(NSMutableArray *)images completion:(void(^)(NSArray *array))completion
@@ -275,11 +289,13 @@
             NSComparisonResult result = [number1 compare:number2];
             return result == NSOrderedDescending;
         }];
-        NSMutableArray *array = [NSMutableArray array];
+        NSMutableArray *array = [NSMutableArray arrayWithArray:images.mutableCopy];
         for (HXPhotoModel *md in images) {
-            [array addObject:md.previewPhoto];
             md.previewPhoto = nil;
+            md.thumbPhoto = nil;
         }
+        [images removeAllObjects];
+        images = nil;
         if (completion) {
             completion(array);
         }
@@ -288,35 +304,43 @@
 
 + (void)fetchImageDataForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void (^)(NSArray<NSData *> *))completion
 {
-    NSMutableArray *imageDatas = [NSMutableArray array];
-    [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-        model.fetchImageDataIndex = idx;
-        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-            NSData *imageData;
-            if (UIImagePNGRepresentation(model.thumbPhoto)) {
-                //返回为png图像。
-                imageData = UIImagePNGRepresentation(model.thumbPhoto);
-            }else {
-                //返回为JPEG图像。
-                imageData = UIImageJPEGRepresentation(model.thumbPhoto, 1.0);
-            }
-            model.imageData = imageData;
-            [self sortDataForModel:model total:photos.count images:imageDatas completion:^(NSArray *array) {
-                if (completion) {
-                    completion(array);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        __block NSMutableArray *imageDatas = [NSMutableArray array];
+        __weak typeof(self) weakSelf= self;
+        [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            model.fetchImageDataIndex = idx;
+            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                NSData *imageData;
+                if (UIImagePNGRepresentation(model.thumbPhoto)) {
+                    //返回为png图像。
+                    imageData = UIImagePNGRepresentation(model.thumbPhoto);
+                }else {
+                    //返回为JPEG图像。
+                    imageData = UIImageJPEGRepresentation(model.thumbPhoto, 1.0);
                 }
-            }];
-        }else {
-            [self FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
                 model.imageData = imageData;
-                [self sortDataForModel:model total:photos.count images:imageDatas completion:^(NSArray *array) {
-                    if (completion) {
-                        completion(array);
-                    }
+                [strongSelf sortDataForModel:model total:photos.count images:imageDatas completion:^(NSArray *array) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (completion) {
+                            completion(array);
+                        }
+                    });
                 }];
-            }];
-        }
-    }];
+            }else {
+                [strongSelf FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+                    model.imageData = imageData;
+                    [strongSelf sortDataForModel:model total:photos.count images:imageDatas completion:^(NSArray *array) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(array);
+                            }
+                        });
+                    }];
+                }];
+            }
+        }];
+    });
 }
 
 + (void)sortDataForModel:(HXPhotoModel *)model total:(NSInteger)total images:(NSMutableArray *)images completion:(void(^)(NSArray *array))completion
@@ -333,11 +357,14 @@
             NSComparisonResult result = [number1 compare:number2];
             return result == NSOrderedDescending;
         }];
-        NSMutableArray *array = [NSMutableArray array];
+        NSMutableArray *array = [NSMutableArray arrayWithArray:images.mutableCopy];
         for (HXPhotoModel *md in images) {
-            [array addObject:md.imageData];
             md.imageData = nil;
+            md.thumbPhoto = nil;
+            md.previewPhoto = nil;
         }
+        [images removeAllObjects];
+        images = nil;
         if (completion) {
             completion(array);
         }

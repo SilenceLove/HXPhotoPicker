@@ -87,18 +87,18 @@
 {
     NSLog(@"%ld - %ld - %ld",allList.count,photos.count,videos.count);
     
-    /*  获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
+    //  获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
     [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
         NSLog(@"%@",images);
     }];
-     */
+     
     
-    /* 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
+    // 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
     [HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
         NSLog(@"%ld",imageDatas.count);
     }];
     
-     */
+     
      
     /*
      
