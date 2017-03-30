@@ -292,7 +292,6 @@
         NSMutableArray *array = [NSMutableArray arrayWithArray:images.mutableCopy];
         for (HXPhotoModel *md in images) {
             md.previewPhoto = nil;
-            md.thumbPhoto = nil;
         }
         [images removeAllObjects];
         images = nil;
@@ -360,7 +359,6 @@
         NSMutableArray *array = [NSMutableArray arrayWithArray:images.mutableCopy];
         for (HXPhotoModel *md in images) {
             md.imageData = nil;
-            md.thumbPhoto = nil;
             md.previewPhoto = nil;
         }
         [images removeAllObjects];
