@@ -251,6 +251,9 @@
             }else {
                 [strongSelf FetchPhotoForPHAsset:model.asset Size:PHImageManagerMaximumSize deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
                     if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                        if (!image) {
+                            image = model.thumbPhoto;
+                        }
                         model.previewPhoto = image;
                         [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
                             dispatch_async(dispatch_get_main_queue(), ^{
@@ -289,17 +292,22 @@
             NSComparisonResult result = [number1 compare:number2];
             return result == NSOrderedDescending;
         }];
-        NSMutableArray *array = [NSMutableArray arrayWithArray:images.mutableCopy];
-        for (HXPhotoModel *md in images) {
-            md.previewPhoto = nil;
-        }
-        [images removeAllObjects];
-        images = nil;
+        NSMutableArray *array = [NSMutableArray array];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for (HXPhotoModel *md in images) {
+                if (!md.previewPhoto) {
+                    continue;
+                }
+                [array addObject:md.previewPhoto];
+            }
+            [images removeAllObjects];
+        });
         if (completion) {
             completion(array);
         }
     }
 }
+
 
 + (void)fetchImageDataForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void (^)(NSArray<NSData *> *))completion
 {
@@ -356,8 +364,12 @@
             NSComparisonResult result = [number1 compare:number2];
             return result == NSOrderedDescending;
         }];
-        NSMutableArray *array = [NSMutableArray arrayWithArray:images.mutableCopy];
+        NSMutableArray *array = [NSMutableArray array];
         for (HXPhotoModel *md in images) {
+            if (!md.imageData) {
+                continue;
+            }
+            [array addObject:md.imageData.copy];
             md.imageData = nil;
             md.previewPhoto = nil;
         }

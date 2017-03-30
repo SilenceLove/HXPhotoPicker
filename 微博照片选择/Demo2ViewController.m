@@ -87,16 +87,18 @@
 {
     NSLog(@"%ld - %ld - %ld",allList.count,photos.count,videos.count);
     
-    //  获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
-    [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-        NSLog(@"%@",images);
-    }];
-     
     
-    // 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
+    // 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
     [HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
         NSLog(@"%ld",imageDatas.count);
     }];
+    
+    //  获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的地方获取 此方法会增大内存. 获取原图图片之后请将选中数组中模型里面的数据全部清空
+//    [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+//        NSLog(@"%@",images);
+//    }];
+    
+    
     
      
      
@@ -110,7 +112,7 @@
         // 大图  - 这个字段没有值,  如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
         model.previewPhoto;
         
-        // imageData  - 这个字段没有值
+        // imageData  - 这个字段没有值 请根据指定方法获取
         model.imageData;
         
         // livePhoto  - 这个字段只有当查看过livePhoto之后才会有值

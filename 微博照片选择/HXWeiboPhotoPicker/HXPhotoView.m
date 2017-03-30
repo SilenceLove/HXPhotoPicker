@@ -322,6 +322,11 @@
     }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
         [self.videos removeObject:model];
     }
+    model.thumbPhoto = nil;
+    model.previewPhoto = nil;
+    model.imageData = nil;
+    model.livePhoto = nil;
+    model = nil;
     [self changeSelectedListModelIndex];
     
     UIView *mirrorView = [cell snapshotViewAfterScreenUpdates:NO];

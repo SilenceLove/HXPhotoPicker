@@ -115,16 +115,15 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 - 关于通过 HXPhotoModel 获取照片/视频信息的使用介绍 具体代码还是请下载Demo
 ```
-// 获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
-[HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-    NSLog(@"%@",images);
-}];
-    
 // 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
 [HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
     NSLog(@"%ld",imageDatas.count);
 }];
 
+// 获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的地方获取 此方法比较消耗内存. 获取原图图片之后请将选中数组中模型里面的数据全部清空   建议使用获取imageData方法
+[HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+    NSLog(@"%@",images);
+}];
 
 // 获取照片资源
 [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
