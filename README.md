@@ -31,15 +31,17 @@
 ## 四.  例子 - Examples
 
 ```
-// 关于为什么照片模型里面只有 thumbPhoto 这个才有值
-// 为了优化相册列表以及预览大图列表快速滑动内存暴增的问题，
-   如果缓存了imageData或者原图的image 如果用户图片过多时这会导致内存的增大,
-   而且当快速滑动遇到图片过大时可能导致滑动卡顿 / 内存警告⚠️程序被杀。
-   故不缓存imageData和image 只保留 thumbPhoto 缩略图   
-   这样可以保证在选择照片/快速滑动过程中,不会因为内存过大导致程序被杀 和 滑动流畅丝滑。
-   所以要获取已选图片的原图可以选择本人提供的快速获取已选照片的全部原图，也可以自己根据指定方法获取不同质量的图片。
-   提醒：在用户没有选择原图的时候不要使用原图上传，获取image时size稍微缩小一点这样可以保证上传快内存消耗小一点。
-   在使用快速获取原图方法时,请将这个方法写在上传方法里! 在获取原图Image的过程中会比较消耗内存.
+  !关于为什么照片模型里面只有 thumbPhoto 这个才有值
+  为了优化相册列表以及预览大图列表快速滑动内存暴增的问题，
+  如果缓存了imageData或者原图的image,用户图片过多时这会导致内存的增大,
+  而且当快速滑动遇到图片过大时可能导致滑动卡顿 / 内存警告⚠️程序被杀。
+  故不缓存imageData和image 只保留 thumbPhoto 缩略图   
+  这样可以保证在选择照片/快速滑动过程中,不会因为内存过大导致程序被杀 和 滑动流畅丝滑。
+  所以要获取已选图片的原图可以选择HXPhotoTools提供的快速获取已选照片的全部原图 或
+  快速获取已选照片的全图高清图片,获取高清图片消耗内存很小而且图片质量也很高
+  当然您也可以自己根据指定方法控制传入的size来获取不同质量的图片。
+  提醒：在用户没有选择原图的时候不要使用原图上传，获取image时size稍微缩小一点这样可以保证上传快内存消耗小一点。
+  在使用快速获取原图方法时,请将这个方法写在上传方法里! 在获取原图Image的过程中会比较消耗内存.
 ```
 - HXPhotoManager 照片管理类相关属性介绍
 
@@ -127,6 +129,24 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 - 关于通过 HXPhotoModel 获取照片/视频信息的使用介绍 具体代码还是请下载Demo
 ```
+// 获取数组里面图片的 HD(高清)图片  传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
+[HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+    NSLog(@"%@",images);
+}];
+/*
+如果真的觉得这个方法获取的高清图片还达不到你想要的效果,你可以按住 command 点击上面方法修改以下属性来获取你想要的图片
+
+  // 这里的size 是普通图片的时候  想要更高质量的图片 可以把 1.5 换成 2 或者 3
+      如果觉得内存消耗过大可以 调小一点
+
+   CGSize size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
+
+  // 这里是判断图片是否过长 因为图片如果长了 上面的size就显的有点小了获取出来的图片就变模糊了,所以这里把宽度 换成了屏幕的宽度,这个可以保证即不影响内存也不影响质量 如果觉得质量达不到你的要求,可以乘上 1.5 或者 2 . 当然你也可以不按我这样给size,自己测试怎么给都可以
+   if (model.endImageSize.height > model.endImageSize.width / 9 * 20) {
+      size = CGSizeMake([UIScreen mainScreen].bounds.size.width, model.endImageSize.height);
+   }
+*/
+
 // 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
 [HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
     NSLog(@"%ld",imageDatas.count);
