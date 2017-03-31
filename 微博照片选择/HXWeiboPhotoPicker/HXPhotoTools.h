@@ -23,6 +23,14 @@
 + (void)fetchOriginalForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
 
 /**
+ 根据已选照片数组返回高清图片数组 (质量略小于原图)
+
+ @param photos 选中照片数组
+ @param completion 高清图片数组
+ */
++ (void)fetchHDImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
+
+/**
  根据已选照片数组返回imageData数组
  
  @param photos 选中照片数组

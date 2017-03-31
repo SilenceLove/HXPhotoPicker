@@ -278,6 +278,70 @@
     });
 }
 
++ (void)fetchHDImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void (^)(NSArray<UIImage *> *))completion
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        __block NSMutableArray *images = [NSMutableArray array];
+        __weak typeof(self) weakSelf = self;
+        [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            model.fetchOriginalIndex = idx;
+            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (completion) {
+                            completion(array);
+                        }
+                    });
+                }];
+            }else if (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
+                [strongSelf FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+                    model.previewPhoto = [UIImage imageWithData:imageData];
+                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(array);
+                            }
+                        });
+                    }];
+                }];
+            }else {
+                // 这里的size 是普通图片的时候  想要更高质量的图片 可以把 1.5 换成 2 或者 3  如果觉得内存消耗过大可以 调小一点
+                CGSize size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
+                
+                // 这里是判断图片是否过长 因为图片如果长了 上面的size就显的有点小了获取出来的图片就变模糊了,所以这里把宽度 换成了屏幕的宽度,这个可以保证即不影响内存也不影响质量 如果觉得质量达不到你的要求,可以乘上 1.5 或者 2 . 当然你也可以不按我这样给size,自己测试怎么给都可以
+                if (model.endImageSize.height > model.endImageSize.width / 9 * 20) {
+                    size = CGSizeMake([UIScreen mainScreen].bounds.size.width, model.endImageSize.height);
+                }
+                [strongSelf FetchPhotoForPHAsset:model.asset Size:size deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+                    if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                        if (!image) {
+                            image = model.thumbPhoto;
+                        }
+                        model.previewPhoto = image;
+                        [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if (completion) {
+                                    completion(array);
+                                }
+                            });
+                        }];
+                    }
+                } error:^(NSDictionary *info) {
+                    model.previewPhoto = model.thumbPhoto;
+                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(array);
+                            }
+                        });
+                    }];
+                }];
+            }
+        }];
+    });
+}
+
 + (void)sortImageForModel:(HXPhotoModel *)model total:(NSInteger)total images:(NSMutableArray *)images completion:(void(^)(NSArray *array))completion
 {
     [images addObject:model];
@@ -293,15 +357,13 @@
             return result == NSOrderedDescending;
         }];
         NSMutableArray *array = [NSMutableArray array];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            for (HXPhotoModel *md in images) {
-                if (!md.previewPhoto) {
-                    continue;
-                }
-                [array addObject:md.previewPhoto];
+        for (HXPhotoModel *md in images) {
+            if (!md.previewPhoto) {
+                continue;
             }
-            [images removeAllObjects];
-        });
+            [array addObject:md.previewPhoto];
+        }
+        [images removeAllObjects];
         if (completion) {
             completion(array);
         }
