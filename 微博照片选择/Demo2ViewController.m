@@ -101,9 +101,9 @@
      */
     
     // 获取数组里面图片的 HD(高清)图片  传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
-    [HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-        NSLog(@"%@",images);
-    }];
+//    [HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+//        NSLog(@"%@",images);
+//    }];
     /*
      如果真的觉得这个方法获取的高清图片还达不到你想要的效果,你可以按住 command 点击上面方法修改以下属性来获取你想要的图片
      
@@ -125,10 +125,10 @@
     }];
     
     //  获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的地方获取 此方法会增大内存. 获取原图图片之后请将选中数组中模型里面的数据全部清空
-//    [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-//        NSLog(@"%@",images);
-//    }];
-     
+    [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+        NSLog(@"%@",images);
+    }];
+    
     /*
      
     // 获取图片资源
@@ -189,7 +189,7 @@
     
     // 判断照片、视频 或 是否是通过相机拍摄的
     [allList enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             // 通过相机录制的视频
         }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
             // 通过相机拍摄的照片
