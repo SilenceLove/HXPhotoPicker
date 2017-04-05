@@ -218,7 +218,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 
 // 判断照片、视频 或 是否是通过相机拍摄的
 [allList enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-    if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+    if (model.type == HXPhotoModelMediaTypeCameraVideo) {
         // 通过相机录制的视频
     }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         // 通过相机拍摄的照片
