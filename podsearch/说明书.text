@@ -1,0 +1,1 @@
+如果podsearch不到请将此文件夹里的 ‘HXWeiboPhotoPicker’ 文件夹复制到 /Users/‘这里是你的用户名’/.cocoapods/repos/master/Specs/f/5/e  这里路径里,然后在终端执行 rm ~/Library/Caches/CocoaPods/search_index.json 然后再 pod search HXWeiboPhotoPicker 
