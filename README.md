@@ -19,7 +19,7 @@
 ## 二.  安装 - Installation
 
 - Cocoapods：pod 'HXWeiboPhotoPicker' '~> 1.2'
-- 如果 pod search 不到请把项目里podsearch文件夹里的 ‘HXWeiboPhotoPicker’ 文件夹复制到 /Users/‘这里是你的用户 名’/.cocoapods/repos/master/Specs/f/5/e  这里路径里,然后在终端执行 rm ~/Library/Caches/CocoaPods/search_index.json 然后再 pod search HXWeiboPhotoPicker
+- 如果 pod search 不到请把项目里podsearch文件夹里的 ‘HXWeiboPhotoPicker’ 文件夹复制到 /Users/‘这里是你的用户 名’/.cocoapods/repos/master/Specs/f/5/e  这个路径里,然后在终端执行 rm ~/Library/Caches/CocoaPods/search_index.json 然后再 pod search HXWeiboPhotoPicker
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
