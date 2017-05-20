@@ -6,6 +6,7 @@
 
 <img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> 
 
+## 最新支持浏览网络图片
 ## 一.  特性 - Features
 
 - [x] 查看/选择GIF图片
@@ -15,10 +16,11 @@
 - [x] 自定义相机拍照/录制视频
 - [x] 自定义转场动画
 - [x] 查看/选择LivePhoto IOS9以上才有用
+- [x] 支持浏览网络图片
 
 ## 二.  安装 - Installation
 
-- Cocoapods：pod 'HXWeiboPhotoPicker' '~> 1.2'
+- Cocoapods：pod 'HXWeiboPhotoPicker' '~> 1.2' 
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
@@ -242,6 +244,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 - 2017-03-13    修复自定义相机bug、优化相机照片访问权限问题
 - 2017-03-22    修复最大数限制问题
 - 2017-03-29    解决裁剪视频时声音丢失问题、优化了快速滑动内存问题、添加获取选中数组里面图片的原图和imageData的方法
+- 2017-05-20    添加支持传入网络图片Url数组后进行浏览查看并删除
 
 ## 六.  更多 - More
 
