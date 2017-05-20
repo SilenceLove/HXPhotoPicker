@@ -844,7 +844,7 @@
             model.videoURL = weakSelf.clipVideoURL;
             model.videoTime = videoTime;
             model.thumbPhoto = image;
-            model.imageSize = [image clipImage:self.effectiveScale].size;
+            model.imageSize = [image clipImage:weakSelf.effectiveScale].size;
             model.previewPhoto = image;
             model.cameraIdentifier = [weakSelf videoOutFutFileName];
             [weakSelf.view handleLoading];

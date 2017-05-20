@@ -19,4 +19,8 @@
 @property (weak, nonatomic) id<HXPhotoSubViewCellDelegate> delegate;
 @property (weak, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic) HXPhotoModel *model;
+/**
+ 删除网络图片时是否显示Alert // 默认显示
+ */
+@property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
 @end

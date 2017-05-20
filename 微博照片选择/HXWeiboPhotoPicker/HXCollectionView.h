@@ -46,4 +46,6 @@
 
 @property (weak, nonatomic) id<HXCollectionViewDelegate> delegate;
 @property (weak, nonatomic) id<HXCollectionViewDataSource> dataSource;
+@property (assign, nonatomic) BOOL editEnabled;
+
 @end

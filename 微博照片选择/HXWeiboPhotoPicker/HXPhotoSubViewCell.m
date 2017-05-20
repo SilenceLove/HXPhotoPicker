@@ -8,7 +8,9 @@
 
 #import "HXPhotoSubViewCell.h"
 #import "HXPhotoModel.h"
-@interface HXPhotoSubViewCell ()
+#import "UIImageView+WebCache.h"
+#import "HXCircleProgressView.h"
+@interface HXPhotoSubViewCell ()<UIAlertViewDelegate>
 @property (weak, nonatomic) UIImageView *imageView;
 @property (weak, nonatomic) UIButton *deleteBtn;
 @property (weak, nonatomic) UIView *bottomView;
@@ -16,6 +18,7 @@
 @property (weak, nonatomic) UILabel *videoTime;
 @property (weak, nonatomic) UIImageView *gifIcon;
 @property (weak, nonatomic) UIImageView *liveIcon;
+@property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
 
 @implementation HXPhotoSubViewCell
@@ -68,12 +71,30 @@
     UIImageView *gifIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"timeline_image_gif@2x.png"]];
     [self.contentView addSubview:gifIcon];
     self.gifIcon = gifIcon;
+    
+    self.progressView = [[HXCircleProgressView alloc] init];
+    self.progressView.hidden = YES;
+    [self.contentView addSubview:self.progressView];
 }
 
 - (void)didDeleteClick
 {
+    if (self.model.networkPhotoUrl.length > 0) {
+        if (self.showDeleteNetworkPhotoAlert) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"是否删除此照片" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+            [alert show];
+            return;
+        }
+    }
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
         [self.delegate cellDidDeleteClcik:self];
+    }
+}
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) {
+        if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
+            [self.delegate cellDidDeleteClcik:self];
+        }
     }
 }
 
@@ -94,7 +115,34 @@
     }else {
         self.deleteBtn.hidden = NO;
     }
-    
+    if (model.networkPhotoUrl.length > 0) {
+        self.progressView.hidden = model.downloadComplete;
+        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.networkPhotoUrl] placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+            model.receivedSize = receivedSize;
+            model.expectedSize = expectedSize;
+            CGFloat progress = (CGFloat)receivedSize / expectedSize;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.progressView.progress = progress;
+            });
+        } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+            if (error != nil) {
+                [self.progressView showError];
+            }else {
+                if (image) {
+                    self.progressView.progress = 1;
+                    self.progressView.hidden = YES;
+                    self.imageView.image = image;
+                    model.imageSize = image.size;
+                    model.thumbPhoto = image;
+                    model.previewPhoto = image;
+                    self.userInteractionEnabled = YES;
+                    model.downloadComplete = YES;
+                }
+            }
+        }];
+    }else {
+        self.progressView.hidden = YES;
+    }
     if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             self.gifIcon.hidden = NO;
@@ -126,6 +174,9 @@
     self.videoTime.frame = CGRectMake(CGRectGetMaxX(self.videoIcon.frame), 0, width - CGRectGetMaxX(self.videoIcon.frame) - 5, 25);
     
     self.gifIcon.frame = CGRectMake(width - self.gifIcon.image.size.width, height - self.gifIcon.image.size.height, self.gifIcon.image.size.width, self.gifIcon.image.size.height);
+    
+//    self.progressView.frame = CGRectMake(0, 0, 60, 60);
+    self.progressView.center = CGPointMake(width / 2, height / 2);
 }
 
 @end

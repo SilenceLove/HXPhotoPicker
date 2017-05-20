@@ -52,6 +52,16 @@ typedef enum : NSUInteger {
 
 
 /**
+ 删除网络图片时是否显示Alert // 默认显示
+ */
+@property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
+
+/**
+ 网络图片地址数组
+ */
+@property (strong, nonatomic) NSMutableArray *networkPhotoUrls;
+
+/**
  是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
  */
 @property (assign, nonatomic) BOOL outerCamera;
@@ -82,7 +92,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL goCamera;
 
 /**
- 最大选择数 默认10 - 必填
+ 最大选择数 等于 图片最大数 + 视频最大数 默认10 - 必填
  */
 @property (assign, nonatomic) NSInteger maxNum;
 

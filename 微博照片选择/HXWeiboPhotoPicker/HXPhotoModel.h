@@ -118,6 +118,11 @@ typedef enum : NSUInteger {
  */
 @property (strong, nonatomic) NSURL *videoURL;
 
+/**  
+ 网络图片的地址
+ */
+@property (copy, nonatomic) NSString *networkPhotoUrl;
+
 /**
  当前图片所在相册的下标
  */
@@ -138,5 +143,9 @@ typedef enum : NSUInteger {
 
 @property (assign, nonatomic) NSInteger fetchOriginalIndex;
 @property (assign, nonatomic) NSInteger fetchImageDataIndex;
+
+@property (assign, nonatomic) NSInteger receivedSize;
+@property (assign, nonatomic) NSInteger expectedSize;
+@property (assign, nonatomic) BOOL downloadComplete;
 
 @end

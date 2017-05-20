@@ -20,11 +20,15 @@
 // 当view更新高度时调用
 - (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view;
 
+// 删除网络图片的地址
+- (void)photoViewDeleteNetworkPhoto:(NSString *)networkPhotoUrl;
+
 @end
 
 @interface HXPhotoView : UIView
 
 @property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
+@property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;

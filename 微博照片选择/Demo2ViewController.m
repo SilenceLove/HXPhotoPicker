@@ -85,7 +85,7 @@
 
 - (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal
 {
-    NSLog(@"%ld - %ld - %ld",allList.count,photos.count,videos.count);
+    NSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     
     /*
      关于为什么照片模型里面只有 thumbPhoto 这个才有值
@@ -101,9 +101,9 @@
      */
     
     // 获取数组里面图片的 HD(高清)图片  传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
-//    [HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-//        NSLog(@"%@",images);
-//    }];
+    [HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+        NSLog(@"%@",images);
+    }];
     /*
      如果真的觉得这个方法获取的高清图片还达不到你想要的效果,你可以按住 command 点击上面方法修改以下属性来获取你想要的图片
      
@@ -121,13 +121,13 @@
     
     // 获取数组里面图片原图的 imageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
     [HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
-        NSLog(@"%ld",imageDatas.count);
+        NSLog(@"照片Data数据:%ld",imageDatas.count);
     }];
     
     //  获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的地方获取 此方法会增大内存. 获取原图图片之后请将选中数组中模型里面的数据全部清空
-    [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-        NSLog(@"%@",images);
-    }];
+//    [HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+//        NSLog(@"照片image:%@",images);
+//    }];
     
     /*
      
@@ -203,6 +203,10 @@
     }];
      
      */
+}
+
+- (void)photoViewDeleteNetworkPhoto:(NSString *)networkPhotoUrl {
+    NSLog(@"%@",networkPhotoUrl);
 }
 
 - (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view

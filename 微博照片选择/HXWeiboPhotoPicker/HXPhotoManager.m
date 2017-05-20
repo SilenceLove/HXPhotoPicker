@@ -8,7 +8,7 @@
 
 #import "HXPhotoManager.h"
 
-#define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
+#define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 @interface HXPhotoManager ()
 @property (strong, nonatomic) NSMutableArray *albums;
 @property (strong, nonatomic) NSMutableArray *allPhotos;
@@ -66,6 +66,8 @@
     self.endSelectedCameraList = [NSMutableArray array];
     self.endSelectedCameraPhotos = [NSMutableArray array];
     self.endSelectedCameraVideos = [NSMutableArray array];
+    self.networkPhotoUrls = [NSMutableArray array];
+    self.showDeleteNetworkPhotoAlert = YES;
 }
 
 /**
@@ -115,7 +117,7 @@
     
     for (int i = 0; i<self.albums.count; i++) {
         HXAlbumModel *model = self.albums[i];
-        if ([model.albumName isEqualToString:@"相机胶卷"]) {
+        if ([model.albumName isEqualToString:@"相机胶卷"] || [model.albumName isEqualToString:@"所有照片"]) {
             [self.albums removeObject:model];
             [self.albums insertObject:model atIndex:0];
             break;

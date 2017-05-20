@@ -358,10 +358,19 @@
         }];
         NSMutableArray *array = [NSMutableArray array];
         for (HXPhotoModel *md in images) {
-            if (!md.previewPhoto) {
-                continue;
+            if (md.type != HXPhotoModelMediaTypeCameraPhoto) {
+                if (!md.previewPhoto) {
+                    if (md.thumbPhoto) {
+                        [array addObject:md.thumbPhoto];
+                    }
+                }else {
+                    [array addObject:md.previewPhoto];
+                }
+            }else {
+                if (md.thumbPhoto) {
+                    [array addObject:md.thumbPhoto];
+                }
             }
-            [array addObject:md.previewPhoto];
         }
         [images removeAllObjects];
         if (completion) {

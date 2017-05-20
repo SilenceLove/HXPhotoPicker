@@ -186,11 +186,14 @@
                 strongSelf.gifImage = gifImage;
             }];
     }else {
-        //if (model.previewPhoto) {
+        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            self.imageView.image = model.thumbPhoto;
+        }else {
+            //if (model.previewPhoto) {
             //self.imageView.image = model.previewPhoto;
-        //}else {
+            //}else {
             __weak typeof(self) weakSelf = self;
-        PHImageRequestID requestID;
+            PHImageRequestID requestID;
             if (imgHeight > imgWidth / 9 * 17) {
                 requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width / 2, height / 2) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
                     //model.previewPhoto = image;
@@ -202,11 +205,12 @@
                     weakSelf.imageView.image = image;
                 }];
             }
-        if (self.requestID != requestID) {
-            [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+            if (self.requestID != requestID) {
+                [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+            }
+            self.requestID = requestID;
+            //}
         }
-        self.requestID = requestID;
-        //}
     }
 }
 

@@ -31,6 +31,7 @@
         self.layer.masksToBounds = NO;
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
+        self.editEnabled = YES;
         [self addGesture];
     }
     return self;
@@ -40,8 +41,14 @@
 {
     UILongPressGestureRecognizer *longPgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPrgEvent:)];
     longPgr.minimumPressDuration = 0.25f;
+    longPgr.enabled = self.editEnabled;
     [self addGestureRecognizer:longPgr];
     self.longPgr = longPgr;
+}
+
+- (void)setEditEnabled:(BOOL)editEnabled {
+    _editEnabled = editEnabled;
+    self.longPgr.enabled = editEnabled;
 }
 
 - (void)longPrgEvent:(UILongPressGestureRecognizer *)longPgr

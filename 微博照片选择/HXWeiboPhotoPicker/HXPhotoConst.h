@@ -7,6 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+/*
+ * 暂时无用
+ */
 
 extern NSString *const HXPhotoCameraFocusing;
 extern NSString *const HXPhotoComposeLivePhotoBackground;
