@@ -167,8 +167,8 @@
     if (!_selectedBtn) {
         CGFloat width = self.view.frame.size.width;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_selectedBtn setImage:[UIImage imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
-        [_selectedBtn setImage:[UIImage imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
         CGFloat selectedBtnW = _selectedBtn.currentImage.size.width;
         CGFloat selectedBtnH = _selectedBtn.currentImage.size.height;
         _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, 84, selectedBtnW, selectedBtnH);

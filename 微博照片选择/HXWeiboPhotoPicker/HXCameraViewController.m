@@ -17,19 +17,14 @@
 @interface HXCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate>
 //捕获设备，通常是前置摄像头，后置摄像头，麦克风（音频输入）
 @property (nonatomic, strong) AVCaptureDevice *device;
-
 //AVCaptureDeviceInput 代表输入设备，他使用AVCaptureDevice 来初始化
 @property (nonatomic, strong) AVCaptureDeviceInput *input;
-
 //输出图片
 @property (nonatomic ,strong) AVCaptureStillImageOutput *imageOutput;
-
 //session：由他把输入输出结合在一起，并开始启动捕获设备（摄像头）
 @property (nonatomic, strong) AVCaptureSession *session;
-
 @property (strong, nonatomic) AVCaptureDevice *audioDevice;
 @property (strong, nonatomic) AVCaptureDeviceInput *audioInput;
-
 //图像预览层，实时显示捕获的图像
 @property (nonatomic ,strong) AVCaptureVideoPreviewLayer *previewLayer;
 @property (weak, nonatomic) UIView *backView;
@@ -37,7 +32,9 @@
 @property (weak, nonatomic) UIButton *rightTwo;
 @property (weak, nonatomic) UIButton *rightOne;
 @property (nonatomic, strong) CMMotionManager *motionManager;
-@property (nonatomic, assign) UIDeviceOrientation deviceOrientation;
+@property (nonatomic, assign) UIDeviceOrientation deviceOrientation; 
+@property (nonatomic, assign) UIDeviceOrientation imageOrientation;
+@property (nonatomic, assign) AVCaptureVideoOrientation currentImageOrientation;
 /**
  *  记录开始的缩放比例
  */
@@ -100,6 +97,9 @@
 - (void)dismiss
 {
     [self.session stopRunning];
+    [self.motionManager stopDeviceMotionUpdates]; 
+    [self.timer invalidate];
+    self.timer = nil;
     [UIView animateWithDuration:0.4 animations:^{
         self.maskViewO.frame = CGRectMake(0, 0, self.backView.frame.size.width, self.backView.frame.size.height / 2);
         self.maskViewT.frame = CGRectMake(0, self.backView.frame.size.height / 2, self.backView.frame.size.width, self.backView.frame.size.height / 2);
@@ -120,20 +120,20 @@
     self.effectiveScale = 1.0f;
     navItem.title = @"拍摄";
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [leftBtn setImage:[UIImage imageNamed:@"camera_close@2x.png"] forState:UIControlStateNormal];
-    [leftBtn setImage:[UIImage imageNamed:@"camera_close_highlighted@2x.png"] forState:UIControlStateHighlighted];
+    [leftBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_close@2x.png"] forState:UIControlStateNormal];
+    [leftBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_close_highlighted@2x.png"] forState:UIControlStateHighlighted];
     [leftBtn addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
     leftBtn.frame = CGRectMake(0, 0, leftBtn.currentImage.size.width, leftBtn.currentImage.size.height);
     
     UIButton *rightOne = [UIButton buttonWithType:UIButtonTypeCustom];
-    [rightOne setImage:[UIImage imageNamed:@"camera_overturn@2x.png"] forState:UIControlStateNormal];
-    [rightOne setImage:[UIImage imageNamed:@"camera_overturn_highlighted@2x.png"] forState:UIControlStateHighlighted];
+    [rightOne setImage:[HXPhotoTools hx_imageNamed:@"camera_overturn@2x.png"] forState:UIControlStateNormal];
+    [rightOne setImage:[HXPhotoTools hx_imageNamed:@"camera_overturn_highlighted@2x.png"] forState:UIControlStateHighlighted];
     [rightOne addTarget:self action:@selector(didRightOneClick) forControlEvents:UIControlEventTouchUpInside];
     rightOne.frame = CGRectMake(0, 0, rightOne.currentImage.size.width, rightOne.currentImage.size.height);
     self.rightOne = rightOne;
     
     UIButton *rightTwo = [UIButton buttonWithType:UIButtonTypeCustom];
-    [rightTwo setImage:[UIImage imageNamed:@"camera_flashlight_auto_disable@2x.png"] forState:UIControlStateNormal];
+    [rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_auto_disable@2x.png"] forState:UIControlStateNormal];
     [rightTwo addTarget:self action:@selector(didRightTwoClick) forControlEvents:UIControlEventTouchUpInside];
     rightTwo.frame = CGRectMake(0, 0, rightTwo.currentImage.size.width, rightTwo.currentImage.size.height);
     self.rightTwo = rightTwo;
@@ -205,8 +205,8 @@
     self.tap = tap;
     
     UIButton *photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [photoBtn setImage:[UIImage imageNamed:@"camera_camera_background@2x.png"] forState:UIControlStateNormal];
-    [photoBtn setImage:[UIImage imageNamed:@"camera_camera_background_highlighted@2x.png"] forState:UIControlStateHighlighted];
+    [photoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_camera_background@2x.png"] forState:UIControlStateNormal];
+    [photoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_camera_background_highlighted@2x.png"] forState:UIControlStateHighlighted];
     [self.view addSubview:photoBtn];
     [photoBtn addTarget:self action:@selector(didPhotoClick) forControlEvents:UIControlEventTouchUpInside];
     photoBtn.frame = CGRectMake(0, 0, photoBtn.currentImage.size.width, photoBtn.currentImage.size.height);
@@ -214,7 +214,7 @@
     self.photoBtn = photoBtn;
     
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [videoBtn setImage:[UIImage imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
+    [videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
     [self.view addSubview:videoBtn];
     videoBtn.hidden = YES;
     UILongPressGestureRecognizer *longPGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongClick:)];
@@ -234,7 +234,7 @@
     [self.view addGestureRecognizer:rightSwipe];
     self.rightSwipe = rightSwipe;
     
-    UIImageView *centerIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"camera_drop_highlighted@2x.png"]];
+    UIImageView *centerIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"camera_drop_highlighted@2x.png"]];
     centerIcon.frame = CGRectMake(0, 0, centerIcon.image.size.width, centerIcon.image.size.height);
     centerIcon.center = CGPointMake(width / 2, CGRectGetMaxY(backView.frame) + 10);
     [self.view addSubview:centerIcon];
@@ -269,8 +269,9 @@
     self.motionManager = [[CMMotionManager alloc] init];
     self.motionManager.deviceMotionUpdateInterval = 1/15.0;
     if (self.motionManager.deviceMotionAvailable) {
+        __weak typeof(self) weakSelf = self;
         [self.motionManager startDeviceMotionUpdatesToQueue:[NSOperationQueue currentQueue] withHandler:^(CMDeviceMotion * _Nullable motion, NSError * _Nullable error) {
-            [self performSelectorOnMainThread:@selector(handleDeviceMotion:) withObject:motion waitUntilDone:YES];
+            [weakSelf performSelectorOnMainThread:@selector(handleDeviceMotion:) withObject:motion waitUntilDone:YES];
         }];
     } else {
         NSLog(@"No device motion on device");
@@ -314,7 +315,7 @@
 //    self.zoomSlider =
 //    [self.backView addSubview:self.zoomSlider];
     
-    self.focusIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"camera_ Focusing@2x.png"]];
+    self.focusIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"camera_ Focusing@2x.png"]];
     self.focusIcon.frame = CGRectMake(0, 0, self.focusIcon.image.size.width, self.focusIcon.image.size.height);
     self.focusIcon.hidden = YES;
     [self.backView addSubview:self.focusIcon];
@@ -341,12 +342,14 @@
     
     if (fabs(y) >= fabs(x)) {
         if (y >= 0) {
+            _imageOrientation = UIDeviceOrientationPortraitUpsideDown;
             videoTransform = CGAffineTransformMakeRotation(M_PI);
             _deviceOrientation = UIDeviceOrientationPortraitUpsideDown;
             [UIView animateWithDuration:0.25 animations:^{
                 self.videoBtn.transform = CGAffineTransformMakeRotation(M_PI);
             }];
         } else {
+            _imageOrientation = UIDeviceOrientationPortrait;
             videoTransform = CGAffineTransformMakeRotation(0);
             _deviceOrientation = UIDeviceOrientationPortrait;
             [UIView animateWithDuration:0.25 animations:^{
@@ -355,12 +358,14 @@
         }
     } else {
         if (x >= 0) {
+            _imageOrientation = UIDeviceOrientationLandscapeRight;
             videoTransform = CGAffineTransformMakeRotation(-M_PI_2);
             _deviceOrientation = UIDeviceOrientationLandscapeRight;    // Home键左侧水平拍摄
             [UIView animateWithDuration:0.25 animations:^{
                 self.videoBtn.transform = CGAffineTransformMakeRotation(-M_PI_2);
             }];
         } else {
+            _imageOrientation = UIDeviceOrientationLandscapeLeft;
             videoTransform = CGAffineTransformMakeRotation(M_PI_2);
             _deviceOrientation = UIDeviceOrientationLandscapeLeft;     // Home键右侧水平拍摄
             [UIView animateWithDuration:0.25 animations:^{
@@ -391,6 +396,10 @@
         [self.view showImageHUDText:@"照片失败"];
         return;
     }
+    if (conntion.isVideoOrientationSupported) {
+        self.currentImageOrientation = [self currentVideoOrientation];
+        conntion.videoOrientation = self.currentImageOrientation;
+    }
     [self.imageOutput captureStillImageAsynchronouslyFromConnection:conntion completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         if (imageDataSampleBuffer == nil) {
             return ;
@@ -404,14 +413,32 @@
         [self hideClick];
     }];
 }
-
+// 调整设备取向
+- (AVCaptureVideoOrientation)currentVideoOrientation {
+    AVCaptureVideoOrientation orientation;
+    switch (self.imageOrientation) {
+        case UIDeviceOrientationPortrait:
+            orientation = AVCaptureVideoOrientationPortrait;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            orientation = AVCaptureVideoOrientationLandscapeLeft;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            orientation = AVCaptureVideoOrientationPortraitUpsideDown;
+            break;
+        default:
+            orientation = AVCaptureVideoOrientationLandscapeRight;
+            break;
+    }
+    return orientation;
+}
 - (void)didLongClick:(UILongPressGestureRecognizer *)longRPG
 {
     if ([longRPG state] == UIGestureRecognizerStateBegan) {
-        [self.videoBtn setImage:[UIImage imageNamed:@"camera_video_background_highlighted@2x.png"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background_highlighted@2x.png"] forState:UIControlStateNormal];
         [self cameraBackgroundDidClickPlay];
     }else if ([longRPG state] == UIGestureRecognizerStateEnded) {
-        [self.videoBtn setImage:[UIImage imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
         [self.videoOutPut stopRecording];
         [self.timer invalidate];
     }
@@ -422,6 +449,7 @@
     AVCaptureConnection *captureConnection = [self.videoOutPut connectionWithMediaType:AVMediaTypeVideo];
     if (![self.videoOutPut isRecording]) {
         captureConnection.videoOrientation = (AVCaptureVideoOrientation)_deviceOrientation; // 视频方向和手机方向一致
+        self.currentImageOrientation = [self currentVideoOrientation];
         NSURL *fileURL = [self outPutFileURL];
         [self.videoOutPut startRecordingToOutputFileURL:fileURL recordingDelegate:self];
     }
@@ -456,7 +484,7 @@
     [self.progressView setProgress:self.videoTime / 60.f animated:YES];
     if (self.videoTime == 60) {
         [timer invalidate];
-        [self.videoBtn setImage:[UIImage imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
         [self.videoOutPut stopRecording];
     }
 }
@@ -497,16 +525,16 @@
     if ([self.device hasFlash]) {
         if (self.flashlight == 0) {
             self.flashlight = 1;
-            [self.rightTwo setImage:[UIImage imageNamed:@"camera_flashlight_disable@2x.png"] forState:UIControlStateNormal];
+            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_disable@2x.png"] forState:UIControlStateNormal];
             self.device.flashMode = AVCaptureFlashModeOff;
         }else if (self.flashlight == 1){
             self.flashlight = 1;
-            [self.rightTwo setImage:[UIImage imageNamed:@"camera_flashlight_open_disable@2x.png"] forState:UIControlStateNormal];
+            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_open_disable@2x.png"] forState:UIControlStateNormal];
             self.device.flashMode = AVCaptureFlashModeOn;
             self.flashlight = 2;
         }else {
             self.flashlight = 0;
-            [self.rightTwo setImage:[UIImage imageNamed:@"camera_flashlight_auto_disable@2x.png"] forState:UIControlStateNormal];
+            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_auto_disable@2x.png"] forState:UIControlStateNormal];
             self.device.flashMode = AVCaptureFlashModeAuto;
         }
     } else {
@@ -747,7 +775,7 @@
     if (!_deleteBtn) {
         _deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _deleteBtn.hidden = YES;
-        [_deleteBtn setImage:[UIImage imageNamed:@"video_delete_dustbin@2x.png"] forState:UIControlStateNormal];
+        [_deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"video_delete_dustbin@2x.png"] forState:UIControlStateNormal];
         [_deleteBtn addTarget:self action:@selector(deleteClick) forControlEvents:UIControlEventTouchUpInside];
         _deleteBtn.frame = CGRectMake(30, 0, _deleteBtn.currentImage.size.width, _deleteBtn.currentImage.size.height);
         _deleteBtn.center = CGPointMake(_deleteBtn.center.x, self.videoBtn.center.y);
@@ -789,8 +817,8 @@
     if (!_nextBtn) {
         _nextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _nextBtn.hidden = YES;
-        [_nextBtn setImage:[UIImage imageNamed:@"video_next_button@2x.png"] forState:UIControlStateNormal];
-        [_nextBtn setImage:[UIImage imageNamed:@"video_next_button_highlighted@2x.png"] forState:UIControlStateHighlighted];
+        [_nextBtn setImage:[HXPhotoTools hx_imageNamed:@"video_next_button@2x.png"] forState:UIControlStateNormal];
+        [_nextBtn setImage:[HXPhotoTools hx_imageNamed:@"video_next_button_highlighted@2x.png"] forState:UIControlStateHighlighted];
         [_nextBtn addTarget:self action:@selector(nextClick) forControlEvents:UIControlEventTouchUpInside];
         CGFloat width = self.view.frame.size.width;
         _nextBtn.frame = CGRectMake(width - 30 - _nextBtn.currentImage.size.width, 0, _nextBtn.currentImage.size.width, _nextBtn.currentImage.size.height);
@@ -813,7 +841,12 @@
         }else {
             image = self.imageView.image;
         }
-        image = [image clipImage:self.effectiveScale];
+        
+        if (self.currentImageOrientation == AVCaptureVideoOrientationLandscapeRight || self.currentImageOrientation == AVCaptureVideoOrientationLandscapeLeft) {
+            image = [image clipLeftOrRightImage:self.effectiveScale];
+        }else {
+            image = [image clipImage:self.effectiveScale];
+        }
         model.thumbPhoto = image;
         model.imageSize = image.size;
         model.previewPhoto = image;
@@ -844,7 +877,11 @@
             model.videoURL = weakSelf.clipVideoURL;
             model.videoTime = videoTime;
             model.thumbPhoto = image;
-            model.imageSize = [image clipImage:weakSelf.effectiveScale].size;
+            if (weakSelf.currentImageOrientation == AVCaptureVideoOrientationLandscapeRight || weakSelf.currentImageOrientation == AVCaptureVideoOrientationLandscapeLeft) {
+                model.imageSize = [image clipLeftOrRightImage:weakSelf.effectiveScale].size;
+            }else {
+                model.imageSize = [image clipImage:weakSelf.effectiveScale].size;
+            }
             model.previewPhoto = image;
             model.cameraIdentifier = [weakSelf videoOutFutFileName];
             [weakSelf.view handleLoading];
@@ -860,7 +897,6 @@
         
     }
 }
-
 - (void)clipVideoCompleted:(void(^)())completed failed:(void(^)())failed
 {
     AVAsset *asset = [AVAsset assetWithURL:self.videoURL];

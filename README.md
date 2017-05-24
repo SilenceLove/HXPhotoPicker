@@ -15,7 +15,7 @@
 - [x] 长按拖动改变顺序
 - [x] 自定义相机拍照/录制视频
 - [x] 自定义转场动画
-- [x] 查看/选择LivePhoto IOS9以上才有用
+- [x] 查看/选择LivePhoto IOS9.1以上才有用
 - [x] 支持浏览网络图片
 
 ## 二.  安装 - Installation
@@ -49,6 +49,15 @@
 - HXPhotoManager 照片管理类相关属性介绍
 
 ```
+显示全屏相机 //  默认 NO
+showFullScreenCamera;
+
+删除网络图片时是否显示Alert // 默认显示
+showDeleteNetworkPhotoAlert;
+
+网络图片地址数组
+networkPhotoUrls
+
 是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
 outerCamera;
 
@@ -245,6 +254,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 - 2017-03-22    修复最大数限制问题
 - 2017-03-29    解决裁剪视频时声音丢失问题、优化了快速滑动内存问题、添加获取选中数组里面图片的原图和imageData的方法
 - 2017-05-20    添加支持传入网络图片Url数组后进行浏览查看并删除
+- 2017-05-24    修复传入网络图片之后添加按钮错误显示问题。添加全屏相机/开关控制
 
 ## 六.  更多 - More
 

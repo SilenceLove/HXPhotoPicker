@@ -25,6 +25,7 @@
     [UIView animateWithDuration:0.25 animations:^{
         hud.alpha = 1;
     }];
+    [UIView cancelPreviousPerformRequestsWithTarget:self];
     [self performSelector:@selector(handleGraceTimer) withObject:nil afterDelay:1.5f inModes:@[NSRunLoopCommonModes]];
 }
 
@@ -99,7 +100,7 @@
 
 - (void)setup
 {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:self.imageName]];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:self.imageName]];
     [self addSubview:imageView];
     CGFloat imgW = imageView.image.size.width;
     CGFloat imgH = imageView.image.size.height;

@@ -109,7 +109,7 @@
     [self.contentView addSubview:photoNum];
     self.photoNum = photoNum;
     
-    UIImageView *numIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"compose_photo_filter_checkbox_checked@2x.png"]];
+    UIImageView *numIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_photo_filter_checkbox_checked@2x.png"]];
     [photoView addSubview:numIcon];
     self.numIcon = numIcon;
 }

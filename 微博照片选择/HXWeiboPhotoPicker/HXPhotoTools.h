@@ -15,6 +15,8 @@
 
 @interface HXPhotoTools : NSObject
 
+
++ (UIImage *)hx_imageNamed:(NSString *)imageName;
 /**
  根据已选照片数组返回原图数组
 

@@ -53,7 +53,7 @@
     [self.contentView addSubview:bottomView];
     self.bottomView = bottomView;
     
-    UIImageView *videoIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"VideoSendIcon@2x.png"]];
+    UIImageView *videoIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"]];
     CGFloat iconWidth = videoIcon.image.size.width;
     CGFloat iconHeight = videoIcon.image.size.height;
     videoIcon.frame = CGRectMake(5, 0, iconWidth, iconHeight);
@@ -69,12 +69,12 @@
     [bottomView addSubview:videoTime];
     self.videoTime = videoTime;
     
-    UIImageView *gifIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"timeline_image_gif@2x.png"]];
+    UIImageView *gifIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"]];
     gifIcon.frame = CGRectMake(self.frame.size.width - gifIcon.image.size.width, self.frame.size.height - gifIcon.image.size.height, gifIcon.image.size.width, gifIcon.image.size.height);
     [self.contentView addSubview:gifIcon];
     self.gifIcon = gifIcon;
     
-    UIImageView *liveIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
+    UIImageView *liveIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
     liveIcon.frame = CGRectMake(7, 5, liveIcon.image.size.width, liveIcon.image.size.height);
     [self.contentView addSubview:liveIcon];
     self.liveIcon = liveIcon;
@@ -86,11 +86,11 @@
     self.maskView = maskView;
     
     UIButton *liveBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [liveBtn setImage:[UIImage imageNamed:@"compose_live_photo_open_icon@2x.png"] forState:UIControlStateNormal];
+    [liveBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] forState:UIControlStateNormal];
     [liveBtn setTitle:@"LIVE" forState:UIControlStateNormal];
-    [liveBtn setImage:[UIImage imageNamed:@"compose_live_photo_close_icon@2x.png"] forState:UIControlStateSelected];
+    [liveBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] forState:UIControlStateSelected];
     [liveBtn setTitle:@"关闭" forState:UIControlStateSelected];
-    [liveBtn setBackgroundImage:[UIImage imageNamed:@"compose_live_photo_background@2x.png"] forState:UIControlStateNormal];
+    [liveBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] forState:UIControlStateNormal];
     [liveBtn setTitleColor:[UIColor colorWithRed:85/255.0 green:85/255.0 blue:85/255.0 alpha:1] forState:UIControlStateNormal];
     liveBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 0);
     liveBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 2, 0, 0);
@@ -103,8 +103,8 @@
     self.liveBtn = liveBtn;
 
     UIButton *selectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [selectBtn setImage:[UIImage imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
-    [selectBtn setImage:[UIImage imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
+    [selectBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
+    [selectBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
     [selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
     CGFloat imageWidth = selectBtn.currentImage.size.width;
     CGFloat imageHeight = selectBtn.currentImage.size.height;

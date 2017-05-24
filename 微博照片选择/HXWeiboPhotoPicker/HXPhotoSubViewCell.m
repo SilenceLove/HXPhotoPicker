@@ -10,6 +10,7 @@
 #import "HXPhotoModel.h"
 #import "UIImageView+WebCache.h"
 #import "HXCircleProgressView.h"
+#import "HXPhotoTools.h"
 @interface HXPhotoSubViewCell ()<UIAlertViewDelegate>
 @property (weak, nonatomic) UIImageView *imageView;
 @property (weak, nonatomic) UIButton *deleteBtn;
@@ -41,12 +42,12 @@
     self.imageView = imageView;
     
     UIButton *deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [deleteBtn setImage:[UIImage imageNamed:@"compose_delete@2x.png"] forState:UIControlStateNormal];
+    [deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_delete@2x.png"] forState:UIControlStateNormal];
     [deleteBtn addTarget:self action:@selector(didDeleteClick) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:deleteBtn];
     self.deleteBtn = deleteBtn;
     
-    UIImageView *liveIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
+    UIImageView *liveIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
     liveIcon.frame = CGRectMake(5, 5, liveIcon.image.size.width, liveIcon.image.size.height);
     [self.contentView addSubview:liveIcon];
     self.liveIcon = liveIcon;
@@ -57,7 +58,7 @@
     [self.contentView addSubview:bottomView];
     self.bottomView = bottomView;
     
-    UIImageView *videoIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"VideoSendIcon@2x.png"]];
+    UIImageView *videoIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"]];
     [bottomView addSubview:videoIcon];
     self.videoIcon = videoIcon;
     
@@ -68,7 +69,7 @@
     [bottomView addSubview:videoTime];
     self.videoTime = videoTime;
     
-    UIImageView *gifIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"timeline_image_gif@2x.png"]];
+    UIImageView *gifIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"]];
     [self.contentView addSubview:gifIcon];
     self.gifIcon = gifIcon;
     

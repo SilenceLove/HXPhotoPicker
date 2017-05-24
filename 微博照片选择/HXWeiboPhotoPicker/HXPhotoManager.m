@@ -38,6 +38,7 @@
 
 - (void)setup
 {
+    self.showFullScreenCamera = NO;
     self.outerCamera = NO;
     self.openCamera = YES;
     self.lookLivePhoto = YES;
@@ -240,11 +241,11 @@
         HXPhotoModel *model = [[HXPhotoModel alloc] init];
         model.type = HXPhotoModelMediaTypeCamera;
         if (photoAy.count == 0 && videoAy.count != 0) {
-            model.thumbPhoto = [UIImage imageNamed:@"compose_photo_video@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_video@2x.png"];
         }else if (videoAy.count == 0) {
-            model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
         }else {
-            model.thumbPhoto = [UIImage imageNamed:@"compose_photo_photograph@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
         }
         [objAy insertObject:model atIndex:0];
     }

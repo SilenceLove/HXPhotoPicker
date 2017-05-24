@@ -141,7 +141,7 @@
 {
     if (!_playBtn) {
         _playBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_playBtn setImage:[UIImage imageNamed:@"multimedia_videocard_play@2x.png"] forState:UIControlStateNormal];
+        [_playBtn setImage:[HXPhotoTools hx_imageNamed:@"multimedia_videocard_play@2x.png"] forState:UIControlStateNormal];
         [_playBtn setImage:[[UIImage alloc] init] forState:UIControlStateSelected];
         [_playBtn addTarget:self action:@selector(didPlayBtnClick:) forControlEvents:UIControlEventTouchUpInside];
         _playBtn.selected = YES;
@@ -154,8 +154,8 @@
     if (!_selectedBtn) {
         CGFloat width = self.view.frame.size.width;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_selectedBtn setImage:[UIImage imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
-        [_selectedBtn setImage:[UIImage imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
         CGFloat selectedBtnW = _selectedBtn.currentImage.size.width;
         CGFloat selectedBtnH = _selectedBtn.currentImage.size.height;
         _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, 84, selectedBtnW, selectedBtnH);

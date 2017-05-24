@@ -14,9 +14,9 @@
 #import "HXVideoPreviewViewController.h"
 #import "HXCameraViewController.h"
 #import "UIView+HXExtension.h"
-
+#import "HXFullScreenCameraViewController.h"
 static NSString *PhotoViewCellId = @"PhotoViewCellId";
-@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate,UIAlertViewDelegate>
+@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate>
 {
     CGRect _originalFrame;
 }
@@ -207,21 +207,27 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (void)setup
 {
     if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
-        self.manager.maxNum = self.manager.photoMaxNum;
+        if (self.manager.networkPhotoUrls.count == 0) {
+            self.manager.maxNum = self.manager.photoMaxNum;
+        }
         if (self.manager.endCameraVideos.count > 0) {
             [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraVideos];
             [self.manager.endCameraVideos removeAllObjects];
         }
     }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-        self.manager.maxNum = self.manager.videoMaxNum;
+        if (self.manager.networkPhotoUrls.count == 0) {
+            self.manager.maxNum = self.manager.videoMaxNum;
+        }
         if (self.manager.endCameraPhotos.count > 0) {
             [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraPhotos];
             [self.manager.endCameraPhotos removeAllObjects];
         }
     }else {
-        // 防错
-        if (self.manager.videoMaxNum + self.manager.photoMaxNum != self.manager.maxNum) {
-            self.manager.maxNum = self.manager.videoMaxNum + self.manager.photoMaxNum;
+        // 防错  请在外面设置好!!!!
+        if (self.manager.networkPhotoUrls.count == 0) {
+            if (self.manager.videoMaxNum + self.manager.photoMaxNum != self.manager.maxNum) {
+                self.manager.maxNum = self.manager.videoMaxNum + self.manager.photoMaxNum;
+            }
         }
     }
     // 上次选择的所有记录
@@ -260,7 +266,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     
     HXAlbumTitleButton *titleBtn = [HXAlbumTitleButton buttonWithType:UIButtonTypeCustom];
     [titleBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [titleBtn setImage:[UIImage imageNamed:@"headlines_icon_arrow"] forState:UIControlStateNormal];
+    [titleBtn setImage:[HXPhotoTools hx_imageNamed:@"headlines_icon_arrow"] forState:UIControlStateNormal];
     titleBtn.frame = CGRectMake(0, 0, 150, 30);
     [titleBtn setTitle:@"相机胶卷" forState:UIControlStateNormal];
     [titleBtn addTarget:self action:@selector(pushAlbumList:) forControlEvents:UIControlEventTouchUpInside];
@@ -512,22 +518,31 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             [alert show];
             return;
         }
-        HXCameraViewController *vc = [[HXCameraViewController alloc] init];
-        vc.delegate = self;
+        HXCameraType type = 0;
         if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
             if (self.photos.count > 0 && self.videos.count > 0) {
-                vc.type = HXCameraTypePhotoAndVideo;
+                type = HXCameraTypePhotoAndVideo;
             }else if (self.videos.count > 0) {
-                vc.type = HXCameraTypeVideo;
+                type = HXCameraTypeVideo;
             }else {
-                vc.type = HXCameraTypePhotoAndVideo;
+                type = HXCameraTypePhotoAndVideo;
             }
         }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
-            vc.type = HXCameraTypePhoto;
+            type = HXCameraTypePhoto;
         }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-            vc.type = HXCameraTypeVideo;
+            type = HXCameraTypeVideo;
         }
-        [self presentViewController:vc animated:YES completion:nil];
+        if (self.manager.showFullScreenCamera) {
+            HXFullScreenCameraViewController *vc = [[HXFullScreenCameraViewController alloc] init];
+            vc.delegate = self;
+            vc.type = type;
+            [self presentViewController:vc animated:YES completion:nil];
+        }else {
+            HXCameraViewController *vc = [[HXCameraViewController alloc] init];
+            vc.delegate = self;
+            vc.type = type;
+            [self presentViewController:vc animated:YES completion:nil];
+        }
     }
 }
 
@@ -536,6 +551,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
  
  @param model 图片/视频 模型
  */
+- (void)fullScreenCameraDidNextClick:(HXPhotoModel *)model {
+    [self cameraDidNextClick:model];
+}
 - (void)cameraDidNextClick:(HXPhotoModel *)model
 {
     if (self.albumModel.index != 0) {
@@ -1168,8 +1186,8 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [previewBtn setTitle:@"预览" forState:UIControlStateNormal];
     [previewBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [previewBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [previewBtn setBackgroundImage:[UIImage imageNamed:@"compose_photo_preview_seleted@2x.png"] forState:UIControlStateNormal];
-    [previewBtn setBackgroundImage:[UIImage imageNamed:@"compose_photo_preview_disable@2x.png"] forState:UIControlStateDisabled];
+    [previewBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:@"compose_photo_preview_seleted@2x.png"] forState:UIControlStateNormal];
+    [previewBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:@"compose_photo_preview_disable@2x.png"] forState:UIControlStateDisabled];
     previewBtn.titleLabel.font = [UIFont systemFontOfSize:14];
     [previewBtn addTarget:self action:@selector(didPreviewClick:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:previewBtn];
@@ -1188,8 +1206,8 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     originalBtn.layer.cornerRadius = 2;
     originalBtn.layer.borderColor = [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:1].CGColor;
     originalBtn.layer.borderWidth = 0.7;
-    [originalBtn setImage:[UIImage imageNamed:@"椭圆-1@2x.png"] forState:UIControlStateNormal];
-    [originalBtn setImage:[UIImage imageNamed:@"椭圆-1-拷贝@2x.png"] forState:UIControlStateSelected];
+    [originalBtn setImage:[HXPhotoTools hx_imageNamed:@"椭圆-1@2x.png"] forState:UIControlStateNormal];
+    [originalBtn setImage:[HXPhotoTools hx_imageNamed:@"椭圆-1-拷贝@2x.png"] forState:UIControlStateSelected];
     originalBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     originalBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 8 + 8, 0, 0);
     originalBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0);

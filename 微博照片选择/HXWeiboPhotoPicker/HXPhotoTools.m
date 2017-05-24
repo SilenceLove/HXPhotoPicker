@@ -8,7 +8,18 @@
 
 #import "HXPhotoTools.h"
 #import "HXPhotoModel.h"
+
+#define HXBUNDLE_NAME   @"HXWeiboPhotoPicker.bundle"
+#define HXBUNDLE_PATH   [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:HXBUNDLE_NAME]
+#define HXBUNDLE        [NSBundle bundleWithPath:HXBUNDLE_PATH]
+
+
 @implementation HXPhotoTools
+
++ (UIImage *)hx_imageNamed:(NSString *)imageName {
+    NSString *imgPath= [HXBUNDLE_PATH stringByAppendingPathComponent:imageName];
+    return [UIImage imageWithContentsOfFile:imgPath];
+}
 
 /**
  根据PHAsset对象获取照片信息
