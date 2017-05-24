@@ -128,7 +128,6 @@
 		7B7369051ECC44950049E9BA /* UIView+WebCacheOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+WebCacheOperation.h"; sourceTree = "<group>"; };
 		7B7369061ECC44950049E9BA /* UIView+WebCacheOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+WebCacheOperation.m"; sourceTree = "<group>"; };
 		7B74BB3D1ED55CD500F81FA0 /* HXWeiboPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXWeiboPhotoPicker.bundle; sourceTree = "<group>"; };
-		7B74BB3F1ED578D700F81FA0 /* HXWeiboPhotoHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXWeiboPhotoHeader.h; sourceTree = "<group>"; };
 		7B7D82251E51A167000DC021 /* HXCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCameraViewController.h; sourceTree = "<group>"; };
 		7B7D82261E51A167000DC021 /* HXCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCameraViewController.m; sourceTree = "<group>"; };
 		7B7D82281E52DD13000DC021 /* HXCameraPreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCameraPreviewViewController.h; sourceTree = "<group>"; };
@@ -285,7 +284,6 @@
 			isa = PBXGroup;
 			children = (
 				7B74BB3D1ED55CD500F81FA0 /* HXWeiboPhotoPicker.bundle */,
-				7B74BB3F1ED578D700F81FA0 /* HXWeiboPhotoHeader.h */,
 				7B7E3E911E4AB081002234EE /* HXPhotoManager.h */,
 				7B7E3E921E4AB081002234EE /* HXPhotoManager.m */,
 				7B7E3E941E4AB377002234EE /* HXAlbumModel.h */,

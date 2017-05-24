@@ -13,10 +13,6 @@ Pod::Spec.new do |s|
   s.resources    = "微博照片选择/HXWeiboPhotoPicker/*.{png,xib,nib,bundle}"
 
   s.requires_arc = true
-
-  s.public_header_files = "微博照片选择/HXWeiboPhotoPicker/HXWeiboPhotoHeader.h"
-  s.source_files = "微博照片选择/HXWeiboPhotoPicker/HXWeiboPhotoHeader.h"
-
   s.dependency "SDWebImage", "~> 3.8"
 
 end

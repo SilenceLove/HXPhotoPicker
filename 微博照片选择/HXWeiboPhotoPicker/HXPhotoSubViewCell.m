@@ -8,7 +8,6 @@
 
 #import "HXPhotoSubViewCell.h"
 #import "HXPhotoModel.h"
-#import "HXWeiboPhotoHeader.h"
 #import "HXCircleProgressView.h"
 #import "HXPhotoTools.h"
 @interface HXPhotoSubViewCell ()<UIAlertViewDelegate>
