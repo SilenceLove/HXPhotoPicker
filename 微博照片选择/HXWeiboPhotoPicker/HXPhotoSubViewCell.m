@@ -8,7 +8,7 @@
 
 #import "HXPhotoSubViewCell.h"
 #import "HXPhotoModel.h"
-#import "UIImageView+WebCache.h"
+#import "HXWeiboPhotoHeader.h"
 #import "HXCircleProgressView.h"
 #import "HXPhotoTools.h"
 @interface HXPhotoSubViewCell ()<UIAlertViewDelegate>
@@ -117,7 +117,7 @@
         self.deleteBtn.hidden = NO;
     }
     if (model.networkPhotoUrl.length > 0) {
-        self.progressView.hidden = model.downloadComplete;
+        self.progressView.hidden = model.downloadComplete; 
         [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.networkPhotoUrl] placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
             model.receivedSize = receivedSize;
             model.expectedSize = expectedSize;
