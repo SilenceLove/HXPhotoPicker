@@ -20,7 +20,7 @@
 
 ## 二.  安装 - Installation
 
-- Cocoapods：pod 'HXWeiboPhotoPicker' '~> 1.2' 
+- Cocoapods：pod 'HXWeiboPhotoPicker' '~> 1.2' pod的版本为浏览网络图片之前的版本(不包含浏览网络图片)
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
