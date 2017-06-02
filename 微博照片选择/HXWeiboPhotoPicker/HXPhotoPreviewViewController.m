@@ -40,6 +40,12 @@
 
 - (void)setup
 {
+    if (self.isPreview) {
+        // 防错,,,,,如果出现问题麻烦及时告诉我.....
+        for (HXPhotoModel *model in self.modelList) {
+            model.selected = YES;
+        }
+    }
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.navigationItem.titleView = self.titleLb;
     self.view.backgroundColor = [UIColor whiteColor];
@@ -342,10 +348,12 @@
             max = YES;
         }
     }
-    if (!self.selectedBtn.selected && !max) {
-        model.selected = YES;
-        [self.manager.selectedList addObject:model];
-        [self.manager.selectedPhotos addObject:model];
+    if (!self.isPreview) {
+        if (!self.selectedBtn.selected && !max) {
+            model.selected = YES;
+            [self.manager.selectedList addObject:model];
+            [self.manager.selectedPhotos addObject:model];
+        }
     }
     if ([self.delegate respondsToSelector:@selector(previewDidNextClick)]) {
         [self.delegate previewDidNextClick];

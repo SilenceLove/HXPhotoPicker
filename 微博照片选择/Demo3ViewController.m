@@ -68,7 +68,7 @@
 - (HXPhotoManager *)manager
 {
     if (!_manager) {
-        _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
+        _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
         //        _manager.openCamera = NO;
         _manager.outerCamera = YES;
         _manager.showDeleteNetworkPhotoAlert = NO;
@@ -121,9 +121,9 @@
      */
     
     // 获取数组里面图片的 HD(高清)图片  传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
-//    [HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-//        NSLog(@"%@",images);
-//    }];
+    [HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
+        NSLog(@"%@",images);
+    }];
     /*
      如果真的觉得这个方法获取的高清图片还达不到你想要的效果,你可以按住 command 点击上面方法修改以下属性来获取你想要的图片
      

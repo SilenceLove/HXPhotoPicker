@@ -722,7 +722,8 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     }else {
         index = model.albumListIndex;
     }
-
+    HXPhotoModel *cellMd = self.objs[index];
+    cellMd.selected = state;
     [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
     // 改变 预览、原图 按钮的状态
     [self changeButtonClick:model];
@@ -963,6 +964,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         // 判断选中数组中有没有图片 如果有图片则只预览选中的图片 反之 视频
         if (self.manager.selectedPhotos.count > 0) {
             HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
+            vc.isPreview = self.isPreview;
             vc.modelList = self.manager.selectedPhotos;
             vc.index = 0;
             vc.delegate = self;

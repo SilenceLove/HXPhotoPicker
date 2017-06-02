@@ -23,5 +23,6 @@
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (weak, nonatomic, readonly) UICollectionView *collectionView;
 @property (assign, nonatomic) BOOL selectedComplete;
+@property (assign, nonatomic) BOOL isPreview; // 是否预览
 - (void)selectClick;
 @end
