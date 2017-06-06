@@ -10,15 +10,21 @@
 #import "HXPhotoModel.h"
 
 #define HXBUNDLE_NAME   @"HXWeiboPhotoPicker.bundle"
-#define HXBUNDLE_PATH   [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:HXBUNDLE_NAME]
-#define HXBUNDLE        [NSBundle bundleWithPath:HXBUNDLE_PATH]
 
 
 @implementation HXPhotoTools
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName {
-    NSString *imgPath= [HXBUNDLE_PATH stringByAppendingPathComponent:imageName];
-    return [UIImage imageWithContentsOfFile:imgPath];
+    UIImage *image = [UIImage imageNamed:[HXBUNDLE_NAME stringByAppendingPathComponent:imageName]];
+    if (image) {
+        return image;
+    } else {
+        image = [UIImage imageNamed:[@"Frameworks/HXWeiboPhotoPicker.framework/HXWeiboPhotoPicker.bundle" stringByAppendingPathComponent:imageName]];
+        if (!image) {
+            image = [UIImage imageNamed:imageName];
+        }
+        return image;
+    }
 }
 
 /**
@@ -50,6 +56,18 @@
         }
     }];
     return requestID;
+}
+
++ (int32_t)fetchPhotoWithAsset:(id)asset photoSize:(CGSize)photoSize completion:(void (^)(UIImage *photo,NSDictionary *info,BOOL isDegraded))completion {
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+    option.resizeMode = PHImageRequestOptionsResizeModeFast; 
+    int32_t imageRequestID = [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:photoSize contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        if (downloadFinined && result) {
+            if (completion) completion(result,info,[[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+        }
+    }];
+    return imageRequestID;
 }
 
 + (PHImageRequestID)FetchLivePhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size Completion:(void (^)(PHLivePhoto *, NSDictionary *))completion

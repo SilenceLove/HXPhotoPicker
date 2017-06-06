@@ -93,7 +93,6 @@
         }
         // 获取照片集合
         PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
-        
         // 过滤掉空相册
         if (result.count > 0 && ![[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"最近删除"]) {
             HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];

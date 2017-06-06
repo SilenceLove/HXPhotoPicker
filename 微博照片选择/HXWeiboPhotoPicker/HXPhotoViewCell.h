@@ -19,13 +19,13 @@
 
 @interface HXPhotoViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXPhotoViewCellDelegate> delegate;
-@property (weak, nonatomic) id <UIViewControllerPreviewing> previewingContext;
+@property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 @property (assign, nonatomic) BOOL firstRegisterPreview;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (weak, nonatomic) UIImageView *imageView;
 @property (weak, nonatomic) UIView *maskView;
 @property (weak, nonatomic) UIButton *selectBtn;
-@property (assign, nonatomic) PHImageRequestID requestID;
+@property (assign, nonatomic) int32_t requestID;
 
 - (void)startLivePhoto;
 - (void)stopLivePhoto;
