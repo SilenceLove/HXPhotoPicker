@@ -332,10 +332,14 @@
             max = YES;
         }
     }
-    if (!self.selectedBtn.selected && !max) {
-        self.model.selected = YES;
-        [self.manager.selectedList addObject:self.model];
-        [self.manager.selectedVideos addObject:self.model];
+    if (!self.isPreview) {
+        if (self.manager.selectedList.count == 0) {
+            if (!self.selectedBtn.selected && !max) {
+                self.model.selected = YES;
+                [self.manager.selectedList addObject:self.model];
+                [self.manager.selectedVideos addObject:self.model];
+            }
+        }
     }
     if ([self.delegate respondsToSelector:@selector(previewVideoDidNextClick)]) {
         [self.delegate previewVideoDidNextClick];

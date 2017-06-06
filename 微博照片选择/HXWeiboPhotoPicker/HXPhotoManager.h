@@ -24,6 +24,16 @@ typedef enum : NSUInteger {
 
 @interface HXPhotoManager : NSObject
 
+/**  
+ 上次选择照片模型的数组
+ */
+//@property (strong, nonatomic) NSMutableArray *lastSelectedList;
+
+/**
+ 是否开启3DTouch预览功能 默认打开
+ */
+@property (assign, nonatomic) BOOL open3DTouchPreview;
+
 /**
  显示全屏相机 //  默认 NO
  */

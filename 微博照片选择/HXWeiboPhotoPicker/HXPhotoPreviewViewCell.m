@@ -9,6 +9,7 @@
 #import "HXPhotoPreviewViewCell.h"
 #import "HXPhotoTools.h"
 #import "UIImage+HXExtension.h"
+#import "HXCircleProgressView.h"
 @interface HXPhotoPreviewViewCell ()<UIScrollViewDelegate,PHLivePhotoViewDelegate>
 @property (weak, nonatomic) UIScrollView *scrollView;
 @property (weak, nonatomic) UIImageView *imageView;
@@ -17,6 +18,7 @@
 @property (strong, nonatomic) UIImage *gifImage;
 @property (assign, nonatomic) PHImageRequestID requestID;
 @property (assign, nonatomic) PHImageRequestID longRequestId;
+@property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
 
 @implementation HXPhotoPreviewViewCell
@@ -104,6 +106,8 @@
     self.isAnimating = NO;
     [self.livePhotoView stopPlayback];
     [self.livePhotoView removeFromSuperview];
+    self.livePhotoView.delegate = nil;
+    self.livePhotoView = nil;
 }
 
 - (void)fetchLongPhoto
@@ -118,12 +122,20 @@
     if (imgHeight > imgWidth / 9 * 17) {
         requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(width, height) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
+            weakSelf.progressView.hidden = YES;
+        } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+            weakSelf.progressView.hidden = NO;
+            weakSelf.progressView.progress = progress;
         } error:^(NSDictionary *info) {
             weakSelf.imageView.image = weakSelf.model.thumbPhoto;
         }];
     }else {
         requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2, _model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
+            weakSelf.progressView.hidden = YES;
+        } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+            weakSelf.progressView.hidden = NO;
+            weakSelf.progressView.progress = progress;
         } error:^(NSDictionary *info) {
             weakSelf.imageView.image = weakSelf.model.thumbPhoto;
         }];
@@ -195,12 +207,12 @@
             __weak typeof(self) weakSelf = self;
             PHImageRequestID requestID;
             if (imgHeight > imgWidth / 9 * 17) {
-                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width / 2, height / 2) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width * 0.5, height * 0.5) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
                     //model.previewPhoto = image;
                     weakSelf.imageView.image = image;
                 }];
             }else {
-                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width, model.endImageSize.height) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
                     //model.previewPhoto = image;
                     weakSelf.imageView.image = image;
                 }];
@@ -263,5 +275,12 @@
     _imageView.frame = CGRectMake(0, 0, w, h);
     _imageView.center = CGPointMake(width / 2, height / 2);
     _imageCenter = _imageView.center;
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    CGFloat width = self.frame.size.width;
+    CGFloat height = self.frame.size.height;
+    self.progressView.center = CGPointMake(width / 2, height / 2);
+    
 }
 @end

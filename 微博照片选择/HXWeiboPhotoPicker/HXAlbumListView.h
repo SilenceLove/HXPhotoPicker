@@ -16,6 +16,7 @@
 @end
 
 @interface HXAlbumListView : UIView
+@property (weak, nonatomic, readonly) UITableView *tableView;
 @property (weak, nonatomic) id<HXAlbumListViewDelegate> delegate;
 @property (copy, nonatomic) NSArray *list;
 @end

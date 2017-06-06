@@ -27,5 +27,6 @@
 @property (strong, nonatomic) UIButton *playBtn;
 @property (assign, nonatomic) BOOL isCamera;
 @property (assign, nonatomic) BOOL selectedComplete;
+@property (assign, nonatomic) BOOL isPreview; // 是否预览
 - (void)selectClick;
 @end

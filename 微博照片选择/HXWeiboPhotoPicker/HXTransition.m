@@ -69,7 +69,7 @@
         [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
             //model.previewPhoto = image;
             [weakSelf pushAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC];
-        } error:^(NSDictionary *info) {
+        } progressHandler:nil error:^(NSDictionary *info) {
             [weakSelf pushAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC];
         }];
     //}

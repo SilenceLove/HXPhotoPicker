@@ -11,7 +11,8 @@
 #import "UIButton+HXExtension.h"
 #import <Photos/Photos.h>
 #import <PhotosUI/PhotosUI.h>
-@interface HXPhotoViewCell ()
+#import "HXPhotoPreviewViewController.h"
+@interface HXPhotoViewCell ()<UIViewControllerPreviewingDelegate>
 @property (weak, nonatomic) UIView *bottomView;
 @property (weak, nonatomic) UIImageView *videoIcon;
 @property (weak, nonatomic) UILabel *videoTime;
@@ -19,9 +20,9 @@
 @property (weak, nonatomic) UIImageView *gifIcon;
 @property (weak, nonatomic) UIImageView *liveIcon;
 @property (weak, nonatomic) UIButton *liveBtn;
-@property (assign, nonatomic) PHImageRequestID requestID;
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @property (copy, nonatomic) NSString *localIdentifier;
+@property (strong, nonatomic) UIImageView *previewImg;
 @end
 
 @implementation HXPhotoViewCell
@@ -35,7 +36,6 @@
     }
     return self;
 }
-
 - (void)setup
 {
     CGFloat width = self.frame.size.width;
@@ -156,7 +156,15 @@
     }else {
         CGFloat width = self.frame.size.width;
         __weak typeof(self) weakSelf = self;
-        [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(width * 2, width * 2) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+        CGSize size;
+        if (self.model.imageSize.width > self.model.imageSize.height / 9 * 15) {
+            size = CGSizeMake(width, width * 1.5);
+        }else if (self.model.imageSize.height > self.model.imageSize.width / 9 * 15) {
+            size = CGSizeMake(width * 1.5, width);
+        }else {
+            size = CGSizeMake(width, width);
+        }
+        self.model.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:size Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
             weakSelf.model.livePhoto = livePhoto;
             weakSelf.livePhotoView.livePhoto = livePhoto;
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
@@ -166,10 +174,14 @@
 
 - (void)stopLivePhoto
 {
+    [[PHCachingImageManager defaultManager] cancelImageRequest:self.model.liveRequestID];
     self.liveIcon.hidden = NO;
     self.liveBtn.hidden = YES;
     [self.livePhotoView stopPlayback];
     [self.livePhotoView removeFromSuperview];
+    self.livePhotoView.delegate = nil;
+    self.livePhotoView = nil;
+    self.model.livePhoto = nil;
 }
 
 - (void)didSelectClick:(UIButton *)button
@@ -183,24 +195,41 @@
     }
 }
 
-- (void)setModel:(HXPhotoModel *)model
-{
+- (void)setModel:(HXPhotoModel *)model {
     _model = model;
     CGFloat width = self.frame.size.width;
     
     if (model.thumbPhoto) {
         self.imageView.image = model.thumbPhoto;
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
     }else {
+    self.localIdentifier = model.asset.localIdentifier;
         __weak typeof(self) weakSelf = self;
-        CGSize size = CGSizeMake(width * 2, width * 2);
+        CGSize size;
+        if (model.imageSize.width > model.imageSize.height / 9 * 15) {
+            size = CGSizeMake(width, width * [UIScreen mainScreen].scale);
+        }else if (model.imageSize.height > model.imageSize.width / 9 * 15) {
+            size = CGSizeMake(width * [UIScreen mainScreen].scale, width);
+        }else {
+            size = CGSizeMake(width, width);
+        }
         //if (model.endImageSize.height > model.endImageSize.width * 20) {
             //size = CGSizeMake(model.imageSize.width, [UIScreen mainScreen].bounds.size.height);
         //}
-        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-            weakSelf.imageView.image = image;
-            model.thumbPhoto = image;
+        model.requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+//            if ([weakSelf.localIdentifier isEqualToString:model.asset.localIdentifier]) {
+                weakSelf.imageView.image = image;
+//            }else {
+//                [[PHImageManager defaultManager] cancelImageRequest:model.requestID];
+//            }
+//            if (!info[PHImageResultIsDegradedKey]) {
+//                weakSelf.requestID = 0;
+//            }
+                model.thumbPhoto = image;
         }];
+//    if (self.requestID != model.requestID) {
+//        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+//    }
+//    self.requestID = model.requestID;
     }
 
     self.videoTime.text = model.videoTime;

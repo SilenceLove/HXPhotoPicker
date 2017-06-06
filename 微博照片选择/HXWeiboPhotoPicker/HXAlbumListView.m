@@ -10,6 +10,7 @@
 #import "HXPhotoTools.h"
 @interface HXAlbumListView ()<UITableViewDelegate,UITableViewDataSource>
 @property (weak, nonatomic) UITableView *tableView;
+@property (assign, nonatomic) NSInteger currentIndex;
 @end
 
 @implementation HXAlbumListView
@@ -18,6 +19,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+        self.currentIndex = 0;
         [self setup];
     }
     return self;
@@ -42,7 +44,7 @@
     _list = list;
     
     [self.tableView reloadData];
-    [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
+    [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentIndex inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -64,6 +66,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    self.currentIndex = indexPath.row;
     if ([self.delegate respondsToSelector:@selector(didTableViewCellClick:animate:)]) {
         [self.delegate didTableViewCellClick:self.list[indexPath.row] animate:YES];
     }
@@ -119,6 +122,9 @@
     _model = model;
     
     __weak typeof(self) weakSelf = self;
+    if (!model.asset) {
+        model.asset = model.result.lastObject;
+    }
     [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(60, 60) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
         weakSelf.photoView.image = image;
     }];

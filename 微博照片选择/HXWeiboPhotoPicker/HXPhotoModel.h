@@ -48,10 +48,21 @@ typedef enum : NSUInteger {
  */
 @property (strong, nonatomic) UIImage *previewPhoto;
 
+/**  
+ 当前照片所在相册的名称
+ */
+@property (copy, nonatomic) NSString *albumName;
+
 /**
  GIF照片
  */
 @property (strong, nonatomic) UIImage *gifImage;
+
+/**  
+ 请求ID
+ */
+@property (assign, nonatomic) PHImageRequestID requestID;
+@property (assign, nonatomic) PHImageRequestID liveRequestID;
 
 /**
  照片数据

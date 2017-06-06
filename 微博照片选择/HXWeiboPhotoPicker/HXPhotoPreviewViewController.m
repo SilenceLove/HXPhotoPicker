@@ -349,10 +349,12 @@
         }
     }
     if (!self.isPreview) {
-        if (!self.selectedBtn.selected && !max) {
-            model.selected = YES;
-            [self.manager.selectedList addObject:model];
-            [self.manager.selectedPhotos addObject:model];
+        if (self.manager.selectedList.count == 0) {
+            if (!self.selectedBtn.selected && !max) {
+                model.selected = YES;
+                [self.manager.selectedList addObject:model];
+                [self.manager.selectedPhotos addObject:model];
+            }
         }
     }
     if ([self.delegate respondsToSelector:@selector(previewDidNextClick)]) {
