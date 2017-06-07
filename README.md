@@ -33,19 +33,6 @@
 
 ## 四.  例子 - Examples
 
-```
-!关于为什么照片模型里面只有 thumbPhoto 这个才有值
-为了优化相册列表以及预览大图列表快速滑动内存暴增的问题，
-如果缓存了imageData或者原图的image,用户图片过多时这会导致内存的增大,
-而且当快速滑动遇到图片过大时可能导致滑动卡顿 / 内存警告⚠️程序被杀。
-故不缓存imageData和image 只保留 thumbPhoto 缩略图   
-这样可以保证在选择照片/快速滑动过程中,不会因为内存过大导致程序被杀 和 滑动流畅丝滑。
-所以要获取已选图片的原图可以选择HXPhotoTools提供的快速获取已选照片的全部原图 或
-快速获取已选照片的全图高清图片,获取高清图片消耗内存很小而且图片质量也很高
-当然您也可以自己根据指定方法控制传入的size来获取不同质量的图片。
-提醒：在用户没有选择原图的时候不要使用原图上传，获取image时size稍微缩小一点这样可以保证上传快内存消耗小一点。
-在使用快速获取原图方法时,请将这个方法写在上传方法里! 在获取原图Image的过程中会比较消耗内存.
-```
 - HXPhotoManager 照片管理类相关属性介绍
 
 ```
@@ -174,17 +161,11 @@ photoView.backgroundColor = [UIColor whiteColor];
 
 // 获取照片资源
 [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-    // 小图  - 这个字段会一直有值
-    model.thumbPhoto;
+    // 小图  - 通过相机拍摄的照片才有值
+    model.thumbPhoto;
 
-    // 大图  - 这个字段没有值  - 如果是通过相机拍照的这个字段一直有值跟 thumbPhoto 是一样的
+    // 大图  - 通过相机拍摄的照片才有值
     model.previewPhoto;
-
-    // imageData  - 这个字段没有值
-    model.imageData;
-
-    // livePhoto  - 这个字段只有当查看过livePhoto之后才会有值
-    model.livePhoto;
 
     // isCloseLivePhoto 判断当前图片是否关闭了 livePhoto 功能 YES-关闭 NO-开启
     model.isCloseLivePhoto;
@@ -206,11 +187,11 @@ photoView.backgroundColor = [UIColor whiteColor];
 
 // 如果是相册选取的视频 要获取视频URL 必须先将视频压缩写入文件,得到的文件路径就是视频的URL 如果是通过相机录制的视频那么 videoURL 这个字段就是视频的URL 可以看需求看要不要压缩
 [videos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-    // 视频封面
+    // 视频封面 -  通过相机录制的视频才有值
     model.thumbPhoto;
-
-    // previewPhoto 这个也是视频封面 如果是在相册选择的视频 这个字段有可能没有值,只有当用户通过3DTouch 预览过之后才会有值 而且比 thumbPhoto 清晰  如果视频是通过相机拍摄的视频 那么 previewPhoto 这个字段跟 thumbPhoto 是同一张图片也是比较清晰的
-    model.previewPhoto;
+         
+    // 视频封面 -  通过相机录制的视频才有值
+    model.previewPhoto; 
 
     // 如果是通过相机录制的视频 需要通过 model.VideoURL 这个字段来压缩写入文件
     if (model.type == HXPhotoModelMediaTypeCameraVideo) {
@@ -234,6 +215,11 @@ photoView.backgroundColor = [UIColor whiteColor];
         // 通过相机录制的视频
     }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         // 通过相机拍摄的照片
+        if (model.networkPhotoUrl.length > 0) {
+              NSLog(@"网络图片");
+        }else {
+              NSLog(@"相机拍摄的照片");
+        }
     }else if (model.type == HXPhotoModelMediaTypePhoto) {
         // 相册里的照片
     }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
