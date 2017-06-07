@@ -68,7 +68,8 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    [self getObjs]; 
+    [self getObjs];
+    [self setup];
     // 获取当前应用对照片的访问授权状态
     if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
         [self.view addSubview:self.authorizationLb];
@@ -141,7 +142,6 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                 weakSelf.videos = [NSMutableArray arrayWithArray:videos];
                 weakSelf.objs = [NSMutableArray arrayWithArray:Objs];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf setup];
                     weakSelf.albumView.list = albums;
                     if (model.albumName.length == 0) {
                         model.albumName = @"相机胶卷";
@@ -155,7 +155,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 //                    transition.duration = 0.05;
 //                    transition.subtype = kCATransitionFade;
 //                    [[weakSelf.collectionView layer] addAnimation:transition forKey:@""];
-//                    [weakSelf.collectionView reloadData];
+                    [weakSelf.collectionView reloadData];
                 });
             }];
         } IsShowSelectTag:isShow];
@@ -416,7 +416,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         if (!self.endScrolling) {
             self.endScrolling = YES;
             self.visibleCells = [NSMutableArray arrayWithArray:[self.collectionView visibleCells]];
-            [self.visibleCells enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(HXPhotoViewCell *cell, NSUInteger idx, BOOL * _Nonnull stop) {
+            for (HXPhotoViewCell *cell in self.visibleCells) {
                 HXPhotoModel *model = self.objs[[self.collectionView indexPathForCell:cell].item];
                 if (model.type != HXPhotoModelMediaTypeCamera) {
                     if (!cell.firstRegisterPreview) {
@@ -430,7 +430,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                         }
                     }
                 }
-            }];
+            } 
         }
     }
 }
@@ -474,17 +474,18 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     HXPhotoModel *model = self.objs[index.item];
     self.previewImg = [[UIImageView alloc] init];
     self.previewImg.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);
-    //if (model.previewPhoto) {
-        //self.previewImg.image = model.previewPhoto;
-    //}else {
-        __weak typeof(self) weakSelf = self;
-        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5) deliveryMode:0 completion:^(UIImage *image, NSDictionary *info) {
-            weakSelf.previewImg.image = image;
-        } progressHandler:nil error:^(NSDictionary *info) { 
-            weakSelf.previewImg.image = model.thumbPhoto;
-        }];
-        [NSThread sleepForTimeInterval:0.2];
-    //}
+    
+    if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
+        HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
+        self.previewImg.image = cell.imageView.image;
+    }
+    __weak typeof(self) weakSelf = self;
+    [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+        weakSelf.previewImg.image = image;
+    } error:^(NSDictionary *info) {
+        weakSelf.previewImg.image = model.thumbPhoto;
+    }];
+    [NSThread sleepForTimeInterval:0.2];
     CGRect rect = CGRectMake(0, 0, previewingContext.sourceView.frame.size.width, previewingContext.sourceView.frame.size.height);
     previewingContext.sourceRect = rect;
     if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
@@ -539,6 +540,12 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     HXPhotoModel *model = self.objs[index.item];
     if (model.type == HXPhotoModelMediaTypeVideo) {
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)viewControllerToCommit;
+        if (self.previewImg.image) {
+            vc.coverImage = self.previewImg.image;
+        }else {
+            HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
+            vc.coverImage = cell.imageView.image;
+        }
         [vc.playVideo play];
         vc.playBtn.selected = YES;
         [vc selectClick];
@@ -551,6 +558,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     self.currentIndexPath = indexPath;
     HXPhotoModel *model = self.objs[indexPath.item];
     if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
@@ -573,6 +581,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         [self.navigationController pushViewController:vc animated:YES];
     }else if (model.type == HXPhotoModelMediaTypeVideo){
         HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
+        vc.coverImage = cell.imageView.image;
         vc.manager = self.manager;
         vc.delegate = self;
         vc.model = model;
@@ -588,6 +597,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         [self.navigationController pushViewController:vc animated:YES];
     }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
         HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
+        vc.coverImage = cell.imageView.image;
         vc.manager = self.manager;
         vc.delegate = self;
         vc.model = model;
@@ -645,6 +655,8 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 {
     if (self.albumModel.index != 0) {
         [self didTableViewCellClick:self.albums.firstObject animate:NO];
+        self.albumView.currentIndex = 0;
+        self.albumView.list = self.albums;
     }
     // 判断类型
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
@@ -776,7 +788,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         transition.type = kCATransitionPush;
         transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         transition.fillMode = kCAFillModeForwards;
-        transition.duration = 0.25;
+        transition.duration = 0.2;
         transition.delegate = self;
         transition.subtype = kCATransitionFade;
         [[weakSelf.collectionView layer] addAnimation:transition forKey:@""];
@@ -898,6 +910,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     BOOL selected = cell.selectBtn.selected;
     
     if (selected) { // 选中之后需要做的
+        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            model.thumbPhoto = cell.imageView.image;
+        }
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             [cell startLivePhoto];
         }
@@ -919,6 +934,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         [self.manager.selectedList addObject:model];
         self.albumModel.selectedCount++;
     }else { // 取消选中之后的
+        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            model.thumbPhoto = nil;
+        }
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             [cell stopLivePhoto];
         }
@@ -1065,10 +1083,13 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             [self.navigationController pushViewController:vc animated:YES];
         }else {
             HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
+            HXPhotoModel *model = self.manager.selectedVideos.firstObject;
+            HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:model.albumListIndex inSection:0]];
+            vc.coverImage = cell.imageView.image;
             vc.isPreview = self.isPreview;
             vc.manager = self.manager;
             vc.delegate = self;
-            vc.model = self.manager.selectedVideos.firstObject;
+            vc.model = model;
             if (vc.model.type == HXPhotoModelMediaTypeCameraVideo) {
                 vc.isCamera = YES;
             }

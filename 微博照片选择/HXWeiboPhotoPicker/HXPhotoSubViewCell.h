@@ -24,4 +24,6 @@
  删除网络图片时是否显示Alert // 默认显示
  */
 @property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
+// 重新下载
+- (void)againDownload;
 @end

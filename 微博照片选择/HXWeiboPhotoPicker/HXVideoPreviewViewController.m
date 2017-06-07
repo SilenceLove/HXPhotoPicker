@@ -211,6 +211,10 @@
                 return;
             }
         }
+        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            model.thumbPhoto = self.coverImage;
+            model.previewPhoto = self.coverImage;
+        }
         if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
             [self.manager.selectedPhotos addObject:model];
         }else if (model.type == HXPhotoModelMediaTypeVideo) {
@@ -230,6 +234,10 @@
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [button.layer addAnimation:anim forKey:@""];
     }else {
+        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            model.thumbPhoto = nil;
+            model.previewPhoto = nil;
+        }
         int i = 0;
         for (HXPhotoModel *subModel in self.manager.selectedList) {
             if ([subModel.asset.localIdentifier isEqualToString:model.asset.localIdentifier]) {
@@ -335,6 +343,8 @@
     if (!self.isPreview) {
         if (self.manager.selectedList.count == 0) {
             if (!self.selectedBtn.selected && !max) {
+                self.model.thumbPhoto = self.coverImage;
+                self.model.previewPhoto = self.coverImage;
                 self.model.selected = YES;
                 [self.manager.selectedList addObject:self.model];
                 [self.manager.selectedVideos addObject:self.model];

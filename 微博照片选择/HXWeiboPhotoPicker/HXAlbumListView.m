@@ -10,7 +10,6 @@
 #import "HXPhotoTools.h"
 @interface HXAlbumListView ()<UITableViewDelegate,UITableViewDataSource>
 @property (weak, nonatomic) UITableView *tableView;
-@property (assign, nonatomic) NSInteger currentIndex;
 @end
 
 @implementation HXAlbumListView

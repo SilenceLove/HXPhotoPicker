@@ -132,6 +132,39 @@
     return requestID;
 }
 
++ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error
+{
+    static PHImageRequestID requestID = -1;
+    
+    CGFloat scale = [UIScreen mainScreen].scale;
+    CGFloat width = MIN([UIScreen mainScreen].bounds.size.width, 500);
+    if (requestID >= 1 && size.width / width == scale) {
+        [[PHCachingImageManager defaultManager] cancelImageRequest:requestID];
+    }
+    
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+//    option.networkAccessAllowed = YES;
+    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.synchronous = NO;
+    option.resizeMode = resizeMode;
+    
+    requestID = [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        if (downloadFinined && completion && result) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(result,info);
+            });
+        }else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (error) {
+                    error(info);
+                }
+            });
+        }
+    }];
+}
+
 + (PHImageRequestID)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void (^)(NSData *, NSDictionary *))completion
 {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
@@ -487,7 +520,6 @@
             completion(array);
         }
     }
-}
-
+} 
 
 @end

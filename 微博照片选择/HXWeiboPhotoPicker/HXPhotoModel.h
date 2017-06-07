@@ -158,5 +158,6 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) NSInteger receivedSize;
 @property (assign, nonatomic) NSInteger expectedSize;
 @property (assign, nonatomic) BOOL downloadComplete;
+@property (assign, nonatomic) BOOL downloadError;
 
 @end

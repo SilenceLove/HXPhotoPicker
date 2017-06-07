@@ -152,7 +152,9 @@
     }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
         [cell startGifImage];
     }else {
-        [cell fetchLongPhoto];
+        if (!model.previewPhoto) {
+            [cell fetchLongPhoto];
+        }
     }
 }
 
@@ -230,6 +232,11 @@
                 return;
             }
         }
+        HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            model.thumbPhoto = cell.imageView.image;
+            model.previewPhoto = cell.imageView.image;
+        }
         if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             [self.manager.selectedPhotos addObject:model];
         }else if (model.type == HXPhotoModelMediaTypeVideo) {
@@ -249,6 +256,10 @@
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [button.layer addAnimation:anim forKey:@""];
     }else {
+        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            model.thumbPhoto = nil;
+            model.previewPhoto = nil;
+        }
         int i = 0;
         for (HXPhotoModel *subModel in self.manager.selectedList) {
             if ([subModel.asset.localIdentifier isEqualToString:model.asset.localIdentifier]) {
@@ -352,6 +363,9 @@
         if (self.manager.selectedList.count == 0) {
             if (!self.selectedBtn.selected && !max) {
                 model.selected = YES;
+                HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+                model.thumbPhoto = cell.imageView.image;
+                model.previewPhoto = cell.imageView.image;
                 [self.manager.selectedList addObject:model];
                 [self.manager.selectedPhotos addObject:model];
             }

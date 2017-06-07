@@ -180,6 +180,10 @@
         if (!model.downloadComplete) {
             [[self viewController:self].view showImageHUDText:@"照片正在下载"];
             return;
+        }else if (model.downloadError) {
+            HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+            [cell againDownload];
+            return;
         }
     }
     if (model.type == HXPhotoModelMediaTypeCamera) {
@@ -641,6 +645,7 @@
     self.collectionView.frame = CGRectMake(0, 0, cWidth, cHeight);
 }
 - (void)dealloc {
+    [[SDWebImageManager sharedManager] cancelAll];
     NSLog(@"dealloc");
 }
 

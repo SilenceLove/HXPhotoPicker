@@ -19,6 +19,9 @@
 @property (assign, nonatomic) PHImageRequestID requestID;
 @property (assign, nonatomic) PHImageRequestID longRequestId;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
+@property (assign, nonatomic) PHImageRequestID liveRequestID;
+@property (weak, nonatomic) UIImage *firstImage;
+
 @end
 
 @implementation HXPhotoPreviewViewCell
@@ -88,21 +91,22 @@
     self.livePhotoView.frame = self.imageView.frame;
     self.livePhotoView.delegate = self;
     [self.scrollView addSubview:self.livePhotoView];
-    if (self.model.livePhoto) {
-        self.livePhotoView.livePhoto = self.model.livePhoto;
-        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
-    }else {
+//    if (self.model.livePhoto) {
+//        self.livePhotoView.livePhoto = self.model.livePhoto;
+//        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+//    }else {
         __weak typeof(self) weakSelf = self;
-        [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 2, self.model.endImageSize.height * 2) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
-            weakSelf.model.livePhoto = livePhoto;
+        self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 2, self.model.endImageSize.height * 2) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+//            weakSelf.model.livePhoto = livePhoto;
             weakSelf.livePhotoView.livePhoto = livePhoto;
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
         }];
-    }
+//    }
 }
 
 - (void)stopLivePhoto
 {
+    [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
     self.isAnimating = NO;
     [self.livePhotoView stopPlayback];
     [self.livePhotoView removeFromSuperview];
@@ -153,11 +157,7 @@
 
 - (void)stopGifImage
 {
-    if (self.model.previewPhoto) {
-        self.imageView.image = self.model.previewPhoto;
-    }else {
-        self.imageView.image = self.model.thumbPhoto;
-    }
+    self.imageView.image = self.firstImage;
 }
 
 - (void)setModel:(HXPhotoModel *)model
@@ -187,41 +187,41 @@
     _imageView.center = CGPointMake(width / 2, height / 2);
     if (model.type == HXPhotoModelMediaTypePhotoGif) {
         __weak typeof(self) weakSelf = self;
-            [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                __strong typeof(weakSelf) strongSelf = weakSelf;
-                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
-                if (gifImage.images.count == 0) {
-                    weakSelf.imageView.image = gifImage;
-                }else {
-                    weakSelf.imageView.image = gifImage.images.firstObject;
-                }
-                strongSelf.gifImage = gifImage;
-            }];
+        [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) { 
+            UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+            if (gifImage.images.count == 0) {
+                weakSelf.firstImage = gifImage;
+                weakSelf.imageView.image = gifImage;
+            }else {
+                weakSelf.firstImage = gifImage.images.firstObject;
+                weakSelf.imageView.image = gifImage.images.firstObject;
+            }
+            weakSelf.gifImage = gifImage;
+        }];
     }else {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
             self.imageView.image = model.thumbPhoto;
         }else {
-            //if (model.previewPhoto) {
-            //self.imageView.image = model.previewPhoto;
-            //}else {
-            __weak typeof(self) weakSelf = self;
-            PHImageRequestID requestID;
-            if (imgHeight > imgWidth / 9 * 17) {
-                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width * 0.5, height * 0.5) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-                    //model.previewPhoto = image;
-                    weakSelf.imageView.image = image;
-                }];
+            if (model.previewPhoto) {
+                self.imageView.image = model.previewPhoto;
             }else {
-                requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-                    //model.previewPhoto = image;
-                    weakSelf.imageView.image = image;
-                }];
+                __weak typeof(self) weakSelf = self;
+                PHImageRequestID requestID;
+                if (imgHeight > imgWidth / 9 * 17) {
+                    requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width * 0.5, height * 0.5) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                        //model.previewPhoto = image;
+                        weakSelf.imageView.image = image;
+                    }];
+                }else {
+                    requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                        weakSelf.imageView.image = image;
+                    }];
+                }
+                if (self.requestID != requestID) {
+                    [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+                }
+                self.requestID = requestID;
             }
-            if (self.requestID != requestID) {
-                [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-            }
-            self.requestID = requestID;
-            //}
         }
     }
 }

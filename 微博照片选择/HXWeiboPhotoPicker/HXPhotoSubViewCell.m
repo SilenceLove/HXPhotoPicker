@@ -98,6 +98,36 @@
     }
 }
 
+- (void)againDownload {
+    self.model.downloadError = NO;
+    self.model.downloadComplete = NO;
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:self.model.networkPhotoUrl] placeholderImage:self.model.thumbPhoto options:SDWebImageCacheMemoryOnly progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+        self.model.receivedSize = receivedSize;
+        self.model.expectedSize = expectedSize;
+        CGFloat progress = (CGFloat)receivedSize / expectedSize;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.progressView.progress = progress;
+        });
+    } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+        if (error != nil) {
+            self.model.downloadError = YES;
+            self.model.downloadComplete = YES;
+            [self.progressView showError];
+        }else {
+            if (image) {
+                self.progressView.progress = 1;
+                self.progressView.hidden = YES;
+                self.imageView.image = image;
+                self.model.imageSize = image.size;
+                self.model.thumbPhoto = image;
+                self.model.previewPhoto = image;
+                self.userInteractionEnabled = YES;
+                self.model.downloadComplete = YES;
+            }
+        }
+    }];
+}
+
 - (void)setModel:(HXPhotoModel *)model
 {
     _model = model;
@@ -116,8 +146,11 @@
         self.deleteBtn.hidden = NO;
     }
     if (model.networkPhotoUrl.length > 0) {
-        self.progressView.hidden = model.downloadComplete; 
-        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.networkPhotoUrl] placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+//        if ([[model.networkPhotoUrl substringFromIndex:model.networkPhotoUrl.length - 3] isEqualToString:@"gif"]) {
+//            self.gifIcon.hidden = NO;
+//        }
+        self.progressView.hidden = model.downloadComplete;
+        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.networkPhotoUrl] placeholderImage:model.thumbPhoto options:SDWebImageCacheMemoryOnly progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
             model.receivedSize = receivedSize;
             model.expectedSize = expectedSize;
             CGFloat progress = (CGFloat)receivedSize / expectedSize;
@@ -126,12 +159,14 @@
             });
         } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
             if (error != nil) {
+                model.downloadError = YES;
+                model.downloadComplete = YES;
                 [self.progressView showError];
             }else {
                 if (image) {
                     self.progressView.progress = 1;
                     self.progressView.hidden = YES;
-                    self.imageView.image = image;
+//                    self.imageView.image = image;
                     model.imageSize = image.size;
                     model.thumbPhoto = image;
                     model.previewPhoto = image;

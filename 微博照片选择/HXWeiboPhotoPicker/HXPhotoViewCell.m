@@ -23,6 +23,8 @@
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @property (copy, nonatomic) NSString *localIdentifier;
 @property (strong, nonatomic) UIImageView *previewImg;
+@property (assign, nonatomic) PHImageRequestID liveRequestID;
+
 @end
 
 @implementation HXPhotoViewCell
@@ -150,10 +152,10 @@
     self.livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
     self.livePhotoView.frame = self.bounds;
     [self.contentView insertSubview:self.livePhotoView aboveSubview:self.imageView];
-    if (self.model.livePhoto) {
-        self.livePhotoView.livePhoto = self.model.livePhoto;
-        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
-    }else {
+//    if (self.model.livePhoto) {
+//        self.livePhotoView.livePhoto = self.model.livePhoto;
+//        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
+//    }else {
         CGFloat width = self.frame.size.width;
         __weak typeof(self) weakSelf = self;
         CGSize size;
@@ -164,17 +166,17 @@
         }else {
             size = CGSizeMake(width, width);
         }
-        self.model.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:size Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
-            weakSelf.model.livePhoto = livePhoto;
+        self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:size Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+//            weakSelf.model.livePhoto = livePhoto;
             weakSelf.livePhotoView.livePhoto = livePhoto;
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
         }];
-    }
+//    }
 }
 
 - (void)stopLivePhoto
 {
-    [[PHCachingImageManager defaultManager] cancelImageRequest:self.model.liveRequestID];
+    [[PHCachingImageManager defaultManager] cancelImageRequest:self.liveRequestID];
     self.liveIcon.hidden = NO;
     self.liveBtn.hidden = YES;
     [self.livePhotoView stopPlayback];
@@ -199,9 +201,9 @@
     _model = model;
     CGFloat width = self.frame.size.width;
     
-//    if (model.thumbPhoto) {
-//        self.imageView.image = model.thumbPhoto;
-//    }else {
+    if (model.thumbPhoto) {
+        self.imageView.image = model.thumbPhoto;
+    }else {
         self.localIdentifier = model.asset.localIdentifier;
         __weak typeof(self) weakSelf = self;
         CGSize size;
@@ -230,7 +232,7 @@
             [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         }
         self.requestID = requestID;
-//    }
+    }
 //        model.requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
 
 //                model.thumbPhoto = image;
