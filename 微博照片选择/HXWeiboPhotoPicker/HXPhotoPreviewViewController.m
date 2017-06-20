@@ -310,8 +310,7 @@
     }
 }
 
-- (UIButton *)rightBtn
-{
+- (UIButton *)rightBtn {
     if (!_rightBtn) {
         _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_rightBtn setTitle:@"下一步" forState:UIControlStateNormal];

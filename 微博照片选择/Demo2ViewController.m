@@ -11,6 +11,7 @@
 #import "HXPhotoView.h"
 @interface Demo2ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
+@property (strong, nonatomic) HXPhotoView *photoView;
 @end
 
 @implementation Demo2ViewController
@@ -64,8 +65,11 @@
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.openCamera = YES;
-//        _manager.outerCamera = YES;
+        _manager.outerCamera = YES;
         _manager.showFullScreenCamera = YES;
+        _manager.photoMaxNum = 4;
+        _manager.videoMaxNum = 4;
+        _manager.maxNum = 8;
     }
     return _manager;
 }
@@ -82,15 +86,20 @@
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:photoView];
+    self.photoView = photoView;
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"相册/相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
 }
-
+- (void)didNavBtnClick {
+    [self.photoView goPhotoViewController];
+}
 - (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal
 {
     NSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     
-    for (HXPhotoModel *model in allList) {
-        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);
-    }
+//    for (HXPhotoModel *model in allList) {
+//        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);
+//    }
     
     // 获取数组里面图片的 HD(高清)图片  传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
 //    [HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {

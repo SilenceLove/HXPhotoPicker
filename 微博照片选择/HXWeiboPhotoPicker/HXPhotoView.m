@@ -479,6 +479,9 @@
 
 - (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original
 {
+//    if ([self.delegate respondsToSelector:@selector(photoViewCurrentSelected:photos:videos:original:)]) {
+//        [self.delegate photoViewCurrentSelected:allList photos:photos videos:videos original:original];
+//    }
     self.original = original;
     NSMutableArray *tempAllArray = [NSMutableArray array];
     NSMutableArray *tempPhotoArray = [NSMutableArray array];
@@ -507,13 +510,32 @@
             self.isAddModel = YES;
         }
     }else {
-        if (photos.count == self.manager.photoMaxNum + self.networkPhotos.count) {
-            [self.dataList removeLastObject];
-            self.isAddModel = YES;
-        }else if (videos.count == self.manager.videoMaxNum) {
-            [self.dataList removeLastObject];
-            self.isAddModel = YES;
+        if (photos.count > 0) {
+            if (photos.count == self.manager.photoMaxNum + self.networkPhotos.count) {
+                if (self.manager.photoMaxNum > 0 || self.networkPhotos.count > 0) {
+                    [self.dataList removeLastObject];
+                    self.isAddModel = YES;
+                }
+            }
+        }else if (videos.count > 0) {
+            if (videos.count == self.manager.videoMaxNum) {
+                if (self.manager.videoMaxNum > 0) {
+                    [self.dataList removeLastObject];
+                    self.isAddModel = YES;
+                }
+            }
         }
+//        if (photos.count == self.manager.photoMaxNum + self.networkPhotos.count) {
+//            if (self.manager.photoMaxNum > 0 || self.networkPhotos.count > 0) {
+//                [self.dataList removeLastObject];
+//                self.isAddModel = YES;
+//            }
+//        }else if (videos.count == self.manager.videoMaxNum) {
+//            if (self.manager.videoMaxNum > 0) {
+//                [self.dataList removeLastObject];
+//                self.isAddModel = YES;
+//            }
+//        }
     }
     [self changeSelectedListModelIndex];
     [self.collectionView reloadData];

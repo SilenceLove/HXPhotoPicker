@@ -183,7 +183,7 @@
     NSMutableArray *videoAy = [NSMutableArray array];
     NSMutableArray *objAy = [NSMutableArray array];
     __block NSInteger photoIndex = 0, videoIndex = 0, albumIndex = 0;
-    __block NSInteger cameraIndex = self.openCamera ? 1 : 0;
+    __block NSInteger cameraIndex = self.openCamera ? 1 : 0; 
     [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
         HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
         photoModel.asset = asset;

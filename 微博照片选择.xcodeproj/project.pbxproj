@@ -60,6 +60,7 @@
 		7B7E3EB41E4C7137002234EE /* HXVideoPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3EB31E4C7137002234EE /* HXVideoPreviewViewController.m */; };
 		7B939E501E5BECB600301BBC /* HXPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */; };
 		7BB604521E5D693A00EBA520 /* HXVideoPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */; };
+		7BC2A6A51EF7E11700DD99AC /* 8836.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BC2A6A41EF7E11700DD99AC /* 8836.mp3 */; };
 		7BECEC261ECD7F2200EDE047 /* HXCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */; };
 		7BFE2E011E54575A00A8EC46 /* UIImage+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE2E001E54575A00A8EC46 /* UIImage+HXExtension.m */; };
 /* End PBXBuildFile section */
@@ -169,6 +170,7 @@
 		7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPresentTransition.m; sourceTree = "<group>"; };
 		7BB604501E5D693A00EBA520 /* HXVideoPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXVideoPresentTransition.h; sourceTree = "<group>"; };
 		7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXVideoPresentTransition.m; sourceTree = "<group>"; };
+		7BC2A6A41EF7E11700DD99AC /* 8836.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 8836.mp3; sourceTree = "<group>"; };
 		7BECEC241ECD7F2200EDE047 /* HXCircleProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCircleProgressView.h; sourceTree = "<group>"; };
 		7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCircleProgressView.m; sourceTree = "<group>"; };
 		7BFE2DFF1E54575A00A8EC46 /* UIImage+HXExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HXExtension.h"; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 		7B7E3E781E4AACD1002234EE /* 微博照片选择 */ = {
 			isa = PBXGroup;
 			children = (
+				7BC2A6A41EF7E11700DD99AC /* 8836.mp3 */,
 				7B7368DC1ECC44950049E9BA /* SDWebImage */,
 				7B7E3E901E4AAFFC002234EE /* HXWeiboPhotoPicker */,
 				7B7E3E7C1E4AACD1002234EE /* AppDelegate.h */,
@@ -400,6 +403,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */,
+				7BC2A6A51EF7E11700DD99AC /* 8836.mp3 in Resources */,
 				7B74BB3E1ED55CD500F81FA0 /* HXWeiboPhotoPicker.bundle in Resources */,
 				7B7E3E891E4AACD1002234EE /* LaunchScreen.storyboard in Resources */,
 				7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */,
@@ -578,7 +582,7 @@
 				INFOPLIST_FILE = "微博照片选择/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.com1;
+				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.com129;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -594,7 +598,7 @@
 				INFOPLIST_FILE = "微博照片选择/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.com1;
+				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.com129;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;

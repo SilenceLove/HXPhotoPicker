@@ -382,80 +382,80 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     cell.model = model;
     return cell;
 }
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    [self unregisterPreview];
-}
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    [self registerPreview];
-}
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if (!decelerate) {
-        [self registerPreview];
-    }
-} 
-- (void)unregisterPreview {
-    if (self.manager.open3DTouchPreview) {
-        self.firstRegisterPreview = YES;
-        if (self.endScrolling) {
-            self.endScrolling = NO;
-            if (self.visibleCells.count > 0) {
-                for (HXPhotoViewCell *cell in self.visibleCells) {
-                    if (cell.firstRegisterPreview && cell.previewingContext) {
-                        [self unregisterForPreviewingWithContext:cell.previewingContext];
-                        cell.previewingContext = nil;
-                        cell.firstRegisterPreview = NO;
-                    }
-                }
-                [self.visibleCells removeAllObjects];
-            }
-        }
-    }
-}
-- (void)registerPreview {
-    if (self.manager.open3DTouchPreview) {
-        if (!self.endScrolling) {
-            self.endScrolling = YES;
-            self.visibleCells = [NSMutableArray arrayWithArray:[self.collectionView visibleCells]];
-            for (HXPhotoViewCell *cell in self.visibleCells) {
-                HXPhotoModel *model = self.objs[[self.collectionView indexPathForCell:cell].item];
-                if (model.type != HXPhotoModelMediaTypeCamera) {
-                    if (!cell.firstRegisterPreview) {
-                        if ([self respondsToSelector:@selector(traitCollection)]) {
-                            if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
-                                if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-                                    cell.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:cell];
-                                    cell.firstRegisterPreview = YES;
-                                }
-                            }
-                        }
-                    }
-                }
-            } 
-        }
-    }
-}
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+//    [self unregisterPreview];
+//}
+//- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+//    [self registerPreview];
+//}
+//- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+//    if (!decelerate) {
+//        [self registerPreview];
+//    }
+//} 
+//- (void)unregisterPreview {
+//    if (self.manager.open3DTouchPreview) {
+//        self.firstRegisterPreview = YES;
+//        if (self.endScrolling) {
+//            self.endScrolling = NO;
+//            if (self.visibleCells.count > 0) {
+//                for (HXPhotoViewCell *cell in self.visibleCells) {
+//                    if (cell.firstRegisterPreview && cell.previewingContext) {
+//                        [self unregisterForPreviewingWithContext:cell.previewingContext];
+//                        cell.previewingContext = nil;
+//                        cell.firstRegisterPreview = NO;
+//                    }
+//                }
+//                [self.visibleCells removeAllObjects];
+//            }
+//        }
+//    }
+//}
+//- (void)registerPreview {
+//    if (self.manager.open3DTouchPreview) {
+//        if (!self.endScrolling) {
+//            self.endScrolling = YES;
+//            self.visibleCells = [NSMutableArray arrayWithArray:[self.collectionView visibleCells]];
+//            for (HXPhotoViewCell *cell in self.visibleCells) {
+//                HXPhotoModel *model = self.objs[[self.collectionView indexPathForCell:cell].item];
+//                if (model.type != HXPhotoModelMediaTypeCamera) {
+//                    if (!cell.firstRegisterPreview) {
+//                        if ([self respondsToSelector:@selector(traitCollection)]) {
+//                            if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
+//                                if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+//                                    cell.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:cell];
+//                                    cell.firstRegisterPreview = YES;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            } 
+//        }
+//    }
+//}
 
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(nonnull UICollectionViewCell *)cell forItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    if (!self.firstRegisterPreview) {
-        if (self.manager.open3DTouchPreview) {
-            HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
-            HXPhotoModel *model = self.objs[indexPath.item];
-            if (model.type != HXPhotoModelMediaTypeCamera) {
-                if (!myCell.firstRegisterPreview) {
-                    if ([self respondsToSelector:@selector(traitCollection)]) {
-                        if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
-                            if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-                                myCell.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:cell];
-                                myCell.firstRegisterPreview = YES;
-                                [self.visibleCells addObject:myCell];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+//- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(nonnull UICollectionViewCell *)cell forItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
+//    if (!self.firstRegisterPreview) {
+//        if (self.manager.open3DTouchPreview) {
+//            HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
+//            HXPhotoModel *model = self.objs[indexPath.item];
+//            if (model.type != HXPhotoModelMediaTypeCamera) {
+//                if (!myCell.firstRegisterPreview) {
+//                    if ([self respondsToSelector:@selector(traitCollection)]) {
+//                        if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
+//                            if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+//                                myCell.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:cell];
+//                                myCell.firstRegisterPreview = YES;
+//                                [self.visibleCells addObject:myCell];
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
     if (myCell.requestID) {
@@ -777,7 +777,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.title = model.albumName;
     [self.titleBtn setTitle:model.albumName forState:UIControlStateNormal];
     __weak typeof(self) weakSelf = self;
-    [self unregisterPreview];
+//    [self unregisterPreview];
     self.firstRegisterPreview = NO;
     // 获取指定相册的所有图片 
     [self.manager FetchAllPhotoForPHFetchResult:model.result Index:model.index FetchResult:^(NSArray *photos, NSArray *videos, NSArray *Objs) {

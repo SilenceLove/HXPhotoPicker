@@ -87,7 +87,7 @@
     }];
 }
 
-+ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void (^)(UIImage *, NSDictionary *))completion progressHandler:(void (^)(double, NSError *, BOOL *, NSDictionary *))progressHandler error:(void (^)(NSDictionary *))error
++ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void (^)(UIImage *, NSDictionary *))completion progressHandler:(void (^)(double, NSError *, BOOL *, NSDictionary *))progressHandler 
 {
     static PHImageRequestID requestID = -1;
     
@@ -132,8 +132,7 @@
     return requestID;
 }
 
-+ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error
-{
++ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error {
     static PHImageRequestID requestID = -1;
     
     CGFloat scale = [UIScreen mainScreen].scale;
@@ -319,8 +318,8 @@
                     }];
                 }];
             }else {
-                [strongSelf FetchPhotoForPHAsset:model.asset Size:PHImageManagerMaximumSize deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
-                    if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                [strongSelf FetchPhotoForPHAsset:model.asset Size:PHImageManagerMaximumSize deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
+                    if (![[info objectForKey:PHImageCancelledKey] boolValue] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]) {
                         if (!image) {
                             image = model.thumbPhoto;
                         }
@@ -333,16 +332,7 @@
                             });
                         }];
                     }
-                } progressHandler:nil error:^(NSDictionary *info) {
-                    model.previewPhoto = model.thumbPhoto;
-                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) {
-                                completion(array);
-                            }
-                        });
-                    }];
-                }];
+                } progressHandler:nil];
             }
         }];
     });
@@ -383,8 +373,8 @@
                 if (model.endImageSize.height > model.endImageSize.width / 9 * 20) {
                     size = CGSizeMake([UIScreen mainScreen].bounds.size.width, model.endImageSize.height);
                 }
-                [strongSelf FetchPhotoForPHAsset:model.asset Size:size deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
-                    if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                [strongSelf FetchPhotoForPHAsset:model.asset Size:size deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
+                    if (![[info objectForKey:PHImageCancelledKey] boolValue] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]) {
                         if (!image) {
                             image = model.thumbPhoto;
                         }
@@ -397,16 +387,7 @@
                             });
                         }];
                     }
-                } progressHandler:nil error:^(NSDictionary *info) {
-                    model.previewPhoto = model.thumbPhoto;
-                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) {
-                                completion(array);
-                            }
-                        });
-                    }];
-                }];
+                } progressHandler:nil];
             }
         }];
     });

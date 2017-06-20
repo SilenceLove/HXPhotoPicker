@@ -14,6 +14,7 @@
 #import "UIView+HXExtension.h"
 #import "UIImage+HXExtension.h"
 #import "HXVideoPresentTransition.h"
+#import "HXCameraPreviewViewController.h"
 @interface HXCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate>
 //捕获设备，通常是前置摄像头，后置摄像头，麦克风（音频输入）
 @property (nonatomic, strong) AVCaptureDevice *device;
@@ -73,6 +74,7 @@
 @property (strong, nonatomic) UISlider *zoomSlider;
 @property (strong, nonatomic) NSURL *clipVideoURL;
 @property (assign, nonatomic) BOOL first;
+@property (strong, nonatomic) NSMutableArray *images;
 @end
 
 @implementation HXCameraViewController
@@ -885,6 +887,49 @@
             model.previewPhoto = image;
             model.cameraIdentifier = [weakSelf videoOutFutFileName];
             [weakSelf.view handleLoading];
+            
+//            AVAsset *asset = [AVAsset assetWithURL:weakSelf.videoURL];
+            
+//            AVAssetReader *reader = [AVAssetReader assetReaderWithAsset:asset error:nil];
+//            int m_pixelFormatType;
+//                 视频播放时，
+//            m_pixelFormatType = kCVPixelFormatType_32BGRA;
+//             其他用途，如视频压缩
+//                m_pixelFormatType = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
+//            NSArray *videoTracks = [asset tracksWithMediaType:AVMediaTypeVideo];
+//            AVAssetTrack *videoTrack1 =[videoTracks objectAtIndex:0];
+//            
+//            AVAssetTrackGroup *track = asset.trackGroups.firstObject;
+//            for (NSNumber *ids in track.trackIDs) {
+//                
+//            };
+            
+//            NSMutableDictionary *options = [NSMutableDictionary dictionary];
+//            [options setObject:@(m_pixelFormatType) forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+//            AVAssetReaderTrackOutput *videoReaderOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack:videoTrack1 outputSettings:options];
+//            [reader addOutput:videoReaderOutput];
+//            [reader startReading];
+//            self.images = [NSMutableArray array];
+//            // 要确保nominalFrameRate>0，之前出现过android拍的0帧视频
+//            while ([reader status] == AVAssetReaderStatusReading && videoTrack1.nominalFrameRate > 0) {
+//                // 读取 video sample
+//                CMSampleBufferRef videoBuffer = [videoReaderOutput copyNextSampleBuffer];
+//                
+//                UIImage *image = [UIImage imageWithCGImage:[self imageFromSamplePlanerPixelBuffer:videoBuffer]];
+//                NSLog(@"%@",image);
+//                if (image) {
+//                    if (image.imageOrientation != UIImageOrientationUp) {
+//                        image = [image normalizedImage];
+//                    }
+//                    [self.images addObject:[UIImage imageWithCGImage:[self imageFromSamplePlanerPixelBuffer:videoBuffer]]];
+//                }
+//                // 根据需要休眠一段时间；比如上层播放视频时每帧之间是有间隔的,这里的 sampleInternal 我设置为0.001秒
+//                [NSThread sleepForTimeInterval:0.001f];
+//            }
+            
+            HXCameraPreviewViewController *vc = [[HXCameraPreviewViewController alloc] init];
+            vc.images = weakSelf.images;
+            [weakSelf presentViewController:vc animated:YES completion:nil];
             if ([weakSelf.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
                 [weakSelf.delegate cameraDidNextClick:model];
             }
@@ -900,6 +945,8 @@
 - (void)clipVideoCompleted:(void(^)())completed failed:(void(^)())failed
 {
     AVAsset *asset = [AVAsset assetWithURL:self.videoURL];
+    
+//    AVAsset *audio = [AVAsset assetWithURL:[[NSBundle mainBundle] URLForResource:@"8836.mp3" withExtension:nil]];
     
     AVAssetTrack *audioTrack;
     if ([[asset tracksWithMediaType:AVMediaTypeAudio] count] != 0) {
@@ -919,6 +966,7 @@
     if (audioTrack != nil) {
         AVMutableCompositionTrack *compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio
                                                                             preferredTrackID:kCMPersistentTrackID_Invalid];
+        
         [compositionAudioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
                                        ofTrack:audioTrack
                                         atTime:kCMTimeZero
@@ -1040,7 +1088,40 @@
         }
     }];
 }
-
+-(CGImageRef ) imageFromSamplePlanerPixelBuffer:(CMSampleBufferRef) sampleBuffer{
+    // 为媒体数据设置一个CMSampleBufferRef
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // 锁定 pixel buffer 的基地址
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    // 得到 pixel buffer 的基地址
+    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+    // 得到 pixel buffer 的行字节数
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    // 得到 pixel buffer 的宽和高
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    
+    // 创建一个依赖于设备的 RGB 颜色空间
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    // 用抽样缓存的数据创建一个位图格式的图形上下文（graphic context）对象
+    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    //根据这个位图 context 中的像素创建一个 Quartz image 对象
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    // 解锁 pixel buffer
+    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    
+    // 释放 context 和颜色空间
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    // 用 Quzetz image 创建一个 UIImage 对象
+    // UIImage *image = [UIImage imageWithCGImage:quartzImage];
+    
+    // 释放 Quartz image 对象
+    //    CGImageRelease(quartzImage);
+    
+    return quartzImage;
+}
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{
     return [HXVideoPresentTransition transitionWithTransitionType:HXVideoPresentTransitionPresent];
 }

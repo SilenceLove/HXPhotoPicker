@@ -124,24 +124,20 @@
     PHImageRequestID requestID;
     __weak typeof(self) weakSelf = self;
     if (imgHeight > imgWidth / 9 * 17) {
-        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(width, height) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(width, height) deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
             weakSelf.progressView.hidden = YES;
         } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
             weakSelf.progressView.hidden = NO;
             weakSelf.progressView.progress = progress;
-        } error:^(NSDictionary *info) {
-            weakSelf.imageView.image = weakSelf.model.thumbPhoto;
         }];
     }else {
-        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2, _model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2, _model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
             weakSelf.progressView.hidden = YES;
         } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
             weakSelf.progressView.hidden = NO;
             weakSelf.progressView.progress = progress;
-        } error:^(NSDictionary *info) {
-            weakSelf.imageView.image = weakSelf.model.thumbPhoto;
         }];
     }
     if (self.longRequestId != requestID) {
