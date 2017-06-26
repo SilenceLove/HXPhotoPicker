@@ -17,27 +17,34 @@
 
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName;
+
++ (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion;
+
++ (void)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
+
++ (void)getTransitionPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
+
 /**
- 根据已选照片数组返回原图数组
+ 根据已选照片数组返回原图数组     暂时不提供使用
 
  @param photos 选中照片数组
  */
-+ (void)fetchOriginalForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
+//+ (void)fetchOriginalForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
 
 /**
- 根据已选照片数组返回高清图片数组 (质量略小于原图)
+ 根据已选照片数组返回高清图片数组 (质量略小于原图)     暂时不提供使用
 
  @param photos 选中照片数组
  @param completion 高清图片数组
  */
-+ (void)fetchHDImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
+//+ (void)fetchHDImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
 
 /**
- 根据已选照片数组返回imageData数组
+ 根据已选照片数组返回imageData数组     暂时不提供使用
  
  @param photos 选中照片数组
  */
-+ (void)fetchImageDataForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<NSData *> *imageDatas))completion;
+//+ (void)fetchImageDataForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<NSData *> *imageDatas))completion;
 
 
 /**
@@ -53,7 +60,6 @@
 /**
  根据PHAsset对象获取照片信息
  */
-+ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion;
 + (int32_t)fetchPhotoWithAsset:(id)asset photoSize:(CGSize)photoSize completion:(void (^)(UIImage *photo,NSDictionary *info,BOOL isDegraded))completion;
 
 /**
@@ -91,9 +97,6 @@
  @param size 指定请求的大小
  @param deliveryMode 请求模式
  @param completion 完成后的block
- @param error 失败后的block
  */
-+ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void(^)(UIImage *image,NSDictionary *info))completion progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *info))progressHandler ;
-
-+ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
++ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void(^)(UIImage *image,NSDictionary *info))completion progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *info))progressHandler;
 @end

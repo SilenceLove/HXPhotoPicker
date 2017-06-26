@@ -66,18 +66,11 @@
         //[self pushAnim:transitionContext Image:model.previewPhoto Model:model FromVC:fromVC ToVC:toVC];
     //}else {
         __weak typeof(self) weakSelf = self;
-    [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+    [HXPhotoTools getTransitionPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) completion:^(UIImage *image, NSDictionary *info) {
         [weakSelf pushAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC];
     } error:^(NSDictionary *info) {
         [weakSelf pushAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC];
-    }];
-//        [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
-//            //model.previewPhoto = image;
-//            [weakSelf pushAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC];
-//        } progressHandler:nil error:^(NSDictionary *info) {
-//            [weakSelf pushAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC];
-//        }];
-    //}
+    }]; 
 }
 
 - (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(HXPhotoViewController *)fromVC ToVC:(UIViewController *)toVC

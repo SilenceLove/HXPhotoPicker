@@ -124,9 +124,9 @@
     if (!model.asset) {
         model.asset = model.result.lastObject;
     }
-    [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(60, 60) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+    [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(60, 60) completion:^(UIImage *image, NSDictionary *info) {
         weakSelf.photoView.image = image;
-    }];
+    }]; 
     
     self.photoName.text = model.albumName;
     self.photoNum.text = [NSString stringWithFormat:@"%ld",model.count];

@@ -124,7 +124,7 @@
     PHImageRequestID requestID;
     __weak typeof(self) weakSelf = self;
     if (imgHeight > imgWidth / 9 * 17) {
-        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(width, height) deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
+        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(width, height) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
             weakSelf.progressView.hidden = YES;
         } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
@@ -132,7 +132,7 @@
             weakSelf.progressView.progress = progress;
         }];
     }else {
-        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2, _model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
+        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2, _model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
             weakSelf.progressView.hidden = YES;
         } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
@@ -204,12 +204,11 @@
                 __weak typeof(self) weakSelf = self;
                 PHImageRequestID requestID;
                 if (imgHeight > imgWidth / 9 * 17) {
-                    requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(width * 0.5, height * 0.5) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-                        //model.previewPhoto = image;
+                    requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.5, height * 0.5) completion:^(UIImage *image, NSDictionary *info) {
                         weakSelf.imageView.image = image;
-                    }];
+                    }]; 
                 }else {
-                    requestID = [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+                    requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
                         weakSelf.imageView.image = image;
                     }];
                 }
