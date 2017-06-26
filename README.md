@@ -128,13 +128,13 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 - 关于通过 HXPhotoModel 获取照片/视频信息的使用介绍 具体代码还是请下载Demo
 ```
-// 获取数组里面图片的 HD(高清)图片  传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的位置
-[HXPhotoTools fetchHDImageForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-    NSLog(@"%@",images);
-}];
 /*
-如果真的觉得这个方法获取的高清图片还达不到你想要的效果,你可以按住 command 点击上面方法修改以下属性来获取你想要的图片
-
+  // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
+    CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
+    [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
+        NSLog(@"%@",image);
+    }];
+    
   // 这里的size 是普通图片的时候  想要更高质量的图片 可以把 1.5 换成 2 或者 3
       如果觉得内存消耗过大可以 调小一点
 
@@ -148,16 +148,6 @@ photoView.backgroundColor = [UIColor whiteColor];
       size = CGSizeMake([UIScreen mainScreen].bounds.size.width, model.endImageSize.height);
    }
 */
-
-// 获取数组里面图片的 ImageData 资源 传入的数组里装的是 HXPhotoModel  -- 这个方法请写在点击上传的位置
-[HXPhotoTools fetchImageDataForSelectedPhoto:photos completion:^(NSArray<NSData *> *imageDatas) {
-    NSLog(@"%ld",imageDatas.count);
-}];
-
-// 获取数组里面图片的原图 传入的数组里装的是 HXPhotoModel  -- 这个方法必须写在点击上传的地方获取 此方法比较消耗内存. 获取原图图片之后请将选中数组中模型里面的数据全部清空   建议使用获取imageData方法
-[HXPhotoTools fetchOriginalForSelectedPhoto:photos completion:^(NSArray<UIImage *> *images) {
-    NSLog(@"%@",images);
-}];
 
 // 获取照片资源
 [photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -242,6 +232,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 - 2017-05-20    添加支持传入网络图片Url数组后进行浏览查看并删除
 - 2017-05-24    修复传入网络图片之后添加按钮错误显示问题。添加全屏相机/开关控制
 - 2017-06-02    修复在预览时取消选中时的问题
+- 2017-06-26    因为潜在问题删除了一些快捷方法，需要自己写方法获取已选数组里照片的image和data
 
 ## 六.  更多 - More
 
