@@ -86,6 +86,7 @@
             return;
         }
     }
+    [self.imageView sd_cancelCurrentAnimationImagesLoad];
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
         [self.delegate cellDidDeleteClcik:self];
     }

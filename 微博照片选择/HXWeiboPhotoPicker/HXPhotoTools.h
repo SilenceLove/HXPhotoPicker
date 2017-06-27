@@ -12,6 +12,10 @@
 /*
  *  工具类
  */
+typedef enum : NSUInteger {
+    HXPhotoToolsFetchHDImageType = 0, // 高清
+    HXPhotoToolsFetchOriginalImageTpe, // 原图
+} HXPhotoToolsFetchType;
 
 @interface HXPhotoTools : NSObject
 
@@ -22,30 +26,13 @@
 
 + (void)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
 
-+ (void)getTransitionPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
-
 /**
- 根据已选照片数组返回原图数组     暂时不提供使用
+ 根据已选照片数组返回 原图/高清(质量略小于原图) 图片数组
 
  @param photos 选中照片数组
+ @param completion image数组
  */
-//+ (void)fetchOriginalForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
-
-/**
- 根据已选照片数组返回高清图片数组 (质量略小于原图)     暂时不提供使用
-
- @param photos 选中照片数组
- @param completion 高清图片数组
- */
-//+ (void)fetchHDImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<UIImage *> *images))completion;
-
-/**
- 根据已选照片数组返回imageData数组     暂时不提供使用
- 
- @param photos 选中照片数组
- */
-//+ (void)fetchImageDataForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void(^)(NSArray<NSData *> *imageDatas))completion;
-
++ (void)getImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos type:(HXPhotoToolsFetchType)type completion:(void(^)(NSArray<UIImage *> *images))completion;
 
 /**
  获取视频的时长

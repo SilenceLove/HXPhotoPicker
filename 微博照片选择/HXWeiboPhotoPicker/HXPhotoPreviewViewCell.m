@@ -132,7 +132,7 @@
             weakSelf.progressView.progress = progress;
         }];
     }else {
-        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2, _model.endImageSize.height * 2) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
+        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2.0, _model.endImageSize.height * 2.0) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
             weakSelf.imageView.image = image;
             weakSelf.progressView.hidden = YES;
         } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {

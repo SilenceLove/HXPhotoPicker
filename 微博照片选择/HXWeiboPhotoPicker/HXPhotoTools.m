@@ -8,7 +8,7 @@
 
 #import "HXPhotoTools.h"
 #import "HXPhotoModel.h"
-
+#import "UIImage+HXExtension.h"
 #define HXBUNDLE_NAME   @"HXWeiboPhotoPicker.bundle"
 
 
@@ -52,30 +52,6 @@
     return requestID;
 }
 
-+ (void)getTransitionPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error {
-    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init]; 
-    option.resizeMode = PHImageRequestOptionsResizeModeFast;
-    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    option.synchronous = YES;
-    [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![[info objectForKey:PHImageErrorKey] boolValue]);
-        if (downloadFinined && result) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (![[info objectForKey:PHImageResultIsDegradedKey] boolValue]) {
-                    if (completion) {
-                        completion(result,info);
-                    }
-                }else {
-                    if (error) {
-                        error(info);
-                    }
-                }
-            });
-        }
-    }];
-}
-
-
 + (void)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error {
     PHImageRequestID requestID = -1;
     
@@ -86,54 +62,22 @@
     
     requestID = [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![[info objectForKey:PHImageErrorKey] boolValue]);
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![[info objectForKey:PHImageErrorKey] boolValue] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
         if (downloadFinined && result) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (![[info objectForKey:PHImageResultIsDegradedKey] boolValue]) {
-                    if (completion) {
-                        completion(result,info);
-                    }
-                }else {
-                    if (error) {
-                        error(info);
-                    }
+                if (completion) {
+                    completion(result,info);
+                }
+            });
+        }else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (error) {
+                    error(info);
                 }
             });
         }
     }];
 }
-
-/**
- 根据PHAsset对象获取照片信息
- */
-+ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion
-{
-    static PHImageRequestID requestID = -1;
-    
-    CGFloat scale = [UIScreen mainScreen].scale;
-    CGFloat width = MIN([UIScreen mainScreen].bounds.size.width, 500);
-    if (requestID >= 1 && size.width / width == scale) {
-        [[PHCachingImageManager defaultManager] cancelImageRequest:requestID];
-    }
-    
-    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
-//    option.networkAccessAllowed = YES;
-//    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    option.resizeMode = resizeMode;
-    
-    requestID = [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
-        
-        if (downloadFinined && completion && result) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion(result,info);
-            });
-        }
-    }];
-    return requestID;
-}
-
 
 + (int32_t)fetchPhotoWithAsset:(id)asset photoSize:(CGSize)photoSize completion:(void (^)(UIImage *photo,NSDictionary *info,BOOL isDegraded))completion {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
@@ -164,23 +108,12 @@
     }];
 }
 
-+ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void (^)(UIImage *, NSDictionary *))completion progressHandler:(void (^)(double, NSError *, BOOL *, NSDictionary *))progressHandler 
-{
-    static PHImageRequestID requestID = -1;
-    
-    CGFloat scale = [UIScreen mainScreen].scale;
-    CGFloat width = MIN([UIScreen mainScreen].bounds.size.width, 500);
-    if (requestID >= 1 && size.width / width == scale) {
-        [[PHCachingImageManager defaultManager] cancelImageRequest:requestID];
-    }
-    
++ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void (^)(UIImage *, NSDictionary *))completion progressHandler:(void (^)(double, NSError *, BOOL *, NSDictionary *))progressHandler  {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
-//    option.networkAccessAllowed = YES;
     option.deliveryMode = deliveryMode;
-    option.synchronous = NO;
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     
-    requestID = [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    return [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = ![[info objectForKey:PHImageErrorKey] boolValue];
         if (downloadFinined && completion && result) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -205,41 +138,7 @@
                 }
             }];
         }
-    }];
-    return requestID;
-}
-
-
-+ (void)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size resizeMode:(PHImageRequestOptionsResizeMode)resizeMode completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error {
-    static PHImageRequestID requestID = -1;
-    
-    CGFloat scale = [UIScreen mainScreen].scale;
-    CGFloat width = MIN([UIScreen mainScreen].bounds.size.width, 500);
-    if (requestID >= 1 && size.width / width == scale) {
-        [[PHCachingImageManager defaultManager] cancelImageRequest:requestID];
-    }
-    
-    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
-//    option.networkAccessAllowed = YES;
-    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    option.synchronous = NO;
-    option.resizeMode = resizeMode;
-    
-    requestID = [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
-        if (downloadFinined && completion && result) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion(result,info);
-            });
-        }else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (error) {
-                    error(info);
-                }
-            });
-        }
-    }];
+    }]; 
 }
 
 + (PHImageRequestID)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void (^)(NSData *, NSDictionary *))completion
@@ -367,27 +266,25 @@
     
     return newSize.width;
 }
-
-+ (void)fetchOriginalForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void (^)(NSArray<UIImage *> *))completion
-{
++ (void)getImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos type:(HXPhotoToolsFetchType)type completion:(void (^)(NSArray<UIImage *> *))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __block NSMutableArray *images = [NSMutableArray array];
+        NSMutableArray *HDImages = [NSMutableArray array];
         __weak typeof(self) weakSelf = self;
-        [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            model.fetchOriginalIndex = idx;
+        for (HXPhotoModel *model in photos) {
             if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-                [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                [self sortImageForModel:model total:photos.count images:HDImages completion:^(NSArray *array) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if (completion) {
                             completion(array);
                         }
                     });
                 }];
-            }else if (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
-                [strongSelf FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                    model.previewPhoto = [UIImage imageWithData:imageData];
-                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+            }
+            /* else if (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
+                [self FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+                    UIImage *image = [UIImage imageWithData:imageData];
+                    model.previewPhoto = image;
+                    [weakSelf sortImageForModel:model total:photos.count images:HDImages completion:^(NSArray *array) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (completion) {
                                 completion(array);
@@ -395,84 +292,50 @@
                         });
                     }];
                 }];
-            }else {
-                [strongSelf FetchPhotoForPHAsset:model.asset Size:PHImageManagerMaximumSize deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
-                    if (![[info objectForKey:PHImageCancelledKey] boolValue] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]) {
-                        if (!image) {
-                            image = model.thumbPhoto;
-                        }
+            }
+             */
+            else {
+                if (model.previewPhoto) {
+                    [self sortImageForModel:model total:photos.count images:HDImages completion:^(NSArray *array) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(array);
+                            }
+                        });
+                    }];
+                }else {
+                    CGSize size;
+                    if (type == HXPhotoToolsFetchHDImageType) {
+                        size = CGSizeMake(model.asset.pixelWidth * 0.8, model.asset.pixelHeight * 0.8);
+                    }else {
+                        size = PHImageManagerMaximumSize;
+                    }
+                    
+                    [self getHighQualityFormatPhotoForPHAsset:model.asset size:size completion:^(UIImage *image, NSDictionary *info) {
                         model.previewPhoto = image;
-                        [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
+                        [weakSelf sortImageForModel:model total:photos.count images:HDImages completion:^(NSArray *array) {
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 if (completion) {
                                     completion(array);
                                 }
                             });
                         }];
-                    }
-                } progressHandler:nil];
-            }
-        }];
-    });
-}
-
-+ (void)fetchHDImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void (^)(NSArray<UIImage *> *))completion
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __block NSMutableArray *images = [NSMutableArray array];
-        __weak typeof(self) weakSelf = self;
-        [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            model.fetchOriginalIndex = idx;
-            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-                [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (completion) {
-                            completion(array);
-                        }
-                    });
-                }];
-            }else if (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
-                [strongSelf FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                    model.previewPhoto = [UIImage imageWithData:imageData];
-                    [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) {
-                                completion(array);
-                            }
-                        });
+                    } error:^(NSDictionary *info) {
+                        model.previewPhoto = model.thumbPhoto;
+                        [weakSelf sortImageForModel:model total:photos.count images:HDImages completion:^(NSArray *array) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if (completion) {
+                                    completion(array);
+                                }
+                            });
+                        }];
                     }];
-                }];
-            }else {
-                // 这里的size 是普通图片的时候  想要更高质量的图片 可以把 1.5 换成 2 或者 3  如果觉得内存消耗过大可以 调小一点
-                CGSize size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
-                
-                // 这里是判断图片是否过长 因为图片如果长了 上面的size就显的有点小了获取出来的图片就变模糊了,所以这里把宽度 换成了屏幕的宽度,这个可以保证即不影响内存也不影响质量 如果觉得质量达不到你的要求,可以乘上 1.5 或者 2 . 当然你也可以不按我这样给size,自己测试怎么给都可以
-                if (model.endImageSize.height > model.endImageSize.width / 9 * 20) {
-                    size = CGSizeMake([UIScreen mainScreen].bounds.size.width, model.endImageSize.height);
                 }
-                [strongSelf FetchPhotoForPHAsset:model.asset Size:size deliveryMode:PHImageRequestOptionsDeliveryModeFastFormat completion:^(UIImage *image, NSDictionary *info) {
-                    if (![[info objectForKey:PHImageCancelledKey] boolValue] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]) {
-                        if (!image) {
-                            image = model.thumbPhoto;
-                        }
-                        model.previewPhoto = image;
-                        [strongSelf sortImageForModel:model total:photos.count images:images completion:^(NSArray *array) {
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                if (completion) {
-                                    completion(array);
-                                }
-                            });
-                        }];
-                    }
-                } progressHandler:nil];
             }
-        }];
+        }
     });
 }
-
-+ (void)sortImageForModel:(HXPhotoModel *)model total:(NSInteger)total images:(NSMutableArray *)images completion:(void(^)(NSArray *array))completion
-{
++ (void)sortImageForModel:(HXPhotoModel *)model total:(NSInteger)total images:(NSMutableArray *)images completion:(void(^)(NSArray *array))completion {
     [images addObject:model];
     if (images.count == total) {
         [images sortUsingComparator:^NSComparisonResult(HXPhotoModel *temp, HXPhotoModel *other) {
@@ -487,18 +350,10 @@
         }];
         NSMutableArray *array = [NSMutableArray array];
         for (HXPhotoModel *md in images) {
-            if (md.type != HXPhotoModelMediaTypeCameraPhoto) {
-                if (!md.previewPhoto) {
-                    if (md.thumbPhoto) {
-                        [array addObject:md.thumbPhoto];
-                    }
-                }else {
-                    [array addObject:md.previewPhoto];
-                }
+            if (!md.previewPhoto) {
+                [array addObject:md.thumbPhoto];
             }else {
-                if (md.thumbPhoto) {
-                    [array addObject:md.thumbPhoto];
-                }
+                [array addObject:md.previewPhoto];
             }
         }
         [images removeAllObjects];
@@ -507,78 +362,4 @@
         }
     }
 }
-
-
-+ (void)fetchImageDataForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos completion:(void (^)(NSArray<NSData *> *))completion
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __block NSMutableArray *imageDatas = [NSMutableArray array];
-        __weak typeof(self) weakSelf= self;
-        [photos.copy enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            model.fetchImageDataIndex = idx;
-            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-                NSData *imageData;
-                if (UIImagePNGRepresentation(model.thumbPhoto)) {
-                    //返回为png图像。
-                    imageData = UIImagePNGRepresentation(model.thumbPhoto);
-                }else {
-                    //返回为JPEG图像。
-                    imageData = UIImageJPEGRepresentation(model.thumbPhoto, 1.0);
-                }
-                model.imageData = imageData;
-                [strongSelf sortDataForModel:model total:photos.count images:imageDatas completion:^(NSArray *array) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (completion) {
-                            completion(array);
-                        }
-                    });
-                }];
-            }else {
-                [strongSelf FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                    model.imageData = imageData;
-                    [strongSelf sortDataForModel:model total:photos.count images:imageDatas completion:^(NSArray *array) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) {
-                                completion(array);
-                            }
-                        });
-                    }];
-                }];
-            }
-        }];
-    });
-}
-
-+ (void)sortDataForModel:(HXPhotoModel *)model total:(NSInteger)total images:(NSMutableArray *)images completion:(void(^)(NSArray *array))completion
-{
-    [images addObject:model];
-    if (images.count == total) {
-        [images sortUsingComparator:^NSComparisonResult(HXPhotoModel *temp, HXPhotoModel *other) {
-            NSInteger length1 = temp.fetchImageDataIndex;
-            NSInteger length2 = other.fetchImageDataIndex;
-            
-            NSNumber *number1 = [NSNumber numberWithInteger:length1];
-            NSNumber *number2 = [NSNumber numberWithInteger:length2];
-            
-            NSComparisonResult result = [number1 compare:number2];
-            return result == NSOrderedDescending;
-        }];
-        NSMutableArray *array = [NSMutableArray array];
-        for (HXPhotoModel *md in images) {
-            if (!md.imageData) {
-                continue;
-            }
-            [array addObject:md.imageData.copy];
-            md.imageData = nil;
-            md.previewPhoto = nil;
-        }
-        [images removeAllObjects];
-        images = nil;
-        if (completion) {
-            completion(array);
-        }
-    }
-} 
-
 @end

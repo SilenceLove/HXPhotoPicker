@@ -96,7 +96,9 @@
 - (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal
 {
     NSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
-    
+    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
+        NSLog(@"%@",images);
+    }];
 //    for (HXPhotoModel *model in allList) {
 //        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);
 //    }
