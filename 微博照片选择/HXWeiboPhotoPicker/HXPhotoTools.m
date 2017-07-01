@@ -306,7 +306,7 @@
                 }else {
                     CGSize size;
                     if (type == HXPhotoToolsFetchHDImageType) {
-                        size = CGSizeMake(model.asset.pixelWidth * 0.8, model.asset.pixelHeight * 0.8);
+                        size = CGSizeMake(model.asset.pixelWidth * 0.6, model.asset.pixelHeight * 0.6);
                     }else {
                         size = PHImageManagerMaximumSize;
                     }

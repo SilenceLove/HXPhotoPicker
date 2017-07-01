@@ -66,7 +66,7 @@
         //[self pushAnim:transitionContext Image:model.previewPhoto Model:model FromVC:fromVC ToVC:toVC];
     //}else {
         __weak typeof(self) weakSelf = self;
-    [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 2, model.endImageSize.height * 2) completion:^(UIImage *image, NSDictionary *info) {
+    [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
         [weakSelf pushAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC];
     } error:^(NSDictionary *info) {
         [weakSelf pushAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC];

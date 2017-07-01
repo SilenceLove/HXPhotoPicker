@@ -125,8 +125,7 @@
     self.cameraBtn = cameraBtn;
 }
 
-- (void)didLivePhotoBtnClick:(UIButton *)button
-{
+- (void)didLivePhotoBtnClick:(UIButton *)button {
     button.selected = !button.selected;
     self.model.isCloseLivePhoto = button.selected;
     if (button.selected) {
@@ -140,8 +139,7 @@
     }
 }
 
-- (void)startLivePhoto
-{
+- (void)startLivePhoto {
     self.liveIcon.hidden = YES;
     self.liveBtn.hidden = NO;
     if (self.model.isCloseLivePhoto) {
@@ -174,8 +172,7 @@
 //    }
 }
 
-- (void)stopLivePhoto
-{
+- (void)stopLivePhoto {
     [[PHCachingImageManager defaultManager] cancelImageRequest:self.liveRequestID];
     self.liveIcon.hidden = NO;
     self.liveBtn.hidden = YES;
@@ -186,14 +183,21 @@
     self.model.livePhoto = nil;
 }
 
-- (void)didSelectClick:(UIButton *)button
-{
+- (void)didSelectClick:(UIButton *)button {
     if (self.model.type == HXPhotoModelMediaTypeCamera) {
         return;
     }
     
     if ([self.delegate respondsToSelector:@selector(cellDidSelectedBtnClick:Model:)]) {
         [self.delegate cellDidSelectedBtnClick:self Model:self.model];
+    }
+}
+
+- (void)setSingleSelected:(BOOL)singleSelected {
+    _singleSelected = singleSelected;
+    if (singleSelected) {
+        self.maskView.hidden = YES;
+        self.selectBtn.hidden = YES;
     }
 }
 

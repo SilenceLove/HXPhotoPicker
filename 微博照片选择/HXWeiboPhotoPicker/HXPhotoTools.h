@@ -22,8 +22,13 @@ typedef enum : NSUInteger {
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName;
 
+/**
+ 根据PHAsset对象获取照片信息   此方法会回调多次
+ */
 + (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion;
-
+/**
+ 根据PHAsset对象获取照片信息   此方法只会回调一次
+ */
 + (void)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
 
 /**

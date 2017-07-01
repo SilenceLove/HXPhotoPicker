@@ -21,6 +21,7 @@
 @property (weak, nonatomic) id<HXPhotoViewCellDelegate> delegate;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 @property (assign, nonatomic) BOOL firstRegisterPreview;
+@property (assign, nonatomic) BOOL singleSelected;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (weak, nonatomic) UIImageView *imageView;
 @property (weak, nonatomic) UIView *maskView;

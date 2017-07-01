@@ -198,11 +198,19 @@
         }
         if (asset.mediaType == PHAssetMediaTypeImage) {
             if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
-                photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
+                if (self.singleSelected) {
+                    photoModel.type = HXPhotoModelMediaTypePhoto;
+                }else {
+                    photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
+                }
             }else {
                 if (iOS9Later) {
                     if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
-                        photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                        if (!self.singleSelected) {
+                            photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                        }else {
+                            photoModel.type = HXPhotoModelMediaTypePhoto;
+                        }
                     }else {
                         photoModel.type = HXPhotoModelMediaTypePhoto;
                     }

@@ -32,10 +32,10 @@ typedef enum : NSUInteger {
 /**
  是否为单选模式 默认 NO
  */
-//@property (assign, nonatomic) BOOL singleSelected;
+@property (assign, nonatomic) BOOL singleSelected;
 
 /**
- 是否开启3DTouch预览功能 默认打开    -- 暂时关闭此功能
+ 是否开启3DTouch预览功能 默认打开
  */
 @property (assign, nonatomic) BOOL open3DTouchPreview;
 

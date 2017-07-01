@@ -20,8 +20,7 @@
 
 @implementation HXVideoPreviewViewController
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.transitioningDelegate = self;
@@ -36,11 +35,10 @@
     [self setup];
 }
 
-- (void)setup
-{
+- (void)setup {
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.view.backgroundColor = [UIColor whiteColor];
-    
+ 
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
     if (self.manager.selectedList.count > 0) {
         self.navigationItem.rightBarButtonItem.enabled = YES;
@@ -79,8 +77,10 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playVideo.currentItem];
         self.playBtn.frame = CGRectMake(0, 64, width, height - 64);
         [self.view addSubview:self.playBtn];
-        self.selectedBtn.selected = self.model.selected;
-        [self.view addSubview:self.selectedBtn];
+        if (!self.manager.singleSelected) {
+            self.selectedBtn.selected = self.model.selected;
+            [self.view addSubview:self.selectedBtn];
+        }
     }else {
         [[PHImageManager defaultManager] requestPlayerItemForVideo:self.model.asset options:nil resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
             
@@ -97,8 +97,10 @@
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playVideo.currentItem];
                 self.playBtn.frame = CGRectMake(0, 64, width, height - 64);
                 [self.view addSubview:self.playBtn];
-                self.selectedBtn.selected = self.model.selected;
-                [self.view addSubview:self.selectedBtn];
+                if (!self.manager.singleSelected) {
+                    self.selectedBtn.selected = self.model.selected;
+                    [self.view addSubview:self.selectedBtn];
+                }
             });
         }];
     }
@@ -115,8 +117,10 @@
     }
 }
 
-- (void)dismissClick
-{
+- (void)dismissClick {
+    [self.playVideo pause];
+    self.playBtn.selected = NO;
+    self.playVideo = nil;
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -126,8 +130,7 @@
     [self.playVideo.currentItem seekToTime:CMTimeMake(0, 1)];
 }
 
-- (void)didPlayBtnClick:(UIButton *)button
-{
+- (void)didPlayBtnClick:(UIButton *)button {
     button.selected = !button.selected;
     
     if (button.selected) {
@@ -149,8 +152,7 @@
     return _playBtn;
 }
 
-- (UIButton *)selectedBtn
-{
+- (UIButton *)selectedBtn {
     if (!_selectedBtn) {
         CGFloat width = self.view.frame.size.width;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -165,15 +167,13 @@
     return _selectedBtn;
 }
 
-- (void)selectClick
-{
+- (void)selectClick {
     if (!self.selectedBtn.selected) {
         [self didSelectedClick:self.selectedBtn];
     }
 }
 
-- (void)didSelectedClick:(UIButton *)button
-{
+- (void)didSelectedClick:(UIButton *)button {
     HXPhotoModel *model = self.model;
     if (!button.selected) {
         if (self.manager.selectedList.count == self.manager.maxNum) {
@@ -287,8 +287,7 @@
     }
 }
 
-- (UIButton *)rightBtn
-{
+- (UIButton *)rightBtn {
     if (!_rightBtn) {
         _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_rightBtn setTitle:@"下一步" forState:UIControlStateNormal];
@@ -307,8 +306,9 @@
     return _rightBtn;
 }
 
-- (void)didNextClick:(UIButton *)button
-{
+- (void)didNextClick:(UIButton *)button {
+    [self.playVideo pause];
+    self.playVideo = nil;
     BOOL max = NO;
     if (self.manager.selectedList.count == self.manager.maxNum) {
         // 已经达到最大选择数
@@ -356,15 +356,14 @@
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.playVideo pause];
     self.playBtn.selected = NO;
+    self.playVideo = nil;
 }
 
-- (UIView *)maskView
-{
+- (UIView *)maskView {
     if (!_maskView) {
         _maskView = [[UIView alloc] initWithFrame:self.view.bounds];
         _maskView.backgroundColor = [UIColor whiteColor];
@@ -372,6 +371,11 @@
     return _maskView;
 }
 
+- (void)dealloc {
+    [self.playVideo pause];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    self.playVideo = nil;
+}
 
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
     if (operation == UINavigationControllerOperationPush) {

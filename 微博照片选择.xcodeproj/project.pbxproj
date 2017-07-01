@@ -58,9 +58,12 @@
 		7B7E3EAE1E4C52AF002234EE /* HXPhotoPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3EAD1E4C52AF002234EE /* HXPhotoPreviewViewController.m */; };
 		7B7E3EB11E4C56CC002234EE /* HXPhotoPreviewViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3EB01E4C56CC002234EE /* HXPhotoPreviewViewCell.m */; };
 		7B7E3EB41E4C7137002234EE /* HXVideoPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3EB31E4C7137002234EE /* HXVideoPreviewViewController.m */; };
+		7B7F6CE71F05F0470093C4C2 /* HXPhotoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F6CE61F05F0470093C4C2 /* HXPhotoEditViewController.m */; };
+		7B7F6CEA1F063F9E0093C4C2 /* HXPhotoEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F6CE91F063F9E0093C4C2 /* HXPhotoEditView.m */; };
 		7B939E501E5BECB600301BBC /* HXPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */; };
 		7BB604521E5D693A00EBA520 /* HXVideoPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */; };
-		7BC2A6A51EF7E11700DD99AC /* 8836.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BC2A6A41EF7E11700DD99AC /* 8836.mp3 */; };
+		7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1D1F07994000715546 /* Demo4ViewController.m */; };
+		7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */; };
 		7BECEC261ECD7F2200EDE047 /* HXCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */; };
 		7BFE2E011E54575A00A8EC46 /* UIImage+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE2E001E54575A00A8EC46 /* UIImage+HXExtension.m */; };
 /* End PBXBuildFile section */
@@ -166,11 +169,17 @@
 		7B7E3EB01E4C56CC002234EE /* HXPhotoPreviewViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoPreviewViewCell.m; sourceTree = "<group>"; };
 		7B7E3EB21E4C7137002234EE /* HXVideoPreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXVideoPreviewViewController.h; sourceTree = "<group>"; };
 		7B7E3EB31E4C7137002234EE /* HXVideoPreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXVideoPreviewViewController.m; sourceTree = "<group>"; };
+		7B7F6CE51F05F0470093C4C2 /* HXPhotoEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoEditViewController.h; sourceTree = "<group>"; };
+		7B7F6CE61F05F0470093C4C2 /* HXPhotoEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditViewController.m; sourceTree = "<group>"; };
+		7B7F6CE81F063F9E0093C4C2 /* HXPhotoEditView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoEditView.h; sourceTree = "<group>"; };
+		7B7F6CE91F063F9E0093C4C2 /* HXPhotoEditView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditView.m; sourceTree = "<group>"; };
 		7B939E4E1E5BECB600301BBC /* HXPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPresentTransition.h; sourceTree = "<group>"; };
 		7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPresentTransition.m; sourceTree = "<group>"; };
 		7BB604501E5D693A00EBA520 /* HXVideoPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXVideoPresentTransition.h; sourceTree = "<group>"; };
 		7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXVideoPresentTransition.m; sourceTree = "<group>"; };
-		7BC2A6A41EF7E11700DD99AC /* 8836.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = 8836.mp3; sourceTree = "<group>"; };
+		7BBE5A1C1F07994000715546 /* Demo4ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo4ViewController.h; sourceTree = "<group>"; };
+		7BBE5A1D1F07994000715546 /* Demo4ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo4ViewController.m; sourceTree = "<group>"; };
+		7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Demo4ViewController.xib; sourceTree = "<group>"; };
 		7BECEC241ECD7F2200EDE047 /* HXCircleProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCircleProgressView.h; sourceTree = "<group>"; };
 		7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCircleProgressView.m; sourceTree = "<group>"; };
 		7BFE2DFF1E54575A00A8EC46 /* UIImage+HXExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HXExtension.h"; sourceTree = "<group>"; };
@@ -253,7 +262,6 @@
 		7B7E3E781E4AACD1002234EE /* 微博照片选择 */ = {
 			isa = PBXGroup;
 			children = (
-				7BC2A6A41EF7E11700DD99AC /* 8836.mp3 */,
 				7B7368DC1ECC44950049E9BA /* SDWebImage */,
 				7B7E3E901E4AAFFC002234EE /* HXWeiboPhotoPicker */,
 				7B7E3E7C1E4AACD1002234EE /* AppDelegate.h */,
@@ -267,6 +275,9 @@
 				7B269E0C1E56961500AB813D /* Demo2ViewController.m */,
 				7B269E101E56962700AB813D /* Demo3ViewController.h */,
 				7B269E111E56962700AB813D /* Demo3ViewController.m */,
+				7BBE5A1C1F07994000715546 /* Demo4ViewController.h */,
+				7BBE5A1D1F07994000715546 /* Demo4ViewController.m */,
+				7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */,
 				7B7E3E851E4AACD1002234EE /* Assets.xcassets */,
 				7B7E3E871E4AACD1002234EE /* LaunchScreen.storyboard */,
 				7B7E3E8A1E4AACD1002234EE /* Info.plist */,
@@ -297,6 +308,10 @@
 				7B7E3E9B1E4AFD1F002234EE /* HXPhotoTools.m */,
 				7B7E3E9D1E4B036A002234EE /* HXPhotoViewController.h */,
 				7B7E3E9E1E4B036A002234EE /* HXPhotoViewController.m */,
+				7B7F6CE51F05F0470093C4C2 /* HXPhotoEditViewController.h */,
+				7B7F6CE61F05F0470093C4C2 /* HXPhotoEditViewController.m */,
+				7B7F6CE81F063F9E0093C4C2 /* HXPhotoEditView.h */,
+				7B7F6CE91F063F9E0093C4C2 /* HXPhotoEditView.m */,
 				7B7E3EA01E4B0586002234EE /* HXPhotoViewCell.h */,
 				7B7E3EA11E4B0586002234EE /* HXPhotoViewCell.m */,
 				7B7E3EA31E4B0D6F002234EE /* HXAlbumListView.h */,
@@ -402,8 +417,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */,
 				7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */,
-				7BC2A6A51EF7E11700DD99AC /* 8836.mp3 in Resources */,
 				7B74BB3E1ED55CD500F81FA0 /* HXWeiboPhotoPicker.bundle in Resources */,
 				7B7E3E891E4AACD1002234EE /* LaunchScreen.storyboard in Resources */,
 				7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */,
@@ -419,6 +434,7 @@
 			files = (
 				7B7369171ECC44950049E9BA /* UIImageView+HighlightedWebCache.m in Sources */,
 				7BFE2E011E54575A00A8EC46 /* UIImage+HXExtension.m in Sources */,
+				7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */,
 				7B7369191ECC44950049E9BA /* UIView+WebCache.m in Sources */,
 				7B269E121E56962700AB813D /* Demo3ViewController.m in Sources */,
 				7B7E3EB11E4C56CC002234EE /* HXPhotoPreviewViewCell.m in Sources */,
@@ -434,6 +450,7 @@
 				7B7369141ECC44950049E9BA /* UIImage+GIF.m in Sources */,
 				7B7369121ECC44950049E9BA /* SDWebImagePrefetcher.m in Sources */,
 				7B73690C1ECC44950049E9BA /* SDImageCacheConfig.m in Sources */,
+				7B7F6CE71F05F0470093C4C2 /* HXPhotoEditViewController.m in Sources */,
 				7B269E061E5695F200AB813D /* Demo1ViewController.m in Sources */,
 				7B73690D1ECC44950049E9BA /* SDWebImageCompat.m in Sources */,
 				7B3B20361ED3D7FC00B2CB47 /* HXFullScreenCameraPlayView.m in Sources */,
@@ -454,6 +471,7 @@
 				7B7369081ECC44950049E9BA /* MKAnnotationView+WebCache.m in Sources */,
 				7B7E3E9C1E4AFD1F002234EE /* HXPhotoTools.m in Sources */,
 				7B7369151ECC44950049E9BA /* UIImage+MultiFormat.m in Sources */,
+				7B7F6CEA1F063F9E0093C4C2 /* HXPhotoEditView.m in Sources */,
 				7B7D82271E51A167000DC021 /* HXCameraViewController.m in Sources */,
 				7B7E3EAB1E4C5111002234EE /* HXTransition.m in Sources */,
 				7B7E3EAE1E4C52AF002234EE /* HXPhotoPreviewViewController.m in Sources */,
