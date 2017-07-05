@@ -12,6 +12,7 @@
 /*
  *  使用选择照片之后自动布局的功能时就创建此块View. 初始化方法传入照片管理类
  */
+@class HXPhotoView;
 @protocol HXPhotoViewDelegate <NSObject>
 
 // 代理返回 选择、移动顺序、删除之后的图片以及视频
@@ -21,18 +22,19 @@
 //- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 
 // 当view更新高度时调用
-- (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view;
+- (void)photoViewUpdateFrame:(CGRect)frame withView:(HXPhotoView *)photoView;
 
 // 删除网络图片的地址
 - (void)photoViewDeleteNetworkPhoto:(NSString *)networkPhotoUrl;
 
 @end
 
+@class HXCollectionView;
 @interface HXPhotoView : UIView
-
 @property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
+@property (weak, nonatomic) HXCollectionView *collectionView;
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 + (instancetype)photoManager:(HXPhotoManager *)manager;

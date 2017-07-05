@@ -6,8 +6,8 @@
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-
+#import <UIKit/UIKit.h> 
+#import "HXPhotoView.h"
 typedef NS_ENUM(NSUInteger, HXPresentTransitionType) {
     HXPresentTransitionTypePresent = 0,
     HXPresentTransitionTypeDismiss
@@ -20,8 +20,8 @@ typedef NS_ENUM(NSUInteger, HXPresentTransitionVcType) {
 
 @interface HXPresentTransition : NSObject<UIViewControllerAnimatedTransitioning>
 
-+ (instancetype)transitionWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType;
++ (instancetype)transitionWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType withPhotoView:(HXPhotoView *)photoView;
 
-- (instancetype)initWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType;
+- (instancetype)initWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType withPhotoView:(HXPhotoView *)photoView;
 
 @end

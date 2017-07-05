@@ -61,6 +61,7 @@
 		7B7F6CE71F05F0470093C4C2 /* HXPhotoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F6CE61F05F0470093C4C2 /* HXPhotoEditViewController.m */; };
 		7B7F6CEA1F063F9E0093C4C2 /* HXPhotoEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F6CE91F063F9E0093C4C2 /* HXPhotoEditView.m */; };
 		7B939E501E5BECB600301BBC /* HXPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */; };
+		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7BB604521E5D693A00EBA520 /* HXVideoPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */; };
 		7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1D1F07994000715546 /* Demo4ViewController.m */; };
 		7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */; };
@@ -175,6 +176,8 @@
 		7B7F6CE91F063F9E0093C4C2 /* HXPhotoEditView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditView.m; sourceTree = "<group>"; };
 		7B939E4E1E5BECB600301BBC /* HXPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPresentTransition.h; sourceTree = "<group>"; };
 		7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPresentTransition.m; sourceTree = "<group>"; };
+		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
+		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
 		7BB604501E5D693A00EBA520 /* HXVideoPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXVideoPresentTransition.h; sourceTree = "<group>"; };
 		7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXVideoPresentTransition.m; sourceTree = "<group>"; };
 		7BBE5A1C1F07994000715546 /* Demo4ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo4ViewController.h; sourceTree = "<group>"; };
@@ -278,6 +281,8 @@
 				7BBE5A1C1F07994000715546 /* Demo4ViewController.h */,
 				7BBE5A1D1F07994000715546 /* Demo4ViewController.m */,
 				7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */,
+				7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */,
+				7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */,
 				7B7E3E851E4AACD1002234EE /* Assets.xcassets */,
 				7B7E3E871E4AACD1002234EE /* LaunchScreen.storyboard */,
 				7B7E3E8A1E4AACD1002234EE /* Info.plist */,
@@ -448,6 +453,7 @@
 				7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */,
 				7B7E3E9F1E4B036A002234EE /* HXPhotoViewController.m in Sources */,
 				7B7369141ECC44950049E9BA /* UIImage+GIF.m in Sources */,
+				7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */,
 				7B7369121ECC44950049E9BA /* SDWebImagePrefetcher.m in Sources */,
 				7B73690C1ECC44950049E9BA /* SDImageCacheConfig.m in Sources */,
 				7B7F6CE71F05F0470093C4C2 /* HXPhotoEditViewController.m in Sources */,

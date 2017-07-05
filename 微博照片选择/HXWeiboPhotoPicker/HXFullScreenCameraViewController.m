@@ -15,10 +15,12 @@
 #import "UIImage+HXExtension.h"
 #import "HXVideoPresentTransition.h"
 #import "HXFullScreenCameraPlayView.h"
+#import "HXPhotoManager.h"
+#import "HXPhotoEditViewController.h"
 #define WIDTH [UIScreen mainScreen].bounds.size.width
 #define HEIGHT [UIScreen mainScreen].bounds.size.height
 
-@interface HXFullScreenCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate>
+@interface HXFullScreenCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate,HXPhotoEditViewControllerDelegate>
 //捕获设备，通常是前置摄像头，后置摄像头，麦克风（音频输入）
 @property (nonatomic, strong) AVCaptureDevice *device;
 //AVCaptureDeviceInput 代表输入设备，他使用AVCaptureDevice 来初始化
@@ -76,6 +78,25 @@
     [super viewDidLoad];
     self.view.layer.backgroundColor = [UIColor grayColor].CGColor;
     [self setupUI];
+    self.title = @"拍摄";
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if (self.session) {
+        [self.session startRunning];
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    if (self.session) {
+        [self.session stopRunning];
+    }
 }
 
 - (void)setupUI {
@@ -615,6 +636,17 @@
     fileName = [fileName stringByAppendingString:numStr];
     return fileName;
 }
+- (void)editViewControllerDidNextClick:(HXPhotoModel *)model {
+    [self.session stopRunning];
+    [self.motionManager stopDeviceMotionUpdates];
+    [self.timer invalidate];
+    self.timer = nil;
+    [self dismissViewControllerAnimated:NO completion:^{
+        if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
+            [self.delegate fullScreenCameraDidNextClick:model];
+        }
+    }];
+}
 - (void)didNextBtnClick {
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
     if (!self.videoURL) {
@@ -633,6 +665,14 @@
         model.imageSize = image.size;
         model.previewPhoto = image;
         model.cameraIdentifier = [self videoOutFutFileName];
+        if (self.photoManager.singleSelected) {
+            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
+            vc.model = model;
+            vc.coverImage = model.thumbPhoto;
+            vc.delegate = self;
+            [self.navigationController pushViewController:vc animated:YES];
+            return;
+        }
     }else {
         [self.timer invalidate];
         self.timer = nil;
@@ -656,6 +696,8 @@
     if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
         [self.delegate fullScreenCameraDidNextClick:model];
     }
+    [self.timer invalidate];
+    self.timer = nil;
     [self.session stopRunning];
     [self.motionManager stopDeviceMotionUpdates];
     [self dismissViewControllerAnimated:YES completion:nil];

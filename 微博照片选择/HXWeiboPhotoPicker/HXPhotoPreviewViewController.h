@@ -16,6 +16,7 @@
 
 @end
 
+@class HXPhotoView;
 @interface HXPhotoPreviewViewController : UIViewController<UINavigationControllerDelegate>
 @property (weak, nonatomic) id<HXPhotoPreviewViewControllerDelegate> delegate;
 @property (copy, nonatomic) NSArray *modelList;
@@ -24,5 +25,7 @@
 @property (weak, nonatomic, readonly) UICollectionView *collectionView;
 @property (assign, nonatomic) BOOL selectedComplete;
 @property (assign, nonatomic) BOOL isPreview; // 是否预览
+@property (strong, nonatomic) HXPhotoView *photoView;
+
 - (void)selectClick;
 @end

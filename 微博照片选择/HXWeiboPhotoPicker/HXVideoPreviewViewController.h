@@ -17,6 +17,7 @@
 
 @end
 
+@class HXPhotoView;
 @interface HXVideoPreviewViewController : UIViewController<UINavigationControllerDelegate>
 @property (assign, nonatomic) BOOL isTouch;
 @property (weak, nonatomic) id<HXVideoPreviewViewControllerDelegate> delegate;
@@ -29,5 +30,9 @@
 @property (assign, nonatomic) BOOL selectedComplete;
 @property (assign, nonatomic) BOOL isPreview; // 是否预览
 @property (strong, nonatomic) UIImage *coverImage;
+@property (strong, nonatomic) UIButton *selectedBtn;
+
+@property (strong, nonatomic) HXPhotoView *photoView;
+
 - (void)selectClick;
 @end

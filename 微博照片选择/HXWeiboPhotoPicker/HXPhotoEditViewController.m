@@ -24,8 +24,13 @@
 #pragma mark - < 生命周期 >
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    [self.navigationController.navigationBar setBarTintColor:[UIColor whiteColor]];
+    [self.navigationController.navigationBar setTintColor:[UIColor blackColor]];
     [self setupUI];
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
@@ -120,9 +125,10 @@
             }
         }
     }
-    self.scrollView.frame = CGRectMake(10, height / 2 - (diameter / 2), diameter, diameter);
+    self.scrollView.frame = self.bgView.bounds;
     self.scrollView.layer.masksToBounds = NO;
     self.scrollView.contentSize = CGSizeMake(width, h);
+    self.scrollView.contentInset = UIEdgeInsetsMake(height / 2 - (diameter / 2), 10, height / 2 - (diameter / 2), 10);
     
     _imageView.frame = CGRectMake(0, 0, w, h);
     
@@ -164,8 +170,10 @@
     NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
     cameraIdentifier = [cameraIdentifier stringByAppendingString:dateStr];
     cameraIdentifier = [cameraIdentifier stringByAppendingString:numStr];
-    
-    UIImage *image = [self imageFromView:self.bgView atFrame:self.scrollView.frame];
+    CGFloat width = self.bgView.frame.size.width;
+    CGFloat height = self.bgView.frame.size.height;
+    CGFloat diameter = width - 20;
+    UIImage *image = [self imageFromView:self.bgView atFrame:CGRectMake(10, (height / 2 - diameter / 2), diameter, diameter)];
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
     model.thumbPhoto = image;
     model.previewPhoto = image;
@@ -204,11 +212,9 @@
     return self.imageView;
 }
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
-    CGFloat offsetX = (scrollView.frame.size.width > scrollView.contentSize.width) ? (scrollView.frame.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
-    
-    CGFloat offsetY = (scrollView.frame.size.height < scrollView.contentSize.height) ? (scrollView.contentSize.height - scrollView.frame.size.height) * 0.5 : 0.0;
-
-    self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.frame.size.height * 0.5 + offsetY); 
+//    CGFloat offsetX = (scrollView.frame.size.width > scrollView.contentSize.width) ? (scrollView.frame.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
+//    CGFloat offsetY = (scrollView.frame.size.height > scrollView.contentSize.height) ? (scrollView.frame.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
+//    self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
 }
 #pragma mark - < 懒加载 >
 - (UIView *)bgView {

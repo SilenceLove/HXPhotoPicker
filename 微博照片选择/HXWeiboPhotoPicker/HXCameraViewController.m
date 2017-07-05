@@ -15,7 +15,9 @@
 #import "UIImage+HXExtension.h"
 #import "HXVideoPresentTransition.h"
 #import "HXCameraPreviewViewController.h"
-@interface HXCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate>
+#import "HXPhotoManager.h"
+#import "HXPhotoEditViewController.h"
+@interface HXCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate,HXPhotoEditViewControllerDelegate>
 //捕获设备，通常是前置摄像头，后置摄像头，麦克风（音频输入）
 @property (nonatomic, strong) AVCaptureDevice *device;
 //AVCaptureDeviceInput 代表输入设备，他使用AVCaptureDevice 来初始化
@@ -91,9 +93,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.title = @"拍摄";
     self.view.backgroundColor = [UIColor whiteColor];
     [self cameraDistrict];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
 - (void)dismiss
@@ -688,6 +696,9 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    if (self.session) {
+        [self.session startRunning];
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -813,7 +824,17 @@
     self.rightSwipe.enabled = YES;
     self.moveView.userInteractionEnabled = YES;
 }
-
+- (void)editViewControllerDidNextClick:(HXPhotoModel *)model {
+    [self.session stopRunning];
+    [self.motionManager stopDeviceMotionUpdates];
+    [self.timer invalidate];
+    self.timer = nil;
+    [self dismissViewControllerAnimated:NO completion:^{
+        if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
+            [self.delegate cameraDidNextClick:model];
+        }
+    }];
+}
 - (UIButton *)nextBtn
 {
     if (!_nextBtn) {
@@ -854,10 +875,19 @@
         model.previewPhoto = image;
         
         model.cameraIdentifier = [self videoOutFutFileName];
-        if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
-            [self.delegate cameraDidNextClick:model];
+        
+        if (self.photoManager.singleSelected) {
+            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
+            vc.model = model;
+            vc.coverImage = model.thumbPhoto;
+            vc.delegate = self;
+            [self.navigationController pushViewController:vc animated:YES];
+        }else {
+            if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
+                [self.delegate cameraDidNextClick:model];
+            }
+            [self dismiss];
         }
-        [self dismiss];
     }else {
         [self.timer invalidate];
         self.timer = nil;
@@ -887,49 +917,6 @@
             model.previewPhoto = image;
             model.cameraIdentifier = [weakSelf videoOutFutFileName];
             [weakSelf.view handleLoading];
-            
-//            AVAsset *asset = [AVAsset assetWithURL:weakSelf.videoURL];
-            
-//            AVAssetReader *reader = [AVAssetReader assetReaderWithAsset:asset error:nil];
-//            int m_pixelFormatType;
-//                 视频播放时，
-//            m_pixelFormatType = kCVPixelFormatType_32BGRA;
-//             其他用途，如视频压缩
-//                m_pixelFormatType = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
-//            NSArray *videoTracks = [asset tracksWithMediaType:AVMediaTypeVideo];
-//            AVAssetTrack *videoTrack1 =[videoTracks objectAtIndex:0];
-//            
-//            AVAssetTrackGroup *track = asset.trackGroups.firstObject;
-//            for (NSNumber *ids in track.trackIDs) {
-//                
-//            };
-            
-//            NSMutableDictionary *options = [NSMutableDictionary dictionary];
-//            [options setObject:@(m_pixelFormatType) forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-//            AVAssetReaderTrackOutput *videoReaderOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack:videoTrack1 outputSettings:options];
-//            [reader addOutput:videoReaderOutput];
-//            [reader startReading];
-//            self.images = [NSMutableArray array];
-//            // 要确保nominalFrameRate>0，之前出现过android拍的0帧视频
-//            while ([reader status] == AVAssetReaderStatusReading && videoTrack1.nominalFrameRate > 0) {
-//                // 读取 video sample
-//                CMSampleBufferRef videoBuffer = [videoReaderOutput copyNextSampleBuffer];
-//                
-//                UIImage *image = [UIImage imageWithCGImage:[self imageFromSamplePlanerPixelBuffer:videoBuffer]];
-//                NSLog(@"%@",image);
-//                if (image) {
-//                    if (image.imageOrientation != UIImageOrientationUp) {
-//                        image = [image normalizedImage];
-//                    }
-//                    [self.images addObject:[UIImage imageWithCGImage:[self imageFromSamplePlanerPixelBuffer:videoBuffer]]];
-//                }
-//                // 根据需要休眠一段时间；比如上层播放视频时每帧之间是有间隔的,这里的 sampleInternal 我设置为0.001秒
-//                [NSThread sleepForTimeInterval:0.001f];
-//            }
-            
-            HXCameraPreviewViewController *vc = [[HXCameraPreviewViewController alloc] init];
-            vc.images = weakSelf.images;
-            [weakSelf presentViewController:vc animated:YES completion:nil];
             if ([weakSelf.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
                 [weakSelf.delegate cameraDidNextClick:model];
             }

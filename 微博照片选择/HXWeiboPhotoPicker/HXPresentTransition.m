@@ -16,17 +16,19 @@
 @interface HXPresentTransition ()
 @property (assign, nonatomic) HXPresentTransitionType type;
 @property (assign, nonatomic) HXPresentTransitionVcType vcType;
+@property (strong, nonatomic) HXPhotoView *photoView ;
 @end
 
 @implementation HXPresentTransition
 
-+ (instancetype)transitionWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType{
-    return [[self alloc] initWithTransitionType:type VcType:vcType];
++ (instancetype)transitionWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType withPhotoView:(HXPhotoView *)photoView  {
+    return [[self alloc] initWithTransitionType:type VcType:vcType withPhotoView:photoView];
 }
 
-- (instancetype)initWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType{
+- (instancetype)initWithTransitionType:(HXPresentTransitionType)type VcType:(HXPresentTransitionVcType)vcType withPhotoView:(HXPhotoView *)photoView {
     self = [super init];
     if (self) {
+        self.photoView = photoView;
         self.type = type;
         self.vcType = vcType;
     }
@@ -56,8 +58,8 @@
     //通过viewControllerForKey取出转场前后的两个控制器，这里toVC就是vc1、fromVC就是vc2
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    UICollectionView *collectionView;
-    HXPhotoView *photoView;
+    UICollectionView *collectionView = (UICollectionView *)self.photoView.collectionView;
+//    HXPhotoView *photoView;
     if ([fromVC isKindOfClass:[UINavigationController class]]) {
         UINavigationController *nav = (UINavigationController *)fromVC;
         fromVC = nav.viewControllers.lastObject;
@@ -70,32 +72,38 @@
             fromVC = tabBar.selectedViewController;
         }
     }
-    for (UIView *view in fromVC.view.subviews) {
-        if (view.tag == 9999) {
-            photoView = (HXPhotoView *)view;
-            for (UIView *subView in view.subviews) {
-                if (subView.tag == 8888) {
-                    collectionView = (UICollectionView *)subView;
-                    break;
-                }
-            }
-        }else {
-            for (UIView *subView in view.subviews) {
-                if (subView.tag == 9999) {
-                    photoView = (HXPhotoView *)subView;
-                    for (UIView *scrollSubView in subView.subviews) {
-                        if (scrollSubView.tag == 8888) {
-                            collectionView = (UICollectionView *)scrollSubView;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    for (UIView *subView in self.photoView.subviews) {
+//        if (subView.tag == 8888) {
+//            collectionView = (UICollectionView *)subView;
+//            break;
+//        }
+//    }
+//    for (UIView *view in fromVC.view.subviews) {
+//        if (view.tag == 9999) {
+//            photoView = (HXPhotoView *)view;
+//            for (UIView *subView in view.subviews) {
+//                if (subView.tag == 8888) {
+//                    collectionView = (UICollectionView *)subView;
+//                    break;
+//                }
+//            }
+//        }else {
+//            for (UIView *subView in view.subviews) {
+//                if (subView.tag == 9999) {
+//                    photoView = (HXPhotoView *)subView;
+//                    for (UIView *scrollSubView in subView.subviews) {
+//                        if (scrollSubView.tag == 8888) {
+//                            collectionView = (UICollectionView *)scrollSubView;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     //这里有个重要的概念containerView，如果要对视图做转场动画，视图就必须要加入containerView中才能进行，可以理解containerView管理者所有做转场动画的视图
     UIView *containerView = [transitionContext containerView];
-    HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:photoView.currentIndexPath];
+    HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:self.photoView.currentIndexPath];
     UIImageView *tempView = [[UIImageView alloc] initWithImage:cell.imageView.image];
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
@@ -140,8 +148,7 @@
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model;
     UIImageView *tempView;
-    UICollectionView *collectionView;
-    HXPhotoView *photoView;
+    UICollectionView *collectionView = (UICollectionView *)self.photoView.collectionView;
     if ([toVC isKindOfClass:[UINavigationController class]]) {
         UINavigationController *nav = (UINavigationController *)toVC;
         toVC = nav.viewControllers.lastObject;
@@ -154,29 +161,29 @@
             toVC = tabBar.selectedViewController;
         }
     }
-    for (UIView *view in toVC.view.subviews) {
-        if (view.tag == 9999) {
-            photoView = (HXPhotoView *)view;
-            for (UIView *subView in view.subviews) {
-                if (subView.tag == 8888) {
-                    collectionView = (UICollectionView *)subView;
-                    break;
-                }
-            }
-        }else {
-            for (UIView *subView in view.subviews) {
-                if (subView.tag == 9999) {
-                    photoView = (HXPhotoView *)subView;
-                    for (UIView *scrollSubView in subView.subviews) {
-                        if (scrollSubView.tag == 8888) {
-                            collectionView = (UICollectionView *)scrollSubView;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    for (UIView *view in toVC.view.subviews) {
+//        if (view.tag == 9999) {
+//            photoView = (HXPhotoView *)view;
+//            for (UIView *subView in view.subviews) {
+//                if (subView.tag == 8888) {
+//                    collectionView = (UICollectionView *)subView;
+//                    break;
+//                }
+//            }
+//        }else {
+//            for (UIView *subView in view.subviews) {
+//                if (subView.tag == 9999) {
+//                    photoView = (HXPhotoView *)subView;
+//                    for (UIView *scrollSubView in subView.subviews) {
+//                        if (scrollSubView.tag == 8888) {
+//                            collectionView = (UICollectionView *)scrollSubView;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     if (self.vcType == HXPresentTransitionVcTypePhoto) {
         HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)fromVC;
         model = vc.modelList[vc.index];

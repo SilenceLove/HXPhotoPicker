@@ -20,6 +20,7 @@
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
         _manager.openCamera = YES;
         _manager.singleSelected = YES;
+        _manager.showFullScreenCamera = YES;
     }
     return _manager;
 }

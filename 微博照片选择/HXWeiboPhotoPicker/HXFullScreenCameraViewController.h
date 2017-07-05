@@ -19,4 +19,5 @@
 @property (weak, nonatomic) id<HXFullScreenCameraViewControllerDelegate> delegate;
 @property (assign, nonatomic) BOOL isVideo;
 @property (assign, nonatomic) HXCameraType type;
+@property (strong, nonatomic) HXPhotoManager *photoManager;
 @end

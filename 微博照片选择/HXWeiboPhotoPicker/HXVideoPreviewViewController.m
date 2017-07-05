@@ -15,7 +15,6 @@
 #import "HXPresentTransition.h"
 @interface HXVideoPreviewViewController ()<UIViewControllerTransitioningDelegate>
 @property (strong, nonatomic) UIButton *rightBtn;
-@property (strong, nonatomic) UIButton *selectedBtn;
 @end
 
 @implementation HXVideoPreviewViewController
@@ -386,11 +385,11 @@
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{
-    return [HXPresentTransition transitionWithTransitionType:HXPresentTransitionTypePresent VcType:HXPresentTransitionVcTypeVideo];
+    return [HXPresentTransition transitionWithTransitionType:HXPresentTransitionTypePresent VcType:HXPresentTransitionVcTypeVideo withPhotoView:self.photoView];
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
-    return [HXPresentTransition transitionWithTransitionType:HXPresentTransitionTypeDismiss VcType:HXPresentTransitionVcTypeVideo];
+    return [HXPresentTransition transitionWithTransitionType:HXPresentTransitionTypeDismiss VcType:HXPresentTransitionVcTypeVideo withPhotoView:self.photoView];
 }
 
 

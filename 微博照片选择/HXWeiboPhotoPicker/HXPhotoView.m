@@ -21,7 +21,6 @@
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
-@property (weak, nonatomic) HXCollectionView *collectionView;
 @property (strong, nonatomic) HXPhotoModel *addModel;
 @property (assign, nonatomic) BOOL isAddModel;
 @property (assign, nonatomic) BOOL original;
@@ -64,13 +63,11 @@
     return _networkPhotos;
 }
 
-+ (instancetype)photoManager:(HXPhotoManager *)manager
-{
++ (instancetype)photoManager:(HXPhotoManager *)manager {
     return [[self alloc] initWithManager:manager];
 }
 
-- (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager
-{
+- (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
         self.manager = manager;
@@ -79,8 +76,7 @@
     return self;
 }
 
-- (instancetype)initWithManager:(HXPhotoManager *)manager
-{
+- (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {
         self.manager = manager;
@@ -89,8 +85,7 @@
     return self;
 }
 
-- (void)setup
-{
+- (void)setup {
     self.numOfLinesOld = 0;
     self.tag = 9999;
     [self.dataList addObject:self.addModel];
@@ -194,12 +189,14 @@
         vc.modelList = self.photos;
         vc.index = model.endIndex;
         vc.manager = self.manager;
+        vc.photoView = self;
         [[self viewController:self] presentViewController:vc animated:YES completion:nil];
     }else if (model.type == HXPhotoModelMediaTypeVideo){
         HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
         vc.manager = self.manager;
         vc.model = model;
         vc.selectedComplete = YES;
+        vc.photoView = self;
         [[self viewController:self] presentViewController:vc animated:YES completion:nil];
     }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
         HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
@@ -207,6 +204,7 @@
         vc.model = model;
         vc.isCamera = YES;
         vc.selectedComplete = YES;
+        vc.photoView = self;
         [[self viewController:self] presentViewController:vc animated:YES completion:nil];
     }
 }
@@ -286,12 +284,22 @@
             HXFullScreenCameraViewController *vc1 = [[HXFullScreenCameraViewController alloc] init];
             vc1.delegate = self;
             vc1.type = type;
-            [[self viewController:self] presentViewController:vc1 animated:YES completion:nil];
+            vc1.photoManager = self.manager;
+            if (self.manager.singleSelected) {
+                [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc1] animated:YES completion:nil];
+            }else {
+                [[self viewController:self] presentViewController:vc1 animated:YES completion:nil];
+            }
         }else {
             HXCameraViewController *vc = [[HXCameraViewController alloc] init];
             vc.delegate = self;
             vc.type = type;
-            [[self viewController:self] presentViewController:vc animated:YES completion:nil];
+            vc.photoManager = self.manager;
+            if (self.manager.singleSelected) {
+                [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+            }else {
+                [[self viewController:self] presentViewController:vc animated:YES completion:nil];
+            }
         }
     }else if (buttonIndex == 1){
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
@@ -635,8 +643,8 @@
         if (newHeight <= 0) {
             self.numOfLinesOld = 0;
         }
-        if ([self.delegate respondsToSelector:@selector(photoViewUpdateFrame:WithView:)]) {
-            [self.delegate photoViewUpdateFrame:self.frame WithView:self];
+        if ([self.delegate respondsToSelector:@selector(photoViewUpdateFrame:withView:)]) {
+            [self.delegate photoViewUpdateFrame:self.frame withView:self];
         }
     }
 }

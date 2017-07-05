@@ -101,16 +101,42 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             [alert show];
             return;
         }
-        HXCameraViewController *vc = [[HXCameraViewController alloc] init];
-        vc.delegate = self;
-        if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-            vc.type = HXCameraTypePhotoAndVideo;
-        }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
-            vc.type = HXCameraTypePhoto;
-        }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-            vc.type = HXCameraTypeVideo;
+        if (self.manager.showFullScreenCamera) {
+            HXFullScreenCameraViewController *vc = [[HXFullScreenCameraViewController alloc] init];
+            vc.delegate = self;
+            if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+                vc.type = HXCameraTypePhotoAndVideo;
+            }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
+                vc.type = HXCameraTypePhoto;
+            }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+                vc.type = HXCameraTypeVideo;
+            }
+            
+            vc.photoManager = self.manager;
+            
+            if (self.manager.singleSelected) {
+                [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+            }else {
+                [self presentViewController:vc animated:YES completion:nil];
+            }
+        }else {
+            HXCameraViewController *vc = [[HXCameraViewController alloc] init];
+            vc.delegate = self;
+            vc.photoManager = self.manager;
+            if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+                vc.type = HXCameraTypePhotoAndVideo;
+            }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
+                vc.type = HXCameraTypePhoto;
+            }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+                vc.type = HXCameraTypeVideo;
+            }
+            
+            if (self.manager.singleSelected) {
+                [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+            }else {
+                [self presentViewController:vc animated:YES completion:nil];
+            }
         }
-        [self presentViewController:vc animated:YES completion:nil];
     }
 }
 
@@ -463,6 +489,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             showVC.delegate = self;
             showVC.model = model;
             showVC.isTouch = YES;
+            showVC.selectedBtn.hidden = YES;
             if (model.type == HXPhotoModelMediaTypeCameraVideo) {
                 showVC.isCamera = YES;
             }
@@ -513,6 +540,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         showVC.delegate = self;
         showVC.model = model;
         showVC.isTouch = YES;
+        showVC.selectedBtn.hidden = YES;
         if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             showVC.isCamera = YES;
         }
@@ -532,6 +560,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     if (!self.manager.singleSelected) {
         if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
             HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)viewControllerToCommit;
+            vc.selectedBtn.hidden = NO;
             if (self.previewImg.image) {
                 vc.coverImage = self.previewImg.image;
             }else {
@@ -556,6 +585,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             }
             [vc.playVideo play];
             vc.playBtn.selected = YES;
+            vc.selectedBtn.hidden = NO;
         }
     }
     [self showViewController:viewControllerToCommit sender:self];
@@ -670,12 +700,23 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         HXFullScreenCameraViewController *vc = [[HXFullScreenCameraViewController alloc] init];
         vc.delegate = self;
         vc.type = type;
-        [self presentViewController:vc animated:YES completion:nil];
+        vc.photoManager = self.manager;
+        if (self.manager.singleSelected) {
+            [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+        }else {
+            [self presentViewController:vc animated:YES completion:nil];
+        }
     }else {
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
         vc.type = type;
-        [self presentViewController:vc animated:YES completion:nil];
+        vc.photoManager = self.manager;
+        
+        if (self.manager.singleSelected) {
+            [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+        }else {
+            [self presentViewController:vc animated:YES completion:nil];
+        }
     }
 }
 
@@ -688,6 +729,14 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [self cameraDidNextClick:model];
 }
 - (void)cameraDidNextClick:(HXPhotoModel *)model {
+    if (self.manager.singleSelected && model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        [self.manager.selectedCameraList addObject:model];
+        [self.manager.selectedCameraPhotos addObject:model];
+        [self.manager.selectedPhotos addObject:model];
+        [self.manager.selectedList addObject:model];
+        [self didNextClick:self.rightBtn];
+        return;
+    }
     if (self.albumModel.index != 0) {
         [self didTableViewCellClick:self.albums.firstObject animate:NO];
         self.albumView.currentIndex = 0;
@@ -1035,7 +1084,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.isSelectedChange = YES; // 记录在当前相册是否操作过
     if (self.manager.selectedList.count > 0) { // 选中数组已经有值时
         if (self.manager.type != HXPhotoManagerSelectedTypeVideo) {
-            if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+//            if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
                 BOOL isVideo = NO, isPhoto = NO;
                 for (HXPhotoModel *model in self.manager.selectedList) {
                     // 循环判断选中的数组中有没有视频或者图片
@@ -1062,9 +1111,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                     self.bottomView.originalBtn.selected = NO;
                     self.manager.isOriginal = NO;
                 }
-            }else {
-                self.bottomView.originalBtn.enabled = YES;
-            }
+//            }else {
+//                self.bottomView.originalBtn.enabled = YES;
+//            }
         }
         self.bottomView.previewBtn.enabled = YES;
         

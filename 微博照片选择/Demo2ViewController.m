@@ -199,7 +199,7 @@
     NSLog(@"%@",networkPhotoUrl);
 }
 
-- (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view
+- (void)photoViewUpdateFrame:(CGRect)frame withView:(HXPhotoView *)photoView
 {
     NSLog(@"%@",NSStringFromCGRect(frame));
 }

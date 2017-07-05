@@ -21,8 +21,10 @@ typedef enum : NSUInteger {
 
 @end
 
+@class HXPhotoManager;
 @interface HXCameraViewController : UIViewController
 @property (weak, nonatomic) id<HXCameraViewControllerDelegate> delegate;
 @property (assign, nonatomic) BOOL isVideo;
+@property (strong, nonatomic) HXPhotoManager *photoManager;
 @property (assign, nonatomic) HXCameraType type;
 @end
