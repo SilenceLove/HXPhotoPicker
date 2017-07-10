@@ -350,8 +350,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [self.collectionView registerClass:[HXPhotoViewCell class] forCellWithReuseIdentifier:PhotoViewCellId];
     [self.view addSubview:self.collectionView];
     if (!self.manager.singleSelected) {
-        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, spacing, 0);
-        
+        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, spacing + 50, 0);
         HXPhotoBottomView *bottomView = [[HXPhotoBottomView alloc] initWithFrame:CGRectMake(0, heght - 50, width, 50)];
         bottomView.delegate = self;
         if (self.manager.selectedList.count > 0) {
@@ -383,6 +382,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     }else {
         self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, spacing, 0);
     }
+    self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
     
     [self.view addSubview:self.albumsBgView];
     HXAlbumListView *albumView = [[HXAlbumListView alloc] initWithFrame:CGRectMake(0, -340, width, 340)];
