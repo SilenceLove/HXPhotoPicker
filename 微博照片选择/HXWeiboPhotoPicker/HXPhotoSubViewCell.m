@@ -124,6 +124,10 @@
                 self.model.previewPhoto = image;
                 self.userInteractionEnabled = YES;
                 self.model.downloadComplete = YES;
+                self.model.downloadError = NO;
+                if ([self.delegate respondsToSelector:@selector(cellNetworkingPhotoDownLoadComplete)]) {
+                    [self.delegate cellNetworkingPhotoDownLoadComplete];
+                }
             }
         }
     }];
@@ -173,6 +177,10 @@
                     model.previewPhoto = image;
                     self.userInteractionEnabled = YES;
                     model.downloadComplete = YES;
+                    model.downloadError = NO;
+                    if ([self.delegate respondsToSelector:@selector(cellNetworkingPhotoDownLoadComplete)]) {
+                        [self.delegate cellNetworkingPhotoDownLoadComplete];
+                    }
                 }
             }
         }];

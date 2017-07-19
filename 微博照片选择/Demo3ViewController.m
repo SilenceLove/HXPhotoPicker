@@ -9,9 +9,12 @@
 #import "Demo3ViewController.h"
 #import "HXPhotoViewController.h"
 #import "HXPhotoView.h"
+
+ 
+
 @interface Demo3ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
-
+@property (weak, nonatomic) HXPhotoView *photoView;
 @end
 
 @implementation Demo3ViewController
@@ -95,26 +98,37 @@
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:photoView];
+    self.photoView = photoView;
     
     // 可以在懒加载中赋值 ,  也可以这样赋值
     self.manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/857980fd0acd3caf9e258e42788e38f5_0.gif",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
     
     photoView.manager = self.manager;
     
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"查看" style:UIBarButtonItemStylePlain target:self action:@selector(lookClick)];
+    
 }
 
-- (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal
-{
-    NSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
+- (void)lookClick {
+    if ([self.photoView networkingPhotoDownloadComplete]) {
+        NSSLog(@"网络图片全部下载完成");
+    }else {
+        NSSLog(@"网络图片未下载完");
+    }
+    NSSLog(@"已下载的网络图片----->%ld",[self.photoView downloadNumberForNetworkingPhoto]);
+}
+
+- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     
     [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
-        NSLog(@"%@",images);
+        NSSLog(@"%@",images);
     }];
     /*
      // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
      CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
      [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-     NSLog(@"%@",image);
+     NSSLog(@"%@",image);
      }];
      
      // 这里的size 是普通图片的时候  想要更高质量的图片 可以把 1.5 换成 2 或者 3
@@ -145,13 +159,13 @@
      
      // 获取imageData - 通过相册获取时有用 / 通过相机拍摄的无效
      [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-        NSLog(@"%@",imageData);
+        NSSLog(@"%@",imageData);
      }];
      
      // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
      CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
      [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-     NSLog(@"%@",image);
+     NSSLog(@"%@",image);
      }];
      
      // 如果是通过相机拍摄的照片只有 thumbPhoto、previewPhoto和imageSize 这三个字段有用可以通过 type 这个字段判断是不是通过相机拍摄的
@@ -170,13 +184,13 @@
      // 如果是通过相机录制的视频 需要通过 model.VideoURL 这个字段来压缩写入文件
         if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             [self compressedVideoWithURL:model.videoURL success:^(NSString *fileName) {
-                NSLog(@"%@",fileName); // 视频路径也是视频URL;
+                NSSLog(@"%@",fileName); // 视频路径也是视频URL;
             } failure:^{
             // 压缩写入失败
             }];
         }else { // 如果是在相册里面选择的视频就需要用过 model.avAsset 这个字段来压缩写入文件
             [self compressedVideoWithURL:model.avAsset success:^(NSString *fileName) {
-                NSLog(@"%@",fileName); // 视频路径也是视频URL;
+                NSSLog(@"%@",fileName); // 视频路径也是视频URL;
             } failure:^{
                 // 压缩写入失败
             }];
@@ -191,9 +205,9 @@
          }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
          // 通过相机拍摄的照片
              if (model.networkPhotoUrl.length > 0) {
-                 NSLog(@"网络图片");
+                 NSSLog(@"网络图片");
              }else {
-                 NSLog(@"相机拍摄的照片");
+                 NSSLog(@"相机拍摄的照片");
              }
          }else if (model.type == HXPhotoModelMediaTypePhoto) {
          // 相册里的照片
@@ -206,13 +220,17 @@
      
 }
 
-- (void)photoViewDeleteNetworkPhoto:(NSString *)networkPhotoUrl {
-    NSLog(@"%@",networkPhotoUrl);
+- (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl {
+    NSSLog(@"%@",networkPhotoUrl);
 }
 
-- (void)photoViewUpdateFrame:(CGRect)frame withView:(HXPhotoView *)photoView
+- (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame
 {
-    NSLog(@"%@",NSStringFromCGRect(frame));
+    NSSLog(@"%@",NSStringFromCGRect(frame));
+}
+
+- (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView {
+    NSSLog(@"所有网络图片下载完成");
 }
 
 // 压缩视频并写入沙盒文件

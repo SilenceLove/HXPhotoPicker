@@ -7,7 +7,7 @@
 //
 
 #import "Demo5ViewController.h"
-#import "HXPhotoView.h"
+#import "HXPhotoView.h" 
 @interface Demo5ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) UIScrollView *scrollView;
 @property (strong, nonatomic) HXPhotoView *onePhotoView;
@@ -63,8 +63,16 @@
     self.threePhotoView.delegate = self;
     [self.scrollView addSubview:self.threePhotoView];
 }
-
-- (void)photoViewUpdateFrame:(CGRect)frame withView:(HXPhotoView *)photoView {
+- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    if (self.onePhotoView == photoView) {
+        NSSLog(@"onePhotoView - %@",allList);
+    }else if (self.twoPhotoView == photoView) {
+        NSSLog(@"twoPhotoView - %@",allList);
+    }else if (self.threePhotoView == photoView) {
+        NSSLog(@"threePhotoView - %@",allList);
+    }
+}
+- (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame {
     if (self.onePhotoView == photoView) {
         self.twoPhotoView.frame = CGRectMake(0, CGRectGetMaxY(self.onePhotoView.frame) + 20, self.view.frame.size.width, self.twoPhotoView.frame.size.height);
         self.threePhotoView.frame = CGRectMake(0, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width, self.threePhotoView.frame.size.height);

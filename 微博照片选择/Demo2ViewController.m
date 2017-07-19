@@ -8,7 +8,7 @@
 
 #import "Demo2ViewController.h"
 #import "HXPhotoViewController.h"
-#import "HXPhotoView.h"
+#import "HXPhotoView.h" 
 @interface Demo2ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXPhotoView *photoView;
@@ -92,12 +92,11 @@
 }
 - (void)didNavBtnClick {
     [self.photoView goPhotoViewController];
-}
-- (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal
-{
-    NSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
+} 
+- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
-        NSLog(@"%@",images);
+        NSSLog(@"%@",images);
     }];
 //    for (HXPhotoModel *model in allList) {
 //        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);
@@ -107,7 +106,7 @@
      // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
      CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
      [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-     NSLog(@"%@",image);
+     NSSLog(@"%@",image);
      }];
      
         // 这里的size 是普通图片的时候  想要更高质量的图片 可以把 1.5 换成 2 或者 3
@@ -139,13 +138,13 @@
         
         // 获取imageData - 通过相册获取时有用 / 通过相机拍摄的无效
         [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-            NSLog(@"%@",imageData);
+            NSSLog(@"%@",imageData);
         }];
         
         // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
         CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
         [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-            NSLog(@"%@",image);
+            NSSLog(@"%@",image);
         }];
         
         // 如果是通过相机拍摄的照片只有 thumbPhoto、previewPhoto和imageSize 这三个字段有用可以通过 type 这个字段判断是不是通过相机拍摄的
@@ -164,13 +163,13 @@
         // 如果是通过相机录制的视频 需要通过 model.VideoURL 这个字段来压缩写入文件
         if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             [self compressedVideoWithURL:model.videoURL success:^(NSString *fileName) {
-                NSLog(@"%@",fileName); // 视频路径也是视频URL;
+                NSSLog(@"%@",fileName); // 视频路径也是视频URL;
             } failure:^{
                 // 压缩写入失败
             }];
         }else { // 如果是在相册里面选择的视频就需要用过 model.avAsset 这个字段来压缩写入文件
             [self compressedVideoWithURL:model.avAsset success:^(NSString *fileName) {
-                NSLog(@"%@",fileName); // 视频路径也是视频URL;
+                NSSLog(@"%@",fileName); // 视频路径也是视频URL;
             } failure:^{
                 // 压缩写入失败
             }];
@@ -194,14 +193,11 @@
      
      */
 }
-
-- (void)photoViewDeleteNetworkPhoto:(NSString *)networkPhotoUrl {
-    NSLog(@"%@",networkPhotoUrl);
+- (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl {
+    NSSLog(@"%@",networkPhotoUrl);
 }
-
-- (void)photoViewUpdateFrame:(CGRect)frame withView:(HXPhotoView *)photoView
-{
-    NSLog(@"%@",NSStringFromCGRect(frame));
+- (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame {
+    NSSLog(@"%@",NSStringFromCGRect(frame));
 }
 
 // 压缩视频并写入沙盒文件

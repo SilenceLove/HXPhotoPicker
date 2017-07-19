@@ -39,6 +39,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @property (strong, nonatomic) UIImageView *previewImg;
 @property (strong, nonatomic) NSTimer *timer;
 @property (strong, nonatomic) UILabel *authorizationLb;
+@property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 @end
 
 @implementation HXPhotoViewController
@@ -61,7 +62,17 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (void)goSetup {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
 }
-
+- (void)dealloc {
+//    if (self.manager.open3DTouchPreview) {
+//        if ([self respondsToSelector:@selector(traitCollection)]) {
+//            if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
+//                if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+//                    [self unregisterForPreviewingWithContext:self.previewingContext];
+//                }
+//            }
+//        }
+//    }
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
@@ -389,6 +400,16 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     albumView.delegate = self;
     [self.view addSubview:albumView];
     self.albumView = albumView;
+    
+//    if (self.manager.open3DTouchPreview) {
+//        if ([self respondsToSelector:@selector(traitCollection)]) {
+//            if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
+//                if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+//                    self.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:self.collectionView];
+//                }
+//            }
+//        }
+//    }
 }
 
 /**
@@ -465,7 +486,13 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 }
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
-    NSIndexPath *index = [self.collectionView indexPathForCell:(UICollectionViewCell *)[previewingContext sourceView]];
+    HXPhotoViewCell *cell = (HXPhotoViewCell *)previewingContext.sourceView;
+    NSIndexPath *index = [self.collectionView indexPathForCell:cell];
+//    NSIndexPath *index = [self.collectionView indexPathForItemAtPoint:location];
+//    HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:index];
+    if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera) {
+        return nil;
+    }
     HXPhotoModel *model = self.objs[index.item];
     self.previewImg = [[UIImageView alloc] init];
     self.previewImg.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);

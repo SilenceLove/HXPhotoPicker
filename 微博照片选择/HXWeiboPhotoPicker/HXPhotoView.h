@@ -16,16 +16,19 @@
 @protocol HXPhotoViewDelegate <NSObject>
 
 // 代理返回 选择、移动顺序、删除之后的图片以及视频
-- (void)photoViewChangeComplete:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)isOriginal;
+- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 
 // 这次在相册选择的图片,不是所有选择的所有图片.
 //- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 
 // 当view更新高度时调用
-- (void)photoViewUpdateFrame:(CGRect)frame withView:(HXPhotoView *)photoView;
+- (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame;
 
 // 删除网络图片的地址
-- (void)photoViewDeleteNetworkPhoto:(NSString *)networkPhotoUrl;
+- (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl;
+
+/**  网络图片全部下载完成时调用  */
+- (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView;
 
 @end
 
@@ -39,4 +42,8 @@
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 + (instancetype)photoManager:(HXPhotoManager *)manager;
 - (void)goPhotoViewController;
+/**  网络图片是否全部下载完成  */
+- (BOOL)networkingPhotoDownloadComplete;
+/**  已下载完成的网络图片数量  */
+- (NSInteger)downloadNumberForNetworkingPhoto;
 @end

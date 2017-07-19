@@ -143,8 +143,7 @@
     }
 }
 
-- (NSString *)videoOutFutFileName
-{
+- (NSString *)videoOutFutFileName {
     NSString *fileName = @"";
     NSDate *nowDate = [NSDate date];
     NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
@@ -153,13 +152,11 @@
     fileName = [fileName stringByAppendingString:numStr];
     return fileName;
 }
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return self.dataList.count;
 }
 
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoSubViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cellId" forIndexPath:indexPath];
     cell.model = self.dataList[indexPath.item];
     cell.delegate = self;
@@ -167,8 +164,7 @@
     return cell;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     self.currentIndexPath = indexPath;
     HXPhotoModel *model = self.dataList[indexPath.item];
     if (model.networkPhotoUrl.length > 0) {
@@ -209,14 +205,12 @@
     }
 }
 
-- (void)goCamera
-{
+- (void)goCamera {
     self.manager.goCamera = YES;
     [self goPhotoViewController];
 }
 
-- (void)goPhotoViewController
-{
+- (void)goPhotoViewController {
     if (self.manager.outerCamera) {
         self.manager.openCamera = NO;
         if (self.manager.networkPhotoUrls.count == 0) {
@@ -242,8 +236,7 @@
     [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 0) {
         if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
             [[self viewController:self].view showImageHUDText:@"此设备不支持相机!"];
@@ -309,8 +302,7 @@
     }
 }
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
@@ -319,8 +311,7 @@
     [self cameraDidNextClick:model];
 }
 
-- (void)cameraDidNextClick:(HXPhotoModel *)model
-{
+- (void)cameraDidNextClick:(HXPhotoModel *)model {
     // 判断类型
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         [self.manager.endCameraPhotos addObject:model];
@@ -406,17 +397,22 @@
     }
     [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
 }
-
-- (void)cellDidDeleteClcik:(UICollectionViewCell *)cell
-{
+- (void)cellNetworkingPhotoDownLoadComplete {
+    if ([self networkingPhotoDownloadComplete]) {
+        if ([self.delegate respondsToSelector:@selector(photoViewAllNetworkingPhotoDownloadComplete:)]) {
+            [self.delegate photoViewAllNetworkingPhotoDownloadComplete:self];
+        }
+    }
+}
+- (void)cellDidDeleteClcik:(UICollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     HXPhotoModel *model = self.dataList[indexPath.item];
     [self.manager deleteSpecifiedModel:model];
     if (model.networkPhotoUrl.length > 0) {
         for (HXPhotoModel *netModel in self.networkPhotos) {
             if ([netModel.networkPhotoUrl isEqualToString:model.networkPhotoUrl]) {
-                if ([self.delegate respondsToSelector:@selector(photoViewDeleteNetworkPhoto:)]) {
-                    [self.delegate photoViewDeleteNetworkPhoto:netModel.networkPhotoUrl];
+                if ([self.delegate respondsToSelector:@selector(photoView:deleteNetworkPhoto:)]) {
+                    [self.delegate photoView:self deleteNetworkPhoto:model.networkPhotoUrl];
                 }
                 self.manager.photoMaxNum += 1;
                 [self.networkPhotos removeObject:netModel];
@@ -449,8 +445,8 @@
     [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
     [self changeSelectedListModelIndex];
     if (self.isAddModel) {
-        if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:Photos:Videos:Original:)]) {
-            [self.delegate photoViewChangeComplete:self.dataList.mutableCopy Photos:self.photos.mutableCopy Videos:self.videos.mutableCopy Original:self.original];
+        if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
+            [self.delegate photoView:self changeComplete:self.dataList photos:self.photos videos:self.videos original:self.original];
         }
         self.isAddModel = NO;
         [self.dataList addObject:self.addModel];
@@ -458,15 +454,14 @@
     }else {
         NSMutableArray *array = [NSMutableArray arrayWithArray:self.dataList.mutableCopy];
         [array removeLastObject];
-        if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:Photos:Videos:Original:)]) {
-            [self.delegate photoViewChangeComplete:array Photos:self.photos.mutableCopy Videos:self.videos.mutableCopy Original:self.original];
+        if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
+            [self.delegate photoView:self changeComplete:array photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
         }
     }
     [self setupNewFrame];
 }
 
-- (void)changeSelectedListModelIndex
-{
+- (void)changeSelectedListModelIndex {
     int i = 0, j = 0, k = 0;
     NSMutableArray *array;
     if (self.isAddModel) {
@@ -485,8 +480,7 @@
     }
 }
 
-- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original
-{
+- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original {
 //    if ([self.delegate respondsToSelector:@selector(photoViewCurrentSelected:photos:videos:original:)]) {
 //        [self.delegate photoViewCurrentSelected:allList photos:photos videos:videos original:original];
 //    }
@@ -548,29 +542,25 @@
     [self changeSelectedListModelIndex];
     [self.collectionView reloadData];
     
-    if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:Photos:Videos:Original:)]) {
-        [self.delegate photoViewChangeComplete:allList.copy Photos:photos.copy Videos:videos.copy Original:original];
+    if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
+        [self.delegate photoView:self changeComplete:allList.copy photos:photos.copy videos:videos.copy original:original];
     }
     [self setupNewFrame];
 }
 
-- (void)photoViewControllerDidCancel
-{
+- (void)photoViewControllerDidCancel {
     
 }
 
-- (NSArray *)dataSourceArrayOfCollectionView:(HXCollectionView *)collectionView
-{
+- (NSArray *)dataSourceArrayOfCollectionView:(HXCollectionView *)collectionView {
     return self.dataList;
 }
 
-- (void)dragCellCollectionView:(HXCollectionView *)collectionView newDataArrayAfterMove:(NSArray *)newDataArray
-{
+- (void)dragCellCollectionView:(HXCollectionView *)collectionView newDataArrayAfterMove:(NSArray *)newDataArray {
     self.dataList = [NSMutableArray arrayWithArray:newDataArray];
 }
 
-- (void)dragCellCollectionView:(HXCollectionView *)collectionView moveCellFromIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
+- (void)dragCellCollectionView:(HXCollectionView *)collectionView moveCellFromIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
     HXPhotoModel *fromModel = self.dataList[fromIndexPath.item];
     HXPhotoModel *toModel = self.dataList[toIndexPath.item];
     [self.manager.endSelectedList removeObject:toModel];
@@ -594,19 +584,39 @@
     self.manager.endSelectedVideos = [NSMutableArray arrayWithArray:self.videos];
 }
 
-- (void)dragCellCollectionViewCellEndMoving:(HXCollectionView *)collectionView
-{
+- (void)dragCellCollectionViewCellEndMoving:(HXCollectionView *)collectionView {
     if (self.isAddModel) {
-        if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:Photos:Videos:Original:)]) {
-            [self.delegate photoViewChangeComplete:self.dataList.mutableCopy Photos:self.photos.mutableCopy Videos:self.videos.mutableCopy Original:self.original];
+        if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
+            [self.delegate photoView:self changeComplete:self.dataList.mutableCopy photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
         }
     }else {
         NSMutableArray *array = [NSMutableArray arrayWithArray:self.dataList.mutableCopy];
         [array removeLastObject];
-        if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:Photos:Videos:Original:)]) {
-            [self.delegate photoViewChangeComplete:array Photos:self.photos.mutableCopy Videos:self.videos.mutableCopy Original:self.original];
+        if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
+            [self.delegate photoView:self changeComplete:array photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
         }
     }
+}
+
+- (BOOL)networkingPhotoDownloadComplete {
+    BOOL complete = YES;
+    for (HXPhotoModel *model in self.networkPhotos) {
+        if (!model.downloadComplete || model.downloadError) {
+            complete = NO;
+            break;
+        }
+    }
+    return complete;
+}
+
+- (NSInteger)downloadNumberForNetworkingPhoto {
+    NSInteger number = 0;
+    for (HXPhotoModel *model in self.networkPhotos) {
+        if (model.downloadComplete && !model.downloadError) {
+            number++;
+        }
+    }
+    return number;
 }
 
 - (UIViewController*)viewController:(UIView *)view {
@@ -619,8 +629,7 @@
     return nil;
 }
 
-- (void)setupNewFrame
-{
+- (void)setupNewFrame {
     CGFloat x = self.frame.origin.x;
     CGFloat y = self.frame.origin.y;
     CGFloat width = self.frame.size.width;
@@ -643,14 +652,13 @@
         if (newHeight <= 0) {
             self.numOfLinesOld = 0;
         }
-        if ([self.delegate respondsToSelector:@selector(photoViewUpdateFrame:withView:)]) {
-            [self.delegate photoViewUpdateFrame:self.frame withView:self];
+        if ([self.delegate respondsToSelector:@selector(photoView:updateFrame:)]) {
+            [self.delegate photoView:self updateFrame:self.frame]; 
         }
     }
 }
 
-- (void)layoutSubviews
-{
+- (void)layoutSubviews {
     [super layoutSubviews];
     NSInteger dataCount = self.dataList.count;
     NSInteger numOfLinesNew = (dataCount / LineNum) + 1;
@@ -676,7 +684,7 @@
 }
 - (void)dealloc {
     [[SDWebImageManager sharedManager] cancelAll];
-    NSLog(@"dealloc");
+    NSSLog(@"dealloc");
 }
 
 @end

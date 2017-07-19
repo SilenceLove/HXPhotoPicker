@@ -57,14 +57,14 @@
     self.photo.text = [NSString stringWithFormat:@"%ld张",photos.count];
     self.video.text = [NSString stringWithFormat:@"%ld个",videos.count];
     self.original.text = original ? @"YES" : @"NO";
-    NSLog(@"all - %@",allList);
-    NSLog(@"photo - %@",photos);
-    NSLog(@"video - %@",videos);
+    NSSLog(@"all - %@",allList);
+    NSSLog(@"photo - %@",photos);
+    NSSLog(@"video - %@",videos);
 }
 
 - (void)photoViewControllerDidCancel
 {
-    NSLog(@"取消");
+    NSSLog(@"取消");
 }
 
 - (IBAction)camera:(id)sender {

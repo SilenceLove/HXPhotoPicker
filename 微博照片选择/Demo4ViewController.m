@@ -34,11 +34,10 @@
     vc.delegate = self;
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
 }
-
 - (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original {
     HXPhotoModel *model = allList.firstObject;
     self.imageView.image = model.thumbPhoto;
-}
+} 
 
 - (void)photoViewControllerDidCancel {
     

@@ -179,7 +179,7 @@
             [weakSelf performSelectorOnMainThread:@selector(handleDeviceMotion:) withObject:motion waitUntilDone:YES];
         }];
     } else {
-        NSLog(@"No device motion on device");
+        NSSLog(@"No device motion on device");
     }
     
     if (self.type == HXCameraTypePhotoAndVideo) {
@@ -298,7 +298,7 @@
             self.flashlight = 1;
         }
     } else {
-        NSLog(@"设备不支持闪光灯");
+        NSSLog(@"设备不支持闪光灯");
     }
     [self.device unlockForConfiguration];
 }
@@ -371,7 +371,7 @@
             [self.session commitConfiguration];
             
         } else if (error) {
-            NSLog(@"toggle carema failed, error = %@", error);
+            NSSLog(@"toggle carema failed, error = %@", error);
         }
     }
 }

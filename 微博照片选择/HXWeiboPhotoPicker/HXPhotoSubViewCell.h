@@ -12,7 +12,7 @@
 @protocol HXPhotoSubViewCellDelegate <NSObject>
 
 - (void)cellDidDeleteClcik:(UICollectionViewCell *)cell;
-
+- (void)cellNetworkingPhotoDownLoadComplete;
 @end
 
 @class HXPhotoModel;

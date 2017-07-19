@@ -130,6 +130,12 @@
     CGFloat width = self.view.frame.size.width;
     CGFloat offsetx = scrollView.contentOffset.x;
     NSInteger currentIndex = (offsetx + (width + 20) * 0.5) / (width + 20);
+    if (currentIndex > self.modelList.count - 1) {
+        currentIndex = self.modelList.count - 1;
+    }
+    if (currentIndex < 0) {
+        currentIndex = 0;
+    }
     self.titleLb.text = [NSString stringWithFormat:@"%ld/%ld",currentIndex + 1,self.modelList.count];
     HXPhotoModel *model = self.modelList[currentIndex];
     self.selectedBtn.selected = model.selected;
