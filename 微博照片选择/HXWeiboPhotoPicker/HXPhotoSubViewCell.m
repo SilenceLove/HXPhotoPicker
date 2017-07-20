@@ -102,7 +102,7 @@
 - (void)againDownload {
     self.model.downloadError = NO;
     self.model.downloadComplete = NO;
-    [self.imageView sd_setImageWithURL:[NSURL URLWithString:self.model.networkPhotoUrl] placeholderImage:self.model.thumbPhoto options:SDWebImageCacheMemoryOnly progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:self.model.networkPhotoUrl] placeholderImage:self.model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
         self.model.receivedSize = receivedSize;
         self.model.expectedSize = expectedSize;
         CGFloat progress = (CGFloat)receivedSize / expectedSize;
@@ -155,7 +155,7 @@
 //            self.gifIcon.hidden = NO;
 //        }
         self.progressView.hidden = model.downloadComplete;
-        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.networkPhotoUrl] placeholderImage:model.thumbPhoto options:SDWebImageCacheMemoryOnly progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.networkPhotoUrl] placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
             model.receivedSize = receivedSize;
             model.expectedSize = expectedSize;
             CGFloat progress = (CGFloat)receivedSize / expectedSize;

@@ -34,6 +34,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.requestID = 0;
+        NSSLog(@"%@",[self viewController:self]);
         [self setup];
     }
     return self;
@@ -271,6 +272,19 @@
     }
     self.maskView.hidden = !model.selected;
     self.selectBtn.selected = model.selected;
+}
+
+- (UIViewController*)viewController:(UIView *)view {
+    for (UIView* next = [view superview]; next; next = next.superview) {
+        UIResponder* nextResponder = [next nextResponder];
+        if ([nextResponder isKindOfClass:[UINavigationController class]] || [nextResponder isKindOfClass:[UIViewController class]]) {
+            return (UIViewController*)nextResponder;
+        }
+    }
+    return nil;
+}
+- (void)dealloc {
+    [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
 }
 
 @end

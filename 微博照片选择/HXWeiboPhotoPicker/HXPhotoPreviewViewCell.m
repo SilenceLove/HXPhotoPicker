@@ -20,7 +20,7 @@
 @property (assign, nonatomic) PHImageRequestID longRequestId;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @property (assign, nonatomic) PHImageRequestID liveRequestID;
-@property (weak, nonatomic) UIImage *firstImage;
+@property (strong, nonatomic) UIImage *firstImage;
 
 @end
 
@@ -37,8 +37,7 @@
     return self;
 }
 
-- (void)setup
-{
+- (void)setup {
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
@@ -70,18 +69,15 @@
     self.imageView = imageView;
 }
 
-- (void)livePhotoView:(PHLivePhotoView *)livePhotoView willBeginPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle
-{
+- (void)livePhotoView:(PHLivePhotoView *)livePhotoView willBeginPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
     self.isAnimating = YES;
 }
 
-- (void)livePhotoView:(PHLivePhotoView *)livePhotoView didEndPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle
-{
+- (void)livePhotoView:(PHLivePhotoView *)livePhotoView didEndPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
     [self stopLivePhoto];
 }
 
-- (void)startLivePhoto
-{
+- (void)startLivePhoto {
     if (self.isAnimating) {
         return;
     }
@@ -104,8 +100,7 @@
 //    }
 }
 
-- (void)stopLivePhoto
-{
+- (void)stopLivePhoto {
     [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
     self.isAnimating = NO;
     [self.livePhotoView stopPlayback];
@@ -114,8 +109,7 @@
     self.livePhotoView = nil;
 }
 
-- (void)fetchLongPhoto
-{
+- (void)fetchLongPhoto {
     [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -146,18 +140,15 @@
     }
 }
 
-- (void)startGifImage
-{
+- (void)startGifImage {
     self.imageView.image = self.gifImage;
 }
 
-- (void)stopGifImage
-{
+- (void)stopGifImage {
     self.imageView.image = self.firstImage;
 }
 
-- (void)setModel:(HXPhotoModel *)model
-{
+- (void)setModel:(HXPhotoModel *)model {
     _model = model;
     self.gifImage = nil;
     [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];

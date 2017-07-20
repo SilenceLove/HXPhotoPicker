@@ -199,25 +199,25 @@
      
      */
      // 判断照片、视频 或 是否是通过相机拍摄的
-     [allList enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-         if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-         // 通过相机录制的视频
-         }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-         // 通过相机拍摄的照片
-             if (model.networkPhotoUrl.length > 0) {
-                 NSSLog(@"网络图片");
-             }else {
-                 NSSLog(@"相机拍摄的照片");
-             }
-         }else if (model.type == HXPhotoModelMediaTypePhoto) {
-         // 相册里的照片
-         }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
-         // 相册里的GIF图
-         }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
-         // 相册里的livePhoto
-         }
-     }];
-     
+//     [allList enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
+//         if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+//         // 通过相机录制的视频
+//         }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+//         // 通过相机拍摄的照片
+//             if (model.networkPhotoUrl.length > 0) {
+//                 NSSLog(@"网络图片");
+//             }else {
+//                 NSSLog(@"相机拍摄的照片");
+//             }
+//         }else if (model.type == HXPhotoModelMediaTypePhoto) {
+//         // 相册里的照片
+//         }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
+//         // 相册里的GIF图
+//         }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+//         // 相册里的livePhoto
+//         }
+//     }];
+    
 }
 
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl {
@@ -231,6 +231,11 @@
 
 - (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView {
     NSSLog(@"所有网络图片下载完成");
+    /*
+     网络图片全部下载完成之后会的调一下这个方法
+     // 代理返回 选择、移动顺序、删除之后的图片以及视频
+     - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
+     */
 }
 
 // 压缩视频并写入沙盒文件

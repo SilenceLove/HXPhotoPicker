@@ -107,6 +107,15 @@
 
 - (void)dismissClick
 {
+    HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+    [[PHImageManager defaultManager] cancelImageRequest:cell.requestID];
+    [[PHImageManager defaultManager] cancelImageRequest:cell.longRequestId];
+    [[PHImageManager defaultManager] cancelImageRequest:cell.liveRequestID];
+    if (cell.model.type == HXPhotoModelMediaTypePhotoGif) {
+        [cell stopGifImage];
+    }else if (cell.model.type == HXPhotoModelMediaTypeLivePhoto) {
+        [cell stopLivePhoto];
+    }
     if (self.livePhotoCell) {
         [self.livePhotoCell stopLivePhoto];
     }

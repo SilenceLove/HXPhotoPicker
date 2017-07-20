@@ -27,6 +27,7 @@
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (assign, nonatomic) NSInteger numOfLinesOld;
 @property (strong, nonatomic) NSMutableArray *networkPhotos;
+@property (assign, nonatomic) BOOL downLoadComplete;
 @end
 
 @implementation HXPhotoView
@@ -398,7 +399,9 @@
     [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
 }
 - (void)cellNetworkingPhotoDownLoadComplete {
-    if ([self networkingPhotoDownloadComplete]) {
+    if ([self networkingPhotoDownloadComplete] && !self.downLoadComplete) {
+        self.downLoadComplete = YES;
+        [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
         if ([self.delegate respondsToSelector:@selector(photoViewAllNetworkingPhotoDownloadComplete:)]) {
             [self.delegate photoViewAllNetworkingPhotoDownloadComplete:self];
         }
