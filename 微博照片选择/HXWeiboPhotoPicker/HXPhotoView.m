@@ -143,7 +143,9 @@
         [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
     }
 }
-
+- (void)refreshView {
+    [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
+}
 - (NSString *)videoOutFutFileName {
     NSString *fileName = @"";
     NSDate *nowDate = [NSDate date];

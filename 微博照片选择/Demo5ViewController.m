@@ -62,6 +62,16 @@
     self.threePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width, 0) WithManager:self.threeManager];
     self.threePhotoView.delegate = self;
     [self.scrollView addSubview:self.threePhotoView];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空" style:UIBarButtonItemStylePlain target:self action:@selector(didCleanClick)];
+}
+- (void)didCleanClick {
+    [self.oneManager emptySelectedList];
+    [self.twoManager emptySelectedList];
+    [self.threeManager emptySelectedList];
+    [self.onePhotoView refreshView];
+    [self.twoPhotoView refreshView];
+    [self.threePhotoView refreshView];
 }
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
     if (self.onePhotoView == photoView) {

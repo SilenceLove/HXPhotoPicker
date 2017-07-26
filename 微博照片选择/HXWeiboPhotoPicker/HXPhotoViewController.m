@@ -487,9 +487,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
     HXPhotoViewCell *cell = (HXPhotoViewCell *)previewingContext.sourceView;
-    NSIndexPath *index = [self.collectionView indexPathForCell:cell];
-//    NSIndexPath *index = [self.collectionView indexPathForItemAtPoint:location];
-//    HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:index];
+    NSIndexPath *index = [self.collectionView indexPathForCell:cell]; 
     if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera) {
         return nil;
     }
@@ -512,23 +510,15 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         if (model.type == HXPhotoModelMediaTypeCameraVideo || model.type == HXPhotoModelMediaTypeVideo) {
             HXVideoPreviewViewController *showVC = [[HXVideoPreviewViewController alloc] init];
             showVC.preferredContentSize = model.endImageSize;
-            showVC.manager = self.manager;
-            showVC.delegate = self;
-            showVC.model = model;
             showVC.isTouch = YES;
-            showVC.selectedBtn.hidden = YES;
-            if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-                showVC.isCamera = YES;
-            }
-            self.navigationController.delegate = showVC;
             [showVC.view addSubview:self.previewImg];
             return showVC;
         }else {
             HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
             vc.preferredContentSize = model.endImageSize;
-            vc.model = model;
-            vc.delegate = self;
+            vc.model = model; 
             vc.coverImage = self.previewImg.image;
+            vc.photoManager = self.manager;
             [vc.view addSubview:self.previewImg];
             return vc;
         }
@@ -537,41 +527,13 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         HXPhotoPreviewViewController *showVC = [[HXPhotoPreviewViewController alloc] init];
         showVC.preferredContentSize = model.endImageSize;
-        showVC.modelList = self.photos;
-        NSInteger index = 0;
-        if (model.type != HXPhotoModelMediaTypeCameraPhoto) {
-            if (self.albumModel.index == 0) {
-                if (self.manager.cameraPhotos.count > 0) {
-                    index = model.photoIndex + self.manager.cameraPhotos.count;
-                }else {
-                    index = model.photoIndex;
-                }
-            }else {
-                index = model.photoIndex;
-            }
-        }else {
-            index = model.photoIndex;
-        }
-        
-        showVC.index = index;
-        showVC.delegate = self;
-        showVC.manager = self.manager;
-        showVC.collectionView.hidden = YES;
-        self.navigationController.delegate = showVC;
+        showVC.isTouch = YES;
         [showVC.view addSubview:self.previewImg];
         return showVC;
     }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo){
         HXVideoPreviewViewController *showVC = [[HXVideoPreviewViewController alloc] init];
-        showVC.preferredContentSize = model.endImageSize;
-        showVC.manager = self.manager;
-        showVC.delegate = self;
-        showVC.model = model;
+        showVC.preferredContentSize = model.endImageSize; 
         showVC.isTouch = YES;
-        showVC.selectedBtn.hidden = YES;
-        if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-            showVC.isCamera = YES;
-        }
-        self.navigationController.delegate = showVC;
         [showVC.view addSubview:self.previewImg];
         return showVC;
     }else {
@@ -587,32 +549,73 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     if (!self.manager.singleSelected) {
         if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
             HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)viewControllerToCommit;
-            vc.selectedBtn.hidden = NO;
+            vc.manager = self.manager;
+            vc.model = model;
+            if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+                vc.isCamera = YES;
+            }
+            [vc setup];
             if (self.previewImg.image) {
                 vc.coverImage = self.previewImg.image;
             }else {
                 HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
                 vc.coverImage = cell.imageView.image;
             }
-            [vc.playVideo play];
+            vc.delegate = self;
             vc.playBtn.selected = YES;
             [vc selectClick];
+            self.navigationController.delegate = vc;
         }else if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)viewControllerToCommit;
+            vc.modelList = self.photos;
+            NSInteger index = 0;
+            if (model.type != HXPhotoModelMediaTypeCameraPhoto) {
+                if (self.albumModel.index == 0) {
+                    if (self.manager.cameraPhotos.count > 0) {
+                        index = model.photoIndex + self.manager.cameraPhotos.count;
+                    }else {
+                        index = model.photoIndex;
+                    }
+                }else {
+                    index = model.photoIndex;
+                }
+            }else {
+                index = model.photoIndex;
+            }
+            vc.index = index;
+            vc.manager = self.manager;
+            if (self.previewImg.image) {
+                vc.gifCoverImage = self.previewImg.image;
+            }else {
+                HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
+                vc.gifCoverImage = cell.imageView.image;
+            }
+            [vc setup];
+            vc.delegate = self;
             [vc selectClick];
+            self.navigationController.delegate = vc;
         }
     }else {
         if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
             HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)viewControllerToCommit;
+            vc.manager = self.manager;
+            vc.model = model;
+            if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+                vc.isCamera = YES;
+            }
+            [vc setup];
+            vc.delegate = self;
             if (self.previewImg.image) {
                 vc.coverImage = self.previewImg.image;
             }else {
                 HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
                 vc.coverImage = cell.imageView.image;
             }
-            [vc.playVideo play];
             vc.playBtn.selected = YES;
-            vc.selectedBtn.hidden = NO;
+            self.navigationController.delegate = vc;
+        }else {
+            HXPhotoEditViewController *vc = (HXPhotoEditViewController *)viewControllerToCommit;
+            vc.delegate = self;
         }
     }
     [self showViewController:viewControllerToCommit sender:self];
@@ -647,6 +650,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             vc.model = model;
             vc.delegate = self;
             vc.coverImage = cell.imageView.image;
+            vc.photoManager = self.manager;
             [self.navigationController pushViewController:vc animated:YES];
         }
         return;
@@ -1396,6 +1400,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @end
 
 @interface HXPhotoBottomView ()
+@property (strong, nonatomic) UIVisualEffectView *effectView;
 @end
 
 @implementation HXPhotoBottomView
@@ -1403,12 +1408,18 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor whiteColor];
+//        self.backgroundColor = [UIColor whiteColor];
         [self setup];
     }
     return self;
 }
+#pragma mark - < 懒加载 >
 - (void)setup {
+    UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
+    self.effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+    self.effectView.frame = self.bounds;
+    [self addSubview:self.effectView];
+    
     UIButton *previewBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [previewBtn setTitle:@"预览" forState:UIControlStateNormal];
     [previewBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -1426,12 +1437,13 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.previewBtn = previewBtn;
     
     UIButton *originalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [originalBtn setBackgroundColor:[UIColor whiteColor]];
     [originalBtn setTitle:@"原图" forState:UIControlStateNormal];
     [originalBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [originalBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     originalBtn.layer.masksToBounds = YES;
-    originalBtn.layer.cornerRadius = 2;
-    originalBtn.layer.borderColor = [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:1].CGColor;
+    originalBtn.layer.cornerRadius = 2.2;
+    originalBtn.layer.borderColor = [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:0.7].CGColor;
     originalBtn.layer.borderWidth = 0.7;
     [originalBtn setImage:[HXPhotoTools hx_imageNamed:@"椭圆-1@2x.png"] forState:UIControlStateNormal];
     [originalBtn setImage:[HXPhotoTools hx_imageNamed:@"椭圆-1-拷贝@2x.png"] forState:UIControlStateSelected];

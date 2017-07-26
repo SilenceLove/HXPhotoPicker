@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class HXPhotoModel;
+@class HXPhotoModel,HXPhotoManager;
 @protocol HXPhotoEditViewControllerDelegate <NSObject>
 
 - (void)editViewControllerDidNextClick:(HXPhotoModel *)model;
@@ -20,4 +20,5 @@
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) UIImage *coverImage;
 @property (weak, nonatomic) id<HXPhotoEditViewControllerDelegate> delegate;
+@property (strong, nonatomic) HXPhotoManager *photoManager;
 @end

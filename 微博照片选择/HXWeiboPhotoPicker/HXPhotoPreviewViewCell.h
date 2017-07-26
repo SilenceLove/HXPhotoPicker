@@ -11,12 +11,12 @@
 #import <PhotosUI/PhotosUI.h>
 @interface HXPhotoPreviewViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
-@property (weak, nonatomic, readonly) UIImageView *imageView;
+@property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic, readonly) PHLivePhotoView *livePhotoView;
 @property (assign, nonatomic) BOOL isAnimating;
 @property (assign, nonatomic, readonly) PHImageRequestID requestID;
 @property (assign, nonatomic, readonly) PHImageRequestID longRequestId;
-@property (assign, nonatomic, readonly) PHImageRequestID liveRequestID;
+@property (assign, nonatomic, readonly) PHImageRequestID liveRequestID; 
 - (void)startLivePhoto;
 - (void)stopLivePhoto;
 - (void)startGifImage;

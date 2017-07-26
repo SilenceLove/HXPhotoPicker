@@ -15,9 +15,9 @@
 @interface HXPhotoPreviewViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerTransitioningDelegate>
 @property (weak, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UILabel *titleLb;
-@property (strong, nonatomic) UIButton *selectedBtn;
 @property (strong, nonatomic) UIButton *rightBtn;
 @property (strong, nonatomic) HXPhotoPreviewViewCell *livePhotoCell;
+@property (assign, nonatomic) BOOL firstWillDisplayCell;
 @end
 
 @implementation HXPhotoPreviewViewController
@@ -34,8 +34,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self setup];
+    if (!self.isTouch) {
+        [self setup];
+    }else {
+        self.firstWillDisplayCell = YES;
+    }
 }
 
 - (void)setup
@@ -66,8 +69,8 @@
         self.rightBtn.layer.borderWidth = 0;
     }
     
-    CGFloat width = self.view.frame.size.width;
-    CGFloat height = self.view.frame.size.height;
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     flowLayout.itemSize = CGSizeMake(width, height - 64);
@@ -133,10 +136,36 @@
     cell.model = self.modelList[indexPath.item];
     return cell;
 }
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.firstWillDisplayCell && self.isTouch) {
+        HXPhotoPreviewViewCell *myCell = (HXPhotoPreviewViewCell *)cell;
+        if (myCell.model.type == HXPhotoModelMediaTypeLivePhoto) {
+            [myCell startLivePhoto];
+            self.livePhotoCell = myCell;
+        }else if (myCell.model.type == HXPhotoModelMediaTypePhotoGif) {
+            myCell.imageView.image = self.gifCoverImage;
+            [myCell startGifImage];
+        }else {
+            [myCell fetchLongPhoto];
+        }
+        self.firstWillDisplayCell = NO;
+    }
+}
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    HXPhotoPreviewViewCell *myCell = (HXPhotoPreviewViewCell *)cell;
+    [[PHImageManager defaultManager] cancelImageRequest:myCell.requestID];
+    [[PHImageManager defaultManager] cancelImageRequest:myCell.longRequestId];
+    [[PHImageManager defaultManager] cancelImageRequest:myCell.liveRequestID];
+    if (myCell.model.type == HXPhotoModelMediaTypePhotoGif) {
+        [myCell stopGifImage];
+    }else if (myCell.model.type == HXPhotoModelMediaTypeLivePhoto) {
+        [myCell stopLivePhoto];
+    }
+}
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    CGFloat width = self.view.frame.size.width;
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
     CGFloat offsetx = scrollView.contentOffset.x;
     NSInteger currentIndex = (offsetx + (width + 20) * 0.5) / (width + 20);
     if (currentIndex > self.modelList.count - 1) {
@@ -188,7 +217,7 @@
 - (UIButton *)selectedBtn
 {
     if (!_selectedBtn) {
-        CGFloat width = self.view.frame.size.width;
+        CGFloat width = [UIScreen mainScreen].bounds.size.width;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
         [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
@@ -249,8 +278,18 @@
         }
         HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
         if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
-            model.thumbPhoto = cell.imageView.image;
-            model.previewPhoto = cell.imageView.image;
+            if (model.type == HXPhotoModelMediaTypePhotoGif) {
+                if (cell.imageView.image.images.count > 0) {
+                    model.thumbPhoto = cell.imageView.image.images.firstObject;
+                    model.previewPhoto = cell.imageView.image.images.firstObject;
+                }else {
+                    model.thumbPhoto = cell.imageView.image;
+                    model.previewPhoto = cell.imageView.image;
+                }
+            }else {
+                model.thumbPhoto = cell.imageView.image;
+                model.previewPhoto = cell.imageView.image;
+            }
         }
         if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             [self.manager.selectedPhotos addObject:model];

@@ -881,6 +881,7 @@
             vc.model = model;
             vc.coverImage = model.thumbPhoto;
             vc.delegate = self;
+            vc.photoManager = self.photoManager;
             [self.navigationController pushViewController:vc animated:YES];
         }else {
             if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {

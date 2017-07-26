@@ -18,7 +18,7 @@
 @class HXPhotoModel;
 @interface HXPhotoSubViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXPhotoSubViewCellDelegate> delegate;
-@property (weak, nonatomic, readonly) UIImageView *imageView;
+@property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic) HXPhotoModel *model;
 /**
  删除网络图片时是否显示Alert // 默认显示

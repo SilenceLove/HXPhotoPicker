@@ -23,8 +23,7 @@
     return self;
 }
 
-- (void)setup
-{
+- (void)setup {
     self.backgroundColor = [UIColor colorWithRed:235/255.0 green:235/255.0 blue:235/255.0 alpha:1];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -38,8 +37,7 @@
     self.tableView = tableView;
 }
 
-- (void)setList:(NSArray *)list
-{
+- (void)setList:(NSArray *)list {
     _list = list;
     
     [self.tableView reloadData];
@@ -74,50 +72,60 @@
 @end
 
 @interface HXAlbumListViewCell ()
-@property (weak, nonatomic) UIImageView *photoView;
-@property (weak, nonatomic) UILabel *photoName;
-@property (weak, nonatomic) UILabel *photoNum;
-@property (weak, nonatomic) UIImageView *numIcon;
+@property (strong, nonatomic) UIImageView *photoView;
+@property (strong, nonatomic) UILabel *photoName;
+@property (strong, nonatomic) UILabel *photoNum;
+@property (strong, nonatomic) UIImageView *numIcon;
 @end
 
 @implementation HXAlbumListViewCell
 
-- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
         self.backgroundColor = [UIColor colorWithRed:240/255.0 green:240/255.0 blue:240/255.0 alpha:1];
         [self setup];
     }
     return self;
 }
-
-- (void)setup
-{
-    UIImageView *photoView = [[UIImageView alloc] init];
-    photoView.contentMode = UIViewContentModeScaleAspectFill;
-    photoView.clipsToBounds = YES;
-    [self.contentView addSubview:photoView];
-    self.photoView = photoView;
-
-    UILabel *photoName = [[UILabel alloc] init];
-    photoName.textColor = [UIColor blackColor];
-    photoName.font = [UIFont systemFontOfSize:17];
-    [self.contentView addSubview:photoName];
-    self.photoName = photoName;
-    
-    UILabel *photoNum = [[UILabel alloc] init];
-    photoNum.textColor = [UIColor darkGrayColor];
-    photoNum.font = [UIFont systemFontOfSize:12];
-    [self.contentView addSubview:photoNum];
-    self.photoNum = photoNum;
-    
-    UIImageView *numIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_photo_filter_checkbox_checked@2x.png"]];
-    [photoView addSubview:numIcon];
-    self.numIcon = numIcon;
+#pragma mark - < 懒加载 >
+- (UIImageView *)photoView {
+    if (!_photoView) {
+        _photoView = [[UIImageView alloc] init];
+        _photoView.contentMode = UIViewContentModeScaleAspectFill;
+        _photoView.clipsToBounds = YES;
+    }
+    return _photoView;
+}
+- (UILabel *)photoName {
+    if (!_photoName) {
+        _photoName = [[UILabel alloc] init];
+        _photoName.textColor = [UIColor blackColor];
+        _photoName.font = [UIFont systemFontOfSize:17];
+    }
+    return _photoName;
+}
+- (UILabel *)photoNum {
+    if (!_photoNum) {
+        _photoNum = [[UILabel alloc] init];
+        _photoNum.textColor = [UIColor darkGrayColor];
+        _photoNum.font = [UIFont systemFontOfSize:12];
+    }
+    return _photoNum;
+}
+- (UIImageView *)numIcon {
+    if (!_numIcon) {
+        _numIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_photo_filter_checkbox_checked@2x.png"]];
+    }
+    return _numIcon;
+}
+- (void)setup {
+    [self.contentView addSubview:self.photoView];
+    [self.contentView addSubview:self.photoName];
+    [self.contentView addSubview:self.photoNum];
+    [self.photoView addSubview:self.numIcon];
 }
 
-- (void)setModel:(HXAlbumModel *)model
-{
+- (void)setModel:(HXAlbumModel *)model {
     _model = model;
     
     __weak typeof(self) weakSelf = self;

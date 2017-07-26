@@ -35,6 +35,11 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL singleSelected;
 
 /**
+ 单选模式下是否需要裁剪  默认YES
+ */
+@property (assign, nonatomic) BOOL singleSelecteClip;
+
+/**
  是否开启3DTouch预览功能 默认打开
  */
 @property (assign, nonatomic) BOOL open3DTouchPreview;
@@ -45,7 +50,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL showFullScreenCamera;
 
 /**
- 删除网络图片时是否显示Alert // 默认显示
+ 删除网络图片时是否显示Alert // 默认不显示
  */
 @property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
 

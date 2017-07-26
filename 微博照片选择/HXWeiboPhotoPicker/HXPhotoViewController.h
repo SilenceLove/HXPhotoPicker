@@ -17,6 +17,7 @@
 
 @protocol HXPhotoViewControllerDelegate <NSObject>
 
+@optional
 /**
  点击下一步执行的代理  数组里面装的都是 HXPhotoModel 对象
 

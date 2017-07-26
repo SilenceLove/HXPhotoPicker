@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 #import "HXPhotoModel.h"
+#import "UIView+HXExtension.h"
 
 #ifdef DEBUG
 #define NSSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
@@ -39,7 +40,7 @@ typedef enum : NSUInteger {
 + (void)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
 
 /**
- 根据已选照片数组返回 原图/高清(质量略小于原图) 图片数组
+ 根据已选照片数组返回 原图/高清(质量略小于原图) 图片数组  注: 此方法只是一个简单的取image,有可能跟你的需求不一样.那么你就需要自己重新循环模型数组取数据了
 
  @param photos 选中照片数组
  @param completion image数组

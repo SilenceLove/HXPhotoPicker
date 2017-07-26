@@ -11,8 +11,8 @@
 #import "UIImage+HXExtension.h"
 #import "HXCircleProgressView.h"
 @interface HXPhotoPreviewViewCell ()<UIScrollViewDelegate,PHLivePhotoViewDelegate>
-@property (weak, nonatomic) UIScrollView *scrollView;
-@property (weak, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIScrollView *scrollView;
+@property (strong, nonatomic) UIImageView *imageView;
 @property (assign, nonatomic) CGPoint imageCenter;
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @property (strong, nonatomic) UIImage *gifImage;
@@ -21,6 +21,7 @@
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @property (assign, nonatomic) PHImageRequestID liveRequestID;
 @property (strong, nonatomic) UIImage *firstImage;
+@property (assign, nonatomic) BOOL needGifImage;
 
 @end
 
@@ -36,37 +37,49 @@
     }
     return self;
 }
-
+#pragma mark - < 懒加载 >
+- (UIScrollView *)scrollView {
+    if (!_scrollView) {
+        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.hx_w, self.hx_h)];
+        _scrollView.showsHorizontalScrollIndicator = NO;
+        _scrollView.showsVerticalScrollIndicator = NO;
+        _scrollView.delegate = self;
+        _scrollView.bouncesZoom = YES;
+        _scrollView.minimumZoomScale = 1;
+        _scrollView.multipleTouchEnabled = YES;
+        _scrollView.delegate = self;
+        _scrollView.scrollsToTop = NO;
+        _scrollView.showsHorizontalScrollIndicator = NO;
+        _scrollView.showsVerticalScrollIndicator = NO;
+        _scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _scrollView.delaysContentTouches = NO;
+        _scrollView.canCancelContentTouches = YES;
+        _scrollView.alwaysBounceVertical = NO;
+        _scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
+        UITapGestureRecognizer *tap2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
+        tap2.numberOfTapsRequired = 2;
+        [_scrollView addGestureRecognizer:tap2];
+    }
+    return _scrollView;
+}
+- (UIImageView *)imageView {
+    if (!_imageView) {
+        _imageView = [[UIImageView alloc] init];
+    }
+    return _imageView;
+}
+- (PHLivePhotoView *)livePhotoView {
+    if (!_livePhotoView) {
+        _livePhotoView = [[PHLivePhotoView alloc] init];
+        _livePhotoView.clipsToBounds = YES;
+        _livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
+        _livePhotoView.delegate = self;
+    }
+    return _livePhotoView;
+}
 - (void)setup {
-    CGFloat width = self.frame.size.width;
-    CGFloat height = self.frame.size.height;
-    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
-    scrollView.showsHorizontalScrollIndicator = NO;
-    scrollView.showsVerticalScrollIndicator = NO;
-    scrollView.delegate = self;
-    scrollView.bouncesZoom = YES;
-    scrollView.minimumZoomScale = 1;
-    scrollView.multipleTouchEnabled = YES;
-    scrollView.delegate = self;
-    scrollView.scrollsToTop = NO;
-    scrollView.showsHorizontalScrollIndicator = NO;
-    scrollView.showsVerticalScrollIndicator = NO;
-    scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    scrollView.delaysContentTouches = NO;
-    scrollView.canCancelContentTouches = YES;
-    scrollView.alwaysBounceVertical = NO;
-    scrollView.contentSize = CGSizeMake(width, height);
-    [self.contentView addSubview:scrollView];
-    
-    UITapGestureRecognizer *tap2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
-    tap2.numberOfTapsRequired = 2;
-    [scrollView addGestureRecognizer:tap2];
-    self.scrollView = scrollView;
-    
-    UIImageView *imageView = [[UIImageView alloc] init];
-    
-    [scrollView addSubview:imageView];
-    self.imageView = imageView;
+    [self.contentView addSubview:self.scrollView];
+    [self.scrollView addSubview:self.imageView];
 }
 
 - (void)livePhotoView:(PHLivePhotoView *)livePhotoView willBeginPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
@@ -81,11 +94,7 @@
     if (self.isAnimating) {
         return;
     }
-    self.livePhotoView = [[PHLivePhotoView alloc] init];
-    self.livePhotoView.clipsToBounds = YES;
-    self.livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
     self.livePhotoView.frame = self.imageView.frame;
-    self.livePhotoView.delegate = self;
     [self.scrollView addSubview:self.livePhotoView];
 //    if (self.model.livePhoto) {
 //        self.livePhotoView.livePhoto = self.model.livePhoto;
@@ -105,8 +114,8 @@
     self.isAnimating = NO;
     [self.livePhotoView stopPlayback];
     [self.livePhotoView removeFromSuperview];
-    self.livePhotoView.delegate = nil;
-    self.livePhotoView = nil;
+//    self.livePhotoView.delegate = nil;
+//    self.livePhotoView = nil;
 }
 
 - (void)fetchLongPhoto {
@@ -141,15 +150,21 @@
 }
 
 - (void)startGifImage {
-    self.imageView.image = self.gifImage;
+    if (self.gifImage == nil) {
+        self.needGifImage = YES;
+    }else { 
+        self.imageView.image = self.gifImage;
+    }
 }
 
 - (void)stopGifImage {
+    self.imageView.image = nil;
     self.imageView.image = self.firstImage;
 }
 
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
+    self.needGifImage = NO;
     self.gifImage = nil;
     [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
     [self.scrollView setZoomScale:1.0 animated:NO];
@@ -181,7 +196,11 @@
                 weakSelf.imageView.image = gifImage;
             }else {
                 weakSelf.firstImage = gifImage.images.firstObject;
-                weakSelf.imageView.image = gifImage.images.firstObject;
+                if (weakSelf.needGifImage) {
+                    weakSelf.imageView.image = gifImage;
+                }else {
+                    weakSelf.imageView.image = gifImage.images.firstObject;
+                }
             }
             weakSelf.gifImage = gifImage;
         }];

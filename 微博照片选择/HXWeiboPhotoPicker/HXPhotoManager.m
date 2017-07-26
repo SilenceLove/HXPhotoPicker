@@ -69,7 +69,8 @@
     self.endSelectedCameraPhotos = [NSMutableArray array];
     self.endSelectedCameraVideos = [NSMutableArray array];
     self.networkPhotoUrls = [NSMutableArray array];
-    self.showDeleteNetworkPhotoAlert = YES;
+    self.showDeleteNetworkPhotoAlert = NO;
+    self.singleSelecteClip = YES;
 }
 
 /**
@@ -198,7 +199,7 @@
         }
         if (asset.mediaType == PHAssetMediaTypeImage) {
             if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
-                if (self.singleSelected) {
+                if (self.singleSelected && self.singleSelecteClip) {
                     photoModel.type = HXPhotoModelMediaTypePhoto;
                 }else {
                     photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;

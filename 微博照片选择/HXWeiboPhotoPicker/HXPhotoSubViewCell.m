@@ -11,13 +11,13 @@
 #import "HXCircleProgressView.h"
 #import "HXPhotoTools.h"
 @interface HXPhotoSubViewCell ()<UIAlertViewDelegate>
-@property (weak, nonatomic) UIImageView *imageView;
-@property (weak, nonatomic) UIButton *deleteBtn;
-@property (weak, nonatomic) UIView *bottomView;
-@property (weak, nonatomic) UIImageView *videoIcon;
-@property (weak, nonatomic) UILabel *videoTime;
-@property (weak, nonatomic) UIImageView *gifIcon;
-@property (weak, nonatomic) UIImageView *liveIcon;
+@property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIButton *deleteBtn;
+@property (strong, nonatomic) UIView *bottomView;
+@property (strong, nonatomic) UIImageView *videoIcon;
+@property (strong, nonatomic) UILabel *videoTime;
+@property (strong, nonatomic) UIImageView *gifIcon;
+@property (strong, nonatomic) UIImageView *liveIcon;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
 
@@ -31,54 +31,79 @@
     }
     return self;
 }
-
+#pragma mark - < 懒加载 >
+- (UIImageView *)imageView {
+    if (!_imageView) {
+        _imageView = [[UIImageView alloc] init];
+        _imageView.clipsToBounds = YES;
+        _imageView.contentMode = UIViewContentModeScaleAspectFill;
+    }
+    return _imageView;
+}
+- (UIButton *)deleteBtn {
+    if (!_deleteBtn) {
+        _deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_delete@2x.png"] forState:UIControlStateNormal];
+        [_deleteBtn addTarget:self action:@selector(didDeleteClick) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _deleteBtn;
+}
+- (UIImageView *)liveIcon {
+    if (!_liveIcon) {
+        _liveIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
+        _liveIcon.frame = CGRectMake(5, 5, _liveIcon.image.size.width, _liveIcon.image.size.height);
+    }
+    return _liveIcon;
+}
+- (UIView *)bottomView {
+    if (!_bottomView) {
+        _bottomView = [[UIView alloc] init];
+        _bottomView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
+        _bottomView.hidden = YES;
+    }
+    return _bottomView;
+}
+- (UIImageView *)videoIcon {
+    if (!_videoIcon) {
+        _videoIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"]];
+    }
+    return _videoIcon;
+}
+- (UILabel *)videoTime {
+    if (!_videoTime) {
+        _videoTime = [[UILabel alloc] init];
+        _videoTime.textColor = [UIColor whiteColor];
+        _videoTime.textAlignment = NSTextAlignmentRight;
+        _videoTime.font = [UIFont systemFontOfSize:10];
+    }
+    return _videoTime;
+}
+- (UIImageView *)gifIcon {
+    if (!_gifIcon) {
+        _gifIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"]];
+    }
+    return _gifIcon;
+}
+- (HXCircleProgressView *)progressView {
+    if (!_progressView) {
+        _progressView = [[HXCircleProgressView alloc] init];
+        _progressView.hidden = YES;
+    }
+    return _progressView;
+}
 - (void)setup
 {
-    UIImageView *imageView = [[UIImageView alloc] init];
-    imageView.clipsToBounds = YES;
-    imageView.contentMode = UIViewContentModeScaleAspectFill;
-    [self.contentView addSubview:imageView];
-    self.imageView = imageView;
-    
-    UIButton *deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_delete@2x.png"] forState:UIControlStateNormal];
-    [deleteBtn addTarget:self action:@selector(didDeleteClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.contentView addSubview:deleteBtn];
-    self.deleteBtn = deleteBtn;
-    
-    UIImageView *liveIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
-    liveIcon.frame = CGRectMake(5, 5, liveIcon.image.size.width, liveIcon.image.size.height);
-    [self.contentView addSubview:liveIcon];
-    self.liveIcon = liveIcon;
-    
-    UIView *bottomView = [[UIView alloc] init];
-    bottomView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
-    bottomView.hidden = YES;
-    [self.contentView addSubview:bottomView];
-    self.bottomView = bottomView;
-    
-    UIImageView *videoIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"]];
-    [bottomView addSubview:videoIcon];
-    self.videoIcon = videoIcon;
-    
-    UILabel *videoTime = [[UILabel alloc] init];
-    videoTime.textColor = [UIColor whiteColor];
-    videoTime.textAlignment = NSTextAlignmentRight;
-    videoTime.font = [UIFont systemFontOfSize:10];
-    [bottomView addSubview:videoTime];
-    self.videoTime = videoTime;
-    
-    UIImageView *gifIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"]];
-    [self.contentView addSubview:gifIcon];
-    self.gifIcon = gifIcon;
-    
-    self.progressView = [[HXCircleProgressView alloc] init];
-    self.progressView.hidden = YES;
+    [self.contentView addSubview:self.imageView];
+    [self.contentView addSubview:self.deleteBtn];
+    [self.contentView addSubview:self.liveIcon];
+    [self.contentView addSubview:self.bottomView];
+    [self.bottomView addSubview:self.videoIcon];
+    [self.bottomView addSubview:self.videoTime];
+    [self.contentView addSubview:self.gifIcon];
     [self.contentView addSubview:self.progressView];
 }
 
-- (void)didDeleteClick
-{
+- (void)didDeleteClick {
     if (self.model.networkPhotoUrl.length > 0) {
         if (self.showDeleteNetworkPhotoAlert) {
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"是否删除此照片" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];

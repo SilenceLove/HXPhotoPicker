@@ -9,13 +9,12 @@
 #import "HXPhotoTools.h"
 #import "HXPhotoModel.h"
 #import "UIImage+HXExtension.h"
-#define HXBUNDLE_NAME   @"HXWeiboPhotoPicker.bundle"
 
 
 @implementation HXPhotoTools
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName {
-    UIImage *image = [UIImage imageNamed:[HXBUNDLE_NAME stringByAppendingPathComponent:imageName]];
+    UIImage *image = [UIImage imageNamed:[@"HXWeiboPhotoPicker.bundle" stringByAppendingPathComponent:imageName]];
     if (image) {
         return image;
     } else {
@@ -279,10 +278,9 @@
                         }
                     });
                 }];
-            }
-            /* else if (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
+            } else if (model.type == HXPhotoModelMediaTypePhotoGif) {
                 [self FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                    UIImage *image = [UIImage imageWithData:imageData];
+                    UIImage *image = [UIImage animatedGIFWithData:imageData];
                     model.previewPhoto = image;
                     [weakSelf sortImageForModel:model total:photos.count images:HDImages completion:^(NSArray *array) {
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -292,9 +290,9 @@
                         });
                     }];
                 }];
-            }
-             */
-            else {
+            }/*else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+             // 关于livephoto 我也不知道怎么上传
+            } */else {
                 if (model.previewPhoto) {
                     [self sortImageForModel:model total:photos.count images:HDImages completion:^(NSArray *array) {
                         dispatch_async(dispatch_get_main_queue(), ^{

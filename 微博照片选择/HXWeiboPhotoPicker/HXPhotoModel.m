@@ -7,7 +7,8 @@
 //
 
 #import "HXPhotoModel.h"
-@implementation HXPhotoModel
+@implementation HXPhotoModel 
+
 - (CGSize)imageSize
 {
     if (_imageSize.width == 0 || _imageSize.height == 0) {

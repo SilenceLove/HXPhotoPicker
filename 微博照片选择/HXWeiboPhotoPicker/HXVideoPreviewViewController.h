@@ -33,6 +33,6 @@
 @property (strong, nonatomic) UIButton *selectedBtn;
 
 @property (strong, nonatomic) HXPhotoView *photoView;
-
+- (void)setup;
 - (void)selectClick;
 @end

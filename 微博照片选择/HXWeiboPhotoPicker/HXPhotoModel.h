@@ -25,7 +25,7 @@ typedef enum : NSUInteger {
 /**
  照片PHAsset对象
  */
-@property (strong, nonatomic) PHAsset *asset;
+@property (strong, nonatomic) PHAsset *asset; 
 
 /**
  视频AVAsset对象

@@ -10,6 +10,8 @@
 #import "HXPhotoModel.h"
 #import "HXPhotoTools.h"
 #import "HXPhotoEditView.h"
+#import "HXPhotoManager.h"
+#import "UIImage+HXExtension.h"
 @interface HXPhotoEditViewController ()<UIScrollViewDelegate>
 @property (weak, nonatomic) UIScrollView *scrollView;
 @property (weak, nonatomic) UIImageView *imageView;
@@ -41,7 +43,6 @@
 }
 #pragma mark - < 设置UI >
 - (void)setupUI {
-    self.title = @"裁剪";
     self.view.backgroundColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.navigationController.navigationBar.translucent = YES;
@@ -63,9 +64,11 @@
     scrollView.multipleTouchEnabled = YES;
     scrollView.delegate = self;
     scrollView.scrollsToTop = NO;
-    scrollView.showsHorizontalScrollIndicator = NO;
-    scrollView.showsVerticalScrollIndicator = NO;
-    scrollView.bounces = NO;
+    if (self.photoManager.singleSelecteClip) {
+        scrollView.bounces = NO;
+    }else {
+        scrollView.bounces = YES;
+    }
     scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     scrollView.delaysContentTouches = NO;
     scrollView.canCancelContentTouches = YES;
@@ -82,9 +85,14 @@
     [scrollView addSubview:imageView];
     self.imageView = imageView;
     
-    self.editView = [[HXPhotoEditView alloc] initWithFrame:self.bgView.frame];
-    
-    [self.view addSubview:self.editView];
+    if (self.photoManager.singleSelecteClip) {
+        self.title = @"裁剪";
+        
+        self.editView = [[HXPhotoEditView alloc] initWithFrame:self.bgView.frame];
+        [self.view addSubview:self.editView];
+    }else {
+        self.title = @"预览";
+    }
     
     [self setupModel];
 }
@@ -106,49 +114,97 @@
         h = imgHeight;
         self.scrollView.maximumZoomScale = 2.5;
     }
-    CGFloat diameter = width - 20;
-    CGFloat multiple = 1.05f;
-    if (h < w) {
-        if (w > diameter) {
-            if (h < diameter) {
+    if (self.photoManager.singleSelecteClip) {
+        
+        CGFloat diameter = width - 20;
+        CGFloat multiple = 1.05f;
+        if (h < w) {
+            if (w > diameter) {
+                if (h < diameter) {
+                    multiple = diameter / h + 0.1;
+                }
+            }else {
                 multiple = diameter / h + 0.1;
             }
         }else {
-            multiple = diameter / h + 0.1;
-        }
-    }else {
-        if (h < diameter) {
-            multiple = diameter / w + 0.1;
-        }else {
-            if (w < diameter) {
+            if (h < diameter) {
                 multiple = diameter / w + 0.1;
+            }else {
+                if (w < diameter) {
+                    multiple = diameter / w + 0.1;
+                }
             }
         }
-    }
-    self.scrollView.frame = self.bgView.bounds;
-    self.scrollView.layer.masksToBounds = NO;
-    self.scrollView.contentSize = CGSizeMake(width, h);
-    self.scrollView.contentInset = UIEdgeInsetsMake(height / 2 - (diameter / 2), 10, height / 2 - (diameter / 2), 10);
-    
-    _imageView.frame = CGRectMake(0, 0, w, h);
-    
-    self.scrollView.minimumZoomScale = multiple;
-    [self.scrollView setZoomScale:multiple animated:NO];
-    self.minimumZoomScale = multiple;
-    self.scrollView.maximumZoomScale = multiple + self.scrollView.maximumZoomScale;
-    
-    if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
-        self.imageView.image = self.model.previewPhoto;
+        self.scrollView.frame = self.bgView.bounds;
+        self.scrollView.layer.masksToBounds = NO;
+        self.scrollView.contentSize = CGSizeMake(width, h);
+        self.scrollView.contentInset = UIEdgeInsetsMake(height / 2 - (diameter / 2), 10, height / 2 - (diameter / 2), 10);
+        
+        self.imageView.frame = CGRectMake(0, 0, w, h);
+        
+        self.scrollView.minimumZoomScale = multiple;
+        [self.scrollView setZoomScale:multiple animated:NO];
+        self.minimumZoomScale = multiple;
+        self.scrollView.maximumZoomScale = multiple + self.scrollView.maximumZoomScale;
+        
+        if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            self.imageView.image = self.model.previewPhoto;
+        }else {
+            __weak typeof(self) weakSelf = self;
+            self.requestID = [HXPhotoTools getPhotoForPHAsset:self.model.asset size:PHImageManagerMaximumSize completion:^(UIImage *image, NSDictionary *info) {
+                weakSelf.imageView.image = image;
+            }];
+        }
     }else {
-        __weak typeof(self) weakSelf = self;
-        self.requestID = [HXPhotoTools getPhotoForPHAsset:self.model.asset size:PHImageManagerMaximumSize completion:^(UIImage *image, NSDictionary *info) {
-            weakSelf.imageView.image = image;
-        }];
+        self.scrollView.frame = self.bgView.bounds;
+        self.scrollView.contentSize = CGSizeMake(width, h);
+        self.imageView.frame = CGRectMake(0, 0, w, h);
+        self.imageView.center = CGPointMake(width / 2, height / 2);
+        self.scrollView.minimumZoomScale = 1;
+        self.minimumZoomScale = 1;
+        [self.scrollView setZoomScale:1.0 animated:NO];
+        if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
+            __weak typeof(self) weakSelf = self;
+            [HXPhotoTools FetchPhotoDataForPHAsset:self.model.asset completion:^(NSData *imageData, NSDictionary *info) {
+                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+                weakSelf.imageView.image = gifImage;
+            }];
+        }else {
+            if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                self.imageView.image = self.model.thumbPhoto;
+            }else {
+                if (self.model.previewPhoto) {
+                    self.imageView.image = self.model.previewPhoto;
+                }else {
+                    __weak typeof(self) weakSelf = self;
+                    PHImageRequestID requestID;
+                    if (imgHeight > imgWidth / 9 * 17) {
+                        requestID = [HXPhotoTools getPhotoForPHAsset:self.model.asset size:CGSizeMake(width, height) completion:^(UIImage *image, NSDictionary *info) {
+                            weakSelf.imageView.image = image;
+                        }];
+                    }else {
+                        requestID = [HXPhotoTools getPhotoForPHAsset:self.model.asset size:CGSizeMake(self.model.endImageSize.width, self.model.endImageSize.height) completion:^(UIImage *image, NSDictionary *info) {
+                            weakSelf.imageView.image = image;
+                        }];
+                    }
+                    if (self.requestID != requestID) {
+                        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+                    }
+                    self.requestID = requestID;
+                }
+            }
+        }
     }
 }
 #pragma mark - < 点击事件 >
 - (void)didRightNavBtnClick {
-    [self clipImage];
+    if (self.photoManager.singleSelecteClip) {
+        [self clipImage];
+    }else {
+        if ([self.delegate respondsToSelector:@selector(editViewControllerDidNextClick:)]) {
+            [self.delegate editViewControllerDidNextClick:self.model];
+        }
+    }
 }
 - (void)doubleTap:(UITapGestureRecognizer *)tap {
     CGFloat width = self.scrollView.frame.size.width;
@@ -212,6 +268,11 @@
     return self.imageView;
 }
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
+    if (!self.photoManager.singleSelecteClip) {
+        CGFloat offsetX = (scrollView.frame.size.width > scrollView.contentSize.width) ? (scrollView.frame.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
+        CGFloat offsetY = (scrollView.frame.size.height > scrollView.contentSize.height) ? (scrollView.frame.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
+        self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
+    }
 //    CGFloat offsetX = (scrollView.frame.size.width > scrollView.contentSize.width) ? (scrollView.frame.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
 //    CGFloat offsetY = (scrollView.frame.size.height > scrollView.contentSize.height) ? (scrollView.frame.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
 //    self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);

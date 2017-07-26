@@ -14,7 +14,7 @@
  */
 @class HXPhotoView;
 @protocol HXPhotoViewDelegate <NSObject>
-
+@optional
 // 代理返回 选择、移动顺序、删除之后的图片以及视频
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 
@@ -46,4 +46,6 @@
 - (BOOL)networkingPhotoDownloadComplete;
 /**  已下载完成的网络图片数量  */
 - (NSInteger)downloadNumberForNetworkingPhoto;
+/**  刷新view  */
+- (void)refreshView;
 @end

@@ -23,9 +23,9 @@
 @property (assign, nonatomic) BOOL firstRegisterPreview;
 @property (assign, nonatomic) BOOL singleSelected;
 @property (strong, nonatomic) HXPhotoModel *model;
-@property (weak, nonatomic) UIImageView *imageView;
-@property (weak, nonatomic) UIView *maskView;
-@property (weak, nonatomic) UIButton *selectBtn;
+@property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIView *maskView;
+@property (strong, nonatomic) UIButton *selectBtn;
 @property (assign, nonatomic) int32_t requestID;
 
 - (void)startLivePhoto;

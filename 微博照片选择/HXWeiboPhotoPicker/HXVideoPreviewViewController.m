@@ -31,12 +31,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [self setup];
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    if (!self.isTouch) {
+        [self setup];
+    }
 }
 
 - (void)setup {
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    self.view.backgroundColor = [UIColor whiteColor];
  
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
     if (self.manager.selectedList.count > 0) {
@@ -60,10 +63,11 @@
         }
     }
     if (!self.isTouch) {
+        // 自定义转场动画 添加的一层遮罩
         [self.view addSubview:self.maskView];
     }
-    CGFloat width = self.view.frame.size.width;
-    CGFloat height = self.view.frame.size.height;
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
     if (self.isCamera) {
         AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.model.videoURL];
         self.playVideo = [AVPlayer playerWithPlayerItem:playerItem];
@@ -81,24 +85,25 @@
             [self.view addSubview:self.selectedBtn];
         }
     }else {
+        __weak typeof(self) weakSelf = self;
         [[PHImageManager defaultManager] requestPlayerItemForVideo:self.model.asset options:nil resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.playVideo = [AVPlayer playerWithPlayerItem:playerItem];
-                AVPlayerLayer *playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.playVideo];
+                weakSelf.playVideo = [AVPlayer playerWithPlayerItem:playerItem];
+                AVPlayerLayer *playerLayer = [AVPlayerLayer playerLayerWithPlayer:weakSelf.playVideo];
                 playerLayer.frame = CGRectMake(0, 64, width, height - 64);
-                if (!self.isTouch) {
+//                if (!weakSelf.isTouch) {
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                        [self.playVideo play];
+                        [weakSelf.playVideo play];
                     });
-                }
-                [self.view.layer insertSublayer:playerLayer atIndex:0];
-                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playVideo.currentItem];
-                self.playBtn.frame = CGRectMake(0, 64, width, height - 64);
-                [self.view addSubview:self.playBtn];
-                if (!self.manager.singleSelected) {
-                    self.selectedBtn.selected = self.model.selected;
-                    [self.view addSubview:self.selectedBtn];
+//                }
+                [weakSelf.view.layer insertSublayer:playerLayer atIndex:0];
+                [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.playVideo.currentItem];
+                weakSelf.playBtn.frame = CGRectMake(0, 64, width, height - 64);
+                [weakSelf.view addSubview:weakSelf.playBtn];
+                if (!weakSelf.manager.singleSelected) {
+                    weakSelf.selectedBtn.selected = weakSelf.model.selected;
+                    [weakSelf.view addSubview:weakSelf.selectedBtn];
                 }
             });
         }];
@@ -353,13 +358,6 @@
     if ([self.delegate respondsToSelector:@selector(previewVideoDidNextClick)]) {
         [self.delegate previewVideoDidNextClick];
     }
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    [self.playVideo pause];
-    self.playBtn.selected = NO;
-    self.playVideo = nil;
 }
 
 - (UIView *)maskView {

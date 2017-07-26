@@ -97,6 +97,11 @@
     NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
         NSSLog(@"%@",images);
+        for (UIImage *image in images) {
+            if (image.images.count > 0) {
+                // 到这里了说明这个image  是个gif图
+            }
+        }
     }];
 //    for (HXPhotoModel *model in allList) {
 //        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);

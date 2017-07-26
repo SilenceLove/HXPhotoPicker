@@ -27,6 +27,8 @@
 @property (assign, nonatomic) BOOL isPreview; // 是否预览
 @property (strong, nonatomic) HXPhotoView *photoView;
 @property (assign, nonatomic) BOOL isTouch;// 是否为3dThouch预览
-
+@property (strong, nonatomic) UIButton *selectedBtn;
+@property (strong, nonatomic) UIImage *gifCoverImage;
+- (void)setup;
 - (void)selectClick;
 @end
