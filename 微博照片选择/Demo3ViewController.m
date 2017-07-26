@@ -116,6 +116,7 @@
         NSSLog(@"网络图片未下载完");
     }
     NSSLog(@"已下载的网络图片----->%ld",[self.photoView downloadNumberForNetworkingPhoto]);
+    [self.view showImageHUDText:[NSString stringWithFormat:@"已下载的网络图片数量%ld张",[self.photoView downloadNumberForNetworkingPhoto]]];
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {

@@ -12,6 +12,7 @@
 #import "Demo3ViewController.h"
 #import "Demo4ViewController.h"
 #import "Demo5ViewController.h"
+#import "Demo6ViewController.h"
 @interface ViewController ()<UITableViewDataSource,UITableViewDelegate>
 @property (copy, nonatomic) NSArray *list;
 @end
@@ -21,7 +22,7 @@
 - (NSArray *)list
 {
     if (!_list) {
-        _list = @[@"Demo1-只使用照片选择功能,不带选好后自动布局(可扩展)",@"Demo2-使用照片选择功能并且选好后自动布局",@"Demo3-附带网络照片功能",@"Demo4-单选样式支持裁剪",@"Demo5-同个界面多个选择器"];
+        _list = @[@"Demo1-只使用照片选择功能,不带选好后自动布局(可扩展)",@"Demo2-使用照片选择功能并且选好后自动布局",@"Demo3-附带网络照片功能",@"Demo4-单选样式支持裁剪",@"Demo5-同个界面多个选择器",@"Demo6-拍照/选择照片完之后跳界面"];
     }
     return _list;
 }
@@ -73,6 +74,10 @@
     }else if (indexPath.row == 4) {
         Demo5ViewController *vc = [[Demo5ViewController alloc] init];
         vc.title = @"Demo5";
+        [self.navigationController pushViewController:vc animated:YES];
+    }else if (indexPath.row == 5) {
+        Demo6ViewController *vc = [[Demo6ViewController alloc] init];
+        vc.title = @"Demo6";
         [self.navigationController pushViewController:vc animated:YES];
     }
 }

@@ -686,6 +686,13 @@
     CGFloat cWidth = self.frame.size.width;
     CGFloat cHeight = self.frame.size.height;
     self.collectionView.frame = CGRectMake(0, 0, cWidth, cHeight);
+    if (cHeight <= 0) {
+        self.numOfLinesOld = 0;
+        [self setupNewFrame];
+        CGFloat cWidth = self.frame.size.width;
+        CGFloat cHeight = self.frame.size.height;
+        self.collectionView.frame = CGRectMake(0, 0, cWidth, cHeight);
+    }
 }
 - (void)dealloc {
     [[SDWebImageManager sharedManager] cancelAll];

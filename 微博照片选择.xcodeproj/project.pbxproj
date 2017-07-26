@@ -26,6 +26,8 @@
 		7B1EF3D41F287CED00A4391C /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1EF3BE1F287CED00A4391C /* UIImageView+WebCache.m */; };
 		7B1EF3D51F287CED00A4391C /* UIView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1EF3C01F287CED00A4391C /* UIView+WebCache.m */; };
 		7B1EF3D61F287CED00A4391C /* UIView+WebCacheOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1EF3C21F287CED00A4391C /* UIView+WebCacheOperation.m */; };
+		7B1EF3D91F28811300A4391C /* Demo6ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1EF3D81F28811300A4391C /* Demo6ViewController.m */; };
+		7B1EF3DC1F28812300A4391C /* Demo6SubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1EF3DB1F28812300A4391C /* Demo6SubViewController.m */; };
 		7B269E061E5695F200AB813D /* Demo1ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E041E5695F200AB813D /* Demo1ViewController.m */; };
 		7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B269E051E5695F200AB813D /* Demo1ViewController.xib */; };
 		7B269E0E1E56961500AB813D /* Demo2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E0C1E56961500AB813D /* Demo2ViewController.m */; };
@@ -110,6 +112,10 @@
 		7B1EF3C01F287CED00A4391C /* UIView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+WebCache.m"; sourceTree = "<group>"; };
 		7B1EF3C11F287CED00A4391C /* UIView+WebCacheOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+WebCacheOperation.h"; sourceTree = "<group>"; };
 		7B1EF3C21F287CED00A4391C /* UIView+WebCacheOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+WebCacheOperation.m"; sourceTree = "<group>"; };
+		7B1EF3D71F28811300A4391C /* Demo6ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo6ViewController.h; sourceTree = "<group>"; };
+		7B1EF3D81F28811300A4391C /* Demo6ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo6ViewController.m; sourceTree = "<group>"; };
+		7B1EF3DA1F28812300A4391C /* Demo6SubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo6SubViewController.h; sourceTree = "<group>"; };
+		7B1EF3DB1F28812300A4391C /* Demo6SubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo6SubViewController.m; sourceTree = "<group>"; };
 		7B269E031E5695F200AB813D /* Demo1ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo1ViewController.h; sourceTree = "<group>"; };
 		7B269E041E5695F200AB813D /* Demo1ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo1ViewController.m; sourceTree = "<group>"; };
 		7B269E051E5695F200AB813D /* Demo1ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Demo1ViewController.xib; sourceTree = "<group>"; };
@@ -286,6 +292,10 @@
 				7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */,
 				7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */,
 				7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */,
+				7B1EF3D71F28811300A4391C /* Demo6ViewController.h */,
+				7B1EF3D81F28811300A4391C /* Demo6ViewController.m */,
+				7B1EF3DA1F28812300A4391C /* Demo6SubViewController.h */,
+				7B1EF3DB1F28812300A4391C /* Demo6SubViewController.m */,
 				7B7E3E851E4AACD1002234EE /* Assets.xcassets */,
 				7B7E3E871E4AACD1002234EE /* LaunchScreen.storyboard */,
 				7B7E3E8A1E4AACD1002234EE /* Info.plist */,
@@ -459,6 +469,7 @@
 				7B7E3E811E4AACD1002234EE /* ViewController.m in Sources */,
 				7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */,
 				7B1EF3C51F287CED00A4391C /* NSData+ImageContentType.m in Sources */,
+				7B1EF3DC1F28812300A4391C /* Demo6SubViewController.m in Sources */,
 				7B7E3E9F1E4B036A002234EE /* HXPhotoViewController.m in Sources */,
 				7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */,
 				7B1EF3D31F287CED00A4391C /* UIImageView+HighlightedWebCache.m in Sources */,
@@ -497,6 +508,7 @@
 				7B7E3EB41E4C7137002234EE /* HXVideoPreviewViewController.m in Sources */,
 				7B269E801E56FC9D00AB813D /* HXPhotoSubViewCell.m in Sources */,
 				7B6F4EAB1ED2D0C600EC9057 /* HXFullScreenCameraViewController.m in Sources */,
+				7B1EF3D91F28811300A4391C /* Demo6ViewController.m in Sources */,
 				7B578EB41E55A1660090BD74 /* UIButton+HXExtension.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
