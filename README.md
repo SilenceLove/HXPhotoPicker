@@ -18,10 +18,11 @@
 - [x] 查看/选择LivePhoto IOS9.1以上才有用
 - [x] 支持浏览网络图片
 - [x] 支持裁剪图片
+- [x] 观察系统相册变化实时增删
 
 ## 二.  安装 - Installation
 
-- Cocoapods：pod 'HXWeiboPhotoPicker' '~> 1.2' pod的版本为浏览网络图片之前的版本(不包含浏览网络图片)
+- Cocoapods：pod 'HXWeiboPhotoPicker' '~> 1.2' pod的版本为浏览网络图片之前的版本(不包含浏览网络图片) // 暂时不支持
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
@@ -35,53 +36,112 @@
 ## 四.  例子 - Examples
 
 - HXPhotoManager 照片管理类相关属性介绍
-
 ```
-显示全屏相机 //  默认 NO
-showFullScreenCamera;
+/**
+ *  拍摄的 照片/视频 是否保存到系统相册  默认NO 此功能需要配合 监听系统相册 和 缓存相册 功能 (请不要关闭)
+ */
+BOOL saveSystemAblum;
 
-删除网络图片时是否显示Alert // 默认显示
-showDeleteNetworkPhotoAlert;
+/**
+ *  视频能选择的最大秒数  -  默认 5分钟/300秒
+ */
+NSTimeInterval videoMaxDuration;
 
-网络图片地址数组
-networkPhotoUrls
+/**
+ *  是否缓存相册, manager会监听系统相册变化(需要此功能时请不要关闭监听系统相册功能)   默认YES
+ */
+BOOL cacheAlbum;
 
-是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
-outerCamera;
+/**
+ *  是否监听系统相册     默认 YES
+ */
+BOOL monitorSystemAlbum;
 
-是否打开相机功能
-openCamera;
+/**
+ 是否为单选模式 默认 NO
+ */
+BOOL singleSelected;
 
-是否开启查看GIF图片功能 - 默认开启
-lookGifPhoto;
+/**
+ 单选模式下是否需要裁剪  默认YES
+ */
+BOOL singleSelecteClip;
 
-是否开启查看LivePhoto功能呢 - 默认开启
-lookLivePhoto;
+/**
+ 是否开启3DTouch预览功能 默认打开
+ */
+BOOL open3DTouchPreview;
 
-是否一开始就进入相机界面
-goCamera;
+/**
+ 显示全屏相机 //  默认 NO
+ */
+BOOL showFullScreenCamera;
 
-最大选择数 默认10 - 必填
-maxNum;
+/**
+ 删除网络图片时是否显示Alert // 默认不显示
+ */
+BOOL showDeleteNetworkPhotoAlert;
 
-图片最大选择数 默认9 - 必填
-photoMaxNum;
+/**
+ 网络图片地址数组
+ */
+NSMutableArray *networkPhotoUrls;
 
-视频最大选择数  默认1 - 必填
-videoMaxNum;
+/**
+ 是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
+ */
+BOOL outerCamera;
 
-图片和视频是否能够同时选择 默认支持
-selectTogether;
+/**
+ 是否打开相机功能
+ */
+BOOL openCamera;
 
-相册列表每行多少个照片 默认4个
-rowCount;
+/**
+ 是否开启查看GIF图片功能 - 默认开启
+ */
+BOOL lookGifPhoto;
+
+/**
+ 是否开启查看LivePhoto功能呢 - 默认开启
+ */
+BOOL lookLivePhoto;
+
+/**
+ 是否一开始就进入相机界面
+ */
+BOOL goCamera;
+
+/**
+ 最大选择数 等于 图片最大数 + 视频最大数 默认10 - 必填
+ */
+NSInteger maxNum;
+
+/**
+ 图片最大选择数 默认9 - 必填
+ */
+NSInteger photoMaxNum;
+
+/**
+ 视频最大选择数 // 默认1 - 必填
+ */
+NSInteger videoMaxNum;
+
+/**
+ 图片和视频是否能够同时选择 默认支持
+ */
+BOOL selectTogether;
+
+/**
+ 相册列表每行多少个照片 默认4个 iphone 4s / 5  默认3个
+ */
+NSInteger rowCount;
 ```
 
 - Demo1
 ```objc
 // 懒加载 照片管理类
-- (HXPhotoManager *)manager
-{
+- (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
     }
@@ -104,8 +164,7 @@ vc.manager = self.manager;
 - Demo2
 ```objc
 // 懒加载 照片管理类
-- (HXPhotoManager *)manager
-{
+- (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
     }
@@ -120,105 +179,34 @@ photoView.delegate = self;
 photoView.backgroundColor = [UIColor whiteColor];
 [self.view addSubview:photoView];
 
-// 通过 HXPhotoViewDelegate 代理返回 选择、移动顺序、删除之后的图片以及视频
-- (void)photoViewChangeComplete:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)isOriginal
+// 代理返回 选择、移动顺序、删除之后的图片以及视频
+- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 
-// 当 HXPhotoView 更新frame改变大小时
-- (void)photoViewUpdateFrame:(CGRect)frame WithView:(UIView *)view
+// 当view更新高度时调用
+- (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame;
 
+// 删除网络图片的地址
+- (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl;
+
+// 网络图片全部下载完成时调用
+- (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView;
 ```
-- 关于通过 HXPhotoModel 获取照片/视频信息的使用介绍 具体代码还是请下载Demo
+- 关于通过 HXPhotoModel 获取照片UIImage对象 具体代码还是请下载Demo
 ```
-/*
-  // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
-    CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
-    [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-        NSLog(@"%@",image);
-    }];
-    
-  // 这里的size 是普通图片的时候  想要更高质量的图片 可以把 1.5 换成 2 或者 3
-      如果觉得内存消耗过大可以 调小一点
+    HXPhotoTools提供一个方法可以根据传入的模型数组转换成图片(UIImage)数组 
 
-   CGSize size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
+    type是个枚举
+    HXPhotoToolsFetchHDImageType = 0, // 高清
+    HXPhotoToolsFetchOriginalImageTpe, // 原图
 
-  // 这里是判断图片是否过长,因为图片如果长了上面的size就显的有点小了获取出来的图片就变模糊了,
-  所以这里把宽度 换成了屏幕的宽度,这个可以保证即不影响内存也不影响质量 
-  如果觉得质量达不到你的要求,可以乘上 1.5 或者 2 . 
-  当然你也可以不按我这样给size,自己测试怎么给都可以
-   if (model.endImageSize.height > model.endImageSize.width / 9 * 20) {
-      size = CGSizeMake([UIScreen mainScreen].bounds.size.width, model.endImageSize.height);
-   }
-*/
-
-// 获取照片资源
-[photos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-    // 小图  - 通过相机拍摄的照片才有值
-    model.thumbPhoto;
-
-    // 大图  - 通过相机拍摄的照片才有值
-    model.previewPhoto;
-
-    // isCloseLivePhoto 判断当前图片是否关闭了 livePhoto 功能 YES-关闭 NO-开启
-    model.isCloseLivePhoto;
-
-    // 获取imageData - 通过相册获取时有用 / 通过相机拍摄的无效
-    [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-        NSLog(@"%@",imageData);
-    }];
-
-    // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
-    CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量
-    [HXPhotoTools FetchPhotoForPHAsset:model.asset Size:size resizeMode:PHImageRequestOptionsResizeModeFast completion:^(UIImage *image, NSDictionary *info) {
-        NSLog(@"%@",image);
-    }];
-
-    // 如果是通过相机拍摄的照片只有 thumbPhoto、previewPhoto和imageSize 这三个字段有用可以通过 type 这个字段判断是不是通过相机拍摄的
-    if (model.type == HXPhotoModelMediaTypeCameraPhoto);
-}];
-
-// 如果是相册选取的视频 要获取视频URL 必须先将视频压缩写入文件,得到的文件路径就是视频的URL 如果是通过相机录制的视频那么 videoURL 这个字段就是视频的URL 可以看需求看要不要压缩
-[videos enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-    // 视频封面 -  通过相机录制的视频才有值
-    model.thumbPhoto;
-         
-    // 视频封面 -  通过相机录制的视频才有值
-    model.previewPhoto; 
-
-    // 如果是通过相机录制的视频 需要通过 model.VideoURL 这个字段来压缩写入文件
-    if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-        [self compressedVideoWithURL:model.videoURL success:^(NSString *fileName) {
-            NSLog(@"%@",fileName); // 视频路径也是视频URL;
-        } failure:^{
-            // 压缩写入失败
-        }];
-    }else { // 如果是在相册里面选择的视频就需要用过 model.avAsset 这个字段来压缩写入文件
-        [self compressedVideoWithURL:model.avAsset success:^(NSString *fileName) {
-            NSLog(@"%@",fileName); // 视频路径也是视频URL;
-        } failure:^{
-            // 压缩写入失败
-        }];
-    }
-}];
-
-// 判断照片、视频 或 是否是通过相机拍摄的
-[allList enumerateObjectsUsingBlock:^(HXPhotoModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
-    if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-        // 通过相机录制的视频
-    }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-        // 通过相机拍摄的照片
-        if (model.networkPhotoUrl.length > 0) {
-              NSLog(@"网络图片");
-        }else {
-              NSLog(@"相机拍摄的照片");
+    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage    *> *images) {
+        NSSLog(@"%@",images);
+        for (UIImage *image in images) {
+            if (image.images.count > 0) {
+                // 到这里了说明这个image  是个gif图
+            }
         }
-    }else if (model.type == HXPhotoModelMediaTypePhoto) {
-        // 相册里的照片
-    }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
-        // 相册里的GIF图
-    }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
-        // 相册里的livePhoto
-    }
-}];
+    }];
 ```
 ## 五.  更新历史 - Update History
 
@@ -237,6 +225,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 - 2017-07-01　　添加单选样式、支持裁剪图片
 - 2017-07-05　　解决同一界面多个选择器界面跳转问题,拍摄视频完成时遗留问题
 - 2017-07-26　　优化cell性能、3DTouch预览内存消耗。添加是否需要裁剪框属性、刷新界面方法以及拍照/选择照片完之后跳界面Demo
+- 2017-08-08　　添加国际化支持英文、保存拍摄的照片/视频到系统相册、实时监听系统相册变化并改变、缓存相册、优化列表滑动、选择视频时限制超过指定秒数不能选。以及一些小问题
 
 ## 六.  更多 - More
 
