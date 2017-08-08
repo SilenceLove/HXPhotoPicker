@@ -193,20 +193,20 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 - 关于通过 HXPhotoModel 获取照片UIImage对象 具体代码还是请下载Demo
 ```
-    HXPhotoTools提供一个方法可以根据传入的模型数组转换成图片(UIImage)数组 
+HXPhotoTools提供一个方法可以根据传入的模型数组转换成图片(UIImage)数组 
 
-    type是个枚举
-    HXPhotoToolsFetchHDImageType = 0, // 高清
-    HXPhotoToolsFetchOriginalImageTpe, // 原图
+type是个枚举
+HXPhotoToolsFetchHDImageType = 0, // 高清
+HXPhotoToolsFetchOriginalImageTpe, // 原图
 
-    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage    *> *images) {
-        NSSLog(@"%@",images);
-        for (UIImage *image in images) {
-            if (image.images.count > 0) {
-                // 到这里了说明这个image  是个gif图
-            }
+[HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage    *> *images) {
+    NSSLog(@"%@",images);
+    for (UIImage *image in images) {
+        if (image.images.count > 0) {
+            // 到这里了说明这个image  是个gif图
         }
-    }];
+    }
+}];
 ```
 ## 五.  更新历史 - Update History
 
