@@ -27,6 +27,7 @@
 @property (strong, nonatomic) UIView *maskView;
 @property (strong, nonatomic) UIButton *selectBtn;
 @property (assign, nonatomic) int32_t requestID;
+@property (copy, nonatomic) NSDictionary *iconDic;
 
 - (void)startLivePhoto;
 - (void)stopLivePhoto;

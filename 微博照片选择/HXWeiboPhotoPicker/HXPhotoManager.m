@@ -9,8 +9,7 @@
 #import "HXPhotoManager.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
-@interface HXPhotoManager ()
-@property (strong, nonatomic) NSMutableArray *albums;
+@interface HXPhotoManager ()<PHPhotoLibraryChangeObserver>
 @property (strong, nonatomic) NSMutableArray *allPhotos;
 @property (strong, nonatomic) NSMutableArray *allVideos;
 @property (strong, nonatomic) NSMutableArray *allObjs;
@@ -48,7 +47,11 @@
     self.maxNum = 10;
     self.photoMaxNum = 9;
     self.videoMaxNum = 1;
-    self.rowCount = 4;
+    if ([UIScreen mainScreen].bounds.size.width == 320) {
+        self.rowCount = 3;
+    }else {
+        self.rowCount = 4;
+    }
     self.albums = [NSMutableArray array];
     self.selectedList = [NSMutableArray array];
     self.selectedPhotos = [NSMutableArray array];
@@ -71,6 +74,48 @@
     self.networkPhotoUrls = [NSMutableArray array];
     self.showDeleteNetworkPhotoAlert = NO;
     self.singleSelecteClip = YES;
+    self.monitorSystemAlbum = YES;
+    self.cacheAlbum = YES;
+    self.videoMaxDuration = 300.f;
+    self.saveSystemAblum = NO;
+    if (!self.singleSelected) {
+        self.photoViewCellIconDic = @{@"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
+                                      @"gifIcon" : [HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"] ,
+                                      @"liveIcon" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"] ,
+                                      @"liveBtnImageNormal" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] ,
+                                      @"liveBtnImageSelected" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] ,
+                                      @"liveBtnBackgroundImage" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] ,
+                                      @"selectBtnNormal" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] ,
+                                      @"selectBtnSelected" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"]};
+    }
+    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+//    [self getMaxAlbum];
+}
+
+- (void)setSaveSystemAblum:(BOOL)saveSystemAblum {
+    _saveSystemAblum = saveSystemAblum;
+    [self getMaxAlbum];
+}
+
+- (void)setMonitorSystemAlbum:(BOOL)monitorSystemAlbum {
+    _monitorSystemAlbum = monitorSystemAlbum;
+    if (!monitorSystemAlbum) {
+        [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
+    }
+}
+
+- (void)setSingleSelected:(BOOL)singleSelected {
+    _singleSelected = singleSelected;
+    if (!singleSelected) {
+        self.photoViewCellIconDic = @{@"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
+                                      @"gifIcon" : [HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"] ,
+                                      @"liveIcon" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"] ,
+                                      @"liveBtnImageNormal" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] ,
+                                      @"liveBtnImageSelected" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] ,
+                                      @"liveBtnBackgroundImage" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] ,
+                                      @"selectBtnNormal" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] ,
+                                      @"selectBtnSelected" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"]};
+    }
 }
 
 /**
@@ -98,7 +143,7 @@
         if (result.count > 0 && ![[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"最近删除"]) {
             HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
             albumModel.count = result.count;
-            albumModel.albumName = [HXPhotoTools transFormPhotoTitle:collection.localizedTitle];
+            albumModel.albumName = collection.localizedTitle;
 //            albumModel.asset = result.lastObject;
             albumModel.result = result;
             if ([[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"相机胶卷"] || [[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"所有照片"]) {
@@ -182,19 +227,37 @@
 {
     NSMutableArray *photoAy = [NSMutableArray array];
     NSMutableArray *videoAy = [NSMutableArray array];
-    NSMutableArray *objAy = [NSMutableArray array];
-    __block NSInteger photoIndex = 0, videoIndex = 0, albumIndex = 0;
-    __block NSInteger cameraIndex = self.openCamera ? 1 : 0; 
+    NSMutableArray *objAy = [NSMutableArray array]; 
+    __block NSInteger cameraIndex = self.openCamera ? 1 : 0;
     [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
         HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
         photoModel.asset = asset;
-        photoModel.albumListIndex = albumIndex + cameraIndex;
         if (self.selectedList.count > 0) {
-            for (HXPhotoModel *model in self.selectedList) {
+            NSMutableArray *selectedList = [NSMutableArray arrayWithArray:self.selectedList];
+            for (HXPhotoModel *model in selectedList) {
                 if ([model.asset.localIdentifier isEqualToString:photoModel.asset.localIdentifier]) {
                     photoModel.selected = YES;
+//                    if (model.currentAlbumIndex == index) {
+                        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeLivePhoto || model.type == HXPhotoModelMediaTypeCameraPhoto)) {
+                            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                                [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:model] withObject:photoModel];
+                            }else {
+                                [self.selectedPhotos replaceObjectAtIndex:[self.selectedPhotos indexOfObject:model] withObject:photoModel];
+                            }
+                        }else {
+                            if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+                                [self.selectedCameraVideos replaceObjectAtIndex:[self.selectedCameraVideos indexOfObject:model] withObject:photoModel];
+                            }else {
+                                [self.selectedVideos replaceObjectAtIndex:[self.selectedVideos indexOfObject:model] withObject:photoModel];
+                            }
+                        }
+                        [self.selectedList replaceObjectAtIndex:[self.selectedList indexOfObject:model] withObject:photoModel];
+
+//                    }
+                    photoModel.thumbPhoto = model.thumbPhoto;
+                    photoModel.previewPhoto = model.previewPhoto;
+                    photoModel.isCloseLivePhoto = model.isCloseLivePhoto;
                 }
-                photoModel.isCloseLivePhoto = model.isCloseLivePhoto;
             }
         }
         if (asset.mediaType == PHAssetMediaTypeImage) {
@@ -219,9 +282,7 @@
                     photoModel.type = HXPhotoModelMediaTypePhoto;
                 }
             }
-            photoModel.photoIndex = photoIndex;
             [photoAy addObject:photoModel];
-            photoIndex++;
         }else if (asset.mediaType == PHAssetMediaTypeVideo) {
             photoModel.type = HXPhotoModelMediaTypeVideo;
             [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
@@ -232,11 +293,8 @@
             //            }];
             NSString *timeLength = [NSString stringWithFormat:@"%0.0f",asset.duration];
             photoModel.videoTime = [HXPhotoTools getNewTimeFromDurationSecond:timeLength.integerValue];
-            photoModel.videoIndex = videoIndex;
             [videoAy addObject:photoModel];
-            videoIndex++;
         }
-        albumIndex++;
         photoModel.currentAlbumIndex = index;
         [objAy addObject:photoModel];
     }];
@@ -254,25 +312,25 @@
     }
     if (index == 0) {
         if (self.cameraList.count > 0) {
-            NSInteger listCount = self.cameraList.count;
-            if (self.outerCamera) {
-                listCount = self.cameraList.count - 1;
-            }
+//            NSInteger listCount = self.cameraList.count;
+//            if (self.outerCamera) {
+//                listCount = self.cameraList.count - 1;
+//            }
             for (int i = 0; i < self.cameraList.count; i++) {
                 HXPhotoModel *phMD = self.cameraList[i];
-                phMD.albumListIndex = listCount--;
+//                phMD.albumListIndex = listCount--;
                 [objAy insertObject:phMD atIndex:cameraIndex];
             }
-            NSInteger photoCount = self.cameraPhotos.count - 1;
+//            NSInteger photoCount = self.cameraPhotos.count - 1;
             for (int i = 0; i < self.cameraPhotos.count; i++) {
                 HXPhotoModel *phMD = self.cameraPhotos[i];
-                phMD.photoIndex = photoCount--;
+//                phMD.photoIndex = photoCount--;
                 [photoAy insertObject:phMD atIndex:0];
             }
-            NSInteger videoCount = self.cameraVideos.count - 1;
+//            NSInteger videoCount = self.cameraVideos.count - 1;
             for (int i = 0; i < self.cameraVideos.count; i++) {
                 HXPhotoModel *phMD = self.cameraVideos[i];
-                phMD.videoIndex = videoCount--;
+//                phMD.videoIndex = videoCount--;
                 [videoAy insertObject:phMD atIndex:0];
             }
         }
@@ -367,8 +425,7 @@
     }
 }
 
-- (void)emptySelectedList
-{
+- (void)clearSelectedList {
     [self.endSelectedList removeAllObjects];
     [self.endCameraPhotos removeAllObjects];
     [self.endSelectedCameraPhotos removeAllObjects];
@@ -384,6 +441,70 @@
     [self.endSelectedVideos removeAllObjects];
     self.endIsOriginal = NO;
     self.endPhotosTotalBtyes = nil;
+}
+
+- (void)getMaxAlbum {
+    if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
+        [[UIApplication sharedApplication].keyWindow showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法访问照片，请前往设置中允许\n访问照片"]];
+        return;
+    }
+    PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    for (PHAssetCollection *collection in smartAlbums) {
+        if ([[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"相机胶卷"] || [[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"所有照片"]) {
+            PHFetchOptions *option = [[PHFetchOptions alloc] init];
+            option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+            if (self.type == HXPhotoManagerSelectedTypePhoto) {
+                option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+            }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
+                option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+            }
+            PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+            albumModel.count = result.count;
+            albumModel.albumName = collection.localizedTitle;
+            albumModel.result = result;
+            self.tempAlbumMd = albumModel;
+            break;
+        }
+    }
+}
+
+- (void)photoLibraryDidChange:(PHChange *)changeInstance {
+    NSMutableArray *array = [NSMutableArray array];
+    for (HXAlbumModel *albumModel in self.albums) {
+        PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:albumModel.result];
+        if (collectionChanges) {
+            [array addObject:@{@"collectionChanges" : collectionChanges ,@"model" : albumModel}];
+        }
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.selectPhoto) {
+            if (self.photoLibraryDidChangeWithPhotoViewController) {
+                self.photoLibraryDidChangeWithPhotoViewController(array);
+            }
+        }
+        if (self.photoLibraryDidChangeWithPhotoPreviewViewController) {
+            self.photoLibraryDidChangeWithPhotoPreviewViewController(array);
+        }
+        if (self.photoLibraryDidChangeWithVideoViewController) {
+            self.photoLibraryDidChangeWithVideoViewController(array);
+        }
+        if (array.count == 0 && self.saveSystemAblum) {
+            PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.tempAlbumMd.result];
+            if (collectionChanges) {
+                [array addObject:@{@"collectionChanges" : collectionChanges ,@"model" : self.tempAlbumMd}];
+            }
+        }
+        if (array.count > 0) {
+            if (self.photoLibraryDidChangeWithPhotoView) {
+                self.photoLibraryDidChangeWithPhotoView(array,self.selectPhoto);
+            }
+        }
+    });
+}
+- (void)dealloc {
+    NSSLog(@"dealloc");
+    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
 }
 
 @end

@@ -9,22 +9,24 @@
 #import "HXPhotoTools.h"
 #import "HXPhotoModel.h"
 #import "UIImage+HXExtension.h"
-
+#import "HXPhotoManager.h"
 
 @implementation HXPhotoTools
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName {
-    UIImage *image = [UIImage imageNamed:[@"HXWeiboPhotoPicker.bundle" stringByAppendingPathComponent:imageName]];
+    NSString *path = [NSString stringWithFormat:@"HXWeiboPhotoPicker.bundle/%@",imageName];
+    UIImage *image = [UIImage imageNamed:path];
     if (image) {
         return image;
     } else {
-        image = [UIImage imageNamed:[@"Frameworks/HXWeiboPhotoPicker.framework/HXWeiboPhotoPicker.bundle" stringByAppendingPathComponent:imageName]];
+        NSString *path = [NSString stringWithFormat:@"Frameworks/HXWeiboPhotoPicker.framework/HXWeiboPhotoPicker.bundle/%@",imageName];
+        image = [UIImage imageNamed:path];
         if (!image) {
             image = [UIImage imageNamed:imageName];
         }
         return image;
     }
-}
+} 
 
 + (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion {
     static PHImageRequestID requestID = -1;
@@ -51,15 +53,13 @@
     return requestID;
 }
 
-+ (void)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error {
-    PHImageRequestID requestID = -1;
-    
++ (PHImageRequestID)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat; 
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
-    option.synchronous = YES;
+//    option.synchronous = YES;
     
-    requestID = [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    PHImageRequestID requestID = [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
         if (downloadFinined && result) {
@@ -76,6 +76,7 @@
             });
         }
     }];
+    return requestID;
 }
 
 + (int32_t)fetchPhotoWithAsset:(id)asset photoSize:(CGSize)photoSize completion:(void (^)(UIImage *photo,NSDictionary *info,BOOL isDegraded))completion {
@@ -259,11 +260,113 @@
     return bytes;
 }
 
++ (NSString *)maximumOfJudgment:(HXPhotoModel *)model manager:(HXPhotoManager *)manager {
+    if (manager.selectedList.count == manager.maxNum) {
+        // 已经达到最大选择数 [NSString stringWithFormat:@"最多只能选择%ld个",manager.maxNum]
+        return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld个"],manager.maxNum];
+    }
+    if (manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
+            if (manager.videoMaxNum > 0) {
+                if (!manager.selectTogether) { // 是否支持图片视频同时选择
+                    if (manager.selectedVideos.count > 0 ) {
+                        // 已经选择了视频,不能再选图片
+                        return [NSBundle hx_localizedStringForKey:@"图片不能和视频同时选择"];
+                    }
+                }
+            }
+            if (manager.selectedPhotos.count == manager.photoMaxNum) {
+                // 已经达到图片最大选择数
+                
+                return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld张图片"],manager.photoMaxNum];
+            }
+        }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
+            if (manager.photoMaxNum > 0) {
+                if (!manager.selectTogether) { // 是否支持图片视频同时选择
+                    if (manager.selectedPhotos.count > 0 ) {
+                        // 已经选择了图片,不能再选视频
+                        
+                        return [NSBundle hx_localizedStringForKey:@"视频不能和图片同时选择"];
+                    }
+                }
+            }
+            if (manager.selectedVideos.count == manager.videoMaxNum) {
+                // 已经达到视频最大选择数
+                
+                return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld个视频"],manager.videoMaxNum];
+            }
+        }
+    }else if (manager.type == HXPhotoManagerSelectedTypePhoto) {
+        if (manager.selectedPhotos.count == manager.photoMaxNum) {
+            // 已经达到图片最大选择数
+            return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld张图片"],manager.photoMaxNum];
+        }
+    }else if (manager.type == HXPhotoManagerSelectedTypeVideo) {
+        if (manager.selectedVideos.count == manager.videoMaxNum) {
+            // 已经达到视频最大选择数
+            return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld个视频"],manager.videoMaxNum];
+        }
+    }
+    if (model.type == HXPhotoModelMediaTypeVideo) {
+        if (model.asset.duration < 3) {
+            return [NSBundle hx_localizedStringForKey:@"视频少于3秒,无法选择"];
+        }else if (model.asset.duration > manager.videoMaxDuration) {
+            return [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"];
+        }
+    }
+    return nil;
+}
+
++ (void)saveImageToAlbum:(UIImage *)image completion:(void(^)())completion error:(void (^)())error {
+    NSError *saveError = nil;
+    
+    // 保存相片到相机胶卷
+    __block PHObjectPlaceholder *createdAsset = nil;
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        createdAsset = [PHAssetCreationRequest creationRequestForAssetFromImage:image].placeholderForCreatedAsset;
+    } error:&saveError];
+    
+    if (saveError) {
+        if (error) {
+            error();
+        }
+        return;
+    }
+    if (completion) {
+        completion();
+    }
+}
+
++ (void)saveVideoToAlbum:(NSURL *)videoUrl completion:(void(^)())completion error:(void (^)())error {
+    NSError *saveError = nil;
+    
+    // 保存相片到相机胶卷
+    __block PHObjectPlaceholder *createdAsset = nil;
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        createdAsset = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:videoUrl].placeholderForCreatedAsset;
+    } error:&saveError];
+    
+    if (saveError) {
+        if (error) {
+            error();
+        }
+        return;
+    }
+    if (completion) {
+        completion();
+    }
+}
+
 + (CGFloat)getTextWidth:(NSString *)text withHeight:(CGFloat)height fontSize:(CGFloat)fontSize
 {
     CGSize newSize = [text boundingRectWithSize:CGSizeMake(MAXFLOAT, height) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontSize]} context:nil].size;
     
     return newSize.width;
+}
++ (CGFloat)getTextHeight:(NSString *)text withHeight:(CGFloat)height fontSize:(CGFloat)fontSize {
+    CGSize newSize = [text boundingRectWithSize:CGSizeMake(MAXFLOAT, height) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontSize]} context:nil].size;
+    
+    return newSize.height;
 }
 + (void)getImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos type:(HXPhotoToolsFetchType)type completion:(void (^)(NSArray<UIImage *> *))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

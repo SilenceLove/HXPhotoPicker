@@ -120,7 +120,9 @@
     UIImageView *tempView;
     if (self.vcType == HXTransitionVcTypePhoto) {
         HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)fromVC;
-        model = vc.modelList[vc.index];
+        if (vc.modelList.count > 0) {
+            model = vc.modelList[vc.index];
+        }
         HXPhotoPreviewViewCell *previewCell = (HXPhotoPreviewViewCell *)[vc.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:vc.index inSection:0]];
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             [previewCell stopGifImage];
@@ -131,32 +133,48 @@
     }else {
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)fromVC;
         model = vc.model;
-        tempView = [[UIImageView alloc] initWithImage:vc.coverImage];
+        if (!vc.coverImage) {
+            if (model.previewPhoto) {
+                tempView = [[UIImageView alloc] initWithImage:model.previewPhoto];
+            }else if (model.thumbPhoto) {
+                tempView = [[UIImageView alloc] initWithImage:model.thumbPhoto];
+            }
+        }else {
+            tempView = [[UIImageView alloc] initWithImage:vc.coverImage];
+        }
     }
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
-    NSInteger index = 0;
-    if (toVC.albumModel.index == 0) {
-        if (toVC.manager.cameraList.count > 0) {
-            if (model.type != HXPhotoModelMediaTypeCameraPhoto && model.type != HXPhotoModelMediaTypeCameraVideo) {
-                index = model.albumListIndex + toVC.manager.cameraList.count;
-            }else {
-                index = model.albumListIndex;
-            }
-        }else {
-            index = model.albumListIndex;
-        }
-    }else {
-        index = model.albumListIndex;
-    }
+    BOOL contains = [toVC.objs containsObject:model];
+    NSInteger index = [toVC.objs indexOfObject:model];
+//    if (toVC.albumModel.index == 0) {
+//        if (toVC.manager.cameraList.count > 0) {
+//            if (model.type != HXPhotoModelMediaTypeCameraPhoto && model.type != HXPhotoModelMediaTypeCameraVideo) {
+//                index = model.albumListIndex + toVC.manager.cameraList.count;
+//            }else {
+//                index = model.albumListIndex;
+//            }
+//        }else {
+//            index = model.albumListIndex;
+//        }
+//    }else {
+//        index = model.albumListIndex;
+//    }
+//    HXPhotoViewCell *cell = (HXPhotoViewCell *)[toVC.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[toVC.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+    
     if (!cell) {
-        if (model.currentAlbumIndex == toVC.albumModel.index) {
+        if (model.currentAlbumIndex == toVC.albumModel.index && contains) {
             [toVC.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
             [toVC.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
             cell = (HXPhotoViewCell *)[toVC.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
         }
     }
+    if (tempView.image == nil) {
+        tempView = [[UIImageView alloc] initWithImage:cell.imageView.image];
+    }
+    tempView.clipsToBounds = YES;
+    tempView.contentMode = UIViewContentModeScaleAspectFill;
     CGFloat height = [UIScreen mainScreen].bounds.size.height;
     UIView *containerView = [transitionContext containerView];
     [containerView insertSubview:toVC.view atIndex:0];
@@ -178,11 +196,12 @@
         fromVC.view.hidden = NO;
     }
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-        if (toVC.albumModel.index == model.currentAlbumIndex) {
+        if (toVC.albumModel.index == model.currentAlbumIndex && contains) {
             tempView.frame = rect;
         }else {
             fromVC.view.alpha = 0;
             tempView.alpha = 0;
+            tempView.transform = CGAffineTransformMakeScale(1.3, 1.3);
         }
     } completion:^(BOOL finished) {
         cell.hidden = NO;

@@ -81,45 +81,42 @@
     [self.contentView addSubview:self.scrollView];
     [self.scrollView addSubview:self.imageView];
 }
-
 - (void)livePhotoView:(PHLivePhotoView *)livePhotoView willBeginPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
     self.isAnimating = YES;
 }
-
 - (void)livePhotoView:(PHLivePhotoView *)livePhotoView didEndPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
     [self stopLivePhoto];
 }
-
 - (void)startLivePhoto {
     if (self.isAnimating) {
         return;
     }
+    if (self.liveRequestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
+        self.liveRequestID = -1;
+    }
     self.livePhotoView.frame = self.imageView.frame;
     [self.scrollView addSubview:self.livePhotoView];
-//    if (self.model.livePhoto) {
-//        self.livePhotoView.livePhoto = self.model.livePhoto;
-//        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
-//    }else {
-        __weak typeof(self) weakSelf = self;
-        self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 2, self.model.endImageSize.height * 2) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
-//            weakSelf.model.livePhoto = livePhoto;
-            weakSelf.livePhotoView.livePhoto = livePhoto;
-            [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
-        }];
-//    }
+    __weak typeof(self) weakSelf = self;
+    self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 2, self.model.endImageSize.height * 2) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+        weakSelf.livePhotoView.livePhoto = livePhoto;
+        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+    }];
 }
-
 - (void)stopLivePhoto {
-    [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
+    if (self.liveRequestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
+        self.liveRequestID = -1;
+    }
     self.isAnimating = NO;
     [self.livePhotoView stopPlayback];
     [self.livePhotoView removeFromSuperview];
-//    self.livePhotoView.delegate = nil;
-//    self.livePhotoView = nil;
 }
-
 - (void)fetchLongPhoto {
-    [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        self.requestID = -1;
+    }
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
     CGFloat imgWidth = self.model.imageSize.width;
@@ -166,7 +163,9 @@
     _model = model;
     self.needGifImage = NO;
     self.gifImage = nil;
-    [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
+    if (self.longRequestId) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
+    }
     [self.scrollView setZoomScale:1.0 animated:NO];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -259,8 +258,7 @@
     self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
 }
 
-- (void)updateImageSize
-{
+- (void)updateImageSize {
     [_scrollView setZoomScale:1.0 animated:NO];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -285,7 +283,20 @@
     [super layoutSubviews];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
-    self.progressView.center = CGPointMake(width / 2, height / 2);
-    
+    self.progressView.center = CGPointMake(width / 2, height / 2); 
+}
+- (void)dealloc {
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        self.requestID = -1;
+    }
+    if (self.liveRequestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
+        self.liveRequestID = -1;
+    }
+    if (self.longRequestId) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
+        self.longRequestId = -1;
+    }
 }
 @end

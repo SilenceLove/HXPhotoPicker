@@ -93,7 +93,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"拍摄";
+    self.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
     self.view.backgroundColor = [UIColor whiteColor];
     [self cameraDistrict];
 }
@@ -128,7 +128,7 @@
     [navBar pushNavigationItem:navItem animated:NO];
     self.beginGestureScale = 1.0f;
     self.effectiveScale = 1.0f;
-    navItem.title = @"拍摄";
+    navItem.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [leftBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_close@2x.png"] forState:UIControlStateNormal];
     [leftBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_close_highlighted@2x.png"] forState:UIControlStateHighlighted];
@@ -403,24 +403,25 @@
 {
     AVCaptureConnection *conntion = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
     if (!conntion) {
-        [self.view showImageHUDText:@"照片失败"];
+        [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"拍摄失败"]];
         return;
     }
     if (conntion.isVideoOrientationSupported) {
         self.currentImageOrientation = [self currentVideoOrientation];
         conntion.videoOrientation = self.currentImageOrientation;
     }
+    __weak typeof(self) weakSelf = self;
     [self.imageOutput captureStillImageAsynchronouslyFromConnection:conntion completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         if (imageDataSampleBuffer == nil) {
             return ;
         }
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-        self.imageView.image = [UIImage imageWithData:imageData];
-        if (self.effectiveScale > 1) {
-            self.imageView.transform = CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale);
+        weakSelf.imageView.image = [UIImage imageWithData:imageData];
+        if (weakSelf.effectiveScale > 1) {
+            weakSelf.imageView.transform = CGAffineTransformMakeScale(weakSelf.effectiveScale, weakSelf.effectiveScale);
         }
-        self.imageView.hidden = NO;
-        [self hideClick];
+        weakSelf.imageView.hidden = NO;
+        [weakSelf hideClick];
     }];
 }
 // 调整设备取向
@@ -714,7 +715,7 @@
     if (!_moveView) {
         _moveView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 25)];
         UIButton *changePhotoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [changePhotoBtn setTitle:@"照片" forState:UIControlStateNormal];
+        [changePhotoBtn setTitle:[NSBundle hx_localizedStringForKey:@"照片"] forState:UIControlStateNormal];
         [changePhotoBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
         [changePhotoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateSelected];
         [changePhotoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateHighlighted];
@@ -726,7 +727,7 @@
         self.changePhotoBtn = changePhotoBtn;
         
         UIButton *changeVideoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [changeVideoBtn setTitle:@"视频" forState:UIControlStateNormal];
+        [changeVideoBtn setTitle:[NSBundle hx_localizedStringForKey:@"视频"] forState:UIControlStateNormal];
         [changeVideoBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
         [changeVideoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateSelected];
         [changeVideoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateHighlighted];
@@ -893,12 +894,12 @@
         [self.timer invalidate];
         self.timer = nil;
         if (self.videoTime < 3) {
-            [self.view showImageHUDText:@"录制时间不能少于3秒"];
+            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
             return;
         }
         [self.playerLayer.player pause];
         __weak typeof(self) weakSelf = self;
-        [self.view showLoadingHUDText:@"处理中"];
+        [self.view showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"处理中"]];
         self.view.userInteractionEnabled = NO;
         [self clipVideoCompleted:^{
             weakSelf.view.userInteractionEnabled = YES;
@@ -925,7 +926,7 @@
         } failed:^{
             weakSelf.view.userInteractionEnabled = YES;
             [weakSelf.view handleLoading];
-            [weakSelf.view showImageHUDText:@"处理失败,请重试!"];
+            [weakSelf.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"处理失败,请重试!"]];
         }];
         
     }
@@ -1076,40 +1077,6 @@
         }
     }];
 }
--(CGImageRef ) imageFromSamplePlanerPixelBuffer:(CMSampleBufferRef) sampleBuffer{
-    // 为媒体数据设置一个CMSampleBufferRef
-    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    // 锁定 pixel buffer 的基地址
-    CVPixelBufferLockBaseAddress(imageBuffer, 0);
-    // 得到 pixel buffer 的基地址
-    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
-    // 得到 pixel buffer 的行字节数
-    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
-    // 得到 pixel buffer 的宽和高
-    size_t width = CVPixelBufferGetWidth(imageBuffer);
-    size_t height = CVPixelBufferGetHeight(imageBuffer);
-    
-    // 创建一个依赖于设备的 RGB 颜色空间
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    
-    // 用抽样缓存的数据创建一个位图格式的图形上下文（graphic context）对象
-    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-    //根据这个位图 context 中的像素创建一个 Quartz image 对象
-    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
-    // 解锁 pixel buffer
-    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
-    
-    // 释放 context 和颜色空间
-    CGContextRelease(context);
-    CGColorSpaceRelease(colorSpace);
-    // 用 Quzetz image 创建一个 UIImage 对象
-    // UIImage *image = [UIImage imageWithCGImage:quartzImage];
-    
-    // 释放 Quartz image 对象
-    //    CGImageRelease(quartzImage);
-    
-    return quartzImage;
-}
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{
     return [HXVideoPresentTransition transitionWithTransitionType:HXVideoPresentTransitionPresent];
 }
@@ -1117,5 +1084,9 @@
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
     return [HXVideoPresentTransition transitionWithTransitionType:HXVideoPresentTransitionDismiss];
 }
+- (void)dealloc { 
+    NSSLog(@"dealloc");
+}
+
 
 @end

@@ -60,20 +60,21 @@
  
  */
 
-- (HXPhotoManager *)manager
-{
+- (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.openCamera = YES;
-        _manager.outerCamera = YES;
+        _manager.cacheAlbum = YES;
+//        _manager.outerCamera = YES;
+//        _manager.open3DTouchPreview = NO;
         _manager.showFullScreenCamera = YES;
         _manager.photoMaxNum = 4;
         _manager.videoMaxNum = 4;
         _manager.maxNum = 8;
+//        _manager.saveSystemAblum = YES;
     }
     return _manager;
 }
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -95,14 +96,14 @@
 } 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
     NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
-    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
-        NSSLog(@"%@",images);
-        for (UIImage *image in images) {
-            if (image.images.count > 0) {
-                // 到这里了说明这个image  是个gif图
-            }
-        }
-    }];
+//    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
+//        NSSLog(@"%@",images);
+//        for (UIImage *image in images) {
+//            if (image.images.count > 0) {
+//                // 到这里了说明这个image  是个gif图
+//            }
+//        }
+//    }];
 //    for (HXPhotoModel *model in allList) {
 //        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);
 //    }
@@ -166,6 +167,7 @@
         model.previewPhoto; 
         
         // 如果是通过相机录制的视频 需要通过 model.VideoURL 这个字段来压缩写入文件
+            // 如果开启了拍照保存相册功能,那么需要压缩
         if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             [self compressedVideoWithURL:model.videoURL success:^(NSString *fileName) {
                 NSSLog(@"%@",fileName); // 视频路径也是视频URL;

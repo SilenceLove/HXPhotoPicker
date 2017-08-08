@@ -170,6 +170,7 @@
             tempView.frame = rect;
         }else {
             tempView.alpha = 0;
+            tempView.transform = CGAffineTransformMakeScale(1.3, 1.3);
         }
     } completion:^(BOOL finished) {
         cell.hidden = NO;

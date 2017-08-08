@@ -127,31 +127,32 @@
 - (void)againDownload {
     self.model.downloadError = NO;
     self.model.downloadComplete = NO;
+    __weak typeof(self) weakSelf = self;
     [self.imageView sd_setImageWithURL:[NSURL URLWithString:self.model.networkPhotoUrl] placeholderImage:self.model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-        self.model.receivedSize = receivedSize;
-        self.model.expectedSize = expectedSize;
+        weakSelf.model.receivedSize = receivedSize;
+        weakSelf.model.expectedSize = expectedSize;
         CGFloat progress = (CGFloat)receivedSize / expectedSize;
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.progressView.progress = progress;
+            weakSelf.progressView.progress = progress;
         });
     } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
         if (error != nil) {
-            self.model.downloadError = YES;
-            self.model.downloadComplete = YES;
-            [self.progressView showError];
+            weakSelf.model.downloadError = YES;
+            weakSelf.model.downloadComplete = YES;
+            [weakSelf.progressView showError];
         }else {
             if (image) {
-                self.progressView.progress = 1;
-                self.progressView.hidden = YES;
-                self.imageView.image = image;
-                self.model.imageSize = image.size;
-                self.model.thumbPhoto = image;
-                self.model.previewPhoto = image;
-                self.userInteractionEnabled = YES;
-                self.model.downloadComplete = YES;
-                self.model.downloadError = NO;
-                if ([self.delegate respondsToSelector:@selector(cellNetworkingPhotoDownLoadComplete)]) {
-                    [self.delegate cellNetworkingPhotoDownLoadComplete];
+                weakSelf.progressView.progress = 1;
+                weakSelf.progressView.hidden = YES;
+                weakSelf.imageView.image = image;
+                weakSelf.model.imageSize = image.size;
+                weakSelf.model.thumbPhoto = image;
+                weakSelf.model.previewPhoto = image;
+                weakSelf.userInteractionEnabled = YES;
+                weakSelf.model.downloadComplete = YES;
+                weakSelf.model.downloadError = NO;
+                if ([weakSelf.delegate respondsToSelector:@selector(cellNetworkingPhotoDownLoadComplete)]) {
+                    [weakSelf.delegate cellNetworkingPhotoDownLoadComplete];
                 }
             }
         }
@@ -179,32 +180,33 @@
 //        if ([[model.networkPhotoUrl substringFromIndex:model.networkPhotoUrl.length - 3] isEqualToString:@"gif"]) {
 //            self.gifIcon.hidden = NO;
 //        }
+        __weak typeof(self) weakSelf = self;
         self.progressView.hidden = model.downloadComplete;
         [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.networkPhotoUrl] placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
             model.receivedSize = receivedSize;
             model.expectedSize = expectedSize;
             CGFloat progress = (CGFloat)receivedSize / expectedSize;
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.progressView.progress = progress;
+                weakSelf.progressView.progress = progress;
             });
         } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
             if (error != nil) {
                 model.downloadError = YES;
                 model.downloadComplete = YES;
-                [self.progressView showError];
+                [weakSelf.progressView showError];
             }else {
                 if (image) {
-                    self.progressView.progress = 1;
-                    self.progressView.hidden = YES;
+                    weakSelf.progressView.progress = 1;
+                    weakSelf.progressView.hidden = YES;
 //                    self.imageView.image = image;
                     model.imageSize = image.size;
                     model.thumbPhoto = image;
                     model.previewPhoto = image;
-                    self.userInteractionEnabled = YES;
+                    weakSelf.userInteractionEnabled = YES;
                     model.downloadComplete = YES;
                     model.downloadError = NO;
-                    if ([self.delegate respondsToSelector:@selector(cellNetworkingPhotoDownLoadComplete)]) {
-                        [self.delegate cellNetworkingPhotoDownLoadComplete];
+                    if ([weakSelf.delegate respondsToSelector:@selector(cellNetworkingPhotoDownLoadComplete)]) {
+                        [weakSelf.delegate cellNetworkingPhotoDownLoadComplete];
                     }
                 }
             }

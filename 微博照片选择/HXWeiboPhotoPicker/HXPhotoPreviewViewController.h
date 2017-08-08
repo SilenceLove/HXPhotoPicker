@@ -19,7 +19,7 @@
 @class HXPhotoView;
 @interface HXPhotoPreviewViewController : UIViewController<UINavigationControllerDelegate>
 @property (weak, nonatomic) id<HXPhotoPreviewViewControllerDelegate> delegate;
-@property (copy, nonatomic) NSArray *modelList;
+@property (strong, nonatomic) NSMutableArray *modelList;
 @property (assign, nonatomic) NSInteger index;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (weak, nonatomic, readonly) UICollectionView *collectionView;

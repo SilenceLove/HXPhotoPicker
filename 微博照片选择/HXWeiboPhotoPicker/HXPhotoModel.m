@@ -7,6 +7,8 @@
 //
 
 #import "HXPhotoModel.h"
+#import "HXPhotoTools.h"
+
 @implementation HXPhotoModel 
 
 - (CGSize)imageSize
@@ -16,7 +18,12 @@
     }
     return _imageSize;
 }
-
+- (NSString *)localIdentifier {
+    if (!_localIdentifier) {
+        _localIdentifier = self.asset.localIdentifier;
+    }
+    return _localIdentifier;
+}
 - (CGSize)endImageSize
 {
     if (_endImageSize.width == 0 || _endImageSize.height == 0) {
@@ -39,4 +46,41 @@
     return _endImageSize;
 }
 
+- (void)prefetchThumbImage {
+    __weak typeof(self) weakSelf = self;
+    self.requestID = [HXPhotoTools getHighQualityFormatPhotoForPHAsset:self.asset size:self.requestSize completion:^(UIImage *image, NSDictionary *info) {
+        weakSelf.thumbPhoto = image;
+    } error:^(NSDictionary *info) {
+        
+    }];
+}
+
+- (CGSize)requestSize {
+    if (_requestSize.width == 0 || _requestSize.height == 0) {
+        CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
+        CGSize size;
+        if (self.imageSize.width > self.imageSize.height / 9 * 15) {
+            size = CGSizeMake(width, width * [UIScreen mainScreen].scale);
+        }else if (self.imageSize.height > self.imageSize.width / 9 * 15) {
+            size = CGSizeMake(width * [UIScreen mainScreen].scale, width);
+        }else {
+            if ([UIScreen mainScreen].bounds.size.width == 375) {
+                size = CGSizeMake(width * 1.2, width * 1.2);
+            }else {
+                size = CGSizeMake(width * 1.4, width * 1.4);
+            }
+        }
+        if ([UIScreen mainScreen].bounds.size.width == 320) {
+            size = CGSizeMake(width * 0.8, width * 0.8);
+        }
+        _requestSize = size;
+    }
+    return _requestSize;
+}
+- (void)dealloc {
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        self.requestID = 0;
+    }
+}
 @end

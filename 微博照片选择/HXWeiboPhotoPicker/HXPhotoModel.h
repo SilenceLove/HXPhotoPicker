@@ -25,7 +25,8 @@ typedef enum : NSUInteger {
 /**
  照片PHAsset对象
  */
-@property (strong, nonatomic) PHAsset *asset; 
+@property (strong, nonatomic) PHAsset *asset;
+@property (copy, nonatomic) NSString *localIdentifier;
 
 /**
  视频AVAsset对象
@@ -39,12 +40,12 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) HXPhotoModelMediaType type;
 
 /**
- 小图
+ 小图 -- 选中之后有值, 取消选中为空
  */
 @property (strong, nonatomic) UIImage *thumbPhoto;
 
 /**
- 预览照片
+ 预览照片 -- 选中之后有值, 取消选中为空
  */
 @property (strong, nonatomic) UIImage *previewPhoto;
 
@@ -54,7 +55,7 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) NSString *albumName;
 
 /**
- GIF照片
+ GIF照片 -- 空
  */
 @property (strong, nonatomic) UIImage *gifImage;
 
@@ -65,7 +66,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) PHImageRequestID liveRequestID;
 
 /**
- 照片数据
+ 照片数据 -- 空
  */
 @property (strong, nonatomic) NSData *imageData;
 
@@ -84,20 +85,20 @@ typedef enum : NSUInteger {
  */
 @property (assign, nonatomic) BOOL selected;
 
-/**
- 为图片时的下标
- */
-@property (assign, nonatomic) NSInteger photoIndex;
-
-/**
- 为视频时的下标
- */
-@property (assign, nonatomic) NSInteger videoIndex;
-
-/**
- 照片在相册列表里的下标
- */
-@property (assign, nonatomic) NSInteger albumListIndex;
+///**
+// 为图片时的下标
+// */
+//@property (assign, nonatomic) NSInteger photoIndex;
+//
+///**
+// 为视频时的下标
+// */
+//@property (assign, nonatomic) NSInteger videoIndex;
+//
+///**
+// 照片在相册列表里的下标
+// */
+//@property (assign, nonatomic) NSInteger albumListIndex;
 
 /**
  图片宽高
@@ -159,5 +160,10 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) NSInteger expectedSize;
 @property (assign, nonatomic) BOOL downloadComplete;
 @property (assign, nonatomic) BOOL downloadError;
+
+@property (strong, nonatomic) UIImage *tempImage;
+@property (assign, nonatomic) NSInteger rowCount;
+@property (assign, nonatomic) CGSize requestSize;
+- (void)prefetchThumbImage;
 
 @end

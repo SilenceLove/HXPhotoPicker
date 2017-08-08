@@ -15,6 +15,8 @@
 #import "HXPresentTransition.h"
 @interface HXVideoPreviewViewController ()<UIViewControllerTransitioningDelegate>
 @property (strong, nonatomic) UIButton *rightBtn;
+@property (assign, nonatomic) BOOL firstOn;
+@property (assign, nonatomic) BOOL isDelete;
 @end
 
 @implementation HXVideoPreviewViewController
@@ -30,10 +32,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.isDelete = NO;
     // Do any additional setup after loading the view.
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.view.backgroundColor = [UIColor whiteColor];
-    
+    self.firstOn = YES;
     if (!self.isTouch) {
         [self setup];
     }
@@ -42,26 +45,7 @@
 - (void)setup {
  
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
-    if (self.manager.selectedList.count > 0) {
-        self.navigationItem.rightBarButtonItem.enabled = YES;
-        [self.rightBtn setTitle:[NSString stringWithFormat:@"下一步(%ld)",self.manager.selectedList.count] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
-        self.rightBtn.layer.borderWidth = 0;
-        CGFloat rightBtnH = self.rightBtn.frame.size.height;
-        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
-        self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
-    }else {
-        [self.rightBtn setTitle:@"下一步" forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
-        self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
-        self.rightBtn.layer.borderWidth = 0;
-        if (self.model.asset.duration < 3) {
-            self.rightBtn.enabled = NO;
-            [self.rightBtn setBackgroundColor:[UIColor whiteColor]];
-            self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
-            self.rightBtn.layer.borderWidth = 0.5;
-        }
-    }
+    [self setupNavRightBtn];
     if (!self.isTouch) {
         // 自定义转场动画 添加的一层遮罩
         [self.view addSubview:self.maskView];
@@ -116,8 +100,51 @@
         UINavigationItem *navItem = [[UINavigationItem alloc] init];
         [navBar pushNavigationItem:navItem animated:NO];
         
-        navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+        navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
         navBar.tintColor = [UIColor blackColor];
+    }
+    __weak typeof(self) weakSelf = self;
+    [self.manager setPhotoLibraryDidChangeWithVideoViewController:^(NSArray *collectionChanges){
+        [weakSelf systemAlbumDidChange:collectionChanges];
+    }];
+}
+- (void)setupNavRightBtn {
+    if (self.manager.selectedList.count > 0) {
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+        [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
+        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        self.rightBtn.layer.borderWidth = 0;
+        CGFloat rightBtnH = self.rightBtn.frame.size.height;
+        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
+        self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
+    }else {
+        [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
+        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
+        self.rightBtn.layer.borderWidth = 0;
+        if (self.model.asset.duration < 3) {
+            self.rightBtn.enabled = NO;
+            [self.rightBtn setBackgroundColor:[UIColor whiteColor]];
+            self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
+            self.rightBtn.layer.borderWidth = 0.5;
+        }
+    }
+}
+- (void)systemAlbumDidChange:(NSArray *)list {
+    if (list.count > 0) {
+        NSDictionary *dic = list.firstObject;
+        PHFetchResultChangeDetails *collectionChanges = dic[@"collectionChanges"];
+        if (collectionChanges) {
+            if ([collectionChanges hasIncrementalChanges]) {
+                if (collectionChanges.removedObjects.count > 0) {
+                    if ([collectionChanges.removedObjects containsObject:self.model.asset]) {
+                        self.isDelete = YES;
+                        [self setupNavRightBtn];
+                        self.selectedBtn.selected = NO;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -178,42 +205,24 @@
 }
 
 - (void)didSelectedClick:(UIButton *)button {
+    if (self.isDelete) {
+        [self.view showImageHUDText:@"视频已被删除!"];
+        return;
+    }
     HXPhotoModel *model = self.model;
     if (!button.selected) {
-        if (self.manager.selectedList.count == self.manager.maxNum) {
-            // 已经达到最大选择数
-            [self.view showImageHUDText:[NSString stringWithFormat:@"最多只能选择%ld个",self.manager.maxNum]];
+        NSString *str = [HXPhotoTools maximumOfJudgment:model manager:self.manager];
+        if (str) {
+            if (!self.isTouch) {
+                [self.view showImageHUDText:str];
+            }else {
+                if (self.firstOn) {
+                    self.firstOn = NO;
+                }else {
+                    [self.view showImageHUDText:str];
+                }
+            }
             return;
-        }
-        if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-            if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
-                if (self.manager.photoMaxNum > 0) {
-                    if (!self.manager.selectTogether) { // 是否支持图片视频同时选择
-                        if (self.manager.selectedPhotos.count > 0 ) {
-                            // 已经选择了图片,不能再选视频
-                            [self.view showImageHUDText:@"视频不能和图片同时选择"];
-                            return;
-                        }
-                    }
-                }
-                if (self.manager.selectedVideos.count == self.manager.videoMaxNum) {
-                    // 已经达到视频最大选择数
-                    [self.view showImageHUDText:[NSString stringWithFormat:@"最多只能选择%ld个视频",self.manager.videoMaxNum]];
-                    return;
-                }
-            }
-        }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-            if (self.manager.selectedVideos.count == self.manager.videoMaxNum) {
-                // 已经达到视频最大选择数
-                [self.view showImageHUDText:[NSString stringWithFormat:@"最多只能选择%ld个视频",self.manager.videoMaxNum]];
-                return;
-            }
-        }
-        if (model.type == HXPhotoModelMediaTypeVideo) {
-            if (model.asset.duration < 3) {
-                [self.view showImageHUDText:@"视频少于3秒,暂不支持"];
-                return;
-            }
         }
         if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
             model.thumbPhoto = self.coverImage;
@@ -242,45 +251,36 @@
             model.thumbPhoto = nil;
             model.previewPhoto = nil;
         }
-        int i = 0;
-        for (HXPhotoModel *subModel in self.manager.selectedList) {
-            if ([subModel.asset.localIdentifier isEqualToString:model.asset.localIdentifier]) {
-                if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) {
-                    [self.manager.selectedPhotos removeObject:subModel];
-                }else if (model.type == HXPhotoModelMediaTypeVideo) {
-                    [self.manager.selectedVideos removeObject:subModel];
-                }
-                [self.manager.selectedList removeObjectAtIndex:i];
-                break;
-            }else if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo){
-                if ([subModel.cameraIdentifier isEqualToString:model.cameraIdentifier]) {
-                    if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-                        [self.manager.selectedPhotos removeObject:subModel];
-                        [self.manager.selectedCameraPhotos removeObject:subModel];
-                    }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-                        [self.manager.selectedVideos removeObject:subModel];
-                        [self.manager.selectedCameraVideos removeObject:subModel];
-                    }
-                    [self.manager.selectedList removeObjectAtIndex:i];
-                    [self.manager.selectedCameraList removeObject:subModel];
-                    break;
-                }
+        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeLivePhoto)) {
+            if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
+                [self.manager.selectedPhotos removeObject:model];
+            }else if (model.type == HXPhotoModelMediaTypeVideo) {
+                [self.manager.selectedVideos removeObject:model];
             }
-            i++;
+        }else if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
+            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                [self.manager.selectedPhotos removeObject:model];
+                [self.manager.selectedCameraPhotos removeObject:model];
+            }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+                [self.manager.selectedVideos removeObject:model];
+                [self.manager.selectedCameraVideos removeObject:model];
+            }
+            [self.manager.selectedCameraList removeObject:model];
         }
+        [self.manager.selectedList removeObject:model];
     }
     button.selected = !button.selected;
     model.selected = button.selected;
     if (self.manager.selectedList.count > 0) {
         self.navigationItem.rightBarButtonItem.enabled = YES;
-        [self.rightBtn setTitle:[NSString stringWithFormat:@"下一步(%ld)",self.manager.selectedList.count] forState:UIControlStateNormal];
+        [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
         [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
         CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else {
-        [self.rightBtn setTitle:@"下一步" forState:UIControlStateNormal];
+        [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
         [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
         self.rightBtn.layer.borderWidth = 0;
@@ -294,7 +294,7 @@
 - (UIButton *)rightBtn {
     if (!_rightBtn) {
         _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_rightBtn setTitle:@"下一步" forState:UIControlStateNormal];
+        [_rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
         [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_rightBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
         [_rightBtn setTitleColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
@@ -346,7 +346,7 @@
     }
     if (!self.isPreview) {
         if (self.manager.selectedList.count == 0) {
-            if (!self.selectedBtn.selected && !max) {
+            if (!self.selectedBtn.selected && !max && !self.isDelete) {
                 self.model.thumbPhoto = self.coverImage;
                 self.model.previewPhoto = self.coverImage;
                 self.model.selected = YES;
@@ -372,6 +372,7 @@
     [self.playVideo pause];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     self.playVideo = nil;
+    NSSLog(@"dealloc");
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{

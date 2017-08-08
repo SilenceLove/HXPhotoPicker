@@ -42,6 +42,10 @@
 @property (strong, nonatomic, readonly) NSIndexPath *currentIndexPath;
 @property (assign, nonatomic) BOOL isPreview;
 @property (strong, nonatomic, readonly) HXAlbumModel *albumModel;
+
+@property (strong, nonatomic) NSMutableArray *videos;
+@property (strong, nonatomic) NSMutableArray *objs;
+@property (strong, nonatomic) NSMutableArray *photos;
 @end
 
 typedef enum : NSUInteger {

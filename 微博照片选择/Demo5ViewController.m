@@ -66,9 +66,9 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空" style:UIBarButtonItemStylePlain target:self action:@selector(didCleanClick)];
 }
 - (void)didCleanClick {
-    [self.oneManager emptySelectedList];
-    [self.twoManager emptySelectedList];
-    [self.threeManager emptySelectedList];
+    [self.oneManager clearSelectedList];
+    [self.twoManager clearSelectedList];
+    [self.threeManager clearSelectedList];
     [self.onePhotoView refreshView];
     [self.twoPhotoView refreshView];
     [self.threePhotoView refreshView];

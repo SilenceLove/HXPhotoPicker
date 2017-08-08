@@ -88,7 +88,8 @@
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110) imageName:@"alert_failed_icon@2x.png" text:text];
+    CGFloat hudH = [HXPhotoTools getTextHeight:text withHeight:hudW fontSize:14];
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110 + hudH - 15) imageName:@"alert_failed_icon@2x.png" text:text];
     hud.alpha = 0;
     hud.tag = 1008611;
     [self addSubview:hud];
@@ -106,7 +107,9 @@
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, 110, 110) imageName:@"alert_failed_icon@2x.png" text:text];
+    CGFloat hudH = [HXPhotoTools getTextHeight:text withHeight:hudW fontSize:14];
+    
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, 110, 110 + hudH - 15) imageName:@"alert_failed_icon@2x.png" text:text];
     [hud showloading];
     hud.alpha = 0;
     hud.tag = 10086;
@@ -176,9 +179,8 @@
     CGFloat imgW = imageView.image.size.width;
     CGFloat imgH = imageView.image.size.height;
     CGFloat imgCenterX = self.frame.size.width / 2;
-    CGFloat imgCenterY = self.frame.size.height / 2 - 12.5;
-    imageView.frame = CGRectMake(0, 0, imgW, imgH);
-    imageView.center = CGPointMake(imgCenterX, imgCenterY);
+    imageView.frame = CGRectMake(0, 20, imgW, imgH);
+    imageView.center = CGPointMake(imgCenterX, imageView.center.y);
     self.imageView = imageView;
     
     UILabel *label = [[UILabel alloc] init];
@@ -186,11 +188,12 @@
     label.textColor = [UIColor whiteColor];
     label.textAlignment = NSTextAlignmentCenter;
     label.font = [UIFont systemFontOfSize:14];
+    label.numberOfLines = 0;
     [self addSubview:label];
     CGFloat labelX = 10;
     CGFloat labelY = CGRectGetMaxY(imageView.frame) + 10;
     CGFloat labelW = self.frame.size.width - 20;
-    CGFloat labelH = 15;
+    CGFloat labelH = [HXPhotoTools getTextHeight:self.text withHeight:labelW fontSize:14];
     label.frame = CGRectMake(labelX, labelY, labelW, labelH);
 }
 

@@ -30,6 +30,8 @@
  */
 @property (strong, nonatomic) PHAsset *asset;
 
+@property (strong, nonatomic) UIImage *albumImage;
+
 /**
  照片集合对象
  */
@@ -44,5 +46,7 @@
  选中的个数
  */
 @property (assign, nonatomic) NSInteger selectedCount;
+
+@property (assign, nonatomic) CGFloat albumNameWidth;
 
 @end

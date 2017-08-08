@@ -24,6 +24,26 @@ typedef enum : NSUInteger {
 
 @interface HXPhotoManager : NSObject
 
+/**
+ *  拍摄的 照片/视频 是否保存到系统相册  默认NO 此功能需要配合 监听系统相册 和 缓存相册 功能 (请不要关闭)
+ */
+@property (assign, nonatomic) BOOL saveSystemAblum;
+
+/**
+ *  视频能选择的最大秒数  -  默认 5分钟/300秒
+ */
+@property (assign, nonatomic) NSTimeInterval videoMaxDuration;
+
+/**
+ *  是否缓存相册, manager会监听系统相册变化(需要此功能时请不要关闭监听系统相册功能)   默认YES
+ */
+@property (assign, nonatomic) BOOL cacheAlbum;
+
+/**
+ *  是否监听系统相册  -  如果开启了缓存相册 自动开启监听   默认 YES
+ */
+@property (assign, nonatomic) BOOL monitorSystemAlbum;
+
 /**  
  上次选择照片模型的数组
  */
@@ -110,11 +130,11 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL selectTogether;
 
 /**
- 相册列表每行多少个照片 默认4个
+ 相册列表每行多少个照片 默认4个 iphone 4s / 5  默认3个
  */
 @property (assign, nonatomic) NSInteger rowCount;
 
-
+/*-------------------------------------------------------*/
 
 //------// 当要删除的已选中的图片或者视频的时候需要在对应的end数组里面删除
 // 例如: 如果删除的是通过相机拍的照片需要在 endCameraList 和 endCameraPhotos 数组删除对应的图片模型
@@ -142,6 +162,26 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL endIsOriginal;
 @property (copy, nonatomic) NSString *photosTotalBtyes;
 @property (copy, nonatomic) NSString *endPhotosTotalBtyes;
+
+
+@property (strong, nonatomic) NSMutableArray *albums;
+
+
+@property (copy, nonatomic) NSDictionary *photoViewCellIconDic;
+
+/**  是否正在照片控制器里选择图片  */
+@property (assign, nonatomic) BOOL selectPhoto;
+
+/**  系统相册发生了变化  */
+@property (copy, nonatomic) void (^photoLibraryDidChangeWithPhotoViewController)(NSArray *collectionChanges);
+@property (copy, nonatomic) void (^photoLibraryDidChangeWithPhotoPreviewViewController)(NSArray *collectionChanges);
+@property (copy, nonatomic) void (^photoLibraryDidChangeWithVideoViewController)(NSArray *collectionChanges);
+@property (copy, nonatomic) void (^photoLibraryDidChangeWithPhotoView)(NSArray *collectionChanges ,BOOL selectPhoto);
+
+/**  是否为相机拍摄的图片  */
+@property (assign, nonatomic) BOOL cameraPhoto;
+
+@property (strong, nonatomic) HXAlbumModel *tempAlbumMd;
 
 
 /**
@@ -187,6 +227,6 @@ typedef enum : NSUInteger {
 /**
  清空所有已选数组
  */
-- (void)emptySelectedList;
+- (void)clearSelectedList;
 
 @end

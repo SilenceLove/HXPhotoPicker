@@ -78,7 +78,7 @@
     [super viewDidLoad];
     self.view.layer.backgroundColor = [UIColor grayColor].CGColor;
     [self setupUI];
-    self.title = @"拍摄";
+    self.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -183,7 +183,7 @@
     }
     
     if (self.type == HXCameraTypePhotoAndVideo) {
-        self.titleStr = @"点击拍照，长按录像";
+        self.titleStr = [NSBundle hx_localizedStringForKey:@"点击拍照，长按录像"];
         if ([self.session canAddOutput:self.imageOutput]) {
             [self.session addOutput:self.imageOutput];
         }
@@ -191,12 +191,12 @@
             [self.session addOutput:self.videoOutPut];
         }
     }else if (self.type == HXCameraTypePhoto) {
-        self.titleStr = @"点击拍照";
+        self.titleStr = [NSBundle hx_localizedStringForKey:@"点击拍照"];
         if ([self.session canAddOutput:self.imageOutput]) {
             [self.session addOutput:self.imageOutput];
         }
     }else if (self.type == HXCameraTypeVideo) {
-        self.titleStr = @"长按录像";
+        self.titleStr = [NSBundle hx_localizedStringForKey:@"长按录像"];
         if ([self.session canAddOutput:self.videoOutPut]) {
             [self.session addOutput:self.videoOutPut];
         }
@@ -254,7 +254,7 @@
     UITapGestureRecognizer *playViewTapGr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(playViewTapGrEvent:)];
     [self.playView addGestureRecognizer:playViewTapGr];
     
-    self.timeLb = [[UILabel alloc] initWithFrame:CGRectMake(0, self.playView.frame.origin.y - 30, WIDTH, 14)];
+    self.timeLb = [[UILabel alloc] initWithFrame:CGRectMake(0, self.playView.frame.origin.y - 30, WIDTH, 16)];
     self.timeLb.text = self.titleStr;
     self.timeLb.textColor = [[UIColor whiteColor] colorWithAlphaComponent:0.9];
     self.timeLb.textAlignment = NSTextAlignmentCenter;
@@ -262,7 +262,7 @@
     [self.view addSubview:self.timeLb];
     
     self.nextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.nextBtn setTitle:@"下一步" forState:UIControlStateNormal];
+    [self.nextBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
     [self.nextBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.nextBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
     self.nextBtn.layer.masksToBounds = YES;
@@ -467,6 +467,7 @@
         self.backBtn.selected = NO;
         [self.backBtn setTitle:@"" forState:UIControlStateNormal];
         [self.backBtn setImage:[HXPhotoTools hx_imageNamed:@"faceu_cancel@3x.png"] forState:UIControlStateNormal];
+        self.backBtn.frame = CGRectMake(15, 20, self.backBtn.currentImage.size.width, self.backBtn.currentImage.size.height);
         self.timeLb.text = self.titleStr;
         self.playView.hidden = NO;
         self.timeLb.hidden = NO;
@@ -496,23 +497,24 @@
 - (void)playViewTapGrEvent:(UITapGestureRecognizer *)tap {
     AVCaptureConnection *conntion = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
     if (!conntion) {
-        [self.view showImageHUDText:@"照片失败"];
+        [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"拍摄失败"]];
         return;
     }
     if (conntion.isVideoOrientationSupported) {
         conntion.videoOrientation = [self currentVideoOrientation];
     }
+    __weak typeof(self) weakSelf = self;
     [self.imageOutput captureStillImageAsynchronouslyFromConnection:conntion completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         if (imageDataSampleBuffer == nil) {
             return ;
         }
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-        self.imageView.image = [UIImage imageWithData:imageData];
-        if (self.effectiveScale > 1) {
-            self.imageView.transform = CGAffineTransformMakeScale(self.effectiveScale, self.effectiveScale);
+        weakSelf.imageView.image = [UIImage imageWithData:imageData];
+        if (weakSelf.effectiveScale > 1) {
+            weakSelf.imageView.transform = CGAffineTransformMakeScale(weakSelf.effectiveScale, weakSelf.effectiveScale);
         }
-        self.imageView.hidden = NO;
-        [self hideClick];
+        weakSelf.imageView.hidden = NO;
+        [weakSelf hideClick];
     }];
 }
 // 调整设备取向
@@ -542,7 +544,8 @@
     self.timeLb.hidden = YES;
     self.playView.hidden = YES;
     [self.backBtn setImage:[[UIImage alloc] init] forState:UIControlStateNormal];
-    [self.backBtn setTitle:@"重拍" forState:UIControlStateNormal];
+    [self.backBtn setTitle:[NSBundle hx_localizedStringForKey:@"重拍"] forState:UIControlStateNormal];
+    self.backBtn.hx_w = [HXPhotoTools getTextWidth:self.backBtn.currentTitle withHeight:18 fontSize:17] + 20;
     self.backBtn.selected = YES;
 }
 // 长按手势
@@ -573,7 +576,7 @@
             if (self.flashBtn.enabled) {
                 self.flashBtn.hidden = NO;
             }
-            [self.view showImageHUDText:@"录制时间不能少于3秒"];
+            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
             self.timeLb.text = self.titleStr;
         }else {
             [self hideClick];
@@ -586,7 +589,7 @@
 - (void)captureOutput:(AVCaptureFileOutput *)captureOutput didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray *)connections { 
     // 开始录制
     self.videoTime = 0;
-    self.timeLb.text = [NSString stringWithFormat:@"0秒"];
+    self.timeLb.text = [NSString stringWithFormat:@"0s"];
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(recordingClick:) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
@@ -606,7 +609,7 @@
 }
 - (void)recordingClick:(NSTimer *)timer {
     self.videoTime++;
-    self.timeLb.text = [NSString stringWithFormat:@"%ld秒",self.videoTime];
+    self.timeLb.text = [NSString stringWithFormat:@"%lds",self.videoTime];
     self.playView.progress = (CGFloat)self.videoTime / 60.f;
     if (self.videoTime == 60) {
         [timer invalidate];
@@ -678,7 +681,7 @@
         [self.timer invalidate];
         self.timer = nil;
         if (self.videoTime < 3) {
-            [self.view showImageHUDText:@"录制时间不能少于3秒"];
+            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
             return;
         }
         [self.playerLayer.player pause];
@@ -708,5 +711,8 @@
 }
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
     return [HXVideoPresentTransition transitionWithTransitionType:HXVideoPresentTransitionDismiss];
+}
+- (void)dealloc {
+    NSSLog(@"dealloc");
 }
 @end

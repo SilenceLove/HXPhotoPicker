@@ -20,4 +20,25 @@
     }
     return tzBundle;
 }
++ (NSString *)hx_localizedStringForKey:(NSString *)key
+{
+    return [self hx_localizedStringForKey:key value:nil];
+}
+
++ (NSString *)hx_localizedStringForKey:(NSString *)key value:(NSString *)value
+{
+    static NSBundle *bundle = nil;
+    if (bundle == nil) {
+        NSString *language = [NSLocale preferredLanguages].firstObject;
+        if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+            language = @"zh-Hans";
+        } else {
+            language = @"en";
+        }
+         
+        bundle = [NSBundle bundleWithPath:[[NSBundle hx_photoPickerBundle] pathForResource:language ofType:@"lproj"]];
+    }
+    value = [bundle localizedStringForKey:key value:value table:nil];
+    return [[NSBundle mainBundle] localizedStringForKey:key value:value table:nil];
+}
 @end

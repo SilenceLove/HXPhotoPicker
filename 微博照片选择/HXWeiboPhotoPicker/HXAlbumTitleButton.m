@@ -10,8 +10,7 @@
 
 @implementation HXAlbumTitleButton
 
-- (void)layoutSubviews
-{
+- (void)layoutSubviews {
     [super layoutSubviews];
     
     CGFloat titleY = self.titleLabel.frame.origin.y;

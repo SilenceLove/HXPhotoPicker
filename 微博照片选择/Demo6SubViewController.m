@@ -29,7 +29,7 @@
 }
 
 - (void)dealloc { 
-    [self.manager emptySelectedList];
+    [self.manager clearSelectedList];
 }
 
 @end

@@ -23,6 +23,7 @@
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.outerCamera = YES;
         _manager.openCamera = NO;
+        _manager.saveSystemAblum = YES;
     }
     return _manager;
 }
@@ -190,27 +191,6 @@
         }
     }
     [self.manager.endCameraList addObject:model];
-    NSInteger cameraIndex = self.manager.openCamera ? 1 : 0;
-    
-    int index = 0;
-    for (NSInteger i = self.manager.endCameraPhotos.count - 1; i >= 0; i--) {
-        HXPhotoModel *photoMD = self.manager.endCameraPhotos[i];
-        photoMD.photoIndex = index;
-        photoMD.albumListIndex = index + cameraIndex;
-        index++;
-    }
-    index = 0;
-    for (NSInteger i = self.manager.endCameraVideos.count - 1; i >= 0; i--) {
-        HXPhotoModel *photoMD = self.manager.endCameraVideos[i];
-        photoMD.videoIndex = index;
-        index++;
-    }
-    index = 0;
-    for (NSInteger i = self.manager.endCameraList.count - 1; i>= 0; i--) {
-        HXPhotoModel *photoMD = self.manager.endCameraList[i];
-        photoMD.albumListIndex = index + cameraIndex;
-        index++;
-    }
     [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
 }
 

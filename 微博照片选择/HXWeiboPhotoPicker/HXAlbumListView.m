@@ -41,28 +41,26 @@
     _list = list;
     
     [self.tableView reloadData];
-    [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentIndex inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
+    if (self.currentIndex < list.count) {
+        [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentIndex inSection:0] animated:NO scrollPosition:UITableViewScrollPositionMiddle];
+    }
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.list.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HXAlbumListViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellId"];
     cell.model = self.list[indexPath.row];
     return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 60;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     self.currentIndex = indexPath.row;
     if ([self.delegate respondsToSelector:@selector(didTableViewCellClick:animate:)]) {
         [self.delegate didTableViewCellClick:self.list[indexPath.row] animate:YES];
@@ -131,13 +129,19 @@
     __weak typeof(self) weakSelf = self;
     if (!model.asset) {
         model.asset = model.result.lastObject;
+        model.albumImage = nil;
     }
-    [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(60, 60) completion:^(UIImage *image, NSDictionary *info) {
-        weakSelf.photoView.image = image;
-    }]; 
+    if (model.albumImage) {
+        self.photoView.image = model.albumImage;
+    }else {
+        [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(60, 60) completion:^(UIImage *image, NSDictionary *info) {
+            weakSelf.photoView.image = image;
+            model.albumImage = image;
+        }];
+    }
     
     self.photoName.text = model.albumName;
-    self.photoNum.text = [NSString stringWithFormat:@"%ld",model.count];
+    self.photoNum.text = [NSString stringWithFormat:@"%ld",(long)model.count];
     if (model.selectedCount > 0) {
         self.numIcon.hidden = NO;
     }else {
@@ -145,8 +149,7 @@
     }
 }
 
-- (void)layoutSubviews
-{
+- (void)layoutSubviews {
     [super layoutSubviews];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -154,7 +157,7 @@
     self.photoView.frame = CGRectMake(10, 5, 50, 50);
     
     CGFloat photoNameX = CGRectGetMaxX(self.photoView.frame) + 10;
-    CGFloat photoNameWith = [HXPhotoTools getTextWidth:self.photoName.text withHeight:18 fontSize:17];
+    CGFloat photoNameWith = self.model.albumNameWidth;
     if (photoNameWith > width - photoNameX - 50) {
         photoNameWith = width - photoNameX - 50;
     }
@@ -162,14 +165,14 @@
     self.photoName.center = CGPointMake(self.photoName.center.x, height / 2);
     
     CGFloat photoNumX = CGRectGetMaxX(self.photoName.frame) + 5;
-    CGFloat photoNumWidth = [HXPhotoTools getTextWidth:self.photoNum.text withHeight:15 fontSize:12];
+    CGFloat photoNumWidth = self.hx_w - CGRectGetMaxX(self.photoName.frame) + 5 - 20;
     self.photoNum.frame = CGRectMake(photoNumX, 0, photoNumWidth, 15);
     self.photoNum.center = CGPointMake(self.photoNum.center.x, height / 2 + 2);
     
-    CGFloat numIconX = 50 - 2 - self.numIcon.image.size.width;
+    CGFloat numIconX = 50 - 2 - 13;
     CGFloat numIconY = 2;
-    CGFloat numIconW = self.numIcon.image.size.width;
-    CGFloat numIconH = self.numIcon.image.size.height;
+    CGFloat numIconW = 13;
+    CGFloat numIconH = 13;
     self.numIcon.frame = CGRectMake(numIconX, numIconY, numIconW, numIconH);
 }
 

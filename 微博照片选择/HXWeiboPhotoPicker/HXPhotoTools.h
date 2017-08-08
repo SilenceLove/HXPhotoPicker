@@ -10,7 +10,7 @@
 #import <Photos/Photos.h>
 #import "HXPhotoModel.h"
 #import "UIView+HXExtension.h"
-
+#import "NSBundle+HXWeiboPhotoPicker.h"
 #ifdef DEBUG
 #define NSSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 
@@ -25,10 +25,16 @@ typedef enum : NSUInteger {
     HXPhotoToolsFetchOriginalImageTpe, // 原图
 } HXPhotoToolsFetchType;
 
+@class HXPhotoManager;
 @interface HXPhotoTools : NSObject
 
++ (NSString *)maximumOfJudgment:(HXPhotoModel *)model manager:(HXPhotoManager *)manager;
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName;
+
+
++ (void)saveImageToAlbum:(UIImage *)image completion:(void(^)())completion error:(void (^)())error;
++ (void)saveVideoToAlbum:(NSURL *)videoUrl completion:(void(^)())completion error:(void (^)())error;
 
 /**
  根据PHAsset对象获取照片信息   此方法会回调多次
@@ -37,7 +43,7 @@ typedef enum : NSUInteger {
 /**
  根据PHAsset对象获取照片信息   此方法只会回调一次
  */
-+ (void)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
++ (PHImageRequestID)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
 
 /**
  根据已选照片数组返回 原图/高清(质量略小于原图) 图片数组  注: 此方法只是一个简单的取image,有可能跟你的需求不一样.那么你就需要自己重新循环模型数组取数据了
@@ -89,6 +95,7 @@ typedef enum : NSUInteger {
  @return 宽度大小
  */
 + (CGFloat)getTextWidth:(NSString *)text withHeight:(CGFloat)height fontSize:(CGFloat)fontSize;
++ (CGFloat)getTextHeight:(NSString *)text withHeight:(CGFloat)height fontSize:(CGFloat)fontSize;
 
 /**
  根据PHAsset对象获取照片信息 带返回错误的block

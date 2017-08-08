@@ -47,7 +47,7 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.navigationController.navigationBar.translucent = YES;
     UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [rightBtn setTitle:@"确定" forState:UIControlStateNormal];
+    [rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"确定"] forState:UIControlStateNormal];
     [rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
     [rightBtn addTarget:self action:@selector(didRightNavBtnClick) forControlEvents:UIControlEventTouchUpInside];
@@ -86,12 +86,12 @@
     self.imageView = imageView;
     
     if (self.photoManager.singleSelecteClip) {
-        self.title = @"裁剪";
+        self.title = [NSBundle hx_localizedStringForKey:@"裁剪"];
         
         self.editView = [[HXPhotoEditView alloc] initWithFrame:self.bgView.frame];
         [self.view addSubview:self.editView];
     }else {
-        self.title = @"预览";
+        self.title = [NSBundle hx_localizedStringForKey:@"预览"];
     }
     
     [self setupModel];
@@ -143,7 +143,6 @@
         self.imageView.frame = CGRectMake(0, 0, w, h);
         
         self.scrollView.minimumZoomScale = multiple;
-        [self.scrollView setZoomScale:multiple animated:NO];
         self.minimumZoomScale = multiple;
         self.scrollView.maximumZoomScale = multiple + self.scrollView.maximumZoomScale;
         
@@ -155,6 +154,7 @@
                 weakSelf.imageView.image = image;
             }];
         }
+        [self.scrollView setZoomScale:multiple animated:NO];
     }else {
         self.scrollView.frame = self.bgView.bounds;
         self.scrollView.contentSize = CGSizeMake(width, h);

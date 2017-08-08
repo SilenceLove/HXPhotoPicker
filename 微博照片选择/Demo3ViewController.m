@@ -75,6 +75,7 @@
         //        _manager.openCamera = NO;
         _manager.outerCamera = YES;
         _manager.showDeleteNetworkPhotoAlert = NO;
+        _manager.saveSystemAblum = YES;
         _manager.photoMaxNum = 2; // 这里需要注意 !!!  第一次传入的最大照片数 是可选最大数 减去 网络照片数量   即   photoMaxNum = maxNum - networkPhotoUrls.count  当点击删除网络照片时, photoMaxNum 内部会自动加1
         _manager.videoMaxNum = 0;  // 如果有网络图片且选择类型为HXPhotoManagerSelectedTypePhotoAndVideo 又设置了视频最大数且不为0时,
 //        那么在选择照片列表最大只能选择 photoMaxNum + videoMaxNum
@@ -253,6 +254,7 @@
     
     if ([compatiblePresets containsObject:AVAssetExportPresetHighestQuality]) {
         
+        // presetName  这个会影响视频质量
         AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetMediumQuality];
         
         NSString *fileName = @""; // 这里是自己定义的文件路径
