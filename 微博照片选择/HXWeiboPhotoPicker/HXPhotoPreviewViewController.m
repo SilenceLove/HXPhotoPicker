@@ -459,7 +459,7 @@
             max = YES;
         }
     }
-    if (!self.isPreview) {
+//    if (self.isPreview) {
         if (self.manager.selectedList.count == 0) {
             if (!self.selectedBtn.selected && !max && self.modelList.count > 0) {
                 model.selected = YES;
@@ -470,7 +470,7 @@
                 [self.manager.selectedPhotos addObject:model];
             }
         }
-    }
+//    }
     if ([self.delegate respondsToSelector:@selector(previewDidNextClick)]) {
         [self.delegate previewDidNextClick];
     }

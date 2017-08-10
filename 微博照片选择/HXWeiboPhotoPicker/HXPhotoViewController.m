@@ -160,6 +160,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                             if (newArray.count > 0) {
                                 select = YES;
                                 HXPhotoModel *photoModel = newArray.firstObject;
+                                photoModel.selected = NO;
                                 if ((photoModel.type == HXPhotoModelMediaTypePhoto || photoModel.type == HXPhotoModelMediaTypePhotoGif) || photoModel.type == HXPhotoModelMediaTypeLivePhoto) {
                                     [self.manager.selectedPhotos removeObject:photoModel];
                                 }else {
