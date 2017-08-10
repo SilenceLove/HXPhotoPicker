@@ -35,7 +35,7 @@
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext
 {
-    return 0.25;
+    return 0.25f;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
@@ -120,8 +120,10 @@
     UIImageView *tempView;
     if (self.vcType == HXTransitionVcTypePhoto) {
         HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)fromVC;
-        if (vc.modelList.count > 0) {
+        if (vc.modelList.count > 0 && !vc.isPreview) {
             model = vc.modelList[vc.index];
+        }else {
+            model = vc.currentModel;
         }
         HXPhotoPreviewViewCell *previewCell = (HXPhotoPreviewViewCell *)[vc.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:vc.index inSection:0]];
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
@@ -179,15 +181,21 @@
     UIView *containerView = [transitionContext containerView];
     [containerView insertSubview:toVC.view atIndex:0];
     [containerView addSubview:tempView];
-    tempView.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);
+    if (model.endImageSize.width == 0 || model.endImageSize.height == 0) {
+        tempView.frame = CGRectMake(0, 0, tempView.image.size.width, tempView.image.size.height);
+    }else {
+        tempView.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);
+    }
     tempView.center = CGPointMake(containerView.frame.size.width / 2, (height - 64) / 2 + 64);
     CGRect rect = [toVC.collectionView convertRect:cell.frame toView:[UIApplication sharedApplication].keyWindow];
-    if (rect.origin.y < 64) {
-        [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - 65)];
-        rect = CGRectMake(cell.frame.origin.x, 65, cell.frame.size.width, cell.frame.size.height);
-    }else if (rect.origin.y + rect.size.height > height - 51) {
-        [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - height + 51 + rect.size.height)];
-        rect = CGRectMake(cell.frame.origin.x, height - 51 - cell.frame.size.height, cell.frame.size.width, cell.frame.size.height);
+    if (cell) {
+        if (rect.origin.y < 64) {
+            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - 65)];
+            rect = CGRectMake(cell.frame.origin.x, 65, cell.frame.size.width, cell.frame.size.height);
+        }else if (rect.origin.y + rect.size.height > height - 51) {
+            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - height + 51 + rect.size.height)];
+            rect = CGRectMake(cell.frame.origin.x, height - 51 - cell.frame.size.height, cell.frame.size.width, cell.frame.size.height);
+        }
     }
     cell.hidden = YES;
     fromVC.view.hidden = YES;

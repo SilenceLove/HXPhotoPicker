@@ -65,6 +65,7 @@
 		7B7F6CEA1F063F9E0093C4C2 /* HXPhotoEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F6CE91F063F9E0093C4C2 /* HXPhotoEditView.m */; };
 		7B939E501E5BECB600301BBC /* HXPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
+		7B9F4BA91F3AABC900DCB91B /* HXPhotoUIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F4BA81F3AABC900DCB91B /* HXPhotoUIManager.m */; };
 		7BB604521E5D693A00EBA520 /* HXVideoPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */; };
 		7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1D1F07994000715546 /* Demo4ViewController.m */; };
 		7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */; };
@@ -188,6 +189,8 @@
 		7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPresentTransition.m; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
+		7B9F4BA71F3AABC900DCB91B /* HXPhotoUIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoUIManager.h; sourceTree = "<group>"; };
+		7B9F4BA81F3AABC900DCB91B /* HXPhotoUIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoUIManager.m; sourceTree = "<group>"; };
 		7BB604501E5D693A00EBA520 /* HXVideoPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXVideoPresentTransition.h; sourceTree = "<group>"; };
 		7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXVideoPresentTransition.m; sourceTree = "<group>"; };
 		7BBE5A1C1F07994000715546 /* Demo4ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo4ViewController.h; sourceTree = "<group>"; };
@@ -319,6 +322,8 @@
 				7B74BB3D1ED55CD500F81FA0 /* HXWeiboPhotoPicker.bundle */,
 				7B7E3E911E4AB081002234EE /* HXPhotoManager.h */,
 				7B7E3E921E4AB081002234EE /* HXPhotoManager.m */,
+				7B9F4BA71F3AABC900DCB91B /* HXPhotoUIManager.h */,
+				7B9F4BA81F3AABC900DCB91B /* HXPhotoUIManager.m */,
 				7B7E3E941E4AB377002234EE /* HXAlbumModel.h */,
 				7B7E3E951E4AB377002234EE /* HXAlbumModel.m */,
 				7B7E3E971E4AB397002234EE /* HXPhotoModel.h */,
@@ -492,6 +497,7 @@
 				7B7E3E7B1E4AACD1002234EE /* main.m in Sources */,
 				7B7E3EA51E4B0D6F002234EE /* HXAlbumListView.m in Sources */,
 				7B1EF3C41F287CED00A4391C /* MKAnnotationView+WebCache.m in Sources */,
+				7B9F4BA91F3AABC900DCB91B /* HXPhotoUIManager.m in Sources */,
 				7B7E3E991E4AB397002234EE /* HXPhotoModel.m in Sources */,
 				7B1EF3D01F287CED00A4391C /* UIImage+GIF.m in Sources */,
 				7B7271471F27262400405131 /* NSBundle+HXWeiboPhotoPicker.m in Sources */,

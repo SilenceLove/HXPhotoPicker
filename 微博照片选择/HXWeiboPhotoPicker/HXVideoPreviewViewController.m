@@ -17,6 +17,8 @@
 @property (strong, nonatomic) UIButton *rightBtn;
 @property (assign, nonatomic) BOOL firstOn;
 @property (assign, nonatomic) BOOL isDelete;
+@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) UINavigationItem *navItem;
 @end
 
 @implementation HXVideoPreviewViewController
@@ -41,17 +43,40 @@
         [self setup];
     }
 }
-
+- (UINavigationBar *)navBar {
+    if (!_navBar) {
+        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
+        [self.view addSubview:_navBar];
+        [_navBar pushNavigationItem:self.navItem animated:NO];
+        _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
+        if (self.manager.UIManager.navBackgroundImageName) {
+            [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
+        }else if (self.manager.UIManager.navBackgroundColor) {
+            [_navBar setBackgroundColor:self.manager.UIManager.navBackgroundColor];
+        }
+    }
+    return _navBar;
+}
+- (UINavigationItem *)navItem {
+    if (!_navItem) {
+        _navItem = [[UINavigationItem alloc] init];
+        
+        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+    }
+    return _navItem;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+}
 - (void)setup {
- 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
     [self setupNavRightBtn];
     if (!self.isTouch) {
         // 自定义转场动画 添加的一层遮罩
         [self.view addSubview:self.maskView];
     }
-    CGFloat width = [UIScreen mainScreen].bounds.size.width;
-    CGFloat height = [UIScreen mainScreen].bounds.size.height;
     if (self.isCamera) {
         AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.model.videoURL];
         self.playVideo = [AVPlayer playerWithPlayerItem:playerItem];
@@ -95,22 +120,16 @@
     if (self.selectedComplete) {
         self.rightBtn.hidden = YES;
         self.selectedBtn.hidden = YES;
-        UINavigationBar *navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
-        [self.view addSubview:navBar];
-        UINavigationItem *navItem = [[UINavigationItem alloc] init];
-        [navBar pushNavigationItem:navItem animated:NO];
-        
-        navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
-        navBar.tintColor = [UIColor blackColor];
     }
     __weak typeof(self) weakSelf = self;
     [self.manager setPhotoLibraryDidChangeWithVideoViewController:^(NSArray *collectionChanges){
         [weakSelf systemAlbumDidChange:collectionChanges];
     }];
+    [self.view addSubview:self.navBar];
 }
 - (void)setupNavRightBtn {
     if (self.manager.selectedList.count > 0) {
-        self.navigationItem.rightBarButtonItem.enabled = YES;
+        self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
         [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
         self.rightBtn.layer.borderWidth = 0;
@@ -152,7 +171,11 @@
     [self.playVideo pause];
     self.playBtn.selected = NO;
     self.playVideo = nil;
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.selectedComplete) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (void)pausePlayerAndShowNaviBar {
@@ -272,7 +295,7 @@
     button.selected = !button.selected;
     model.selected = button.selected;
     if (self.manager.selectedList.count > 0) {
-        self.navigationItem.rightBarButtonItem.enabled = YES;
+        self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
         [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
         self.rightBtn.layer.borderWidth = 0;

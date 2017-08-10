@@ -18,6 +18,7 @@
 @class HXPhotoModel;
 @interface HXPhotoSubViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXPhotoSubViewCellDelegate> delegate;
+@property (copy, nonatomic) NSDictionary *dic;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic) HXPhotoModel *model;
 /**

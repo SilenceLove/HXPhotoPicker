@@ -53,7 +53,7 @@
     if (!_addModel) {
         _addModel = [[HXPhotoModel alloc] init];
         _addModel.type = HXPhotoModelMediaTypeCamera;
-        _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_pic_add@2x.png"];
+        _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:self.manager.UIManager.photoViewAddImageName];
     }
     return _addModel;
 }
@@ -73,6 +73,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.manager = manager;
+        [self.manager getImage];
         [self setup];
     }
     return self;
@@ -82,6 +83,7 @@
     self = [super init];
     if (self) {
         self.manager = manager;
+        [self.manager getImage];
         [self setup];
     }
     return self;
@@ -113,7 +115,7 @@
             model.cameraIdentifier = [self videoOutFutFileName];
             model.imageSize = CGSizeMake([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width);
             model.selected = YES;
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"qz_photolist_picture_fail@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.manager.UIManager.placeholderImageName];
             model.previewPhoto = model.thumbPhoto;
             [self.networkPhotos addObject:model];
         }
@@ -238,7 +240,7 @@
             model.cameraIdentifier = [self videoOutFutFileName];
             model.imageSize = CGSizeMake([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width);
             model.selected = YES;
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"qz_photolist_picture_fail@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.manager.UIManager.placeholderImageName];
             model.previewPhoto = model.thumbPhoto;
             [self.networkPhotos addObject:model];
         }
@@ -265,6 +267,7 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoSubViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cellId" forIndexPath:indexPath];
+    cell.dic = self.manager.photoViewCellIconDic;
     cell.model = self.dataList[indexPath.item];
     cell.delegate = self;
     cell.showDeleteNetworkPhotoAlert = self.manager.showDeleteNetworkPhotoAlert;

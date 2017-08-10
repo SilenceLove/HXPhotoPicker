@@ -37,11 +37,11 @@
 
 - (void)setup
 {
-    self.open3DTouchPreview = YES;
+    self.open3DTouchPreview = NO;
     self.showFullScreenCamera = NO;
     self.outerCamera = NO;
     self.openCamera = YES;
-    self.lookLivePhoto = YES;
+    self.lookLivePhoto = NO;
     self.lookGifPhoto = YES;
     self.selectTogether = YES;
     self.maxNum = 10;
@@ -78,18 +78,40 @@
     self.cacheAlbum = YES;
     self.videoMaxDuration = 300.f;
     self.saveSystemAblum = NO;
-    if (!self.singleSelected) {
-        self.photoViewCellIconDic = @{@"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
-                                      @"gifIcon" : [HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"] ,
-                                      @"liveIcon" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"] ,
-                                      @"liveBtnImageNormal" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] ,
-                                      @"liveBtnImageSelected" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] ,
-                                      @"liveBtnBackgroundImage" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] ,
-                                      @"selectBtnNormal" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] ,
-                                      @"selectBtnSelected" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"]};
-    }
+    self.UIManager = [[HXPhotoUIManager alloc] init];
+    self.UIManager.photoViewAddImageName = @"compose_pic_add@2x.png";
+    self.UIManager.placeholderImageName = @"qz_photolist_picture_fail@2x.png";
+    self.UIManager.navLeftBtnTitleColor = [UIColor blackColor]; 
+    self.UIManager.navTitleColor = [UIColor blackColor];
+    self.UIManager.navTitleImageName = @"headlines_icon_arrow@2x.png";
+    self.UIManager.navRightBtnNormalBgColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
+    self.UIManager.navRightBtnDisabledBgColor = [UIColor whiteColor];
+    self.UIManager.navRightBtnBorderColor = [UIColor lightGrayColor];
+    self.UIManager.navRightBtnNormalTitleColor = [UIColor whiteColor];
+    self.UIManager.navRightBtnDisabledTitleColor = [UIColor lightGrayColor];
+    self.UIManager.bottomViewBgColor = [UIColor whiteColor];
+    self.UIManager.blurEffect = NO;
+    self.UIManager.previewBtnNormalTitleColor = [UIColor blackColor];
+    self.UIManager.previewBtnDisabledTitleColor = [UIColor lightGrayColor];
+    self.UIManager.previewBtnNormalBgImageName = @"compose_photo_preview_seleted@2x.png";
+    self.UIManager.previewBtnDisabledBgImageName = @"compose_photo_preview_disable@2x.png";
+    self.UIManager.originalBtnBgColor = [UIColor whiteColor];
+    self.UIManager.originalBtnNormalTitleColor = [UIColor blackColor];
+    self.UIManager.originalBtnDisabledTitleColor = [UIColor lightGrayColor];
+    self.UIManager.originalBtnBorderColor = [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:0.7];
+    self.UIManager.originalBtnNormalImageName = @"椭圆-1@2x.png";
+    self.UIManager.originalBtnSelectedImageName = @"椭圆-1-拷贝@2x.png";
+    self.UIManager.albumViewBgColor = [UIColor colorWithRed:240/255.0 green:240/255.0 blue:240/255.0 alpha:1];
+    self.UIManager.albumViewSelectImageName = @"compose_photo_filter_checkbox_checked@2x.png";
+    self.UIManager.albumNameTitleColor = [UIColor blackColor];
+    self.UIManager.photosNumberTitleColor = [UIColor darkGrayColor];
+    self.UIManager.cellCameraPhotoImageName = @"compose_photo_photograph@2x.png";
+    self.UIManager.cellCameraVideoImageName = @"compose_photo_video@2x.png";
+    self.UIManager.cellGitIconImageName = @"timeline_image_gif@2x.png";
+    self.UIManager.cellSelectBtnNormalImageName = @"compose_guide_check_box_default@2x.png";
+    self.UIManager.cellSelectBtnSelectedImageName = @"compose_guide_check_box_right@2x.png";
+    
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
-//    [self getMaxAlbum];
 }
 
 - (void)setSaveSystemAblum:(BOOL)saveSystemAblum {
@@ -104,17 +126,17 @@
     }
 }
 
-- (void)setSingleSelected:(BOOL)singleSelected {
-    _singleSelected = singleSelected;
-    if (!singleSelected) {
+- (void)getImage {
+    
+    if (!self.singleSelected && !self.photoViewCellIconDic) {
         self.photoViewCellIconDic = @{@"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
-                                      @"gifIcon" : [HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"] ,
-                                      @"liveIcon" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"] ,
-                                      @"liveBtnImageNormal" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] ,
-                                      @"liveBtnImageSelected" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] ,
-                                      @"liveBtnBackgroundImage" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] ,
-                                      @"selectBtnNormal" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] ,
-                                      @"selectBtnSelected" : [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"]};
+                                              @"gifIcon" : [HXPhotoTools hx_imageNamed:self.UIManager.cellGitIconImageName] ,
+                                              @"liveIcon" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"] ,
+                                              @"liveBtnImageNormal" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] ,
+                                              @"liveBtnImageSelected" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] ,
+                                              @"liveBtnBackgroundImage" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] ,
+                                              @"selectBtnNormal" : [HXPhotoTools hx_imageNamed:self.UIManager.cellSelectBtnNormalImageName] ,
+                                              @"selectBtnSelected" : [HXPhotoTools hx_imageNamed:self.UIManager.cellSelectBtnSelectedImageName]};
     }
 }
 
@@ -302,11 +324,11 @@
         HXPhotoModel *model = [[HXPhotoModel alloc] init];
         model.type = HXPhotoModelMediaTypeCamera;
         if (photoAy.count == 0 && videoAy.count != 0) {
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_video@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.UIManager.cellCameraVideoImageName];
         }else if (videoAy.count == 0) {
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.UIManager.cellCameraPhotoImageName];
         }else {
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.UIManager.cellCameraPhotoImageName];
         }
         [objAy insertObject:model atIndex:0];
     }

@@ -18,6 +18,8 @@
 @property (strong, nonatomic) UIButton *rightBtn;
 @property (strong, nonatomic) HXPhotoPreviewViewCell *livePhotoCell;
 @property (assign, nonatomic) BOOL firstWillDisplayCell;
+@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) UINavigationItem *navItem;
 @end
 
 @implementation HXPhotoPreviewViewController
@@ -40,6 +42,33 @@
     }
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+}
+- (UINavigationBar *)navBar {
+    if (!_navBar) {
+        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
+        [self.view addSubview:_navBar];
+        [_navBar pushNavigationItem:self.navItem animated:NO];
+        _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
+        if (self.manager.UIManager.navBackgroundImageName) {
+            [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
+        }else if (self.manager.UIManager.navBackgroundColor) {
+            [_navBar setBackgroundColor:self.manager.UIManager.navBackgroundColor];
+        }
+    }
+    return _navBar;
+}
+- (UINavigationItem *)navItem {
+    if (!_navItem) {
+        _navItem = [[UINavigationItem alloc] init];
+        
+        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+        _navItem.titleView = self.titleLb;
+    }
+    return _navItem;
+}
 - (void)setup {
     if (self.isPreview) {
         // 防错,,,,,如果出现问题麻烦及时告诉我..... qq294005139
@@ -47,21 +76,25 @@
             model.selected = YES;
         }
     }
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    self.navigationItem.titleView = self.titleLb;
-    self.view.backgroundColor = [UIColor whiteColor];
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
-    [self setupNavRightBtn];
     
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
     CGFloat height = [UIScreen mainScreen].bounds.size.height;
+
+    
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    self.navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
+    [self setupNavRightBtn];
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     flowLayout.itemSize = CGSizeMake(width, height - 64);
     flowLayout.minimumInteritemSpacing = 0;
     flowLayout.minimumLineSpacing = 20;
-    flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
+    if (self.selectedComplete) {
+        flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
+    }else {
+        flowLayout.sectionInset = UIEdgeInsetsMake(-20, 10, 0, 10);
+    }
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, 64, width + 20, height - 64) collectionViewLayout:flowLayout];
     collectionView.backgroundColor = [UIColor whiteColor];
@@ -82,34 +115,27 @@
     if (self.selectedComplete) {
         self.rightBtn.hidden = YES;
         self.selectedBtn.hidden = YES;
-        UINavigationBar *navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
-        [self.view addSubview:navBar];
-        UINavigationItem *navItem = [[UINavigationItem alloc] init];
-        [navBar pushNavigationItem:navItem animated:NO];
-        
-        navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
-        navBar.tintColor = [UIColor blackColor];
-        navItem.titleView = self.titleLb;
     }else {
         __weak typeof(self) weakSelf = self;
         [self.manager setPhotoLibraryDidChangeWithPhotoPreviewViewController:^(NSArray *collectionChanges){
             [weakSelf systemPhotoDidChange:collectionChanges];
         }];
     }
+    [self.view addSubview:self.navBar];
 }
 
 - (void)setupNavRightBtn {
     if (self.manager.selectedList.count > 0) {
-        self.navigationItem.rightBarButtonItem.enabled = YES;
+        self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
         CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else {
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
         self.rightBtn.layer.borderWidth = 0;
     }
@@ -160,7 +186,12 @@
         [[PHImageManager defaultManager] cancelImageRequest:cell.liveRequestID];
     } 
     self.livePhotoCell = nil;
-    [self dismissViewControllerAnimated:YES completion:nil];
+    
+    if (self.selectedComplete) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }else {
+        [self.navigationController popViewControllerAnimated:YES];
+    } 
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -228,6 +259,7 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     HXPhotoModel *model = self.modelList[self.index];
+    self.currentModel = model;
     if (model.isCloseLivePhoto) {
         return;
     }
@@ -250,7 +282,7 @@
 - (UILabel *)titleLb {
     if (!_titleLb) {
         _titleLb = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
-        _titleLb.textColor = [UIColor blackColor];
+        _titleLb.textColor = self.manager.UIManager.navTitleColor;
         _titleLb.font = [UIFont boldSystemFontOfSize:17];
         _titleLb.textAlignment = NSTextAlignmentCenter;
         _titleLb.text = [NSString stringWithFormat:@"%ld/%ld",self.index + 1,self.modelList.count];
@@ -262,8 +294,8 @@
     if (!_selectedBtn) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
-        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.cellSelectBtnNormalImageName] forState:UIControlStateNormal];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.cellSelectBtnSelectedImageName] forState:UIControlStateSelected];
         CGFloat selectedBtnW = _selectedBtn.currentImage.size.width;
         CGFloat selectedBtnH = _selectedBtn.currentImage.size.height;
         _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, 84, selectedBtnW, selectedBtnH);
@@ -358,20 +390,19 @@
     model.selected = button.selected;
     
     if (self.manager.selectedList.count > 0) {
-        self.navigationItem.rightBarButtonItem.enabled = YES;
+        self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
         CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else {
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
         self.rightBtn.layer.borderWidth = 0;
     }
-    
     if ([self.delegate respondsToSelector:@selector(didSelectedClick:AddOrDelete:)]) {
         [self.delegate didSelectedClick:model AddOrDelete:button.selected];
     }
@@ -381,14 +412,14 @@
     if (!_rightBtn) {
         _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_rightBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+        [_rightBtn setTitleColor:self.manager.UIManager.navRightBtnNormalTitleColor forState:UIControlStateNormal];
+        [_rightBtn setTitleColor:self.manager.UIManager.navRightBtnDisabledTitleColor forState:UIControlStateDisabled];
         [_rightBtn setTitleColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
         _rightBtn.layer.masksToBounds = YES;
         _rightBtn.layer.cornerRadius = 2;
         _rightBtn.layer.borderWidth = 0.5;
-        _rightBtn.layer.borderColor = [UIColor lightGrayColor].CGColor;
-        [_rightBtn setBackgroundColor:[UIColor whiteColor]];
+        _rightBtn.layer.borderColor = self.manager.UIManager.navRightBtnBorderColor.CGColor;
+        [_rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnDisabledBgColor];
         [_rightBtn addTarget:self action:@selector(didNextClick:) forControlEvents:UIControlEventTouchUpInside];
         _rightBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         _rightBtn.frame = CGRectMake(0, 0, 60, 25);
@@ -449,6 +480,7 @@
 {
     [super viewDidAppear:animated];
     HXPhotoModel *model = self.modelList[self.index];
+    self.currentModel = model;
     if (model.isCloseLivePhoto) {
         return;
     }

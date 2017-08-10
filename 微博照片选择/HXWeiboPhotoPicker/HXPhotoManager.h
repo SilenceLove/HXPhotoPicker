@@ -11,7 +11,7 @@
 #import "HXAlbumModel.h"
 #import "HXPhotoModel.h"
 #import "HXPhotoTools.h"
-
+#import "HXPhotoUIManager.h"
 /**
  *  照片选择的管理类, 使用照片选择时必须先懒加载此类,然后赋值给对应的对象
  */
@@ -23,6 +23,11 @@ typedef enum : NSUInteger {
 } HXPhotoManagerSelectedType;
 
 @interface HXPhotoManager : NSObject
+
+/**
+ *  管理UI的类
+ */
+@property (strong, nonatomic) HXPhotoUIManager *UIManager;
 
 /**
  *  拍摄的 照片/视频 是否保存到系统相册  默认NO 此功能需要配合 监听系统相册 和 缓存相册 功能 (请不要关闭)
@@ -60,7 +65,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL singleSelecteClip;
 
 /**
- 是否开启3DTouch预览功能 默认打开
+ 是否开启3DTouch预览功能 默认 NO
  */
 @property (assign, nonatomic) BOOL open3DTouchPreview;
 
@@ -95,7 +100,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL lookGifPhoto;
 
 /**
- 是否开启查看LivePhoto功能呢 - 默认开启
+ 是否开启查看LivePhoto功能呢 - 默认 NO
  */
 @property (assign, nonatomic) BOOL lookLivePhoto;
 
@@ -228,5 +233,7 @@ typedef enum : NSUInteger {
  清空所有已选数组
  */
 - (void)clearSelectedList;
+
+- (void)getImage;
 
 @end

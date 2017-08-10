@@ -8,15 +8,17 @@
 
 #import "HXAlbumListView.h"
 #import "HXPhotoTools.h"
+#import "HXPhotoManager.h"
 @interface HXAlbumListView ()<UITableViewDelegate,UITableViewDataSource>
+@property (strong, nonatomic) HXPhotoManager *manager;
 @end
 
 @implementation HXAlbumListView
 
-- (instancetype)initWithFrame:(CGRect)frame
-{
+- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
+        self.manager = manager;
         self.currentIndex = 0;
         [self setup];
     }
@@ -24,14 +26,14 @@
 }
 
 - (void)setup {
-    self.backgroundColor = [UIColor colorWithRed:235/255.0 green:235/255.0 blue:235/255.0 alpha:1];
+    self.backgroundColor = self.manager.UIManager.albumViewBgColor;
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
     UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, width, height) style:UITableViewStylePlain];
     tableView.dataSource = self;
     tableView.delegate = self;
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    tableView.backgroundColor = [UIColor colorWithRed:240/255.0 green:240/255.0 blue:240/255.0 alpha:1];
+    tableView.backgroundColor = self.backgroundColor = self.manager.UIManager.albumViewBgColor;
     [tableView registerClass:[HXAlbumListViewCell class] forCellReuseIdentifier:@"cellId"];
     [self addSubview:tableView];
     self.tableView = tableView;
@@ -52,6 +54,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HXAlbumListViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellId"];
+    cell.manager = self.manager;
     cell.model = self.list[indexPath.row];
     return cell;
 }
@@ -74,13 +77,13 @@
 @property (strong, nonatomic) UILabel *photoName;
 @property (strong, nonatomic) UILabel *photoNum;
 @property (strong, nonatomic) UIImageView *numIcon;
+@property (strong, nonatomic) UIView *selectedView;
 @end
 
 @implementation HXAlbumListViewCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
-        self.backgroundColor = [UIColor colorWithRed:240/255.0 green:240/255.0 blue:240/255.0 alpha:1];
         [self setup];
     }
     return self;
@@ -97,7 +100,6 @@
 - (UILabel *)photoName {
     if (!_photoName) {
         _photoName = [[UILabel alloc] init];
-        _photoName.textColor = [UIColor blackColor];
         _photoName.font = [UIFont systemFontOfSize:17];
     }
     return _photoName;
@@ -105,16 +107,21 @@
 - (UILabel *)photoNum {
     if (!_photoNum) {
         _photoNum = [[UILabel alloc] init];
-        _photoNum.textColor = [UIColor darkGrayColor];
         _photoNum.font = [UIFont systemFontOfSize:12];
     }
     return _photoNum;
 }
 - (UIImageView *)numIcon {
     if (!_numIcon) {
-        _numIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_photo_filter_checkbox_checked@2x.png"]];
+        _numIcon = [[UIImageView alloc] init];
     }
     return _numIcon;
+}
+- (UIView *)selectedView {
+    if (!_selectedView) {
+        _selectedView = [[UIView alloc] init];
+    }
+    return _selectedView;
 }
 - (void)setup {
     [self.contentView addSubview:self.photoView];
@@ -122,7 +129,19 @@
     [self.contentView addSubview:self.photoNum];
     [self.photoView addSubview:self.numIcon];
 }
-
+- (void)setManager:(HXPhotoManager *)manager {
+    _manager = manager;
+    if (manager.UIManager.albumViewCellSelectedColor) {
+        self.selectedView.backgroundColor = manager.UIManager.albumViewCellSelectedColor;
+        self.selectedBackgroundView = self.selectedView;
+    }
+    self.photoName.textColor = manager.UIManager.albumNameTitleColor;
+    self.photoNum.textColor = manager.UIManager.photosNumberTitleColor;
+    if (!self.numIcon.image) {
+        self.numIcon.image = [HXPhotoTools hx_imageNamed:manager.UIManager.albumViewSelectImageName];
+    }
+    self.backgroundColor = manager.UIManager.albumViewBgColor;
+}
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
     

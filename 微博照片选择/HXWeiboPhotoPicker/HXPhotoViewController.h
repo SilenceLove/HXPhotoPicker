@@ -63,4 +63,5 @@ typedef enum : NSUInteger {
 @property (weak, nonatomic) id<HXPhotoBottomViewDelegate> delegate;
 @property (weak, nonatomic) UIButton *previewBtn;
 @property (weak, nonatomic) UIButton *originalBtn;
+- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
 @end

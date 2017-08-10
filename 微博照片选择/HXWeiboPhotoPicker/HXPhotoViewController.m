@@ -44,6 +44,8 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @property (assign, nonatomic) BOOL responseForceTouchCapability;
 @property (assign, nonatomic) BOOL isCapabilityAvailable;
 @property (assign, nonatomic) BOOL selectOtherAlbum;
+@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) UINavigationItem *navItem;
 @end
 
 @implementation HXPhotoViewController
@@ -71,6 +73,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self.manager getImage];
     self.view.backgroundColor = [UIColor whiteColor];
     self.manager.selectPhoto = YES;
     [self setup];
@@ -403,6 +406,41 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         }];
     }
 }
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+}
+- (UINavigationBar *)navBar {
+    if (!_navBar) {
+        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
+        [_navBar pushNavigationItem:self.navItem animated:NO];
+        
+        _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
+        if (self.manager.UIManager.navBackgroundImageName) {
+            [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
+        }else if (self.manager.UIManager.navBackgroundColor) {
+            [_navBar setBackgroundColor:self.manager.UIManager.navBackgroundColor];
+        }
+    }
+    return _navBar;
+}
+- (UINavigationItem *)navItem {
+    if (!_navItem) {
+        _navItem = [[UINavigationItem alloc] init];
+        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(cancelClick)];
+        
+        HXAlbumTitleButton *titleBtn = [HXAlbumTitleButton buttonWithType:UIButtonTypeCustom];
+        [titleBtn setTitleColor:self.manager.UIManager.navTitleColor forState:UIControlStateNormal];
+        [titleBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navTitleImageName] forState:UIControlStateNormal];
+        titleBtn.frame = CGRectMake(0, 0, 150, 30);
+        [titleBtn setTitle:@"相机胶卷" forState:UIControlStateNormal];
+        [titleBtn addTarget:self action:@selector(pushAlbumList:) forControlEvents:UIControlEventTouchUpInside];
+        self.titleBtn = titleBtn;
+        _navItem.title = @"相机胶卷";
+        _navItem.titleView = self.titleBtn;
+    }
+    return _navItem;
+}
 - (void)setup {
     self.responseTraitCollection = [self respondsToSelector:@selector(traitCollection)];
     self.responseForceTouchCapability = [self.traitCollection respondsToSelector:@selector(forceTouchCapability)];
@@ -446,48 +484,38 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.manager.photosTotalBtyes = self.manager.endPhotosTotalBtyes;
     
     self.view.backgroundColor = [UIColor whiteColor];
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    self.navigationController.navigationBar.tintColor = [UIColor blackColor];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(cancelClick)];
+    
+    CGFloat width = self.view.frame.size.width;
+    CGFloat height = self.view.frame.size.height;
+    
     if (!self.manager.singleSelected) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
+        self.navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
         if (self.manager.selectedList.count > 0) {
-            self.navigationItem.rightBarButtonItem.enabled = YES;
+            self.navItem.rightBarButtonItem.enabled = YES;
             [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
-            [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+            [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
             self.rightBtn.layer.borderWidth = 0;
             CGFloat rightBtnH = self.rightBtn.frame.size.height;
             CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
             self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
         }else {
-            self.navigationItem.rightBarButtonItem.enabled = NO;
+            self.navItem.rightBarButtonItem.enabled = NO;
             [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-            [self.rightBtn setBackgroundColor:[UIColor whiteColor]];
+            [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnDisabledBgColor];
             self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
             self.rightBtn.layer.borderWidth = 0.5;
         }
     }
     
-    HXAlbumTitleButton *titleBtn = [HXAlbumTitleButton buttonWithType:UIButtonTypeCustom];
-    [titleBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [titleBtn setImage:[HXPhotoTools hx_imageNamed:@"headlines_icon_arrow"] forState:UIControlStateNormal];
-    titleBtn.frame = CGRectMake(0, 0, 150, 30);
-    [titleBtn setTitle:@"相机胶卷" forState:UIControlStateNormal];
-    [titleBtn addTarget:self action:@selector(pushAlbumList:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.titleView = titleBtn;
-    self.title = @"相机胶卷";
-    self.titleBtn = titleBtn;
-    
-    CGFloat width = self.view.frame.size.width;
-    CGFloat heght = self.view.frame.size.height;
     CGFloat spacing = 1;
     CGFloat CVwidth = (width - spacing * self.manager.rowCount - 1 ) / self.manager.rowCount;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     flowLayout.itemSize = CGSizeMake(CVwidth, CVwidth);
     flowLayout.minimumInteritemSpacing = spacing;
     flowLayout.minimumLineSpacing = spacing;
+    self.automaticallyAdjustsScrollViewInsets = NO;
     
-    self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, width, heght) collectionViewLayout:flowLayout];
+    self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, width, height) collectionViewLayout:flowLayout];
     self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
@@ -501,7 +529,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [self.view addSubview:self.collectionView];
     if (!self.manager.singleSelected) {
         self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, spacing + 50, 0);
-        HXPhotoBottomView *bottomView = [[HXPhotoBottomView alloc] initWithFrame:CGRectMake(0, heght - 50, width, 50)];
+        HXPhotoBottomView *bottomView = [[HXPhotoBottomView alloc] initWithFrame:CGRectMake(0, height - 50, width, 50) manager:self.manager];
         bottomView.delegate = self;
         if (self.manager.selectedList.count > 0) {
             bottomView.originalBtn.enabled = self.manager.selectedPhotos.count;
@@ -530,15 +558,17 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             bottomView.originalBtn.frame = CGRectMake(originalBtnX, originalBtnY, originalBtnW+totalW  , originalBtnH);
         }
     }else {
-        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, spacing, 0);
+        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0,  spacing, 0);
     }
     self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
     
     [self.view addSubview:self.albumsBgView];
-    HXAlbumListView *albumView = [[HXAlbumListView alloc] initWithFrame:CGRectMake(0, -340, width, 340)];
+    HXAlbumListView *albumView = [[HXAlbumListView alloc] initWithFrame:CGRectMake(0, -340, width, 340) manager:self.manager];
     albumView.delegate = self;
     [self.view addSubview:albumView];
     self.albumView = albumView;
+    
+    [self.view addSubview:self.navBar];
 }
 /**
  点击取消按钮 清空所有操作
@@ -1231,7 +1261,8 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         }
         self.bottomView.previewBtn.enabled = YES;
         
-        self.navigationItem.rightBarButtonItem.enabled = YES;
+        
+        self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
         [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
         self.rightBtn.layer.borderWidth = 0;
@@ -1244,7 +1275,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         self.bottomView.originalBtn.selected = NO;
         self.bottomView.previewBtn.enabled = NO;
         self.bottomView.originalBtn.enabled = NO;
-        self.navigationItem.rightBarButtonItem.enabled = NO;
+        self.navItem.rightBarButtonItem.enabled = NO;
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
         [self.rightBtn setBackgroundColor:[UIColor whiteColor]];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
@@ -1265,7 +1296,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         if (self.manager.selectedPhotos.count > 0) {
             HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
             vc.isPreview = self.isPreview;
-            vc.modelList = self.manager.selectedPhotos;
+            vc.modelList = self.manager.selectedPhotos.mutableCopy;
             vc.index = 0;
             vc.delegate = self;
             vc.manager = self.manager;
@@ -1423,8 +1454,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
  
  @return 小菊花
  */
-- (UIActivityIndicatorView *)indica
-{
+- (UIActivityIndicatorView *)indica {
     if (!_indica) {
         _indica = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         CGFloat indicaX = self.bottomView.originalBtn.titleLabel.frame.origin.x + [HXPhotoTools getTextWidth:[NSBundle hx_localizedStringForKey:@"原图"] withHeight:self.bottomView.originalBtn.frame.size.height / 2 fontSize:14] + 5;
@@ -1442,19 +1472,18 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
  
  @return 按钮
  */
-- (UIButton *)rightBtn
-{
+- (UIButton *)rightBtn {
     if (!_rightBtn) {
         _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_rightBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+        [_rightBtn setTitleColor:self.manager.UIManager.navRightBtnNormalTitleColor forState:UIControlStateNormal];
+        [_rightBtn setTitleColor:self.manager.UIManager.navRightBtnDisabledTitleColor forState:UIControlStateDisabled];
         [_rightBtn setTitleColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
         _rightBtn.layer.masksToBounds = YES;
         _rightBtn.layer.cornerRadius = 2;
         _rightBtn.layer.borderWidth = 0.5;
-        _rightBtn.layer.borderColor = [UIColor lightGrayColor].CGColor;
-        [_rightBtn setBackgroundColor:[UIColor whiteColor]];
+        _rightBtn.layer.borderColor = self.manager.UIManager.navRightBtnBorderColor.CGColor;
+        [_rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnDisabledBgColor];
         [_rightBtn addTarget:self action:@selector(didNextClick:) forControlEvents:UIControlEventTouchUpInside];
         _rightBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         _rightBtn.frame = CGRectMake(0, 0, 60, 25);
@@ -1489,31 +1518,36 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 
 @interface HXPhotoBottomView ()
 @property (strong, nonatomic) UIVisualEffectView *effectView;
+@property (strong, nonatomic) HXPhotoManager *manager;
 @end
 
 @implementation HXPhotoBottomView
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
-//        self.backgroundColor = [UIColor whiteColor];
+        self.manager = manager;
         [self setup];
     }
     return self;
 }
 #pragma mark - < 懒加载 >
 - (void)setup {
-    UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
-    self.effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
-    self.effectView.frame = self.bounds;
-    [self addSubview:self.effectView];
+    if (self.manager.UIManager.blurEffect) {
+        UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
+        self.effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+        self.effectView.frame = self.bounds;
+        [self addSubview:self.effectView];
+    }else {
+        self.backgroundColor = self.manager.UIManager.bottomViewBgColor;
+    }
     
     UIButton *previewBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [previewBtn setTitle:[NSBundle hx_localizedStringForKey:@"预览"] forState:UIControlStateNormal];
-    [previewBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [previewBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [previewBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:@"compose_photo_preview_seleted@2x.png"] forState:UIControlStateNormal];
-    [previewBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:@"compose_photo_preview_disable@2x.png"] forState:UIControlStateDisabled];
+    [previewBtn setTitleColor:self.manager.UIManager.previewBtnNormalTitleColor forState:UIControlStateNormal];
+    [previewBtn setTitleColor:self.manager.UIManager.previewBtnDisabledTitleColor forState:UIControlStateDisabled];
+    [previewBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.previewBtnNormalBgImageName] forState:UIControlStateNormal];
+    [previewBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.previewBtnDisabledBgImageName] forState:UIControlStateDisabled];
     previewBtn.titleLabel.font = [UIFont systemFontOfSize:14];
     [previewBtn addTarget:self action:@selector(didPreviewClick:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:previewBtn];
@@ -1528,16 +1562,16 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.previewBtn = previewBtn;
     
     UIButton *originalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [originalBtn setBackgroundColor:[UIColor whiteColor]];
+    [originalBtn setBackgroundColor:self.manager.UIManager.originalBtnBgColor];
     [originalBtn setTitle:[NSBundle hx_localizedStringForKey:@"原图"] forState:UIControlStateNormal];
-    [originalBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [originalBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    [originalBtn setTitleColor:self.manager.UIManager.originalBtnNormalTitleColor forState:UIControlStateNormal];
+    [originalBtn setTitleColor:self.manager.UIManager.originalBtnDisabledTitleColor forState:UIControlStateDisabled];
     originalBtn.layer.masksToBounds = YES;
     originalBtn.layer.cornerRadius = 2.2;
-    originalBtn.layer.borderColor = [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:0.7].CGColor;
+    originalBtn.layer.borderColor = self.manager.UIManager.originalBtnBorderColor.CGColor;
     originalBtn.layer.borderWidth = 0.7;
-    [originalBtn setImage:[HXPhotoTools hx_imageNamed:@"椭圆-1@2x.png"] forState:UIControlStateNormal];
-    [originalBtn setImage:[HXPhotoTools hx_imageNamed:@"椭圆-1-拷贝@2x.png"] forState:UIControlStateSelected];
+    [originalBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.originalBtnNormalImageName] forState:UIControlStateNormal];
+    [originalBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.originalBtnSelectedImageName] forState:UIControlStateSelected];
     originalBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     originalBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 8 + 8, 0, 0);
     originalBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0);

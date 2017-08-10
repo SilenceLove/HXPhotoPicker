@@ -80,7 +80,7 @@
 }
 - (UIImageView *)gifIcon {
     if (!_gifIcon) {
-        _gifIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"]];
+        _gifIcon = [[UIImageView alloc] init];
     }
     return _gifIcon;
 }
@@ -101,6 +101,13 @@
     [self.bottomView addSubview:self.videoTime];
     [self.contentView addSubview:self.gifIcon];
     [self.contentView addSubview:self.progressView];
+}
+
+- (void)setDic:(NSDictionary *)dic {
+    _dic = dic;
+    if (!self.gifIcon.image && dic) {
+        self.gifIcon.image = dic[@"gifIcon"];
+    }
 }
 
 - (void)didDeleteClick {

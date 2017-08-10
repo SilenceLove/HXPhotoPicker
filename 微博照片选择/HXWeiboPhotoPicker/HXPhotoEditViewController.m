@@ -20,6 +20,8 @@
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) HXPhotoEditView *editView;
 @property (assign, nonatomic) CGFloat minimumZoomScale;
+@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) UINavigationItem *navItem;
 @end
 
 @implementation HXPhotoEditViewController
@@ -32,7 +34,7 @@
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
@@ -45,7 +47,6 @@
 - (void)setupUI {
     self.view.backgroundColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
-    self.navigationController.navigationBar.translucent = YES;
     UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"确定"] forState:UIControlStateNormal];
     [rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -54,7 +55,7 @@
     rightBtn.titleLabel.font = [UIFont systemFontOfSize:14];
     rightBtn.layer.cornerRadius = 3;
     rightBtn.frame = CGRectMake(0, 0, 60, 25);
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBtn];
+    self.navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:rightBtn];
     [self.view addSubview:self.bgView];
     UIScrollView *scrollView = [[UIScrollView alloc] init];
     scrollView.showsHorizontalScrollIndicator = NO;
@@ -86,15 +87,15 @@
     self.imageView = imageView;
     
     if (self.photoManager.singleSelecteClip) {
-        self.title = [NSBundle hx_localizedStringForKey:@"裁剪"];
+        self.navItem.title = [NSBundle hx_localizedStringForKey:@"裁剪"];
         
         self.editView = [[HXPhotoEditView alloc] initWithFrame:self.bgView.frame];
         [self.view addSubview:self.editView];
     }else {
-        self.title = [NSBundle hx_localizedStringForKey:@"预览"];
+        self.navItem.title = [NSBundle hx_localizedStringForKey:@"预览"];
     }
-    
     [self setupModel];
+    [self.view addSubview:self.navBar];
 }
 - (void)setupModel {
     CGFloat width = self.bgView.frame.size.width;
@@ -197,6 +198,9 @@
     }
 }
 #pragma mark - < 点击事件 >
+- (void)dismissClick {
+    [self.navigationController popViewControllerAnimated:YES];
+}
 - (void)didRightNavBtnClick {
     if (self.photoManager.singleSelecteClip) {
         [self clipImage];
@@ -285,5 +289,29 @@
         _bgView.backgroundColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.2];
     }
     return _bgView;
+}
+
+- (UINavigationBar *)navBar {
+    if (!_navBar) {
+        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
+        [self.view addSubview:_navBar];
+        [_navBar pushNavigationItem:self.navItem animated:NO];
+        _navBar.tintColor = self.photoManager.UIManager.navLeftBtnTitleColor;
+        _navBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.photoManager.UIManager.navTitleColor};
+        if (self.photoManager.UIManager.navBackgroundImageName) {
+            [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
+        }else if (self.photoManager.UIManager.navBackgroundColor) {
+            [_navBar setBackgroundColor:self.photoManager.UIManager.navBackgroundColor];
+        }
+    }
+    return _navBar;
+}
+- (UINavigationItem *)navItem {
+    if (!_navItem) {
+        _navItem = [[UINavigationItem alloc] init];
+        
+        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)]; 
+    }
+    return _navItem;
 }
 @end

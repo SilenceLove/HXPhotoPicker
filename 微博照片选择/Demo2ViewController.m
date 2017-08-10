@@ -104,6 +104,11 @@
 //            }
 //        }
 //    }];
+    HXPhotoModel *model = photos.firstObject;
+    [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+        
+    }];
+    
 //    for (HXPhotoModel *model in allList) {
 //        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);
 //    }
