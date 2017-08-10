@@ -38,6 +38,11 @@
 - HXPhotoManager 照片管理类相关属性介绍
 ```
 /**
+ *  管理UI的类
+ */
+HXPhotoUIManager *UIManager;
+
+/**
  *  拍摄的 照片/视频 是否保存到系统相册  默认NO 此功能需要配合 监听系统相册 和 缓存相册 功能 (请不要关闭)
  */
 BOOL saveSystemAblum;
@@ -338,7 +343,7 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
 
 ## 六.  更多 - More
 
-- 关于自定义化和支持横屏功能正在准备当中...
+- 支持横屏功能正在准备当中...
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 
