@@ -137,6 +137,114 @@ BOOL selectTogether;
  */
 NSInteger rowCount;
 ```
+- HXPhotoUIManager类相关属性
+```
+/**  HXPhotoView添加按钮图片  */
+NSString *photoViewAddImageName;
+
+/**  网络图片占位图  */
+NSString *placeholderImageName;
+
+/*-------------------导航栏相关属性------------------*/
+/**  导航栏背景颜色  */
+UIColor *navBackgroundColor;
+
+/**  导航栏背景图片  */
+NSString *navBackgroundImageName;
+
+/**  导航栏左边按钮文字颜色  */
+UIColor *navLeftBtnTitleColor;
+
+/**  导航栏 标题/相册名 文字颜色  */
+UIColor *navTitleColor;
+
+/**  导航栏标题箭头图标  */
+@NSString *navTitleImageName;
+
+/**  导航栏右边按钮普通状态背景颜色  */
+UIColor *navRightBtnNormalBgColor;
+
+/**  导航栏右边按钮普通状态文字颜色  */
+UIColor *navRightBtnNormalTitleColor;
+
+/**  导航栏右边按钮禁用状态背景颜色  */
+UIColor *navRightBtnDisabledBgColor;
+
+/**  导航栏右边按钮禁用状态文字颜色  */
+UIColor *navRightBtnDisabledTitleColor;
+
+/**  导航栏右边按钮禁用状态下的 layer.borderColor 边框线颜色 */
+UIColor *navRightBtnBorderColor;
+
+/*-------------------相册列表视图------------------*/
+/**  相册列表有选择内容的提醒图标  */
+NSString *albumViewSelectImageName;
+
+/**  相册名称文字颜色  */
+UIColor *albumNameTitleColor;
+
+/**  照片数量文字颜色  */
+UIColor *photosNumberTitleColor;
+
+/**  相册列表视图背景颜色  */
+UIColor *albumViewBgColor;
+
+/**  相册列表cell选中颜色  */
+UIColor *albumViewCellSelectedColor;
+
+/*-------------------Cell------------------*/
+/**  cell相机照片图片  */
+NSString *cellCameraPhotoImageName;
+
+/**  cell相机视频图片  */
+NSString *cellCameraVideoImageName;
+
+/**  选择按钮普通状态图片  */
+NSString *cellSelectBtnNormalImageName;
+
+/**  选择按钮选中状态图片  */
+NSString *cellSelectBtnSelectedImageName;
+
+/**  gif标示图标  */
+NSString *cellGitIconImageName;
+
+/*-------------------底部预览、原图按钮视图------------------*/
+/**  是否开启毛玻璃效果开启了自动屏蔽背景颜色  */
+BOOL blurEffect;
+
+/**  底部视图背景颜色  */
+UIColor *bottomViewBgColor;
+
+/**  预览按钮普通状态文字颜色  */
+UIColor *previewBtnNormalTitleColor;
+
+/**  预览按钮禁用状态文字颜色  */
+UIColor *previewBtnDisabledTitleColor;
+
+/**  预览按钮普通状态背景图片  */
+NSString *previewBtnNormalBgImageName;
+
+/**  预览按钮禁用状态背景图片  */
+NSString *previewBtnDisabledBgImageName;
+
+/**  原图按钮普通状态文字颜色  */
+UIColor *originalBtnNormalTitleColor;
+
+/**  原图按钮禁用状态文字颜色  */
+UIColor *originalBtnDisabledTitleColor;
+
+/**  原图按钮边框线颜色  */
+UIColor *originalBtnBorderColor;
+
+/**  原图按钮背景颜色  */
+UIColor *originalBtnBgColor;
+
+/**  原图按钮普通状态图片  */
+NSString *originalBtnNormalImageName;
+
+/**  原图按钮选中状态图片  */
+NSString *originalBtnSelectedImageName;
+```
 
 - Demo1
 ```objc
@@ -226,9 +334,10 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
 - 2017-07-05　　解决同一界面多个选择器界面跳转问题,拍摄视频完成时遗留问题
 - 2017-07-26　　优化cell性能、3DTouch预览内存消耗。添加是否需要裁剪框属性、刷新界面方法以及拍照/选择照片完之后跳界面Demo
 - 2017-08-08　　添加国际化支持英文、保存拍摄的照片/视频到系统相册、实时监听系统相册变化并改变、缓存相册、针对ios10和iphone4s/5s优化列表滑动、选择视频时限制超过指定秒数不能选。以及一些小问题
+- 2017-08-10　　添加自定义属性、修复导航栏可能偏移64的问题
 
 ## 六.  更多 - More
- 
+
 - 关于自定义化和支持横屏功能正在准备当中...
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
@@ -239,6 +348,6 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
  
 - QQ : 294005139<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
 
-- 如果觉得的不行，麻烦请多包涵。(真实工作经验1年3个月-2017.08.08)
+- 如果觉得的不行，麻烦请多包涵。
 
 - [有兴趣可以加下创建的QQ群:531895229](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) 
