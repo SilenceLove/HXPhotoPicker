@@ -293,7 +293,8 @@
 
 - (UINavigationBar *)navBar {
     if (!_navBar) {
-        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
+        CGFloat width = [UIScreen mainScreen].bounds.size.width;
+        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
         [self.view addSubview:_navBar];
         [_navBar pushNavigationItem:self.navItem animated:NO];
         _navBar.tintColor = self.photoManager.UIManager.navLeftBtnTitleColor;

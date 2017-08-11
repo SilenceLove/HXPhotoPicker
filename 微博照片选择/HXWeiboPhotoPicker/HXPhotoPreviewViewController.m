@@ -20,6 +20,7 @@
 @property (assign, nonatomic) BOOL firstWillDisplayCell;
 @property (strong, nonatomic) UINavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
+@property (assign, nonatomic) BOOL firstOn;
 @end
 
 @implementation HXPhotoPreviewViewController
@@ -35,6 +36,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.firstOn = YES;
     if (!self.isTouch) {
         [self setup];
     }else {
@@ -48,7 +50,8 @@
 }
 - (UINavigationBar *)navBar {
     if (!_navBar) {
-        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
+        CGFloat width = [UIScreen mainScreen].bounds.size.width;
+        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
         [self.view addSubview:_navBar];
         [_navBar pushNavigationItem:self.navItem animated:NO];
         _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
@@ -322,6 +325,12 @@
         if (str) {
             if (!self.isTouch) {
                 [self.view showImageHUDText:str];
+            }else {
+                if (self.firstOn) {
+                    self.firstOn = NO;
+                }else {
+                    [self.view showImageHUDText:str];
+                }
             }
             return;
         }

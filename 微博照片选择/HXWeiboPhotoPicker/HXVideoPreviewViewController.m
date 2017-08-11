@@ -45,8 +45,8 @@
 }
 - (UINavigationBar *)navBar {
     if (!_navBar) {
-        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
-        [self.view addSubview:_navBar];
+        CGFloat width = [UIScreen mainScreen].bounds.size.width;
+        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)]; 
         [_navBar pushNavigationItem:self.navItem animated:NO];
         _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
         if (self.manager.UIManager.navBackgroundImageName) {
