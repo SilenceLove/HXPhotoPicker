@@ -65,8 +65,9 @@
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.openCamera = YES;
         _manager.cacheAlbum = YES;
+        _manager.lookLivePhoto = YES;
 //        _manager.outerCamera = YES;
-//        _manager.open3DTouchPreview = NO;
+        _manager.open3DTouchPreview = YES;
         _manager.showFullScreenCamera = YES;
         _manager.photoMaxNum = 4;
         _manager.videoMaxNum = 4;

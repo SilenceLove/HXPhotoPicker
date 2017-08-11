@@ -263,6 +263,10 @@
     _model = model; 
     if (model.thumbPhoto) {
         self.imageView.image = model.thumbPhoto;
+        if (model.requestID) {
+            [[PHImageManager defaultManager] cancelImageRequest:model.requestID];
+            model.requestID = 0;
+        }
     }else {
         if (model.requestID) {
             [[PHImageManager defaultManager] cancelImageRequest:model.requestID];

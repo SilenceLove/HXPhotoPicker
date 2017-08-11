@@ -48,11 +48,22 @@
 
 - (void)prefetchThumbImage {
     __weak typeof(self) weakSelf = self;
-    self.requestID = [HXPhotoTools getHighQualityFormatPhotoForPHAsset:self.asset size:self.requestSize completion:^(UIImage *image, NSDictionary *info) {
-        weakSelf.thumbPhoto = image;
-    } error:^(NSDictionary *info) {
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+    
+    self.requestID = [[PHImageManager defaultManager] requestImageForAsset:self.asset targetSize:self.requestSize contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+        if (downloadFinined && result) {
+            weakSelf.thumbPhoto = result;
+        }
     }];
+//    self.requestID = [HXPhotoTools getHighQualityFormatPhotoForPHAsset:self.asset size:self.requestSize completion:^(UIImage *image, NSDictionary *info) {
+//        weakSelf.thumbPhoto = image;
+//    } error:^(NSDictionary *info) {
+//        
+//    }];
 }
 
 - (CGSize)requestSize {
