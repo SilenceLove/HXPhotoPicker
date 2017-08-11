@@ -73,7 +73,7 @@ BOOL singleSelected;
 BOOL singleSelecteClip;
 
 /**
- 是否开启3DTouch预览功能 默认打开
+ 是否开启3DTouch预览功能 默认NO
  */
 BOOL open3DTouchPreview;
 
@@ -108,7 +108,7 @@ BOOL openCamera;
 BOOL lookGifPhoto;
 
 /**
- 是否开启查看LivePhoto功能呢 - 默认开启
+ 是否开启查看LivePhoto功能呢 - 默认NO
  */
 BOOL lookLivePhoto;
 
@@ -164,7 +164,7 @@ UIColor *navLeftBtnTitleColor;
 UIColor *navTitleColor;
 
 /**  导航栏标题箭头图标  */
-@NSString *navTitleImageName;
+NSString *navTitleImageName;
 
 /**  导航栏右边按钮普通状态背景颜色  */
 UIColor *navRightBtnNormalBgColor;
@@ -249,6 +249,67 @@ NSString *originalBtnNormalImageName;
 
 /**  原图按钮选中状态图片  */
 NSString *originalBtnSelectedImageName;
+
+/*-------------------半屏相机界面------------------*/
+/**  返回按钮X普通状态图片  */
+NSString *cameraCloseNormalImageName;
+
+/**  返回按钮X高亮状态图片  */
+NSString *cameraCloseHighlightedImageName;
+
+/**  闪光灯自动模式图片  */
+NSString *flashAutoImageName;
+
+/**  闪光灯打开模型图片  */
+NSString *flashOnImageName;
+
+/**  闪光灯关闭模式图片  */
+NSString *flashOffImageName;
+
+/**  反转相机普通状态图片  */
+NSString *cameraReverseNormalImageName;
+
+/**  反转相机高亮状态图片  */
+NSString *cameraReverseHighlightedImageName;
+
+/**  中心圆点下照片and视频普通状态文字颜色  */
+UIColor *cameraPhotoVideoNormalTitleColor;
+
+/**  中心圆点下照片and视频选中状态文字颜色  */
+UIColor *cameraPhotoVideoSelectedTitleColor;
+
+/**  拍照按钮普通状态图片  */
+NSString *takePicturesBtnNormalImageName;
+
+/**  拍照按钮高亮状态图片  */
+NSString *takePicturesBtnHighlightedImageName;
+
+/**  录制按钮普通状态图片  */
+NSString *recordedBtnNormalImageName;
+
+/**  录制按钮高亮状态图片  */
+NSString *recordedBtnHighlightedImageName;
+
+/**  删除拍摄的照片/视频图片  */
+NSString *cameraDeleteBtnImageName;
+
+/**  确定拍摄的照片/视频普通状态图片  */
+NSString *cameraNextBtnNormalImageName;
+
+/**  确定拍摄的照片/视频高亮状态图片  */
+NSString *cameraNextBtnHighlightedImageName;
+
+/**  中心圆点图片  */
+NSString *cameraCenterDotImageName;
+
+/**  相机聚焦图片  */
+NSString *cameraFocusImageName;
+
+/**  全屏相机界面下一步按钮文字颜色  */
+UIColor *fullScreenCameraNextBtnTitleColor;
+
+/**  全屏相机界面下一步按钮背景颜色  */
+UIColor *fullScreenCameraNextBtnBgColor;
 ```
 
 - Demo1
