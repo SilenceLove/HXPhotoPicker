@@ -201,7 +201,7 @@
             [self.session addOutput:self.videoOutPut];
         }
     }
-    self.focusIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"camera_ Focusing@2x.png"]];
+    self.focusIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraFocusImageName]];
     self.focusIcon.frame = CGRectMake(0, 0, self.focusIcon.image.size.width, self.focusIcon.image.size.height);
     self.focusIcon.hidden = YES;
     [self.view addSubview:self.focusIcon];
@@ -263,8 +263,8 @@
     
     self.nextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.nextBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-    [self.nextBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.nextBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+    [self.nextBtn setTitleColor:self.photoManager.UIManager.fullScreenCameraNextBtnTitleColor forState:UIControlStateNormal];
+    [self.nextBtn setBackgroundColor:self.photoManager.UIManager.fullScreenCameraNextBtnBgColor];
     self.nextBtn.layer.masksToBounds = YES;
     self.nextBtn.layer.cornerRadius = 2;
     self.nextBtn.titleLabel.font = [UIFont systemFontOfSize:14];

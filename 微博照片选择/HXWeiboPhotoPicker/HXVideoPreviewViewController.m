@@ -62,6 +62,7 @@
         _navItem = [[UINavigationItem alloc] init];
         
         _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+        _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
     }
     return _navItem;
 }
@@ -367,9 +368,9 @@
             max = YES;
         }
     }
-    if (!self.isPreview) {
+//    if (!self.isPreview) {
         if (self.manager.selectedList.count == 0) {
-            if (!self.selectedBtn.selected && !max && !self.isDelete) {
+            if (!self.selectedBtn.selected && !max) {
                 self.model.thumbPhoto = self.coverImage;
                 self.model.previewPhoto = self.coverImage;
                 self.model.selected = YES;
@@ -377,7 +378,7 @@
                 [self.manager.selectedVideos addObject:self.model];
             }
         }
-    }
+//    }
     if ([self.delegate respondsToSelector:@selector(previewVideoDidNextClick)]) {
         [self.delegate previewVideoDidNextClick];
     }

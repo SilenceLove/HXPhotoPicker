@@ -110,6 +110,26 @@
     self.UIManager.cellGitIconImageName = @"timeline_image_gif@2x.png";
     self.UIManager.cellSelectBtnNormalImageName = @"compose_guide_check_box_default@2x.png";
     self.UIManager.cellSelectBtnSelectedImageName = @"compose_guide_check_box_right@2x.png";
+    self.UIManager.cameraCloseNormalImageName = @"camera_close@2x.png";
+    self.UIManager.cameraCloseHighlightedImageName = @"camera_close_highlighted@2x.png";
+    self.UIManager.cameraReverseNormalImageName = @"camera_overturn@2x.png";
+    self.UIManager.cameraReverseHighlightedImageName = @"camera_overturn_highlighted@2x.png";
+    self.UIManager.flashAutoImageName = @"camera_flashlight_auto_disable@2x.png";
+    self.UIManager.flashOnImageName = @"camera_flashlight_open_disable@2x.png";
+    self.UIManager.flashOffImageName = @"camera_flashlight_disable@2x.png";
+    self.UIManager.takePicturesBtnNormalImageName = @"camera_camera_background@2x.png";
+    self.UIManager.takePicturesBtnHighlightedImageName = @"camera_camera_background_highlighted@2x.png";
+    self.UIManager.recordedBtnNormalImageName = @"camera_video_background@2x.png";
+    self.UIManager.recordedBtnHighlightedImageName = @"camera_video_background_highlighted@2x.png";
+    self.UIManager.cameraDeleteBtnImageName = @"video_delete_dustbin@2x.png";
+    self.UIManager.cameraNextBtnNormalImageName = @"video_next_button@2x.png";
+    self.UIManager.cameraNextBtnHighlightedImageName = @"video_next_button_highlighted@2x.png";
+    self.UIManager.cameraCenterDotImageName = @"camera_drop_highlighted@2x.png";
+    self.UIManager.cameraFocusImageName = @"camera_ Focusing@2x.png";
+    self.UIManager.fullScreenCameraNextBtnTitleColor = [UIColor whiteColor];
+    self.UIManager.fullScreenCameraNextBtnBgColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
+    self.UIManager.cameraPhotoVideoNormalTitleColor = [UIColor lightGrayColor];
+    self.UIManager.cameraPhotoVideoSelectedTitleColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
     
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }

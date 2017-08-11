@@ -118,5 +118,65 @@
 /**  原图按钮选中状态图片  */
 @property (copy, nonatomic) NSString *originalBtnSelectedImageName;
 
+/*-------------------半屏相机界面------------------*/
+/**  返回按钮X普通状态图片  */
+@property (copy, nonatomic) NSString *cameraCloseNormalImageName;
+
+/**  返回按钮X高亮状态图片  */
+@property (copy, nonatomic) NSString *cameraCloseHighlightedImageName;
+
+/**  闪光灯自动模式图片  */
+@property (copy, nonatomic) NSString *flashAutoImageName;
+
+/**  闪光灯打开模型图片  */
+@property (copy, nonatomic) NSString *flashOnImageName;
+
+/**  闪光灯关闭模式图片  */
+@property (copy, nonatomic) NSString *flashOffImageName;
+
+/**  反转相机普通状态图片  */
+@property (copy, nonatomic) NSString *cameraReverseNormalImageName;
+
+/**  反转相机高亮状态图片  */
+@property (copy, nonatomic) NSString *cameraReverseHighlightedImageName;
+
+/**  中心圆点下照片and视频普通状态文字颜色  */
+@property (strong, nonatomic) UIColor *cameraPhotoVideoNormalTitleColor;
+
+/**  中心圆点下照片and视频选中状态文字颜色  */
+@property (strong, nonatomic) UIColor *cameraPhotoVideoSelectedTitleColor;
+
+/**  拍照按钮普通状态图片  */
+@property (copy, nonatomic) NSString *takePicturesBtnNormalImageName;
+
+/**  拍照按钮高亮状态图片  */
+@property (copy, nonatomic) NSString *takePicturesBtnHighlightedImageName;
+
+/**  录制按钮普通状态图片  */
+@property (copy, nonatomic) NSString *recordedBtnNormalImageName;
+
+/**  录制按钮高亮状态图片  */
+@property (copy, nonatomic) NSString *recordedBtnHighlightedImageName;
+
+/**  删除拍摄的照片/视频图片  */
+@property (copy, nonatomic) NSString *cameraDeleteBtnImageName;
+
+/**  确定拍摄的照片/视频普通状态图片  */
+@property (copy, nonatomic) NSString *cameraNextBtnNormalImageName;
+
+/**  确定拍摄的照片/视频高亮状态图片  */
+@property (copy, nonatomic) NSString *cameraNextBtnHighlightedImageName;
+
+/**  中心圆点图片  */
+@property (copy, nonatomic) NSString *cameraCenterDotImageName;
+
+/**  相机聚焦图片  */
+@property (copy, nonatomic) NSString *cameraFocusImageName;
+
+/**  全屏相机界面下一步按钮文字颜色  */
+@property (strong, nonatomic) UIColor *fullScreenCameraNextBtnTitleColor;
+
+/**  全屏相机界面下一步按钮背景颜色  */
+@property (strong, nonatomic) UIColor *fullScreenCameraNextBtnBgColor;
 
 @end

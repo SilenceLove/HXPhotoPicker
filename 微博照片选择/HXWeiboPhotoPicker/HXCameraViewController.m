@@ -124,26 +124,32 @@
     CGFloat height = self.view.frame.size.height;
     UINavigationBar *navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
     [self.view addSubview:navBar];
+    navBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.photoManager.UIManager.navTitleColor};
+    if (self.photoManager.UIManager.navBackgroundImageName) {
+        [navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
+    }else if (self.photoManager.UIManager.navBackgroundColor) {
+        [navBar setBackgroundColor:self.photoManager.UIManager.navBackgroundColor];
+    }
     UINavigationItem *navItem = [[UINavigationItem alloc] init];
     [navBar pushNavigationItem:navItem animated:NO];
     self.beginGestureScale = 1.0f;
     self.effectiveScale = 1.0f;
     navItem.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [leftBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_close@2x.png"] forState:UIControlStateNormal];
-    [leftBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_close_highlighted@2x.png"] forState:UIControlStateHighlighted];
+    [leftBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraCloseNormalImageName] forState:UIControlStateNormal];
+    [leftBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraCloseHighlightedImageName] forState:UIControlStateHighlighted];
     [leftBtn addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
     leftBtn.frame = CGRectMake(0, 0, leftBtn.currentImage.size.width, leftBtn.currentImage.size.height);
     
     UIButton *rightOne = [UIButton buttonWithType:UIButtonTypeCustom];
-    [rightOne setImage:[HXPhotoTools hx_imageNamed:@"camera_overturn@2x.png"] forState:UIControlStateNormal];
-    [rightOne setImage:[HXPhotoTools hx_imageNamed:@"camera_overturn_highlighted@2x.png"] forState:UIControlStateHighlighted];
+    [rightOne setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraReverseNormalImageName] forState:UIControlStateNormal];
+    [rightOne setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraReverseHighlightedImageName] forState:UIControlStateHighlighted];
     [rightOne addTarget:self action:@selector(didRightOneClick) forControlEvents:UIControlEventTouchUpInside];
     rightOne.frame = CGRectMake(0, 0, rightOne.currentImage.size.width, rightOne.currentImage.size.height);
     self.rightOne = rightOne;
     
     UIButton *rightTwo = [UIButton buttonWithType:UIButtonTypeCustom];
-    [rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_auto_disable@2x.png"] forState:UIControlStateNormal];
+    [rightTwo setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.flashAutoImageName] forState:UIControlStateNormal];
     [rightTwo addTarget:self action:@selector(didRightTwoClick) forControlEvents:UIControlEventTouchUpInside];
     rightTwo.frame = CGRectMake(0, 0, rightTwo.currentImage.size.width, rightTwo.currentImage.size.height);
     self.rightTwo = rightTwo;
@@ -215,8 +221,8 @@
     self.tap = tap;
     
     UIButton *photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [photoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_camera_background@2x.png"] forState:UIControlStateNormal];
-    [photoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_camera_background_highlighted@2x.png"] forState:UIControlStateHighlighted];
+    [photoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.takePicturesBtnNormalImageName] forState:UIControlStateNormal];
+    [photoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.takePicturesBtnHighlightedImageName] forState:UIControlStateHighlighted];
     [self.view addSubview:photoBtn];
     [photoBtn addTarget:self action:@selector(didPhotoClick) forControlEvents:UIControlEventTouchUpInside];
     photoBtn.frame = CGRectMake(0, 0, photoBtn.currentImage.size.width, photoBtn.currentImage.size.height);
@@ -224,7 +230,7 @@
     self.photoBtn = photoBtn;
     
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
+    [videoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.recordedBtnNormalImageName] forState:UIControlStateNormal];
     [self.view addSubview:videoBtn];
     videoBtn.hidden = YES;
     UILongPressGestureRecognizer *longPGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongClick:)];
@@ -244,7 +250,7 @@
     [self.view addGestureRecognizer:rightSwipe];
     self.rightSwipe = rightSwipe;
     
-    UIImageView *centerIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"camera_drop_highlighted@2x.png"]];
+    UIImageView *centerIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraCenterDotImageName]];
     centerIcon.frame = CGRectMake(0, 0, centerIcon.image.size.width, centerIcon.image.size.height);
     centerIcon.center = CGPointMake(width / 2, CGRectGetMaxY(backView.frame) + 10);
     [self.view addSubview:centerIcon];
@@ -325,7 +331,7 @@
 //    self.zoomSlider =
 //    [self.backView addSubview:self.zoomSlider];
     
-    self.focusIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"camera_ Focusing@2x.png"]];
+    self.focusIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraFocusImageName]];
     self.focusIcon.frame = CGRectMake(0, 0, self.focusIcon.image.size.width, self.focusIcon.image.size.height);
     self.focusIcon.hidden = YES;
     [self.backView addSubview:self.focusIcon];
@@ -446,10 +452,10 @@
 - (void)didLongClick:(UILongPressGestureRecognizer *)longRPG
 {
     if ([longRPG state] == UIGestureRecognizerStateBegan) {
-        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background_highlighted@2x.png"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.recordedBtnHighlightedImageName] forState:UIControlStateNormal];
         [self cameraBackgroundDidClickPlay];
     }else if ([longRPG state] == UIGestureRecognizerStateEnded) {
-        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.recordedBtnNormalImageName] forState:UIControlStateNormal];
         [self.videoOutPut stopRecording];
         [self.timer invalidate];
     }
@@ -495,7 +501,7 @@
     [self.progressView setProgress:self.videoTime / 60.f animated:YES];
     if (self.videoTime == 60) {
         [timer invalidate];
-        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_video_background@2x.png"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.recordedBtnNormalImageName] forState:UIControlStateNormal];
         [self.videoOutPut stopRecording];
     }
 }
@@ -536,16 +542,16 @@
     if ([self.device hasFlash]) {
         if (self.flashlight == 0) {
             self.flashlight = 1;
-            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_disable@2x.png"] forState:UIControlStateNormal];
+            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.flashOffImageName] forState:UIControlStateNormal];
             self.device.flashMode = AVCaptureFlashModeOff;
         }else if (self.flashlight == 1){
             self.flashlight = 1;
-            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_open_disable@2x.png"] forState:UIControlStateNormal];
+            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.flashOnImageName] forState:UIControlStateNormal];
             self.device.flashMode = AVCaptureFlashModeOn;
             self.flashlight = 2;
         }else {
             self.flashlight = 0;
-            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight_auto_disable@2x.png"] forState:UIControlStateNormal];
+            [self.rightTwo setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.flashAutoImageName] forState:UIControlStateNormal];
             self.device.flashMode = AVCaptureFlashModeAuto;
         }
     } else {
@@ -716,9 +722,9 @@
         _moveView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 25)];
         UIButton *changePhotoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [changePhotoBtn setTitle:[NSBundle hx_localizedStringForKey:@"照片"] forState:UIControlStateNormal];
-        [changePhotoBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
-        [changePhotoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateSelected];
-        [changePhotoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateHighlighted];
+        [changePhotoBtn setTitleColor:self.photoManager.UIManager.cameraPhotoVideoNormalTitleColor forState:UIControlStateNormal];
+        [changePhotoBtn setTitleColor:self.photoManager.UIManager.cameraPhotoVideoSelectedTitleColor forState:UIControlStateSelected];
+        [changePhotoBtn setTitleColor:self.photoManager.UIManager.cameraPhotoVideoSelectedTitleColor forState:UIControlStateHighlighted];
         changePhotoBtn.titleLabel.font = [UIFont systemFontOfSize:11];
         [changePhotoBtn addTarget:self action:@selector(didMoveViewClick:) forControlEvents:UIControlEventTouchUpInside];
         changePhotoBtn.frame = CGRectMake(0, 0, 50, 25);
@@ -728,9 +734,9 @@
         
         UIButton *changeVideoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [changeVideoBtn setTitle:[NSBundle hx_localizedStringForKey:@"视频"] forState:UIControlStateNormal];
-        [changeVideoBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
-        [changeVideoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateSelected];
-        [changeVideoBtn setTitleColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1] forState:UIControlStateHighlighted];
+        [changeVideoBtn setTitleColor:self.photoManager.UIManager.cameraPhotoVideoNormalTitleColor forState:UIControlStateNormal];
+        [changeVideoBtn setTitleColor:self.photoManager.UIManager.cameraPhotoVideoSelectedTitleColor forState:UIControlStateSelected];
+        [changeVideoBtn setTitleColor:self.photoManager.UIManager.cameraPhotoVideoSelectedTitleColor forState:UIControlStateHighlighted];
         changeVideoBtn.titleLabel.font = [UIFont systemFontOfSize:11];
         [changeVideoBtn addTarget:self action:@selector(didMoveViewClick:) forControlEvents:UIControlEventTouchUpInside];
         changeVideoBtn.frame = CGRectMake(50, 0, 50, 25);
@@ -789,7 +795,7 @@
     if (!_deleteBtn) {
         _deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _deleteBtn.hidden = YES;
-        [_deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"video_delete_dustbin@2x.png"] forState:UIControlStateNormal];
+        [_deleteBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraDeleteBtnImageName] forState:UIControlStateNormal];
         [_deleteBtn addTarget:self action:@selector(deleteClick) forControlEvents:UIControlEventTouchUpInside];
         _deleteBtn.frame = CGRectMake(30, 0, _deleteBtn.currentImage.size.width, _deleteBtn.currentImage.size.height);
         _deleteBtn.center = CGPointMake(_deleteBtn.center.x, self.videoBtn.center.y);
@@ -841,8 +847,8 @@
     if (!_nextBtn) {
         _nextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _nextBtn.hidden = YES;
-        [_nextBtn setImage:[HXPhotoTools hx_imageNamed:@"video_next_button@2x.png"] forState:UIControlStateNormal];
-        [_nextBtn setImage:[HXPhotoTools hx_imageNamed:@"video_next_button_highlighted@2x.png"] forState:UIControlStateHighlighted];
+        [_nextBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraNextBtnNormalImageName] forState:UIControlStateNormal];
+        [_nextBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraNextBtnHighlightedImageName] forState:UIControlStateHighlighted];
         [_nextBtn addTarget:self action:@selector(nextClick) forControlEvents:UIControlEventTouchUpInside];
         CGFloat width = self.view.frame.size.width;
         _nextBtn.frame = CGRectMake(width - 30 - _nextBtn.currentImage.size.width, 0, _nextBtn.currentImage.size.width, _nextBtn.currentImage.size.height);
