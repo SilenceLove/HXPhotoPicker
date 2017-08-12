@@ -20,8 +20,8 @@
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
         _manager.openCamera = YES;
         _manager.singleSelected = YES;
-//        _manager.singleSelecteClip = NO;
-        _manager.showFullScreenCamera = YES;
+        //        _manager.singleSelecteClip = NO;
+        _manager.cameraType = HXPhotoManagerCameraTypeFullScreen;
     }
     return _manager;
 }

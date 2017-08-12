@@ -99,13 +99,56 @@
     option.networkAccessAllowed = YES;
     
     return [[PHCachingImageManager defaultManager] requestLivePhotoForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
-        BOOL downloadFinined = (![[info objectForKey:PHLivePhotoInfoCancelledKey] boolValue] && ![[info objectForKey:PHLivePhotoInfoErrorKey] boolValue]);
+        BOOL downloadFinined = (![[info objectForKey:PHLivePhotoInfoCancelledKey] boolValue] && ![info objectForKey:PHLivePhotoInfoErrorKey]);
         if (downloadFinined && completion && livePhoto) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 completion(livePhoto,info);
             });
         }
     }];
+}
+
++ (void)getFullSizeImageUrlFor:(HXPhotoModel *)model complete:(void (^)(NSURL *))complete {
+    if (model.asset) {
+        PHContentEditingInputRequestOptions *options = [[PHContentEditingInputRequestOptions alloc] init];
+        options.networkAccessAllowed = YES;
+//        options.canHandleAdjustmentData = ^BOOL(PHAdjustmentData * _Nonnull adjustmentData) {
+//            
+//            return YES;
+//        };
+        
+        [model.asset requestContentEditingInputWithOptions:options completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+            BOOL error = [info objectForKey:PHContentEditingInputErrorKey];
+//            BOOL cloud = [[info objectForKey:PHContentEditingInputResultIsInCloudKey] boolValue];
+            BOOL cancel = [[info objectForKey:PHContentEditingInputCancelledKey] boolValue];
+            
+            if (!error && !cancel && contentEditingInput) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (complete) {
+                        complete(contentEditingInput.fullSizeImageURL);
+                    }
+                });
+            }
+        }];
+    }else {
+        NSData *imageData;
+        NSString *suffix;
+        if (UIImagePNGRepresentation(model.previewPhoto)) {
+            //返回为png图像。
+            imageData = UIImagePNGRepresentation(model.previewPhoto);
+            suffix = @"png";
+        }else {
+            //返回为JPEG图像。
+            imageData = UIImageJPEGRepresentation(model.previewPhoto, 1.0);
+            suffix = @"jpeg";
+        }
+        NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+        [imageData writeToFile:fullPathToFile atomically:YES];
+        if (complete) {
+            complete([NSURL fileURLWithPath:fullPathToFile]);
+        }
+    }
 }
 
 + (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void (^)(UIImage *, NSDictionary *))completion progressHandler:(void (^)(double, NSError *, BOOL *, NSDictionary *))progressHandler  {
@@ -440,8 +483,8 @@
     [images addObject:model];
     if (images.count == total) {
         [images sortUsingComparator:^NSComparisonResult(HXPhotoModel *temp, HXPhotoModel *other) {
-            NSInteger length1 = temp.fetchOriginalIndex;
-            NSInteger length2 = other.fetchOriginalIndex;
+            NSInteger length1 = temp.endIndex;
+            NSInteger length2 = other.endIndex;
             
             NSNumber *number1 = [NSNumber numberWithInteger:length1];
             NSNumber *number2 = [NSNumber numberWithInteger:length2];
@@ -463,4 +506,194 @@
         }
     }
 }
+
++ (void)getSelectedPhotosFullSizeImageUrl:(NSArray<HXPhotoModel *> *)photos complete:(void (^)(NSArray<NSURL *> *))complete {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableArray *urls = [NSMutableArray array];
+        for (HXPhotoModel *model in photos) {
+            __weak typeof(self) weakSelf = self;
+            [self getFullSizeImageUrlFor:model complete:^(NSURL *url) {
+                model.fullSizeImageURL = url;
+                [weakSelf sortFullImageUrlForModel:model total:photos.count images:urls completion:^(NSArray *array) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (complete) {
+                            complete(array);
+                        }
+                    });
+                }];
+            }];
+        }
+    });
+}
++ (void)sortFullImageUrlForModel:(HXPhotoModel *)model total:(NSInteger)total images:(NSMutableArray *)images completion:(void(^)(NSArray *array))completion {
+    [images addObject:model];
+    if (images.count == total) {
+        [images sortUsingComparator:^NSComparisonResult(HXPhotoModel *temp, HXPhotoModel *other) {
+            NSInteger length1 = temp.endIndex;
+            NSInteger length2 = other.endIndex;
+            
+            NSNumber *number1 = [NSNumber numberWithInteger:length1];
+            NSNumber *number2 = [NSNumber numberWithInteger:length2];
+            
+            NSComparisonResult result = [number1 compare:number2];
+            return result == NSOrderedDescending;
+        }];
+        NSMutableArray *array = [NSMutableArray array];
+        for (HXPhotoModel *md in images) {
+            [array addObject:md.fullSizeImageURL];
+        }
+        [images removeAllObjects];
+        if (completion) {
+            completion(array);
+        }
+    }
+}
++ (NSString *)uploadFileName {
+    NSString *fileName = @"";
+    NSDate *nowDate = [NSDate date];
+    NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
+    
+    NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
+    
+    fileName = [fileName stringByAppendingString:@"hx"];
+    fileName = [fileName stringByAppendingString:dateStr];
+    fileName = [fileName stringByAppendingString:numStr];
+    return fileName;
+}
++ (void)sortResultModel:(HXPhotoResultModel *)model total:(NSInteger)total models:(NSMutableArray *)models photos:(NSMutableArray *)photos videos:(NSMutableArray *)videos completion:(void(^)(NSArray *all, NSArray *photos, NSArray *videos))completion {
+    [models addObject:model];
+    if (model.type == HXPhotoResultModelMediaTypePhoto) {
+        [photos addObject:model];
+    }else {
+        [videos addObject:model];
+    }
+    if (models.count == total) {
+        [models sortUsingComparator:^NSComparisonResult(HXPhotoResultModel *temp, HXPhotoResultModel *other) {
+            NSInteger length1 = temp.index;
+            NSInteger length2 = other.index;
+            
+            NSNumber *number1 = [NSNumber numberWithInteger:length1];
+            NSNumber *number2 = [NSNumber numberWithInteger:length2];
+            
+            NSComparisonResult result = [number1 compare:number2];
+            return result == NSOrderedDescending;
+        }];
+        [photos sortUsingComparator:^NSComparisonResult(HXPhotoResultModel *temp, HXPhotoResultModel *other) {
+            NSInteger length1 = temp.photoIndex;
+            NSInteger length2 = other.photoIndex;
+            
+            NSNumber *number1 = [NSNumber numberWithInteger:length1];
+            NSNumber *number2 = [NSNumber numberWithInteger:length2];
+            
+            NSComparisonResult result = [number1 compare:number2];
+            return result == NSOrderedDescending;
+        }];
+        [videos sortUsingComparator:^NSComparisonResult(HXPhotoResultModel *temp, HXPhotoResultModel *other) {
+            NSInteger length1 = temp.videoIndex;
+            NSInteger length2 = other.videoIndex;
+            
+            NSNumber *number1 = [NSNumber numberWithInteger:length1];
+            NSNumber *number2 = [NSNumber numberWithInteger:length2];
+            
+            NSComparisonResult result = [number1 compare:number2];
+            return result == NSOrderedDescending;
+        }];
+        if (completion) {
+            completion(models,photos,videos);
+        }
+    }
+}
+
++ (void)getSelectedListResultModel:(NSArray<HXPhotoModel *> *)selectedList complete:(void (^)(NSArray<HXPhotoResultModel *> *, NSArray<HXPhotoResultModel *> *, NSArray<HXPhotoResultModel *> *))complete {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableArray *models = [NSMutableArray array];
+        NSMutableArray *photos = [NSMutableArray array];
+        NSMutableArray *videos = [NSMutableArray array];
+        for (HXPhotoModel *photoModel in selectedList) {
+            HXPhotoResultModel *resultModel = [[HXPhotoResultModel alloc] init];
+            resultModel.index = photoModel.endCollectionIndex;
+            if (photoModel.asset) {
+                if (photoModel.subType == HXPhotoModelMediaSubTypeVideo) {
+                    if ([photoModel.avAsset isKindOfClass:[AVURLAsset class]]) {
+                        AVURLAsset *urlAsset = (AVURLAsset *)photoModel.avAsset;
+                        resultModel.videoURL = urlAsset.URL;
+                    }
+                    resultModel.type = HXPhotoResultModelMediaTypeVideo;
+                    resultModel.videoIndex = photoModel.videoIndex;
+                }else {
+                    resultModel.photoIndex = photoModel.endIndex;
+                    resultModel.type = HXPhotoResultModelMediaTypePhoto;
+                }
+                resultModel.avAsset = photoModel.avAsset;
+                PHContentEditingInputRequestOptions *options = [[PHContentEditingInputRequestOptions alloc] init];
+                options.networkAccessAllowed = YES;
+                __weak typeof(self) weakSelf = self;
+                [photoModel.asset requestContentEditingInputWithOptions:options completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+                    BOOL error = [info objectForKey:PHContentEditingInputErrorKey];
+                    //            BOOL cloud = [[info objectForKey:PHContentEditingInputResultIsInCloudKey] boolValue];
+                    BOOL cancel = [[info objectForKey:PHContentEditingInputCancelledKey] boolValue];
+                    
+                    if (!error && !cancel && contentEditingInput) {
+                        resultModel.fullSizeImageURL = contentEditingInput.fullSizeImageURL;
+                        if (resultModel.type == HXPhotoResultModelMediaTypePhoto) {
+                            resultModel.displaySizeImage = contentEditingInput.displaySizeImage;
+                        }else {
+                            resultModel.displaySizeImage = photoModel.thumbPhoto;
+                        }
+                        resultModel.fullSizeImageOrientation = contentEditingInput.fullSizeImageOrientation;
+                        resultModel.creationDate = contentEditingInput.creationDate;
+                        resultModel.location = contentEditingInput.location;
+                        if ([contentEditingInput.avAsset isKindOfClass:[AVURLAsset class]]) {
+                            AVURLAsset *urlAsset = (AVURLAsset *)contentEditingInput.avAsset;
+                            resultModel.videoURL = urlAsset.URL;
+                        }
+                        [weakSelf sortResultModel:resultModel total:selectedList.count models:models photos:photos videos:videos completion:^(NSArray *all, NSArray *photos, NSArray *videos) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if (complete) {
+                                    complete(all,photos,videos);
+                                }
+                            });
+                        }];
+                    }
+                }];
+            }else {
+                resultModel.creationDate = [NSDate date];
+                resultModel.displaySizeImage = photoModel.previewPhoto;
+                if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                    resultModel.photoIndex = photoModel.endIndex;
+                    resultModel.type = HXPhotoResultModelMediaTypePhoto;
+                    resultModel.fullSizeImageOrientation = photoModel.previewPhoto.imageOrientation;
+                    NSData *imageData;
+                    NSString *suffix;
+                    if (UIImagePNGRepresentation(photoModel.previewPhoto)) {
+                        //返回为png图像。
+                        imageData = UIImagePNGRepresentation(photoModel.previewPhoto);
+                        suffix = @"png";
+                    }else {
+                        //返回为JPEG图像。
+                        imageData = UIImageJPEGRepresentation(photoModel.previewPhoto, 1.0);
+                        suffix = @"jpeg";
+                    }
+                    NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+                    NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                    [imageData writeToFile:fullPathToFile atomically:YES];
+                    resultModel.fullSizeImageURL = [NSURL fileURLWithPath:fullPathToFile];
+                }else {
+                    resultModel.videoIndex = photoModel.videoIndex;
+                    resultModel.type = HXPhotoResultModelMediaTypeVideo;
+                    resultModel.videoURL = photoModel.videoURL;
+                }
+                [self sortResultModel:resultModel total:selectedList.count models:models photos:photos videos:videos completion:^(NSArray *all, NSArray *photos, NSArray *videos) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (complete) {
+                            complete(all,photos,videos);
+                        }
+                    });
+                }];
+            }
+            
+        }
+    });
+}
+
 @end

@@ -654,6 +654,7 @@
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
     if (!self.videoURL) {
         model.type = HXPhotoModelMediaTypeCameraPhoto;
+        model.subType = HXPhotoModelMediaSubTypePhoto;
         if (self.imageView.image.imageOrientation != UIImageOrientationUp) {
             self.imageView.image = [self.imageView.image fullNormalizedImage];
         }
@@ -686,6 +687,7 @@
         }
         [self.playerLayer.player pause];
         model.type = HXPhotoModelMediaTypeCameraVideo;
+        model.subType = HXPhotoModelMediaSubTypeVideo;
         MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:self.videoURL] ;
         player.shouldAutoplay = NO;
         UIImage  *image = [player thumbnailImageAtTime:1.0 timeOption:MPMovieTimeOptionNearestKeyFrame];

@@ -862,6 +862,7 @@
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
     if (self.changePhotoBtn.selected) {
         model.type = HXPhotoModelMediaTypeCameraPhoto;
+        model.subType = HXPhotoModelMediaSubTypePhoto;
         if (self.imageView.image.imageOrientation != UIImageOrientationUp) {
             self.imageView.image = [self.imageView.image normalizedImage];
         }
@@ -910,6 +911,7 @@
         [self clipVideoCompleted:^{
             weakSelf.view.userInteractionEnabled = YES;
             model.type = HXPhotoModelMediaTypeCameraVideo;
+            model.subType = HXPhotoModelMediaSubTypeVideo;
             MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:weakSelf.videoURL] ;
             player.shouldAutoplay = NO;
             UIImage  *image = [player thumbnailImageAtTime:1.0 timeOption:MPMovieTimeOptionNearestKeyFrame];

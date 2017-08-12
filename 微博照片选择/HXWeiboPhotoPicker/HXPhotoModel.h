@@ -20,6 +20,11 @@ typedef enum : NSUInteger {
     HXPhotoModelMediaTypeCamera         // 跳转相机
 } HXPhotoModelMediaType;
 
+typedef enum : NSUInteger {
+    HXPhotoModelMediaSubTypePhoto = 0, // 照片
+    HXPhotoModelMediaSubTypeVideo // 视频
+} HXPhotoModelMediaSubType;
+
 @interface HXPhotoModel : NSObject
 
 /**
@@ -27,6 +32,9 @@ typedef enum : NSUInteger {
  */
 @property (strong, nonatomic) PHAsset *asset;
 @property (copy, nonatomic) NSString *localIdentifier;
+
+/**  照片原图url 空的, 请根据tools里的方法获取  */
+@property (strong, nonatomic) NSURL *fullSizeImageURL;
 
 /**
  视频AVAsset对象
@@ -38,6 +46,7 @@ typedef enum : NSUInteger {
  照片类型
  */
 @property (assign, nonatomic) HXPhotoModelMediaType type;
+@property (assign, nonatomic) HXPhotoModelMediaSubType subType;
 
 /**
  小图 -- 选中之后有值, 取消选中为空
@@ -147,6 +156,8 @@ typedef enum : NSUInteger {
  选完点下一步之后在collectionView上的图片数组下标
  */
 @property (assign, nonatomic) NSInteger endIndex;
+
+@property (assign, nonatomic) NSInteger videoIndex;
 
 /**
  选完点下一步之后在collectionView上的下标

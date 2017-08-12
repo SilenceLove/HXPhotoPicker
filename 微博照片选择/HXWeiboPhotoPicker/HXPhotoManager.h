@@ -18,9 +18,15 @@
 
 typedef enum : NSUInteger {
     HXPhotoManagerSelectedTypePhoto = 0, // 只选择图片
-    HXPhotoManagerSelectedTypeVideo, // 只选择视频
+    HXPhotoManagerSelectedTypeVideo = 1, // 只选择视频
     HXPhotoManagerSelectedTypePhotoAndVideo // 图片和视频一起
 } HXPhotoManagerSelectedType;
+
+typedef enum : NSUInteger {
+    HXPhotoManagerCameraTypeHalfScreen = 0, // 半屏相机
+    HXPhotoManagerCameraTypeFullScreen = 1, // 全屏相机
+    HXPhotoManagerCameraTypeSystem // 系统相机
+} HXPhotoManagerCameraType;
 
 @interface HXPhotoManager : NSObject
 
@@ -70,9 +76,9 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL open3DTouchPreview;
 
 /**
- 显示全屏相机 //  默认 NO
+ 相机界面类型 //  默认  半屏
  */
-@property (assign, nonatomic) BOOL showFullScreenCamera;
+@property (assign, nonatomic) HXPhotoManagerCameraType cameraType;
 
 /**
  删除网络图片时是否显示Alert // 默认不显示

@@ -19,6 +19,7 @@
 @property (assign, nonatomic) BOOL isDelete;
 @property (strong, nonatomic) UINavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
+@property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @end
 
 @implementation HXVideoPreviewViewController
@@ -81,42 +82,22 @@
     if (self.isCamera) {
         AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.model.videoURL];
         self.playVideo = [AVPlayer playerWithPlayerItem:playerItem];
-        AVPlayerLayer *playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.playVideo];
-        playerLayer.frame = CGRectMake(0, 64, width, height - 64);
-        if (!self.isTouch) {
-            [self.playVideo play];
-        }
-        [self.view.layer insertSublayer:playerLayer atIndex:0];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playVideo.currentItem];
-        self.playBtn.frame = CGRectMake(0, 64, width, height - 64);
-        [self.view addSubview:self.playBtn];
-        if (!self.manager.singleSelected) {
-            self.selectedBtn.selected = self.model.selected;
-            [self.view addSubview:self.selectedBtn];
-        }
     }else {
-        __weak typeof(self) weakSelf = self;
-        [[PHImageManager defaultManager] requestPlayerItemForVideo:self.model.asset options:nil resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.playVideo = [AVPlayer playerWithPlayerItem:playerItem];
-                AVPlayerLayer *playerLayer = [AVPlayerLayer playerLayerWithPlayer:weakSelf.playVideo];
-                playerLayer.frame = CGRectMake(0, 64, width, height - 64);
-//                if (!weakSelf.isTouch) {
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                        [weakSelf.playVideo play];
-                    });
-//                }
-                [weakSelf.view.layer insertSublayer:playerLayer atIndex:0];
-                [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.playVideo.currentItem];
-                weakSelf.playBtn.frame = CGRectMake(0, 64, width, height - 64);
-                [weakSelf.view addSubview:weakSelf.playBtn];
-                if (!weakSelf.manager.singleSelected) {
-                    weakSelf.selectedBtn.selected = weakSelf.model.selected;
-                    [weakSelf.view addSubview:weakSelf.selectedBtn];
-                }
-            });
-        }];
+        self.playVideo = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:self.model.avAsset]]; 
+    }
+    
+    self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.playVideo];
+    self.playerLayer.frame = CGRectMake(0, 64, width, height - 64);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.playVideo play];
+    });
+    [self.view.layer insertSublayer:self.playerLayer atIndex:0];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playVideo.currentItem];
+    self.playBtn.frame = CGRectMake(0, 64, width, height - 64);
+    [self.view addSubview:self.playBtn];
+    if (!self.manager.singleSelected) {
+        self.selectedBtn.selected = self.model.selected;
+        [self.view addSubview:self.selectedBtn];
     }
     if (self.selectedComplete) {
         self.rightBtn.hidden = YES;
@@ -132,19 +113,19 @@
     if (self.manager.selectedList.count > 0) {
         self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
         CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else {
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
         self.rightBtn.layer.borderWidth = 0;
         if (self.model.asset.duration < 3) {
-            self.rightBtn.enabled = NO;
-            [self.rightBtn setBackgroundColor:[UIColor whiteColor]];
+            self.navItem.rightBarButtonItem.enabled = NO;
+            [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnDisabledBgColor];
             self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
             self.rightBtn.layer.borderWidth = 0.5;
         }
@@ -171,7 +152,6 @@
 - (void)dismissClick {
     [self.playVideo pause];
     self.playBtn.selected = NO;
-    self.playVideo = nil;
     if (self.selectedComplete) {
         [self dismissViewControllerAnimated:YES completion:nil];
     }else {
@@ -211,8 +191,8 @@
     if (!_selectedBtn) {
         CGFloat width = self.view.frame.size.width;
         _selectedBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
-        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.cellSelectBtnNormalImageName] forState:UIControlStateNormal];
+        [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.cellSelectBtnSelectedImageName] forState:UIControlStateSelected];
         CGFloat selectedBtnW = _selectedBtn.currentImage.size.width;
         CGFloat selectedBtnH = _selectedBtn.currentImage.size.height;
         _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, 84, selectedBtnW, selectedBtnH);
@@ -298,14 +278,14 @@
     if (self.manager.selectedList.count > 0) {
         self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
         CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else {
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
         self.rightBtn.layer.borderWidth = 0;
     }
@@ -319,14 +299,14 @@
     if (!_rightBtn) {
         _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [_rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_rightBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+        [_rightBtn setTitleColor:self.manager.UIManager.navRightBtnNormalTitleColor forState:UIControlStateNormal];
+        [_rightBtn setTitleColor:self.manager.UIManager.navRightBtnDisabledTitleColor forState:UIControlStateDisabled];
         [_rightBtn setTitleColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
         _rightBtn.layer.masksToBounds = YES;
         _rightBtn.layer.cornerRadius = 2;
         _rightBtn.layer.borderWidth = 0.5;
-        _rightBtn.layer.borderColor = [UIColor lightGrayColor].CGColor;
-        [_rightBtn setBackgroundColor:[UIColor whiteColor]];
+        _rightBtn.layer.borderColor = self.manager.UIManager.navRightBtnBorderColor.CGColor;
+        [_rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnDisabledBgColor];
         [_rightBtn addTarget:self action:@selector(didNextClick:) forControlEvents:UIControlEventTouchUpInside];
         _rightBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         _rightBtn.frame = CGRectMake(0, 0, 60, 25);
@@ -395,7 +375,8 @@
 - (void)dealloc {
     [self.playVideo pause];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    self.playVideo = nil;
+    [self.playerLayer removeFromSuperlayer];
+    self.playerLayer.player = nil;
     NSSLog(@"dealloc");
 }
 

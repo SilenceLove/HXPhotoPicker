@@ -68,11 +68,11 @@
         _manager.lookLivePhoto = YES;
 //        _manager.outerCamera = YES;
         _manager.open3DTouchPreview = YES;
-        _manager.showFullScreenCamera = YES;
+        _manager.cameraType = HXPhotoManagerCameraTypeSystem;
         _manager.photoMaxNum = 4;
         _manager.videoMaxNum = 4;
         _manager.maxNum = 8;
-//        _manager.saveSystemAblum = YES;
+        _manager.saveSystemAblum = NO;
     }
     return _manager;
 }
@@ -105,10 +105,26 @@
 //            }
 //        }
 //    }];
-    HXPhotoModel *model = photos.firstObject;
-    [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-        
+    
+//    将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
+//    !!!!  必须是全部类型的那个数组 就是 allList 这个数组  !!!!
+    [HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls, NSArray<HXPhotoResultModel *> *photos, NSArray<HXPhotoResultModel *> *videos) {
+        NSSLog(@"\n全部类型:%@\n照片:%@\n视频:%@",alls,photos,videos);
     }];
+    
+//    [HXPhotoTools getSelectedPhotosFullSizeImageUrl:photos complete:^(NSArray<NSURL *> *imageUrls) {
+//        NSSLog(@"%@",imageUrls);
+//    }];
+    
+//    HXPhotoModel *model = allList.firstObject;
+//    if ([model.avAsset isKindOfClass:[AVURLAsset class]]) {
+//        AVURLAsset *urlAsset = (AVURLAsset *)model.avAsset;
+//        NSSLog(@"%@",urlAsset.URL);
+//    }
+//    // 获取相册里照片原图URL  如果是相机拍的照片且没有保存到系统相册时 此方法无效
+//    [HXPhotoTools getFullSizeImageUrlFor:model complete:^(NSURL *url) {
+//        NSSLog(@"%@",url);
+//    }];
     
 //    for (HXPhotoModel *model in allList) {
 //        NSLog(@"\n%@\n%@",model.thumbPhoto,model.previewPhoto);
@@ -172,21 +188,7 @@
         // 视频封面 大图 - 只有在查看大图的时候选中之后才有值
         model.previewPhoto; 
         
-        // 如果是通过相机录制的视频 需要通过 model.VideoURL 这个字段来压缩写入文件
-            // 如果开启了拍照保存相册功能,那么需要压缩
-        if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-            [self compressedVideoWithURL:model.videoURL success:^(NSString *fileName) {
-                NSSLog(@"%@",fileName); // 视频路径也是视频URL;
-            } failure:^{
-                // 压缩写入失败
-            }];
-        }else { // 如果是在相册里面选择的视频就需要用过 model.avAsset 这个字段来压缩写入文件
-            [self compressedVideoWithURL:model.avAsset success:^(NSString *fileName) {
-                NSSLog(@"%@",fileName); // 视频路径也是视频URL;
-            } failure:^{
-                // 压缩写入失败
-            }];
-        }
+     
     }];
     
     // 判断照片、视频 或 是否是通过相机拍摄的
@@ -213,73 +215,79 @@
     NSSLog(@"%@",NSStringFromCGRect(frame));
 }
 
-// 压缩视频并写入沙盒文件
-- (void)compressedVideoWithURL:(id)url success:(void(^)(NSString *fileName))success failure:(void(^)())failure
-{
-    AVURLAsset *avAsset;
-    if ([url isKindOfClass:[NSURL class]]) {
-        avAsset = [AVURLAsset assetWithURL:url];
-    }else if ([url isKindOfClass:[AVAsset class]]) {
-        avAsset = (AVURLAsset *)url;
-    }
-    
-    NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
-    
-    if ([compatiblePresets containsObject:AVAssetExportPresetHighestQuality]) {
-        
-        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetMediumQuality];
-        
-        NSString *fileName = @""; // 这里是自己定义的文件路径
-        
-        NSDate *nowDate = [NSDate date];
-        NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
-        
-        NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
-        fileName = [fileName stringByAppendingString:dateStr];
-        fileName = [fileName stringByAppendingString:numStr];
-        
-        // ````` 这里取的是时间加上一些随机数  保证每次写入文件的路径不一样
-        fileName = [fileName stringByAppendingString:@".mp4"]; // 视频后缀
-        NSString *fileName1 = [NSTemporaryDirectory() stringByAppendingString:fileName]; //文件名称
-        exportSession.outputURL = [NSURL fileURLWithPath:fileName1];
-        exportSession.outputFileType = AVFileTypeMPEG4;
-        exportSession.shouldOptimizeForNetworkUse = YES;
-        
-        [exportSession exportAsynchronouslyWithCompletionHandler:^{
-            
-            switch (exportSession.status) {
-                case AVAssetExportSessionStatusCancelled:
-                    break;
-                case AVAssetExportSessionStatusCompleted:
-                {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (success) {
-                            success(fileName1);
-                        }
-                    });
-                }
-                    break;
-                case AVAssetExportSessionStatusExporting:
-                    break;
-                case AVAssetExportSessionStatusFailed:
-                {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (failure) {
-                            failure();
-                        }
-                    });
-                }
-                    break;
-                case AVAssetExportSessionStatusUnknown:
-                    break;
-                case AVAssetExportSessionStatusWaiting:
-                    break;
-                default:
-                    break;
-            }
-        }];
-    }
-}
+
+
+
+
+
+//
+//// 压缩视频并写入沙盒文件
+//- (void)compressedVideoWithURL:(id)url success:(void(^)(NSString *fileName))success failure:(void(^)())failure
+//{
+//    AVURLAsset *avAsset;
+//    if ([url isKindOfClass:[NSURL class]]) {
+//        avAsset = [AVURLAsset assetWithURL:url];
+//    }else if ([url isKindOfClass:[AVAsset class]]) {
+//        avAsset = (AVURLAsset *)url;
+//    }
+//    
+//    NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+//    
+//    if ([compatiblePresets containsObject:AVAssetExportPresetHighestQuality]) {
+//        
+//        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetMediumQuality];
+//        
+//        NSString *fileName = @""; // 这里是自己定义的文件路径
+//        
+//        NSDate *nowDate = [NSDate date];
+//        NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
+//        
+//        NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
+//        fileName = [fileName stringByAppendingString:dateStr];
+//        fileName = [fileName stringByAppendingString:numStr];
+//        
+//        // ````` 这里取的是时间加上一些随机数  保证每次写入文件的路径不一样
+//        fileName = [fileName stringByAppendingString:@".mp4"]; // 视频后缀
+//        NSString *fileName1 = [NSTemporaryDirectory() stringByAppendingString:fileName]; //文件名称
+//        exportSession.outputURL = [NSURL fileURLWithPath:fileName1];
+//        exportSession.outputFileType = AVFileTypeMPEG4;
+//        exportSession.shouldOptimizeForNetworkUse = YES;
+//        
+//        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+//            
+//            switch (exportSession.status) {
+//                case AVAssetExportSessionStatusCancelled:
+//                    break;
+//                case AVAssetExportSessionStatusCompleted:
+//                {
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        if (success) {
+//                            success(fileName1);
+//                        }
+//                    });
+//                }
+//                    break;
+//                case AVAssetExportSessionStatusExporting:
+//                    break;
+//                case AVAssetExportSessionStatusFailed:
+//                {
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        if (failure) {
+//                            failure();
+//                        }
+//                    });
+//                }
+//                    break;
+//                case AVAssetExportSessionStatusUnknown:
+//                    break;
+//                case AVAssetExportSessionStatusWaiting:
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }];
+//    }
+//}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

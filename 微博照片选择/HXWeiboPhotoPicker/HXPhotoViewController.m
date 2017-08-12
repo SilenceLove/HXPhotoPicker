@@ -16,11 +16,13 @@
 #import "UIView+HXExtension.h"
 #import "HXFullScreenCameraViewController.h"
 #import "HXPhotoEditViewController.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 
 static NSString *PhotoViewCellId = @"PhotoViewCellId";
-@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,CAAnimationDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,HXPhotoEditViewControllerDelegate,UICollectionViewDataSourcePrefetching>
+@interface HXPhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,CAAnimationDelegate,UIViewControllerPreviewingDelegate,HXAlbumListViewDelegate,HXPhotoPreviewViewControllerDelegate,HXPhotoBottomViewDelegate,HXVideoPreviewViewControllerDelegate,HXCameraViewControllerDelegate,HXPhotoViewCellDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,HXPhotoEditViewControllerDelegate,UICollectionViewDataSourcePrefetching,UIImagePickerControllerDelegate>
 {
     CGRect _originalFrame;
 }
@@ -46,6 +48,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @property (assign, nonatomic) BOOL selectOtherAlbum;
 @property (strong, nonatomic) UINavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
+@property (strong, nonatomic) UIImagePickerController* imagePickerController;
 @end
 
 @implementation HXPhotoViewController
@@ -212,6 +215,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
         photoModel.asset = asset;
         if (asset.mediaType == PHAssetMediaTypeImage) {
+            photoModel.subType = HXPhotoModelMediaSubTypePhoto;
             if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
                 if (self.manager.singleSelected && self.manager.singleSelecteClip) {
                     photoModel.type = HXPhotoModelMediaTypePhoto;
@@ -235,6 +239,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             }
             [self.photos insertObject:photoModel atIndex:0];
         }else if (asset.mediaType == PHAssetMediaTypeVideo) {
+            photoModel.subType = HXPhotoModelMediaSubTypeVideo;
             photoModel.type = HXPhotoModelMediaTypeVideo;
             [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
                 photoModel.avAsset = asset;
@@ -284,7 +289,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             [alert show];
             return;
         }
-        if (self.manager.showFullScreenCamera) {
+        if (self.manager.cameraType == HXPhotoManagerCameraTypeFullScreen) {
             HXFullScreenCameraViewController *vc = [[HXFullScreenCameraViewController alloc] init];
             vc.delegate = self;
             if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
@@ -302,7 +307,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             }else {
                 [self presentViewController:vc animated:YES completion:nil];
             }
-        }else {
+        }else if (self.manager.cameraType == HXPhotoManagerCameraTypeHalfScreen) {
             HXCameraViewController *vc = [[HXCameraViewController alloc] init];
             vc.delegate = self;
             vc.photoManager = self.manager;
@@ -319,8 +324,37 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             }else {
                 [self presentViewController:vc animated:YES completion:nil];
             }
+        }else {
+            // 跳转到相机或相册页面
+            NSString *requiredMediaTypeImage = ( NSString *)kUTTypeImage;
+            NSString *requiredMediaTypeMovie = ( NSString *)kUTTypeMovie;
+            NSArray *arrMediaTypes;
+            if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage,nil];
+            }else if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage, requiredMediaTypeMovie,nil];
+            }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeMovie,nil];
+            }
+            [self.imagePickerController setMediaTypes:arrMediaTypes];
+            [self presentViewController:self.imagePickerController animated:YES completion:nil];
         }
     }
+}
+- (UIImagePickerController *)imagePickerController {
+    if (!_imagePickerController) {
+        _imagePickerController = [[UIImagePickerController alloc] init];
+        _imagePickerController.delegate = (id)self;
+        _imagePickerController.allowsEditing = NO;
+        // 设置录制视频的质量
+        [_imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
+        //设置最长摄像时间
+        [_imagePickerController setVideoMaximumDuration:60.f];
+        _imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        _imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+        _imagePickerController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    }
+    return _imagePickerController;
 }
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
@@ -893,7 +927,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
         type = HXCameraTypeVideo;
     }
-    if (self.manager.showFullScreenCamera) {
+    if (self.manager.cameraType == HXPhotoManagerCameraTypeFullScreen) {
         HXFullScreenCameraViewController *vc = [[HXFullScreenCameraViewController alloc] init];
         vc.delegate = self;
         vc.type = type;
@@ -903,7 +937,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         }else {
             [self presentViewController:vc animated:YES completion:nil];
         }
-    }else {
+    }else if (self.manager.cameraType == HXPhotoManagerCameraTypeHalfScreen) {
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
         vc.type = type;
@@ -914,9 +948,74 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         }else {
             [self presentViewController:vc animated:YES completion:nil];
         }
+    }else {
+        // 跳转到相机或相册页面
+        NSString *requiredMediaTypeImage = ( NSString *)kUTTypeImage;
+        NSString *requiredMediaTypeMovie = ( NSString *)kUTTypeMovie;
+        NSArray *arrMediaTypes;
+        if (type == HXCameraTypePhoto) {
+            arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage,nil];
+        }else if (type == HXCameraTypePhotoAndVideo) {
+            arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage, requiredMediaTypeMovie,nil];
+        }else if (type == HXCameraTypeVideo) {
+            arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeMovie,nil];
+        }
+        
+        [self.imagePickerController setMediaTypes:arrMediaTypes];
+        [self presentViewController:self.imagePickerController animated:YES completion:nil];
     }
 }
-
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    HXPhotoModel *model = [[HXPhotoModel alloc] init];
+    if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        model.type = HXPhotoModelMediaTypeCameraPhoto;
+        model.subType = HXPhotoModelMediaSubTypePhoto;
+        model.thumbPhoto = image;
+        model.imageSize = image.size;
+        model.previewPhoto = image;
+        model.cameraIdentifier = [self videoOutFutFileName];
+    }else  if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
+        NSURL *url = info[UIImagePickerControllerMediaURL];
+        model.type = HXPhotoModelMediaTypeCameraVideo;
+        model.subType = HXPhotoModelMediaSubTypeVideo;
+        MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:url] ;
+        player.shouldAutoplay = NO;
+        UIImage  *image = [player thumbnailImageAtTime:1.0 timeOption:MPMovieTimeOptionNearestKeyFrame];
+        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
+        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:opts];
+        float second = 0;
+        second = urlAsset.duration.value/urlAsset.duration.timescale;
+        NSString *videoTime = [HXPhotoTools getNewTimeFromDurationSecond:second];
+        model.videoURL = url;
+        model.videoTime = videoTime;
+        model.thumbPhoto = image;
+        model.imageSize = image.size;
+        model.previewPhoto = image;
+        model.cameraIdentifier = [self videoOutFutFileName];
+        //        if (second < 3) {
+        //            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
+        //            return;
+        //        }
+    }
+    [self cameraDidNextClick:model];
+}
+- (NSString *)videoOutFutFileName {
+    NSString *fileName = @"";
+    NSDate *nowDate = [NSDate date];
+    NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
+    NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
+    fileName = [fileName stringByAppendingString:dateStr];
+    fileName = [fileName stringByAppendingString:numStr];
+    return fileName;
+}
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
 /**
  通过相机拍照的图片或视频
  

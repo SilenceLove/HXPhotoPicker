@@ -28,8 +28,6 @@
 #pragma mark - < 生命周期 >
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.navigationController.navigationBar setBarTintColor:[UIColor whiteColor]];
-    [self.navigationController.navigationBar setTintColor:[UIColor blackColor]];
     [self setupUI];
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -303,7 +301,7 @@
             [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
         }else if (self.photoManager.UIManager.navBackgroundColor) {
             [_navBar setBackgroundColor:self.photoManager.UIManager.navBackgroundColor];
-        }
+        } 
     }
     return _navBar;
 }

@@ -20,6 +20,7 @@
 
 - (HXPhotoManager *)manager {
     if (!_manager) {
+        /**  注意!!! 如果是先选照片拍摄的话, 不支持将拍摄的照片或者视频保存到系统相册  **/
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.outerCamera = YES;
         _manager.openCamera = NO;
@@ -91,7 +92,7 @@
             type = HXCameraTypeVideo;
         }
 
-        if (self.manager.showFullScreenCamera) {
+        if (self.manager.cameraType == HXPhotoManagerCameraTypeFullScreen) {
             HXFullScreenCameraViewController *vc1 = [[HXFullScreenCameraViewController alloc] init];
             vc1.delegate = self;
             vc1.type = type;
@@ -101,7 +102,7 @@
             }else {
                 [self presentViewController:vc1 animated:YES completion:nil];
             }
-        }else {
+        }else if (self.manager.cameraType == HXPhotoManagerCameraTypeHalfScreen) {
             HXCameraViewController *vc = [[HXCameraViewController alloc] init];
             vc.delegate = self;
             vc.type = type;

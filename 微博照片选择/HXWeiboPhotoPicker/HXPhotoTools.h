@@ -10,6 +10,7 @@
 #import <Photos/Photos.h>
 #import "HXPhotoModel.h"
 #import "UIView+HXExtension.h"
+#import "HXPhotoResultModel.h"
 #import "NSBundle+HXWeiboPhotoPicker.h"
 #ifdef DEBUG
 #define NSSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
@@ -32,7 +33,6 @@ typedef enum : NSUInteger {
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName;
 
-
 + (void)saveImageToAlbum:(UIImage *)image completion:(void(^)())completion error:(void (^)())error;
 + (void)saveVideoToAlbum:(NSURL *)videoUrl completion:(void(^)())completion error:(void (^)())error;
 
@@ -45,8 +45,35 @@ typedef enum : NSUInteger {
  */
 + (PHImageRequestID)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
 
+
 /**
- 根据已选照片数组返回 原图/高清(质量略小于原图) 图片数组  注: 此方法只是一个简单的取image,有可能跟你的需求不一样.那么你就需要自己重新循环模型数组取数据了
+ 根据HXPhotoModel模型获取照片原图路径 
+ 
+ @param model 照片模型
+ @param complete 原图url
+ */
++ (void)getFullSizeImageUrlFor:(HXPhotoModel *)model complete:(void (^)(NSURL *url))complete;
+
+/**
+ 将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
+ !!!!  必须是全部类型的那个数组  !!!!
+ @param selectedList 已选的所有类型(photoAndVideo)数组
+ @param complete 各个类型HXPhotoResultModel模型数组
+ */
++ (void)getSelectedListResultModel:(NSArray<HXPhotoModel *> *)selectedList complete:(void (^)(NSArray<HXPhotoResultModel *> *alls, NSArray<HXPhotoResultModel *> *photos, NSArray<HXPhotoResultModel *> *videos))complete;
+
+/**
+ 获取已选照片模型数组里照片原图路径  - 已按选择顺序排序
+
+ @param photos 已选照片模型数组
+ @param complete 原图路径数组
+ */
++ (void)getSelectedPhotosFullSizeImageUrl:(NSArray<HXPhotoModel *> *)photos complete:(void (^)(NSArray<NSURL *> *imageUrls))complete;
+
+/**
+ 根据已选照片数组返回 原图/高清(质量略小于原图) 图片数组   - 已按选择顺序排序
+ 
+ 注: 此方法只是一个简单的取image,有可能跟你的需求不一样.那么你就需要自己重新循环模型数组取数据了
 
  @param photos 选中照片数组
  @param completion image数组

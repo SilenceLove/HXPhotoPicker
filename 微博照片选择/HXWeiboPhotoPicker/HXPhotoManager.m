@@ -38,7 +38,7 @@
 - (void)setup
 {
     self.open3DTouchPreview = NO;
-    self.showFullScreenCamera = NO;
+    self.cameraType = HXPhotoManagerCameraTypeHalfScreen;
     self.outerCamera = NO;
     self.openCamera = YES;
     self.lookLivePhoto = NO;
@@ -303,6 +303,7 @@
             }
         }
         if (asset.mediaType == PHAssetMediaTypeImage) {
+            photoModel.subType = HXPhotoModelMediaSubTypePhoto;
             if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
                 if (self.singleSelected && self.singleSelecteClip) {
                     photoModel.type = HXPhotoModelMediaTypePhoto;
@@ -326,6 +327,7 @@
             }
             [photoAy addObject:photoModel];
         }else if (asset.mediaType == PHAssetMediaTypeVideo) {
+            photoModel.subType = HXPhotoModelMediaSubTypeVideo;
             photoModel.type = HXPhotoModelMediaTypeVideo;
             [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
                 photoModel.avAsset = asset;

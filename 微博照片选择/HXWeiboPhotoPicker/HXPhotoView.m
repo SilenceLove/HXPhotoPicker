@@ -15,12 +15,13 @@
 #import "HXCameraViewController.h"
 #import "UIView+HXExtension.h"
 #import "HXFullScreenCameraViewController.h"
-
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 #define Spacing 3 // 每个item的间距
 #define LineNum 3 // 每行个数
-@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate>
+@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,UIImagePickerControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
@@ -32,6 +33,7 @@
 @property (strong, nonatomic) NSMutableArray *networkPhotos;
 @property (assign, nonatomic) BOOL downLoadComplete;
 @property (strong, nonatomic) UIImage *tempCameraImage;
+@property (strong, nonatomic) UIImagePickerController* imagePickerController;
 @end
 
 @implementation HXPhotoView
@@ -153,6 +155,7 @@
                             photoModel.thumbPhoto = self.tempCameraImage;
                             photoModel.previewPhoto = self.tempCameraImage;
                             if (asset.mediaType == PHAssetMediaTypeImage) {
+                                photoModel.subType = HXPhotoModelMediaSubTypePhoto;
                                 if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
                                     if (self.manager.singleSelected && self.manager.singleSelecteClip) {
                                         photoModel.type = HXPhotoModelMediaTypePhoto;
@@ -176,6 +179,7 @@
                                 }
                                 [self.manager.endSelectedPhotos addObject:photoModel];
                             }else if (asset.mediaType == PHAssetMediaTypeVideo) {
+                                photoModel.subType = HXPhotoModelMediaSubTypeVideo;
                                 photoModel.type = HXPhotoModelMediaTypeVideo;
                                 [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
                                     photoModel.avAsset = asset;
@@ -383,7 +387,7 @@
             }
             type = HXCameraTypeVideo;
         }
-        if (self.manager.showFullScreenCamera) {
+        if (self.manager.cameraType == HXPhotoManagerCameraTypeFullScreen) {
             HXFullScreenCameraViewController *vc1 = [[HXFullScreenCameraViewController alloc] init];
             vc1.delegate = self;
             vc1.type = type;
@@ -393,7 +397,7 @@
             }else {
                 [[self viewController:self] presentViewController:vc1 animated:YES completion:nil];
             }
-        }else {
+        }else if (self.manager.cameraType == HXPhotoManagerCameraTypeHalfScreen) {
             HXCameraViewController *vc = [[HXCameraViewController alloc] init];
             vc.delegate = self;
             vc.type = type;
@@ -403,6 +407,31 @@
             }else {
                 [[self viewController:self] presentViewController:vc animated:YES completion:nil];
             }
+        }else { 
+            // 跳转到相机或相册页面
+            self.imagePickerController = [[UIImagePickerController alloc] init];
+            self.imagePickerController.delegate = (id)self;
+            self.imagePickerController.allowsEditing = NO;
+            NSString *requiredMediaTypeImage = ( NSString *)kUTTypeImage;
+            NSString *requiredMediaTypeMovie = ( NSString *)kUTTypeMovie;
+            NSArray *arrMediaTypes;
+            if (type == HXCameraTypePhoto) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage,nil];
+            }else if (type == HXCameraTypePhotoAndVideo) {
+                    arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage, requiredMediaTypeMovie,nil];
+            }else if (type == HXCameraTypeVideo) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeMovie,nil];
+            }
+            
+            [self.imagePickerController setMediaTypes:arrMediaTypes];
+            // 设置录制视频的质量
+            [self.imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
+            //设置最长摄像时间
+            [self.imagePickerController setVideoMaximumDuration:60.f];
+            self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+            self.imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+            self.imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
+            [[self viewController:self] presentViewController:self.imagePickerController animated:YES completion:nil];
         }
     }else if (buttonIndex == 1){
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
@@ -416,6 +445,48 @@
     if (buttonIndex == 1) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
+}
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    HXPhotoModel *model = [[HXPhotoModel alloc] init];
+    if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        model.type = HXPhotoModelMediaTypeCameraPhoto;
+        model.subType = HXPhotoModelMediaSubTypePhoto;
+        model.thumbPhoto = image;
+        model.imageSize = image.size;
+        model.previewPhoto = image;
+        model.cameraIdentifier = [self videoOutFutFileName];
+    }else  if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
+        NSURL *url = info[UIImagePickerControllerMediaURL];
+        model.type = HXPhotoModelMediaTypeCameraVideo;
+        model.subType = HXPhotoModelMediaSubTypeVideo;
+        MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:url] ;
+        player.shouldAutoplay = NO;
+        UIImage  *image = [player thumbnailImageAtTime:1.0 timeOption:MPMovieTimeOptionNearestKeyFrame];
+        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
+        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:opts];
+        float second = 0;
+        second = urlAsset.duration.value/urlAsset.duration.timescale;
+        NSString *videoTime = [HXPhotoTools getNewTimeFromDurationSecond:second];
+        model.videoURL = url;
+        model.videoTime = videoTime;
+        model.thumbPhoto = image;
+        model.imageSize = image.size;
+        model.previewPhoto = image;
+        model.cameraIdentifier = [self videoOutFutFileName];
+//        if (second < 3) {
+//            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
+//            return;
+//        }
+    }
+    [self cameraDidNextClick:model];
+}
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
 }
 - (void)fullScreenCameraDidNextClick:(HXPhotoModel *)model {
     [self cameraDidNextClick:model];
@@ -596,7 +667,7 @@
         if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             model.endIndex = i++;
         }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
-            model.endIndex = j++;
+            model.videoIndex = j++;
         }
         model.endCollectionIndex = k++;
     }
