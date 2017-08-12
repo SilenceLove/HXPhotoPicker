@@ -37,6 +37,14 @@
 
 - HXPhotoManager 照片管理类相关属性介绍
 ```
+HXPhotoManagerSelectedTypePhoto           // 只选择图片
+HXPhotoManagerSelectedTypeVideo          // 只选择视频
+HXPhotoManagerSelectedTypePhotoAndVideo // 图片和视频一起
+
+HXPhotoManagerCameraTypeHalfScreen   // 半屏相机
+HXPhotoManagerCameraTypeFullScreen  // 全屏相机
+HXPhotoManagerCameraTypeSystem     // 系统相机
+    
 /**
  *  管理UI的类
  */
@@ -78,9 +86,9 @@ BOOL singleSelecteClip;
 BOOL open3DTouchPreview;
 
 /**
- 显示全屏相机 //  默认 NO
+ 相机界面类型 //  默认  半屏
  */
-BOOL showFullScreenCamera;
+HXPhotoManagerCameraType cameraType;
 
 /**
  删除网络图片时是否显示Alert // 默认不显示
@@ -311,6 +319,35 @@ UIColor *fullScreenCameraNextBtnTitleColor;
 /**  全屏相机界面下一步按钮背景颜色  */
 UIColor *fullScreenCameraNextBtnBgColor;
 ```
+- HXPhotoResultModel相关属性介绍
+```
+HXPhotoResultModelMediaTypePhoto  // 照片
+HXPhotoResultModelMediaTypeVideo // 视频
+ 
+/**  资源类型  */
+HXPhotoResultModelMediaType type;
+
+/**  原图URL  */
+NSURL *fullSizeImageURL;
+
+/**  原尺寸image 如果资源为视频时此字段为视频封面图片  */
+UIImage *displaySizeImage;
+
+/**  原图方向  */
+int fullSizeImageOrientation;
+
+/**  视频Asset  */
+AVAsset *avAsset;
+
+/**  视频URL  */
+NSURL *videoURL;
+
+/**  创建日期  */
+NSDate *creationDate;
+
+/**  位置信息  */
+CLLocation *location;
+```
 
 - Demo1
 ```objc
@@ -365,8 +402,14 @@ photoView.backgroundColor = [UIColor whiteColor];
 // 网络图片全部下载完成时调用
 - (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView;
 ```
-- 关于通过 HXPhotoModel 获取照片UIImage对象 具体代码还是请下载Demo
+- 关于HXPhotoTools获取资源信息 具体代码还是请下载Demo
 ```
+//    将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
+//    !!!!  必须是全部类型的那个数组 就是 allList 这个数组  !!!!
+[HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls,  NSArray<HXPhotoResultModel       *> *photos, NSArray<HXPhotoResultModel *> *videos) {
+    NSSLog(@"\n全部类型:%@\n照片:%@\n视频:%@",alls,photos,videos);
+}];
+
 HXPhotoTools提供一个方法可以根据传入的模型数组转换成图片(UIImage)数组 
 
 type是个枚举
@@ -401,6 +444,7 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
 - 2017-07-26　　优化cell性能、3DTouch预览内存消耗。添加是否需要裁剪框属性、刷新界面方法以及拍照/选择照片完之后跳界面Demo
 - 2017-08-08　　添加国际化支持英文、保存拍摄的照片/视频到系统相册、实时监听系统相册变化并改变、缓存相册、针对ios10和iphone4s/5s优化列表滑动、选择视频时限制超过指定秒数不能选。以及一些小问题
 - 2017-08-10　　添加自定义属性、修复导航栏可能偏移64的问题
+- 2017-08-12　　添加系统相机、HXPhotoTools添加转换方法
 
 ## 六.  更多 - More
 
