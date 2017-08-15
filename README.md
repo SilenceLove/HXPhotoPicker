@@ -6,7 +6,6 @@
 
 <img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> 
 
-## 最新支持浏览网络图片
 ## 一.  特性 - Features
 
 - [x] 查看/选择GIF图片
@@ -22,15 +21,17 @@
 
 ## 二.  安装 - Installation
 
-- Cocoapods：pod 'HXWeiboPhotoPicker' '~> 2.0' 
+- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0'```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
+- 网络图片加载使用的是```SDWebImage v4.0.0```
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
 - 选完照片/视频后自动布局功能 导入头文件 "HXPhotoView.h"
 
 ## 三.  要求 - Requirements
 
 - iOS8及以上系统可使用. ARC环境. - iOS 8 or later. Requires ARC
-- 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置三个info.plist文件。                                              Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description 以及 Privacy - Microphone Usage Description。
+- 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置三个info.plist文件
+- Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description 以及 Privacy - Microphone Usage Description
 - 相机拍照功能请使用真机调试
 
 ## 四.  例子 - Examples
