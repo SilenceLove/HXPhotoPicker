@@ -137,10 +137,11 @@
         HXPhotoPreviewViewCell *previewCell = (HXPhotoPreviewViewCell *)[vc.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:vc.index inSection:0]];
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             [previewCell stopGifImage];
+//            tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
+        }
+//        else {
             tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
-        }else {
-            tempView = previewCell.imageView;
-        } 
+//        } 
     }else {
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)fromVC;
         model = vc.model;
@@ -151,11 +152,13 @@
             tempView.image = model.thumbPhoto;
         }
     }
-    tempView.clipsToBounds = YES;
-    tempView.contentMode = UIViewContentModeScaleAspectFill;
 
     HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:model.endCollectionIndex inSection:0]];
-
+    if (!tempView.image) {
+        tempView = [[UIImageView alloc] initWithImage:cell.imageView.image]; 
+    }
+    tempView.clipsToBounds = YES;
+    tempView.contentMode = UIViewContentModeScaleAspectFill;
     CGFloat height = [UIScreen mainScreen].bounds.size.height;
     UIView *containerView = [transitionContext containerView];
     [containerView addSubview:tempView];

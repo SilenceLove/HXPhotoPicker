@@ -128,10 +128,11 @@
         HXPhotoPreviewViewCell *previewCell = (HXPhotoPreviewViewCell *)[vc.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:vc.index inSection:0]];
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             [previewCell stopGifImage];
-            tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
-        }else if (model.type != HXPhotoModelMediaTypeLivePhoto){
-            tempView = previewCell.imageView;
+//            tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
         }
+//        else {
+            tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
+//        }
     }else {
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)fromVC;
         model = vc.model;
@@ -149,20 +150,7 @@
     tempView.contentMode = UIViewContentModeScaleAspectFill;
     BOOL contains = [toVC.objs containsObject:model];
     NSInteger index = [toVC.objs indexOfObject:model];
-//    if (toVC.albumModel.index == 0) {
-//        if (toVC.manager.cameraList.count > 0) {
-//            if (model.type != HXPhotoModelMediaTypeCameraPhoto && model.type != HXPhotoModelMediaTypeCameraVideo) {
-//                index = model.albumListIndex + toVC.manager.cameraList.count;
-//            }else {
-//                index = model.albumListIndex;
-//            }
-//        }else {
-//            index = model.albumListIndex;
-//        }
-//    }else {
-//        index = model.albumListIndex;
-//    }
-//    HXPhotoViewCell *cell = (HXPhotoViewCell *)[toVC.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+    
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[toVC.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
     
     if (!cell) {

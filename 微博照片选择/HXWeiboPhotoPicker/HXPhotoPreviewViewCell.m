@@ -219,6 +219,9 @@
                 self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width, self.model.endImageSize.height) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
                     weakSelf.livePhotoView.livePhoto = livePhoto;
                 }];
+                self.requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.5, height * 0.5) completion:^(UIImage *image, NSDictionary *info) {
+                    weakSelf.imageView.image = image;
+                }];
             }else {
                 if (model.previewPhoto) {
                     self.imageView.image = model.previewPhoto;
