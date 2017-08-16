@@ -407,7 +407,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 //    将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
 //    !!!!  必须是全部类型的那个数组 就是 allList 这个数组  !!!!
-[HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls,  NSArray<HXPhotoResultModel       *> *photos, NSArray<HXPhotoResultModel *> *videos) {
+[HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls,  NSArray<HXPhotoResultModel *> *photos, NSArray<HXPhotoResultModel *> *videos) {
     NSSLog(@"\n全部类型:%@\n照片:%@\n视频:%@",alls,photos,videos);
 }];
 
@@ -417,7 +417,7 @@ type是个枚举
 HXPhotoToolsFetchHDImageType = 0, // 高清
 HXPhotoToolsFetchOriginalImageTpe, // 原图
 
-[HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage    *> *images) {
+[HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
     NSSLog(@"%@",images);
     for (UIImage *image in images) {
         if (image.images.count > 0) {
@@ -434,7 +434,7 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
 - 2017-07-01　　添加单选样式、支持裁剪图片
 - 2017-07-05　　解决同一界面多个选择器界面跳转问题,拍摄视频完成时遗留问题
 - 2017-07-26　　优化cell性能、3DTouch预览内存消耗。添加是否需要裁剪框属性、刷新界面方法以及拍照/选择照片完之后跳界面Demo
-- 2017-08-08　　添加国际化支持英文、保存拍摄的照片/视频到系统相册、实时监听系统相册变化并改变、缓存相册、针对ios10和iphone4s/5s优化列表滑动、选择视频时限制超过指定秒数不能选。以及一些小问题
+- 2017-08-08　　添加国际化支持英文、保存拍摄的照片/视频到系统相册、实时监听系统相册变化并改变、缓存相册、选择视频时限制超过指定秒数不能选。以及一些小问题
 - 2017-08-10　　添加自定义属性、修复导航栏可能偏移64的问题
 - 2017-08-12　　添加系统相机、HXPhotoTools添加转换方法
 
