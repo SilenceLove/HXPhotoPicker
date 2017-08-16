@@ -266,9 +266,6 @@
     if (model.isCloseLivePhoto) {
         return;
     }
-    if (self.livePhotoCell) {
-        [self.livePhotoCell stopLivePhoto];
-    }
     HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
     if (model.type == HXPhotoModelMediaTypeLivePhoto) {
         [cell startLivePhoto];

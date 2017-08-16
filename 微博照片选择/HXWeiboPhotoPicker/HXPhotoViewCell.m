@@ -263,27 +263,20 @@
     _model = model; 
     if (model.thumbPhoto) {
         self.imageView.image = model.thumbPhoto;
-        if (model.requestID) {
-            [[PHImageManager defaultManager] cancelImageRequest:model.requestID];
-            model.requestID = 0;
-        }
     }else {
-        if (model.requestID) {
-            [[PHImageManager defaultManager] cancelImageRequest:model.requestID];
-            model.requestID = 0;
-        }
+//        [model cancelImageRequest];
         self.localIdentifier = model.asset.localIdentifier;
         __weak typeof(self) weakSelf = self;
         int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:model.requestSize completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
-//            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if ([weakSelf.localIdentifier isEqualToString:model.asset.localIdentifier]) {
-                weakSelf.imageView.image = photo;
-            } else {
-                [[PHImageManager defaultManager] cancelImageRequest:weakSelf.requestID];
-            }
-            if (!isDegraded) {
-                weakSelf.requestID = 0;
-            }
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+//            if ([strongSelf.localIdentifier isEqualToString:model.asset.localIdentifier]) {
+                strongSelf.imageView.image = photo;
+//            } else {
+//                [[PHImageManager defaultManager] cancelImageRequest:strongSelf.requestID];
+//            }
+//            if (!isDegraded) {
+//                weakSelf.requestID = -1;
+//            }
         }];
         if (requestID && self.requestID && requestID != self.requestID) {
             [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
@@ -322,14 +315,11 @@
     self.selectBtn.selected = model.selected;
 }
 - (void)dealloc {
-    if (self.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-        self.requestID = 0;
-    }
-    if (self.model.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.model.requestID];
-        self.model.requestID = 0;
-    }
+//    if (self.requestID) {
+//        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+//        self.requestID = -1;
+//    }
+//    [self.model cancelImageRequest];
 }
 
 @end

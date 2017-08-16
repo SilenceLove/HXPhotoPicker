@@ -31,6 +31,7 @@
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.videoMaxNum = 5;
+        _manager.cacheAlbum = NO; 
     }
     return _manager;
 }

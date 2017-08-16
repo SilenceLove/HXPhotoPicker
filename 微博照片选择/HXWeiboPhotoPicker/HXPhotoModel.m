@@ -47,18 +47,21 @@
 }
 
 - (void)prefetchThumbImage {
-    __weak typeof(self) weakSelf = self;
-    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
-    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+//    __weak typeof(self) weakSelf = self;
+//    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+//    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+//    PHCachingImageManager *cachingManager = [[PHCachingImageManager alloc] init];
+//    
+//    [cachingManager startCachingImagesForAssets:@[self.asset] targetSize:self.requestSize contentMode:PHImageContentModeAspectFill options:option];
     
-    self.requestID = [[PHImageManager defaultManager] requestImageForAsset:self.asset targetSize:self.requestSize contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-        if (downloadFinined && result) {
-            weakSelf.thumbPhoto = result;
-        }
-    }];
+//    self.requestID = [[PHImageManager defaultManager] requestImageForAsset:self.asset targetSize:self.requestSize contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+//        NSError *error = [info objectForKey:PHImageErrorKey];
+//        BOOL cancel = [[info objectForKey:PHImageCancelledKey] boolValue];
+//        BOOL degraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+//        if ((!error && !cancel && !degraded) && result) {
+//            weakSelf.thumbPhoto = result; 
+//        }
+//    }];
 //    self.requestID = [HXPhotoTools getHighQualityFormatPhotoForPHAsset:self.asset size:self.requestSize completion:^(UIImage *image, NSDictionary *info) {
 //        weakSelf.thumbPhoto = image;
 //    } error:^(NSDictionary *info) {
@@ -66,21 +69,32 @@
 //    }];
 }
 
+- (void)cancelImageRequest {
+//    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+//    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+//    PHCachingImageManager *cachingManager = [[PHCachingImageManager alloc] init];
+//    [cachingManager stopCachingImagesForAssets:@[self.asset] targetSize:self.requestSize contentMode:PHImageContentModeAspectFill options:option];
+//    if (!self.thumbPhoto && self.requestID) {
+//        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+//        self.requestID = -1;
+//    }
+}
+
 - (CGSize)requestSize {
     if (_requestSize.width == 0 || _requestSize.height == 0) {
         CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
         CGSize size;
-        if (self.imageSize.width > self.imageSize.height / 9 * 15) {
-            size = CGSizeMake(width, width * [UIScreen mainScreen].scale);
-        }else if (self.imageSize.height > self.imageSize.width / 9 * 15) {
-            size = CGSizeMake(width * [UIScreen mainScreen].scale, width);
-        }else {
+//        if (self.imageSize.width > self.imageSize.height / 9 * 15) {
+//            size = CGSizeMake(width, width * [UIScreen mainScreen].scale);
+//        }else if (self.imageSize.height > self.imageSize.width / 9 * 15) {
+//            size = CGSizeMake(width * [UIScreen mainScreen].scale, width);
+//        }else {
             if ([UIScreen mainScreen].bounds.size.width == 375) {
                 size = CGSizeMake(width * 1.2, width * 1.2);
             }else {
                 size = CGSizeMake(width * 1.4, width * 1.4);
             }
-        }
+//        }
         if ([UIScreen mainScreen].bounds.size.width == 320) {
             size = CGSizeMake(width * 0.8, width * 0.8);
         }
@@ -89,9 +103,6 @@
     return _requestSize;
 }
 - (void)dealloc {
-    if (self.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-        self.requestID = 0;
-    }
+//    [self cancelImageRequest];
 }
 @end

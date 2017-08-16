@@ -80,6 +80,7 @@
 - (void)setup {
     [self.contentView addSubview:self.scrollView];
     [self.scrollView addSubview:self.imageView];
+    [self.scrollView addSubview:self.livePhotoView];
 }
 - (void)livePhotoView:(PHLivePhotoView *)livePhotoView willBeginPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
     self.isAnimating = YES;
@@ -91,26 +92,25 @@
     if (self.isAnimating) {
         return;
     }
-    if (self.liveRequestID) {
+//    if (self.liveRequestID) {
+//        [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
+//        self.liveRequestID = -1;
+//    }
+//    [self.scrollView addSubview:self.livePhotoView];
+    if (self.livePhotoView.livePhoto) {
+        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+    }else {
         [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
-        self.liveRequestID = -1;
+        __weak typeof(self) weakSelf = self;
+        self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width, self.model.endImageSize.height) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+            weakSelf.livePhotoView.livePhoto = livePhoto;
+            [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        }];
     }
-    self.livePhotoView.frame = self.imageView.frame;
-    [self.scrollView addSubview:self.livePhotoView];
-    __weak typeof(self) weakSelf = self;
-    self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 2, self.model.endImageSize.height * 2) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
-        weakSelf.livePhotoView.livePhoto = livePhoto;
-        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
-    }];
 }
 - (void)stopLivePhoto {
-    if (self.liveRequestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.liveRequestID];
-        self.liveRequestID = -1;
-    }
     self.isAnimating = NO;
     [self.livePhotoView stopPlayback];
-    [self.livePhotoView removeFromSuperview];
 }
 - (void)fetchLongPhoto {
     if (self.requestID) {
@@ -165,7 +165,9 @@
     self.gifImage = nil;
     if (self.longRequestId) {
         [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
+        self.longRequestId = -1;
     }
+    self.imageView.hidden = NO;
     [self.scrollView setZoomScale:1.0 animated:NO];
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
@@ -186,6 +188,9 @@
     }
     _imageView.frame = CGRectMake(0, 0, w, h);
     _imageView.center = CGPointMake(width / 2, height / 2);
+    self.livePhotoView.frame = self.imageView.frame;
+    self.livePhotoView.hidden = YES;
+    self.imageView.hidden = NO;
     if (model.type == HXPhotoModelMediaTypePhotoGif) {
         __weak typeof(self) weakSelf = self;
         [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) { 
@@ -207,24 +212,33 @@
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
             self.imageView.image = model.thumbPhoto;
         }else {
-            if (model.previewPhoto) {
-                self.imageView.image = model.previewPhoto;
-            }else {
+            if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+                self.livePhotoView.hidden = NO;
+                self.imageView.hidden = YES;
                 __weak typeof(self) weakSelf = self;
-                PHImageRequestID requestID;
-                if (imgHeight > imgWidth / 9 * 17) {
-                    requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.5, height * 0.5) completion:^(UIImage *image, NSDictionary *info) {
-                        weakSelf.imageView.image = image;
-                    }]; 
+                self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width, self.model.endImageSize.height) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+                    weakSelf.livePhotoView.livePhoto = livePhoto;
+                }];
+            }else {
+                if (model.previewPhoto) {
+                    self.imageView.image = model.previewPhoto;
                 }else {
-                    requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
-                        weakSelf.imageView.image = image;
-                    }];
+                    __weak typeof(self) weakSelf = self;
+                    PHImageRequestID requestID;
+                    if (imgHeight > imgWidth / 9 * 17) {
+                        requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.5, height * 0.5) completion:^(UIImage *image, NSDictionary *info) {
+                            weakSelf.imageView.image = image;
+                        }];
+                    }else {
+                        requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
+                            weakSelf.imageView.image = image;
+                        }];
+                    }
+                    if (self.requestID != requestID) {
+                        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+                    }
+                    self.requestID = requestID;
                 }
-                if (self.requestID != requestID) {
-                    [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-                }
-                self.requestID = requestID;
             }
         }
     }
@@ -236,7 +250,12 @@
     } else {
         CGFloat width = self.frame.size.width;
         CGFloat height = self.frame.size.height;
-        CGPoint touchPoint = [tap locationInView:self.imageView];
+        CGPoint touchPoint;
+        if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
+            touchPoint = [tap locationInView:self.livePhotoView];
+        }else {
+            touchPoint = [tap locationInView:self.imageView];
+        }
         CGFloat newZoomScale = _scrollView.maximumZoomScale;
         CGFloat xsize = width / newZoomScale;
         CGFloat ysize = height / newZoomScale;
@@ -246,16 +265,22 @@
 
 #pragma mark - 返回需要缩放的控件
 - (nullable UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-    if (self.isAnimating) {
-        [self stopLivePhoto];
+    if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
+        return self.livePhotoView;
+    }else {
+        return self.imageView;
     }
-    return self.imageView;
 }
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
     CGFloat offsetX = (scrollView.frame.size.width > scrollView.contentSize.width) ? (scrollView.frame.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
     CGFloat offsetY = (scrollView.frame.size.height > scrollView.contentSize.height) ? (scrollView.frame.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
-    self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
+    
+    if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
+        self.livePhotoView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
+    }else {
+        self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
+    }
 }
 
 - (void)updateImageSize {

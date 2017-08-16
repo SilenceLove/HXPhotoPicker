@@ -85,7 +85,9 @@
     int32_t imageRequestID = [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:photoSize contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         if (downloadFinined && result) {
-            if (completion) completion(result,info,[[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(result,info,[[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+            });
         }
     }];
     return imageRequestID;
@@ -94,7 +96,6 @@
 + (PHImageRequestID)FetchLivePhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size Completion:(void (^)(PHLivePhoto *, NSDictionary *))completion
 {
     PHLivePhotoRequestOptions *option = [[PHLivePhotoRequestOptions alloc] init];
-    option.version = PHImageRequestOptionsVersionCurrent;
     option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     option.networkAccessAllowed = YES;
     
@@ -646,6 +647,7 @@
                         if ([contentEditingInput.avAsset isKindOfClass:[AVURLAsset class]]) {
                             AVURLAsset *urlAsset = (AVURLAsset *)contentEditingInput.avAsset;
                             resultModel.videoURL = urlAsset.URL;
+                            resultModel.avAsset = contentEditingInput.avAsset;
                         }
                         [weakSelf sortResultModel:resultModel total:selectedList.count models:models photos:photos videos:videos completion:^(NSArray *all, NSArray *photos, NSArray *videos) {
                             dispatch_async(dispatch_get_main_queue(), ^{

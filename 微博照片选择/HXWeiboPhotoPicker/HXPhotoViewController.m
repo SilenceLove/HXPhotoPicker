@@ -66,12 +66,11 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     }
     return _authorizationLb;
 }
-
 - (void)goSetup {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
 }
 - (void)dealloc {
-    self.manager.selectPhoto = NO;
+    self.manager.selectPhoto = NO; 
     NSSLog(@"dealloc");
 }
 - (void)viewDidLoad {
@@ -542,7 +541,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         }
     }
     
-    CGFloat spacing = 1;
+    CGFloat spacing = 0.5;
     CGFloat CVwidth = (width - spacing * self.manager.rowCount - 1 ) / self.manager.rowCount;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     flowLayout.itemSize = CGSizeMake(CVwidth, CVwidth);
@@ -648,29 +647,33 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     return cell;
 }
 - (void)collectionView:(UICollectionView *)collectionView prefetchItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
-    for (NSIndexPath *indexPath in indexPaths) {
-        HXPhotoModel *model = self.objs[indexPath.item];
-        model.rowCount = self.manager.rowCount;
-        if (model.type != HXPhotoModelMediaTypeCamera && model.type != HXPhotoModelMediaTypeCameraPhoto && model.type != HXPhotoModelMediaTypeCameraVideo) {
-            [model prefetchThumbImage];
-        }
-    }
+//    NSMutableArray *assets = [NSMutableArray array];
+//    HXPhotoModel *model;
+//    for (NSIndexPath *indexPath in indexPaths) {
+//        model = self.objs[indexPath.item];
+//        model.rowCount = self.manager.rowCount;
+//        if (model.type != HXPhotoModelMediaTypeCamera && model.type != HXPhotoModelMediaTypeCameraPhoto && model.type != HXPhotoModelMediaTypeCameraVideo) {
+//            [model prefetchThumbImage];
+//            [assets addObject:model.asset];
+//        }
+//    }
+//    [self.cachingManager startCachingImagesForAssets:assets targetSize:model.requestSize contentMode:PHImageContentModeAspectFill options:self.option];
 }
 - (void)collectionView:(UICollectionView *)collectionView cancelPrefetchingForItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
-    if (self.selectOtherAlbum) {
-        self.selectOtherAlbum = NO;
-        return;
-    }
-    for (NSIndexPath *indexPath in indexPaths) {
-        HXPhotoModel *model = self.objs[indexPath.item];
-        if (model.requestID) {
-            if (!model.selected) {
-                model.thumbPhoto = nil;
-            }
-            [[PHImageManager defaultManager] cancelImageRequest:model.requestID];
-            model.requestID = 0;
-        } 
-    }
+//    if (self.selectOtherAlbum) {
+//        self.selectOtherAlbum = NO;
+//        return;
+//    }
+//    NSMutableArray *assets = [NSMutableArray array];
+//    HXPhotoModel *model;
+//    for (NSIndexPath *indexPath in indexPaths) {
+//        model = self.objs[indexPath.item];
+////        [model cancelImageRequest];
+//        if (!model.selected && model.type != HXPhotoModelMediaTypeCamera && model.thumbPhoto) {
+//            model.thumbPhoto = nil;
+//        }
+//    }
+//    [self.cachingManager stopCachingImagesForAssets:assets targetSize:model.requestSize contentMode:PHImageContentModeAspectFill options:self.option];
 }
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(nonnull UICollectionViewCell *)cell forItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
     if (self.manager.open3DTouchPreview) {
@@ -690,16 +693,13 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 }
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
-    if (myCell.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:myCell.requestID];
-        myCell.requestID = 0;
-    }
-    if (myCell.model.requestID) {
-        if (!myCell.model.selected) {
-            myCell.model.thumbPhoto = nil;
-        }
-        [[PHImageManager defaultManager] cancelImageRequest:myCell.model.requestID];
-        myCell.model.requestID = 0;
+//    if (myCell.requestID) {
+//        [[PHImageManager defaultManager] cancelImageRequest:myCell.requestID];
+//        myCell.requestID = -1;
+//    }
+//    [myCell.model cancelImageRequest];
+    if (!myCell.model.selected && myCell.model.type != HXPhotoModelMediaTypeCamera && myCell.model.thumbPhoto) {
+        myCell.model.thumbPhoto = nil;
     }
     if (self.manager.open3DTouchPreview) {
         if (myCell.firstRegisterPreview) {
