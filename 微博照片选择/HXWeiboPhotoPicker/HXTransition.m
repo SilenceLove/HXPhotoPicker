@@ -129,7 +129,7 @@
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             [previewCell stopGifImage];
             tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
-        }else {
+        }else if (model.type != HXPhotoModelMediaTypeLivePhoto){
             tempView = previewCell.imageView;
         }
     }else {
