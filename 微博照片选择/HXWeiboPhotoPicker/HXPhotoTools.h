@@ -121,8 +121,8 @@ typedef enum : NSUInteger {
  @param fontSize 字体大小
  @return 宽度大小
  */
-+ (CGFloat)getTextWidth:(NSString *)text withHeight:(CGFloat)height fontSize:(CGFloat)fontSize;
-+ (CGFloat)getTextHeight:(NSString *)text withHeight:(CGFloat)height fontSize:(CGFloat)fontSize;
++ (CGFloat)getTextWidth:(NSString *)text height:(CGFloat)height fontSize:(CGFloat)fontSize;
++ (CGFloat)getTextHeight:(NSString *)text width:(CGFloat)width fontSize:(CGFloat)fontSize;
 
 /**
  根据PHAsset对象获取照片信息 带返回错误的block

@@ -530,7 +530,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
             self.rightBtn.layer.borderWidth = 0;
             CGFloat rightBtnH = self.rightBtn.frame.size.height;
-            CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
+            CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle height:rightBtnH fontSize:14];
             self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
         }else {
             self.navItem.rightBarButtonItem.enabled = NO;
@@ -586,7 +586,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             CGFloat originalBtnY = self.bottomView.originalBtn.frame.origin.y;
             CGFloat originalBtnW = self.bottomView.originalBtn.frame.size.width;
             CGFloat originalBtnH = self.bottomView.originalBtn.frame.size.height;
-            CGFloat totalW = [HXPhotoTools getTextWidth:[NSString stringWithFormat:@"(%@)",self.manager.photosTotalBtyes] withHeight:originalBtnH fontSize:14];
+            CGFloat totalW = [HXPhotoTools getTextWidth:[NSString stringWithFormat:@"(%@)",self.manager.photosTotalBtyes] height:originalBtnH fontSize:14];
             [bottomView.originalBtn setTitle:[NSString stringWithFormat:@"%@(%@)",[NSBundle hx_localizedStringForKey:@"原图"],self.manager.photosTotalBtyes] forState:UIControlStateNormal];
             
             bottomView.originalBtn.frame = CGRectMake(originalBtnX, originalBtnY, originalBtnW+totalW  , originalBtnH);
@@ -1367,7 +1367,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
-        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
+        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle height:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else { // 没有选中时 全部恢复成初始状态
         [self changeOriginalState:NO IsChange:NO];
@@ -1475,7 +1475,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                     return;
                 }
                 weakSelf.manager.photosTotalBtyes = totalBytes;
-                CGFloat totalW = [HXPhotoTools getTextWidth:[NSString stringWithFormat:@"(%@)",totalBytes] withHeight:originalBtnH fontSize:14];
+                CGFloat totalW = [HXPhotoTools getTextWidth:[NSString stringWithFormat:@"(%@)",totalBytes] height:originalBtnH fontSize:14];
                 [weakSelf.bottomView.originalBtn setTitle:[NSString stringWithFormat:@"%@(%@)",[NSBundle hx_localizedStringForKey:@"原图"],totalBytes] forState:UIControlStateNormal];
                 [weakSelf.indica stopAnimating];
                 weakSelf.indica.hidden = YES;
@@ -1557,7 +1557,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (UIActivityIndicatorView *)indica {
     if (!_indica) {
         _indica = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        CGFloat indicaX = self.bottomView.originalBtn.titleLabel.frame.origin.x + [HXPhotoTools getTextWidth:[NSBundle hx_localizedStringForKey:@"原图"] withHeight:self.bottomView.originalBtn.frame.size.height / 2 fontSize:14] + 5;
+        CGFloat indicaX = self.bottomView.originalBtn.titleLabel.frame.origin.x + [HXPhotoTools getTextWidth:[NSBundle hx_localizedStringForKey:@"原图"] height:self.bottomView.originalBtn.frame.size.height / 2 fontSize:14] + 5;
         CGFloat indicaW = _indica.frame.size.width;
         CGFloat indicaH = _indica.frame.size.height;
         _indica.frame = CGRectMake(indicaX, 0, indicaW, indicaH);
@@ -1652,7 +1652,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [previewBtn addTarget:self action:@selector(didPreviewClick:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:previewBtn];
     CGFloat previewBtnX = 10;
-    CGFloat previewBtnW = [HXPhotoTools getTextWidth:previewBtn.currentTitle withHeight:15 fontSize:14] + 20;
+    CGFloat previewBtnW = [HXPhotoTools getTextWidth:previewBtn.currentTitle height:15 fontSize:14] + 20;
     if (previewBtnW < previewBtn.currentBackgroundImage.size.width) {
         previewBtnW = previewBtn.currentBackgroundImage.size.width;
     }
@@ -1680,7 +1680,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [self addSubview:originalBtn];
     CGFloat originalBtnX = CGRectGetMaxX(previewBtn.frame)+10;
     CGFloat originalBtnH = previewBtnH;
-    CGFloat originalBtnW = [HXPhotoTools getTextWidth:originalBtn.currentTitle withHeight:15 fontSize:14] + 35;
+    CGFloat originalBtnW = [HXPhotoTools getTextWidth:originalBtn.currentTitle height:15 fontSize:14] + 35;
     if (originalBtnW < 65) {
         originalBtnW = 65;
     }

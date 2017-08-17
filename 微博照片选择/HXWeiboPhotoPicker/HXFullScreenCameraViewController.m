@@ -545,7 +545,7 @@
     self.playView.hidden = YES;
     [self.backBtn setImage:[[UIImage alloc] init] forState:UIControlStateNormal];
     [self.backBtn setTitle:[NSBundle hx_localizedStringForKey:@"重拍"] forState:UIControlStateNormal];
-    self.backBtn.hx_w = [HXPhotoTools getTextWidth:self.backBtn.currentTitle withHeight:18 fontSize:17] + 20;
+    self.backBtn.hx_w = [HXPhotoTools getTextWidth:self.backBtn.currentTitle height:18 fontSize:17] + 20;
     self.backBtn.selected = YES;
 }
 // 长按手势

@@ -25,7 +25,6 @@
 @property (strong, nonatomic) UIImageView *previewImg;
 @property (assign, nonatomic) PHImageRequestID liveRequestID;
 @property (assign, nonatomic) BOOL addImageComplete;
-
 @end
 
 @implementation HXPhotoViewCell
@@ -58,7 +57,6 @@
 - (UIImageView *)videoIcon {
     if (!_videoIcon) {
         _videoIcon = [[UIImageView alloc] init];
-//        _videoIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"]];
         _videoIcon.frame = CGRectMake(5, 0, 17, 17);
         _videoIcon.center = CGPointMake(_videoIcon.center.x, 25 / 2);
     }
@@ -77,7 +75,6 @@
 - (UIImageView *)gifIcon {
     if (!_gifIcon) {
         _gifIcon = [[UIImageView alloc] init];
-//        _gifIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"timeline_image_gif@2x.png"]];
         _gifIcon.frame = CGRectMake(self.hx_w - 28, self.hx_h - 18, 28, 18);
     }
     return _gifIcon;
@@ -85,7 +82,6 @@
 - (UIImageView *)liveIcon {
     if (!_liveIcon) {
         _liveIcon = [[UIImageView alloc] init];
-//        _liveIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"]];
         _liveIcon.frame = CGRectMake(7, 5, 18, 18);
     }
     return _liveIcon;
@@ -101,11 +97,8 @@
 - (UIButton *)liveBtn {
     if (!_liveBtn) {
         _liveBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        [_liveBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] forState:UIControlStateNormal];
         [_liveBtn setTitle:@"LIVE" forState:UIControlStateNormal];
-//        [_liveBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] forState:UIControlStateSelected];
         [_liveBtn setTitle:[NSBundle hx_localizedStringForKey:@"关闭"] forState:UIControlStateSelected];
-//        [_liveBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] forState:UIControlStateNormal];
         [_liveBtn setTitleColor:[UIColor colorWithRed:85/255.0 green:85/255.0 blue:85/255.0 alpha:1] forState:UIControlStateNormal];
         _liveBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 0);
         _liveBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 2, 0, 0);
@@ -120,8 +113,6 @@
 - (UIButton *)selectBtn {
     if (!_selectBtn) {
         _selectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        [_selectBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"] forState:UIControlStateNormal];
-//        [_selectBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_guide_check_box_right@2x.png"] forState:UIControlStateSelected];
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
         _selectBtn.frame = CGRectMake(self.hx_w - 32, 0, 32, 32);
         _selectBtn.center = CGPointMake(_selectBtn.center.x, self.liveBtn.center.y);
@@ -210,26 +201,20 @@
         return;
     }
     [self.contentView insertSubview:self.livePhotoView aboveSubview:self.imageView];
-//    if (self.model.livePhoto) {
-//        self.livePhotoView.livePhoto = self.model.livePhoto;
-//        [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
-//    }else {
-        CGFloat width = self.frame.size.width;
-        __weak typeof(self) weakSelf = self;
-        CGSize size;
-        if (self.model.imageSize.width > self.model.imageSize.height / 9 * 15) {
-            size = CGSizeMake(width, width * 1.5);
-        }else if (self.model.imageSize.height > self.model.imageSize.width / 9 * 15) {
-            size = CGSizeMake(width * 1.5, width);
-        }else {
-            size = CGSizeMake(width, width);
-        }
-        self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:size Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
-//            weakSelf.model.livePhoto = livePhoto;
-            weakSelf.livePhotoView.livePhoto = livePhoto;
-            [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
-        }];
-//    }
+    CGFloat width = self.frame.size.width;
+    __weak typeof(self) weakSelf = self;
+    CGSize size;
+    if (self.model.imageSize.width > self.model.imageSize.height / 9 * 15) {
+        size = CGSizeMake(width, width * 1.5);
+    }else if (self.model.imageSize.height > self.model.imageSize.width / 9 * 15) {
+        size = CGSizeMake(width * 1.5, width);
+    }else {
+        size = CGSizeMake(width, width);
+    }
+    self.liveRequestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:size Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+        weakSelf.livePhotoView.livePhoto = livePhoto;
+        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
+    }];
 }
 
 - (void)stopLivePhoto {
@@ -237,8 +222,7 @@
     self.liveIcon.hidden = NO;
     self.liveBtn.hidden = YES;
     [self.livePhotoView stopPlayback];
-    [self.livePhotoView removeFromSuperview];  
-    self.model.livePhoto = nil;
+    [self.livePhotoView removeFromSuperview];
 }
 
 - (void)didSelectClick:(UIButton *)button {
@@ -264,19 +248,11 @@
     if (model.thumbPhoto) {
         self.imageView.image = model.thumbPhoto;
     }else {
-//        [model cancelImageRequest];
         self.localIdentifier = model.asset.localIdentifier;
         __weak typeof(self) weakSelf = self;
         int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:model.requestSize completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
-//            if ([strongSelf.localIdentifier isEqualToString:model.asset.localIdentifier]) {
-                strongSelf.imageView.image = photo;
-//            } else {
-//                [[PHImageManager defaultManager] cancelImageRequest:strongSelf.requestID];
-//            }
-//            if (!isDegraded) {
-//                weakSelf.requestID = -1;
-//            }
+            strongSelf.imageView.image = photo;
         }];
         if (requestID && self.requestID && requestID != self.requestID) {
             [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
@@ -313,13 +289,6 @@
     }
     self.maskView.hidden = !model.selected;
     self.selectBtn.selected = model.selected;
-}
-- (void)dealloc {
-//    if (self.requestID) {
-//        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-//        self.requestID = -1;
-//    }
-//    [self.model cancelImageRequest];
-}
+} 
 
 @end

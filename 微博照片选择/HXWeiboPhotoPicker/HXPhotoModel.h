@@ -63,21 +63,12 @@ typedef enum : NSUInteger {
  */
 @property (copy, nonatomic) NSString *albumName;
 
-/**
- GIF照片 -- 空
- */
-@property (strong, nonatomic) UIImage *gifImage;
-
 /**  
  请求ID
  */
 @property (assign, nonatomic) PHImageRequestID requestID;
 @property (assign, nonatomic) PHImageRequestID liveRequestID;
 
-/**
- 照片数据 -- 空
- */
-@property (strong, nonatomic) NSData *imageData;
 
 /**
  视频时长
@@ -94,21 +85,6 @@ typedef enum : NSUInteger {
  */
 @property (assign, nonatomic) BOOL selected;
 
-///**
-// 为图片时的下标
-// */
-//@property (assign, nonatomic) NSInteger photoIndex;
-//
-///**
-// 为视频时的下标
-// */
-//@property (assign, nonatomic) NSInteger videoIndex;
-//
-///**
-// 照片在相册列表里的下标
-// */
-//@property (assign, nonatomic) NSInteger albumListIndex;
-
 /**
  图片宽高
  */
@@ -117,12 +93,7 @@ typedef enum : NSUInteger {
 /**
  缩小之后的图片宽高
  */
-@property (assign, nonatomic) CGSize endImageSize;
-
-/**
- livePhoto
- */
-@property (strong, nonatomic) PHLivePhoto *livePhoto;
+@property (assign, nonatomic) CGSize endImageSize; 
 
 /**
  判断当前照片 是否关闭了livePhoto功能

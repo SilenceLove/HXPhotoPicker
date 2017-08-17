@@ -84,11 +84,11 @@
 
 - (void)showImageHUDText:(NSString *)text
 {
-    CGFloat hudW = [HXPhotoTools getTextWidth:text withHeight:15 fontSize:14];
+    CGFloat hudW = [HXPhotoTools getTextWidth:text height:15 fontSize:14];
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
     }
-    CGFloat hudH = [HXPhotoTools getTextHeight:text withHeight:hudW fontSize:14];
+    CGFloat hudH = [HXPhotoTools getTextHeight:text width:hudW fontSize:14];
     HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110 + hudH - 15) imageName:@"alert_failed_icon@2x.png" text:text];
     hud.alpha = 0;
     hud.tag = 1008611;
@@ -103,11 +103,11 @@
 
 - (void)showLoadingHUDText:(NSString *)text
 {
-    CGFloat hudW = [HXPhotoTools getTextWidth:text withHeight:15 fontSize:14];
+    CGFloat hudW = [HXPhotoTools getTextWidth:text height:15 fontSize:14];
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
     }
-    CGFloat hudH = [HXPhotoTools getTextHeight:text withHeight:hudW fontSize:14];
+    CGFloat hudH = [HXPhotoTools getTextHeight:text width:hudW fontSize:14];
     
     HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, 110, 110 + hudH - 15) imageName:@"alert_failed_icon@2x.png" text:text];
     [hud showloading];
@@ -193,7 +193,7 @@
     CGFloat labelX = 10;
     CGFloat labelY = CGRectGetMaxY(imageView.frame) + 10;
     CGFloat labelW = self.frame.size.width - 20;
-    CGFloat labelH = [HXPhotoTools getTextHeight:self.text withHeight:labelW fontSize:14];
+    CGFloat labelH = [HXPhotoTools getTextHeight:self.text width:labelW fontSize:14];
     label.frame = CGRectMake(labelX, labelY, labelW, labelH);
 }
 

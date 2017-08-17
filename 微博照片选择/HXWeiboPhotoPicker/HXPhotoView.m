@@ -619,9 +619,7 @@
         [self.videos removeObject:model];
     }
     model.thumbPhoto = nil;
-    model.previewPhoto = nil;
-    model.imageData = nil;
-    model.livePhoto = nil;
+    model.previewPhoto = nil; 
     model = nil;
     
     UIView *mirrorView = [cell snapshotViewAfterScreenUpdates:NO];

@@ -134,7 +134,7 @@
         [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
-        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
+        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle height:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else {
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
@@ -401,7 +401,7 @@
         [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
-        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle withHeight:rightBtnH fontSize:14];
+        CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle height:rightBtnH fontSize:14];
         self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
     }else {
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
