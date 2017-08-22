@@ -21,6 +21,8 @@
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 #define Spacing 3 // 每个item的间距
 #define LineNum 3 // 每行个数
+
+static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 @interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,UIImagePickerControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
@@ -98,15 +100,14 @@
     
     self.flowLayout.minimumLineSpacing = Spacing;
     self.flowLayout.minimumInteritemSpacing = Spacing;
-    HXCollectionView *collectionView = [[HXCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.flowLayout];
-    collectionView.tag = 8888;
-    collectionView.scrollEnabled = NO;
-    collectionView.dataSource = self;
-    collectionView.delegate = self;
-    collectionView.backgroundColor = self.backgroundColor;
-    [collectionView registerClass:[HXPhotoSubViewCell class] forCellWithReuseIdentifier:@"cellId"];
-    [self addSubview:collectionView];
-    self.collectionView = collectionView;
+    self.collectionView = [[HXCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.flowLayout];
+    self.collectionView.tag = 8888;
+    self.collectionView.scrollEnabled = NO;
+    self.collectionView.dataSource = self;
+    self.collectionView.delegate = self;
+    self.collectionView.backgroundColor = self.backgroundColor;
+    [self.collectionView registerClass:[HXPhotoSubViewCell class] forCellWithReuseIdentifier:HXPhotoSubViewCellId];
+    [self addSubview:self.collectionView];
     if (self.manager.networkPhotoUrls.count) {
         self.collectionView.editEnabled = NO;
         [self.networkPhotos removeAllObjects];
@@ -270,10 +271,10 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    HXPhotoSubViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cellId" forIndexPath:indexPath];
+    HXPhotoSubViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:HXPhotoSubViewCellId forIndexPath:indexPath];
+    cell.delegate = self;
     cell.dic = self.manager.photoViewCellIconDic;
     cell.model = self.dataList[indexPath.item];
-    cell.delegate = self;
     cell.showDeleteNetworkPhotoAlert = self.manager.showDeleteNetworkPhotoAlert;
     return cell;
 }
@@ -588,10 +589,21 @@
     [self.manager.endCameraList addObject:model];
     [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
 }
+
 - (void)cellNetworkingPhotoDownLoadComplete {
     if ([self networkingPhotoDownloadComplete] && !self.downLoadComplete) {
         self.downLoadComplete = YES;
-        [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
+        NSMutableArray *tempAllArray = [NSMutableArray array];
+        NSMutableArray *tempPhotoArray = [NSMutableArray array];
+        for (HXPhotoModel *model in self.networkPhotos) {
+            [tempAllArray addObject:model];
+            [tempPhotoArray addObject:model];
+        }
+        [tempAllArray addObjectsFromArray:self.manager.endSelectedList];
+        [tempPhotoArray addObjectsFromArray:self.manager.endSelectedPhotos];
+        if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
+            [self.delegate photoView:self changeComplete:tempAllArray.mutableCopy photos:tempPhotoArray.mutableCopy videos:self.manager.endSelectedVideos.mutableCopy original:self.manager.endIsOriginal];
+        }
         if ([self.delegate respondsToSelector:@selector(photoViewAllNetworkingPhotoDownloadComplete:)]) {
             [self.delegate photoViewAllNetworkingPhotoDownloadComplete:self];
         }
@@ -672,9 +684,6 @@
 }
 
 - (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original {
-//    if ([self.delegate respondsToSelector:@selector(photoViewCurrentSelected:photos:videos:original:)]) {
-//        [self.delegate photoViewCurrentSelected:allList photos:photos videos:videos original:original];
-//    }
     self.original = original;
     NSMutableArray *tempAllArray = [NSMutableArray array];
     NSMutableArray *tempPhotoArray = [NSMutableArray array];
@@ -690,12 +699,7 @@
     self.photos = [NSMutableArray arrayWithArray:photos];
     self.videos = [NSMutableArray arrayWithArray:videos];
     [self.dataList removeAllObjects];
-//    if (self.manager.separate) {
-//        [self.dataList addObjectsFromArray:photos];
-//    }else {
-
-        [self.dataList addObjectsFromArray:allList];
-//    }
+    [self.dataList addObjectsFromArray:allList];
     [self.dataList addObject:self.addModel];
     if (self.manager.selectTogether) {
         if (self.manager.maxNum == allList.count) {
@@ -718,17 +722,6 @@
                 }
             }
         }
-//        if (photos.count == self.manager.photoMaxNum + self.networkPhotos.count) {
-//            if (self.manager.photoMaxNum > 0 || self.networkPhotos.count > 0) {
-//                [self.dataList removeLastObject];
-//                self.isAddModel = YES;
-//            }
-//        }else if (videos.count == self.manager.videoMaxNum) {
-//            if (self.manager.videoMaxNum > 0) {
-//                [self.dataList removeLastObject];
-//                self.isAddModel = YES;
-//            }
-//        }
     }
     [self changeSelectedListModelIndex];
     [self.collectionView reloadData];
@@ -881,7 +874,6 @@
     }
 }
 - (void)dealloc {
-    [[SDWebImageManager sharedManager] cancelAll];
     NSSLog(@"dealloc");
 }
 

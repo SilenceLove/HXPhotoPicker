@@ -90,9 +90,9 @@
 //            size = CGSizeMake(width * [UIScreen mainScreen].scale, width);
 //        }else {
             if ([UIScreen mainScreen].bounds.size.width == 375) {
-                size = CGSizeMake(width * 1.1, width * 1.1);
+                size = CGSizeMake(width * 1.2, width * 1.2);
             }else {
-                size = CGSizeMake(width * 1.3, width * 1.3);
+                size = CGSizeMake(width * 1.4, width * 1.4);
             }
 //        }
         if ([UIScreen mainScreen].bounds.size.width == 320) {

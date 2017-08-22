@@ -73,6 +73,7 @@
         _manager.videoMaxNum = 4;
         _manager.maxNum = 8;
         _manager.saveSystemAblum = NO;
+//        _manager.rowCount = 3;
     }
     return _manager;
 }

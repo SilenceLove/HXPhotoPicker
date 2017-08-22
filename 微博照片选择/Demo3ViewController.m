@@ -128,12 +128,12 @@
     }];
 //    HXPhotoModel *model = photos.firstObject;
     
-    [HXPhotoTools getSelectedPhotosFullSizeImageUrl:photos complete:^(NSArray<NSURL *> *imageUrls) {
+//    [HXPhotoTools getSelectedPhotosFullSizeImageUrl:photos complete:^(NSArray<NSURL *> *imageUrls) {
 //        NSSLog(@"%@",imageUrls);
-        NSURL *url = imageUrls.firstObject;
-        UIImage *image = [UIImage imageWithContentsOfFile:url.path];
-        NSSLog(@"%@\n%@",image,url.path);
-    }];
+//        NSURL *url = imageUrls.firstObject;
+//        UIImage *image = [UIImage imageWithContentsOfFile:url.path];
+//        NSSLog(@"%@\n%@",image,url.path);
+//    }];
     /*
      // 获取image - PHImageManagerMaximumSize 是原图尺寸 - 通过相册获取时有用 / 通过相机拍摄的无效
      CGSize size = PHImageManagerMaximumSize; // 通过传入 size 的大小来控制图片的质量

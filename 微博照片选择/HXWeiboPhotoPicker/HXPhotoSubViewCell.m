@@ -19,6 +19,7 @@
 @property (strong, nonatomic) UIImageView *gifIcon;
 @property (strong, nonatomic) UIImageView *liveIcon;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
+@property (assign, nonatomic) int32_t requestID;
 @end
 
 @implementation HXPhotoSubViewCell
@@ -169,17 +170,18 @@
 - (void)setModel:(HXPhotoModel *)model
 {
     _model = model;
-    if (model.previewPhoto) {
-        self.imageView.image = model.previewPhoto;
-    }else {
-        self.imageView.image = model.thumbPhoto;
-    }
+//    if (model.previewPhoto) {
+//        self.imageView.image = model.previewPhoto;
+//    }else {
+//        self.imageView.image = model.thumbPhoto;
+//    }
     self.videoTime.text = model.videoTime;
     self.gifIcon.hidden = YES;
     self.liveIcon.hidden = YES;
     if (model.type == HXPhotoModelMediaTypeCamera) {
         self.deleteBtn.hidden = YES;
         self.bottomView.hidden = YES;
+//        self.imageView.image = model.thumbPhoto;
     }else {
         self.deleteBtn.hidden = NO;
     }
@@ -205,7 +207,7 @@
                 if (image) {
                     weakSelf.progressView.progress = 1;
                     weakSelf.progressView.hidden = YES;
-//                    self.imageView.image = image;
+                    weakSelf.imageView.image = image;
                     model.imageSize = image.size;
                     model.thumbPhoto = image;
                     model.previewPhoto = image;
@@ -220,6 +222,11 @@
         }];
     }else {
         self.progressView.hidden = YES;
+        if (model.previewPhoto) {
+            self.imageView.image = model.previewPhoto;
+        }else {
+            self.imageView.image = model.thumbPhoto;
+        }
     }
     if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
