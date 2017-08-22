@@ -2,8 +2,8 @@
 Pod::Spec.new do |s|
 
   s.name         = "HXWeiboPhotoPicker"
-  s.version      = "2.0.3"
-  s.summary      = "A simple photo picker."
+  s.version      = "2.0.4"
+  s.summary      = "仿微博照片/图片选择器 - 支持LivePhoto、GIF图片选择、3DTouch预览、浏览网络图片 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function"
   s.homepage     = "https://github.com/LoveZYForever/HXWeiboPhotoPicker"
   s.license      = { :type => "MIT", :file => "LICENSE" }
   s.author       = { "LoveZYForever" => "294005139@qq.com" }
