@@ -18,6 +18,7 @@
 #import "HXPhotoEditViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import "UIImage+HXExtension.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 
@@ -693,13 +694,10 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 }
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
-//    if (myCell.requestID) {
-//        [[PHImageManager defaultManager] cancelImageRequest:myCell.requestID];
-//        myCell.requestID = -1;
-//    }
-//    [myCell.model cancelImageRequest];
-    if (!myCell.model.selected && myCell.model.type != HXPhotoModelMediaTypeCamera && myCell.model.thumbPhoto) {
-        myCell.model.thumbPhoto = nil;
+    if (!myCell.model.selected && myCell.model.thumbPhoto) {
+        if (myCell.model.type != HXPhotoModelMediaTypeCamera && myCell.model.type != HXPhotoModelMediaTypeCameraPhoto && myCell.model.type != HXPhotoModelMediaTypeCameraVideo) {
+            myCell.model.thumbPhoto = nil;
+        }
     }
     if (self.manager.open3DTouchPreview) {
         if (myCell.firstRegisterPreview) {
@@ -972,6 +970,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        if (image.imageOrientation != UIImageOrientationUp) {
+            image = [image normalizedImage];
+        }
         model.type = HXPhotoModelMediaTypeCameraPhoto;
         model.subType = HXPhotoModelMediaSubTypePhoto;
         model.thumbPhoto = image;

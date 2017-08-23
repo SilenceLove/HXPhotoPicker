@@ -69,10 +69,11 @@
 //        _manager.outerCamera = YES;
         _manager.open3DTouchPreview = YES;
         _manager.cameraType = HXPhotoManagerCameraTypeSystem;
-        _manager.photoMaxNum = 4;
-        _manager.videoMaxNum = 4;
-        _manager.maxNum = 8;
+        _manager.photoMaxNum = 9;
+        _manager.videoMaxNum = 9;
+        _manager.maxNum = 18;
         _manager.saveSystemAblum = NO;
+//        _manager.selectTogether = NO;
 //        _manager.rowCount = 3;
     }
     return _manager;

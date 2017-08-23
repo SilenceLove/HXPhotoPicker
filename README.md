@@ -21,7 +21,7 @@
 
 ## 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.4'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.5'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
@@ -437,6 +437,8 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
 - 2017-08-08　　添加国际化支持英文、保存拍摄的照片/视频到系统相册、实时监听系统相册变化并改变、缓存相册、选择视频时限制超过指定秒数不能选。以及一些小问题
 - 2017-08-10　　添加自定义属性、修复导航栏可能偏移64的问题
 - 2017-08-12　　添加系统相机、HXPhotoTools添加转换方法
+- ...
+- v2.0.5　　修复相机拍照后显示错误
 
 ## 六.  更多 - More
 

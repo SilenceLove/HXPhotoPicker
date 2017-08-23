@@ -245,17 +245,21 @@
 
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
-    if (model.type == HXPhotoModelMediaTypeCamera) {
+    if (model.type == HXPhotoModelMediaTypeCamera || model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
         self.imageView.image = model.thumbPhoto;
     }else {
         self.localIdentifier = model.asset.localIdentifier;
         __weak typeof(self) weakSelf = self;
         int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:model.requestSize completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
-            strongSelf.imageView.image = photo;
-//            if (model.selected) {
-//                model.thumbPhoto = strongSelf.imageView.image;
-//            }
+            if (strongSelf.model.type != HXPhotoModelMediaTypeCamera && strongSelf.model.type != HXPhotoModelMediaTypeCameraPhoto && strongSelf.model.type != HXPhotoModelMediaTypeCameraVideo) {
+                strongSelf.imageView.image = photo;
+            }else {
+                if (strongSelf.requestID) {
+                    [[PHImageManager defaultManager] cancelImageRequest:strongSelf.requestID];
+                    strongSelf.requestID = -1;
+                }
+            }
         }];
         if (requestID && self.requestID && requestID != self.requestID) {
             [[PHImageManager defaultManager] cancelImageRequest:self.requestID];

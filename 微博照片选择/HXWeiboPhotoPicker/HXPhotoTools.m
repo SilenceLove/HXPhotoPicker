@@ -261,12 +261,12 @@
             HXPhotoModel *model = photos[i];
             if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
                 NSData *imageData;
-                if (UIImagePNGRepresentation(model.previewPhoto)) {
+                if (UIImagePNGRepresentation(model.thumbPhoto)) {
                     //返回为png图像。
-                    imageData = UIImagePNGRepresentation(model.previewPhoto);
+                    imageData = UIImagePNGRepresentation(model.thumbPhoto);
                 }else {
                     //返回为JPEG图像。
-                    imageData = UIImageJPEGRepresentation(model.previewPhoto, 1.0);
+                    imageData = UIImageJPEGRepresentation(model.thumbPhoto, 1.0);
                 }
                 dataLength += imageData.length;
                 assetCount ++;

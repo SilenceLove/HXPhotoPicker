@@ -17,6 +17,7 @@
 #import "HXFullScreenCameraViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import "UIImage+HXExtension.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 #define Spacing 3 // 每个item的间距
@@ -454,6 +455,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        if (image.imageOrientation != UIImageOrientationUp) {
+            image = [image normalizedImage];
+        }
         model.type = HXPhotoModelMediaTypeCameraPhoto;
         model.subType = HXPhotoModelMediaSubTypePhoto;
         model.thumbPhoto = image;

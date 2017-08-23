@@ -356,25 +356,16 @@
     }
     if (index == 0) {
         if (self.cameraList.count > 0) {
-//            NSInteger listCount = self.cameraList.count;
-//            if (self.outerCamera) {
-//                listCount = self.cameraList.count - 1;
-//            }
             for (int i = 0; i < self.cameraList.count; i++) {
                 HXPhotoModel *phMD = self.cameraList[i];
-//                phMD.albumListIndex = listCount--;
                 [objAy insertObject:phMD atIndex:cameraIndex];
             }
-//            NSInteger photoCount = self.cameraPhotos.count - 1;
             for (int i = 0; i < self.cameraPhotos.count; i++) {
                 HXPhotoModel *phMD = self.cameraPhotos[i];
-//                phMD.photoIndex = photoCount--;
                 [photoAy insertObject:phMD atIndex:0];
             }
-//            NSInteger videoCount = self.cameraVideos.count - 1;
             for (int i = 0; i < self.cameraVideos.count; i++) {
                 HXPhotoModel *phMD = self.cameraVideos[i];
-//                phMD.videoIndex = videoCount--;
                 [videoAy insertObject:phMD atIndex:0];
             }
         }
