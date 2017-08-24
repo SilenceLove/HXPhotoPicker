@@ -10,9 +10,10 @@
 #import "HXPhotoViewController.h"
 
 @interface Demo1ViewController ()<HXPhotoViewControllerDelegate>
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *total;
-@property (weak, nonatomic) IBOutlet UILabel *photo;
-@property (weak, nonatomic) IBOutlet UILabel *video;
+//@property (weak, nonatomic) IBOutlet UILabel *photo;
+//@property (weak, nonatomic) IBOutlet UILabel *video;
 @property (weak, nonatomic) IBOutlet UILabel *original;
 @property (weak, nonatomic) IBOutlet UISwitch *camera;
 @property (strong, nonatomic) HXPhotoManager *manager;
@@ -54,9 +55,10 @@
 
 - (void)photoViewControllerDidNext:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)original
 {
-    self.total.text = [NSString stringWithFormat:@"%ld个",allList.count];
-    self.photo.text = [NSString stringWithFormat:@"%ld张",photos.count];
-    self.video.text = [NSString stringWithFormat:@"%ld个",videos.count];
+    self.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photos.count, videos.count];
+//    [NSString stringWithFormat:@"%ld个",allList.count];
+//    self.photo.text = [NSString stringWithFormat:@"%ld张",photos.count];
+//    self.video.text = [NSString stringWithFormat:@"%ld个",videos.count];
     self.original.text = original ? @"YES" : @"NO";
     NSSLog(@"all - %@",allList);
     NSSLog(@"photo - %@",photos);

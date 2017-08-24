@@ -34,9 +34,9 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:@"相机📷/相册" forState:UIControlStateNormal];
-    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [button setBackgroundColor:[UIColor whiteColor]];
     button.frame = CGRectMake(0, 0, 200, 40);
     [button addTarget:self action:@selector(didBtnClick) forControlEvents:UIControlEventTouchUpInside];

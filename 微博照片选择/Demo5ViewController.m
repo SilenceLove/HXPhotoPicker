@@ -51,15 +51,15 @@
     self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     [self.view addSubview:self.scrollView];
     
-    self.onePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(0, 20, self.view.frame.size.width, 0) WithManager:self.oneManager];
+    self.onePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(12, 20, self.view.frame.size.width - 24, 0) WithManager:self.oneManager];
     self.onePhotoView.delegate = self;
     [self.scrollView addSubview:self.onePhotoView];
     
-    self.twoPhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.onePhotoView.frame) + 20, self.view.frame.size.width, 0) WithManager:self.twoManager];
+    self.twoPhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(12, CGRectGetMaxY(self.onePhotoView.frame) + 20, self.view.frame.size.width - 24, 0) WithManager:self.twoManager];
     self.twoPhotoView.delegate = self;
     [self.scrollView addSubview:self.twoPhotoView];
     
-    self.threePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width, 0) WithManager:self.threeManager];
+    self.threePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(12, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width - 24, 0) WithManager:self.threeManager];
     self.threePhotoView.delegate = self;
     [self.scrollView addSubview:self.threePhotoView];
     
@@ -84,13 +84,13 @@
 }
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame {
     if (self.onePhotoView == photoView) {
-        self.twoPhotoView.frame = CGRectMake(0, CGRectGetMaxY(self.onePhotoView.frame) + 20, self.view.frame.size.width, self.twoPhotoView.frame.size.height);
-        self.threePhotoView.frame = CGRectMake(0, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width, self.threePhotoView.frame.size.height);
+        self.twoPhotoView.frame = CGRectMake(12, CGRectGetMaxY(self.onePhotoView.frame) + 20, self.view.frame.size.width - 24, self.twoPhotoView.frame.size.height);
+        self.threePhotoView.frame = CGRectMake(12, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width - 24, self.threePhotoView.frame.size.height);
     }else if (self.twoPhotoView == photoView) {
-        self.twoPhotoView.frame = CGRectMake(0, CGRectGetMaxY(self.onePhotoView.frame) + 20, self.view.frame.size.width, self.twoPhotoView.frame.size.height);
-        self.threePhotoView.frame = CGRectMake(0, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width, self.threePhotoView.frame.size.height);
+        self.twoPhotoView.frame = CGRectMake(12, CGRectGetMaxY(self.onePhotoView.frame) + 20, self.view.frame.size.width - 24, self.twoPhotoView.frame.size.height);
+        self.threePhotoView.frame = CGRectMake(12, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width - 24, self.threePhotoView.frame.size.height);
     }else if (self.threePhotoView == photoView) {
-        self.threePhotoView.frame = CGRectMake(0, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width, frame.size.height);
+        self.threePhotoView.frame = CGRectMake(12, CGRectGetMaxY(self.twoPhotoView.frame) + 20, self.view.frame.size.width - 24, frame.size.height);
     }
     self.scrollView.contentSize = CGSizeMake(self.view.frame.size.width, CGRectGetMaxY(self.threePhotoView.frame) + 100);
 }
