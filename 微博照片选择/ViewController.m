@@ -65,6 +65,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     self.title = @"仿微博照片选择器";
 
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     tableView.tableFooterView = [[UIView alloc] init];
     tableView.dataSource = self;
     tableView.delegate = self;

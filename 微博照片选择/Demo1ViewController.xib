@@ -173,8 +173,8 @@
                                         <action selector="isLookLivePhoto:" destination="-1" eventType="valueChanged" id="W0q-x0-SUC"/>
                                     </connections>
                                 </switch>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="相机功能外置(请在Demo2中使用)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Zy-9f-2ve">
-                                    <rect key="frame" x="16" y="305" width="257.33333333333331" height="20.333333333333314"/>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="相机功能外置(请在Demo2中使用)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Zy-9f-2ve">
+                                    <rect key="frame" x="16" y="305" width="239" height="20.333333333333314"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
@@ -228,6 +228,7 @@
                                 <constraint firstAttribute="trailing" secondItem="cT8-W7-Zfe" secondAttribute="trailing" constant="16" id="ed6-4S-p0C"/>
                                 <constraint firstItem="jLM-Ou-hPa" firstAttribute="leading" secondItem="8Zy-9f-2ve" secondAttribute="leading" id="ikP-1U-3cb"/>
                                 <constraint firstAttribute="trailing" secondItem="Awx-MX-B2E" secondAttribute="trailing" constant="16" id="k8d-9h-dvW"/>
+                                <constraint firstItem="6JA-MA-05N" firstAttribute="leading" secondItem="8Zy-9f-2ve" secondAttribute="trailing" id="m68-ZE-yyz"/>
                                 <constraint firstItem="ge9-kO-A60" firstAttribute="top" secondItem="3LS-gI-lTu" secondAttribute="bottom" constant="20" id="nwW-E7-2YB"/>
                                 <constraint firstItem="9jQ-H1-sTM" firstAttribute="centerY" secondItem="7Mt-a3-Hfi" secondAttribute="centerY" id="ovo-FN-OZp"/>
                                 <constraint firstItem="Awx-MX-B2E" firstAttribute="centerY" secondItem="PU4-xi-L3Y" secondAttribute="centerY" id="r3w-HB-gu7"/>
@@ -258,7 +259,7 @@
                         <constraint firstItem="dKv-nw-BK4" firstAttribute="leading" secondItem="8oH-fQ-g46" secondAttribute="leading" id="hSg-iZ-eet"/>
                         <constraint firstItem="dKv-nw-BK4" firstAttribute="top" secondItem="Tvt-2O-Yp3" secondAttribute="bottom" constant="1" id="mbe-sf-SmA"/>
                         <constraint firstItem="LO3-2P-AXX" firstAttribute="leading" secondItem="8oH-fQ-g46" secondAttribute="leading" id="n6q-iu-kgh"/>
-                        <constraint firstAttribute="bottom" secondItem="GVr-SR-yKM" secondAttribute="bottom" constant="-32" id="o2x-Rp-BRJ"/>
+                        <constraint firstAttribute="bottom" secondItem="GVr-SR-yKM" secondAttribute="bottom" constant="20" id="o2x-Rp-BRJ"/>
                         <constraint firstAttribute="trailing" secondItem="LO3-2P-AXX" secondAttribute="trailing" id="t8W-Ok-QMi"/>
                         <constraint firstItem="GVr-SR-yKM" firstAttribute="centerX" secondItem="8oH-fQ-g46" secondAttribute="centerX" id="w3Z-7v-gfU"/>
                         <constraint firstAttribute="trailing" secondItem="Tvt-2O-Yp3" secondAttribute="trailing" id="xnJ-VS-n2y"/>
