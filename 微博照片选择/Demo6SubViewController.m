@@ -8,7 +8,12 @@
 
 #import "Demo6SubViewController.h"
 #import "HXPhotoView.h"
+
+static const CGFloat kPhotoViewMargin = 12.0;
+
 @interface Demo6SubViewController ()<HXPhotoViewDelegate>
+
+@property (strong, nonatomic) UIScrollView *scrollView;
 
 @end
 
@@ -18,18 +23,31 @@
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationController.navigationBar.translucent = NO;
+//    self.navigationController.navigationBar.translucent = NO;
     self.automaticallyAdjustsScrollViewInsets = YES;
-    CGFloat width = self.view.frame.size.width;
+    
+    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    scrollView.alwaysBounceVertical = YES;
+    [self.view addSubview:scrollView];
+    self.scrollView = scrollView;
+    
+    CGFloat width = scrollView.frame.size.width;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
-    photoView.frame = CGRectMake(12, 100, width - 24, 0);
+    photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:photoView]; 
+    [scrollView addSubview:photoView];
 }
 
 - (void)dealloc { 
     [self.manager clearSelectedList];
+}
+
+#pragma mark - HXPhotoViewDelegate
+
+- (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame
+{
+    self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width, CGRectGetMaxY(frame) + kPhotoViewMargin);
 }
 
 @end
