@@ -479,7 +479,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 - (void)setup {
     self.responseTraitCollection = [self respondsToSelector:@selector(traitCollection)];
     self.responseForceTouchCapability = [self.traitCollection respondsToSelector:@selector(forceTouchCapability)];
-    self.isCapabilityAvailable = self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
+    if (self.responseTraitCollection && self.responseForceTouchCapability) {
+        self.isCapabilityAvailable = self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
+    }
     
     if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
         if (self.manager.networkPhotoUrls.count == 0) {
