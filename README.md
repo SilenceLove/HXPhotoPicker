@@ -439,7 +439,7 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
 - 2017-08-12　　添加系统相机、HXPhotoTools添加转换方法
 - ...
 - v2.0.5　修复相机拍照后显示错误，删除错误版本
-- v2.0.6  修复ios8适配问题
+- v2.0.6　修复ios8适配问题
 
 ## 六.  更多 - More
 
