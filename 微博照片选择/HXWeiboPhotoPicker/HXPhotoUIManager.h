@@ -85,6 +85,9 @@
 /**  是否开启毛玻璃效果开启了自动屏蔽背景颜色  */
 @property (assign, nonatomic) BOOL blurEffect;
 
+/**  隐藏原图按钮  */
+@property (assign, nonatomic) BOOL hideOriginalBtn;
+
 /**  底部视图背景颜色  */
 @property (strong, nonatomic) UIColor *bottomViewBgColor;
 

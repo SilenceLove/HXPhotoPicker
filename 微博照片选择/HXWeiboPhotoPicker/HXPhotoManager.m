@@ -17,8 +17,7 @@
 
 @implementation HXPhotoManager
 
-- (instancetype)initWithType:(HXPhotoManagerSelectedType)type
-{
+- (instancetype)initWithType:(HXPhotoManagerSelectedType)type {
     if (self = [super init]) {
         self.type = type;
         [self setup];
@@ -26,8 +25,7 @@
     return self;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     if ([super init]) {
         self.type = HXPhotoManagerSelectedTypePhoto;
         [self setup];
@@ -35,8 +33,7 @@
     return self;
 }
 
-- (void)setup
-{
+- (void)setup {
     self.open3DTouchPreview = NO;
     self.cameraType = HXPhotoManagerCameraTypeHalfScreen;
     self.outerCamera = NO;
@@ -78,6 +75,7 @@
     self.cacheAlbum = YES;
     self.videoMaxDuration = 300.f;
     self.saveSystemAblum = NO;
+    self.deleteTemporaryPhoto = YES;
     self.UIManager = [[HXPhotoUIManager alloc] init];
     self.UIManager.photoViewAddImageName = @"compose_pic_add@2x.png";
     self.UIManager.placeholderImageName = @"qz_photolist_picture_fail@2x.png";
@@ -130,6 +128,7 @@
     self.UIManager.fullScreenCameraNextBtnBgColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
     self.UIManager.cameraPhotoVideoNormalTitleColor = [UIColor lightGrayColor];
     self.UIManager.cameraPhotoVideoSelectedTitleColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
+    self.UIManager.hideOriginalBtn = NO;
     
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
@@ -146,8 +145,25 @@
     }
 }
 
+- (void)setLocalImageList:(NSArray *)localImageList {
+    _localImageList = localImageList;
+    if (![localImageList.firstObject isKindOfClass:[UIImage class]]) {
+        NSSLog(@"请传入装着UIImage对象的数组");
+        return;
+    }
+    for (UIImage *image in localImageList) {
+        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:image];
+        photoModel.selected = YES;
+        [self.endCameraPhotos addObject:photoModel];
+        [self.endSelectedCameraPhotos addObject:photoModel];
+        [self.endCameraList addObject:photoModel];
+        [self.endSelectedCameraList addObject:photoModel];
+        [self.endSelectedPhotos addObject:photoModel];
+        [self.endSelectedList addObject:photoModel];
+    }
+}
+
 - (void)getImage {
-    
     if (!self.singleSelected && !self.photoViewCellIconDic) {
         self.photoViewCellIconDic = @{@"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
                                               @"gifIcon" : [HXPhotoTools hx_imageNamed:self.UIManager.cellGitIconImageName] ,
@@ -165,8 +181,7 @@
  
  @param albums 相册集合
  */
-- (void)FetchAllAlbum:(void(^)(NSArray *albums))albums IsShowSelectTag:(BOOL)isShow
-{
+- (void)FetchAllAlbum:(void(^)(NSArray *albums))albums IsShowSelectTag:(BOOL)isShow {
     if (self.albums.count > 0) [self.albums removeAllObjects];
     // 获取系统智能相册
     PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
@@ -265,8 +280,7 @@
  @param index 相册下标
  @param list 照片和视频的集合
  */
-- (void)FetchAllPhotoForPHFetchResult:(PHFetchResult *)result Index:(NSInteger)index FetchResult:(void(^)(NSArray *photos, NSArray *videos, NSArray *Objs))list
-{
+- (void)FetchAllPhotoForPHFetchResult:(PHFetchResult *)result Index:(NSInteger)index FetchResult:(void(^)(NSArray *photos, NSArray *videos, NSArray *Objs))list {
     NSMutableArray *photoAy = [NSMutableArray array];
     NSMutableArray *videoAy = [NSMutableArray array];
     NSMutableArray *objAy = [NSMutableArray array]; 
@@ -398,8 +412,7 @@
 //        } IsShowSelectTag:NO];
 //    });
 }
-- (void)deleteSpecifiedModel:(HXPhotoModel *)model
-{
+- (void)deleteSpecifiedModel:(HXPhotoModel *)model {
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         
         [self.endCameraPhotos removeObject:model];
@@ -428,8 +441,7 @@
     [self.endSelectedList removeObject:model];
 }
 
-- (void)addSpecifiedArrayToSelectedArray:(NSArray *)list
-{
+- (void)addSpecifiedArrayToSelectedArray:(NSArray *)list {
     for (HXPhotoModel *model in list) {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
             
@@ -476,6 +488,22 @@
     [self.endSelectedVideos removeAllObjects];
     self.endIsOriginal = NO;
     self.endPhotosTotalBtyes = nil;
+    
+    [self.selectedList removeAllObjects];
+    [self.cameraPhotos removeAllObjects];
+    [self.selectedCameraPhotos removeAllObjects];
+    [self.cameraList removeAllObjects];
+    [self.selectedCameraList removeAllObjects];
+    [self.selectedPhotos removeAllObjects];
+    [self.cameraVideos removeAllObjects];
+    [self.selectedCameraVideos removeAllObjects];
+    [self.cameraList removeAllObjects];
+    [self.selectedCameraList removeAllObjects];
+    [self.selectedVideos removeAllObjects];
+    [self.selectedPhotos removeAllObjects];
+    [self.selectedVideos removeAllObjects];
+    self.isOriginal = NO;
+    self.photosTotalBtyes = nil;
 }
 
 - (void)getMaxAlbum {

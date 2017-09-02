@@ -1367,7 +1367,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         
         self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
         CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle height:rightBtnH fontSize:14];
@@ -1380,7 +1380,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         self.bottomView.originalBtn.enabled = NO;
         self.navItem.rightBarButtonItem.enabled = NO;
         [self.rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"下一步"] forState:UIControlStateNormal];
-        [self.rightBtn setBackgroundColor:[UIColor whiteColor]];
+        [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnDisabledBgColor];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
         self.rightBtn.layer.borderWidth = 0.5;
     }
@@ -1521,12 +1521,27 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)sortSelectList {
+    int i = 0, j = 0, k = 0;
+    for (HXPhotoModel *model in self.manager.selectedList) {
+        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
+            model.endIndex = i++;
+        }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
+            model.videoIndex = j++;
+        }
+        model.endCollectionIndex = k++;
+    }
+}
+
 - (void)cleanSelectedList {
+    [self sortSelectList];
     // 如果通过相机拍的数组为空 则清空所有关于相机的数组
-    if (self.manager.selectedCameraList.count == 0) {
-        [self.manager.cameraList removeAllObjects];
-        [self.manager.cameraVideos removeAllObjects];
-        [self.manager.cameraPhotos removeAllObjects];
+    if (self.manager.deleteTemporaryPhoto) {
+        if (self.manager.selectedCameraList.count == 0) {
+            [self.manager.cameraList removeAllObjects];
+            [self.manager.cameraVideos removeAllObjects];
+            [self.manager.cameraPhotos removeAllObjects];
+        }
     }
     if (!self.manager.singleSelected) {
         // 记录这次操作的数据
@@ -1694,6 +1709,12 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 0.5)];
     lineView.backgroundColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.5];
     [self addSubview:lineView];
+    
+    if (self.manager.UIManager.hideOriginalBtn) {
+        self.originalBtn.hidden = YES;
+    }else {
+        self.originalBtn.hidden = NO;
+    }
 }
 - (void)didPreviewClick:(UIButton *)button {
     if ([self.delegate respondsToSelector:@selector(didPhotoBottomViewClick:Button:)]) {

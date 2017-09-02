@@ -58,7 +58,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if (!_addModel) {
         _addModel = [[HXPhotoModel alloc] init];
         _addModel.type = HXPhotoModelMediaTypeCamera;
-        _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:self.manager.UIManager.photoViewAddImageName];
+        if (self.manager.UIManager.photoViewAddImageName) {
+            _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:self.manager.UIManager.photoViewAddImageName];
+        }else {
+            _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_pic_add@2x.png"];
+        }
     }
     return _addModel;
 }
@@ -73,7 +77,15 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 + (instancetype)photoManager:(HXPhotoManager *)manager {
     return [[self alloc] initWithManager:manager];
 }
-
+- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.manager = manager;
+        [self.manager getImage];
+        [self setup];
+    }
+    return self;
+}
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
@@ -93,6 +105,15 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
     return self;
 }
+
+/**  不要使用 "initWithFrame" 这个方法初始化  */
+//- (instancetype)initWithFrame:(CGRect)frame {
+//    self = [super initWithFrame:frame];
+//    if (self) {
+//        [self setup];
+//    }
+//    return self;
+//}
 
 - (void)setup {
     self.numOfLinesOld = 0;
@@ -133,6 +154,13 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         [weakSelf photoLibraryDidChange:collectionChanges selectPhoto:selectPhoto];
     }];
 }
+
+/**
+ 系统相册发生变化
+
+ @param list 发生改变的相册数组
+ @param selectPhoto 是否正在选择照片
+ */
 - (void)photoLibraryDidChange:(NSArray *)list selectPhoto:(BOOL)selectPhoto {
     for (int i = 0; i < list.count ; i++) {
         NSDictionary *dic = list[i];
@@ -236,6 +264,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
+    [manager getImage];
     [self.networkPhotos removeAllObjects];
     if (self.manager.networkPhotoUrls.count) {
         self.collectionView.editEnabled = NO;
@@ -255,6 +284,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
     }
 }
+
+/**
+ 刷新视图
+ */
 - (void)refreshView {
     [self photoViewControllerDidNext:self.manager.endSelectedList.mutableCopy Photos:self.manager.endSelectedPhotos.mutableCopy Videos:self.manager.endSelectedVideos.mutableCopy Original:self.manager.endIsOriginal];
 }
@@ -321,11 +354,17 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
 }
 
+/**
+ 先进入相册再进入相机
+ */
 - (void)goCamera {
     self.manager.goCamera = YES;
     [self goPhotoViewController];
 }
 
+/**
+ 添加按钮点击事件
+ */
 - (void)goPhotoViewController {
     if (self.manager.outerCamera) {
         self.manager.openCamera = NO;
@@ -346,103 +385,114 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         [sheet showInView:self];
         return;
     }
+    [self directGoPhotoViewController];
+}
+
+- (void)directGoPhotoViewController {
     HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
     vc.manager = self.manager;
     vc.delegate = self;
     [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 0) {
-        if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
-            return;
-        }
-        AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-        if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] otherButtonTitles:[NSBundle hx_localizedStringForKey:@"设置"], nil];
-            [alert show];
-            return;
-        }
-        HXCameraType type = 0;
-        if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-            if (self.videos.count >= self.manager.videoMaxNum && self.photos.count < self.manager.photoMaxNum + self.networkPhotos.count) {
-                type = HXCameraTypePhoto;
-            }else if (self.photos.count >= self.manager.photoMaxNum + self.networkPhotos.count && self.videos.count < self.manager.videoMaxNum) {
-                type = HXCameraTypeVideo;
-            }else if (self.photos.count + self.videos.count >= self.manager.maxNum + self.networkPhotos.count) {
-                [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"已达最大数!"]];
-                return;
-            }else {
-                type = HXCameraTypePhotoAndVideo;
-            }
-        }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
-            if (self.photos.count >= self.manager.photoMaxNum + self.networkPhotos.count) {
-                [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片已达最大数!"]];
-                return;
-            }
+/**
+ 前往相机
+ */
+- (void)goCameraViewContoller {
+    if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
+        return;
+    }
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] otherButtonTitles:[NSBundle hx_localizedStringForKey:@"设置"], nil];
+        [alert show];
+        return;
+    }
+    HXCameraType type = 0;
+    if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+        if (self.videos.count >= self.manager.videoMaxNum && self.photos.count < self.manager.photoMaxNum + self.networkPhotos.count) {
             type = HXCameraTypePhoto;
-        }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-            if (self.videos.count >= self.manager.videoMaxNum) {
-                [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频已达最大数!"]];
-                return;
-            }
+        }else if (self.photos.count >= self.manager.photoMaxNum + self.networkPhotos.count && self.videos.count < self.manager.videoMaxNum) {
             type = HXCameraTypeVideo;
+        }else if (self.photos.count + self.videos.count >= self.manager.maxNum + self.networkPhotos.count) {
+            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"已达最大数!"]];
+            return;
+        }else {
+            type = HXCameraTypePhotoAndVideo;
         }
-        if (self.manager.cameraType == HXPhotoManagerCameraTypeFullScreen) {
-            HXFullScreenCameraViewController *vc1 = [[HXFullScreenCameraViewController alloc] init];
-            vc1.delegate = self;
-            vc1.type = type;
-            vc1.photoManager = self.manager;
-            if (self.manager.singleSelected) {
-                [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc1] animated:YES completion:nil];
-            }else {
-                [[self viewController:self] presentViewController:vc1 animated:YES completion:nil];
-            }
-        }else if (self.manager.cameraType == HXPhotoManagerCameraTypeHalfScreen) {
-            HXCameraViewController *vc = [[HXCameraViewController alloc] init];
-            vc.delegate = self;
-            vc.type = type;
-            vc.photoManager = self.manager;
-            if (self.manager.singleSelected) {
-                [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
-            }else {
-                [[self viewController:self] presentViewController:vc animated:YES completion:nil];
-            }
-        }else { 
-            // 跳转到相机或相册页面
-            self.imagePickerController = [[UIImagePickerController alloc] init];
-            self.imagePickerController.delegate = (id)self;
-            self.imagePickerController.allowsEditing = NO;
-            NSString *requiredMediaTypeImage = ( NSString *)kUTTypeImage;
-            NSString *requiredMediaTypeMovie = ( NSString *)kUTTypeMovie;
-            NSArray *arrMediaTypes;
-            if (type == HXCameraTypePhoto) {
-                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage,nil];
-            }else if (type == HXCameraTypePhotoAndVideo) {
-                    arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage, requiredMediaTypeMovie,nil];
-            }else if (type == HXCameraTypeVideo) {
-                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeMovie,nil];
-            }
-            
-            [self.imagePickerController setMediaTypes:arrMediaTypes];
-            // 设置录制视频的质量
-            [self.imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
-            //设置最长摄像时间
-            [self.imagePickerController setVideoMaximumDuration:60.f];
-            self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-            self.imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-            self.imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
-            [[self viewController:self] presentViewController:self.imagePickerController animated:YES completion:nil];
+    }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
+        if (self.photos.count >= self.manager.photoMaxNum + self.networkPhotos.count) {
+            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片已达最大数!"]];
+            return;
         }
-    }else if (buttonIndex == 1){
-        HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
-        vc.manager = self.manager;
+        type = HXCameraTypePhoto;
+    }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+        if (self.videos.count >= self.manager.videoMaxNum) {
+            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频已达最大数!"]];
+            return;
+        }
+        type = HXCameraTypeVideo;
+    }
+    if (self.manager.cameraType == HXPhotoManagerCameraTypeFullScreen) {
+        HXFullScreenCameraViewController *vc1 = [[HXFullScreenCameraViewController alloc] init];
+        vc1.delegate = self;
+        vc1.type = type;
+        vc1.photoManager = self.manager;
+        if (self.manager.singleSelected) {
+            [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc1] animated:YES completion:nil];
+        }else {
+            [[self viewController:self] presentViewController:vc1 animated:YES completion:nil];
+        }
+    }else if (self.manager.cameraType == HXPhotoManagerCameraTypeHalfScreen) {
+        HXCameraViewController *vc = [[HXCameraViewController alloc] init];
         vc.delegate = self;
-        [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+        vc.type = type;
+        vc.photoManager = self.manager;
+        if (self.manager.singleSelected) {
+            [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+        }else {
+            [[self viewController:self] presentViewController:vc animated:YES completion:nil];
+        }
+    }else {
+        // 跳转到相机或相册页面
+        self.imagePickerController = [[UIImagePickerController alloc] init];
+        self.imagePickerController.delegate = (id)self;
+        self.imagePickerController.allowsEditing = NO;
+        NSString *requiredMediaTypeImage = ( NSString *)kUTTypeImage;
+        NSString *requiredMediaTypeMovie = ( NSString *)kUTTypeMovie;
+        NSArray *arrMediaTypes;
+        if (type == HXCameraTypePhoto) {
+            arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage,nil];
+        }else if (type == HXCameraTypePhotoAndVideo) {
+            arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage, requiredMediaTypeMovie,nil];
+        }else if (type == HXCameraTypeVideo) {
+            arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeMovie,nil];
+        }
+        
+        [self.imagePickerController setMediaTypes:arrMediaTypes];
+        // 设置录制视频的质量
+        [self.imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
+        //设置最长摄像时间
+        [self.imagePickerController setVideoMaximumDuration:60.f];
+        self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        self.imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+        self.imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
+        [[self viewController:self] presentViewController:self.imagePickerController animated:YES completion:nil];
     }
 }
 
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 0) {
+        [self goCameraViewContoller];
+    }else if (buttonIndex == 1){
+        [self directGoPhotoViewController];
+    }
+}
+
+/**
+ 前往设置开启权限
+ */
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
@@ -497,6 +547,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     [self cameraDidNextClick:model];
 }
 
+/**
+ 相机拍完之后的代理
+
+ @param model 照片模型
+ */
 - (void)cameraDidNextClick:(HXPhotoModel *)model {
     if (self.manager.saveSystemAblum) {
         if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
@@ -613,6 +668,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
     }
 }
+
+/**
+ cell删除按钮的代理
+
+ @param cell 被删的cell
+ */
 - (void)cellDidDeleteClcik:(UICollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     HXPhotoModel *model = self.dataList[indexPath.item];
@@ -797,6 +858,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     return complete;
 }
 
+/**
+ 获取已下载完成的网络图片数量
+
+ @return 个数
+ */
 - (NSInteger)downloadNumberForNetworkingPhoto {
     NSInteger number = 0;
     for (HXPhotoModel *model in self.networkPhotos) {
@@ -807,6 +873,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     return number;
 }
 
+/**
+ 获取当前视图的控制器
+
+ @param view 当前视图
+ @return 控制器
+ */
 - (UIViewController*)viewController:(UIView *)view {
     for (UIView* next = [view superview]; next; next = next.superview) {
         UIResponder* nextResponder = [next nextResponder];
@@ -817,13 +889,18 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     return nil;
 }
 
+/**
+ 更新高度
+ */
 - (void)setupNewFrame {
     CGFloat x = self.frame.origin.x;
     CGFloat y = self.frame.origin.y;
     CGFloat width = self.frame.size.width;
     
     CGFloat itemW = (width - Spacing * (LineNum - 1)) / LineNum;
-    self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
+    if (itemW > 0) {
+        self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
+    }
     
     NSInteger dataCount = self.dataList.count;
     NSInteger numOfLinesNew = (dataCount / LineNum) + 1;

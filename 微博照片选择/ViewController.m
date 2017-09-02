@@ -13,6 +13,7 @@
 #import "Demo4ViewController.h"
 #import "Demo5ViewController.h"
 #import "Demo6ViewController.h"
+#import "Demo7ViewController.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -54,7 +55,10 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                 viewControllClass: [Demo5ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo6"
                                          subTitle:@"拍照/选择照片完之后跳界面"
-                                viewControllClass: [Demo6ViewController class]]];
+                                viewControllClass: [Demo6ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo7"
+                                         subTitle:@"传入本地image并展示"
+                                viewControllClass: [Demo7ViewController class]]];
     }
     return _list;
 }

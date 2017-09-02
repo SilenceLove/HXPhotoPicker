@@ -8,8 +8,49 @@
 
 #import "HXPhotoModel.h"
 #import "HXPhotoTools.h"
+#import "UIImage+HXExtension.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 @implementation HXPhotoModel 
+
++ (instancetype)photoModelWithImage:(UIImage *)image {
+    return [[self alloc] initWithImage:image];
+}
+
++ (instancetype)photoModelWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
+    return [[self alloc] initWithVideoURL:videoURL videoTime:videoTime];
+}
+
+- (instancetype)initWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
+    if (self = [super init]) {
+        self.type = HXPhotoModelMediaTypeCameraVideo;
+        self.subType = HXPhotoModelMediaSubTypeVideo;
+        self.videoURL = videoURL;
+        MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:videoURL] ;
+        player.shouldAutoplay = NO;
+        UIImage  *image = [player thumbnailImageAtTime:0.1 timeOption:MPMovieTimeOptionNearestKeyFrame];
+        NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:videoTime];
+        self.videoURL = videoURL;
+        self.videoTime = time;
+        self.thumbPhoto = image;
+    }
+    return self;
+}
+
+- (instancetype)initWithImage:(UIImage *)image {
+    self = [super init];
+    if (self) {
+        self.type = HXPhotoModelMediaTypeCameraPhoto;
+        self.subType = HXPhotoModelMediaSubTypePhoto;
+        if (image.imageOrientation != UIImageOrientationUp) {
+            image = [image normalizedImage];
+        }
+        self.thumbPhoto = image;
+        self.previewPhoto = image;
+        self.imageSize = image.size;
+    }
+    return self;
+}
 
 - (CGSize)imageSize
 {

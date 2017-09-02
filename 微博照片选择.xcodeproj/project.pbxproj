@@ -67,6 +67,7 @@
 		7B939E501E5BECB600301BBC /* HXPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B939E4F1E5BECB600301BBC /* HXPresentTransition.m */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7B9F4BA91F3AABC900DCB91B /* HXPhotoUIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F4BA81F3AABC900DCB91B /* HXPhotoUIManager.m */; };
+		7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */; };
 		7BB604521E5D693A00EBA520 /* HXVideoPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */; };
 		7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1D1F07994000715546 /* Demo4ViewController.m */; };
 		7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */; };
@@ -194,6 +195,8 @@
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
 		7B9F4BA71F3AABC900DCB91B /* HXPhotoUIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoUIManager.h; sourceTree = "<group>"; };
 		7B9F4BA81F3AABC900DCB91B /* HXPhotoUIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoUIManager.m; sourceTree = "<group>"; };
+		7BADE74F1F5A5C1F007AF1D9 /* Demo7ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo7ViewController.h; sourceTree = "<group>"; };
+		7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo7ViewController.m; sourceTree = "<group>"; };
 		7BB604501E5D693A00EBA520 /* HXVideoPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXVideoPresentTransition.h; sourceTree = "<group>"; };
 		7BB604511E5D693A00EBA520 /* HXVideoPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXVideoPresentTransition.m; sourceTree = "<group>"; };
 		7BBE5A1C1F07994000715546 /* Demo4ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo4ViewController.h; sourceTree = "<group>"; };
@@ -303,6 +306,8 @@
 				7B1EF3D81F28811300A4391C /* Demo6ViewController.m */,
 				7B1EF3DA1F28812300A4391C /* Demo6SubViewController.h */,
 				7B1EF3DB1F28812300A4391C /* Demo6SubViewController.m */,
+				7BADE74F1F5A5C1F007AF1D9 /* Demo7ViewController.h */,
+				7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */,
 				7B7E3E851E4AACD1002234EE /* Assets.xcassets */,
 				7B7E3E871E4AACD1002234EE /* LaunchScreen.storyboard */,
 				7B7E3E8A1E4AACD1002234EE /* Info.plist */,
@@ -498,6 +503,7 @@
 				7BECEC261ECD7F2200EDE047 /* HXCircleProgressView.m in Sources */,
 				7B7E3EA21E4B0586002234EE /* HXPhotoViewCell.m in Sources */,
 				7B342F7C1E7BB82800E7BD99 /* HXPhotoConst.m in Sources */,
+				7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */,
 				7B578EB11E5590A40090BD74 /* UIView+HXExtension.m in Sources */,
 				7B7E3E7B1E4AACD1002234EE /* main.m in Sources */,
 				7B7E3EA51E4B0D6F002234EE /* HXAlbumListView.m in Sources */,

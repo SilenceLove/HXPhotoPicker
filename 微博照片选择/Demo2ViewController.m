@@ -123,9 +123,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     
 //    将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
 //    !!!!  必须是全部类型的那个数组 就是 allList 这个数组  !!!!
-    [HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls, NSArray<HXPhotoResultModel *> *photos, NSArray<HXPhotoResultModel *> *videos) {
-        NSSLog(@"\n全部类型:%@\n照片:%@\n视频:%@",alls,photos,videos);
-    }];
+//    [HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls, NSArray<HXPhotoResultModel *> *photos, NSArray<HXPhotoResultModel *> *videos) {
+//        NSSLog(@"\n全部类型:%@\n照片:%@\n视频:%@",alls,photos,videos);
+//    }];
     
 //    [HXPhotoTools getSelectedPhotosFullSizeImageUrl:photos complete:^(NSArray<NSURL *> *imageUrls) {
 //        NSSLog(@"%@",imageUrls);

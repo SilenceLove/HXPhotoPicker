@@ -12,23 +12,33 @@
 #import "HXPhotoModel.h"
 #import "HXPhotoTools.h"
 #import "HXPhotoUIManager.h"
+
 /**
  *  照片选择的管理类, 使用照片选择时必须先懒加载此类,然后赋值给对应的对象
  */
-
 typedef enum : NSUInteger {
-    HXPhotoManagerSelectedTypePhoto = 0, // 只选择图片
-    HXPhotoManagerSelectedTypeVideo = 1, // 只选择视频
-    HXPhotoManagerSelectedTypePhotoAndVideo // 图片和视频一起
+    HXPhotoManagerSelectedTypePhoto = 0,        // 只选择图片
+    HXPhotoManagerSelectedTypeVideo = 1,        // 只选择视频
+    HXPhotoManagerSelectedTypePhotoAndVideo     // 图片和视频一起
 } HXPhotoManagerSelectedType;
 
 typedef enum : NSUInteger {
-    HXPhotoManagerCameraTypeHalfScreen = 0, // 半屏相机
-    HXPhotoManagerCameraTypeFullScreen = 1, // 全屏相机
-    HXPhotoManagerCameraTypeSystem // 系统相机
+    HXPhotoManagerCameraTypeHalfScreen = 0,     // 半屏相机
+    HXPhotoManagerCameraTypeFullScreen = 1,     // 全屏相机
+    HXPhotoManagerCameraTypeSystem              // 系统相机
 } HXPhotoManagerCameraType;
 
 @interface HXPhotoManager : NSObject
+
+/**
+ *  删除临时的照片/视频 - 注:相机拍摄的照片并没有保存到系统相机 或 是本地图片 如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..  - 默认 YES
+ */
+@property (assign, nonatomic) BOOL deleteTemporaryPhoto;
+
+/**
+ *  本地图片数组 <UIImage *> 装的是UIImage对象 - 已设置为选中状态
+ */
+@property (copy, nonatomic) NSArray *localImageList;
 
 /**
  *  管理UI的类

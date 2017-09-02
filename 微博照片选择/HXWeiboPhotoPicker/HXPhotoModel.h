@@ -148,4 +148,8 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) CGSize requestSize;
 - (void)prefetchThumbImage;
 - (void)cancelImageRequest;
+
++ (instancetype)photoModelWithImage:(UIImage *)image;
++ (instancetype)photoModelWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime;
+
 @end
