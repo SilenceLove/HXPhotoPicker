@@ -18,10 +18,11 @@
 - [x] 支持浏览网络图片
 - [x] 支持裁剪图片
 - [x] 观察系统相册变化实时增删
+- [x] 支持传入本地图片
 
 ## 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.6'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.7'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
@@ -45,6 +46,16 @@ HXPhotoManagerSelectedTypePhotoAndVideo // 图片和视频一起
 HXPhotoManagerCameraTypeHalfScreen   // 半屏相机
 HXPhotoManagerCameraTypeFullScreen  // 全屏相机
 HXPhotoManagerCameraTypeSystem     // 系统相机
+    
+/**
+ *  删除临时的照片/视频 - 注:相机拍摄的照片/视频且没有保存到系统相册 或 是本地图片 如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..  - 默认 YES
+ */
+BOOL deleteTemporaryPhoto;
+
+/**
+ *  本地图片数组 <UIImage *> 装的是UIImage对象 - 已设置为选中状态
+ */
+NSArray *localImageList;
     
 /**
  *  管理UI的类
@@ -226,6 +237,9 @@ NSString *cellGitIconImageName;
 /**  是否开启毛玻璃效果开启了自动屏蔽背景颜色  */
 BOOL blurEffect;
 
+/**  隐藏原图按钮  */
+BOOL hideOriginalBtn;
+
 /**  底部视图背景颜色  */
 UIColor *bottomViewBgColor;
 
@@ -386,7 +400,7 @@ vc.manager = self.manager;
 self.navigationController.navigationBar.translucent = NO;
 self.automaticallyAdjustsScrollViewInsets = YES;
 
-HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake((414 - 375) / 2, 100, 375, 400) WithManager:self.manager];
+HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake((414 - 375) / 2, 100, 375, 400) manager:self.manager];
 photoView.delegate = self;
 photoView.backgroundColor = [UIColor whiteColor];
 [self.view addSubview:photoView];
@@ -440,6 +454,7 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
 - ...
 - v2.0.5　修复相机拍照后显示错误，删除错误版本
 - v2.0.6　修复ios8适配问题
+- v2.0.7　支持传入本地图片、添加了一些属性和方法、优化了一些细节
 
 ## 六.  更多 - More
 
