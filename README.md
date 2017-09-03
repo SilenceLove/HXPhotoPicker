@@ -1,10 +1,11 @@
 # HXWeiboPhotoPicker - 仿微博照片选择器<p>如有遇到问题请先下载最新版</p>
 [![Platform](http://img.shields.io/badge/platform-ios-blue.svg?style=flat
              )](https://developer.apple.com/iphone/index.action)
+[![Pod Version](http://img.shields.io/cocoapods/v/HXWeiboPhotoPicker.svg?style=flat)](http://cocoadocs.org/docsets/HXWeiboPhotoPicker/)
 [![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
-<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> 
+<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30001531-a1c135a2-90c3-11e7-8d09-7408ab590d1e.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30001574-8e4d3e3e-90c4-11e7-9897-bb4fbeb26bf6.PNG" width="270" height="480">
 
 ## 目录
 * [项目特性](#特性)
