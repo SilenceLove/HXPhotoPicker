@@ -18,6 +18,12 @@
 
 /*-------------------导航栏相关属性------------------*/
 
+@property (copy, nonatomic) void (^navBar)(UINavigationBar *navBar);
+
+@property (copy, nonatomic) void (^navItem)(UINavigationItem *item); 
+
+@property (copy, nonatomic) void (^navRightBtn)(UIButton *rightBtn);
+
 /**  导航栏背景颜色  */
 @property (strong, nonatomic) UIColor *navBackgroundColor;
 

@@ -10,7 +10,7 @@
 #import "HXPhotoModel.h"
 #import "UIImage+HXExtension.h"
 #import "HXPhotoManager.h"
-
+#import <sys/utsname.h>
 @implementation HXPhotoTools
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName {
@@ -185,8 +185,7 @@
     }]; 
 }
 
-+ (PHImageRequestID)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void (^)(NSData *, NSDictionary *))completion
-{
++ (PHImageRequestID)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void (^)(NSData *, NSDictionary *))completion {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
     option.networkAccessAllowed = YES;
     return [[PHImageManager defaultManager] requestImageDataForAsset:asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
@@ -696,6 +695,24 @@
             
         }
     });
+}
+
++ (BOOL)platform {
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    
+    NSString *platform = [NSString stringWithCString:systemInfo.machine encoding:NSASCIIStringEncoding];
+    BOOL have = NO;
+    if ([platform isEqualToString:@"iPhone8,1"]) { // iphone6s
+        have = YES;
+    }else if ([platform isEqualToString:@"iPhone8,2"]) { // iphone6s plus
+        have = YES;
+    }else if ([platform isEqualToString:@"iPhone9,1"]) { // iphone7
+        have = YES;
+    }else if ([platform isEqualToString:@"iPhone9,2"]) { // iphone7 plus
+        have = YES;
+    }
+    return have;
 }
 
 @end

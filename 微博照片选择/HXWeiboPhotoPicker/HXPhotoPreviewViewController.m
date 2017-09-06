@@ -125,6 +125,15 @@
         }];
     }
     [self.view addSubview:self.navBar];
+    if (self.manager.UIManager.navBar) {
+        self.manager.UIManager.navBar(self.navBar);
+    }
+    if (self.manager.UIManager.navItem) {
+        self.manager.UIManager.navItem(self.navItem);
+    }
+    if (self.manager.UIManager.navRightBtn) {
+        self.manager.UIManager.navRightBtn(self.rightBtn);
+    }
 }
 
 - (void)setupNavRightBtn {

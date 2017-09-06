@@ -76,66 +76,15 @@
     self.videoMaxDuration = 300.f;
     self.saveSystemAblum = NO;
     self.deleteTemporaryPhoto = YES;
-    self.UIManager = [[HXPhotoUIManager alloc] init];
-    self.UIManager.photoViewAddImageName = @"compose_pic_add@2x.png";
-    self.UIManager.placeholderImageName = @"qz_photolist_picture_fail@2x.png";
-    self.UIManager.navLeftBtnTitleColor = [UIColor blackColor]; 
-    self.UIManager.navTitleColor = [UIColor blackColor];
-    self.UIManager.navTitleImageName = @"headlines_icon_arrow@2x.png";
-    self.UIManager.navRightBtnNormalBgColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
-    self.UIManager.navRightBtnDisabledBgColor = [UIColor whiteColor];
-    self.UIManager.navRightBtnBorderColor = [UIColor lightGrayColor];
-    self.UIManager.navRightBtnNormalTitleColor = [UIColor whiteColor];
-    self.UIManager.navRightBtnDisabledTitleColor = [UIColor lightGrayColor];
-    self.UIManager.bottomViewBgColor = [UIColor whiteColor];
-    self.UIManager.blurEffect = NO;
-    self.UIManager.previewBtnNormalTitleColor = [UIColor blackColor];
-    self.UIManager.previewBtnDisabledTitleColor = [UIColor lightGrayColor];
-    self.UIManager.previewBtnNormalBgImageName = @"compose_photo_preview_seleted@2x.png";
-    self.UIManager.previewBtnDisabledBgImageName = @"compose_photo_preview_disable@2x.png";
-    self.UIManager.originalBtnBgColor = [UIColor whiteColor];
-    self.UIManager.originalBtnNormalTitleColor = [UIColor blackColor];
-    self.UIManager.originalBtnDisabledTitleColor = [UIColor lightGrayColor];
-    self.UIManager.originalBtnBorderColor = [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:0.7];
-    self.UIManager.originalBtnNormalImageName = @"椭圆-1@2x.png";
-    self.UIManager.originalBtnSelectedImageName = @"椭圆-1-拷贝@2x.png";
-    self.UIManager.albumViewBgColor = [UIColor colorWithRed:240/255.0 green:240/255.0 blue:240/255.0 alpha:1];
-    self.UIManager.albumViewSelectImageName = @"compose_photo_filter_checkbox_checked@2x.png";
-    self.UIManager.albumNameTitleColor = [UIColor blackColor];
-    self.UIManager.photosNumberTitleColor = [UIColor darkGrayColor];
-    self.UIManager.cellCameraPhotoImageName = @"compose_photo_photograph@2x.png";
-    self.UIManager.cellCameraVideoImageName = @"compose_photo_video@2x.png";
-    self.UIManager.cellGitIconImageName = @"timeline_image_gif@2x.png";
-    self.UIManager.cellSelectBtnNormalImageName = @"compose_guide_check_box_default@2x.png";
-    self.UIManager.cellSelectBtnSelectedImageName = @"compose_guide_check_box_right@2x.png";
-    self.UIManager.cameraCloseNormalImageName = @"camera_close@2x.png";
-    self.UIManager.cameraCloseHighlightedImageName = @"camera_close_highlighted@2x.png";
-    self.UIManager.cameraReverseNormalImageName = @"camera_overturn@2x.png";
-    self.UIManager.cameraReverseHighlightedImageName = @"camera_overturn_highlighted@2x.png";
-    self.UIManager.flashAutoImageName = @"camera_flashlight_auto_disable@2x.png";
-    self.UIManager.flashOnImageName = @"camera_flashlight_open_disable@2x.png";
-    self.UIManager.flashOffImageName = @"camera_flashlight_disable@2x.png";
-    self.UIManager.takePicturesBtnNormalImageName = @"camera_camera_background@2x.png";
-    self.UIManager.takePicturesBtnHighlightedImageName = @"camera_camera_background_highlighted@2x.png";
-    self.UIManager.recordedBtnNormalImageName = @"camera_video_background@2x.png";
-    self.UIManager.recordedBtnHighlightedImageName = @"camera_video_background_highlighted@2x.png";
-    self.UIManager.cameraDeleteBtnImageName = @"video_delete_dustbin@2x.png";
-    self.UIManager.cameraNextBtnNormalImageName = @"video_next_button@2x.png";
-    self.UIManager.cameraNextBtnHighlightedImageName = @"video_next_button_highlighted@2x.png";
-    self.UIManager.cameraCenterDotImageName = @"camera_drop_highlighted@2x.png";
-    self.UIManager.cameraFocusImageName = @"camera_ Focusing@2x.png";
-    self.UIManager.fullScreenCameraNextBtnTitleColor = [UIColor whiteColor];
-    self.UIManager.fullScreenCameraNextBtnBgColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
-    self.UIManager.cameraPhotoVideoNormalTitleColor = [UIColor lightGrayColor];
-    self.UIManager.cameraPhotoVideoSelectedTitleColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
-    self.UIManager.hideOriginalBtn = NO;
-    
+    self.UIManager = [[HXPhotoUIManager alloc] init];    
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
 
 - (void)setSaveSystemAblum:(BOOL)saveSystemAblum {
     _saveSystemAblum = saveSystemAblum;
-    [self getMaxAlbum];
+    if (self.saveSystemAblum) {
+        [self getMaxAlbum];
+    }
 }
 
 - (void)setMonitorSystemAlbum:(BOOL)monitorSystemAlbum {
@@ -325,7 +274,7 @@
                     photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
                 }
             }else {
-                if (iOS9Later) {
+                if (iOS9Later && [HXPhotoTools platform]) {
                     if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
                         if (!self.singleSelected) {
                             photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;

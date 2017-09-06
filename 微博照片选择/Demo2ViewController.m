@@ -81,6 +81,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.saveSystemAblum = NO;
 //        _manager.selectTogether = NO;
 //        _manager.rowCount = 3;
+        
+        _manager.UIManager.navBar = ^(UINavigationBar *navBar) {
+//            [navBar setBackgroundImage:[UIImage imageNamed:@"APPCityPlayer_bannerGame"] forBarMetrics:UIBarMetricsDefault];
+        };
     }
     return _manager;
 }

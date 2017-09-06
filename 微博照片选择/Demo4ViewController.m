@@ -20,7 +20,7 @@
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
         _manager.openCamera = YES;
         _manager.singleSelected = YES;
-                _manager.singleSelecteClip = NO;
+//                _manager.singleSelecteClip = NO;
         _manager.cameraType = HXPhotoManagerCameraTypeFullScreen;
     }
     return _manager;
@@ -35,12 +35,14 @@
     vc.delegate = self;
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
 }
-- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original { 
-    __weak typeof(self) weakSelf = self;
-    [HXPhotoTools getImageForSelectedPhoto:photos type:0 completion:^(NSArray<UIImage *> *images) {
-        weakSelf.imageView.image = images.firstObject;
-    }];
-} 
+- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original {
+    HXPhotoModel *model = allList.firstObject;
+    self.imageView.image = model.previewPhoto;
+//    __weak typeof(self) weakSelf = self;
+//    [HXPhotoTools getImageForSelectedPhoto:photos type:0 completion:^(NSArray<UIImage *> *images) {
+//        weakSelf.imageView.image = images.firstObject;
+//    }];
+}
 
 - (void)photoViewControllerDidCancel {
     

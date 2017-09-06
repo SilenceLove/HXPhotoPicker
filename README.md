@@ -43,7 +43,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.7'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.8'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
@@ -71,6 +71,7 @@
 - v2.0.5　修复相机拍照后显示错误，删除错误版本
 - v2.0.6　修复ios8适配问题
 - v2.0.7　支持传入本地图片、添加了一些属性和方法、优化了一些细节
+- v2.0.8　修改一些细节问题、删除无效文件
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoManager"></a> HXPhotoManager 照片管理类相关属性介绍

@@ -223,7 +223,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                     photoModel.type = self.manager.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
                 }
             }else {
-                if (iOS9Later) {
+                if (iOS9Later && [HXPhotoTools platform]) {
                     if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
                         if (!self.manager.singleSelected) {
                             photoModel.type = self.manager.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
@@ -606,6 +606,15 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     self.albumView = albumView;
     
     [self.view addSubview:self.navBar];
+    if (self.manager.UIManager.navBar) {
+        self.manager.UIManager.navBar(self.navBar);
+    }
+    if (self.manager.UIManager.navItem) {
+        self.manager.UIManager.navItem(self.navItem);
+    }
+    if (self.manager.UIManager.navRightBtn) {
+        self.manager.UIManager.navRightBtn(self.rightBtn);
+    }
 }
 /**
  点击取消按钮 清空所有操作

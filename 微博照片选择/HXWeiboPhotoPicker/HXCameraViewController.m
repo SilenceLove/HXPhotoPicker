@@ -157,6 +157,7 @@
     navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBtn];
     UIBarButtonItem *rightOne_ = [[UIBarButtonItem alloc] initWithCustomView:rightOne];
     UIBarButtonItem *rightTwo_ = [[UIBarButtonItem alloc] initWithCustomView:rightTwo];
+    
     self.flashlight = 0;
     //    AVCaptureDevicePositionBack  后置摄像头
     //    AVCaptureDevicePositionFront 前置摄像头

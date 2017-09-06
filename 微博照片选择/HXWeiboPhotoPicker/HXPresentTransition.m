@@ -50,7 +50,44 @@
             break;
     }
 }
-
+- (void)presentAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(UIViewController *)fromVC ToVC:(UIViewController *)toVC cell:(HXPhotoSubViewCell *)cell{
+    UIView *containerView = [transitionContext containerView];
+    UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
+    tempView.clipsToBounds = YES;
+    tempView.contentMode = UIViewContentModeScaleAspectFill;
+    tempView.frame = [cell.imageView convertRect:cell.imageView.bounds toView:containerView];
+    if (!image) {
+        tempView.image = cell.imageView.image;
+    }
+    // vc1可以隐藏了
+    fromVC.view.hidden = YES;
+    if (self.vcType == HXPresentTransitionVcTypePhoto) {
+        HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)toVC;
+        vc.collectionView.hidden = YES;
+    }
+    //将视图和vc2的view都加入ContainerView中
+    [containerView addSubview:toVC.view];
+    [containerView addSubview:tempView];
+    CGFloat imgWidht = model.endImageSize.width;
+    CGFloat imgHeight = model.endImageSize.height;
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+    
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + 32, imgWidht, imgHeight);
+    } completion:^(BOOL finished) {
+        fromVC.view.hidden = NO;
+        if (self.vcType == HXPresentTransitionVcTypePhoto) {
+            HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)toVC;
+            vc.collectionView.hidden = NO;
+        }else {
+            HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)toVC;
+            [vc.maskView removeFromSuperview];
+        }
+        tempView.hidden = YES;
+        [transitionContext completeTransition:YES];
+    }];
+}
 /**
  *  实现present动画
  */
@@ -71,41 +108,14 @@
         }else {
             fromVC = tabBar.selectedViewController;
         }
-    } 
-    UIView *containerView = [transitionContext containerView];
-    HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:self.photoView.currentIndexPath];
-    UIImageView *tempView = [[UIImageView alloc] initWithImage:cell.imageView.image];
-    tempView.clipsToBounds = YES;
-    tempView.contentMode = UIViewContentModeScaleAspectFill;
-    tempView.frame = [cell.imageView convertRect:cell.imageView.bounds toView: containerView];
-    // vc1可以隐藏了
-    fromVC.view.hidden = YES;
-    if (self.vcType == HXPresentTransitionVcTypePhoto) {
-        HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)toVC;
-        vc.collectionView.hidden = YES;
     }
-    //将视图和vc2的view都加入ContainerView中
-    [containerView addSubview:toVC.view];
-    [containerView addSubview:tempView];
+    HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:self.photoView.currentIndexPath];
     HXPhotoModel *model = cell.model;
-    CGFloat imgWidht = model.endImageSize.width;
-    CGFloat imgHeight = model.endImageSize.height;
-    CGFloat width = [UIScreen mainScreen].bounds.size.width;
-    CGFloat height = [UIScreen mainScreen].bounds.size.height;
-    
-    [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + 32, imgWidht, imgHeight);
-    } completion:^(BOOL finished) {
-        fromVC.view.hidden = NO;
-        if (self.vcType == HXPresentTransitionVcTypePhoto) {
-            HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)toVC;
-            vc.collectionView.hidden = NO;
-        }else {
-            HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)toVC;
-            [vc.maskView removeFromSuperview];
-        }
-        tempView.hidden = YES;
-        [transitionContext completeTransition:YES];
+    __weak typeof(self) weakSelf = self;
+    [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
+        [weakSelf presentAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC cell:cell];
+    } error:^(NSDictionary *info) {
+        [weakSelf presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
     }];
 }
 

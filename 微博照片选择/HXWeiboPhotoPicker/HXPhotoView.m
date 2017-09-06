@@ -193,7 +193,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                                         photoModel.type = self.manager.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
                                     }
                                 }else {
-                                    if (iOS9Later) {
+                                    if (iOS9Later && [HXPhotoTools platform]) {
                                         if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
                                             if (!self.manager.singleSelected) {
                                                 photoModel.type = self.manager.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;

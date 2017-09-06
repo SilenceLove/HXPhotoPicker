@@ -47,8 +47,8 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [rightBtn setTitle:[NSBundle hx_localizedStringForKey:@"确定"] forState:UIControlStateNormal];
-    [rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [rightBtn setBackgroundColor:[UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1]];
+    [rightBtn setTitleColor:self.photoManager.UIManager.navRightBtnNormalTitleColor forState:UIControlStateNormal];
+    [rightBtn setBackgroundColor:self.photoManager.UIManager.navRightBtnNormalBgColor];
     [rightBtn addTarget:self action:@selector(didRightNavBtnClick) forControlEvents:UIControlEventTouchUpInside];
     rightBtn.titleLabel.font = [UIFont systemFontOfSize:14];
     rightBtn.layer.cornerRadius = 3;
@@ -94,6 +94,15 @@
     }
     [self setupModel];
     [self.view addSubview:self.navBar];
+    if (self.photoManager.UIManager.navBar) {
+        self.photoManager.UIManager.navBar(self.navBar);
+    }
+    if (self.photoManager.UIManager.navItem) {
+        self.photoManager.UIManager.navItem(self.navItem);
+    }
+    if (self.photoManager.UIManager.navRightBtn) {
+        self.photoManager.UIManager.navRightBtn(rightBtn);
+    }
 }
 - (void)setupModel {
     CGFloat width = self.bgView.frame.size.width;
@@ -203,6 +212,8 @@
     if (self.photoManager.singleSelecteClip) {
         [self clipImage];
     }else {
+        self.model.thumbPhoto = self.imageView.image;
+        self.model.previewPhoto = self.imageView.image;
         if ([self.delegate respondsToSelector:@selector(editViewControllerDidNextClick:)]) {
             [self.delegate editViewControllerDidNextClick:self.model];
         }

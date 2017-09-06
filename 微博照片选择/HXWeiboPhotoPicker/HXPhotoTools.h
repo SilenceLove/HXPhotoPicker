@@ -133,4 +133,6 @@ typedef enum : NSUInteger {
  @param completion 完成后的block
  */
 + (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void(^)(UIImage *image,NSDictionary *info))completion progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *info))progressHandler;
+
++ (BOOL)platform;
 @end
