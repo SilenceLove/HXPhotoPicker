@@ -451,7 +451,6 @@ vc.manager = self.manager;
 - (void)photoViewControllerDidCancel
 
 ```
-
 ### <a id="Demo2"></a> Demo2
 ```objc
 // 懒加载 照片管理类
@@ -482,7 +481,6 @@ photoView.backgroundColor = [UIColor whiteColor];
 // 网络图片全部下载完成时调用
 - (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView;
 ```
-
 ### <a id="Demo3"></a> Demo3
 ```
 - (HXPhotoManager *)manager { // 懒加载管理类
@@ -515,7 +513,6 @@ self.manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://oss-cn
 // 设置完网络图片地址数组后重新给manager赋值
 photoView.manager = self.manager;
 ```
-
 ### <a id="Demo4"></a> Demo4
 ```
 - (HXPhotoManager *)manager {
@@ -543,7 +540,6 @@ vc.delegate = self;
     }];
 } 
 ```
- 
 ### <a id="Demo5"></a> Demo5
 ```
 // 懒加载三个管理类用来控制三个选择器
@@ -606,7 +602,6 @@ self.threePhotoView.delegate = self;
     self.scrollView.contentSize = CGSizeMake(self.view.frame.size.width, CGRectGetMaxY(self.threePhotoView.frame) + kPhotoViewMargin);
 }
 ```
-
 ### <a id="Demo6"></a> Demo6
 ```
 // 先在第一个控制器里初始化管理类并设置好属性
@@ -631,7 +626,6 @@ self.threePhotoView.delegate = self;
     [self.manager clearSelectedList];
 }
 ```
-
 ### <a id="Demo7"></a> Demo7
 ```
 // 加载本地图片
@@ -661,9 +655,5 @@ self.photoView = photoView;
 - 如果您有什么好的建议也可以提issue,大家一起讨论一起学习进步...
 
 - 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
- 
-- QQ : 294005139<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
 
-- 如果觉得的不行，麻烦请多包涵。
-
-- [有兴趣可以加下创建的QQ群:531895229](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) 
+- [有兴趣可以加下创建的QQ群:531895229](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
