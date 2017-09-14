@@ -5,7 +5,8 @@
 [![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
-<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30001531-a1c135a2-90c3-11e7-8d09-7408ab590d1e.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30001574-8e4d3e3e-90c4-11e7-9897-bb4fbeb26bf6.PNG" width="270" height="480">
+<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411283-90f6cf8e-9942-11e7-8f21-6de1ca434cc5.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411216-3dc719ea-9942-11e7-8d1e-24e6d7a9b011.PNG" width="270" height="480">
+<img src="https://user-images.githubusercontent.com/18083149/30411300-a67b52c6-9942-11e7-96cc-a05727d109af.png" width="854" height="336">
 
 ## 目录
 * [项目特性](#特性)
@@ -43,7 +44,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.8'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.0.9'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
@@ -72,6 +73,7 @@
 - v2.0.6　修复ios8适配问题
 - v2.0.7　支持传入本地图片、添加了一些属性和方法、优化了一些细节
 - v2.0.8　修改一些细节问题、删除无效文件
+- v2.0.9　添加一键将已选模型数组写入temp目录方法和新属性、demo示例
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoManager"></a> HXPhotoManager 照片管理类相关属性介绍
