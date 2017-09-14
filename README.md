@@ -1,4 +1,5 @@
-# HXWeiboPhotoPicker - 仿微博照片选择器<p>如有遇到问题请先下载最新版</p>
+<img src="https://user-images.githubusercontent.com/18083149/30428044-b9358c32-9984-11e7-8baf-3504abb29e6c.jpg" width="900" height="175">
+
 [![Platform](http://img.shields.io/badge/platform-ios-blue.svg?style=flat
              )](https://developer.apple.com/iphone/index.action)
 [![Pod Version](http://img.shields.io/cocoapods/v/HXWeiboPhotoPicker.svg?style=flat)](http://cocoadocs.org/docsets/HXWeiboPhotoPicker/)
