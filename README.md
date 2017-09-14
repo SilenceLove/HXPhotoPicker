@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/18083149/30428044-b9358c32-9984-11e7-8baf-3504abb29e6c.jpg" width="900" height="175">
+<img src="https://user-images.githubusercontent.com/18083149/30428503-65ebb784-9986-11e7-921f-5e3a7de5978c.jpeg" width="850" height="188">
 
 [![Platform](http://img.shields.io/badge/platform-ios-blue.svg?style=flat
              )](https://developer.apple.com/iphone/index.action)
