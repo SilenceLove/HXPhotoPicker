@@ -152,4 +152,6 @@ typedef enum : NSUInteger {
 + (instancetype)photoModelWithImage:(UIImage *)image;
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime;
 
+@property (copy, nonatomic) NSString *fullPathToFile;
+
 @end

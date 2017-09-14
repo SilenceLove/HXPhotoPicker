@@ -37,6 +37,15 @@ typedef enum : NSUInteger {
 + (void)saveVideoToAlbum:(NSURL *)videoUrl completion:(void(^)())completion error:(void (^)())error;
 
 /**
+ 将选择的模型数组写入临时目录
+
+ @param selectList 已选的模型数组
+ @param completion 成功block
+ @param error 失败block
+ */
++ (void)selectListWriteToTempPath:(NSArray *)selectList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)())error;
+
+/**
  根据PHAsset对象获取照片信息   此方法会回调多次
  */
 + (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion;

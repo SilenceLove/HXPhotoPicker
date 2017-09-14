@@ -1,32 +1,32 @@
 //
-//  Demo7ViewController.m
+//  Demo8ViewController.m
 //  微博照片选择
 //
-//  Created by 洪欣 on 2017/9/2.
+//  Created by 洪欣 on 2017/9/14.
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "Demo7ViewController.h"
+#import "Demo8ViewController.h"
 #import "HXPhotoViewController.h"
 #import "HXPhotoView.h"
 
-
 static const CGFloat kPhotoViewMargin = 12.0;
-
-@interface Demo7ViewController ()<HXPhotoViewDelegate>
+@interface Demo8ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXPhotoView *photoView;
 @property (strong, nonatomic) UIScrollView *scrollView;
+
+@property (copy, nonatomic) NSArray *selectList;
 @end
 
-@implementation Demo7ViewController
-
+@implementation Demo8ViewController
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.openCamera = YES;
         _manager.cacheAlbum = YES;
         _manager.lookLivePhoto = YES;
+//        _manager.lookGifPhoto = NO;
         //        _manager.outerCamera = YES;
         _manager.open3DTouchPreview = YES;
         _manager.cameraType = HXPhotoManagerCameraTypeSystem;
@@ -45,15 +45,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     //    self.navigationController.navigationBar.translucent = NO;
     self.automaticallyAdjustsScrollViewInsets = YES;
     
-    // 加载本地图片
-    NSMutableArray *images = [NSMutableArray array];
-    
-    for (int i = 0 ; i < 4; i++) {
-        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"%d",i]];
-        
-        [images addObject:image];
-    }
-//    [self.manager addLocalImageToAlbumWithImages:images];
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;
     [self.view addSubview:scrollView];
@@ -63,28 +54,30 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0) manager:self.manager];
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
-//    self.manager.localImageList = images;
-    [self.manager addLocalImage:images selected:YES];
     [photoView refreshView];
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     
-    UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavOneBtnClick)];
+    UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"写入Temp" style:UIBarButtonItemStylePlain target:self action:@selector(didNavOneBtnClick)];
     
-    UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithTitle:@"相册" style:UIBarButtonItemStylePlain target:self action:@selector(didNavTwoBtnClick)];
-    
-    self.navigationItem.rightBarButtonItems = @[item1,item2];
+    self.navigationItem.rightBarButtonItems = @[item1];
 }
 
 - (void)didNavOneBtnClick {
-    [self.photoView goCameraViewContoller];
-}
-
-- (void)didNavTwoBtnClick {
-    [self.photoView directGoPhotoViewController];
+    [self.view showLoadingHUDText:@"写入中"];
+    __weak typeof(self) weakSelf = self;
+    [HXPhotoTools selectListWriteToTempPath:self.selectList completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
+        NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allUrl,imageUrls,videoUrls);
+        [weakSelf.view handleLoading];
+    } error:^{
+        [weakSelf.view handleLoading];
+        [weakSelf.view showImageHUDText:@"写入失败"];
+        NSSLog(@"写入失败");
+    }];
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    self.selectList = allList;
     NSSLog(@"%@",allList);
 }
 

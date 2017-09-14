@@ -112,6 +112,42 @@
     }
 }
 
+- (void)addLocalImage:(NSArray *)images selected:(BOOL)selected {
+    if (![images.firstObject isKindOfClass:[UIImage class]]) {
+        NSSLog(@"请传入装着UIImage对象的数组");
+        return;
+    }
+    self.deleteTemporaryPhoto = NO;
+    for (UIImage *image in images) {
+        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:image];
+        photoModel.selected = selected;
+        if (selected) {
+            [self.endCameraPhotos addObject:photoModel];
+            [self.endSelectedCameraPhotos addObject:photoModel];
+            [self.endCameraList addObject:photoModel];
+            [self.endSelectedCameraList addObject:photoModel];
+            [self.endSelectedPhotos addObject:photoModel];
+            [self.endSelectedList addObject:photoModel];
+        }else {
+            [self.endCameraPhotos addObject:photoModel];
+            [self.endCameraList addObject:photoModel];
+        }
+    }
+}
+
+- (void)addLocalImageToAlbumWithImages:(NSArray *)images {
+    if (![images.firstObject isKindOfClass:[UIImage class]]) {
+        NSSLog(@"请传入装着UIImage对象的数组");
+        return;
+    }
+    self.deleteTemporaryPhoto = NO;
+    for (UIImage *image in images) {
+        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:image];
+        [self.endCameraPhotos addObject:photoModel];
+        [self.endCameraList addObject:photoModel];
+    }
+}
+
 - (void)getImage {
     if (!self.singleSelected && !self.photoViewCellIconDic) {
         self.photoViewCellIconDic = @{@"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,

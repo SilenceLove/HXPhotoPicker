@@ -715,4 +715,187 @@
     return have;
 }
 
++ (void)selectListWriteToTempPath:(NSArray *)selectList completion:(void (^)(NSArray<NSURL *> *, NSArray<NSURL *> *, NSArray<NSURL *> *))completion error:(void (^)())error {
+    if (selectList.count == 0) {
+        NSSLog(@"请选择后再写入");
+        if (error) {
+            error();
+        }
+        return;
+    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableArray *allUrl = [NSMutableArray array];
+        NSMutableArray *imageUrls = [NSMutableArray array];
+        NSMutableArray *videoUrls = [NSMutableArray array];
+        for (HXPhotoModel *photoModel in selectList) {
+            if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                NSString *suffix;
+                if (photoModel.asset) {
+                    if (photoModel.type == HXPhotoModelMediaTypePhotoGif) {
+                        suffix = @"gif";
+                    }else if ([[photoModel.asset valueForKey:@"filename"] hasSuffix:@"JPG"]) {
+                        suffix = @"jpeg";
+                    }else {
+                        suffix = @"png";
+                    }
+                }else {
+                    if (!photoModel.previewPhoto) {
+                        photoModel.previewPhoto = photoModel.thumbPhoto;
+                    }
+                    if (UIImagePNGRepresentation(photoModel.previewPhoto)) {
+                        suffix = @"png";
+                    }else {
+                        suffix = @"jpeg";
+                    }
+                }
+                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                photoModel.fullPathToFile = fullPathToFile;
+                [imageUrls addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                [allUrl addObject:[NSURL fileURLWithPath:fullPathToFile]];
+            }else {
+                NSString *fileName = [[self uploadFileName] stringByAppendingString:@".mp4"];
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                photoModel.fullPathToFile = fullPathToFile;
+                [videoUrls addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                [allUrl addObject:[NSURL fileURLWithPath:fullPathToFile]];
+            }
+        }
+        __block NSInteger i = 0 ,k = 0 , j = 0;
+        __block NSInteger imageCount = imageUrls.count , videoCount = videoUrls.count , count = selectList.count;
+        __block BOOL writeError = NO;
+        for (HXPhotoModel *photoModel in selectList) {
+            if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                [self writeOriginalImageToTempWith:photoModel success:^{
+                    i++;
+                    k++;
+                    if (k == imageCount && !writeError) {
+                        NSSLog(@"图片写入成功");
+                    }
+                    if (i == count && !writeError) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(allUrl,imageUrls,videoUrls);
+                            }
+                        });
+                    }
+                } failure:^{
+                    if (!writeError) {
+                        writeError = YES;
+                        if (error) {
+                            error();
+                        }
+                    }
+                }];
+            } else {
+                [self compressedVideoWithMediumQualityWriteToTemp:photoModel progress:^(float progress) {
+                    
+                } success:^{
+                    i++;
+                    j++;
+                    if (j == videoCount && !writeError) {
+                        NSSLog(@"视频写入成功");
+                    }
+                    if (i == count && !writeError) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(allUrl,imageUrls,videoUrls);
+                            }
+                        });
+                    }
+                } failure:^{
+                    if (!writeError) {
+                        writeError = YES;
+                        if (error) {
+                            error();
+                        }
+                    }
+                }];
+            }
+        }
+    });
+}
+
++ (void)writeOriginalImageToTempWith:(HXPhotoModel *)model success:(void (^)())success failure:(void (^)())failure {
+    if (model.asset) {
+        PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
+        option.synchronous = YES;
+        [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:nil resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+            if (imageData) {
+                if (orientation != UIImageOrientationUp && model.type != HXPhotoModelMediaTypePhotoGif) {
+                    UIImage *image = [[UIImage imageWithData:imageData] normalizedImage];
+                    if (UIImagePNGRepresentation(image)) {
+                        imageData = UIImagePNGRepresentation(image);
+                    }else {
+                        imageData = UIImageJPEGRepresentation(image, 1.0);
+                    }
+                }
+                if ([imageData writeToFile:model.fullPathToFile atomically:YES]) {
+                    if (success) {
+                        success();
+                    }
+                } else {
+                    if (failure) {
+                        failure();
+                    }
+                }
+            }else {
+                if (failure) {
+                    failure();
+                }
+            }
+        }];
+    }else {
+        NSData *imageData;
+        if (UIImagePNGRepresentation(model.previewPhoto)) {
+            //返回为png图像。
+            imageData = UIImagePNGRepresentation(model.previewPhoto);
+        }else {
+            //返回为JPEG图像。
+            imageData = UIImageJPEGRepresentation(model.previewPhoto, 1.0);
+        }
+        if ([imageData writeToFile:model.fullPathToFile atomically:YES]) {
+            if (success) {
+                success();
+            }
+        }else {
+            if (failure) {
+                failure();
+            }
+        }
+    }
+}
+
++ (void)compressedVideoWithMediumQualityWriteToTemp:(HXPhotoModel *)model progress:(void (^)(float progress))progress success:(void (^)())success failure:(void (^)())failure {
+    AVAsset *avAsset;
+    if (model.avAsset) {
+        avAsset = model.avAsset;
+    }else {
+        avAsset = [AVURLAsset URLAssetWithURL:model.videoURL options:nil];
+    }
+    NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+    if ([compatiblePresets containsObject:AVAssetExportPresetHighestQuality]) {
+        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetHighestQuality];
+        exportSession.outputURL = [NSURL fileURLWithPath:model.fullPathToFile];
+        exportSession.outputFileType = AVFileTypeMPEG4;
+        exportSession.shouldOptimizeForNetworkUse = YES;
+        
+        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+            if ([exportSession status] == AVAssetExportSessionStatusCompleted) {
+                if (success) {
+                    success();
+                }
+            }else if ([exportSession status] == AVAssetExportSessionStatusFailed){
+                if (failure) {
+                    failure();
+                }
+            }
+        }];
+    }else {
+        if (failure) {
+            failure();
+        }
+    }
+}
+
 @end

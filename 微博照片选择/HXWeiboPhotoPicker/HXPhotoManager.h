@@ -31,7 +31,7 @@ typedef enum : NSUInteger {
 @interface HXPhotoManager : NSObject
 
 /**
- *  删除临时的照片/视频 - 注:相机拍摄的照片并没有保存到系统相机 或 是本地图片 如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..  - 默认 YES
+ *  删除临时的照片/视频 - 注:相机拍摄的照片并没有保存到系统相册 或 是本地图片 如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..  - 默认 YES
  */
 @property (assign, nonatomic) BOOL deleteTemporaryPhoto;
 
@@ -39,6 +39,21 @@ typedef enum : NSUInteger {
  *  本地图片数组 <UIImage *> 装的是UIImage对象 - 已设置为选中状态
  */
 @property (copy, nonatomic) NSArray *localImageList;
+
+/**
+ 添加本地图片数组  内部会将  deleteTemporaryPhoto 设置为NO
+
+ @param images <UIImage *> 装的是UIImage对象
+ @param selected 是否选中  选中的话HXPhotoView自动添加显示 没选中可以在相册里手动选中
+ */
+- (void)addLocalImage:(NSArray *)images selected:(BOOL)selected;
+
+/**
+ 将本地图片添加到相册中  内部会将  deleteTemporaryPhoto 设置为NO 
+
+ @param images <UIImage *> 装的是UIImage对象
+ */
+- (void)addLocalImageToAlbumWithImages:(NSArray *)images;
 
 /**
  *  管理UI的类
@@ -64,11 +79,6 @@ typedef enum : NSUInteger {
  *  是否监听系统相册  -  如果开启了缓存相册 自动开启监听   默认 YES
  */
 @property (assign, nonatomic) BOOL monitorSystemAlbum;
-
-/**  
- 上次选择照片模型的数组
- */
-//@property (strong, nonatomic) NSMutableArray *lastSelectedList;
 
 /**
  是否为单选模式 默认 NO
@@ -156,6 +166,12 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) NSInteger rowCount;
 
 /*-------------------------------------------------------*/
+
+
+
+
+
+
 
 //------// 当要删除的已选中的图片或者视频的时候需要在对应的end数组里面删除
 // 例如: 如果删除的是通过相机拍的照片需要在 endCameraList 和 endCameraPhotos 数组删除对应的图片模型

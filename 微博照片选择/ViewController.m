@@ -14,6 +14,7 @@
 #import "Demo5ViewController.h"
 #import "Demo6ViewController.h"
 #import "Demo7ViewController.h"
+#import "Demo8ViewController.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -58,7 +59,10 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                 viewControllClass: [Demo6ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo7"
                                          subTitle:@"传入本地image并展示"
-                                viewControllClass: [Demo7ViewController class]]];
+                                viewControllClass: [Demo7ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo8"
+                                         subTitle:@"将已选模型(图片和视频)写入临时目录  一键写入^_^"
+                                viewControllClass: [Demo8ViewController class]]];
     }
     return _list;
 }

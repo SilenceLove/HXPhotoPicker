@@ -1041,9 +1041,8 @@
     mainCompositionInst.instructions = [NSArray arrayWithObject:mainInstruction];
     mainCompositionInst.frameDuration = CMTimeMake(1, 30);
     
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:
+ 
+    NSString *myPathDocs =  [NSTemporaryDirectory() stringByAppendingPathComponent:
                              [NSString stringWithFormat:@"FinalVideo-%d.mov",arc4random() % 1000]];
     self.clipVideoURL = [NSURL fileURLWithPath:myPathDocs];
     
