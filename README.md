@@ -58,7 +58,7 @@
 - 相机拍照功能请使用真机调试
 
 ## <a id="更新历史"></a> 四.  更新历史 - Update History
-
+- 2017-03-06　　第一次提交
 - 2017-03-07　　修复通过相机拍照时照片旋转90°的问题
 - ...
 - 2017-06-26　　合并一些方法、删除无用方法
@@ -426,6 +426,18 @@ HXPhotoToolsFetchOriginalImageTpe, // 原图
             // 到这里了说明这个image  是个gif图
         }
     }
+}];
+
+[self.view showLoadingHUDText:@"写入中"];
+__weak typeof(self) weakSelf = self;
+// 将选择的模型数组写入临时目录
+[HXPhotoTools selectListWriteToTempPath:self.selectList completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
+    NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allUrl,imageUrls,videoUrls);
+    [weakSelf.view handleLoading];
+} error:^{
+    [weakSelf.view handleLoading];
+    [weakSelf.view showImageHUDText:@"写入失败"];
+    NSSLog(@"写入失败");
 }];
 ```
 
