@@ -91,7 +91,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL singleSelecteClip;
 
 /**
- 是否开启3DTouch预览功能 默认 NO
+ 是否开启3DTouch预览功能 默认 YES
  */
 @property (assign, nonatomic) BOOL open3DTouchPreview;
 

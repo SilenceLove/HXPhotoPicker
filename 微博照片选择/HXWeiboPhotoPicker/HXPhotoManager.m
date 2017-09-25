@@ -34,7 +34,7 @@
 }
 
 - (void)setup {
-    self.open3DTouchPreview = NO;
+    self.open3DTouchPreview = YES;
     self.cameraType = HXPhotoManagerCameraTypeHalfScreen;
     self.outerCamera = NO;
     self.openCamera = YES;

@@ -61,20 +61,21 @@
     }else {
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)toVC;
         model = vc.model;
-    } 
+    }
     //if (model.previewPhoto) {
-        //[self pushAnim:transitionContext Image:model.previewPhoto Model:model FromVC:fromVC ToVC:toVC];
+    //[self pushAnim:transitionContext Image:model.previewPhoto Model:model FromVC:fromVC ToVC:toVC];
     //}else {
-        __weak typeof(self) weakSelf = self;
+    __weak typeof(self) weakSelf = self;
     [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
         [weakSelf pushAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC];
     } error:^(NSDictionary *info) {
         [weakSelf pushAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC];
-    }]; 
+    }];
 }
 
 - (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(HXPhotoViewController *)fromVC ToVC:(UIViewController *)toVC
 {
+    model.tempImage = image;
     HXPhotoViewCell *fromCell = (HXPhotoViewCell *)[fromVC.collectionView cellForItemAtIndexPath:fromVC.currentIndexPath];
     UIView *containerView = [transitionContext containerView];
     CGFloat imgWidht = model.endImageSize.width;
@@ -98,7 +99,7 @@
         vc.collectionView.hidden = YES;
     }
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + 32, imgWidht, imgHeight);
+        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + (kNavigationBarHeight / 2), imgWidht, imgHeight);
     } completion:^(BOOL finished) {
         if (self.vcType == HXTransitionVcTypePhoto) {
             HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)toVC;
@@ -128,11 +129,11 @@
         HXPhotoPreviewViewCell *previewCell = (HXPhotoPreviewViewCell *)[vc.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:vc.index inSection:0]];
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             [previewCell stopGifImage];
-//            tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
+            //            tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
         }
-//        else {
-            tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
-//        }
+        //        else {
+        tempView = [[UIImageView alloc] initWithImage:previewCell.imageView.image];
+        //        }
     }else {
         HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)fromVC;
         model = vc.model;
@@ -174,15 +175,15 @@
     }else {
         tempView.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);
     }
-    tempView.center = CGPointMake(containerView.frame.size.width / 2, (height - 64) / 2 + 64);
+    tempView.center = CGPointMake(containerView.frame.size.width / 2, (height - kNavigationBarHeight) / 2 + kNavigationBarHeight);
     CGRect rect = [toVC.collectionView convertRect:cell.frame toView:[UIApplication sharedApplication].keyWindow];
     if (cell) {
-        if (rect.origin.y < 64) {
-            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - 65)];
-            rect = CGRectMake(cell.frame.origin.x, 65, cell.frame.size.width, cell.frame.size.height);
-        }else if (rect.origin.y + rect.size.height > height - 51) {
-            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - height + 51 + rect.size.height)];
-            rect = CGRectMake(cell.frame.origin.x, height - 51 - cell.frame.size.height, cell.frame.size.width, cell.frame.size.height);
+        if (rect.origin.y < kNavigationBarHeight) {
+            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - kNavigationBarHeight + 1)];
+            rect = CGRectMake(cell.frame.origin.x, kNavigationBarHeight + 1, cell.frame.size.width, cell.frame.size.height);
+        }else if (rect.origin.y + rect.size.height > height - 51 - kBottomMargin) {
+            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - height + 51 + kBottomMargin + rect.size.height)];
+            rect = CGRectMake(cell.frame.origin.x, height - 51 - kBottomMargin - cell.frame.size.height, cell.frame.size.width, cell.frame.size.height);
         }
     }
     cell.hidden = YES;
@@ -208,3 +209,4 @@
 }
 
 @end
+

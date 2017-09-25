@@ -51,6 +51,7 @@
     }
 }
 - (void)presentAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(UIViewController *)fromVC ToVC:(UIViewController *)toVC cell:(HXPhotoSubViewCell *)cell{
+    model.tempImage = image;
     UIView *containerView = [transitionContext containerView];
     UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
     tempView.clipsToBounds = YES;
@@ -74,7 +75,7 @@
     CGFloat height = [UIScreen mainScreen].bounds.size.height;
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + 32, imgWidht, imgHeight);
+        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + (kNavigationBarHeight / 2), imgWidht, imgHeight);
     } completion:^(BOOL finished) {
         fromVC.view.hidden = NO;
         if (self.vcType == HXPresentTransitionVcTypePhoto) {
@@ -173,7 +174,7 @@
     UIView *containerView = [transitionContext containerView];
     [containerView addSubview:tempView];
     tempView.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);
-    tempView.center = CGPointMake(containerView.frame.size.width / 2, (height - 64) / 2 + 64);
+    tempView.center = CGPointMake(containerView.frame.size.width / 2, (height - kNavigationBarHeight) / 2 + kNavigationBarHeight);
     CGRect rect = [collectionView convertRect:cell.frame toView:[UIApplication sharedApplication].keyWindow];
     cell.hidden = YES;
     fromVC.view.hidden = YES;

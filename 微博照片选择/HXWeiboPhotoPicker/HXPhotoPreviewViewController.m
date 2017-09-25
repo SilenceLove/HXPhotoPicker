@@ -12,13 +12,14 @@
 #import "UIView+HXExtension.h"
 #import "UIButton+HXExtension.h"
 #import "HXPresentTransition.h"
+#import "HXPhotoCustomNavigationBar.h"
 @interface HXPhotoPreviewViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerTransitioningDelegate>
 @property (weak, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UILabel *titleLb;
 @property (strong, nonatomic) UIButton *rightBtn;
 @property (strong, nonatomic) HXPhotoPreviewViewCell *livePhotoCell;
 @property (assign, nonatomic) BOOL firstWillDisplayCell;
-@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) HXPhotoCustomNavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
 @property (assign, nonatomic) BOOL firstOn;
 @end
@@ -36,22 +37,23 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.firstOn = YES;
-    if (!self.isTouch) {
+//    self.firstOn = YES;
+//    if (!self.isTouch) {
         [self setup];
-    }else {
-        self.firstWillDisplayCell = YES;
-    }
+//    }else {
+//        self.firstWillDisplayCell = YES;
+//    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:NO];
 }
-- (UINavigationBar *)navBar {
+- (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
+        _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, kNavigationBarHeight)];
+        _navBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [self.view addSubview:_navBar];
         [_navBar pushNavigationItem:self.navItem animated:NO];
         _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
@@ -90,16 +92,25 @@
     [self setupNavRightBtn];
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.itemSize = CGSizeMake(width, height - 64);
+    flowLayout.itemSize = CGSizeMake(width, height - kNavigationBarHeight);
     flowLayout.minimumInteritemSpacing = 0;
     flowLayout.minimumLineSpacing = 20;
     if (self.selectedComplete) {
         flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
     }else {
-        flowLayout.sectionInset = UIEdgeInsetsMake(-20, 10, 0, 10);
+#ifdef __IPHONE_11_0
+        if (@available(iOS 11.0, *)) {
+#else
+        if ((NO)) {
+#endif
+            flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
+        }else {
+            flowLayout.sectionInset = UIEdgeInsetsMake(-20, 10, 0, 10);
+        }
     }
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, 64, width + 20, height - 64) collectionViewLayout:flowLayout];
+    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, kNavigationBarHeight, width + 20, height - kNavigationBarHeight) collectionViewLayout:flowLayout];
+    collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     collectionView.backgroundColor = [UIColor whiteColor];
     collectionView.dataSource = self;
     collectionView.delegate = self;
@@ -110,6 +121,11 @@
     [collectionView registerClass:[HXPhotoPreviewViewCell class] forCellWithReuseIdentifier:@"cellId"];
     [self.view addSubview:collectionView];
     self.collectionView = collectionView;
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        self.collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    }
+#endif
     [collectionView setContentOffset:CGPointMake(self.index * (width + 20), 0) animated:NO];
     [self.view addSubview:self.selectedBtn];
     HXPhotoModel *model = self.modelList[self.index];
@@ -214,21 +230,6 @@
     cell.model = self.modelList[indexPath.item];
     return cell;
 }
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.firstWillDisplayCell && self.isTouch) {
-        HXPhotoPreviewViewCell *myCell = (HXPhotoPreviewViewCell *)cell;
-        if (myCell.model.type == HXPhotoModelMediaTypeLivePhoto) {
-            [myCell startLivePhoto];
-            self.livePhotoCell = myCell;
-        }else if (myCell.model.type == HXPhotoModelMediaTypePhotoGif) {
-            myCell.imageView.image = self.gifCoverImage;
-            [myCell startGifImage];
-        }else {
-            [myCell fetchLongPhoto];
-        } 
-        self.firstWillDisplayCell = NO;
-    }
-}
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoPreviewViewCell *myCell = (HXPhotoPreviewViewCell *)cell;
     if (myCell.requestID) {
@@ -285,7 +286,7 @@
         if (!model.previewPhoto) {
             [cell fetchLongPhoto];
         }
-    }
+    } 
 }
 
 - (UILabel *)titleLb {
@@ -307,7 +308,7 @@
         [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.cellSelectBtnSelectedImageName] forState:UIControlStateSelected];
         CGFloat selectedBtnW = _selectedBtn.currentImage.size.width;
         CGFloat selectedBtnH = _selectedBtn.currentImage.size.height;
-        _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, 84, selectedBtnW, selectedBtnH);
+        _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, kNavigationBarHeight + 20, selectedBtnW, selectedBtnH);
         [_selectedBtn addTarget:self action:@selector(didSelectedClick:) forControlEvents:UIControlEventTouchUpInside];
         [_selectedBtn setEnlargeEdgeWithTop:20 right:20 bottom:20 left:20];
     }
@@ -315,7 +316,8 @@
 }
 
 - (void)selectClick {
-    if (!self.selectedBtn.selected) {
+    HXPhotoModel *model = self.modelList[self.index];
+    if (!self.selectedBtn.selected && !model.selected) {
         [self didSelectedClick:self.selectedBtn];
     }
 }
@@ -329,23 +331,12 @@
     if (!button.selected) {
         NSString *str = [HXPhotoTools maximumOfJudgment:model manager:self.manager];
         if (str) {
-            if (!self.isTouch) {
-                [self.view showImageHUDText:str];
-            }else {
-                if (self.firstOn) {
-                    self.firstOn = NO;
-                }else {
-                    [self.view showImageHUDText:str];
-                }
-            }
+            [self.view showImageHUDText:str];
             return;
         }
-        if (self.isTouch) {
-            model.thumbPhoto = self.gifCoverImage;
-            model.previewPhoto = self.gifCoverImage;
-        }else {
+        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
             HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
-            if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+            if (cell) {
                 if (model.type == HXPhotoModelMediaTypePhotoGif) {
                     if (cell.imageView.image.images.count > 0) {
                         model.thumbPhoto = cell.imageView.image.images.firstObject;
@@ -358,6 +349,17 @@
                     model.thumbPhoto = cell.imageView.image;
                     model.previewPhoto = cell.imageView.image;
                 }
+            }else {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    HXPhotoPreviewViewCell *cell_1 = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+                    if (model.type == HXPhotoModelMediaTypePhotoGif) {
+                        model.thumbPhoto = cell_1.firstImage;
+                        model.previewPhoto = cell_1.firstImage;
+                    }else {
+                        model.thumbPhoto = cell_1.imageView.image;
+                        model.previewPhoto = cell_1.imageView.image;
+                    }
+                });
             }
         }
         if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) {
@@ -500,13 +502,28 @@
         return;
     }
     HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
-    if (model.type == HXPhotoModelMediaTypeLivePhoto) {
-        [cell startLivePhoto];
-        self.livePhotoCell = cell;
-    }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
-        [cell startGifImage];
+    
+    if (!cell) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            HXPhotoPreviewViewCell *cell_1 = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.index inSection:0]];
+            if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+                [cell_1 startLivePhoto];
+                self.livePhotoCell = cell_1;
+            }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
+                [cell_1 startGifImage];
+            }else {
+                [cell_1 fetchLongPhoto];
+            }
+        });
     }else {
-        [cell fetchLongPhoto];
+        if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+            [cell startLivePhoto];
+            self.livePhotoCell = cell;
+        }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
+            [cell startGifImage];
+        }else {
+            [cell fetchLongPhoto];
+        }
     }
 }
 

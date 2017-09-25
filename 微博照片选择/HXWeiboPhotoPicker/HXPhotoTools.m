@@ -164,30 +164,32 @@
                 completion(result,info);
             });
         }
-        if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue] && !result) {
-            PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
-            options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (progressHandler) {
-                        progressHandler(progress, error, stop, info);
-                    }
-                });
-            };
-            options.networkAccessAllowed = YES;
-            options.resizeMode = PHImageRequestOptionsResizeModeFast;
-            [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-                UIImage *resultImage = [UIImage imageWithData:imageData scale:0.1];
-                if (resultImage) {
-                    completion(resultImage,info);
-                }
-            }];
-        }
-    }]; 
+//        if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue] && !result) {
+//            PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+//            options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    if (progressHandler) {
+//                        progressHandler(progress, error, stop, info);
+//                    }
+//                });
+//            };
+//            options.networkAccessAllowed = YES;
+//            options.resizeMode = PHImageRequestOptionsResizeModeFast;
+//            [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+//                UIImage *resultImage = [UIImage imageWithData:imageData scale:0.1];
+//                if (resultImage) {
+//                    completion(resultImage,info);
+//                }
+//            }];
+//        }
+    }];
 }
 
 + (PHImageRequestID)FetchPhotoDataForPHAsset:(PHAsset *)asset completion:(void (^)(NSData *, NSDictionary *))completion {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
     option.networkAccessAllowed = YES;
+    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
     return [[PHImageManager defaultManager] requestImageDataForAsset:asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
         if (imageData) {
             if (completion) completion(imageData,info);
@@ -818,33 +820,85 @@
 
 + (void)writeOriginalImageToTempWith:(HXPhotoModel *)model success:(void (^)())success failure:(void (^)())failure {
     if (model.asset) {
-        PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
-        option.synchronous = YES;
-        [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:nil resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-            if (imageData) {
-                if (orientation != UIImageOrientationUp && model.type != HXPhotoModelMediaTypePhotoGif) {
-                    UIImage *image = [[UIImage imageWithData:imageData] normalizedImage];
-                    if (UIImagePNGRepresentation(image)) {
-                        imageData = UIImagePNGRepresentation(image);
-                    }else {
-                        imageData = UIImageJPEGRepresentation(image, 1.0);
-                    }
+        if (model.type != HXPhotoModelMediaTypePhotoGif && [[model.asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
+            [self getHighQualityFormatPhotoForPHAsset:model.asset size:PHImageManagerMaximumSize completion:^(UIImage *image, NSDictionary *info) {
+                NSData *imageData;
+                if (image.imageOrientation != UIImageOrientationUp) {
+                    image = [image normalizedImage];
+                }
+                if (UIImagePNGRepresentation(image)) {
+                    imageData = UIImagePNGRepresentation(image);
+                }else {
+                    imageData = UIImageJPEGRepresentation(image, 1.0);
                 }
                 if ([imageData writeToFile:model.fullPathToFile atomically:YES]) {
-                    if (success) {
-                        success();
-                    }
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (success) {
+                            success();
+                        }
+                    });
                 } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (failure) {
+                            failure();
+                        }
+                    });
+                }
+            } error:^(NSDictionary *info) {
+                NSData *imageData;
+                UIImage *image = model.thumbPhoto;
+                if (image.imageOrientation != UIImageOrientationUp) {
+                    image = [image normalizedImage];
+                }
+                if (UIImagePNGRepresentation(image)) {
+                    imageData = UIImagePNGRepresentation(image);
+                }else {
+                    imageData = UIImageJPEGRepresentation(image, 1.0);
+                }
+                if ([imageData writeToFile:model.fullPathToFile atomically:YES]) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (success) {
+                            success();
+                        }
+                    });
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (failure) {
+                            failure();
+                        }
+                    });
+                }
+            }];
+        }else {
+            PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
+            option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+            option.resizeMode = PHImageRequestOptionsResizeModeFast;
+            [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:nil resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                if (imageData) {
+                    if (orientation != UIImageOrientationUp && model.type != HXPhotoModelMediaTypePhotoGif) {
+                        UIImage *image = [[UIImage imageWithData:imageData] normalizedImage];
+                        if (UIImagePNGRepresentation(image)) {
+                            imageData = UIImagePNGRepresentation(image);
+                        }else {
+                            imageData = UIImageJPEGRepresentation(image, 1.0);
+                        }
+                    }
+                    if ([imageData writeToFile:model.fullPathToFile atomically:YES]) {
+                        if (success) {
+                            success();
+                        }
+                    } else {
+                        if (failure) {
+                            failure();
+                        }
+                    }
+                }else {
                     if (failure) {
                         failure();
                     }
                 }
-            }else {
-                if (failure) {
-                    failure();
-                }
-            }
-        }];
+            }];
+        }
     }else {
         NSData *imageData;
         if (UIImagePNGRepresentation(model.previewPhoto)) {

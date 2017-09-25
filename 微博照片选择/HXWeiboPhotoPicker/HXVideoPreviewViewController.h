@@ -19,7 +19,7 @@
 
 @class HXPhotoView;
 @interface HXVideoPreviewViewController : UIViewController<UINavigationControllerDelegate>
-@property (assign, nonatomic) BOOL isTouch;
+//@property (assign, nonatomic) BOOL isTouch;
 @property (weak, nonatomic) id<HXVideoPreviewViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) HXPhotoManager *manager;

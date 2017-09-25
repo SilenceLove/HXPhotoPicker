@@ -217,20 +217,20 @@
     
     UIImageView *bottomMaskView = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"camera_shadow_down@2x.png"]];
     bottomMaskView.alpha = 0.85;
-    bottomMaskView.frame = CGRectMake(0, HEIGHT - bottomMaskView.image.size.height, WIDTH, bottomMaskView.image.size.height);
+    bottomMaskView.frame = CGRectMake(0, HEIGHT - bottomMaskView.image.size.height - kBottomMargin, WIDTH, bottomMaskView.image.size.height);
     [self.view addSubview:bottomMaskView];
     
     UIButton *backBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [backBtn setImage:[HXPhotoTools hx_imageNamed:@"faceu_cancel@3x.png"] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(didBackClick) forControlEvents:UIControlEventTouchUpInside];
-    backBtn.frame = CGRectMake(15, 20, backBtn.currentImage.size.width, backBtn.currentImage.size.height);
+    backBtn.frame = CGRectMake(15, kNavigationBarHeight - 44, backBtn.currentImage.size.width, backBtn.currentImage.size.height);
     [self.view addSubview:backBtn];
     self.backBtn = backBtn;
     
     UIButton *changeCameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [changeCameraBtn setImage:[HXPhotoTools hx_imageNamed:@"faceu_camera@3x.png"] forState:UIControlStateNormal];
     [changeCameraBtn addTarget:self action:@selector(didchangeCameraClick) forControlEvents:UIControlEventTouchUpInside];
-    changeCameraBtn.frame = CGRectMake(WIDTH - 15 - changeCameraBtn.currentImage.size.width, 20, changeCameraBtn.currentImage.size.width, changeCameraBtn.currentImage.size.height);
+    changeCameraBtn.frame = CGRectMake(WIDTH - 15 - changeCameraBtn.currentImage.size.width, kNavigationBarHeight - 44, changeCameraBtn.currentImage.size.width, changeCameraBtn.currentImage.size.height);
     [self.view addSubview:changeCameraBtn];
     self.changeCameraBtn = changeCameraBtn;
     
@@ -244,7 +244,7 @@
     [self.flashBtn addTarget:self action:@selector(didFlashClick:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.flashBtn];
     
-    self.playView = [[HXFullScreenCameraPlayView alloc] initWithFrame:CGRectMake(0, HEIGHT - 20 - 70, 70, 70)];
+    self.playView = [[HXFullScreenCameraPlayView alloc] initWithFrame:CGRectMake(0, HEIGHT - 20 - 70 - kBottomMargin, 70, 70)];
     self.playView.center = CGPointMake(WIDTH / 2, self.playView.center.y);
     [self.view addSubview:self.playView];
     UILongPressGestureRecognizer *playViewLongPrg = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(playViewLongPgrEvent:)];
@@ -268,7 +268,7 @@
     self.nextBtn.layer.masksToBounds = YES;
     self.nextBtn.layer.cornerRadius = 2;
     self.nextBtn.titleLabel.font = [UIFont systemFontOfSize:14];
-    self.nextBtn.frame = CGRectMake(WIDTH - 10 - 60, HEIGHT - 20 - 25, 60, 25);
+    self.nextBtn.frame = CGRectMake(WIDTH - 10 - 60, HEIGHT - 20 - 25 - kBottomMargin, 60, 25);
     [self.nextBtn addTarget:self action:@selector(didNextBtnClick) forControlEvents:UIControlEventTouchUpInside];
     self.nextBtn.hidden = YES;
     [self.view addSubview:self.nextBtn];
@@ -292,9 +292,11 @@
             self.flashlight = 0;
             self.flashBtn.selected = NO;
             self.device.flashMode = AVCaptureFlashModeOff;
+//            [self.device setTorchMode:AVCaptureTorchModeOff];
         }else if (self.flashlight == 0){
             self.flashBtn.selected = YES;
             self.device.flashMode = AVCaptureFlashModeOn;
+//            [self.device setTorchMode:AVCaptureTorchModeOn];
             self.flashlight = 1;
         }
     } else {

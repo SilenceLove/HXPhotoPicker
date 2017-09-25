@@ -707,6 +707,8 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         mirrorView.transform = CGAffineTransformMakeScale(0.0001, 0.0001);
     } completion:^(BOOL finished) {
         cell.hidden = NO;
+        HXPhotoSubViewCell *myCell = (HXPhotoSubViewCell *)cell;
+        myCell.imageView.image = nil;
         [mirrorView removeFromSuperview];
     }];
     [self.dataList removeObjectAtIndex:indexPath.item];

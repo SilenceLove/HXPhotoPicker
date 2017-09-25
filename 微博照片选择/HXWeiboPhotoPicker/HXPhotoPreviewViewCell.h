@@ -16,7 +16,8 @@
 @property (assign, nonatomic) BOOL isAnimating;
 @property (assign, nonatomic, readonly) PHImageRequestID requestID;
 @property (assign, nonatomic, readonly) PHImageRequestID longRequestId;
-@property (assign, nonatomic, readonly) PHImageRequestID liveRequestID; 
+@property (assign, nonatomic, readonly) PHImageRequestID liveRequestID;
+@property (strong, nonatomic) UIImage *firstImage;
 - (void)startLivePhoto;
 - (void)stopLivePhoto;
 - (void)startGifImage;

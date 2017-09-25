@@ -17,6 +17,7 @@
 #import "HXCameraPreviewViewController.h"
 #import "HXPhotoManager.h"
 #import "HXPhotoEditViewController.h"
+#import "HXPhotoCustomNavigationBar.h"
 @interface HXCameraViewController ()<UIGestureRecognizerDelegate,AVCaptureFileOutputRecordingDelegate,UIViewControllerTransitioningDelegate,HXPhotoEditViewControllerDelegate>
 //捕获设备，通常是前置摄像头，后置摄像头，麦克风（音频输入）
 @property (nonatomic, strong) AVCaptureDevice *device;
@@ -122,7 +123,7 @@
 {
     CGFloat width = self.view.frame.size.width;
     CGFloat height = self.view.frame.size.height;
-    UINavigationBar *navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
+    HXPhotoCustomNavigationBar *navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, kNavigationBarHeight)];
     [self.view addSubview:navBar];
     navBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.photoManager.UIManager.navTitleColor};
     if (self.photoManager.UIManager.navBackgroundImageName) {
@@ -192,7 +193,7 @@
             captureConnection.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeCinematic;
         }
     }
-    UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, width, width)];
+    UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, kNavigationBarHeight, width, width)];
     backView.layer.masksToBounds = YES;
     [self.view addSubview:backView];
     self.backView = backView;
@@ -227,7 +228,7 @@
     [self.view addSubview:photoBtn];
     [photoBtn addTarget:self action:@selector(didPhotoClick) forControlEvents:UIControlEventTouchUpInside];
     photoBtn.frame = CGRectMake(0, 0, photoBtn.currentImage.size.width, photoBtn.currentImage.size.height);
-    photoBtn.center = CGPointMake(width / 2, CGRectGetMaxY(backView.frame) + (height - CGRectGetMaxY(backView.frame)) / 2);
+    photoBtn.center = CGPointMake(width / 2, CGRectGetMaxY(backView.frame) + (height - CGRectGetMaxY(backView.frame) - kBottomMargin) / 2);
     self.photoBtn = photoBtn;
     
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -238,7 +239,7 @@
     longPGR.minimumPressDuration = 0.1;
     [videoBtn addGestureRecognizer:longPGR];
     videoBtn.frame = CGRectMake(0, 0, videoBtn.currentImage.size.width, videoBtn.currentImage.size.height);
-    videoBtn.center = CGPointMake(width / 2, CGRectGetMaxY(backView.frame) + (height - CGRectGetMaxY(backView.frame)) / 2);
+    videoBtn.center = CGPointMake(width / 2, CGRectGetMaxY(backView.frame) + (height - CGRectGetMaxY(backView.frame) - kBottomMargin) / 2);
     self.videoBtn = videoBtn;
     
     UISwipeGestureRecognizer *leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(leftSwipeClick:)];

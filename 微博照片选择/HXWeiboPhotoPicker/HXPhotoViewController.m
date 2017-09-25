@@ -19,6 +19,8 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"
+#import "HXPhotoCustomNavigationBar.h"
+#import "HXPhoto3DTouchViewController.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 
@@ -39,7 +41,6 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @property (strong, nonatomic) HXAlbumModel *albumModel;
 @property (assign, nonatomic) NSInteger currentSelectCount;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
-@property (strong, nonatomic) UIImageView *previewImg;
 @property (strong, nonatomic) NSTimer *timer;
 @property (strong, nonatomic) UILabel *authorizationLb;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
@@ -47,7 +48,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 @property (assign, nonatomic) BOOL responseForceTouchCapability;
 @property (assign, nonatomic) BOOL isCapabilityAvailable;
 @property (assign, nonatomic) BOOL selectOtherAlbum;
-@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) HXPhotoCustomNavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
 @property (strong, nonatomic) UIImagePickerController* imagePickerController;
 @end
@@ -71,7 +72,10 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
 }
 - (void)dealloc {
-    self.manager.selectPhoto = NO; 
+    self.manager.selectPhoto = NO;
+    if (self.previewingContext) {
+        [self unregisterForPreviewingWithContext:self.previewingContext];
+    }
     NSSLog(@"dealloc");
 }
 - (void)viewDidLoad {
@@ -82,6 +86,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [self setup];
     if (self.manager.albums.count > 0) {
         if (self.manager.cacheAlbum) {
+            [self.view showLoadingHUDText:nil];
             self.albums = self.manager.albums.mutableCopy;
             [self getAlbumPhotos];
         }else {
@@ -127,6 +132,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             transition.subtype = kCATransitionFade;
             [[weakSelf.collectionView layer] addAnimation:transition forKey:@""];
             [weakSelf.collectionView reloadData];
+            [weakSelf.view handleLoading];
         });
     }];
 
@@ -188,7 +194,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                         }
                     }
                     if (select) {
-                        [self changeButtonClick:self.manager.selectedList.lastObject];
+                        [self changeButtonClick:self.manager.selectedList.lastObject isPreview:NO];
                     }
                     if (indexPathList.count > 0) {
                         [self.collectionView deleteItemsAtIndexPaths:indexPathList];
@@ -409,7 +415,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         
         self.albumsBgView.hidden = NO;
         [UIView animateWithDuration:0.2 animations:^{
-            self.albumView.frame = CGRectMake(0, 64, self.view.frame.size.width, 340);
+            self.albumView.frame = CGRectMake(0, kNavigationBarHeight, self.view.frame.size.width, 340);
             self.albumView.tableView.frame = CGRectMake(0, 15, self.view.frame.size.width, 340);
             button.imageView.transform = CGAffineTransformMakeRotation(M_PI);
         } completion:^(BOOL finished) {
@@ -445,11 +451,11 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:NO];
 }
-- (UINavigationBar *)navBar {
+- (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
-        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, 64)];
+        _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, kNavigationBarHeight)];
         [_navBar pushNavigationItem:self.navItem animated:NO];
-        
+        _navBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
         if (self.manager.UIManager.navBackgroundImageName) {
             [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
@@ -550,23 +556,33 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     flowLayout.itemSize = CGSizeMake(CVwidth, CVwidth);
     flowLayout.minimumInteritemSpacing = spacing;
     flowLayout.minimumLineSpacing = spacing;
-    self.automaticallyAdjustsScrollViewInsets = NO;
     
-    self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, width, height) collectionViewLayout:flowLayout];
+    self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, width, height - kBottomMargin) collectionViewLayout:flowLayout];
     self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    if (([UIDevice currentDevice].systemVersion.floatValue >= 10.0f)) {
-        self.collectionView.prefetchDataSource = self;
-        self.collectionView.prefetchingEnabled = YES;
-    }
+    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//    if (([UIDevice currentDevice].systemVersion.floatValue >= 10.0f)) {
+//        self.collectionView.prefetchDataSource = self;
+//        self.collectionView.prefetchingEnabled = YES;
+//    }
     self.collectionView.alwaysBounceVertical = YES;
     self.collectionView.backgroundColor = [UIColor whiteColor];
     [self.collectionView registerClass:[HXPhotoViewCell class] forCellWithReuseIdentifier:PhotoViewCellId];
     [self.view addSubview:self.collectionView];
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        self.collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+#else
+    if ((NO)) {
+#endif
+    } else {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
     if (!self.manager.singleSelected) {
-        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0, spacing + 50, 0);
-        HXPhotoBottomView *bottomView = [[HXPhotoBottomView alloc] initWithFrame:CGRectMake(0, height - 50, width, 50) manager:self.manager];
+        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + kNavigationBarHeight, 0, spacing + 50, 0);
+        HXPhotoBottomView *bottomView = [[HXPhotoBottomView alloc] initWithFrame:CGRectMake(0, height - 50 - kBottomMargin, width, 50) manager:self.manager];
+        bottomView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomView.delegate = self;
         if (self.manager.selectedList.count > 0) {
             bottomView.originalBtn.enabled = self.manager.selectedPhotos.count;
@@ -578,10 +594,11 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         bottomView.originalBtn.selected = self.manager.isOriginal;
         if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
             bottomView.hidden = YES;
-            self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0,  spacing, 0);
+            self.collectionView.contentInset = UIEdgeInsetsMake(spacing + kNavigationBarHeight, 0,  spacing, 0);
             self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
         }
         [self.view addSubview:bottomView];
+        
         self.bottomView = bottomView;
         _originalFrame = bottomView.originalBtn.frame;
         if (self.manager.selectedPhotos.count > 0 && self.manager.isOriginal) {
@@ -595,7 +612,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             bottomView.originalBtn.frame = CGRectMake(originalBtnX, originalBtnY, originalBtnW+totalW  , originalBtnH);
         }
     }else {
-        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + 64, 0,  spacing, 0);
+        self.collectionView.contentInset = UIEdgeInsetsMake(spacing + kNavigationBarHeight, 0,  spacing, 0);
     }
     self.collectionView.scrollIndicatorInsets = self.collectionView.contentInset;
     
@@ -614,6 +631,15 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     }
     if (self.manager.UIManager.navRightBtn) {
         self.manager.UIManager.navRightBtn(self.rightBtn);
+    }
+    if (self.manager.open3DTouchPreview) {
+        if (self.responseTraitCollection) {
+            if (self.responseForceTouchCapability) {
+                if (self.isCapabilityAvailable) {
+                    self.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:self.collectionView];
+                }
+            }
+        }
     }
 }
 /**
@@ -658,51 +684,6 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     
     return cell;
 }
-- (void)collectionView:(UICollectionView *)collectionView prefetchItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
-//    NSMutableArray *assets = [NSMutableArray array];
-//    HXPhotoModel *model;
-//    for (NSIndexPath *indexPath in indexPaths) {
-//        model = self.objs[indexPath.item];
-//        model.rowCount = self.manager.rowCount;
-//        if (model.type != HXPhotoModelMediaTypeCamera && model.type != HXPhotoModelMediaTypeCameraPhoto && model.type != HXPhotoModelMediaTypeCameraVideo) {
-//            [model prefetchThumbImage];
-//            [assets addObject:model.asset];
-//        }
-//    }
-//    [self.cachingManager startCachingImagesForAssets:assets targetSize:model.requestSize contentMode:PHImageContentModeAspectFill options:self.option];
-}
-- (void)collectionView:(UICollectionView *)collectionView cancelPrefetchingForItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
-//    if (self.selectOtherAlbum) {
-//        self.selectOtherAlbum = NO;
-//        return;
-//    }
-//    NSMutableArray *assets = [NSMutableArray array];
-//    HXPhotoModel *model;
-//    for (NSIndexPath *indexPath in indexPaths) {
-//        model = self.objs[indexPath.item];
-////        [model cancelImageRequest];
-//        if (!model.selected && model.type != HXPhotoModelMediaTypeCamera && model.thumbPhoto) {
-//            model.thumbPhoto = nil;
-//        }
-//    }
-//    [self.cachingManager stopCachingImagesForAssets:assets targetSize:model.requestSize contentMode:PHImageContentModeAspectFill options:self.option];
-}
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(nonnull UICollectionViewCell *)cell forItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    if (self.manager.open3DTouchPreview) {
-        if (self.responseTraitCollection) {
-            if (self.responseForceTouchCapability) {
-                if (self.isCapabilityAvailable) {
-                    HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
-                    HXPhotoModel *model = self.objs[indexPath.item];
-                    if (model.type != HXPhotoModelMediaTypeCamera) {
-                        myCell.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:myCell];
-                        myCell.firstRegisterPreview = YES;
-                    }
-                }
-            }
-        }
-    }
-}
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
     if (!myCell.model.selected && myCell.model.thumbPhoto) {
@@ -710,135 +691,80 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             myCell.model.thumbPhoto = nil;
         }
     }
-    if (self.manager.open3DTouchPreview) {
-        if (myCell.firstRegisterPreview) {
-            if (myCell.previewingContext) {
-                [self unregisterForPreviewingWithContext:myCell.previewingContext];
-                myCell.previewingContext = nil;
-                myCell.firstRegisterPreview = NO;
-            }
-        }
-    }
 }
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
-    HXPhotoViewCell *cell = (HXPhotoViewCell *)previewingContext.sourceView;
-    NSIndexPath *index = [self.collectionView indexPathForCell:cell]; 
+    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
+    if (!indexPath) {
+        return nil;
+    }
+    HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera) {
         return nil;
     }
-    HXPhotoModel *model = self.objs[index.item];
-    self.previewImg = [[UIImageView alloc] init];
-    self.previewImg.frame = CGRectMake(0, 0, model.endImageSize.width, model.endImageSize.height);
-    
-    if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
-        HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
-        self.previewImg.image = cell.imageView.image;
-    }
-    __weak typeof(self) weakSelf = self;
-    [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5) completion:^(UIImage *image, NSDictionary *info) {
-        weakSelf.previewImg.image = image;
-    }];
-    [NSThread sleepForTimeInterval:0.2];
-    CGRect rect = CGRectMake(0, 0, previewingContext.sourceView.frame.size.width, previewingContext.sourceView.frame.size.height);
-    previewingContext.sourceRect = rect;
-    if (self.manager.singleSelected) {
-        if (model.type == HXPhotoModelMediaTypeCameraVideo || model.type == HXPhotoModelMediaTypeVideo) {
-            HXVideoPreviewViewController *showVC = [[HXVideoPreviewViewController alloc] init];
-            showVC.preferredContentSize = model.endImageSize;
-            showVC.isTouch = YES;
-            [showVC.view addSubview:self.previewImg];
-            return showVC;
-        }else {
-            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
-            vc.preferredContentSize = model.endImageSize;
-            vc.model = model; 
-            vc.coverImage = self.previewImg.image;
-            vc.photoManager = self.manager;
-            [vc.view addSubview:self.previewImg];
-            return vc;
-        }
-    }
-    
-    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
-        HXPhotoPreviewViewController *showVC = [[HXPhotoPreviewViewController alloc] init];
-        showVC.preferredContentSize = model.endImageSize;
-        showVC.isTouch = YES;
-        [showVC.view addSubview:self.previewImg];
-        return showVC;
-    }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo){
-        HXVideoPreviewViewController *showVC = [[HXVideoPreviewViewController alloc] init];
-        showVC.preferredContentSize = model.endImageSize; 
-        showVC.isTouch = YES;
-        [showVC.view addSubview:self.previewImg];
-        return showVC;
-    }else {
-        return nil;
-    }
+    //设置突出区域
+    previewingContext.sourceRect = [self.collectionView cellForItemAtIndexPath:indexPath].frame;
+    HXPhotoModel *model = self.objs[indexPath.item];
+    HXPhoto3DTouchViewController *vc = [[HXPhoto3DTouchViewController alloc] init];
+    vc.model = model;
+    vc.indexPath = indexPath;
+    vc.image = cell.imageView.image;
+    vc.preferredContentSize = model.endImageSize;
+    return vc;
 }
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
-    NSIndexPath *index = [self.collectionView indexPathForCell:(UICollectionViewCell *)[previewingContext sourceView]];
-    self.currentIndexPath = index;
-    [self.previewImg removeFromSuperview];
-    HXPhotoModel *model = self.objs[index.item];
+     HXPhoto3DTouchViewController *viewController = (HXPhoto3DTouchViewController *)viewControllerToCommit;
+    self.currentIndexPath = viewController.indexPath;
+    HXPhotoModel *model = viewController.model;
+    HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:viewController.indexPath];
     if (!self.manager.singleSelected) {
         if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
-            HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)viewControllerToCommit;
+            HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
             vc.manager = self.manager;
             vc.model = model;
             if (model.type == HXPhotoModelMediaTypeCameraVideo) {
                 vc.isCamera = YES;
             }
-            [vc setup];
-            if (self.previewImg.image) {
-                vc.coverImage = self.previewImg.image;
-            }else {
-                HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
-                vc.coverImage = cell.imageView.image;
-            }
+            vc.coverImage = cell.imageView.image;
             vc.delegate = self;
             vc.playBtn.selected = YES;
-            [vc selectClick];
             self.navigationController.delegate = vc;
-        }else if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
-            HXPhotoPreviewViewController *vc = (HXPhotoPreviewViewController *)viewControllerToCommit;
+            [self showViewController:vc sender:self];
+            [vc selectClick];
+            [vc.maskView removeFromSuperview];
+        }else {
+            HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc]  init];
             vc.modelList = self.photos;
+            model.tempImage = viewController.imageView.image;
             vc.index = [self.photos indexOfObject:model];
             vc.manager = self.manager;
-            if (self.previewImg.image) {
-                vc.gifCoverImage = self.previewImg.image;
-            }else {
-                HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
-                vc.gifCoverImage = cell.imageView.image;
-            }
-            [vc setup];
             vc.delegate = self;
-            [vc selectClick];
             self.navigationController.delegate = vc;
+            [self showViewController:vc sender:self];
+            [vc selectClick];
         }
     }else {
         if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
-            HXVideoPreviewViewController *vc = (HXVideoPreviewViewController *)viewControllerToCommit;
+            HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
             vc.manager = self.manager;
             vc.model = model;
             if (model.type == HXPhotoModelMediaTypeCameraVideo) {
                 vc.isCamera = YES;
             }
-            [vc setup];
             vc.delegate = self;
-            if (self.previewImg.image) {
-                vc.coverImage = self.previewImg.image;
-            }else {
-                HXPhotoViewCell *cell = (HXPhotoViewCell *)[previewingContext sourceView];
-                vc.coverImage = cell.imageView.image;
-            }
+            vc.coverImage = cell.imageView.image;
             vc.playBtn.selected = YES;
             self.navigationController.delegate = vc;
+            [self showViewController:vc sender:self];
+            [vc.maskView removeFromSuperview];
         }else {
-            HXPhotoEditViewController *vc = (HXPhotoEditViewController *)viewControllerToCommit;
+            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
+            vc.coverImage = cell.imageView.image;
+            vc.model = model;
+            vc.photoManager = self.manager;
             vc.delegate = self;
+            [self showViewController:vc sender:self];
         }
     }
-    [self showViewController:viewControllerToCommit sender:self];
 } 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
@@ -1161,7 +1087,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     NSInteger cameraIndex = self.manager.openCamera ? 1 : 0;
     [self.objs insertObject:model atIndex:cameraIndex];
     [self.collectionView reloadData];
-    [self changeButtonClick:model];
+    [self changeButtonClick:model isPreview:NO];
 }
 
 /**
@@ -1222,7 +1148,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     model.selected = state;
     [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:[self.objs indexOfObject:model] inSection:0]]];
     // 改变 预览、原图 按钮的状态
-    [self changeButtonClick:model];
+    [self changeButtonClick:model isPreview:YES];
 }
 /**
  cell选中代理
@@ -1303,7 +1229,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         [self.manager.selectedList removeObject:model];
      }
     // 改变 预览、原图 按钮的状态
-    [self changeButtonClick:model];
+    [self changeButtonClick:model isPreview:NO];
 }
 
 /**
@@ -1317,18 +1243,6 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     
     HXPhotoModel *PHModel1 = [self.manager.selectedPhotos objectAtIndex:[self.manager.selectedPhotos indexOfObject:model]];
     PHModel1.isCloseLivePhoto = model.isCloseLivePhoto;
-//    for (HXPhotoModel *PHModel in self.manager.selectedList) {
-//        if ([model.asset.localIdentifier isEqualToString:PHModel.asset.localIdentifier]) {
-//            PHModel.isCloseLivePhoto = model.isCloseLivePhoto;
-//            break;
-//        }
-//    }
-//    for (HXPhotoModel *PHModel in self.manager.selectedPhotos) {
-//        if ([model.asset.localIdentifier isEqualToString:PHModel.asset.localIdentifier]) {
-//            PHModel.isCloseLivePhoto = model.isCloseLivePhoto;
-//            break;
-//        }
-//    }
 }
 
 /**
@@ -1336,7 +1250,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
  
  @param model 选中的模型
  */
-- (void)changeButtonClick:(HXPhotoModel *)model {
+- (void)changeButtonClick:(HXPhotoModel *)model isPreview:(BOOL)isPreview {
     self.isSelectedChange = YES; // 记录在当前相册是否操作过
     if (self.manager.selectedList.count > 0) { // 选中数组已经有值时
         if (self.manager.type != HXPhotoManagerSelectedTypeVideo) {
@@ -1373,14 +1287,20 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         }
         self.bottomView.previewBtn.enabled = YES;
         
-        
         self.navItem.rightBarButtonItem.enabled = YES;
         [self.rightBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"下一步"],self.manager.selectedList.count] forState:UIControlStateNormal];
         [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.layer.borderWidth = 0;
         CGFloat rightBtnH = self.rightBtn.frame.size.height;
         CGFloat rightBtnW = [HXPhotoTools getTextWidth:self.rightBtn.currentTitle height:rightBtnH fontSize:14];
-        self.rightBtn.frame = CGRectMake(0, 0, rightBtnW + 20, rightBtnH);
+        self.rightBtn.hx_w = rightBtnW + 20;
+#ifdef __IPHONE_11_0
+        if (@available(iOS 11.0, *)) {
+            if (isPreview) {
+                self.navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBtn];
+            }
+        }
+#endif
     }else { // 没有选中时 全部恢复成初始状态
         [self changeOriginalState:NO IsChange:NO];
         self.manager.isOriginal = NO;
@@ -1453,7 +1373,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 {
     [self.collectionView reloadData];
     // 改变 预览、原图 按钮的状态
-    [self changeButtonClick:model];
+    [self changeButtonClick:model isPreview:YES];
 }
 
 /**
@@ -1625,7 +1545,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
  */
 - (UIView *)albumsBgView {
     if (!_albumsBgView) {
-        _albumsBgView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, self.view.frame.size.width, self.view.frame.size.height - 64)];
+        _albumsBgView = [[UIView alloc] initWithFrame:CGRectMake(0, kNavigationBarHeight, self.view.frame.size.width, self.view.frame.size.height - kNavigationBarHeight)];
         _albumsBgView.hidden = YES;
         _albumsBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
         _albumsBgView.alpha = 0;

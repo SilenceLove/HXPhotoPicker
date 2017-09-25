@@ -13,11 +13,11 @@
 #import "UIView+HXExtension.h"
 #import "UIButton+HXExtension.h"
 #import "HXPresentTransition.h"
+#import "HXPhotoCustomNavigationBar.h"
 @interface HXVideoPreviewViewController ()<UIViewControllerTransitioningDelegate>
 @property (strong, nonatomic) UIButton *rightBtn;
-@property (assign, nonatomic) BOOL firstOn;
 @property (assign, nonatomic) BOOL isDelete;
-@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) HXPhotoCustomNavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @end
@@ -39,15 +39,13 @@
     // Do any additional setup after loading the view.
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.view.backgroundColor = [UIColor whiteColor];
-    self.firstOn = YES;
-    if (!self.isTouch) {
-        [self setup];
-    }
+    [self setup];
 }
-- (UINavigationBar *)navBar {
+- (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)]; 
+        _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, kNavigationBarHeight)];
+        _navBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [_navBar pushNavigationItem:self.navItem animated:NO];
         _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
         if (self.manager.UIManager.navBackgroundImageName) {
@@ -75,10 +73,8 @@
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
     CGFloat height = [UIScreen mainScreen].bounds.size.height;
     [self setupNavRightBtn];
-    if (!self.isTouch) {
-        // 自定义转场动画 添加的一层遮罩
-        [self.view addSubview:self.maskView];
-    }
+    // 自定义转场动画 添加的一层遮罩
+    [self.view addSubview:self.maskView];
     if (self.isCamera) {
         AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.model.videoURL];
         self.playVideo = [AVPlayer playerWithPlayerItem:playerItem];
@@ -87,13 +83,13 @@
     }
     
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.playVideo];
-    self.playerLayer.frame = CGRectMake(0, 64, width, height - 64);
+    self.playerLayer.frame = CGRectMake(0, kNavigationBarHeight, width, height - kNavigationBarHeight);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.playVideo play];
     });
     [self.view.layer insertSublayer:self.playerLayer atIndex:0];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playVideo.currentItem];
-    self.playBtn.frame = CGRectMake(0, 64, width, height - 64);
+    self.playBtn.frame = CGRectMake(0, kNavigationBarHeight, width, height - kNavigationBarHeight);
     [self.view addSubview:self.playBtn];
     if (!self.manager.singleSelected) {
         self.selectedBtn.selected = self.model.selected;
@@ -204,7 +200,7 @@
         [_selectedBtn setImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.cellSelectBtnSelectedImageName] forState:UIControlStateSelected];
         CGFloat selectedBtnW = _selectedBtn.currentImage.size.width;
         CGFloat selectedBtnH = _selectedBtn.currentImage.size.height;
-        _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, 84, selectedBtnW, selectedBtnH);
+        _selectedBtn.frame = CGRectMake(width - 30 - selectedBtnW, kNavigationBarHeight + 20, selectedBtnW, selectedBtnH);
         [_selectedBtn addTarget:self action:@selector(didSelectedClick:) forControlEvents:UIControlEventTouchUpInside];
         [_selectedBtn setEnlargeEdgeWithTop:20 right:20 bottom:20 left:20];
     }
@@ -212,7 +208,7 @@
 }
 
 - (void)selectClick {
-    if (!self.selectedBtn.selected) {
+    if (!self.selectedBtn.selected && !self.model.selected) {
         [self didSelectedClick:self.selectedBtn];
     }
 }
@@ -226,15 +222,7 @@
     if (!button.selected) {
         NSString *str = [HXPhotoTools maximumOfJudgment:model manager:self.manager];
         if (str) {
-            if (!self.isTouch) {
-                [self.view showImageHUDText:str];
-            }else {
-                if (self.firstOn) {
-                    self.firstOn = NO;
-                }else {
-                    [self.view showImageHUDText:str];
-                }
-            }
+            [self.view showImageHUDText:str];
             return;
         }
         if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {

@@ -117,7 +117,7 @@
         _selectBtn.frame = CGRectMake(self.hx_w - 32, 0, 32, 32);
         _selectBtn.center = CGPointMake(_selectBtn.center.x, self.liveBtn.center.y);
         self.liveIcon.center = CGPointMake(self.liveIcon.center.x, self.liveBtn.center.y);
-        [_selectBtn setEnlargeEdgeWithTop:0 right:0 bottom:30 left:30];
+        [_selectBtn setEnlargeEdgeWithTop:0 right:0 bottom:20 left:20];
     }
     return _selectBtn;
 }
@@ -250,7 +250,7 @@
     }else {
         self.localIdentifier = model.asset.localIdentifier;
         __weak typeof(self) weakSelf = self;
-        int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:model.requestSize completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
+        int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:model.requestSize completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) { 
             __strong typeof(weakSelf) strongSelf = weakSelf;
             if (strongSelf.model.type != HXPhotoModelMediaTypeCamera && strongSelf.model.type != HXPhotoModelMediaTypeCameraPhoto && strongSelf.model.type != HXPhotoModelMediaTypeCameraVideo) {
                 strongSelf.imageView.image = photo;

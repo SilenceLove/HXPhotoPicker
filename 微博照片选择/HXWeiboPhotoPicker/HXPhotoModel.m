@@ -69,7 +69,7 @@
 {
     if (_endImageSize.width == 0 || _endImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height - 64;
+        CGFloat height = [UIScreen mainScreen].bounds.size.height - kNavigationBarHeight;
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;

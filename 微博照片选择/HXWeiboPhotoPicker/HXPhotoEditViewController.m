@@ -12,6 +12,7 @@
 #import "HXPhotoEditView.h"
 #import "HXPhotoManager.h"
 #import "UIImage+HXExtension.h"
+#import "HXPhotoCustomNavigationBar.h"
 @interface HXPhotoEditViewController ()<UIScrollViewDelegate>
 @property (weak, nonatomic) UIScrollView *scrollView;
 @property (weak, nonatomic) UIImageView *imageView;
@@ -20,7 +21,7 @@
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) HXPhotoEditView *editView;
 @property (assign, nonatomic) CGFloat minimumZoomScale;
-@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) HXPhotoCustomNavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
 @end
 
@@ -157,9 +158,9 @@
         if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
             self.imageView.image = self.model.previewPhoto;
         }else {
-            __weak typeof(self) weakSelf = self;
-            self.requestID = [HXPhotoTools getPhotoForPHAsset:self.model.asset size:PHImageManagerMaximumSize completion:^(UIImage *image, NSDictionary *info) {
-                weakSelf.imageView.image = image;
+            __weak typeof(self) weakSelf = self; 
+            self.requestID = [HXPhotoTools fetchPhotoWithAsset:self.model.asset photoSize:CGSizeMake(width * 1.5, height * 1.5) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
+                weakSelf.imageView.image = photo;
             }];
         }
         [self.scrollView setZoomScale:multiple animated:NO];
@@ -187,12 +188,12 @@
                     __weak typeof(self) weakSelf = self;
                     PHImageRequestID requestID;
                     if (imgHeight > imgWidth / 9 * 17) {
-                        requestID = [HXPhotoTools getPhotoForPHAsset:self.model.asset size:CGSizeMake(width, height) completion:^(UIImage *image, NSDictionary *info) {
-                            weakSelf.imageView.image = image;
+                        requestID = [HXPhotoTools fetchPhotoWithAsset:self.model.asset photoSize:CGSizeMake(width, height) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
+                            weakSelf.imageView.image = photo;
                         }];
                     }else {
-                        requestID = [HXPhotoTools getPhotoForPHAsset:self.model.asset size:CGSizeMake(self.model.endImageSize.width, self.model.endImageSize.height) completion:^(UIImage *image, NSDictionary *info) {
-                            weakSelf.imageView.image = image;
+                        requestID = [HXPhotoTools fetchPhotoWithAsset:self.model.asset photoSize:CGSizeMake(self.model.endImageSize.width, self.model.endImageSize.height) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
+                            weakSelf.imageView.image = photo;
                         }];
                     }
                     if (self.requestID != requestID) {
@@ -293,17 +294,17 @@
 #pragma mark - < 懒加载 >
 - (UIView *)bgView {
     if (!_bgView) {
-        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, self.view.frame.size.width, self.view.frame.size.height - 64)];
+        _bgView = [[UIView alloc] initWithFrame:CGRectMake(0, kNavigationBarHeight, self.view.frame.size.width, self.view.frame.size.height - kNavigationBarHeight)];
         _bgView.layer.masksToBounds = YES;
         _bgView.backgroundColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.2];
     }
     return _bgView;
 }
 
-- (UINavigationBar *)navBar {
+- (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        _navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 64)];
+        _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, kNavigationBarHeight)];
         [self.view addSubview:_navBar];
         [_navBar pushNavigationItem:self.navItem animated:NO];
         _navBar.tintColor = self.photoManager.UIManager.navLeftBtnTitleColor;

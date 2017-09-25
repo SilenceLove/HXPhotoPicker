@@ -208,6 +208,7 @@
                     weakSelf.progressView.progress = 1;
                     weakSelf.progressView.hidden = YES;
                     weakSelf.imageView.image = image;
+                    
                     model.imageSize = image.size;
                     model.thumbPhoto = image;
                     model.previewPhoto = image;
