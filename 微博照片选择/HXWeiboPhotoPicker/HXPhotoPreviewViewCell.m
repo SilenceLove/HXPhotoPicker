@@ -219,7 +219,6 @@
                 }else {
                     self.requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.5, height * 0.5) completion:^(UIImage *image, NSDictionary *info) {
                         weakSelf.imageView.image = image;
-                        weakSelf.model.tempImage = nil;
                     }];
                 }
             }else {
@@ -236,12 +235,10 @@
                         if (imgHeight > imgWidth / 9 * 17) {
                             requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.6, height * 0.6) completion:^(UIImage *image, NSDictionary *info) {
                                 weakSelf.imageView.image = image;
-                                weakSelf.model.tempImage = nil;
                             }];
                         }else {
                             requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
                                 weakSelf.imageView.image = image;
-                                weakSelf.model.tempImage = nil;
                             }];
                         }
                         if (self.requestID != requestID) {

@@ -73,7 +73,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.cacheAlbum = YES;
         _manager.lookLivePhoto = YES;
 //        _manager.outerCamera = YES;
-        _manager.open3DTouchPreview = YES;
         _manager.cameraType = HXPhotoManagerCameraTypeSystem;
         _manager.photoMaxNum = 9;
         _manager.videoMaxNum = 9;
