@@ -7,7 +7,7 @@
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
 <img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411283-90f6cf8e-9942-11e7-8f21-6de1ca434cc5.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411216-3dc719ea-9942-11e7-8d1e-24e6d7a9b011.PNG" width="270" height="480">
-<img src="https://user-images.githubusercontent.com/18083149/30411300-a67b52c6-9942-11e7-96cc-a05727d109af.png" width="854" height="336">
+<img src="https://user-images.githubusercontent.com/18083149/30796597-5ce8b4ca-a205-11e7-92c8-1fd13322c171.png" width="270" height="585">
 
 ## 目录
 * [项目特性](#特性)
@@ -75,6 +75,7 @@
 - v2.0.7　支持传入本地图片、添加了一些属性和方法、优化了一些细节
 - v2.0.8　修改一些细节问题、删除无效文件
 - v2.0.9　添加一键将已选模型数组写入temp目录方法和新属性、demo示例
+- v2.1.0　适配ios11以及iphone X /  3DTouch预览时播放gif、视频
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoManager"></a> HXPhotoManager 照片管理类相关属性介绍
