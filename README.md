@@ -75,7 +75,7 @@
 - v2.0.7　支持传入本地图片、添加了一些属性和方法、优化了一些细节
 - v2.0.8　修改一些细节问题、删除无效文件
 - v2.0.9　添加一键将已选模型数组写入temp目录方法和新属性、demo示例
-- v2.1.0　适配ios11以及iphone X /  3DTouch预览时播放gif、视频
+- v2.1.0　适配ios11以及iphone X / 3DTouch预览时播放gif、视频 / 优化区分icloud照片、修改写入文件方法
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoManager"></a> HXPhotoManager 照片管理类相关属性介绍
