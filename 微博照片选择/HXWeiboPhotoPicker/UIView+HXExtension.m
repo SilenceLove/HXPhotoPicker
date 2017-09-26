@@ -82,6 +82,21 @@
     return self.frame.origin;
 }
 
+/**
+ 获取当前视图的控制器
+ 
+ @return 控制器
+ */
+- (UIViewController*)viewController {
+    for (UIView* next = [self superview]; next; next = next.superview) {
+        UIResponder* nextResponder = [next nextResponder];
+        if ([nextResponder isKindOfClass:[UINavigationController class]] || [nextResponder isKindOfClass:[UIViewController class]]) {
+            return (UIViewController*)nextResponder;
+        }
+    }
+    return nil;
+}
+
 - (void)showImageHUDText:(NSString *)text
 {
     CGFloat hudW = [HXPhotoTools getTextWidth:text height:15 fontSize:14];

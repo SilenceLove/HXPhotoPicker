@@ -59,6 +59,13 @@
     }
     return _scrollView;
 }
+- (HXCircleProgressView *)progressView {
+    if (!_progressView) {
+        _progressView = [[HXCircleProgressView alloc] init];
+        _progressView.hidden = YES;
+    }
+    return _progressView;
+}
 - (UIImageView *)imageView {
     if (!_imageView) {
         _imageView = [[UIImageView alloc] init];
@@ -78,6 +85,7 @@
     [self.contentView addSubview:self.scrollView];
     [self.scrollView addSubview:self.imageView];
     [self.scrollView addSubview:self.livePhotoView];
+    [self.contentView addSubview:self.progressView];
 }
 - (void)livePhotoView:(PHLivePhotoView *)livePhotoView willBeginPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
     self.isAnimating = YES;
@@ -119,24 +127,29 @@
     CGFloat imgWidth = self.model.imageSize.width;
     CGFloat imgHeight = self.model.imageSize.height;
     PHImageRequestID requestID;
+    CGSize size;
     __weak typeof(self) weakSelf = self;
     if (imgHeight > imgWidth / 9 * 17) {
-        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(width, height) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
-            weakSelf.imageView.image = image;
-            weakSelf.progressView.hidden = YES;
-        } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
-            weakSelf.progressView.hidden = NO;
-            weakSelf.progressView.progress = progress;
-        }];
+        size = CGSizeMake(width, height);
     }else {
-        requestID = [HXPhotoTools FetchPhotoForPHAsset:self.model.asset Size:CGSizeMake(_model.endImageSize.width * 2.0, _model.endImageSize.height * 2.0) deliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat completion:^(UIImage *image, NSDictionary *info) {
-            weakSelf.imageView.image = image;
-            weakSelf.progressView.hidden = YES;
-        } progressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
-            weakSelf.progressView.hidden = NO;
-            weakSelf.progressView.progress = progress;
-        }];
+        size = CGSizeMake(_model.endImageSize.width * 2.0, _model.endImageSize.height * 2.0);
     }
+    requestID = [HXPhotoTools getHighQualityFormatPhoto:self.model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+        weakSelf.longRequestId = cloudRequestId;
+        weakSelf.progressView.hidden = NO;
+    } progressHandler:^(double progress) {
+        weakSelf.progressView.hidden = NO;
+        weakSelf.progressView.progress = progress;
+    } completion:^(UIImage *image) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.progressView.hidden = YES;
+            weakSelf.imageView.image = image;
+        });
+    } failed:^(NSDictionary *info) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.progressView.hidden = YES; 
+        });
+    }];
     if (self.longRequestId != requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];
         self.longRequestId = requestID;
@@ -154,6 +167,7 @@
 
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
+    self.progressView.hidden = YES;
     self.gifImage = nil;
     if (self.longRequestId) {
         [[PHImageManager defaultManager] cancelImageRequest:self.longRequestId];

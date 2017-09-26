@@ -71,8 +71,8 @@
     self.networkPhotoUrls = [NSMutableArray array];
     self.showDeleteNetworkPhotoAlert = NO;
     self.singleSelecteClip = YES;
-    self.monitorSystemAlbum = YES;
-    self.cacheAlbum = YES;
+    self.monitorSystemAlbum = YES; // NO
+    self.cacheAlbum = YES; // NO
     self.videoMaxDuration = 300.f;
     self.saveSystemAblum = NO;
     self.deleteTemporaryPhoto = YES;
@@ -82,7 +82,7 @@
 
 - (void)setSaveSystemAblum:(BOOL)saveSystemAblum {
     _saveSystemAblum = saveSystemAblum;
-    if (self.saveSystemAblum) {
+    if (saveSystemAblum) {
         [self getMaxAlbum];
     }
 }
@@ -91,6 +91,8 @@
     _monitorSystemAlbum = monitorSystemAlbum;
     if (!monitorSystemAlbum) {
         [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
+    }else {
+        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     }
 }
 
@@ -150,14 +152,25 @@
 
 - (void)getImage {
     if (!self.singleSelected && !self.photoViewCellIconDic) {
-        self.photoViewCellIconDic = @{@"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
-                                              @"gifIcon" : [HXPhotoTools hx_imageNamed:self.UIManager.cellGitIconImageName] ,
-                                              @"liveIcon" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"] ,
-                                              @"liveBtnImageNormal" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] ,
-                                              @"liveBtnImageSelected" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] ,
-                                              @"liveBtnBackgroundImage" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] ,
-                                              @"selectBtnNormal" : [HXPhotoTools hx_imageNamed:self.UIManager.cellSelectBtnNormalImageName] ,
-                                              @"selectBtnSelected" : [HXPhotoTools hx_imageNamed:self.UIManager.cellSelectBtnSelectedImageName]};
+        self.photoViewCellIconDic = @{
+                                      @"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
+                                      
+                                      @"gifIcon" : [HXPhotoTools hx_imageNamed:self.UIManager.cellGitIconImageName] ,
+                                      
+                                      @"liveIcon" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_only_icon@2x.png"] ,
+                                      
+                                      @"liveBtnImageNormal" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_open_icon@2x.png"] ,
+                                      
+                                      @"liveBtnImageSelected" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_close_icon@2x.png"] ,
+                                      
+                                      @"liveBtnBackgroundImage" : [HXPhotoTools hx_imageNamed:@"compose_live_photo_background@2x.png"] ,
+                                      
+                                      @"selectBtnNormal" : [HXPhotoTools hx_imageNamed:self.UIManager.cellSelectBtnNormalImageName] ,
+                                      
+                                      @"selectBtnSelected" : [HXPhotoTools hx_imageNamed:self.UIManager.cellSelectBtnSelectedImageName] ,
+                                      
+                                      @"icloudIcon" : [HXPhotoTools hx_imageNamed:self.UIManager.cellICloudIconImageName]
+                                      };
     }
 }
 
@@ -170,6 +183,7 @@
     if (self.albums.count > 0) [self.albums removeAllObjects];
     // 获取系统智能相册
     PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    
     [smartAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
         // 是否按创建时间排序
         PHFetchOptions *option = [[PHFetchOptions alloc] init];
@@ -273,6 +287,28 @@
     [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
         HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
         photoModel.asset = asset;
+//        if ([[asset valueForKey:@"localResourcesState"] longLongValue] == 18446744073709551615) {
+//            photoModel.isIcloud = YES;
+//            NSSLog(@"%@",[asset valueForKey:@"cloudPlaceholderKind"]);
+//        }
+        
+        if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
+            photoModel.isIcloud = YES;
+        }
+//        if ([[asset valueForKey:@"fileURLForFullsizeRenderImage"] boolValue]) {
+//            NSSLog(@"%@",[asset valueForKey:@"mainFileURL"]);
+//        }
+//        if ([[asset valueForKey:@"cloudIsDeletable"] boolValue]) {
+//            photoModel.isIcloud = YES;
+//            photoModel.cloudIsDeletable = YES;
+//        }
+        
+        
+//        NSArray *resourceArray = [PHAssetResource assetResourcesForAsset:asset];
+//        BOOL bIsLocallayAvailable = [[resourceArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
+//        if (!bIsLocallayAvailable) {
+//            photoModel.isIcloud = YES;
+//        }
         if (self.selectedList.count > 0) {
             NSMutableArray *selectedList = [NSMutableArray arrayWithArray:self.selectedList];
             for (HXPhotoModel *model in selectedList) {
@@ -324,22 +360,25 @@
                     photoModel.type = HXPhotoModelMediaTypePhoto;
                 }
             }
-            [photoAy addObject:photoModel];
+            if (!photoModel.isIcloud) {
+                [photoAy addObject:photoModel];
+            }
         }else if (asset.mediaType == PHAssetMediaTypeVideo) {
             photoModel.subType = HXPhotoModelMediaSubTypeVideo;
             photoModel.type = HXPhotoModelMediaTypeVideo;
             [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
                 photoModel.avAsset = asset;
             }];
-            //            [[PHImageManager defaultManager] requestPlayerItemForVideo:asset options:nil resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
-            //                photoModel.playerItem = playerItem;
-            //            }];
             NSString *timeLength = [NSString stringWithFormat:@"%0.0f",asset.duration];
             photoModel.videoTime = [HXPhotoTools getNewTimeFromDurationSecond:timeLength.integerValue];
-            [videoAy addObject:photoModel];
+            if (!photoModel.isIcloud) {
+                [videoAy addObject:photoModel];
+            }
         }
-        photoModel.currentAlbumIndex = index;
-        [objAy addObject:photoModel];
+        if (!photoModel.cloudIsDeletable) {
+            photoModel.currentAlbumIndex = index;
+            [objAy addObject:photoModel];
+        }
     }];
     if (self.openCamera) {
         HXPhotoModel *model = [[HXPhotoModel alloc] init];

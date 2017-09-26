@@ -44,7 +44,7 @@
         default:
             [self loadPhoto];
             break;
-    }
+    } 
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

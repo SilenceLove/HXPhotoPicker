@@ -17,6 +17,13 @@
 @property (assign, nonatomic) CGSize hx_size;
 @property (assign, nonatomic) CGPoint hx_origin;
 
+/**
+ 获取当前视图的控制器
+ 
+ @return 控制器
+ */
+- (UIViewController*)viewController;
+
 - (void)showImageHUDText:(NSString *)text;
 - (void)showLoadingHUDText:(NSString *)text;
 - (void)handleLoading;

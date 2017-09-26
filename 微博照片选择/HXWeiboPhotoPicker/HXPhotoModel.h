@@ -26,14 +26,45 @@ typedef enum : NSUInteger {
 } HXPhotoModelMediaSubType;
 
 @interface HXPhotoModel : NSObject
+/**
+ 文件在手机里的原路径(照片 或 视频)
+ 
+ - 如果是通过相机拍摄的并且没有保存到相册(临时的) 视频有值, 照片没有值
+ */
+@property (strong, nonatomic) NSURL *fileURL;
+/**
+ 创建日期
+ 
+ - 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
+ */
+@property (strong, nonatomic) NSDate *creationDate;
+/**
+ 修改日期
+ 
+ - 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
+ */
+@property (strong, nonatomic) NSDate *modificationDate;
+/**
+ 位置信息 NSData 对象
+ 
+ - 如果是通过相机拍摄的并且没有保存到相册(临时的) 没有值
+ */
+@property (strong, nonatomic) NSData *locationData;
+/**
+ 位置信息 CLLocation 对象
+ 
+ - 如果是通过相机拍摄的并且没有保存到相册(临时的) 没有值
+ */
+@property (strong, nonatomic) CLLocation *location;
+
 
 /**
  照片PHAsset对象
  */
 @property (strong, nonatomic) PHAsset *asset;
 @property (copy, nonatomic) NSString *localIdentifier;
-
-/**  照片原图url 空的, 请根据tools里的方法获取  */
+@property (nonatomic, assign) BOOL isIcloud;
+@property (nonatomic, assign) BOOL cloudIsDeletable;
 @property (strong, nonatomic) NSURL *fullSizeImageURL;
 
 /**
@@ -146,11 +177,10 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) UIImage *tempImage;
 @property (assign, nonatomic) NSInteger rowCount;
 @property (assign, nonatomic) CGSize requestSize;
-- (void)prefetchThumbImage;
-- (void)cancelImageRequest;
 
 + (instancetype)photoModelWithImage:(UIImage *)image;
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime;
++ (instancetype)photoModelWithPHAsset:(PHAsset *)asset;
 
 @property (copy, nonatomic) NSString *fullPathToFile;
 

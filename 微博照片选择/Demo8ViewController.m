@@ -17,6 +17,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (strong, nonatomic) UIScrollView *scrollView;
 
 @property (copy, nonatomic) NSArray *selectList;
+@property (copy, nonatomic) NSArray *imageRequestIds;
+@property (copy, nonatomic) NSArray *videoSessions;
 @end
 
 @implementation Demo8ViewController
@@ -58,15 +60,19 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     
-    UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"写入Temp" style:UIBarButtonItemStylePlain target:self action:@selector(didNavOneBtnClick)];
-    
-    self.navigationItem.rightBarButtonItems = @[item1];
+    UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"写入" style:UIBarButtonItemStylePlain target:self action:@selector(didNavOneBtnClick)];
+    UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(didNavTwoBtnClick)];
+    self.navigationItem.rightBarButtonItems = @[item1,item2];
 }
 
 - (void)didNavOneBtnClick {
     [self.view showLoadingHUDText:@"写入中"];
     __weak typeof(self) weakSelf = self;
-    [HXPhotoTools selectListWriteToTempPath:self.selectList completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
+    [HXPhotoTools selectListWriteToTempPath:self.selectList requestList:^(NSArray *imageRequestIds, NSArray *videoSessions) {
+        weakSelf.imageRequestIds = imageRequestIds;
+        weakSelf.videoSessions = videoSessions;
+        NSSLog(@"image请求 : %ld  视频压缩会话 : %ld",imageRequestIds.count,videoSessions.count);
+    } completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
         NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allUrl,imageUrls,videoUrls);
         [weakSelf.view handleLoading];
     } error:^{
@@ -74,6 +80,24 @@ static const CGFloat kPhotoViewMargin = 12.0;
         [weakSelf.view showImageHUDText:@"写入失败"];
         NSSLog(@"写入失败");
     }];
+}
+
+- (void)didNavTwoBtnClick {
+    /**
+        关于取消!!!
+        
+        图片：只能取消 正在请求资源的 不能取消正在写入临时目录的  简而言之就是图片写入取消不了 🤣🤣🤣
+             当请求到结果后是取消不了的。这个也什么影响 图片请求速度很快写入也很快只有视频比较慢
+     
+        视频：可以取消正在压缩写入文件的
+     
+     */
+    for (NSNumber *number in self.imageRequestIds) {
+        [[PHImageManager defaultManager] cancelImageRequest:[number intValue]];
+    }
+    for (AVAssetExportSession *session in self.videoSessions) {
+        [session cancelExport];
+    }
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {

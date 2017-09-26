@@ -128,7 +128,7 @@
         [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnNormalBgColor];
         self.rightBtn.frame = CGRectMake(0, 0, 60, 25);
         self.rightBtn.layer.borderWidth = 0;
-        if (self.model.asset.duration < 3) {
+        if (self.model.asset.duration < 3 || self.model.asset.duration > self.manager.videoMaxDuration) {
             self.navItem.rightBarButtonItem.enabled = NO;
             [self.rightBtn setBackgroundColor:self.manager.UIManager.navRightBtnDisabledBgColor];
             self.rightBtn.frame = CGRectMake(0, 0, 60, 25);

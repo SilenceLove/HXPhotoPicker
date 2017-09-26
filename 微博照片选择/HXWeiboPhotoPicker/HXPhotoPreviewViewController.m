@@ -37,12 +37,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    self.firstOn = YES;
-//    if (!self.isTouch) {
-        [self setup];
-//    }else {
-//        self.firstWillDisplayCell = YES;
-//    }
+    [self setup];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

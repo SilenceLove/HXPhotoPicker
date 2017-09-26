@@ -25,6 +25,8 @@
 @property (strong, nonatomic) UIImageView *previewImg;
 @property (assign, nonatomic) PHImageRequestID liveRequestID;
 @property (assign, nonatomic) BOOL addImageComplete;
+@property (strong, nonatomic) UIButton *iCloudBtn;
+@property (strong, nonatomic) UIImageView *iCloudIcon;
 @end
 
 @implementation HXPhotoViewCell
@@ -130,6 +132,21 @@
     }
     return _cameraBtn;
 }
+- (UIButton *)iCloudBtn {
+    if (!_iCloudBtn) {
+        _iCloudBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_iCloudBtn setBackgroundColor:[[UIColor whiteColor] colorWithAlphaComponent:0.4]];
+        [_iCloudBtn addTarget:self action:@selector(didICloudBtnCLick) forControlEvents:UIControlEventTouchUpInside];
+        _iCloudBtn.frame = self.bounds;
+    }
+    return _iCloudBtn;
+}
+- (UIImageView *)iCloudIcon {
+    if (!_iCloudIcon) {
+        _iCloudIcon = [[UIImageView alloc] init];
+    }
+    return _iCloudIcon;
+}
 - (void)setIconDic:(NSDictionary *)iconDic {
     _iconDic = iconDic;
     if (self.addImageComplete) {
@@ -155,8 +172,17 @@
         [self.selectBtn setImage:iconDic[@"selectBtnNormal"] forState:UIControlStateNormal];
         [self.selectBtn setImage:iconDic[@"selectBtnSelected"] forState:UIControlStateSelected];
     }
+    if (!self.iCloudIcon.image) {
+        self.iCloudIcon.image = iconDic[@"icloudIcon"];
+        self.iCloudIcon.hx_size = self.iCloudIcon.image.size;
+        self.iCloudIcon.center = self.selectBtn.center;
+    }
     self.addImageComplete = YES;
 }
+- (void)didICloudBtnCLick {
+    [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"尚未从iCloud上下载，请至相册下载完毕后选择"]];
+}
+
 - (void)setup {
     [self.contentView addSubview:self.imageView];
     [self.contentView addSubview:self.bottomView];
@@ -166,6 +192,8 @@
     [self.contentView addSubview:self.liveIcon];
     [self.contentView addSubview:self.maskView];
     [self.contentView addSubview:self.liveBtn];
+    [self.contentView addSubview:self.iCloudBtn];
+    [self.iCloudBtn addSubview:self.iCloudIcon];
     [self.contentView addSubview:self.selectBtn];
     [self.contentView addSubview:self.cameraBtn];
 }
@@ -229,7 +257,10 @@
     if (self.model.type == HXPhotoModelMediaTypeCamera) {
         return;
     }
-    
+    if (self.model.isIcloud) {
+        [self didICloudBtnCLick];
+        return;
+    }
     if ([self.delegate respondsToSelector:@selector(cellDidSelectedBtnClick:Model:)]) {
         [self.delegate cellDidSelectedBtnClick:self Model:self.model];
     }
@@ -245,6 +276,12 @@
 
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
+    self.iCloudBtn.hidden = YES;
+    self.selectBtn.hidden = NO;
+    if (model.isIcloud) {
+        self.iCloudBtn.hidden = NO;
+        self.selectBtn.hidden = YES;
+    }
     if (model.type == HXPhotoModelMediaTypeCamera || model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
         self.imageView.image = model.thumbPhoto;
     }else {

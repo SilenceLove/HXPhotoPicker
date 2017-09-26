@@ -179,11 +179,11 @@
     CGRect rect = [toVC.collectionView convertRect:cell.frame toView:[UIApplication sharedApplication].keyWindow];
     if (cell) {
         if (rect.origin.y < kNavigationBarHeight) {
-            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - kNavigationBarHeight + 1)];
-            rect = CGRectMake(cell.frame.origin.x, kNavigationBarHeight + 1, cell.frame.size.width, cell.frame.size.height);
-        }else if (rect.origin.y + rect.size.height > height - 51 - kBottomMargin) {
-            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - height + 51 + kBottomMargin + rect.size.height)];
-            rect = CGRectMake(cell.frame.origin.x, height - 51 - kBottomMargin - cell.frame.size.height, cell.frame.size.width, cell.frame.size.height);
+            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - kNavigationBarHeight)];
+            rect = CGRectMake(cell.frame.origin.x, kNavigationBarHeight + 0.5, cell.frame.size.width, cell.frame.size.height);
+        }else if (rect.origin.y + rect.size.height > height - 50.5 - kBottomMargin) {
+            [toVC.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - height + 50.5 + kBottomMargin + rect.size.height)];
+            rect = CGRectMake(cell.frame.origin.x, height - 50.5 - kBottomMargin - cell.frame.size.height, cell.frame.size.width, cell.frame.size.height);
         }
     }
     cell.hidden = YES;

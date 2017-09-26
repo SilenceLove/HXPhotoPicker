@@ -77,6 +77,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.photoMaxNum = 9;
         _manager.videoMaxNum = 9;
         _manager.maxNum = 18;
+        _manager.videoMaxDuration = 9;
         _manager.saveSystemAblum = NO;
 //        _manager.selectTogether = NO;
 //        _manager.rowCount = 3;
@@ -126,6 +127,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     
 //    将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
 //    !!!!  必须是全部类型的那个数组 就是 allList 这个数组  !!!!
+    /**  不推荐使用此方法,请使用一键写入临时目录的方法  */
 //    [HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls, NSArray<HXPhotoResultModel *> *photos, NSArray<HXPhotoResultModel *> *videos) {
 //        NSSLog(@"\n全部类型:%@\n照片:%@\n视频:%@",alls,photos,videos);
 //    }];

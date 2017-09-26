@@ -71,6 +71,9 @@
 @property (strong, nonatomic) UIColor *albumViewCellSelectedColor;
 
 /*-------------------Cell------------------*/
+/**  cell iCloud图标  */
+@property (copy, nonatomic) NSString *cellICloudIconImageName;
+
 /**  cell相机照片图片  */
 @property (copy, nonatomic) NSString *cellCameraPhotoImageName;
 

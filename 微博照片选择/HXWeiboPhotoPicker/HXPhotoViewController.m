@@ -679,7 +679,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     HXPhotoModel *model = self.objs[indexPath.item];
     model.rowCount = self.manager.rowCount;
     cell.delegate = self;
-    cell.model = model;
+    cell.model = model; 
     cell.singleSelected = self.manager.singleSelected;
     
     return cell;
@@ -698,7 +698,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         return nil;
     }
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-    if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera) {
+    if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isIcloud) {
         return nil;
     }
     //设置突出区域
@@ -1338,7 +1338,11 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
             HXPhotoModel *model = self.manager.selectedVideos.firstObject;
             HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:[self.objs indexOfObject:model] inSection:0]];
-            vc.coverImage = cell.imageView.image;
+            if (cell) {
+                vc.coverImage = cell.imageView.image;
+            }else {
+                vc.coverImage = model.thumbPhoto;
+            }
             vc.isPreview = self.isPreview;
             vc.manager = self.manager;
             vc.delegate = self;

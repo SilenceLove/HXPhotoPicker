@@ -50,7 +50,7 @@ typedef enum : NSUInteger {
  @param completion 成功block
  @param error 失败block
  */
-+ (void)selectListWriteToTempPath:(NSArray *)selectList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)())error;
++ (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)())error;
 
 /**
  根据PHAsset对象获取照片信息   此方法会回调多次
@@ -72,7 +72,11 @@ typedef enum : NSUInteger {
 
 /**
  将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
- !!!!  必须是全部类型的那个数组  !!!!
+ !!!!  必须是全部类型的那个数组  !!!! 
+ 
+ /--  不推荐使用此方法,请使用一键写入临时目录的方法  --/
+ 位置信息 创建日期 已加入HXPhotoModel里选完之后就可拿到
+ 
  @param selectedList 已选的所有类型(photoAndVideo)数组
  @param complete 各个类型HXPhotoResultModel模型数组
  */
@@ -95,6 +99,12 @@ typedef enum : NSUInteger {
  @param completion image数组
  */
 + (void)getImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos type:(HXPhotoToolsFetchType)type completion:(void(^)(NSArray<UIImage *> *images))completion;
+
++ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size succeed:(void (^)(UIImage *image))succeed failed:(void(^)())failed;
+
++ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(UIImage *image))completion failed:(void(^)(NSDictionary *info))failed;
+
++ (PHImageRequestID)getImageData:(PHAsset *)asset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(NSData *imageData, UIImageOrientation orientation))completion failed:(void(^)(NSDictionary *info))failed;
 
 /**
  获取视频的时长
@@ -148,7 +158,7 @@ typedef enum : NSUInteger {
  @param deliveryMode 请求模式
  @param completion 完成后的block
  */
-+ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void(^)(UIImage *image,NSDictionary *info))completion progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *info))progressHandler;
++ (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void (^)(UIImage *, NSDictionary *))completion;
 
 + (BOOL)platform;
 @end

@@ -309,4 +309,10 @@
     }
     return _cameraPhotoVideoSelectedTitleColor;
 }
+- (NSString *)cellICloudIconImageName {
+    if (!_cellICloudIconImageName) {
+        _cellICloudIconImageName = @"icon_yunxiazai@2x.png";
+    }
+    return _cellICloudIconImageName;
+}
 @end

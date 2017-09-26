@@ -318,7 +318,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     HXPhotoModel *model = self.dataList[indexPath.item];
     if (model.networkPhotoUrl.length > 0) {
         if (!model.downloadComplete) {
-            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片正在下载"]];
+            [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片正在下载"]];
             return;
         }else if (model.downloadError) {
             HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
@@ -335,14 +335,14 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         vc.index = model.endIndex;
         vc.manager = self.manager;
         vc.photoView = self;
-        [[self viewController:self] presentViewController:vc animated:YES completion:nil];
+        [[self viewController] presentViewController:vc animated:YES completion:nil];
     }else if (model.type == HXPhotoModelMediaTypeVideo){
         HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
         vc.manager = self.manager;
         vc.model = model;
         vc.selectedComplete = YES;
         vc.photoView = self;
-        [[self viewController:self] presentViewController:vc animated:YES completion:nil];
+        [[self viewController] presentViewController:vc animated:YES completion:nil];
     }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
         HXVideoPreviewViewController *vc = [[HXVideoPreviewViewController alloc] init];
         vc.manager = self.manager;
@@ -350,7 +350,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         vc.isCamera = YES;
         vc.selectedComplete = YES;
         vc.photoView = self;
-        [[self viewController:self] presentViewController:vc animated:YES completion:nil];
+        [[self viewController] presentViewController:vc animated:YES completion:nil];
     }
 }
 
@@ -392,7 +392,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
     vc.manager = self.manager;
     vc.delegate = self;
-    [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+    [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
 }
 
 /**
@@ -400,7 +400,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
  */
 - (void)goCameraViewContoller {
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
+        [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
         return;
     }
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
@@ -416,20 +416,20 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }else if (self.photos.count >= self.manager.photoMaxNum + self.networkPhotos.count && self.videos.count < self.manager.videoMaxNum) {
             type = HXCameraTypeVideo;
         }else if (self.photos.count + self.videos.count >= self.manager.maxNum + self.networkPhotos.count) {
-            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"已达最大数!"]];
+            [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"已达最大数!"]];
             return;
         }else {
             type = HXCameraTypePhotoAndVideo;
         }
     }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
         if (self.photos.count >= self.manager.photoMaxNum + self.networkPhotos.count) {
-            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片已达最大数!"]];
+            [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片已达最大数!"]];
             return;
         }
         type = HXCameraTypePhoto;
     }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
         if (self.videos.count >= self.manager.videoMaxNum) {
-            [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频已达最大数!"]];
+            [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频已达最大数!"]];
             return;
         }
         type = HXCameraTypeVideo;
@@ -440,9 +440,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         vc1.type = type;
         vc1.photoManager = self.manager;
         if (self.manager.singleSelected) {
-            [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc1] animated:YES completion:nil];
+            [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc1] animated:YES completion:nil];
         }else {
-            [[self viewController:self] presentViewController:vc1 animated:YES completion:nil];
+            [[self viewController] presentViewController:vc1 animated:YES completion:nil];
         }
     }else if (self.manager.cameraType == HXPhotoManagerCameraTypeHalfScreen) {
         HXCameraViewController *vc = [[HXCameraViewController alloc] init];
@@ -450,9 +450,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         vc.type = type;
         vc.photoManager = self.manager;
         if (self.manager.singleSelected) {
-            [[self viewController:self] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+            [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
         }else {
-            [[self viewController:self] presentViewController:vc animated:YES completion:nil];
+            [[self viewController] presentViewController:vc animated:YES completion:nil];
         }
     }else {
         // 跳转到相机或相册页面
@@ -478,7 +478,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
         self.imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
         self.imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
-        [[self viewController:self] presentViewController:self.imagePickerController animated:YES completion:nil];
+        [[self viewController] presentViewController:self.imagePickerController animated:YES completion:nil];
     }
 }
 
@@ -556,7 +556,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if (self.manager.saveSystemAblum) {
         if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [[self viewController:self].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"保存失败，无法访问照片\n请前往设置中允许访问照片"]];
+                [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"保存失败，无法访问照片\n请前往设置中允许访问照片"]];
             });
             return;
         }
@@ -569,7 +569,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             } error:^{
                 weakSelf.manager.cameraPhoto = YES;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [[weakSelf viewController:weakSelf].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片保存失败!"]];
+                    [[weakSelf viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片保存失败!"]];
                 });
             }];
         }else {
@@ -578,7 +578,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             } error:^{
                 weakSelf.manager.cameraPhoto = YES;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [[weakSelf viewController:weakSelf].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频保存失败!"]];
+                    [[weakSelf viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频保存失败!"]];
                 });
             }];
         }
@@ -873,22 +873,6 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
     }
     return number;
-}
-
-/**
- 获取当前视图的控制器
-
- @param view 当前视图
- @return 控制器
- */
-- (UIViewController*)viewController:(UIView *)view {
-    for (UIView* next = [view superview]; next; next = next.superview) {
-        UIResponder* nextResponder = [next nextResponder];
-        if ([nextResponder isKindOfClass:[UINavigationController class]] || [nextResponder isKindOfClass:[UIViewController class]]) {
-            return (UIViewController*)nextResponder;
-        }
-    }
-    return nil;
 }
 
 /**
