@@ -18,10 +18,12 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"
+#import "HXAlbumListViewController.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 #define Spacing 3 // 每个item的间距
-#define LineNum 3 // 每行个数
+
+#define LineNum 3 // 每行个数  !! 这个宏已经没用了, 请用HXPhotoView 的 lineCount 这个属性来控制
 
 static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 @interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,UIImagePickerControllerDelegate>
@@ -37,6 +39,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 @property (assign, nonatomic) BOOL downLoadComplete;
 @property (strong, nonatomic) UIImage *tempCameraImage;
 @property (strong, nonatomic) UIImagePickerController* imagePickerController;
+@property (assign, nonatomic) BOOL isDeleteAddModel;
 @end
 
 @implementation HXPhotoView
@@ -115,7 +118,13 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 //    return self;
 //}
 
+- (void)deleteAddBtn {
+    [self.dataList removeObject:self.addModel];
+    self.isDeleteAddModel = YES;
+}
+
 - (void)setup {
+    self.lineCount = 3;
     self.numOfLinesOld = 0;
     self.tag = 9999;
     [self.dataList addObject:self.addModel];
@@ -389,10 +398,17 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 
 - (void)directGoPhotoViewController {
-    HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
-    vc.manager = self.manager;
-    vc.delegate = self;
-    [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+    if (self.manager.styles == HXPhotoAlbumStylesWeibo) {
+        HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
+        vc.manager = self.manager;
+        vc.delegate = self;
+        [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+    }else {
+        HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
+        vc.manager = self.manager;
+        //    vc.delegate = self;
+        [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+    }
 }
 
 /**
@@ -474,7 +490,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         // 设置录制视频的质量
         [self.imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
         //设置最长摄像时间
-        [self.imagePickerController setVideoMaximumDuration:60.f];
+        [self.imagePickerController setVideoMaximumDuration:self.manager.videoMaximumDuration];
         self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
         self.imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
         self.imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
@@ -883,15 +899,15 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     CGFloat y = self.frame.origin.y;
     CGFloat width = self.frame.size.width;
     
-    CGFloat itemW = (width - Spacing * (LineNum - 1)) / LineNum;
+    CGFloat itemW = (width - Spacing * (self.lineCount - 1)) / self.lineCount;
     if (itemW > 0) {
         self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
     }
     
     NSInteger dataCount = self.dataList.count;
-    NSInteger numOfLinesNew = (dataCount / LineNum) + 1;
+    NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
     
-    if (dataCount % LineNum == 0) {
+    if (dataCount % self.lineCount == 0) {
         numOfLinesNew -= 1;
     }
     self.flowLayout.minimumLineSpacing = Spacing;
@@ -912,7 +928,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSInteger dataCount = self.dataList.count;
-    NSInteger numOfLinesNew = (dataCount / LineNum) + 1;
+    NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
     
     [self setupNewFrame];
     CGFloat x = self.frame.origin.x;
@@ -921,12 +937,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     CGFloat height = self.frame.size.height;
     
     if (dataCount == 1) {
-        CGFloat itemW = (width - Spacing * (LineNum - 1)) / LineNum;
+        CGFloat itemW = (width - Spacing * (self.lineCount - 1)) / self.lineCount;
         if ((int)height != (int)itemW) {
             self.frame = CGRectMake(x, y, width, itemW);
         }
     }
-    if (dataCount % LineNum == 0) {
+    if (dataCount % self.lineCount == 0) {
         numOfLinesNew -= 1;
     }
     CGFloat cWidth = self.frame.size.width;

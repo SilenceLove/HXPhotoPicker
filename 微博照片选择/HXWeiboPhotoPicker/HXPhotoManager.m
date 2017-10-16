@@ -7,6 +7,7 @@
 //
 
 #import "HXPhotoManager.h"
+#import <mach/mach_time.h>
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 @interface HXPhotoManager ()<PHPhotoLibraryChangeObserver>
@@ -74,9 +75,12 @@
     self.monitorSystemAlbum = YES; // NO
     self.cacheAlbum = YES; // NO
     self.videoMaxDuration = 300.f;
+    self.videoMaximumDuration = 60.f;
     self.saveSystemAblum = NO;
     self.deleteTemporaryPhoto = YES;
-    self.UIManager = [[HXPhotoUIManager alloc] init];    
+    self.styles = HXPhotoAlbumStylesWeibo;
+    self.reverseDate = NO;
+    self.UIManager = [[HXPhotoUIManager alloc] init];
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
 
@@ -152,6 +156,7 @@
 
 - (void)getImage {
     if (!self.singleSelected && !self.photoViewCellIconDic) {
+        uint64_t start = mach_absolute_time();
         self.photoViewCellIconDic = @{
                                       @"videoIcon" : [HXPhotoTools hx_imageNamed:@"VideoSendIcon@2x.png"] ,
                                       
@@ -171,6 +176,8 @@
                                       
                                       @"icloudIcon" : [HXPhotoTools hx_imageNamed:self.UIManager.cellICloudIconImageName]
                                       };
+        uint64_t stop = mach_absolute_time();
+        NSSLog(@"%f",subtractTimes(stop, start));
     }
 }
 
@@ -271,6 +278,185 @@
         albums(self.albums);
     }
 }
+/**
+ *  是否为同一天
+ */
+- (BOOL)isSameDay:(NSDate*)date1 date2:(NSDate*)date2 {
+    NSCalendar* calendar = [NSCalendar currentCalendar];
+    
+    unsigned unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay;
+    NSDateComponents* comp1 = [calendar components:unitFlags fromDate:date1];
+    NSDateComponents* comp2 = [calendar components:unitFlags fromDate:date2];
+    
+    return [comp1 day]   == [comp2 day] &&
+    [comp1 month] == [comp2 month] &&
+    [comp1 year]  == [comp2 year];
+}  
+- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(void (^)(NSArray *allList ,NSArray *photoList ,NSArray *videoList ,NSArray *dateList))complete {
+    NSMutableArray *allArray = [NSMutableArray array];
+    NSMutableArray *videoArray = [NSMutableArray array];
+    NSMutableArray *photoArray = [NSMutableArray array];
+    NSMutableArray *dateArray = [NSMutableArray array];
+    __block NSDate *currentIndexDate;
+    __block NSMutableArray *sameDayArray;
+    __block HXPhotoDateModel *dateModel;
+    if (self.reverseDate) {
+        [albumModel.result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
+            HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
+            photoModel.asset = asset;
+            if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
+                photoModel.isIcloud = YES;
+            }
+            
+            if (asset.mediaType == PHAssetMediaTypeImage) {
+                photoModel.subType = HXPhotoModelMediaSubTypePhoto;
+                if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
+                    if (self.singleSelected && self.singleSelecteClip) {
+                        photoModel.type = HXPhotoModelMediaTypePhoto;
+                    }else {
+                        photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
+                    }
+                }else {
+                    if (iOS9Later && [HXPhotoTools platform]) {
+                        if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+                            if (!self.singleSelected) {
+                                photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                            }else {
+                                photoModel.type = HXPhotoModelMediaTypePhoto;
+                            }
+                        }else {
+                            photoModel.type = HXPhotoModelMediaTypePhoto;
+                        }
+                    }else {
+                        photoModel.type = HXPhotoModelMediaTypePhoto;
+                    }
+                }
+                if (!photoModel.isIcloud) {
+                    [photoArray addObject:photoModel];
+                }
+            }else if (asset.mediaType == PHAssetMediaTypeVideo) {
+                photoModel.subType = HXPhotoModelMediaSubTypeVideo;
+                photoModel.type = HXPhotoModelMediaTypeVideo;
+                [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                    photoModel.avAsset = asset;
+                }];
+                NSString *timeLength = [NSString stringWithFormat:@"%0.0f",asset.duration];
+                photoModel.videoTime = [HXPhotoTools getNewTimeFromDurationSecond:timeLength.integerValue];
+                if (!photoModel.isIcloud) {
+                    [videoArray addObject:photoModel];
+                }
+            }
+            photoModel.currentAlbumIndex = albumModel.index;
+            [allArray addObject:photoModel];
+            
+            
+            NSDate *photoDate = photoModel.creationDate;
+            //        CLLocation *photoLocation = photoModel.location;
+            if (!currentIndexDate) {
+                dateModel = [[HXPhotoDateModel alloc] init];
+                dateModel.date = photoDate;
+                sameDayArray = [NSMutableArray array];
+                [sameDayArray addObject:photoModel];
+                [dateArray addObject:dateModel];
+            }else {
+                if ([self isSameDay:photoDate date2:currentIndexDate]) {
+                    [sameDayArray addObject:photoModel];
+                }else {
+                    dateModel.photoModelArray = sameDayArray;
+                    sameDayArray = [NSMutableArray array];
+                    dateModel = [[HXPhotoDateModel alloc] init];
+                    dateModel.date = photoDate;
+                    [sameDayArray addObject:photoModel];
+                    [dateArray addObject:dateModel];
+                }
+            }
+            if (idx == 0) {
+                dateModel.photoModelArray = sameDayArray;
+            }
+            currentIndexDate = photoDate;
+        }];
+    }else {
+        NSInteger index = 0;
+        for (PHAsset *asset in albumModel.result) {
+            HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
+            photoModel.asset = asset;
+            if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
+                photoModel.isIcloud = YES;
+            }
+            
+            if (asset.mediaType == PHAssetMediaTypeImage) {
+                photoModel.subType = HXPhotoModelMediaSubTypePhoto;
+                if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
+                    if (self.singleSelected && self.singleSelecteClip) {
+                        photoModel.type = HXPhotoModelMediaTypePhoto;
+                    }else {
+                        photoModel.type = self.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
+                    }
+                }else {
+                    if (iOS9Later && [HXPhotoTools platform]) {
+                        if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+                            if (!self.singleSelected) {
+                                photoModel.type = self.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                            }else {
+                                photoModel.type = HXPhotoModelMediaTypePhoto;
+                            }
+                        }else {
+                            photoModel.type = HXPhotoModelMediaTypePhoto;
+                        }
+                    }else {
+                        photoModel.type = HXPhotoModelMediaTypePhoto;
+                    }
+                }
+                if (!photoModel.isIcloud) {
+                    [photoArray addObject:photoModel];
+                }
+            }else if (asset.mediaType == PHAssetMediaTypeVideo) {
+                photoModel.subType = HXPhotoModelMediaSubTypeVideo;
+                photoModel.type = HXPhotoModelMediaTypeVideo;
+                [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                    photoModel.avAsset = asset;
+                }];
+                NSString *timeLength = [NSString stringWithFormat:@"%0.0f",asset.duration];
+                photoModel.videoTime = [HXPhotoTools getNewTimeFromDurationSecond:timeLength.integerValue];
+                if (!photoModel.isIcloud) {
+                    [videoArray addObject:photoModel];
+                }
+            }
+            photoModel.currentAlbumIndex = albumModel.index;
+            [allArray addObject:photoModel];
+            
+            
+            NSDate *photoDate = photoModel.creationDate;
+            //        CLLocation *photoLocation = photoModel.location;
+            if (!currentIndexDate) {
+                dateModel = [[HXPhotoDateModel alloc] init];
+                dateModel.date = photoDate;
+                sameDayArray = [NSMutableArray array];
+                [sameDayArray addObject:photoModel];
+                [dateArray addObject:dateModel];
+            }else {
+                if ([self isSameDay:photoDate date2:currentIndexDate]) {
+                    [sameDayArray addObject:photoModel];
+                }else {
+                    dateModel.photoModelArray = sameDayArray;
+                    sameDayArray = [NSMutableArray array];
+                    dateModel = [[HXPhotoDateModel alloc] init];
+                    dateModel.date = photoDate;
+                    [sameDayArray addObject:photoModel];
+                    [dateArray addObject:dateModel];
+                }
+            }
+            if (index == albumModel.result.count - 1) {
+                dateModel.photoModelArray = sameDayArray;
+            }
+            currentIndexDate = photoDate;
+            index++;
+        }
+    }
+    if (complete) {
+        complete(allArray,photoArray,videoArray,dateArray);
+    }
+}
 
 /**
  根据PHFetchResult获取某个相册里面的所有图片和视频
@@ -284,6 +470,7 @@
     NSMutableArray *videoAy = [NSMutableArray array];
     NSMutableArray *objAy = [NSMutableArray array]; 
     __block NSInteger cameraIndex = self.openCamera ? 1 : 0;
+    uint64_t start = mach_absolute_time();
     [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
         HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
         photoModel.asset = asset;
@@ -301,13 +488,6 @@
 //        if ([[asset valueForKey:@"cloudIsDeletable"] boolValue]) {
 //            photoModel.isIcloud = YES;
 //            photoModel.cloudIsDeletable = YES;
-//        }
-        
-        
-//        NSArray *resourceArray = [PHAssetResource assetResourcesForAsset:asset];
-//        BOOL bIsLocallayAvailable = [[resourceArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
-//        if (!bIsLocallayAvailable) {
-//            photoModel.isIcloud = YES;
 //        }
         if (self.selectedList.count > 0) {
             NSMutableArray *selectedList = [NSMutableArray arrayWithArray:self.selectedList];
@@ -408,11 +588,25 @@
             }
         }
     }
+    uint64_t stop = mach_absolute_time();
+    NSSLog(@"%f",subtractTimes(stop, start));
     if (list) {
         list(photoAy,videoAy,objAy);
     }
 }
-
+double subtractTimes( uint64_t endTime, uint64_t startTime ) {
+    uint64_t difference = endTime - startTime;
+    static double conversion = 0.0;
+    if( conversion == 0.0 )
+    {
+        mach_timebase_info_data_t info;
+        kern_return_t err =mach_timebase_info( &info );
+        //Convert the timebase into seconds
+        if( err == 0  )
+            conversion= 1e-9 * (double) info.numer / (double) info.denom;
+    }
+    return conversion * (double)difference;
+}
 - (void)deletePhotoModelFromLastSelectedListWhereNotInSystemAlbums {
 //    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 //        __weak typeof(self) weakSelf = self;

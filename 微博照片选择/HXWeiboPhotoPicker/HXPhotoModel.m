@@ -141,9 +141,9 @@
 //            size = CGSizeMake(width * [UIScreen mainScreen].scale, width);
 //        }else {
             if ([UIScreen mainScreen].bounds.size.width == 375) {
-                size = CGSizeMake(width * 1.2, width * 1.2);
+                size = CGSizeMake(width * 1.4, width * 1.4);
             }else {
-                size = CGSizeMake(width * 1.5, width * 1.5);
+                size = CGSizeMake(width * 1.7, width * 1.7);
             }
 //        }
         if ([UIScreen mainScreen].bounds.size.width == 320) {
@@ -155,5 +155,31 @@
 }
 - (void)dealloc {
 //    [self cancelImageRequest];
+}
+@end
+
+@implementation HXPhotoDateModel
+- (NSString *)dateString {
+    if (!_dateString) {
+        
+        if ([self.date isToday]) {
+            _dateString = @"今天";
+        }else if ([self.date isYesterday]) {
+            _dateString = @"昨天";
+        }else if ([self.date isSameWeek]) {
+            _dateString = [self.date getNowWeekday];
+        }else if ([self.date isThisYear]) {
+            _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM月dd日"],[self.date getNowWeekday]];
+        }else {
+            _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
+        }
+    }
+    return _dateString;
+}
+- (NSMutableArray *)locationList {
+    if (!_locationList) {
+        _locationList = [NSMutableArray array];
+    }
+    return _locationList;
 }
 @end

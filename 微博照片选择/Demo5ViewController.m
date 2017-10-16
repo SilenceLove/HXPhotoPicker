@@ -37,7 +37,7 @@ static const CGFloat kPhotoViewSectionMargin = 20.0;
 - (HXPhotoManager *)twoManager {
     if (!_twoManager) {
         _twoManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypeVideo];
-        
+        _twoManager.videoMaximumDuration = 10.f;
     }
     return _twoManager;
 }

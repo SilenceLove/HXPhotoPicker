@@ -38,6 +38,12 @@
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
 @property (strong, nonatomic) HXCollectionView *collectionView;
+
+/**
+ 每行个数 默认3;
+ */
+@property (assign, nonatomic) NSInteger lineCount;
+
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 /**  不要使用 "initWithFrame" 这个方法初始化否者会出现异常, 请使用下面这个三个初始化方法  */
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
@@ -55,4 +61,6 @@
 - (NSInteger)downloadNumberForNetworkingPhoto;
 /**  刷新view  */
 - (void)refreshView;
+/**  删除添加按钮(即不需要)  */
+//- (void)deleteAddBtn;
 @end

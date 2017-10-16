@@ -134,8 +134,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
             [weakSelf.collectionView reloadData];
             [weakSelf.view handleLoading];
         });
-    }];
-
+    }]; 
 }
 - (void)photoLibraryDidChange:(NSArray *)list {
     for (int i = 0; i < list.count ; i++) {
@@ -355,7 +354,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         // 设置录制视频的质量
         [_imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
         //设置最长摄像时间
-        [_imagePickerController setVideoMaximumDuration:60.f];
+        [_imagePickerController setVideoMaximumDuration:self.manager.videoMaximumDuration];
         _imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
         _imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
         _imagePickerController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
@@ -767,6 +766,9 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     }
 } 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.navigationController.topViewController != self) {
+        return;
+    }
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     self.currentIndexPath = indexPath;
     HXPhotoModel *model = self.objs[indexPath.item];
@@ -1556,6 +1558,27 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
         [_albumsBgView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didAlbumsBgViewClick)]];
     }
     return _albumsBgView;
+}
+
+- (NSMutableArray *)objs {
+    if (!_objs) {
+        _objs = [NSMutableArray array];
+    }
+    return _objs;
+}
+
+- (NSMutableArray *)photos {
+    if (!_photos) {
+        _photos = [NSMutableArray array];
+    }
+    return _photos;
+}
+
+- (NSMutableArray *)videos {
+    if (!_videos) {
+        _videos = [NSMutableArray array];
+    }
+    return _videos;
 }
 
 /**

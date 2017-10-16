@@ -28,7 +28,27 @@ typedef enum : NSUInteger {
     HXPhotoManagerCameraTypeSystem              // 系统相机
 } HXPhotoManagerCameraType;
 
+typedef enum : NSUInteger {
+    HXPhotoAlbumStylesWeibo = 0,           // 微博相册风格
+    HXPhotoAlbumStylesSystem               // 系统相册 - (未完成)
+} HXPhotoAlbumStyles;
+
 @interface HXPhotoManager : NSObject
+
+/**
+ 相册风格 默认weibo (system未完成)
+ */
+@property (assign, nonatomic) HXPhotoAlbumStyles styles;
+
+/**
+ 照片列表按日期倒序 - HXPhotoAlbumStylesSystem 时有用 默认 NO
+ */
+@property (assign, nonatomic) BOOL reverseDate;
+
+/**
+ 相机视频录制最大秒数  -  默认60s
+ */
+@property (assign, nonatomic) NSTimeInterval videoMaximumDuration;
 
 /**
  *  删除临时的照片/视频 - 注:相机拍摄的照片并没有保存到系统相册 或 是本地图片 如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..  - 默认 YES
@@ -247,6 +267,7 @@ typedef enum : NSUInteger {
  */
 - (void)FetchAllPhotoForPHFetchResult:(PHFetchResult *)result Index:(NSInteger)index FetchResult:(void(^)(NSArray *photos, NSArray *videos, NSArray *Objs))list;
 
+- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(void (^)(NSArray *allList ,NSArray *photoList ,NSArray *videoList ,NSArray *dateList))complete;
 /**
  删除指定model
 

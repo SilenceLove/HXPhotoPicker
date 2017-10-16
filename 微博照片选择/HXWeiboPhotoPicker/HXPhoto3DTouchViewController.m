@@ -113,6 +113,11 @@
 
 - (void)dealloc {
     [self.playerLayer removeFromSuperlayer];
+    if (_livePhotoView) {
+        self.livePhotoView.delegate = nil;
+        [self.livePhotoView removeFromSuperview];
+        self.livePhotoView = nil;
+    }
 }
 
 - (UIImageView *)imageView {

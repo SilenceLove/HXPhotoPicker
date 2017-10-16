@@ -12,6 +12,8 @@
 #import "UIView+HXExtension.h"
 #import "HXPhotoResultModel.h"
 #import "NSBundle+HXWeiboPhotoPicker.h"
+#import "NSDate+HXExtension.h"
+#import "UIFont+HXExtension.h"
 #ifdef DEBUG
 #define NSSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 
@@ -24,6 +26,7 @@
 #define kNavigationBarHeight (kDevice_Is_iPhoneX ? 88 : 64)
 
 #define kBottomMargin (kDevice_Is_iPhoneX ? 34 : 0)
+#define iOS9_Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
 
 /*
  *  工具类

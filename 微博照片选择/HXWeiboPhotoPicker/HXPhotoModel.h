@@ -183,5 +183,12 @@ typedef enum : NSUInteger {
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset;
 
 @property (copy, nonatomic) NSString *fullPathToFile;
+@end
 
+@interface HXPhotoDateModel : NSObject
+@property (strong, nonatomic) NSDate *date;
+@property (strong, nonatomic) NSMutableArray *locationList;
+@property (copy, nonatomic) NSString *dateString;
+@property (copy, nonatomic) NSString *locationString;
+@property (copy, nonatomic) NSArray *photoModelArray;
 @end

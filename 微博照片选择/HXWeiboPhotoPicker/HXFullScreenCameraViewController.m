@@ -105,10 +105,10 @@
     //    AVCaptureDevicePositionFront 前置摄像头
     self.device = [self cameraWithPosition:AVCaptureDevicePositionBack];
     
-//    if ([self.device hasFlash]) {
-//        navItem.rightBarButtonItems = @[rightOne_,rightTwo_];
-//    }else {
-//        navItem.rightBarButtonItems = @[rightOne_];
+    //    if ([self.device hasFlash]) {
+    //        navItem.rightBarButtonItems = @[rightOne_,rightTwo_];
+    //    }else {
+    //        navItem.rightBarButtonItems = @[rightOne_];
     //    }
     self.beginGestureScale = 1.0f;
     self.effectiveScale = 1.0f;
@@ -205,7 +205,7 @@
     self.focusIcon.frame = CGRectMake(0, 0, self.focusIcon.image.size.width, self.focusIcon.image.size.height);
     self.focusIcon.hidden = YES;
     [self.view addSubview:self.focusIcon];
-
+    
     UITapGestureRecognizer *bgViewTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(bgViewTapClick:)];
     [self.view addGestureRecognizer:bgViewTap];
     self.bgViewTap = bgViewTap;
@@ -292,11 +292,11 @@
             self.flashlight = 0;
             self.flashBtn.selected = NO;
             self.device.flashMode = AVCaptureFlashModeOff;
-//            [self.device setTorchMode:AVCaptureTorchModeOff];
+            //            [self.device setTorchMode:AVCaptureTorchModeOff];
         }else if (self.flashlight == 0){
             self.flashBtn.selected = YES;
             self.device.flashMode = AVCaptureFlashModeOn;
-//            [self.device setTorchMode:AVCaptureTorchModeOn];
+            //            [self.device setTorchMode:AVCaptureTorchModeOn];
             self.flashlight = 1;
         }
     } else {
@@ -329,6 +329,12 @@
 }
 // 切换前后置摄像头
 - (void)didchangeCameraClick {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+        [alert show];
+        return;
+    }
     [self changeCamera];
 }
 - (void)changeCamera{
@@ -457,6 +463,9 @@
         [self.playerLayer removeFromSuperlayer];
         self.playerLayer = nil;
         [self.motionManager stopDeviceMotionUpdates];
+        if ([self.delegate respondsToSelector:@selector(fullScreenCameraViewControllerDidCancel:)]) {
+            [self.delegate fullScreenCameraViewControllerDidCancel:self];
+        }
         [self dismissViewControllerAnimated:YES completion:nil];
     }else {
         if (self.flashBtn.enabled) {
@@ -497,6 +506,12 @@
 }
 // 点击事件
 - (void)playViewTapGrEvent:(UITapGestureRecognizer *)tap {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+        [alert show];
+        return;
+    }
     AVCaptureConnection *conntion = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
     if (!conntion) {
         [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"拍摄失败"]];
@@ -555,6 +570,17 @@
     if (longPgr.state == UIGestureRecognizerStatePossible) {
     }
     if (longPgr.state == UIGestureRecognizerStateBegan) {
+        AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+        if (authStatus != AVAuthorizationStatusAuthorized) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+            [alert show];
+            return;
+        }
+        if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio] != AVAuthorizationStatusAuthorized) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用麦克风"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+            [alert show];
+            return;
+        }
         self.changeCameraBtn.hidden = YES;
         self.flashBtn.hidden = YES;
         self.effectiveScale = 1.0f;
@@ -571,7 +597,7 @@
         longPgr.state == UIGestureRecognizerStateEnded){
         [self.timer invalidate];
         self.timer = nil;
-        [self.videoOutPut stopRecording]; 
+        [self.videoOutPut stopRecording];
         [self.playView clean];
         if (self.videoTime < 3) {
             self.changeCameraBtn.hidden = NO;
@@ -588,7 +614,7 @@
         }];
     }
 }
-- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray *)connections { 
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray *)connections {
     // 开始录制
     self.videoTime = 0;
     self.timeLb.text = [NSString stringWithFormat:@"0s"];
@@ -612,8 +638,8 @@
 - (void)recordingClick:(NSTimer *)timer {
     self.videoTime++;
     self.timeLb.text = [NSString stringWithFormat:@"%lds",self.videoTime];
-    self.playView.progress = (CGFloat)self.videoTime / 60.f;
-    if (self.videoTime == 60) {
+    self.playView.progress = (CGFloat)self.videoTime / self.photoManager.videoMaximumDuration;
+    if (self.videoTime == self.photoManager.videoMaximumDuration) {
         [timer invalidate];
         self.timer = nil;
     }
@@ -649,6 +675,9 @@
     [self dismissViewControllerAnimated:NO completion:^{
         if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
             [self.delegate fullScreenCameraDidNextClick:model];
+        }
+        if ([self.delegate respondsToSelector:@selector(fullScreenCameraViewController:didNext:)]) {
+            [self.delegate fullScreenCameraViewController:self didNext:model];
         }
     }];
 }
@@ -699,10 +728,13 @@
         model.thumbPhoto = image;
         model.imageSize = image.size;
         model.previewPhoto = image;
-        model.cameraIdentifier = [self videoOutFutFileName]; 
+        model.cameraIdentifier = [self videoOutFutFileName];
     }
     if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
         [self.delegate fullScreenCameraDidNextClick:model];
+    }
+    if ([self.delegate respondsToSelector:@selector(fullScreenCameraViewController:didNext:)]) {
+        [self.delegate fullScreenCameraViewController:self didNext:model];
     }
     [self.timer invalidate];
     self.timer = nil;
@@ -720,3 +752,4 @@
     NSSLog(@"dealloc");
 }
 @end
+

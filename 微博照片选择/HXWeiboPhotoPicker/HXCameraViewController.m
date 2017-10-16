@@ -36,7 +36,7 @@
 @property (weak, nonatomic) UIButton *rightTwo;
 @property (weak, nonatomic) UIButton *rightOne;
 @property (nonatomic, strong) CMMotionManager *motionManager;
-@property (nonatomic, assign) UIDeviceOrientation deviceOrientation; 
+@property (nonatomic, assign) UIDeviceOrientation deviceOrientation;
 @property (nonatomic, assign) UIDeviceOrientation imageOrientation;
 @property (nonatomic, assign) AVCaptureVideoOrientation currentImageOrientation;
 /**
@@ -108,13 +108,16 @@
 - (void)dismiss
 {
     [self.session stopRunning];
-    [self.motionManager stopDeviceMotionUpdates]; 
+    [self.motionManager stopDeviceMotionUpdates];
     [self.timer invalidate];
     self.timer = nil;
     [UIView animateWithDuration:0.4 animations:^{
         self.maskViewO.frame = CGRectMake(0, 0, self.backView.frame.size.width, self.backView.frame.size.height / 2);
         self.maskViewT.frame = CGRectMake(0, self.backView.frame.size.height / 2, self.backView.frame.size.width, self.backView.frame.size.height / 2);
     } completion:^(BOOL finished) {
+        if ([self.delegate respondsToSelector:@selector(cameraViewControllerDidCancel:)]) {
+            [self.delegate cameraViewControllerDidCancel:self];
+        }
         [self dismissViewControllerAnimated:YES completion:nil];
     }];
 }
@@ -329,9 +332,9 @@
     [self.backView addSubview:maskViewT];
     self.maskViewT = maskViewT;
     
-//    self.zoomSlider = [[UISlider alloc] init];
-//    self.zoomSlider =
-//    [self.backView addSubview:self.zoomSlider];
+    //    self.zoomSlider = [[UISlider alloc] init];
+    //    self.zoomSlider =
+    //    [self.backView addSubview:self.zoomSlider];
     
     self.focusIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.cameraFocusImageName]];
     self.focusIcon.frame = CGRectMake(0, 0, self.focusIcon.image.size.width, self.focusIcon.image.size.height);
@@ -407,8 +410,13 @@
     }
 }
 
-- (void)didPhotoClick
-{
+- (void)didPhotoClick {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+        [alert show];
+        return;
+    }
     AVCaptureConnection *conntion = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
     if (!conntion) {
         [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"拍摄失败"]];
@@ -454,6 +462,17 @@
 - (void)didLongClick:(UILongPressGestureRecognizer *)longRPG
 {
     if ([longRPG state] == UIGestureRecognizerStateBegan) {
+        AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+        if (authStatus != AVAuthorizationStatusAuthorized) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+            [alert show];
+            return;
+        }
+        if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio] != AVAuthorizationStatusAuthorized) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用麦克风"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+            [alert show];
+            return;
+        }
         [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.recordedBtnHighlightedImageName] forState:UIControlStateNormal];
         [self cameraBackgroundDidClickPlay];
     }else if ([longRPG state] == UIGestureRecognizerStateEnded) {
@@ -490,26 +509,23 @@
     return fileName;
 }
 
-- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray *)connections
-{
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray *)connections {
     // 开始录制
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(recordingClick:) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
 
-- (void)recordingClick:(NSTimer *)timer
-{
+- (void)recordingClick:(NSTimer *)timer {
     self.videoTime++;
-    [self.progressView setProgress:self.videoTime / 60.f animated:YES];
-    if (self.videoTime == 60) {
+    [self.progressView setProgress:self.videoTime / self.photoManager.videoMaximumDuration animated:YES];
+    if (self.videoTime == self.photoManager.videoMaximumDuration) {
         [timer invalidate];
         [self.videoBtn setImage:[HXPhotoTools hx_imageNamed:self.photoManager.UIManager.recordedBtnNormalImageName] forState:UIControlStateNormal];
         [self.videoOutPut stopRecording];
     }
 }
 
-- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error
-{
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error {
     [self.timer invalidate];
     // 录制结束
     self.playerLayer.hidden = NO;
@@ -521,8 +537,7 @@
     [self hideClick];
 }
 
-- (void)hideClick
-{
+- (void)hideClick {
     self.videoBtn.hidden = YES;
     self.photoBtn.hidden = YES;
     self.deleteBtn.hidden = NO;
@@ -533,8 +548,13 @@
     self.moveView.userInteractionEnabled = NO;
 }
 
-- (void)didRightOneClick
-{
+- (void)didRightOneClick {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] delegate:self cancelButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+        [alert show];
+        return;
+    }
     [self changeCamera];
 }
 
@@ -842,6 +862,9 @@
         if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
             [self.delegate cameraDidNextClick:model];
         }
+        if ([self.delegate respondsToSelector:@selector(cameraViewController:didNext:)]) {
+            [self.delegate cameraViewController:self didNext:model];
+        }
     }];
 }
 - (UIButton *)nextBtn
@@ -897,6 +920,9 @@
             if ([self.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
                 [self.delegate cameraDidNextClick:model];
             }
+            if ([self.delegate respondsToSelector:@selector(cameraViewController:didNext:)]) {
+                [self.delegate cameraViewController:self didNext:model];
+            }
             [self dismiss];
         }
     }else {
@@ -932,6 +958,9 @@
             if ([weakSelf.delegate respondsToSelector:@selector(cameraDidNextClick:)]) {
                 [weakSelf.delegate cameraDidNextClick:model];
             }
+            if ([weakSelf.delegate respondsToSelector:@selector(cameraViewController:didNext:)]) {
+                [weakSelf.delegate cameraViewController:weakSelf didNext:model];
+            }
             [weakSelf dismiss];
         } failed:^{
             weakSelf.view.userInteractionEnabled = YES;
@@ -945,7 +974,7 @@
 {
     AVAsset *asset = [AVAsset assetWithURL:self.videoURL];
     
-//    AVAsset *audio = [AVAsset assetWithURL:[[NSBundle mainBundle] URLForResource:@"8836.mp3" withExtension:nil]];
+    //    AVAsset *audio = [AVAsset assetWithURL:[[NSBundle mainBundle] URLForResource:@"8836.mp3" withExtension:nil]];
     
     AVAssetTrack *audioTrack;
     if ([[asset tracksWithMediaType:AVMediaTypeAudio] count] != 0) {
@@ -964,7 +993,7 @@
     
     if (audioTrack != nil) {
         AVMutableCompositionTrack *compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio
-                                                                            preferredTrackID:kCMPersistentTrackID_Invalid];
+                                                                                       preferredTrackID:kCMPersistentTrackID_Invalid];
         
         [compositionAudioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
                                        ofTrack:audioTrack
@@ -1023,9 +1052,9 @@
         }
     }
     [videolayerInstruction setOpacity:0.0 atTime:asset.duration];
-
+    
     mainInstruction.layerInstructions = [NSArray arrayWithObjects:videolayerInstruction,nil];
-
+    
     AVMutableVideoComposition *mainCompositionInst = [AVMutableVideoComposition videoComposition];
     
     CGSize naturalSize;
@@ -1042,7 +1071,7 @@
     mainCompositionInst.instructions = [NSArray arrayWithObject:mainInstruction];
     mainCompositionInst.frameDuration = CMTimeMake(1, 30);
     
- 
+    
     NSString *myPathDocs =  [NSTemporaryDirectory() stringByAppendingPathComponent:
                              [NSString stringWithFormat:@"FinalVideo-%d.mov",arc4random() % 1000]];
     self.clipVideoURL = [NSURL fileURLWithPath:myPathDocs];
@@ -1093,9 +1122,10 @@
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
     return [HXVideoPresentTransition transitionWithTransitionType:HXVideoPresentTransitionDismiss];
 }
-- (void)dealloc { 
+- (void)dealloc {
     NSSLog(@"dealloc");
 }
 
 
 @end
+

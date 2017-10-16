@@ -105,6 +105,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     CGFloat width = scrollView.frame.size.width;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
+    photoView.lineCount = 5;
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];
