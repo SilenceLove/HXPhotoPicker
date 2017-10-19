@@ -57,6 +57,9 @@ typedef enum : NSUInteger {
  */
 @property (strong, nonatomic) CLLocation *location;
 
+@property (copy, nonatomic) NSString *barTitle;
+@property (copy, nonatomic) NSString *barSubTitle;
+
 
 /**
  照片PHAsset对象
@@ -110,11 +113,15 @@ typedef enum : NSUInteger {
  选择的下标
  */
 @property (assign, nonatomic) NSInteger selectedIndex;
+@property (assign, nonatomic) NSInteger dateSection;
+@property (assign, nonatomic) NSInteger dateItem;
+@property (assign, nonatomic) BOOL dateCellIsVisible;
 
 /**
  是否选中
  */
 @property (assign, nonatomic) BOOL selected;
+@property (copy, nonatomic) NSString *selectIndexStr;
 
 /**
  图片宽高
@@ -124,7 +131,9 @@ typedef enum : NSUInteger {
 /**
  缩小之后的图片宽高
  */
-@property (assign, nonatomic) CGSize endImageSize; 
+@property (assign, nonatomic) CGSize endImageSize;
+@property (assign, nonatomic) CGSize endDateImageSize;
+@property (assign, nonatomic) CGSize dateBottomImageSize;
 
 /**
  判断当前照片 是否关闭了livePhoto功能

@@ -8,7 +8,7 @@
 
 #import "HXAlbumListViewController.h" 
 #import "HXDatePhotoViewController.h"
-@interface HXAlbumListViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate>
+@interface HXAlbumListViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXDatePhotoViewControllerDelegate>
 
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
@@ -17,20 +17,27 @@
 @property (strong, nonatomic) NSTimer *timer;
 @property (strong, nonatomic) UILabel *authorizationLb;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
-
 @end
 
 @implementation HXAlbumListViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self setPhotoManager];
     self.navigationController.popoverPresentationController.delegate = (id)self;
     [self setupUI];
-    [self getAlbumModelList];
+    [self getAlbumModelList:YES];
     // 获取当前应用对照片的访问授权状态
     if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
         [self.view addSubview:self.authorizationLb];
         self.timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange:) userInfo:nil repeats:YES];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if (self.albumModelArray.count == 0) {
+        [self getAlbumModelList:NO];
     }
 }
 - (void)observeAuthrizationStatusChange:(NSTimer *)timer {
@@ -47,30 +54,122 @@
 //                [self getObjs];
 //            }
 //        }else {
-            [self getAlbumModelList];
+        [self getAlbumModelList:YES];
 //        }
     }
 }
 - (void)setupUI {
     self.title = @"相册";
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(cancelClick)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(cancelClick)];
     [self.view addSubview:self.collectionView];
 }
+- (void)setPhotoManager {
+    if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
+        if (self.manager.networkPhotoUrls.count == 0) {
+            self.manager.maxNum = self.manager.photoMaxNum;
+        }
+        if (self.manager.endCameraVideos.count > 0) {
+            [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraVideos];
+            [self.manager.endCameraVideos removeAllObjects];
+        }
+    }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+        if (self.manager.networkPhotoUrls.count == 0) {
+            self.manager.maxNum = self.manager.videoMaxNum;
+        }
+        if (self.manager.endCameraPhotos.count > 0) {
+            [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraPhotos];
+            [self.manager.endCameraPhotos removeAllObjects];
+        }
+    }else {
+        // 防错  请在外面设置好!!!!
+        if (self.manager.networkPhotoUrls.count == 0) {
+            if (self.manager.videoMaxNum + self.manager.photoMaxNum != self.manager.maxNum) {
+                self.manager.maxNum = self.manager.videoMaxNum + self.manager.photoMaxNum;
+            }
+        }
+    }
+    // 上次选择的所有记录
+    self.manager.selectedList = [NSMutableArray arrayWithArray:self.manager.endSelectedList];
+    self.manager.selectedPhotos = [NSMutableArray arrayWithArray:self.manager.endSelectedPhotos];
+    self.manager.selectedVideos = [NSMutableArray arrayWithArray:self.manager.endSelectedVideos];
+    self.manager.cameraList = [NSMutableArray arrayWithArray:self.manager.endCameraList];
+    self.manager.cameraPhotos = [NSMutableArray arrayWithArray:self.manager.endCameraPhotos];
+    self.manager.cameraVideos = [NSMutableArray arrayWithArray:self.manager.endCameraVideos];
+    self.manager.selectedCameraList = [NSMutableArray arrayWithArray:self.manager.endSelectedCameraList];
+    self.manager.selectedCameraPhotos = [NSMutableArray arrayWithArray:self.manager.endSelectedCameraPhotos];
+    self.manager.selectedCameraVideos = [NSMutableArray arrayWithArray:self.manager.endSelectedCameraVideos];
+    self.manager.isOriginal = self.manager.endIsOriginal;
+    self.manager.photosTotalBtyes = self.manager.endPhotosTotalBtyes;
+}
 - (void)cancelClick {
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+    [self.manager.selectedList removeAllObjects];
+    [self.manager.selectedPhotos removeAllObjects];
+    [self.manager.selectedVideos removeAllObjects];
+    self.manager.isOriginal = NO;
+    self.manager.photosTotalBtyes = nil;
+    [self.manager.selectedCameraList removeAllObjects];
+    [self.manager.selectedCameraVideos removeAllObjects];
+    [self.manager.selectedCameraPhotos removeAllObjects];
+    [self.manager.cameraPhotos removeAllObjects];
+    [self.manager.cameraList removeAllObjects];
+    [self.manager.cameraVideos removeAllObjects];
+    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidCancel:)]) {
+        [self.delegate albumListViewControllerDidCancel:self];
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
-- (void)getAlbumModelList {
-    [self.view showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
+#pragma mark - < HXDatePhotoViewControllerDelegate >
+- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
+    if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllList:photos:videos:original:)]) {
+        [self.delegate albumListViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
+
+    }
+}
+- (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController {
+    [self cancelClick];
+    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidCancel:)]) {
+        [self.delegate albumListViewControllerDidCancel:self];
+    }
+}
+- (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected {
+    if (self.albumModelArray.count > 0) {
+        HXAlbumModel *albumModel = self.albumModelArray[model.currentAlbumIndex];
+        if (selected) {
+            albumModel.selectedCount++;
+        }else {
+            albumModel.selectedCount--;
+        }
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:model.currentAlbumIndex inSection:0]]];
+    }
+}
+- (void)getAlbumModelList:(BOOL)isFirst {
+    if (!isFirst) {
+        [self.view showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
+    }
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         __weak typeof(self) weakSelf = self;
-        [self.manager FetchAllAlbum:^(NSArray *albums) {
+        [self.manager getAllPhotoAlbums:^(HXAlbumModel *firstAlbumModel) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                HXAlbumModel *model = firstAlbumModel;
+                HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
+                vc.manager = weakSelf.manager;
+                vc.title = model.albumName;
+                vc.albumModel = model;
+                vc.delegate = weakSelf;
+                [weakSelf.navigationController pushViewController:vc animated:NO];
+            });
+        } albums:^(NSArray *albums) {
             weakSelf.albumModelArray = [NSMutableArray arrayWithArray:albums];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [weakSelf.collectionView reloadData];
                 [weakSelf.view handleLoading];
             });
-        } IsShowSelectTag:NO];
+        } isFirst:isFirst];
     });
 }
 #pragma mark - < UICollectionViewDataSource >
@@ -92,6 +191,7 @@
     vc.manager = self.manager;
     vc.title = model.albumName;
     vc.albumModel = model;
+    vc.delegate = self;
     [self.navigationController pushViewController:vc animated:YES];
 }
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
@@ -107,6 +207,7 @@
     vc.manager = self.manager;
     vc.title = cell.model.albumName;
     vc.albumModel = cell.model;
+    vc.delegate = self;
     return vc;
 }
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
@@ -171,6 +272,7 @@
     return _authorizationLb;
 }
 - (void)dealloc {
+    NSSLog(@"dealloc");
     [self unregisterForPreviewingWithContext:self.previewingContext];
 }
 - (void)goSetup {
@@ -180,6 +282,7 @@
 
 @interface HXAlbumListQuadrateViewCell ()
 @property (strong, nonatomic) UIImageView *coverView;
+@property (strong, nonatomic) UIButton *selectNumberBtn;
 @property (strong, nonatomic) UILabel *albumNameLb;
 @property (strong, nonatomic) UILabel *photoNumberLb;
 @property (copy, nonatomic) NSString *localIdentifier;
@@ -199,6 +302,7 @@
     [self.contentView addSubview:self.coverView];
     [self.contentView addSubview:self.albumNameLb];
     [self.contentView addSubview:self.photoNumberLb];
+//    [self.contentView addSubview:self.selectNumberBtn];
 }
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
@@ -223,12 +327,22 @@
     
     self.albumNameLb.text = model.albumName;
     self.photoNumberLb.text = @(model.result.count).stringValue;
+//    if (model.selectedCount == 0) {
+//        self.selectNumberBtn.hidden = YES;
+//    }else {
+//        self.selectNumberBtn.hidden = NO;
+//    }
+//    [self.selectNumberBtn setTitle:@(model.selectedCount).stringValue forState:UIControlStateNormal];
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.coverView.frame = CGRectMake(0, 0, self.hx_w, self.hx_w);
     self.albumNameLb.frame = CGRectMake(0, self.hx_w + 6, self.hx_w, 14);
     self.photoNumberLb.frame = CGRectMake(0, CGRectGetMaxY(self.albumNameLb.frame) + 4, self.hx_w, 14);
+    self.selectNumberBtn.hx_size = CGSizeMake(12, 12);
+    self.selectNumberBtn.hx_x = self.hx_w - 5 - self.selectNumberBtn.hx_w;
+    CGFloat margin = (self.hx_h - self.hx_w) / 2 + 3;
+    self.selectNumberBtn.center = CGPointMake(self.selectNumberBtn.center.x, self.hx_w + margin);
 }
 #pragma mark - < cell懒加载 >
 - (UIImageView *)coverView {
@@ -256,5 +370,17 @@
         _photoNumberLb.font = [UIFont systemFontOfSize:13];
     }
     return _photoNumberLb;
+}
+- (UIButton *)selectNumberBtn {
+    if (!_selectNumberBtn) {
+        _selectNumberBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _selectNumberBtn.userInteractionEnabled = NO;
+        [_selectNumberBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        _selectNumberBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        [_selectNumberBtn setBackgroundColor:self.tintColor];
+        _selectNumberBtn.layer.cornerRadius = 12.f / 2;
+        _selectNumberBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
+    }
+    return _selectNumberBtn;
 }
 @end

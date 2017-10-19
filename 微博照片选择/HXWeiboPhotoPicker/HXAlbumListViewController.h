@@ -9,7 +9,16 @@
 #import <UIKit/UIKit.h>
 #import "HXAlbumModel.h"
 #import "HXPhotoManager.h"
+
+@class HXAlbumListViewController;
+@protocol HXAlbumListViewControllerDelegate <NSObject>
+@optional
+- (void)albumListViewControllerDidCancel:(HXAlbumListViewController *)albumListViewController;
+- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original;
+@end
+
 @interface HXAlbumListViewController : UIViewController
+@property (weak, nonatomic) id<HXAlbumListViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @end
 

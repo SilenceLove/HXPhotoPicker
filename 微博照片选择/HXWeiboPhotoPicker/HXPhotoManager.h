@@ -38,7 +38,12 @@ typedef enum : NSUInteger {
 /**
  相册风格 默认weibo (system未完成)
  */
-@property (assign, nonatomic) HXPhotoAlbumStyles styles;
+@property (assign, nonatomic) HXPhotoAlbumStyles style;
+
+/**
+ 是否需要显示日期section  默认YES
+ */
+@property (assign, nonatomic) BOOL showDateHeaderSection;
 
 /**
  照片列表按日期倒序 - HXPhotoAlbumStylesSystem 时有用 默认 NO
@@ -257,7 +262,7 @@ typedef enum : NSUInteger {
  @param albums 相册集合
  */
 - (void)FetchAllAlbum:(void(^)(NSArray *albums))albums IsShowSelectTag:(BOOL)isShow;
-
+- (void)getAllPhotoAlbums:(void(^)(HXAlbumModel *firstAlbumModel))firstModel albums:(void(^)(NSArray *albums))albums isFirst:(BOOL)isFirst;
 /**
  根据PHFetchResult获取某个相册里面的所有图片和视频
 
@@ -267,7 +272,7 @@ typedef enum : NSUInteger {
  */
 - (void)FetchAllPhotoForPHFetchResult:(PHFetchResult *)result Index:(NSInteger)index FetchResult:(void(^)(NSArray *photos, NSArray *videos, NSArray *Objs))list;
 
-- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(void (^)(NSArray *allList ,NSArray *photoList ,NSArray *videoList ,NSArray *dateList))complete;
+- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(void (^)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel))complete;
 /**
  删除指定model
 

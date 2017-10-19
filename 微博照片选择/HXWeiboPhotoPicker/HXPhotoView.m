@@ -7,7 +7,6 @@
 //
 
 #import "HXPhotoView.h"
-#import "HXCollectionView.h"
 #import "HXPhotoSubViewCell.h"
 #import "HXPhotoViewController.h"
 #import "HXPhotoPreviewViewController.h"
@@ -19,14 +18,16 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"
 #import "HXAlbumListViewController.h"
+#import "HXDatePhotoPreviewViewController.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
-#define Spacing 3 // 每个item的间距
+
+#define Spacing 3 // 每个item的间距  !! 这个宏已经没用了, 请用HXPhotoView 的 spacing 这个属性来控制
 
 #define LineNum 3 // 每行个数  !! 这个宏已经没用了, 请用HXPhotoView 的 lineCount 这个属性来控制
 
 static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
-@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,UIImagePickerControllerDelegate>
+@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
@@ -83,6 +84,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
+        self.spacing = 3;
+        self.lineCount = 3;
+        self.numOfLinesOld = 0;
         self.manager = manager;
         [self.manager getImage];
         [self setup];
@@ -92,6 +96,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
+        self.spacing = 3;
+        self.lineCount = 3;
+        self.numOfLinesOld = 0;
         self.manager = manager;
         [self.manager getImage];
         [self setup];
@@ -102,6 +109,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {
+        self.spacing = 3;
+        self.lineCount = 3;
+        self.numOfLinesOld = 0;
         self.manager = manager;
         [self.manager getImage];
         [self setup];
@@ -124,13 +134,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 
 - (void)setup {
-    self.lineCount = 3;
-    self.numOfLinesOld = 0;
     self.tag = 9999;
     [self.dataList addObject:self.addModel];
     
-    self.flowLayout.minimumLineSpacing = Spacing;
-    self.flowLayout.minimumInteritemSpacing = Spacing;
+    self.flowLayout.minimumLineSpacing = self.spacing;
+    self.flowLayout.minimumInteritemSpacing = self.spacing;
     self.collectionView = [[HXCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.flowLayout];
     self.collectionView.tag = 8888;
     self.collectionView.scrollEnabled = NO;
@@ -335,6 +343,19 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             return;
         }
     }
+    if (self.manager.style == HXPhotoAlbumStylesSystem) {
+        if (model.type == HXPhotoModelMediaTypeCamera) {
+            [self goPhotoViewController];
+        }else {
+            HXDatePhotoPreviewViewController *vc = [[HXDatePhotoPreviewViewController alloc] init];
+            vc.outside = YES;
+            vc.manager = self.manager;
+            vc.modelArray = self.manager.endSelectedList;
+            vc.currentModelIndex = [self.manager.endSelectedList indexOfObject:model];
+            [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+        }
+        return;
+    }
     if (model.type == HXPhotoModelMediaTypeCamera) {
         [self goPhotoViewController];
     }else if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
@@ -398,7 +419,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 
 - (void)directGoPhotoViewController {
-    if (self.manager.styles == HXPhotoAlbumStylesWeibo) {
+    if (self.manager.style == HXPhotoAlbumStylesWeibo) {
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
         vc.manager = self.manager;
         vc.delegate = self;
@@ -406,7 +427,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }else {
         HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
         vc.manager = self.manager;
-        //    vc.delegate = self;
+        vc.delegate = self;
         [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
     }
 }
@@ -684,7 +705,20 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
     }
 }
-
+- (void)deleteModelWithIndex:(NSInteger)index {
+    if (index < 0) {
+        index = 0;
+    }
+    if (index > self.manager.endSelectedList.count - 1) {
+        index = self.manager.endSelectedList.count - 1;
+    }
+    UICollectionViewCell *cell = [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+    if (cell) {
+        [self cellDidDeleteClcik:cell];
+    }else {
+        NSSLog(@"删除失败 - cell为空");
+    }
+}
 /**
  cell删除按钮的代理
 
@@ -757,6 +791,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         [array removeLastObject];
     }
     for (HXPhotoModel *model in array) {
+        model.selectIndexStr = [NSString stringWithFormat:@"%d",k + 1];
         if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             model.endIndex = i++;
         }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
@@ -765,7 +800,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         model.endCollectionIndex = k++;
     }
 }
-
+#pragma mark - < HXAlbumListViewControllerDelegate >
+- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
+    [self photoViewControllerDidNext:allList Photos:photoList Videos:videoList Original:original];
+}
 - (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original {
     self.original = original;
     NSMutableArray *tempAllArray = [NSMutableArray array];
@@ -838,6 +876,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     [self.videos removeAllObjects];
     int i = 0, j = 0, k = 0;
     for (HXPhotoModel *model in self.manager.endSelectedList) {
+        model.selectIndexStr = [NSString stringWithFormat:@"%d",k + 1];
         if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
             model.endIndex = i++;
             [self.photos addObject:model];
@@ -895,25 +934,31 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
  更新高度
  */
 - (void)setupNewFrame {
-    CGFloat x = self.frame.origin.x;
-    CGFloat y = self.frame.origin.y;
+    double x = self.frame.origin.x;
+    double y = self.frame.origin.y;
     CGFloat width = self.frame.size.width;
     
-    CGFloat itemW = (width - Spacing * (self.lineCount - 1)) / self.lineCount;
+    CGFloat itemW = (width - self.spacing * (self.lineCount - 1)) / self.lineCount;
     if (itemW > 0) {
         self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
     }
     
     NSInteger dataCount = self.dataList.count;
-    NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
+    NSInteger numOfLinesNew = 0;
+    if (self.lineCount != 0) {
+        numOfLinesNew = (dataCount / self.lineCount) + 1;
+    }
     
     if (dataCount % self.lineCount == 0) {
         numOfLinesNew -= 1;
     }
-    self.flowLayout.minimumLineSpacing = Spacing;
+    self.flowLayout.minimumLineSpacing = self.spacing;
     
     if (numOfLinesNew != self.numOfLinesOld) {
-        CGFloat newHeight = numOfLinesNew * itemW + Spacing * (numOfLinesNew - 1);
+        CGFloat newHeight = numOfLinesNew * itemW + self.spacing * (numOfLinesNew - 1);
+        if (newHeight < 0) {
+            newHeight = 0;
+        }
         self.frame = CGRectMake(x, y, width, newHeight);
         self.numOfLinesOld = numOfLinesNew;
         if (newHeight <= 0) {
@@ -937,7 +982,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     CGFloat height = self.frame.size.height;
     
     if (dataCount == 1) {
-        CGFloat itemW = (width - Spacing * (self.lineCount - 1)) / self.lineCount;
+        CGFloat itemW = (width - self.spacing * (self.lineCount - 1)) / self.lineCount;
         if ((int)height != (int)itemW) {
             self.frame = CGRectMake(x, y, width, itemW);
         }

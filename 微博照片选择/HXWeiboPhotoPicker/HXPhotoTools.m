@@ -15,8 +15,12 @@
 @implementation HXPhotoTools
 
 + (UIImage *)hx_imageNamed:(NSString *)imageName {
+    UIImage *image = [UIImage imageNamed:imageName];
+    if (image) {
+        return image;
+    }
     NSString *path = [NSString stringWithFormat:@"HXWeiboPhotoPicker.bundle/%@",imageName];
-    UIImage *image = [UIImage imageNamed:path];
+    image = [UIImage imageNamed:path];
     if (image) {
         return image;
     } else {

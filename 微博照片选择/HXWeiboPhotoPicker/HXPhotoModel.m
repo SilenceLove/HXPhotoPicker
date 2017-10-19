@@ -100,7 +100,11 @@
 - (CGSize)imageSize
 {
     if (_imageSize.width == 0 || _imageSize.height == 0) {
-        _imageSize = CGSizeMake(self.asset.pixelWidth, self.asset.pixelHeight);
+        if (self.asset) {
+            _imageSize = CGSizeMake(self.asset.pixelWidth, self.asset.pixelHeight);
+        }else {
+            _imageSize = self.thumbPhoto.size;
+        }
     }
     return _imageSize;
 }
@@ -130,7 +134,27 @@
         _endImageSize = CGSizeMake(w, h);
     }
     return _endImageSize;
-} 
+}
+- (CGSize)endDateImageSize {
+    if (_endDateImageSize.width == 0 || _endDateImageSize.height == 0) {
+        CGFloat width = [UIScreen mainScreen].bounds.size.width;
+        CGFloat height = [UIScreen mainScreen].bounds.size.height - kTopMargin - kBottomMargin;
+        CGFloat imgWidth = self.imageSize.width;
+        CGFloat imgHeight = self.imageSize.height;
+        CGFloat w;
+        CGFloat h;
+        imgHeight = width / imgWidth * imgHeight;
+        if (imgHeight > height) {
+            w = height / self.imageSize.height * imgWidth;
+            h = height;
+        }else {
+            w = width;
+            h = imgHeight;
+        }
+        _endImageSize = CGSizeMake(w, h);
+    }
+    return _endDateImageSize;
+}
 - (CGSize)requestSize {
     if (_requestSize.width == 0 || _requestSize.height == 0) {
         CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
@@ -152,6 +176,46 @@
         _requestSize = size;
     }
     return _requestSize;
+}
+- (CGSize)dateBottomImageSize {
+    if (_dateBottomImageSize.width == 0 || _dateBottomImageSize.height == 0) {
+        CGFloat width = 0;
+        CGFloat height = 50;
+        CGFloat imgWidth = self.imageSize.width;
+        CGFloat imgHeight = self.imageSize.height;
+        if (imgHeight > height) {
+            width = imgWidth * (height / imgHeight);
+        }else {
+            width = imgWidth * (imgHeight / height);
+        }
+        if (width < 50 / 16 * 9) {
+            width = 50 / 16 * 9;
+        }
+        _dateBottomImageSize = CGSizeMake(width, height);
+    }
+    return _dateBottomImageSize;
+}
+- (NSString *)barTitle {
+    if (!_barTitle) {
+        if ([self.creationDate isToday]) {
+            _barTitle = @"今天";
+        }else if ([self.creationDate isYesterday]) {
+            _barTitle = @"昨天";
+        }else if ([self.creationDate isSameWeek]) {
+            _barTitle = [self.creationDate getNowWeekday];
+        }else if ([self.creationDate isThisYear]) {
+            _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM月dd日"],[self.creationDate getNowWeekday]];
+        }else {
+            _barTitle = [self.creationDate dateStringWithFormat:@"yyyy年MM月dd日"];
+        }
+    }
+    return _barTitle;
+}
+- (NSString *)barSubTitle {
+    if (!_barSubTitle) {
+        _barSubTitle = [self.creationDate dateStringWithFormat:@"HH:mm"];
+    }
+    return _barSubTitle;
 }
 - (void)dealloc {
 //    [self cancelImageRequest];

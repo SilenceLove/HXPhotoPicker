@@ -74,13 +74,14 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.lookLivePhoto = YES;
 //        _manager.outerCamera = YES;
         _manager.cameraType = HXPhotoManagerCameraTypeSystem;
-        _manager.photoMaxNum = 9;
-        _manager.videoMaxNum = 9;
-        _manager.maxNum = 18;
-        _manager.videoMaxDuration = 9;
+        _manager.photoMaxNum = 40;
+        _manager.videoMaxNum = 10;
+        _manager.maxNum = 50;
+        _manager.videoMaxDuration = 500.f;
         _manager.saveSystemAblum = NO;
-        _manager.styles = HXPhotoAlbumStylesSystem;
-        _manager.reverseDate = YES;
+        _manager.style = HXPhotoAlbumStylesSystem;
+//        _manager.reverseDate = YES;
+//        _manager.showDateHeaderSection = NO;
 //        _manager.selectTogether = NO;
 //        _manager.rowCount = 3;
         
@@ -108,8 +109,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];
-    self.photoView = photoView;
-    
+    self.photoView = photoView; 
+
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"相册/相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
 }
 - (void)didNavBtnClick {
@@ -118,6 +119,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
     NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
+    NSSLog(@"所有:%@ - 照片:%@ - 视频:%@",allList,photos,videos);
 //    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
 //        NSSLog(@"%@",images);
 //        for (UIImage *image in images) {

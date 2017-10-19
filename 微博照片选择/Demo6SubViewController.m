@@ -28,12 +28,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;
+    scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, 0);
     [self.view addSubview:scrollView];
     self.scrollView = scrollView;
     
     CGFloat width = scrollView.frame.size.width;
-    HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
-    photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
+    HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0) manager:self.manager];
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];

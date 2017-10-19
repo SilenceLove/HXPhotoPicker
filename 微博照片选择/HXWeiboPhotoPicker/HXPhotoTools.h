@@ -24,9 +24,12 @@
 #define kDevice_Is_iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
 
 #define kNavigationBarHeight (kDevice_Is_iPhoneX ? 88 : 64)
-
+#define kTopMargin (kDevice_Is_iPhoneX ? 24 : 0)
 #define kBottomMargin (kDevice_Is_iPhoneX ? 34 : 0)
+
 #define iOS9_Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
+
+#define iOS8_2Later ([UIDevice currentDevice].systemVersion.floatValue >= 8.2f)
 
 /*
  *  工具类

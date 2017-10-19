@@ -51,6 +51,9 @@
     [super viewWillDisappear:animated];
     [[PHImageManager defaultManager] cancelImageRequest:requestId];
     [self.player pause];
+    [self.player seekToTime:kCMTimeZero];
+    self.playerLayer.player = nil;
+    self.player = nil;
     if (_livePhotoView) {
         [self.livePhotoView stopPlayback];
     }
@@ -99,9 +102,37 @@
     if (self.model.type == HXPhotoModelMediaTypeCameraVideo) {
         AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.model.videoURL];
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
+        [self playVideo];
     }else {
-        self.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:self.model.avAsset]];
+        __weak typeof(self) weakSelf = self;
+//        requestId = [[PHImageManager defaultManager] requestAVAssetForVideo:self.model.asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+//            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+//            if (downloadFinined && asset) {
+//                __strong typeof(weakSelf) strongSelf = self;
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    strongSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
+//                    [strongSelf playVideo];
+//                });
+//            }
+//        }];
+        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+        options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+        options.networkAccessAllowed = NO;
+        
+        requestId = [[PHImageManager defaultManager] requestPlayerItemForVideo:self.model.asset options:options resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
+            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+            if (downloadFinined && playerItem) {
+                __strong typeof(weakSelf) strongSelf = self;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    strongSelf.player = [AVPlayer playerWithPlayerItem:playerItem];
+                    [strongSelf playVideo];
+                });
+            }
+        }];
     }
+}
+
+- (void)playVideo {
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
     self.playerLayer.frame = CGRectMake(0, 0, self.model.endImageSize.width, self.model.endImageSize.height);
     [self.view.layer insertSublayer:self.playerLayer atIndex:0];
