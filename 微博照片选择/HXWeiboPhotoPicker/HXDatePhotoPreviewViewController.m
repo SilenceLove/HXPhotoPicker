@@ -10,25 +10,127 @@
 #import "UIImage+HXExtension.h"
 #import "HXDatePhotoPreviewBottomView.h"
 #import "UIButton+HXExtension.h"
+#import "HXDatePhotoViewTransition.h"
+#import "HXDatePhotoInteractiveTransition.h"
+#import "HXDatePhotoViewPresentTransition.h"
+#import "HXPhotoCustomNavigationBar.h"
 
 @interface HXDatePhotoPreviewViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,HXDatePhotoPreviewBottomViewDelegate>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
-@property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) HXPhotoModel *currentModel;
 @property (strong, nonatomic) UIView *customTitleView;
 @property (strong, nonatomic) UILabel *titleLb;
 @property (strong, nonatomic) UILabel *subTitleLb;
 @property (strong, nonatomic) HXDatePhotoPreviewViewCell *tempCell;
-@property (strong, nonatomic) HXDatePhotoPreviewBottomView *bottomView;
 @property (strong, nonatomic) UIButton *selectBtn;
+@property (assign, nonatomic) BOOL orientationDidChange;
+@property (assign, nonatomic) NSInteger beforeOrientationIndex;
+@property (strong, nonatomic) HXDatePhotoInteractiveTransition *interactiveTransition;
+@property (strong, nonatomic) HXPhotoCustomNavigationBar *navBar;
+@property (strong, nonatomic) UINavigationItem *navItem;
 @end
 
 @implementation HXDatePhotoPreviewViewController
-
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.transitioningDelegate = self;
+        self.modalPresentationStyle = UIModalPresentationCustom;
+    }
+    return self;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     [self setupUI];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+    //初始化手势过渡的代理
+    self.interactiveTransition = [[HXDatePhotoInteractiveTransition alloc] init];
+    //给当前控制器的视图添加手势
+    [self.interactiveTransition addPanGestureForViewController:self];
+}
+- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
+    if (operation == UINavigationControllerOperationPush) {
+        return [HXDatePhotoViewTransition transitionWithType:HXDatePhotoViewTransitionTypePush];
+    }else {
+        return [HXDatePhotoViewTransition transitionWithType:HXDatePhotoViewTransitionTypePop];
+    }
+}
+- (id<UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController{
+    return self.interactiveTransition.interation ? self.interactiveTransition : nil;
+}
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{
+    return [HXDatePhotoViewPresentTransition transitionWithTransitionType:HXDatePhotoViewPresentTransitionTypePresent photoView:self.photoView];
+}
+
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
+    return [HXDatePhotoViewPresentTransition transitionWithTransitionType:HXDatePhotoViewPresentTransitionTypeDismiss photoView:self.photoView];
+}
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if (self.orientationDidChange) {
+        self.orientationDidChange = NO;
+        [self changeSubviewFrame];
+    }
+}
+- (void)deviceOrientationChanged:(NSNotification *)notify {
+    self.beforeOrientationIndex = self.currentModelIndex;
+    self.orientationDidChange = YES;
+}
+- (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model {
+    if (!model) {
+        return nil;
+    }
+    return (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+}
+- (void)changeSubviewFrame {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    HXPhotoModel *model = self.modelArray[self.currentModelIndex];
+    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        self.titleLb.hidden = NO;
+        self.customTitleView.frame = CGRectMake(0, 0, 150, 44);
+        self.titleLb.frame = CGRectMake(0, 9, 150, 14);
+        self.subTitleLb.frame = CGRectMake(0, CGRectGetMaxY(self.titleLb.frame) + 4, 150, 12);
+        self.titleLb.text = model.barTitle;
+        self.subTitleLb.text = model.barSubTitle;
+    }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        self.customTitleView.frame = CGRectMake(0, 0, 200, 30);
+        self.titleLb.hidden = YES;
+        self.subTitleLb.frame = CGRectMake(0, 0, 200, 30);
+        self.subTitleLb.text = [NSString stringWithFormat:@"%@  %@",model.barTitle,model.barSubTitle];
+    }
+    CGFloat bottomMargin = kBottomMargin;
+//    CGFloat leftMargin = 0;
+//    CGFloat rightMargin = 0;
+    CGFloat width = self.view.hx_w;
+    CGFloat itemMargin = 20;
+    if (kDevice_Is_iPhoneX && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+        bottomMargin = 21;
+//        leftMargin = 35;
+//        rightMargin = 35;
+//        width = self.view.hx_w - 70;
+    }
+    self.flowLayout.itemSize = CGSizeMake(width, self.view.hx_h - kTopMargin - bottomMargin);
+    self.flowLayout.minimumLineSpacing = itemMargin;
+    
+    [self.collectionView setCollectionViewLayout:self.flowLayout];
+    
+//    self.collectionView.contentInset = UIEdgeInsetsMake(0, leftMargin, 0, rightMargin);
+    if (self.outside) {
+        self.navBar.frame = CGRectMake(0, 0, self.view.hx_w, kNavigationBarHeight);
+    }
+    self.collectionView.frame = CGRectMake(-(itemMargin / 2), kTopMargin,self.view.hx_w + itemMargin, self.view.hx_h - kTopMargin - bottomMargin);
+    self.collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + itemMargin), 0);
+    
+    [self.collectionView setContentOffset:CGPointMake(self.beforeOrientationIndex * (self.view.hx_w + itemMargin), 0)];
+    
+    [UIView performWithoutAnimation:^{
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.beforeOrientationIndex inSection:0]]];
+    }];
+
+    self.bottomView.frame = CGRectMake(0, self.view.hx_h - 50 - bottomMargin, self.view.hx_w, 50 + bottomMargin);
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -55,10 +157,9 @@
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.collectionView];
     [self.view addSubview:self.bottomView];
+    self.beforeOrientationIndex = self.currentModelIndex;
+    [self changeSubviewFrame];
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
-    self.titleLb.text = model.barTitle;
-    self.subTitleLb.text = model.barSubTitle;
-    
     if (!self.outside) {
         self.bottomView.selectCount = self.manager.selectedList.count;
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.selectBtn];
@@ -77,6 +178,7 @@
         }else {
             [self.bottomView deselected];
         }
+        [self.view addSubview:self.navBar];
     }
 }
 - (void)didSelectClick:(UIButton *)button {
@@ -203,6 +305,9 @@
         weakSelf.bottomView.userInteractionEnabled = !hide;
         [UIView animateWithDuration:0.15 animations:^{
             weakSelf.navigationController.navigationBar.alpha = hide ? 0 : 1;
+            if (weakSelf.outside) {
+                weakSelf.navBar.alpha = hide ? 0 : 1;
+            }
             weakSelf.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
             weakSelf.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
             weakSelf.bottomView.alpha = hide ? 0 : 1;
@@ -214,14 +319,20 @@
     }];
     return cell;
 }
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    [(HXDatePhotoPreviewViewCell *)cell resetScale];
+}
 #pragma mark - < UICollectionViewDelegate >
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (!self.tempCell.dragging) {
         [self.tempCell cancelRequest];
         self.tempCell.dragging = YES;
     }
+    if (scrollView != self.collectionView) {
+        return;
+    }
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
-    CGFloat offsetx = scrollView.contentOffset.x;
+    CGFloat offsetx = self.collectionView.contentOffset.x;
     NSInteger currentIndex = (offsetx + (width + 20) * 0.5) / (width + 20);
     if (currentIndex > self.modelArray.count - 1) {
         currentIndex = self.modelArray.count - 1;
@@ -231,8 +342,13 @@
     }
     if (self.modelArray.count > 0) {
         HXPhotoModel *model = self.modelArray[currentIndex];
-        self.titleLb.text = model.barTitle;
-        self.subTitleLb.text = model.barSubTitle;
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+            self.titleLb.text = model.barTitle;
+            self.subTitleLb.text = model.barSubTitle;
+        }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+            self.subTitleLb.text = [NSString stringWithFormat:@"%@  %@",model.barTitle,model.barSubTitle];
+        }
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
         self.selectBtn.backgroundColor = self.selectBtn.selected ? self.view.tintColor : nil;
@@ -356,9 +472,33 @@
     }
 }
 #pragma mark - < 懒加载 >
+- (HXPhotoCustomNavigationBar *)navBar {
+    if (!_navBar) {
+        CGFloat width = [UIScreen mainScreen].bounds.size.width;
+        _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, kNavigationBarHeight)];
+        _navBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [_navBar pushNavigationItem:self.navItem animated:NO];
+//        _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
+//        if (self.manager.UIManager.navBackgroundImageName) {
+//            [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
+//        }else if (self.manager.UIManager.navBackgroundColor) {
+//            [_navBar setBackgroundColor:self.manager.UIManager.navBackgroundColor];
+//        }
+    }
+    return _navBar;
+}
+- (UINavigationItem *)navItem {
+    if (!_navItem) {
+        _navItem = [[UINavigationItem alloc] init];
+//
+//        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+        _navItem.titleView = self.customTitleView;
+    }
+    return _navItem;
+}
 - (UIView *)customTitleView {
     if (!_customTitleView) {
-        _customTitleView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 150, 44)];
+        _customTitleView = [[UIView alloc] init];
         [_customTitleView addSubview:self.titleLb];
         [_customTitleView addSubview:self.subTitleLb];
     }
@@ -366,7 +506,7 @@
 }
 - (UILabel *)titleLb {
     if (!_titleLb) {
-        _titleLb = [[UILabel alloc] initWithFrame:CGRectMake(0, 9, 150, 14)];
+        _titleLb = [[UILabel alloc] init];
         _titleLb.textAlignment = NSTextAlignmentCenter;
         if (iOS8_2Later) {
             _titleLb.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
@@ -422,13 +562,13 @@
         _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
-        _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight; 
+//        _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _collectionView.pagingEnabled = YES;
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;
-        _collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + 20), 0);
+//        _collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + 20), 0);
         [_collectionView registerClass:[HXDatePhotoPreviewViewCell class] forCellWithReuseIdentifier:@"DatePreviewCellId"];
-        [_collectionView setContentOffset:CGPointMake(self.currentModelIndex * (self.view.hx_w + 20), 0) animated:NO];
+//        [_collectionView setContentOffset:CGPointMake(self.currentModelIndex * (self.view.hx_w + 20), 0) animated:NO];
         #ifdef __IPHONE_11_0
         if (@available(iOS 11.0, *)) {
             _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -444,9 +584,8 @@
 - (UICollectionViewFlowLayout *)flowLayout {
     if (!_flowLayout) {
         _flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        _flowLayout.itemSize = CGSizeMake(self.view.hx_w, self.view.hx_h - kTopMargin - kBottomMargin);
+//        _flowLayout.itemSize = CGSizeMake(self.view.hx_w, self.view.hx_h - kTopMargin - kBottomMargin);
         _flowLayout.minimumInteritemSpacing = 0;
-        _flowLayout.minimumLineSpacing = 20;
         _flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         
         if (self.outside) {
@@ -476,8 +615,12 @@
     [cell cancelRequest];
     if ([UIApplication sharedApplication].statusBarHidden) {
         [self.navigationController setNavigationBarHidden:NO animated:NO];
-        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+            [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        }
     }
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     NSSLog(@"dealloc");
 }
 @end
@@ -512,24 +655,27 @@
     [self.contentView addSubview:self.videoPlayBtn];
 //    [self.scrollView addSubview:self.livePhotoView];
 }
+- (void)resetScale {
+    [self.scrollView setZoomScale:1.0 animated:NO];
+}
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     [self cancelRequest];
     self.playerLayer.player = nil;
     self.player = nil;
-    self.imageView.hidden = NO; 
-    [self.scrollView setZoomScale:1.0 animated:NO];
+    
+    [self resetScale];
     
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
-    CGFloat imgWidth = model.imageSize.width;
-    CGFloat imgHeight = model.imageSize.height;
+    CGFloat imgWidth = self.model.imageSize.width;
+    CGFloat imgHeight = self.model.imageSize.height;
     CGFloat w;
     CGFloat h;
     
     imgHeight = width / imgWidth * imgHeight;
     if (imgHeight > height) {
-        w = height / model.imageSize.height * imgWidth;
+        w = height / self.model.imageSize.height * imgWidth;
         h = height;
         self.scrollView.maximumZoomScale = width / w + 0.5;
     }else {
@@ -568,7 +714,7 @@
                     self.imageView.image = model.tempImage;
                     model.tempImage = nil;
                 }else {
-                    self.requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.5, height * 0.5) completion:^(UIImage *image, NSDictionary *info) {
+                    self.requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(self.hx_w * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, NSDictionary *info) {
                         weakSelf.imageView.image = image;
                     }];
                 }
@@ -583,7 +729,7 @@
                     }else {
                         PHImageRequestID requestID;
                         if (imgHeight > imgWidth / 9 * 17) {
-                            requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(width * 0.6, height * 0.6) completion:^(UIImage *image, NSDictionary *info) {
+                            requestID = [HXPhotoTools getPhotoForPHAsset:model.asset size:CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6) completion:^(UIImage *image, NSDictionary *info) {
                                 weakSelf.imageView.image = image;
                             }];
                         }else {
@@ -793,10 +939,17 @@
         self.cellTapClick();
     }
 }
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    self.scrollView.frame = self.bounds;
+    self.playerLayer.frame = self.bounds;
+    self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
+}
 #pragma mark - < 懒加载 >
 - (UIScrollView *)scrollView {
     if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.hx_w, self.hx_h)];
+        _scrollView = [[UIScrollView alloc] init];
         _scrollView.showsHorizontalScrollIndicator = NO;
         _scrollView.showsVerticalScrollIndicator = NO;
         _scrollView.bouncesZoom = YES;
@@ -810,7 +963,6 @@
         _scrollView.delaysContentTouches = NO;
         _scrollView.canCancelContentTouches = YES;
         _scrollView.alwaysBounceVertical = NO;
-        _scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
         UITapGestureRecognizer *tap1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTap:)];
         [_scrollView addGestureRecognizer:tap1];
         UITapGestureRecognizer *tap2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
@@ -849,7 +1001,6 @@
 - (AVPlayerLayer *)playerLayer {
     if (!_playerLayer) {
         _playerLayer = [[AVPlayerLayer alloc] init];
-        _playerLayer.frame = self.bounds;
         _playerLayer.hidden = YES;
     }
     return _playerLayer;

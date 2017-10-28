@@ -17,7 +17,6 @@
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
 
-@property (strong, nonatomic) HXDatePhotoBottomView *bottomView;
 
 @property (strong, nonatomic) NSMutableArray *allArray;
 @property (strong, nonatomic) NSMutableArray *previewArray;
@@ -28,6 +27,10 @@
 @property (assign, nonatomic) NSInteger currentSectionIndex;
 @property (strong, nonatomic) UICollectionReusableView *currentHeaderView;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
+
+@property (assign, nonatomic) BOOL orientationDidChange;
+@property (assign, nonatomic) BOOL needChangeViewFrame;
+@property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
 @end
 
 @implementation HXDatePhotoViewController
@@ -35,8 +38,82 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupUI];
+    [self changeSubviewFrame];
     [self.view showLoadingHUDText:@"加载中"];
     [self getPhotoList];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (self.needChangeViewFrame) { 
+        self.needChangeViewFrame = NO;
+    }
+}
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if (self.orientationDidChange) {
+        [self changeSubviewFrame];
+        self.orientationDidChange = NO;
+    }
+}
+- (void)deviceOrientationChanged:(NSNotification *)notify {
+    self.beforeOrientationIndexPath = [self.collectionView indexPathsForVisibleItems].firstObject; 
+    self.orientationDidChange = YES;
+    if (self.navigationController.topViewController != self) {
+        self.needChangeViewFrame = YES;
+    }
+}
+- (void)changeSubviewFrame {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGFloat navBarHeight = kNavigationBarHeight;
+    NSInteger lineCount = self.manager.rowCount;
+    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+        navBarHeight = kNavigationBarHeight;
+        lineCount = self.manager.rowCount;
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        if ([UIApplication sharedApplication].statusBarHidden) {
+            navBarHeight = self.navigationController.navigationBar.hx_h;
+        }else {
+            navBarHeight = self.navigationController.navigationBar.hx_h + 20;
+        }
+        lineCount = self.manager.horizontalRowCount;
+    }
+    CGFloat bottomMargin = kBottomMargin;
+    CGFloat leftMargin = 0;
+    CGFloat rightMargin = 0;
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+    CGFloat viewWidth = [UIScreen mainScreen].bounds.size.width;
+    
+    if (!CGRectEqualToRect(self.view.bounds, [UIScreen mainScreen].bounds)) {
+        self.view.frame = CGRectMake(0, 0, viewWidth, height);
+    }
+    if (kDevice_Is_iPhoneX && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+        bottomMargin = 21;
+        leftMargin = 35;
+        rightMargin = 35;
+        width = [UIScreen mainScreen].bounds.size.width - 70;
+    }
+    CGFloat itemWidth = (width - (lineCount - 1)) / lineCount;
+    CGFloat itemHeight = itemWidth;
+    self.flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+    
+    
+    self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
+    if (!self.manager.singleSelected) {
+        self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, 50 + bottomMargin, rightMargin);
+    } else {
+        self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
+    }
+    self.collectionView.scrollIndicatorInsets = _collectionView.contentInset;
+    
+    if (self.orientationDidChange) {
+        [self.collectionView scrollToItemAtIndexPath:self.beforeOrientationIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    }
+    
+    self.bottomView.frame = CGRectMake(0, height - 50 - bottomMargin, viewWidth, 50 + bottomMargin);
 }
 - (void)setupUI {
     self.currentSectionIndex = 0;
@@ -49,26 +126,45 @@
     }
 }
 - (void)didCancelClick {
-    
-//    if (self.timer) {
-//        [self.timer invalidate];
-//        self.timer = nil;
-//    }
-//    [self.manager.selectedList removeAllObjects];
-//    [self.manager.selectedPhotos removeAllObjects];
-//    [self.manager.selectedVideos removeAllObjects];
-//    self.manager.isOriginal = NO;
-//    self.manager.photosTotalBtyes = nil;
-//    [self.manager.selectedCameraList removeAllObjects];
-//    [self.manager.selectedCameraVideos removeAllObjects];
-//    [self.manager.selectedCameraPhotos removeAllObjects];
-//    [self.manager.cameraPhotos removeAllObjects];
-//    [self.manager.cameraList removeAllObjects];
-//    [self.manager.cameraVideos removeAllObjects];
     if ([self.delegate respondsToSelector:@selector(datePhotoViewControllerDidCancel:)]) {
         [self.delegate datePhotoViewControllerDidCancel:self];
     }
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (HXDatePhotoViewCell *)currentPreviewCell:(HXPhotoModel *)model {
+    if (!model || ![self.allArray containsObject:model]) {
+        return nil;
+    }
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:model.dateItem inSection:model.dateSection];
+    return (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+}
+- (BOOL)scrollToModel:(HXPhotoModel *)model {
+    if ([self.allArray containsObject:model]) {
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:model.dateItem inSection:model.dateSection] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:model.dateItem inSection:model.dateSection]]];
+    }
+    return [self.allArray containsObject:model];
+}
+- (void)scrollToPoint:(HXDatePhotoViewCell *)cell rect:(CGRect)rect {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGFloat navBarHeight = kNavigationBarHeight;
+    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+        navBarHeight = kNavigationBarHeight;
+    }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+        if ([UIApplication sharedApplication].statusBarHidden) {
+            navBarHeight = self.navigationController.navigationBar.hx_h;
+        }else {
+            navBarHeight = self.navigationController.navigationBar.hx_h + 20;
+        }
+    }
+    if (self.manager.showDateHeaderSection) {
+        navBarHeight += 50;
+    }
+    if (rect.origin.y < navBarHeight) {
+        [self.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - navBarHeight)];
+    }else if (rect.origin.y + rect.size.height > self.view.hx_h - 50.5 - kBottomMargin) {
+        [self.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - self.view.hx_h + 50.5 + kBottomMargin + rect.size.height)];
+    }
 }
 - (void)getPhotoList {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -162,11 +258,13 @@
         [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"尚未从iCloud上下载，请至相册下载完毕后选择"]];
         return;
     }
+    NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
     HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
     previewVC.delegate = self;
     previewVC.modelArray = self.previewArray;
     previewVC.manager = self.manager;
-    previewVC.currentModelIndex = [self.previewArray indexOfObject:cell.model];
+    previewVC.currentModelIndex = currentIndex;
+    self.navigationController.delegate = previewVC;
     [self.navigationController pushViewController:previewVC animated:YES];
 }
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
@@ -232,7 +330,9 @@
     previewVC.manager = self.manager;
     HXDatePhotoViewCell *cell = (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:vc.indexPath];
     cell.model.tempImage = vc.imageView.image;
-    previewVC.currentModelIndex = [self.previewArray indexOfObject:cell.model];
+    NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
+    previewVC.currentModelIndex = currentIndex;
+    self.navigationController.delegate = previewVC;
     [self.navigationController pushViewController:previewVC animated:YES];
 }
 #pragma mark - < HXDatePhotoViewCellDelegate >
@@ -260,6 +360,7 @@
         }
         [self.manager.selectedList removeObject:cell.model];
         cell.model.selectIndexStr = @"";
+        cell.selectMaskLayer.hidden = YES;
         selectBtn.selected = NO;
     }else {
         NSString *str = [HXPhotoTools maximumOfJudgment:cell.model manager:self.manager];
@@ -286,6 +387,7 @@
             [self.manager.selectedCameraList addObject:cell.model];
         }
         [self.manager.selectedList addObject:cell.model];
+        cell.selectMaskLayer.hidden = NO;
         selectBtn.selected = YES;
         cell.model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.selectedList indexOfObject:cell.model] + 1];
         [selectBtn setTitle:cell.model.selectIndexStr forState:UIControlStateSelected];
@@ -316,22 +418,24 @@
 }
 #pragma mark - < HXDatePhotoPreviewViewControllerDelegate >
 - (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model {
-    NSMutableArray *indexPathList = [NSMutableArray array];
-    [indexPathList addObject:[NSIndexPath indexPathForItem:model.dateItem inSection:model.dateSection]];
-    if (!model.selected) {
-        NSInteger index = 0;
-        for (HXPhotoModel *model in self.manager.selectedList) {
-            if ([self.allArray containsObject:model]) {
-                model.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1];
-                if (model.dateCellIsVisible) {
-                    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:model.dateItem inSection:model.dateSection];
-                    [indexPathList addObject:indexPath];
+    if (model.currentAlbumIndex == self.albumModel.index) {
+        NSMutableArray *indexPathList = [NSMutableArray array];
+        [indexPathList addObject:[NSIndexPath indexPathForItem:model.dateItem inSection:model.dateSection]];
+        if (!model.selected) {
+            NSInteger index = 0;
+            for (HXPhotoModel *model in self.manager.selectedList) {
+                if ([self.allArray containsObject:model]) {
+                    model.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1];
+                    if (model.dateCellIsVisible) {
+                        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:model.dateItem inSection:model.dateSection];
+                        [indexPathList addObject:indexPath];
+                    }
+                    index++;
                 }
-                index++;
             }
         }
+        [self.collectionView reloadItemsAtIndexPaths:indexPathList];
     }
-    [self.collectionView reloadItemsAtIndexPaths:indexPathList];
     self.bottomView.selectCount = self.manager.selectedList.count;
     if ([self.delegate respondsToSelector:@selector(datePhotoViewControllerDidChangeSelect:selected:)]) {
         [self.delegate datePhotoViewControllerDidChangeSelect:model selected:model.selected];
@@ -348,6 +452,7 @@
     previewVC.manager = self.manager;
     previewVC.currentModelIndex = 0;
     previewVC.selectPreview = YES;
+    self.navigationController.delegate = previewVC;
     [self.navigationController pushViewController:previewVC animated:YES];
 }
 - (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController {
@@ -421,7 +526,6 @@
         _collectionView.alwaysBounceVertical = YES;
         [_collectionView registerClass:[HXDatePhotoViewCell class] forCellWithReuseIdentifier:@"DateCellId"];
         [_collectionView registerClass:[HXDatePhotoViewSectionHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"sectionHeaderId"];
-        _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, kBottomMargin, 0);
 #ifdef __IPHONE_11_0
     if (@available(iOS 11.0, *)) {
         _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -440,21 +544,22 @@
                 }
             }
         }
-        if (!self.manager.singleSelected) {
-            _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, 50 + kBottomMargin, 0);
-        } else {
-            _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, kBottomMargin, 0);
-        }
-        _collectionView.scrollIndicatorInsets = _collectionView.contentInset;
+//        _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, kBottomMargin, 0);
+//        if (!self.manager.singleSelected) {
+//            _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, 50 + kBottomMargin, 0);
+//        } else {
+//            _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, kBottomMargin, 0);
+//        }
+//        _collectionView.scrollIndicatorInsets = _collectionView.contentInset;
     }
     return _collectionView;
 }
 - (UICollectionViewFlowLayout *)flowLayout {
     if (!_flowLayout) {
         _flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        CGFloat itemWidth = (self.view.hx_w - 3) / 4;
-        CGFloat itemHeight = itemWidth;
-        _flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+//        CGFloat itemWidth = (self.view.hx_w - 3) / 4;
+//        CGFloat itemHeight = itemWidth;
+//        _flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
         _flowLayout.minimumLineSpacing = 0.5;
         _flowLayout.minimumInteritemSpacing = 0.5;
         _flowLayout.sectionInset = UIEdgeInsetsMake(0.5, 0, 0.5, 0);
@@ -497,6 +602,7 @@
 - (void)dealloc {
     [self.collectionView.layer removeAllAnimations];
     [self unregisterForPreviewingWithContext:self.previewingContext];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 @end
 
@@ -564,6 +670,7 @@
             self.bottomMaskLayer.hidden = YES;
         }
     }
+    self.selectMaskLayer.hidden = !model.selected;
     self.selectBtn.selected = model.selected;
     [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
     self.selectBtn.backgroundColor = model.selected ? self.tintColor :nil;
@@ -584,20 +691,36 @@
         [self.delegate datePhotoViewCell:self didSelectBtn:button];
     }
 }
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.imageView.frame = self.bounds;
+    self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
+    self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
+    self.selectBtn.frame = CGRectMake(self.hx_w - 27, 2, 25, 25);
+    self.selectMaskLayer.frame = self.bounds;
+}
 #pragma mark - < 懒加载 >
 - (UIImageView *)imageView {
     if (!_imageView) {
         _imageView = [[UIImageView alloc] init];
-        _imageView.frame = self.bounds;
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         _imageView.clipsToBounds = YES;
         [_imageView.layer addSublayer:self.bottomMaskLayer];
+        [_imageView.layer addSublayer:self.selectMaskLayer];
     }
     return _imageView;
 }
+- (CALayer *)selectMaskLayer {
+    if (!_selectMaskLayer) {
+        _selectMaskLayer = [CALayer layer];
+        _selectMaskLayer.hidden = YES;
+        _selectMaskLayer.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.3].CGColor;
+    }
+    return _selectMaskLayer;
+}
 - (UILabel *)stateLb {
     if (!_stateLb) {
-        _stateLb = [[UILabel alloc] initWithFrame:CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18)];
+        _stateLb = [[UILabel alloc] init];
         _stateLb.textColor = [UIColor whiteColor];
         _stateLb.textAlignment = NSTextAlignmentRight;
         _stateLb.font = [UIFont systemFontOfSize:12];
@@ -607,7 +730,6 @@
 - (CAGradientLayer *)bottomMaskLayer {
     if (!_bottomMaskLayer) {
         _bottomMaskLayer = [CAGradientLayer layer];
-        _bottomMaskLayer.frame       = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
         _bottomMaskLayer.colors = @[
                                  (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor,
                                  (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor
@@ -628,9 +750,8 @@
         _selectBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         _selectBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
-        _selectBtn.frame = CGRectMake(self.hx_w - 27, 2, 25, 25);
         [_selectBtn setEnlargeEdgeWithTop:0 right:0 bottom:10 left:10];
-        _selectBtn.layer.cornerRadius = _selectBtn.hx_w / 2;
+        _selectBtn.layer.cornerRadius = 25 / 2;
     }
     return _selectBtn;
 }
@@ -656,9 +777,13 @@
     _model = model;
     self.dateLb.text = model.dateString;
 }
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.dateLb.frame = CGRectMake(6, 0, self.hx_w - 12, 50);
+}
 - (UILabel *)dateLb {
     if (!_dateLb) {
-        _dateLb = [[UILabel alloc] initWithFrame:CGRectMake(6, 0, self.hx_w - 12, 50)];
+        _dateLb = [[UILabel alloc] init];
         _dateLb.textColor = [UIColor blackColor];
         _dateLb.font = [UIFont hx_pingFangFontOfSize:14];
     }
@@ -719,9 +844,19 @@
         [self.delegate datePhotoBottomViewDidPreviewBtn];
     }
 }
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    self.bgView.frame = self.bounds;
+    self.previewBtn.frame = CGRectMake(12, 0, 50, 50);
+    self.previewBtn.center = CGPointMake(self.previewBtn.center.x, 25);
+    self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
+    self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
+    [self changeDoneBtnFrame];
+}
 - (UIToolbar *)bgView {
     if (!_bgView) {
-        _bgView = [[UIToolbar alloc] initWithFrame:self.bounds];
+        _bgView = [[UIToolbar alloc] init];
     }
     return _bgView;
 }
@@ -733,8 +868,6 @@
         [_previewBtn setTitleColor:[self.tintColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _previewBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         _previewBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-        _previewBtn.frame = CGRectMake(12, 0, 50, 50);
-        _previewBtn.center = CGPointMake(_previewBtn.center.x, 25);
         [_previewBtn addTarget:self action:@selector(didPreviewClick) forControlEvents:UIControlEventTouchUpInside];
         _previewBtn.enabled = NO;
     }
@@ -748,8 +881,6 @@
         [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
 //        _doneBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         _doneBtn.titleLabel.font = [UIFont systemFontOfSize:14];
-        _doneBtn.frame = CGRectMake(0, 0, 50, 30);
-        _doneBtn.center = CGPointMake(_doneBtn.center.x, 25);
         _doneBtn.layer.cornerRadius = 3;
         _doneBtn.enabled = NO;
         _doneBtn.backgroundColor = [self.tintColor colorWithAlphaComponent:0.5];

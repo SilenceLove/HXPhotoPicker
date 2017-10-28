@@ -30,10 +30,21 @@ typedef enum : NSUInteger {
 
 typedef enum : NSUInteger {
     HXPhotoAlbumStylesWeibo = 0,           // 微博相册风格
-    HXPhotoAlbumStylesSystem               // 系统相册 - (未完成)
+    HXPhotoAlbumStylesSystem               // 系统相册(支持横屏) - (未完成)
 } HXPhotoAlbumStyles;
 
 @interface HXPhotoManager : NSObject
+
+
+/**
+ 系统相册风格横屏时是否隐藏状态栏 默认 NO
+ */
+//@property (assign, nonatomic) BOOL horizontalHideStatusBar;
+
+/**
+ 系统相册风格横屏时相册每行个数  默认6个
+ */
+@property (assign, nonatomic) NSInteger horizontalRowCount;
 
 /**
  相册风格 默认weibo (system未完成)

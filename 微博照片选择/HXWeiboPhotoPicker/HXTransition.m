@@ -19,8 +19,7 @@
 
 @implementation HXTransition
 
-+ (instancetype)transitionWithType:(HXTransitionType)type VcType:(HXTransitionVcType)vcType
-{
++ (instancetype)transitionWithType:(HXTransitionType)type VcType:(HXTransitionVcType)vcType {
     return [[self alloc] initWithTransitionType:type VcType:vcType];
 }
 

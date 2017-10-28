@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
 
-@class HXDatePhotoViewController;
+@class HXDatePhotoViewController,HXDatePhotoViewCell,HXDatePhotoBottomView;
 @protocol HXDatePhotoViewControllerDelegate <NSObject>
 @optional
 - (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController;
@@ -21,9 +21,12 @@
 @property (weak, nonatomic) id<HXDatePhotoViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXAlbumModel *albumModel;
+@property (strong, nonatomic) HXDatePhotoBottomView *bottomView;
+- (HXDatePhotoViewCell *)currentPreviewCell:(HXPhotoModel *)model;
+- (BOOL)scrollToModel:(HXPhotoModel *)model;
+- (void)scrollToPoint:(HXDatePhotoViewCell *)cell rect:(CGRect)rect;
 @end
 
-@class HXDatePhotoViewCell;
 @protocol HXDatePhotoViewCellDelegate <NSObject>
 @optional
 - (void)datePhotoViewCell:(HXDatePhotoViewCell *)cell didSelectBtn:(UIButton *)selectBtn;
@@ -32,6 +35,7 @@
 @interface HXDatePhotoViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXDatePhotoViewCellDelegate> delegate;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
+@property (strong, nonatomic) CALayer *selectMaskLayer;
 @property (strong, nonatomic) HXPhotoModel *model;
 @end
 

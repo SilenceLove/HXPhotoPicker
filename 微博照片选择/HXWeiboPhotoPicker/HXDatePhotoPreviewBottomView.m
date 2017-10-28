@@ -109,10 +109,18 @@
     self.doneBtn.hx_x = self.hx_w - 12 - self.doneBtn.hx_w;
     self.collectionView.hx_w = self.doneBtn.hx_x - 12;
 }
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.bgView.frame = self.bounds;
+    self.collectionView.frame = CGRectMake(0, 0,self.hx_w - 12 - 50, 50);
+    self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
+    self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
+    [self changeDoneBtnFrame];
+}
 #pragma mark - < 懒加载 >
 - (UIToolbar *)bgView {
     if (!_bgView) {
-        _bgView = [[UIToolbar alloc] initWithFrame:self.bounds];
+        _bgView = [[UIToolbar alloc] init];
     }
     return _bgView;
 }
@@ -148,8 +156,6 @@
         [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _doneBtn.titleLabel.font = [UIFont systemFontOfSize:14];
-        _doneBtn.frame = CGRectMake(0, 0, 50, 30);
-        _doneBtn.center = CGPointMake(_doneBtn.center.x, 25);
         _doneBtn.layer.cornerRadius = 3;
         _doneBtn.backgroundColor = self.tintColor;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
@@ -198,9 +204,13 @@
         self.requestID = requestID;
     }
 }
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.imageView.frame = self.bounds;
+}
 - (UIImageView *)imageView {
     if (!_imageView) {
-        _imageView = [[UIImageView alloc] initWithFrame:self.bounds];
+        _imageView = [[UIImageView alloc] init];
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         _imageView.clipsToBounds = YES;
     }

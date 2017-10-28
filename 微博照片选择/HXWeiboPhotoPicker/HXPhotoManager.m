@@ -81,6 +81,8 @@
     self.style = HXPhotoAlbumStylesWeibo;
     self.showDateHeaderSection = YES;
     self.reverseDate = NO;
+//    self.horizontalHideStatusBar = NO;
+    self.horizontalRowCount = 6;
     self.UIManager = [[HXPhotoUIManager alloc] init];
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
@@ -177,7 +179,7 @@
                                       
                                       @"icloudIcon" : [HXPhotoTools hx_imageNamed:self.UIManager.cellICloudIconImageName]
                                       };
-        uint64_t stop = mach_absolute_time();
+//        uint64_t stop = mach_absolute_time();
 //        NSSLog(@"%f",subtractTimes(stop, start));
     }
 }
@@ -399,6 +401,7 @@
     __block HXPhotoDateModel *dateModel;
     __block HXPhotoModel *firstSelectModel;
     __block BOOL already = NO;
+    
     if (self.reverseDate) {
         [albumModel.result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
             HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
@@ -489,9 +492,13 @@
                     sameDayArray = [NSMutableArray array];
                     [sameDayArray addObject:photoModel];
                     [dateArray addObject:dateModel];
+                    photoModel.dateItem = sameDayArray.count - 1;
+                    photoModel.dateSection = dateArray.count - 1;
                 }else {
                     if ([self isSameDay:photoDate date2:currentIndexDate]) {
                         [sameDayArray addObject:photoModel];
+                        photoModel.dateItem = sameDayArray.count - 1;
+                        photoModel.dateSection = dateArray.count - 1;
                     }else {
                         dateModel.photoModelArray = sameDayArray;
                         sameDayArray = [NSMutableArray array];
@@ -499,6 +506,8 @@
                         dateModel.date = photoDate;
                         [sameDayArray addObject:photoModel];
                         [dateArray addObject:dateModel];
+                        photoModel.dateItem = sameDayArray.count - 1;
+                        photoModel.dateSection = dateArray.count - 1;
                     }
                 }
                 if (firstSelectModel && !already) {
@@ -510,6 +519,9 @@
                     dateModel.photoModelArray = sameDayArray;
                 }
                 currentIndexDate = photoDate;
+            }else {
+                photoModel.dateItem = allArray.count - 1;
+                photoModel.dateSection = 0;
             }
         }];
     }else {
@@ -604,9 +616,13 @@
                     sameDayArray = [NSMutableArray array];
                     [sameDayArray addObject:photoModel];
                     [dateArray addObject:dateModel];
+                    photoModel.dateItem = sameDayArray.count - 1;
+                    photoModel.dateSection = dateArray.count - 1;
                 }else {
                     if ([self isSameDay:photoDate date2:currentIndexDate]) {
                         [sameDayArray addObject:photoModel];
+                        photoModel.dateItem = sameDayArray.count - 1;
+                        photoModel.dateSection = dateArray.count - 1;
                     }else {
                         dateModel.photoModelArray = sameDayArray;
                         sameDayArray = [NSMutableArray array];
@@ -614,6 +630,8 @@
                         dateModel.date = photoDate;
                         [sameDayArray addObject:photoModel];
                         [dateArray addObject:dateModel];
+                        photoModel.dateItem = sameDayArray.count - 1;
+                        photoModel.dateSection = dateArray.count - 1;
                     }
                 }
                 if (firstSelectModel && !already) {
@@ -625,6 +643,9 @@
                     dateModel.photoModelArray = sameDayArray;
                 }
                 currentIndexDate = photoDate;
+            }else {
+                photoModel.dateItem = allArray.count - 1;
+                photoModel.dateSection = 0;
             }
             index++;
         }

@@ -80,8 +80,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.videoMaxDuration = 500.f;
         _manager.saveSystemAblum = NO;
         _manager.style = HXPhotoAlbumStylesSystem;
-//        _manager.reverseDate = YES;
-//        _manager.showDateHeaderSection = NO;
+        _manager.reverseDate = YES;
+        _manager.showDateHeaderSection = NO;
 //        _manager.selectTogether = NO;
 //        _manager.rowCount = 3;
         

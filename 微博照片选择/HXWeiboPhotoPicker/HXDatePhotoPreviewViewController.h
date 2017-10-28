@@ -10,20 +10,24 @@
 #import <PhotosUI/PhotosUI.h>
 #import "HXPhotoManager.h"
 
-@class HXDatePhotoPreviewViewController;
+@class HXDatePhotoPreviewViewController,HXDatePhotoPreviewBottomView,HXDatePhotoPreviewViewCell,HXPhotoView;
 @protocol HXDatePhotoPreviewViewControllerDelegate <NSObject>
 @optional
 - (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 - (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController;
 @end
 
-@interface HXDatePhotoPreviewViewController : UIViewController
+@interface HXDatePhotoPreviewViewController : UIViewController<UINavigationControllerDelegate,UIViewControllerTransitioningDelegate>
 @property (weak, nonatomic) id<HXDatePhotoPreviewViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSMutableArray *modelArray;
 @property (assign, nonatomic) NSInteger currentModelIndex;
 @property (assign, nonatomic) BOOL outside;
 @property (assign, nonatomic) BOOL selectPreview;
+@property (strong, nonatomic) UICollectionView *collectionView;
+@property (strong, nonatomic) HXDatePhotoPreviewBottomView *bottomView;
+@property (strong, nonatomic) HXPhotoView *photoView;
+- (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 @end
 
 
@@ -34,6 +38,7 @@
 @property (assign, nonatomic) BOOL dragging;
 @property (nonatomic, copy) void (^cellTapClick)();
 
+- (void)resetScale;
 - (void)requestHDImage;
 - (void)cancelRequest;
 @end

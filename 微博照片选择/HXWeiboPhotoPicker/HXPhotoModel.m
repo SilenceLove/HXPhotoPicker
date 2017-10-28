@@ -139,6 +139,12 @@
     if (_endDateImageSize.width == 0 || _endDateImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
         CGFloat height = [UIScreen mainScreen].bounds.size.height - kTopMargin - kBottomMargin;
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+            if (kDevice_Is_iPhoneX) {
+                height = [UIScreen mainScreen].bounds.size.height - kTopMargin - 21;
+            }
+        }
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;
@@ -151,7 +157,7 @@
             w = width;
             h = imgHeight;
         }
-        _endImageSize = CGSizeMake(w, h);
+        _endDateImageSize = CGSizeMake(w, h);
     }
     return _endDateImageSize;
 }

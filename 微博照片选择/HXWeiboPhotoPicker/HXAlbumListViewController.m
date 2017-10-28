@@ -17,6 +17,9 @@
 @property (strong, nonatomic) NSTimer *timer;
 @property (strong, nonatomic) UILabel *authorizationLb;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
+
+@property (assign, nonatomic) BOOL orientationDidChange;
+@property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
 @end
 
 @implementation HXAlbumListViewController
@@ -32,8 +35,57 @@
         [self.view addSubview:self.authorizationLb];
         self.timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange:) userInfo:nil repeats:YES];
     }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if (self.orientationDidChange) {
+        [self changeSubviewFrame];
+        self.orientationDidChange = NO;
+    }
+}
+
+- (void)deviceOrientationChanged:(NSNotification *)notify {
+    self.beforeOrientationIndexPath = [self.collectionView indexPathsForVisibleItems].firstObject;
+    self.orientationDidChange = YES;
+}
+- (void)changeSubviewFrame {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGFloat navBarHeight = kNavigationBarHeight;
+    NSInteger lineCount = 2;
+    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+        navBarHeight = kNavigationBarHeight;
+        lineCount = 2;
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        if ([UIApplication sharedApplication].statusBarHidden) {
+            navBarHeight = self.navigationController.navigationBar.hx_h;
+        }else {
+            navBarHeight = self.navigationController.navigationBar.hx_h + 20;
+        }
+        lineCount = 3;
+    }
+    CGFloat leftMargin = 0;
+    CGFloat rightMargin = 0;
+    CGFloat width = self.view.hx_w;
+    if (kDevice_Is_iPhoneX && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+        leftMargin = 35;
+        rightMargin = 35;
+        width = self.view.hx_w - 70;
+    }
+    
+    CGFloat itemWidth = (width - (lineCount + 1) * 15) / lineCount;
+    CGFloat itemHeight = itemWidth + 6 + 14 + 4 + 14;
+    self.flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+    
+    self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
+    self.collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
+    if (self.orientationDidChange) {
+        [self.collectionView scrollToItemAtIndexPath:self.beforeOrientationIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    }
+}
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if (self.albumModelArray.count == 0) {
@@ -63,6 +115,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(cancelClick)];
     [self.view addSubview:self.collectionView];
+    [self changeSubviewFrame];
 }
 - (void)setPhotoManager {
     if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
@@ -223,8 +276,8 @@
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _collectionView.alwaysBounceVertical = YES;
         [_collectionView registerClass:[HXAlbumListQuadrateViewCell class] forCellWithReuseIdentifier:@"cellId"];
-        _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
-        _collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
+//        _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
+//        _collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
 #ifdef __IPHONE_11_0
         if (@available(iOS 11.0, *)) {
             _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -249,9 +302,9 @@
 - (UICollectionViewFlowLayout *)flowLayout {
     if (!_flowLayout) {
         _flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        CGFloat itemWidth = (self.view.hx_w - 45) / 2;
-        CGFloat itemHeight = itemWidth + 6 + 14 + 4 + 14;
-        _flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+//        CGFloat itemWidth = (self.view.hx_w - 45) / 2;
+//        CGFloat itemHeight = itemWidth + 6 + 14 + 4 + 14;
+//        _flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
         _flowLayout.minimumLineSpacing = 15;
         _flowLayout.minimumInteritemSpacing = 15;
         _flowLayout.sectionInset = UIEdgeInsetsMake(15, 15, 15, 15);
@@ -274,6 +327,7 @@
 - (void)dealloc {
     NSSLog(@"dealloc");
     [self unregisterForPreviewingWithContext:self.previewingContext];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 - (void)goSetup {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];

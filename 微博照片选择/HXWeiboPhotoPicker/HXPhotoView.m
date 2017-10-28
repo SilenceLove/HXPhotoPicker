@@ -352,7 +352,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             vc.manager = self.manager;
             vc.modelArray = self.manager.endSelectedList;
             vc.currentModelIndex = [self.manager.endSelectedList indexOfObject:model];
-            [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+            vc.photoView = self;
+            
+//            UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+//            nav.transitioningDelegate = vc;
+//            nav.modalPresentationStyle = UIModalPresentationCustom;
+            [[self viewController] presentViewController:vc animated:YES completion:nil];
         }
         return;
     }
