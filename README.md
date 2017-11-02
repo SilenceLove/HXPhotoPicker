@@ -6,7 +6,7 @@
 [![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
-<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411283-90f6cf8e-9942-11e7-8f21-6de1ca434cc5.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411216-3dc719ea-9942-11e7-8d1e-24e6d7a9b011.PNG" width="270" height="480">
+<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32322874-fe149aa8-c000-11e7-8172-629de70f7089.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411216-3dc719ea-9942-11e7-8d1e-24e6d7a9b011.PNG" width="270" height="480">
 <img src="https://user-images.githubusercontent.com/18083149/30796597-5ce8b4ca-a205-11e7-92c8-1fd13322c171.png" width="270" height="585">
 
 ## 目录
@@ -42,7 +42,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.1.0'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.1.1'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
@@ -73,6 +73,7 @@
 - v2.0.8　修改一些细节问题、删除无效文件
 - v2.0.9　添加一键将已选模型数组写入temp目录方法和新属性、demo示例
 - v2.1.0　适配ios11以及iphone X / 3DTouch预览时播放gif、视频 / 优化区分icloud照片、修改写入文件方法
+- v2.1.0　发布v2.1.1版本.添加新相册风格(性能更好,支持横屏)、完善细节功能
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoTools"></a> 关于HXPhotoTools获取资源信息 具体代码还是请下载Demo这里只是简单的两个
