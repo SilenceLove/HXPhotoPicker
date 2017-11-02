@@ -14,7 +14,7 @@
 @property (strong, nonatomic) UICollectionView *collectionView;
 
 @property (strong, nonatomic) NSMutableArray *albumModelArray;
-@property (strong, nonatomic) NSTimer *timer;
+
 @property (strong, nonatomic) UILabel *authorizationLb;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 
@@ -29,12 +29,23 @@
     [self setPhotoManager];
     self.navigationController.popoverPresentationController.delegate = (id)self;
     [self setupUI];
-    [self getAlbumModelList:YES];
     // 获取当前应用对照片的访问授权状态
-    if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
-        [self.view addSubview:self.authorizationLb];
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange:) userInfo:nil repeats:YES];
-    }
+    __weak typeof(self) weakSelf = self;
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
+                [weakSelf.view addSubview:weakSelf.authorizationLb];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSBundle hx_localizedStringForKey:@"无法访问相册"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相册中允许访问相册"] preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleDefault handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"设置"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }]];
+                [weakSelf presentViewController:alert animated:YES completion:nil];
+            }else {
+                [weakSelf getAlbumModelList:YES];
+            }
+        });
+    }];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 
@@ -92,24 +103,6 @@
         [self getAlbumModelList:NO];
     }
 }
-- (void)observeAuthrizationStatusChange:(NSTimer *)timer {
-    if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
-        [timer invalidate];
-        [self.timer invalidate];
-        self.timer = nil;
-        [self.authorizationLb removeFromSuperview];
-//        if (self.manager.albums.count > 0) {
-//            if (self.manager.cacheAlbum) {
-//                self.albums = self.manager.albums.mutableCopy;
-//                [self getAlbumPhotos];
-//            }else {
-//                [self getObjs];
-//            }
-//        }else {
-        [self getAlbumModelList:YES];
-//        }
-    }
-}
 - (void)setupUI {
     self.title = @"相册";
     self.view.backgroundColor = [UIColor whiteColor];
@@ -156,10 +149,6 @@
     self.manager.photosTotalBtyes = self.manager.endPhotosTotalBtyes;
 }
 - (void)cancelClick {
-    if (self.timer) {
-        [self.timer invalidate];
-        self.timer = nil;
-    }
     [self.manager.selectedList removeAllObjects];
     [self.manager.selectedPhotos removeAllObjects];
     [self.manager.selectedVideos removeAllObjects];
@@ -246,6 +235,9 @@
     vc.albumModel = model;
     vc.delegate = self;
     [self.navigationController pushViewController:vc animated:YES];
+}
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    [(HXAlbumListQuadrateViewCell *)cell cancelRequest];
 }
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
@@ -339,8 +331,7 @@
 @property (strong, nonatomic) UIButton *selectNumberBtn;
 @property (strong, nonatomic) UILabel *albumNameLb;
 @property (strong, nonatomic) UILabel *photoNumberLb;
-@property (copy, nonatomic) NSString *localIdentifier;
-@property (assign, nonatomic) int32_t requestID;
+@property (assign, nonatomic) PHImageRequestID requestID;
 @end
 
 @implementation HXAlbumListQuadrateViewCell
@@ -364,20 +355,12 @@
         model.asset = model.result.lastObject;
         model.albumImage = nil;
     }
-    self.localIdentifier = model.asset.localIdentifier;
     __weak typeof(self) weakSelf = self;
-    int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:CGSizeMake(self.hx_w * 1.5, self.hx_w * 1.5) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        strongSelf.coverView.image = photo;
-//        if (strongSelf.requestID) {
-//            [[PHImageManager defaultManager] cancelImageRequest:strongSelf.requestID];
-//            strongSelf.requestID = -1;
-//        }
+    self.requestID = [HXPhotoTools getImageWithAlbumModel:model size:CGSizeMake(self.hx_w * 1.5, self.hx_w * 1.5) completion:^(UIImage *image, HXAlbumModel *model) {
+        if (weakSelf.model == model) {
+            weakSelf.coverView.image = image;
+        }
     }];
-    if (requestID && self.requestID && requestID != self.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-    }
-    self.requestID = requestID;
     
     self.albumNameLb.text = model.albumName;
     self.photoNumberLb.text = @(model.result.count).stringValue;
@@ -397,6 +380,15 @@
     self.selectNumberBtn.hx_x = self.hx_w - 5 - self.selectNumberBtn.hx_w;
     CGFloat margin = (self.hx_h - self.hx_w) / 2 + 3;
     self.selectNumberBtn.center = CGPointMake(self.selectNumberBtn.center.x, self.hx_w + margin);
+}
+- (void)cancelRequest {
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        self.requestID = -1;
+    }
+}
+- (void)dealloc {
+    [self cancelRequest];
 }
 #pragma mark - < cell懒加载 >
 - (UIImageView *)coverView {

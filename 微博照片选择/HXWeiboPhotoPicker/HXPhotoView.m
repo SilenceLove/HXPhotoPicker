@@ -19,6 +19,8 @@
 #import "UIImage+HXExtension.h"
 #import "HXAlbumListViewController.h"
 #import "HXDatePhotoPreviewViewController.h"
+#import "HXCustomNavigationController.h"
+#import "HXCustomCameraViewController.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 
@@ -27,7 +29,7 @@
 #define LineNum 3 // 每行个数  !! 这个宏已经没用了, 请用HXPhotoView 的 lineCount 这个属性来控制
 
 static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
-@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
+@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoViewControllerDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,HXCameraViewControllerDelegate,UIAlertViewDelegate,HXFullScreenCameraViewControllerDelegate,UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
@@ -433,7 +435,8 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
         vc.manager = self.manager;
         vc.delegate = self;
-        [[self viewController] presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+        [[self viewController] presentViewController:nav animated:YES completion:nil];
     }
 }
 
@@ -443,6 +446,28 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (void)goCameraViewContoller {
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
+        return;
+    }
+    if (self.manager.style == HXPhotoAlbumStylesSystem) {
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (granted) {
+                    HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
+                    vc.delegate = self;
+                    vc.manager = self.manager;
+                    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+                    nav.isCamera = YES;
+                    [[self viewController] presentViewController:nav animated:YES completion:nil];
+                }else {
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleDefault handler:nil]];
+                    [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"设置"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                    }]];
+                    [[self viewController] presentViewController:alert animated:YES completion:nil];
+                }
+            });
+        }];
         return;
     }
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
@@ -588,14 +613,16 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (void)fullScreenCameraDidNextClick:(HXPhotoModel *)model {
     [self cameraDidNextClick:model];
 }
-
+- (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model {
+    [self cameraDidNextClick:model];
+}
 /**
  相机拍完之后的代理
 
  @param model 照片模型
  */
 - (void)cameraDidNextClick:(HXPhotoModel *)model {
-    if (self.manager.saveSystemAblum) {
+    if (self.manager.saveSystemAblum && self.manager.style != HXPhotoAlbumStylesSystem) {
         if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"保存失败，无法访问照片\n请前往设置中允许访问照片"]];
@@ -640,6 +667,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                         [self.manager.endSelectedList addObject:model];
                         [self.manager.endSelectedCameraList addObject:model];
                         model.selected = YES;
+                        model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
                     }
                 }else {
                     [self.manager.endSelectedCameraPhotos insertObject:model atIndex:0];
@@ -647,6 +675,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                     [self.manager.endSelectedList addObject:model];
                     [self.manager.endSelectedCameraList addObject:model];
                     model.selected = YES;
+                    model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
                 }
             }else {
                 [self.manager.endSelectedCameraPhotos insertObject:model atIndex:0];
@@ -654,6 +683,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                 [self.manager.endSelectedList addObject:model];
                 [self.manager.endSelectedCameraList addObject:model];
                 model.selected = YES;
+                model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
             }
         }
     }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
@@ -669,6 +699,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                         [self.manager.endSelectedList addObject:model];
                         [self.manager.endSelectedCameraList addObject:model];
                         model.selected = YES;
+                        model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
                     }
                 }else {
                     
@@ -677,6 +708,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                     [self.manager.endSelectedList addObject:model];
                     [self.manager.endSelectedCameraList addObject:model];
                     model.selected = YES;
+                    model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
                 }
             }else {
                 [self.manager.endSelectedCameraVideos insertObject:model atIndex:0];
@@ -684,6 +716,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                 [self.manager.endSelectedList addObject:model];
                 [self.manager.endSelectedCameraList addObject:model];
                 model.selected = YES;
+                model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
             }
         }
     }

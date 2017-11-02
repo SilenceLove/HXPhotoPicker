@@ -25,15 +25,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.openCamera = YES;
-        _manager.cacheAlbum = YES;
-        _manager.lookLivePhoto = YES;
-        //        _manager.outerCamera = YES;
-        _manager.open3DTouchPreview = YES;
-        _manager.cameraType = HXPhotoManagerCameraTypeSystem;
+        _manager.style = HXPhotoAlbumStylesSystem;
         _manager.photoMaxNum = 9;
         _manager.videoMaxNum = 9;
         _manager.maxNum = 18;
-        _manager.saveSystemAblum = NO;
     }
     return _manager;
 }

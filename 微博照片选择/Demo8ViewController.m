@@ -9,7 +9,7 @@
 #import "Demo8ViewController.h"
 #import "HXPhotoViewController.h"
 #import "HXPhotoView.h"
-
+#import "HXDatePhotoToolManager.h"
 static const CGFloat kPhotoViewMargin = 12.0;
 @interface Demo8ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
@@ -19,6 +19,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (copy, nonatomic) NSArray *selectList;
 @property (copy, nonatomic) NSArray *imageRequestIds;
 @property (copy, nonatomic) NSArray *videoSessions;
+
+@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 @end
 
 @implementation Demo8ViewController
@@ -26,20 +28,20 @@ static const CGFloat kPhotoViewMargin = 12.0;
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.openCamera = YES;
-        _manager.cacheAlbum = YES;
-        _manager.lookLivePhoto = YES;
-//        _manager.lookGifPhoto = NO;
         //        _manager.outerCamera = YES;
-        _manager.open3DTouchPreview = YES;
-        _manager.cameraType = HXPhotoManagerCameraTypeSystem;
+        _manager.style = HXPhotoAlbumStylesSystem;
         _manager.photoMaxNum = 9;
         _manager.videoMaxNum = 9;
         _manager.maxNum = 18;
-        _manager.saveSystemAblum = NO;
     }
     return _manager;
 }
-
+- (HXDatePhotoToolManager *)toolManager {
+    if (!_toolManager) {
+        _toolManager = [[HXDatePhotoToolManager alloc] init];
+    }
+    return _toolManager;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -68,6 +70,18 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)didNavOneBtnClick {
     [self.view showLoadingHUDText:@"写入中"];
     __weak typeof(self) weakSelf = self;
+    if (self.manager.style == HXPhotoAlbumStylesSystem) {
+        // 相册风格为系统时  必须使用此方法写入临时文件
+        [self.toolManager writeSelectModelListToTempPathWithList:self.selectList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
+            NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
+            [weakSelf.view handleLoading];
+        } failed:^{
+            [weakSelf.view handleLoading];
+            [weakSelf.view showImageHUDText:@"写入失败"];
+            NSSLog(@"写入失败");
+        }];
+        return;
+    }
     [HXPhotoTools selectListWriteToTempPath:self.selectList requestList:^(NSArray *imageRequestIds, NSArray *videoSessions) {
         weakSelf.imageRequestIds = imageRequestIds;
         weakSelf.videoSessions = videoSessions;

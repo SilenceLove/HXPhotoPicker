@@ -34,8 +34,15 @@
 
 @interface HXDatePhotoViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXDatePhotoViewCellDelegate> delegate;
+@property (assign, nonatomic) NSInteger section;
+@property (assign, nonatomic) NSInteger item;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic) CALayer *selectMaskLayer;
+@property (strong, nonatomic) HXPhotoModel *model;
+- (void)cancelRequest;
+@end
+
+@interface HXDatePhotoCameraViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
 @end
 

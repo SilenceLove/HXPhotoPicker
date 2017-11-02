@@ -54,9 +54,14 @@
     [self.player seekToTime:kCMTimeZero];
     self.playerLayer.player = nil;
     self.player = nil;
+    [self.playerLayer removeFromSuperlayer];
     if (_livePhotoView) {
         [self.livePhotoView stopPlayback];
+        [self.livePhotoView removeFromSuperview];
+        self.livePhotoView.livePhoto = nil;
+        self.livePhotoView = nil;
     }
+    [self.view addSubview:self.imageView];
 }
 
 - (void)loadPhoto {
@@ -88,7 +93,9 @@
         [self loadPhoto];
         return;
     }
-    self.livePhotoView.hx_size = self.model.endImageSize;
+    self.livePhotoView = [[PHLivePhotoView alloc] initWithFrame:CGRectMake(0, 0, self.model.endImageSize.width, self.model.endImageSize.height)];
+    self.livePhotoView.clipsToBounds = YES;
+    self.livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
     [self.view addSubview:self.livePhotoView];
     __weak typeof(self) weakSelf = self;
     requestId = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 1.5, self.model.endImageSize.height * 1.5) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
@@ -142,14 +149,9 @@
     });
 }
 
-- (void)dealloc {
-    [self.playerLayer removeFromSuperlayer];
-    if (_livePhotoView) {
-        self.livePhotoView.delegate = nil;
-        [self.livePhotoView removeFromSuperview];
-        self.livePhotoView = nil;
-    }
-}
+//- (void)dealloc {
+//
+//}
 
 - (UIImageView *)imageView {
     if (!_imageView) {
@@ -160,12 +162,12 @@
     }
     return _imageView;
 }
-- (PHLivePhotoView *)livePhotoView {
-    if (!_livePhotoView) {
-        _livePhotoView = [[PHLivePhotoView alloc] init];
-        _livePhotoView.clipsToBounds = YES;
-        _livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
-    }
-    return _livePhotoView;
-}
+//- (PHLivePhotoView *)livePhotoView {
+//    if (!_livePhotoView) {
+//        _livePhotoView = [[PHLivePhotoView alloc] init];
+//        _livePhotoView.clipsToBounds = YES;
+//        _livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
+//    }
+//    return _livePhotoView;
+//}
 @end

@@ -14,6 +14,7 @@
 #import "HXDatePhotoInteractiveTransition.h"
 #import "HXDatePhotoViewPresentTransition.h"
 #import "HXPhotoCustomNavigationBar.h"
+#import "HXCircleProgressView.h"
 
 @interface HXDatePhotoPreviewViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,HXDatePhotoPreviewBottomViewDelegate>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
@@ -44,10 +45,14 @@
     // Do any additional setup after loading the view.
     [self setupUI];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
-    //初始化手势过渡的代理
-    self.interactiveTransition = [[HXDatePhotoInteractiveTransition alloc] init];
-    //给当前控制器的视图添加手势
-    [self.interactiveTransition addPanGestureForViewController:self];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationWillChanged:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
+    if (!self.outside) {
+        //初始化手势过渡的代理
+        self.interactiveTransition = [[HXDatePhotoInteractiveTransition alloc] init];
+        //给当前控制器的视图添加手势
+        [self.interactiveTransition addPanGestureForViewController:self];
+    }
 }
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
     if (operation == UINavigationControllerOperationPush) {
@@ -74,8 +79,10 @@
     }
 }
 - (void)deviceOrientationChanged:(NSNotification *)notify {
-    self.beforeOrientationIndex = self.currentModelIndex;
     self.orientationDidChange = YES;
+}
+- (void)deviceOrientationWillChanged:(NSNotification *)notify {
+    self.beforeOrientationIndex = self.currentModelIndex;
 }
 - (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model {
     if (!model) {
@@ -266,22 +273,7 @@
         [self.bottomView deleteModel:model];
     }
     if (self.selectPreview) {
-//        [self.tempCell cancelRequest];
-//        [self.collectionView reloadData];
-//        if (self.modelArray.count == 0) {
-//            self.titleLb.text = nil;
-//            self.subTitleLb.text = nil;
-//            self.selectBtn.hidden = YES;
-//        }
-//        [self.collectionView setContentOffset:CGPointMake(0, 0)];
-//        HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-//        self.tempCell = cell;
-//        if (self.modelArray.count > 0) {
-//            self.currentModelIndex = 0;
-//            HXPhotoModel *model = self.modelArray[self.currentModelIndex];
-//            self.currentModel = model;
-//        }
-//        [cell requestHDImage];
+        
     }
 }
 #pragma mark - < UICollectionViewDataSource >
@@ -322,12 +314,15 @@
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     [(HXDatePhotoPreviewViewCell *)cell resetScale];
 }
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    [(HXDatePhotoPreviewViewCell *)cell cancelRequest];
+}
 #pragma mark - < UICollectionViewDelegate >
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if (!self.tempCell.dragging) {
-        [self.tempCell cancelRequest];
-        self.tempCell.dragging = YES;
-    }
+//    if (!self.tempCell.dragging) {
+//        [self.tempCell cancelRequest];
+//        self.tempCell.dragging = YES;
+//    }
     if (scrollView != self.collectionView) {
         return;
     }
@@ -371,12 +366,12 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if (self.modelArray.count > 0) {
         HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-        self.tempCell = cell;
+//        self.tempCell = cell;
         HXPhotoModel *model = self.modelArray[self.currentModelIndex];
         self.currentModel = model;
         [cell requestHDImage];
     }
-    self.tempCell.dragging = NO;
+//    self.tempCell.dragging = NO;
 }
 - (void)datePhotoPreviewBottomViewDidItem:(HXPhotoModel *)model currentIndex:(NSInteger)currentIndex beforeIndex:(NSInteger)beforeIndex {
     if ([self.modelArray containsObject:model]) {
@@ -562,7 +557,7 @@
         _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
-//        _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _collectionView.pagingEnabled = YES;
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;
@@ -621,6 +616,7 @@
         }
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     NSSLog(@"dealloc");
 }
 @end
@@ -637,6 +633,7 @@
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) AVPlayer *player;
 @property (strong, nonatomic) UIButton *videoPlayBtn;
+@property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
 
 @implementation HXDatePhotoPreviewViewCell
@@ -654,6 +651,7 @@
     [self.contentView.layer addSublayer:self.playerLayer];
     [self.contentView addSubview:self.videoPlayBtn];
 //    [self.scrollView addSubview:self.livePhotoView];
+    [self.contentView addSubview:self.progressView];
 }
 - (void)resetScale {
     [self.scrollView setZoomScale:1.0 animated:NO];
@@ -663,6 +661,9 @@
     [self cancelRequest];
     self.playerLayer.player = nil;
     self.player = nil;
+    self.progressView.hidden = YES;
+    self.progressView.progress = 0;
+    self.videoPlayBtn.userInteractionEnabled = YES;
     
     [self resetScale];
     
@@ -692,17 +693,45 @@
         if (model.tempImage) {
             self.imageView.image = model.tempImage;
         }
-        self.requestID = [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
-            UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
-            if (gifImage.images.count == 0) {
-                weakSelf.gifFirstFrame = gifImage;
-                weakSelf.imageView.image = gifImage;
-            }else {
-                weakSelf.gifFirstFrame = gifImage.images.firstObject;
-                weakSelf.imageView.image = weakSelf.gifFirstFrame;
-            }
-            weakSelf.model.tempImage = nil;
-            weakSelf.gifImage = gifImage;
+//        self.requestID = [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
+//            UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+//            if (gifImage.images.count == 0) {
+//                weakSelf.gifFirstFrame = gifImage;
+//                weakSelf.imageView.image = gifImage;
+//            }else {
+//                weakSelf.gifFirstFrame = gifImage.images.firstObject;
+//                weakSelf.imageView.image = weakSelf.gifFirstFrame;
+//            }
+//            weakSelf.model.tempImage = nil;
+//            weakSelf.gifImage = gifImage;
+//        }];
+        self.requestID = [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.progressView.hidden = NO;
+                weakSelf.requestID = cloudRequestId;
+            });
+        } progressHandler:^(double progress) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.progressView.hidden = NO;
+                weakSelf.progressView.progress = progress;
+            });
+        } completion:^(NSData *imageData, UIImageOrientation orientation) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+                if (gifImage.images.count == 0) {
+                    weakSelf.gifFirstFrame = gifImage;
+                    weakSelf.imageView.image = gifImage;
+                }else {
+                    weakSelf.gifFirstFrame = gifImage.images.firstObject;
+                    weakSelf.imageView.image = weakSelf.gifFirstFrame;
+                }
+                weakSelf.model.tempImage = nil;
+                weakSelf.gifImage = gifImage;
+            });
+        } failed:^(NSDictionary *info) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.progressView.hidden = YES;
+            });
         }];
     }else {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
@@ -737,9 +766,6 @@
                                 weakSelf.imageView.image = image;
                             }];
                         }
-//                        if (self.requestID != requestID) {
-//                            [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-//                        }
                         self.requestID = requestID;
                     }
                 }
@@ -771,7 +797,9 @@
         size = CGSizeMake(_model.endImageSize.width * 2.0, _model.endImageSize.height * 2.0);
     }
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
-        if (self.model.isCloseLivePhoto) {
+        if (_livePhotoView.livePhoto) {
+            [self.livePhotoView stopPlayback];
+            [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
             return;
         }
         self.requestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:self.model.endImageSize Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
@@ -783,19 +811,19 @@
         }];
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
         self.requestID = [HXPhotoTools getHighQualityFormatPhoto:self.model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-//            weakSelf.longRequestId = cloudRequestId;
-//            weakSelf.progressView.hidden = NO;
+            weakSelf.progressView.hidden = NO;
+            weakSelf.requestID = cloudRequestId;
         } progressHandler:^(double progress) {
-//            weakSelf.progressView.hidden = NO;
-//            weakSelf.progressView.progress = progress;
+            weakSelf.progressView.hidden = NO;
+            weakSelf.progressView.progress = progress;
         } completion:^(UIImage *image) {
             dispatch_async(dispatch_get_main_queue(), ^{
-//                weakSelf.progressView.hidden = YES;
+                weakSelf.progressView.hidden = YES;
                 weakSelf.imageView.image = image;
             });
         } failed:^(NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
-//                weakSelf.progressView.hidden = YES;
+                weakSelf.progressView.hidden = YES;
             });
         }];
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
@@ -811,30 +839,36 @@
     }
     if (self.player != nil) return;
     if (self.model.type == HXPhotoModelMediaTypeVideo) {
-        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-        options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
-        options.networkAccessAllowed = NO;
-//        self.requestID = [[PHImageManager defaultManager] requestAVAssetForVideo:self.model.asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+        self.requestID = [HXPhotoTools getPlayerItemWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+            weakSelf.progressView.hidden = NO;
+            weakSelf.requestID = cloudRequestId;
+            weakSelf.videoPlayBtn.userInteractionEnabled = NO;
+        } progressHandler:^(double progress) {
+            weakSelf.progressView.hidden = NO;
+            weakSelf.progressView.progress = progress;
+        } completion:^(AVPlayerItem *playerItem) {
+            weakSelf.videoPlayBtn.userInteractionEnabled = YES;
+            weakSelf.player = [AVPlayer playerWithPlayerItem:playerItem];
+            weakSelf.playerLayer.player = weakSelf.player;
+            [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem];
+        } failed:^(NSDictionary *info) {
+            weakSelf.videoPlayBtn.userInteractionEnabled = YES;
+            weakSelf.progressView.hidden = YES;
+        }];
+//        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+//        options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+//        options.networkAccessAllowed = NO;
+//        self.requestID = [[PHImageManager defaultManager] requestPlayerItemForVideo:self.model.asset options:options resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
 //            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-//            if (downloadFinined && asset) {
+//            if (downloadFinined && playerItem) {
+////                __strong typeof(weakSelf) strongSelf = self;
 //                dispatch_async(dispatch_get_main_queue(), ^{
-//                    weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
+//                    weakSelf.player = [AVPlayer playerWithPlayerItem:playerItem];
 //                    weakSelf.playerLayer.player = weakSelf.player;
 //                    [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem];
 //                });
 //            }
 //        }];
-        self.requestID = [[PHImageManager defaultManager] requestPlayerItemForVideo:self.model.asset options:options resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
-            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-            if (downloadFinined && playerItem) {
-//                __strong typeof(weakSelf) strongSelf = self;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    weakSelf.player = [AVPlayer playerWithPlayerItem:playerItem];
-                    weakSelf.playerLayer.player = weakSelf.player;
-                    [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem];;
-                });
-            }
-        }];
     }else if (self.model.type == HXPhotoModelMediaTypeCameraVideo ) {
         self.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithURL:self.model.videoURL]];
         self.playerLayer.player = self.player;
@@ -851,8 +885,11 @@
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
     }
+    self.progressView.hidden = YES;
+    self.progressView.progress = 0;
+    self.videoPlayBtn.userInteractionEnabled = YES;
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
-        if (_livePhotoView) {
+        if (_livePhotoView.livePhoto) {
             self.livePhotoView.livePhoto = nil;
             [self.livePhotoView removeFromSuperview];
             self.imageView.hidden = NO;
@@ -945,6 +982,7 @@
     self.scrollView.frame = self.bounds;
     self.playerLayer.frame = self.bounds;
     self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
+    self.progressView.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
 }
 #pragma mark - < 懒加载 >
 - (UIScrollView *)scrollView {
@@ -997,6 +1035,13 @@
         _videoPlayBtn.hidden = YES;
     }
     return _videoPlayBtn;
+}
+- (HXCircleProgressView *)progressView {
+    if (!_progressView) {
+        _progressView = [[HXCircleProgressView alloc] init];
+        _progressView.hidden = YES;
+    }
+    return _progressView;
 }
 - (AVPlayerLayer *)playerLayer {
     if (!_playerLayer) {

@@ -685,6 +685,7 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 }
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *myCell = (HXPhotoViewCell *)cell;
+    [myCell cancelRequest];
     if (!myCell.model.selected && myCell.model.thumbPhoto) {
         if (myCell.model.type != HXPhotoModelMediaTypeCamera && myCell.model.type != HXPhotoModelMediaTypeCameraPhoto && myCell.model.type != HXPhotoModelMediaTypeCameraVideo) {
             myCell.model.thumbPhoto = nil;

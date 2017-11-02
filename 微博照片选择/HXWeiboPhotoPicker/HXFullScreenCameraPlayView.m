@@ -27,6 +27,19 @@
     }
     return self;
 }
+- (instancetype)initWithFrame:(CGRect)frame color:(UIColor *)color {
+    if (self = [super initWithFrame:frame]) {
+        self.color = color;
+        [self setup];
+    }
+    return self;
+}
+- (UIColor *)color {
+    if (!_color) {
+        _color = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1];
+    }
+    return _color;
+}
 
 - (void)setup {
     self.backgroundColor = [UIColor clearColor];
@@ -40,14 +53,14 @@
     
     CAShapeLayer *circleLayer = [CAShapeLayer layer];
     circleLayer.strokeColor = [UIColor clearColor].CGColor;
-    circleLayer.fillColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1].CGColor;
+    circleLayer.fillColor = self.color.CGColor;
     circleLayer.path = [self circlePath:(self.frame.size.width * 0.5 - 12)].CGPath;
     [self.layer addSublayer:circleLayer];
     circleLayer.hidden = YES;
     self.circleLayer = circleLayer;
     
     CAShapeLayer *progressLayer = [CAShapeLayer layer];
-    progressLayer.strokeColor = [UIColor colorWithRed:253/255.0 green:142/255.0 blue:36/255.0 alpha:1].CGColor;
+    progressLayer.strokeColor = self.color.CGColor;
     progressLayer.fillColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0].CGColor;
     progressLayer.lineWidth = 5;
     progressLayer.path = [UIBezierPath bezierPathWithArcCenter:CGPointMake(self.frame.size.width * 0.5, self.frame.size.height * 0.5) radius:self.frame.size.width * 0.5 startAngle:-M_PI / 2 endAngle:-M_PI / 2 + M_PI * 2 * 1 clockwise:true].CGPath;

@@ -15,6 +15,7 @@
 #import "Demo6ViewController.h"
 #import "Demo7ViewController.h"
 #import "Demo8ViewController.h"
+#import "YYFPSLabel.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -79,6 +80,8 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.delegate = self;
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
+    YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, 10, 100, 30)];
+    [[UIApplication sharedApplication].keyWindow addSubview:label];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

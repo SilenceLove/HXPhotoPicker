@@ -630,8 +630,7 @@
     }
 }
 
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
-{
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     if ( [gestureRecognizer isKindOfClass:[UIPinchGestureRecognizer class]] ) {
         self.beginGestureScale = self.effectiveScale;
     }

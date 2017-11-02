@@ -284,24 +284,16 @@
     }
     if (model.type == HXPhotoModelMediaTypeCamera || model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
         self.imageView.image = model.thumbPhoto;
-    }else {
-        self.localIdentifier = model.asset.localIdentifier;
+    }else { 
         __weak typeof(self) weakSelf = self;
-        int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:model.requestSize completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) { 
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (strongSelf.model.type != HXPhotoModelMediaTypeCamera && strongSelf.model.type != HXPhotoModelMediaTypeCameraPhoto && strongSelf.model.type != HXPhotoModelMediaTypeCameraVideo) {
-                strongSelf.imageView.image = photo;
-            }else {
-                if (strongSelf.requestID) {
-                    [[PHImageManager defaultManager] cancelImageRequest:strongSelf.requestID];
-                    strongSelf.requestID = -1;
-                }
+        
+        PHImageRequestID requestId = [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
+            if (weakSelf.model == model) {
+                weakSelf.imageView.image = image;
             }
         }];
-        if (requestID && self.requestID && requestID != self.requestID) {
-            [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-        }
-        self.requestID = requestID;
+        
+        self.requestID = requestId;
     }
 
     self.videoTime.text = model.videoTime;
@@ -333,6 +325,18 @@
     }
     self.maskView.hidden = !model.selected;
     self.selectBtn.selected = model.selected;
-} 
+}
+- (void)cancelRequest {
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        self.requestID = -1;
+    }
+}
+- (void)dealloc {
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        self.requestID = -1;
+    }
+}
 
 @end

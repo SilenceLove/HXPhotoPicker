@@ -24,4 +24,5 @@
 
 @interface HXAlbumListQuadrateViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXAlbumModel *model;
+- (void)cancelRequest ;
 @end

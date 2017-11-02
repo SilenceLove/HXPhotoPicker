@@ -29,7 +29,7 @@ static const CGFloat kPhotoViewSectionMargin = 20.0;
 - (HXPhotoManager *)oneManager {
     if (!_oneManager) {
         _oneManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
-        
+        _oneManager.cameraType = HXPhotoManagerCameraTypeFullScreen;
     }
     return _oneManager;
 }

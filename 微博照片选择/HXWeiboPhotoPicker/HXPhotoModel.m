@@ -108,6 +108,13 @@
     }
     return _imageSize;
 }
+- (NSString *)videoTime {
+    if (!_videoTime) {
+        NSString *timeLength = [NSString stringWithFormat:@"%0.0f",self.asset.duration];
+        _videoTime = [HXPhotoTools getNewTimeFromDurationSecond:timeLength.integerValue];
+    }
+    return _videoTime;
+}
 - (NSString *)localIdentifier {
     if (!_localIdentifier) {
         _localIdentifier = self.asset.localIdentifier;

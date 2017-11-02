@@ -30,4 +30,5 @@
 
 @interface HXDatePhotoPreviewBottomViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
+- (void)cancelRequest;
 @end

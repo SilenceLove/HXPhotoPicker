@@ -143,7 +143,7 @@
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
         if (view.tag == 10086) {
-            [UIView animateWithDuration:0.25 animations:^{
+            [UIView animateWithDuration:0.2f animations:^{
                 view.alpha = 0;
             } completion:^(BOOL finished) {
                 [view removeFromSuperview];
@@ -157,7 +157,7 @@
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
         if (view.tag == 1008611) {
-            [UIView animateWithDuration:0.25 animations:^{
+            [UIView animateWithDuration:0.2f animations:^{
                 view.alpha = 0;
             } completion:^(BOOL finished) {
                 [view removeFromSuperview];

@@ -80,7 +80,9 @@
         [self.delagate datePhotoPreviewBottomViewDidItem:self.modelArray[indexPath.item] currentIndex:indexPath.item beforeIndex:self.currentIndex];
     }
 }
-
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    [(HXDatePhotoPreviewBottomViewCell *)cell cancelRequest];
+}
 - (void)deselectedWithIndex:(NSInteger)index {
     if (index < 0 || index > self.modelArray.count - 1) {
         return;
@@ -166,7 +168,7 @@
 
 @interface HXDatePhotoPreviewBottomViewCell ()
 @property (strong, nonatomic) UIImageView *imageView;
-@property (assign, nonatomic) int32_t requestID;
+@property (assign, nonatomic) PHImageRequestID requestID;
 @end
 
 @implementation HXDatePhotoPreviewBottomViewCell
@@ -187,21 +189,11 @@
         self.imageView.image = model.thumbPhoto;
     }else {
         __weak typeof(self) weakSelf = self;
-        int32_t requestID = [HXPhotoTools fetchPhotoWithAsset:model.asset photoSize:CGSizeMake(self.hx_w * 2.0, self.hx_h * 2.0) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf.model.thumbPhoto) {
-                strongSelf.imageView.image = photo;
-            }else {
-                if (strongSelf.requestID) {
-                    [[PHImageManager defaultManager] cancelImageRequest:strongSelf.requestID];
-                    strongSelf.requestID = -1;
-                }
+        self.requestID = [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
+            if (weakSelf.model == model) {
+                weakSelf.imageView.image = image;
             }
         }];
-        if (requestID && self.requestID && requestID != self.requestID) {
-            [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-        }
-        self.requestID = requestID;
     }
 }
 - (void)layoutSubviews {
@@ -220,6 +212,15 @@
     [super setSelected:selected];
     self.layer.borderWidth = selected ? 5 : 0;
     self.layer.borderColor = selected ? [self.tintColor colorWithAlphaComponent:0.5].CGColor : nil;
+}
+- (void)cancelRequest {
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        self.requestID = -1;
+    }
+}
+- (void)dealloc {
+    [self cancelRequest];
 }
 //- (void)applyLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes {
 //    HXDatePhotoCollectionViewLayoutAttributes *collectionViewLayoutAttributes = (HXDatePhotoCollectionViewLayoutAttributes *)layoutAttributes;
