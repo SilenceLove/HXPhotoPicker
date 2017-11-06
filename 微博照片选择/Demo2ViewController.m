@@ -96,7 +96,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     // Do any additional setup after loading the view from its nib.
     self.view.backgroundColor = [UIColor whiteColor];
 //    self.navigationController.navigationBar.translucent = NO;
-    self.automaticallyAdjustsScrollViewInsets = YES;
+//    self.automaticallyAdjustsScrollViewInsets = YES;
     
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;

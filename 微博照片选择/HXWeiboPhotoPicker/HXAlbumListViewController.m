@@ -204,6 +204,9 @@
                 vc.albumModel = model;
                 vc.delegate = weakSelf;
                 [weakSelf.navigationController pushViewController:vc animated:NO];
+//                if (weakSelf.albumModelArray.count == 0) {
+//                    [weakSelf getAlbumModelList:NO];
+//                }
             });
         } albums:^(NSArray *albums) {
             weakSelf.albumModelArray = [NSMutableArray arrayWithArray:albums];
@@ -318,7 +321,11 @@
 }
 - (void)dealloc {
     NSSLog(@"dealloc");
-    [self unregisterForPreviewingWithContext:self.previewingContext];
+    if (self.manager.open3DTouchPreview) {
+        if (self.previewingContext) {
+            [self unregisterForPreviewingWithContext:self.previewingContext];
+        }
+    } 
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 - (void)goSetup {

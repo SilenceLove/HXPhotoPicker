@@ -100,7 +100,7 @@
     __weak typeof(self) weakSelf = self;
     requestId = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 1.5, self.model.endImageSize.height * 1.5) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
         weakSelf.livePhotoView.livePhoto = livePhoto;
-        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
         [weakSelf.imageView removeFromSuperview];
     }];
 }

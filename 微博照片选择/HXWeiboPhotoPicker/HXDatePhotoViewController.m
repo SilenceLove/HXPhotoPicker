@@ -33,6 +33,8 @@
 @property (assign, nonatomic) BOOL orientationDidChange;
 @property (assign, nonatomic) BOOL needChangeViewFrame;
 @property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
+
+@property (weak, nonatomic) HXDatePhotoViewSectionFooterView *footerView;
 @end
 
 @implementation HXDatePhotoViewController
@@ -389,6 +391,8 @@
             [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:count - cameraIndex inSection:0]]];
         }
     }
+    self.footerView.photoCount = self.photoArray.count;
+    self.footerView.videoCount = self.videoArray.count;
     self.bottomView.selectCount = self.manager.selectedList.count;
 }
 #pragma mark - < UICollectionViewDataSource >
@@ -502,6 +506,12 @@
         HXDatePhotoViewSectionHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"sectionHeaderId" forIndexPath:indexPath];
         headerView.model = self.dateArray[indexPath.section];
         return headerView;
+    }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
+        HXDatePhotoViewSectionFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"sectionFooterId" forIndexPath:indexPath];
+        footerView.photoCount = self.photoArray.count;
+        footerView.videoCount = self.videoArray.count;
+        self.footerView = footerView;
+        return footerView;
     }
     return nil;
 }
@@ -510,6 +520,17 @@
         return CGSizeMake(self.view.hx_w, 50);
     }
     return CGSizeZero;
+}
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
+    if (self.manager.showDateHeaderSection) {
+        if (section == self.dateArray.count - 1) {
+            return CGSizeMake(self.view.hx_w, 50);
+        }else {
+            return CGSizeZero;
+        }
+    }else {
+        return CGSizeMake(self.view.hx_w, 50);
+    }
 }
 
 //- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
@@ -762,6 +783,8 @@
         [_collectionView registerClass:[HXDatePhotoViewCell class] forCellWithReuseIdentifier:@"DateCellId"];
         [_collectionView registerClass:[HXDatePhotoCameraViewCell class] forCellWithReuseIdentifier:@"DateCameraCellId"];
         [_collectionView registerClass:[HXDatePhotoViewSectionHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"sectionHeaderId"];
+        [_collectionView registerClass:[HXDatePhotoViewSectionFooterView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"sectionFooterId"];
+        
 #ifdef __IPHONE_11_0
     if (@available(iOS 11.0, *)) {
         _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -780,22 +803,12 @@
                 }
             }
         }
-//        _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, kBottomMargin, 0);
-//        if (!self.manager.singleSelected) {
-//            _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, 50 + kBottomMargin, 0);
-//        } else {
-//            _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, kBottomMargin, 0);
-//        }
-//        _collectionView.scrollIndicatorInsets = _collectionView.contentInset;
     }
     return _collectionView;
 }
 - (UICollectionViewFlowLayout *)flowLayout {
     if (!_flowLayout) {
         _flowLayout = [[UICollectionViewFlowLayout alloc] init];
-//        CGFloat itemWidth = (self.view.hx_w - 3) / 4;
-//        CGFloat itemHeight = itemWidth;
-//        _flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
         _flowLayout.minimumLineSpacing = 0.5;
         _flowLayout.minimumInteritemSpacing = 0.5;
         _flowLayout.sectionInset = UIEdgeInsetsMake(0.5, 0, 0.5, 0);
@@ -838,7 +851,11 @@
 - (void)dealloc {
     NSSLog(@"dealloc : %@",self);
     [self.collectionView.layer removeAllAnimations];
-    [self unregisterForPreviewingWithContext:self.previewingContext];
+    if (self.manager.open3DTouchPreview) {
+        if (self.previewingContext) {
+            [self unregisterForPreviewingWithContext:self.previewingContext];
+        }
+    }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 @end
@@ -945,9 +962,12 @@
     }
 }
 - (void)didSelectClick:(UIButton *)button {
+//    [HXPhotoTools isICloudAssetWithModel:self.model complete:^(BOOL isICloud) {
+//
+//    }];
     if (self.model.type == HXPhotoModelMediaTypeCamera) {
         return;
-    }
+    } 
     if (self.model.isIcloud) {
         return;
     }
@@ -1062,6 +1082,47 @@
 }
 @end
 
+@interface HXDatePhotoViewSectionFooterView ()
+@property (strong, nonatomic) UILabel *titleLb;
+@end
+
+@implementation HXDatePhotoViewSectionFooterView
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self setupUI];
+    }
+    return self;
+}
+- (void)setupUI {
+    self.backgroundColor = [UIColor whiteColor];
+    [self addSubview:self.titleLb];
+}
+- (void)setVideoCount:(NSInteger)videoCount {
+    _videoCount = videoCount;
+    if (self.photoCount > 0 && videoCount > 0) {
+        self.titleLb.text = [NSString stringWithFormat:@"%ld 张照片、%ld 个视频",self.photoCount,videoCount];
+    }else if (self.photoCount > 0) {
+        self.titleLb.text = [NSString stringWithFormat:@"%ld 张照片",self.photoCount];
+    }else {
+        self.titleLb.text = [NSString stringWithFormat:@"%ld 个视频",videoCount];
+    }
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.titleLb.frame = CGRectMake(0, 0, self.hx_w, 50);
+}
+- (UILabel *)titleLb {
+    if (!_titleLb) {
+        _titleLb = [[UILabel alloc] init];
+        _titleLb.textColor = [UIColor blackColor];
+        _titleLb.textAlignment = NSTextAlignmentCenter;
+        _titleLb.font = [UIFont systemFontOfSize:15];
+    }
+    return _titleLb;
+}
+@end
+    
 @interface HXDatePhotoBottomView ()
 @property (strong, nonatomic) UIToolbar *bgView;
 @property (strong, nonatomic) UIButton *previewBtn;

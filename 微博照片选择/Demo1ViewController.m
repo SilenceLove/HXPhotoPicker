@@ -41,6 +41,7 @@
         _manager.cacheAlbum = NO;
         _manager.style = HXPhotoAlbumStylesSystem;
         _manager.deleteTemporaryPhoto = NO;
+        _manager.lookLivePhoto = YES;
     }
     return _manager;
 }

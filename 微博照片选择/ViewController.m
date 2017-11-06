@@ -71,7 +71,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.title = @"仿微博照片选择器";
+    self.title = @"仿微博照片选择器"; 
 
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

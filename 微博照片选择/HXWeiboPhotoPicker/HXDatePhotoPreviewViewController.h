@@ -17,7 +17,7 @@
 - (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController;
 @end
 
-@interface HXDatePhotoPreviewViewController : UIViewController<UINavigationControllerDelegate,UIViewControllerTransitioningDelegate>
+@interface HXDatePhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
 @property (weak, nonatomic) id<HXDatePhotoPreviewViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSMutableArray *modelArray;
@@ -28,6 +28,7 @@
 @property (strong, nonatomic) HXDatePhotoPreviewBottomView *bottomView;
 @property (strong, nonatomic) HXPhotoView *photoView;
 - (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
+- (void)setSubviewAlphaAnimate:(BOOL)animete;
 @end
 
 
@@ -37,6 +38,7 @@
 @property (strong, nonatomic, readonly) UIImage *gifImage;
 @property (assign, nonatomic) BOOL dragging;
 @property (nonatomic, copy) void (^cellTapClick)();
+@property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
 
 - (void)resetScale;
 - (void)requestHDImage;

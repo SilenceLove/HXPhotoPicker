@@ -31,7 +31,50 @@
         }
         return image;
     }
-} 
+}
+
++ (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(BOOL isICloud))complete {
+//    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+        options.networkAccessAllowed = NO;
+        [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+            if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
+                NSSLog(@"是iCloud上的照片");
+            }else {
+                NSSLog(@"不是iCloud上的照片");
+            }
+            [[PHImageManager defaultManager] cancelImageRequest:[[info objectForKey:PHImageResultRequestIDKey] intValue]];
+        }];
+//    }else {
+//        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+//        options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+//        options.networkAccessAllowed = NO;
+//        [[PHImageManager defaultManager] requestPlayerItemForVideo:model.asset options:options resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
+//            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+//            if (downloadFinined && playerItem) {
+//                if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
+//                    NSSLog(@"是iCloud上的视频");
+//                }else {
+//                    NSSLog(@"不是iCloud上的视频");
+//                }
+//
+//                [[PHImageManager defaultManager] cancelImageRequest:[[info objectForKey:PHImageResultRequestIDKey] intValue]];
+//            }
+//        }];
+//        [[PHImageManager defaultManager] requestAVAssetForVideo:model.asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+//            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+//            if (downloadFinined && asset) {
+//                if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
+//                    NSSLog(@"是iCloud上的视频");
+//                }else {
+//                    NSSLog(@"不是iCloud上的视频");
+//                }
+//                
+//                [[PHImageManager defaultManager] cancelImageRequest:[[info objectForKey:PHImageResultRequestIDKey] intValue]];
+//            }
+//        }];
+//    }
+}
 
 + (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion {
     static PHImageRequestID requestID = -1;

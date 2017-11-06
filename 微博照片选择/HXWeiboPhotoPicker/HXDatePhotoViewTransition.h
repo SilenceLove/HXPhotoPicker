@@ -17,3 +17,4 @@ typedef enum : NSUInteger {
 + (instancetype)transitionWithType:(HXDatePhotoViewTransitionType)type;
 - (instancetype)initWithTransitionType:(HXDatePhotoViewTransitionType)type;
 @end
+

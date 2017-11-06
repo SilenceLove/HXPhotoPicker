@@ -6,7 +6,7 @@
 [![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
-<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32322874-fe149aa8-c000-11e7-8172-629de70f7089.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/30411216-3dc719ea-9942-11e7-8d1e-24e6d7a9b011.PNG" width="270" height="480">
+<img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32322874-fe149aa8-c000-11e7-8172-629de70f7089.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32438543-db479232-c325-11e7-87d9-48282914e752.gif" width="270" height="480">
 
 ## 目录
 * [项目特性](#特性)
@@ -66,13 +66,14 @@
 - 2017-08-10　　添加自定义属性、修复导航栏可能偏移64的问题
 - 2017-08-12　　添加系统相机、HXPhotoTools添加转换方法
 - ...
-- v2.0.5　修复相机拍照后显示错误，删除错误版本
-- v2.0.6　修复ios8适配问题
-- v2.0.7　支持传入本地图片、添加了一些属性和方法、优化了一些细节
-- v2.0.8　修改一些细节问题、删除无效文件
-- v2.0.9　添加一键将已选模型数组写入temp目录方法和新属性、demo示例
-- v2.1.0　适配ios11以及iphone X / 3DTouch预览时播放gif、视频 / 优化区分icloud照片、修改写入文件方法
-- v2.1.1　添加新相册风格(性能更好,支持横屏)、完善细节功能
+- v2.0.5　-　修复相机拍照后显示错误，删除错误版本
+- v2.0.6　-　修复ios8适配问题
+- v2.0.7　-　支持传入本地图片、添加了一些属性和方法、优化了一些细节
+- v2.0.8　-　修改一些细节问题、删除无效文件
+- v2.0.9　-　添加一键将已选模型数组写入temp目录方法和新属性、demo示例
+- v2.1.0　-　适配ios11以及iphone X / 3DTouch预览时播放gif、视频 / 优化区分icloud照片、修改写入文件方法
+- v2.1.1　-　添加新相册风格(性能更好,支持横屏)、完善细节功能
+- 2017-11-06　　完善手势返回效果、修改小问题
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoTools"></a> 关于HXPhotoTools获取资源信息 具体代码还是请下载Demo这里只是简单的两个
@@ -331,8 +332,6 @@ self.photoView = photoView;
 ```
 
 ## <a id="更多"></a> 六.  更多 - More
-
-- 支持横屏功能正在准备当中...
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 

@@ -11,6 +11,5 @@
 @interface HXDatePhotoInteractiveTransition : UIPercentDrivenInteractiveTransition
 /**记录是否开始手势，判断pop操作是手势触发还是返回键触发*/
 @property (nonatomic, assign) BOOL interation;
-/** 给传入的控制器添加手势*/
 - (void)addPanGestureForViewController:(UIViewController *)viewController;
 @end

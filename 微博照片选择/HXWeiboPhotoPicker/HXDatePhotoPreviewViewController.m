@@ -58,6 +58,9 @@
     if (operation == UINavigationControllerOperationPush) {
         return [HXDatePhotoViewTransition transitionWithType:HXDatePhotoViewTransitionTypePush];
     }else {
+        if (![fromVC isKindOfClass:[self class]]) {
+            return nil;
+        }
         return [HXDatePhotoViewTransition transitionWithType:HXDatePhotoViewTransitionTypePop];
     }
 }
@@ -285,31 +288,81 @@
     HXPhotoModel *model = self.modelArray[indexPath.item]; 
     cell.model = model;
     __weak typeof(self) weakSelf = self;
+    [cell setCellDidPlayVideoBtn:^(BOOL play) {
+        if (play) {
+            if (weakSelf.bottomView.userInteractionEnabled) {
+                [weakSelf setSubviewAlphaAnimate:YES];
+            }
+        }else {
+            if (!weakSelf.bottomView.userInteractionEnabled) {
+                [weakSelf setSubviewAlphaAnimate:YES];
+            }
+        }
+    }];
     [cell setCellTapClick:^{
-        BOOL hide = NO;
-        if (weakSelf.bottomView.alpha == 1) {
-            hide = YES;
-        }
-        if (!hide) {
-            [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
-        }
-        [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
-        weakSelf.bottomView.userInteractionEnabled = !hide;
-        [UIView animateWithDuration:0.15 animations:^{
-            weakSelf.navigationController.navigationBar.alpha = hide ? 0 : 1;
-            if (weakSelf.outside) {
-                weakSelf.navBar.alpha = hide ? 0 : 1;
-            }
-            weakSelf.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
-            weakSelf.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
-            weakSelf.bottomView.alpha = hide ? 0 : 1;
-        } completion:^(BOOL finished) {
-            if (hide) {
-                [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
-            }
-        }];
+        [weakSelf setSubviewAlphaAnimate:YES];
+//        BOOL hide = NO;
+//        if (weakSelf.bottomView.alpha == 1) {
+//            hide = YES;
+//        }
+//        if (!hide) {
+//            [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
+//        }
+//        [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
+//        weakSelf.bottomView.userInteractionEnabled = !hide;
+//        [UIView animateWithDuration:0.15 animations:^{
+//            weakSelf.navigationController.navigationBar.alpha = hide ? 0 : 1;
+//            if (weakSelf.outside) {
+//                weakSelf.navBar.alpha = hide ? 0 : 1;
+//            }
+//            weakSelf.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+//            weakSelf.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+//            weakSelf.bottomView.alpha = hide ? 0 : 1;
+//        } completion:^(BOOL finished) {
+//            if (hide) {
+//                [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
+//            }
+//        }];
     }];
     return cell;
+}
+- (void)setSubviewAlphaAnimate:(BOOL)animete {
+    BOOL hide = NO;
+    if (self.bottomView.alpha == 1) {
+        hide = YES;
+    }
+    if (!hide) {
+        [self.navigationController setNavigationBarHidden:hide animated:NO];
+    }
+    self.bottomView.userInteractionEnabled = !hide;
+    if (animete) {
+        [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
+        [UIView animateWithDuration:0.15 animations:^{
+            self.navigationController.navigationBar.alpha = hide ? 0 : 1;
+            if (self.outside) {
+                self.navBar.alpha = hide ? 0 : 1;
+            }
+            self.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+            self.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+            self.bottomView.alpha = hide ? 0 : 1;
+        } completion:^(BOOL finished) {
+            if (hide) {
+                [self.navigationController setNavigationBarHidden:hide animated:NO];
+            }
+        }];
+    }else {
+        [[UIApplication sharedApplication] setStatusBarHidden:hide];
+        self.navigationController.navigationBar.alpha = hide ? 0 : 1;
+        if (self.outside) {
+            self.navBar.alpha = hide ? 0 : 1;
+        }
+        self.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+        self.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+        self.bottomView.alpha = hide ? 0 : 1;
+        if (hide) {
+            [self.navigationController setNavigationBarHidden:hide];
+        }
+    }
 }
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     [(HXDatePhotoPreviewViewCell *)cell resetScale];
@@ -609,11 +662,8 @@
     HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
     [cell cancelRequest];
     if ([UIApplication sharedApplication].statusBarHidden) {
-        [self.navigationController setNavigationBarHidden:NO animated:NO];
-        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-        if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
-            [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
-        }
+        [self.navigationController setNavigationBarHidden:NO animated:NO]; 
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
@@ -689,10 +739,10 @@
     
     self.imageView.hidden = NO;
     __weak typeof(self) weakSelf = self;
-    if (model.type == HXPhotoModelMediaTypePhotoGif) {
-        if (model.tempImage) {
-            self.imageView.image = model.tempImage;
-        }
+//    if (model.type == HXPhotoModelMediaTypePhotoGif) {
+//        if (model.tempImage) {
+//            self.imageView.image = model.tempImage;
+//        }
 //        self.requestID = [HXPhotoTools FetchPhotoDataForPHAsset:model.asset completion:^(NSData *imageData, NSDictionary *info) {
 //            UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
 //            if (gifImage.images.count == 0) {
@@ -705,35 +755,35 @@
 //            weakSelf.model.tempImage = nil;
 //            weakSelf.gifImage = gifImage;
 //        }];
-        self.requestID = [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.progressView.hidden = NO;
-                weakSelf.requestID = cloudRequestId;
-            });
-        } progressHandler:^(double progress) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.progressView.hidden = NO;
-                weakSelf.progressView.progress = progress;
-            });
-        } completion:^(NSData *imageData, UIImageOrientation orientation) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
-                if (gifImage.images.count == 0) {
-                    weakSelf.gifFirstFrame = gifImage;
-                    weakSelf.imageView.image = gifImage;
-                }else {
-                    weakSelf.gifFirstFrame = gifImage.images.firstObject;
-                    weakSelf.imageView.image = weakSelf.gifFirstFrame;
-                }
-                weakSelf.model.tempImage = nil;
-                weakSelf.gifImage = gifImage;
-            });
-        } failed:^(NSDictionary *info) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.progressView.hidden = YES;
-            });
-        }];
-    }else {
+//        self.requestID = [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                weakSelf.progressView.hidden = NO;
+//                weakSelf.requestID = cloudRequestId;
+//            });
+//        } progressHandler:^(double progress) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                weakSelf.progressView.hidden = NO;
+//                weakSelf.progressView.progress = progress;
+//            });
+//        } completion:^(NSData *imageData, UIImageOrientation orientation) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+//                if (gifImage.images.count == 0) {
+//                    weakSelf.gifFirstFrame = gifImage;
+//                    weakSelf.imageView.image = gifImage;
+//                }else {
+//                    weakSelf.gifFirstFrame = gifImage.images.firstObject;
+//                    weakSelf.imageView.image = weakSelf.gifFirstFrame;
+//                }
+//                weakSelf.model.tempImage = nil;
+//                weakSelf.gifImage = gifImage;
+//            });
+//        } failed:^(NSDictionary *info) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                weakSelf.progressView.hidden = YES;
+//            });
+//        }];
+//    }else {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
             self.imageView.image = model.thumbPhoto;
             model.tempImage = nil;
@@ -771,7 +821,7 @@
                 }
             }
         }
-    }
+//    }
     if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         self.playerLayer.hidden = NO;
         self.videoPlayBtn.hidden = NO;
@@ -830,10 +880,34 @@
         if (self.gifImage) {
             self.imageView.image = self.gifImage;
         }else {
-            self.requestID = [HXPhotoTools FetchPhotoDataForPHAsset:self.model.asset completion:^(NSData *imageData, NSDictionary *info) {
-                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
-                weakSelf.imageView.image = gifImage;
-                weakSelf.gifImage = gifImage;
+            self.requestID = [HXPhotoTools getImageData:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.progressView.hidden = NO;
+                    weakSelf.requestID = cloudRequestId;
+                });
+            } progressHandler:^(double progress) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.progressView.hidden = NO;
+                    weakSelf.progressView.progress = progress;
+                });
+            } completion:^(NSData *imageData, UIImageOrientation orientation) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+                    if (gifImage.images.count == 0) {
+                        weakSelf.gifFirstFrame = gifImage;
+//                        weakSelf.imageView.image = gifImage;
+                    }else {
+                        weakSelf.gifFirstFrame = gifImage.images.firstObject;
+//                        weakSelf.imageView.image = weakSelf.gifFirstFrame;
+                    }
+                    weakSelf.model.tempImage = nil;
+                    weakSelf.imageView.image = gifImage;
+                    weakSelf.gifImage = gifImage;
+                });
+            } failed:^(NSDictionary *info) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.progressView.hidden = YES;
+                });
             }];
         }
     }
@@ -972,8 +1046,8 @@
     }else {
         [self.player pause];
     }
-    if (self.cellTapClick) {
-        self.cellTapClick();
+    if (self.cellDidPlayVideoBtn) {
+        self.cellDidPlayVideoBtn(button.selected);
     }
 }
 - (void)layoutSubviews {

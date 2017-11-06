@@ -73,8 +73,10 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
 }
 - (void)dealloc {
     self.manager.selectPhoto = NO;
-    if (self.previewingContext) {
-        [self unregisterForPreviewingWithContext:self.previewingContext];
+    if (self.manager.open3DTouchPreview) {
+        if (self.previewingContext) {
+            [self unregisterForPreviewingWithContext:self.previewingContext];
+        }
     }
     NSSLog(@"dealloc");
 }

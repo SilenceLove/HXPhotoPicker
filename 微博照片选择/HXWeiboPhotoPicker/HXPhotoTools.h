@@ -28,6 +28,8 @@
 #define kTopMargin (kDevice_Is_iPhoneX ? 24 : 0)
 #define kBottomMargin (kDevice_Is_iPhoneX ? 34 : 0)
 
+#define iOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)
+
 #define iOS9_Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
 
 #define iOS8_2Later ([UIDevice currentDevice].systemVersion.floatValue >= 8.2f)
@@ -106,6 +108,8 @@ typedef enum : NSUInteger {
  @param completion image数组
  */
 + (void)getImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos type:(HXPhotoToolsFetchType)type completion:(void(^)(NSArray<UIImage *> *images))completion;
+
++ (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(BOOL isICloud))complete;
 
 + (PHImageRequestID)getImageWithModel:(HXPhotoModel *)model completion:(void (^)(UIImage *image, HXPhotoModel *model))completion;
 

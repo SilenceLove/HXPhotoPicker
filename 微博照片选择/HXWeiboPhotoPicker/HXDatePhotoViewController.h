@@ -50,6 +50,11 @@
 @property (strong, nonatomic) HXPhotoDateModel *model;
 @end
 
+@interface HXDatePhotoViewSectionFooterView : UICollectionReusableView
+@property (assign, nonatomic) NSInteger photoCount;
+@property (assign, nonatomic) NSInteger videoCount;
+@end
+
 @protocol HXDatePhotoBottomViewDelegate <NSObject>
 @optional
 - (void)datePhotoBottomViewDidPreviewBtn;

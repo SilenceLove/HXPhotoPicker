@@ -89,7 +89,7 @@
         tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:1];
         toVC.bottomView.alpha = 1;
     } completion:^(BOOL finished) {
-        fromCell.hidden = NO; 
+        fromCell.hidden = NO;
         toVC.view.backgroundColor = [UIColor whiteColor];
         toVC.collectionView.hidden = NO;
         [tempBgView removeFromSuperview];
@@ -99,6 +99,7 @@
     }];
 }
 - (void)popAnimation:(id<UIViewControllerContextTransitioning>)transitionContext {
+    NSSLog(@"12312321");
     HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXDatePhotoViewController *toVC = (HXDatePhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [fromVC.modelArray objectAtIndex:fromVC.currentModelIndex];
@@ -151,8 +152,8 @@
         fromVC.bottomView.alpha = 0;
         if (!fromVC.bottomView.userInteractionEnabled) {
             tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
-//            toVC.navigationController.navigationBar.alpha = 1;
-//            toVC.bottomView.alpha = 1;
+            //            toVC.navigationController.navigationBar.alpha = 1;
+            //            toVC.bottomView.alpha = 1;
         }else {
             tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
         }

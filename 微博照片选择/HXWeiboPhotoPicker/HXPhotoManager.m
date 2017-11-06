@@ -687,19 +687,29 @@
     }
     if (self.cameraList.count > 0) {
         NSInteger index = 0;
+        NSInteger photoIndex = 0;
+        NSInteger videoIndex = 0;
         for (HXPhotoModel *model in self.cameraList) {
             model.currentAlbumIndex = albumModel.index;
             if (self.reverseDate) {
                 [allArray insertObject:model atIndex:cameraIndex + index];
                 [previewArray insertObject:model atIndex:index];
-                [videoArray insertObject:model atIndex:index];
-                [photoArray insertObject:model atIndex:index];
+                if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+                    [photoArray insertObject:model atIndex:photoIndex];
+                    photoIndex++;
+                }else {
+                    [videoArray insertObject:model atIndex:videoIndex];
+                    videoIndex++;
+                }
             }else {
                 NSInteger count = allArray.count;
                 [allArray insertObject:model atIndex:count - cameraIndex];
                 [previewArray addObject:model];
-                [videoArray addObject:model];
-                [photoArray addObject:model];
+                if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+                    [photoArray addObject:model];
+                }else {
+                    [videoArray addObject:model];
+                }
             }
             if (self.showDateHeaderSection) {
                 if (self.reverseDate) {
