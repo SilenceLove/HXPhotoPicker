@@ -52,6 +52,9 @@ typedef enum : NSUInteger {
 + (void)saveImageToAlbum:(UIImage *)image completion:(void(^)())completion error:(void (^)())error;
 + (void)saveVideoToAlbum:(NSURL *)videoUrl completion:(void(^)())completion error:(void (^)())error;
 
++ (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL;
++ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo;
+
 /**
  将选择的模型数组写入临时目录
 

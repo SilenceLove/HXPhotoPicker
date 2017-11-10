@@ -190,6 +190,18 @@
     }
 }
 - (void)getAlbumModelList:(BOOL)isFirst {
+    if (self.manager.albums.count > 0 && self.manager.saveSystemAblum) {
+        self.albumModelArray = [NSMutableArray arrayWithArray:self.manager.albums];
+        HXAlbumModel *model = self.albumModelArray.firstObject;
+        HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
+        vc.manager = self.manager;
+        vc.title = model.albumName;
+        vc.albumModel = model;
+        vc.delegate = self;
+        [self.navigationController pushViewController:vc animated:NO];
+        [self.collectionView reloadData];
+        return;
+    }
     if (!isFirst) {
         [self.view showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
     }
@@ -204,9 +216,11 @@
                 vc.albumModel = model;
                 vc.delegate = weakSelf;
                 [weakSelf.navigationController pushViewController:vc animated:NO];
-//                if (weakSelf.albumModelArray.count == 0) {
-//                    [weakSelf getAlbumModelList:NO];
-//                }
+                if (weakSelf.manager.saveSystemAblum) {
+                    if (weakSelf.albumModelArray.count == 0) {
+                        [weakSelf getAlbumModelList:NO];
+                    }
+                }
             });
         } albums:^(NSArray *albums) {
             weakSelf.albumModelArray = [NSMutableArray arrayWithArray:albums];

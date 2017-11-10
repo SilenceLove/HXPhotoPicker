@@ -13,11 +13,8 @@
 @interface HXDatePhotoInteractiveTransition ()
 @property (nonatomic, weak) id<UIViewControllerContextTransitioning> transitionContext;
 @property (nonatomic, weak) UIViewController *vc;
-
 @property (strong, nonatomic) UIImageView *imageView;
-
 @property (strong, nonatomic) UIView *bgView;
-
 @property (weak, nonatomic) HXDatePhotoViewCell *tempCell;
 @property (strong, nonatomic) UIImageView *tempImageView;
 @property (nonatomic, assign) CGPoint transitionImgViewCenter;
@@ -193,7 +190,13 @@
     HXDatePhotoViewController *toVC = (HXDatePhotoViewController *)[self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
     [UIView animateWithDuration:0.4 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:UIViewAnimationOptionCurveLinear animations:^{
-        self.tempImageView.frame = [self.tempCell.imageView convertRect:self.tempCell.imageView.bounds toView: containerView];
+        if (self.tempCell) {
+            self.tempImageView.frame = [self.tempCell.imageView convertRect:self.tempCell.imageView.bounds toView: containerView];
+        }else {
+            self.tempImageView.center = self.transitionImgViewCenter;
+            self.tempImageView.alpha = 0;
+            self.tempImageView.transform = CGAffineTransformMakeScale(0.3, 0.3);
+        }
         fromVC.view.alpha = 0;
         self.bgView.alpha = 0;
         toVC.navigationController.navigationBar.alpha = 1;

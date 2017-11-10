@@ -37,6 +37,17 @@ typedef enum : NSUInteger {
 
 
 /**
+ HXPhotoAlbumStylesSystem 拍摄的照片/视频保存到指定相册的名称  默认 BundleName
+ (需9.0以上系统才可以保存到自定义相册 , 以下的系统只保存到相机胶卷...)
+ */
+@property (copy, nonatomic) NSString *customAlbumName;
+
+/**
+ HXPhotoAlbumStylesSystem 相机cell是否显示预览  默认YES
+ */
+@property (assign, nonatomic) BOOL cameraCellShowPreview;
+
+/**
  系统相册风格横屏时是否隐藏状态栏 默认显示  暂不支持修改
  */
 //@property (assign, nonatomic) BOOL horizontalHideStatusBar;
@@ -97,7 +108,9 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) HXPhotoUIManager *UIManager;
 
 /**
- *  拍摄的 照片/视频 是否保存到系统相册  默认NO 此功能需要配合 监听系统相册 和 缓存相册 功能 (请不要关闭)
+ *  拍摄的 照片/视频 是否保存到系统相册  默认NO
+ *  系统风格时不需要监听和缓存 可直接保存 支持添加到自定义相册 - (需8.0以上)
+ *  微博风格使用此功能需要配合 监听系统相册 和 缓存相册 功能 (请不要关闭) - (需9.0以上)
  */
 @property (assign, nonatomic) BOOL saveSystemAblum;
 
@@ -107,12 +120,12 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) NSTimeInterval videoMaxDuration;
 
 /**
- *  是否缓存相册, manager会监听系统相册变化(需要此功能时请不要关闭监听系统相册功能)   默认YES
+ *  是否缓存相册, manager会监听系统相册变化(需要此功能时请不要关闭监听系统相册功能)   默认NO
  */
 @property (assign, nonatomic) BOOL cacheAlbum;
 
 /**
- *  是否监听系统相册  -  如果开启了缓存相册 自动开启监听   默认 YES
+ *  是否监听系统相册  -  如果开启了缓存相册 自动开启监听   默认 NO
  */
 @property (assign, nonatomic) BOOL monitorSystemAlbum;
 

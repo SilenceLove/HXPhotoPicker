@@ -28,6 +28,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *showHeaderSection;
 @property (weak, nonatomic) IBOutlet UISwitch *reverse;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *selectedTypeView;
+@property (weak, nonatomic) IBOutlet UISwitch *saveAblum;
 
 @end
 
@@ -42,6 +43,8 @@
         _manager.style = HXPhotoAlbumStylesSystem;
         _manager.deleteTemporaryPhoto = NO;
         _manager.lookLivePhoto = YES;
+        _manager.saveSystemAblum = YES;
+//        _manager.cameraCellShowPreview = NO;
     }
     return _manager;
 }
@@ -61,6 +64,7 @@
     }else {
         self.manager.style = HXPhotoAlbumStylesWeibo;
     }
+    self.manager.saveSystemAblum = self.saveAblum.on;
     self.manager.showDateHeaderSection = self.showHeaderSection.on;
     self.manager.reverseDate = self.reverse.on;
     if (self.manager.style == HXPhotoAlbumStylesWeibo) {

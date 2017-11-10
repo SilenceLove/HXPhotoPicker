@@ -455,6 +455,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                     HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
                     vc.delegate = self;
                     vc.manager = self.manager;
+                    vc.isOutside = YES;
                     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
                     nav.isCamera = YES;
                     [[self viewController] presentViewController:nav animated:YES completion:nil];
@@ -486,7 +487,17 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"已达最大数!"]];
             return;
         }else {
-            type = HXCameraTypePhotoAndVideo;
+            if (!self.manager.selectTogether) {
+                if (self.photos.count > 0) {
+                    type = HXCameraTypePhoto;
+                }else if (self.videos.count > 0) {
+                    type = HXCameraTypeVideo;
+                }else {
+                    type = HXCameraTypePhotoAndVideo;
+                }
+            }else {
+                type = HXCameraTypePhotoAndVideo;
+            }
         }
     }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
         if (self.photos.count >= self.manager.photoMaxNum + self.networkPhotos.count) {
@@ -653,6 +664,13 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
         return;
     }
+    if (self.manager.saveSystemAblum && self.manager.style == HXPhotoAlbumStylesSystem) {
+        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.customAlbumName photo:model.thumbPhoto];
+        }else {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.customAlbumName videoURL:model.videoURL];
+        }
+    }
     // 判断类型
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         [self.manager.endCameraPhotos addObject:model];
@@ -685,6 +703,8 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                 model.selected = YES;
                 model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
             }
+        }else {
+            [[self viewController].view showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld张图片"],self.manager.photoMaxNum]];
         }
     }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
         [self.manager.endCameraVideos addObject:model];
@@ -718,6 +738,8 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                 model.selected = YES;
                 model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.endSelectedList indexOfObject:model] + 1];
             }
+        }else {
+            [[self viewController].view showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld个视频"],self.manager.videoMaxNum]];
         }
     }
     [self.manager.endCameraList addObject:model];

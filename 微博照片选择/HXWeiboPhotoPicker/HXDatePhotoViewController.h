@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
+#import "HXCustomCollectionReusableView.h"
 
-@class HXDatePhotoViewController,HXDatePhotoViewCell,HXDatePhotoBottomView;
+@class HXDatePhotoViewController,HXDatePhotoViewCell,HXDatePhotoBottomView,HXCustomCameraController;
 @protocol HXDatePhotoViewControllerDelegate <NSObject>
 @optional
 - (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController;
@@ -44,9 +45,12 @@
 
 @interface HXDatePhotoCameraViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
+@property (strong, nonatomic, readonly) HXCustomCameraController *cameraController;
+- (void)starRunning;
+- (void)stopRunning;
 @end
 
-@interface HXDatePhotoViewSectionHeaderView : UICollectionReusableView
+@interface HXDatePhotoViewSectionHeaderView : HXCustomCollectionReusableView
 @property (strong, nonatomic) HXPhotoDateModel *model;
 @end
 
@@ -67,4 +71,5 @@
 @property (assign, nonatomic) BOOL previewBtnEnabled;
 @property (assign, nonatomic) BOOL doneBtnEnabled;
 @property (assign, nonatomic) NSInteger selectCount;
+@property (strong, nonatomic) UIButton *originalBtn;
 @end

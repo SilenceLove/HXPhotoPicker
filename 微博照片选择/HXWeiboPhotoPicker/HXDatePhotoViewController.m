@@ -15,6 +15,8 @@
 #import "HXFullScreenCameraViewController.h"
 #import "HXCustomCameraViewController.h"
 #import "HXCustomNavigationController.h"
+#import "HXCustomCameraController.h"
+#import "HXCustomPreviewView.h"
 @interface HXDatePhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UIViewControllerPreviewingDelegate,HXDatePhotoViewCellDelegate,HXDatePhotoBottomViewDelegate,HXDatePhotoPreviewViewControllerDelegate,HXCustomCameraViewControllerDelegate>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
@@ -271,6 +273,13 @@
 //        [self didNextClick:self.rightBtn];
 //        return;
 //    }
+    if (self.manager.saveSystemAblum) {
+        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.customAlbumName photo:model.thumbPhoto];
+        }else {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.customAlbumName videoURL:model.videoURL];
+        }
+    }
     model.dateCellIsVisible = YES;
     model.currentAlbumIndex = self.albumModel.index;
     // 判断类型
@@ -424,6 +433,9 @@
     if (model.type == HXPhotoModelMediaTypeCamera) {
         HXDatePhotoCameraViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DateCameraCellId" forIndexPath:indexPath];
         cell.model = model;
+        if (self.manager.cameraCellShowPreview) {
+            [cell starRunning];
+        }
         return cell;
     }else {
         HXDatePhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DateCellId" forIndexPath:indexPath];
@@ -768,6 +780,7 @@
     if (!_bottomView) {
         _bottomView = [[HXDatePhotoBottomView alloc] initWithFrame:CGRectMake(0, self.view.hx_h - 50 - kBottomMargin, self.view.hx_w, 50 + kBottomMargin)];
         _bottomView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        _bottomView.manager = self.manager;
         _bottomView.delegate = self;
     }
     return _bottomView;
@@ -861,6 +874,8 @@
 @end
 @interface HXDatePhotoCameraViewCell ()
 @property (strong, nonatomic) UIButton *cameraBtn;
+@property (strong, nonatomic) HXCustomCameraController *cameraController;
+@property (strong, nonatomic) HXCustomPreviewView *previewView;
 @end
 
 @implementation HXDatePhotoCameraViewCell
@@ -872,15 +887,48 @@
     return self;
 }
 - (void)setupUI  {
+    [self.contentView addSubview:self.previewView];
     [self.contentView addSubview:self.cameraBtn];
+}
+- (void)starRunning {
+    if (![UIImagePickerController isSourceTypeAvailable:
+          UIImagePickerControllerSourceTypeCamera]) {
+        return;
+    }
+    if (self.cameraController.captureSession) {
+        return;
+    }
+    if ([self.cameraController setupSession:nil]) {
+        [self.previewView setSession:self.cameraController.captureSession];
+        [self.cameraController startSession];
+        self.cameraBtn.selected = YES;
+        
+    }
+}
+- (void)stopRunning {
+    if (![UIImagePickerController isSourceTypeAvailable:
+          UIImagePickerControllerSourceTypeCamera]) {
+        return;
+    }
+    if (!self.cameraController.captureSession) {
+        return;
+    }
+    [self.cameraController stopSession];
+    self.cameraBtn.selected = NO;
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     [self.cameraBtn setImage:model.thumbPhoto forState:UIControlStateNormal];
+    [self.cameraBtn setImage:model.previewPhoto forState:UIControlStateSelected];
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.cameraBtn.frame = self.bounds;
+    self.previewView.frame = self.bounds;
+}
+- (void)dealloc {
+    [self stopRunning];
+    NSSLog(@"camera - dealloc");
 }
 - (UIButton *)cameraBtn {
     if (!_cameraBtn) {
@@ -888,6 +936,21 @@
         _cameraBtn.userInteractionEnabled = NO;
     }
     return _cameraBtn;
+}
+- (HXCustomCameraController *)cameraController {
+    if (!_cameraController) {
+        _cameraController = [[HXCustomCameraController alloc] init];
+    }
+    return _cameraController;
+}
+- (HXCustomPreviewView *)previewView {
+    if (!_previewView) {
+        _previewView = [[HXCustomPreviewView alloc] init];
+        _previewView.pinchToZoomEnabled = NO;
+        _previewView.tapToFocusEnabled = NO;
+        _previewView.tapToExposeEnabled = NO;
+    }
+    return _previewView;
 }
 @end
 @interface HXDatePhotoViewCell ()
@@ -1041,7 +1104,7 @@
         _selectBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         _selectBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
-        [_selectBtn setEnlargeEdgeWithTop:0 right:0 bottom:10 left:10];
+        [_selectBtn setEnlargeEdgeWithTop:0 right:0 bottom:20 left:20];
         _selectBtn.layer.cornerRadius = 25 / 2;
     }
     return _selectBtn;
@@ -1126,7 +1189,7 @@
 @interface HXDatePhotoBottomView ()
 @property (strong, nonatomic) UIToolbar *bgView;
 @property (strong, nonatomic) UIButton *previewBtn;
-@property (strong, nonatomic) UIButton *doneBtn;
+@property (strong, nonatomic) UIButton *doneBtn; 
 @end
 
 @implementation HXDatePhotoBottomView
@@ -1140,10 +1203,18 @@
 - (void)setupUI {
     [self addSubview:self.bgView];
     [self addSubview:self.previewBtn];
+    [self addSubview:self.originalBtn];
     [self addSubview:self.doneBtn];
     [self changeDoneBtnFrame];
 }
-
+- (void)setManager:(HXPhotoManager *)manager {
+    _manager = manager;
+    self.originalBtn.hidden = self.manager.UIManager.hideOriginalBtn;
+    if (manager.type == HXPhotoManagerSelectedTypeVideo) {
+        self.originalBtn.hidden = YES;
+    }
+    self.originalBtn.selected = self.manager.isOriginal;
+}
 - (void)setSelectCount:(NSInteger)selectCount {
     _selectCount = selectCount;
     if (selectCount <= 0) {
@@ -1157,6 +1228,13 @@
     }
     self.doneBtn.backgroundColor = self.doneBtn.enabled ? self.tintColor : [self.tintColor colorWithAlphaComponent:0.5];
     [self changeDoneBtnFrame];
+    if (self.manager.selectedPhotos.count == 0) {
+        self.originalBtn.enabled = NO;
+        self.originalBtn.selected = NO;
+        self.manager.isOriginal = NO;
+    }else {
+        self.originalBtn.enabled = YES;
+    }
 }
 - (void)changeDoneBtnFrame {
     CGFloat width = [HXPhotoTools getTextWidth:self.doneBtn.currentTitle height:30 fontSize:14];
@@ -1176,12 +1254,17 @@
         [self.delegate datePhotoBottomViewDidPreviewBtn];
     }
 }
+- (void)didOriginalClick:(UIButton *)button {
+    button.selected = !button.selected;
+    self.manager.isOriginal = button.selected;
+}
 - (void)layoutSubviews {
     [super layoutSubviews];
     
     self.bgView.frame = self.bounds;
     self.previewBtn.frame = CGRectMake(12, 0, 50, 50);
     self.previewBtn.center = CGPointMake(self.previewBtn.center.x, 25);
+    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame), 0, 80, 50);
     self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
     self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
     [self changeDoneBtnFrame];
@@ -1219,6 +1302,23 @@
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _doneBtn;
+}
+- (UIButton *)originalBtn {
+    if (!_originalBtn) {
+        _originalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_originalBtn setTitle:@"原图" forState:UIControlStateNormal];
+        [_originalBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
+        [_originalBtn setTitleColor:[self.tintColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        _originalBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+        [_originalBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_original_normal@2x.png"] forState:UIControlStateNormal];
+        [_originalBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_original_selected@2x.png"] forState:UIControlStateSelected];
+        [_originalBtn addTarget:self action:@selector(didOriginalClick:) forControlEvents:UIControlEventTouchUpInside];
+        _originalBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+        _originalBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 35, 0, 0);
+        _originalBtn.titleEdgeInsets = UIEdgeInsetsMake(0, -15, 0, 0);
+        _originalBtn.enabled = NO;
+    }
+    return _originalBtn;
 }
 @end
     

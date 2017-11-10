@@ -73,20 +73,22 @@
     self.networkPhotoUrls = [NSMutableArray array];
     self.showDeleteNetworkPhotoAlert = NO;
     self.singleSelecteClip = YES;
-    self.monitorSystemAlbum = YES; // NO
-    self.cacheAlbum = YES; // NO
+//    self.monitorSystemAlbum = NO; // NO
+//    self.cacheAlbum = NO; // NO
     self.videoMaxDuration = 300.f;
     self.videoMaximumDuration = 60.f;
-    self.saveSystemAblum = NO;
+//    self.saveSystemAblum = NO;
     self.deleteTemporaryPhoto = YES;
     self.style = HXPhotoAlbumStylesWeibo;
     self.showDateHeaderSection = YES;
-    self.reverseDate = NO;
+//    self.reverseDate = NO;
+    self.cameraCellShowPreview = YES;
 //    self.horizontalHideStatusBar = NO;
+    self.customAlbumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     self.horizontalRowCount = 6;
     self.hasLivePhoto = [HXPhotoTools platform];
     self.UIManager = [[HXPhotoUIManager alloc] init];
-    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+//    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
 - (void)setVideoMaximumDuration:(NSTimeInterval)videoMaximumDuration {
     if (videoMaximumDuration <= 3) {
@@ -94,14 +96,28 @@
     }
     _videoMaximumDuration = videoMaximumDuration;
 }
-
 - (void)setSaveSystemAblum:(BOOL)saveSystemAblum {
-    _saveSystemAblum = saveSystemAblum;
     if (saveSystemAblum) {
-        [self getMaxAlbum];
+        if (self.style == HXPhotoAlbumStylesWeibo) {
+            if (!iOS9_Later) {
+                saveSystemAblum = NO;
+                NSSLog(@"微博样式保存到系统相册需要IOS9.0以上");
+            }else {
+                [self getMaxAlbum];
+            }
+        }
+    }
+    _saveSystemAblum = saveSystemAblum;
+}
+-(void)setStyle:(HXPhotoAlbumStyles)style {
+    _style = style;
+    if (self.style == HXPhotoAlbumStylesWeibo) {
+        if (self.saveSystemAblum && !iOS9_Later) {
+            NSSLog(@"微博样式保存到系统相册需要IOS9.0以上");
+            self.saveSystemAblum = NO;
+        }
     }
 }
-
 - (void)setMonitorSystemAlbum:(BOOL)monitorSystemAlbum {
     _monitorSystemAlbum = monitorSystemAlbum;
     if (!monitorSystemAlbum) {
@@ -654,10 +670,13 @@
         model.type = HXPhotoModelMediaTypeCamera;
         if (photoArray.count == 0 && videoArray.count != 0) {
             model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.UIManager.cellCameraVideoImageName];
+            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
         }else if (photoArray.count == 0) {
             model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.UIManager.cellCameraPhotoImageName];
+            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
         }else {
             model.thumbPhoto = [HXPhotoTools hx_imageNamed:self.UIManager.cellCameraPhotoImageName];
+            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
         }
         if (!self.reverseDate) {
             if (self.showDateHeaderSection) {
@@ -999,6 +1018,8 @@ double subtractTimes( uint64_t endTime, uint64_t startTime ) {
     [self.selectedVideos removeAllObjects];
     self.isOriginal = NO;
     self.photosTotalBtyes = nil;
+    
+    [self.albums removeAllObjects];
 }
 
 - (void)getMaxAlbum {

@@ -480,9 +480,127 @@
         completion();
     }
 }
-
-+ (CGFloat)getTextWidth:(NSString *)text height:(CGFloat)height fontSize:(CGFloat)fontSize
-{
++ (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL {
+    if (!videoURL) {
+        return;
+    }
+    // 判断授权状态
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        if (status != PHAuthorizationStatusAuthorized) return;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!iOS9_Later) {
+                if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum([videoURL path])) {
+                    //保存相册核心代码
+                    UISaveVideoAtPathToSavedPhotosAlbum([videoURL path], nil, nil, nil);
+                }
+                return;
+            }
+            NSError *error = nil;
+            // 保存相片到相机胶卷
+            __block PHObjectPlaceholder *createdAsset = nil;
+            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                createdAsset = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:videoURL].placeholderForCreatedAsset;
+            } error:&error];
+            
+            if (error) {
+                NSSLog(@"保存失败");
+                return;
+            }
+            
+            // 拿到自定义的相册对象
+            PHAssetCollection *collection = [self createCollection:albumName];
+            if (collection == nil) {
+                NSSLog(@"保存自定义相册失败");
+                return;
+            }
+            
+            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
+            } error:&error];
+            
+            if (error) {
+                NSSLog(@"保存自定义相册失败");
+            } else {
+                NSSLog(@"保存成功");
+            }
+        });
+    }];
+}
++ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo {
+    if (!photo) {
+        return;
+    }
+    // 判断授权状态
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        if (status != PHAuthorizationStatusAuthorized) return;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!iOS9_Later) {
+                UIImageWriteToSavedPhotosAlbum(photo, nil, nil, nil);
+                return;
+            }
+            NSError *error = nil;
+            // 保存相片到相机胶卷
+            __block PHObjectPlaceholder *createdAsset = nil;
+            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                createdAsset = [PHAssetCreationRequest creationRequestForAssetFromImage:photo].placeholderForCreatedAsset;
+            } error:&error];
+            
+            if (error) {
+                NSSLog(@"保存失败");
+                return;
+            }
+            
+            // 拿到自定义的相册对象
+            PHAssetCollection *collection = [self createCollection:albumName];
+            if (collection == nil) {
+                NSSLog(@"保存自定义相册失败");
+                return;
+            }
+            
+            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
+            } error:&error];
+            
+            if (error) {
+                NSSLog(@"保存自定义相册失败");
+            } else {
+                NSSLog(@"保存成功");
+            }
+        });
+    }];
+}
+// 创建自己要创建的自定义相册
++ (PHAssetCollection * )createCollection:(NSString *)albumName {
+    NSString * title = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
+    PHFetchResult<PHAssetCollection *> *collections =  [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    
+    PHAssetCollection * createCollection = nil;
+    for (PHAssetCollection * collection in collections) {
+        if ([collection.localizedTitle isEqualToString:title]) {
+            createCollection = collection;
+            break;
+        }
+    }
+    if (createCollection == nil) {
+        
+        NSError * error1 = nil;
+        __block NSString * createCollectionID = nil;
+        [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+            NSString * title = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
+            createCollectionID = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:title].placeholderForCreatedAssetCollection.localIdentifier;
+        } error:&error1];
+        
+        if (error1) {
+            NSSLog(@"创建相册失败...");
+            return nil;
+        }
+        // 创建相册之后我们还要获取此相册  因为我们要往进存储相片
+        createCollection = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[createCollectionID] options:nil].firstObject;
+    }
+    
+    return createCollection;
+}
++ (CGFloat)getTextWidth:(NSString *)text height:(CGFloat)height fontSize:(CGFloat)fontSize {
     CGSize newSize = [text boundingRectWithSize:CGSizeMake(MAXFLOAT, height) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:fontSize]} context:nil].size;
     
     return newSize.width;

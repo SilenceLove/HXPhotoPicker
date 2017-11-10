@@ -36,6 +36,7 @@
 		7B269E7D1E56FC3400AB813D /* HXPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E7C1E56FC3400AB813D /* HXPhotoView.m */; };
 		7B269E801E56FC9D00AB813D /* HXPhotoSubViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E7F1E56FC9D00AB813D /* HXPhotoSubViewCell.m */; };
 		7B269E831E56FE9400AB813D /* HXCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E821E56FE9400AB813D /* HXCollectionView.m */; };
+		7B2E98181FB2FC2000D40471 /* HXCustomCollectionReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B2E98171FB2FC2000D40471 /* HXCustomCollectionReusableView.m */; };
 		7B3768841FA2D44400660C88 /* HXDatePhotoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B3768831FA2D44400660C88 /* HXDatePhotoEditViewController.m */; };
 		7B3768871FA2E68300660C88 /* HXDatePhotoViewTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B3768861FA2E68300660C88 /* HXDatePhotoViewTransition.m */; };
 		7B37688A1FA423FB00660C88 /* HXDatePhotoInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B3768891FA423FA00660C88 /* HXDatePhotoInteractiveTransition.m */; };
@@ -156,6 +157,8 @@
 		7B269E7F1E56FC9D00AB813D /* HXPhotoSubViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoSubViewCell.m; sourceTree = "<group>"; };
 		7B269E811E56FE9400AB813D /* HXCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCollectionView.h; sourceTree = "<group>"; };
 		7B269E821E56FE9400AB813D /* HXCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCollectionView.m; sourceTree = "<group>"; };
+		7B2E98161FB2FC2000D40471 /* HXCustomCollectionReusableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCustomCollectionReusableView.h; sourceTree = "<group>"; };
+		7B2E98171FB2FC2000D40471 /* HXCustomCollectionReusableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCustomCollectionReusableView.m; sourceTree = "<group>"; };
 		7B3768821FA2D44400660C88 /* HXDatePhotoEditViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXDatePhotoEditViewController.h; sourceTree = "<group>"; };
 		7B3768831FA2D44400660C88 /* HXDatePhotoEditViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXDatePhotoEditViewController.m; sourceTree = "<group>"; };
 		7B3768851FA2E68300660C88 /* HXDatePhotoViewTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXDatePhotoViewTransition.h; sourceTree = "<group>"; };
@@ -417,6 +420,8 @@
 				7B7E3E9E1E4B036A002234EE /* HXPhotoViewController.m */,
 				7B4A70B11F91A0FB00BC1423 /* HXDatePhotoViewController.h */,
 				7B4A70B21F91A0FB00BC1423 /* HXDatePhotoViewController.m */,
+				7B2E98161FB2FC2000D40471 /* HXCustomCollectionReusableView.h */,
+				7B2E98171FB2FC2000D40471 /* HXCustomCollectionReusableView.m */,
 				7B3768851FA2E68300660C88 /* HXDatePhotoViewTransition.h */,
 				7B3768861FA2E68300660C88 /* HXDatePhotoViewTransition.m */,
 				7B37688B1FA4587600660C88 /* HXDatePhotoViewPresentTransition.h */,
@@ -625,6 +630,7 @@
 				7B75FC731F756A7B0068C405 /* HXPhotoCustomNavigationBar.m in Sources */,
 				7B7E3E991E4AB397002234EE /* HXPhotoModel.m in Sources */,
 				7B8060241FA6DC5B00882E34 /* YYFPSLabel.m in Sources */,
+				7B2E98181FB2FC2000D40471 /* HXCustomCollectionReusableView.m in Sources */,
 				7B1EF3D01F287CED00A4391C /* UIImage+GIF.m in Sources */,
 				7B7271471F27262400405131 /* NSBundle+HXWeiboPhotoPicker.m in Sources */,
 				7B6C2F331F6A283D0044E3D6 /* Demo8ViewController.m in Sources */,
@@ -774,7 +780,7 @@
 				INFOPLIST_FILE = "微博照片选择/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.comhx123;
+				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.comhx1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -790,7 +796,7 @@
 				INFOPLIST_FILE = "微博照片选择/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.comhx123;
+				PRODUCT_BUNDLE_IDENTIFIER = Foreverlove.comhx1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;

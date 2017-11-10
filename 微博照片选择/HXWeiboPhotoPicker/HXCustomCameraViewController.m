@@ -55,9 +55,24 @@
             self.addAudioInputComplete = YES;
             [self.cameraController initMovieOutput];
         }else {
-            [self.view insertSubview:self.playVideoView belowSubview:self.bottomView];
-            [self.cameraController initImageOutput];
-            [self.previewView addSwipeGesture];
+            if (!self.manager.selectTogether && self.isOutside) {
+                if (self.manager.endSelectedPhotos.count > 0) {
+                    [self.cameraController initImageOutput];
+                }else if (self.manager.endSelectedVideos.count > 0) {
+                    [self.view insertSubview:self.playVideoView belowSubview:self.bottomView];
+                    [self.cameraController addAudioInput];
+                    self.addAudioInputComplete = YES;
+                    [self.cameraController initMovieOutput];
+                }else {
+                    [self.view insertSubview:self.playVideoView belowSubview:self.bottomView];
+                    [self.cameraController initImageOutput];
+                    [self.previewView addSwipeGesture];
+                }
+            }else {
+                [self.view insertSubview:self.playVideoView belowSubview:self.bottomView];
+                [self.cameraController initImageOutput];
+                [self.previewView addSwipeGesture];
+            }
         }
         [self.cameraController startSession];
     }
@@ -471,7 +486,7 @@
 }
 - (HXCustomCameraBottomView *)bottomView {
     if (!_bottomView) {
-        _bottomView = [[HXCustomCameraBottomView alloc] initWithFrame:CGRectZero manager:self.manager];
+        _bottomView = [[HXCustomCameraBottomView alloc] initWithFrame:CGRectZero manager:self.manager isOutside:self.isOutside];
         _bottomView.delegate = self;
     }
     return _bottomView;
@@ -514,12 +529,14 @@
 @property (strong, nonatomic) UITapGestureRecognizer *tap;
 @property (strong, nonatomic) UIButton *photoBtn;
 @property (strong, nonatomic) UIButton *videoBtn;
+@property (assign, nonatomic) BOOL isOutside;
 @end
 
 @implementation HXCustomCameraBottomView
-- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
+- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager isOutside:(BOOL)isOutside{
     self = [super initWithFrame:frame];
     if (self) {
+        self.isOutside = isOutside;
         self.manager = manager;
         [self setupUI];
     }
@@ -536,12 +553,35 @@
     self.videoBtn.hx_x = CGRectGetMaxX(self.photoBtn.frame) + 10;
     self.titleLb.alpha = 0;
     if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-        self.mode = HXCustomCameraBottomViewModePhoto;
-        self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击拍照"];
-        self.photoBtn.hidden = NO;
-        self.videoBtn.hidden = NO;
-        self.photoBtn.enabled = NO;
-        self.videoBtn.enabled = YES;
+        if (!self.manager.selectTogether && self.isOutside) {
+            if (self.manager.endSelectedPhotos.count > 0) {
+                self.mode = HXCustomCameraBottomViewModePhoto;
+                self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击拍照"];
+                self.titleLb.alpha = 1;
+                self.photoBtn.hidden = YES;
+                self.videoBtn.hidden = YES;
+            }else if (self.manager.endSelectedVideos.count > 0) {
+                self.mode = HXCustomCameraBottomViewModeVideo;
+                self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击录制"];
+                self.titleLb.alpha = 1;
+                self.photoBtn.hidden = YES;
+                self.videoBtn.hidden = YES;
+            }else {
+                self.mode = HXCustomCameraBottomViewModePhoto;
+                self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击拍照"];
+                self.photoBtn.hidden = NO;
+                self.videoBtn.hidden = NO;
+                self.photoBtn.enabled = NO;
+                self.videoBtn.enabled = YES;
+            }
+        }else {
+            self.mode = HXCustomCameraBottomViewModePhoto;
+            self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击拍照"];
+            self.photoBtn.hidden = NO;
+            self.videoBtn.hidden = NO;
+            self.photoBtn.enabled = NO;
+            self.videoBtn.enabled = YES;
+        }
     }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
         self.mode = HXCustomCameraBottomViewModePhoto;
         self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击拍照"];
@@ -594,9 +634,20 @@
     self.timeLb.text = [NSBundle hx_localizedStringForKey:@"3秒内的视频无效哦~"];
 }
 - (void)stopRecord {
-    if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-        self.photoBtn.hidden = NO;
-        self.videoBtn.hidden = NO;
+    if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo && self.isOutside) {
+        if (!self.manager.selectTogether) {
+            if (self.manager.endSelectedPhotos.count > 0) {
+                self.photoBtn.hidden = NO;
+            }else if (self.manager.endSelectedVideos.count > 0) {
+                self.videoBtn.hidden = NO;
+            }else {
+                self.photoBtn.hidden = NO;
+                self.videoBtn.hidden = NO;
+            }
+        }else {
+            self.photoBtn.hidden = NO;
+            self.videoBtn.hidden = NO;
+        }
     }else {
         self.titleLb.alpha = 1;
     }
@@ -612,6 +663,14 @@
     self.titleLb.frame = CGRectMake(12, self.playView.hx_y - 20 - 30, self.hx_w - 24, 15);
     if (self.manager.type == HXPhotoManagerSelectedTypeVideo || self.manager.type == HXPhotoManagerSelectedTypePhoto) {
         self.titleLb.hx_y = self.playView.hx_y - 30;
+    }else if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+        if (!self.manager.selectTogether && self.isOutside) {
+            if (self.manager.endSelectedPhotos.count > 0) {
+                self.titleLb.hx_y = self.playView.hx_y - 30;
+            }else if (self.manager.endSelectedVideos.count > 0) {
+                self.titleLb.hx_y = self.playView.hx_y - 30;
+            }
+        }
     }
     self.photoBtn.hx_y = self.playView.hx_y - 30;
     self.videoBtn.hx_y = self.photoBtn.hx_y;

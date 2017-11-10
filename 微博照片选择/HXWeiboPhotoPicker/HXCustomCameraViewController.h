@@ -24,6 +24,7 @@ typedef enum : NSUInteger {
 @interface HXCustomCameraViewController : UIViewController
 @property (weak, nonatomic) id<HXCustomCameraViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
+@property (assign, nonatomic) BOOL isOutside;
 @end
 
 @protocol HXCustomCameraBottomViewDelegate <NSObject>
@@ -37,7 +38,7 @@ typedef enum : NSUInteger {
 @property (weak, nonatomic) id<HXCustomCameraBottomViewDelegate> delegate;
 @property (assign ,nonatomic) BOOL animating;
 @property (assign, nonatomic) HXCustomCameraBottomViewMode mode;
-- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
+- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager isOutside:(BOOL)isOutside;
 - (void)changeTime:(NSInteger)time;
 - (void)startRecord;
 - (void)stopRecord;
