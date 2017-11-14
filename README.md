@@ -7,6 +7,7 @@
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
 <img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32322874-fe149aa8-c000-11e7-8172-629de70f7089.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32438543-db479232-c325-11e7-87d9-48282914e752.gif" width="270" height="480">
+<img src="https://user-images.githubusercontent.com/18083149/32778022-585f3628-c973-11e7-8139-9d19c26f1515.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32778166-d2397300-c973-11e7-9135-8ba11b24636e.gif" width="270" height="480">
 
 ## 目录
 * [项目特性](#特性)
@@ -71,9 +72,10 @@
 - v2.0.7　-　支持传入本地图片、添加了一些属性和方法、优化了一些细节
 - v2.0.8　-　修改一些细节问题、删除无效文件
 - v2.0.9　-　添加一键将已选模型数组写入temp目录方法和新属性、demo示例
-- v2.1.0　-　适配ios11以及iphone X / 3DTouch预览时播放gif、视频 / 优化区分icloud照片、修改写入文件方法
+- v2.1.0　-　适配ios11以及iphone X / 3DTouch预览时播放gif、视频 / 优化区分iCloud照片、修改写入文件方法
 - v2.1.1　-　添加新相册风格(性能更好,支持横屏)、完善细节功能
 - 2017-11-06　　完善手势返回效果、修改小问题
+- 2017-11-14　　添加自定义裁剪功能
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoTools"></a> 关于HXPhotoTools获取资源信息 具体代码还是请下载Demo这里只是简单的两个
