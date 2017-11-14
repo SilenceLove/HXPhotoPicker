@@ -490,7 +490,8 @@
     }
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     if (self.manager.singleSelected) {
-        if (model.asset.duration > self.manager.videoMaxDuration) { [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
+        if (model.asset.duration > self.manager.videoMaxDuration) {
+            [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
             return;
         }else if (model.asset.duration < 3.f) {
             [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频少于3秒,无法选择"]];
@@ -528,6 +529,15 @@
         }
     }
     if (self.manager.selectedList.count == 0) {
+        if (model.type == HXPhotoModelMediaTypeVideo ) {
+            if (model.asset.duration > self.manager.videoMaxDuration) {
+                [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
+                return;
+            }else if (model.asset.duration < 3.f) {
+                [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频少于3秒,无法选择"]];
+                return;
+            }
+        }
         if (!self.selectBtn.selected && !max && self.modelArray.count > 0) {
             model.selected = YES;
             HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];

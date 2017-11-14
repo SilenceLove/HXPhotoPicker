@@ -40,6 +40,11 @@
     self.view.backgroundColor = [UIColor grayColor];
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
+    if (self.manager.videoMaximumDuration > self.manager.videoMaxDuration) {
+        self.manager.videoMaximumDuration = self.manager.videoMaxDuration;
+    }else if (self.manager.videoMaximumDuration < 3.f) {
+        self.manager.videoMaximumDuration = 4.f;
+    }
     
     [self.view addSubview:self.previewView];
     self.cameraController = [[HXCustomCameraController alloc] init];
