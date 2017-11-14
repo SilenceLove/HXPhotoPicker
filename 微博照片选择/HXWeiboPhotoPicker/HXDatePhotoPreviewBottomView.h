@@ -13,6 +13,7 @@
 @optional
 - (void)datePhotoPreviewBottomViewDidItem:(HXPhotoModel *)model currentIndex:(NSInteger)currentIndex beforeIndex:(NSInteger)beforeIndex;
 - (void)datePhotoPreviewBottomViewDidDone:(HXDatePhotoPreviewBottomView *)bottomView;
+- (void)datePhotoPreviewBottomViewDidEdit:(HXDatePhotoPreviewBottomView *)bottomView;
 @end
 
 @interface HXDatePhotoPreviewBottomView : UIView
@@ -20,6 +21,9 @@
 @property (strong, nonatomic) NSMutableArray *modelArray;
 @property (assign, nonatomic) NSInteger selectCount;
 @property (assign, nonatomic) NSInteger currentIndex;
+@property (assign, nonatomic) BOOL hideEditBtn;
+@property (assign, nonatomic) BOOL enabled;
+
 - (void)insertModel:(HXPhotoModel *)model;
 - (void)deleteModel:(HXPhotoModel *)model;
 - (instancetype)initWithFrame:(CGRect)frame modelArray:(NSArray *)modelArray;

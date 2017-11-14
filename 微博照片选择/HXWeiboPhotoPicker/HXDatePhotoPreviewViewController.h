@@ -15,6 +15,8 @@
 @optional
 - (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 - (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController;
+- (void)datePhotoPreviewDidEditClick:(HXDatePhotoPreviewViewController *)previewController;
+- (void)datePhotoPreviewSingleSelectedClick:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 @end
 
 @interface HXDatePhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>

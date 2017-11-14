@@ -43,7 +43,7 @@
         _manager.style = HXPhotoAlbumStylesSystem;
         _manager.deleteTemporaryPhoto = NO;
         _manager.lookLivePhoto = YES;
-        _manager.saveSystemAblum = YES;
+        _manager.saveSystemAblum = YES; 
 //        _manager.cameraCellShowPreview = NO;
     }
     return _manager;
@@ -89,6 +89,7 @@
     }else {
         self.manager.type = HXPhotoManagerSelectedTypePhotoAndVideo;
     }
+    [self.manager clearSelectedList];
 }
 
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {

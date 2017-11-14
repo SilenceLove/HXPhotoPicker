@@ -33,16 +33,30 @@
     }
 }
 
-+ (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(BOOL isICloud))complete {
++ (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(HXPhotoModel *mode, BOOL isICloud))complete {
+    if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (complete) {
+            complete(model,NO);
+        }
+        return;
+    }
 //    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
         PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
         options.networkAccessAllowed = NO;
         [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-            if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
-                NSSLog(@"是iCloud上的照片");
-            }else {
-                NSSLog(@"不是iCloud上的照片");
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
+                    NSSLog(@"是iCloud上的照片");
+                    if (complete) {
+                        complete(model,YES);
+                    }
+                }else {
+                    NSSLog(@"不是iCloud上的照片");
+                    if (complete) {
+                        complete(model,NO);
+                    }
+                }
+            });
             [[PHImageManager defaultManager] cancelImageRequest:[[info objectForKey:PHImageResultRequestIDKey] intValue]];
         }];
 //    }else {
@@ -51,13 +65,12 @@
 //        options.networkAccessAllowed = NO;
 //        [[PHImageManager defaultManager] requestPlayerItemForVideo:model.asset options:options resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
 //            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-//            if (downloadFinined && playerItem) {
+//            if (downloadFinined) {
 //                if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
 //                    NSSLog(@"是iCloud上的视频");
 //                }else {
 //                    NSSLog(@"不是iCloud上的视频");
 //                }
-//
 //                [[PHImageManager defaultManager] cancelImageRequest:[[info objectForKey:PHImageResultRequestIDKey] intValue]];
 //            }
 //        }];
@@ -77,18 +90,10 @@
 }
 
 + (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion {
-    static PHImageRequestID requestID = -1;
-    
-    CGFloat scale = [UIScreen mainScreen].scale;
-    CGFloat width = MIN([UIScreen mainScreen].bounds.size.width, 500);
-    if (requestID >= 1 && size.width / width == scale) {
-        [[PHCachingImageManager defaultManager] cancelImageRequest:requestID];
-    }
-    
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     
-    requestID = [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    return [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         
@@ -98,7 +103,6 @@
             });
         }
     }];
-    return requestID;
 }
 
 + (PHImageRequestID)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error {
@@ -894,6 +898,20 @@
             
         }
     });
+}
+
++ (BOOL)isIphone6 {
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    
+    NSString *platform = [NSString stringWithCString:systemInfo.machine encoding:NSASCIIStringEncoding];
+    if([platform isEqualToString:@"iPhone7,1"]){
+        return YES;
+    }
+    if([platform isEqualToString:@"iPhone7,2"]) {
+        return YES;
+    }
+    return NO;
 }
 
 + (BOOL)platform {

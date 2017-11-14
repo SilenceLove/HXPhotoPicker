@@ -126,7 +126,9 @@
         hudW = self.frame.size.width - 60;
     }
     CGFloat hudH = [HXPhotoTools getTextHeight:text width:hudW fontSize:14];
-    
+    if (!text) {
+        hudH = 15;
+    }
     HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, 110, 110 + hudH - 15) imageName:@"alert_failed_icon@2x.png" text:text];
     [hud showloading];
     hud.alpha = 0;
@@ -140,30 +142,33 @@
 
 - (void)handleLoading
 {
-    [UIView cancelPreviousPerformRequestsWithTarget:self];
-    for (UIView *view in self.subviews) {
-        if (view.tag == 10086) {
-            [UIView animateWithDuration:0.2f animations:^{
-                view.alpha = 0;
-            } completion:^(BOOL finished) {
-                [view removeFromSuperview];
-            }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView cancelPreviousPerformRequestsWithTarget:self];
+        for (UIView *view in self.subviews) {
+            if (view.tag == 10086) {
+                [UIView animateWithDuration:0.2f animations:^{
+                    view.alpha = 0;
+                } completion:^(BOOL finished) {
+                    [view removeFromSuperview];
+                }];
+            }
         }
-    }
+    });
 }
 
-- (void)handleGraceTimer
-{
-    [UIView cancelPreviousPerformRequestsWithTarget:self];
-    for (UIView *view in self.subviews) {
-        if (view.tag == 1008611) {
-            [UIView animateWithDuration:0.2f animations:^{
-                view.alpha = 0;
-            } completion:^(BOOL finished) {
-                [view removeFromSuperview];
-            }];
+- (void)handleGraceTimer {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView cancelPreviousPerformRequestsWithTarget:self];
+        for (UIView *view in self.subviews) {
+            if (view.tag == 1008611) {
+                [UIView animateWithDuration:0.2f animations:^{
+                    view.alpha = 0;
+                } completion:^(BOOL finished) {
+                    [view removeFromSuperview];
+                }];
+            }
         }
-    }
+    });
 }
 
 @end

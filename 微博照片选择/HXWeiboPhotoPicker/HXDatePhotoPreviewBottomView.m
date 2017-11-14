@@ -16,6 +16,7 @@
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
 @property (strong, nonatomic) UIButton *doneBtn;
+@property (strong, nonatomic) UIButton *editBtn;
 @end
 
 @implementation HXDatePhotoPreviewBottomView
@@ -32,7 +33,19 @@
     [self addSubview:self.bgView];
     [self addSubview:self.collectionView];
     [self addSubview:self.doneBtn];
+    [self addSubview:self.editBtn];
     [self changeDoneBtnFrame];
+}
+- (void)setEnabled:(BOOL)enabled {
+    _enabled = enabled;
+    self.editBtn.enabled = enabled;
+}
+- (void)setHideEditBtn:(BOOL)hideEditBtn {
+    _hideEditBtn = hideEditBtn;
+    if (hideEditBtn) {
+        [self.editBtn removeFromSuperview];
+        [self layoutSubviews];
+    }
 }
 - (void)insertModel:(HXPhotoModel *)model {
     [self.modelArray addObject:model];
@@ -102,6 +115,11 @@
         [self.delagate datePhotoPreviewBottomViewDidDone:self];
     }
 }
+- (void)didEditBtnClick {
+    if ([self.delagate respondsToSelector:@selector(datePhotoPreviewBottomViewDidEdit:)]) {
+        [self.delagate datePhotoPreviewBottomViewDidEdit:self];
+    }
+}
 - (void)changeDoneBtnFrame {
     CGFloat width = [HXPhotoTools getTextWidth:self.doneBtn.currentTitle height:30 fontSize:14];
     self.doneBtn.hx_w = width + 20;
@@ -109,7 +127,12 @@
         self.doneBtn.hx_w = 50;
     }
     self.doneBtn.hx_x = self.hx_w - 12 - self.doneBtn.hx_w;
-    self.collectionView.hx_w = self.doneBtn.hx_x - 12;
+    self.editBtn.hx_x = self.doneBtn.hx_x - self.editBtn.hx_w;
+    if (!self.hideEditBtn) {
+        self.collectionView.hx_w = self.editBtn.hx_x;
+    }else {
+        self.collectionView.hx_w = self.doneBtn.hx_x - 12;
+    }
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -163,6 +186,18 @@
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _doneBtn;
+}
+- (UIButton *)editBtn {
+    if (!_editBtn) {
+        _editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_editBtn setTitle:@"编辑" forState:UIControlStateNormal];
+        [_editBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
+        [_editBtn setTitleColor:[self.tintColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        _editBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+        [_editBtn addTarget:self action:@selector(didEditBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        _editBtn.hx_size = CGSizeMake(50, 50);
+    }
+    return _editBtn;
 }
 @end
 

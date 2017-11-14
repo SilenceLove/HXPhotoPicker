@@ -40,6 +40,7 @@
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic) CALayer *selectMaskLayer;
 @property (strong, nonatomic) HXPhotoModel *model;
+@property (assign, nonatomic) BOOL singleSelected;
 - (void)cancelRequest;
 @end
 
@@ -63,6 +64,7 @@
 @optional
 - (void)datePhotoBottomViewDidPreviewBtn;
 - (void)datePhotoBottomViewDidDoneBtn;
+- (void)datePhotoBottomViewDidEditBtn;
 @end
 
 @interface HXDatePhotoBottomView : UIView

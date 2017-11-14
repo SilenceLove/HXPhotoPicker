@@ -17,7 +17,8 @@
 #import "HXCustomNavigationController.h"
 #import "HXCustomCameraController.h"
 #import "HXCustomPreviewView.h"
-@interface HXDatePhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UIViewControllerPreviewingDelegate,HXDatePhotoViewCellDelegate,HXDatePhotoBottomViewDelegate,HXDatePhotoPreviewViewControllerDelegate,HXCustomCameraViewControllerDelegate>
+#import "HXDatePhotoEditViewController.h"
+@interface HXDatePhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UIViewControllerPreviewingDelegate,HXDatePhotoViewCellDelegate,HXDatePhotoBottomViewDelegate,HXDatePhotoPreviewViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXDatePhotoEditViewControllerDelegate>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
 
@@ -265,20 +266,30 @@
 }
 #pragma mark - < HXCustomCameraViewControllerDelegate >
 - (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model {
-//    if (self.manager.singleSelected && model.type == HXPhotoModelMediaTypeCameraPhoto) {
-//        [self.manager.selectedCameraList addObject:model];
-//        [self.manager.selectedCameraPhotos addObject:model];
-//        [self.manager.selectedPhotos addObject:model];
-//        [self.manager.selectedList addObject:model];
-//        [self didNextClick:self.rightBtn];
-//        return;
-//    }
     if (self.manager.saveSystemAblum) {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
             [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.customAlbumName photo:model.thumbPhoto];
         }else {
             [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.customAlbumName videoURL:model.videoURL];
         }
+    }
+    if (self.manager.singleSelected) {
+        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+            vc.delegate = self;
+            vc.manager = self.manager;
+            vc.model = model;
+            [self.navigationController pushViewController:vc animated:NO];
+        }else {
+            HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+            previewVC.delegate = self;
+            previewVC.modelArray = [NSMutableArray arrayWithObjects:model, nil];
+            previewVC.manager = self.manager;
+            previewVC.currentModelIndex = 0;
+            self.navigationController.delegate = previewVC;
+            [self.navigationController pushViewController:previewVC animated:YES];
+        }
+        return;
     }
     model.dateCellIsVisible = YES;
     model.currentAlbumIndex = self.albumModel.index;
@@ -370,7 +381,7 @@
         [self.previewArray insertObject:model atIndex:0];
         [self.manager.cameraList insertObject:model atIndex:0];
     }else {
-        NSInteger count = self.allArray.count - 1;
+        NSInteger count = self.allArray.count - cameraIndex;
         [self.allArray insertObject:model atIndex:count];
         [self.previewArray addObject:model];
         [self.manager.cameraList addObject:model];
@@ -387,7 +398,7 @@
             model.dateSection = self.dateArray.count - 1;
             HXPhotoDateModel *dateModel = self.dateArray.lastObject;
             NSMutableArray *array = [NSMutableArray arrayWithArray:dateModel.photoModelArray];
-            NSInteger count = array.count - 1;
+            NSInteger count = array.count - cameraIndex;
             [array insertObject:model atIndex:count];
             dateModel.photoModelArray = array;
             [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:count inSection:self.dateArray.count - 1]]];
@@ -443,6 +454,7 @@
 //        cell.section = indexPath.section;
 //        cell.item = indexPath.item;
         cell.model = model;
+        cell.singleSelected = self.manager.singleSelected;
         return cell;
     }
 }
@@ -486,17 +498,35 @@
     }else {
         HXDatePhotoViewCell *cell = (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
         if (cell.model.isIcloud) {
-            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"尚未从iCloud上下载，请至相册下载完毕后选择"]];
+            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"尚未从iCloud上下载，请至系统相册下载完毕后选择"]];
             return;
         }
-        NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
-        HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
-        previewVC.delegate = self;
-        previewVC.modelArray = self.previewArray;
-        previewVC.manager = self.manager;
-        previewVC.currentModelIndex = currentIndex;
-        self.navigationController.delegate = previewVC;
-        [self.navigationController pushViewController:previewVC animated:YES];
+        if (!self.manager.singleSelected) {
+            NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
+            HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+            previewVC.delegate = self;
+            previewVC.modelArray = self.previewArray;
+            previewVC.manager = self.manager;
+            previewVC.currentModelIndex = currentIndex;
+            self.navigationController.delegate = previewVC;
+            [self.navigationController pushViewController:previewVC animated:YES];
+        }else {
+            if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
+                HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+                vc.model = cell.model;
+                vc.delegate = self;
+                vc.manager = self.manager;
+                [self.navigationController pushViewController:vc animated:NO];
+            }else {
+                HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+                previewVC.delegate = self;
+                previewVC.modelArray = [NSMutableArray arrayWithObjects:cell.model, nil];
+                previewVC.manager = self.manager;
+                previewVC.currentModelIndex = 0;
+                self.navigationController.delegate = previewVC;
+                [self.navigationController pushViewController:previewVC animated:YES];
+            }
+        }
     }
 }
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -590,16 +620,35 @@
 }
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
     HXPhoto3DTouchViewController *vc = (HXPhoto3DTouchViewController *)viewControllerToCommit;
-    HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
-    previewVC.delegate = self;
-    previewVC.modelArray = self.previewArray;
-    previewVC.manager = self.manager;
     HXDatePhotoViewCell *cell = (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:vc.indexPath];
-    cell.model.tempImage = vc.imageView.image;
-    NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
-    previewVC.currentModelIndex = currentIndex;
-    self.navigationController.delegate = previewVC;
-    [self.navigationController pushViewController:previewVC animated:YES];
+    if (!self.manager.singleSelected) {
+        HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+        previewVC.delegate = self;
+        previewVC.modelArray = self.previewArray;
+        previewVC.manager = self.manager;
+        cell.model.tempImage = vc.imageView.image;
+        NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
+        previewVC.currentModelIndex = currentIndex;
+        self.navigationController.delegate = previewVC;
+        [self.navigationController pushViewController:previewVC animated:YES];
+    }else {
+        if (vc.model.subType == HXPhotoModelMediaSubTypePhoto) {
+            HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+            vc.model = cell.model;
+            vc.delegate = self;
+            vc.manager = self.manager;
+            [self.navigationController pushViewController:vc animated:NO];
+        }else {
+            HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+            previewVC.delegate = self;
+            previewVC.modelArray = [NSMutableArray arrayWithObjects:cell.model, nil];
+            previewVC.manager = self.manager;
+            cell.model.tempImage = vc.imageView.image;
+            previewVC.currentModelIndex = 0;
+            self.navigationController.delegate = previewVC;
+            [self.navigationController pushViewController:previewVC animated:YES];
+        }
+    }
 }
 #pragma mark - < HXDatePhotoViewCellDelegate >
 - (void)datePhotoViewCell:(HXDatePhotoViewCell *)cell didSelectBtn:(UIButton *)selectBtn {
@@ -709,6 +758,45 @@
         [self.delegate datePhotoViewControllerDidChangeSelect:model selected:model.selected];
     }
 }
+- (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController {
+    [self datePhotoBottomViewDidDoneBtn];
+}
+- (void)datePhotoPreviewDidEditClick:(HXDatePhotoPreviewViewController *)previewController {
+    [self datePhotoBottomViewDidDoneBtn];
+}
+- (void)datePhotoPreviewSingleSelectedClick:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model {
+    if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+        [self.manager.selectedCameraList addObject:model];
+        [self.manager.selectedCameraVideos addObject:model];
+    }
+    [self.manager.selectedVideos addObject:model];
+    [self.manager.selectedList addObject:model];
+    [self datePhotoBottomViewDidDoneBtn];
+}
+#pragma mark - < HXDatePhotoEditViewControllerDelegate >
+- (void)datePhotoEditViewControllerDidClipClick:(HXDatePhotoEditViewController *)datePhotoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+    if (self.manager.singleSelected) {
+        [self.manager.selectedCameraList addObject:afterModel];
+        [self.manager.selectedCameraPhotos addObject:afterModel];
+        [self.manager.selectedPhotos addObject:afterModel];
+        [self.manager.selectedList addObject:afterModel];
+        [self datePhotoBottomViewDidDoneBtn];
+        return;
+    }
+    beforeModel.selected = NO;
+    beforeModel.selectIndexStr = @"";
+    if (beforeModel.type == HXPhotoModelMediaTypeCameraPhoto) {
+        [self.manager.selectedCameraList removeObject:beforeModel];
+        [self.manager.selectedCameraPhotos removeObject:beforeModel];
+    }else {
+        beforeModel.thumbPhoto = nil;
+        beforeModel.previewPhoto = nil;
+    }
+    [self.manager.selectedList removeObject:beforeModel];
+    [self.manager.selectedPhotos removeObject:beforeModel];
+    [self datePhotoPreviewControllerDidSelect:nil model:beforeModel];
+    [self customCameraViewController:nil didDone:afterModel];
+}
 #pragma mark - < HXDatePhotoBottomViewDelegate >
 - (void)datePhotoBottomViewDidPreviewBtn {
     if (self.navigationController.topViewController != self || self.manager.selectedList.count == 0) {
@@ -723,12 +811,16 @@
     self.navigationController.delegate = previewVC;
     [self.navigationController pushViewController:previewVC animated:YES];
 }
-- (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController {
-    [self datePhotoBottomViewDidDoneBtn];
-}
 - (void)datePhotoBottomViewDidDoneBtn {
     [self cleanSelectedList];
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (void)datePhotoBottomViewDidEditBtn {
+    HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+    vc.model = self.manager.selectedPhotos.firstObject;
+    vc.delegate = self;
+    vc.manager = self.manager;
+    [self.navigationController pushViewController:vc animated:NO];
 }
 - (void)sortSelectList {
     int i = 0, j = 0, k = 0;
@@ -862,7 +954,7 @@
     return _dateArray;
 }
 - (void)dealloc {
-    NSSLog(@"dealloc : %@",self);
+    NSSLog(@"dealloc");
     [self.collectionView.layer removeAllAnimations];
     if (self.manager.open3DTouchPreview) {
         if (self.previewingContext) {
@@ -898,16 +990,26 @@
     if (self.cameraController.captureSession) {
         return;
     }
-    if ([self.cameraController setupSession:nil]) {
-        [self.previewView setSession:self.cameraController.captureSession];
-        [self.cameraController startSession];
-        self.cameraBtn.selected = YES;
-        
-    }
+    __weak typeof(self) weakSelf = self;
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (granted) {
+                if ([weakSelf.cameraController setupSession:nil]) {
+                    [weakSelf.previewView setSession:weakSelf.cameraController.captureSession];
+                    [weakSelf.cameraController startSession];
+                    weakSelf.cameraBtn.selected = YES;
+                }
+            }
+        });
+    }];
 }
 - (void)stopRunning {
     if (![UIImagePickerController isSourceTypeAvailable:
           UIImagePickerControllerSourceTypeCamera]) {
+        return;
+    }
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus != AVAuthorizationStatusAuthorized) {
         return;
     }
     if (!self.cameraController.captureSession) {
@@ -960,6 +1062,8 @@
 @property (strong, nonatomic) UILabel *stateLb;
 @property (strong, nonatomic) CAGradientLayer *bottomMaskLayer;
 @property (strong, nonatomic) UIButton *selectBtn;
+@property (strong, nonatomic) UIImageView *iCloudIcon;
+@property (strong, nonatomic) CALayer *iCloudMaskLayer;
 @end
 
 @implementation HXDatePhotoViewCell
@@ -975,6 +1079,12 @@
     [self.contentView addSubview:self.imageView];
     [self.contentView addSubview:self.stateLb];
     [self.contentView addSubview:self.selectBtn];
+}
+- (void)setSingleSelected:(BOOL)singleSelected {
+    _singleSelected = singleSelected;
+    if (singleSelected) {
+        [self.selectBtn removeFromSuperview];
+    }
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
@@ -1012,11 +1122,14 @@
     self.selectBtn.selected = model.selected;
     [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
     self.selectBtn.backgroundColor = model.selected ? self.tintColor :nil;
-    if (model.isIcloud) {
-        self.selectBtn.userInteractionEnabled = NO;
-    }else {
-        self.selectBtn.userInteractionEnabled = YES;
-    }
+//    if (model.isIcloud) {
+//        self.selectBtn.userInteractionEnabled = NO;
+//    }else {
+//        self.selectBtn.userInteractionEnabled = YES;
+//    }
+    self.iCloudIcon.hidden = !model.isIcloud;
+    self.selectBtn.hidden = model.isIcloud;
+    self.iCloudMaskLayer.hidden = !model.isIcloud;
 }
 - (void)cancelRequest {
     if (self.requestID) {
@@ -1025,12 +1138,9 @@
     }
 }
 - (void)didSelectClick:(UIButton *)button {
-//    [HXPhotoTools isICloudAssetWithModel:self.model complete:^(BOOL isICloud) {
-//
-//    }];
     if (self.model.type == HXPhotoModelMediaTypeCamera) {
         return;
-    } 
+    }
     if (self.model.isIcloud) {
         return;
     }
@@ -1045,6 +1155,9 @@
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
     self.selectBtn.frame = CGRectMake(self.hx_w - 27, 2, 25, 25);
     self.selectMaskLayer.frame = self.bounds;
+    self.iCloudMaskLayer.frame = self.bounds;
+    self.iCloudIcon.hx_x = self.hx_w - 3 - self.iCloudIcon.hx_w;
+    self.iCloudIcon.hx_y = 3;
 }
 - (void)dealloc {
     self.model.dateCellIsVisible = NO;
@@ -1061,8 +1174,17 @@
         _imageView.clipsToBounds = YES;
         [_imageView.layer addSublayer:self.bottomMaskLayer];
         [_imageView.layer addSublayer:self.selectMaskLayer];
+        [_imageView.layer addSublayer:self.iCloudMaskLayer];
+        [_imageView addSubview:self.iCloudIcon];
     }
     return _imageView;
+}
+- (UIImageView *)iCloudIcon {
+    if (!_iCloudIcon) {
+        _iCloudIcon = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:@"icon_yunxiazai@2x.png"]];
+        _iCloudIcon.hx_size = _iCloudIcon.image.size;
+    }
+    return _iCloudIcon;
 }
 - (CALayer *)selectMaskLayer {
     if (!_selectMaskLayer) {
@@ -1071,6 +1193,13 @@
         _selectMaskLayer.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.3].CGColor;
     }
     return _selectMaskLayer;
+}
+- (CALayer *)iCloudMaskLayer {
+    if (!_iCloudMaskLayer) {
+        _iCloudMaskLayer = [CALayer layer];
+        _iCloudMaskLayer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3].CGColor;
+    }
+    return _iCloudMaskLayer;
 }
 - (UILabel *)stateLb {
     if (!_stateLb) {
@@ -1189,7 +1318,8 @@
 @interface HXDatePhotoBottomView ()
 @property (strong, nonatomic) UIToolbar *bgView;
 @property (strong, nonatomic) UIButton *previewBtn;
-@property (strong, nonatomic) UIButton *doneBtn; 
+@property (strong, nonatomic) UIButton *doneBtn;
+@property (strong, nonatomic) UIButton *editBtn;
 @end
 
 @implementation HXDatePhotoBottomView
@@ -1205,6 +1335,7 @@
     [self addSubview:self.previewBtn];
     [self addSubview:self.originalBtn];
     [self addSubview:self.doneBtn];
+    [self addSubview:self.editBtn];
     [self changeDoneBtnFrame];
 }
 - (void)setManager:(HXPhotoManager *)manager {
@@ -1212,6 +1343,7 @@
     self.originalBtn.hidden = self.manager.UIManager.hideOriginalBtn;
     if (manager.type == HXPhotoManagerSelectedTypeVideo) {
         self.originalBtn.hidden = YES;
+        self.editBtn.hidden = YES;
     }
     self.originalBtn.selected = self.manager.isOriginal;
 }
@@ -1229,10 +1361,12 @@
     self.doneBtn.backgroundColor = self.doneBtn.enabled ? self.tintColor : [self.tintColor colorWithAlphaComponent:0.5];
     [self changeDoneBtnFrame];
     if (self.manager.selectedPhotos.count == 0) {
+        self.editBtn.enabled = NO;
         self.originalBtn.enabled = NO;
         self.originalBtn.selected = NO;
         self.manager.isOriginal = NO;
     }else {
+        self.editBtn.enabled = YES;
         self.originalBtn.enabled = YES;
     }
 }
@@ -1254,6 +1388,11 @@
         [self.delegate datePhotoBottomViewDidPreviewBtn];
     }
 }
+- (void)didEditBtnClick {
+    if ([self.delegate respondsToSelector:@selector(datePhotoBottomViewDidEditBtn)]) {
+        [self.delegate datePhotoBottomViewDidEditBtn];
+    }
+}
 - (void)didOriginalClick:(UIButton *)button {
     button.selected = !button.selected;
     self.manager.isOriginal = button.selected;
@@ -1264,7 +1403,8 @@
     self.bgView.frame = self.bounds;
     self.previewBtn.frame = CGRectMake(12, 0, 50, 50);
     self.previewBtn.center = CGPointMake(self.previewBtn.center.x, 25);
-    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame), 0, 80, 50);
+    self.editBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame), 0, 50, 50);
+    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame), 0, 80, 50);
     self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
     self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
     [self changeDoneBtnFrame];
@@ -1320,5 +1460,18 @@
     }
     return _originalBtn;
 }
+    - (UIButton *)editBtn {
+        if (!_editBtn) {
+            _editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+            [_editBtn setTitle:@"编辑" forState:UIControlStateNormal];
+            [_editBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
+            [_editBtn setTitleColor:[self.tintColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+            _editBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+            _editBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+            [_editBtn addTarget:self action:@selector(didEditBtnClick) forControlEvents:UIControlEventTouchUpInside];
+            _editBtn.enabled = NO;
+        }
+        return _editBtn;
+    }
 @end
     

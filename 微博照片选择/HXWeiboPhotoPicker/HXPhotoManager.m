@@ -49,7 +49,11 @@
     if ([UIScreen mainScreen].bounds.size.width == 320) {
         self.rowCount = 3;
     }else {
-        self.rowCount = 4;
+        if ([HXPhotoTools isIphone6]) {
+            self.rowCount = 3;
+        }else {
+            self.rowCount = 4;
+        }
     }
     self.albums = [NSMutableArray array];
     self.selectedList = [NSMutableArray array];

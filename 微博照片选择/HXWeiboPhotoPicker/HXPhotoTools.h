@@ -112,7 +112,7 @@ typedef enum : NSUInteger {
  */
 + (void)getImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos type:(HXPhotoToolsFetchType)type completion:(void(^)(NSArray<UIImage *> *images))completion;
 
-+ (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(BOOL isICloud))complete;
++ (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(HXPhotoModel *model, BOOL isICloud))complete;
 
 + (PHImageRequestID)getImageWithModel:(HXPhotoModel *)model completion:(void (^)(UIImage *image, HXPhotoModel *model))completion;
 
@@ -183,4 +183,5 @@ typedef enum : NSUInteger {
 + (PHImageRequestID)FetchPhotoForPHAsset:(PHAsset *)asset Size:(CGSize)size deliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode completion:(void (^)(UIImage *, NSDictionary *))completion;
 
 + (BOOL)platform;
++ (BOOL)isIphone6;
 @end

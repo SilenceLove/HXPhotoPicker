@@ -30,7 +30,7 @@ typedef enum : NSUInteger {
 
 typedef enum : NSUInteger {
     HXPhotoAlbumStylesWeibo = 0,           // 微博相册风格
-    HXPhotoAlbumStylesSystem               // 系统相册(支持横屏、暂不支持单选)
+    HXPhotoAlbumStylesSystem               // 系统相册(支持横屏,功能已完善)
 } HXPhotoAlbumStyles;
 
 @interface HXPhotoManager : NSObject

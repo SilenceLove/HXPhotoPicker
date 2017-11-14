@@ -207,7 +207,7 @@
         model.type = HXPhotoModelMediaTypeCameraPhoto;
         model.subType = HXPhotoModelMediaSubTypePhoto;
         if (self.imageView.image.imageOrientation != UIImageOrientationUp) {
-            self.imageView.image = [self.imageView.image fullNormalizedImage];
+            self.imageView.image = [self.imageView.image normalizedImage];
         }
         model.thumbPhoto = self.imageView.image;
         model.imageSize = self.imageView.image.size;

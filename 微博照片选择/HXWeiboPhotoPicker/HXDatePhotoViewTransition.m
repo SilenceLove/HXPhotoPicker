@@ -52,6 +52,10 @@
 - (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext image:(UIImage *)image model:(HXPhotoModel *)model fromVC:(HXDatePhotoViewController *)fromVC toVC:(HXDatePhotoPreviewViewController *)toVC {
     model.tempImage = image;
     HXDatePhotoViewCell *fromCell = [fromVC currentPreviewCell:model];
+    if (!image) {
+        model.tempImage = fromCell.imageView.image;
+        image = fromCell.imageView.image;
+    }
     UIView *containerView = [transitionContext containerView];
     model.endDateImageSize = CGSizeZero;
     CGFloat imgWidht = model.endDateImageSize.width;
@@ -99,7 +103,6 @@
     }];
 }
 - (void)popAnimation:(id<UIViewControllerContextTransitioning>)transitionContext {
-    NSSLog(@"12312321");
     HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXDatePhotoViewController *toVC = (HXDatePhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [fromVC.modelArray objectAtIndex:fromVC.currentModelIndex];

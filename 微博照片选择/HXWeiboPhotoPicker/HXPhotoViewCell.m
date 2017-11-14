@@ -180,7 +180,7 @@
     self.addImageComplete = YES;
 }
 - (void)didICloudBtnCLick {
-    [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"尚未从iCloud上下载，请至相册下载完毕后选择"]];
+    [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"尚未从iCloud上下载，请至系统相册下载完毕后选择"]];
 }
 
 - (void)setup {

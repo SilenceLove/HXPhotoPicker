@@ -190,7 +190,7 @@
     }
 }
 - (void)getAlbumModelList:(BOOL)isFirst {
-    if (self.manager.albums.count > 0 && self.manager.saveSystemAblum) {
+    if (self.manager.albums.count > 0 && self.manager.saveSystemAblum && !self.manager.singleSelected) {
         self.albumModelArray = [NSMutableArray arrayWithArray:self.manager.albums];
         HXAlbumModel *model = self.albumModelArray.firstObject;
         HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
@@ -216,7 +216,7 @@
                 vc.albumModel = model;
                 vc.delegate = weakSelf;
                 [weakSelf.navigationController pushViewController:vc animated:NO];
-                if (weakSelf.manager.saveSystemAblum) {
+                if (weakSelf.manager.saveSystemAblum && !weakSelf.manager.singleSelected) {
                     if (weakSelf.albumModelArray.count == 0) {
                         [weakSelf getAlbumModelList:NO];
                     }
