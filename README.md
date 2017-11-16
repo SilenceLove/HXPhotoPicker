@@ -36,13 +36,13 @@
 - [x] 自定义转场动画
 - [x] 查看/选择LivePhoto IOS9.1以上才有用
 - [x] 支持浏览网络图片
-- [x] 支持裁剪图片
+- [x] 支持自定义裁剪图片
 - [x] 观察系统相册变化实时增删
 - [x] 支持传入本地图片
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.1.1'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXWeiboPhotoPicker' '~> 2.1.2'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 只使用照片选择功能 导入头文件 "HXPhotoViewController.h"
@@ -76,6 +76,7 @@
 - v2.1.1　-　添加新相册风格(性能更好,支持横屏)、完善细节功能
 - 2017-11-06　　完善手势返回效果、修改小问题
 - 2017-11-14　　添加自定义裁剪功能
+- v2.1.2　-　添加显示照片地理位置信息、优化细节
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoTools"></a> 关于HXPhotoTools获取资源信息 具体代码还是请下载Demo这里只是简单的两个
@@ -334,6 +335,8 @@ self.photoView = photoView;
 ```
 
 ## <a id="更多"></a> 六.  更多 - More
+
+- 后期计划（针对系统风格相册优化关于网络图片的部分、单选模式支持HXPhotoView）
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 
