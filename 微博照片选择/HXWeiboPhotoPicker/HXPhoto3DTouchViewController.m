@@ -21,7 +21,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.imageView.hx_size = self.model.endImageSize;
+    self.imageView.hx_size = self.model.previewViewSize;
     self.imageView.image = self.image;
     [self.view addSubview:self.imageView];
 }
@@ -70,7 +70,8 @@
         return;
     }
     __weak typeof(self) weakSelf = self;
-    requestId = [HXPhotoTools fetchPhotoWithAsset:self.model.asset photoSize:CGSizeMake(self.model.endImageSize.width * 1.5, self.model.endImageSize.height * 1.5) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
+    
+    requestId = [HXPhotoTools fetchPhotoWithAsset:self.model.asset photoSize:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
         weakSelf.imageView.image = photo;
     }];
 }
@@ -93,12 +94,12 @@
         [self loadPhoto];
         return;
     }
-    self.livePhotoView = [[PHLivePhotoView alloc] initWithFrame:CGRectMake(0, 0, self.model.endImageSize.width, self.model.endImageSize.height)];
+    self.livePhotoView = [[PHLivePhotoView alloc] initWithFrame:CGRectMake(0, 0, self.model.previewViewSize.width, self.model.previewViewSize.height)];
     self.livePhotoView.clipsToBounds = YES;
     self.livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
     [self.view addSubview:self.livePhotoView];
     __weak typeof(self) weakSelf = self;
-    requestId = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.endImageSize.width * 1.5, self.model.endImageSize.height * 1.5) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+    requestId = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
         weakSelf.livePhotoView.livePhoto = livePhoto;
         [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
         [weakSelf.imageView removeFromSuperview];
@@ -141,7 +142,7 @@
 
 - (void)playVideo {
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
-    self.playerLayer.frame = CGRectMake(0, 0, self.model.endImageSize.width, self.model.endImageSize.height);
+    self.playerLayer.frame = CGRectMake(0, 0, self.model.previewViewSize.width, self.model.previewViewSize.height);
     [self.view.layer insertSublayer:self.playerLayer atIndex:0];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.player play];
@@ -156,6 +157,7 @@
 - (UIImageView *)imageView {
     if (!_imageView) {
         _imageView = [[UIImageView alloc] init];
+        _imageView.clipsToBounds = YES;
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         _imageView.hx_x = 0;
         _imageView.hx_y = 0;

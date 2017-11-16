@@ -48,10 +48,13 @@
     self.videoMaxNum = 1;
     if ([UIScreen mainScreen].bounds.size.width == 320) {
         self.rowCount = 3;
+        self.headerSectionShowPhotoLocation = NO;
     }else {
         if ([HXPhotoTools isIphone6]) {
             self.rowCount = 3;
+            self.headerSectionShowPhotoLocation = NO;
         }else {
+            self.headerSectionShowPhotoLocation = YES;
             self.rowCount = 4;
         }
     }
@@ -502,13 +505,23 @@
                 }
             }
             photoModel.currentAlbumIndex = albumModel.index;
-            [allArray addObject:photoModel];
+            
+            BOOL canAddPhoto = YES;
+            if (self.filtrationICloudAsset) {
+                if (!photoModel.isIcloud) {
+                    [allArray addObject:photoModel];
+                }else {
+                    canAddPhoto = NO;
+                }
+            }else {
+                [allArray addObject:photoModel];
+            }
             if (!photoModel.isIcloud) {
                 [previewArray addObject:photoModel];
             }
-            if (self.showDateHeaderSection) {
+
+            if (self.showDateHeaderSection && canAddPhoto) {
                 NSDate *photoDate = photoModel.creationDate;
-                //        CLLocation *photoLocation = photoModel.location;
                 if (!currentIndexDate) {
                     dateModel = [[HXPhotoDateModel alloc] init];
                     dateModel.date = photoDate;
@@ -540,6 +553,11 @@
                 }
                 if (idx == 0) {
                     dateModel.photoModelArray = sameDayArray;
+                }
+                if (!dateModel.location && self.headerSectionShowPhotoLocation) {
+                    if (photoModel.asset.location) {
+                        dateModel.location = photoModel.asset.location;
+                    }
                 }
                 currentIndexDate = photoDate;
             }else {
@@ -620,12 +638,20 @@
                 }
             }
             photoModel.currentAlbumIndex = albumModel.index;
-            [allArray addObject:photoModel];
-            
+            BOOL canAddPhoto = YES;
+            if (self.filtrationICloudAsset) {
+                if (!photoModel.isIcloud) {
+                    [allArray addObject:photoModel];
+                }else {
+                    canAddPhoto = NO;
+                }
+            }else {
+                [allArray addObject:photoModel];
+            }
             if (!photoModel.isIcloud) {
                 [previewArray addObject:photoModel];
             }
-            if (self.showDateHeaderSection) {
+            if (self.showDateHeaderSection && canAddPhoto) {
                 NSDate *photoDate = photoModel.creationDate;
                 //        CLLocation *photoLocation = photoModel.location;
                 if (!currentIndexDate) {
@@ -659,6 +685,11 @@
                 }
                 if (index == albumModel.result.count - 1) {
                     dateModel.photoModelArray = sameDayArray;
+                }
+                if (!dateModel.location && self.headerSectionShowPhotoLocation) {
+                    if (photoModel.asset.location) {
+                        dateModel.location = photoModel.asset.location;
+                    }
                 }
                 currentIndexDate = photoDate;
             }else {

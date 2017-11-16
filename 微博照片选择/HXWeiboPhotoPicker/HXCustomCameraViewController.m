@@ -348,7 +348,7 @@
         [self.view addSubview:self.doneBtn];
     }
     self.cancelBtn.hidden = NO;
-    NSSLog(@"%@",videoURL);
+//    NSSLog(@"%@",videoURL);
 }
 - (void)mediaCaptureFailedWithError:(NSError *)error {
     self.time = 0;
@@ -642,9 +642,9 @@
     if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo && self.isOutside) {
         if (!self.manager.selectTogether) {
             if (self.manager.endSelectedPhotos.count > 0) {
-                self.photoBtn.hidden = NO;
+                self.titleLb.alpha = 1;
             }else if (self.manager.endSelectedVideos.count > 0) {
-                self.videoBtn.hidden = NO;
+                self.titleLb.alpha = 1;
             }else {
                 self.photoBtn.hidden = NO;
                 self.videoBtn.hidden = NO;
@@ -654,7 +654,12 @@
             self.videoBtn.hidden = NO;
         }
     }else {
-        self.titleLb.alpha = 1;
+        if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
+            self.photoBtn.hidden = NO;
+            self.videoBtn.hidden = NO;
+        }else {
+            self.titleLb.alpha = 1;
+        }
     }
     self.timeLb.hidden = YES;
     [self.playView clean];

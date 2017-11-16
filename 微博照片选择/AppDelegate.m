@@ -8,6 +8,12 @@
 
 #import "AppDelegate.h"
 #import "ViewController.h"
+#import "HXPhotoTools.h"
+void uncaughtExceptionHandler(NSException *exception) {
+    NSSLog(@"CRASH: %@", exception);
+    NSSLog(@"Stack Trace: %@", [exception callStackSymbols]);
+    // Internal error reporting
+}
 @interface AppDelegate ()
 
 @end
@@ -16,7 +22,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:[[ViewController alloc] init]];

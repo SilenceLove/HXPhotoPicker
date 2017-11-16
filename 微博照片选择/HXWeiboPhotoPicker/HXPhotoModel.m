@@ -142,6 +142,29 @@
     }
     return _endImageSize;
 }
+- (CGSize)previewViewSize {
+    if (_previewViewSize.width == 0 || _previewViewSize.height == 0) {
+        CGFloat width = [UIScreen mainScreen].bounds.size.width;
+        CGFloat height = [UIScreen mainScreen].bounds.size.height;
+        CGFloat imgWidth = self.imageSize.width;
+        CGFloat imgHeight = self.imageSize.height;
+        CGFloat w;
+        CGFloat h;
+        
+        if (imgWidth > width) {
+            h = width / self.imageSize.width * imgHeight;
+            w = width;
+        }else {
+            w = width;
+            h = width / imgWidth * imgHeight;
+        }
+        if (h > height + 20) {
+            h = w;
+        }
+        _previewViewSize = CGSizeMake(w, h);
+    }
+    return _previewViewSize;
+}
 - (CGSize)endDateImageSize {
     if (_endDateImageSize.width == 0 || _endDateImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
@@ -259,4 +282,5 @@
     }
     return _locationList;
 }
+
 @end

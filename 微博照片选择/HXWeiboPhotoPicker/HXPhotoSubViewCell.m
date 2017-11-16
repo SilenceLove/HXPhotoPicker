@@ -20,6 +20,8 @@
 @property (strong, nonatomic) UIImageView *liveIcon;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @property (assign, nonatomic) int32_t requestID;
+@property (strong, nonatomic) UILabel *stateLb;
+@property (strong, nonatomic) CAGradientLayer *bottomMaskLayer;
 @end
 
 @implementation HXPhotoSubViewCell
@@ -38,8 +40,32 @@
         _imageView = [[UIImageView alloc] init];
         _imageView.clipsToBounds = YES;
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
+        [_imageView.layer addSublayer:self.bottomMaskLayer];
     }
     return _imageView;
+}
+- (UILabel *)stateLb {
+    if (!_stateLb) {
+        _stateLb = [[UILabel alloc] init];
+        _stateLb.textColor = [UIColor whiteColor];
+        _stateLb.textAlignment = NSTextAlignmentRight;
+        _stateLb.font = [UIFont systemFontOfSize:12];
+    }
+    return _stateLb;
+}
+- (CAGradientLayer *)bottomMaskLayer {
+    if (!_bottomMaskLayer) {
+        _bottomMaskLayer = [CAGradientLayer layer];
+        _bottomMaskLayer.colors = @[
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor,
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor
+                                    ];
+        _bottomMaskLayer.startPoint = CGPointMake(0, 0);
+        _bottomMaskLayer.endPoint = CGPointMake(0, 1);
+        _bottomMaskLayer.locations = @[@(0.15f),@(0.9f)];
+        _bottomMaskLayer.borderWidth  = 0.0;
+    }
+    return _bottomMaskLayer;
 }
 - (UIButton *)deleteBtn {
     if (!_deleteBtn) {
@@ -95,12 +121,13 @@
 - (void)setup
 {
     [self.contentView addSubview:self.imageView];
+    [self.contentView addSubview:self.stateLb];
     [self.contentView addSubview:self.deleteBtn];
-    [self.contentView addSubview:self.liveIcon];
-    [self.contentView addSubview:self.bottomView];
-    [self.bottomView addSubview:self.videoIcon];
-    [self.bottomView addSubview:self.videoTime];
-    [self.contentView addSubview:self.gifIcon];
+//    [self.contentView addSubview:self.liveIcon];
+//    [self.contentView addSubview:self.bottomView];
+//    [self.bottomView addSubview:self.videoIcon];
+//    [self.bottomView addSubview:self.videoTime];
+//    [self.contentView addSubview:self.gifIcon];
     [self.contentView addSubview:self.progressView];
 }
 
@@ -239,12 +266,33 @@
     }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
         self.bottomView.hidden = NO;
     }
+    if (model.type == HXPhotoModelMediaTypePhotoGif) {
+        self.stateLb.text = @"GIF";
+        self.stateLb.hidden = NO;
+        self.bottomMaskLayer.hidden = NO;
+    }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+        self.stateLb.text = @"Live";
+        self.stateLb.hidden = NO;
+        self.bottomMaskLayer.hidden = NO;
+    }else {
+        if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            self.stateLb.text = model.videoTime;
+            self.stateLb.hidden = NO;
+            self.bottomMaskLayer.hidden = NO;
+        }else {
+            self.stateLb.hidden = YES;
+            self.bottomMaskLayer.hidden = YES;
+        }
+    }
 }
 
 - (void)layoutSubviews
 {
     [super layoutSubviews];
     self.imageView.frame = self.bounds;
+    
+    self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
+    self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
     
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;

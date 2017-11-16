@@ -8,10 +8,12 @@
 
 #import "HXAlbumListViewController.h" 
 #import "HXDatePhotoViewController.h"
-@interface HXAlbumListViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXDatePhotoViewControllerDelegate>
+@interface HXAlbumListViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXDatePhotoViewControllerDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
+
+@property (strong, nonatomic) UITableView *tableView;
 
 @property (strong, nonatomic) NSMutableArray *albumModelArray;
 
@@ -58,7 +60,9 @@
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notify {
-    self.beforeOrientationIndexPath = [self.collectionView indexPathsForVisibleItems].firstObject;
+    if (!self.manager.singleSelected) {
+        self.beforeOrientationIndexPath = [self.collectionView indexPathsForVisibleItems].firstObject;
+    }
     self.orientationDidChange = YES;
 }
 - (void)changeSubviewFrame {
@@ -86,15 +90,19 @@
         rightMargin = 35;
         width = self.view.hx_w - 70;
     }
-    
-    CGFloat itemWidth = (width - (lineCount + 1) * 15) / lineCount;
-    CGFloat itemHeight = itemWidth + 6 + 14 + 4 + 14;
-    self.flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
-    
-    self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
-    self.collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
-    if (self.orientationDidChange) {
-        [self.collectionView scrollToItemAtIndexPath:self.beforeOrientationIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    if (self.manager.singleSelected) {
+        self.tableView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
+        self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
+    }else {
+        CGFloat itemWidth = (width - (lineCount + 1) * 15) / lineCount;
+        CGFloat itemHeight = itemWidth + 6 + 14 + 4 + 14;
+        self.flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+        
+        self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
+        self.collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
+        if (self.orientationDidChange) {
+            [self.collectionView scrollToItemAtIndexPath:self.beforeOrientationIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+        }
     }
 }
 - (void)viewDidAppear:(BOOL)animated {
@@ -107,7 +115,11 @@
     self.title = @"相册";
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(cancelClick)];
-    [self.view addSubview:self.collectionView];
+    if (self.manager.singleSelected) {
+        [self.view addSubview:self.tableView];
+    }else {
+        [self.view addSubview:self.collectionView];
+    }
     [self changeSubviewFrame];
 }
 - (void)setPhotoManager {
@@ -180,13 +192,13 @@
 }
 - (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected {
     if (self.albumModelArray.count > 0) {
-        HXAlbumModel *albumModel = self.albumModelArray[model.currentAlbumIndex];
-        if (selected) {
-            albumModel.selectedCount++;
-        }else {
-            albumModel.selectedCount--;
-        }
-        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:model.currentAlbumIndex inSection:0]]];
+//        HXAlbumModel *albumModel = self.albumModelArray[model.currentAlbumIndex];
+//        if (selected) {
+//            albumModel.selectedCount++;
+//        }else {
+//            albumModel.selectedCount--;
+//        }
+//        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:model.currentAlbumIndex inSection:0]]];
     }
 }
 - (void)getAlbumModelList:(BOOL)isFirst {
@@ -199,11 +211,15 @@
         vc.albumModel = model;
         vc.delegate = self;
         [self.navigationController pushViewController:vc animated:NO];
-        [self.collectionView reloadData];
+        if (self.manager.singleSelected) {
+            [self.tableView reloadData];
+        }else {
+            [self.collectionView reloadData];
+        }
         return;
     }
     if (!isFirst) {
-        [self.view showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
+        [self.view showLoadingHUDText:nil];
     }
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         __weak typeof(self) weakSelf = self;
@@ -225,7 +241,11 @@
         } albums:^(NSArray *albums) {
             weakSelf.albumModelArray = [NSMutableArray arrayWithArray:albums];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.collectionView reloadData];
+                if (weakSelf.manager.singleSelected) {
+                    [weakSelf.tableView reloadData];
+                }else {
+                    [weakSelf.collectionView reloadData];
+                }
                 [weakSelf.view handleLoading];
             });
         } isFirst:isFirst];
@@ -256,6 +276,36 @@
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     [(HXAlbumListQuadrateViewCell *)cell cancelRequest];
 }
+#pragma mark - < UITableViewDataSource >
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.albumModelArray.count;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    HXAlbumListSingleViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"tableViewCellId"];
+    cell.model = self.albumModelArray[indexPath.row];
+    return cell;
+}
+#pragma mark - < UITableViewDelegate >
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if (self.navigationController.topViewController != self) {
+        return;
+    }
+    HXAlbumModel *model = self.albumModelArray[indexPath.row];
+    HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
+    vc.manager = self.manager;
+    vc.title = model.albumName;
+    vc.albumModel = model;
+    vc.delegate = self;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 100;
+}
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    [(HXAlbumListSingleViewCell *)cell cancelRequest];
+}
+
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
     if (!indexPath) {
@@ -276,6 +326,30 @@
     [self.navigationController pushViewController:viewControllerToCommit animated:YES];
 }
 #pragma mark - < 懒加载 >
+- (UITableView *)tableView {
+    if (!_tableView) {
+        _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) style:UITableViewStylePlain];
+        _tableView.dataSource = self;
+        _tableView.delegate = self;
+        _tableView.estimatedRowHeight = 0;
+        _tableView.estimatedSectionFooterHeight = 0;
+        _tableView.estimatedSectionHeaderHeight = 0;
+        _tableView.backgroundColor = [UIColor whiteColor];
+        _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        [_tableView registerClass:[HXAlbumListSingleViewCell class] forCellReuseIdentifier:@"tableViewCellId"];
+#ifdef __IPHONE_11_0
+        if (@available(iOS 11.0, *)) {
+            _tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+#else
+            if ((NO)) {
+#endif
+            } else {
+                self.automaticallyAdjustsScrollViewInsets = NO;
+            }
+    }
+    return _tableView;
+}
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) collectionViewLayout:self.flowLayout];
@@ -449,5 +523,158 @@
         _selectNumberBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
     }
     return _selectNumberBtn;
+}
+@end
+
+@interface HXAlbumListSingleViewCell ()
+@property (strong, nonatomic) UIImageView *coverView1;
+@property (strong, nonatomic) UIImageView *coverView2;
+@property (strong, nonatomic) UIImageView *coverView3;
+@property (strong, nonatomic) UILabel *albumNameLb;
+@property (strong, nonatomic) UILabel *photoNumberLb;
+@property (assign, nonatomic) PHImageRequestID requestId1;
+@property (assign, nonatomic) PHImageRequestID requestId2;
+@property (assign, nonatomic) PHImageRequestID requestId3;
+@end
+
+@implementation HXAlbumListSingleViewCell
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        [self setupUI];
+    }
+    return self;
+}
+- (void)setupUI {
+    [self.contentView addSubview:self.coverView3];
+    [self.contentView addSubview:self.coverView2];
+    [self.contentView addSubview:self.coverView1];
+    [self.contentView addSubview:self.albumNameLb];
+    [self.contentView addSubview:self.photoNumberLb];
+}
+- (void)cancelRequest {
+    if (self.requestId1) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestId1];
+        self.requestId1 = -1;
+    }
+    if (self.requestId2) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestId2];
+        self.requestId2 = -1;
+    }
+    if (self.requestId3) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestId3];
+        self.requestId3 = -1;
+    }
+}
+- (void)setModel:(HXAlbumModel *)model {
+    _model = model;
+    NSInteger photoCount = model.result.count;
+    if (!model.asset) {
+        model.asset = model.result.lastObject;
+        model.albumImage = nil;
+    }
+    __weak typeof(self) weakSelf = self;
+    self.requestId1 = [HXPhotoTools getImageWithAlbumModel:model size:CGSizeMake(self.hx_h * 1.6, self.hx_h * 1.6) completion:^(UIImage *image, HXAlbumModel *model) {
+        if (weakSelf.model == model) {
+            weakSelf.coverView1.image = image;
+        }
+    }];
+    if (photoCount == 1) {
+        self.coverView2.hidden = YES;
+        self.coverView3.hidden = YES;
+    }else if (photoCount == 2) {
+        if (!model.asset2) {
+            model.asset2 = model.result[1];
+        }
+        self.requestId2 = [HXPhotoTools getImageWithAlbumModel:model asset:model.asset2 size:CGSizeMake(self.hx_h * 0.7, self.hx_h * 0.7) completion:^(UIImage *image, HXAlbumModel *model) {
+            if (weakSelf.model == model) {
+                weakSelf.coverView2.image = image;
+            }
+        }];
+        self.coverView2.hidden = NO;
+        self.coverView3.hidden = YES;
+    }else {
+        if (!model.asset2) {
+            model.asset2 = model.result[1];
+        }
+        if (!model.asset3) {
+            model.asset3 = model.result[2];
+        }
+        self.coverView2.hidden = NO;
+        self.coverView3.hidden = NO;
+        
+        self.requestId2 = [HXPhotoTools getImageWithAlbumModel:model asset:model.asset2 size:CGSizeMake(self.hx_h * 0.7, self.hx_h * 0.7) completion:^(UIImage *image, HXAlbumModel *model) {
+            if (weakSelf.model == model) {
+                weakSelf.coverView2.image = image;
+            }
+        }];
+        self.requestId3 = [HXPhotoTools getImageWithAlbumModel:model asset:model.asset3 size:CGSizeMake(self.hx_h * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, HXAlbumModel *model) {
+            if (weakSelf.model == model) {
+                weakSelf.coverView3.image = image;
+            }
+        }];
+    }
+    
+    self.albumNameLb.text = model.albumName;
+    self.photoNumberLb.text = @(photoCount).stringValue;
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.coverView1.frame = CGRectMake(10, 5, self.hx_h - 10, self.hx_h - 10);
+    if (self.model.count == 2) {
+        self.coverView2.frame = CGRectMake(12.5, 3.5, self.hx_h - 15, self.hx_h - 15);
+    }else {
+        self.coverView2.frame = CGRectMake(12.5, 3.5, self.hx_h - 15, self.hx_h - 15);
+        self.coverView3.frame = CGRectMake(15, 2, self.hx_h - 20, self.hx_h - 20);
+    }
+    CGFloat albumNameLbX = CGRectGetMaxX(self.coverView1.frame) + 12;
+    CGFloat albumNameLbY = self.hx_h / 2  - 16;
+    self.albumNameLb.frame = CGRectMake(albumNameLbX, albumNameLbY, self.hx_w - albumNameLbX - 40, 14);
+    self.photoNumberLb.frame = CGRectMake(albumNameLbX, self.hx_h / 2 + 2, self.hx_w, 13);
+}
+- (void)dealloc {
+    [self cancelRequest];
+}
+#pragma mark - < cell懒加载 >
+- (UIImageView *)coverView1 {
+    if (!_coverView1) {
+        _coverView1 = [[UIImageView alloc] init];
+        _coverView1.contentMode = UIViewContentModeScaleAspectFill;
+        _coverView1.clipsToBounds = YES;
+    }
+    return _coverView1;
+}
+- (UIImageView *)coverView2 {
+    if (!_coverView2) {
+        _coverView2 = [[UIImageView alloc] init];
+        _coverView2.contentMode = UIViewContentModeScaleAspectFill;
+        _coverView2.clipsToBounds = YES;
+    }
+    return _coverView2;
+}
+- (UIImageView *)coverView3 {
+    if (!_coverView3) {
+        _coverView3 = [[UIImageView alloc] init];
+        _coverView3.contentMode = UIViewContentModeScaleAspectFill;
+        _coverView3.clipsToBounds = YES;
+    }
+    return _coverView3;
+}
+- (UILabel *)albumNameLb {
+    if (!_albumNameLb) {
+        _albumNameLb = [[UILabel alloc] init];
+        _albumNameLb.textColor = [UIColor blackColor];
+        _albumNameLb.font = [UIFont systemFontOfSize:13];
+    }
+    return _albumNameLb;
+}
+- (UILabel *)photoNumberLb {
+    if (!_photoNumberLb) {
+        _photoNumberLb = [[UILabel alloc] init];
+        _photoNumberLb.textColor = [UIColor lightGrayColor];
+        _photoNumberLb.font = [UIFont systemFontOfSize:12];
+    }
+    return _photoNumberLb;
 }
 @end

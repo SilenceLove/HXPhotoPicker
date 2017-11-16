@@ -26,3 +26,8 @@
 @property (strong, nonatomic) HXAlbumModel *model;
 - (void)cancelRequest ;
 @end
+
+@interface HXAlbumListSingleViewCell : UITableViewCell
+@property (strong, nonatomic) HXAlbumModel *model;
+- (void)cancelRequest ;
+@end

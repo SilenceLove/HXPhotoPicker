@@ -29,6 +29,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *reverse;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *selectedTypeView;
 @property (weak, nonatomic) IBOutlet UISwitch *saveAblum;
+@property (weak, nonatomic) IBOutlet UISwitch *icloudSwitch;
 
 @end
 
@@ -56,6 +57,7 @@
 
 - (IBAction)goAlbum:(id)sender {
     self.camera.on = NO;
+    self.manager.filtrationICloudAsset = self.icloudSwitch.on;
     self.manager.photoMaxNum = self.photoText.text.integerValue;
     self.manager.videoMaxNum = self.videoText.text.integerValue;
     self.manager.rowCount = self.columnText.text.integerValue;

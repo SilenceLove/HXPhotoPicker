@@ -72,7 +72,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.openCamera = YES;
         _manager.cacheAlbum = YES;
         _manager.lookLivePhoto = YES;
-        _manager.outerCamera = NO;
+        _manager.outerCamera = YES;
         _manager.cameraType = HXPhotoManagerCameraTypeFullScreen;
         _manager.photoMaxNum = 4;
         _manager.videoMaxNum = 4;
@@ -82,7 +82,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.style = HXPhotoAlbumStylesSystem;
 //        _manager.reverseDate = YES;
         _manager.showDateHeaderSection = NO;
-//        _manager.selectTogether = NO;
+        _manager.selectTogether = NO;
 //        _manager.rowCount = 3;
         
         _manager.UIManager.navBar = ^(UINavigationBar *navBar) {

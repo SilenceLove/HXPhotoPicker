@@ -53,6 +53,7 @@
 
 @interface HXDatePhotoViewSectionHeaderView : HXCustomCollectionReusableView
 @property (strong, nonatomic) HXPhotoDateModel *model;
+@property (assign, nonatomic) BOOL changeState; 
 @end
 
 @interface HXDatePhotoViewSectionFooterView : UICollectionReusableView

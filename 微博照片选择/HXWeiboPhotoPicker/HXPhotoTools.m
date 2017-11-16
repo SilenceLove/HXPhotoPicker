@@ -10,7 +10,7 @@
 #import "HXPhotoModel.h"
 #import "UIImage+HXExtension.h"
 #import "HXPhotoManager.h"
-#import <sys/utsname.h>
+#import <sys/utsname.h> 
 #import <MobileCoreServices/MobileCoreServices.h>
 @implementation HXPhotoTools
 
@@ -31,6 +31,35 @@
         }
         return image;
     }
+}
+
++ (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model completion:(void (^)(CLPlacemark *placemark,HXPhotoDateModel *model))completion {
+    CLGeocoder *geoCoder = [[CLGeocoder alloc] init];
+    [geoCoder reverseGeocodeLocation:model.location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+        if (placemarks.count > 0 && !error) {
+            CLPlacemark *placemark = placemarks.firstObject;
+            if (completion) {
+                completion(placemark,model);
+            }
+        }
+    }];
+    return geoCoder;
+//    __block NSMutableArray *placemarkArray = [NSMutableArray array];
+//    NSInteger locationCount = 0;
+//    for (HXPhotoModel *subModel in model.photoModelArray) {
+//        if (subModel.asset.location) {
+//            [geoCoder reverseGeocodeLocation:subModel.asset.location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+//                if (placemarks.count > 0 && !error) {
+//                    CLPlacemark *placemark = placemarks.firstObject;
+//                    [placemarkArray addObject:placemark];
+//                    if (placemark) {
+//                        <#statements#>
+//                    }
+//                }
+//            }];
+//            locationCount++;
+//        }
+//    }
 }
 
 + (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(HXPhotoModel *mode, BOOL isICloud))complete {
@@ -170,6 +199,18 @@
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     return [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        if (downloadFinined && result) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(result,model);
+            });
+        }
+    }];
+}
++ (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model asset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *image, HXAlbumModel *model))completion {
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+    return [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         if (downloadFinined && result) {
             dispatch_async(dispatch_get_main_queue(), ^{

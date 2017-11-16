@@ -18,10 +18,11 @@
 #import "HXCustomCameraController.h"
 #import "HXCustomPreviewView.h"
 #import "HXDatePhotoEditViewController.h"
+#import "HXDatePhotoViewFlowLayout.h" 
 @interface HXDatePhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UIViewControllerPreviewingDelegate,HXDatePhotoViewCellDelegate,HXDatePhotoBottomViewDelegate,HXDatePhotoPreviewViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXDatePhotoEditViewControllerDelegate>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
-
+@property (strong, nonatomic) HXDatePhotoViewFlowLayout *customLayout;
 
 @property (strong, nonatomic) NSMutableArray *allArray;
 @property (strong, nonatomic) NSMutableArray *previewArray;
@@ -30,7 +31,6 @@
 @property (strong, nonatomic) NSMutableArray *dateArray;
 
 @property (assign, nonatomic) NSInteger currentSectionIndex;
-@property (strong, nonatomic) UICollectionReusableView *currentHeaderView;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 
 @property (assign, nonatomic) BOOL orientationDidChange;
@@ -38,6 +38,8 @@
 @property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
 
 @property (weak, nonatomic) HXDatePhotoViewSectionFooterView *footerView;
+
+
 @end
 
 @implementation HXDatePhotoViewController
@@ -46,7 +48,7 @@
     [super viewDidLoad];
     [self setupUI];
     [self changeSubviewFrame];
-    [self.view showLoadingHUDText:@"加载中"];
+    [self.view showLoadingHUDText:nil];
     [self getPhotoList];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
@@ -105,7 +107,11 @@
     }
     CGFloat itemWidth = (width - (lineCount - 1)) / lineCount;
     CGFloat itemHeight = itemWidth;
-    self.flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+    if (self.manager.showDateHeaderSection) {
+        self.customLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+    }else {
+        self.flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
+    }
     
     
     self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
@@ -543,6 +549,11 @@
         [(HXDatePhotoViewCell *)cell cancelRequest];
     }
 }
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingSupplementaryView:(UICollectionReusableView *)view forElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath {
+    if ([elementKind isEqualToString:UICollectionElementKindSectionHeader]) {
+//        NSSLog(@"headerSection消失");
+    }
+}
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
     if ([kind isEqualToString:UICollectionElementKindSectionHeader] && self.manager.showDateHeaderSection) {
         HXDatePhotoViewSectionHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"sectionHeaderId" forIndexPath:indexPath];
@@ -575,27 +586,6 @@
     }
 }
 
-//- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-//    self.currentHeaderView.backgroundColor = [UIColor whiteColor];
-//    UICollectionReusableView *headerView = [self.collectionView supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:self.currentSectionIndex]];
-//    headerView.backgroundColor = [UIColor colorWithRed:234/255.0 green:234/255.0 blue:234/255.0 alpha:1];
-//    self.currentHeaderView = headerView;
-//    CGRect frame = [headerView.superview convertRect:headerView.frame toView:[UIApplication sharedApplication].keyWindow];
-//    if (frame.origin.y <= 0 && self.currentSectionIndex < self.dateArray.count - 1) {
-//        self.currentSectionIndex++;
-//        if (self.currentSectionIndex > self.dateArray.count - 1) {
-//            self.currentSectionIndex = self.dateArray.count - 1;
-//        }
-//        self.currentHeaderView.backgroundColor = [UIColor whiteColor];
-//    }else if (frame.origin.y > kNavigationBarHeight + 50 && self.currentSectionIndex > 0) {
-//        self.currentSectionIndex--;
-//        if (self.currentSectionIndex < 0) {
-//            self.currentSectionIndex = 0;
-//        }
-//        self.currentHeaderView.backgroundColor = [UIColor whiteColor];
-//    }
-//    NSSLog(@"%f",frame.origin.y);
-//}
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
     if (!indexPath) {
@@ -615,7 +605,7 @@
     vc.model = model;
     vc.indexPath = indexPath;
     vc.image = cell.imageView.image;
-    vc.preferredContentSize = model.endImageSize;
+    vc.preferredContentSize = model.previewViewSize;
     return vc;
 }
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
@@ -726,7 +716,9 @@
             }
             index++;
         }
-        [self.collectionView reloadItemsAtIndexPaths:indexPathList];
+        if (indexPathList.count > 0) {
+            [self.collectionView reloadItemsAtIndexPaths:indexPathList];
+        }
     }
     self.bottomView.selectCount = self.manager.selectedList.count;
     if ([self.delegate respondsToSelector:@selector(datePhotoViewControllerDidChangeSelect:selected:)]) {
@@ -877,9 +869,25 @@
     }
     return _bottomView;
 }
+- (HXDatePhotoViewFlowLayout *)customLayout {
+    if (!_customLayout) {
+        _customLayout = [[HXDatePhotoViewFlowLayout alloc] init];
+        _customLayout.minimumLineSpacing = 0.5;
+        _customLayout.minimumInteritemSpacing = 0.5;
+        _customLayout.sectionInset = UIEdgeInsetsMake(0.5, 0, 0.5, 0);
+//        if (iOS9_Later) {
+//            _customLayout.sectionHeadersPinToVisibleBounds = YES;
+//        }
+    }
+    return _customLayout;
+}
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) collectionViewLayout:self.flowLayout];
+        if (self.manager.showDateHeaderSection) {
+            _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) collectionViewLayout:self.customLayout];
+        }else {
+            _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) collectionViewLayout:self.flowLayout];
+        }
         _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
@@ -917,9 +925,9 @@
         _flowLayout.minimumLineSpacing = 0.5;
         _flowLayout.minimumInteritemSpacing = 0.5;
         _flowLayout.sectionInset = UIEdgeInsetsMake(0.5, 0, 0.5, 0);
-        if (iOS9_Later) {
-            _flowLayout.sectionHeadersPinToVisibleBounds = YES;
-        }
+//        if (iOS9_Later) {
+//            _flowLayout.sectionHeadersPinToVisibleBounds = YES;
+//        }
     }
     return _flowLayout;
 }
@@ -1242,6 +1250,8 @@
 
 @interface HXDatePhotoViewSectionHeaderView ()
 @property (strong, nonatomic) UILabel *dateLb;
+@property (strong, nonatomic) UILabel *subTitleLb;
+@property (strong, nonatomic) UIToolbar *bgView;
 @end
 
 @implementation HXDatePhotoViewSectionHeaderView 
@@ -1253,24 +1263,107 @@
     return self;
 }
 - (void)setupUI {
-    self.backgroundColor = [UIColor whiteColor];
+    [self addSubview:self.bgView];
     [self addSubview:self.dateLb];
+    [self addSubview:self.subTitleLb];
+}
+- (void)setChangeState:(BOOL)changeState {
+    _changeState = changeState;
+    self.bgView.translucent = changeState;
+    if (changeState) {
+        self.bgView.alpha = 1;
+    }else {
+        self.bgView.alpha = 0;
+    }
 }
 - (void)setModel:(HXPhotoDateModel *)model {
     _model = model;
-    self.dateLb.text = model.dateString;
-}
+    if (model.location) {
+        if (model.hasLocationTitles) {
+            self.dateLb.frame = CGRectMake(8, 4, self.hx_w - 16, 30);
+            self.subTitleLb.hidden = NO;
+            self.subTitleLb.text = model.locationSubTitle;
+            self.dateLb.text = model.locationTitle;
+        }else {
+            self.dateLb.frame = CGRectMake(8, 0, self.hx_w - 16, 50);
+            self.dateLb.text = model.dateString;
+            self.subTitleLb.hidden = YES;
+            __weak typeof(self) weakSelf = self;
+            [HXPhotoTools getDateLocationDetailInformationWithModel:model completion:^(CLPlacemark *placemark, HXPhotoDateModel *model) {
+                if (placemark.locality) {
+                    NSString *province = placemark.administrativeArea;
+                    NSString *city = placemark.locality;
+                    NSString *area = placemark.subLocality;
+                    NSString *street = placemark.thoroughfare;
+                    NSString *subStreet = placemark.subThoroughfare;
+                    if (area) {
+                        model.locationTitle = [NSString stringWithFormat:@"%@ ﹣ %@",city,area];
+                    }else {
+                        model.locationTitle = [NSString stringWithFormat:@"%@",city];
+                    }
+                    if (street) {
+                        if (subStreet) {
+                            model.locationSubTitle = [NSString stringWithFormat:@"%@・%@%@",model.dateString,street,subStreet];
+                        }else {
+                            model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,street];
+                        }
+                    }else if (province) {
+                        model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,province];
+                    }else {
+                        model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,city];
+                    }
+                }else {
+                    NSString *province = placemark.administrativeArea;
+                    model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,province];
+                    model.locationTitle = province;
+                }
+                model.hasLocationTitles = YES;
+                if (weakSelf.model == model) {
+                    weakSelf.subTitleLb.text = model.locationSubTitle;
+                    weakSelf.dateLb.text = model.locationTitle;
+                    weakSelf.dateLb.frame = CGRectMake(8, 4, weakSelf.hx_w - 16, 30);
+                    weakSelf.subTitleLb.hidden = NO;
+                }
+            }];
+        }
+    }else {
+        self.dateLb.frame = CGRectMake(8, 0, self.hx_w - 16, 50);
+        self.dateLb.text = model.dateString;
+        self.subTitleLb.hidden = YES;
+    }
+} 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    self.dateLb.frame = CGRectMake(6, 0, self.hx_w - 12, 50);
+    if (self.model.location) {
+        self.dateLb.frame = CGRectMake(8, 4, self.hx_w - 16, 30);
+        self.subTitleLb.frame = CGRectMake(8, 26, self.hx_w - 16, 20);
+    }else {
+    }
+    self.bgView.frame = self.bounds;
 }
 - (UILabel *)dateLb {
     if (!_dateLb) {
         _dateLb = [[UILabel alloc] init];
         _dateLb.textColor = [UIColor blackColor];
-        _dateLb.font = [UIFont hx_pingFangFontOfSize:14];
+        _dateLb.font = [UIFont hx_pingFangFontOfSize:15];
     }
     return _dateLb;
+}
+- (UIToolbar *)bgView {
+    if (!_bgView) {
+        _bgView = [[UIToolbar alloc] init];
+        _bgView.translucent = NO;
+        _bgView.clipsToBounds = YES;
+    }
+    return _bgView;
+}
+- (UILabel *)subTitleLb {
+    if (!_subTitleLb) {
+        _subTitleLb = [[UILabel alloc] init];
+        _subTitleLb.textColor = [UIColor blackColor];
+        _subTitleLb.font = [UIFont hx_pingFangFontOfSize:11];
+    }
+    return _subTitleLb;
 }
 @end
 

@@ -8,8 +8,6 @@
 
 #import "HXDatePhotoPreviewBottomView.h"
 #import "HXPhotoManager.h"
-#import "HXDatePhotoCollectionViewLayout.h"
-#import "HXDatePhotoCollectionViewLayoutAttributes.h"
 @interface HXDatePhotoPreviewBottomView ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout>
 @property (strong, nonatomic) UIToolbar *bgView;
 @property (strong, nonatomic) UICollectionView *collectionView;
@@ -256,9 +254,5 @@
 }
 - (void)dealloc {
     [self cancelRequest];
-}
-//- (void)applyLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes {
-//    HXDatePhotoCollectionViewLayoutAttributes *collectionViewLayoutAttributes = (HXDatePhotoCollectionViewLayoutAttributes *)layoutAttributes;
-//    self.layer.anchorPoint = collectionViewLayoutAttributes.anchorPoint;
-//}
+} 
 @end

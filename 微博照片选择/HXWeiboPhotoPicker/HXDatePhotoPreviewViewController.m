@@ -30,6 +30,7 @@
 @property (strong, nonatomic) HXDatePhotoInteractiveTransition *interactiveTransition;
 @property (strong, nonatomic) HXPhotoCustomNavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
+@property (assign, nonatomic) BOOL isAddInteractiveTransition;
 @end
 
 @implementation HXDatePhotoPreviewViewController
@@ -48,12 +49,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationWillChanged:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
-    if (!self.outside) {
-        //初始化手势过渡的代理
-        self.interactiveTransition = [[HXDatePhotoInteractiveTransition alloc] init];
-        //给当前控制器的视图添加手势
-        [self.interactiveTransition addPanGestureForViewController:self];
-    }
 }
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
     if (operation == UINavigationControllerOperationPush) {
@@ -157,6 +152,15 @@
     }else { 
         self.tempCell = cell;
         [cell requestHDImage];
+    }
+    if (!self.isAddInteractiveTransition) {
+        if (!self.outside) {
+            //初始化手势过渡的代理
+            self.interactiveTransition = [[HXDatePhotoInteractiveTransition alloc] init];
+            //给当前控制器的视图添加手势
+            [self.interactiveTransition addPanGestureForViewController:self];
+        }
+        self.isAddInteractiveTransition = YES;
     }
 }
 - (void)viewWillDisappear:(BOOL)animated {

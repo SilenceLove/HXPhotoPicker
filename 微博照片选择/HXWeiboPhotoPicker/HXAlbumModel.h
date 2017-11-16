@@ -30,6 +30,11 @@
  */
 @property (strong, nonatomic) PHAsset *asset;
 
+@property (strong, nonatomic) PHAsset *asset2;
+@property (strong, nonatomic) PHAsset *asset3;
+
+
+
 @property (strong, nonatomic) UIImage *albumImage;
 
 /**

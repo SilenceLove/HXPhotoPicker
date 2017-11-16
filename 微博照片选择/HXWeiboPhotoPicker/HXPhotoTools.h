@@ -15,6 +15,7 @@
 #import "NSBundle+HXWeiboPhotoPicker.h"
 #import "NSDate+HXExtension.h"
 #import "UIFont+HXExtension.h"
+#import <CoreLocation/CoreLocation.h>
 #ifdef DEBUG
 #define NSSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 
@@ -54,6 +55,8 @@ typedef enum : NSUInteger {
 
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL;
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo;
+
++ (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model completion:(void (^)(CLPlacemark *placemark,HXPhotoDateModel *model))completion;
 
 /**
  将选择的模型数组写入临时目录
@@ -117,6 +120,8 @@ typedef enum : NSUInteger {
 + (PHImageRequestID)getImageWithModel:(HXPhotoModel *)model completion:(void (^)(UIImage *image, HXPhotoModel *model))completion;
 
 + (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model size:(CGSize)size completion:(void (^)(UIImage *image, HXAlbumModel *model))completion;
+
++ (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model asset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *image, HXAlbumModel *model))completion;
 
 + (PHImageRequestID)getPlayerItemWithPHAsset:(PHAsset *)asset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVPlayerItem *playerItem))completion failed:(void(^)(NSDictionary *info))failed;
 

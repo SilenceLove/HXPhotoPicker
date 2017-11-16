@@ -97,8 +97,7 @@
     return nil;
 }
 
-- (void)showImageHUDText:(NSString *)text
-{
+- (void)showImageHUDText:(NSString *)text {
     CGFloat hudW = [HXPhotoTools getTextWidth:text height:15 fontSize:14];
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
@@ -119,17 +118,19 @@
     [self performSelector:@selector(handleGraceTimer) withObject:nil afterDelay:1.5f inModes:@[NSRunLoopCommonModes]];
 }
 
-- (void)showLoadingHUDText:(NSString *)text
-{
+- (void)showLoadingHUDText:(NSString *)text {
     CGFloat hudW = [HXPhotoTools getTextWidth:text height:15 fontSize:14];
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
     }
     CGFloat hudH = [HXPhotoTools getTextHeight:text width:hudW fontSize:14];
+    CGFloat width = 110;
+    CGFloat height = width + hudH - 15;
     if (!text) {
-        hudH = 15;
+        width = 95;
+        height = 95;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, 110, 110 + hudH - 15) imageName:@"alert_failed_icon@2x.png" text:text];
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:@"alert_failed_icon@2x.png" text:text];
     [hud showloading];
     hud.alpha = 0;
     hud.tag = 10086;
@@ -140,35 +141,30 @@
     }];
 }
 
-- (void)handleLoading
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView cancelPreviousPerformRequestsWithTarget:self];
-        for (UIView *view in self.subviews) {
-            if (view.tag == 10086) {
-                [UIView animateWithDuration:0.2f animations:^{
-                    view.alpha = 0;
-                } completion:^(BOOL finished) {
-                    [view removeFromSuperview];
-                }];
-            }
+- (void)handleLoading {
+    [UIView cancelPreviousPerformRequestsWithTarget:self];
+    for (UIView *view in self.subviews) {
+        if (view.tag == 10086) {
+            [UIView animateWithDuration:0.2f animations:^{
+                view.alpha = 0;
+            } completion:^(BOOL finished) {
+                [view removeFromSuperview];
+            }];
         }
-    });
+    }
 }
 
 - (void)handleGraceTimer {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView cancelPreviousPerformRequestsWithTarget:self];
-        for (UIView *view in self.subviews) {
-            if (view.tag == 1008611) {
-                [UIView animateWithDuration:0.2f animations:^{
-                    view.alpha = 0;
-                } completion:^(BOOL finished) {
-                    [view removeFromSuperview];
-                }];
-            }
+    [UIView cancelPreviousPerformRequestsWithTarget:self];
+    for (UIView *view in self.subviews) {
+        if (view.tag == 1008611) {
+            [UIView animateWithDuration:0.2f animations:^{
+                view.alpha = 0;
+            } completion:^(BOOL finished) {
+                [view removeFromSuperview];
+            }];
         }
-    });
+    }
 }
 
 @end
@@ -181,8 +177,7 @@
 
 @implementation HXHUD
 
-- (instancetype)initWithFrame:(CGRect)frame imageName:(NSString *)imageName text:(NSString *)text
-{
+- (instancetype)initWithFrame:(CGRect)frame imageName:(NSString *)imageName text:(NSString *)text {
     self = [super initWithFrame:frame];
     if (self) {
         self.text = text;
@@ -195,8 +190,7 @@
     return self;
 }
 
-- (void)setup
-{
+- (void)setup {
     UIImageView *imageView = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:self.imageName]];
     [self addSubview:imageView];
     CGFloat imgW = imageView.image.size.width;
@@ -220,12 +214,15 @@
     label.frame = CGRectMake(labelX, labelY, labelW, labelH);
 }
 
-- (void)showloading
-{
+- (void)showloading {
     UIActivityIndicatorView *loading = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     [loading startAnimating];
     [self addSubview:loading];
-    loading.frame = self.imageView.frame;
+    if (self.text) {
+        loading.frame = self.imageView.frame;
+    }else {
+        loading.frame = self.bounds;
+    }
     self.imageView.hidden = YES;
 }
 @end

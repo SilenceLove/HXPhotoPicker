@@ -37,6 +37,16 @@ typedef enum : NSUInteger {
 
 
 /**
+ 是否过滤icloud上的资源 默认NO
+ */
+@property (assign, nonatomic) BOOL filtrationICloudAsset;
+
+/**
+ headerSection 是否显示照片的位置信息 默认 5、6不显示，其余的显示
+ */
+@property (assign, nonatomic) BOOL headerSectionShowPhotoLocation;
+
+/**
  HXPhotoAlbumStylesSystem 拍摄的照片/视频保存到指定相册的名称  默认 BundleName
  (需9.0以上系统才可以保存到自定义相册 , 以下的系统只保存到相机胶卷...)
  */

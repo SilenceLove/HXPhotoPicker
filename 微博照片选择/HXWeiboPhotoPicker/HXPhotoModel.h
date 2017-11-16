@@ -132,6 +132,7 @@ typedef enum : NSUInteger {
  缩小之后的图片宽高
  */
 @property (assign, nonatomic) CGSize endImageSize;
+@property (assign, nonatomic) CGSize previewViewSize;
 @property (assign, nonatomic) CGSize endDateImageSize;
 @property (assign, nonatomic) CGSize dateBottomImageSize;
 
@@ -194,10 +195,16 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) NSString *fullPathToFile;
 @end
 
+@class CLGeocoder;
 @interface HXPhotoDateModel : NSObject
+@property (strong, nonatomic) CLLocation *location;
 @property (strong, nonatomic) NSDate *date;
 @property (strong, nonatomic) NSMutableArray *locationList;
 @property (copy, nonatomic) NSString *dateString;
 @property (copy, nonatomic) NSString *locationString;
 @property (copy, nonatomic) NSArray *photoModelArray;
+@property (copy, nonatomic) NSString *locationSubTitle;
+@property (copy, nonatomic) NSString *locationTitle;
+@property (assign, nonatomic) BOOL hasLocationTitles;
+//@property (strong, nonatomic) CLGeocoder *geocoder;
 @end
