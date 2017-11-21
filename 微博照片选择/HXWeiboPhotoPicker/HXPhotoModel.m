@@ -254,6 +254,11 @@
     return _barSubTitle;
 }
 - (void)dealloc {
+    if (self.iCloudRequestID) {
+        if (self.iCloudDownloading) {
+            [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+        }
+    }
 //    [self cancelImageRequest];
 }
 @end

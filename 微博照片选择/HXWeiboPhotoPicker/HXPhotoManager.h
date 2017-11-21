@@ -37,6 +37,11 @@ typedef enum : NSUInteger {
 
 
 /**
+ 下载iCloud上的资源  默认YES
+ */
+@property (assign, nonatomic) BOOL downloadICloudAsset;
+
+/**
  是否过滤icloud上的资源 默认NO
  */
 @property (assign, nonatomic) BOOL filtrationICloudAsset;
@@ -261,6 +266,7 @@ typedef enum : NSUInteger {
 
 
 @property (strong, nonatomic) NSMutableArray *albums;
+@property (strong, nonatomic) NSMutableArray *iCloudUploadArray;
 
 
 @property (copy, nonatomic) NSDictionary *photoViewCellIconDic;

@@ -78,8 +78,10 @@
     self.endSelectedCameraPhotos = [NSMutableArray array];
     self.endSelectedCameraVideos = [NSMutableArray array];
     self.networkPhotoUrls = [NSMutableArray array];
+    self.iCloudUploadArray = [NSMutableArray array];
     self.showDeleteNetworkPhotoAlert = NO;
     self.singleSelecteClip = YES;
+    self.downloadICloudAsset = YES;
 //    self.monitorSystemAlbum = NO; // NO
 //    self.cacheAlbum = NO; // NO
     self.videoMaxDuration = 300.f;
@@ -223,6 +225,7 @@
 
 - (void)getAllPhotoAlbums:(void(^)(HXAlbumModel *firstAlbumModel))firstModel albums:(void(^)(NSArray *albums))albums isFirst:(BOOL)isFirst {
     if (self.albums.count > 0) [self.albums removeAllObjects];
+    [self.iCloudUploadArray removeAllObjects];
     // 获取系统智能相册
     PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
     [smartAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -438,7 +441,16 @@
             HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
             photoModel.asset = asset;
             if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
-                photoModel.isIcloud = YES;
+                if (self.iCloudUploadArray.count) {
+                    NSString *property = @"asset";
+                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K = %@", property, asset];
+                    NSArray *newArray = [self.iCloudUploadArray filteredArrayUsingPredicate:pred];
+                    if (!newArray.count) {
+                        photoModel.isIcloud = YES;
+                    }
+                }else {
+                    photoModel.isIcloud = YES;
+                }
             }
             if (selectList.count > 0) {
                 NSString *property = @"asset";
@@ -494,15 +506,15 @@
                         photoModel.type = HXPhotoModelMediaTypePhoto;
                     }
                 }
-                if (!photoModel.isIcloud) {
+//                if (!photoModel.isIcloud) {
                     [photoArray addObject:photoModel];
-                }
+//                }
             }else if (asset.mediaType == PHAssetMediaTypeVideo) {
                 photoModel.subType = HXPhotoModelMediaSubTypeVideo;
                 photoModel.type = HXPhotoModelMediaTypeVideo;
-                if (!photoModel.isIcloud) {
+//                if (!photoModel.isIcloud) {
                     [videoArray addObject:photoModel];
-                }
+//                }
             }
             photoModel.currentAlbumIndex = albumModel.index;
             
@@ -510,14 +522,19 @@
             if (self.filtrationICloudAsset) {
                 if (!photoModel.isIcloud) {
                     [allArray addObject:photoModel];
+                    [previewArray addObject:photoModel];
                 }else {
                     canAddPhoto = NO;
                 }
             }else {
                 [allArray addObject:photoModel];
-            }
-            if (!photoModel.isIcloud) {
-                [previewArray addObject:photoModel];
+                if (photoModel.isIcloud) {
+                    if (self.downloadICloudAsset) {
+                        [previewArray addObject:photoModel];
+                    }
+                }else {
+                    [previewArray addObject:photoModel];
+                }
             }
 
             if (self.showDateHeaderSection && canAddPhoto) {
@@ -571,7 +588,16 @@
             HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
             photoModel.asset = asset;
             if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
-                photoModel.isIcloud = YES;
+                if (self.iCloudUploadArray.count) {
+                    NSString *property = @"asset";
+                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K = %@", property, asset];
+                    NSArray *newArray = [self.iCloudUploadArray filteredArrayUsingPredicate:pred];
+                    if (!newArray.count) {
+                        photoModel.isIcloud = YES;
+                    }
+                }else {
+                    photoModel.isIcloud = YES;
+                }
             }
             if (selectList.count > 0) {
                 NSString *property = @"asset";
@@ -627,29 +653,34 @@
                         photoModel.type = HXPhotoModelMediaTypePhoto;
                     }
                 }
-                if (!photoModel.isIcloud) {
+//                if (!photoModel.isIcloud) {
                     [photoArray addObject:photoModel];
-                }
+//                }
             }else if (asset.mediaType == PHAssetMediaTypeVideo) {
                 photoModel.subType = HXPhotoModelMediaSubTypeVideo;
                 photoModel.type = HXPhotoModelMediaTypeVideo;
-                if (!photoModel.isIcloud) {
+//                if (!photoModel.isIcloud) {
                     [videoArray addObject:photoModel];
-                }
+//                }
             }
             photoModel.currentAlbumIndex = albumModel.index;
             BOOL canAddPhoto = YES;
             if (self.filtrationICloudAsset) {
                 if (!photoModel.isIcloud) {
                     [allArray addObject:photoModel];
+                    [previewArray addObject:photoModel];
                 }else {
                     canAddPhoto = NO;
                 }
             }else {
                 [allArray addObject:photoModel];
-            }
-            if (!photoModel.isIcloud) {
-                [previewArray addObject:photoModel];
+                if (photoModel.isIcloud) {
+                    if (self.downloadICloudAsset) {
+                        [previewArray addObject:photoModel];
+                    }
+                }else {
+                    [previewArray addObject:photoModel];
+                }
             }
             if (self.showDateHeaderSection && canAddPhoto) {
                 NSDate *photoDate = photoModel.creationDate;
@@ -1055,6 +1086,7 @@ double subtractTimes( uint64_t endTime, uint64_t startTime ) {
     self.photosTotalBtyes = nil;
     
     [self.albums removeAllObjects];
+    [self.iCloudUploadArray removeAllObjects];
 }
 
 - (void)getMaxAlbum {

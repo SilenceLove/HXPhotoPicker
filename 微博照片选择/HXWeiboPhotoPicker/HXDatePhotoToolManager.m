@@ -119,22 +119,24 @@
         } progressHandler:^(double progress) {
             
         } completion:^(NSData *imageData, UIImageOrientation orientation) {
-            NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
-            
-            NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-            
-            if ([imageData writeToFile:fullPathToFile atomically:YES]) {
-                [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
-                [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                [weakSelf writeModelToTempPath];
-            }else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (weakSelf.failedHandler) {
-                        weakSelf.failedHandler();
-                    }
-                });
-            }
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
+                
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                
+                if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+                    [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
+                    [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [weakSelf writeModelToTempPath];
+                }else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (weakSelf.failedHandler) {
+                            weakSelf.failedHandler();
+                        }
+                    });
+                }
+            });
         } failed:^(NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (weakSelf.failedHandler) {
@@ -158,37 +160,40 @@
         } progressHandler:^(double progress) {
             
         } completion:^(UIImage *image) {
-            if (image.imageOrientation != UIImageOrientationUp) {
-                image = [image normalizedImage];
-            }
-            NSData *imageData;
-            NSString *suffix;
-            if (UIImagePNGRepresentation(image)) {
-                //返回为png图像。
-                imageData = UIImagePNGRepresentation(image);
-                suffix = @"png";
-            }else {
-            //返回为JPEG图像。
-                imageData = UIImageJPEGRepresentation(image, 0.8);
-                suffix = @"jpeg";
-            }
-         
-            NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
-            
-            NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-            
-            if ([imageData writeToFile:fullPathToFile atomically:YES]) {
-                [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
-                [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                [weakSelf writeModelToTempPath];
-            }else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (weakSelf.failedHandler) {
-                        weakSelf.failedHandler();
-                    }
-                });
-            }
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                UIImage *tempImage = image;
+                if (tempImage.imageOrientation != UIImageOrientationUp) {
+                    tempImage = [tempImage normalizedImage];
+                }
+                NSData *imageData;
+                NSString *suffix;
+                if (UIImagePNGRepresentation(tempImage)) {
+                    //返回为png图像。
+                    imageData = UIImagePNGRepresentation(tempImage);
+                    suffix = @"png";
+                }else {
+                    //返回为JPEG图像。
+                    imageData = UIImageJPEGRepresentation(tempImage, 0.8);
+                    suffix = @"jpeg";
+                }
+                
+                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+                
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                
+                if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+                    [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
+                    [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [weakSelf writeModelToTempPath];
+                }else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (weakSelf.failedHandler) {
+                            weakSelf.failedHandler();
+                        }
+                    });
+                }
+            });
         } failed:^(NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (weakSelf.failedHandler) {
@@ -209,7 +214,7 @@
     
     NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
     if ([compatiblePresets containsObject:AVAssetExportPresetHighestQuality]) {
-        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetHighestQuality];
+        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetMediumQuality];
         
         NSString *fileName = [[self uploadFileName] stringByAppendingString:@".mp4"];
         NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];

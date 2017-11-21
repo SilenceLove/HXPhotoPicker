@@ -108,22 +108,22 @@
         self.subTitleLb.text = [NSString stringWithFormat:@"%@  %@",model.barTitle,model.barSubTitle];
     }
     CGFloat bottomMargin = kBottomMargin;
-//    CGFloat leftMargin = 0;
-//    CGFloat rightMargin = 0;
+    //    CGFloat leftMargin = 0;
+    //    CGFloat rightMargin = 0;
     CGFloat width = self.view.hx_w;
     CGFloat itemMargin = 20;
     if (kDevice_Is_iPhoneX && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
         bottomMargin = 21;
-//        leftMargin = 35;
-//        rightMargin = 35;
-//        width = self.view.hx_w - 70;
+        //        leftMargin = 35;
+        //        rightMargin = 35;
+        //        width = self.view.hx_w - 70;
     }
     self.flowLayout.itemSize = CGSizeMake(width, self.view.hx_h - kTopMargin - bottomMargin);
     self.flowLayout.minimumLineSpacing = itemMargin;
     
     [self.collectionView setCollectionViewLayout:self.flowLayout];
     
-//    self.collectionView.contentInset = UIEdgeInsetsMake(0, leftMargin, 0, rightMargin);
+    //    self.collectionView.contentInset = UIEdgeInsetsMake(0, leftMargin, 0, rightMargin);
     if (self.outside) {
         self.navBar.frame = CGRectMake(0, 0, self.view.hx_w, kNavigationBarHeight);
     }
@@ -135,7 +135,7 @@
     [UIView performWithoutAnimation:^{
         [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.beforeOrientationIndex inSection:0]]];
     }];
-
+    
     self.bottomView.frame = CGRectMake(0, self.view.hx_h - 50 - bottomMargin, self.view.hx_w, 50 + bottomMargin);
 }
 - (void)viewDidAppear:(BOOL)animated {
@@ -149,7 +149,7 @@
             self.tempCell = tempCell;
             [tempCell requestHDImage];
         });
-    }else { 
+    }else {
         self.tempCell = cell;
         [cell requestHDImage];
     }
@@ -219,6 +219,13 @@
         return;
     }
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
+    if (model.isIcloud) {
+        HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+        [cell cancelRequest];
+        [cell requestHDImage];
+        [self.view showImageHUDText:@"正在下载iCloud上的资源"];
+        return;
+    }
     if (button.selected) {
         button.selected = NO;
         if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
@@ -307,7 +314,7 @@
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXDatePhotoPreviewViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewCellId" forIndexPath:indexPath];
-    HXPhotoModel *model = self.modelArray[indexPath.item]; 
+    HXPhotoModel *model = self.modelArray[indexPath.item];
     cell.model = model;
     __weak typeof(self) weakSelf = self;
     [cell setCellDidPlayVideoBtn:^(BOOL play) {
@@ -321,30 +328,35 @@
             }
         }
     }];
+    [cell setCellDownloadICloudAssetComplete:^(HXDatePhotoPreviewViewCell *myCell) {
+        if ([weakSelf.delegate respondsToSelector:@selector(datePhotoPreviewDownLoadICloudAssetComplete:model:)]) {
+            [weakSelf.delegate datePhotoPreviewDownLoadICloudAssetComplete:weakSelf model:myCell.model];
+        }
+    }];
     [cell setCellTapClick:^{
         [weakSelf setSubviewAlphaAnimate:YES];
-//        BOOL hide = NO;
-//        if (weakSelf.bottomView.alpha == 1) {
-//            hide = YES;
-//        }
-//        if (!hide) {
-//            [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
-//        }
-//        [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
-//        weakSelf.bottomView.userInteractionEnabled = !hide;
-//        [UIView animateWithDuration:0.15 animations:^{
-//            weakSelf.navigationController.navigationBar.alpha = hide ? 0 : 1;
-//            if (weakSelf.outside) {
-//                weakSelf.navBar.alpha = hide ? 0 : 1;
-//            }
-//            weakSelf.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
-//            weakSelf.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
-//            weakSelf.bottomView.alpha = hide ? 0 : 1;
-//        } completion:^(BOOL finished) {
-//            if (hide) {
-//                [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
-//            }
-//        }];
+        //        BOOL hide = NO;
+        //        if (weakSelf.bottomView.alpha == 1) {
+        //            hide = YES;
+        //        }
+        //        if (!hide) {
+        //            [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
+        //        }
+        //        [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
+        //        weakSelf.bottomView.userInteractionEnabled = !hide;
+        //        [UIView animateWithDuration:0.15 animations:^{
+        //            weakSelf.navigationController.navigationBar.alpha = hide ? 0 : 1;
+        //            if (weakSelf.outside) {
+        //                weakSelf.navBar.alpha = hide ? 0 : 1;
+        //            }
+        //            weakSelf.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+        //            weakSelf.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+        //            weakSelf.bottomView.alpha = hide ? 0 : 1;
+        //        } completion:^(BOOL finished) {
+        //            if (hide) {
+        //                [weakSelf.navigationController setNavigationBarHidden:hide animated:NO];
+        //            }
+        //        }];
     }];
     return cell;
 }
@@ -394,10 +406,10 @@
 }
 #pragma mark - < UICollectionViewDelegate >
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-//    if (!self.tempCell.dragging) {
-//        [self.tempCell cancelRequest];
-//        self.tempCell.dragging = YES;
-//    }
+    //    if (!self.tempCell.dragging) {
+    //        [self.tempCell cancelRequest];
+    //        self.tempCell.dragging = YES;
+    //    }
     if (scrollView != self.collectionView) {
         return;
     }
@@ -451,12 +463,12 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if (self.modelArray.count > 0) {
         HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-//        self.tempCell = cell;
+        //        self.tempCell = cell;
         HXPhotoModel *model = self.modelArray[self.currentModelIndex];
         self.currentModel = model;
         [cell requestHDImage];
     }
-//    self.tempCell.dragging = NO;
+    //    self.tempCell.dragging = NO;
 }
 - (void)datePhotoPreviewBottomViewDidItem:(HXPhotoModel *)model currentIndex:(NSInteger)currentIndex beforeIndex:(NSInteger)beforeIndex {
     if ([self.modelArray containsObject:model]) {
@@ -617,20 +629,20 @@
         _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, kNavigationBarHeight)];
         _navBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [_navBar pushNavigationItem:self.navItem animated:NO];
-//        _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
-//        if (self.manager.UIManager.navBackgroundImageName) {
-//            [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
-//        }else if (self.manager.UIManager.navBackgroundColor) {
-//            [_navBar setBackgroundColor:self.manager.UIManager.navBackgroundColor];
-//        }
+        //        _navBar.tintColor = self.manager.UIManager.navLeftBtnTitleColor;
+        //        if (self.manager.UIManager.navBackgroundImageName) {
+        //            [_navBar setBackgroundImage:[HXPhotoTools hx_imageNamed:self.manager.UIManager.navBackgroundImageName] forBarMetrics:UIBarMetricsDefault];
+        //        }else if (self.manager.UIManager.navBackgroundColor) {
+        //            [_navBar setBackgroundColor:self.manager.UIManager.navBackgroundColor];
+        //        }
     }
     return _navBar;
 }
 - (UINavigationItem *)navItem {
     if (!_navItem) {
         _navItem = [[UINavigationItem alloc] init];
-//
-//        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+        //
+        //        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
         _navItem.titleView = self.customTitleView;
     }
     return _navItem;
@@ -706,16 +718,16 @@
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;
         [_collectionView registerClass:[HXDatePhotoPreviewViewCell class] forCellWithReuseIdentifier:@"DatePreviewCellId"];
-        #ifdef __IPHONE_11_0
+#ifdef __IPHONE_11_0
         if (@available(iOS 11.0, *)) {
             _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-        #else
-            if ((NO)) {
-        #endif
-            } else {
-                self.automaticallyAdjustsScrollViewInsets = NO;
+#else
+        if ((NO)) {
+#endif
+        } else {
+            self.automaticallyAdjustsScrollViewInsets = NO;
         }
-        }
+    }
     return _collectionView;
 }
 - (UICollectionViewFlowLayout *)flowLayout {
@@ -727,19 +739,19 @@
         if (self.outside) {
             _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
         }else {
-        #ifdef __IPHONE_11_0
+#ifdef __IPHONE_11_0
             if (@available(iOS 11.0, *)) {
-        #else
+#else
                 if ((NO)) {
-        #endif
+#endif
                     _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
                 }else {
                     _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
                 }
             }
         }
-    return _flowLayout;
-}
+        return _flowLayout;
+    }
 - (NSMutableArray *)modelArray {
     if (!_modelArray) {
         _modelArray = [NSMutableArray array];
@@ -750,7 +762,7 @@
     HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
     [cell cancelRequest];
     if ([UIApplication sharedApplication].statusBarHidden) {
-        [self.navigationController setNavigationBarHidden:NO animated:NO]; 
+        [self.navigationController setNavigationBarHidden:NO animated:NO];
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
@@ -758,7 +770,7 @@
     NSSLog(@"dealloc");
 }
 @end
-    
+
 @interface HXDatePhotoPreviewViewCell ()<UIScrollViewDelegate,PHLivePhotoViewDelegate>
 @property (strong, nonatomic) UIScrollView *scrollView;
 @property (strong, nonatomic) UIImageView *imageView;
@@ -788,7 +800,7 @@
     [self.scrollView addSubview:self.imageView];
     [self.contentView.layer addSublayer:self.playerLayer];
     [self.contentView addSubview:self.videoPlayBtn];
-//    [self.scrollView addSubview:self.livePhotoView];
+    //    [self.scrollView addSubview:self.livePhotoView];
     [self.contentView addSubview:self.progressView];
 }
 - (void)resetScale {
@@ -865,7 +877,7 @@
     }
     if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         self.playerLayer.hidden = NO;
-//        self.videoPlayBtn.hidden = NO;
+        //        self.videoPlayBtn.hidden = NO;
         self.videoPlayBtn.hidden = YES;
     }else {
         self.playerLayer.hidden = YES;
@@ -886,7 +898,7 @@
     if (imgHeight > imgWidth / 9 * 17) {
         size = CGSizeMake(width, height);
     }else {
-        size = CGSizeMake(_model.endImageSize.width * 2.0, _model.endImageSize.height * 2.0);
+        size = CGSizeMake(self.model.endImageSize.width * 2.0, self.model.endImageSize.height * 2.0);
     }
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         if (_livePhotoView.livePhoto) {
@@ -894,28 +906,56 @@
             [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
             return;
         }
-        self.requestID = [HXPhotoTools FetchLivePhotoForPHAsset:self.model.asset Size:self.model.endImageSize Completion:^(PHLivePhoto *livePhoto, NSDictionary *info) {
+        if (self.model.iCloudRequestID) {
+            [[PHImageManager defaultManager] cancelImageRequest:self.model.iCloudRequestID];
+            self.model.iCloudRequestID = -1;
+        }
+        self.requestID = [HXPhotoTools getLivePhotoForAsset:self.model.asset size:self.model.endImageSize startRequestICloud:^(PHImageRequestID iCloudRequestId) {
+            if (weakSelf.model.isIcloud) {
+                weakSelf.progressView.hidden = NO;
+            }
+            weakSelf.requestID = iCloudRequestId;
+        } progressHandler:^(double progress) {
+            if (weakSelf.model.isIcloud) {
+                weakSelf.progressView.hidden = NO;
+            }
+            weakSelf.progressView.progress = progress;
+        } completion:^(PHLivePhoto *livePhoto) {
+            [weakSelf downloadICloudAssetComplete];
             weakSelf.livePhotoView.frame = weakSelf.imageView.frame;
             [weakSelf.scrollView addSubview:weakSelf.livePhotoView];
             weakSelf.imageView.hidden = YES;
             weakSelf.livePhotoView.livePhoto = livePhoto;
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        } failed:^{
+            weakSelf.progressView.hidden = YES;
+            if (weakSelf.model.isIcloud) {
+                //                [weakSelf.progressView showError];
+            }
         }];
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
         self.requestID = [HXPhotoTools getHighQualityFormatPhoto:self.model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            weakSelf.progressView.hidden = NO;
+            if (weakSelf.model.isIcloud) {
+                weakSelf.progressView.hidden = NO;
+            }
             weakSelf.requestID = cloudRequestId;
         } progressHandler:^(double progress) {
-            weakSelf.progressView.hidden = NO;
+            if (weakSelf.model.isIcloud) {
+                weakSelf.progressView.hidden = NO;
+            }
             weakSelf.progressView.progress = progress;
         } completion:^(UIImage *image) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf downloadICloudAssetComplete];
                 weakSelf.progressView.hidden = YES;
                 weakSelf.imageView.image = image;
             });
         } failed:^(NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 weakSelf.progressView.hidden = YES;
+                if (weakSelf.model.isIcloud) {
+                    //                    [weakSelf.progressView showError];
+                }
             });
         }];
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
@@ -924,16 +964,21 @@
         }else {
             self.requestID = [HXPhotoTools getImageData:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    weakSelf.progressView.hidden = NO;
+                    if (weakSelf.model.isIcloud) {
+                        weakSelf.progressView.hidden = NO;
+                    }
                     weakSelf.requestID = cloudRequestId;
                 });
             } progressHandler:^(double progress) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    weakSelf.progressView.hidden = NO;
+                    if (weakSelf.model.isIcloud) {
+                        weakSelf.progressView.hidden = NO;
+                    }
                     weakSelf.progressView.progress = progress;
                 });
             } completion:^(NSData *imageData, UIImageOrientation orientation) {
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf downloadICloudAssetComplete];
                     weakSelf.progressView.hidden = YES;
                     UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
                     if (gifImage.images.count == 0) {
@@ -948,34 +993,56 @@
             } failed:^(NSDictionary *info) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     weakSelf.progressView.hidden = YES;
+                    if (weakSelf.model.isIcloud) {
+                        //                        [weakSelf.progressView showError];
+                    }
                 });
             }];
         }
     }
     if (self.player != nil) return;
     if (self.model.type == HXPhotoModelMediaTypeVideo) {
-        self.requestID = [HXPhotoTools getPlayerItemWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            weakSelf.progressView.hidden = NO;
+        self.requestID = [HXPhotoTools getAVAssetWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+            if (weakSelf.model.isIcloud) {
+                weakSelf.progressView.hidden = NO;
+            }
             weakSelf.videoPlayBtn.hidden = YES;
             weakSelf.requestID = cloudRequestId;
         } progressHandler:^(double progress) {
-            weakSelf.progressView.hidden = NO;
+            if (weakSelf.model.isIcloud) {
+                weakSelf.progressView.hidden = NO;
+            }
             weakSelf.progressView.progress = progress;
-        } completion:^(AVPlayerItem *playerItem) {
+        } completion:^(AVAsset *asset) {
+            [weakSelf downloadICloudAssetComplete];
+            weakSelf.model.avAsset = asset;
             weakSelf.progressView.hidden = YES;
             weakSelf.videoPlayBtn.hidden = NO;
-            weakSelf.player = [AVPlayer playerWithPlayerItem:playerItem];
+            weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
             weakSelf.playerLayer.player = weakSelf.player;
             [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem];
         } failed:^(NSDictionary *info) {
             weakSelf.videoPlayBtn.hidden = NO;
             weakSelf.progressView.hidden = YES;
+            if (weakSelf.model.isIcloud) {
+                //                [weakSelf.progressView showError];
+            }
         }];
     }else if (self.model.type == HXPhotoModelMediaTypeCameraVideo ) {
         self.videoPlayBtn.hidden = NO;
         self.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithURL:self.model.videoURL]];
         self.playerLayer.player = self.player;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
+    }
+}
+- (void)downloadICloudAssetComplete {
+    self.progressView.hidden = YES;
+    if (self.model.isIcloud) {
+        self.model.iCloudDownloading = NO;
+        self.model.isIcloud = NO;
+        if (self.cellDownloadICloudAssetComplete) {
+            self.cellDownloadICloudAssetComplete(self);
+        }
     }
 }
 - (void)pausePlayerAndShowNaviBar {
@@ -988,6 +1055,7 @@
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
     }
+    self.model.avAsset = nil;
     self.videoPlayBtn.hidden = YES;
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
@@ -1157,3 +1225,4 @@
     [self cancelRequest];
 }
 @end
+

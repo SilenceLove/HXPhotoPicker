@@ -663,14 +663,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             }];
         }
         return;
-    }
-    if (self.manager.saveSystemAblum && self.manager.style == HXPhotoAlbumStylesSystem) {
-        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.customAlbumName photo:model.thumbPhoto];
-        }else {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.customAlbumName videoURL:model.videoURL];
-        }
-    }
+    } 
     // 判断类型
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         [self.manager.endCameraPhotos addObject:model];

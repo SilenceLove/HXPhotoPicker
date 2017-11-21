@@ -7,7 +7,7 @@
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
 <img src="http://wx1.sinaimg.cn/mw690/ade10dedgy1fdgf4qs610j20ku112n31.jpg" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32322874-fe149aa8-c000-11e7-8172-629de70f7089.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32438543-db479232-c325-11e7-87d9-48282914e752.gif" width="270" height="480">
-<img src="https://user-images.githubusercontent.com/18083149/32778022-585f3628-c973-11e7-8139-9d19c26f1515.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32778166-d2397300-c973-11e7-9135-8ba11b24636e.gif" width="270" height="480">
+<img src="https://user-images.githubusercontent.com/18083149/32778022-585f3628-c973-11e7-8139-9d19c26f1515.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32778166-d2397300-c973-11e7-9135-8ba11b24636e.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/33060991-55f9abf4-ced5-11e7-8b97-609813c0e937.gif" width="270" height="480">
 
 ## 目录
 * [项目特性](#特性)
@@ -39,6 +39,7 @@
 - [x] 支持自定义裁剪图片
 - [x] 观察系统相册变化实时增删
 - [x] 支持传入本地图片
+- [x] 支持在线下载iCloud上的资源
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
@@ -77,6 +78,7 @@
 - 2017-11-06　　完善手势返回效果、修改小问题
 - 2017-11-14　　添加自定义裁剪功能
 - v2.1.2　-　添加显示照片地理位置信息、优化细节
+- 2017-11-21　　支持在线下载iCloud上的照片和视频
 
 ## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
 ### <a id="HXPhotoTools"></a> 关于HXPhotoTools获取资源信息 具体代码还是请下载Demo这里只是简单的两个

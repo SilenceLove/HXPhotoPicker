@@ -115,8 +115,6 @@ typedef enum : NSUInteger {
  */
 + (void)getImageForSelectedPhoto:(NSArray<HXPhotoModel *> *)photos type:(HXPhotoToolsFetchType)type completion:(void(^)(NSArray<UIImage *> *images))completion;
 
-+ (void)isICloudAssetWithModel:(HXPhotoModel *)model complete:(void (^)(HXPhotoModel *model, BOOL isICloud))complete;
-
 + (PHImageRequestID)getImageWithModel:(HXPhotoModel *)model completion:(void (^)(UIImage *image, HXPhotoModel *model))completion;
 
 + (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model size:(CGSize)size completion:(void (^)(UIImage *image, HXAlbumModel *model))completion;
@@ -131,7 +129,17 @@ typedef enum : NSUInteger {
 
 + (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(UIImage *image))completion failed:(void(^)(NSDictionary *info))failed;
 
++ (PHImageRequestID)getLivePhotoForAsset:(PHAsset *)asset size:(CGSize)size startRequestICloud:(void (^)(PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(PHLivePhoto *livePhoto))completion failed:(void(^)())failed;
+
 + (PHImageRequestID)getImageData:(PHAsset *)asset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(NSData *imageData, UIImageOrientation orientation))completion failed:(void(^)(NSDictionary *info))failed;
+
+/**  通过模型去获取  */
++ (PHImageRequestID)getAVAssetWithModel:(HXPhotoModel *)model startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, AVAsset *asset))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
+
++ (PHImageRequestID)getLivePhotoWithModel:(HXPhotoModel *)model size:(CGSize)size startRequestICloud:(void (^)(HXPhotoModel *model, PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, PHLivePhoto *livePhoto))completion failed:(void(^)(HXPhotoModel *model))failed;
+
++ (PHImageRequestID)getImageDataWithModel:(HXPhotoModel *)model startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, NSData *imageData, UIImageOrientation orientation))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
+/**  -------  */
 
 /**
  获取视频的时长

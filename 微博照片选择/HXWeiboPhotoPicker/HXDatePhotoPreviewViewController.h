@@ -17,6 +17,7 @@
 - (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController;
 - (void)datePhotoPreviewDidEditClick:(HXDatePhotoPreviewViewController *)previewController;
 - (void)datePhotoPreviewSingleSelectedClick:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
+- (void)datePhotoPreviewDownLoadICloudAssetComplete:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 @end
 
 @interface HXDatePhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
@@ -41,6 +42,7 @@
 @property (assign, nonatomic) BOOL dragging;
 @property (nonatomic, copy) void (^cellTapClick)();
 @property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
+@property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXDatePhotoPreviewViewCell *myCell);
 
 - (void)resetScale;
 - (void)requestHDImage;

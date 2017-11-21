@@ -31,6 +31,7 @@
 @protocol HXDatePhotoViewCellDelegate <NSObject>
 @optional
 - (void)datePhotoViewCell:(HXDatePhotoViewCell *)cell didSelectBtn:(UIButton *)selectBtn;
+- (void)datePhotoViewCellRequestICloudAssetComplete:(HXDatePhotoViewCell *)cell;
 @end
 
 @interface HXDatePhotoViewCell : UICollectionViewCell
@@ -42,6 +43,7 @@
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (assign, nonatomic) BOOL singleSelected;
 - (void)cancelRequest;
+- (void)startRequestICloudAsset;
 @end
 
 @interface HXDatePhotoCameraViewCell : UICollectionViewCell

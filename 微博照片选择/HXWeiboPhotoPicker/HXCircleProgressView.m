@@ -46,6 +46,7 @@
     
     CAShapeLayer *errorLayer = [CAShapeLayer layer];
     errorLayer.frame = self.bounds;
+    errorLayer.hidden = YES;
     // 旋转 45 度
     errorLayer.affineTransform = CGAffineTransformMakeRotation(M_PI_4);
     errorLayer.fillColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.8].CGColor;

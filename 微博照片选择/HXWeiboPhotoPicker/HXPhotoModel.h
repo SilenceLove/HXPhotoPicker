@@ -57,6 +57,10 @@ typedef enum : NSUInteger {
  */
 @property (strong, nonatomic) CLLocation *location;
 
+@property (assign, nonatomic) BOOL iCloudDownloading;
+@property (assign, nonatomic) CGFloat iCloudProgress;
+@property (assign, nonatomic) PHImageRequestID iCloudRequestID;
+
 @property (copy, nonatomic) NSString *barTitle;
 @property (copy, nonatomic) NSString *barSubTitle;
 

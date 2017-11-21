@@ -239,7 +239,14 @@
     }
     [self stopTimer];
     [self.cameraController stopMontionUpdate];
-    [self.cameraController stopSession];
+    [self.cameraController stopSession]; 
+    if (self.manager.saveSystemAblum) {
+        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.customAlbumName photo:model.thumbPhoto];
+        }else {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.customAlbumName videoURL:model.videoURL];
+        }
+    }
     if ([self.delegate respondsToSelector:@selector(customCameraViewController:didDone:)]) {
         [self.delegate customCameraViewController:self didDone:model];
     }

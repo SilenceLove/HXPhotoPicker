@@ -30,6 +30,7 @@
 @property (weak, nonatomic) IBOutlet UISegmentedControl *selectedTypeView;
 @property (weak, nonatomic) IBOutlet UISwitch *saveAblum;
 @property (weak, nonatomic) IBOutlet UISwitch *icloudSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *downloadICloudAsset;
 
 @end
 
@@ -51,16 +52,22 @@
 }
 
 - (void)viewDidLoad {
-    [super viewDidLoad]; 
+    [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空选择" style:UIBarButtonItemStylePlain target:self action:@selector(didRightClick)];
 }
-
+- (void)didRightClick {
+    [self.manager clearSelectedList];
+    self.total.text = @"总数量：0   ( 照片：0   视频：0 )";
+    self.original.text = @"NO";
+}
 - (IBAction)goAlbum:(id)sender {
     self.camera.on = NO;
     self.manager.filtrationICloudAsset = self.icloudSwitch.on;
     self.manager.photoMaxNum = self.photoText.text.integerValue;
     self.manager.videoMaxNum = self.videoText.text.integerValue;
     self.manager.rowCount = self.columnText.text.integerValue;
+    self.manager.downloadICloudAsset = self.downloadICloudAsset.on;
     if (self.isSystems.on) {
         self.manager.style = HXPhotoAlbumStylesSystem;
     }else {
