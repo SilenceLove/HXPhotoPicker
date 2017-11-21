@@ -54,7 +54,7 @@
 }
 - (void)setProgress:(CGFloat)progress {
     _progress = progress;
-    self.label.text = @((int)(progress * 100)).stringValue;
+    self.label.text = [NSString stringWithFormat:@"%d%%",(int)(progress * 100)];
     if (progress >= 1) {
         progress = 1;
         [self animationComplete];

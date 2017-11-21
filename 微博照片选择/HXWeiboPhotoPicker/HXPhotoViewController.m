@@ -968,6 +968,14 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
     [self cameraDidNextClick:model];
 }
 - (void)cameraDidNextClick:(HXPhotoModel *)model {
+    if (self.manager.singleSelected && model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        [self.manager.selectedCameraList addObject:model];
+        [self.manager.selectedCameraPhotos addObject:model];
+        [self.manager.selectedPhotos addObject:model];
+        [self.manager.selectedList addObject:model];
+        [self didNextClick:self.rightBtn];
+        return;
+    }
     if (self.manager.saveSystemAblum) {
         if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -998,14 +1006,6 @@ static NSString *PhotoViewCellId = @"PhotoViewCellId";
                 });
             }];
         }
-        return;
-    }
-    if (self.manager.singleSelected && model.type == HXPhotoModelMediaTypeCameraPhoto) {
-        [self.manager.selectedCameraList addObject:model];
-        [self.manager.selectedCameraPhotos addObject:model];
-        [self.manager.selectedPhotos addObject:model];
-        [self.manager.selectedList addObject:model];
-        [self didNextClick:self.rightBtn];
         return;
     }
     if (self.albumModel.index != 0) {

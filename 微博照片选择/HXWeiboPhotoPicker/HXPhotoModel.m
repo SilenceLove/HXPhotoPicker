@@ -195,19 +195,12 @@
     if (_requestSize.width == 0 || _requestSize.height == 0) {
         CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
         CGSize size;
-//        if (self.imageSize.width > self.imageSize.height / 9 * 15) {
-//            size = CGSizeMake(width, width * [UIScreen mainScreen].scale);
-//        }else if (self.imageSize.height > self.imageSize.width / 9 * 15) {
-//            size = CGSizeMake(width * [UIScreen mainScreen].scale, width);
-//        }else {
-            if ([UIScreen mainScreen].bounds.size.width == 375) {
-                size = CGSizeMake(width * 1.4, width * 1.4);
-            }else {
-                size = CGSizeMake(width * 1.7, width * 1.7);
-            }
-//        }
         if ([UIScreen mainScreen].bounds.size.width == 320) {
             size = CGSizeMake(width * 0.8, width * 0.8);
+        }else if ([UIScreen mainScreen].bounds.size.width == 375) {
+            size = CGSizeMake(width * 1.4, width * 1.4);
+        }else {
+            size = CGSizeMake(width * 1.7, width * 1.7);
         }
         _requestSize = size;
     }

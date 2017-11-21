@@ -82,7 +82,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         }];
         return;
     }
-    [HXPhotoTools selectListWriteToTempPath:self.selectList requestList:^(NSArray *imageRequestIds, NSArray *videoSessions) {
+    [HXPhotoTools selectListWriteToTempPath:self.manager.endSelectedList requestList:^(NSArray *imageRequestIds, NSArray *videoSessions) {
         weakSelf.imageRequestIds = imageRequestIds;
         weakSelf.videoSessions = videoSessions;
         NSSLog(@"image请求 : %ld  视频压缩会话 : %ld",imageRequestIds.count,videoSessions.count);

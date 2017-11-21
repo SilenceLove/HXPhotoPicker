@@ -1431,7 +1431,7 @@
     }
     NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
     if ([compatiblePresets containsObject:AVAssetExportPresetHighestQuality]) {
-        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetHighestQuality];
+        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetMediumQuality];
         exportSession.outputURL = [NSURL fileURLWithPath:model.fullPathToFile];
         exportSession.outputFileType = AVFileTypeMPEG4;
         exportSession.shouldOptimizeForNetworkUse = YES;

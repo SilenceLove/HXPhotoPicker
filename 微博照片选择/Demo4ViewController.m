@@ -22,9 +22,7 @@
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        _manager.openCamera = YES;
         _manager.singleSelected = YES;
-        _manager.saveSystemAblum = YES;
         _manager.style = HXPhotoAlbumStylesSystem;
     }
     return _manager;
@@ -42,11 +40,13 @@
 }
 - (IBAction)selectedPhoto:(id)sender {
     if (self.manager.style == HXPhotoAlbumStylesWeibo) {
+        self.manager.saveSystemAblum = NO;
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
         vc.manager = self.manager;
         vc.delegate = self;
         [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
     }else {
+        self.manager.saveSystemAblum = YES;
         HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
         vc.delegate = self;
         vc.manager = self.manager;

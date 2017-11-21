@@ -14,8 +14,6 @@
 * [安装方式](#安装)
 * [使用要求](#要求)
 * [更新记录](#更新历史)
-* [属性介绍](#属性介绍)
-	* [HXPhotoTools](#HXPhotoTools)
 * [应用示例](#例子)
 	* [单独使用HXPhotoViewController](#Demo1)
 	* [使用HXPhotoView选照片后自动布局](#Demo2)
@@ -80,44 +78,7 @@
 - v2.1.2　-　添加显示照片地理位置信息、优化细节
 - 2017-11-21　　支持在线下载iCloud上的照片和视频
 
-## <a id="属性介绍"></a> 五.  属性介绍 - Atribute Introduce
-### <a id="HXPhotoTools"></a> 关于HXPhotoTools获取资源信息 具体代码还是请下载Demo这里只是简单的两个
-```
-//    将HXPhotoModel模型数组转化成HXPhotoResultModel模型数组  - 已按选择顺序排序
-//    !!!!  必须是全部类型的那个数组 就是 allList 这个数组  !!!!
-[HXPhotoTools getSelectedListResultModel:allList complete:^(NSArray<HXPhotoResultModel *> *alls,  NSArray<HXPhotoResultModel *> *photos, NSArray<HXPhotoResultModel *> *videos) {
-    NSSLog(@"\n全部类型:%@\n照片:%@\n视频:%@",alls,photos,videos);
-}];
-
-HXPhotoTools提供一个方法可以根据传入的模型数组转换成图片(UIImage)数组 
-
-type是个枚举
-HXPhotoToolsFetchHDImageType = 0, // 高清
-HXPhotoToolsFetchOriginalImageTpe, // 原图
-
-[HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
-    NSSLog(@"%@",images);
-    for (UIImage *image in images) {
-        if (image.images.count > 0) {
-            // 到这里了说明这个image  是个gif图
-        }
-    }
-}];
-
-[self.view showLoadingHUDText:@"写入中"];
-__weak typeof(self) weakSelf = self;
-// 将选择的模型数组写入临时目录
-[HXPhotoTools selectListWriteToTempPath:self.selectList completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
-    NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allUrl,imageUrls,videoUrls);
-    [weakSelf.view handleLoading];
-} error:^{
-    [weakSelf.view handleLoading];
-    [weakSelf.view showImageHUDText:@"写入失败"];
-    NSSLog(@"写入失败");
-}];
-```
-
-## <a id="例子"></a> 六.  应用示例 - Examples
+## <a id="例子"></a> 五.  应用示例 - Examples
 ### <a id="Demo1"></a> Demo1
 ```objc
 // 懒加载 照片管理类
@@ -338,7 +299,7 @@ self.photoView = photoView;
 
 ## <a id="更多"></a> 六.  更多 - More
 
-- 后期计划（针对系统风格相册优化关于网络图片的部分、单选模式支持HXPhotoView）
+- 后期计划（剔除微博样式、框架大改造、优化关于网络图片的部分、单选模式支持HXPhotoView）
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 
