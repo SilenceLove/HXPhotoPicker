@@ -39,6 +39,12 @@
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
 @property (strong, nonatomic) HXCollectionView *collectionView;
 
+
+/**
+ 是否把相机功能放在外面 默认 NO
+ */
+@property (assign, nonatomic) BOOL outerCamera;
+
 /**
  每行个数 默认3;
  */
@@ -54,12 +60,13 @@
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 + (instancetype)photoManager:(HXPhotoManager *)manager;
+- (NSIndexPath *)currentModelIndexPath:(HXPhotoModel *)model;
 /**  跳转相册 如果需要选择相机/相册时 还是需要选择  */
 - (void)goPhotoViewController;
 /**  跳转相册 过滤掉选择 - 不管需不需要选择 直接前往相册  */
 - (void)directGoPhotoViewController;
 /**  跳转相机  */
-- (void)goCameraViewContoller;
+- (void)goCameraViewController;
 /**  网络图片是否全部下载完成  */
 - (BOOL)networkingPhotoDownloadComplete;
 /**  删除某个模型  */

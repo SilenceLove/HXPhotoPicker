@@ -17,16 +17,18 @@
 @end
 
 @interface HXDatePhotoPreviewBottomView : UIView
+@property (strong, nonatomic) UIToolbar *bgView;
 @property (weak, nonatomic) id<HXDatePhotoPreviewBottomViewDelegate> delagate;
 @property (strong, nonatomic) NSMutableArray *modelArray;
 @property (assign, nonatomic) NSInteger selectCount;
 @property (assign, nonatomic) NSInteger currentIndex;
 @property (assign, nonatomic) BOOL hideEditBtn;
 @property (assign, nonatomic) BOOL enabled;
+@property (assign, nonatomic) BOOL outside;
 
 - (void)insertModel:(HXPhotoModel *)model;
 - (void)deleteModel:(HXPhotoModel *)model;
-- (instancetype)initWithFrame:(CGRect)frame modelArray:(NSArray *)modelArray;
+- (instancetype)initWithFrame:(CGRect)frame modelArray:(NSArray *)modelArray manager:(HXPhotoManager *)manager;
 - (void)deselected;
 - (void)deselectedWithIndex:(NSInteger)index;
 @end
@@ -34,5 +36,6 @@
 
 @interface HXDatePhotoPreviewBottomViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
+@property (strong, nonatomic) UIColor *selectColor;
 - (void)cancelRequest;
 @end

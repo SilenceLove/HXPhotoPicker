@@ -29,7 +29,6 @@ static const CGFloat kPhotoViewSectionMargin = 20.0;
 - (HXPhotoManager *)oneManager {
     if (!_oneManager) {
         _oneManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
-        _oneManager.cameraType = HXPhotoManagerCameraTypeFullScreen;
     }
     return _oneManager;
 }
@@ -37,7 +36,7 @@ static const CGFloat kPhotoViewSectionMargin = 20.0;
 - (HXPhotoManager *)twoManager {
     if (!_twoManager) {
         _twoManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypeVideo];
-        _twoManager.videoMaximumDuration = 10.f;
+        _twoManager.configuration.videoMaximumDuration = 10.f;
     }
     return _twoManager;
 }

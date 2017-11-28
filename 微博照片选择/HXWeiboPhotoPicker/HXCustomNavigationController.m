@@ -19,13 +19,27 @@
     // Do any additional setup after loading the view.
 }
 -(BOOL)shouldAutorotate{
-    return !self.isCamera;
+    if (self.isCamera) {
+        return NO;
+    }
+    if (self.supportRotation) {
+        return YES;
+    }else {
+        return NO;
+    }
 }
 
 //支持的方向
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return self.isCamera ? UIInterfaceOrientationMaskPortrait : UIInterfaceOrientationMaskAll;
+    if (self.isCamera) {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+    if (self.supportRotation) {
+        return UIInterfaceOrientationMaskAll;
+    }else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
 }
 
 @end

@@ -79,7 +79,7 @@ const CGFloat HXZoomRate = 1.0f;
 //    if ([self.captureSession canSetSessionPreset:AVCaptureSessionPreset3840x2160]) {
 //        self.captureSession.sessionPreset = AVCaptureSessionPreset3840x2160;
 //    }else {
-        self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+        self.captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
 //    }
     
     AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];

@@ -65,6 +65,8 @@
 @property (strong, nonatomic) CALayer *selectMaskLayer;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (assign, nonatomic) BOOL singleSelected;
+@property (strong, nonatomic) UIColor *selectBgColor;
+@property (strong, nonatomic) UIColor *selectedTitleColor;
 - (void)cancelRequest;
 - (void)startRequestICloudAsset;
 @end
@@ -78,7 +80,10 @@
 
 @interface HXDatePhotoViewSectionHeaderView : HXCustomCollectionReusableView
 @property (strong, nonatomic) HXPhotoDateModel *model;
-@property (assign, nonatomic) BOOL changeState; 
+@property (assign, nonatomic) BOOL changeState;
+@property (assign, nonatomic) BOOL translucent;
+@property (strong, nonatomic) UIColor *suspensionBgColor;
+@property (strong, nonatomic) UIColor *suspensionTitleColor;
 @end
 
 @interface HXDatePhotoViewSectionFooterView : UICollectionReusableView
@@ -100,4 +105,5 @@
 @property (assign, nonatomic) BOOL doneBtnEnabled;
 @property (assign, nonatomic) NSInteger selectCount;
 @property (strong, nonatomic) UIButton *originalBtn;
+@property (strong, nonatomic) UIToolbar *bgView;
 @end

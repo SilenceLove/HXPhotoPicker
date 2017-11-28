@@ -6,8 +6,7 @@
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "Demo8ViewController.h"
-#import "HXPhotoViewController.h"
+#import "Demo8ViewController.h" 
 #import "HXPhotoView.h"
 #import "HXDatePhotoToolManager.h"
 static const CGFloat kPhotoViewMargin = 12.0;
@@ -27,12 +26,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        _manager.openCamera = YES;
-        //        _manager.outerCamera = YES;
-        _manager.style = HXPhotoAlbumStylesSystem;
-        _manager.photoMaxNum = 9;
-        _manager.videoMaxNum = 9;
-        _manager.maxNum = 18;
+        _manager.configuration.openCamera = YES;
+        _manager.configuration.photoMaxNum = 9;
+        _manager.configuration.videoMaxNum = 9;
+        _manager.configuration.maxNum = 18;
     }
     return _manager;
 }
@@ -70,26 +67,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)didNavOneBtnClick {
     [self.view showLoadingHUDText:@"写入中"];
     __weak typeof(self) weakSelf = self;
-    if (self.manager.style == HXPhotoAlbumStylesSystem) {
-        // 相册风格为系统时  必须使用此方法写入临时文件
-        [self.toolManager writeSelectModelListToTempPathWithList:self.selectList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
-            NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
-            [weakSelf.view handleLoading];
-        } failed:^{
-            [weakSelf.view handleLoading];
-            [weakSelf.view showImageHUDText:@"写入失败"];
-            NSSLog(@"写入失败");
-        }];
-        return;
-    }
-    [HXPhotoTools selectListWriteToTempPath:self.manager.endSelectedList requestList:^(NSArray *imageRequestIds, NSArray *videoSessions) {
-        weakSelf.imageRequestIds = imageRequestIds;
-        weakSelf.videoSessions = videoSessions;
-        NSSLog(@"image请求 : %ld  视频压缩会话 : %ld",imageRequestIds.count,videoSessions.count);
-    } completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
-        NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allUrl,imageUrls,videoUrls);
+    // 相册风格为系统时  必须使用此方法写入临时文件
+    [self.toolManager writeSelectModelListToTempPathWithList:self.selectList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
+        NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
         [weakSelf.view handleLoading];
-    } error:^{
+    } failed:^{
         [weakSelf.view handleLoading];
         [weakSelf.view showImageHUDText:@"写入失败"];
         NSSLog(@"写入失败");

@@ -19,6 +19,7 @@
 @property (weak, nonatomic) id<HXDatePhotoEditViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) HXPhotoManager *manager;
+@property (assign, nonatomic) BOOL outside;
 @end
 
 @class HXEditRatio;

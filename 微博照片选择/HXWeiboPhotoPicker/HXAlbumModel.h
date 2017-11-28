@@ -29,13 +29,10 @@
  封面Asset
  */
 @property (strong, nonatomic) PHAsset *asset;
-
+/**  单选时的第二个资源  */
 @property (strong, nonatomic) PHAsset *asset2;
+/**  单选时的第三个资源  */
 @property (strong, nonatomic) PHAsset *asset3;
-
-
-
-@property (strong, nonatomic) UIImage *albumImage;
 
 /**
  照片集合对象
@@ -51,7 +48,4 @@
  选中的个数
  */
 @property (assign, nonatomic) NSInteger selectedCount;
-
-@property (assign, nonatomic) CGFloat albumNameWidth;
-
 @end

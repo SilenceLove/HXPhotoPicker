@@ -6,9 +6,8 @@
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "Demo2ViewController.h"
-#import "HXPhotoViewController.h"
-#import "HXPhotoView.h" 
+#import "Demo2ViewController.h" 
+#import "HXPhotoPicker.h"
 
 static const CGFloat kPhotoViewMargin = 12.0;
 
@@ -17,76 +16,37 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXPhotoView *photoView;
 @property (strong, nonatomic) UIScrollView *scrollView;
+@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 
 @end
 
 @implementation Demo2ViewController
 
-/**
-    HXPhotoManager 照片管理类的属性介绍
- 
-    是否把相机功能放在外面 默认 NO   使用 HXPhotoView 时有用
-    outerCamera;
-
-
-    是否打开相机功能
-    openCamera;
-
-
-    是否开启查看GIF图片功能 - 默认开启
-    lookGifPhoto;
-
-
-    是否开启查看LivePhoto功能呢 - 默认开启
-    lookLivePhoto;
-
-
-    是否一开始就进入相机界面
-    goCamera;
-
-
-    最大选择数 默认10 - 必填
-    maxNum;
-
-
-    图片最大选择数 默认9 - 必填
-    photoMaxNum;
-
-
-    视频最大选择数  默认1 - 必填
-    videoMaxNum;
-
-
-    图片和视频是否能够同时选择 默认支持
-    selectTogether;
-
-
-    相册列表每行多少个照片 默认4个
-    rowCount;
- 
- */
+- (HXDatePhotoToolManager *)toolManager {
+    if (!_toolManager) {
+        _toolManager = [[HXDatePhotoToolManager alloc] init];
+    }
+    return _toolManager;
+}
 
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        _manager.openCamera = YES;
-        _manager.cacheAlbum = YES;
-        _manager.lookLivePhoto = YES;
-        _manager.outerCamera = YES;
-        _manager.cameraType = HXPhotoManagerCameraTypeFullScreen;
-        _manager.photoMaxNum = 4;
-        _manager.videoMaxNum = 4;
-        _manager.maxNum = 8;
-        _manager.videoMaxDuration = 500.f;
-        _manager.saveSystemAblum = NO;
-        _manager.style = HXPhotoAlbumStylesSystem;
-//        _manager.reverseDate = YES;
-        _manager.showDateHeaderSection = NO;
-        _manager.selectTogether = NO;
-//        _manager.rowCount = 3;
-        
-        _manager.UIManager.navBar = ^(UINavigationBar *navBar) {
-//            [navBar setBackgroundImage:[UIImage imageNamed:@"APPCityPlayer_bannerGame"] forBarMetrics:UIBarMetricsDefault];
+        _manager.configuration.openCamera = YES;
+        _manager.configuration.lookLivePhoto = YES;
+        _manager.configuration.photoMaxNum = 4;
+        _manager.configuration.videoMaxNum = 6;
+        _manager.configuration.maxNum = 10;
+        _manager.configuration.videoMaxDuration = 500.f;
+        _manager.configuration.saveSystemAblum = NO;
+//        _manager.configuration.reverseDate = YES;
+        _manager.configuration.showDateSectionHeader = NO;
+//        _manager.configuration.selectTogether = NO;
+//        _manager.configuration.rowCount = 3;
+//        _manager.configuration.themeColor = [UIColor orangeColor];
+//        _manager.configuration.navigationTitleSynchColor = YES;
+        _manager.configuration.navigationBar = ^(UINavigationBar *navigationBar) {
+//            navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor orangeColor]};
         };
     }
     return _manager;
@@ -120,6 +80,21 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
     NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     NSSLog(@"所有:%@ - 照片:%@ - 视频:%@",allList,photos,videos);
+    
+    [HXPhotoTools selectListWriteToTempPath:allList requestList:^(NSArray *imageRequestIds, NSArray *videoSessions) {
+        NSSLog(@"requestIds - image : %@ \nsessions - video : %@",imageRequestIds,videoSessions);
+    } completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
+        NSSLog(@"allUrl - %@\nimageUrls - %@\nvideoUrls - %@",allUrl,imageUrls,videoUrls);
+    } error:^{
+        NSSLog(@"失败");
+    }];
+    
+//    [self.toolManager getSelectedImageList:allList success:^(NSArray<UIImage *> *imageList) {
+//
+//    } failed:^{
+//
+//    }];
+//    [self.toolManager cancelGetImageList];
 //    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
 //        NSSLog(@"%@",images);
 //        for (UIImage *image in images) {

@@ -144,11 +144,7 @@
     //    }];
 }
 
-- (void)loadLivePhoto {
-    if (self.model.isCloseLivePhoto) {
-        [self loadPhoto];
-        return;
-    }
+- (void)loadLivePhoto { 
     self.livePhotoView = [[PHLivePhotoView alloc] initWithFrame:CGRectMake(0, 0, self.model.previewViewSize.width, self.model.previewViewSize.height)];
     self.livePhotoView.clipsToBounds = YES;
     self.livePhotoView.hidden = YES;

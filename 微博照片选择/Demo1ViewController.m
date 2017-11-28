@@ -7,11 +7,9 @@
 //
 
 #import "Demo1ViewController.h"
-#import "HXPhotoViewController.h"
-#import "HXCustomNavigationController.h"
-#import "HXAlbumListViewController.h"
+#import "HXPhotoPicker.h"
 
-@interface Demo1ViewController ()<HXPhotoViewControllerDelegate,HXAlbumListViewControllerDelegate>
+@interface Demo1ViewController ()<HXAlbumListViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *total;
 //@property (weak, nonatomic) IBOutlet UILabel *photo;
@@ -31,7 +29,12 @@
 @property (weak, nonatomic) IBOutlet UISwitch *saveAblum;
 @property (weak, nonatomic) IBOutlet UISwitch *icloudSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *downloadICloudAsset;
-
+@property (weak, nonatomic) IBOutlet UISegmentedControl *tintColor;
+@property (weak, nonatomic) IBOutlet UISwitch *hideOriginal;
+@property (weak, nonatomic) IBOutlet UISwitch *synchTitleColor;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *navBgColor;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *navTitleColor;
+@property (strong, nonatomic) UIColor *bottomViewBgColor;
 @end
 
 @implementation Demo1ViewController
@@ -40,13 +43,39 @@
 {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
-        _manager.videoMaxNum = 5;
-        _manager.cacheAlbum = NO;
-        _manager.style = HXPhotoAlbumStylesSystem;
-        _manager.deleteTemporaryPhoto = NO;
-        _manager.lookLivePhoto = YES;
-        _manager.saveSystemAblum = YES; 
-//        _manager.cameraCellShowPreview = NO;
+        _manager.configuration.videoMaxNum = 5;
+        _manager.configuration.deleteTemporaryPhoto = NO;
+        _manager.configuration.lookLivePhoto = YES;
+        _manager.configuration.saveSystemAblum = YES;
+//        _manager.configuration.supportRotation = NO;
+//        _manager.configuration.cameraCellShowPreview = NO;
+//        _manager.configuration.themeColor = [UIColor redColor];
+        _manager.configuration.navigationBar = ^(UINavigationBar *navigationBar) {
+//            [navigationBar setBackgroundImage:[UIImage imageNamed:@"APPCityPlayer_bannerGame"] forBarMetrics:UIBarMetricsDefault];
+//            navigationBar.barTintColor = [UIColor redColor];
+        };
+//        _manager.configuration.sectionHeaderTranslucent = NO;
+//        _manager.configuration.navBarBackgroudColor = [UIColor redColor];
+//        _manager.configuration.sectionHeaderSuspensionBgColor = [UIColor redColor];
+//        _manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
+//        _manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
+//        _manager.configuration.selectedTitleColor = [UIColor redColor];
+        __weak typeof(self) weakSelf = self;
+        _manager.configuration.photoListBottomView = ^(HXDatePhotoBottomView *bottomView) {
+            bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
+        };
+        _manager.configuration.previewBottomView = ^(HXDatePhotoPreviewBottomView *bottomView) {
+            bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
+        };
+        _manager.configuration.albumListCollectionView = ^(UICollectionView *collectionView) {
+//            NSSLog(@"albumList:%@",collectionView);
+        };
+        _manager.configuration.photoListCollectionView = ^(UICollectionView *collectionView) {
+//            NSSLog(@"photoList:%@",collectionView);
+        };
+        _manager.configuration.previewCollectionView = ^(UICollectionView *collectionView) {
+//            NSSLog(@"preview:%@",collectionView);
+        };
     }
     return _manager;
 }
@@ -56,6 +85,10 @@
     // Do any additional setup after loading the view from its nib.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空选择" style:UIBarButtonItemStylePlain target:self action:@selector(didRightClick)];
 }
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+}
 - (void)didRightClick {
     [self.manager clearSelectedList];
     self.total.text = @"总数量：0   ( 照片：0   视频：0 )";
@@ -63,32 +96,117 @@
 }
 - (IBAction)goAlbum:(id)sender {
     self.camera.on = NO;
-    self.manager.filtrationICloudAsset = self.icloudSwitch.on;
-    self.manager.photoMaxNum = self.photoText.text.integerValue;
-    self.manager.videoMaxNum = self.videoText.text.integerValue;
-    self.manager.rowCount = self.columnText.text.integerValue;
-    self.manager.downloadICloudAsset = self.downloadICloudAsset.on;
-    if (self.isSystems.on) {
-        self.manager.style = HXPhotoAlbumStylesSystem;
+    if (self.tintColor.selectedSegmentIndex == 0) {
+        self.manager.configuration.themeColor = self.view.tintColor;
+        self.manager.configuration.cellSelectedTitleColor = nil;
+    }else if (self.tintColor.selectedSegmentIndex == 1) {
+        self.manager.configuration.themeColor = [UIColor redColor];
+        self.manager.configuration.cellSelectedTitleColor = [UIColor redColor];
+    }else if (self.tintColor.selectedSegmentIndex == 2) {
+        self.manager.configuration.themeColor = [UIColor whiteColor];
+        self.manager.configuration.cellSelectedTitleColor = [UIColor whiteColor];
+    }else if (self.tintColor.selectedSegmentIndex == 3) {
+        self.manager.configuration.themeColor = [UIColor blackColor];
+        self.manager.configuration.cellSelectedTitleColor = [UIColor blackColor];
+    }else if (self.tintColor.selectedSegmentIndex == 4) {
+        self.manager.configuration.themeColor = [UIColor orangeColor];
+        self.manager.configuration.cellSelectedTitleColor = [UIColor orangeColor];
     }else {
-        self.manager.style = HXPhotoAlbumStylesWeibo;
+        self.manager.configuration.themeColor = self.view.tintColor;
+        self.manager.configuration.cellSelectedTitleColor = nil;
     }
-    self.manager.saveSystemAblum = self.saveAblum.on;
-    self.manager.showDateHeaderSection = self.showHeaderSection.on;
-    self.manager.reverseDate = self.reverse.on;
-    if (self.manager.style == HXPhotoAlbumStylesWeibo) {
-        HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
-        vc.delegate = self;
-        vc.manager = self.manager;
-        [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+    
+    if (self.navBgColor.selectedSegmentIndex == 0) {
+        self.manager.configuration.navBarBackgroudColor = nil;
+        self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
+        self.manager.configuration.sectionHeaderTranslucent = YES;
+        self.bottomViewBgColor = nil;
+        self.manager.configuration.cellSelectedBgColor = nil;
+        self.manager.configuration.selectedTitleColor = nil;
+        self.manager.configuration.sectionHeaderSuspensionBgColor = nil;
+        self.manager.configuration.sectionHeaderSuspensionTitleColor = nil;
+    }else if (self.navBgColor.selectedSegmentIndex == 1) {
+        self.manager.configuration.navBarBackgroudColor = [UIColor redColor];
+        self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
+        self.manager.configuration.sectionHeaderTranslucent = NO;
+        self.bottomViewBgColor = [UIColor redColor];
+        self.manager.configuration.cellSelectedBgColor = [UIColor redColor];
+        self.manager.configuration.selectedTitleColor = [UIColor redColor];
+        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor redColor];
+        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
+    }else if (self.navBgColor.selectedSegmentIndex == 2) {
+        self.manager.configuration.navBarBackgroudColor = [UIColor whiteColor];
+        self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
+        self.manager.configuration.sectionHeaderTranslucent = NO;
+        self.bottomViewBgColor = [UIColor whiteColor];
+        self.manager.configuration.cellSelectedBgColor = self.manager.configuration.themeColor;
+        self.manager.configuration.cellSelectedTitleColor = [UIColor whiteColor];
+        self.manager.configuration.selectedTitleColor = [UIColor whiteColor];
+        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor whiteColor];
+        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor blackColor];
+    }else if (self.navBgColor.selectedSegmentIndex == 3) {
+        self.manager.configuration.navBarBackgroudColor = [UIColor blackColor];
+        self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
+        self.manager.configuration.sectionHeaderTranslucent = NO;
+        self.bottomViewBgColor = [UIColor blackColor];
+        self.manager.configuration.cellSelectedBgColor = [UIColor blackColor];
+        self.manager.configuration.selectedTitleColor = [UIColor blackColor];
+        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor blackColor];
+        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
+    }else if (self.navBgColor.selectedSegmentIndex == 4) {
+        self.manager.configuration.navBarBackgroudColor = [UIColor orangeColor];
+        self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
+        self.manager.configuration.sectionHeaderTranslucent = NO;
+        self.bottomViewBgColor = [UIColor orangeColor];
+        self.manager.configuration.cellSelectedBgColor = [UIColor orangeColor];
+        self.manager.configuration.selectedTitleColor = [UIColor orangeColor];
+        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor orangeColor];
+        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
     }else {
-        HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-        vc.delegate = self;
-        vc.manager = self.manager;
-        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-        
-        [self presentViewController:nav animated:YES completion:nil];
+        self.manager.configuration.navBarBackgroudColor = nil;
+        self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
+        self.manager.configuration.sectionHeaderTranslucent = YES;
+        self.bottomViewBgColor = nil;
+        self.manager.configuration.cellSelectedBgColor = nil;
+        self.manager.configuration.selectedTitleColor = nil;
+        self.manager.configuration.sectionHeaderSuspensionBgColor = nil;
+        self.manager.configuration.sectionHeaderSuspensionTitleColor = nil;
     }
+    
+    if (self.navTitleColor.selectedSegmentIndex == 0) {
+        self.manager.configuration.navigationTitleColor = nil;
+    }else if (self.navTitleColor.selectedSegmentIndex == 1) {
+        self.manager.configuration.navigationTitleColor = [UIColor redColor];
+    }else if (self.navTitleColor.selectedSegmentIndex == 2) {
+        self.manager.configuration.navigationTitleColor = [UIColor whiteColor];
+    }else if (self.navTitleColor.selectedSegmentIndex == 3) {
+        self.manager.configuration.navigationTitleColor = [UIColor blackColor];
+    }else if (self.navTitleColor.selectedSegmentIndex == 4) {
+        self.manager.configuration.navigationTitleColor = [UIColor orangeColor];
+    }else {
+        self.manager.configuration.navigationTitleColor = nil;
+    }
+    self.manager.configuration.hideOriginalBtn = self.hideOriginal.on;
+    self.manager.configuration.filtrationICloudAsset = self.icloudSwitch.on;
+    self.manager.configuration.photoMaxNum = self.photoText.text.integerValue;
+    self.manager.configuration.videoMaxNum = self.videoText.text.integerValue;
+    self.manager.configuration.rowCount = self.columnText.text.integerValue;
+    self.manager.configuration.downloadICloudAsset = self.downloadICloudAsset.on;
+    self.manager.configuration.saveSystemAblum = self.saveAblum.on;
+    self.manager.configuration.showDateSectionHeader = self.showHeaderSection.on;
+    self.manager.configuration.reverseDate = self.reverse.on;
+    self.manager.configuration.navigationTitleSynchColor = self.synchTitleColor.on;
+    
+//    [self.view hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
+    
+    [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
+    
+//    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
+//    vc.delegate = self;
+//    vc.manager = self.manager;
+//    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+
+//    [self presentViewController:nav animated:YES completion:nil];
 }
 - (IBAction)selectTypeClick:(UISegmentedControl *)sender {
     if (sender.selectedSegmentIndex == 0) {
@@ -112,47 +230,24 @@
     NSSLog(@"video - %@",videoList);
 }
 
-- (void)photoViewControllerDidNext:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)original
-{
-    self.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photos.count, videos.count];
-//    [NSString stringWithFormat:@"%ld个",allList.count];
-//    self.photo.text = [NSString stringWithFormat:@"%ld张",photos.count];
-//    self.video.text = [NSString stringWithFormat:@"%ld个",videos.count];
-    self.original.text = original ? @"YES" : @"NO";
-    NSSLog(@"all - %@",allList);
-    NSSLog(@"photo - %@",photos);
-    NSSLog(@"video - %@",videos);
-}
-
-- (void)photoViewControllerDidCancel
-{
-    NSSLog(@"取消");
-}
-
-- (IBAction)camera:(id)sender {
-    UISwitch *sw = (UISwitch *)sender;
-    
-    self.manager.goCamera = sw.on;
-}
 - (IBAction)same:(id)sender {
     UISwitch *sw = (UISwitch *)sender;
-    self.manager.selectTogether = sw.on;
+    self.manager.configuration.selectTogether = sw.on;
 }
 
 - (IBAction)isLookGIFPhoto:(UISwitch *)sender {
-    self.manager.lookGifPhoto = sender.on;
+    self.manager.configuration.lookGifPhoto = sender.on;
 }
 
 - (IBAction)isLookLivePhoto:(UISwitch *)sender {
-    self.manager.lookLivePhoto = sender.on;
-}
-
-- (IBAction)outerCamera:(id)sender {
+    self.manager.configuration.lookLivePhoto = sender.on;
 }
 
 - (IBAction)addCamera:(id)sender {
     UISwitch *sw = (UISwitch *)sender;
-    self.manager.openCamera = sw.on;
+    self.manager.configuration.openCamera = sw.on;
 }
-
+- (void)dealloc {
+    NSSLog(@"dealloc");
+}
 @end

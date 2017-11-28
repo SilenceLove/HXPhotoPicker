@@ -7,7 +7,7 @@
 //
 
 #import "UIView+HXExtension.h"
-#import "HXPhotoTools.h"
+#import "HXPhotoPicker.h"
 
 @implementation UIView (HXExtension)
 - (void)setHx_x:(CGFloat)hx_x
@@ -95,6 +95,26 @@
         }
     }
     return nil;
+}
+
+- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
+    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
+    vc.delegate = delegate;
+    vc.manager = manager;
+    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+    nav.supportRotation = manager.configuration.supportRotation;
+    [self.viewController presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
+    HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
+    vc.delegate = delegate;
+    vc.manager = manager;
+    vc.isOutside = YES;
+    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+    nav.isCamera = YES;
+    nav.supportRotation = manager.configuration.supportRotation;
+    [self.viewController presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)showImageHUDText:(NSString *)text {

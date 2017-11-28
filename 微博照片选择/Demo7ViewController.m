@@ -6,8 +6,7 @@
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "Demo7ViewController.h"
-#import "HXPhotoViewController.h"
+#import "Demo7ViewController.h" 
 #import "HXPhotoView.h"
 
 
@@ -24,11 +23,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        _manager.openCamera = YES;
-        _manager.style = HXPhotoAlbumStylesSystem;
-        _manager.photoMaxNum = 9;
-        _manager.videoMaxNum = 9;
-        _manager.maxNum = 18;
+        _manager.configuration.openCamera = YES;
+        _manager.configuration.photoMaxNum = 9;
+        _manager.configuration.videoMaxNum = 9;
+        _manager.configuration.maxNum = 18;
     }
     return _manager;
 }
@@ -72,7 +70,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)didNavOneBtnClick {
-    [self.photoView goCameraViewContoller];
+    [self.photoView goCameraViewController];
 }
 
 - (void)didNavTwoBtnClick {

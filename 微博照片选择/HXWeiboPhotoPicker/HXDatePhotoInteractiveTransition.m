@@ -30,7 +30,6 @@
     CGFloat scale = 0;
     
     CGPoint translation = [gestureRecognizer translationInView:gestureRecognizer.view];
-    
     CGFloat transitionY = translation.y;
     scale = transitionY / ((gestureRecognizer.view.frame.size.height - 50) / 2);
     if (scale > 1.f) {
@@ -54,10 +53,10 @@
                     scale = 0.f;
                 }
                 CGFloat imageViewScale = 1 - scale * 0.5;
-                self.tempImageView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
                 if (imageViewScale < 0.5) {
                     imageViewScale = 0.5;
                 }
+                self.tempImageView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
                 self.tempImageView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
                 [self updateInterPercent:1 - scale * scale];
                 
@@ -135,7 +134,6 @@
     if (toCell) {
         [toVC scrollToPoint:toCell rect:rect];
     }
-    
     self.tempCell = toCell;
 }
 - (void)updateInterPercent:(CGFloat)scale{

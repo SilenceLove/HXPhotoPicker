@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+@class HXPhotoManager;
 @interface UIView (HXExtension)
 
 @property (assign, nonatomic) CGFloat hx_x;
@@ -22,11 +23,17 @@
  
  @return 控制器
  */
-- (UIViewController*)viewController;
+- (UIViewController *)viewController;
 
 - (void)showImageHUDText:(NSString *)text;
 - (void)showLoadingHUDText:(NSString *)text;
 - (void)handleLoading;
+
+/* <HXAlbumListViewControllerDelegate> */
+- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;
+
+/* <HXCustomCameraViewControllerDelegate> */
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;
 
 @end
 

@@ -111,12 +111,16 @@
     }
     HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:self.photoView.currentIndexPath];
     HXPhotoModel *model = cell.model;
-    __weak typeof(self) weakSelf = self;
-    [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
-        [weakSelf presentAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC cell:cell];
-    } error:^(NSDictionary *info) {
-        [weakSelf presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
-    }];
+    if (model.asset) {
+        __weak typeof(self) weakSelf = self;
+        [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
+            [weakSelf presentAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC cell:cell];
+        } error:^(NSDictionary *info) {
+            [weakSelf presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
+        }];
+    }else {
+        [self presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
+    }
 }
 
 /**
@@ -127,8 +131,12 @@
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [fromVC.modelArray objectAtIndex:fromVC.currentModelIndex];
     HXDatePhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
-    
-    UIImageView *tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
+    UIImageView *tempView;
+    if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        tempView = [[UIImageView alloc] initWithImage:model.thumbPhoto];
+    }else {
+        tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
+    }
     UICollectionView *collectionView = (UICollectionView *)self.photoView.collectionView;
     
     if ([toVC isKindOfClass:[UINavigationController class]]) {
@@ -143,7 +151,8 @@
             toVC = tabBar.selectedViewController;
         }
     }
-    HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:model.endCollectionIndex inSection:0]];
+    
+    HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:[self.photoView currentModelIndexPath:model]];
     if (!tempView.image) {
         tempView = [[UIImageView alloc] initWithImage:cell.imageView.image];
     }
@@ -154,6 +163,11 @@
     UIView *containerView = [transitionContext containerView];
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
     [containerView addSubview:tempView];
+    if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        CGPoint center = tempView.center;
+        tempView.hx_size = model.endImageSize;
+        tempView.center = center;
+    }
     
     CGRect rect = [cell convertRect:cell.bounds toView:containerView];
     cell.hidden = YES;

@@ -40,10 +40,10 @@
     self.view.backgroundColor = [UIColor grayColor];
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
-    if (self.manager.videoMaximumDuration > self.manager.videoMaxDuration) {
-        self.manager.videoMaximumDuration = self.manager.videoMaxDuration;
-    }else if (self.manager.videoMaximumDuration < 3.f) {
-        self.manager.videoMaximumDuration = 4.f;
+    if (self.manager.configuration.videoMaximumDuration > self.manager.configuration.videoMaxDuration) {
+        self.manager.configuration.videoMaximumDuration = self.manager.configuration.videoMaxDuration;
+    }else if (self.manager.configuration.videoMaximumDuration < 3.f) {
+        self.manager.configuration.videoMaximumDuration = 4.f;
     }
     
     [self.view addSubview:self.previewView];
@@ -60,10 +60,10 @@
             self.addAudioInputComplete = YES;
             [self.cameraController initMovieOutput];
         }else {
-            if (!self.manager.selectTogether && self.isOutside) {
-                if (self.manager.endSelectedPhotos.count > 0) {
+            if (!self.manager.configuration.selectTogether && self.isOutside) {
+                if (self.manager.afterSelectedPhotoArray.count > 0) {
                     [self.cameraController initImageOutput];
-                }else if (self.manager.endSelectedVideos.count > 0) {
+                }else if (self.manager.afterSelectedVideoArray.count > 0) {
                     [self.view insertSubview:self.playVideoView belowSubview:self.bottomView];
                     [self.cameraController addAudioInput];
                     self.addAudioInputComplete = YES;
@@ -164,6 +164,9 @@
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    AVCaptureConnection *previewLayerConnection = [(AVCaptureVideoPreviewLayer *)self.previewView.layer connection]; 
+    if ([previewLayerConnection isVideoOrientationSupported])
+        [previewLayerConnection setVideoOrientation:(AVCaptureVideoOrientation)[[UIApplication sharedApplication] statusBarOrientation]];
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -230,6 +233,7 @@
         player.shouldAutoplay = NO;
         UIImage  *image = [player thumbnailImageAtTime:0.1 timeOption:MPMovieTimeOptionNearestKeyFrame];
         NSString *videoTime = [HXPhotoTools getNewTimeFromDurationSecond:self.time];
+        model.videoDuration = self.time;
         model.videoURL = self.videoURL;
         model.videoTime = videoTime;
         model.thumbPhoto = image;
@@ -240,11 +244,11 @@
     [self stopTimer];
     [self.cameraController stopMontionUpdate];
     [self.cameraController stopSession]; 
-    if (self.manager.saveSystemAblum) {
+    if (self.manager.configuration.saveSystemAblum) {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.customAlbumName photo:model.thumbPhoto];
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto];
         }else {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.customAlbumName videoURL:model.videoURL];
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:model.videoURL];
         }
     }
     if ([self.delegate respondsToSelector:@selector(customCameraViewController:didDone:)]) {
@@ -316,7 +320,7 @@
     NSUInteger time = (NSUInteger)CMTimeGetSeconds(duration);
     self.time = time;
     [self.bottomView changeTime:time];
-    if (time == self.manager.videoMaximumDuration) {
+    if (time == self.manager.configuration.videoMaximumDuration) {
         [self.cameraController stopRecording];
         [self stopTimer];
     }
@@ -565,14 +569,14 @@
     self.videoBtn.hx_x = CGRectGetMaxX(self.photoBtn.frame) + 10;
     self.titleLb.alpha = 0;
     if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-        if (!self.manager.selectTogether && self.isOutside) {
-            if (self.manager.endSelectedPhotos.count > 0) {
+        if (!self.manager.configuration.selectTogether && self.isOutside) {
+            if (self.manager.afterSelectedPhotoArray.count > 0) {
                 self.mode = HXCustomCameraBottomViewModePhoto;
                 self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击拍照"];
                 self.titleLb.alpha = 1;
                 self.photoBtn.hidden = YES;
                 self.videoBtn.hidden = YES;
-            }else if (self.manager.endSelectedVideos.count > 0) {
+            }else if (self.manager.afterSelectedVideoArray.count > 0) {
                 self.mode = HXCustomCameraBottomViewModeVideo;
                 self.titleLb.text = [NSBundle hx_localizedStringForKey:@"点击录制"];
                 self.titleLb.alpha = 1;
@@ -619,7 +623,7 @@
     }else {
         self.timeLb.text = [NSString stringWithFormat:@"%lds",time];
     }
-    self.playView.progress = (CGFloat)time / self.manager.videoMaximumDuration;
+    self.playView.progress = (CGFloat)time / self.manager.configuration.videoMaximumDuration;
 }
 - (void)beganAnimate {
     self.userInteractionEnabled = NO;
@@ -647,10 +651,10 @@
 }
 - (void)stopRecord {
     if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo && self.isOutside) {
-        if (!self.manager.selectTogether) {
-            if (self.manager.endSelectedPhotos.count > 0) {
+        if (!self.manager.configuration.selectTogether) {
+            if (self.manager.afterSelectedPhotoArray.count > 0) {
                 self.titleLb.alpha = 1;
-            }else if (self.manager.endSelectedVideos.count > 0) {
+            }else if (self.manager.afterSelectedVideoArray.count > 0) {
                 self.titleLb.alpha = 1;
             }else {
                 self.photoBtn.hidden = NO;
@@ -681,10 +685,10 @@
     if (self.manager.type == HXPhotoManagerSelectedTypeVideo || self.manager.type == HXPhotoManagerSelectedTypePhoto) {
         self.titleLb.hx_y = self.playView.hx_y - 30;
     }else if (self.manager.type == HXPhotoManagerSelectedTypePhotoAndVideo) {
-        if (!self.manager.selectTogether && self.isOutside) {
-            if (self.manager.endSelectedPhotos.count > 0) {
+        if (!self.manager.configuration.selectTogether && self.isOutside) {
+            if (self.manager.afterSelectedPhotoArray.count > 0) {
                 self.titleLb.hx_y = self.playView.hx_y - 30;
-            }else if (self.manager.endSelectedVideos.count > 0) {
+            }else if (self.manager.afterSelectedVideoArray.count > 0) {
                 self.titleLb.hx_y = self.playView.hx_y - 30;
             }
         }
@@ -774,7 +778,7 @@
 }
 - (HXFullScreenCameraPlayView *)playView {
     if (!_playView) {
-        _playView = [[HXFullScreenCameraPlayView alloc] initWithFrame:CGRectMake(0, 0, 70, 70) color:self.tintColor];
+        _playView = [[HXFullScreenCameraPlayView alloc] initWithFrame:CGRectMake(0, 0, 70, 70) color:self.manager.configuration.themeColor];
         self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(takePictures)];
         [_playView addGestureRecognizer:self.tap];
     }

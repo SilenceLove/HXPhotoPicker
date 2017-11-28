@@ -128,6 +128,7 @@
     [self clippingRatioDidChange:animated];
 }
 - (void)setupUI {
+    self.view.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.imageView];
     [self.view addSubview:self.bottomView];
     [self.view addSubview:self.leftTopView];
@@ -450,7 +451,11 @@
 }
 #pragma mark - < HXDatePhotoEditBottomViewDelegate >
 - (void)bottomViewDidCancelClick {
-    [self stopTimer];
+    [self stopTimer]; 
+    if (self.outside) {
+        [self dismissViewControllerAnimated:NO completion:nil];
+        return;
+    }
     [self.navigationController popViewControllerAnimated:NO];
 }
 - (void)bottomViewDidRestoreClick {
@@ -482,6 +487,14 @@
 - (void)bottomViewDidClipClick {
     [self stopTimer];
     HXPhotoModel *model = [HXPhotoModel photoModelWithImage:self.imageView.image];
+    if (self.outside) {
+        [self dismissViewControllerAnimated:NO completion:^{
+            if ([self.delegate respondsToSelector:@selector(datePhotoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+                [self.delegate datePhotoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+            }
+        }];
+        return;
+    }
     if ([self.delegate respondsToSelector:@selector(datePhotoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
         [self.delegate datePhotoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
     }
@@ -590,7 +603,7 @@
 - (void)setEnabled:(BOOL)enabled {
     _enabled = enabled;
     self.restoreBtn.enabled = enabled;
-    if (!self.manager.singleSelected) {
+    if (!self.manager.configuration.singleSelected) {
         self.clipBtn.enabled = enabled;
     }
 }
@@ -730,14 +743,18 @@
 - (UIButton *)clipBtn {
     if (!_clipBtn) {
         _clipBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        if (self.manager.singleSelected) {
+        if (self.manager.configuration.singleSelected) {
             [_clipBtn setTitle:@"选择" forState:UIControlStateNormal];
         }else {
             [_clipBtn setTitle:@"裁剪" forState:UIControlStateNormal];
             _clipBtn.enabled = NO;
         }
-        [_clipBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
-        [_clipBtn setTitleColor:[self.tintColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        UIColor *color = self.manager.configuration.themeColor;
+        if ([color isEqual:[UIColor blackColor]]) {
+            color = [UIColor whiteColor];
+        }
+        [_clipBtn setTitleColor:color forState:UIControlStateNormal];
+        [_clipBtn setTitleColor:[color colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _clipBtn.titleLabel.font = [UIFont systemFontOfSize:15];
         _clipBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         [_clipBtn addTarget:self action:@selector(didClipBtnClick) forControlEvents:UIControlEventTouchUpInside];

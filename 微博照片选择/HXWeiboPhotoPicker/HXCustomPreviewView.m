@@ -33,7 +33,7 @@
         [self setupView];
     }
     return self;
-}
+} 
 
 - (void)setupView {
     self.beginGestureScale = 1.0f;

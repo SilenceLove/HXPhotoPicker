@@ -10,4 +10,5 @@
 
 @interface HXCustomNavigationController : UINavigationController
 @property (nonatomic) BOOL isCamera;
+@property (assign, nonatomic) BOOL supportRotation;
 @end

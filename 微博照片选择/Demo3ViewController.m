@@ -7,7 +7,6 @@
 //
 
 #import "Demo3ViewController.h"
-#import "HXPhotoViewController.h"
 #import "HXPhotoView.h"
 
 static const CGFloat kPhotoViewMargin = 12.0;
@@ -76,14 +75,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
         //        _manager.openCamera = NO;
-        _manager.outerCamera = YES;
-        _manager.showDeleteNetworkPhotoAlert = NO;
-        _manager.saveSystemAblum = YES;
-        _manager.photoMaxNum = 2; // 这里需要注意 !!!  第一次传入的最大照片数 是可选最大数 减去 网络照片数量   即   photoMaxNum = maxNum - networkPhotoUrls.count  当点击删除网络照片时, photoMaxNum 内部会自动加1
-        _manager.videoMaxNum = 0;  // 如果有网络图片且选择类型为HXPhotoManagerSelectedTypePhotoAndVideo 又设置了视频最大数且不为0时,
+        _manager.configuration.showDeleteNetworkPhotoAlert = NO;
+        _manager.configuration.saveSystemAblum = YES;
+        _manager.configuration.photoMaxNum = 5; // 这里需要注意 !!!  第一次传入的最大照片数 是可选最大数 减去 网络照片数量   即   photoMaxNum = maxNum - networkPhotoUrls.count  当点击删除网络照片时, photoMaxNum 内部会自动加1
+        _manager.configuration.videoMaxNum = 5;  // 如果有网络图片且选择类型为HXPhotoManagerSelectedTypePhotoAndVideo 又设置了视频最大数且不为0时,
 //        那么在选择照片列表最大只能选择 photoMaxNum + videoMaxNum
 //        在外面collectionView上最大数是 photoMaxNum + networkPhotoUrls.count + videoMaxNum
-        _manager.maxNum = 6;
+        _manager.configuration.maxNum = 10;
         
 //        _manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/003d86db-b140-4162-aafa-d38056742181.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
     }
@@ -110,11 +108,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];
     self.photoView = photoView;
-    
+//    NSMutableArray *array = [NSMutableArray arrayWithObjects:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/857980fd0acd3caf9e258e42788e38f5_0.gif",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
+//    [self.manager addNetworkingImageToAlbum:array selected:YES];
+//    [self.photoView refreshView];
     // 可以在懒加载中赋值 ,  也可以这样赋值
-    self.manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/857980fd0acd3caf9e258e42788e38f5_0.gif",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
+//    self.manager.networkPhotoUrls = ;
     
-    photoView.manager = self.manager;
+//    photoView.manager = self.manager;
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"查看" style:UIBarButtonItemStylePlain target:self action:@selector(lookClick)];
     
@@ -133,9 +133,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
     NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     
-    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
-        NSSLog(@"%@",images);
-    }];
+//    [HXPhotoTools getImageForSelectedPhoto:photos type:HXPhotoToolsFetchHDImageType completion:^(NSArray<UIImage *> *images) {
+//        NSSLog(@"%@",images);
+//    }];
 //    HXPhotoModel *model = photos.firstObject;
     
 //    [HXPhotoTools getSelectedPhotosFullSizeImageUrl:photos complete:^(NSArray<NSURL *> *imageUrls) {

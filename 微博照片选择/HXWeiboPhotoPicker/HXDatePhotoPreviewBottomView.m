@@ -9,18 +9,19 @@
 #import "HXDatePhotoPreviewBottomView.h"
 #import "HXPhotoManager.h"
 @interface HXDatePhotoPreviewBottomView ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout>
-@property (strong, nonatomic) UIToolbar *bgView;
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
 @property (strong, nonatomic) UIButton *doneBtn;
 @property (strong, nonatomic) UIButton *editBtn;
+@property (strong, nonatomic) HXPhotoManager *manager;
 @end
 
 @implementation HXDatePhotoPreviewBottomView
-- (instancetype)initWithFrame:(CGRect)frame modelArray:(NSArray *)modelArray {
+- (instancetype)initWithFrame:(CGRect)frame modelArray:(NSArray *)modelArray manager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
+        self.manager = manager;
         self.modelArray = [NSMutableArray arrayWithArray:modelArray];
         [self setupUI];
     }
@@ -43,6 +44,12 @@
     if (hideEditBtn) {
         [self.editBtn removeFromSuperview];
         [self layoutSubviews];
+    }
+}
+- (void)setOutside:(BOOL)outside {
+    _outside = outside;
+    if (outside) {
+        self.doneBtn.hidden = YES;
     }
 }
 - (void)insertModel:(HXPhotoModel *)model {
@@ -71,7 +78,15 @@
     if (selectCount <= 0) {
         [self.doneBtn setTitle:@"完成" forState:UIControlStateNormal];
     }else {
-        [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld)",selectCount] forState:UIControlStateNormal];
+        if (!self.manager.configuration.selectTogether) {
+            if (self.manager.selectedPhotoCount > 0) {
+                [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
+            }else {
+                [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
+            }
+        }else {
+            [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
+        }
     }
     [self changeDoneBtnFrame];
 }
@@ -81,6 +96,7 @@
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXDatePhotoPreviewBottomViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewBottomViewCellId" forIndexPath:indexPath];
+    cell.selectColor = self.manager.configuration.themeColor;
     HXPhotoModel *model = self.modelArray[indexPath.item];
     cell.model = model;
     return cell;
@@ -119,17 +135,27 @@
     }
 }
 - (void)changeDoneBtnFrame {
-    CGFloat width = [HXPhotoTools getTextWidth:self.doneBtn.currentTitle height:30 fontSize:14];
-    self.doneBtn.hx_w = width + 20;
-    if (self.doneBtn.hx_w < 50) {
-        self.doneBtn.hx_w = 50;
-    }
-    self.doneBtn.hx_x = self.hx_w - 12 - self.doneBtn.hx_w;
-    self.editBtn.hx_x = self.doneBtn.hx_x - self.editBtn.hx_w;
-    if (!self.hideEditBtn) {
-        self.collectionView.hx_w = self.editBtn.hx_x;
+    if (self.outside) {
+        if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
+            self.editBtn.hidden = YES;
+            self.collectionView.hx_w = self.hx_w;
+        }else {
+            self.editBtn.hx_x = self.hx_w - 12 - self.editBtn.hx_w;
+            self.collectionView.hx_w = self.editBtn.hx_x;
+        }
     }else {
-        self.collectionView.hx_w = self.doneBtn.hx_x - 12;
+        CGFloat width = [HXPhotoTools getTextWidth:self.doneBtn.currentTitle height:30 fontSize:14];
+        self.doneBtn.hx_w = width + 20;
+        if (self.doneBtn.hx_w < 50) {
+            self.doneBtn.hx_w = 50;
+        }
+        self.doneBtn.hx_x = self.hx_w - 12 - self.doneBtn.hx_w;
+        self.editBtn.hx_x = self.doneBtn.hx_x - self.editBtn.hx_w;
+        if (!self.hideEditBtn) {
+            self.collectionView.hx_w = self.editBtn.hx_x;
+        }else {
+            self.collectionView.hx_w = self.doneBtn.hx_x - 12;
+        }
     }
 }
 - (void)layoutSubviews {
@@ -176,11 +202,20 @@
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_doneBtn setTitle:@"完成" forState:UIControlStateNormal];
-        [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
-        _doneBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        if ([self.manager.configuration.themeColor isEqual:[UIColor whiteColor]]) {
+            [_doneBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+            [_doneBtn setTitleColor:[[UIColor blackColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        }else {
+            [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        }
+        if (self.manager.configuration.selectedTitleColor) {
+            [_doneBtn setTitleColor:self.manager.configuration.selectedTitleColor forState:UIControlStateNormal];
+            [_doneBtn setTitleColor:[self.manager.configuration.selectedTitleColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        }
+        _doneBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
         _doneBtn.layer.cornerRadius = 3;
-        _doneBtn.backgroundColor = self.tintColor;
+        _doneBtn.backgroundColor = self.manager.configuration.themeColor;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _doneBtn;
@@ -189,8 +224,8 @@
     if (!_editBtn) {
         _editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_editBtn setTitle:@"编辑" forState:UIControlStateNormal];
-        [_editBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
-        [_editBtn setTitleColor:[self.tintColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        [_editBtn setTitleColor:self.manager.configuration.themeColor forState:UIControlStateNormal];
+        [_editBtn setTitleColor:[self.manager.configuration.themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _editBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         [_editBtn addTarget:self action:@selector(didEditBtnClick) forControlEvents:UIControlEventTouchUpInside];
         _editBtn.hx_size = CGSizeMake(50, 50);
@@ -241,10 +276,16 @@
     }
     return _imageView;
 }
+- (void)setSelectColor:(UIColor *)selectColor {
+    if (!_selectColor) {
+        self.layer.borderColor = self.selected ? [selectColor colorWithAlphaComponent:0.5].CGColor : nil;
+    }
+    _selectColor = selectColor;
+}
 - (void)setSelected:(BOOL)selected {
     [super setSelected:selected];
     self.layer.borderWidth = selected ? 5 : 0;
-    self.layer.borderColor = selected ? [self.tintColor colorWithAlphaComponent:0.5].CGColor : nil;
+    self.layer.borderColor = selected ? [self.selectColor colorWithAlphaComponent:0.5].CGColor : nil;
 }
 - (void)cancelRequest {
     if (self.requestID) {
