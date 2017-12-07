@@ -89,16 +89,16 @@
 }
 
 // 照片选择控制器
-HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
+HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
 vc.delegate = self;
 vc.manager = self.manager; 
-[self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
+[self presentViewController:[[HXCustomNavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
 
 // 通过 HXPhotoViewControllerDelegate 代理返回选择的图片以及视频
-- (void)photoViewControllerDidNext:(NSArray *)allList Photos:(NSArray *)photos Videos:(NSArray *)videos Original:(BOOL)original
+- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original
 
 // 点击取消
-- (void)photoViewControllerDidCancel
+- (void)albumListViewControllerDidCancel:(HXAlbumListViewController *)albumListViewController
 
 ```
 ### <a id="Demo2"></a> Demo2
@@ -304,4 +304,4 @@ self.photoView = photoView;
 
 - 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
 
-- [有兴趣可以加下创建的QQ群:531895229](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
+- [有兴趣可以加下创建的QQ群:531895229(因为工作很忙所以可能问问题没人回答!!)](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
