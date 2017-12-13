@@ -80,4 +80,10 @@
     }
     _videoMaximumDuration = videoMaximumDuration;
 }
+- (CGPoint)movableCropBoxCustomRatio {
+//    if (_movableCropBoxCustomRatio.x == 0 || _movableCropBoxCustomRatio.y == 0) {
+//        return CGPointMake(1, 1);
+//    }
+    return _movableCropBoxCustomRatio;
+}
 @end

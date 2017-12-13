@@ -18,6 +18,8 @@
 @property (weak, nonatomic) HXDatePhotoViewCell *tempCell;
 @property (strong, nonatomic) UIImageView *tempImageView;
 @property (nonatomic, assign) CGPoint transitionImgViewCenter;
+@property (nonatomic, assign) CGFloat transitionImgViewY;
+@property (nonatomic, assign) CGFloat transitionImgViewX;
 @end
 
 @implementation HXDatePhotoInteractiveTransition
@@ -52,12 +54,15 @@
                 if (scale < 0.f) {
                     scale = 0.f;
                 }
-                CGFloat imageViewScale = 1 - scale * 0.5;
+                CGFloat imageViewScale = 1 - scale * 0.5 * 0.5;
                 if (imageViewScale < 0.5) {
                     imageViewScale = 0.5;
                 }
                 self.tempImageView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
                 self.tempImageView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
+                self.tempImageView.hx_y = self.transitionImgViewY + translation.y;
+//                self.tempImageView.hx_x = self.transitionImgViewX + translation.x;
+                
                 [self updateInterPercent:1 - scale * scale];
                 
                 [self updateInteractiveTransition:scale];
@@ -112,6 +117,8 @@
     self.bgView.backgroundColor = [UIColor whiteColor];
     self.tempImageView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
     self.transitionImgViewCenter = self.tempImageView.center;
+    self.transitionImgViewY = self.tempImageView.hx_y;
+    self.transitionImgViewX = self.tempImageView.hx_x;
     [containerView addSubview:toVC.view];
     [containerView addSubview:fromVC.view];
     [toVC.view insertSubview:self.bgView belowSubview:toVC.bottomView];

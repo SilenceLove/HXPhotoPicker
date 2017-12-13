@@ -28,6 +28,7 @@
                 <outlet property="synchTitleColor" destination="aqm-zY-YUn" id="X15-95-wz5"/>
                 <outlet property="tintColor" destination="qn1-aB-tYt" id="GzU-iy-oaa"/>
                 <outlet property="total" destination="GIg-T5-JGa" id="yNJ-mj-xNo"/>
+                <outlet property="useCustomCamera" destination="glf-jT-s5U" id="uka-8R-0HE"/>
                 <outlet property="videoText" destination="Awx-MX-B2E" id="Tui-p9-skB"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -87,7 +88,7 @@
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dKv-nw-BK4" userLabel="SettingView">
-                            <rect key="frame" x="0.0" y="91" width="320" height="800"/>
+                            <rect key="frame" x="0.0" y="91" width="320" height="850"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="照片最大数" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tCx-T3-1aZ">
                                     <rect key="frame" x="16" y="20" width="86.666666666666671" height="20.333333333333329"/>
@@ -242,17 +243,6 @@
                                         <action selector="addCamera:" destination="-1" eventType="valueChanged" id="D1a-9z-U8B"/>
                                     </connections>
                                 </switch>
-                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="5YV-tw-PiV">
-                                    <rect key="frame" x="76.666666666666686" y="760" width="167" height="29"/>
-                                    <segments>
-                                        <segment title="photo"/>
-                                        <segment title="video"/>
-                                        <segment title="pAndV"/>
-                                    </segments>
-                                    <connections>
-                                        <action selector="selectTypeClick:" destination="-1" eventType="valueChanged" id="d9h-E2-JPd"/>
-                                    </connections>
-                                </segmentedControl>
                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="qn1-aB-tYt">
                                     <rect key="frame" x="15.666666666666657" y="169" width="289" height="29"/>
                                     <segments>
@@ -325,6 +315,29 @@
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="是否使用自己的相机" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bm0-xW-FRG">
+                                    <rect key="frame" x="16" y="760" width="156" height="21"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="glf-jT-s5U">
+                                    <rect key="frame" x="255" y="755" width="51" height="31"/>
+                                    <connections>
+                                        <action selector="addCamera:" destination="-1" eventType="valueChanged" id="PaB-LV-Jwf"/>
+                                    </connections>
+                                </switch>
+                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="5YV-tw-PiV">
+                                    <rect key="frame" x="76.666666666666686" y="796" width="167" height="29"/>
+                                    <segments>
+                                        <segment title="photo"/>
+                                        <segment title="video"/>
+                                        <segment title="pAndV"/>
+                                    </segments>
+                                    <connections>
+                                        <action selector="selectTypeClick:" destination="-1" eventType="valueChanged" id="d9h-E2-JPd"/>
+                                    </connections>
+                                </segmentedControl>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
@@ -361,7 +374,7 @@
                                 <constraint firstItem="jLM-Ou-hPa" firstAttribute="leading" secondItem="FO2-nE-uvu" secondAttribute="leading" id="Q0i-Gy-Jvp"/>
                                 <constraint firstItem="UdD-l1-uRs" firstAttribute="top" secondItem="3LS-gI-lTu" secondAttribute="bottom" constant="15" id="RYt-EO-Ga6"/>
                                 <constraint firstItem="3LS-gI-lTu" firstAttribute="top" secondItem="jnR-tO-gbs" secondAttribute="bottom" constant="15" id="Rnb-Hj-IeO"/>
-                                <constraint firstAttribute="height" constant="800" id="SFi-gt-Zcr"/>
+                                <constraint firstAttribute="height" constant="850" id="SFi-gt-Zcr"/>
                                 <constraint firstItem="uo2-wH-iLW" firstAttribute="centerY" secondItem="UdD-l1-uRs" secondAttribute="centerY" id="SnM-Iq-5wW"/>
                                 <constraint firstItem="5YV-tw-PiV" firstAttribute="centerX" secondItem="dKv-nw-BK4" secondAttribute="centerX" id="T5N-WA-t0d"/>
                                 <constraint firstItem="Xkb-Yv-n5h" firstAttribute="leading" secondItem="kBW-xb-2fW" secondAttribute="leading" id="Tax-Mn-iGa"/>
@@ -374,6 +387,7 @@
                                 <constraint firstItem="jLM-Ou-hPa" firstAttribute="top" secondItem="FO2-nE-uvu" secondAttribute="bottom" constant="15" id="b4j-Ed-wR3"/>
                                 <constraint firstItem="Kwy-Jh-J7p" firstAttribute="leading" secondItem="izN-PU-bsL" secondAttribute="leading" id="bJc-eh-8MZ"/>
                                 <constraint firstItem="FO2-nE-uvu" firstAttribute="leading" secondItem="UdD-l1-uRs" secondAttribute="leading" id="cBj-GB-ZFX"/>
+                                <constraint firstItem="bm0-xW-FRG" firstAttribute="top" secondItem="Kwy-Jh-J7p" secondAttribute="bottom" constant="15" id="dVm-bt-KyK"/>
                                 <constraint firstItem="Snx-lR-3pl" firstAttribute="centerY" secondItem="jnR-tO-gbs" secondAttribute="centerY" id="dZp-Dw-Rql"/>
                                 <constraint firstAttribute="trailing" secondItem="cT8-W7-Zfe" secondAttribute="trailing" constant="16" id="ed6-4S-p0C"/>
                                 <constraint firstItem="bvm-EA-YPa" firstAttribute="top" secondItem="7Mt-a3-Hfi" secondAttribute="bottom" constant="15" id="fCy-Fw-IC0"/>
@@ -384,6 +398,7 @@
                                 <constraint firstItem="AEo-Lp-ecm" firstAttribute="centerX" secondItem="qn1-aB-tYt" secondAttribute="centerX" id="jiD-M4-gRx"/>
                                 <constraint firstAttribute="trailing" secondItem="Awx-MX-B2E" secondAttribute="trailing" constant="16" id="k8d-9h-dvW"/>
                                 <constraint firstItem="aqm-zY-YUn" firstAttribute="centerY" secondItem="ort-k5-atT" secondAttribute="centerY" id="ldv-sM-Eho"/>
+                                <constraint firstItem="bm0-xW-FRG" firstAttribute="leading" secondItem="Kwy-Jh-J7p" secondAttribute="leading" id="oll-2x-mbS"/>
                                 <constraint firstItem="9jQ-H1-sTM" firstAttribute="centerY" secondItem="7Mt-a3-Hfi" secondAttribute="centerY" id="ovo-FN-OZp"/>
                                 <constraint firstItem="bvm-EA-YPa" firstAttribute="centerX" secondItem="dKv-nw-BK4" secondAttribute="centerX" id="p6s-oH-Dj0"/>
                                 <constraint firstItem="jnR-tO-gbs" firstAttribute="leading" secondItem="7Mt-a3-Hfi" secondAttribute="leading" id="pg0-f0-UXz"/>
@@ -391,19 +406,21 @@
                                 <constraint firstItem="so7-ds-cs7" firstAttribute="top" secondItem="kDd-oR-TDZ" secondAttribute="bottom" constant="20" id="qrm-36-vi6"/>
                                 <constraint firstItem="Awx-MX-B2E" firstAttribute="centerY" secondItem="PU4-xi-L3Y" secondAttribute="centerY" id="r3w-HB-gu7"/>
                                 <constraint firstAttribute="trailing" secondItem="uo2-wH-iLW" secondAttribute="trailing" constant="16" id="tF7-7T-vkN"/>
-                                <constraint firstItem="5YV-tw-PiV" firstAttribute="top" secondItem="Kwy-Jh-J7p" secondAttribute="bottom" constant="15" id="tSP-JX-If2"/>
                                 <constraint firstItem="ort-k5-atT" firstAttribute="top" secondItem="gss-Qp-Tne" secondAttribute="bottom" constant="15" id="tbm-Oe-0NJ"/>
+                                <constraint firstItem="5YV-tw-PiV" firstAttribute="top" secondItem="bm0-xW-FRG" secondAttribute="bottom" constant="15" id="uGq-as-gsX"/>
                                 <constraint firstItem="PU4-xi-L3Y" firstAttribute="top" secondItem="tCx-T3-1aZ" secondAttribute="bottom" constant="20" id="uoU-7s-LeT"/>
                                 <constraint firstItem="Xkb-Yv-n5h" firstAttribute="centerY" secondItem="izN-PU-bsL" secondAttribute="centerY" id="uzD-C0-vWf"/>
                                 <constraint firstItem="Snx-lR-3pl" firstAttribute="leading" secondItem="1xC-gv-LEB" secondAttribute="leading" id="vCp-cp-6bP"/>
+                                <constraint firstItem="glf-jT-s5U" firstAttribute="leading" secondItem="Pgn-6L-OK1" secondAttribute="leading" id="vb7-M7-rps"/>
                                 <constraint firstItem="7Mt-a3-Hfi" firstAttribute="leading" secondItem="PU4-xi-L3Y" secondAttribute="leading" id="vzz-9w-7et"/>
                                 <constraint firstItem="tCx-T3-1aZ" firstAttribute="top" secondItem="dKv-nw-BK4" secondAttribute="top" constant="20" id="xdQ-EJ-fMQ"/>
                                 <constraint firstItem="sEg-nF-dXI" firstAttribute="centerX" secondItem="AEo-Lp-ecm" secondAttribute="centerX" id="y6p-BV-zop"/>
                                 <constraint firstItem="WXB-HF-6oV" firstAttribute="top" secondItem="sEg-nF-dXI" secondAttribute="bottom" constant="10" id="yNB-xT-mdN"/>
+                                <constraint firstItem="glf-jT-s5U" firstAttribute="centerY" secondItem="bm0-xW-FRG" secondAttribute="centerY" id="zE1-Dt-Nel"/>
                             </constraints>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GVr-SR-yKM">
-                            <rect key="frame" x="137.66666666666666" y="901" width="46" height="30"/>
+                            <rect key="frame" x="137.66666666666666" y="951" width="46" height="30"/>
                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                             <state key="normal" title="去选择"/>
                             <connections>

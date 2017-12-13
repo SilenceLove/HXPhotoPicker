@@ -23,6 +23,10 @@
         _manager.configuration.albumListTableView = ^(UITableView *tableView) {
 //            NSSLog(@"%@",tableView);
         };
+        
+        _manager.configuration.movableCropBox = YES;
+        _manager.configuration.movableCropBoxEditSize = YES;
+//        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
     }
     return _manager;
 }

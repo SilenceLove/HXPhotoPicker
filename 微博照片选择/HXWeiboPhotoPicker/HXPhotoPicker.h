@@ -17,3 +17,8 @@
 #import "UIViewController+HXExtension.h"
 #import "HXDatePhotoEditViewController.h"
 #import "HXCustomCameraViewController.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <MediaPlayer/MediaPlayer.h>
+#import "HXPhotoTools.h"
+#import "HXPhotoDefine.h"
+#import "UIImage+HXExtension.h"

@@ -148,56 +148,9 @@
 }
 - (void)setPhotoManager {
     [self.manager selectedListTransformBefore];
-//    if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
-//        if (self.manager.networkPhotoUrls.count == 0) {
-//            self.manager.configuration.maxNum = self.manager.configuration.photoMaxNum;
-//        }
-//        if (self.manager.endCameraVideos.count > 0) {
-//            [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraVideos];
-//            [self.manager.endCameraVideos removeAllObjects];
-//        }
-//    }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-//        if (self.manager.networkPhotoUrls.count == 0) {
-//            self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum;
-//        }
-//        if (self.manager.endCameraPhotos.count > 0) {
-//            [self.manager.endCameraList removeObjectsInArray:self.manager.endCameraPhotos];
-//            [self.manager.endCameraPhotos removeAllObjects];
-//        }
-//    }else {
-//        // 防错  请在外面设置好!!!!
-//        if (self.manager.networkPhotoUrls.count == 0) {
-//            if (self.manager.configuration.videoMaxNum + self.manager.configuration.photoMaxNum != self.manager.configuration.maxNum) {
-//                self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum + self.manager.configuration.photoMaxNum;
-//            }
-//        }
-//    }
-//    // 上次选择的所有记录
-//    self.manager.selectedList = [NSMutableArray arrayWithArray:self.manager.endSelectedList];
-//    self.manager.selectedPhotos = [NSMutableArray arrayWithArray:self.manager.endSelectedPhotos];
-//    self.manager.selectedVideos = [NSMutableArray arrayWithArray:self.manager.endSelectedVideos];
-//    self.manager.cameraList = [NSMutableArray arrayWithArray:self.manager.endCameraList];
-//    self.manager.cameraPhotos = [NSMutableArray arrayWithArray:self.manager.endCameraPhotos];
-//    self.manager.cameraVideos = [NSMutableArray arrayWithArray:self.manager.endCameraVideos];
-//    self.manager.selectedCameraList = [NSMutableArray arrayWithArray:self.manager.endSelectedCameraList];
-//    self.manager.selectedCameraPhotos = [NSMutableArray arrayWithArray:self.manager.endSelectedCameraPhotos];
-//    self.manager.selectedCameraVideos = [NSMutableArray arrayWithArray:self.manager.endSelectedCameraVideos];
-//    self.manager.isOriginal = self.manager.endIsOriginal;
-//    self.manager.photosTotalBtyes = self.manager.endPhotosTotalBtyes;
 }
 - (void)cancelClick {
-    [self.manager cancelBeforeSelectedList];
-//    [self.manager.selectedList removeAllObjects];
-//    [self.manager.selectedPhotos removeAllObjects];
-//    [self.manager.selectedVideos removeAllObjects];
-//    self.manager.isOriginal = NO;
-//    self.manager.photosTotalBtyes = nil;
-//    [self.manager.selectedCameraList removeAllObjects];
-//    [self.manager.selectedCameraVideos removeAllObjects];
-//    [self.manager.selectedCameraPhotos removeAllObjects];
-//    [self.manager.cameraPhotos removeAllObjects];
-//    [self.manager.cameraList removeAllObjects];
-//    [self.manager.cameraVideos removeAllObjects];
+    [self.manager cancelBeforeSelectedList]; 
     if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidCancel:)]) {
         [self.delegate albumListViewControllerDidCancel:self];
     }

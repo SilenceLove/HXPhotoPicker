@@ -8,8 +8,49 @@
 
 #import <UIKit/UIKit.h>
 
-@class HXDatePhotoBottomView,HXDatePhotoPreviewBottomView;
+typedef enum : NSUInteger {
+    HXPhotoConfigurationCameraTypePhoto = 0,        // 拍照
+    HXPhotoConfigurationCameraTypeVideo = 1,        // 录制
+    HXPhotoConfigurationCameraTypeTypePhotoAndVideo     // 拍照和录制一起
+} HXPhotoConfigurationCameraType;
+
+@class HXDatePhotoBottomView,HXDatePhotoPreviewBottomView,HXPhotoManager,HXPhotoModel;
 @interface HXPhotoConfiguration : NSObject
+
+/**
+ 是否可移动的裁剪框
+ */
+@property (assign, nonatomic) BOOL movableCropBox;
+
+/**
+ 可移动的裁剪框是否可以编辑大小
+ */
+@property (assign, nonatomic) BOOL movableCropBoxEditSize;
+
+/**
+ 可移动裁剪框的比例 (w,h)
+ 一定要是宽比高哦!!!
+ 当 movableCropBox = YES && movableCropBoxEditSize = YES
+ 如果不设置比例即可自由编辑大小
+ */
+@property (assign, nonatomic) CGPoint movableCropBoxCustomRatio;
+
+/**
+ 是否使用自己的相机
+ 使用自己的相机时需要调用下面两个block
+ */
+@property (assign, nonatomic) BOOL useCustomCamera;
+
+/**
+ 将要跳转相机界面 在block内实现跳转
+ demo1 里有示例（使用的是系统相机）
+ */
+@property (copy, nonatomic) void (^shouldUseCamera)(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager);
+
+/**
+ 相机拍照完成调用这个block 传入模型
+ */
+@property (copy, nonatomic) void (^useCameraComplete)(HXPhotoModel *model);
 
 /**
  是否支持旋转  默认YES
@@ -112,7 +153,7 @@
 @property (assign, nonatomic) BOOL downloadICloudAsset;
 
 /**
- 是否过滤icloud上的资源 默认NO
+ 是否过滤iCloud上的资源 默认NO
  */
 @property (assign, nonatomic) BOOL filtrationICloudAsset;
 
@@ -158,7 +199,10 @@
 @property (assign, nonatomic) NSTimeInterval videoMaximumDuration;
 
 /**
- *  删除临时的照片/视频 - 注:相机拍摄的照片并没有保存到系统相册 或 是本地图片 如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..  - 默认 YES
+ *  删除临时的照片/视频 -
+    注:相机拍摄的照片并没有保存到系统相册 或 是本地图片
+    如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..
+    - 默认 YES
  */
 @property (assign, nonatomic) BOOL deleteTemporaryPhoto;
 
@@ -175,6 +219,7 @@
 
 /**
  是否为单选模式 默认 NO
+ 会自动过滤掉gif、livephoto
  */
 @property (assign, nonatomic) BOOL singleSelected;
 

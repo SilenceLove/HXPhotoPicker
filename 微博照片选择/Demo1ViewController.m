@@ -9,7 +9,7 @@
 #import "Demo1ViewController.h"
 #import "HXPhotoPicker.h"
 
-@interface Demo1ViewController ()<HXAlbumListViewControllerDelegate>
+@interface Demo1ViewController ()<HXAlbumListViewControllerDelegate,UIImagePickerControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *total;
 //@property (weak, nonatomic) IBOutlet UILabel *photo;
@@ -20,9 +20,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *photoText;
 @property (weak, nonatomic) IBOutlet UITextField *videoText;
 @property (weak, nonatomic) IBOutlet UITextField *columnText;
-@property (weak, nonatomic) IBOutlet UISwitch *addCamera;
-@property (weak, nonatomic) IBOutlet UISwitch *outerCamera;
-@property (weak, nonatomic) IBOutlet UISwitch *isSystems;
+@property (weak, nonatomic) IBOutlet UISwitch *addCamera; 
 @property (weak, nonatomic) IBOutlet UISwitch *showHeaderSection;
 @property (weak, nonatomic) IBOutlet UISwitch *reverse;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *selectedTypeView;
@@ -34,7 +32,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *synchTitleColor;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *navBgColor;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *navTitleColor;
-@property (strong, nonatomic) UIColor *bottomViewBgColor;
+@property (weak, nonatomic) IBOutlet UISwitch *useCustomCamera;
+@property (strong, nonatomic) UIColor *bottomViewBgColor; 
 @end
 
 @implementation Demo1ViewController
@@ -46,7 +45,7 @@
         _manager.configuration.videoMaxNum = 5;
         _manager.configuration.deleteTemporaryPhoto = NO;
         _manager.configuration.lookLivePhoto = YES;
-        _manager.configuration.saveSystemAblum = YES;
+        _manager.configuration.saveSystemAblum = YES; 
 //        _manager.configuration.supportRotation = NO;
 //        _manager.configuration.cameraCellShowPreview = NO;
 //        _manager.configuration.themeColor = [UIColor redColor];
@@ -76,10 +75,71 @@
         _manager.configuration.previewCollectionView = ^(UICollectionView *collectionView) {
 //            NSSLog(@"preview:%@",collectionView);
         };
+//        _manager.configuration.movableCropBox = YES;
+//        _manager.configuration.movableCropBoxEditSize = YES;
+//        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
+        
+        // 使用自动的相机  这里拿系统相机做示例
+        _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
+            
+            // 这里拿使用系统相机做例子
+            UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+            imagePickerController.delegate = (id)weakSelf;
+            imagePickerController.allowsEditing = NO;
+            NSString *requiredMediaTypeImage = ( NSString *)kUTTypeImage;
+            NSString *requiredMediaTypeMovie = ( NSString *)kUTTypeMovie;
+            NSArray *arrMediaTypes;
+            if (cameraType == HXPhotoConfigurationCameraTypePhoto) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage,nil];
+            }else if (cameraType == HXPhotoConfigurationCameraTypeVideo) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeMovie,nil];
+            }else {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage, requiredMediaTypeMovie,nil];
+            }
+            [imagePickerController setMediaTypes:arrMediaTypes];
+            // 设置录制视频的质量
+            [imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
+            //设置最长摄像时间
+            [imagePickerController setVideoMaximumDuration:60.f];
+            imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+            imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+            imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
+            [viewController presentViewController:imagePickerController animated:YES completion:nil];
+        };
     }
     return _manager;
 }
 
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    HXPhotoModel *model;
+    if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        model = [HXPhotoModel photoModelWithImage:image];
+        if (self.manager.configuration.saveSystemAblum) {
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto];
+        }
+    }else  if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
+        NSURL *url = info[UIImagePickerControllerMediaURL];
+        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
+        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:opts];
+        float second = 0;
+        second = urlAsset.duration.value/urlAsset.duration.timescale;
+        model = [HXPhotoModel photoModelWithVideoURL:url videoTime:second];
+        if (self.manager.configuration.saveSystemAblum) {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url];
+        }
+    }
+    if (self.manager.configuration.useCameraComplete) {
+        self.manager.configuration.useCameraComplete(model);
+    }
+}
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -196,6 +256,8 @@
     self.manager.configuration.showDateSectionHeader = self.showHeaderSection.on;
     self.manager.configuration.reverseDate = self.reverse.on;
     self.manager.configuration.navigationTitleSynchColor = self.synchTitleColor.on;
+    self.manager.configuration.useCustomCamera = self.useCustomCamera.on;
+    self.manager.configuration.openCamera = self.addCamera.on;
     
 //    [self.view hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
     

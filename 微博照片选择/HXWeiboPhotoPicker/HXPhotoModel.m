@@ -87,6 +87,9 @@
         self.type = HXPhotoModelMediaTypeCameraVideo;
         self.subType = HXPhotoModelMediaSubTypeVideo;
         self.videoURL = videoURL;
+        if (videoTime <= 0) {
+            videoTime = 1;
+        }
         MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:videoURL] ;
         player.shouldAutoplay = NO;
         UIImage  *image = [player thumbnailImageAtTime:0.1 timeOption:MPMovieTimeOptionNearestKeyFrame];
@@ -95,6 +98,8 @@
         self.videoURL = videoURL;
         self.videoTime = time;
         self.thumbPhoto = image;
+        self.previewPhoto = image;
+        self.imageSize = self.thumbPhoto.size;
     }
     return self;
 }

@@ -11,7 +11,7 @@
 
 static const CGFloat kPhotoViewMargin = 12.0;
 
-@interface Demo2ViewController ()<HXPhotoViewDelegate>
+@interface Demo2ViewController ()<HXPhotoViewDelegate,UIImagePickerControllerDelegate>
 
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXPhotoView *photoView;
@@ -41,15 +41,78 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.saveSystemAblum = NO;
 //        _manager.configuration.reverseDate = YES;
         _manager.configuration.showDateSectionHeader = NO;
-//        _manager.configuration.selectTogether = NO;
+        _manager.configuration.selectTogether = NO;
 //        _manager.configuration.rowCount = 3;
 //        _manager.configuration.themeColor = [UIColor orangeColor];
 //        _manager.configuration.navigationTitleSynchColor = YES;
         _manager.configuration.navigationBar = ^(UINavigationBar *navigationBar) {
 //            navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor orangeColor]};
         };
+        
+//        _manager.configuration.movableCropBox = YES;
+//        _manager.configuration.movableCropBoxEditSize = YES;
+//        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
+        
+        __weak typeof(self) weakSelf = self;
+//        _manager.configuration.useCustomCamera = YES;
+        _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
+            
+            // 这里拿使用系统相机做例子
+            UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+            imagePickerController.delegate = (id)weakSelf;
+            imagePickerController.allowsEditing = NO;
+            NSString *requiredMediaTypeImage = ( NSString *)kUTTypeImage;
+            NSString *requiredMediaTypeMovie = ( NSString *)kUTTypeMovie;
+            NSArray *arrMediaTypes;
+            if (cameraType == HXPhotoConfigurationCameraTypePhoto) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage,nil];
+            }else if (cameraType == HXPhotoConfigurationCameraTypeVideo) {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeMovie,nil];
+            }else {
+                arrMediaTypes=[NSArray arrayWithObjects:requiredMediaTypeImage, requiredMediaTypeMovie,nil];
+            }
+            [imagePickerController setMediaTypes:arrMediaTypes];
+            // 设置录制视频的质量
+            [imagePickerController setVideoQuality:UIImagePickerControllerQualityTypeHigh];
+            //设置最长摄像时间
+            [imagePickerController setVideoMaximumDuration:60.f];
+            imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+            imagePickerController.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+            imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
+            [viewController presentViewController:imagePickerController animated:YES completion:nil];
+        };
     }
     return _manager;
+}
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    HXPhotoModel *model;
+    if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        model = [HXPhotoModel photoModelWithImage:image];
+        if (self.manager.configuration.saveSystemAblum) {
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto];
+        }
+    }else  if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
+        NSURL *url = info[UIImagePickerControllerMediaURL];
+        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
+        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:opts];
+        float second = 0;
+        second = urlAsset.duration.value/urlAsset.duration.timescale;
+        model = [HXPhotoModel photoModelWithVideoURL:url videoTime:second];
+        if (self.manager.configuration.saveSystemAblum) {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url];
+        }
+    }
+    if (self.manager.configuration.useCameraComplete) {
+        self.manager.configuration.useCameraComplete(model);
+    }
+}
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -67,6 +130,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.delegate = self;
+    photoView.outerCamera = YES;
     photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];
     self.photoView = photoView; 
