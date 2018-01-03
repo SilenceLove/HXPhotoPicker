@@ -11,7 +11,7 @@
 #ifdef __IPHONE_11_0
 @implementation HXCustomLayer
 
-- (CGFloat) zPosition {
+- (CGFloat)zPosition {
     return 0;
 }
 

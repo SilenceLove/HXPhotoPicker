@@ -181,6 +181,9 @@ const CGFloat HXZoomRate = 1.0f;
 }
 - (void)stopSession {
     if ([self.captureSession isRunning]) {
+//        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//            [self.captureSession stopRunning];
+//        });
         dispatch_async(self.videoQueue, ^{
             [self.captureSession stopRunning];
         });

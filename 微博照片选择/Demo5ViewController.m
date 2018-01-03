@@ -58,6 +58,7 @@ static const CGFloat kPhotoViewSectionMargin = 20.0;
     [self.view addSubview:self.scrollView];
     
     self.onePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, self.view.frame.size.width - kPhotoViewMargin * 2, 0) WithManager:self.oneManager];
+    self.onePhotoView.outerCamera = YES;
     self.onePhotoView.delegate = self;
     [self.scrollView addSubview:self.onePhotoView];
     

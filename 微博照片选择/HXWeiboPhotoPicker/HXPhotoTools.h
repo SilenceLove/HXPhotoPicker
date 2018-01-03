@@ -71,7 +71,7 @@
 /**  通过模型去获取  */
 + (PHImageRequestID)getAVAssetWithModel:(HXPhotoModel *)model startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, AVAsset *asset))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
 
-+ (PHImageRequestID)getLivePhotoWithModel:(HXPhotoModel *)model size:(CGSize)size startRequestICloud:(void (^)(HXPhotoModel *model, PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, PHLivePhoto *livePhoto))completion failed:(void(^)(HXPhotoModel *model))failed;
++ (PHImageRequestID)getLivePhotoWithModel:(HXPhotoModel *)model size:(CGSize)size startRequestICloud:(void (^)(HXPhotoModel *model, PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, PHLivePhoto *livePhoto))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
 
 + (PHImageRequestID)getImageDataWithModel:(HXPhotoModel *)model startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, NSData *imageData, UIImageOrientation orientation))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
 /**  -------  */

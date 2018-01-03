@@ -265,7 +265,7 @@
         return;
     }
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
-    if (model.isIcloud) {
+    if (model.isICloud) {
         HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
         [cell cancelRequest];
         [cell requestHDImage];
@@ -970,12 +970,12 @@
             self.model.iCloudRequestID = -1;
         }
         self.requestID = [HXPhotoTools getLivePhotoForAsset:self.model.asset size:self.model.endImageSize startRequestICloud:^(PHImageRequestID iCloudRequestId) {
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.requestID = iCloudRequestId;
         } progressHandler:^(double progress) {
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
@@ -988,18 +988,18 @@
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
         } failed:^{
             weakSelf.progressView.hidden = YES;
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 //                [weakSelf.progressView showError];
             }
         }];
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
         self.requestID = [HXPhotoTools getHighQualityFormatPhoto:self.model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.requestID = cloudRequestId;
         } progressHandler:^(double progress) {
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
@@ -1012,7 +1012,7 @@
         } failed:^(NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 weakSelf.progressView.hidden = YES;
-                if (weakSelf.model.isIcloud) {
+                if (weakSelf.model.isICloud) {
                     //                    [weakSelf.progressView showError];
                 }
             });
@@ -1023,14 +1023,14 @@
         }else {
             self.requestID = [HXPhotoTools getImageData:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (weakSelf.model.isIcloud) {
+                    if (weakSelf.model.isICloud) {
                         weakSelf.progressView.hidden = NO;
                     }
                     weakSelf.requestID = cloudRequestId;
                 });
             } progressHandler:^(double progress) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (weakSelf.model.isIcloud) {
+                    if (weakSelf.model.isICloud) {
                         weakSelf.progressView.hidden = NO;
                     }
                     weakSelf.progressView.progress = progress;
@@ -1052,7 +1052,7 @@
             } failed:^(NSDictionary *info) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     weakSelf.progressView.hidden = YES;
-                    if (weakSelf.model.isIcloud) {
+                    if (weakSelf.model.isICloud) {
                         //                        [weakSelf.progressView showError];
                     }
                 });
@@ -1062,13 +1062,13 @@
     if (self.player != nil) return;
     if (self.model.type == HXPhotoModelMediaTypeVideo) {
         self.requestID = [HXPhotoTools getAVAssetWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.videoPlayBtn.hidden = YES;
             weakSelf.requestID = cloudRequestId;
         } progressHandler:^(double progress) {
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
@@ -1083,7 +1083,7 @@
         } failed:^(NSDictionary *info) {
             weakSelf.videoPlayBtn.hidden = NO;
             weakSelf.progressView.hidden = YES;
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 //                [weakSelf.progressView showError];
             }
         }];
@@ -1096,9 +1096,9 @@
 }
 - (void)downloadICloudAssetComplete {
     self.progressView.hidden = YES;
-    if (self.model.isIcloud) {
+    if (self.model.isICloud) {
         self.model.iCloudDownloading = NO;
-        self.model.isIcloud = NO;
+        self.model.isICloud = NO;
         if (self.cellDownloadICloudAssetComplete) {
             self.cellDownloadICloudAssetComplete(self);
         }

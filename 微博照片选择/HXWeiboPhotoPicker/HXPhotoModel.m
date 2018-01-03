@@ -123,7 +123,11 @@
 {
     if (_imageSize.width == 0 || _imageSize.height == 0) {
         if (self.asset) {
-            _imageSize = CGSizeMake(self.asset.pixelWidth, self.asset.pixelHeight);
+            if (self.asset.pixelWidth == 0 || self.asset.pixelHeight == 0) {
+                _imageSize = CGSizeMake(200, 200);
+            }else {
+                _imageSize = CGSizeMake(self.asset.pixelWidth, self.asset.pixelHeight);
+            }
         }else {
             _imageSize = self.thumbPhoto.size;
         }
@@ -210,14 +214,7 @@
 - (CGSize)requestSize {
     if (_requestSize.width == 0 || _requestSize.height == 0) {
         CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
-        CGSize size;
-        if ([UIScreen mainScreen].bounds.size.width == 320) {
-            size = CGSizeMake(width * 0.8, width * 0.8);
-        }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-            size = CGSizeMake(width * 1.4, width * 1.4);
-        }else {
-            size = CGSizeMake(width * 1.7, width * 1.7);
-        }
+        CGSize size = CGSizeMake(width * self.clarityScale, width * self.clarityScale);
         _requestSize = size;
     }
     return _requestSize;

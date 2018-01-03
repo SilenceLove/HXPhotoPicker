@@ -193,8 +193,10 @@
     UIView *containerView = [transitionContext containerView];
     HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXDatePhotoViewController *toVC = (HXDatePhotoViewController *)[self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    NSTimeInterval duration = fromVC.manager.configuration.popInteractiveTransitionDuration;
+    UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
     
-    [UIView animateWithDuration:0.4 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
         if (self.tempCell) {
             self.tempImageView.frame = [self.tempCell.imageView convertRect:self.tempCell.imageView.bounds toView: containerView];
         }else {
@@ -208,10 +210,12 @@
         toVC.bottomView.alpha = 1;
     }completion:^(BOOL finished) {
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
+        [self.tempCell bottomViewPrepareAnimation];
         self.tempCell.hidden = NO;
+        [self.tempCell bottomViewStartAnimation];
         [self.tempImageView removeFromSuperview];
         [self.bgView removeFromSuperview];
-        
+
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
     }];
     

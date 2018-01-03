@@ -48,17 +48,45 @@
     self.deleteTemporaryPhoto = YES;
     self.showDateSectionHeader = YES;
     //    self.reverseDate = NO;
-    self.cameraCellShowPreview = YES;
+    if ([UIScreen mainScreen].bounds.size.width != 320) {
+        self.cameraCellShowPreview = YES;
+    }
     //    self.horizontalHideStatusBar = NO;
     self.customAlbumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     self.horizontalRowCount = 6;
     self.sectionHeaderTranslucent = YES;
     self.supportRotation = YES;
+    
+    self.pushTransitionDuration = 0.45f;
+    self.popTransitionDuration = 0.35f;
+    self.popInteractiveTransitionDuration = 0.35f;
+    self.transitionAnimationOption = UIViewAnimationOptionCurveEaseOut;
+    
+    if ([UIScreen mainScreen].bounds.size.width == 320) {
+        self.clarityScale = 0.8;
+    }else if ([UIScreen mainScreen].bounds.size.width == 375) {
+        self.clarityScale = 1.4;
+    }else {
+        self.clarityScale = 1.7;
+    }
+    self.doneBtnShowDetail = YES;
 }
-
+- (void)setClarityScale:(CGFloat)clarityScale {
+    if (clarityScale <= 0.f) {
+        if ([UIScreen mainScreen].bounds.size.width == 320) {
+            _clarityScale = 0.8;
+        }else if ([UIScreen mainScreen].bounds.size.width == 375) {
+            _clarityScale = 1.4;
+        }else {
+            _clarityScale = 1.7;
+        }
+    }else {
+        _clarityScale = clarityScale;
+    }
+}
 - (UIColor *)themeColor {
     if (!_themeColor) {
-        _themeColor = [UIApplication sharedApplication].keyWindow.rootViewController.view.tintColor;
+        _themeColor = [UIColor colorWithRed:0 green:0.478431 blue:1 alpha:1]; 
     }
     return _themeColor;
 }

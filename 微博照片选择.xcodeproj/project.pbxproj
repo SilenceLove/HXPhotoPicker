@@ -78,6 +78,7 @@
 		7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1D1F07994000715546 /* Demo4ViewController.m */; };
 		7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */; };
 		7BD8F16E1F7F4F770054F2A5 /* HXCustomCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8F16D1F7F4F770054F2A5 /* HXCustomCameraViewController.m */; };
+		7BE1F1061FF7F925003CCBCD /* HXDateVideoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BE1F1051FF7F925003CCBCD /* HXDateVideoEditViewController.m */; };
 		7BECEC261ECD7F2200EDE047 /* HXCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */; };
 		7BFE2E011E54575A00A8EC46 /* UIImage+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE2E001E54575A00A8EC46 /* UIImage+HXExtension.m */; };
 /* End PBXBuildFile section */
@@ -225,6 +226,8 @@
 		7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Demo4ViewController.xib; sourceTree = "<group>"; };
 		7BD8F16C1F7F4F770054F2A5 /* HXCustomCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCustomCameraViewController.h; sourceTree = "<group>"; };
 		7BD8F16D1F7F4F770054F2A5 /* HXCustomCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCustomCameraViewController.m; sourceTree = "<group>"; };
+		7BE1F1041FF7F925003CCBCD /* HXDateVideoEditViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXDateVideoEditViewController.h; sourceTree = "<group>"; };
+		7BE1F1051FF7F925003CCBCD /* HXDateVideoEditViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXDateVideoEditViewController.m; sourceTree = "<group>"; };
 		7BECEC241ECD7F2200EDE047 /* HXCircleProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCircleProgressView.h; sourceTree = "<group>"; };
 		7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCircleProgressView.m; sourceTree = "<group>"; };
 		7BFE2DFF1E54575A00A8EC46 /* UIImage+HXExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HXExtension.h"; sourceTree = "<group>"; };
@@ -391,6 +394,8 @@
 				7B4A70C11F94A63100BC1423 /* HXDatePhotoPreviewBottomView.m */,
 				7B3768821FA2D44400660C88 /* HXDatePhotoEditViewController.h */,
 				7B3768831FA2D44400660C88 /* HXDatePhotoEditViewController.m */,
+				7BE1F1041FF7F925003CCBCD /* HXDateVideoEditViewController.h */,
+				7BE1F1051FF7F925003CCBCD /* HXDateVideoEditViewController.m */,
 				7B4A70B41F91A15400BC1423 /* HXAlbumListViewController.h */,
 				7B4A70B51F91A15400BC1423 /* HXAlbumListViewController.m */,
 				7B152D651F78913500910987 /* HXPhoto3DTouchViewController.h */,
@@ -514,6 +519,7 @@
 				7B1EF3D21F287CED00A4391C /* UIImage+WebP.m in Sources */,
 				7BFE2E011E54575A00A8EC46 /* UIImage+HXExtension.m in Sources */,
 				7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */,
+				7BE1F1061FF7F925003CCBCD /* HXDateVideoEditViewController.m in Sources */,
 				7B269E121E56962700AB813D /* Demo3ViewController.m in Sources */,
 				7B8060281FA8641C00882E34 /* HXCustomPreviewView.m in Sources */,
 				7B7E3E931E4AB081002234EE /* HXPhotoManager.m in Sources */,

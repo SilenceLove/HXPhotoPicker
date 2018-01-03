@@ -14,8 +14,70 @@ typedef enum : NSUInteger {
     HXPhotoConfigurationCameraTypeTypePhotoAndVideo     // 拍照和录制一起
 } HXPhotoConfigurationCameraType;
 
-@class HXDatePhotoBottomView,HXDatePhotoPreviewBottomView,HXPhotoManager,HXPhotoModel;
+@class HXDatePhotoBottomView;
+@class HXDatePhotoPreviewBottomView;
+@class HXPhotoManager;
+@class HXPhotoModel;
+
 @interface HXPhotoConfiguration : NSObject
+
+/**
+ 视频是否可以编辑   default YES
+ 计划中...
+ */
+@property (assign, nonatomic) BOOL videoCanEdit;
+
+/**
+ 是否替换照片编辑界面   default NO
+ 计划中...
+ */
+@property (assign, nonatomic) BOOL replacePhotoEditViewController;
+
+/**
+ 是否替换视频编辑界面   default NO
+ 计划中...
+ */
+@property (assign, nonatomic) BOOL replaceVideoEditViewController;
+
+/**
+ 完成按钮是否显示详情   default YES
+ */
+@property (assign, nonatomic) BOOL doneBtnShowDetail;
+
+/**
+ 过渡动画枚举
+ 时间函数曲线相关
+ UIViewAnimationOptionCurveEaseInOut
+ UIViewAnimationOptionCurveEaseIn
+ UIViewAnimationOptionCurveEaseOut   -->    default
+ UIViewAnimationOptionCurveLinear
+ */
+@property (assign, nonatomic) UIViewAnimationOptions transitionAnimationOption;
+
+/**
+ push动画时长 default 0.45f
+ */
+@property (assign, nonatomic) NSTimeInterval pushTransitionDuration;
+
+/**
+ po动画时长 default 0.35f
+ */
+@property (assign, nonatomic) NSTimeInterval popTransitionDuration;
+
+/**
+ 手势松开时返回的动画时长 default 0.35f
+ */
+@property (assign, nonatomic) NSTimeInterval popInteractiveTransitionDuration;
+
+/**
+ 小图照片清晰度 越大越清晰、越消耗性能
+ 设置太大的话获取图片资源时耗时长且内存消耗大可能会引起界面卡顿
+ default：[UIScreen mainScreen].bounds.size.width
+         320    ->  0.8
+         375    ->  1.4
+         other  ->  1.7
+ */
+@property (assign, nonatomic) CGFloat clarityScale;
 
 /**
  是否可移动的裁剪框
@@ -36,10 +98,10 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) CGPoint movableCropBoxCustomRatio;
 
 /**
- 是否使用自己的相机
+ 是否替换相机控制器
  使用自己的相机时需要调用下面两个block
  */
-@property (assign, nonatomic) BOOL useCustomCamera;
+@property (assign, nonatomic) BOOL replaceCameraViewController;
 
 /**
  将要跳转相机界面 在block内实现跳转
@@ -79,12 +141,12 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) UIColor *selectedTitleColor;
 
 /**
- sectionHeader悬浮时的标题颜色
+ sectionHeader悬浮时的标题颜色 ios9以上才有效果
  */
 @property (strong, nonatomic) UIColor *sectionHeaderSuspensionTitleColor;
 
 /**
- sectionHeader悬浮时的背景色
+ sectionHeader悬浮时的背景色 ios9以上才有效果
  */
 @property (strong, nonatomic) UIColor *sectionHeaderSuspensionBgColor;
 
@@ -104,7 +166,7 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) void (^navigationBar)(UINavigationBar *navigationBar);
 
 /**
- headerSection 半透明毛玻璃效果  默认YES
+ headerSection 半透明毛玻璃效果  默认YES  ios9以上才有效果
  */
 @property (assign, nonatomic) BOOL sectionHeaderTranslucent;
 
@@ -126,19 +188,19 @@ typedef enum : NSUInteger {
 
 /**
  主题颜色  默认 tintColor
- - 改变主题颜色后建议也改下原图按钮的图片
+ - 改变主题颜色后建议也改下原图按钮的图标
  */
 @property (strong, nonatomic) UIColor *themeColor;
 
 /**
- 原图按钮普通状态下的按钮图片名
- - 改变主题颜色后建议也改下原图按钮的图片
+ 原图按钮普通状态下的按钮图标名
+ - 改变主题颜色后建议也改下原图按钮的图标
  */
 @property (copy, nonatomic) NSString *originalNormalImageName;
 
 /**
- 原图按钮选中状态下的按钮图片名
- - 改变主题颜色后建议也改下原图按钮的图片
+ 原图按钮选中状态下的按钮图标名
+ - 改变主题颜色后建议也改下原图按钮的图标
  */
 @property (copy, nonatomic) NSString *originalSelectedImageName;
 
@@ -158,7 +220,7 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL filtrationICloudAsset;
 
 /**
- headerSection 是否显示照片的位置信息 默认 5、6不显示，其余的显示
+ sectionHeader 是否显示照片的位置信息 默认 5、6不显示，其余的显示
  */
 @property (assign, nonatomic) BOOL sectionHeaderShowPhotoLocation;
 
@@ -169,7 +231,9 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) NSString *customAlbumName;
 
 /**
- 相机cell是否显示预览  默认YES
+ 相机cell是否显示预览
+ 屏幕宽  320  ->  NO
+        other  ->  YES
  */
 @property (assign, nonatomic) BOOL cameraCellShowPreview;
 

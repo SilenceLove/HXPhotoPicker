@@ -72,7 +72,7 @@
         if (downloadFinined && asset) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 model.iCloudDownloading = NO;
-                model.isIcloud = NO;
+                model.isICloud = NO;
                 if (completion) {
                     completion(model,asset);
                 }
@@ -96,7 +96,7 @@
                     if (downloadFinined && asset) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             model.iCloudDownloading = NO;
-                            model.isIcloud = NO;
+                            model.isICloud = NO;
                             if (completion) {
                                 completion(model,asset);
                             }
@@ -133,7 +133,7 @@
     model.iCloudRequestID = requestId;
     return requestId;
 }
-+ (PHImageRequestID)getLivePhotoWithModel:(HXPhotoModel *)model size:(CGSize)size startRequestICloud:(void (^)(HXPhotoModel *model, PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, PHLivePhoto *livePhoto))completion failed:(void(^)(HXPhotoModel *model))failed {
++ (PHImageRequestID)getLivePhotoWithModel:(HXPhotoModel *)model size:(CGSize)size startRequestICloud:(void (^)(HXPhotoModel *model, PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, PHLivePhoto *livePhoto))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed {
     PHLivePhotoRequestOptions *option = [[PHLivePhotoRequestOptions alloc] init];
     option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     option.networkAccessAllowed = NO;
@@ -143,7 +143,7 @@
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
         if (downloadFinined && completion && livePhoto) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                model.isIcloud = NO;
+                model.isICloud = NO;
                 model.iCloudDownloading = NO;
                 completion(model,livePhoto);
             });
@@ -165,7 +165,7 @@
                     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
                     if (downloadFinined && livePhoto) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            model.isIcloud = NO;
+                            model.isICloud = NO;
                             model.iCloudDownloading = NO;
                             if (completion) {
                                 completion(model,livePhoto);
@@ -177,7 +177,7 @@
                                 model.iCloudDownloading = NO;
                             }
                             if (failed) {
-                                failed(model);
+                                failed(model,info);
                             }
                         });
                     }
@@ -194,7 +194,7 @@
                         model.iCloudDownloading = NO;
                     }
                     if (failed) {
-                        failed(model);
+                        failed(model,info);
                     }
                 });
             }
@@ -215,7 +215,7 @@
         if (downloadFinined && imageData) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 model.iCloudDownloading = NO;
-                model.isIcloud = NO;
+                model.isICloud = NO;
                 if (completion) {
                     completion(model,imageData, orientation);
                 }
@@ -240,7 +240,7 @@
                     if (downloadFinined && imageData) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             model.iCloudDownloading = NO;
-                            model.isIcloud = NO;
+                            model.isICloud = NO;
                             if (completion) {
                                 completion(model,imageData, orientation);
                             }
@@ -371,9 +371,9 @@
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     return [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:model.requestSize contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
-        if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
-            NSSLog(@"icloud上的资源!!!");
-        }
+//        if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
+//            NSSLog(@"icloud上的资源!!!");
+//        }
         if (downloadFinined && result) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(result,model);

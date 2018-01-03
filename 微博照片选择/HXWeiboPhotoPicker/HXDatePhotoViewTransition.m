@@ -88,12 +88,15 @@
     fromCell.hidden = YES;
     // 弹簧动画，参数分别为：时长，延时，弹性（越小弹性越大），初始速度
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
-    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.75f initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
+    
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
         tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + kTopMargin, imgWidht, imgHeight);
         tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:1];
         toVC.bottomView.alpha = 1;
     } completion:^(BOOL finished) {
         fromCell.hidden = NO;
+        
         toVC.view.backgroundColor = [UIColor whiteColor];
         toVC.collectionView.hidden = NO;
         [tempBgView removeFromSuperview];
@@ -144,6 +147,88 @@
         [toVC scrollToPoint:toCell rect:rect];
     }
     
+    UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
+    
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
+        if (!contains || !toCell) {
+            tempView.transform = CGAffineTransformMakeScale(0.3, 0.3);
+            tempView.alpha = 0;
+        }else {
+            tempView.frame = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
+        }
+        fromVC.view.backgroundColor = [UIColor clearColor];
+        fromVC.bottomView.alpha = 0;
+        if (!fromVC.bottomView.userInteractionEnabled) {
+            tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
+            //            toVC.navigationController.navigationBar.alpha = 1;
+            //            toVC.bottomView.alpha = 1;
+        }else {
+            tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
+        }
+    }completion:^(BOOL finished) {
+        //由于加入了手势必须判断
+        if ([transitionContext transitionWasCancelled]) {//手势取消了，原来隐藏的imageView要显示出来
+            //失败了隐藏tempView，显示fromVC.imageView
+            fromVC.collectionView.hidden = NO;
+            if (!fromVC.bottomView.userInteractionEnabled) {
+                fromVC.view.backgroundColor = [UIColor blackColor];
+                [toVC.navigationController setNavigationBarHidden:YES];
+                [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+            }
+        }else{//手势成功，cell的imageView也要显示出来
+            //成功了移除tempView，下一次pop的时候又要创建，然后显示cell的imageView
+            
+        }
+        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
+        [toCell bottomViewPrepareAnimation];
+        toCell.hidden = NO;
+        [toCell bottomViewStartAnimation];
+        [tempBgView removeFromSuperview];
+        [tempView removeFromSuperview];
+        
+        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+    }];
+    
+    /*
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:option animations:^{
+        if (!contains || !toCell) {
+            tempView.transform = CGAffineTransformMakeScale(0.3, 0.3);
+            tempView.alpha = 0;
+        }else {
+            tempView.frame = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
+        }
+        fromVC.view.backgroundColor = [UIColor clearColor];
+        fromVC.bottomView.alpha = 0;
+        if (!fromVC.bottomView.userInteractionEnabled) {
+            tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
+            //            toVC.navigationController.navigationBar.alpha = 1;
+            //            toVC.bottomView.alpha = 1;
+        }else {
+            tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
+        }
+    } completion:^(BOOL finished) {
+        //由于加入了手势必须判断
+        if ([transitionContext transitionWasCancelled]) {//手势取消了，原来隐藏的imageView要显示出来
+            //失败了隐藏tempView，显示fromVC.imageView
+            fromVC.collectionView.hidden = NO;
+            if (!fromVC.bottomView.userInteractionEnabled) {
+                fromVC.view.backgroundColor = [UIColor blackColor];
+                [toVC.navigationController setNavigationBarHidden:YES];
+                [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+            }
+        }else{//手势成功，cell的imageView也要显示出来
+            //成功了移除tempView，下一次pop的时候又要创建，然后显示cell的imageView
+            
+        }
+        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
+        [toCell bottomViewPrepareAnimation];
+        toCell.hidden = NO;
+        [toCell bottomViewStartAnimation];
+        [tempBgView removeFromSuperview];
+        [tempView removeFromSuperview];
+        
+        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+    }];
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         if (!contains || !toCell) {
             tempView.transform = CGAffineTransformMakeScale(0.3, 0.3);
@@ -175,19 +260,24 @@
             
         }
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
+        [toCell bottomViewPrepareAnimation];
         toCell.hidden = NO;
+        [toCell bottomViewStartAnimation];
         [tempBgView removeFromSuperview];
         [tempView removeFromSuperview];
         
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
     }];
+     */
 }
 
 - (NSTimeInterval)transitionDuration:(nullable id<UIViewControllerContextTransitioning>)transitionContext {
     if (self.type == HXDatePhotoViewTransitionTypePush) {
-        return 0.45f;
+        HXDatePhotoViewController *fromVC = (HXDatePhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        return fromVC.manager.configuration.pushTransitionDuration;
     }else {
-        return 0.25f;
+        HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        return fromVC.manager.configuration.popTransitionDuration;
     }
 }
 

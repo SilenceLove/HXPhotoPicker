@@ -283,9 +283,20 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
                 }
             }
 //        }
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] destructiveButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"相机"],[NSBundle hx_localizedStringForKey:@"相册"], nil];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"相机"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self goCameraViewController];
+        }]];
         
-        [sheet showInView:self];
+        [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"相册"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self directGoPhotoViewController];
+        }]];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleCancel handler:nil]];
+        [self.viewController presentViewController:alertController animated:YES completion:nil];
+//        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] destructiveButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"相机"],[NSBundle hx_localizedStringForKey:@"相册"], nil];
+//
+//        [sheet showInView:self];
         return;
     }
     [self directGoPhotoViewController];
@@ -312,7 +323,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (granted) {
-                if (weakSelf.manager.configuration.useCustomCamera) {
+                if (weakSelf.manager.configuration.replaceCameraViewController) {
                     HXPhotoConfigurationCameraType cameraType;
                     if (weakSelf.manager.type == HXPhotoManagerSelectedTypePhoto) {
                         cameraType = HXPhotoConfigurationCameraTypePhoto;

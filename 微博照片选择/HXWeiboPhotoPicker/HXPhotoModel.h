@@ -70,20 +70,14 @@ typedef enum : NSUInteger {
 /**  照片PHAsset对象  */
 @property (strong, nonatomic) PHAsset *asset;
 /**  是否iCloud上的资源  */
-@property (nonatomic, assign) BOOL isIcloud;
-
-/**
- 视频AVAsset对象
- */
-//@property (strong, nonatomic) AVAsset *avAsset;
-
+@property (nonatomic, assign) BOOL isICloud;
 /**  照片类型  */
 @property (assign, nonatomic) HXPhotoModelMediaType type;
 /**  照片子类型  */
 @property (assign, nonatomic) HXPhotoModelMediaSubType subType;
-/**  小图  */
+/**  临时的列表小图  */
 @property (strong, nonatomic) UIImage *thumbPhoto;
-/**  预览图  */
+/**  临时的预览大图  */
 @property (strong, nonatomic) UIImage *previewPhoto;
 /**  当前照片所在相册的名称 */
 @property (copy, nonatomic) NSString *albumName;
@@ -135,6 +129,14 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) NSInteger rowCount;
 /**  照片列表请求的资源的大小 */
 @property (assign, nonatomic) CGSize requestSize;
+/**
+ 小图照片清晰度 越大越清晰、越消耗性能。太大可能会引起界面卡顿
+ 默认设置：[UIScreen mainScreen].bounds.size.width
+ 320    ->  0.8
+ 375    ->  1.4
+ other  ->  1.7
+ */
+@property (assign, nonatomic) CGFloat clarityScale;
 
 @property (copy, nonatomic) NSString *fullPathToFile;;
 

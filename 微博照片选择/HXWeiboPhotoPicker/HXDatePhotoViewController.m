@@ -427,7 +427,7 @@
         [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (granted) {
-                    if (weakSelf.manager.configuration.useCustomCamera) {
+                    if (weakSelf.manager.configuration.replaceCameraViewController) {
                         HXPhotoConfigurationCameraType cameraType;
                         if (weakSelf.manager.type == HXPhotoManagerSelectedTypePhoto) {
                             cameraType = HXPhotoConfigurationCameraTypePhoto;
@@ -474,7 +474,7 @@
         }];
     }else {
         HXDatePhotoViewCell *cell = (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-        if (cell.model.isIcloud) {
+        if (cell.model.isICloud) {
             if (self.manager.configuration.downloadICloudAsset) {
                 if (!cell.model.iCloudDownloading) {
                     [cell startRequestICloudAsset];
@@ -575,7 +575,7 @@
         return nil;
     }
     HXDatePhotoViewCell *cell = (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-    if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isIcloud) {
+    if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isICloud) {
         return nil;
     }
     //设置突出区域
@@ -628,9 +628,6 @@
             [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
         }
         [self.manager addICloudModel:cell.model];
-//        if (![self.manager.iCloudUploadArray containsObject:cell.model]) {
-//            [self.manager.iCloudUploadArray addObject:cell.model];
-//        }
     }
 }
 - (void)datePhotoViewCell:(HXDatePhotoViewCell *)cell didSelectBtn:(UIButton *)selectBtn {
@@ -640,23 +637,6 @@
             cell.model.previewPhoto = nil;
         }
         [self.manager beforeSelectedListdeletePhotoModel:cell.model];
-//        if ((cell.model.type == HXPhotoModelMediaTypePhoto || cell.model.type == HXPhotoModelMediaTypePhotoGif) || (cell.model.type == HXPhotoModelMediaTypeVideo || cell.model.type == HXPhotoModelMediaTypeLivePhoto)) {
-//            if (cell.model.type == HXPhotoModelMediaTypePhoto || cell.model.type == HXPhotoModelMediaTypePhotoGif || cell.model.type == HXPhotoModelMediaTypeLivePhoto) {
-//                [self.manager.selectedPhotos removeObject:cell.model];
-//            }else if (cell.model.type == HXPhotoModelMediaTypeVideo) {
-//                [self.manager.selectedVideos removeObject:cell.model];
-//            }
-//        }else if (cell.model.type == HXPhotoModelMediaTypeCameraPhoto || cell.model.type == HXPhotoModelMediaTypeCameraVideo) {
-//            if (cell.model.type == HXPhotoModelMediaTypeCameraPhoto) {
-//                [self.manager.selectedPhotos removeObject:cell.model];
-//                [self.manager.selectedCameraPhotos removeObject:cell.model];
-//            }else if (cell.model.type == HXPhotoModelMediaTypeCameraVideo) {
-//                [self.manager.selectedVideos removeObject:cell.model];
-//                [self.manager.selectedCameraVideos removeObject:cell.model];
-//            }
-//            [self.manager.selectedCameraList removeObject:cell.model];
-//        }
-//        [self.manager.selectedList removeObject:cell.model];
         cell.model.selectIndexStr = @"";
         cell.selectMaskLayer.hidden = YES;
         selectBtn.selected = NO;
@@ -670,33 +650,14 @@
             cell.model.thumbPhoto = cell.imageView.image;
         }
         [self.manager beforeSelectedListAddPhotoModel:cell.model];
-        
-//        if (cell.model.type == HXPhotoModelMediaTypePhoto || (cell.model.type == HXPhotoModelMediaTypePhotoGif || cell.model.type == HXPhotoModelMediaTypeLivePhoto)) { // 为图片时
-//            [self.manager.selectedPhotos addObject:cell.model];
-//        }else if (cell.model.type == HXPhotoModelMediaTypeVideo) { // 为视频时
-//            [self.manager.selectedVideos addObject:cell.model];
-//        }else if (cell.model.type == HXPhotoModelMediaTypeCameraPhoto) {
-//            // 为相机拍的照片时
-//            [self.manager.selectedPhotos addObject:cell.model];
-//            [self.manager.selectedCameraPhotos addObject:cell.model];
-//            [self.manager.selectedCameraList addObject:cell.model];
-//        }else if (cell.model.type == HXPhotoModelMediaTypeCameraVideo) {
-//            // 为相机录的视频时
-//            [self.manager.selectedVideos addObject:cell.model];
-//            [self.manager.selectedCameraVideos addObject:cell.model];
-//            [self.manager.selectedCameraList addObject:cell.model];
-//        }
-//        [self.manager.selectedList addObject:cell.model];
         cell.selectMaskLayer.hidden = NO;
         selectBtn.selected = YES;
-//        cell.model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.selectedList indexOfObject:cell.model] + 1];
         [selectBtn setTitle:cell.model.selectIndexStr forState:UIControlStateSelected];
         CAKeyframeAnimation *anim = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
         anim.duration = 0.25;
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [selectBtn.layer addAnimation:anim forKey:@""];
     }
-//    cell.model.selected = selectBtn.selected;
     UIColor *bgColor;
     if (self.manager.configuration.cellSelectedBgColor) {
         bgColor = self.manager.configuration.cellSelectedBgColor;
@@ -734,29 +695,13 @@
     if (model.dateCellIsVisible) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:model] inSection:model.dateSection];
         [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-        [self.manager addICloudModel:model];
-//        if (![self.manager.iCloudUploadArray containsObject:model]) {
-//            [self.manager.iCloudUploadArray addObject:model];
-//        }
+        [self.manager addICloudModel:model]; 
     }
 }
 - (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model {
     NSMutableArray *indexPathList = [NSMutableArray array];
     if (model.currentAlbumIndex == self.albumModel.index) {
         [indexPathList addObject:[NSIndexPath indexPathForItem:[self dateItem:model] inSection:model.dateSection]];
-//        if (!model.selected) {
-//            NSInteger index = 0;
-//            for (HXPhotoModel *subModel in [self.manager selectedArray]) {
-//                subModel.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1];
-//                if ([self.allArray containsObject:subModel]) {
-//                    if (subModel.dateCellIsVisible) {
-//                        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:subModel] inSection:subModel.dateSection];
-//                        [indexPathList addObject:indexPath];
-//                    }
-//                }
-//                index++;
-//            }
-//        }
     }
     if (!model.selected) {
         NSInteger index = 0;
@@ -1071,6 +1016,7 @@
 @end
 @interface HXDatePhotoViewCell ()
 @property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIView *maskView;
 @property (copy, nonatomic) NSString *localIdentifier;
 @property (assign, nonatomic) PHImageRequestID requestID;
 @property (assign, nonatomic) PHImageRequestID iCloudRequestID;
@@ -1093,9 +1039,16 @@
 }
 - (void)setupUI {
     [self.contentView addSubview:self.imageView];
-    [self.contentView addSubview:self.stateLb];
-    [self.contentView addSubview:self.selectBtn];
+    [self.contentView addSubview:self.maskView];
     [self.contentView addSubview:self.downloadView];
+}
+- (void)bottomViewPrepareAnimation {
+    self.maskView.alpha = 0;
+}
+- (void)bottomViewStartAnimation {
+    [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        self.maskView.alpha = 1;
+    } completion:nil];
 }
 - (void)setSingleSelected:(BOOL)singleSelected {
     _singleSelected = singleSelected;
@@ -1109,6 +1062,7 @@
         self.imageView.image = model.thumbPhoto;
     }else {
         __weak typeof(self) weakSelf = self;
+        self.imageView.image = nil;
         PHImageRequestID requestID = [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
             if (weakSelf.model == model) {
                 weakSelf.imageView.image = image;
@@ -1138,16 +1092,16 @@
     self.selectBtn.selected = model.selected;
     [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
     self.selectBtn.backgroundColor = model.selected ? self.selectBgColor :nil;
-    //    if (model.isIcloud) {
+    //    if (model.isICloud) {
     //        self.selectBtn.userInteractionEnabled = NO;
     //    }else {
     //        self.selectBtn.userInteractionEnabled = YES;
     //    }
-    self.iCloudIcon.hidden = !model.isIcloud;
-    self.selectBtn.hidden = model.isIcloud;
-    self.iCloudMaskLayer.hidden = !model.isIcloud;
+    self.iCloudIcon.hidden = !model.isICloud;
+    self.selectBtn.hidden = model.isICloud;
+    self.iCloudMaskLayer.hidden = !model.isICloud;
     if (model.iCloudDownloading) {
-        if (model.isIcloud) {
+        if (model.isICloud) {
             self.downloadView.progress = model.iCloudProgress;
             [self startRequestICloudAsset];
         }else {
@@ -1194,7 +1148,7 @@
             }
         } failed:^(HXPhotoModel *model, NSDictionary *info) {
             if (weakSelf.model == model) {
-                [weakSelf downloadError];
+                [weakSelf downloadError:info];
             }
         }];
     }else if (self.model.type == HXPhotoModelMediaTypeLivePhoto){
@@ -1215,9 +1169,9 @@
                     [weakSelf.delegate datePhotoViewCellRequestICloudAssetComplete:weakSelf];
                 }
             }
-        } failed:^(HXPhotoModel *model) {
+        } failed:^(HXPhotoModel *model, NSDictionary *info) {
             if (weakSelf.model == model) {
-                [weakSelf downloadError];
+                [weakSelf downloadError:info];
             }
         }];
     }else {
@@ -1240,17 +1194,19 @@
             }
         } failed:^(HXPhotoModel *model, NSDictionary *info) {
             if (weakSelf.model == model) {
-                [weakSelf downloadError];
+                [weakSelf downloadError:info];
             }
         }];
     }
 }
-- (void)downloadError {
-    [[self viewController].view showImageHUDText:@"下载失败，请重试！"];
+- (void)downloadError:(NSDictionary *)info {
+    if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+        [[self viewController].view showImageHUDText:@"下载失败，请重试！"];
+    }
     self.downloadView.hidden = YES;
     [self.downloadView resetState];
-    self.iCloudIcon.hidden = !self.model.isIcloud;
-    self.iCloudMaskLayer.hidden = !self.model.isIcloud;
+    self.iCloudIcon.hidden = !self.model.isICloud;
+    self.iCloudMaskLayer.hidden = !self.model.isICloud;
 }
 - (void)cancelRequest {
     if (self.requestID) {
@@ -1266,7 +1222,7 @@
     if (self.model.type == HXPhotoModelMediaTypeCamera) {
         return;
     }
-    if (self.model.isIcloud) {
+    if (self.model.isICloud) {
         return;
     }
     if ([self.delegate respondsToSelector:@selector(datePhotoViewCell:didSelectBtn:)]) {
@@ -1276,6 +1232,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.imageView.frame = self.bounds;
+    self.maskView.frame = self.bounds;
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
     self.selectBtn.frame = CGRectMake(self.hx_w - 27, 2, 25, 25);
@@ -1300,12 +1257,20 @@
         _imageView = [[UIImageView alloc] init];
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         _imageView.clipsToBounds = YES;
-        [_imageView.layer addSublayer:self.bottomMaskLayer];
-        [_imageView.layer addSublayer:self.selectMaskLayer];
-        [_imageView.layer addSublayer:self.iCloudMaskLayer];
-        [_imageView addSubview:self.iCloudIcon];
     }
     return _imageView;
+}
+- (UIView *)maskView {
+    if (!_maskView) {
+        _maskView = [[UIView alloc] init];
+        [_maskView.layer addSublayer:self.bottomMaskLayer];
+        [_maskView.layer addSublayer:self.selectMaskLayer];
+        [_maskView.layer addSublayer:self.iCloudMaskLayer];
+        [_maskView addSubview:self.iCloudIcon];
+        [_maskView addSubview:self.stateLb];
+        [_maskView addSubview:self.selectBtn];
+    }
+    return _maskView;
 }
 - (UIImageView *)iCloudIcon {
     if (!_iCloudIcon) {
@@ -1614,14 +1579,18 @@
     }else {
         self.previewBtn.enabled = YES;
         self.doneBtn.enabled = YES;
-        if (!self.manager.configuration.selectTogether) {
-            if (self.manager.selectedPhotoCount > 0) {
-                [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
+        if (self.manager.configuration.doneBtnShowDetail) {
+            if (!self.manager.configuration.selectTogether) {
+                if (self.manager.selectedPhotoCount > 0) {
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
+                }else {
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
+                }
             }else {
-                [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
+                [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
             }
         }else {
-            [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
+            [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld)",selectCount] forState:UIControlStateNormal];
         }
     }
     

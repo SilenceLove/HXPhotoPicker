@@ -37,6 +37,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];
+    [photoView refreshView];
 }
 
 - (void)dealloc { 
@@ -44,7 +45,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 #pragma mark - HXPhotoViewDelegate
-
+- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    NSSLog(@"%@",allList);
+}
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame
 {
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width, CGRectGetMaxY(frame) + kPhotoViewMargin);

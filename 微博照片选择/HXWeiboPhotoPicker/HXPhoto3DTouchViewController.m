@@ -77,13 +77,13 @@
     self.requestId = [HXPhotoTools getHighQualityFormatPhoto:self.model.asset size:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) startRequestIcloud:^(PHImageRequestID cloudRequestId) {
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.requestId = cloudRequestId;
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
         });
     } progressHandler:^(double progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
@@ -108,13 +108,13 @@
     self.requestId = [HXPhotoTools getImageData:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.requestId = cloudRequestId;
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
         });
     } progressHandler:^(double progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
@@ -154,13 +154,13 @@
     self.requestId = [HXPhotoTools getLivePhotoForAsset:self.model.asset size:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) startRequestICloud:^(PHImageRequestID iCloudRequestId) {
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.requestId = iCloudRequestId;
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
         });
     } progressHandler:^(double progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (weakSelf.model.isIcloud) {
+            if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
@@ -195,13 +195,13 @@
         self.requestId = [HXPhotoTools getAVAssetWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 weakSelf.requestId = cloudRequestId;
-                if (weakSelf.model.isIcloud) {
+                if (weakSelf.model.isICloud) {
                     weakSelf.progressView.hidden = NO;
                 }
             });
         } progressHandler:^(double progress) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (weakSelf.model.isIcloud) {
+                if (weakSelf.model.isICloud) {
                     weakSelf.progressView.hidden = NO;
                 }
                 weakSelf.progressView.progress = progress;

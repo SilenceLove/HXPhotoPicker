@@ -70,15 +70,19 @@
             CGFloat min = MIN(max, missingY);
             
             if (topY >= normalY && topY <= missingY + headerHeight) {
-                HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
-                if (headerView) {
-                    headerView.changeState = YES;
+                if (iOS9_Later) {
+                    HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
+                    if (headerView) {
+                        headerView.changeState = YES;
+                    }
                 }
                 self.hasSuspension = YES;
             }else {
-                HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
-                if (headerView) {
-                    headerView.changeState = NO;
+                if (iOS9_Later) {
+                    HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
+                    if (headerView) {
+                        headerView.changeState = NO;
+                    }
                 }
                 self.hasSuspension = NO;
             }

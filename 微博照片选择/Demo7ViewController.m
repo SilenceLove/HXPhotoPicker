@@ -27,6 +27,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.photoMaxNum = 9;
         _manager.configuration.videoMaxNum = 9;
         _manager.configuration.maxNum = 18;
+
     }
     return _manager;
 }

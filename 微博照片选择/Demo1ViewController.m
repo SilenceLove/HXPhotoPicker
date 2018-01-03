@@ -9,7 +9,7 @@
 #import "Demo1ViewController.h"
 #import "HXPhotoPicker.h"
 
-@interface Demo1ViewController ()<HXAlbumListViewControllerDelegate,UIImagePickerControllerDelegate>
+@interface Demo1ViewController ()<HXAlbumListViewControllerDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate>
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *total;
 //@property (weak, nonatomic) IBOutlet UILabel *photo;
@@ -34,6 +34,7 @@
 @property (weak, nonatomic) IBOutlet UISegmentedControl *navTitleColor;
 @property (weak, nonatomic) IBOutlet UISwitch *useCustomCamera;
 @property (strong, nonatomic) UIColor *bottomViewBgColor; 
+@property (weak, nonatomic) IBOutlet UITextField *clarityText;
 @end
 
 @implementation Demo1ViewController
@@ -144,6 +145,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空选择" style:UIBarButtonItemStylePlain target:self action:@selector(didRightClick)];
+    self.scrollView.delegate = self;
+    if ([UIScreen mainScreen].bounds.size.width == 320) {
+        self.clarityText.text = @"0.8";
+    }else if ([UIScreen mainScreen].bounds.size.width == 375) {
+        self.clarityText.text = @"1.4";
+    }else {
+        self.clarityText.text = @"1.7";
+    }
+}
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self.view endEditing:YES];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -155,7 +167,7 @@
     self.original.text = @"NO";
 }
 - (IBAction)goAlbum:(id)sender {
-    self.camera.on = NO;
+    self.manager.configuration.clarityScale = self.clarityText.text.floatValue;
     if (self.tintColor.selectedSegmentIndex == 0) {
         self.manager.configuration.themeColor = self.view.tintColor;
         self.manager.configuration.cellSelectedTitleColor = nil;
@@ -256,7 +268,7 @@
     self.manager.configuration.showDateSectionHeader = self.showHeaderSection.on;
     self.manager.configuration.reverseDate = self.reverse.on;
     self.manager.configuration.navigationTitleSynchColor = self.synchTitleColor.on;
-    self.manager.configuration.useCustomCamera = self.useCustomCamera.on;
+    self.manager.configuration.replaceCameraViewController = self.useCustomCamera.on;
     self.manager.configuration.openCamera = self.addCamera.on;
     
 //    [self.view hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
@@ -308,7 +320,7 @@
 - (IBAction)addCamera:(id)sender {
     UISwitch *sw = (UISwitch *)sender;
     self.manager.configuration.openCamera = sw.on;
-}
+} 
 - (void)dealloc {
     NSSLog(@"dealloc");
 }
