@@ -205,10 +205,22 @@
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.bottomView.enabled = NO;
         } else {
-            if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                self.bottomView.enabled = NO;
+            if (!self.manager.configuration.selectTogether) {
+                if (self.manager.selectedVideoArray.count > 0) {
+                    self.bottomView.enabled = NO;
+                }else {
+                    if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                        self.bottomView.enabled = NO;
+                    }else {
+                        self.bottomView.enabled = YES;
+                    }
+                }
             }else {
-                self.bottomView.enabled = YES;
+                if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                    self.bottomView.enabled = NO;
+                }else {
+                    self.bottomView.enabled = YES;
+                }
             }
         }
         self.bottomView.selectCount = [self.manager selectedCount];
@@ -231,6 +243,11 @@
             self.bottomView.currentIndex = [[self.manager afterSelectedArray] indexOfObject:model];
         }else {
             [self.bottomView deselected];
+        }
+        if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            self.bottomView.enabled = NO;
+        } else {
+            self.bottomView.enabled = YES;
         }
         [self.view addSubview:self.navBar];
         [self.navBar setTintColor:self.manager.configuration.themeColor];
@@ -447,11 +464,24 @@
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.bottomView.enabled = NO;
         }else {
-            self.bottomView.enabled = YES;
-            if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                self.bottomView.enabled = NO;
+            if (!self.manager.configuration.selectTogether) {
+                if (self.manager.selectedVideoArray.count > 0) {
+                    self.bottomView.enabled = NO;
+                }else {
+                    self.bottomView.enabled = YES;
+                    if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                        self.bottomView.enabled = NO;
+                    }else {
+                        self.bottomView.enabled = YES;
+                    }
+                }
             }else {
                 self.bottomView.enabled = YES;
+                if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                    self.bottomView.enabled = NO;
+                }else {
+                    self.bottomView.enabled = YES;
+                }
             }
         }
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
