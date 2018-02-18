@@ -264,7 +264,6 @@ HXDateVideoEditViewControllerDelegate
         }else {
             [self.bottomView deselected];
         }
-        
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.bottomView.enabled = self.manager.configuration.videoCanEdit;
         } else {
