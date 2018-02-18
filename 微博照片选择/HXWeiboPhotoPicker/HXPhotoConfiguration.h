@@ -40,9 +40,9 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL replaceVideoEditViewController;
 
 /**
- 完成按钮是否显示详情   default YES
+ 照片是否可以编辑   default YES
  */
-@property (assign, nonatomic) BOOL doneBtnShowDetail;
+@property (assign, nonatomic) BOOL photoCanEdit;
 
 /**
  过渡动画枚举
@@ -69,15 +69,6 @@ typedef enum : NSUInteger {
  */
 @property (assign, nonatomic) NSTimeInterval popInteractiveTransitionDuration;
 
-/**
- 小图照片清晰度 越大越清晰、越消耗性能
- 设置太大的话获取图片资源时耗时长且内存消耗大可能会引起界面卡顿
- default：[UIScreen mainScreen].bounds.size.width
-         320    ->  0.8
-         375    ->  1.4
-         other  ->  1.7
- */
-@property (assign, nonatomic) CGFloat clarityScale;
 
 /**
  是否可移动的裁剪框
@@ -113,6 +104,13 @@ typedef enum : NSUInteger {
  相机拍照完成调用这个block 传入模型
  */
 @property (copy, nonatomic) void (^useCameraComplete)(HXPhotoModel *model);
+
+
+#pragma mark - < UI相关 >
+/**
+ 完成按钮是否显示详情   default YES
+ */
+@property (assign, nonatomic) BOOL doneBtnShowDetail;
 
 /**
  是否支持旋转  默认YES
@@ -161,24 +159,9 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) UIColor *navBarBackgroudColor;
 
 /**
- 设置导航栏
- */
-@property (copy, nonatomic) void (^navigationBar)(UINavigationBar *navigationBar);
-
-/**
  headerSection 半透明毛玻璃效果  默认YES  ios9以上才有效果
  */
 @property (assign, nonatomic) BOOL sectionHeaderTranslucent;
-
-/**
- 照片列表底部View
- */
-@property (copy, nonatomic) void (^photoListBottomView)(HXDatePhotoBottomView *bottomView);
-
-/**
- 预览界面底部View
- */
-@property (copy, nonatomic) void (^previewBottomView)(HXDatePhotoPreviewBottomView *bottomView);
 
 /**
  导航栏标题颜色是否与主题色同步  默认NO;
@@ -210,30 +193,14 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL hideOriginalBtn;
 
 /**
- 下载iCloud上的资源  默认YES
- */
-@property (assign, nonatomic) BOOL downloadICloudAsset;
-
-/**
- 是否过滤iCloud上的资源 默认NO
- */
-@property (assign, nonatomic) BOOL filtrationICloudAsset;
-
-/**
  sectionHeader 是否显示照片的位置信息 默认 5、6不显示，其余的显示
  */
 @property (assign, nonatomic) BOOL sectionHeaderShowPhotoLocation;
 
 /**
- 拍摄的照片/视频保存到指定相册的名称  默认 BundleName
- (需9.0以上系统才可以保存到自定义相册 , 以下的系统只保存到相机胶卷...)
- */
-@property (copy, nonatomic) NSString *customAlbumName;
-
-/**
  相机cell是否显示预览
  屏幕宽  320  ->  NO
-        other  ->  YES
+ other  ->  YES
  */
 @property (assign, nonatomic) BOOL cameraCellShowPreview;
 
@@ -257,65 +224,11 @@ typedef enum : NSUInteger {
  */
 @property (assign, nonatomic) BOOL reverseDate;
 
+#pragma mark - < 基本配置 >
 /**
- 相机视频录制最大秒数  -  默认60s
+ 相册列表每行多少个照片 默认4个 iphone 4s / 5  默认3个
  */
-@property (assign, nonatomic) NSTimeInterval videoMaximumDuration;
-
-/**
- *  删除临时的照片/视频 -
-    注:相机拍摄的照片并没有保存到系统相册 或 是本地图片
-    如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..
-    - 默认 YES
- */
-@property (assign, nonatomic) BOOL deleteTemporaryPhoto;
-
-/**
- *  拍摄的 照片/视频 是否保存到系统相册  默认NO
- *  支持添加到自定义相册 - (需9.0以上)
- */
-@property (assign, nonatomic) BOOL saveSystemAblum;
-
-/**
- *  视频能选择的最大秒数  -  默认 3分钟/180秒
- */
-@property (assign, nonatomic) NSTimeInterval videoMaxDuration;
-
-/**
- 是否为单选模式 默认 NO
- 会自动过滤掉gif、livephoto
- */
-@property (assign, nonatomic) BOOL singleSelected;
-
-/**
- 是否开启3DTouch预览功能 默认 YES
- */
-@property (assign, nonatomic) BOOL open3DTouchPreview;
-
-/**
- 删除网络图片时是否显示Alert // 默认不显示
- */
-@property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
-
-/**
- 是否打开相机功能
- */
-@property (assign, nonatomic) BOOL openCamera;
-
-/**
- 是否开启查看GIF图片功能 - 默认开启
- */
-@property (assign, nonatomic) BOOL lookGifPhoto;
-
-/**
- 是否开启查看LivePhoto功能呢 - 默认 NO
- */
-@property (assign, nonatomic) BOOL lookLivePhoto;
-
-/**
- 当选择类型为 HXPhotoManagerSelectedTypePhotoAndVideo 时 此属性为YES时 选择的视频会跟图片分开排  反之  视频和图片混合在一起排
- */
-@property (assign, nonatomic) BOOL separate; // ---- 预留 
+@property (assign, nonatomic) NSInteger rowCount;
 
 /**
  最大选择数 等于 图片最大数 + 视频最大数 默认10 - 必填
@@ -333,14 +246,110 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) NSInteger videoMaxNum;
 
 /**
+ 是否打开相机功能
+ */
+@property (assign, nonatomic) BOOL openCamera;
+
+/**
+ 是否开启查看GIF图片功能 - 默认开启
+ */
+@property (assign, nonatomic) BOOL lookGifPhoto;
+
+/**
+ 是否开启查看LivePhoto功能呢 - 默认 NO
+ */
+@property (assign, nonatomic) BOOL lookLivePhoto;
+
+/**
  图片和视频是否能够同时选择 默认支持
  */
 @property (assign, nonatomic) BOOL selectTogether;
 
 /**
- 相册列表每行多少个照片 默认4个 iphone 4s / 5  默认3个
+ 删除网络图片时是否显示Alert // 默认不显示
  */
-@property (assign, nonatomic) NSInteger rowCount;
+@property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
+/**
+ 相机视频录制最大秒数  -  默认60s
+ */
+@property (assign, nonatomic) NSTimeInterval videoMaximumDuration;
+
+/**
+ *  删除临时的照片/视频 -
+ 注:相机拍摄的照片并没有保存到系统相册 或 是本地图片
+ 如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..
+ - 默认 YES
+ */
+@property (assign, nonatomic) BOOL deleteTemporaryPhoto;
+
+/**
+ *  拍摄的 照片/视频 是否保存到系统相册  默认NO
+ *  支持添加到自定义相册 - (需9.0以上)
+ */
+@property (assign, nonatomic) BOOL saveSystemAblum;
+
+/**
+ 拍摄的照片/视频保存到指定相册的名称  默认 BundleName
+ (需9.0以上系统才可以保存到自定义相册 , 以下的系统只保存到相机胶卷...)
+ */
+@property (copy, nonatomic) NSString *customAlbumName;
+
+/**
+ *  视频能选择的最大秒数  -  默认 3分钟/180秒
+ */
+@property (assign, nonatomic) NSTimeInterval videoMaxDuration;
+
+/**
+ 是否为单选模式 默认 NO
+ 会自动过滤掉gif、livephoto
+ */
+@property (assign, nonatomic) BOOL singleSelected;
+
+/**
+ 单选模式下选择图片时是否直接跳转到编辑界面  - 默认 YES
+ */
+@property (assign, nonatomic) BOOL singleJumpEdit;
+
+/**
+ 是否开启3DTouch预览功能 默认 YES
+ */
+@property (assign, nonatomic) BOOL open3DTouchPreview;
+
+/**
+ 下载iCloud上的资源  默认YES
+ */
+@property (assign, nonatomic) BOOL downloadICloudAsset;
+
+/**
+ 是否过滤iCloud上的资源 默认NO
+ */
+@property (assign, nonatomic) BOOL filtrationICloudAsset;
+
+/**
+ 小图照片清晰度 越大越清晰、越消耗性能
+ 设置太大的话获取图片资源时耗时长且内存消耗大可能会引起界面卡顿
+ default：[UIScreen mainScreen].bounds.size.width
+ 320    ->  0.8
+ 375    ->  1.4
+ other  ->  1.7
+ */
+@property (assign, nonatomic) CGFloat clarityScale;
+
+#pragma mark - < block返回的视图 >
+/**
+ 设置导航栏
+ */
+@property (copy, nonatomic) void (^navigationBar)(UINavigationBar *navigationBar);
+
+/**
+ 照片列表底部View
+ */
+@property (copy, nonatomic) void (^photoListBottomView)(HXDatePhotoBottomView *bottomView);
+
+/**
+ 预览界面底部View
+ */
+@property (copy, nonatomic) void (^previewBottomView)(HXDatePhotoPreviewBottomView *bottomView);
 
 /**
  相册列表的collectionView

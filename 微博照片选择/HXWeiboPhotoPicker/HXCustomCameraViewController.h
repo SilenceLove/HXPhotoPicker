@@ -15,6 +15,10 @@ typedef enum : NSUInteger {
 } HXCustomCameraBottomViewMode;
 
 @class HXPhotoManager,HXCustomCameraViewController,HXPhotoModel;
+ 
+typedef void (^ HXCustomCameraViewControllerDidDoneBlock)(HXPhotoModel *model, HXCustomCameraViewController *viewController);
+typedef void (^ HXCustomCameraViewControllerDidCancelBlock)(HXCustomCameraViewController *viewController);
+
 @protocol HXCustomCameraViewControllerDelegate <NSObject>
 @optional
 - (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model;
@@ -25,6 +29,8 @@ typedef enum : NSUInteger {
 @property (weak, nonatomic) id<HXCustomCameraViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (assign, nonatomic) BOOL isOutside;
+@property (copy, nonatomic) HXCustomCameraViewControllerDidDoneBlock doneBlock;
+@property (copy, nonatomic) HXCustomCameraViewControllerDidCancelBlock cancelBlock;
 @end
 
 @protocol HXCustomCameraBottomViewDelegate <NSObject>

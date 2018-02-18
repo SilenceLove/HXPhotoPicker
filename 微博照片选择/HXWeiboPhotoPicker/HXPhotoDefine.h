@@ -21,7 +21,7 @@
 
 // 导航栏 + 状态栏 的高度
 #define kNavigationBarHeight (kDevice_Is_iPhoneX ? 88 : 64)
-#define kTopMargin (kDevice_Is_iPhoneX ? 24 : 0)
+#define kTopMargin (kDevice_Is_iPhoneX ? 44 : 0)
 #define kBottomMargin (kDevice_Is_iPhoneX ? 34 : 0)
 
 #define iOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)

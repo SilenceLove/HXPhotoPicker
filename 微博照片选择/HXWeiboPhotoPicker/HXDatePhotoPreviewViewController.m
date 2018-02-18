@@ -17,8 +17,18 @@
 #import "HXCircleProgressView.h"
 #import "HXDatePhotoEditViewController.h"
 #import "UIViewController+HXExtension.h"
+#import "HXDateVideoEditViewController.h"
 
-@interface HXDatePhotoPreviewViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,HXDatePhotoPreviewBottomViewDelegate,HXDatePhotoEditViewControllerDelegate>
+#import "UIImageView+HXExtension.h"
+
+@interface HXDatePhotoPreviewViewController ()
+<
+UICollectionViewDataSource,
+UICollectionViewDelegate,
+HXDatePhotoPreviewBottomViewDelegate,
+HXDatePhotoEditViewControllerDelegate,
+HXDateVideoEditViewControllerDelegate
+>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) HXPhotoModel *currentModel;
 @property (strong, nonatomic) UIView *customTitleView;
@@ -173,7 +183,9 @@
 }
 - (void)viewWillDisappear:(BOOL)animated {
     HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+    cell.stopCancel = self.stopCancel;
     [cell cancelRequest];
+    self.stopCancel = NO;
 }
 - (void)setupUI {
     self.navigationItem.titleView = self.customTitleView;
@@ -184,6 +196,17 @@
     [self changeSubviewFrame];
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     self.bottomView.outside = self.outside;
+    
+    if (self.manager.type == HXPhotoManagerSelectedTypeVideo && !self.manager.configuration.videoCanEdit) {
+        self.bottomView.hideEditBtn = YES;
+    }else if (self.manager.type == HXPhotoManagerSelectedTypePhoto && !self.manager.configuration.photoCanEdit) {
+        self.bottomView.hideEditBtn = YES;
+    }else {
+        if (!self.manager.configuration.videoCanEdit && !self.manager.configuration.photoCanEdit) {
+            self.bottomView.hideEditBtn = YES;
+        }
+    }
+    
     if (!self.outside) {
         if (self.manager.configuration.navigationTitleSynchColor) {
             self.titleLb.textColor = self.manager.configuration.themeColor;
@@ -199,16 +222,25 @@
                 self.subTitleLb.textColor = self.manager.configuration.navigationTitleColor;
             }
         }
-        if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-            self.bottomView.hideEditBtn = YES;
-        }
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-            self.bottomView.enabled = NO;
+            self.bottomView.enabled = self.manager.configuration.videoCanEdit;
         } else {
-            if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                self.bottomView.enabled = NO;
+            if (!self.manager.configuration.selectTogether) {
+                if (self.manager.selectedVideoArray.count > 0) {
+                    self.bottomView.enabled = NO;
+                }else {
+                    if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                        self.bottomView.enabled = NO;
+                    }else {
+                        self.bottomView.enabled = self.manager.configuration.photoCanEdit;
+                    }
+                }
             }else {
-                self.bottomView.enabled = YES;
+                if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                    self.bottomView.enabled = NO;
+                }else {
+                    self.bottomView.enabled = self.manager.configuration.photoCanEdit;
+                }
             }
         }
         self.bottomView.selectCount = [self.manager selectedCount];
@@ -223,7 +255,7 @@
         }
         if (self.manager.configuration.singleSelected) {
             self.selectBtn.hidden = YES;
-            self.bottomView.hideEditBtn = YES;
+            self.bottomView.hideEditBtn = self.manager.configuration.singleJumpEdit;
         }
     }else {
         self.bottomView.selectCount = [self.manager afterSelectedCount];
@@ -231,6 +263,12 @@
             self.bottomView.currentIndex = [[self.manager afterSelectedArray] indexOfObject:model];
         }else {
             [self.bottomView deselected];
+        }
+        
+        if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            self.bottomView.enabled = self.manager.configuration.videoCanEdit;
+        } else {
+            self.bottomView.enabled = self.manager.configuration.photoCanEdit;
         }
         [self.view addSubview:self.navBar];
         [self.navBar setTintColor:self.manager.configuration.themeColor];
@@ -274,30 +312,7 @@
     }
     if (button.selected) {
         button.selected = NO;
-//        if (model.type != HXPhotoModelMediaTypeCameraVideo && model.type != HXPhotoModelMediaTypeCameraPhoto) {
-//            model.thumbPhoto = nil;
-//            model.previewPhoto = nil;
-//        }
         [self.manager beforeSelectedListdeletePhotoModel:model];
-        
-//        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeLivePhoto)) {
-//            if (model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto) {
-//                [self.manager.selectedPhotos removeObject:model];
-//            }else if (model.type == HXPhotoModelMediaTypeVideo) {
-//                [self.manager.selectedVideos removeObject:model];
-//            }
-//        }else if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
-//            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-//                [self.manager.selectedPhotos removeObject:model];
-//                [self.manager.selectedCameraPhotos removeObject:model];
-//            }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-//                [self.manager.selectedVideos removeObject:model];
-//                [self.manager.selectedCameraVideos removeObject:model];
-//            }
-//            [self.manager.selectedCameraList removeObject:model];
-//        }
-//        [self.manager.selectedList removeObject:model];
-//        model.selectIndexStr = @"";
     }else {
         NSString *str = [self.manager maximumOfJudgment:model];
         if (str) {
@@ -318,31 +333,13 @@
             model.previewPhoto = cell.imageView.image;
         }
         [self.manager beforeSelectedListAddPhotoModel:model];
-//        if (model.type == HXPhotoModelMediaTypePhoto || (model.type == HXPhotoModelMediaTypePhotoGif || model.type == HXPhotoModelMediaTypeLivePhoto)) { // 为图片时
-//            [self.manager.selectedPhotos addObject:model];
-//        }else if (model.type == HXPhotoModelMediaTypeVideo) { // 为视频时
-//            [self.manager.selectedVideos addObject:model];
-//        }else if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-//            // 为相机拍的照片时
-//            [self.manager.selectedPhotos addObject:model];
-//            [self.manager.selectedCameraPhotos addObject:model];
-//            [self.manager.selectedCameraList addObject:model];
-//        }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-//            // 为相机录的视频时
-//            [self.manager.selectedVideos addObject:model];
-//            [self.manager.selectedCameraVideos addObject:model];
-//            [self.manager.selectedCameraList addObject:model];
-//        }
-//        [self.manager.selectedList addObject:model];
         button.selected = YES;
-//        model.selectIndexStr = [NSString stringWithFormat:@"%ld",[self.manager.selectedList indexOfObject:model] + 1];
         [button setTitle:model.selectIndexStr forState:UIControlStateSelected];
         CAKeyframeAnimation *anim = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
         anim.duration = 0.25;
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [button.layer addAnimation:anim forKey:@""];
     }
-//    model.selected = button.selected;
     button.backgroundColor = button.selected ? self.manager.configuration.themeColor : nil;
     if ([self.delegate respondsToSelector:@selector(datePhotoPreviewControllerDidSelect:model:)]) {
         [self.delegate datePhotoPreviewControllerDidSelect:self model:model];
@@ -445,13 +442,33 @@
     if (self.modelArray.count > 0) {
         HXPhotoModel *model = self.modelArray[currentIndex];
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-            self.bottomView.enabled = NO;
+            // 为视频时
+            self.bottomView.enabled = self.manager.configuration.videoCanEdit;
         }else {
-            self.bottomView.enabled = YES;
-            if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                self.bottomView.enabled = NO;
+            if (!self.manager.configuration.selectTogether) {
+                // 照片,视频不能同时选择时
+                if (self.manager.selectedVideoArray.count > 0) {
+                    // 如果有选择视频那么照片就不能编辑
+                    self.bottomView.enabled = NO;
+                }else {
+                    // 没有选择视频时
+                    if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                        // 当选择照片数达到最大数且当前照片没选中时就不能编辑
+                        self.bottomView.enabled = NO;
+                    }else {
+                        // 反之就能
+                        self.bottomView.enabled = self.manager.configuration.photoCanEdit;
+                    }
+                }
             }else {
-                self.bottomView.enabled = YES;
+                // 能同时选择时
+                if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
+                    // 当选择照片数达到最大数且当前照片没选中时就不能编辑
+                    self.bottomView.enabled = NO;
+                }else {
+                    // 反之就能
+                    self.bottomView.enabled = self.manager.configuration.photoCanEdit;
+                }
             }
         }
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -507,15 +524,38 @@
     }
 }
 - (void)datePhotoPreviewBottomViewDidEdit:(HXDatePhotoPreviewBottomView *)bottomView {
-    HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
-    vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
-    vc.delegate = self;
-    vc.manager = self.manager;
-    if (self.outside) {
-        vc.outside = YES;
-        [self presentViewController:vc animated:NO completion:nil];
+    if (self.currentModel.networkPhotoUrl) {
+        if (self.currentModel.downloadError) {
+            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"下载失败"]];
+            return;
+        }
+        if (!self.currentModel.downloadComplete) {
+            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"照片正在下载"]];
+            return;
+        }
+    }
+    if (self.currentModel.subType == HXPhotoModelMediaSubTypePhoto) {
+        HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+        vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
+        vc.delegate = self;
+        vc.manager = self.manager;
+        if (self.outside) {
+            vc.outside = YES;
+            [self presentViewController:vc animated:NO completion:nil];
+        }else {
+            [self.navigationController pushViewController:vc animated:NO];
+        }
     }else {
-        [self.navigationController pushViewController:vc animated:NO];
+        HXDateVideoEditViewController *vc = [[HXDateVideoEditViewController alloc] init];
+        vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
+        vc.delegate = self;
+        vc.manager = self.manager;
+        if (self.outside) {
+            vc.outside = YES;
+            [self presentViewController:vc animated:NO completion:nil];
+        }else {
+            [self.navigationController pushViewController:vc animated:NO];
+        }
     }
 }
 - (void)datePhotoPreviewBottomViewDidDone:(HXDatePhotoPreviewBottomView *)bottomView {
@@ -841,7 +881,6 @@
 @property (assign, nonatomic) BOOL livePhotoAnimating;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) AVPlayer *player;
-@property (strong, nonatomic) UIButton *videoPlayBtn;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
 
@@ -864,6 +903,42 @@
 }
 - (void)resetScale {
     [self.scrollView setZoomScale:1.0 animated:NO];
+}
+- (void)againAddImageView {
+    [self refreshImageSize];
+    [self.scrollView addSubview:self.imageView];
+    if (self.model.subType == HXPhotoModelMediaSubTypeVideo) {
+        self.videoPlayBtn.hidden = NO;
+        [self.contentView.layer addSublayer:self.playerLayer];
+        [self.contentView addSubview:self.videoPlayBtn];
+        self.videoPlayBtn.alpha = 0;
+        [UIView animateWithDuration:0.2 animations:^{
+            self.videoPlayBtn.alpha = 1;
+        }];
+    }
+}
+- (void)refreshImageSize {
+    CGFloat width = self.frame.size.width;
+    CGFloat height = self.frame.size.height;
+    CGFloat imgWidth = self.model.imageSize.width;
+    CGFloat imgHeight = self.model.imageSize.height;
+    CGFloat w;
+    CGFloat h;
+    
+    imgHeight = width / imgWidth * imgHeight;
+    if (imgHeight > height) {
+        w = height / self.model.imageSize.height * imgWidth;
+        h = height;
+        self.scrollView.maximumZoomScale = width / w + 0.5;
+    }else {
+        w = width;
+        h = imgHeight;
+        self.scrollView.maximumZoomScale = 2.5;
+    }
+    self.imageView.frame = CGRectMake(0, 0, w, h);
+    self.imageView.center = CGPointMake(width / 2, height / 2);
+    self.playerLayer.frame = self.imageView.frame;
+    self.videoPlayBtn.frame = self.playerLayer.frame;
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
@@ -894,12 +969,38 @@
     }
     self.imageView.frame = CGRectMake(0, 0, w, h);
     self.imageView.center = CGPointMake(width / 2, height / 2);
+    self.playerLayer.frame = self.imageView.frame;
+    self.videoPlayBtn.frame = self.playerLayer.frame;
     
     self.imageView.hidden = NO;
     __weak typeof(self) weakSelf = self;
     if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
-        self.imageView.image = model.thumbPhoto;
-        model.tempImage = nil;
+        if (model.networkPhotoUrl) {
+            self.progressView.hidden = model.downloadComplete;
+            CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
+            self.progressView.progress = progress;
+            [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    weakSelf.progressView.progress = progress;
+                }
+            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    if (error != nil) { 
+                        [weakSelf.progressView showError];
+                    }else {
+                        if (image) {
+                            weakSelf.progressView.progress = 1;
+                            weakSelf.progressView.hidden = YES;
+                            weakSelf.imageView.image = image;
+                            [weakSelf refreshImageSize];
+                        }
+                    }
+                }
+            }];
+        }else {
+            self.imageView.image = model.thumbPhoto;
+            model.tempImage = nil;
+        }
     }else {
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             if (model.tempImage) {
@@ -1105,9 +1206,10 @@
     }
 }
 - (void)pausePlayerAndShowNaviBar {
-    [self.player pause];
-    self.videoPlayBtn.selected = NO;
+//    [self.player pause];
+//    self.videoPlayBtn.selected = NO;
     [self.player.currentItem seekToTime:CMTimeMake(0, 1)];
+    [self.player play];
 }
 - (void)cancelRequest {
     if (self.requestID) {
@@ -1128,12 +1230,16 @@
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
         
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
-        self.imageView.image = nil;
-        self.gifImage = nil;
-        self.imageView.image = self.gifFirstFrame;
+        if (!self.stopCancel) {
+            self.imageView.image = nil;
+            self.gifImage = nil;
+            self.imageView.image = self.gifFirstFrame;
+        }else {
+            self.stopCancel = NO;
+        }
     }
     if (self.model.subType == HXPhotoModelMediaSubTypeVideo) {
-        if (self.player != nil) {
+        if (self.player != nil && !self.stopCancel) {
             [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
             [self.player pause];
             self.videoPlayBtn.selected = NO;
@@ -1141,6 +1247,7 @@
             self.playerLayer.player = nil;
             self.player = nil;
         }
+        self.stopCancel = NO;
     }
 }
 - (void)singleTap:(UITapGestureRecognizer *)tap {
@@ -1208,9 +1315,9 @@
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
+//    self.playerLayer.frame = self.bounds;
+//    self.videoPlayBtn.frame = self.bounds;
     self.scrollView.frame = self.bounds;
-    self.playerLayer.frame = self.bounds;
     self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
     self.progressView.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
 }
@@ -1261,7 +1368,6 @@
         [_videoPlayBtn setImage:[HXPhotoTools hx_imageNamed:@"multimedia_videocard_play@2x.png"] forState:UIControlStateNormal];
         [_videoPlayBtn setImage:[[UIImage alloc] init] forState:UIControlStateSelected];
         [_videoPlayBtn addTarget:self action:@selector(didPlayBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        _videoPlayBtn.frame = self.bounds;
         _videoPlayBtn.hidden = YES;
     }
     return _videoPlayBtn;
@@ -1277,6 +1383,7 @@
     if (!_playerLayer) {
         _playerLayer = [[AVPlayerLayer alloc] init];
         _playerLayer.hidden = YES;
+        _playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     }
     return _playerLayer;
 }

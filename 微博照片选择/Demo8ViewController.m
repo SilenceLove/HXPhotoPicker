@@ -19,6 +19,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (copy, nonatomic) NSArray *imageRequestIds;
 @property (copy, nonatomic) NSArray *videoSessions;
 
+@property (assign, nonatomic) BOOL original;
+
 @property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 @end
 
@@ -67,7 +69,34 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)didNavOneBtnClick {
     [self.view showLoadingHUDText:@"写入中"];
     __weak typeof(self) weakSelf = self;
- 
+    HXDatePhotoToolManagerRequestType requestType;
+    if (self.original) {
+        requestType = HXDatePhotoToolManagerRequestTypeOriginal;
+    }else {
+        requestType = HXDatePhotoToolManagerRequestTypeHD;
+    }
+    [self.toolManager writeSelectModelListToTempPathWithList:self.selectList requestType:requestType success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
+        NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
+        NSURL *url = photoURL.firstObject;
+        if (url) {
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
+            NSSLog(@"%@",image);
+        }
+        [weakSelf.view handleLoading];
+    } failed:^{
+        [weakSelf.view handleLoading];
+        [weakSelf.view showImageHUDText:@"写入失败"];
+        NSSLog(@"写入失败");
+    }];
+    
+    /*
+     
+     [self.toolManager getSelectedImageList:self.selectList requestType:HXDatePhotoToolManagerRequestTypeOriginal success:^(NSArray<UIImage *> *imageList) {
+     NSSLog(@"%@",imageList);
+     } failed:^{
+     
+     }];
+     
     [self.toolManager writeSelectModelListToTempPathWithList:self.selectList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
         NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
         NSURL *url = photoURL.firstObject;
@@ -81,6 +110,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         [weakSelf.view showImageHUDText:@"写入失败"];
         NSSLog(@"写入失败");
     }];
+     */
 }
 
 - (void)didNavTwoBtnClick {
@@ -102,6 +132,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    self.original = isOriginal;
     self.selectList = allList;
     NSSLog(@"%@",allList);
 }

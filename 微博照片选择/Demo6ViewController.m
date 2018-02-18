@@ -61,7 +61,16 @@
             [alert show];
             return;
         }
-        [self hx_presentCustomCameraViewControllerWithManager:self.manager delegate:self];
+//        [self hx_presentCustomCameraViewControllerWithManager:self.manager delegate:self];
+        __weak typeof(self) weakSelf = self;
+        [self hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
+            [weakSelf.manager afterListAddCameraTakePicturesModel:model];
+            Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
+            vc.manager = weakSelf.manager;
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+        } cancel:^(HXCustomCameraViewController *viewController) {
+            NSSLog(@"取消了");
+        }];
     }else if (buttonIndex == 1){
         [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
     }

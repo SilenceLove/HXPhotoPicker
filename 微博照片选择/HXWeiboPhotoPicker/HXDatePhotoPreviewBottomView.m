@@ -8,6 +8,7 @@
 
 #import "HXDatePhotoPreviewBottomView.h"
 #import "HXPhotoManager.h"
+#import "UIImageView+HXExtension.h"
 @interface HXDatePhotoPreviewBottomView ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout>
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
@@ -257,10 +258,27 @@
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
+    
+    __weak typeof(self) weakSelf = self;
     if (model.thumbPhoto) {
         self.imageView.image = model.thumbPhoto;
+        if (model.networkPhotoUrl) {
+            [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    
+                }
+            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    if (error != nil) {
+                    }else {
+                        if (image) {
+                            weakSelf.imageView.image = image;
+                        }
+                    }
+                }
+            }];
+        }
     }else {
-        __weak typeof(self) weakSelf = self;
         self.requestID = [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
             if (weakSelf.model == model) {
                 weakSelf.imageView.image = image;

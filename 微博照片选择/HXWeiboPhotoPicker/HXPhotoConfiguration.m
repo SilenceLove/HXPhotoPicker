@@ -70,7 +70,11 @@
         self.clarityScale = 1.7;
     }
     self.doneBtnShowDetail = YES;
+//    self.videoCanEdit = YES;
+    self.singleJumpEdit = YES;
+    self.photoCanEdit = YES;
 }
+
 - (void)setClarityScale:(CGFloat)clarityScale {
     if (clarityScale <= 0.f) {
         if ([UIScreen mainScreen].bounds.size.width == 320) {

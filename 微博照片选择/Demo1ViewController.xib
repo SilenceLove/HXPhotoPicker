@@ -269,7 +269,7 @@
                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Snx-lR-3pl">
                                     <rect key="frame" x="255" y="425.66666666666663" width="51" height="31"/>
                                     <connections>
-                                        <action selector="same:" destination="-1" eventType="valueChanged" id="OSB-nU-MRe"/>
+                                        <action selector="yc:" destination="-1" eventType="valueChanged" id="ogd-2m-ii0"/>
                                     </connections>
                                 </switch>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="导航栏标题颜色是否同步主题色" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ort-k5-atT">
@@ -281,7 +281,7 @@
                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="aqm-zY-YUn">
                                     <rect key="frame" x="255" y="389.66666666666669" width="51" height="31"/>
                                     <connections>
-                                        <action selector="same:" destination="-1" eventType="valueChanged" id="rxJ-7u-PKj"/>
+                                        <action selector="tb:" destination="-1" eventType="valueChanged" id="yCL-QH-Dci"/>
                                     </connections>
                                 </switch>
                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="sEg-nF-dXI">

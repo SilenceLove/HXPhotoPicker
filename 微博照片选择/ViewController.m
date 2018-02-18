@@ -15,6 +15,7 @@
 #import "Demo6ViewController.h"
 #import "Demo7ViewController.h"
 #import "Demo8ViewController.h"
+#import "Demo9ViewController.h"
 #import "YYFPSLabel.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
@@ -63,7 +64,11 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                 viewControllClass: [Demo7ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo8"
                                          subTitle:@"将已选模型(图片和视频)写入临时目录  一键写入^_^"
-                                viewControllClass: [Demo8ViewController class]]];
+                                viewControllClass: [Demo8ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo9"
+                                         subTitle:@"cell上添加photoView"
+                                viewControllClass: [Demo9ViewController class]]
+                  ];
     }
     return _list;
 }

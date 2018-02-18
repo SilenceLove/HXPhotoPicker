@@ -16,10 +16,12 @@
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UIView *bgView;
 @property (weak, nonatomic) HXDatePhotoViewCell *tempCell;
+@property (weak, nonatomic) HXDatePhotoPreviewViewCell *fromCell;
 @property (strong, nonatomic) UIImageView *tempImageView;
 @property (nonatomic, assign) CGPoint transitionImgViewCenter;
-@property (nonatomic, assign) CGFloat transitionImgViewY;
-@property (nonatomic, assign) CGFloat transitionImgViewX;
+@property (nonatomic, assign) CGFloat beginX;
+@property (nonatomic, assign) CGFloat beginY;
+@property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @end
 
 @implementation HXDatePhotoInteractiveTransition
@@ -46,6 +48,9 @@
             if (![(HXDatePhotoPreviewViewController *)self.vc bottomView].userInteractionEnabled && iOS11_Later) {
                 [(HXDatePhotoPreviewViewController *)self.vc setSubviewAlphaAnimate:NO];
             }
+            [(HXDatePhotoPreviewViewController *)self.vc setStopCancel:YES];
+            self.beginX = [gestureRecognizer locationInView:gestureRecognizer.view].x;
+            self.beginY = [gestureRecognizer locationInView:gestureRecognizer.view].y;
             self.interation = YES;
             [self.vc.navigationController popViewControllerAnimated:YES];
             break;
@@ -54,14 +59,12 @@
                 if (scale < 0.f) {
                     scale = 0.f;
                 }
-                CGFloat imageViewScale = 1 - scale * 0.5 * 0.5;
-                if (imageViewScale < 0.5) {
-                    imageViewScale = 0.5;
+                CGFloat imageViewScale = 1 - scale * 0.5;
+                if (imageViewScale < 0.4) {
+                    imageViewScale = 0.4;
                 }
                 self.tempImageView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
                 self.tempImageView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
-                self.tempImageView.hx_y = self.transitionImgViewY + translation.y;
-//                self.tempImageView.hx_x = self.transitionImgViewX + translation.x;
                 
                 [self updateInterPercent:1 - scale * scale];
                 
@@ -103,8 +106,26 @@
     
     HXDatePhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     HXDatePhotoViewCell *toCell = [toVC currentPreviewCell:model];
+    self.fromCell = fromCell;
     
-    self.tempImageView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
+    UIView *containerView = [transitionContext containerView];
+    CGRect tempImageViewFrame;
+    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        self.tempImageView = fromCell.imageView;
+        tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+    }else {
+        if (!fromCell.playerLayer.player) {
+            self.tempImageView = fromCell.imageView;
+            tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+        }else {
+            tempImageViewFrame = containerView.bounds;
+            [fromCell.playerLayer removeFromSuperlayer];
+            self.playerLayer = fromCell.playerLayer;
+            self.tempImageView = [[UIImageView alloc] init];
+            self.tempImageView.layer.masksToBounds = YES;
+            [self.tempImageView.layer addSublayer:self.playerLayer];
+        }
+    }
     self.tempImageView.clipsToBounds = YES;
     self.tempImageView.contentMode = UIViewContentModeScaleAspectFill;
     BOOL contains = YES;
@@ -112,13 +133,28 @@
         contains = [toVC scrollToModel:model];
         toCell = [toVC currentPreviewCell:model];
     }
-    UIView *containerView = [transitionContext containerView];
     self.bgView = [[UIView alloc] initWithFrame:containerView.bounds];
     self.bgView.backgroundColor = [UIColor whiteColor];
-    self.tempImageView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+    CGFloat scaleX;
+    CGFloat scaleY;
+    if (self.beginX < tempImageViewFrame.origin.x) {
+        scaleX = 0;
+    }else if (self.beginX > CGRectGetMaxX(tempImageViewFrame)) {
+        scaleX = 1.0f;
+    }else {
+        scaleX = (self.beginX - tempImageViewFrame.origin.x) / tempImageViewFrame.size.width;
+    }
+    if (self.beginY < tempImageViewFrame.origin.y) {
+        scaleY = 0;
+    }else if (self.beginY > CGRectGetMaxY(tempImageViewFrame)){
+        scaleY = 1.0f;
+    }else {
+        scaleY = (self.beginY - tempImageViewFrame.origin.y) / tempImageViewFrame.size.height;
+    }
+    self.tempImageView.layer.anchorPoint = CGPointMake(scaleX, scaleY);
+    
+    self.tempImageView.frame = tempImageViewFrame;
     self.transitionImgViewCenter = self.tempImageView.center;
-    self.transitionImgViewY = self.tempImageView.hx_y;
-    self.transitionImgViewX = self.tempImageView.hx_x;
     [containerView addSubview:toVC.view];
     [containerView addSubview:fromVC.view];
     [toVC.view insertSubview:self.bgView belowSubview:toVC.bottomView];
@@ -141,7 +177,7 @@
     if (toCell) {
         [toVC scrollToPoint:toCell rect:rect];
     }
-    self.tempCell = toCell;
+    self.tempCell = toCell; 
 }
 - (void)updateInterPercent:(CGFloat)scale{
     HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[self.transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -182,6 +218,9 @@
         self.tempCell.hidden = NO;
         self.tempCell = nil;
         [self.tempImageView removeFromSuperview];
+        self.tempImageView.layer.anchorPoint = CGPointMake(0.5f, 0.5f);
+        [self.fromCell againAddImageView];
+        self.playerLayer = nil;
         [self.bgView removeFromSuperview];
         self.bgView = nil;
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -195,6 +234,12 @@
     HXDatePhotoViewController *toVC = (HXDatePhotoViewController *)[self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     NSTimeInterval duration = fromVC.manager.configuration.popInteractiveTransitionDuration;
     UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
+    
+    CGRect tempImageViewFrame = self.tempImageView.frame;
+    self.tempImageView.layer.anchorPoint = CGPointMake(0.5, 0.5);
+    self.tempImageView.transform = CGAffineTransformIdentity;
+    self.tempImageView.frame = tempImageViewFrame;
+    self.playerLayer.frame = CGRectMake(0, 0, self.tempCell.imageView.hx_w, self.tempCell.imageView.hx_h);
     
     [UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
         if (self.tempCell) {
@@ -213,12 +258,12 @@
         [self.tempCell bottomViewPrepareAnimation];
         self.tempCell.hidden = NO;
         [self.tempCell bottomViewStartAnimation];
+        self.playerLayer = nil;
         [self.tempImageView removeFromSuperview];
         [self.bgView removeFromSuperview];
 
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-    }];
-    
+    }];  
 }
 - (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
     self.transitionContext = transitionContext;

@@ -99,7 +99,7 @@
 
 - (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
     HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-    vc.delegate = delegate;
+    vc.delegate = delegate ? delegate : (id)self;
     vc.manager = manager;
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
@@ -108,7 +108,7 @@
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
     HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
-    vc.delegate = delegate;
+    vc.delegate = delegate ? delegate : (id)self;
     vc.manager = manager;
     vc.isOutside = YES;
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];

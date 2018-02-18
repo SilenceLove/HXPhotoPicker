@@ -57,12 +57,12 @@ typedef enum : NSUInteger {
 - (void)addLocalImageToAlbumWithImages:(NSArray *)images;
 
 /**
- 添加网络图片数组  - 暂时移除
+ 添加网络图片数组
 
  @param imageUrls 图片地址  NSString*
  @param selected 是否选中
  */
-//- (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected;
+- (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected;
 
 /**
  相册列表
@@ -70,9 +70,9 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic,readonly) NSMutableArray *albums;
 
 /**
- 网络图片地址数组  - 暂时移除
+ 网络图片地址数组
  */
-//@property (strong, nonatomic) NSMutableArray *networkPhotoUrls;
+@property (strong, nonatomic) NSArray<NSString *> *networkPhotoUrls;
 
 
 /**
@@ -241,4 +241,22 @@ typedef enum : NSUInteger {
  */
 - (void)clearSelectedList;
 
+/**  cell上添加photoView时所需要用到的方法  */
+- (void)changeAfterCameraArray:(NSArray *)array;
+- (void)changeAfterCameraPhotoArray:(NSArray *)array;
+- (void)changeAfterCameraVideoArray:(NSArray *)array;
+- (void)changeAfterSelectedCameraArray:(NSArray *)array;
+- (void)changeAfterSelectedCameraPhotoArray:(NSArray *)array;
+- (void)changeAfterSelectedCameraVideoArray:(NSArray *)array;
+- (void)changeAfterSelectedArray:(NSArray *)array;
+- (void)changeAfterSelectedPhotoArray:(NSArray *)array;
+- (void)changeAfterSelectedVideoArray:(NSArray *)array;
+- (void)changeICloudUploadArray:(NSArray *)array;
+- (NSArray *)afterCameraArray;
+- (NSArray *)afterCameraPhotoArray;
+- (NSArray *)afterCameraVideoArray;
+- (NSArray *)afterSelectedCameraArray;
+- (NSArray *)afterSelectedCameraPhotoArray;
+- (NSArray *)afterSelectedCameraVideoArray;
+- (NSArray *)afterICloudUploadArray;
 @end

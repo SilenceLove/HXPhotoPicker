@@ -206,6 +206,9 @@
         if ([self.delegate respondsToSelector:@selector(customCameraViewControllerDidCancel:)]) {
             [self.delegate customCameraViewControllerDidCancel:self];
         }
+        if (self.cancelBlock) {
+            self.cancelBlock(self);
+        }
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
@@ -253,6 +256,9 @@
     }
     if ([self.delegate respondsToSelector:@selector(customCameraViewController:didDone:)]) {
         [self.delegate customCameraViewController:self didDone:model];
+    }
+    if (self.doneBlock) {
+        self.doneBlock(model, self);
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }

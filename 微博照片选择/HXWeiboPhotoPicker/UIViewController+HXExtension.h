@@ -7,11 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
-@class HXPhotoManager;
+#import "HXAlbumListViewController.h"
+#import "HXCustomCameraViewController.h" 
+
 @interface UIViewController (HXExtension)
-/* <HXAlbumListViewControllerDelegate> */
+/*  <HXAlbumListViewControllerDelegate>
+ *  delegate 不传则代表自己
+ */
 - (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;
-/* <HXCustomCameraViewControllerDelegate> */
+
+- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager done:(HXAlbumListViewControllerDidDoneBlock)done cancel:(HXAlbumListViewControllerDidCancelBlock)cancel;
+
+/*  <HXCustomCameraViewControllerDelegate>
+ *  delegate 不传则代表自己
+ */
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;
+
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager  done:(HXCustomCameraViewControllerDidDoneBlock)done cancel:(HXCustomCameraViewControllerDidCancelBlock)cancel;
+
 - (BOOL)navigationBarWhetherSetupBackground;
 @end

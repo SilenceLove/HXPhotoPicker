@@ -494,6 +494,45 @@
     });
 }
 
++ (void)getVideoEachFrameWithAsset:(AVAsset *)asset total:(NSInteger)total size:(CGSize)size complete:(void (^)(AVAsset *, NSArray<UIImage *> *))complete {
+    long duration = round(asset.duration.value) / asset.duration.timescale;
+    
+    NSTimeInterval average = (CGFloat)duration / (CGFloat)total;
+    
+    AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    generator.maximumSize = size;
+    generator.appliesPreferredTrackTransform = YES;
+    generator.requestedTimeToleranceBefore = kCMTimeZero;
+    generator.requestedTimeToleranceAfter = kCMTimeZero;
+    
+    NSMutableArray *arr = [NSMutableArray array];
+    for (int i = 1; i <= total; i++) {
+        CMTime time = CMTimeMake((i * average) * asset.duration.timescale, asset.duration.timescale);
+        NSValue *value = [NSValue valueWithCMTime:time];
+        [arr addObject:value];
+    }
+    NSMutableArray *arrImages = [NSMutableArray array];
+    __block long count = 0;
+    [generator generateCGImagesAsynchronouslyForTimes:arr completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
+        switch (result) {
+            case AVAssetImageGeneratorSucceeded:
+                [arrImages addObject:[UIImage imageWithCGImage:image]];
+                break;
+            case AVAssetImageGeneratorFailed:
+                
+                break;
+            case AVAssetImageGeneratorCancelled:
+                
+                break;
+        }
+        count++;
+        if (count == arr.count && complete) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                complete(asset, arrImages);
+            });
+        }
+    }];
+}
 + (NSString *)getBytesFromDataLength:(NSInteger)dataLength {
     NSString *bytes;
     if (dataLength >= 0.1 * (1024 * 1024)) {

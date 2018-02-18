@@ -9,8 +9,15 @@
 #import "HXAlbumListViewController.h" 
 #import "HXDatePhotoViewController.h"
 #import "UIViewController+HXExtension.h"
-@interface HXAlbumListViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIViewControllerPreviewingDelegate,HXDatePhotoViewControllerDelegate,UITableViewDataSource,UITableViewDelegate>
-
+@interface HXAlbumListViewController ()
+<
+UICollectionViewDataSource,
+UICollectionViewDelegate,
+UIViewControllerPreviewingDelegate,
+HXDatePhotoViewControllerDelegate,
+UITableViewDataSource,
+UITableViewDelegate
+>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
 
@@ -36,9 +43,11 @@
     [self setupUI];
     // 获取当前应用对照片的访问授权状态
     __weak typeof(self) weakSelf = self;
+    [self.view showLoadingHUDText:nil];
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized) {
+                [weakSelf.view handleLoading];
                 [weakSelf.view addSubview:weakSelf.authorizationLb];
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSBundle hx_localizedStringForKey:@"无法访问相册"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相册中允许访问相册"] preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleDefault handler:nil]];
@@ -123,6 +132,8 @@
 - (void)setupUI {
     [self.navigationController.navigationBar setTintColor:self.manager.configuration.themeColor];
     if (self.manager.configuration.navBarBackgroudColor) {
+        [self.navigationController.navigationBar setBackgroundColor:nil];
+        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
         self.navigationController.navigationBar.barTintColor = self.manager.configuration.navBarBackgroudColor;
     }
     if (self.manager.configuration.navigationBar) {
@@ -138,7 +149,7 @@
     
     self.title = @"相册";
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(cancelClick)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStyleDone target:self action:@selector(cancelClick)];
     if (self.manager.configuration.singleSelected) {
         [self.view addSubview:self.tableView];
     }else {
@@ -154,6 +165,9 @@
     if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidCancel:)]) {
         [self.delegate albumListViewControllerDidCancel:self];
     }
+    if (self.cancelBlock) {
+        self.cancelBlock(self);
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 #pragma mark - < HXDatePhotoViewControllerDelegate >
@@ -162,12 +176,15 @@
         [self.delegate albumListViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
 
     }
+    if (self.doneBlock) {
+        self.doneBlock(allList, photoList, videoList, original, self);
+    }
 }
 - (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController {
     [self cancelClick];
-    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidCancel:)]) {
-        [self.delegate albumListViewControllerDidCancel:self];
-    }
+//    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidCancel:)]) {
+//        [self.delegate albumListViewControllerDidCancel:self];
+//    }
 }
 - (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected {
     if (self.albumModelArray.count > 0) {
@@ -182,6 +199,7 @@
 }
 - (void)getAlbumModelList:(BOOL)isFirst {
     if (self.manager.albums.count > 0 && self.manager.configuration.saveSystemAblum && !self.manager.configuration.singleSelected) {
+        [self.view handleLoading];
         self.albumModelArray = [NSMutableArray arrayWithArray:self.manager.albums];
         HXAlbumModel *model = self.albumModelArray.firstObject;
         HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
@@ -204,6 +222,7 @@
         __weak typeof(self) weakSelf = self;
         [self.manager getAllPhotoAlbums:^(HXAlbumModel *firstAlbumModel) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.view handleLoading];
                 HXAlbumModel *model = firstAlbumModel;
                 HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
                 vc.manager = weakSelf.manager;

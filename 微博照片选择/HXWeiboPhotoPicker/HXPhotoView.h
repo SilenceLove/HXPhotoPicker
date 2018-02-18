@@ -28,9 +28,6 @@
 // 删除网络图片的地址
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl;
 
-/**  网络图片全部下载完成时调用  */
-- (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView;
-
 @end
 
 @interface HXPhotoView : UIView
@@ -67,12 +64,8 @@
 - (void)directGoPhotoViewController;
 /**  跳转相机  */
 - (void)goCameraViewController;
-/**  网络图片是否全部下载完成  */
-- (BOOL)networkingPhotoDownloadComplete;
 /**  删除某个模型  */
 - (void)deleteModelWithIndex:(NSInteger)index;
-/**  已下载完成的网络图片数量  */
-- (NSInteger)downloadNumberForNetworkingPhoto;
 /**  刷新view  */
 - (void)refreshView;
 /**  删除添加按钮(即不需要)  */

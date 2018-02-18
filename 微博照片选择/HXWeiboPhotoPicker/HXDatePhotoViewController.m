@@ -20,7 +20,27 @@
 #import "HXCircleProgressView.h"
 #import "HXDownloadProgressView.h"
 #import "UIViewController+HXExtension.h"
-@interface HXDatePhotoViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UIViewControllerPreviewingDelegate,HXDatePhotoViewCellDelegate,HXDatePhotoBottomViewDelegate,HXDatePhotoPreviewViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXDatePhotoEditViewControllerDelegate>
+
+#import "UIImageView+HXExtension.h"
+
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>)
+#import <SDWebImage/UIImageView+WebCache.h>
+#else
+#import "UIImageView+WebCache.h"
+#endif
+
+@interface HXDatePhotoViewController ()
+<
+UICollectionViewDataSource,
+UICollectionViewDelegate,
+UICollectionViewDelegateFlowLayout,
+UIViewControllerPreviewingDelegate,
+HXDatePhotoViewCellDelegate,
+HXDatePhotoBottomViewDelegate,
+HXDatePhotoPreviewViewControllerDelegate,
+HXCustomCameraViewControllerDelegate,
+HXDatePhotoEditViewControllerDelegate
+>
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) HXDatePhotoViewFlowLayout *customLayout;
@@ -39,8 +59,6 @@
 @property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
 
 @property (weak, nonatomic) HXDatePhotoViewSectionFooterView *footerView;
-
-
 @end
 
 @implementation HXDatePhotoViewController
@@ -460,7 +478,7 @@
                     vc.manager = weakSelf.manager;
                     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
                     nav.isCamera = YES;
-                    nav.supportRotation = self.manager.configuration.supportRotation;
+                    nav.supportRotation = weakSelf.manager.configuration.supportRotation;
                     [weakSelf presentViewController:nav animated:YES completion:nil];
                 }else {
                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] preferredStyle:UIAlertControllerStyleAlert];
@@ -494,20 +512,31 @@
             self.navigationController.delegate = previewVC;
             [self.navigationController pushViewController:previewVC animated:YES];
         }else {
-            if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
-                HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
-                vc.model = cell.model;
-                vc.delegate = self;
-                vc.manager = self.manager;
-                [self.navigationController pushViewController:vc animated:NO];
-            }else {
+            if (!self.manager.configuration.singleJumpEdit) {
+                NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
                 HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
                 previewVC.delegate = self;
-                previewVC.modelArray = [NSMutableArray arrayWithObjects:cell.model, nil];
+                previewVC.modelArray = self.previewArray;
                 previewVC.manager = self.manager;
-                previewVC.currentModelIndex = 0;
+                previewVC.currentModelIndex = currentIndex;
                 self.navigationController.delegate = previewVC;
                 [self.navigationController pushViewController:previewVC animated:YES];
+            }else {
+                if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
+                    HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+                    vc.model = cell.model;
+                    vc.delegate = self;
+                    vc.manager = self.manager;
+                    [self.navigationController pushViewController:vc animated:NO];
+                }else {
+                    HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+                    previewVC.delegate = self;
+                    previewVC.modelArray = [NSMutableArray arrayWithObjects:cell.model, nil];
+                    previewVC.manager = self.manager;
+                    previewVC.currentModelIndex = 0;
+                    self.navigationController.delegate = previewVC;
+                    [self.navigationController pushViewController:previewVC animated:YES];
+                }
             }
         }
     }
@@ -577,6 +606,14 @@
     HXDatePhotoViewCell *cell = (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isICloud) {
         return nil;
+    }
+    if (cell.model.networkPhotoUrl) {
+        if (cell.model.downloadError) {
+            return nil;
+        }
+        if (!cell.model.downloadComplete) {
+            return nil;
+        }
     }
     //设置突出区域
     previewingContext.sourceRect = [self.collectionView cellForItemAtIndexPath:indexPath].frame;
@@ -1026,6 +1063,7 @@
 @property (strong, nonatomic) UIImageView *iCloudIcon;
 @property (strong, nonatomic) CALayer *iCloudMaskLayer;
 @property (strong, nonatomic) HXDownloadProgressView *downloadView;
+    @property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
 
 @implementation HXDatePhotoViewCell
@@ -1041,6 +1079,7 @@
     [self.contentView addSubview:self.imageView];
     [self.contentView addSubview:self.maskView];
     [self.contentView addSubview:self.downloadView];
+    [self.contentView addSubview:self.progressView];
 }
 - (void)bottomViewPrepareAnimation {
     self.maskView.alpha = 0;
@@ -1058,10 +1097,35 @@
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
+    self.progressView.hidden = YES;
+    self.progressView.progress = 0;
+    __weak typeof(self) weakSelf = self;
     if (model.type == HXPhotoModelMediaTypeCamera || model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
-        self.imageView.image = model.thumbPhoto;
+        if (model.networkPhotoUrl) {
+            self.progressView.hidden = model.downloadComplete;
+            CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
+            self.progressView.progress = progress;
+            [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    weakSelf.progressView.progress = progress;
+                }
+            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    if (error != nil) {
+                        [weakSelf.progressView showError];
+                    }else {
+                        if (image) {
+                            weakSelf.progressView.progress = 1;
+                            weakSelf.progressView.hidden = YES;
+                            weakSelf.imageView.image = image;
+                        }
+                    }
+                }
+            }]; 
+        }else {
+            self.imageView.image = model.thumbPhoto;
+        }
     }else {
-        __weak typeof(self) weakSelf = self;
         self.imageView.image = nil;
         PHImageRequestID requestID = [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
             if (weakSelf.model == model) {
@@ -1209,6 +1273,7 @@
     self.iCloudMaskLayer.hidden = !self.model.isICloud;
 }
 - (void)cancelRequest {
+    [self.imageView sd_cancelCurrentAnimationImagesLoad];
     if (self.requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
@@ -1241,6 +1306,7 @@
     self.iCloudIcon.hx_x = self.hx_w - 3 - self.iCloudIcon.hx_w;
     self.iCloudIcon.hx_y = 3;
     self.downloadView.frame = self.bounds;
+    self.progressView.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
 }
 - (void)dealloc {
     self.model.dateCellIsVisible = NO;
@@ -1251,6 +1317,13 @@
         _downloadView = [[HXDownloadProgressView alloc] initWithFrame:self.bounds];
     }
     return _downloadView;
+}
+- (HXCircleProgressView *)progressView {
+    if (!_progressView) {
+        _progressView = [[HXCircleProgressView alloc] init];
+        _progressView.hidden = YES;
+    }
+    return _progressView;
 }
 - (UIImageView *)imageView {
     if (!_imageView) {
@@ -1546,9 +1619,15 @@
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
     self.originalBtn.hidden = self.manager.configuration.hideOriginalBtn;
-    if (manager.type == HXPhotoManagerSelectedTypeVideo) {
+    if (manager.type == HXPhotoManagerSelectedTypePhoto) {
+        self.editBtn.hidden = !manager.configuration.photoCanEdit;
+    }else if (manager.type == HXPhotoManagerSelectedTypeVideo) {
         self.originalBtn.hidden = YES;
-        self.editBtn.hidden = YES;
+        self.editBtn.hidden = !manager.configuration.videoCanEdit;
+    }else {
+        if (!manager.configuration.videoCanEdit && !manager.configuration.photoCanEdit) {
+            self.editBtn.hidden = YES;
+        }
     }
     self.originalBtn.selected = self.manager.original;
     
@@ -1596,13 +1675,32 @@
     
     self.doneBtn.backgroundColor = self.doneBtn.enabled ? self.manager.configuration.themeColor : [self.manager.configuration.themeColor colorWithAlphaComponent:0.5];
     [self changeDoneBtnFrame];
+    
+    if (!self.manager.configuration.selectTogether) {
+        if (self.manager.selectedPhotoArray.count) {
+            self.editBtn.enabled = self.manager.configuration.photoCanEdit;
+        }else if (self.manager.selectedVideoArray.count) {
+            self.editBtn.enabled = self.manager.configuration.videoCanEdit;
+        }else {
+            self.editBtn.enabled = NO;
+        }
+    }else {
+        if (self.manager.selectedArray.count) {
+            HXPhotoModel *model = self.manager.selectedArray.firstObject;
+            if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+                self.editBtn.enabled = self.manager.configuration.photoCanEdit;
+            }else {
+                self.editBtn.enabled = self.manager.configuration.videoCanEdit;
+            }
+        }else {
+            self.editBtn.enabled = NO;
+        }
+    }
     if (self.manager.selectedPhotoArray.count == 0) {
-        self.editBtn.enabled = NO;
         self.originalBtn.enabled = NO;
         self.originalBtn.selected = NO;
         [self.manager setOriginal:NO] ;
-    }else {
-        self.editBtn.enabled = YES;
+    }else { 
         self.originalBtn.enabled = YES;
     }
 }
@@ -1640,7 +1738,11 @@
     self.previewBtn.frame = CGRectMake(12, 0, 50, 50);
     self.previewBtn.center = CGPointMake(self.previewBtn.center.x, 25);
     self.editBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame), 0, 50, 50);
-    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame), 0, 80, 50);
+    if (self.editBtn.hidden) {
+        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame), 0, 80, 50);
+    }else {
+        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame), 0, 80, 50);
+    }
     self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
     self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
     [self changeDoneBtnFrame];

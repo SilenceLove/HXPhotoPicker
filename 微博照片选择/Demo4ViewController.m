@@ -23,7 +23,7 @@
         _manager.configuration.albumListTableView = ^(UITableView *tableView) {
 //            NSSLog(@"%@",tableView);
         };
-        
+        _manager.configuration.singleJumpEdit = YES;
         _manager.configuration.movableCropBox = YES;
         _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
@@ -43,7 +43,45 @@
 }
 - (IBAction)selectedPhoto:(id)sender {
     self.manager.configuration.saveSystemAblum = YES;
-    [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
+    
+    __weak typeof(self) weakSelf = self;
+    [self hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
+        if (photoList.count > 0) {
+//            HXPhotoModel *model = photoList.firstObject;
+//            weakSelf.imageView.image = model.previewPhoto;
+            [weakSelf.view showLoadingHUDText:@"获取图片中"];
+            [weakSelf.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
+                [weakSelf.view handleLoading];
+                weakSelf.imageView.image = imageList.firstObject;
+            } failed:^{
+                [weakSelf.view handleLoading];
+                [weakSelf.view showImageHUDText:@"获取失败"];
+            }];
+            NSSLog(@"%ld张图片",photoList.count);
+        }else if (videoList.count > 0) {
+            [weakSelf.toolManager getSelectedImageList:allList success:^(NSArray<UIImage *> *imageList) {
+                weakSelf.imageView.image = imageList.firstObject;
+            } failed:^{
+                
+            }];
+            
+            // 通个这个方法将视频压缩写入临时目录获取视频URL  或者 通过这个获取视频在手机里的原路径 model.fileURL  可自己压缩
+            [weakSelf.view showLoadingHUDText:@"视频写入中"];
+            [weakSelf.toolManager writeSelectModelListToTempPathWithList:videoList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
+                NSSLog(@"%@",videoURL);
+                [weakSelf.view handleLoading];
+            } failed:^{
+                [weakSelf.view handleLoading];
+                [weakSelf.view showImageHUDText:@"写入失败"];
+                NSSLog(@"写入失败");
+            }];
+            NSSLog(@"%ld个视频",videoList.count);
+        }
+    } cancel:^(HXAlbumListViewController *viewController) {
+        NSSLog(@"取消了");
+    }];
+    
+//    [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
 //    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
 //    vc.delegate = self;
 //    vc.manager = self.manager;

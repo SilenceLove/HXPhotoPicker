@@ -79,8 +79,7 @@
     self.selectedCameraVideos = [NSMutableArray array];
     self.endSelectedCameraList = [NSMutableArray array];
     self.endSelectedCameraPhotos = [NSMutableArray array];
-    self.endSelectedCameraVideos = [NSMutableArray array];
-//    self.networkPhotoUrls = [NSMutableArray array];
+    self.endSelectedCameraVideos = [NSMutableArray array]; 
     self.iCloudUploadArray = [NSMutableArray array];
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
@@ -127,6 +126,20 @@
             [self.endCameraPhotos addObject:photoModel];
             [self.endCameraList addObject:photoModel];
         }
+    }
+}
+- (void)setNetworkPhotoUrls:(NSArray<NSString *> *)networkPhotoUrls {
+    _networkPhotoUrls = networkPhotoUrls;
+    if (![networkPhotoUrls.firstObject isKindOfClass:[NSString class]]) {
+        NSSLog(@"请传入装着NSString对象的数组");
+        return;
+    }
+    self.configuration.deleteTemporaryPhoto = NO;
+    for (NSString *imageUrlStr in networkPhotoUrls) {
+        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImageURL:[NSURL URLWithString:imageUrlStr]];
+        photoModel.selected = NO;
+        [self.endCameraPhotos addObject:photoModel];
+        [self.endCameraList addObject:photoModel];
     }
 }
 - (void)addLocalImage:(NSArray *)images selected:(BOOL)selected {
@@ -1202,6 +1215,58 @@
 - (void)dealloc {
     [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     NSSLog(@"dealloc");
+}
+
+- (void)changeAfterCameraArray:(NSArray *)array {
+    self.endCameraList = array.mutableCopy;
+}
+- (void)changeAfterCameraPhotoArray:(NSArray *)array {
+    self.endCameraPhotos = array.mutableCopy;
+}
+- (void)changeAfterCameraVideoArray:(NSArray *)array {
+    self.endCameraVideos = array.mutableCopy;
+}
+- (void)changeAfterSelectedCameraArray:(NSArray *)array {
+    self.endSelectedCameraList = array.mutableCopy;
+}
+- (void)changeAfterSelectedCameraPhotoArray:(NSArray *)array {
+    self.endSelectedCameraPhotos = array.mutableCopy;
+}
+- (void)changeAfterSelectedCameraVideoArray:(NSArray *)array {
+    self.endSelectedCameraVideos = array.mutableCopy;
+}
+- (void)changeAfterSelectedArray:(NSArray *)array {
+    self.endSelectedList = array.mutableCopy;
+}
+- (void)changeAfterSelectedPhotoArray:(NSArray *)array {
+    self.endSelectedPhotos = array.mutableCopy;
+}
+- (void)changeAfterSelectedVideoArray:(NSArray *)array {
+    self.endSelectedVideos = array.mutableCopy;
+}
+- (void)changeICloudUploadArray:(NSArray *)array {
+    self.iCloudUploadArray = array.mutableCopy;
+}
+- (NSArray *)afterCameraArray {
+    return self.endCameraList;
+}
+- (NSArray *)afterCameraPhotoArray {
+    return self.endCameraPhotos;
+}
+- (NSArray *)afterCameraVideoArray {
+    return self.endCameraVideos;
+}
+- (NSArray *)afterSelectedCameraArray {
+    return self.endSelectedCameraList;
+}
+- (NSArray *)afterSelectedCameraPhotoArray {
+    return self.endSelectedCameraPhotos;
+}
+- (NSArray *)afterSelectedCameraVideoArray {
+    return self.endSelectedCameraVideos;
+}
+- (NSArray *)afterICloudUploadArray {
+    return self.iCloudUploadArray;
 }
 
 @end
