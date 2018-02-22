@@ -41,7 +41,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker', '~> 2.1.4'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXWeiboPhotoPicker', '~> 2.1.5'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 使用前导入头文件 "HXPhotoPicker.h"
@@ -77,6 +77,7 @@
 - v2.1.2　-　添加显示照片地理位置信息、优化细节
 - 2017-11-21　　支持在线下载iCloud上的照片和视频
 - v2.1.4　-　支持更换相机界面、添加属性控制裁剪
+- v2.1.5　-　添加cell上使用示例，支持添加网络图片、优化显示效果
 
 ## <a id="例子"></a> 五.  应用示例 - Examples
 ### <a id="Demo1"></a> Demo1
@@ -88,6 +89,18 @@
     }
     return _manager;
 }
+
+// 一个方法调用
+__weak typeof(self) weakSelf = self;
+[self hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
+    weakSelf.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
+    weakSelf.original.text = original ? @"YES" : @"NO";
+    NSSLog(@"all - %@",allList);
+    NSSLog(@"photo - %@",photoList);
+    NSSLog(@"video - %@",videoList);
+} cancel:^(HXAlbumListViewController *viewController) {
+    NSSLog(@"取消了");
+}];
 
 // 照片选择控制器
 HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
@@ -128,9 +141,6 @@ photoView.backgroundColor = [UIColor whiteColor];
 
 // 删除网络图片的地址
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl;
-
-// 网络图片全部下载完成时调用
-- (void)photoViewAllNetworkingPhotoDownloadComplete:(HXPhotoView *)photoView;
 ```
 ### <a id="Demo3"></a> Demo3
 ```
@@ -138,13 +148,9 @@ photoView.backgroundColor = [UIColor whiteColor];
     if (!_manager) { // 设置一些配置信息
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
         //        _manager.openCamera = NO;
-        _manager.outerCamera = YES;
         _manager.showDeleteNetworkPhotoAlert = NO;
         _manager.saveSystemAblum = YES;
-        _manager.photoMaxNum = 2; // 这里需要注意 !!!  第一次传入的最大照片数 是可选最大数 减去 网络照片数量   即   photoMaxNum = maxNum - networkPhotoUrls.count  当点击删除网络照片时, photoMaxNum 内部会自动加1
-        _manager.videoMaxNum = 0;  // 如果有网络图片且选择类型为HXPhotoManagerSelectedTypePhotoAndVideo 又设置了视频最大数且不为0时,
-//        那么在选择照片列表最大只能选择 photoMaxNum + videoMaxNum
-//        在外面collectionView上最大数是 photoMaxNum + networkPhotoUrls.count + videoMaxNum
+        _manager.photoMaxNum = 6;
         _manager.maxNum = 6;
         // 可以这个赋值也可以像下面那样
 //       _manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/003d86db-b140-4162-aafa-d38056742181.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
@@ -160,9 +166,10 @@ photoView.backgroundColor = [UIColor whiteColor];
 self.photoView = photoView;
     
  // 可以在懒加载中赋值 ,  也可以这样赋值
-self.manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/857980fd0acd3caf9e258e42788e38f5_0.gif",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
-// 设置完网络图片地址数组后重新给manager赋值
-photoView.manager = self.manager;
+NSMutableArray *array = [NSMutableArray arrayWithObjects:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/857980fd0acd3caf9e258e42788e38f5_0.gif",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
+[self.manager addNetworkingImageToAlbum:array selected:YES];
+// 设置完网络图片地址数组后重新刷新视图
+[self.photoView refreshView];
 ```
 ### <a id="Demo4"></a> Demo4
 ```
@@ -172,24 +179,51 @@ photoView.manager = self.manager;
         _manager.openCamera = YES;
         // 在这里设置为单选模式
         _manager.singleSelected = YES;
-        // 设置是否需要裁剪功能
-        _manager.singleSelecteClip = NO;
-        _manager.cameraType = HXPhotoManagerCameraTypeFullScreen;
+        // 单选模式下选择图片时是否直接跳转到编辑界面
+        _manager.configuration.singleJumpEdit = YES;
+        // 是否可移动的裁剪框
+        _manager.configuration.movableCropBox = YES;
+        // 可移动的裁剪框是否可以编辑大小
+        _manager.configuration.movableCropBoxEditSize = YES;
     }
     return _manager;
 }
-HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
-vc.manager = self.manager;
-vc.delegate = self;
-[self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc] animated:YES completion:nil];
-// 代理返回选择的结果
-- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original { 
-    __weak typeof(self) weakSelf = self;
-    // 这里使用HXPhotoTools 里面的方法获取image
-    [HXPhotoTools getImageForSelectedPhoto:photos type:0 completion:^(NSArray<UIImage *> *images) {
-        weakSelf.imageView.image = images.firstObject;
-    }];
-} 
+__weak typeof(self) weakSelf = self;
+[self hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
+    if (photoList.count > 0) {
+//            HXPhotoModel *model = photoList.firstObject;
+//            weakSelf.imageView.image = model.previewPhoto;
+        [weakSelf.view showLoadingHUDText:@"获取图片中"];
+        [weakSelf.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
+            [weakSelf.view handleLoading];
+            weakSelf.imageView.image = imageList.firstObject;
+        } failed:^{
+            [weakSelf.view handleLoading];
+            [weakSelf.view showImageHUDText:@"获取失败"];
+        }];
+        NSSLog(@"%ld张图片",photoList.count);
+    }else if (videoList.count > 0) {
+        [weakSelf.toolManager getSelectedImageList:allList success:^(NSArray<UIImage *> *imageList) {
+            weakSelf.imageView.image = imageList.firstObject;
+        } failed:^{
+
+        }];
+
+        // 通个这个方法将视频压缩写入临时目录获取视频URL  或者 通过这个获取视频在手机里的原路径 model.fileURL  可自己压缩
+        [weakSelf.view showLoadingHUDText:@"视频写入中"];
+        [weakSelf.toolManager writeSelectModelListToTempPathWithList:videoList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
+            NSSLog(@"%@",videoURL);
+            [weakSelf.view handleLoading];
+        } failed:^{
+            [weakSelf.view handleLoading];
+            [weakSelf.view showImageHUDText:@"写入失败"];
+            NSSLog(@"写入失败");
+        }];
+        NSSLog(@"%ld个视频",videoList.count);
+    }
+} cancel:^(HXAlbumListViewController *viewController) {
+    NSSLog(@"取消了");
+}];
 ```
 ### <a id="Demo5"></a> Demo5
 ```
@@ -291,10 +325,44 @@ HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoVie
 photoView.delegate = self;
 photoView.backgroundColor = [UIColor whiteColor];
 // 在这里将本地图片image数组给管理类并且刷新界面
-self.manager.localImageList = images;
+[self.manager addLocalImage:images selected:YES];
 [photoView refreshView];
 [scrollView addSubview:photoView];
 self.photoView = photoView;
+```
+### <a id="Demo8"></a> Demo8
+```
+- (HXDatePhotoToolManager *)toolManager {
+    if (!_toolManager) {
+        _toolManager = [[HXDatePhotoToolManager alloc] init];
+    }
+    return _toolManager;
+}
+[self.view showLoadingHUDText:@"写入中"];
+__weak typeof(self) weakSelf = self;
+HXDatePhotoToolManagerRequestType requestType;
+if (self.original) {
+    requestType = HXDatePhotoToolManagerRequestTypeOriginal;
+}else {
+    requestType = HXDatePhotoToolManagerRequestTypeHD;
+}
+[self.toolManager writeSelectModelListToTempPathWithList:self.selectList requestType:requestType success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
+    NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
+    NSURL *url = photoURL.firstObject;
+    if (url) {
+        UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
+        NSSLog(@"%@",image);
+    }
+            [weakSelf.view handleLoading];
+} failed:^{
+    [weakSelf.view handleLoading];
+    [weakSelf.view showImageHUDText:@"写入失败"];
+    NSSLog(@"写入失败");
+}];
+```
+### <a id="Demo9"></a> Demo9
+```
+距离代码请下载工程查看demo9
 ```
 
 ## <a id="更多"></a> 六.  更多 - More
