@@ -402,9 +402,6 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
         [self.videos removeObject:model];
     }
-    model.thumbPhoto = nil;
-    model.previewPhoto = nil; 
-    model = nil;
     
     UIView *mirrorView = [cell snapshotViewAfterScreenUpdates:NO];
     mirrorView.frame = cell.frame;
@@ -435,6 +432,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             [self.delegate photoView:self changeComplete:array photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
         }
     }
+    if ([self.delegate respondsToSelector:@selector(photoView:currentDeleteModel:currentIndex:)]) {
+        [self.delegate photoView:self currentDeleteModel:model currentIndex:indexPath.item];
+    }
+    model.thumbPhoto = nil;
+    model.previewPhoto = nil;
+    model = nil;
     [self setupNewFrame];
 }
 
