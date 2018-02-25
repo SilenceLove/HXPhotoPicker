@@ -160,7 +160,7 @@ typedef enum : NSUInteger {
  */
 - (void)beforeListAddCameraTakePicturesModel:(HXPhotoModel *)model;
 
-/**  关于选择完成之后的一些方法  **/
+/*--  关于选择完成之后的一些方法  --*/
 /**
  完成之后选择的总数是否达到最大
  */

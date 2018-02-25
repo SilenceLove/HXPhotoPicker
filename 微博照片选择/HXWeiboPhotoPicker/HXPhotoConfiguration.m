@@ -73,7 +73,20 @@
 //    self.videoCanEdit = YES;
     self.singleJumpEdit = YES;
     self.photoCanEdit = YES;
+    
+//    [self preloadImage];
 }
+
+//- (void)preloadImage {
+//    [HXPhotoTools hx_imageNamed:@"icon_yunxiazai@2x.png"];
+//    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"];
+//    [HXPhotoTools hx_imageNamed:@"compose_photo_video@2x.png"];
+//    [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
+//    [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
+//    [HXPhotoTools hx_imageNamed:@"qz_photolist_picture_fail@2x.png"];
+//    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"];
+//    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default111@2x.png"];
+//}
 
 - (void)setClarityScale:(CGFloat)clarityScale {
     if (clarityScale <= 0.f) {
@@ -97,12 +110,14 @@
 - (NSString *)originalNormalImageName {
     if (!_originalNormalImageName) {
         _originalNormalImageName = @"hx_original_normal@2x.png";
+        [HXPhotoTools hx_imageNamed:_originalNormalImageName];
     }
     return _originalNormalImageName;
 }
 - (NSString *)originalSelectedImageName {
     if (!_originalSelectedImageName) {
         _originalSelectedImageName = @"hx_original_selected@2x.png";
+        [HXPhotoTools hx_imageNamed:_originalSelectedImageName];
     }
     return _originalSelectedImageName;
 }

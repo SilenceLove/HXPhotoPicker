@@ -65,7 +65,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     
     UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavOneBtnClick)];
     
-    UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithTitle:@"相册" style:UIBarButtonItemStylePlain target:self action:@selector(didNavTwoBtnClick)];
+    UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithTitle:@"添加" style:UIBarButtonItemStylePlain target:self action:@selector(didNavTwoBtnClick)];
     
     self.navigationItem.rightBarButtonItems = @[item1,item2];
 }
@@ -75,9 +75,15 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)didNavTwoBtnClick {
-    [self.photoView directGoPhotoViewController];
+    if (self.manager.afterSelectPhotoCountIsMaximum) {
+        [self.view showImageHUDText:@"图片已达到最大数"];
+        return;
+    }
+    int x = arc4random() % 4;
+    [self.manager addLocalImage:[NSArray arrayWithObjects:[UIImage imageNamed:@(x).stringValue], nil] selected:YES];
+    [self.photoView refreshView];
 }
-
+ 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
     NSSLog(@"%@",allList);
 }

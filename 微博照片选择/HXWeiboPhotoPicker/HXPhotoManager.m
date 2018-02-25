@@ -14,7 +14,7 @@
 @property (strong, nonatomic) NSMutableArray *allPhotos;
 @property (strong, nonatomic) NSMutableArray *allVideos;
 @property (strong, nonatomic) NSMutableArray *allObjs;
-@property (assign, nonatomic) BOOL hasLivePhoto;
+//@property (assign, nonatomic) BOOL hasLivePhoto;
 //------// 当要删除的已选中的图片或者视频的时候需要在对应的end数组里面删除
 // 例如: 如果删除的是通过相机拍的照片需要在 endCameraList 和 endCameraPhotos 数组删除对应的图片模型
 @property (strong, nonatomic) NSMutableArray *selectedList;
@@ -357,20 +357,18 @@
                     }else {
                         photoModel.type = self.configuration.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
                     }
-                }else {
-                    if (iOS9Later && self.hasLivePhoto) {
-                        if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
-                            if (!self.configuration.singleSelected) {
-                                photoModel.type = self.configuration.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
-                            }else {
-                                photoModel.type = HXPhotoModelMediaTypePhoto;
-                            }
+                }else if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive){
+                    if (iOS9Later) {
+                        if (!self.configuration.singleSelected) {
+                            photoModel.type = self.configuration.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
                         }else {
                             photoModel.type = HXPhotoModelMediaTypePhoto;
                         }
                     }else {
                         photoModel.type = HXPhotoModelMediaTypePhoto;
                     }
+                }else {
+                    photoModel.type = HXPhotoModelMediaTypePhoto;
                 }
 //                if (!photoModel.isICloud) {
                     [photoArray addObject:photoModel];
@@ -504,20 +502,18 @@
                     }else {
                         photoModel.type = self.configuration.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
                     }
-                }else {
-                    if (iOS9Later && self.hasLivePhoto) {
-                        if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
-                            if (!self.configuration.singleSelected) {
-                                photoModel.type = self.configuration.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
-                            }else {
-                                photoModel.type = HXPhotoModelMediaTypePhoto;
-                            }
+                }else if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive){
+                    if (iOS9Later) {
+                        if (!self.configuration.singleSelected) {
+                            photoModel.type = self.configuration.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
                         }else {
                             photoModel.type = HXPhotoModelMediaTypePhoto;
                         }
                     }else {
                         photoModel.type = HXPhotoModelMediaTypePhoto;
                     }
+                }else {
+                    photoModel.type = HXPhotoModelMediaTypePhoto;
                 }
 //                if (!photoModel.isICloud) {
                     [photoArray addObject:photoModel];

@@ -28,9 +28,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
         //        _manager.openCamera = NO;
         _manager.configuration.showDeleteNetworkPhotoAlert = NO;
         _manager.configuration.saveSystemAblum = YES;
-        _manager.configuration.photoMaxNum = 5; //
+        _manager.configuration.photoMaxNum = 9; //
         _manager.configuration.videoMaxNum = 5;  //
-        _manager.configuration.maxNum = 10;
+        _manager.configuration.maxNum = 14;
         
 //        _manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/003d86db-b140-4162-aafa-d38056742181.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
     }
@@ -69,9 +69,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //    self.manager.networkPhotoUrls = ;
     
 //    photoView.manager = self.manager;
+    UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"添加网络" style:UIBarButtonItemStylePlain target:self action:@selector(addNetworkPhoto)];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空缓存" style:UIBarButtonItemStylePlain target:self action:@selector(lookClick)];
+    UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithTitle:@"清空缓存" style:UIBarButtonItemStylePlain target:self action:@selector(lookClick)];
     
+    self.navigationItem.rightBarButtonItems = @[item1,item2];
 }
 
 - (void)lookClick {
@@ -80,6 +82,23 @@ static const CGFloat kPhotoViewMargin = 12.0;
     }];
     [[SDImageCache sharedImageCache] clearMemory];
     return;
+}
+- (void)addNetworkPhoto {
+    if (self.manager.afterSelectPhotoCountIsMaximum) {
+        [self.view showImageHUDText:@"图片已达到最大数"];
+        return;
+    }
+    int x = arc4random() % 4;
+    NSString *url;
+    if (x == 0) {
+        url = @"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg";
+    }else if (x == 1) {
+        url = @"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg";
+    }else {
+        url = @"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg";
+    }
+    [self.manager addNetworkingImageToAlbum:@[url] selected:YES];
+    [self.photoView refreshView];
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
@@ -90,14 +109,16 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //    } failed:^{
 //
 //    }];
-    [self.view showLoadingHUDText:nil];
-    __weak typeof(self) weakSelf = self;
-    [self.toolManager getSelectedImageList:allList success:^(NSArray<UIImage *> *imageList) {
-        [weakSelf.view handleLoading];
-        NSSLog(@"%@",imageList);
-    } failed:^{
-        [weakSelf.view handleLoading];
-    }];
+    
+    
+//    [self.view showLoadingHUDText:nil];
+//    __weak typeof(self) weakSelf = self;
+//    [self.toolManager getSelectedImageList:allList success:^(NSArray<UIImage *> *imageList) {
+//        [weakSelf.view handleLoading];
+//        NSSLog(@"%@",imageList);
+//    } failed:^{
+//        [weakSelf.view handleLoading];
+//    }];
 }
 
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl {
