@@ -42,7 +42,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXWeiboPhotoPicker', '~> 2.1.5'```搜索不到库或最新版请执行```pod repo update```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.1.6'```搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.0.0```
 - 使用前导入头文件 "HXPhotoPicker.h"
