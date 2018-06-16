@@ -87,12 +87,14 @@
 - (void)didDeleteClick {
     if (self.model.networkPhotoUrl) {
         if (self.showDeleteNetworkPhotoAlert) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"是否删除此照片" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"提示"] message:[NSBundle hx_localizedStringForKey:@"是否删除此照片"] delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
             [alert show];
             return;
         }
     }
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     [self.imageView sd_cancelCurrentAnimationImagesLoad];
+#endif
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
         [self.delegate cellDidDeleteClcik:self];
     }

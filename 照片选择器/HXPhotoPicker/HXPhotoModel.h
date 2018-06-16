@@ -10,14 +10,14 @@
 #import <Photos/Photos.h>
 
 typedef enum : NSUInteger {
-    HXPhotoModelMediaTypePhoto = 0,     //!< 照片
-    HXPhotoModelMediaTypeLivePhoto,     //!< LivePhoto
-    HXPhotoModelMediaTypePhotoGif,      //!< gif图
-    HXPhotoModelMediaTypeVideo,         //!< 视频
-    HXPhotoModelMediaTypeAudio,         //!< 预留
-    HXPhotoModelMediaTypeCameraPhoto,   //!< 通过相机拍的照片
-    HXPhotoModelMediaTypeCameraVideo,   //!< 通过相机录制的视频
-    HXPhotoModelMediaTypeCamera         //!< 跳转相机
+    HXPhotoModelMediaTypePhoto          = 0,    //!< 照片
+    HXPhotoModelMediaTypeLivePhoto      = 1,    //!< LivePhoto
+    HXPhotoModelMediaTypePhotoGif       = 2,    //!< gif图
+    HXPhotoModelMediaTypeVideo          = 3,    //!< 视频
+    HXPhotoModelMediaTypeAudio          = 4,    //!< 预留
+    HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的照片 
+    HXPhotoModelMediaTypeCameraVideo    = 6,    //!< 通过相机录制的视频
+    HXPhotoModelMediaTypeCamera         = 7     //!< 跳转相机
 } HXPhotoModelMediaType;
 
 typedef enum : NSUInteger {

@@ -89,7 +89,7 @@ HXDataVideoEditBottomViewDelegate
     [self getVideo];
 }
 - (void)getVideo {
-    [self.view showLoadingHUDText:@"加载中"];
+    [self.view showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
     __weak typeof(self) weakSelf = self;
     self.requestId = [HXPhotoTools getAVAssetWithModel:self.model startRequestIcloud:^(HXPhotoModel *model, PHImageRequestID cloudRequestId) {
         weakSelf.requestId = cloudRequestId;
@@ -231,7 +231,7 @@ UICollectionViewDelegate
     if (!_cancelBtn) {
         _cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _cancelBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-        [_cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [_cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"取消"] forState:UIControlStateNormal];
         [_cancelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         _cancelBtn.titleLabel.font = [UIFont systemFontOfSize:15];
         [_cancelBtn addTarget:self action:@selector(didCancelBtnClick) forControlEvents:UIControlEventTouchUpInside];

@@ -10,7 +10,7 @@
 #import "UIImageView+HXExtension.h"
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
-#else
+#elif __has_include("UIImageView+WebCache.h")
 #import "UIImageView+WebCache.h"
 #endif
 

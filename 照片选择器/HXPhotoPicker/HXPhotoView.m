@@ -147,6 +147,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
+    manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
     if (self.manager.afterSelectedArray.count > 0) {
         [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
     }

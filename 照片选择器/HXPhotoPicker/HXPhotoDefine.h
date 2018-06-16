@@ -31,5 +31,6 @@
 #define iOS9_Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
 
 #define iOS8_2Later ([UIDevice currentDevice].systemVersion.floatValue >= 8.2f)
+ 
 
 #endif /* HXPhotoDefine_h */

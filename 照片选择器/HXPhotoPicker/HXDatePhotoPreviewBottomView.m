@@ -87,20 +87,20 @@
 - (void)setSelectCount:(NSInteger)selectCount {
     _selectCount = selectCount;
     if (selectCount <= 0) {
-        [self.doneBtn setTitle:@"完成" forState:UIControlStateNormal];
+        [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
     }else {
         if (self.manager.configuration.doneBtnShowDetail) {
             if (!self.manager.configuration.selectTogether) {
                 if (self.manager.selectedPhotoCount > 0) {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
                 }else {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
                 }
             }else {
-                [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
+                [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
             }
         }else {
-            [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld)",selectCount] forState:UIControlStateNormal];
+            [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount] forState:UIControlStateNormal];
         }
     }
     [self changeDoneBtnFrame];
@@ -219,7 +219,7 @@
 - (UILabel *)tipLb {
     if (!_tipLb) {
         _tipLb = [[UILabel alloc] init];
-        _tipLb.text = @"选择照片时不能选择视频";
+        _tipLb.text = [NSBundle hx_localizedStringForKey:@"选择照片时不能选择视频"];
         _tipLb.textColor = self.manager.configuration.themeColor;
         _tipLb.font = [UIFont systemFontOfSize:14];
     }
@@ -253,7 +253,7 @@
 - (UIButton *)doneBtn {
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_doneBtn setTitle:@"完成" forState:UIControlStateNormal];
+        [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
         if ([self.manager.configuration.themeColor isEqual:[UIColor whiteColor]]) {
             [_doneBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
             [_doneBtn setTitleColor:[[UIColor blackColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
@@ -275,7 +275,7 @@
 - (UIButton *)editBtn {
     if (!_editBtn) {
         _editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_editBtn setTitle:@"编辑" forState:UIControlStateNormal];
+        [_editBtn setTitle:[NSBundle hx_localizedStringForKey:@"编辑"] forState:UIControlStateNormal];
         [_editBtn setTitleColor:self.manager.configuration.themeColor forState:UIControlStateNormal];
         [_editBtn setTitleColor:[self.manager.configuration.themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _editBtn.titleLabel.font = [UIFont systemFontOfSize:16];

@@ -2,7 +2,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "HXPhotoPicker"
-  s.version      = "2.1.6"
+  s.version      = "2.1.7"
   s.summary      = "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义裁剪照片、3DTouch预览、浏览网络图片 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function"
   s.homepage     = "https://github.com/SilenceLove/HXPhotoPicker"
   s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -13,6 +13,6 @@ Pod::Spec.new do |s|
   s.resources    = "照片选择器/HXPhotoPicker/*.{png,xib,nib,bundle}"
   s.framework    = "UIKit"
   s.requires_arc = true
-  s.dependency "SDWebImage", "~> 4.0"
+  s.dependency "SDWebImage", "~> 4.4.1"
 
 end

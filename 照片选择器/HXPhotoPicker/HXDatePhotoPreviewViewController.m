@@ -312,7 +312,7 @@ HXDateVideoEditViewControllerDelegate
         HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
         [cell cancelRequest];
         [cell requestHDImage];
-        [self.view showImageHUDText:@"正在下载iCloud上的资源"];
+        [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"正在下载iCloud上的资源"]];
         return;
     }
     if (button.selected) {
@@ -571,16 +571,18 @@ HXDateVideoEditViewControllerDelegate
                 [weakSelf datePhotoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
-            HXDateVideoEditViewController *vc = [[HXDateVideoEditViewController alloc] init];
-            vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
-            vc.delegate = self;
-            vc.manager = self.manager;
-            if (self.outside) {
-                vc.outside = YES;
-                [self presentViewController:vc animated:NO completion:nil];
-            }else {
-                [self.navigationController pushViewController:vc animated:NO];
-            }
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"要使用视频编辑功能，请先替换视频编辑界面" message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"好的", nil];
+            [alert show];
+//            HXDateVideoEditViewController *vc = [[HXDateVideoEditViewController alloc] init];
+//            vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
+//            vc.delegate = self;
+//            vc.manager = self.manager;
+//            if (self.outside) {
+//                vc.outside = YES;
+//                [self presentViewController:vc animated:NO completion:nil];
+//            }else {
+//                [self.navigationController pushViewController:vc animated:NO];
+//            }
         }
     }
 }
@@ -590,7 +592,7 @@ HXDateVideoEditViewControllerDelegate
         return;
     }
     if (self.modelArray.count == 0) {
-        [self.view showImageHUDText:@"没有照片可选!"];
+        [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"没有照片可选!"]];
         return;
     }
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];

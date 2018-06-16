@@ -272,4 +272,6 @@ typedef enum : NSUInteger {
 - (NSArray *)afterSelectedCameraPhotoArray;
 - (NSArray *)afterSelectedCameraVideoArray;
 - (NSArray *)afterICloudUploadArray;
+
+- (NSString *)version;
 @end

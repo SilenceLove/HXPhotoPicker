@@ -8,7 +8,9 @@
 
 #import "Demo3ViewController.h"
 #import "HXPhotoPicker.h"
+#if SDWebImageEmbed
 #import "SDWebImageManager.h"
+#endif
 static const CGFloat kPhotoViewMargin = 12.0;
 
 @interface Demo3ViewController ()<HXPhotoViewDelegate>
@@ -77,10 +79,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)lookClick {
+#if SDWebImageEmbed
     [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
         
     }];
     [[SDImageCache sharedImageCache] clearMemory];
+#endif
     return;
 }
 - (void)addNetworkPhoto {

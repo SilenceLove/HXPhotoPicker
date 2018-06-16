@@ -25,7 +25,7 @@
 
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
-#else
+#elif __has_include("UIImageView+WebCache.h")
 #import "UIImageView+WebCache.h"
 #endif
 
@@ -154,7 +154,7 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)setupUI {
     self.currentSectionIndex = 0;
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStyleDone target:self action:@selector(didCancelClick)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(didCancelClick)];
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.collectionView];
     if (!self.manager.configuration.singleSelected) {
@@ -406,10 +406,12 @@ HXDatePhotoEditViewControllerDelegate
         }
         return cell;
     }else {
-        if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle && !self.manager.videoCanSelected && model.subType == HXPhotoModelMediaSubTypeVideo) {
-            model.videoUnableSelect = YES;
-        }else {
-            model.videoUnableSelect = NO;
+        if (self.manager.configuration.specialModeNeedHideVideoSelectBtn) {
+            if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle && !self.manager.videoCanSelected && model.subType == HXPhotoModelMediaSubTypeVideo) {
+                model.videoUnableSelect = YES;
+            }else {
+                model.videoUnableSelect = NO;
+            }
         }
         HXDatePhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DateCellId" forIndexPath:indexPath];
         cell.delegate = self;
@@ -1333,7 +1335,7 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)downloadError:(NSDictionary *)info {
     if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
-        [[self viewController].view showImageHUDText:@"下载失败，请重试！"];
+        [[self viewController].view showImageHUDText:[NSBundle hx_localizedStringForKey:@"下载失败，请重试！"]];
     }
     self.downloadView.hidden = YES;
     [self.downloadView resetState];
@@ -1341,7 +1343,9 @@ HXDatePhotoEditViewControllerDelegate
     self.iCloudMaskLayer.hidden = !self.model.isICloud;
 }
 - (void)cancelRequest {
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     [self.imageView sd_cancelCurrentAnimationImagesLoad];
+#endif
     if (self.requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
@@ -1649,11 +1653,37 @@ HXDatePhotoEditViewControllerDelegate
 - (void)setVideoCount:(NSInteger)videoCount {
     _videoCount = videoCount;
     if (self.photoCount > 0 && videoCount > 0) {
-        self.titleLb.text = [NSString stringWithFormat:@"%ld 张照片、%ld 个视频",self.photoCount,videoCount];
+        NSString *photoStr;
+        if (self.photoCount > 1) {
+            photoStr = @"Photos";
+        }else {
+            photoStr = @"Photo";
+        }
+        NSString *videoStr;
+        if (videoCount > 1) {
+            videoStr = @"Videos";
+        }else {
+            videoStr = @"Video";
+        }
+        self.titleLb.text = [NSString stringWithFormat:@"%ld %@、%ld %@",self.photoCount,[NSBundle hx_localizedStringForKey:photoStr],videoCount,[NSBundle hx_localizedStringForKey:videoStr]];
+        
     }else if (self.photoCount > 0) {
-        self.titleLb.text = [NSString stringWithFormat:@"%ld 张照片",self.photoCount];
+        NSString *photoStr;
+        if (self.photoCount > 1) {
+            photoStr = @"Photos";
+        }else {
+            photoStr = @"Photo";
+        }
+        self.titleLb.text = [NSString stringWithFormat:@"%ld %@",self.photoCount,[NSBundle hx_localizedStringForKey:photoStr]];
     }else {
-        self.titleLb.text = [NSString stringWithFormat:@"%ld 个视频",videoCount];
+        NSString *videoStr;
+        if (videoCount > 1) {
+            videoStr = @"Videos";
+        }else {
+            videoStr = @"Video";
+        }
+        self.titleLb.text = [NSString stringWithFormat:@"%ld %@",videoCount,
+                             [NSBundle hx_localizedStringForKey:videoStr]];
     }
 }
 - (void)layoutSubviews {
@@ -1731,22 +1761,22 @@ HXDatePhotoEditViewControllerDelegate
     if (selectCount <= 0) {
         self.previewBtn.enabled = NO;
         self.doneBtn.enabled = NO;
-        [self.doneBtn setTitle:@"完成" forState:UIControlStateNormal];
+        [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
     }else {
         self.previewBtn.enabled = YES;
         self.doneBtn.enabled = YES;
         if (self.manager.configuration.doneBtnShowDetail) {
             if (!self.manager.configuration.selectTogether) {
                 if (self.manager.selectedPhotoCount > 0) {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
                 }else {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
                 }
             }else {
-                [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld/%ld)",selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
+                [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
             }
         }else {
-            [self.doneBtn setTitle:[NSString stringWithFormat:@"完成(%ld)",selectCount] forState:UIControlStateNormal];
+            [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount] forState:UIControlStateNormal];
         }
     }
     
@@ -1812,13 +1842,15 @@ HXDatePhotoEditViewControllerDelegate
     [super layoutSubviews];
     
     self.bgView.frame = self.bounds;
-    self.previewBtn.frame = CGRectMake(12, 0, 50, 50);
+    self.previewBtn.frame = CGRectMake(12, 0, [HXPhotoTools getTextWidth:self.previewBtn.currentTitle height:50 fontSize:16], 50);
     self.previewBtn.center = CGPointMake(self.previewBtn.center.x, 25);
-    self.editBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame), 0, 50, 50);
+    self.editBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, [HXPhotoTools getTextWidth:self.editBtn.currentTitle height:50 fontSize:16], 50);
     if (self.editBtn.hidden) {
-        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame), 0, 80, 50);
+        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, 80, 50);
     }else {
-        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame), 0, 80, 50);
+        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame) + 10, 0, [HXPhotoTools getTextWidth:self.originalBtn.currentTitle height:50 fontSize:16] + 20, 50);
+        self.originalBtn.imageEdgeInsets = UIEdgeInsetsMake(0, [HXPhotoTools getTextWidth:self.originalBtn.currentTitle height:50 fontSize:16] , 0, 0);
+//        self.originalBtn.titleEdgeInsets = UIEdgeInsetsMake(0, -15, 0, 0);
     }
     self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
     self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
@@ -1833,7 +1865,7 @@ HXDatePhotoEditViewControllerDelegate
 - (UIButton *)previewBtn {
     if (!_previewBtn) {
         _previewBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_previewBtn setTitle:@"预览" forState:UIControlStateNormal];
+        [_previewBtn setTitle:[NSBundle hx_localizedStringForKey:@"预览"] forState:UIControlStateNormal];
         _previewBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         _previewBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
         [_previewBtn addTarget:self action:@selector(didPreviewClick) forControlEvents:UIControlEventTouchUpInside];
@@ -1844,7 +1876,7 @@ HXDatePhotoEditViewControllerDelegate
 - (UIButton *)doneBtn {
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_doneBtn setTitle:@"完成" forState:UIControlStateNormal];
+        [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
         [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         //        _doneBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
@@ -1858,7 +1890,7 @@ HXDatePhotoEditViewControllerDelegate
 - (UIButton *)originalBtn {
     if (!_originalBtn) {
         _originalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_originalBtn setTitle:@"原图" forState:UIControlStateNormal];
+        [_originalBtn setTitle:[NSBundle hx_localizedStringForKey:@"原图"] forState:UIControlStateNormal];
         [_originalBtn addTarget:self action:@selector(didOriginalClick:) forControlEvents:UIControlEventTouchUpInside];
         _originalBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         _originalBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 35, 0, 0);
@@ -1871,7 +1903,7 @@ HXDatePhotoEditViewControllerDelegate
 - (UIButton *)editBtn {
     if (!_editBtn) {
         _editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_editBtn setTitle:@"编辑" forState:UIControlStateNormal];
+        [_editBtn setTitle:[NSBundle hx_localizedStringForKey:@"编辑"] forState:UIControlStateNormal];
         _editBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         _editBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
         [_editBtn addTarget:self action:@selector(didEditBtnClick) forControlEvents:UIControlEventTouchUpInside];

@@ -684,10 +684,10 @@
 - (void)didSelectRatioBtnClick {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
-    [alertController addAction:[UIAlertAction actionWithTitle:@"原始值" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"原始值"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self setupRatioWithValue1:0 value2:0];
     }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"正方形" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"正方形"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self setupRatioWithValue1:1 value2:1];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"2:3" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -700,7 +700,7 @@
         [self setupRatioWithValue1:9 value2:16];
     }]];
     
-    [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleCancel handler:nil]];
     
     [self.viewController presentViewController:alertController animated:YES completion:nil];
 }
@@ -764,14 +764,14 @@
     if (!_restoreBtn) {
         _restoreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_restoreBtn setImage:[HXPhotoTools hx_imageNamed:@"paizhao_bianji_huanyuan@2x.png"] forState:UIControlStateNormal];
-        [_restoreBtn setTitle:@"还原" forState:UIControlStateNormal];
+        [_restoreBtn setTitle:[NSBundle hx_localizedStringForKey:@"还原"] forState:UIControlStateNormal];
         [_restoreBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_restoreBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _restoreBtn.enabled = NO;
         _restoreBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         _restoreBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 0);
         [_restoreBtn addTarget:self action:@selector(didRestoreBtnClick) forControlEvents:UIControlEventTouchUpInside];
-        _restoreBtn.hx_size = CGSizeMake(60, 60);
+        _restoreBtn.hx_size = CGSizeMake(100, 60);
     }
     return _restoreBtn;
 }
@@ -780,19 +780,19 @@
         _rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_rotateBtn setImage:[HXPhotoTools hx_imageNamed:@"paizhao_bianji_xuanzhuan@2x.png"] forState:UIControlStateNormal];
-        [_rotateBtn setTitle:@"旋转" forState:UIControlStateNormal];
+        [_rotateBtn setTitle:[NSBundle hx_localizedStringForKey:@"旋转"] forState:UIControlStateNormal];
         [_rotateBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         _rotateBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         _rotateBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 0);
         [_rotateBtn addTarget:self action:@selector(didRotateBtnClick) forControlEvents:UIControlEventTouchUpInside];
-        _rotateBtn.hx_size = CGSizeMake(60, 60);
+        _rotateBtn.hx_size = CGSizeMake(100, 60);
     }
     return _rotateBtn;
 }
 - (UIButton *)cancelBtn {
     if (!_cancelBtn) {
         _cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [_cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"取消"] forState:UIControlStateNormal];
         [_cancelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         _cancelBtn.titleLabel.font = [UIFont systemFontOfSize:15];
         _cancelBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
@@ -804,9 +804,9 @@
     if (!_clipBtn) {
         _clipBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         if (self.manager.configuration.singleSelected) {
-            [_clipBtn setTitle:@"选择" forState:UIControlStateNormal];
+            [_clipBtn setTitle:[NSBundle hx_localizedStringForKey:@"选择"] forState:UIControlStateNormal];
         }else {
-            [_clipBtn setTitle:@"裁剪" forState:UIControlStateNormal];
+            [_clipBtn setTitle:[NSBundle hx_localizedStringForKey:@"裁剪"] forState:UIControlStateNormal];
             if (!self.manager.configuration.movableCropBox) {
                 _clipBtn.enabled = NO;
             }else {

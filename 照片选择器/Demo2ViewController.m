@@ -34,8 +34,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.configuration.openCamera = YES;
         _manager.configuration.lookLivePhoto = YES;
-        _manager.configuration.photoMaxNum = 4;
-        _manager.configuration.videoMaxNum = 6;
+        _manager.configuration.photoMaxNum = 9;
+        _manager.configuration.videoMaxNum = 1;
         _manager.configuration.maxNum = 10;
         _manager.configuration.videoMaxDuration = 500.f;
         _manager.configuration.saveSystemAblum = NO;
@@ -131,6 +131,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"相册/相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
 }
 - (void)didNavBtnClick {
+    if (self.manager.configuration.specialModeNeedHideVideoSelectBtn && !self.manager.configuration.selectTogether && self.manager.configuration.videoMaxNum == 1) {
+        if (self.manager.afterSelectedVideoArray.count) {
+            [self.view showImageHUDText:@"请先删除视频"];
+            return;
+        }
+    }
     [self.photoView goPhotoViewController];
 }
 
@@ -138,6 +144,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
     NSSLog(@"所有:%@ - 照片:%@ - 视频:%@",allList,photos,videos);
     
+    // 获取图片
     [self.toolManager getSelectedImageList:allList requestType:HXDatePhotoToolManagerRequestTypeOriginal success:^(NSArray<UIImage *> *imageList) {
         
     } failed:^{

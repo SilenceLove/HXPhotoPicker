@@ -240,15 +240,29 @@
 - (NSString *)barTitle {
     if (!_barTitle) {
         if ([self.creationDate isToday]) {
-            _barTitle = @"今天";
+            _barTitle = [NSBundle hx_localizedStringForKey:@"今天"];
         }else if ([self.creationDate isYesterday]) {
-            _barTitle = @"昨天";
+            _barTitle = [NSBundle hx_localizedStringForKey:@"昨天"];
         }else if ([self.creationDate isSameWeek]) {
             _barTitle = [self.creationDate getNowWeekday];
         }else if ([self.creationDate isThisYear]) {
-            _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM月dd日"],[self.creationDate getNowWeekday]];
+            NSString *language = [NSLocale preferredLanguages].firstObject;
+            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+                // 中文
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM月dd日"],[self.creationDate getNowWeekday]];
+            } else {
+                // 英文
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MMM dd"],[self.creationDate getNowWeekday]];
+            }
         }else {
-            _barTitle = [self.creationDate dateStringWithFormat:@"yyyy年MM月dd日"];
+            NSString *language = [NSLocale preferredLanguages].firstObject;
+            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+                // 中文
+                _barTitle = [self.creationDate dateStringWithFormat:@"yyyy年MM月dd日"];
+            } else {
+                // 英文
+                _barTitle = [self.creationDate dateStringWithFormat:@"MMM dd, yyyy"];
+            }
         }
     }
     return _barTitle;
@@ -274,15 +288,29 @@
     if (!_dateString) {
         
         if ([self.date isToday]) {
-            _dateString = @"今天";
+            _dateString = [NSBundle hx_localizedStringForKey:@"今天"];
         }else if ([self.date isYesterday]) {
-            _dateString = @"昨天";
+            _dateString = [NSBundle hx_localizedStringForKey:@"昨天"];
         }else if ([self.date isSameWeek]) {
             _dateString = [self.date getNowWeekday];
         }else if ([self.date isThisYear]) {
-            _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM月dd日"],[self.date getNowWeekday]];
+            NSString *language = [NSLocale preferredLanguages].firstObject;
+            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+                // 中文
+                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM月dd日"],[self.date getNowWeekday]];
+            } else {
+                // 英文
+                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MMM dd"],[self.date getNowWeekday]];
+            }
         }else {
-            _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
+            NSString *language = [NSLocale preferredLanguages].firstObject;
+            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+                // 中文
+                _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
+            } else {
+                // 英文
+                _dateString = [self.date dateStringWithFormat:@"MMMM dd, yyyy"];
+            }
         }
     }
     return _dateString;

@@ -10,7 +10,7 @@
 #import "UIImage+HXExtension.h"
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
-#else
+#elif __has_include("UIImageView+WebCache.h")
 #import "UIImageView+WebCache.h"
 #endif
 
@@ -521,6 +521,7 @@
         if (model.networkPhotoUrl) {
             __weak typeof(self) weakSelf = self;
             if (model.downloadError) {
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -537,9 +538,11 @@
                     }
                 }];
                 [self.downloadTokenArray addObject:token];
+#endif
                 return;
             }
             if (!model.downloadComplete) {
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -556,6 +559,7 @@
                     }
                 }];
                 [self.downloadTokenArray addObject:token];
+#endif
                 return;
             }
             [self.imageArray addObject:model.thumbPhoto];
@@ -570,9 +574,11 @@
 }
 - (void)cancelGetImageList {
     self.cancelGetImage = YES;
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     for (SDWebImageDownloadToken *token in self.downloadTokenArray) {
-        [[SDWebImageDownloader sharedDownloader] cancel:token]; 
+        [[SDWebImageDownloader sharedDownloader] cancel:token];
     }
+#endif
     [self.downloadTokenArray removeAllObjects];
     if (self.currentImageRequestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.currentImageRequestID];

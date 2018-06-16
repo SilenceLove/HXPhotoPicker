@@ -763,9 +763,11 @@
     return nil;
 }
 #pragma mark - < 改变模型的视频状态 >
-- (void)changeModelVideoState:(HXPhotoModel *)model { 
-    if (self.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle && model.subType == HXPhotoModelMediaSubTypeVideo) {
-        model.needHideSelectBtn = YES;
+- (void)changeModelVideoState:(HXPhotoModel *)model {
+    if (self.configuration.specialModeNeedHideVideoSelectBtn) {
+        if (self.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle && model.subType == HXPhotoModelMediaSubTypeVideo) {
+            model.needHideSelectBtn = YES;
+        }
     }
     if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         if (model.type == HXPhotoModelMediaTypeVideo) {
@@ -1346,5 +1348,7 @@
 - (NSArray *)afterICloudUploadArray {
     return self.iCloudUploadArray;
 }
-
+- (NSString *)version {
+    return @"2.1.7";
+}
 @end

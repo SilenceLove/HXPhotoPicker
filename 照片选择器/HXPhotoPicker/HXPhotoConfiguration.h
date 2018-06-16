@@ -28,6 +28,8 @@ typedef enum : NSUInteger {
 
 @interface HXPhotoConfiguration : NSObject
 
+@property (assign, nonatomic) BOOL specialModeNeedHideVideoSelectBtn;
+
 /**
  在照片列表选择照片完后点击完成时是否请求图片
  选中了原图则是原图，没选中则是高清图

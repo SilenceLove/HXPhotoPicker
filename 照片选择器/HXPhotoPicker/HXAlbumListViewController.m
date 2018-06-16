@@ -149,9 +149,9 @@ UITableViewDelegate
         }
     }
     
-    self.title = @"相册";
+    self.title = [NSBundle hx_localizedStringForKey:@"相册"];
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStyleDone target:self action:@selector(cancelClick)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(cancelClick)];
     if (self.manager.configuration.singleSelected) {
         [self.view addSubview:self.tableView];
     }else {
@@ -192,6 +192,14 @@ UITableViewDelegate
         }
         [self.toolManager getSelectedImageList:allList requestType:requestType success:^(NSArray<UIImage *> *imageList) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
+            int i = 0;
+            for (HXPhotoModel *subModel in strongSelf.manager.afterSelectedArray) {
+                if (i < imageList.count) {
+                    subModel.thumbPhoto = imageList[i];
+                    subModel.previewPhoto = imageList[i];
+                }
+                i++;
+            }
             if ([strongSelf.delegate respondsToSelector:@selector(albumListViewController:didDoneAllImage:)]) {
                 [strongSelf.delegate albumListViewController:weakSelf didDoneAllImage:imageList];
             }

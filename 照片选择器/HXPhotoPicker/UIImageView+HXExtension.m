@@ -12,12 +12,13 @@
 
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
-#else
+#elif __has_include("UIImageView+WebCache.h")
 #import "UIImageView+WebCache.h"
 #endif
 
 @implementation UIImageView (HXExtension)
 - (void)hx_setImageWithModel:(HXPhotoModel *)model progress:(void (^)(CGFloat progress, HXPhotoModel *model))progressBlock completed:(void (^)(UIImage * image, NSError * error, HXPhotoModel * model))completedBlock {
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     __weak typeof(self) weakSelf = self;
     [self sd_setImageWithURL:model.networkPhotoUrl placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
         model.receivedSize = receivedSize;
@@ -46,5 +47,8 @@
             completedBlock(image,error,model);
         }
     }];
+#else
+    NSAssert(NO, @"请导入SDWebImage后再使用网络图片功能");
+#endif
 }
 @end
