@@ -75,5 +75,7 @@
 /**  删除某个模型  */
 - (void)deleteModelWithIndex:(NSInteger)index;
 /**  刷新view  */
-- (void)refreshView; 
+- (void)refreshView;
+/**  是否显示添加的cell  */
+- (void)showAddCell:(BOOL)isShow;
 @end

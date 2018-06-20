@@ -37,6 +37,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 @property (strong, nonatomic) UIImage *tempCameraImage;
 @property (strong, nonatomic) UIImagePickerController* imagePickerController;
 @property (strong, nonatomic) HXPhotoSubViewCell *addCell;
+@property (assign, nonatomic) BOOL tempShowAddCell;
 @end
 
 @implementation HXPhotoView
@@ -157,7 +158,14 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     _hideDeleteButton = hideDeleteButton;
     [self.collectionView reloadData];
 }
-
+- (void)showAddCell:(BOOL)isShow {
+    self.showAddCell = isShow;
+    [self.collectionView reloadData];
+}
+- (void)setShowAddCell:(BOOL)showAddCell {
+    _showAddCell = showAddCell;
+    self.tempShowAddCell = showAddCell;
+}
 /**
  刷新视图
  */
@@ -174,11 +182,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     return fileName;
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.showAddCell ? self.dataList.count + 1 : self.dataList.count;
+    return self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.showAddCell) {
+    if (self.tempShowAddCell) {
         if (indexPath.item == self.dataList.count) {
             return self.addCell;
         }
@@ -192,7 +200,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.showAddCell) {
+    if (self.tempShowAddCell) {
         if (indexPath.item == self.dataList.count) {
             [self goPhotoViewController];
             return;
@@ -439,10 +447,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     [self.dataList removeObjectAtIndex:indexPath.item];
     [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
     [self changeSelectedListModelIndex];
-    
-    if (!self.showAddCell) {
-        self.showAddCell = YES;
-        [self.collectionView reloadData];
+    if (self.showAddCell) {
+        if (!self.tempShowAddCell) {
+            self.tempShowAddCell = YES;
+            [self.collectionView reloadData];
+        }
     }
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
         [self.delegate photoView:self changeComplete:self.dataList photos:self.photos videos:self.videos original:self.original];
@@ -485,22 +494,24 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     self.videos = [NSMutableArray arrayWithArray:videos];
     [self.dataList removeAllObjects];
     [self.dataList addObjectsFromArray:allList];
-    self.showAddCell = YES;
-    if (self.manager.configuration.selectTogether) {
-        if (self.manager.configuration.maxNum == allList.count) {
-            self.showAddCell = NO;
-        }
-    }else {
-        if (photos.count > 0) {
-            if (photos.count == self.manager.configuration.photoMaxNum) {
-                if (self.manager.configuration.photoMaxNum > 0) {
-                    self.showAddCell = NO;
-                }
+    if (self.showAddCell) {
+        self.tempShowAddCell = YES;
+        if (self.manager.configuration.selectTogether) {
+            if (self.manager.configuration.maxNum == allList.count) {
+                self.tempShowAddCell = NO;
             }
-        }else if (videos.count > 0) {
-            if (videos.count == self.manager.configuration.videoMaxNum) {
-                if (self.manager.configuration.videoMaxNum > 0) {
-                    self.showAddCell = NO;
+        }else {
+            if (photos.count > 0) {
+                if (photos.count == self.manager.configuration.photoMaxNum) {
+                    if (self.manager.configuration.photoMaxNum > 0) {
+                        self.tempShowAddCell = NO;
+                    }
+                }
+            }else if (videos.count > 0) {
+                if (videos.count == self.manager.configuration.videoMaxNum) {
+                    if (self.manager.configuration.videoMaxNum > 0) {
+                        self.tempShowAddCell = NO;
+                    }
                 }
             }
         }
@@ -589,7 +600,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
     }
     
-    NSInteger dataCount = self.showAddCell ? self.dataList.count + 1 : self.dataList.count;
+    NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
     NSInteger numOfLinesNew = 0;
     if (self.lineCount != 0) {
         numOfLinesNew = (dataCount / self.lineCount) + 1;
@@ -618,7 +629,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    NSInteger dataCount = self.showAddCell ? self.dataList.count + 1 : self.dataList.count;
+    NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
     NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
     
     [self setupNewFrame];

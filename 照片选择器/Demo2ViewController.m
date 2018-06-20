@@ -124,6 +124,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.delegate = self;
     photoView.outerCamera = YES;
 //    photoView.hideDeleteButton = YES;
+    photoView.showAddCell = YES;
+    [photoView.collectionView reloadData];
     photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];
     self.photoView = photoView; 
