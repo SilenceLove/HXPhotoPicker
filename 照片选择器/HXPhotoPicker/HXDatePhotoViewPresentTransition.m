@@ -129,6 +129,19 @@
 - (void)dismissAnimation:(id<UIViewControllerContextTransitioning>)transitionContext {
     HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    if (!fromVC.modelArray.count) {
+        UIView *containerView = [transitionContext containerView];
+        UIView *tempView = [fromVC.view snapshotViewAfterScreenUpdates:YES];
+        [containerView addSubview:tempView];
+        [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            tempView.alpha = 0;
+            tempView.transform = CGAffineTransformMakeScale(0.7, 0.7);
+        } completion:^(BOOL finished) {
+            [tempView removeFromSuperview];
+            [transitionContext completeTransition:YES];
+        }];
+        return;
+    }
     HXPhotoModel *model = [fromVC.modelArray objectAtIndex:fromVC.currentModelIndex];
     HXDatePhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     UIImageView *tempView;

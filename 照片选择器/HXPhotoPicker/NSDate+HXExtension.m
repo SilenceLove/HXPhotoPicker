@@ -82,15 +82,28 @@
 - (NSString *)getNowWeekday {
     NSDateFormatter *dateday = [[NSDateFormatter alloc] init];
     NSString *language = [NSLocale preferredLanguages].firstObject;
-    if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+    
+    if ([language hasPrefix:@"en"]) {
+        // 英文
+        [dateday setDateFormat:@"MMM dd"];
+        [dateday setDateFormat:@"EEE"];
+    } else if ([language hasPrefix:@"zh"]) {
         // 中文
+        [dateday setDateFormat:@"MM月dd日"];
+        [dateday setDateFormat:@"EEEE"];
+    }else if ([language hasPrefix:@"ko"]) {
+        // 韩语
+        [dateday setDateFormat:@"MM월dd일"];
+        [dateday setDateFormat:@"EEEE"];
+    }else if ([language hasPrefix:@"ja"]) {
+        // 日语
         [dateday setDateFormat:@"MM月dd日"];
         [dateday setDateFormat:@"EEEE"];
     } else {
         // 英文
         [dateday setDateFormat:@"MMM dd"];
         [dateday setDateFormat:@"EEE"];
-    }
+    } 
     return [dateday stringFromDate:self];
 }
 

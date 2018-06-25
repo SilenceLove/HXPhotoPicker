@@ -31,6 +31,36 @@
 #define iOS9_Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
 
 #define iOS8_2Later ([UIDevice currentDevice].systemVersion.floatValue >= 8.2f)
- 
+
+// 弱引用
+#define HXWeakSelf __weak typeof(self) weakSelf = self;
+
+CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
+                                          NSString *title,
+                                          NSString *message,
+                                          NSString *buttonTitle1,
+                                          NSString *buttonTitle2,
+                                          dispatch_block_t buttonTitle1Handler,
+                                          dispatch_block_t buttonTitle2Handler) {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                             message:message
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:buttonTitle1
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction * _Nonnull action) {
+                                                             if (buttonTitle1Handler) buttonTitle1Handler();
+                                                         }];
+    [alertController addAction:cancelAction];
+    
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:buttonTitle2
+                                                       style:UIAlertActionStyleDefault
+                                                     handler:^(UIAlertAction * _Nonnull action) {
+                                                         if (buttonTitle2Handler) buttonTitle2Handler();
+                                                     }];
+    [alertController addAction:okAction];
+    
+    [vc presentViewController:alertController animated:YES completion:nil];
+    return alertController;
+}
 
 #endif /* HXPhotoDefine_h */

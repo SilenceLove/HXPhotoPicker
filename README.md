@@ -42,8 +42,8 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.1.7'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
-- 手动导入：将项目中的“HXWeiboPhotoPicker”文件夹拖入项目中
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.1.8'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.4.1```
 - 使用前导入头文件 "HXPhotoPicker.h"
 
@@ -79,7 +79,8 @@
 - 2017-11-21　　支持在线下载iCloud上的照片和视频
 - v2.1.4　-　支持更换相机界面、添加属性控制裁剪
 - v2.1.5　-　添加cell上使用示例，支持添加网络图片、优化显示效果
-- v2.1.7    -   完善支持英文、优化一些功能
+- v2.1.7　-　完善支持英文、优化一些功能 
+- v2.1.8　-　添加支持繁体字、韩文、日文，以及一些功能优化
 
 ## <a id="例子"></a> 五.  应用示例 - Examples
 ### <a id="Demo1"></a> Demo1

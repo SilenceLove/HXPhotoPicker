@@ -158,13 +158,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     _hideDeleteButton = hideDeleteButton;
     [self.collectionView reloadData];
 }
-- (void)showAddCell:(BOOL)isShow {
-    self.showAddCell = isShow;
-    [self.collectionView reloadData];
-}
 - (void)setShowAddCell:(BOOL)showAddCell {
     _showAddCell = showAddCell;
     self.tempShowAddCell = showAddCell;
+    [self.collectionView reloadData];
 }
 /**
  刷新视图
@@ -224,12 +221,16 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         vc.delegate = self;
         vc.modelArray = [NSMutableArray arrayWithArray:self.manager.afterSelectedArray];
         vc.currentModelIndex = [self.manager.afterSelectedArray indexOfObject:model];
+        vc.previewShowDeleteButton = self.previewShowDeleteButton;
         vc.photoView = self;
         [[self viewController] presentViewController:vc animated:YES completion:nil];
     }
 }
 
 #pragma mark - < HXDatePhotoPreviewViewControllerDelegate >
+- (void)datePhotoPreviewDidDeleteClick:(HXDatePhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model deleteIndex:(NSInteger)index {
+    [self deleteModelWithIndex:index];
+}
 - (void)datePhotoPreviewSelectLaterDidEditClick:(HXDatePhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
     [self.manager afterSelectedArrayReplaceModelAtModel:beforeModel withModel:afterModel];
     [self.manager afterSelectedListAddEditPhotoModel:afterModel];

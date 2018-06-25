@@ -61,14 +61,16 @@
     self.popTransitionDuration = 0.35f;
     self.popInteractiveTransitionDuration = 0.35f;
     self.transitionAnimationOption = UIViewAnimationOptionCurveEaseOut;
-    
-    if ([UIScreen mainScreen].bounds.size.width == 320) {
+    if (kDevice_Is_iPhoneX) {
+        self.clarityScale = 2.0f;
+    }else if ([UIScreen mainScreen].bounds.size.width == 320) {
         self.clarityScale = 0.8;
     }else if ([UIScreen mainScreen].bounds.size.width == 375) {
         self.clarityScale = 1.4;
     }else {
         self.clarityScale = 1.7;
     }
+    
     self.doneBtnShowDetail = YES;
 //    self.videoCanEdit = YES;
     self.singleJumpEdit = YES;

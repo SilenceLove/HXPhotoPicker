@@ -239,6 +239,7 @@
 }
 - (NSString *)barTitle {
     if (!_barTitle) {
+        NSString *language = [NSLocale preferredLanguages].firstObject;
         if ([self.creationDate isToday]) {
             _barTitle = [NSBundle hx_localizedStringForKey:@"今天"];
         }else if ([self.creationDate isYesterday]) {
@@ -246,21 +247,39 @@
         }else if ([self.creationDate isSameWeek]) {
             _barTitle = [self.creationDate getNowWeekday];
         }else if ([self.creationDate isThisYear]) {
-            NSString *language = [NSLocale preferredLanguages].firstObject;
-            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+            if ([language hasPrefix:@"en"]) {
+                // 英文
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MMM dd"],[self.creationDate getNowWeekday]];
+            } else if ([language hasPrefix:@"zh"]) {
                 // 中文
                 _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM月dd日"],[self.creationDate getNowWeekday]];
-            } else {
+                
+            }else if ([language hasPrefix:@"ko"]) {
+                // 韩语
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM월dd일"],[self.creationDate getNowWeekday]];
+            }else if ([language hasPrefix:@"ja"]) {
+                // 日语
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM月dd日"],[self.creationDate getNowWeekday]];
+            }else {
                 // 英文
                 _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MMM dd"],[self.creationDate getNowWeekday]];
             }
         }else {
-            NSString *language = [NSLocale preferredLanguages].firstObject;
-            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+            if ([language hasPrefix:@"en"]) {
+                // 英文
+                _barTitle = [self.creationDate dateStringWithFormat:@"MMM dd, yyyy"];
+            } else if ([language hasPrefix:@"zh"]) {
                 // 中文
                 _barTitle = [self.creationDate dateStringWithFormat:@"yyyy年MM月dd日"];
-            } else {
-                // 英文
+                
+            }else if ([language hasPrefix:@"ko"]) {
+                // 韩语
+                _barTitle = [self.creationDate dateStringWithFormat:@"yyyy년MM월dd일"];
+            }else if ([language hasPrefix:@"ja"]) {
+                // 日语
+                _barTitle = [self.creationDate dateStringWithFormat:@"yyyy年MM月dd日"];
+            }else {
+                // 其他
                 _barTitle = [self.creationDate dateStringWithFormat:@"MMM dd, yyyy"];
             }
         }
@@ -287,6 +306,7 @@
 - (NSString *)dateString {
     if (!_dateString) {
         
+        NSString *language = [NSLocale preferredLanguages].firstObject;
         if ([self.date isToday]) {
             _dateString = [NSBundle hx_localizedStringForKey:@"今天"];
         }else if ([self.date isYesterday]) {
@@ -294,23 +314,39 @@
         }else if ([self.date isSameWeek]) {
             _dateString = [self.date getNowWeekday];
         }else if ([self.date isThisYear]) {
-            NSString *language = [NSLocale preferredLanguages].firstObject;
-            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
+            if ([language hasPrefix:@"en"]) {
+                // 英文
+                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MMM dd"],[self.date getNowWeekday]];
+            } else if ([language hasPrefix:@"zh"]) {
                 // 中文
                 _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM月dd日"],[self.date getNowWeekday]];
+            }else if ([language hasPrefix:@"ko"]) {
+                // 韩语
+                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM월dd일"],[self.date getNowWeekday]];
+            }else if ([language hasPrefix:@"ja"]) {
+                // 日语
+                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM月dd日"],[self.date getNowWeekday]]; 
             } else {
                 // 英文
                 _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MMM dd"],[self.date getNowWeekday]];
             }
         }else {
-            NSString *language = [NSLocale preferredLanguages].firstObject;
-            if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
-                // 中文
-                _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
-            } else {
+            if ([language hasPrefix:@"en"]) {
                 // 英文
                 _dateString = [self.date dateStringWithFormat:@"MMMM dd, yyyy"];
-            }
+            } else if ([language hasPrefix:@"zh"]) {
+                // 中文
+                _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
+            }else if ([language hasPrefix:@"ko"]) {
+                // 韩语
+                _dateString = [self.date dateStringWithFormat:@"yyyy년MM월dd일"];
+            }else if ([language hasPrefix:@"ja"]) {
+                // 日语
+                _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
+            } else {
+                // 其他
+                _dateString = [self.date dateStringWithFormat:@"MMMM dd, yyyy"];
+            } 
         }
     }
     return _dateString;

@@ -30,9 +30,21 @@
     static NSBundle *bundle = nil;
     if (bundle == nil) {
         NSString *language = [NSLocale preferredLanguages].firstObject;
-        if ([language rangeOfString:@"zh-Hans"].location != NSNotFound) {
-            language = @"zh-Hans";
-        } else {
+        if ([language hasPrefix:@"en"]) {
+            language = @"en";
+        } else if ([language hasPrefix:@"zh"]) {
+            if ([language rangeOfString:@"Hans"].location != NSNotFound) {
+                language = @"zh-Hans"; // 简体中文
+            } else { // zh-Hant\zh-HK\zh-TW
+                language = @"zh-Hant"; // 繁體中文
+            }
+        } else if ([language hasPrefix:@"ja"]){
+            // 日文
+            language = @"ja";
+        }else if ([language hasPrefix:@"ko"]) {
+            // 韩文
+            language = @"ko";
+        }else {
             language = @"en";
         }
          

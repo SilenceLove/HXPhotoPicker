@@ -57,8 +57,10 @@
 @property (assign, nonatomic) BOOL hideDeleteButton;
 /**  cell是否可以长按拖动编辑  */
 @property (assign, nonatomic) BOOL editEnabled;
-/**  是否显示添加的cell，需手动刷新视图[self.collectionView reloadData] 默认 YES  */
+/**  是否显示添加的cell    默认 YES  */
 @property (assign, nonatomic) BOOL showAddCell;
+/**  预览大图时是否显示删除按钮  */
+@property (assign, nonatomic) BOOL previewShowDeleteButton;
 
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 /**  不要使用 "initWithFrame" 这个方法初始化否者会出现异常, 请使用下面这个三个初始化方法  */
@@ -76,6 +78,4 @@
 - (void)deleteModelWithIndex:(NSInteger)index;
 /**  刷新view  */
 - (void)refreshView;
-/**  是否显示添加的cell  */
-- (void)showAddCell:(BOOL)isShow;
 @end

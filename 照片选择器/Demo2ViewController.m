@@ -123,6 +123,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.delegate = self;
     photoView.outerCamera = YES;
+    photoView.previewShowDeleteButton = YES;
 //    photoView.hideDeleteButton = YES;
     photoView.showAddCell = YES;
     [photoView.collectionView reloadData];

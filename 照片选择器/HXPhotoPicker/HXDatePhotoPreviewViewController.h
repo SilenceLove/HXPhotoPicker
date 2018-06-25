@@ -19,6 +19,7 @@
 - (void)datePhotoPreviewSingleSelectedClick:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 - (void)datePhotoPreviewDownLoadICloudAssetComplete:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 - (void)datePhotoPreviewSelectLaterDidEditClick:(HXDatePhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
+- (void)datePhotoPreviewDidDeleteClick:(HXDatePhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model deleteIndex:(NSInteger)index;
 @end
 
 @interface HXDatePhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
@@ -31,6 +32,7 @@
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) HXDatePhotoPreviewBottomView *bottomView;
 @property (strong, nonatomic) HXPhotoView *photoView;
+@property (assign, nonatomic) BOOL previewShowDeleteButton;
 @property (assign, nonatomic) BOOL stopCancel;
 - (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (void)setSubviewAlphaAnimate:(BOOL)animete;

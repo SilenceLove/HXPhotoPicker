@@ -489,8 +489,15 @@ HXDateVideoEditViewControllerDelegate
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
         self.selectBtn.backgroundColor = self.selectBtn.selected ? self.manager.configuration.themeColor : nil;
         if (self.outside) {
-            if ([[self.manager afterSelectedArray] containsObject:model]) {
+            /*
+             if ([[self.manager afterSelectedArray] containsObject:model]) {
                 self.bottomView.currentIndex = [[self.manager afterSelectedArray] indexOfObject:model];
+             }else {
+                [self.bottomView deselected];
+             }
+             */
+            if ([self.modelArray containsObject:model]) {
+                self.bottomView.currentIndex = [self.modelArray indexOfObject:model];
             }else {
                 [self.bottomView deselected];
             }
@@ -539,6 +546,10 @@ HXDateVideoEditViewControllerDelegate
     }
 }
 - (void)datePhotoPreviewBottomViewDidEdit:(HXDatePhotoPreviewBottomView *)bottomView {
+    if (!self.modelArray.count) {
+        [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"当前没有可编辑的资源"]];
+        return;
+    }
     if (self.currentModel.networkPhotoUrl) {
         if (self.currentModel.downloadError) {
             [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"下载失败"]];
@@ -748,6 +759,37 @@ HXDateVideoEditViewControllerDelegate
 - (void)dismissClick {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+- (void)deleteClick {
+    if (!self.modelArray.count) {
+        [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"当前没有可删除的资源"]];
+        return;
+    }
+    NSString *message;
+    if (self.currentModel.subType == HXPhotoModelMediaSubTypePhoto) {
+        message = [NSBundle hx_localizedStringForKey:@"确定删除这张照片吗?"];
+    }else {
+        message = [NSBundle hx_localizedStringForKey:@"确定删除这个视频吗?"];
+    }
+    HXWeakSelf
+    hx_showAlert(self, message, nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"删除"], ^{
+        
+    }, ^{
+        HXPhotoModel *tempModel = weakSelf.currentModel;
+        NSInteger tempIndex = weakSelf.currentModelIndex;
+        
+        [weakSelf.modelArray removeObject:weakSelf.currentModel];
+        [weakSelf.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:weakSelf.currentModelIndex inSection:0]]];
+        [weakSelf.bottomView deleteModel:weakSelf.currentModel];
+        if ([weakSelf.delegate respondsToSelector:@selector(datePhotoPreviewDidDeleteClick:deleteModel:deleteIndex:)]) {
+            [weakSelf.delegate datePhotoPreviewDidDeleteClick:weakSelf deleteModel:tempModel deleteIndex:tempIndex];
+        }
+        [weakSelf scrollViewDidScroll:weakSelf.collectionView];
+        [weakSelf scrollViewDidEndDecelerating:weakSelf.collectionView];
+        if (!weakSelf.modelArray.count) {
+            [weakSelf dismissClick];
+        }
+    });
+}
 #pragma mark - < 懒加载 >
 - (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
@@ -762,7 +804,12 @@ HXDateVideoEditViewControllerDelegate
 - (UINavigationItem *)navItem {
     if (!_navItem) {
         _navItem = [[UINavigationItem alloc] init];
-        _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+        if (self.previewShowDeleteButton) {
+            _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"返回"] style:UIBarButtonItemStyleDone target:self action:@selector(dismissClick)];
+            _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"删除"] style:UIBarButtonItemStylePlain target:self action:@selector(deleteClick)];
+        }else {
+            _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(dismissClick)];
+        }
         _navItem.titleView = self.customTitleView;
     }
     return _navItem;

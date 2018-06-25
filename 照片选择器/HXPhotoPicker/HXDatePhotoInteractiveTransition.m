@@ -124,6 +124,9 @@
             self.tempImageView = [[UIImageView alloc] init];
             self.tempImageView.layer.masksToBounds = YES;
             [self.tempImageView.layer addSublayer:self.playerLayer];
+            if (kDevice_Is_iPhoneX) {
+                tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + kTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
+            }
         }
     }
     self.tempImageView.clipsToBounds = YES;

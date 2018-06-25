@@ -722,7 +722,7 @@
     self.rotateBtn.hx_x = self.hx_w / 2 + 20;
     self.rotateBtn.center = CGPointMake(self.rotateBtn.center.x, 30);
     
-    self.cancelBtn.frame = CGRectMake(20, 0, 50, 40);
+    self.cancelBtn.frame = CGRectMake(20, 0, [HXPhotoTools getTextWidth:self.cancelBtn.currentTitle height:40 fontSize:15] + 20, 40);
     self.clipBtn.hx_size = CGSizeMake(50, 40);
     self.clipBtn.hx_x = self.hx_w - 20 - self.clipBtn.hx_w;
     

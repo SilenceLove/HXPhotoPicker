@@ -424,30 +424,46 @@
  相册名称转换
  */
 + (NSString *)transFormPhotoTitle:(NSString *)englishName {
-    NSString *photoName;
+    NSString *photoName; 
     if ([englishName isEqualToString:@"Bursts"]) {
         photoName = @"连拍快照";
-    }else if([englishName isEqualToString:@"Recently Added"]){
+    }else if([englishName isEqualToString:@"Recently Added"] ||
+             [englishName isEqualToString:@"最後に追加した項目"] ||
+             [englishName isEqualToString:@"최근 추가된 항목"] ){
         photoName = @"最近添加";
-    }else if([englishName isEqualToString:@"Screenshots"]){
+    }else if([englishName isEqualToString:@"Screenshots"] ||
+             [englishName isEqualToString:@"スクリーンショット"] ||
+             [englishName isEqualToString:@"스크린샷"] ){
         photoName = @"屏幕快照";
-    }else if([englishName isEqualToString:@"Camera Roll"]){
+    }else if([englishName isEqualToString:@"Camera Roll"] ||
+             [englishName isEqualToString:@"カメラロール"] ||
+             [englishName isEqualToString:@"카메라 롤"] ){
         photoName = @"相机胶卷";
-    }else if([englishName isEqualToString:@"Selfies"]){
+    }else if([englishName isEqualToString:@"Selfies"] ||
+             [englishName isEqualToString:@"셀카"] ){
         photoName = @"自拍";
     }else if([englishName isEqualToString:@"My Photo Stream"]){
         photoName = @"我的照片流";
-    }else if([englishName isEqualToString:@"Videos"]){
+    }else if([englishName isEqualToString:@"Videos"] ||
+             [englishName isEqualToString:@"ビデオ"] ){
         photoName = @"视频";
-    }else if([englishName isEqualToString:@"All Photos"]){
+    }else if([englishName isEqualToString:@"All Photos"] ||
+             [englishName isEqualToString:@"すべての写真"] ||
+             [englishName isEqualToString:@"비디오"] ){
         photoName = @"所有照片";
-    }else if([englishName isEqualToString:@"Slo-mo"]){
+    }else if([englishName isEqualToString:@"Slo-mo"] ||
+             [englishName isEqualToString:@"スローモーション"] ){
         photoName = @"慢动作";
-    }else if([englishName isEqualToString:@"Recently Deleted"]){
+    }else if([englishName isEqualToString:@"Recently Deleted"] ||
+             [englishName isEqualToString:@"最近削除した項目"] ){
         photoName = @"最近删除";
-    }else if([englishName isEqualToString:@"Favorites"]){
+    }else if([englishName isEqualToString:@"Favorites"] ||
+             [englishName isEqualToString:@"お気に入り"] ||
+             [englishName isEqualToString:@"최근 삭제된 항목"] ){
         photoName = @"个人收藏";
-    }else if([englishName isEqualToString:@"Panoramas"]){
+    }else if([englishName isEqualToString:@"Panoramas"] ||
+             [englishName isEqualToString:@"パノラマ"] ||
+             [englishName isEqualToString:@"파노라마"] ){
         photoName = @"全景照片";
     }else {
         photoName = englishName;

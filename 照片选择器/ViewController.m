@@ -17,6 +17,7 @@
 #import "Demo8ViewController.h"
 #import "Demo9ViewController.h"
 #import "YYFPSLabel.h"
+#import "HXPhotoPicker.h"
  
 
 static NSString *const kCellIdentifier = @"cell_identifier";
@@ -86,9 +87,11 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.delegate = self;
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
-    YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, 10, 100, 30)];
+    YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, kTopMargin + 10, 100, 30)];
     [[UIApplication sharedApplication].keyWindow addSubview:label];
     
+    NSString *language = [NSLocale preferredLanguages].firstObject;
+    NSSLog(@"%@",language);
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
