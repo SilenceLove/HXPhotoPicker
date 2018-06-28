@@ -28,6 +28,38 @@
  *  @param toIndexPath      交换cell的新位置
  */
 - (void)dragCellCollectionView:(HXCollectionView *)collectionView moveCellFromIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath;
+
+/**
+ 长按手势结束时是否删除当前拖动的cell
+
+ @param collectionView 视图本身
+ @return 是否删除
+ */
+- (BOOL)collectionViewShouldDeleteCurrentMoveItem:(UICollectionView *)collectionView;
+
+/**
+ 长按手势发生改变时调用
+
+ @param collectionView 视图本身
+ @param longPgr 长按手势识别器
+ */
+- (void)collectionView:(UICollectionView *)collectionView gestureRecognizerChange:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
+
+/**
+ 长按手势开始时调用
+
+ @param collectionView 视图本身
+ @param longPgr 长按手势识别器
+ */
+- (void)collectionView:(UICollectionView *)collectionView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
+
+/**
+ 长按手势结束时调用
+
+ @param collectionView 视图本身
+ @param longPgr 长按手势识别器
+ */
+- (void)collectionView:(UICollectionView *)collectionView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 @end
 
 @protocol HXCollectionViewDataSource<UICollectionViewDataSource>

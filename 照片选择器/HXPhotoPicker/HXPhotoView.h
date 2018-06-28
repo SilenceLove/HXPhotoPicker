@@ -16,19 +16,40 @@
 @class HXPhotoView;
 @protocol HXPhotoViewDelegate <NSObject>
 @optional
-// 代理返回 选择、移动顺序、删除之后的图片以及视频
+
+/**
+ 照片/视频发生改变时调用 - 选择、移动顺序、删除
+
+ @param photoView 视图本身
+ @param allList 所有类型的模型数组
+ @param photos 照片类型的模型数组
+ @param videos 视频类型的模型数组
+ @param isOriginal 是否原图
+ */
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 
-// 代理返回 选择、移动顺序、删除之后的图片以及视频
+/**
+ 照片/视频发生改变时调用 - 选择、移动顺序、删除
+
+ @param photoView 视图本身
+ @param imageList 图片数组
+ */
 - (void)photoView:(HXPhotoView *)photoView imageChangeComplete:(NSArray<UIImage *> *)imageList;
 
-// 这次在相册选择的图片,不是所有选择的所有图片.
-//- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
+/**
+ 当view高度改变时调用
 
-// 当view更新高度时调用
+ @param photoView 视图本身
+ @param frame 位置大小
+ */
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame;
 
-// 删除网络图片的地址
+/**
+ 删除网络图片时调用
+
+ @param photoView 视图本身
+ @param networkPhotoUrl 被删除的图片地址
+ */
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl;
 
 /**
@@ -39,6 +60,43 @@
  @param index 下标
  */
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index;
+
+/**
+ 长按手势结束时是否删除当前拖动的cell
+ 
+ @param photoView 视图本身
+ @return 是否删除
+ */
+- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView;
+
+/**
+ 长按手势发生改变时调用
+
+ @param photoView 视图本身
+ @param longPgr 长按手势识别器
+ */
+- (void)photoView:(HXPhotoView *)photoView gestureRecognizerChange:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
+
+/**
+ 长按手势开始时调用
+
+ @param photoView 视图本身
+ @param longPgr 长按手势识别器
+ */
+- (void)photoView:(HXPhotoView *)photoView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
+
+/**
+ 长按手势结束时调用
+
+ @param photoView 视图本身
+ @param longPgr 长按手势识别器
+ */
+- (void)photoView:(HXPhotoView *)photoView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
+
+
+
+// 这次在相册选择的图片,不是所有选择的所有图片.
+//- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 @end
 
 @interface HXPhotoView : UIView
@@ -61,6 +119,8 @@
 @property (assign, nonatomic) BOOL showAddCell;
 /**  预览大图时是否显示删除按钮  */
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
+/**  已选的image数组  */
+@property (strong, nonatomic) NSMutableArray *imageList;
 
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 /**  不要使用 "initWithFrame" 这个方法初始化否者会出现异常, 请使用下面这个三个初始化方法  */

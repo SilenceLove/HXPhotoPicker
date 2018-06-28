@@ -28,6 +28,7 @@
     self.maxNum = 10;
     self.photoMaxNum = 9;
     self.videoMaxNum = 1;
+    self.showBottomPhotoDetail = YES;
     if ([UIScreen mainScreen].bounds.size.width == 320) {
         self.rowCount = 3;
         self.sectionHeaderShowPhotoLocation = NO;

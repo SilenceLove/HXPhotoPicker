@@ -579,11 +579,13 @@ HXDatePhotoEditViewControllerDelegate
         headerView.model = self.dateArray[indexPath.section];
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
-        HXDatePhotoViewSectionFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"sectionFooterId" forIndexPath:indexPath];
-        footerView.photoCount = self.photoArray.count;
-        footerView.videoCount = self.videoArray.count;
-        self.footerView = footerView;
-        return footerView;
+        if (self.manager.configuration.showBottomPhotoDetail) {
+            HXDatePhotoViewSectionFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"sectionFooterId" forIndexPath:indexPath];
+            footerView.photoCount = self.photoArray.count;
+            footerView.videoCount = self.videoArray.count;
+            self.footerView = footerView;
+            return footerView;
+        }
     }
     return nil;
 }
@@ -596,12 +598,12 @@ HXDatePhotoEditViewControllerDelegate
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
     if (self.manager.configuration.showDateSectionHeader) {
         if (section == self.dateArray.count - 1) {
-            return CGSizeMake(self.view.hx_w, 50);
+            return self.manager.configuration.showBottomPhotoDetail ? CGSizeMake(self.view.hx_w, 50) : CGSizeZero;
         }else {
             return CGSizeZero;
         }
     }else {
-        return CGSizeMake(self.view.hx_w, 50);
+        return self.manager.configuration.showBottomPhotoDetail ? CGSizeMake(self.view.hx_w, 50) : CGSizeZero;
     }
 }
 

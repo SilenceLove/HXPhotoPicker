@@ -16,6 +16,7 @@
 #import "HXDatePhotoPreviewViewController.h"
 #import "HXCustomNavigationController.h"
 #import "HXCustomCameraViewController.h"
+#import "HXDatePhotoToolManager.h"
 
 #define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 
@@ -38,9 +39,22 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 @property (strong, nonatomic) UIImagePickerController* imagePickerController;
 @property (strong, nonatomic) HXPhotoSubViewCell *addCell;
 @property (assign, nonatomic) BOOL tempShowAddCell;
+@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 @end
 
 @implementation HXPhotoView
+- (NSMutableArray *)imageList {
+    if (!_imageList) {
+        _imageList = [NSMutableArray array];
+    }
+    return _imageList;
+}
+- (HXDatePhotoToolManager *)toolManager {
+    if (!_toolManager) {
+        _toolManager = [[HXDatePhotoToolManager alloc] init];
+    }
+    return _toolManager;
+}
 - (UICollectionViewFlowLayout *)flowLayout {
     if (!_flowLayout) {
         _flowLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -401,6 +415,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
     }
     [self.manager afterListAddCameraTakePicturesModel:model];
+    if (self.manager.configuration.requestImageAfterFinishingSelection) {
+        [self.imageList addObject:model.thumbPhoto];
+        if ([self.delegate respondsToSelector:@selector(photoView:imageChangeComplete:)]) {
+            [self.delegate photoView:self imageChangeComplete:self.imageList];
+        }
+    }
     [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
 }
 
@@ -425,6 +445,15 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
  */
 - (void)cellDidDeleteClcik:(UICollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    
+    if (self.manager.configuration.requestImageAfterFinishingSelection) {
+        if (indexPath.item < self.imageList.count) {
+            [self.imageList removeObjectAtIndex:indexPath.item];
+        }
+        if ([self.delegate respondsToSelector:@selector(photoView:imageChangeComplete:)]) {
+            [self.delegate photoView:self imageChangeComplete:self.imageList];
+        }
+    }
     HXPhotoModel *model = self.dataList[indexPath.item];
     [self.manager afterSelectedListdeletePhotoModel:model];
     if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
@@ -475,6 +504,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 #pragma mark - < HXAlbumListViewControllerDelegate >
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllImage:(NSArray<UIImage *> *)imageList {
+    self.imageList = [NSMutableArray arrayWithArray:imageList];
     if ([self.delegate respondsToSelector:@selector(photoView:imageChangeComplete:)]) {
         [self.delegate photoView:self imageChangeComplete:imageList];
     }
@@ -541,7 +571,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     HXPhotoModel *fromModel = self.dataList[fromIndexPath.item];
     HXPhotoModel *toModel = self.dataList[toIndexPath.item];
     [self.manager afterSelectedArraySwapPlacesWithFromModel:fromModel fromIndex:fromIndexPath.item toModel:toModel toIndex:toIndexPath.item];
-    
+    if (self.manager.configuration.requestImageAfterFinishingSelection) {
+        UIImage *fromImage = self.imageList[fromIndexPath.item];
+        UIImage *toImage = self.imageList[toIndexPath.item];
+        [self.imageList replaceObjectAtIndex:toIndexPath.item withObject:fromImage];
+        [self.imageList replaceObjectAtIndex:fromIndexPath.item withObject:toImage];
+    }
 //    [self.manager.endSelectedList removeObject:toModel];
 //    [self.manager.endSelectedList insertObject:toModel atIndex:toIndexPath.item];
 //    [self.manager.endSelectedList removeObject:fromModel];
@@ -577,8 +612,44 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 
 - (void)dragCellCollectionViewCellEndMoving:(HXCollectionView *)collectionView {
+    if (self.manager.configuration.requestImageAfterFinishingSelection) {
+        if ([self.delegate respondsToSelector:@selector(photoView:imageChangeComplete:)]) {
+            [self.delegate photoView:self imageChangeComplete:self.imageList];
+        }
+    }
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
         [self.delegate photoView:self changeComplete:self.dataList.mutableCopy photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
+    }
+}
+- (BOOL)collectionViewShouldDeleteCurrentMoveItem:(UICollectionView *)collectionView {
+    if ([self.delegate respondsToSelector:@selector(photoViewShouldDeleteCurrentMoveItem:)]) {
+        return [self.delegate photoViewShouldDeleteCurrentMoveItem:self];
+    }
+    return NO;
+}
+- (void)collectionView:(UICollectionView *)collectionView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
+    if (indexPath) {
+        if ([self.delegate respondsToSelector:@selector(photoView:gestureRecognizerBegan:indexPath:)]) {
+            [self.delegate photoView:self gestureRecognizerBegan:longPgr indexPath:indexPath];
+        }
+    }
+}
+- (void)collectionView:(UICollectionView *)collectionView gestureRecognizerChange:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
+    if (indexPath) {
+        HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+        if (cell.model.type == HXPhotoModelMediaTypeCamera) {
+            return;
+        }
+        if ([self.delegate respondsToSelector:@selector(photoView:gestureRecognizerChange:indexPath:)]) {
+            [self.delegate photoView:self gestureRecognizerChange:longPgr indexPath:indexPath];
+        }
+    }
+}
+- (void)collectionView:(UICollectionView *)collectionView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
+    if (indexPath) {
+        if ([self.delegate respondsToSelector:@selector(photoView:gestureRecognizerEnded:indexPath:)]) {
+            [self.delegate photoView:self gestureRecognizerEnded:longPgr indexPath:indexPath];
+        }
     }
 }
  

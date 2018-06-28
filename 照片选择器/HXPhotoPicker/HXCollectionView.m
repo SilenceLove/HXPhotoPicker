@@ -12,6 +12,7 @@
 @interface HXCollectionView ()
 @property (weak, nonatomic) UILongPressGestureRecognizer *longPgr;
 @property (strong, nonatomic) NSIndexPath *originalIndexPath;
+
 @property (strong, nonatomic) UIView *tempMoveCell;
 @property (assign, nonatomic) CGPoint lastPoint;
 @property (nonatomic, strong) UICollectionViewCell *dragCell;
@@ -56,16 +57,45 @@
     if (longPgr.state == UIGestureRecognizerStateBegan) {
         self.isDeleteItem = NO;
         [self gestureRecognizerBegan:longPgr];
+        if (self.isAddBtn) {
+            self.isAddBtn = NO;
+            return;
+        }
+        if ([self.delegate respondsToSelector:@selector(collectionView:gestureRecognizerBegan:indexPath:)]) {
+            [self.delegate collectionView:self gestureRecognizerBegan:longPgr indexPath:self.originalIndexPath];
+        }
     }
     if (longPgr.state == UIGestureRecognizerStateChanged) {
         if (_originalIndexPath.section != 0 || self.isAddBtn) {
             return;
+        }
+        if ([self.delegate respondsToSelector:@selector(collectionView:gestureRecognizerChange:indexPath:)]) {
+            [self.delegate collectionView:self gestureRecognizerChange:longPgr indexPath:self.originalIndexPath];
         }
         [self gestureRecognizerChange:longPgr];
         [self moveCell];
     }
     if (longPgr.state == UIGestureRecognizerStateCancelled ||
         longPgr.state == UIGestureRecognizerStateEnded){
+        if ([self.delegate respondsToSelector:@selector(collectionView:gestureRecognizerEnded:indexPath:)]) {
+            [self.delegate collectionView:self gestureRecognizerEnded:longPgr indexPath:self.originalIndexPath];
+        }
+        BOOL isRemoveItem = NO;
+        if ([self.delegate respondsToSelector:@selector(collectionViewShouldDeleteCurrentMoveItem:)]) {
+            isRemoveItem = [self.delegate collectionViewShouldDeleteCurrentMoveItem:self];
+        }
+        if (isRemoveItem) {
+            if ([self.delegate respondsToSelector:@selector(dragCellCollectionViewCellEndMoving:)]) {
+                [self.delegate dragCellCollectionViewCellEndMoving:self];
+            }
+            [UIView animateWithDuration:0.25 animations:^{
+                self.tempMoveCell.alpha = 0;
+            } completion:^(BOOL finished) {
+                [self.tempMoveCell removeFromSuperview];
+                self.dragCell.hidden = NO;
+            }];
+            return;
+        }
         if (self.isAddBtn) {
             self.isAddBtn = NO;
             return;
@@ -127,6 +157,9 @@
 - (NSArray *)findAllLastIndexPathInVisibleSection {
     
     NSArray *array = [self indexPathsForVisibleItems];
+    if (!array.count) {
+        return nil;
+    }
     array = [array sortedArrayUsingComparator:^NSComparisonResult(NSIndexPath *  _Nonnull obj1, NSIndexPath *  _Nonnull obj2) {
         return obj1.section > obj2.section;
     }];
@@ -151,7 +184,9 @@
     NSArray *temp = [tempArray sortedArrayUsingComparator:^NSComparisonResult(NSIndexPath *  _Nonnull obj1, NSIndexPath *  _Nonnull obj2) {
         return obj1.row > obj2.row;
     }];
-    [totalArray addObject:temp.lastObject];
+    if (temp.count) {
+        [totalArray addObject:temp.lastObject];
+    }
     return totalArray.copy;
 }
 

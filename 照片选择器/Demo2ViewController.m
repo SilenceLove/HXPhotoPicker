@@ -18,10 +18,24 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (strong, nonatomic) UIScrollView *scrollView;
 @property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 
+@property (strong, nonatomic) UIButton *bottomView;
+
+@property (assign, nonatomic) BOOL needDeleteItem;
+
 @end
 
 @implementation Demo2ViewController
-
+- (UIButton *)bottomView {
+    if (!_bottomView) {
+        _bottomView = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_bottomView setTitle:@"删除" forState:UIControlStateNormal];
+        [_bottomView setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_bottomView setBackgroundColor:[UIColor redColor]];
+        _bottomView.frame = CGRectMake(0, self.view.hx_h - 50, self.view.hx_w, 50);
+        _bottomView.alpha = 0;
+    }
+    return _bottomView;
+}
 - (HXDatePhotoToolManager *)toolManager {
     if (!_toolManager) {
         _toolManager = [[HXDatePhotoToolManager alloc] init];
@@ -113,10 +127,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     // Do any additional setup after loading the view from its nib.
     self.view.backgroundColor = [UIColor whiteColor];
     
+    
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;
     [self.view addSubview:scrollView];
     self.scrollView = scrollView;
+    
     
     CGFloat width = scrollView.frame.size.width;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
@@ -132,6 +148,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.photoView = photoView; 
 
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"相册/相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
+    
+    [self.view addSubview:self.bottomView];
 }
 - (void)didNavBtnClick {
     if (self.manager.configuration.specialModeNeedHideVideoSelectBtn && !self.manager.configuration.selectTogether && self.manager.configuration.videoMaxNum == 1) {
@@ -144,8 +162,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
-    NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
-    NSSLog(@"所有:%@ - 照片:%@ - 视频:%@",allList,photos,videos);
+//    NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
+//    NSSLog(@"所有:%@ - 照片:%@ - 视频:%@",allList,photos,videos);
     
     // 获取图片
     [self.toolManager getSelectedImageList:allList requestType:HXDatePhotoToolManagerRequestTypeOriginal success:^(NSArray<UIImage *> *imageList) {
@@ -179,6 +197,42 @@ static const CGFloat kPhotoViewMargin = 12.0;
 
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index {
     NSSLog(@"%@ --> index - %ld",model,index);
+}
+
+- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView {
+    return self.needDeleteItem;
+}
+- (void)photoView:(HXPhotoView *)photoView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
+    [UIView animateWithDuration:0.25 animations:^{
+        self.bottomView.alpha = 0.5;
+    }];
+    NSSLog(@"长按手势开始了 - %ld",indexPath.item);
+}
+- (void)photoView:(HXPhotoView *)photoView gestureRecognizerChange:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
+    CGPoint point = [longPgr locationInView:self.view];
+    if (point.y >= self.bottomView.hx_y) {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.bottomView.alpha = 1;
+        }];
+    }else {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.bottomView.alpha = 0.5;
+        }];
+    }
+    NSSLog(@"长按手势改变了 %@ - %ld",NSStringFromCGPoint(point), indexPath.item);
+}
+- (void)photoView:(HXPhotoView *)photoView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
+    CGPoint point = [longPgr locationInView:self.view];
+    if (point.y >= self.bottomView.hx_y) {
+        self.needDeleteItem = YES;
+        [self.photoView deleteModelWithIndex:indexPath.item]; 
+    }else {
+        self.needDeleteItem = NO;
+    }
+    NSSLog(@"长按手势结束了 - %ld",indexPath.item);
+    [UIView animateWithDuration:0.25 animations:^{
+        self.bottomView.alpha = 0;
+    }];
 }
 
 

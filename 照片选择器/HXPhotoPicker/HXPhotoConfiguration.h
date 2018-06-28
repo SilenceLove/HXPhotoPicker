@@ -136,7 +136,12 @@ typedef enum : NSUInteger {
 
 #pragma mark - < UI相关 >
 /**
- 完成按钮是否显示详情   default YES
+ 显示底部照片详细信息 default YES
+ */
+@property (assign, nonatomic) BOOL showBottomPhotoDetail;
+
+/**
+ 完成按钮是否显示详情 default YES
  */
 @property (assign, nonatomic) BOOL doneBtnShowDetail;
 

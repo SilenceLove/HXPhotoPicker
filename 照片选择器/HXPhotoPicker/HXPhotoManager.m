@@ -1349,6 +1349,6 @@
     return self.iCloudUploadArray;
 }
 - (NSString *)version {
-    return @"2.1.7";
+    return @"2.1.9";
 }
 @end

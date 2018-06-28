@@ -106,6 +106,10 @@
     [self setupFlashAndTorchBtn];
     self.previewView.tapToExposeEnabled = self.cameraController.cameraSupportsTapToExpose;
     self.previewView.tapToFocusEnabled = self.cameraController.cameraSupportsTapToFocus;
+    
+    if (self.manager.configuration.navigationBar) {
+        self.manager.configuration.navigationBar(self.navigationController.navigationBar);
+    }
 }
 - (void)requestAccessForAudio {
     [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
