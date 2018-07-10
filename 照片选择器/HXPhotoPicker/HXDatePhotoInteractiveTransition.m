@@ -46,7 +46,7 @@
                 return;
             }
             if (![(HXDatePhotoPreviewViewController *)self.vc bottomView].userInteractionEnabled && iOS11_Later) {
-                [(HXDatePhotoPreviewViewController *)self.vc setSubviewAlphaAnimate:NO];
+                [(HXDatePhotoPreviewViewController *)self.vc setSubviewAlphaAnimate:NO duration:0.3f];
             }
             [(HXDatePhotoPreviewViewController *)self.vc setStopCancel:YES];
             self.beginX = [gestureRecognizer locationInView:gestureRecognizer.view].x;

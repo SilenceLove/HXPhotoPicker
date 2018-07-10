@@ -88,7 +88,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
     YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, kTopMargin + 10, 100, 30)];
-    [[UIApplication sharedApplication].keyWindow addSubview:label];
+    [[UIApplication sharedApplication].keyWindow addSubview:label]; 
     
     NSString *language = [NSLocale preferredLanguages].firstObject;
     NSSLog(@"%@",language);

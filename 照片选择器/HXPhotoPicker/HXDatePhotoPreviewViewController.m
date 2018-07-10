@@ -386,7 +386,7 @@ HXDateVideoEditViewControllerDelegate
     }];
     return cell;
 }
-- (void)setSubviewAlphaAnimate:(BOOL)animete {
+- (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration {
     BOOL hide = NO;
     if (self.bottomView.alpha == 1) {
         hide = YES;
@@ -397,7 +397,7 @@ HXDateVideoEditViewControllerDelegate
     self.bottomView.userInteractionEnabled = !hide;
     if (animete) {
         [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
-        [UIView animateWithDuration:0.15 animations:^{
+        [UIView animateWithDuration:duration animations:^{
             self.navigationController.navigationBar.alpha = hide ? 0 : 1;
             if (self.outside) {
                 self.navBar.alpha = hide ? 0 : 1;
@@ -423,6 +423,9 @@ HXDateVideoEditViewControllerDelegate
             [self.navigationController setNavigationBarHidden:hide];
         }
     }
+}
+- (void)setSubviewAlphaAnimate:(BOOL)animete {
+    [self setSubviewAlphaAnimate:animete duration:0.15];
 }
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     [(HXDatePhotoPreviewViewCell *)cell resetScale];
@@ -957,6 +960,7 @@ HXDateVideoEditViewControllerDelegate
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) AVPlayer *player;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
+@property (strong, nonatomic) UIActivityIndicatorView *loadingView;
 @end
 
 @implementation HXDatePhotoPreviewViewCell
@@ -975,6 +979,7 @@ HXDateVideoEditViewControllerDelegate
     [self.contentView addSubview:self.videoPlayBtn];
     //    [self.scrollView addSubview:self.livePhotoView];
     [self.contentView addSubview:self.progressView];
+    [self.contentView addSubview:self.loadingView];
 }
 - (void)resetScale {
     [self.scrollView setZoomScale:1.0 animated:NO];
@@ -1021,6 +1026,7 @@ HXDateVideoEditViewControllerDelegate
     self.playerLayer.player = nil;
     self.player = nil;
     self.progressView.hidden = YES;
+    [self.loadingView stopAnimating];
     self.progressView.progress = 0;
     
     [self resetScale];
@@ -1238,25 +1244,28 @@ HXDateVideoEditViewControllerDelegate
     if (self.player != nil) return;
     if (self.model.type == HXPhotoModelMediaTypeVideo) {
         self.requestID = [HXPhotoTools getAVAssetWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            if (weakSelf.model.isICloud) {
-                weakSelf.progressView.hidden = NO;
-            }
+//            if (weakSelf.model.isICloud) {
+//                weakSelf.progressView.hidden = NO;
+//            }
+            [weakSelf.loadingView startAnimating];
             weakSelf.videoPlayBtn.hidden = YES;
             weakSelf.requestID = cloudRequestId;
         } progressHandler:^(double progress) {
-            if (weakSelf.model.isICloud) {
-                weakSelf.progressView.hidden = NO;
-            }
+//            if (weakSelf.model.isICloud) {
+//                weakSelf.progressView.hidden = NO;
+//            }
             weakSelf.progressView.progress = progress;
         } completion:^(AVAsset *asset) {
             [weakSelf downloadICloudAssetComplete];
 //            weakSelf.model.avAsset = asset;
             weakSelf.progressView.hidden = YES;
+            [weakSelf.loadingView stopAnimating];
             weakSelf.videoPlayBtn.hidden = NO;
             weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
             weakSelf.playerLayer.player = weakSelf.player;
-            [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem];
+            [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem]; 
         } failed:^(NSDictionary *info) {
+            [weakSelf.loadingView stopAnimating];
             weakSelf.videoPlayBtn.hidden = NO;
             weakSelf.progressView.hidden = YES;
             if (weakSelf.model.isICloud) {
@@ -1272,6 +1281,7 @@ HXDateVideoEditViewControllerDelegate
 }
 - (void)downloadICloudAssetComplete {
     self.progressView.hidden = YES;
+    [self.loadingView stopAnimating];
     if (self.model.isICloud) {
         self.model.iCloudDownloading = NO;
         self.model.isICloud = NO;
@@ -1361,6 +1371,9 @@ HXDateVideoEditViewControllerDelegate
 }
 #pragma mark - < UIScrollViewDelegate >
 - (nullable UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+    if (self.model.subType == HXPhotoModelMediaSubTypeVideo) {
+        return nil;
+    }
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         return self.livePhotoView;
     }else {
@@ -1395,6 +1408,7 @@ HXDateVideoEditViewControllerDelegate
     self.scrollView.frame = self.bounds;
     self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
     self.progressView.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
+    self.loadingView.center = self.progressView.center;
 }
 #pragma mark - < 懒加载 >
 - (UIScrollView *)scrollView {
@@ -1453,6 +1467,13 @@ HXDateVideoEditViewControllerDelegate
         _progressView.hidden = YES;
     }
     return _progressView;
+}
+- (UIActivityIndicatorView *)loadingView {
+    if (!_loadingView) {
+        _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        [_loadingView stopAnimating];
+    }
+    return _loadingView;
 }
 - (AVPlayerLayer *)playerLayer {
     if (!_playerLayer) {

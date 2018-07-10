@@ -12,7 +12,7 @@
 
 @class HXAlbumListViewController;
  
-typedef void (^ HXAlbumListViewControllerDidDoneBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController);
+typedef void (^ HXAlbumListViewControllerDidDoneBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController);
 typedef void (^ HXAlbumListViewControllerDidCancelBlock)(HXAlbumListViewController *viewController);
 
 @protocol HXAlbumListViewControllerDelegate <NSObject>

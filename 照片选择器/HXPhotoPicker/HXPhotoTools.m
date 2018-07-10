@@ -209,6 +209,9 @@
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     option.networkAccessAllowed = NO;
     option.synchronous = NO;
+    if (model.type == HXPhotoModelMediaTypePhotoGif) { 
+        option.version = PHImageRequestOptionsVersionOriginal;
+    }
     model.iCloudDownloading = YES;
     PHImageRequestID requestID = [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
@@ -894,7 +897,7 @@
             if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
                 PHImageRequestID cloudRequestId = 0;
                 PHVideoRequestOptions *cloudOptions = [[PHVideoRequestOptions alloc] init];
-                cloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeMediumQualityFormat;
+                cloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
                 cloudOptions.networkAccessAllowed = YES;
                 cloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1120,6 +1123,7 @@
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     option.networkAccessAllowed = NO;
     option.synchronous = NO;
+    option.version = PHImageRequestOptionsVersionOriginal;
     
     PHImageRequestID requestID = [[PHImageManager defaultManager] requestImageDataForAsset:asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);

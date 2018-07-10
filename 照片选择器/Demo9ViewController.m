@@ -29,7 +29,8 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor whiteColor];   
+//    self.navigationController.navigationBar.translucent = YES;
+    self.view.backgroundColor = [UIColor whiteColor];
     self.dataArray = [NSMutableArray array];
     for (int i = 0; i < 10; i++) {
         Demo9Model *model = [[Demo9Model alloc] init];

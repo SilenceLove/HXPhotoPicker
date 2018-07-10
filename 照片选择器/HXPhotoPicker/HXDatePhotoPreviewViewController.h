@@ -35,7 +35,7 @@
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
 @property (assign, nonatomic) BOOL stopCancel;
 - (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
-- (void)setSubviewAlphaAnimate:(BOOL)animete;
+- (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
 @end
 
 

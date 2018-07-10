@@ -15,6 +15,7 @@
 @property (strong, nonatomic) AVPlayer *player;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
+@property (strong, nonatomic) UIActivityIndicatorView *loadingView;
 @property (assign, nonatomic) PHImageRequestID requestId;
 @end
 
@@ -26,7 +27,9 @@
     self.imageView.image = self.image;
     [self.view addSubview:self.imageView];
     [self.view addSubview:self.progressView];
+    [self.view addSubview:self.loadingView];
     self.progressView.center = CGPointMake(self.imageView.hx_size.width / 2, self.imageView.hx_size.height / 2);
+    self.loadingView.center = self.progressView.center;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -65,6 +68,7 @@
         self.livePhotoView = nil;
     }
     [self.progressView removeFromSuperview];
+    [self.loadingView stopAnimating];
     [self.view addSubview:self.imageView];
 }
 
@@ -195,9 +199,10 @@
         self.requestId = [HXPhotoTools getAVAssetWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 weakSelf.requestId = cloudRequestId;
-                if (weakSelf.model.isICloud) {
-                    weakSelf.progressView.hidden = NO;
-                }
+//                if (weakSelf.model.isICloud) {
+//                    weakSelf.progressView.hidden = NO;
+//                }
+                [weakSelf.loadingView startAnimating];
             });
         } progressHandler:^(double progress) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -211,10 +216,12 @@
                 weakSelf.progressView.hidden = YES;
                 weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
                 [weakSelf playVideo];
+                [weakSelf.loadingView stopAnimating];
             });
         } failed:^(NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
 //                [weakSelf.progressView showError];
+                [weakSelf.loadingView stopAnimating];
             });
         }];
         //        requestId = [[PHImageManager defaultManager] requestAVAssetForVideo:self.model.asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
@@ -274,6 +281,12 @@
         _progressView.hidden = YES;
     }
     return _progressView;
+}
+- (UIActivityIndicatorView *)loadingView {
+    if (!_loadingView) {
+        _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    }
+    return _loadingView;
 }
 //- (PHLivePhotoView *)livePhotoView {
 //    if (!_livePhotoView) {

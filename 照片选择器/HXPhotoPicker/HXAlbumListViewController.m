@@ -63,6 +63,8 @@ UITableViewDelegate
         });
     }];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+    
+    [UINavigationBar appearance].translucent = YES;
 }
 
 - (void)viewDidLayoutSubviews {
@@ -178,9 +180,6 @@ UITableViewDelegate
         [self.delegate albumListViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
         
     }
-    if (self.doneBlock) {
-        self.doneBlock(allList, photoList, videoList, original, self);
-    }
     if (self.manager.configuration.requestImageAfterFinishingSelection) {
         [self.navigationController.viewControllers.lastObject.view showLoadingHUDText:nil];
         __weak typeof(self) weakSelf = self;
@@ -203,13 +202,20 @@ UITableViewDelegate
             if ([strongSelf.delegate respondsToSelector:@selector(albumListViewController:didDoneAllImage:)]) {
                 [strongSelf.delegate albumListViewController:weakSelf didDoneAllImage:imageList];
             }
+            if (strongSelf.doneBlock) {
+                strongSelf.doneBlock(allList, photoList, videoList, imageList, original, self);
+            }
             [strongSelf dismissViewControllerAnimated:YES completion:nil];
         } failed:^{
             __strong typeof(weakSelf) strongSelf = weakSelf;
             [strongSelf.navigationController.viewControllers.lastObject.view handleLoading];
             [strongSelf dismissViewControllerAnimated:YES completion:nil];
         }];
-    } 
+    }else {
+        if (self.doneBlock) {
+            self.doneBlock(allList, photoList, videoList, nil, original, self);
+        }
+    }
 }
 - (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController {
     [self cancelClick];

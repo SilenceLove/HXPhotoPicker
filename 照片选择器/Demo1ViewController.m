@@ -294,12 +294,13 @@
     
 //    [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
     __weak typeof(self) weakSelf = self;
-    [self hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
+    [self hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
         weakSelf.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
         weakSelf.original.text = original ? @"YES" : @"NO";
         NSSLog(@"all - %@",allList);
         NSSLog(@"photo - %@",photoList);
         NSSLog(@"video - %@",videoList);
+        NSSLog(@"image - %@",imageList);
     } cancel:^(HXAlbumListViewController *viewController) {
         NSSLog(@"取消了");
     }];

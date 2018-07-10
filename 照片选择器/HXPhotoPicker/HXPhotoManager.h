@@ -15,16 +15,16 @@
 /**
  *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
  */
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSUInteger, HXPhotoManagerSelectedType) {
     HXPhotoManagerSelectedTypePhoto = 0,        //!< 只显示图片
     HXPhotoManagerSelectedTypeVideo = 1,        //!< 只显示视频
     HXPhotoManagerSelectedTypePhotoAndVideo     //!< 图片和视频一起显示
-} HXPhotoManagerSelectedType;
+};
 
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
     HXPhotoManagerVideoSelectedTypeNormal = 0,  //!< 普通状态显示选择按钮
     HXPhotoManagerVideoSelectedTypeSingle       //!< 单选不显示选择按钮
-} HXPhotoManagerVideoSelectedType;
+};
 
 @interface HXPhotoManager : NSObject
 
@@ -39,7 +39,7 @@ typedef enum : NSUInteger {
 /**
  配置信息
  */
-@property (strong, nonatomic) HXPhotoConfiguration *configuration;
+@property (strong, nonatomic) HXPhotoConfiguration *configuration; 
 
 @property (assign, nonatomic) HXPhotoManagerVideoSelectedType videoSelectedType;
 

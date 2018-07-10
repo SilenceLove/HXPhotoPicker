@@ -8,11 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSUInteger, HXPhotoConfigurationCameraType) {
     HXPhotoConfigurationCameraTypePhoto = 0,        //!< 拍照
     HXPhotoConfigurationCameraTypeVideo = 1,        //!< 录制
     HXPhotoConfigurationCameraTypeTypePhotoAndVideo //!< 拍照和录制一起
-} HXPhotoConfigurationCameraType;
+}; 
 
 /*
 typedef enum : NSUInteger {
