@@ -12,6 +12,7 @@
 #import "HXPhotoModel.h"
 #import "HXPhotoTools.h"
 #import "HXPhotoConfiguration.h"
+#import "HXCustomAssetModel.h"
 /**
  *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
  */
@@ -43,6 +44,35 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 
 @property (assign, nonatomic) HXPhotoManagerVideoSelectedType videoSelectedType;
 
+
+/**
+ 添加模型数组
+
+ @param modelArray ...
+ */
+- (void)addModelArray:(NSArray<HXPhotoModel *> *)modelArray;
+
+/**
+ 添加自定义资源模型
+ 如果图片/视频 选中的数量超过最大选择数时,之后选中的会变为未选中
+ 如果设置的图片/视频不能同时选择时
+ 图片在视频前面的话只会将图片添加到已选数组.
+ 视频在图片前面的话只会将视频添加到已选数组.
+ 如果 type = HXPhotoManagerSelectedTypePhoto 时 会过滤掉视频
+ 如果 type = HXPhotoManagerSelectedTypeVideo 时 会过滤掉图片
+ 
+ @param assetArray 模型数组
+ */
+- (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
+
+/**
+ 添加本地视频数组   内部会将  deleteTemporaryPhoto 设置为NO
+
+ @param urlArray <NSURL *> 本地视频地址
+ @param selected 是否选中   选中的话HXPhotoView自动添加显示 没选中可以在相册里手动选中
+ */
+- (void)addLocalVideo:(NSArray<NSURL *> *)urlArray selected:(BOOL)selected;
+
 /**
  *  本地图片数组 <UIImage *> 装的是UIImage对象 - 已设置为选中状态
  */
@@ -52,7 +82,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
  添加本地图片数组  内部会将  deleteTemporaryPhoto 设置为NO
 
  @param images <UIImage *> 装的是UIImage对象
- @param selected 是否选中  选中的话HXPhotoView自动添加显示 没选中可以在相册里手动选中
+ @param selected 是否选中   选中的话HXPhotoView自动添加显示 没选中可以在相册里手动选中
  */
 - (void)addLocalImage:(NSArray *)images selected:(BOOL)selected;
 

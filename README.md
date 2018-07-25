@@ -23,6 +23,7 @@
 	* [传入本地图片](#Demo7)
 	* [将模型写入临时目录、获取图片/视频](#Demo8)
 	* [cell上使用photoView](#Demo9)
+       * [更多请下载工程查看](#) 
 * [更多](#更多)
 
 ## <a id="特性"></a> 一.  特性 - Features
@@ -41,7 +42,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.1.9'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.0'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.4.1```
 - 使用前导入头文件 "HXPhotoPicker.h"
@@ -81,6 +82,7 @@
 - v2.1.7　-　完善支持英文、优化一些功能 
 - v2.1.8　-　添加支持繁体字、韩文、日文，以及一些功能优化
 - v2.1.9　-　Demo2添加长按拖动删除功能（类似微信）
+- v2.2.0　-　添加xib使用示例（Demo11）、混合添加本地图片/网络图片/本地视频示例（Demo12）
 
 ## <a id="例子"></a> 五.  应用示例 - Examples
 ### <a id="Demo1"></a> Demo1

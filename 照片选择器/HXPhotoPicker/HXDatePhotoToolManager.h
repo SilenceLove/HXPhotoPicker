@@ -20,6 +20,9 @@ typedef void (^ HXDatePhotoToolManagerFailedHandler)();
 typedef void (^ HXDatePhotoToolManagerGetImageListSuccessHandler)(NSArray<UIImage *> *imageList);
 typedef void (^ HXDatePhotoToolManagerGetImageListFailedHandler)();
 
+typedef void (^ HXDatePhotoToolManagerGetImageDataListSuccessHandler)(NSArray<NSData *> *imageDataList);
+typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)();
+
 @interface HXDatePhotoToolManager : NSObject
 
 /**
@@ -73,4 +76,15 @@ typedef void (^ HXDatePhotoToolManagerGetImageListFailedHandler)();
  */
 - (void)cancelGetImageList;
 
+/**
+ 根据模型数组获取与之对应的NSData数组
+ 如果有网络图片时，会先判断是否已经下载完成了，未下载完则重新下载。
+ 
+ @param modelList 模型数组
+ @param success 成功
+ @param failed 失败
+ */
+- (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed;
+
+- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)())success failed:(void (^)())failed;
 @end

@@ -85,7 +85,7 @@
 //        _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
         
-        // 使用自动的相机  这里拿系统相机做示例
+        // 使用自动的相机  这里拿系统相机做示例 
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
             
             // 这里拿使用系统相机做例子

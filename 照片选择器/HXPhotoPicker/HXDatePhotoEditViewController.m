@@ -76,7 +76,7 @@
     [self stopTimer];
 }
 - (void)dealloc {
-    NSSLog(@"dealloc");
+    if (showLog) NSSLog(@"dealloc");
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     

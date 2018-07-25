@@ -31,7 +31,8 @@ typedef enum : NSUInteger {
     HXPhotoModelVideoStateOversize      //!< 视频时长超出限制
 } HXPhotoModelVideoState;
 
-@interface HXPhotoModel : NSObject
+@class HXPhotoManager;
+@interface HXPhotoModel : NSObject<NSCoding>
 /**
  文件在手机里的原路径(照片 或 视频)
  
@@ -58,8 +59,6 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) NSData *locationData;
 /**
  位置信息 CLLocation 对象
- 
- - 如果是通过相机拍摄的并且没有保存到相册(临时的) 没有值
  */
 @property (strong, nonatomic) CLLocation *location;
 
@@ -75,6 +74,10 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) NSString *barSubTitle;
 /**  照片PHAsset对象  */
 @property (strong, nonatomic) PHAsset *asset;
+/**  视频AVAsset对象  */
+@property (strong, nonatomic) AVAsset *avAsset;
+/**  PHAsset对象唯一标示  */
+@property (copy, nonatomic) NSString *localIdentifier;
 /**  是否iCloud上的资源  */
 @property (nonatomic, assign) BOOL isICloud;
 /**  照片类型  */
@@ -151,7 +154,9 @@ typedef enum : NSUInteger {
 /**  如果当前为视频资源时的视频状态  */
 @property (assign, nonatomic) HXPhotoModelVideoState videoState;
 
+@property (strong, nonatomic) NSData *gifImageData;
 @property (copy, nonatomic) NSString *fullPathToFile;;
+@property (strong, nonatomic) HXPhotoManager *photoManager;
 
 /**  通过image初始化 */
 + (instancetype)photoModelWithImage:(UIImage *)image;
@@ -161,6 +166,8 @@ typedef enum : NSUInteger {
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset;
 /**  通过网络图片URL对象初始化 */
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL;
+/**  通过本地视频地址URL对象初始化 */
++ (instancetype)photoModelWithVideoURL:(NSURL *)videoURL;
 @end
 
 @class CLGeocoder;

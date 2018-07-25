@@ -16,6 +16,10 @@
 #define NSSLog(...)
 #endif
 
+#define encodeKey @"HXModelArray"
+
+#define showLog YES
+
 // 判断iPhone X
 #define kDevice_Is_iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
 

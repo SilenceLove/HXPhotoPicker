@@ -24,6 +24,36 @@
 + (UIImage *)hx_imageNamed:(NSString *)imageName;
 
 /**
+ 保存模型数组到本地
+ 
+ @param manager 照片管理者
+ @param success 成功
+ @param failed 失败
+ */
++ (void)saveSelectModelArrayWithManager:(HXPhotoManager *)manager success:(void (^)())success failed:(void (^)())failed;
+
+/**
+ 删除本地保存的模型数组
+
+ @param manager 照片管理者
+ @return success or failed
+ */
++ (BOOL)deleteLocalSelectModelArrayWithManager:(HXPhotoManager *)manager;
+
+/**
+ 获取保存在本地的模型数组
+
+ @param manager 照片管理者 
+ */
++ (void)getSelectedModelArrayWithManager:(HXPhotoManager *)manager complete:(void (^)(NSArray<HXPhotoModel *> *modelArray))complete;
+
++ (BOOL)saveSelectModelArray:(NSArray<HXPhotoModel *> *)modelArray fileName:(NSString *)fileName;
+
++ (NSArray<HXPhotoModel *> *)getSelectedModelArrayWithFileName:(NSString *)fileName;
+
++ (BOOL)deleteSelectModelArrayWithFileName:(NSString *)fileName;
+
+/**
  保存本地视频到系统相册和自定义相册
 
  @param albumName 自定义相册名称

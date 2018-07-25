@@ -463,7 +463,7 @@ UITableViewDelegate
     return _authorizationLb;
 }
 - (void)dealloc {
-    NSSLog(@"dealloc");
+    if (showLog) NSSLog(@"dealloc");
     if (self.manager.configuration.open3DTouchPreview) {
         if (self.previewingContext) {
             [self unregisterForPreviewingWithContext:self.previewingContext];

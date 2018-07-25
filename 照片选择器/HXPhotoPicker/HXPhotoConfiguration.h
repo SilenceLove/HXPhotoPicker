@@ -28,6 +28,12 @@ typedef enum : NSUInteger {
 
 @interface HXPhotoConfiguration : NSObject
 
+/**
+ 模型数组保存草稿时存在本地的文件名称 default HXPhotoPickerModelArray
+ 如果有多个地方保存了草稿请设置不同的fileName
+ */
+@property (copy, nonatomic) NSString *localFileName;
+
 @property (assign, nonatomic) BOOL specialModeNeedHideVideoSelectBtn;
 
 /**
@@ -38,20 +44,20 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL requestImageAfterFinishingSelection;
 
 /**
- 视频是否可以编辑   default YES
- 计划中...
+ 视频是否可以编辑   default NO
+ 
  */
 @property (assign, nonatomic) BOOL videoCanEdit;
 
 /**
  是否替换照片编辑界面   default NO
- 计划中...
+ 
  */
 @property (assign, nonatomic) BOOL replacePhotoEditViewController;
 
 /**
  是否替换视频编辑界面   default NO
- 计划中...
+ 
  */
 @property (assign, nonatomic) BOOL replaceVideoEditViewController;
 

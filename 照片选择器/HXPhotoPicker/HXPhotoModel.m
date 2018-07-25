@@ -8,41 +8,65 @@
 
 #import "HXPhotoModel.h"
 #import "HXPhotoTools.h"
+#import "HXPhotoManager.h"
 #import "UIImage+HXExtension.h"
 #import <MediaPlayer/MediaPlayer.h>
 
 @implementation HXPhotoModel
 
 - (NSURL *)fileURL {
-    if (self.type == HXPhotoModelMediaTypeCameraVideo) {
-        return self.videoURL;
+    if (self.type == HXPhotoModelMediaTypeCameraVideo && !_fileURL) {
+        _fileURL = self.videoURL;
     }
     if (self.type != HXPhotoModelMediaTypeCameraPhoto) {
-        return [self.asset valueForKey:@"mainFileURL"];
+        if (self.asset && !_fileURL) {
+            _fileURL = [self.asset valueForKey:@"mainFileURL"];
+        }
     }
-    return nil;
+    return _fileURL;
 }
 
 - (NSDate *)creationDate {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto || self.type == HXPhotoModelMediaTypeCameraVideo) {
         return [NSDate date];
     }
-    return [self.asset valueForKey:@"creationDate"];
+    if (!_creationDate) {
+        _creationDate = [self.asset valueForKey:@"creationDate"];
+    }
+    return _creationDate;
 }
 
 - (NSDate *)modificationDate {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto || self.type == HXPhotoModelMediaTypeCameraVideo) {
-        return [NSDate date];
+        if (!_modificationDate) {
+            _modificationDate = [NSDate date];
+        }
     }
-    return [self.asset valueForKey:@"modificationDate"];
+    if (!_modificationDate) {
+        _modificationDate = [self.asset valueForKey:@"modificationDate"];
+    }
+    return _modificationDate;
 }
 
 - (NSData *)locationData {
-    return [self.asset valueForKey:@"locationData"];
+    if (!_locationData) {
+        _locationData = [self.asset valueForKey:@"locationData"];
+    }
+    return _locationData;
 }
 
 - (CLLocation *)location {
-    return [self.asset valueForKey:@"location"];
+    if (!_location) {
+        _location = [self.asset valueForKey:@"location"];
+    }
+    return _location;
+}
+
+- (NSString *)localIdentifier {
+    if (self.asset) {
+        return self.asset.localIdentifier;
+    }
+    return _localIdentifier;
 }
 
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset {
@@ -59,6 +83,10 @@
 
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
     return [[self alloc] initWithVideoURL:videoURL videoTime:videoTime];
+}
+
++ (instancetype)photoModelWithVideoURL:(NSURL *)videoURL {
+    return [[self alloc] initWithVideoURL:videoURL];
 }
 
 - (instancetype)initWithImageURL:(NSURL *)imageURL {
@@ -78,6 +106,60 @@
         self.asset = asset;
         self.type = HXPhotoModelMediaTypePhoto;
         self.subType = HXPhotoModelMediaSubTypePhoto;
+    }
+    return self;
+}
+
+- (void)setPhotoManager:(HXPhotoManager *)photoManager {
+    _photoManager = photoManager;
+    if (self.asset.mediaType == PHAssetMediaTypeImage) {
+        self.subType = HXPhotoModelMediaSubTypePhoto;
+        if ([[self.asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
+            if (photoManager.configuration.singleSelected) {
+                self.type = HXPhotoModelMediaTypePhoto;
+            }else {
+                self.type = photoManager.configuration.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
+            }
+        }else if (self.asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive){
+            if (iOS9Later) {
+                if (!photoManager.configuration.singleSelected) {
+                    self.type = photoManager.configuration.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
+                }else {
+                    self.type = HXPhotoModelMediaTypePhoto;
+                }
+            }else {
+                self.type = HXPhotoModelMediaTypePhoto;
+            }
+        }else {
+            self.type = HXPhotoModelMediaTypePhoto;
+        }
+    }else if (self.asset.mediaType == PHAssetMediaTypeVideo) {
+        self.type = HXPhotoModelMediaTypeVideo;
+        self.subType = HXPhotoModelMediaSubTypeVideo;
+    }
+}
+
+- (instancetype)initWithVideoURL:(NSURL *)videoURL {
+    if (self = [super init]) {
+        self.type = HXPhotoModelMediaTypeCameraVideo;
+        self.subType = HXPhotoModelMediaSubTypeVideo;
+        self.videoURL = videoURL;
+        MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:videoURL] ;
+        player.shouldAutoplay = NO;
+        UIImage  *image = [player thumbnailImageAtTime:0.1 timeOption:MPMovieTimeOptionNearestKeyFrame];
+        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
+        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:videoURL options:opts];
+        float second = 0;
+        second = urlAsset.duration.value/urlAsset.duration.timescale;
+        
+        NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:second];
+        self.videoDuration = second;
+        self.videoURL = videoURL;
+        self.videoTime = time;
+        self.thumbPhoto = image;
+        self.previewPhoto = image;
+        self.imageSize = self.thumbPhoto.size;
     }
     return self;
 }
@@ -300,6 +382,52 @@
     }
 //    [self cancelImageRequest];
 }
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        self.thumbPhoto = [aDecoder decodeObjectForKey:@"thumbPhoto"];
+        self.previewPhoto = [aDecoder decodeObjectForKey:@"previewPhoto"];
+        self.localIdentifier = [aDecoder decodeObjectForKey:@"localIdentifier"];
+        self.type = [aDecoder decodeIntegerForKey:@"type"];
+        self.subType = [aDecoder decodeIntegerForKey:@"subType"];
+        self.videoDuration = [aDecoder decodeFloatForKey:@"videoDuration"];
+        self.selected = [aDecoder decodeBoolForKey:@"selected"];
+        self.videoURL = [aDecoder decodeObjectForKey:@"videoURL"];
+        self.networkPhotoUrl = [aDecoder decodeObjectForKey:@"networkPhotoUrl"];
+        self.creationDate = [aDecoder decodeObjectForKey:@"creationDate"];
+        self.modificationDate = [aDecoder decodeObjectForKey:@"modificationDate"];
+        self.locationData = [aDecoder decodeObjectForKey:@"locationData"];
+        self.location = [aDecoder decodeObjectForKey:@"location"];
+        self.videoTime = [aDecoder decodeObjectForKey:@"videoTime"];
+        self.selectIndexStr = [aDecoder decodeObjectForKey:@"videoTime"];
+        self.cameraIdentifier = [aDecoder decodeObjectForKey:@"cameraIdentifier"];
+        self.fileURL = [aDecoder decodeObjectForKey:@"fileURL"];
+        self.gifImageData = [aDecoder decodeObjectForKey:@"gifImageData"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:self.thumbPhoto forKey:@"thumbPhoto"];
+    [aCoder encodeObject:self.previewPhoto forKey:@"previewPhoto"];
+    [aCoder encodeObject:self.localIdentifier forKey:@"localIdentifier"];
+    [aCoder encodeInteger:self.type forKey:@"type"];
+    [aCoder encodeInteger:self.subType forKey:@"subType"];
+    [aCoder encodeFloat:self.videoDuration forKey:@"videoDuration"];
+    [aCoder encodeBool:self.selected forKey:@"selected"];
+    [aCoder encodeObject:self.videoURL forKey:@"videoURL"];
+    [aCoder encodeObject:self.networkPhotoUrl forKey:@"networkPhotoUrl"];
+    [aCoder encodeObject:self.creationDate forKey:@"creationDate"];
+    [aCoder encodeObject:self.modificationDate forKey:@"modificationDate"];
+    [aCoder encodeObject:self.locationData forKey:@"locationData"];
+    [aCoder encodeObject:self.location forKey:@"location"];
+    [aCoder encodeObject:self.videoTime forKey:@"videoTime"];
+    [aCoder encodeObject:self.selectIndexStr forKey:@"selectIndexStr"];
+    [aCoder encodeObject:self.cameraIdentifier forKey:@"cameraIdentifier"];
+    [aCoder encodeObject:self.fileURL forKey:@"fileURL"];
+    [aCoder encodeObject:self.gifImageData forKey:@"gifImageData"]; 
+}
+
 @end
 
 @implementation HXPhotoDateModel

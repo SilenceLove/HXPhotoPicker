@@ -70,6 +70,9 @@
     [self.progressView removeFromSuperview];
     [self.loadingView stopAnimating];
     [self.view addSubview:self.imageView];
+    if (self.player) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
+    }
 }
 
 - (void)loadPhoto {
@@ -78,65 +81,74 @@
         return;
     }
     __weak typeof(self) weakSelf = self;
-    self.requestId = [HXPhotoTools getHighQualityFormatPhoto:self.model.asset size:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.requestId = cloudRequestId;
-            if (weakSelf.model.isICloud) {
-                weakSelf.progressView.hidden = NO;
-            }
-        });
-    } progressHandler:^(double progress) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (weakSelf.model.isICloud) {
-                weakSelf.progressView.hidden = NO;
-            }
-            weakSelf.progressView.progress = progress;
-        });
-    } completion:^(UIImage *image) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.progressView.hidden = YES;
-            weakSelf.imageView.image = image;
-        });
-    } failed:^(NSDictionary *info) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-//            [weakSelf.progressView showError];
-        });
-    }];
+    if (self.model.asset) {
+        self.requestId = [HXPhotoTools getHighQualityFormatPhoto:self.model.asset size:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.requestId = cloudRequestId;
+                if (weakSelf.model.isICloud) {
+                    weakSelf.progressView.hidden = NO;
+                }
+            });
+        } progressHandler:^(double progress) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (weakSelf.model.isICloud) {
+                    weakSelf.progressView.hidden = NO;
+                }
+                weakSelf.progressView.progress = progress;
+            });
+        } completion:^(UIImage *image) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.progressView.hidden = YES;
+                weakSelf.imageView.image = image;
+            });
+        } failed:^(NSDictionary *info) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //            [weakSelf.progressView showError];
+            });
+        }];
+    }else {
+        self.imageView.image = self.model.thumbPhoto;
+    }
     //    requestId = [HXPhotoTools fetchPhotoWithAsset:self.model.asset photoSize:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
     //        weakSelf.imageView.image = photo;
     //    }];
 }
 
 - (void)loadGifPhoto {
-    __weak typeof(self) weakSelf = self;
-    self.requestId = [HXPhotoTools getImageData:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.requestId = cloudRequestId;
-            if (weakSelf.model.isICloud) {
-                weakSelf.progressView.hidden = NO;
-            }
-        });
-    } progressHandler:^(double progress) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (weakSelf.model.isICloud) {
-                weakSelf.progressView.hidden = NO;
-            }
-            weakSelf.progressView.progress = progress;
-        });
-    } completion:^(NSData *imageData, UIImageOrientation orientation) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.progressView.hidden = YES;
-            UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
-            if (gifImage.images.count > 0) {
-                weakSelf.imageView.image = nil;
-                weakSelf.imageView.image = gifImage;
-            }
-        });
-    } failed:^(NSDictionary *info) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-//            [weakSelf.progressView showError];
-        });
-    }];
+    if (self.model.asset) {
+        __weak typeof(self) weakSelf = self;
+        self.requestId = [HXPhotoTools getImageData:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.requestId = cloudRequestId;
+                if (weakSelf.model.isICloud) {
+                    weakSelf.progressView.hidden = NO;
+                }
+            });
+        } progressHandler:^(double progress) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (weakSelf.model.isICloud) {
+                    weakSelf.progressView.hidden = NO;
+                }
+                weakSelf.progressView.progress = progress;
+            });
+        } completion:^(NSData *imageData, UIImageOrientation orientation) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.progressView.hidden = YES;
+                UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
+                if (gifImage.images.count > 0) {
+                    weakSelf.imageView.image = nil;
+                    weakSelf.imageView.image = gifImage;
+                }
+            });
+        } failed:^(NSDictionary *info) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //            [weakSelf.progressView showError];
+            });
+        }];
+    }else {
+        UIImage *gifImage = [UIImage animatedGIFWithData:self.model.gifImageData];
+        self.imageView.image = gifImage;
+    }
     //    requestId = [HXPhotoTools FetchPhotoDataForPHAsset:self.model.asset completion:^(NSData *imageData, NSDictionary *info) {
     //        if (imageData) {
     //            UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
@@ -194,36 +206,45 @@
         AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.model.videoURL];
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
         [self playVideo];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
     }else {
-        __weak typeof(self) weakSelf = self;
-        self.requestId = [HXPhotoTools getAVAssetWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.requestId = cloudRequestId;
-//                if (weakSelf.model.isICloud) {
-//                    weakSelf.progressView.hidden = NO;
-//                }
-                [weakSelf.loadingView startAnimating];
-            });
-        } progressHandler:^(double progress) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (weakSelf.model.isICloud) {
-                    weakSelf.progressView.hidden = NO;
-                }
-                weakSelf.progressView.progress = progress;
-            });
-        } completion:^(AVAsset *asset) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.progressView.hidden = YES;
-                weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
-                [weakSelf playVideo];
-                [weakSelf.loadingView stopAnimating];
-            });
-        } failed:^(NSDictionary *info) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-//                [weakSelf.progressView showError];
-                [weakSelf.loadingView stopAnimating];
-            });
-        }];
+        if (self.model.asset) {
+            __weak typeof(self) weakSelf = self;
+            self.requestId = [HXPhotoTools getAVAssetWithPHAsset:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.requestId = cloudRequestId;
+                    //                if (weakSelf.model.isICloud) {
+                    //                    weakSelf.progressView.hidden = NO;
+                    //                }
+                    [weakSelf.loadingView startAnimating];
+                });
+            } progressHandler:^(double progress) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (weakSelf.model.isICloud) {
+                        weakSelf.progressView.hidden = NO;
+                    }
+                    weakSelf.progressView.progress = progress;
+                });
+            } completion:^(AVAsset *asset) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.progressView.hidden = YES;
+                    weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
+                    [weakSelf playVideo];
+                    [weakSelf.loadingView stopAnimating];
+                    [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem];
+                });
+            } failed:^(NSDictionary *info) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //                [weakSelf.progressView showError];
+                    [weakSelf.loadingView stopAnimating];
+                });
+            }];
+        }else {
+            AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.model.fileURL];
+            self.player = [AVPlayer playerWithPlayerItem:playerItem];
+            [self playVideo];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
+        }
         //        requestId = [[PHImageManager defaultManager] requestAVAssetForVideo:self.model.asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
         //            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
         //            if (downloadFinined && asset) {
@@ -250,7 +271,10 @@
         //        }];
     }
 }
-
+- (void)pausePlayerAndShowNaviBar {
+    [self.player.currentItem seekToTime:CMTimeMake(0, 1)];
+    [self.player play];
+}
 - (void)playVideo {
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
     self.playerLayer.frame = CGRectMake(0, 0, self.model.previewViewSize.width, self.model.previewViewSize.height);
@@ -261,9 +285,9 @@
     });
 }
 
-//- (void)dealloc {
-//
-//}
+- (void)dealloc {
+    if (showLog) NSSLog(@"%@",self);
+}
 
 - (UIImageView *)imageView {
     if (!_imageView) {

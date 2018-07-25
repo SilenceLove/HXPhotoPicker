@@ -76,6 +76,7 @@
 //    self.videoCanEdit = YES;
     self.singleJumpEdit = YES;
     self.photoCanEdit = YES;
+    self.localFileName = @"HXPhotoPickerModelArray";
     
 //    [self preloadImage];
 }
@@ -89,6 +90,21 @@
 //    [HXPhotoTools hx_imageNamed:@"qz_photolist_picture_fail@2x.png"];
 //    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"];
 //    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default111@2x.png"];
+//}
+
+//- (NSInteger)maxNum {
+//    if (!_maxNum) {
+//        if (self.type == HXPhotoManagerSelectedTypePhoto) {
+//            _maxNum = self.photoMaxNum;
+//        }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
+//            _maxNum = self.videoMaxNum;
+//        }else {
+//            if (self.videoMaxNum + self.photoMaxNum != self.maxNum) {
+//                _maxNum = self.videoMaxNum + self.photoMaxNum;
+//            }
+//        }
+//    }
+//    return _maxNum;
 //}
 
 - (void)setClarityScale:(CGFloat)clarityScale {

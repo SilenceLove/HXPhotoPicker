@@ -16,9 +16,11 @@
 #import "Demo7ViewController.h"
 #import "Demo8ViewController.h"
 #import "Demo9ViewController.h"
+#import "Demo10ViewController.h"
 #import "YYFPSLabel.h"
 #import "HXPhotoPicker.h"
- 
+#import "Demo11ViewController.h"
+#import "Demo12ViewController.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -62,14 +64,24 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                          subTitle:@"拍照/选择照片完之后跳界面"
                                 viewControllClass: [Demo6ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo7"
-                                         subTitle:@"传入本地image并展示"
+                                         subTitle:@"传入本地image/video并展示"
                                 viewControllClass: [Demo7ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo8"
                                          subTitle:@"将已选模型(图片和视频)写入临时目录  一键写入^_^"
                                 viewControllClass: [Demo8ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo9"
                                          subTitle:@"cell上添加photoView"
-                                viewControllClass: [Demo9ViewController class]]
+                                viewControllClass: [Demo9ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo10"
+                                         subTitle:@"保存草稿功能"
+                                viewControllClass: [Demo10ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo11"
+                                         subTitle:@"xib上使用HXPhotoView"
+                                viewControllClass: [Demo11ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo12"
+                                         subTitle:@"混合添加资源"
+                                viewControllClass: [Demo12ViewController class]]
+                  
                   ];
     }
     return _list;
@@ -78,7 +90,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.title = @"";
+    self.title = @"Demo 1 ~ 12";
 
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -117,7 +129,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 {
     ListItem *item = self.list[indexPath.row];
     UIViewController *viewController = [[item.viewControllClass alloc] init];
-    viewController.title = item.title;
+    viewController.title = item.title; 
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];  
     [self.navigationController pushViewController:viewController animated:YES];
     

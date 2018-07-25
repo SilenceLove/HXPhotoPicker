@@ -991,7 +991,7 @@ HXDatePhotoEditViewControllerDelegate
     return _dateArray;
 }
 - (void)dealloc {
-    NSSLog(@"dealloc");
+    if (showLog) NSSLog(@"dealloc");
     [self.collectionView.layer removeAllAnimations];
     if (self.manager.configuration.open3DTouchPreview) {
         if (self.previewingContext) {
@@ -1067,7 +1067,7 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)dealloc {
     [self stopRunning];
-    NSSLog(@"camera - dealloc");
+    if (showLog) NSSLog(@"camera - dealloc");
 }
 - (UIButton *)cameraBtn {
     if (!_cameraBtn) {

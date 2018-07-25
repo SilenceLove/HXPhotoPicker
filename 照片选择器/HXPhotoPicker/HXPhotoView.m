@@ -94,22 +94,16 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
-        self.spacing = 3;
-        self.lineCount = 3;
-        self.numOfLinesOld = 0;
-        self.manager = manager;
         [self setup];
+        self.manager = manager;
     }
     return self;
 }
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
-        self.spacing = 3;
-        self.lineCount = 3;
-        self.numOfLinesOld = 0;
-        self.manager = manager;
         [self setup];
+        self.manager = manager;
     }
     return self;
 }
@@ -117,27 +111,39 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {
-        self.spacing = 3;
-        self.lineCount = 3;
-        self.numOfLinesOld = 0;
+        [self setup];
         self.manager = manager;
+    }
+    return self;
+}
+- (instancetype)init {
+    if (self = [super init]) {
         [self setup];
     }
     return self;
 }
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    self.spacing = 3;
+    self.lineCount = 3;
+    self.numOfLinesOld = 0;
+    [self setup];
+    self.manager = [[HXPhotoManager alloc] init];
+}
 
-/**  不要使用 "initWithFrame" 这个方法初始化  */
-//- (instancetype)initWithFrame:(CGRect)frame {
-//    self = [super initWithFrame:frame];
-//    if (self) {
-//        [self setup];
-//    }
-//    return self;
-//}
 - (void)setup {
+    self.spacing = 3;
+    self.lineCount = 3;
+    self.numOfLinesOld = 0;
     self.tag = 9999;
-    self.showAddCell = YES;
-//    [self.dataList addObject:self.addModel];
+    self.showAddCell = YES; 
     
     self.flowLayout.minimumLineSpacing = self.spacing;
     self.flowLayout.minimumInteritemSpacing = self.spacing;
@@ -151,6 +157,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     [self.collectionView registerClass:[HXPhotoSubViewCell class] forCellWithReuseIdentifier:@"addCell"];
     [self addSubview:self.collectionView]; 
     if (self.manager.afterSelectedArray.count > 0) {
+        self.imageList = [NSMutableArray array];
+        for (HXPhotoModel *photoModel in self.manager.afterSelectedArray) {
+            [self.imageList addObject:photoModel.thumbPhoto];
+        }
         [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
     }
 } 
@@ -164,6 +174,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     _manager = manager;
     manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
     if (self.manager.afterSelectedArray.count > 0) {
+        self.imageList = [NSMutableArray array];
+        for (HXPhotoModel *photoModel in self.manager.afterSelectedArray) {
+            [self.imageList addObject:photoModel.thumbPhoto];
+        }
         [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
     }
 }
@@ -175,7 +189,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (void)setShowAddCell:(BOOL)showAddCell {
     _showAddCell = showAddCell;
     self.tempShowAddCell = showAddCell;
-    [self.collectionView reloadData];
+    if (self.manager.afterSelectedArray.count > 0) {
+        [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
+    }
 }
 /**
  刷新视图
@@ -435,7 +451,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if (cell) {
         [self cellDidDeleteClcik:cell];
     }else {
-        NSSLog(@"删除失败 - cell为空");
+        if (showLog) NSSLog(@"删除失败 - cell为空");
     }
 }
 /**
@@ -489,9 +505,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if ([self.delegate respondsToSelector:@selector(photoView:currentDeleteModel:currentIndex:)]) {
         [self.delegate photoView:self currentDeleteModel:model currentIndex:indexPath.item];
     }
-    model.thumbPhoto = nil;
-    model.previewPhoto = nil;
-    model = nil;
+    if (model.type != HXPhotoModelMediaTypeCameraPhoto &&
+        model.type != HXPhotoModelMediaTypeCameraVideo) {
+        model.thumbPhoto = nil;
+        model.previewPhoto = nil;
+        model = nil;
+    }
     [self setupNewFrame];
 }
 
@@ -556,7 +575,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 
 - (void)photoViewControllerDidCancel {
-    
+    if ([self.delegate respondsToSelector:@selector(photoViewDidCancel:)]) {
+        [self.delegate photoViewDidCancel:self];
+    }
 }
 
 - (NSArray *)dataSourceArrayOfCollectionView:(HXCollectionView *)collectionView {
@@ -731,7 +752,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
 }
 - (void)dealloc {
-    NSSLog(@"dealloc");
+    if (showLog) NSSLog(@"dealloc");
 }
 
 @end

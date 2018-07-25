@@ -131,11 +131,11 @@
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     if (!fromVC.modelArray.count) {
         UIView *containerView = [transitionContext containerView];
-        UIView *tempView = [fromVC.view snapshotViewAfterScreenUpdates:YES];
+        UIView *tempView = [fromVC.view snapshotViewAfterScreenUpdates:NO];
         [containerView addSubview:tempView];
         [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
             tempView.alpha = 0;
-            tempView.transform = CGAffineTransformMakeScale(0.7, 0.7);
+            tempView.transform = CGAffineTransformMakeScale(1.5, 1.5);
         } completion:^(BOOL finished) {
             [tempView removeFromSuperview];
             [transitionContext completeTransition:YES];

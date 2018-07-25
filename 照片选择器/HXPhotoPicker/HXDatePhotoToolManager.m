@@ -39,6 +39,17 @@
 @property (strong, nonatomic) NSMutableArray *currentImageModelArray;
 @property (strong, nonatomic) NSMutableArray *imageArray;
 @property (assign, nonatomic) HXDatePhotoToolManagerRequestType requestType;
+
+
+@property (copy, nonatomic) HXDatePhotoToolManagerGetImageDataListSuccessHandler imageDataSuccessHandler;
+@property (copy, nonatomic) HXDatePhotoToolManagerGetImageDataListFailedHandler imageDataFailedHandler;
+@property (assign, nonatomic) BOOL gettingImageData;
+@property (assign, nonatomic) BOOL cancelGetImageData;
+@property (assign, nonatomic) PHImageRequestID currentImageDataRequestID;
+@property (strong, nonatomic) NSMutableArray *allImageDataModelArray;
+@property (strong, nonatomic) NSMutableArray *waitImageDataModelArray;
+@property (strong, nonatomic) NSMutableArray *currentImageDataModelArray;
+@property (strong, nonatomic) NSMutableArray *imageDataArray;
 @end
 
 @implementation HXDatePhotoToolManager
@@ -51,7 +62,7 @@
 
 - (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList requestType:(HXDatePhotoToolManagerRequestType)requestType success:(HXDatePhotoToolManagerSuccessHandler)success failed:(HXDatePhotoToolManagerFailedHandler)failed {
     if (self.writing) {
-        NSSLog(@"已有写入任务,请等待");
+        if (showLog) NSSLog(@"已有写入任务,请等待");
         return;
     }
     self.requestType = requestType;
@@ -71,9 +82,33 @@
     [self writeModelToTempPath];
 }
 
+- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)())success failed:(void (^)())failed {
+    __block NSInteger count = 0;
+    __block NSInteger modelCount = gifModelArray.count;
+    for (HXPhotoModel *model in gifModelArray) {
+        [HXPhotoTools getImageDataWithModel:model startRequestIcloud:^(HXPhotoModel *model, PHImageRequestID cloudRequestId) {
+            
+        } progressHandler:^(HXPhotoModel *model, double progress) {
+            
+        } completion:^(HXPhotoModel *model, NSData *imageData, UIImageOrientation orientation) {
+            model.gifImageData = imageData;
+            count++;
+            if (count == modelCount) {
+                if (success) {
+                    success();
+                }
+            }
+        } failed:^(HXPhotoModel *model, NSDictionary *info) {
+            if (failed) {
+                failed();
+            }
+        }];
+    }
+}
+
 - (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerSuccessHandler)success failed:(HXDatePhotoToolManagerFailedHandler)failed {
     if (self.writing) {
-        NSSLog(@"已有写入任务,请等待");
+        if (showLog) NSSLog(@"已有写入任务,请等待");
         return;
     }
     self.writing = YES;
@@ -103,7 +138,7 @@
 }
 - (void)writeModelToTempPath {
     if (self.waitArray.count == 0) {
-        NSSLog(@"全部压缩成功");
+        if (showLog) NSSLog(@"全部压缩成功");
         dispatch_async(dispatch_get_main_queue(), ^{
             self.writing = NO;
             if (self.successHandler) {
@@ -123,44 +158,63 @@
         }else {
             presetName = AVAssetExportPresetMediumQuality;
         }
-        [HXPhotoTools getExportSessionWithPHAsset:model.asset deliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic presetName:presetName startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            
-        } progressHandler:^(double progress) {
-            
-        } completion:^(AVAssetExportSession *exportSession, NSDictionary *info) {
-            NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:@".mp4"];
-            NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-            NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
-            exportSession.outputURL = videoURL;
-            exportSession.outputFileType = AVFileTypeMPEG4;
-            exportSession.shouldOptimizeForNetworkUse = YES;
-            
-            [exportSession exportAsynchronouslyWithCompletionHandler:^{
+        if (model.asset) {
+            [HXPhotoTools getExportSessionWithPHAsset:model.asset deliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic presetName:presetName startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+                
+            } progressHandler:^(double progress) {
+                
+            } completion:^(AVAssetExportSession *exportSession, NSDictionary *info) {
+                NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:@".mp4"];
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
+                exportSession.outputURL = videoURL;
+                exportSession.outputFileType = AVFileTypeMPEG4;
+                exportSession.shouldOptimizeForNetworkUse = YES;
+                
+                [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if ([exportSession status] == AVAssetExportSessionStatusCompleted) {
+                            [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
+                            [weakSelf.allURL addObject:videoURL];
+                            [weakSelf.videoURL addObject:videoURL];
+                            [weakSelf writeModelToTempPath];
+                        }else if ([exportSession status] == AVAssetExportSessionStatusFailed){
+                            if (weakSelf.failedHandler) {
+                                weakSelf.failedHandler();
+                            }
+                            [weakSelf cleanWriteList];
+                        }else if ([exportSession status] == AVAssetExportSessionStatusCancelled) {
+                            if (weakSelf.failedHandler) {
+                                weakSelf.failedHandler();
+                            }
+                            [weakSelf cleanWriteList];
+                        }
+                    });
+                }];
+            } failed:^(NSDictionary *info) {
+                if (weakSelf.failedHandler) {
+                    weakSelf.failedHandler();
+                }
+                [weakSelf cleanWriteList];
+            }];
+        }else {
+            [self compressedVideoWithMediumQualityWriteToTemp:model.fileURL progress:^(float progress) {
+                
+            } success:^(NSURL *url) {
+                [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
+                [weakSelf.allURL addObject:url];
+                [weakSelf.videoURL addObject:url];
+                [weakSelf writeModelToTempPath];
+            } failure:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([exportSession status] == AVAssetExportSessionStatusCompleted) {
-                        [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
-                        [weakSelf.allURL addObject:videoURL];
-                        [weakSelf.videoURL addObject:videoURL];
-                        [weakSelf writeModelToTempPath];
-                    }else if ([exportSession status] == AVAssetExportSessionStatusFailed){
-                        if (weakSelf.failedHandler) {
-                            weakSelf.failedHandler();
-                        }
-                        [weakSelf cleanWriteList];
-                    }else if ([exportSession status] == AVAssetExportSessionStatusCancelled) {
-                        if (weakSelf.failedHandler) {
-                            weakSelf.failedHandler();
-                        }
-                        [weakSelf cleanWriteList];
+                    if (weakSelf.failedHandler) {
+                        weakSelf.failedHandler();
                     }
+                    [weakSelf cleanWriteList];
                 });
             }];
-        } failed:^(NSDictionary *info) {
-            if (weakSelf.failedHandler) {
-                weakSelf.failedHandler();
-            }
-            [weakSelf cleanWriteList];
-        }];
+
+        }
         /*
         [HXPhotoTools getAVAssetWithPHAsset:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
             
@@ -246,101 +300,152 @@
             }
         });
     }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
-        [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            
-        } progressHandler:^(double progress) {
-            
-        } completion:^(NSData *imageData, UIImageOrientation orientation) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
+        if (model.asset) {
+            [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
                 
-                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+            } progressHandler:^(double progress) {
                 
-                if ([imageData writeToFile:fullPathToFile atomically:YES]) {
-                    [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
-                    [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                    [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                    [weakSelf writeModelToTempPath];
-                }else {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (weakSelf.failedHandler) {
-                            weakSelf.failedHandler();
-                        }
+            } completion:^(NSData *imageData, UIImageOrientation orientation) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
+                    
+                    NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                    
+                    if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+                        [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
+                        [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                        [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                        [weakSelf writeModelToTempPath];
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (weakSelf.failedHandler) {
+                                weakSelf.failedHandler();
+                            }
+                            [weakSelf cleanWriteList];
+                        });
+                    }
+                });
+            } failed:^(NSDictionary *info) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (weakSelf.failedHandler) {
+                        weakSelf.failedHandler();
                         [weakSelf cleanWriteList];
-                    });
-                }
-            });
-        } failed:^(NSDictionary *info) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (weakSelf.failedHandler) {
-                    weakSelf.failedHandler();
-                    [weakSelf cleanWriteList];
-                }
-            });
-        }];
-    }else {
-        CGSize size = CGSizeZero;
-        if (self.requestType == HXDatePhotoToolManagerRequestTypeHD) {
-            CGFloat width = [UIScreen mainScreen].bounds.size.width;
-            CGFloat height = [UIScreen mainScreen].bounds.size.height;
-            CGFloat imgWidth = model.imageSize.width;
-            CGFloat imgHeight = model.imageSize.height;
-            if (imgHeight > imgWidth / 9 * 17) {
-                size = CGSizeMake(width, height);
-            }else {
-                size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
-            }
+                    }
+                });
+            }];
         }else {
-            size = PHImageManagerMaximumSize;
-        }
-        [HXPhotoTools getHighQualityFormatPhoto:model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            
-        } progressHandler:^(double progress) {
-            
-        } completion:^(UIImage *image) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                UIImage *tempImage = image;
-                if (tempImage.imageOrientation != UIImageOrientationUp) {
-                    tempImage = [tempImage normalizedImage];
-                }
-                NSData *imageData;
-                NSString *suffix;
-                if (UIImagePNGRepresentation(tempImage)) {
-                    //返回为png图像。
-                    imageData = UIImagePNGRepresentation(tempImage);
-                    suffix = @"png";
-                }else {
-                    //返回为JPEG图像。
-                    imageData = UIImageJPEGRepresentation(tempImage, 0.8);
-                    suffix = @"jpeg";
-                }
+                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
                 
-                NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                
+                if ([model.gifImageData writeToFile:fullPathToFile atomically:YES]) {
+                    [self.allArray removeObject:self.writeArray.firstObject];
+                    [self.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [self.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [self writeModelToTempPath];
+                }else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (self.failedHandler) {
+                            self.failedHandler();
+                        }
+                        [self cleanWriteList];
+                    });
+                }
+            });
+        }
+    }else {
+        if (model.asset) {
+            CGSize size = CGSizeZero;
+            if (self.requestType == HXDatePhotoToolManagerRequestTypeHD) {
+                CGFloat width = [UIScreen mainScreen].bounds.size.width;
+                CGFloat height = [UIScreen mainScreen].bounds.size.height;
+                CGFloat imgWidth = model.imageSize.width;
+                CGFloat imgHeight = model.imageSize.height;
+                if (imgHeight > imgWidth / 9 * 17) {
+                    size = CGSizeMake(width, height);
+                }else {
+                    size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
+                }
+            }else {
+                size = PHImageManagerMaximumSize;
+            }
+            [HXPhotoTools getHighQualityFormatPhoto:model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+                
+            } progressHandler:^(double progress) {
+                
+            } completion:^(UIImage *image) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    UIImage *tempImage = image;
+                    if (tempImage.imageOrientation != UIImageOrientationUp) {
+                        tempImage = [tempImage normalizedImage];
+                    }
+                    NSData *imageData;
+                    NSString *suffix;
+                    if (UIImagePNGRepresentation(tempImage)) {
+                        //返回为png图像。
+                        imageData = UIImagePNGRepresentation(tempImage);
+                        suffix = @"png";
+                    }else {
+                        //返回为JPEG图像。
+                        imageData = UIImageJPEGRepresentation(tempImage, 0.8);
+                        suffix = @"jpeg";
+                    }
+                    
+                    NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+                    
+                    NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                    
+                    if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+                        [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
+                        [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                        [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                        [weakSelf writeModelToTempPath];
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (weakSelf.failedHandler) {
+                                weakSelf.failedHandler();
+                            }
+                            [weakSelf cleanWriteList];
+                        });
+                    }
+                });
+            } failed:^(NSDictionary *info) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (weakSelf.failedHandler) {
+                        weakSelf.failedHandler();
+                    }
+                    [weakSelf cleanWriteList];
+                });
+            }];
+        }else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                CGFloat scale;
+                if (self.requestType == HXDatePhotoToolManagerRequestTypeHD) {
+                    scale = 0.8f;
+                }else {
+                    scale = 1.0f;
+                }
+                NSData *imageData = UIImageJPEGRepresentation(model.thumbPhoto, scale);
+                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".jpeg"]];
                 
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 
                 if ([imageData writeToFile:fullPathToFile atomically:YES]) {
-                    [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
-                    [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                    [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                    [weakSelf writeModelToTempPath];
+                    [self.allArray removeObject:weakSelf.writeArray.firstObject];
+                    [self.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [self.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [self writeModelToTempPath];
                 }else {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        if (weakSelf.failedHandler) {
-                            weakSelf.failedHandler();
+                        if (self.failedHandler) {
+                            self.failedHandler();
                         }
-                        [weakSelf cleanWriteList];
+                        [self cleanWriteList];
                     });
                 }
             });
-        } failed:^(NSDictionary *info) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (weakSelf.failedHandler) {
-                    weakSelf.failedHandler();
-                }
-                [weakSelf cleanWriteList];
-            });
-        }];
+        }
     }
 }
 
@@ -403,12 +508,157 @@
     
     return [NSString stringWithFormat:@"%@%@",name,fileName];
 }
+- (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed {
+    if (self.gettingImageData) {
+        if (showLog) NSSLog(@"已有任务,请等待");
+        return;
+    }
+    [self cancelGetImageList];
+    
+    self.cancelGetImageData = NO;
+    self.gettingImageData = YES;
+    self.imageDataSuccessHandler = success;
+    self.imageDataFailedHandler = failed;
+    
+    [self.imageDataArray removeAllObjects];
+    [self.currentImageDataModelArray removeAllObjects];
+    
+    self.allImageDataModelArray = [NSMutableArray array];
+    for (HXPhotoModel *model in modelList) {
+        [self.allImageDataModelArray insertObject:model atIndex:0];
+    }
+    self.waitImageDataModelArray = [NSMutableArray arrayWithArray:self.allImageDataModelArray];
+    [self getCurrentModelImageData];
+}
+- (void)getCurrentModelImageData {
+    if (self.cancelGetImageData) {
+        self.cancelGetImageData = NO;
+        self.gettingImageData = NO;
+        [self.downloadTokenArray removeAllObjects];
+        if (showLog) NSSLog(@"取消了");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.imageDataFailedHandler) {
+                self.imageDataFailedHandler();
+            }
+        });
+        return;
+    }
+    if (self.waitImageDataModelArray.count == 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.downloadTokenArray removeAllObjects];
+            self.gettingImageData = NO;
+            self.cancelGetImageData = NO;
+            if (self.imageDataSuccessHandler) {
+                self.imageDataSuccessHandler(self.imageDataArray);
+            }
+        });
+        return;
+    }
+    self.currentImageDataModelArray = [NSMutableArray arrayWithObjects:self.waitImageDataModelArray.lastObject, nil];
+    [self.waitImageDataModelArray removeLastObject];
+    HXPhotoModel *model = self.currentImageDataModelArray.firstObject;
+    if (model.asset) {
+        __weak typeof(self) weakSelf = self;
+        self.currentImageDataRequestID = [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+            weakSelf.currentImageDataRequestID = cloudRequestId;
+        } progressHandler:^(double progress) {
+            
+        } completion:^(NSData *imageData, UIImageOrientation orientation) {
+            [weakSelf.imageDataArray addObject:imageData];
+            [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
+            [weakSelf getCurrentModelImageData];
+        } failed:^(NSDictionary *info) {
+            if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
+                weakSelf.gettingImageData = NO;
+                weakSelf.cancelGetImageData = NO;
+                if (showLog) NSSLog(@"取消了请求了");
+                if (weakSelf.imageDataFailedHandler) {
+                    weakSelf.imageDataFailedHandler();
+                }
+                return;
+            }
+            HXPhotoModel *model = weakSelf.currentImageDataModelArray.firstObject;
+            if (model.gifImageData) {
+                [weakSelf.imageDataArray addObject:model.gifImageData];
+                [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
+                [weakSelf getCurrentModelImageData];
+            }else {
+                weakSelf.gettingImageData = NO;
+                if (weakSelf.imageDataFailedHandler) {
+                    weakSelf.imageDataFailedHandler();
+                }
+            }
+        }];
+    }else {
+        if (model.networkPhotoUrl) {
+            __weak typeof(self) weakSelf = self;
+            if (model.downloadError) {
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+                SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                    if (!error && data) {
+                        model.thumbPhoto = image;
+                        model.previewPhoto = image;
+                        model.gifImageData = data;
+                        [weakSelf.imageDataArray addObject:data];
+                        [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
+                        [weakSelf getCurrentModelImageData];
+                    }else {
+                        [weakSelf.downloadTokenArray removeAllObjects];
+                        weakSelf.gettingImageData = NO;
+                        if (weakSelf.imageDataFailedHandler) {
+                            weakSelf.imageDataFailedHandler();
+                        }
+                    }
+                }];
+                [self.downloadTokenArray addObject:token];
+#endif
+                return;
+            }
+            if (!model.downloadComplete) {
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+                SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                    if (!error && image) {
+                        model.thumbPhoto = image;
+                        model.previewPhoto = image;
+                        model.gifImageData = data;
+                        [weakSelf.imageDataArray addObject:data];
+                        [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
+                        [weakSelf getCurrentModelImageData];
+                    }else {
+                        [weakSelf.downloadTokenArray removeAllObjects];
+                        weakSelf.gettingImageData = NO;
+                        if (weakSelf.imageDataFailedHandler) {
+                            weakSelf.imageDataFailedHandler();
+                        }
+                    }
+                }];
+                [self.downloadTokenArray addObject:token];
+#endif
+                return;
+            }
+        }
+        if (model.gifImageData) {
+            [self.imageDataArray addObject:model.gifImageData];
+            [self.allImageDataModelArray removeObject:self.currentImageDataModelArray.firstObject];
+            [self getCurrentModelImageData];
+        }else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{ 
+                NSData *imageData = UIImageJPEGRepresentation(model.thumbPhoto, 1.0f);
+                model.gifImageData = imageData;
+                [self.imageDataArray addObject:imageData];
+                [self.allImageDataModelArray removeObject:self.currentImageDataModelArray.firstObject];
+                [self getCurrentModelImageData];
+            });
+        }
+    }
+}
 
 - (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList requestType:(HXDatePhotoToolManagerRequestType)requestType success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed {
     if (self.gettingImage) {
-        NSSLog(@"已有任务,请等待");
+        if (showLog) NSSLog(@"已有任务,请等待");
         return;
     }
+    [self cancelGetImageDataList];
     self.requestType = requestType;
     self.cancelGetImage = NO;
     self.gettingImage = YES;
@@ -427,9 +677,10 @@
 }
 - (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed {
     if (self.gettingImage) {
-        NSSLog(@"已有任务,请等待");
+        if (showLog) NSSLog(@"已有任务,请等待");
         return;
     }
+    [self cancelGetImageDataList];
     self.cancelGetImage = NO;
     self.gettingImage = YES;
     self.imageSuccessHandler = success;
@@ -450,7 +701,7 @@
         self.cancelGetImage = NO;
         self.gettingImage = NO;
         [self.downloadTokenArray removeAllObjects];
-        NSSLog(@"取消了");
+        if (showLog) NSSLog(@"取消了");
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.imageFailedHandler) {
@@ -499,7 +750,7 @@
             if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
                 weakSelf.gettingImage = NO;
                 weakSelf.cancelGetImage = NO;
-                NSSLog(@"取消了请求了");
+                if (showLog) NSSLog(@"取消了请求了");
                 if (weakSelf.imageFailedHandler) {
                     weakSelf.imageFailedHandler();
                 }
@@ -585,6 +836,19 @@
         self.currentImageRequestID = 0;
     }
 }
+- (void)cancelGetImageDataList {
+    self.cancelGetImageData = YES;
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+    for (SDWebImageDownloadToken *token in self.downloadTokenArray) {
+        [[SDWebImageDownloader sharedDownloader] cancel:token];
+    }
+#endif
+    [self.downloadTokenArray removeAllObjects];
+    if (self.currentImageDataRequestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.currentImageDataRequestID];
+        self.currentImageDataRequestID = 0;
+    }
+}
 - (NSMutableArray *)allURL {
     if (!_allURL) {
         _allURL = [NSMutableArray array];
@@ -645,7 +909,32 @@
     }
     return _downloadTokenArray;
 }
+- (NSMutableArray *)allImageDataModelArray {
+    if (!_allImageDataModelArray) {
+        _allImageDataModelArray = [NSMutableArray array];
+    }
+    return _allImageDataModelArray;
+}
+- (NSMutableArray *)waitImageDataModelArray {
+    if (!_waitImageDataModelArray) {
+        _waitImageDataModelArray = [NSMutableArray array];
+    }
+    return _waitImageDataModelArray;
+}
+- (NSMutableArray *)currentImageDataModelArray {
+    if (!_currentImageDataModelArray) {
+        _currentImageDataModelArray = [NSMutableArray array];
+    }
+    return _currentImageDataModelArray;
+}
+- (NSMutableArray *)imageDataArray {
+    if (!_imageDataArray) {
+        _imageDataArray = [NSMutableArray array];
+    }
+    return _imageDataArray;
+}
+
 - (void)dealloc {
-    NSSLog(@"dealloc");
+    if (showLog) NSSLog(@"dealloc");
 }
 @end

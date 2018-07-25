@@ -14,8 +14,9 @@
 #import "HXPhotoManager.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"
+#import <CoreLocation/CoreLocation.h>
 
-@interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraBottomViewDelegate,HXCustomCameraControllerDelegate>
+@interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraBottomViewDelegate,HXCustomCameraControllerDelegate, CLLocationManagerDelegate>
 @property (strong, nonatomic) HXCustomCameraController *cameraController;
 @property (strong, nonatomic) HXCustomPreviewView *previewView;
 @property (strong, nonatomic) CAGradientLayer *topMaskLayer;
@@ -31,6 +32,8 @@
 @property (strong, nonatomic) UIButton *doneBtn;
 @property (assign, nonatomic) BOOL addAudioInputComplete;
 @property (strong, nonatomic) NSURL *videoURL;
+@property (strong, nonatomic) CLLocationManager *locationManager;
+@property (strong, nonatomic) CLLocation *location;
 @end
 
 @implementation HXCustomCameraViewController
@@ -38,7 +41,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor grayColor];
-    
+    [self.locationManager startUpdatingLocation];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
     if (self.manager.configuration.videoMaximumDuration > self.manager.configuration.videoMaxDuration) {
         self.manager.configuration.videoMaximumDuration = self.manager.configuration.videoMaxDuration;
@@ -187,7 +190,8 @@
     [self.cameraController stopSession];
 } 
 - (void)dealloc {
-    NSSLog(@"dealloc");
+    [self.locationManager stopUpdatingLocation];
+    if (showLog) NSSLog(@"dealloc");
 }
 - (void)cancelClick:(UIButton *)button {
     if (button.selected) {
@@ -218,6 +222,7 @@
 }
 - (void)didDoneBtnClick {
     HXPhotoModel *model = [[HXPhotoModel alloc] init];
+    model.location = self.location;
     if (!self.videoURL) {
         model.type = HXPhotoModelMediaTypeCameraPhoto;
         model.subType = HXPhotoModelMediaSubTypePhoto;
@@ -543,6 +548,33 @@
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _doneBtn;
+}
+- (CLLocationManager *)locationManager {
+    if (!_locationManager) {
+        _locationManager = [[CLLocationManager alloc] init];
+        _locationManager.delegate = self;
+        _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        _locationManager.distanceFilter = kCLDistanceFilterNone;
+        [_locationManager requestWhenInUseAuthorization];
+    }
+    return _locationManager;
+}
+#pragma mark - < CLLocationManagerDelegate >
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+    self.location = locations.lastObject;
+}
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    if(error.code == kCLErrorLocationUnknown) {
+        if (showLog) NSSLog(@"定位失败，无法检索位置");
+    }
+    else if(error.code == kCLErrorNetwork) {
+        if (showLog) NSSLog(@"定位失败，网络问题");
+    }
+    else if(error.code == kCLErrorDenied) {
+        if (showLog) NSSLog(@"定位失败，定位权限的问题");
+        [self.locationManager stopUpdatingLocation];
+        self.locationManager = nil;
+    }
 }
 @end
 

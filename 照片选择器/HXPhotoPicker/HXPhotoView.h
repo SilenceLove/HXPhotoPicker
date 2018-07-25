@@ -45,6 +45,13 @@
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame;
 
 /**
+ 点击取消时调用
+
+ @param photoView self
+ */
+- (void)photoViewDidCancel:(HXPhotoView *)photoView;
+
+/**
  删除网络图片时调用
 
  @param photoView 视图本身
@@ -123,7 +130,6 @@
 @property (strong, nonatomic) NSMutableArray *imageList;
 
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
-/**  不要使用 "initWithFrame" 这个方法初始化否者会出现异常, 请使用下面这个三个初始化方法  */
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 + (instancetype)photoManager:(HXPhotoManager *)manager;

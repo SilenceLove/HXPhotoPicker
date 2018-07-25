@@ -33,7 +33,12 @@
 		7B4A70C21F94A63100BC1423 /* HXDatePhotoPreviewBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4A70C11F94A63100BC1423 /* HXDatePhotoPreviewBottomView.m */; };
 		7B578EB11E5590A40090BD74 /* UIView+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B578EB01E5590A40090BD74 /* UIView+HXExtension.m */; };
 		7B578EB41E55A1660090BD74 /* UIButton+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B578EB31E55A1660090BD74 /* UIButton+HXExtension.m */; };
+		7B5DA4C421030DB400489749 /* Demo10ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5DA4C321030DB400489749 /* Demo10ViewController.m */; };
+		7B5DA4CB21030DCF00489749 /* Demo11ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5DA4C921030DCF00489749 /* Demo11ViewController.m */; };
+		7B5DA4CC21030DCF00489749 /* Demo11ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B5DA4CA21030DCF00489749 /* Demo11ViewController.xib */; };
 		7B6869FA1FBC1D040028F5F0 /* HXDatePhotoViewFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6869F91FBC1D040028F5F0 /* HXDatePhotoViewFlowLayout.m */; };
+		7B6BC6B721073F1A00136D61 /* Demo12ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6BC6B621073F1A00136D61 /* Demo12ViewController.m */; };
+		7B6BC6B92107408200136D61 /* QQ空间视频_20180301091047.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */; };
 		7B6C2F331F6A283D0044E3D6 /* Demo8ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */; };
 		7B7271471F27262400405131 /* NSBundle+HXPhotoPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7271461F27262400405131 /* NSBundle+HXPhotoPicker.m */; };
 		7B74BB3E1ED55CD500F81FA0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B74BB3D1ED55CD500F81FA0 /* HXPhotoPicker.bundle */; };
@@ -94,6 +99,7 @@
 		7BD8F16E1F7F4F770054F2A5 /* HXCustomCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8F16D1F7F4F770054F2A5 /* HXCustomCameraViewController.m */; };
 		7BE1F1061FF7F925003CCBCD /* HXDateVideoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BE1F1051FF7F925003CCBCD /* HXDateVideoEditViewController.m */; };
 		7BECEC261ECD7F2200EDE047 /* HXCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */; };
+		7BFC7565210892FF00D04120 /* HXCustomAssetModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BFC7564210892FF00D04120 /* HXCustomAssetModel.m */; };
 		7BFE2E011E54575A00A8EC46 /* UIImage+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE2E001E54575A00A8EC46 /* UIImage+HXExtension.m */; };
 /* End PBXBuildFile section */
 
@@ -150,8 +156,16 @@
 		7B578EB01E5590A40090BD74 /* UIView+HXExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HXExtension.m"; sourceTree = "<group>"; };
 		7B578EB21E55A1660090BD74 /* UIButton+HXExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+HXExtension.h"; sourceTree = "<group>"; };
 		7B578EB31E55A1660090BD74 /* UIButton+HXExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+HXExtension.m"; sourceTree = "<group>"; };
+		7B5DA4C221030DB400489749 /* Demo10ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo10ViewController.h; sourceTree = "<group>"; };
+		7B5DA4C321030DB400489749 /* Demo10ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo10ViewController.m; sourceTree = "<group>"; };
+		7B5DA4C821030DCF00489749 /* Demo11ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo11ViewController.h; sourceTree = "<group>"; };
+		7B5DA4C921030DCF00489749 /* Demo11ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo11ViewController.m; sourceTree = "<group>"; };
+		7B5DA4CA21030DCF00489749 /* Demo11ViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Demo11ViewController.xib; sourceTree = "<group>"; };
 		7B6869F81FBC1D040028F5F0 /* HXDatePhotoViewFlowLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXDatePhotoViewFlowLayout.h; sourceTree = "<group>"; };
 		7B6869F91FBC1D040028F5F0 /* HXDatePhotoViewFlowLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXDatePhotoViewFlowLayout.m; sourceTree = "<group>"; };
+		7B6BC6B521073F1A00136D61 /* Demo12ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo12ViewController.h; sourceTree = "<group>"; };
+		7B6BC6B621073F1A00136D61 /* Demo12ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo12ViewController.m; sourceTree = "<group>"; };
+		7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QQ空间视频_20180301091047.mp4"; sourceTree = SOURCE_ROOT; };
 		7B6C2F311F6A283D0044E3D6 /* Demo8ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo8ViewController.h; sourceTree = "<group>"; };
 		7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo8ViewController.m; sourceTree = "<group>"; };
 		7B7271451F27262400405131 /* NSBundle+HXPhotoPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+HXPhotoPicker.h"; sourceTree = "<group>"; };
@@ -275,6 +289,8 @@
 		7BEA308020DD536300A559A6 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		7BECEC241ECD7F2200EDE047 /* HXCircleProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXCircleProgressView.h; sourceTree = "<group>"; };
 		7BECEC251ECD7F2200EDE047 /* HXCircleProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCircleProgressView.m; sourceTree = "<group>"; };
+		7BFC7563210892FF00D04120 /* HXCustomAssetModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCustomAssetModel.h; sourceTree = "<group>"; };
+		7BFC7564210892FF00D04120 /* HXCustomAssetModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCustomAssetModel.m; sourceTree = "<group>"; };
 		7BFE2DFF1E54575A00A8EC46 /* UIImage+HXExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HXExtension.h"; sourceTree = "<group>"; };
 		7BFE2E001E54575A00A8EC46 /* UIImage+HXExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+HXExtension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -341,6 +357,13 @@
 				7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */,
 				7B81626A20343E4C0084F4C3 /* Demo9Model.h */,
 				7B81626B20343E4C0084F4C3 /* Demo9Model.m */,
+				7B5DA4C221030DB400489749 /* Demo10ViewController.h */,
+				7B5DA4C321030DB400489749 /* Demo10ViewController.m */,
+				7B5DA4C821030DCF00489749 /* Demo11ViewController.h */,
+				7B5DA4C921030DCF00489749 /* Demo11ViewController.m */,
+				7B5DA4CA21030DCF00489749 /* Demo11ViewController.xib */,
+				7B6BC6B521073F1A00136D61 /* Demo12ViewController.h */,
+				7B6BC6B621073F1A00136D61 /* Demo12ViewController.m */,
 				7B8060201FA6DC5A00882E34 /* YYFPSLabel.h */,
 				7B8060221FA6DC5A00882E34 /* YYFPSLabel.m */,
 				7B8060211FA6DC5A00882E34 /* YYWeakProxy.h */,
@@ -356,6 +379,7 @@
 		7B7E3E791E4AACD1002234EE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */,
 				7B7E3E7A1E4AACD1002234EE /* main.m */,
 			);
 			name = "Supporting Files";
@@ -375,6 +399,8 @@
 				7B7E3E951E4AB377002234EE /* HXAlbumModel.m */,
 				7B7E3E971E4AB397002234EE /* HXPhotoModel.h */,
 				7B7E3E981E4AB397002234EE /* HXPhotoModel.m */,
+				7BFC7563210892FF00D04120 /* HXCustomAssetModel.h */,
+				7BFC7564210892FF00D04120 /* HXCustomAssetModel.m */,
 				7B75FC711F756A7B0068C405 /* HXPhotoCustomNavigationBar.h */,
 				7B75FC721F756A7B0068C405 /* HXPhotoCustomNavigationBar.m */,
 				7B7E3E9A1E4AFD1F002234EE /* HXPhotoTools.h */,
@@ -574,6 +600,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */,
+				7B5DA4CC21030DCF00489749 /* Demo11ViewController.xib in Resources */,
+				7B6BC6B92107408200136D61 /* QQ空间视频_20180301091047.mp4 in Resources */,
 				7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */,
 				7B74BB3E1ED55CD500F81FA0 /* HXPhotoPicker.bundle in Resources */,
 				7B7E3E891E4AACD1002234EE /* LaunchScreen.storyboard in Resources */,
@@ -598,6 +626,7 @@
 				7B269E7D1E56FC3400AB813D /* HXPhotoView.m in Sources */,
 				7B81626920343E370084F4C3 /* Demo9ViewController.m in Sources */,
 				7B3235F11FC443AD00E8E8C4 /* HXPhotoConfiguration.m in Sources */,
+				7B5DA4C421030DB400489749 /* Demo10ViewController.m in Sources */,
 				7B269E831E56FE9400AB813D /* HXCollectionView.m in Sources */,
 				7BBF48C820D50ECD00566BEB /* UIImageView+WebCache.m in Sources */,
 				7BBF48CC20D50ECD00566BEB /* UIView+WebCacheOperation.m in Sources */,
@@ -622,6 +651,7 @@
 				7B3B20361ED3D7FC00B2CB47 /* HXFullScreenCameraPlayView.m in Sources */,
 				7B269E0E1E56961500AB813D /* Demo2ViewController.m in Sources */,
 				7BBF48CD20D50ECD00566BEB /* UIView+WebCache.m in Sources */,
+				7BFC7565210892FF00D04120 /* HXCustomAssetModel.m in Sources */,
 				7BECEC261ECD7F2200EDE047 /* HXCircleProgressView.m in Sources */,
 				7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */,
 				7BBF48B420D50ECD00566BEB /* MKAnnotationView+WebCache.m in Sources */,
@@ -637,6 +667,7 @@
 				7B2E98181FB2FC2000D40471 /* HXCustomCollectionReusableView.m in Sources */,
 				7BBF48C320D50ECD00566BEB /* SDAnimatedImageRep.m in Sources */,
 				7B7271471F27262400405131 /* NSBundle+HXPhotoPicker.m in Sources */,
+				7B6BC6B721073F1A00136D61 /* Demo12ViewController.m in Sources */,
 				7B6C2F331F6A283D0044E3D6 /* Demo8ViewController.m in Sources */,
 				7BBF48C020D50ECD00566BEB /* SDWebImagePrefetcher.m in Sources */,
 				7BA0E78E1FC80693007619A4 /* UIViewController+HXExtension.m in Sources */,
@@ -656,6 +687,7 @@
 				7B80602B1FA8660C00882E34 /* HXCustomCameraController.m in Sources */,
 				7BBF48BD20D50ECD00566BEB /* UIImage+MultiFormat.m in Sources */,
 				7B8060251FA6DC5B00882E34 /* YYWeakProxy.m in Sources */,
+				7B5DA4CB21030DCF00489749 /* Demo11ViewController.m in Sources */,
 				7B4A70BF1F921C2600BC1423 /* HXDatePhotoPreviewViewController.m in Sources */,
 				7B81626C20343E4C0084F4C3 /* Demo9Model.m in Sources */,
 				7BBF48C220D50ECD00566BEB /* NSButton+WebCache.m in Sources */,

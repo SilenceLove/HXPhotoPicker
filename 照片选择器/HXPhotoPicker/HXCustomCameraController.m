@@ -49,7 +49,7 @@ const CGFloat HXZoomRate = 1.0f;
     [self.motionManager stopDeviceMotionUpdates];
 }
 - (void)dealloc {
-    NSSLog(@"dealloc");
+    if (showLog) NSSLog(@"dealloc");
 }
 /// 重力感应回调
 - (void)handleDeviceMotion:(CMDeviceMotion *)deviceMotion{

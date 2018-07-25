@@ -59,6 +59,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.backgroundColor = [UIColor whiteColor];
 //    self.manager.localImageList = images;
     [self.manager addLocalImage:images selected:YES];
+    
+    /**  添加本地视频  **/
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
+    [self.manager addLocalVideo:@[url] selected:YES];
+    /**  添加本地视频  **/
+    
     [photoView refreshView];
     [scrollView addSubview:photoView];
     self.photoView = photoView;
@@ -92,6 +98,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
     NSSLog(@"%@",NSStringFromCGRect(frame));
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width, CGRectGetMaxY(frame) + kPhotoViewMargin);
     
+}
+
+- (void)dealloc {
+    NSSLog(@"%@",self);
 }
 
 @end
