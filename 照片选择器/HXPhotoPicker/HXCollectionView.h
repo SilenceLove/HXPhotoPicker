@@ -35,7 +35,7 @@
  @param collectionView 视图本身
  @return 是否删除
  */
-- (BOOL)collectionViewShouldDeleteCurrentMoveItem:(UICollectionView *)collectionView;
+- (BOOL)collectionViewShouldDeleteCurrentMoveItem:(UICollectionView *)collectionView gestureRecognizer:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 
 /**
  长按手势发生改变时调用

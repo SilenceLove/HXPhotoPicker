@@ -81,10 +81,10 @@
     }
 }
 - (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model {
-    [self.manager afterListAddCameraTakePicturesModel:model];
-    Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
-    vc.manager = self.manager;
-    [self.navigationController pushViewController:vc animated:YES];
+//    [self.manager afterListAddCameraTakePicturesModel:model];
+//    Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
+//    vc.manager = self.manager;
+//    [self.navigationController pushViewController:vc animated:YES];
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];

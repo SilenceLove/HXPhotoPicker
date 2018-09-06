@@ -143,6 +143,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 
 - (BOOL)videoCanSelected;
 
+- (NSInteger)cameraCount;
+- (HXPhotoModel *)firstCameraModel;
+
 /**  关于选择完成之前的一些方法  **/
 /**
  完成之前选择的总数量

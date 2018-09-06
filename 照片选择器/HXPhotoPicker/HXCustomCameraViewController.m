@@ -40,6 +40,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if (self.manager.configuration.saveSystemAblum && !self.manager.albums.count) { 
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self.manager getAllPhotoAlbums:nil albums:nil isFirst:NO];
+        });
+    }
     self.view.backgroundColor = [UIColor grayColor];
     [self.locationManager startUpdatingLocation];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];

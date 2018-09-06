@@ -47,7 +47,7 @@
 @property (strong, nonatomic, readonly) UIImage *gifImage;
 @property (strong, nonatomic) UIButton *videoPlayBtn;
 @property (assign, nonatomic) BOOL dragging;
-@property (nonatomic, copy) void (^cellTapClick)();
+@property (nonatomic, copy) void (^cellTapClick)(void);
 @property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
 @property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXDatePhotoPreviewViewCell *myCell);
 - (void)againAddImageView;

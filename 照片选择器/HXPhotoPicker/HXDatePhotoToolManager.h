@@ -15,13 +15,13 @@ typedef enum : NSUInteger {
 } HXDatePhotoToolManagerRequestType;
 
 typedef void (^ HXDatePhotoToolManagerSuccessHandler)(NSArray<NSURL *> *allURL,NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL);
-typedef void (^ HXDatePhotoToolManagerFailedHandler)();
+typedef void (^ HXDatePhotoToolManagerFailedHandler)(void);
 
 typedef void (^ HXDatePhotoToolManagerGetImageListSuccessHandler)(NSArray<UIImage *> *imageList);
-typedef void (^ HXDatePhotoToolManagerGetImageListFailedHandler)();
+typedef void (^ HXDatePhotoToolManagerGetImageListFailedHandler)(void);
 
 typedef void (^ HXDatePhotoToolManagerGetImageDataListSuccessHandler)(NSArray<NSData *> *imageDataList);
-typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)();
+typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
 
 @interface HXDatePhotoToolManager : NSObject
 
@@ -86,5 +86,5 @@ typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)();
  */
 - (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed;
 
-- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)())success failed:(void (^)())failed;
+- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)(void))success failed:(void (^)(void))failed;
 @end

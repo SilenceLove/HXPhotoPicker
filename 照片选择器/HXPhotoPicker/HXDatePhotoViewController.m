@@ -272,7 +272,9 @@ HXDatePhotoEditViewControllerDelegate
                             if (firstSelectModel) {
                                 [weakSelf.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:[weakSelf dateItem:firstSelectModel] inSection:firstSelectModel.dateSection] atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
                             }else {
-                                [weakSelf.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:dateModel.photoModelArray.count - 1 inSection:weakSelf.dateArray.count - 1] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+                                NSInteger forItem = (dateModel.photoModelArray.count - 1) <= 0 ? 0 : dateModel.photoModelArray.count - 1;
+                                NSInteger inSection = (weakSelf.dateArray.count - 1) <= 0 ? 0 : weakSelf.dateArray.count - 1;
+                                [weakSelf.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:forItem inSection:inSection] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
                             }
                         }
                     }else {
@@ -280,7 +282,8 @@ HXDatePhotoEditViewControllerDelegate
                             if (firstSelectModel) {
                                 [weakSelf.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:[weakSelf.allArray indexOfObject:firstSelectModel] inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
                             }else {
-                                [weakSelf.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:weakSelf.allArray.count - 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+                                NSInteger forItem = (weakSelf.allArray.count - 1) <= 0 ? 0 : weakSelf.allArray.count - 1;
+                                [weakSelf.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:forItem inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
                             }
                         }
                     }
@@ -371,6 +374,8 @@ HXDatePhotoEditViewControllerDelegate
     self.footerView.photoCount = self.photoArray.count;
     self.footerView.videoCount = self.videoArray.count;
     self.bottomView.selectCount = [self.manager selectedCount];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"CustomCameraViewControllerDidDoneNotification" object:nil];
 }
 #pragma mark - < UICollectionViewDataSource >
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {

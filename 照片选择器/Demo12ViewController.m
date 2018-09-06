@@ -21,11 +21,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        //        _manager.openCamera = NO;
+//        _manager.configuration.openCamera = NO;
         _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.photoMaxNum = 9; //
         _manager.configuration.videoMaxNum = 1;  //
         _manager.configuration.maxNum = 10;
+        _manager.configuration.reverseDate = YES;
 //        _manager.configuration.selectTogether = NO;
     }
     return _manager;
@@ -46,6 +47,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.lineCount = 3;
+    photoView.outerCamera = YES;
     photoView.delegate = self;
     //    photoView.showAddCell = NO;
     photoView.backgroundColor = [UIColor whiteColor];

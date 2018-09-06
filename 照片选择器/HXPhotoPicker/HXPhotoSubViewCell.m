@@ -138,6 +138,10 @@
         self.deleteBtn.hidden = hideDeleteButton;
     }
 }
+- (void)setDeleteImageName:(NSString *)deleteImageName {
+    _deleteImageName = deleteImageName;
+    [self.deleteBtn setImage:[HXPhotoTools hx_imageNamed:deleteImageName] forState:UIControlStateNormal];
+}
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     self.progressView.hidden = YES;

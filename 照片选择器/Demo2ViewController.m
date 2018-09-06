@@ -141,7 +141,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.delegate = self;
-//    photoView.outerCamera = YES;
+    photoView.outerCamera = YES;
     photoView.previewShowDeleteButton = YES;
 //    photoView.hideDeleteButton = YES;
     photoView.showAddCell = YES;
@@ -275,7 +275,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     NSSLog(@"%@ --> index - %ld",model,index);
 }
 
-- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView {
+- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView gestureRecognizer:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
     return self.needDeleteItem;
 }
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {

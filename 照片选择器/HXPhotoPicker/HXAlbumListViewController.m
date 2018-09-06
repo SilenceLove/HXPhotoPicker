@@ -36,6 +36,9 @@ UITableViewDelegate
 
 @implementation HXAlbumListViewController
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return self.manager.configuration.statusBarStyle;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
@@ -64,9 +67,26 @@ UITableViewDelegate
     }];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(customCameraViewControllerDidDoneClick) name:@"CustomCameraViewControllerDidDoneNotification" object:nil];
+    
+    
     [UINavigationBar appearance].translucent = YES;
 }
-
+- (void)customCameraViewControllerDidDoneClick {
+    NSInteger i = 0;
+    for (HXAlbumModel *albumMd in self.albumModelArray) {
+        albumMd.cameraCount = [self.manager cameraCount];
+        if (i == 0 && !albumMd.result) {
+            albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
+        }
+        i++;
+    }
+    if (self.manager.configuration.singleSelected) {
+        [self.tableView reloadData];
+    }else {
+        [self.collectionView reloadData];
+    }
+}
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     if (self.orientationDidChange) {
@@ -245,6 +265,14 @@ UITableViewDelegate
         vc.albumModel = model;
         vc.delegate = self;
         [self.navigationController pushViewController:vc animated:NO];
+        NSInteger i = 0;
+        for (HXAlbumModel *albumMd in self.albumModelArray) {
+            albumMd.cameraCount = [self.manager cameraCount];
+            if (i == 0 && !albumMd.result) {
+                albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
+            }
+            i++;
+        }
         if (self.manager.configuration.singleSelected) {
             [self.tableView reloadData];
         }else {
@@ -275,6 +303,9 @@ UITableViewDelegate
             });
         } albums:^(NSArray *albums) {
             weakSelf.albumModelArray = [NSMutableArray arrayWithArray:albums];
+            for (HXAlbumModel *albumMd in weakSelf.albumModelArray) {
+                albumMd.cameraCount = [weakSelf.manager cameraCount];
+            }
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (weakSelf.manager.configuration.singleSelected) {
                     [weakSelf.tableView reloadData];
@@ -468,7 +499,9 @@ UITableViewDelegate
         if (self.previewingContext) {
             [self unregisterForPreviewingWithContext:self.previewingContext];
         }
-    } 
+    }
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CustomCameraViewControllerDidDoneNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 - (void)goSetup {
@@ -512,7 +545,10 @@ UITableViewDelegate
     }];
     
     self.albumNameLb.text = model.albumName;
-    self.photoNumberLb.text = @(model.result.count).stringValue;
+    self.photoNumberLb.text = @(model.result.count + model.cameraCount).stringValue;
+    if (!model.result) {
+        self.coverView.image = model.tempImage ?: [HXPhotoTools hx_imageNamed:@"yundian_tupian@3x.png"];
+    }
 //    if (model.selectedCount == 0) {
 //        self.selectNumberBtn.hidden = YES;
 //    }else {
@@ -670,7 +706,12 @@ UITableViewDelegate
     }
     
     self.albumNameLb.text = model.albumName;
-    self.photoNumberLb.text = @(photoCount).stringValue;
+    self.photoNumberLb.text = @(photoCount + model.cameraCount).stringValue;
+    if (!model.result) {
+        self.coverView1.image = model.tempImage ?: [HXPhotoTools hx_imageNamed:@"yundian_tupian@3x.png"];
+        self.coverView2.hidden = YES;
+        self.coverView3.hidden = YES;
+    }
 }
 - (void)layoutSubviews {
     [super layoutSubviews];

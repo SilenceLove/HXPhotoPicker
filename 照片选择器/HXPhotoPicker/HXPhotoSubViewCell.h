@@ -24,6 +24,8 @@
 @property (weak, nonatomic) id<HXPhotoSubViewCellDelegate> delegate;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic) HXPhotoModel *model;
+/**  删除按钮图片  */
+@property (copy, nonatomic) NSString *deleteImageName;
 /**  隐藏cell上的删除按钮  */
 @property (assign, nonatomic) BOOL hideDeleteButton;
 /**

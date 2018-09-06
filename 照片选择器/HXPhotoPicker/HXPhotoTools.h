@@ -30,7 +30,7 @@
  @param success 成功
  @param failed 失败
  */
-+ (void)saveSelectModelArrayWithManager:(HXPhotoManager *)manager success:(void (^)())success failed:(void (^)())failed;
++ (void)saveSelectModelArrayWithManager:(HXPhotoManager *)manager success:(void (^)(void))success failed:(void (^)(void))failed;
 
 /**
  删除本地保存的模型数组
@@ -166,7 +166,7 @@
  @param failed 失败后的回调
  @return 请求id
  */
-+ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size succeed:(void (^)(UIImage *image))succeed failed:(void(^)())failed;
++ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size succeed:(void (^)(UIImage *image))succeed failed:(void(^)(void))failed;
 
 /**
  根据PHAsset对象获取指定大小的图片
@@ -193,7 +193,7 @@
  @param failed 失败后的block
  @return 请求id
  */
-+ (PHImageRequestID)getLivePhotoForAsset:(PHAsset *)asset size:(CGSize)size startRequestICloud:(void (^)(PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(PHLivePhoto *livePhoto))completion failed:(void(^)())failed;
++ (PHImageRequestID)getLivePhotoForAsset:(PHAsset *)asset size:(CGSize)size startRequestICloud:(void (^)(PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(PHLivePhoto *livePhoto))completion failed:(void(^)(void))failed;
 
 /**
  根据PHAsset获取imageData
@@ -257,5 +257,5 @@
 
 /**********************************/
 
-+ (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)())error;
++ (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)(void))error;
 @end

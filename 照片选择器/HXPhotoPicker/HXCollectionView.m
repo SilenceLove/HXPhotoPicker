@@ -18,7 +18,6 @@
 @property (nonatomic, strong) UICollectionViewCell *dragCell;
 @property (nonatomic, strong) NSIndexPath *moveIndexPath;
 @property (nonatomic, assign) BOOL isDeleteItem;
-@property (assign, nonatomic) BOOL isAddBtn;
 @end
 
 @implementation HXCollectionView
@@ -57,8 +56,7 @@
     if (longPgr.state == UIGestureRecognizerStateBegan) {
         self.isDeleteItem = NO;
         [self gestureRecognizerBegan:longPgr];
-        if (self.isAddBtn) {
-            self.isAddBtn = NO;
+        if ([(HXPhotoSubViewCell *)[self cellForItemAtIndexPath:self.originalIndexPath] model].type == HXPhotoModelMediaTypeCamera) {
             return;
         }
         if ([self.delegate respondsToSelector:@selector(collectionView:gestureRecognizerBegan:indexPath:)]) {
@@ -66,7 +64,7 @@
         }
     }
     if (longPgr.state == UIGestureRecognizerStateChanged) {
-        if (_originalIndexPath.section != 0 || self.isAddBtn) {
+        if (_originalIndexPath.section != 0 || [(HXPhotoSubViewCell *)[self cellForItemAtIndexPath:self.originalIndexPath] model].type == HXPhotoModelMediaTypeCamera) {
             return;
         }
         if ([self.delegate respondsToSelector:@selector(collectionView:gestureRecognizerChange:indexPath:)]) {
@@ -81,8 +79,8 @@
             [self.delegate collectionView:self gestureRecognizerEnded:longPgr indexPath:self.originalIndexPath];
         }
         BOOL isRemoveItem = NO;
-        if ([self.delegate respondsToSelector:@selector(collectionViewShouldDeleteCurrentMoveItem:)]) {
-            isRemoveItem = [self.delegate collectionViewShouldDeleteCurrentMoveItem:self];
+        if ([self.delegate respondsToSelector:@selector(collectionViewShouldDeleteCurrentMoveItem:gestureRecognizer:indexPath:)]) {
+            isRemoveItem = [self.delegate collectionViewShouldDeleteCurrentMoveItem:self gestureRecognizer:longPgr indexPath:self.originalIndexPath];
         }
         if (isRemoveItem) {
             if ([self.delegate respondsToSelector:@selector(dragCellCollectionViewCellEndMoving:)]) {
@@ -96,8 +94,7 @@
             }];
             return;
         }
-        if (self.isAddBtn) {
-            self.isAddBtn = NO;
+        if ([(HXPhotoSubViewCell *)[self cellForItemAtIndexPath:self.originalIndexPath] model].type == HXPhotoModelMediaTypeCamera) {
             return;
         }
         [self handelItemInSpace];
@@ -112,7 +109,6 @@
     self.originalIndexPath = [self indexPathForItemAtPoint:[longPgr locationOfTouch:0 inView:longPgr.view]];
     HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[self cellForItemAtIndexPath:self.originalIndexPath];
     if (cell.model.type == HXPhotoModelMediaTypeCamera) {
-        self.isAddBtn = YES;
         return;
     }
     UIView *tempMoveCell = [cell snapshotViewAfterScreenUpdates:NO];

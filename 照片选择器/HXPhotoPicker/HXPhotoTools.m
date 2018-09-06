@@ -34,7 +34,7 @@
     }
 }
 
-+ (void)saveSelectModelArrayWithManager:(HXPhotoManager *)manager success:(void (^)())success failed:(void (^)())failed {
++ (void)saveSelectModelArrayWithManager:(HXPhotoManager *)manager success:(void (^)(void))success failed:(void (^)(void))failed {
     if (!manager.afterSelectedArray.count) if (failed) {
         failed();
         return;
@@ -862,7 +862,7 @@
     return have;
 }
 
-+ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size succeed:(void (^)(UIImage *image))succeed failed:(void(^)())failed {
++ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size succeed:(void (^)(UIImage *image))succeed failed:(void(^)(void))failed {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
@@ -1300,7 +1300,7 @@
     }];
     return requestID;
 }
-+ (PHImageRequestID)getLivePhotoForAsset:(PHAsset *)asset size:(CGSize)size startRequestICloud:(void (^)(PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(PHLivePhoto *livePhoto))completion failed:(void(^)())failed {
++ (PHImageRequestID)getLivePhotoForAsset:(PHAsset *)asset size:(CGSize)size startRequestICloud:(void (^)(PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(PHLivePhoto *livePhoto))completion failed:(void(^)(void))failed {
     PHLivePhotoRequestOptions *option = [[PHLivePhotoRequestOptions alloc] init];
     option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     option.networkAccessAllowed = NO;
@@ -1369,7 +1369,7 @@
     fileName = [fileName stringByAppendingString:numStr];
     return fileName;
 }
-+ (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)())error {
++ (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)(void))error {
     if (selectList.count == 0) {
         if (showLog) NSSLog(@"请选择后再写入");
         if (error) {
@@ -1581,7 +1581,7 @@
         }
     });
 }
-+ (void)writeOriginalImageToTempWith:(HXPhotoModel *)model requestId:(void (^)(PHImageRequestID requestId))requestId iCloudRequestId:(void (^)(PHImageRequestID requestId))iCloudRequestId success:(void (^)())success failure:(void (^)())failure {
++ (void)writeOriginalImageToTempWith:(HXPhotoModel *)model requestId:(void (^)(PHImageRequestID requestId))requestId iCloudRequestId:(void (^)(PHImageRequestID requestId))iCloudRequestId success:(void (^)(void))success failure:(void (^)(void))failure {
     if (model.asset) { // asset有值说明是系统相册里的照片
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             // 根据asset获取imageData
@@ -1668,7 +1668,7 @@
         }
     }
 }
-+ (AVAssetExportSession *)compressedVideoWithMediumQualityWriteToTemp:(id)obj pathFile:(NSString *)pathFile progress:(void (^)(float progress))progress success:(void (^)())success failure:(void (^)())failure {
++ (AVAssetExportSession *)compressedVideoWithMediumQualityWriteToTemp:(id)obj pathFile:(NSString *)pathFile progress:(void (^)(float progress))progress success:(void (^)(void))success failure:(void (^)(void))failure {
     AVAsset *avAsset;
     if ([obj isKindOfClass:[AVAsset class]]) {
         avAsset = (AVAsset *)obj;

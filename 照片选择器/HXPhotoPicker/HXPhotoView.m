@@ -43,6 +43,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 @end
 
 @implementation HXPhotoView
+@synthesize addImageName = _addImageName;
 - (NSMutableArray *)imageList {
     if (!_imageList) {
         _imageList = [NSMutableArray array];
@@ -79,11 +80,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if (!_addModel) {
         _addModel = [[HXPhotoModel alloc] init];
         _addModel.type = HXPhotoModelMediaTypeCamera;
-//        if (self.manager.UIManager.photoViewAddImageName) {
-//            _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:self.manager.UIManager.photoViewAddImageName];
-//        }else {
-            _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_pic_add@2x.png"];
-//        }
+        _addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:self.addImageName];
     }
     return _addModel;
 }
@@ -161,7 +158,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         for (HXPhotoModel *photoModel in self.manager.afterSelectedArray) {
             [self.imageList addObject:photoModel.thumbPhoto];
         }
-        [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
+        [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
     }
 } 
 
@@ -178,7 +175,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         for (HXPhotoModel *photoModel in self.manager.afterSelectedArray) {
             [self.imageList addObject:photoModel.thumbPhoto];
         }
-        [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
+        [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
     }
 }
 
@@ -190,14 +187,31 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     _showAddCell = showAddCell;
     self.tempShowAddCell = showAddCell;
     if (self.manager.afterSelectedArray.count > 0) {
-        [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
+        [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
     }
+}
+- (NSString *)addImageName {
+    if (!_addImageName) {
+        _addImageName = @"compose_pic_add@2x.png";
+    }
+    return _addImageName;
+}
+- (void)setAddImageName:(NSString *)addImageName {
+    _addImageName = addImageName;
+    self.addModel.thumbPhoto = [HXPhotoTools hx_imageNamed:addImageName];
+    if (self.tempShowAddCell) {
+        [self.collectionView reloadData];
+    }
+}
+- (void)setDeleteImageName:(NSString *)deleteImageName {
+    _deleteImageName = deleteImageName;
+    [self.collectionView reloadData];
 }
 /**
  刷新视图
  */
 - (void)refreshView {
-    [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
+    [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
 }
 - (NSString *)videoOutFutFileName {
     NSString *fileName = @"";
@@ -220,6 +234,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
     HXPhotoSubViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:HXPhotoSubViewCellId forIndexPath:indexPath];
     cell.delegate = self;
+    if (self.deleteImageName) {
+        cell.deleteImageName = self.deleteImageName;
+    }
     cell.model = self.dataList[indexPath.item];
     cell.showDeleteNetworkPhotoAlert = self.manager.configuration.showDeleteNetworkPhotoAlert;
     cell.hideDeleteButton = self.hideDeleteButton;
@@ -437,7 +454,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             [self.delegate photoView:self imageChangeComplete:self.imageList];
         }
     }
-    [self photoViewControllerDidNext:self.manager.afterSelectedArray.mutableCopy Photos:self.manager.afterSelectedPhotoArray.mutableCopy Videos:self.manager.afterSelectedVideoArray.mutableCopy Original:self.manager.afterOriginal];
+    [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
 }
 
 - (void)deleteModelWithIndex:(NSInteger)index {
@@ -497,6 +514,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         if (!self.tempShowAddCell) {
             self.tempShowAddCell = YES;
             [self.collectionView reloadData];
+        }
+    }
+    if (model.networkPhotoUrl) {
+        if ([self.delegate respondsToSelector:@selector(photoView:deleteNetworkPhoto:)]) {
+            [self.delegate photoView:self deleteNetworkPhoto:model.networkPhotoUrl.absoluteString];
         }
     }
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
@@ -642,9 +664,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         [self.delegate photoView:self changeComplete:self.dataList.mutableCopy photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
     }
 }
-- (BOOL)collectionViewShouldDeleteCurrentMoveItem:(UICollectionView *)collectionView {
-    if ([self.delegate respondsToSelector:@selector(photoViewShouldDeleteCurrentMoveItem:)]) {
-        return [self.delegate photoViewShouldDeleteCurrentMoveItem:self];
+- (BOOL)collectionViewShouldDeleteCurrentMoveItem:(UICollectionView *)collectionView gestureRecognizer:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
+    if ([self.delegate respondsToSelector:@selector(photoViewShouldDeleteCurrentMoveItem:gestureRecognizer:indexPath:)]) {
+        return [self.delegate photoViewShouldDeleteCurrentMoveItem:self gestureRecognizer:longPgr indexPath:indexPath];
     }
     return NO;
 }

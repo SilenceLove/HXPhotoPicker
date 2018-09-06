@@ -82,7 +82,7 @@
     [self writeModelToTempPath];
 }
 
-- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)())success failed:(void (^)())failed {
+- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)(void))success failed:(void (^)(void))failed {
     __block NSInteger count = 0;
     __block NSInteger modelCount = gifModelArray.count;
     for (HXPhotoModel *model in gifModelArray) {
@@ -449,7 +449,7 @@
     }
 }
 
-- (AVAssetExportSession *)compressedVideoWithMediumQualityWriteToTemp:(id)obj progress:(void (^)(float progress))progress success:(void (^)(NSURL *url))success failure:(void (^)())failure {
+- (AVAssetExportSession *)compressedVideoWithMediumQualityWriteToTemp:(id)obj progress:(void (^)(float progress))progress success:(void (^)(NSURL *url))success failure:(void (^)(void))failure {
     AVAsset *avAsset;
     if ([obj isKindOfClass:[AVAsset class]]) {
         avAsset = obj;

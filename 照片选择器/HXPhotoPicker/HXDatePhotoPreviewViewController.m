@@ -62,6 +62,9 @@ HXDateVideoEditViewControllerDelegate
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationWillChanged:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
 }
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return self.manager.configuration.statusBarStyle;
+}
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
     if (operation == UINavigationControllerOperationPush) {
         return [HXDatePhotoViewTransition transitionWithType:HXDatePhotoViewTransitionTypePush];

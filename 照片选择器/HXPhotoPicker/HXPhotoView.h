@@ -14,6 +14,35 @@
  *  使用选择照片之后自动布局的功能时就创建此块View. 初始化方法传入照片管理类
  */
 @class HXPhotoView;
+
+/**
+ 照片/视频发生改变时调用 - 选择、移动顺序、删除
+
+ @param allList 所有类型的模型数组
+ @param photos 照片类型的模型数组
+ @param videos 视频类型的模型数组
+ @param isOriginal 是否原图
+ */
+typedef void (^HXPhotoViewChangeComplete)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photos, NSArray<HXPhotoModel *> *videos, BOOL isOriginal);
+
+typedef void (^HXPhotoViewImageChangeComplete)(NSArray<UIImage *> *imageList);
+
+typedef void (^HXPhotoViewUpdateFrame)(CGRect frame);
+
+typedef void (^HXPhotoViewDidCancel)(void);
+
+typedef void (^HXPhotoViewDeleteNetworkPhoto)(NSString *networkPhotoUrl);
+
+typedef void (^HXPhotoViewDidDeleteModel)(HXPhotoModel *model, NSInteger index);
+
+typedef BOOL (^HXPhotoViewShouldDeleteCurrentMoveItem)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+
+typedef void (^HXPhotoViewLongGestureRecognizerChange)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+
+typedef void (^HXPhotoViewLongGestureRecognizerBegan)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+
+typedef void (^HXPhotoViewLongGestureRecognizerEnded)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+
 @protocol HXPhotoViewDelegate <NSObject>
 @optional
 
@@ -30,7 +59,8 @@
 
 /**
  照片/视频发生改变时调用 - 选择、移动顺序、删除
-
+ requestImageAfterFinishingSelection == YES 时 才会有回调
+ 
  @param photoView 视图本身
  @param imageList 图片数组
  */
@@ -74,7 +104,7 @@
  @param photoView 视图本身
  @return 是否删除
  */
-- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView;
+- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView gestureRecognizer:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 
 /**
  长按手势发生改变时调用
@@ -102,11 +132,11 @@
 
 
 
-// 这次在相册选择的图片,不是所有选择的所有图片.
+// 每次在相册选择的图片,不是所有选择的所有图片.
 //- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 @end
 
-@interface HXPhotoView : UIView
+@interface HXPhotoView : UIView 
 @property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
@@ -128,6 +158,10 @@
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
 /**  已选的image数组  */
 @property (strong, nonatomic) NSMutableArray *imageList;
+/**  添加按钮的图片  */
+@property (copy, nonatomic) NSString *addImageName;
+/**  删除按钮图片  */
+@property (copy, nonatomic) NSString *deleteImageName;
 
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;

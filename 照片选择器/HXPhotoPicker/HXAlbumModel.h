@@ -48,4 +48,8 @@
  选中的个数
  */
 @property (assign, nonatomic) NSInteger selectedCount;
+
+@property (assign, nonatomic) NSUInteger cameraCount;
+
+@property (strong, nonatomic) UIImage *tempImage;
 @end
