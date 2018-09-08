@@ -62,6 +62,7 @@
 		7B81626920343E370084F4C3 /* Demo9ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626820343E370084F4C3 /* Demo9ViewController.m */; };
 		7B81626C20343E4C0084F4C3 /* Demo9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626B20343E4C0084F4C3 /* Demo9Model.m */; };
 		7B81626F20343EE10084F4C3 /* Demo9ViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */; };
+		7B9772E62143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9772E52143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7BA0E78E1FC80693007619A4 /* UIViewController+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BA0E78D1FC80693007619A4 /* UIViewController+HXExtension.m */; };
 		7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */; };
@@ -210,6 +211,8 @@
 		7B81626B20343E4C0084F4C3 /* Demo9Model.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo9Model.m; sourceTree = "<group>"; };
 		7B81626D20343EE10084F4C3 /* Demo9ViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo9ViewCell.h; sourceTree = "<group>"; };
 		7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo9ViewCell.m; sourceTree = "<group>"; };
+		7B9772E42143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXDatePhotoPersentInteractiveTransition.h; sourceTree = "<group>"; };
+		7B9772E52143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXDatePhotoPersentInteractiveTransition.m; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
 		7BA0E78A1FC7B1A8007619A4 /* HXPhotoDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoDefine.h; sourceTree = "<group>"; };
@@ -419,6 +422,8 @@
 				7B37688C1FA4587600660C88 /* HXDatePhotoViewPresentTransition.m */,
 				7B3768881FA423FA00660C88 /* HXDatePhotoInteractiveTransition.h */,
 				7B3768891FA423FA00660C88 /* HXDatePhotoInteractiveTransition.m */,
+				7B9772E42143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.h */,
+				7B9772E52143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m */,
 				7B4A70BD1F921C2600BC1423 /* HXDatePhotoPreviewViewController.h */,
 				7B4A70BE1F921C2600BC1423 /* HXDatePhotoPreviewViewController.m */,
 				7B4A70C01F94A63100BC1423 /* HXDatePhotoPreviewBottomView.h */,
@@ -654,6 +659,7 @@
 				7BFC7565210892FF00D04120 /* HXCustomAssetModel.m in Sources */,
 				7BECEC261ECD7F2200EDE047 /* HXCircleProgressView.m in Sources */,
 				7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */,
+				7B9772E62143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m in Sources */,
 				7BBF48B420D50ECD00566BEB /* MKAnnotationView+WebCache.m in Sources */,
 				7B578EB11E5590A40090BD74 /* UIView+HXExtension.m in Sources */,
 				7B7E3E7B1E4AACD1002234EE /* main.m in Sources */,

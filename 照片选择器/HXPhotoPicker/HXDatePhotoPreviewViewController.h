@@ -34,6 +34,8 @@
 @property (strong, nonatomic) HXPhotoView *photoView;
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
 @property (assign, nonatomic) BOOL stopCancel;
+/**  预览大图时是否禁用手势返回  */
+@property (assign, nonatomic) BOOL disableaPersentInteractiveTransition;
 - (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
 @end

@@ -28,7 +28,7 @@
 
 - (NSDate *)creationDate {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto || self.type == HXPhotoModelMediaTypeCameraVideo) {
-        return [NSDate date];
+        return _creationDate ?: [NSDate date];
     }
     if (!_creationDate) {
         _creationDate = [self.asset valueForKey:@"creationDate"];

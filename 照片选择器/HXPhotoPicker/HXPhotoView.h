@@ -23,25 +23,75 @@
  @param videos 视频类型的模型数组
  @param isOriginal 是否原图
  */
-typedef void (^HXPhotoViewChangeComplete)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photos, NSArray<HXPhotoModel *> *videos, BOOL isOriginal);
+typedef void (^HXPhotoViewChangeCompleteBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photos, NSArray<HXPhotoModel *> *videos, BOOL isOriginal);
 
-typedef void (^HXPhotoViewImageChangeComplete)(NSArray<UIImage *> *imageList);
+/**
+ 照片/视频发生改变时调用 - 选择、移动顺序、删除
+ requestImageAfterFinishingSelection == YES 时 才会有回调
 
-typedef void (^HXPhotoViewUpdateFrame)(CGRect frame);
+ @param imageList 图片数组
+ */
+typedef void (^HXPhotoViewImageChangeCompleteBlock)(NSArray<UIImage *> *imageList);
 
-typedef void (^HXPhotoViewDidCancel)(void);
+/**
+ 当view高度改变时调用
 
-typedef void (^HXPhotoViewDeleteNetworkPhoto)(NSString *networkPhotoUrl);
+ @param frame 位置大小
+ */
+typedef void (^HXPhotoViewUpdateFrameBlock)(CGRect frame);
 
-typedef void (^HXPhotoViewDidDeleteModel)(HXPhotoModel *model, NSInteger index);
+/**
+ 点击取消时调用
+ */
+typedef void (^HXPhotoViewDidCancelBlock)(void);
 
-typedef BOOL (^HXPhotoViewShouldDeleteCurrentMoveItem)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+/**
+ 删除网络图片时调用
 
-typedef void (^HXPhotoViewLongGestureRecognizerChange)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+ @param networkPhotoUrl 被删除的图片地址
+ */
+typedef void (^HXPhotoViewDeleteNetworkPhotoBlock)(NSString *networkPhotoUrl);
 
-typedef void (^HXPhotoViewLongGestureRecognizerBegan)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+/**
+ 当前删除的模型
 
-typedef void (^HXPhotoViewLongGestureRecognizerEnded)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+ @param model 模型
+ @param index 下标
+ */
+typedef void (^HXPhotoViewCurrentDeleteModelBlock)(HXPhotoModel *model, NSInteger index);
+
+/**
+ 长按手势结束时是否删除当前拖动的cell
+
+ @param longPgr 长按手势识别器
+ @param indexPath 当前拖动的cell
+ @return 是否删除
+ */
+typedef BOOL (^HXPhotoViewShouldDeleteCurrentMoveItemBlock)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+
+/**
+ 长按手势发生改变时调用
+
+ @param longPgr 长按手势识别器
+ @param indexPath 当前拖动的cell
+ */
+typedef void (^HXPhotoViewLongGestureRecognizerChangeBlock)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+
+/**
+ 长按手势开始时调用
+
+ @param longPgr 长按手势识别器
+ @param indexPath 当前拖动的cell
+ */
+typedef void (^HXPhotoViewLongGestureRecognizerBeganBlock)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
+
+/**
+ 长按手势结束时调用
+
+ @param longPgr 长按手势识别器
+ @param indexPath 当前拖动的cell
+ */
+typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRecognizer *longPgr, NSIndexPath *indexPath);
 
 @protocol HXPhotoViewDelegate <NSObject>
 @optional
@@ -140,7 +190,58 @@ typedef void (^HXPhotoViewLongGestureRecognizerEnded)(UILongPressGestureRecogniz
 @property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
-@property (strong, nonatomic) HXCollectionView *collectionView; 
+@property (strong, nonatomic) HXCollectionView *collectionView;
+
+/**
+ 照片/视频发生改变时调用 - 选择、移动顺序、删除
+ */
+@property (copy, nonatomic) HXPhotoViewChangeCompleteBlock changeCompleteBlock;
+
+/**
+ 照片/视频发生改变时调用 - 选择、移动顺序、删除
+ requestImageAfterFinishingSelection == YES 时 才会有回调
+ */
+@property (copy, nonatomic) HXPhotoViewImageChangeCompleteBlock imageChangeCompleteBlock;
+
+/**
+ 当view高度改变时调用
+ */
+@property (copy, nonatomic) HXPhotoViewUpdateFrameBlock updateFrameBlock;
+
+/**
+ 点击取消时调用
+ */
+@property (copy, nonatomic) HXPhotoViewDidCancelBlock didCancelBlock;
+
+/**
+ 删除网络图片时调用
+ */
+@property (copy, nonatomic) HXPhotoViewDeleteNetworkPhotoBlock deleteNetworkPhotoBlock;
+
+/**
+ 当前删除的模型
+ */
+@property (copy, nonatomic) HXPhotoViewCurrentDeleteModelBlock currentDeleteModelBlock;
+
+/**
+ 长按手势结束时是否删除当前拖动的cell
+ */
+@property (copy, nonatomic) HXPhotoViewShouldDeleteCurrentMoveItemBlock shouldDeleteCurrentMoveItemBlock;
+
+/**
+ 长按手势发生改变时调用
+ */
+@property (copy, nonatomic) HXPhotoViewLongGestureRecognizerChangeBlock longGestureRecognizerChangeBlock;
+
+/**
+ 长按手势开始时调用
+ */
+@property (copy, nonatomic) HXPhotoViewLongGestureRecognizerBeganBlock longGestureRecognizerBeganBlock;
+
+/**
+ 长按手势结束时调用
+ */
+@property (copy, nonatomic) HXPhotoViewLongGestureRecognizerEndedBlock longGestureRecognizerEndedBlock;
 
 /**  是否把相机功能放在外面 默认 NO  */
 @property (assign, nonatomic) BOOL outerCamera;
@@ -162,6 +263,8 @@ typedef void (^HXPhotoViewLongGestureRecognizerEnded)(UILongPressGestureRecogniz
 @property (copy, nonatomic) NSString *addImageName;
 /**  删除按钮图片  */
 @property (copy, nonatomic) NSString *deleteImageName;
+/**  预览大图时是否禁用手势返回  默认NO  */
+@property (assign, nonatomic) BOOL disableaInteractiveTransition;
 
 - (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;

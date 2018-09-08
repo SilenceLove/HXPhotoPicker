@@ -8,6 +8,7 @@
 
 #import "HXPhotoManager.h"
 #import <mach/mach_time.h>
+#import "HXDatePhotoToolManager.h"
 
 
 @interface HXPhotoManager ()<PHPhotoLibraryChangeObserver>
@@ -1592,6 +1593,127 @@
     return self.iCloudUploadArray;
 }
 - (NSString *)version {
-    return @"2.2.0";
+    return @"2.2.1";
 }
+
+#pragma mark - < 保存草稿功能 >
+- (void)saveSelectModelArraySuccess:(void (^)(void))success failed:(void (^)(void))failed {
+    if (!self.afterSelectedArray.count) {
+        if (failed) failed();
+        return;
+    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableArray *gifModel = [NSMutableArray array];
+        for (HXPhotoModel *model in self.afterSelectedArray) {
+            if (model.type == HXPhotoModelMediaTypePhotoGif && !model.gifImageData) {
+                [gifModel addObject:model];
+            }
+        }
+        if (gifModel.count) {
+            HXWeakSelf
+            [[[HXDatePhotoToolManager alloc] init] gifModelAssignmentData:gifModel success:^{
+                BOOL su = [weakSelf saveSelectModelArray];
+                if (!su) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (failed) {
+                            failed();
+                        }
+                        if (showLog) NSSLog(@"保存草稿失败啦!");
+                    });
+                }else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (success) {
+                            success();
+                        }
+                    });
+                }
+            } failed:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed();
+                    }
+                    if (showLog) NSSLog(@"保存草稿失败啦!");
+                });
+            }];
+        }else {
+            BOOL su = [self saveSelectModelArray];
+            if (!su) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed();
+                    }
+                    if (showLog) NSSLog(@"保存草稿失败啦!");
+                });
+            }else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (success) {
+                        success();
+                    }
+                });
+            }
+        }
+    });
+}
+
+- (BOOL)deleteLocalSelectModelArray {
+    return [self deleteSelectModelArray];
+}
+
+- (void)getSelectedModelArrayComplete:(void (^)(NSArray<HXPhotoModel *> *modelArray))complete  {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray *modelArray = [self getSelectedModelArray];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (complete) {
+                complete(modelArray);
+            }
+        });
+    });
+}
+
+- (BOOL)saveSelectModelArray {
+    NSMutableData *data = [[NSMutableData alloc] init];
+    //创建归档辅助类
+    NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
+    //编码
+    [archiver encodeObject:self.afterSelectedArray forKey:encodeKey];
+    //结束编码
+    [archiver finishEncoding];
+    //写入到沙盒
+    NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
+    
+    if([data writeToFile:toFileName atomically:YES]){
+        if (showLog) NSSLog(@"归档成功");
+        return YES;
+    }
+    return NO;
+}
+
+- (NSArray<HXPhotoModel *> *)getSelectedModelArray {
+    NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
+    //解档
+    NSData *undata = [[NSData alloc] initWithContentsOfFile:toFileName];
+    //解档辅助类
+    NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:undata];
+    //解码并解档出model
+    NSArray *tempArray = [unarchiver decodeObjectForKey:encodeKey];
+    //关闭解档
+    [unarchiver finishDecoding];
+    return tempArray.copy;
+}
+
+- (BOOL)deleteSelectModelArray {
+    NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
+    NSError *error;
+    [[NSFileManager defaultManager] removeItemAtPath:toFileName error:&error];
+    if (error) {
+        if (showLog) NSSLog(@"删除失败");
+        return NO;
+    }
+    return YES;
+}
+
 @end

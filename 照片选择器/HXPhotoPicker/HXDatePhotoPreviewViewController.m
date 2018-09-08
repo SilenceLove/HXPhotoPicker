@@ -18,6 +18,7 @@
 #import "HXDatePhotoEditViewController.h"
 #import "UIViewController+HXExtension.h"
 #import "HXDateVideoEditViewController.h"
+#import "HXDatePhotoPersentInteractiveTransition.h"
 
 #import "UIImageView+HXExtension.h"
 
@@ -39,9 +40,12 @@ HXDateVideoEditViewControllerDelegate
 @property (assign, nonatomic) BOOL orientationDidChange;
 @property (assign, nonatomic) NSInteger beforeOrientationIndex;
 @property (strong, nonatomic) HXDatePhotoInteractiveTransition *interactiveTransition;
+@property (strong, nonatomic) HXDatePhotoPersentInteractiveTransition *persentInteractiveTransition;
+
 @property (strong, nonatomic) HXPhotoCustomNavigationBar *navBar;
 @property (strong, nonatomic) UINavigationItem *navItem;
 @property (assign, nonatomic) BOOL isAddInteractiveTransition;
+@property (strong, nonatomic) UIView *dismissTempTopView;
 @end
 
 @implementation HXDatePhotoPreviewViewController
@@ -75,6 +79,7 @@ HXDateVideoEditViewControllerDelegate
         return [HXDatePhotoViewTransition transitionWithType:HXDatePhotoViewTransitionTypePop];
     }
 }
+
 - (id<UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController{
     return self.interactiveTransition.interation ? self.interactiveTransition : nil;
 }
@@ -84,6 +89,9 @@ HXDateVideoEditViewControllerDelegate
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
     return [HXDatePhotoViewPresentTransition transitionWithTransitionType:HXDatePhotoViewPresentTransitionTypeDismiss photoView:self.photoView];
+}
+- (id<UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id<UIViewControllerAnimatedTransitioning>)animator {
+    return self.persentInteractiveTransition.interation ? self.persentInteractiveTransition : nil;
 }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
@@ -179,6 +187,13 @@ HXDateVideoEditViewControllerDelegate
                 self.interactiveTransition = [[HXDatePhotoInteractiveTransition alloc] init];
                 //给当前控制器的视图添加手势
                 [self.interactiveTransition addPanGestureForViewController:self];
+            });
+        }else if (!self.disableaPersentInteractiveTransition) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                //初始化手势过渡的代理
+                self.persentInteractiveTransition = [[HXDatePhotoPersentInteractiveTransition alloc] init];
+                //给当前控制器的视图添加手势
+                [self.persentInteractiveTransition addPanGestureForViewController:self photoView:self.photoView];
             });
         }
         self.isAddInteractiveTransition = YES;
@@ -389,6 +404,7 @@ HXDateVideoEditViewControllerDelegate
     }];
     return cell;
 }
+
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration {
     BOOL hide = NO;
     if (self.bottomView.alpha == 1) {
@@ -797,6 +813,13 @@ HXDateVideoEditViewControllerDelegate
     });
 }
 #pragma mark - < 懒加载 >
+- (UIView *)dismissTempTopView {
+    if (!_dismissTempTopView) {
+        _dismissTempTopView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, kNavigationBarHeight)];
+        _dismissTempTopView.backgroundColor = [UIColor blackColor];
+    }
+    return _dismissTempTopView;
+}
 - (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;

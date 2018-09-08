@@ -59,6 +59,8 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) NSData *locationData;
 /**
  位置信息 CLLocation 对象
+ 
+ - 通过相机拍摄的时候有定位权限的话就有值
  */
 @property (strong, nonatomic) CLLocation *location;
 

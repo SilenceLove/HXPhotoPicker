@@ -42,7 +42,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.0'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.1'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.4.1```
 - 使用前导入头文件 "HXPhotoPicker.h"
@@ -50,8 +50,9 @@
 ## <a id="要求"></a> 三.  要求 - Requirements
 
 - iOS8及以上系统可使用. ARC环境. - iOS 8 or later. Requires ARC
-- 在Xcode8环境下将项目运行在iOS10的设备/模拟器中，访问相册和相机需要配置三个info.plist文件
+- 在Xcode8环境下将项目运行在iOS11的设备/模拟器中，访问相册和相机需要配置四个info.plist文件
 - Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description 以及 Privacy - Microphone Usage Description
+- Privacy - Location When In Use Usage Description 使用相机拍照时会获取位置信息
 - 相机拍照功能请使用真机调试
 
 ## <a id="更新历史"></a> 四.  更新历史 - Update History
@@ -83,6 +84,7 @@
 - v2.1.8　-　添加支持繁体字、韩文、日文，以及一些功能优化
 - v2.1.9　-　Demo2添加长按拖动删除功能（类似微信）
 - v2.2.0　-　添加xib使用示例（Demo11）、混合添加本地图片/网络图片/本地视频示例（Demo12）
+- v2.2.1　-　修改了一些问题、优化了一些效果，使用HXPhotoView预览大图时支持手势返回
 
 ## <a id="例子"></a> 五.  应用示例 - Examples
 ### <a id="Demo1"></a> Demo1
@@ -378,4 +380,4 @@ if (self.original) {
 
 - 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
 
-- [有兴趣可以加下创建的QQ群:531895229(因为工作很忙所以可能问问题没人回答!!)](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
+- [有兴趣可以加下创建的QQ群:531895229(有问题请先看Demo，因为工作很忙所以可能问问题没人回答!!)](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
