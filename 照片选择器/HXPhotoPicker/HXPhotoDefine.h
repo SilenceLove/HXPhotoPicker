@@ -16,7 +16,7 @@
 #define NSSLog(...)
 #endif
 
-#define encodeKey @"HXModelArray"
+#define HXEncodeKey @"HXModelArray"
 
 #define showLog YES
 

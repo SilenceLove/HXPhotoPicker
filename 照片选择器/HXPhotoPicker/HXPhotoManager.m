@@ -1676,7 +1676,7 @@
     //创建归档辅助类
     NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
     //编码
-    [archiver encodeObject:self.afterSelectedArray forKey:encodeKey];
+    [archiver encodeObject:self.afterSelectedArray forKey:HXEncodeKey];
     //结束编码
     [archiver finishEncoding];
     //写入到沙盒
@@ -1698,7 +1698,7 @@
     //解档辅助类
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:undata];
     //解码并解档出model
-    NSArray *tempArray = [unarchiver decodeObjectForKey:encodeKey];
+    NSArray *tempArray = [unarchiver decodeObjectForKey:HXEncodeKey];
     //关闭解档
     [unarchiver finishDecoding];
     return tempArray.copy;
