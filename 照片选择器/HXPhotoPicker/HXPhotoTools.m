@@ -701,13 +701,16 @@
     uname(&systemInfo);
     
     NSString *platform = [NSString stringWithCString:systemInfo.machine encoding:NSASCIIStringEncoding];
-    if([platform isEqualToString:@"iPhone7,1"]){
+    if([platform isEqualToString:@"iPhone7,2"]){//6
         return YES;
     }
-    if([platform isEqualToString:@"iPhone7,2"]) {
+    if ([platform isEqualToString:@"iPhone8,1"]) {//6s
         return YES;
     }
-    if ([platform isEqualToString:@"iPhone8,1"]) {
+    if([platform isEqualToString:@"iPhone9,1"] || [platform isEqualToString:@"iPhone9,3"]) {//7
+        return YES;
+    }
+    if([platform isEqualToString:@"iPhone10,1"] || [platform isEqualToString:@"iPhone10,4"]) {//8
         return YES;
     }
     return NO;
