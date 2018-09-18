@@ -224,6 +224,7 @@
 + (CGFloat)getTextHeight:(NSString *)text width:(CGFloat)width fontSize:(CGFloat)fontSize;
 
 + (BOOL)platform;
+/**  iphone6, 6s, 7, 8  */
 + (BOOL)isIphone6;
 
 /**********************************/
