@@ -318,6 +318,85 @@
         [self.endCameraList addObject:photoModel];
     }
 }
+
+- (void)fetchAlbums:(void (^)(HXAlbumModel *selectedModel))selectedModel albums:(void(^)(NSArray *albums))albums {
+    // 获取系统智能相册
+    PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    if (self.albums.count > 0) [self.albums removeAllObjects];
+    [self.iCloudUploadArray removeAllObjects];
+    [smartAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
+        // 是否按创建时间排序
+        PHFetchOptions *option = [[PHFetchOptions alloc] init];
+        option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        if (self.type == HXPhotoManagerSelectedTypePhoto) {
+            option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+        }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
+            option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+        }
+        // 获取照片集合
+        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+        
+        // 过滤掉空相册
+        if (result.count > 0 && ![[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"最近删除"]) {
+            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+            albumModel.count = result.count;
+            albumModel.albumName = collection.localizedTitle;
+            albumModel.result = result;
+            if ([[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"相机胶卷"] || [[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"所有照片"]) {
+                [self.albums insertObject:albumModel atIndex:0];
+                if (selectedModel) {
+                    selectedModel(albumModel);
+                }
+            }else {
+                [self.albums addObject:albumModel];
+            }
+        }
+    }];
+    // 获取用户相册
+    PHFetchResult *userAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary options:nil];
+    [userAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
+        // 是否按创建时间排序
+        PHFetchOptions *option = [[PHFetchOptions alloc] init];
+        option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        if (self.type == HXPhotoManagerSelectedTypePhoto) {
+            option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+        }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
+            option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+        }
+        // 获取照片集合
+        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+        
+        // 过滤掉空相册
+        if (result.count > 0) {
+            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+            albumModel.count = result.count;
+            albumModel.albumName = [HXPhotoTools transFormPhotoTitle:collection.localizedTitle];
+            albumModel.result = result;
+            [self.albums addObject:albumModel];
+        }
+    }];
+    for (int i = 0 ; i < self.albums.count; i++) {
+        HXAlbumModel *model = self.albums[i];
+        model.index = i;
+        //        NSPredicate *pred = [NSPredicate predicateWithFormat:@"currentAlbumIndex = %d", i];
+        //        NSArray *newArray = [self.selectedList filteredArrayUsingPredicate:pred];
+        //        model.selectedCount = newArray.count;
+    }
+    if (!self.albums.count &&
+        [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        HXPhotoModel *photoMd = self.cameraList.firstObject;
+        HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+        albumModel.count = self.cameraList.count;
+        albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
+        albumModel.index = 0;
+        albumModel.tempImage = photoMd.thumbPhoto;
+        [self.albums addObject:albumModel];
+    }
+    if (albums) {
+        albums(self.albums);
+    }
+}
+
 /**
  获取系统所有相册
  
@@ -807,14 +886,14 @@
         HXPhotoModel *model = [[HXPhotoModel alloc] init];
         model.type = HXPhotoModelMediaTypeCamera;
         if (photoArray.count == 0 && videoArray.count != 0) {
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_video@2x.png"];
-            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"hx_compose_photo_video@2x.png"];
+            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"hx_takePhoto@2x.png"];
         }else if (photoArray.count == 0) {
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
-            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"hx_compose_photo_photograph@2x.png"];
+            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"hx_takePhoto@2x.png"];
         }else {
-            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
-            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
+            model.thumbPhoto = [HXPhotoTools hx_imageNamed:@"hx_compose_photo_photograph@2x.png"];
+            model.previewPhoto = [HXPhotoTools hx_imageNamed:@"hx_takePhoto@2x.png"];
         }
         if (!self.configuration.reverseDate) {
             if (self.configuration.showDateSectionHeader) {
@@ -1593,7 +1672,7 @@
     return self.iCloudUploadArray;
 }
 - (NSString *)version {
-    return @"2.2.1";
+    return @"2.2.2";
 }
 
 #pragma mark - < 保存草稿功能 >

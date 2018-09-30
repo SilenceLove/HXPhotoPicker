@@ -10,6 +10,12 @@
 #import <PhotosUI/PhotosUI.h>
 #import "HXPhotoManager.h"
 
+#if __has_include(<YYWebImage/YYWebImage.h>)
+#import <YYWebImage/YYWebImage.h>
+#elif __has_include("YYWebImage.h")
+#import "YYWebImage.h"
+#endif
+
 @class HXDatePhotoPreviewViewController,HXDatePhotoPreviewBottomView,HXDatePhotoPreviewViewCell,HXPhotoView;
 @protocol HXDatePhotoPreviewViewControllerDelegate <NSObject>
 @optional
@@ -44,6 +50,11 @@
 @interface HXDatePhotoPreviewViewCell : UICollectionViewCell
 @property (assign, nonatomic) BOOL stopCancel;
 @property (strong, nonatomic) HXPhotoModel *model;
+
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+@property (strong, nonatomic) YYAnimatedImageView *animatedImageView;
+#endif
+
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic, readonly) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic, readonly) UIImage *gifImage;

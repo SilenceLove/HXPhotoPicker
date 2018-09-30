@@ -23,12 +23,19 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    self.animatedImageView.hx_size = self.model.previewViewSize;
+    self.animatedImageView.image = self.image;
+    [self.view addSubview:self.animatedImageView];
+    self.progressView.center = CGPointMake(self.animatedImageView.hx_size.width / 2, self.animatedImageView.hx_size.height / 2);
+#else
     self.imageView.hx_size = self.model.previewViewSize;
     self.imageView.image = self.image;
     [self.view addSubview:self.imageView];
+    self.progressView.center = CGPointMake(self.imageView.hx_size.width / 2, self.imageView.hx_size.height / 2);
+#endif
     [self.view addSubview:self.progressView];
     [self.view addSubview:self.loadingView];
-    self.progressView.center = CGPointMake(self.imageView.hx_size.width / 2, self.imageView.hx_size.height / 2);
     self.loadingView.center = self.progressView.center;
 }
 
@@ -69,7 +76,11 @@
     }
     [self.progressView removeFromSuperview];
     [self.loadingView stopAnimating];
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    [self.view addSubview:self.animatedImageView];
+#else
     [self.view addSubview:self.imageView];
+#endif
     if (self.player) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
     }
@@ -77,7 +88,11 @@
 
 - (void)loadPhoto {
     if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        self.animatedImageView.image = self.model.thumbPhoto;
+#else
         self.imageView.image = self.model.thumbPhoto;
+#endif
         return;
     }
     __weak typeof(self) weakSelf = self;
@@ -99,7 +114,11 @@
         } completion:^(UIImage *image) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 weakSelf.progressView.hidden = YES;
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+                weakSelf.animatedImageView.image = image;
+#else
                 weakSelf.imageView.image = image;
+#endif
             });
         } failed:^(NSDictionary *info) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -107,7 +126,11 @@
             });
         }];
     }else {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        self.animatedImageView.image = self.model.thumbPhoto;
+#else
         self.imageView.image = self.model.thumbPhoto;
+#endif
     }
     //    requestId = [HXPhotoTools fetchPhotoWithAsset:self.model.asset photoSize:CGSizeMake(self.model.previewViewSize.width * 1.5, self.model.previewViewSize.height * 1.5) completion:^(UIImage *photo, NSDictionary *info, BOOL isDegraded) {
     //        weakSelf.imageView.image = photo;
@@ -136,8 +159,13 @@
                 weakSelf.progressView.hidden = YES;
                 UIImage *gifImage = [UIImage animatedGIFWithData:imageData];
                 if (gifImage.images.count > 0) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+                    weakSelf.animatedImageView.image = nil;
+                    weakSelf.animatedImageView.image = gifImage;
+#else
                     weakSelf.imageView.image = nil;
                     weakSelf.imageView.image = gifImage;
+#endif
                 }
             });
         } failed:^(NSDictionary *info) {
@@ -147,7 +175,11 @@
         }];
     }else {
         UIImage *gifImage = [UIImage animatedGIFWithData:self.model.gifImageData];
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        self.animatedImageView.image = gifImage;
+#else
         self.imageView.image = gifImage;
+#endif
     }
     //    requestId = [HXPhotoTools FetchPhotoDataForPHAsset:self.model.asset completion:^(NSData *imageData, NSDictionary *info) {
     //        if (imageData) {
@@ -187,7 +219,11 @@
             weakSelf.livePhotoView.hidden = NO;
             weakSelf.livePhotoView.livePhoto = livePhoto;
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+            [weakSelf.animatedImageView removeFromSuperview];
+#else
             [weakSelf.imageView removeFromSuperview];
+#endif
         });
     } failed:^{
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -281,7 +317,11 @@
     [self.view.layer insertSublayer:self.playerLayer atIndex:0];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.player play];
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        [self.animatedImageView removeFromSuperview];
+#else
         [self.imageView removeFromSuperview];
+#endif
     });
 }
 
@@ -289,6 +329,18 @@
     if (showLog) NSSLog(@"%@",self);
 }
 
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+- (YYAnimatedImageView *)animatedImageView {
+    if (!_animatedImageView) {
+        _animatedImageView = [[YYAnimatedImageView alloc] init];
+        _animatedImageView.clipsToBounds = YES;
+        _animatedImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _animatedImageView.hx_x = 0;
+        _animatedImageView.hx_y = 0;
+    }
+    return _animatedImageView;
+}
+#endif
 - (UIImageView *)imageView {
     if (!_imageView) {
         _imageView = [[UIImageView alloc] init];

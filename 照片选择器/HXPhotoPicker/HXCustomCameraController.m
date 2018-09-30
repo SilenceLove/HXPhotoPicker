@@ -52,7 +52,7 @@ const CGFloat HXZoomRate = 1.0f;
     if (showLog) NSSLog(@"dealloc");
 }
 /// 重力感应回调
-- (void)handleDeviceMotion:(CMDeviceMotion *)deviceMotion{
+- (void)handleDeviceMotion:(CMDeviceMotion *)deviceMotion {
     double x = deviceMotion.gravity.x;
     double y = deviceMotion.gravity.y;
     
@@ -406,6 +406,14 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     
     if (connection.isVideoOrientationSupported) {
         connection.videoOrientation = [self currentVideoOrientation];
+    }
+    
+    AVCaptureDevicePosition position = [[self activeCamera] position];
+    if (position == AVCaptureDevicePositionUnspecified ||
+        position == AVCaptureDevicePositionFront) {
+        connection.videoMirrored = YES;
+    }else {
+        connection.videoMirrored = NO;
     }
     
     id handler = ^(CMSampleBufferRef sampleBuffer, NSError *error) {

@@ -85,6 +85,7 @@
 - v2.1.9　-　Demo2添加长按拖动删除功能（类似微信）
 - v2.2.0　-　添加xib使用示例（Demo11）、混合添加本地图片/网络图片/本地视频示例（Demo12）
 - v2.2.1　-　修改了一些问题、优化了一些效果，使用HXPhotoView预览大图时支持手势返回
+- v2.2.2　-　适配iphone XS - XSMax - XR、支持加载网络动图（需要YYWebImage）。支持YYWebImage（SD和YY同时存在时优先使用YY）
 
 ## <a id="例子"></a> 五.  应用示例 - Examples
 ### <a id="Demo1"></a> Demo1

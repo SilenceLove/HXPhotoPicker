@@ -72,7 +72,7 @@
     CGFloat height = [UIScreen mainScreen].bounds.size.height - kTopMargin - kBottomMargin;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-        if (kDevice_Is_iPhoneX) {
+        if (HX_IS_IPhoneX_All) {
             height = [UIScreen mainScreen].bounds.size.height - kTopMargin - 21;
         }
     }
@@ -148,7 +148,11 @@
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         tempView = [[UIImageView alloc] initWithImage:model.thumbPhoto];
     }else {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
+#else
         tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
+#endif
     }
     UICollectionView *collectionView = (UICollectionView *)self.photoView.collectionView;
     
@@ -174,7 +178,11 @@
     
     
     UIView *containerView = [transitionContext containerView];
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") 
+    tempView.frame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
+#else
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+#endif
     [containerView addSubview:tempView];
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         CGPoint center = tempView.center;

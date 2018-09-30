@@ -14,6 +14,12 @@
 #import "UIImageView+WebCache.h"
 #endif
 
+#if __has_include(<YYWebImage/YYWebImage.h>)
+#import <YYWebImage/YYWebImage.h>
+#elif __has_include("YYWebImage.h")
+#import "YYWebImage.h"
+#endif
+
 @interface HXDatePhotoToolManager ()
 @property (copy, nonatomic) HXDatePhotoToolManagerSuccessHandler successHandler;
 @property (copy, nonatomic) HXDatePhotoToolManagerFailedHandler failedHandler;
@@ -276,7 +282,7 @@
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             CGFloat scale;
             if (self.requestType == HXDatePhotoToolManagerRequestTypeHD) {
-                scale = 0.8f;
+                scale = 0.7f;
             }else {
                 scale = 1.0f;
             }
@@ -370,6 +376,7 @@
             }else {
                 size = PHImageManagerMaximumSize;
             }
+            
             [HXPhotoTools getHighQualityFormatPhoto:model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
                 
             } progressHandler:^(double progress) {
@@ -382,6 +389,14 @@
                     }
                     NSData *imageData;
                     NSString *suffix;
+                    
+//                    NSString *UTI = [model.asset valueForKey:@"uniformTypeIdentifier"];
+//                    BOOL isHEIF = NO;
+//                    isHEIF = [UTI isEqualToString:@"public.heif"] || [UTI isEqualToString:@"public.heic"];
+//                    if (isHEIF) {
+//
+//                    }
+                    
                     if (UIImagePNGRepresentation(tempImage)) {
                         //返回为png图像。
                         imageData = UIImagePNGRepresentation(tempImage);
@@ -422,7 +437,7 @@
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 CGFloat scale;
                 if (self.requestType == HXDatePhotoToolManagerRequestTypeHD) {
-                    scale = 0.8f;
+                    scale = 0.7f;
                 }else {
                     scale = 1.0f;
                 }
@@ -432,7 +447,7 @@
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 
                 if ([imageData writeToFile:fullPathToFile atomically:YES]) {
-                    [self.allArray removeObject:weakSelf.writeArray.firstObject];
+                    [self.allArray removeObject:self.writeArray.firstObject];
                     [self.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
                     [self.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
                     [self writeModelToTempPath];
@@ -772,7 +787,24 @@
         if (model.networkPhotoUrl) {
             __weak typeof(self) weakSelf = self;
             if (model.downloadError) {
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+                YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:model.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+                    if (!error && image) {
+                        model.thumbPhoto = image;
+                        model.previewPhoto = image;
+                        [weakSelf.imageArray addObject:model.thumbPhoto];
+                        [weakSelf.allImageModelArray removeObject:weakSelf.currentImageModelArray.firstObject];
+                        [weakSelf getCurrentModelImage];
+                    }else {
+                        [weakSelf.downloadTokenArray removeAllObjects];
+                        weakSelf.gettingImage = NO;
+                        if (weakSelf.imageFailedHandler) {
+                            weakSelf.imageFailedHandler();
+                        }
+                    }
+                }];
+                [self.downloadTokenArray addObject:operation];
+#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -793,7 +825,24 @@
                 return;
             }
             if (!model.downloadComplete) {
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+                YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:model.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+                    if (!error && image) {
+                        model.thumbPhoto = image;
+                        model.previewPhoto = image;
+                        [weakSelf.imageArray addObject:model.thumbPhoto];
+                        [weakSelf.allImageModelArray removeObject:weakSelf.currentImageModelArray.firstObject];
+                        [weakSelf getCurrentModelImage];
+                    }else {
+                        [weakSelf.downloadTokenArray removeAllObjects];
+                        weakSelf.gettingImage = NO;
+                        if (weakSelf.imageFailedHandler) {
+                            weakSelf.imageFailedHandler();
+                        }
+                    }
+                }];
+                [self.downloadTokenArray addObject:operation];
+#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -825,11 +874,17 @@
 }
 - (void)cancelGetImageList {
     self.cancelGetImage = YES;
+    for (id obj in self.downloadTokenArray) {
+        if ([obj isKindOfClass:NSClassFromString(@"SDWebImageDownloadToken")]) {
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
-    for (SDWebImageDownloadToken *token in self.downloadTokenArray) {
-        [[SDWebImageDownloader sharedDownloader] cancel:token];
-    }
+            [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
+        }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+            [(YYWebImageOperation *)obj cancel];
+#endif
+        }
+    }
     [self.downloadTokenArray removeAllObjects];
     if (self.currentImageRequestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.currentImageRequestID];
@@ -838,17 +893,23 @@
 }
 - (void)cancelGetImageDataList {
     self.cancelGetImageData = YES;
+    for (id obj in self.downloadTokenArray) {
+        if ([obj isKindOfClass:NSClassFromString(@"SDWebImageDownloadToken")]) {
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
-    for (SDWebImageDownloadToken *token in self.downloadTokenArray) {
-        [[SDWebImageDownloader sharedDownloader] cancel:token];
-    }
+            [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
+        }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+            [(YYWebImageOperation *)obj cancel];
+#endif
+        }
+    }
     [self.downloadTokenArray removeAllObjects];
     if (self.currentImageDataRequestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.currentImageDataRequestID];
         self.currentImageDataRequestID = 0;
     }
-}
+} 
 - (NSMutableArray *)allURL {
     if (!_allURL) {
         _allURL = [NSMutableArray array];

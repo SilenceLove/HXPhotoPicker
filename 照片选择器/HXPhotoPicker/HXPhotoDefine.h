@@ -19,14 +19,26 @@
 #define HXEncodeKey @"HXModelArray"
 
 #define showLog YES
-
+#define HX_UI_IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 // 判断iPhone X
-#define kDevice_Is_iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
+#define HX_Is_iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
+
+//判断iPHoneXr
+#define HX_Is_iPhoneXR ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(828, 1792), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)
+
+//判断iPHoneXs
+#define HX_Is_iPhoneXS ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)
+
+//判断iPhoneXs Max
+#define HX_Is_iPhoneXS_MAX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1242, 2688), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)
+
+#define HX_IS_IPhoneX_All (HX_Is_iPhoneX || HX_Is_iPhoneXR || HX_Is_iPhoneXS || HX_Is_iPhoneXS_MAX)
+
 
 // 导航栏 + 状态栏 的高度
-#define kNavigationBarHeight (kDevice_Is_iPhoneX ? 88 : 64)
-#define kTopMargin (kDevice_Is_iPhoneX ? 44 : 0)
-#define kBottomMargin (kDevice_Is_iPhoneX ? 34 : 0)
+#define kNavigationBarHeight (HX_IS_IPhoneX_All ? 88 : 64)
+#define kTopMargin (HX_IS_IPhoneX_All ? 44 : 0)
+#define kBottomMargin (HX_IS_IPhoneX_All ? 34 : 0)
 
 #define iOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)
 

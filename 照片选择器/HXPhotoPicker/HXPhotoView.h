@@ -34,6 +34,11 @@ typedef void (^HXPhotoViewChangeCompleteBlock)(NSArray<HXPhotoModel *> *allList,
 typedef void (^HXPhotoViewImageChangeCompleteBlock)(NSArray<UIImage *> *imageList);
 
 /**
+ 点击了添加cell的事件
+ */
+typedef void (^HXPhotoViewDidAddCellBlock)(void);
+
+/**
  当view高度改变时调用
 
  @param frame 位置大小
@@ -105,7 +110,17 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  @param videos 视频类型的模型数组
  @param isOriginal 是否原图
  */
-- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
+- (void)photoView:(HXPhotoView *)photoView
+   changeComplete:(NSArray<HXPhotoModel *> *)allList
+           photos:(NSArray<HXPhotoModel *> *)photos
+           videos:(NSArray<HXPhotoModel *> *)videos
+         original:(BOOL)isOriginal;
+
+- (void)photoViewChangeComplete:(HXPhotoView *)photoView
+                   allAssetList:(NSArray<PHAsset *> *)allAssetList
+                    photoAssets:(NSArray<PHAsset *> *)photoAssets
+                    videoAssets:(NSArray<PHAsset *> *)videoAssets
+                       original:(BOOL)isOriginal;
 
 /**
  照片/视频发生改变时调用 - 选择、移动顺序、删除
@@ -115,6 +130,13 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  @param imageList 图片数组
  */
 - (void)photoView:(HXPhotoView *)photoView imageChangeComplete:(NSArray<UIImage *> *)imageList;
+
+/**
+ 点击了添加cell的事件
+
+ @param photoView self
+ */
+- (void)photoViewDidAddCellClick:(HXPhotoView *)photoView;
 
 /**
  当view高度改变时调用
@@ -154,7 +176,9 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  @param photoView 视图本身
  @return 是否删除
  */
-- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView gestureRecognizer:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
+- (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView
+                           gestureRecognizer:(UILongPressGestureRecognizer *)longPgr
+                                   indexPath:(NSIndexPath *)indexPath;
 
 /**
  长按手势发生改变时调用
@@ -202,6 +226,11 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  requestImageAfterFinishingSelection == YES 时 才会有回调
  */
 @property (copy, nonatomic) HXPhotoViewImageChangeCompleteBlock imageChangeCompleteBlock;
+
+/**
+ 点击了添加cell
+ */
+@property (copy, nonatomic) HXPhotoViewDidAddCellBlock didAddCellBlock;
 
 /**
  当view高度改变时调用

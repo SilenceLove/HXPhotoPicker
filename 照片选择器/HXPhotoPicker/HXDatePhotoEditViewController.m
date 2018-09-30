@@ -94,7 +94,7 @@
     CGFloat bottomMargin = kBottomMargin;
     CGFloat width = self.view.hx_w - 40;
     CGFloat imageY = 30;
-    if (kDevice_Is_iPhoneX && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+    if (HX_IS_IPhoneX_All && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
         bottomMargin = 21;
         width = self.view.hx_w - 80;
         imageY = 20;
@@ -754,7 +754,7 @@
 - (UIButton *)selectRatioBtn {
     if (!_selectRatioBtn) {
         _selectRatioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_selectRatioBtn setImage:[HXPhotoTools hx_imageNamed:@"icon_xiangce_xuanbili@2x.png"] forState:UIControlStateNormal];
+        [_selectRatioBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_xiangce_xuanbili@2x.png"] forState:UIControlStateNormal];
         _selectRatioBtn.hx_size = CGSizeMake(50, 40);
         [_selectRatioBtn addTarget:self action:@selector(didSelectRatioBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -763,7 +763,7 @@
 - (UIButton *)restoreBtn {
     if (!_restoreBtn) {
         _restoreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_restoreBtn setImage:[HXPhotoTools hx_imageNamed:@"paizhao_bianji_huanyuan@2x.png"] forState:UIControlStateNormal];
+        [_restoreBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_paizhao_bianji_huanyuan@2x.png"] forState:UIControlStateNormal];
         [_restoreBtn setTitle:[NSBundle hx_localizedStringForKey:@"还原"] forState:UIControlStateNormal];
         [_restoreBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_restoreBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
@@ -779,7 +779,7 @@
     if (!_rotateBtn) {
         _rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_rotateBtn setImage:[HXPhotoTools hx_imageNamed:@"paizhao_bianji_xuanzhuan@2x.png"] forState:UIControlStateNormal];
+        [_rotateBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_paizhao_bianji_xuanzhuan@2x.png"] forState:UIControlStateNormal];
         [_rotateBtn setTitle:[NSBundle hx_localizedStringForKey:@"旋转"] forState:UIControlStateNormal];
         [_rotateBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         _rotateBtn.titleLabel.font = [UIFont systemFontOfSize:16];

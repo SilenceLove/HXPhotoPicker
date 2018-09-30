@@ -91,7 +91,7 @@
                 self.interation = NO;
                 [self cancelInteractiveTransition];
                 [self interPercentCancel];
-            }
+            } 
             break;
     }
 }
@@ -111,12 +111,22 @@
     UIView *containerView = [transitionContext containerView];
     CGRect tempImageViewFrame;
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        self.tempImageView = fromCell.animatedImageView;
+        tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
+#else
         self.tempImageView = fromCell.imageView;
         tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+#endif
     }else {
         if (!fromCell.playerLayer.player) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") 
+            self.tempImageView = fromCell.animatedImageView;
+            tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
+#else
             self.tempImageView = fromCell.imageView;
             tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+#endif
         }else {
             tempImageViewFrame = containerView.bounds;
             [fromCell.playerLayer removeFromSuperlayer];
@@ -124,7 +134,7 @@
             self.tempImageView = [[UIImageView alloc] init];
             self.tempImageView.layer.masksToBounds = YES;
             [self.tempImageView.layer addSublayer:self.playerLayer];
-            if (kDevice_Is_iPhoneX) {
+            if (HX_IS_IPhoneX_All) {
                 tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + kTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
             }
         }

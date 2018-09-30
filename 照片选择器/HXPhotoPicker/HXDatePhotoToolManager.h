@@ -23,6 +23,9 @@ typedef void (^ HXDatePhotoToolManagerGetImageListFailedHandler)(void);
 typedef void (^ HXDatePhotoToolManagerGetImageDataListSuccessHandler)(NSArray<NSData *> *imageDataList);
 typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
 
+//typedef void (^ HXDatePhotoToolManagerGetImagePathSuccessHandler)(NSArray<NSString *> *paths);
+//typedef void (^ HXDatePhotoToolManagerGetImagePathFailedHandler)(void);
+
 @interface HXDatePhotoToolManager : NSObject
 
 /**
@@ -36,7 +39,9 @@ typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
  @param success 成功回调
  @param failed 失败回调
  */
-- (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerSuccessHandler)success failed:(HXDatePhotoToolManagerFailedHandler)failed;
+- (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList
+                                       success:(HXDatePhotoToolManagerSuccessHandler)success
+                                        failed:(HXDatePhotoToolManagerFailedHandler)failed;
 
 /**
  将选择的模型数组写入临时目录
@@ -50,7 +55,10 @@ typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
  @param success 成功回调
  @param failed 失败回调
  */
-- (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList requestType:(HXDatePhotoToolManagerRequestType)requestType success:(HXDatePhotoToolManagerSuccessHandler)success failed:(HXDatePhotoToolManagerFailedHandler)failed;
+- (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList
+                                   requestType:(HXDatePhotoToolManagerRequestType)requestType
+                                       success:(HXDatePhotoToolManagerSuccessHandler)success
+                                        failed:(HXDatePhotoToolManagerFailedHandler)failed;
 
 /**
  根据模型数组获取与之对应的image数组   -   HXDatePhotoToolManagerRequestTypeHD
@@ -59,7 +67,9 @@ typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
  @param success 成功
  @param failed 失败
  */
-- (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed;
+- (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList
+                     success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success
+                      failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed;
 
 /**
  根据模型数组获取与之对应的image数组
@@ -69,12 +79,17 @@ typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
  @param success 成功回调
  @param failed 失败回调
  */
-- (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList requestType:(HXDatePhotoToolManagerRequestType)requestType success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed;
+- (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList
+                 requestType:(HXDatePhotoToolManagerRequestType)requestType
+                     success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success
+                      failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed;
 
 /**
  取消获取image
  */
 - (void)cancelGetImageList;
+
+//- (void)getSelectedImagePath:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImagePathSuccessHandler)success failed:(HXDatePhotoToolManagerGetImagePathFailedHandler)failed;
 
 /**
  根据模型数组获取与之对应的NSData数组
@@ -84,7 +99,11 @@ typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
  @param success 成功
  @param failed 失败
  */
-- (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed;
+- (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList
+                         success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success
+                          failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed;
 
-- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)(void))success failed:(void (^)(void))failed;
+- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray
+                       success:(void (^)(void))success
+                        failed:(void (^)(void))failed;
 @end

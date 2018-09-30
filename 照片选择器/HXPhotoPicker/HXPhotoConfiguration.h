@@ -378,7 +378,7 @@ typedef enum : NSUInteger {
 /**
  设置导航栏
  */
-@property (copy, nonatomic) void (^navigationBar)(UINavigationBar *navigationBar);
+@property (copy, nonatomic) void (^navigationBar)(UINavigationBar *navigationBar, UIViewController *viewController);
 
 /**
  照片列表底部View

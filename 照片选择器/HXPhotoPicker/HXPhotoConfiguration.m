@@ -62,14 +62,14 @@
     self.popTransitionDuration = 0.35f;
     self.popInteractiveTransitionDuration = 0.35f;
     self.transitionAnimationOption = UIViewAnimationOptionCurveEaseOut;
-    if (kDevice_Is_iPhoneX) {
-        self.clarityScale = 2.0f;
+    if (HX_IS_IPhoneX_All) {
+        self.clarityScale = 2.4f;
     }else if ([UIScreen mainScreen].bounds.size.width == 320) {
-        self.clarityScale = 0.8;
+        self.clarityScale = 1.2;
     }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-        self.clarityScale = 1.4;
+        self.clarityScale = 1.8;
     }else {
-        self.clarityScale = 1.7;
+        self.clarityScale = 2.0;
     }
     
     self.doneBtnShowDetail = YES;
@@ -77,20 +77,9 @@
     self.singleJumpEdit = YES;
     self.photoCanEdit = YES;
     self.localFileName = @"HXPhotoPickerModelArray";
+    self.requestImageAfterFinishingSelection = YES;
     
-//    [self preloadImage];
 }
-
-//- (void)preloadImage {
-//    [HXPhotoTools hx_imageNamed:@"icon_yunxiazai@2x.png"];
-//    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"];
-//    [HXPhotoTools hx_imageNamed:@"compose_photo_video@2x.png"];
-//    [HXPhotoTools hx_imageNamed:@"compose_photo_photograph@2x.png"];
-//    [HXPhotoTools hx_imageNamed:@"takePhoto@2x.png"];
-//    [HXPhotoTools hx_imageNamed:@"qz_photolist_picture_fail@2x.png"];
-//    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default@2x.png"];
-//    [HXPhotoTools hx_imageNamed:@"compose_guide_check_box_default111@2x.png"];
-//}
 
 //- (NSInteger)maxNum {
 //    if (!_maxNum) {

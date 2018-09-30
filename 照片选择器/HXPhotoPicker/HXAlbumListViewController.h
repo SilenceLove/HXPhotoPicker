@@ -33,7 +33,8 @@ typedef void (^ HXAlbumListViewControllerDidCancelBlock)(HXAlbumListViewControll
  @param albumListViewController self
  @param imageList 图片数组
  */
-- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllImage:(NSArray<UIImage *> *)imageList;
+- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController
+                didDoneAllImage:(NSArray<UIImage *> *)imageList;
 
 /**
  点击完成
@@ -44,7 +45,17 @@ typedef void (^ HXAlbumListViewControllerDidCancelBlock)(HXAlbumListViewControll
  @param videoList 已选的视频列表
  @param original 是否原图
  */
-- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original;
+- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController
+                 didDoneAllList:(NSArray<HXPhotoModel *> *)allList
+                         photos:(NSArray<HXPhotoModel *> *)photoList
+                         videos:(NSArray<HXPhotoModel *> *)videoList
+                       original:(BOOL)original;
+
+- (void)albumListViewControllerDidDone:(HXAlbumListViewController *)albumListViewController
+                          allAssetList:(NSArray<PHAsset *> *)allAssetList
+                           photoAssets:(NSArray<PHAsset *> *)photoAssetList
+                           videoAssets:(NSArray<PHAsset *> *)videoAssetList
+                              original:(BOOL)original;
 @end
 
 @interface HXAlbumListViewController : UIViewController

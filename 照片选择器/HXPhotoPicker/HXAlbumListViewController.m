@@ -121,7 +121,7 @@ UITableViewDelegate
     CGFloat leftMargin = 0;
     CGFloat rightMargin = 0;
     CGFloat width = self.view.hx_w;
-    if (kDevice_Is_iPhoneX && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+    if (HX_IS_IPhoneX_All && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
         leftMargin = 35;
         rightMargin = 35;
         width = self.view.hx_w - 70;
@@ -161,7 +161,7 @@ UITableViewDelegate
         self.navigationController.navigationBar.barTintColor = self.manager.configuration.navBarBackgroudColor;
     }
     if (self.manager.configuration.navigationBar) {
-        self.manager.configuration.navigationBar(self.navigationController.navigationBar);
+        self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
     }
     if (self.manager.configuration.navigationTitleSynchColor) {
         self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.manager.configuration.themeColor};
@@ -199,6 +199,22 @@ UITableViewDelegate
     if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllList:photos:videos:original:)]) {
         [self.delegate albumListViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
         
+    }
+    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidDone:allAssetList:photoAssets:videoAssets:original:)]) {
+        NSMutableArray *allAsset = [NSMutableArray array];
+        NSMutableArray *photoAssets = [NSMutableArray array];
+        NSMutableArray *videoAssets = [NSMutableArray array];
+        for (HXPhotoModel *phMd in allList) {
+            if (phMd.asset) {
+                if (phMd.subType == HXPhotoModelMediaSubTypePhoto) {
+                    [photoAssets addObject:phMd.asset];
+                }else {
+                    [videoAssets addObject:phMd.asset];
+                }
+                [allAsset addObject:phMd.asset];
+            }
+        }
+        [self.delegate albumListViewControllerDidDone:self allAssetList:allAsset photoAssets:photoAssets videoAssets:videoAssets original:original];
     }
     if (self.manager.configuration.requestImageAfterFinishingSelection) {
         [self.navigationController.viewControllers.lastObject.view showLoadingHUDText:nil];
@@ -547,7 +563,7 @@ UITableViewDelegate
     self.albumNameLb.text = model.albumName;
     self.photoNumberLb.text = @(model.result.count + model.cameraCount).stringValue;
     if (!model.result) {
-        self.coverView.image = model.tempImage ?: [HXPhotoTools hx_imageNamed:@"yundian_tupian@3x.png"];
+        self.coverView.image = model.tempImage ?: [HXPhotoTools hx_imageNamed:@"hx_yundian_tupian@3x.png"];
     }
 //    if (model.selectedCount == 0) {
 //        self.selectNumberBtn.hidden = YES;
@@ -708,7 +724,7 @@ UITableViewDelegate
     self.albumNameLb.text = model.albumName;
     self.photoNumberLb.text = @(photoCount + model.cameraCount).stringValue;
     if (!model.result) {
-        self.coverView1.image = model.tempImage ?: [HXPhotoTools hx_imageNamed:@"yundian_tupian@3x.png"];
+        self.coverView1.image = model.tempImage ?: [HXPhotoTools hx_imageNamed:@"hx_yundian_tupian@3x.png"];
         self.coverView2.hidden = YES;
         self.coverView3.hidden = YES;
     }

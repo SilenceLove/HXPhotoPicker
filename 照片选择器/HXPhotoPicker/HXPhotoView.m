@@ -192,7 +192,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 }
 - (NSString *)addImageName {
     if (!_addImageName) {
-        _addImageName = @"compose_pic_add@2x.png";
+        _addImageName = @"hx_compose_pic_add@2x.png";
     }
     return _addImageName;
 }
@@ -246,6 +246,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self.tempShowAddCell) {
         if (indexPath.item == self.dataList.count) {
+            if ([self.delegate respondsToSelector:@selector(photoViewDidAddCellClick:)]) {
+                [self.delegate photoViewDidAddCellClick:self];
+            }
+            if (self.didAddCellBlock) {
+                self.didAddCellBlock();
+            }
             [self goPhotoViewController];
             return;
         }
@@ -260,6 +266,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
     }
     if (model.type == HXPhotoModelMediaTypeCamera) {
+        if ([self.delegate respondsToSelector:@selector(photoViewDidAddCellClick:)]) {
+            [self.delegate photoViewDidAddCellClick:self];
+        }
+        if (self.didAddCellBlock) {
+            self.didAddCellBlock();
+        }
         [self goPhotoViewController];
     }else {
         HXDatePhotoPreviewViewController *vc = [[HXDatePhotoPreviewViewController alloc] init];
@@ -534,6 +546,22 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
         [self.delegate photoView:self changeComplete:self.dataList photos:self.photos videos:self.videos original:self.original];
     }
+    if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:allAssetList:photoAssets:videoAssets:original:)]) {
+        NSMutableArray *allAsset = [NSMutableArray array];
+        NSMutableArray *photoAssets = [NSMutableArray array];
+        NSMutableArray *videoAssets = [NSMutableArray array];
+        for (HXPhotoModel *phMd in self.dataList) {
+            if (phMd.asset) {
+                if (phMd.subType == HXPhotoModelMediaSubTypePhoto) {
+                    [photoAssets addObject:phMd.asset];
+                }else {
+                    [videoAssets addObject:phMd.asset];
+                }
+                [allAsset addObject:phMd.asset];
+            }
+        }
+        [self.delegate photoViewChangeComplete:self allAssetList:allAsset photoAssets:photoAssets videoAssets:videoAssets original:self.original];
+    }
     if (self.changeCompleteBlock) {
         self.changeCompleteBlock(self.dataList.copy, self.photos.copy, self.videos.copy, self.original);
     }
@@ -560,6 +588,9 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
 }
 #pragma mark - < HXAlbumListViewControllerDelegate >
+- (void)albumListViewControllerDidDone:(HXAlbumListViewController *)albumListViewController allAssetList:(NSArray<PHAsset *> *)allAssetList photoAssets:(NSArray<PHAsset *> *)photoAssetList videoAssets:(NSArray<PHAsset *> *)videoAssetList original:(BOOL)original {
+    
+}
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllImage:(NSArray<UIImage *> *)imageList {
     self.imageList = [NSMutableArray arrayWithArray:imageList];
     if ([self.delegate respondsToSelector:@selector(photoView:imageChangeComplete:)]) {
@@ -612,6 +643,22 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
         [self.delegate photoView:self changeComplete:allList.copy photos:photos.copy videos:videos.copy original:original];
     }
+    if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:allAssetList:photoAssets:videoAssets:original:)]) {
+        NSMutableArray *allAsset = [NSMutableArray array];
+        NSMutableArray *photoAssets = [NSMutableArray array];
+        NSMutableArray *videoAssets = [NSMutableArray array];
+        for (HXPhotoModel *phMd in allList) {
+            if (phMd.asset) {
+                if (phMd.subType == HXPhotoModelMediaSubTypePhoto) {
+                    [photoAssets addObject:phMd.asset];
+                }else {
+                    [videoAssets addObject:phMd.asset];
+                }
+                [allAsset addObject:phMd.asset];
+            }
+        }
+        [self.delegate photoViewChangeComplete:self allAssetList:allAsset photoAssets:photoAssets videoAssets:videoAssets original:original];
+    }
     if (self.changeCompleteBlock) {
         self.changeCompleteBlock(allList.copy, photos.copy, videos.copy, original);
     }
@@ -640,10 +687,13 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     HXPhotoModel *toModel = self.dataList[toIndexPath.item];
     [self.manager afterSelectedArraySwapPlacesWithFromModel:fromModel fromIndex:fromIndexPath.item toModel:toModel toIndex:toIndexPath.item];
     if (self.manager.configuration.requestImageAfterFinishingSelection) {
-        UIImage *fromImage = self.imageList[fromIndexPath.item];
-        UIImage *toImage = self.imageList[toIndexPath.item];
-        [self.imageList replaceObjectAtIndex:toIndexPath.item withObject:fromImage];
-        [self.imageList replaceObjectAtIndex:fromIndexPath.item withObject:toImage];
+        if (self.imageList.count > fromIndexPath.item &&
+           self.imageList.count > toIndexPath.item ) {
+            UIImage *fromImage = self.imageList[fromIndexPath.item];
+            UIImage *toImage = self.imageList[toIndexPath.item];
+            [self.imageList replaceObjectAtIndex:toIndexPath.item withObject:fromImage];
+            [self.imageList replaceObjectAtIndex:fromIndexPath.item withObject:toImage];
+        }
     }
 //    [self.manager.endSelectedList removeObject:toModel];
 //    [self.manager.endSelectedList insertObject:toModel atIndex:toIndexPath.item];
@@ -690,6 +740,23 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
         [self.delegate photoView:self changeComplete:self.dataList.mutableCopy photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:allAssetList:photoAssets:videoAssets:original:)]) {
+        NSMutableArray *allAsset = [NSMutableArray array];
+        NSMutableArray *photoAssets = [NSMutableArray array];
+        NSMutableArray *videoAssets = [NSMutableArray array];
+        for (HXPhotoModel *phMd in self.dataList) {
+            if (phMd.asset) {
+                if (phMd.subType == HXPhotoModelMediaSubTypePhoto) {
+                    [photoAssets addObject:phMd.asset];
+                }else {
+                    [videoAssets addObject:phMd.asset];
+                }
+                [allAsset addObject:phMd.asset];
+            }
+        }
+        [self.delegate photoViewChangeComplete:self allAssetList:allAsset photoAssets:photoAssets videoAssets:videoAssets original:self.original];
     }
     if (self.changeCompleteBlock) {
         self.changeCompleteBlock(self.dataList.copy, self.photos.copy, self.videos.copy, self.original);

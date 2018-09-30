@@ -64,7 +64,7 @@
     CGFloat height = [UIScreen mainScreen].bounds.size.height - kTopMargin - kBottomMargin;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-        if (kDevice_Is_iPhoneX) {
+        if (HX_IS_IPhoneX_All) {
             height = [UIScreen mainScreen].bounds.size.height - kTopMargin - 21;
         }
     }
@@ -112,7 +112,12 @@
     
     HXDatePhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     HXDatePhotoViewCell *toCell = [toVC currentPreviewCell:model];
-    UIImageView *tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
+    UIImageView *tempView;
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
+#else
+    tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
+#endif
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
     BOOL contains = YES;
@@ -140,7 +145,11 @@
     toCell.hidden = YES;
     fromVC.view.backgroundColor = [UIColor clearColor];
     
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    tempView.frame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
+#else
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+#endif
     
     CGRect rect = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
     if (toCell) {

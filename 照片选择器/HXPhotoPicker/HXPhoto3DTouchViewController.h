@@ -8,10 +8,18 @@
 
 #import <UIKit/UIKit.h>
 #import "HXPhotoTools.h"
+#if __has_include(<YYWebImage/YYWebImage.h>)
+#import <YYWebImage/YYWebImage.h>
+#elif __has_include("YYWebImage.h")
+#import "YYWebImage.h"
+#endif
 
 @interface HXPhoto3DTouchViewController : UIViewController
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) UIImage *image;
 @property (strong, nonatomic) UIImageView *imageView;
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+@property (strong, nonatomic) YYAnimatedImageView *animatedImageView;
+#endif
 @property (strong, nonatomic) NSIndexPath *indexPath;
 @end

@@ -30,7 +30,8 @@
  @param albumName 自定义相册名称
  @param videoURL 本地视频地址
  */
-+ (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL;
++ (void)saveVideoToCustomAlbumWithName:(NSString *)albumName
+                              videoURL:(NSURL *)videoURL;
 
 /**
  保存图片到系统相册和自定义相册
@@ -38,18 +39,25 @@
  @param albumName 自定义相册名称
  @param photo uiimage
  */
-+ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo;
++ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
+                                 photo:(UIImage *)photo;
 
-+ (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model completion:(void (^)(CLPlacemark *placemark,HXPhotoDateModel *model))completion;
++ (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model
+                                               completion:(void (^)(CLPlacemark *placemark,HXPhotoDateModel *model))completion;
 
 /**
  根据PHAsset对象获取照片信息   此方法会回调多次
  */
-+ (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion;
++ (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset
+                                  size:(CGSize)size
+                            completion:(void(^)(UIImage *image,NSDictionary *info))completion;
 /**
  根据PHAsset对象获取照片信息   此方法只会回调一次
  */
-+ (PHImageRequestID)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion error:(void(^)(NSDictionary *info))error;
++ (PHImageRequestID)getHighQualityFormatPhotoForPHAsset:(PHAsset *)asset
+                                                   size:(CGSize)size
+                                             completion:(void (^)(UIImage *image,NSDictionary *info))completion
+                                                  error:(void (^)(NSDictionary *info))error;
 
 /**
  根据模型获取image
@@ -58,7 +66,8 @@
  @param completion 完成后的block
  @return 请求id
  */
-+ (PHImageRequestID)getImageWithModel:(HXPhotoModel *)model completion:(void (^)(UIImage *image, HXPhotoModel *model))completion;
++ (PHImageRequestID)getImageWithModel:(HXPhotoModel *)model
+                           completion:(void (^)(UIImage *image, HXPhotoModel *model))completion;
 
 /**
  根据模型获取指定大小的image
@@ -69,7 +78,9 @@
  @param completion 完成后的block
  @return 请求id
  */
-+ (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model size:(CGSize)size completion:(void (^)(UIImage *image, HXAlbumModel *model))completion;
++ (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model
+                                      size:(CGSize)size
+                                completion:(void (^)(UIImage *image, HXAlbumModel *model))completion;
 
 /**
  根据相册模型、PHAsset获取指定大小的iamge
@@ -80,7 +91,10 @@
  @param completion 完成后的block
  @return 请求id
  */
-+ (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model asset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *image, HXAlbumModel *model))completion;
++ (PHImageRequestID)getImageWithAlbumModel:(HXAlbumModel *)model
+                                     asset:(PHAsset *)asset
+                                      size:(CGSize)size
+                                completion:(void (^)(UIImage *image, HXAlbumModel *model))completion;
 
 /**
  根据PHAsset对象获取 AVPlayerItem
@@ -93,7 +107,11 @@
  @param failed 失败后的block
  @return 请求id
  */
-+ (PHImageRequestID)getPlayerItemWithPHAsset:(PHAsset *)asset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVPlayerItem *playerItem))completion failed:(void(^)(NSDictionary *info))failed;
++ (PHImageRequestID)getPlayerItemWithPHAsset:(PHAsset *)asset
+                          startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud
+                             progressHandler:(void (^)(double progress))progressHandler
+                                  completion:(void (^)(AVPlayerItem *playerItem))completion
+                                      failed:(void (^)(NSDictionary *info))failed;
 
 /**
  根据PHAsset对象获取 AVAsset
@@ -106,7 +124,11 @@
  @param failed 失败后的block
  @return 请求id
  */
-+ (PHImageRequestID)getAVAssetWithPHAsset:(PHAsset *)phAsset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVAsset *asset))completion failed:(void(^)(NSDictionary *info))failed;
++ (PHImageRequestID)getAVAssetWithPHAsset:(PHAsset *)phAsset
+                       startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud
+                          progressHandler:(void (^)(double progress))progressHandler
+                               completion:(void (^)(AVAsset *asset))completion
+                                   failed:(void (^)(NSDictionary *info))failed;
 
 /**
  获取 AVAssetExportSession
@@ -120,13 +142,14 @@
  @param failed 失败后的block
  @return 请求id
  */
-+ (PHImageRequestID)getExportSessionWithPHAsset:(PHAsset *)phAsset deliveryMode:(PHVideoRequestOptionsDeliveryMode)deliveryMode presetName:(NSString *)presetName startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVAssetExportSession * exportSession, NSDictionary *info))completion failed:(void(^)(NSDictionary *info))failed;
++ (PHImageRequestID)getExportSessionWithPHAsset:(PHAsset *)phAsset
+                                   deliveryMode:(PHVideoRequestOptionsDeliveryMode)deliveryMode
+                                     presetName:(NSString *)presetName
+                             startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud
+                                progressHandler:(void (^)(double progress))progressHandler
+                                     completion:(void (^)(AVAssetExportSession * exportSession, NSDictionary *info))completion
+                                         failed:(void (^)(NSDictionary *info))failed;
 
-/**  根据PHAsset获取中等质量的视频AVAsset对象  */
-+ (PHImageRequestID)getMediumQualityAVAssetWithPHAsset:(PHAsset *)phAsset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVAsset *asset))completion failed:(void(^)(NSDictionary *info))failed;
-
-/**  根据PHAsset获取高等质量的视频AVAsset对象  */
-+ (PHImageRequestID)getHighQualityAVAssetWithPHAsset:(PHAsset *)phAsset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVAsset *asset))completion failed:(void(^)(NSDictionary *info))failed;
 /**
  根据PHAsset对象获取指定大小的图片
  成功回调只会执行一次
@@ -137,7 +160,10 @@
  @param failed 失败后的回调
  @return 请求id
  */
-+ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size succeed:(void (^)(UIImage *image))succeed failed:(void(^)(void))failed;
++ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset
+                                         size:(CGSize)size
+                                      succeed:(void (^)(UIImage *image))succeed
+                                       failed:(void (^)(void))failed;
 
 /**
  根据PHAsset对象获取指定大小的图片
@@ -151,7 +177,12 @@
  @param failed 失败后的block
  @return 请求id
  */
-+ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(UIImage *image))completion failed:(void(^)(NSDictionary *info))failed;
++ (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset
+                                         size:(CGSize)size
+                           startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud
+                              progressHandler:(void (^)(double progress))progressHandler
+                                   completion:(void (^)(UIImage *image))completion
+                                       failed:(void (^)(NSDictionary *info))failed;
 
 /**
  根据PHAsset获取指定大小的LivePhoto图片
@@ -164,7 +195,12 @@
  @param failed 失败后的block
  @return 请求id
  */
-+ (PHImageRequestID)getLivePhotoForAsset:(PHAsset *)asset size:(CGSize)size startRequestICloud:(void (^)(PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(PHLivePhoto *livePhoto))completion failed:(void(^)(void))failed;
++ (PHImageRequestID)getLivePhotoForAsset:(PHAsset *)asset
+                                    size:(CGSize)size
+                      startRequestICloud:(void (^)(PHImageRequestID iCloudRequestId))startRequestICloud
+                         progressHandler:(void (^)(double progress))progressHandler
+                              completion:(void (^)(PHLivePhoto *livePhoto))completion
+                                  failed:(void (^)(void))failed;
 
 /**
  根据PHAsset获取imageData
@@ -176,14 +212,38 @@
  @param failed 失败后的block
  @return 请求id
  */
-+ (PHImageRequestID)getImageData:(PHAsset *)asset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(NSData *imageData, UIImageOrientation orientation))completion failed:(void(^)(NSDictionary *info))failed;
++ (PHImageRequestID)getImageData:(PHAsset *)asset
+              startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud
+                 progressHandler:(void (^)(double progress))progressHandler
+                      completion:(void (^)(NSData *imageData, UIImageOrientation orientation))completion
+                          failed:(void (^)(NSDictionary *info))failed;
 
 /**  通过模型去获取AVAsset  */
-+ (PHImageRequestID)getAVAssetWithModel:(HXPhotoModel *)model startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, AVAsset *asset))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
++ (PHImageRequestID)getAVAssetWithModel:(HXPhotoModel *)model
+                     startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud
+                        progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler
+                             completion:(void (^)(HXPhotoModel *model, AVAsset *asset))completion
+                                 failed:(void (^)(HXPhotoModel *model, NSDictionary *info))failed;
 /**  通过模型去获取PHLivePhoto  */
-+ (PHImageRequestID)getLivePhotoWithModel:(HXPhotoModel *)model size:(CGSize)size startRequestICloud:(void (^)(HXPhotoModel *model, PHImageRequestID iCloudRequestId))startRequestICloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, PHLivePhoto *livePhoto))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
++ (PHImageRequestID)getLivePhotoWithModel:(HXPhotoModel *)model
+                                     size:(CGSize)size
+                       startRequestICloud:(void (^)(HXPhotoModel *model, PHImageRequestID iCloudRequestId))startRequestICloud
+                          progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler
+                               completion:(void (^)(HXPhotoModel *model, PHLivePhoto *livePhoto))completion
+                                   failed:(void (^)(HXPhotoModel *model, NSDictionary *info))failed;
 /**  通过模型去获取imageData  */
-+ (PHImageRequestID)getImageDataWithModel:(HXPhotoModel *)model startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler completion:(void(^)(HXPhotoModel *model, NSData *imageData, UIImageOrientation orientation))completion failed:(void(^)(HXPhotoModel *model, NSDictionary *info))failed;
++ (PHImageRequestID)getImageDataWithModel:(HXPhotoModel *)model
+                       startRequestIcloud:(void (^)(HXPhotoModel *model, PHImageRequestID cloudRequestId))startRequestIcloud
+                          progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler
+                               completion:(void (^)(HXPhotoModel *model, NSData *imageData, UIImageOrientation orientation))completion
+                                   failed:(void (^)(HXPhotoModel *model, NSDictionary *info))failed;
+
++ (PHContentEditingInputRequestID)getImagePathWithModel:(HXPhotoModel *)model
+                                     startRequestIcloud:(void (^)(HXPhotoModel *model, PHContentEditingInputRequestID cloudRequestId))startRequestIcloud
+                                        progressHandler:(void (^)(HXPhotoModel *model, double progress))progressHandler
+                                             completion:(void (^)(HXPhotoModel *model, NSString *path))completion
+                                                 failed:(void (^)(HXPhotoModel *model, NSDictionary *info))failed;
+
 /**  -------  */
 
 /**
@@ -195,7 +255,10 @@
  @param size 图片大小
  @param complete 完成后的block
  */
-+ (void)getVideoEachFrameWithAsset:(AVAsset *)asset total:(NSInteger)total size:(CGSize)size complete:(void (^)(AVAsset *asset, NSArray<UIImage *> *images))complete;
++ (void)getVideoEachFrameWithAsset:(AVAsset *)asset
+                             total:(NSInteger)total
+                              size:(CGSize)size
+                          complete:(void (^)(AVAsset *asset, NSArray<UIImage *> *images))complete;
 
 /**
  获取视频的时长
@@ -210,7 +273,8 @@
 /**
  获取数组里面图片的大小
  */
-+ (void)FetchPhotosBytes:(NSArray *)photos completion:(void (^)(NSString *totalBytes))completion;
++ (void)FetchPhotosBytes:(NSArray *)photos
+              completion:(void (^)(NSString *totalBytes))completion;
 
 /**
  获取指定字符串的宽度
@@ -220,8 +284,12 @@
  @param fontSize 字体大小
  @return 宽度大小
  */
-+ (CGFloat)getTextWidth:(NSString *)text height:(CGFloat)height fontSize:(CGFloat)fontSize;
-+ (CGFloat)getTextHeight:(NSString *)text width:(CGFloat)width fontSize:(CGFloat)fontSize;
++ (CGFloat)getTextWidth:(NSString *)text
+                 height:(CGFloat)height
+               fontSize:(CGFloat)fontSize;
++ (CGFloat)getTextHeight:(NSString *)text
+                   width:(CGFloat)width
+                fontSize:(CGFloat)fontSize;
 
 + (BOOL)platform;
 /**  iphone6, 6s, 7, 8  */
@@ -229,5 +297,8 @@
 
 /**********************************/
 
-+ (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)(void))error;
++ (void)selectListWriteToTempPath:(NSArray *)selectList
+                      requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList
+                       completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion
+                            error:(void (^)(void))error;
 @end

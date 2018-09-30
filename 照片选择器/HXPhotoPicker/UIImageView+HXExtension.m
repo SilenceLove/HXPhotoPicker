@@ -7,7 +7,7 @@
 //
 
 #import "UIImageView+HXExtension.h"
-
+#import "HXPhotoDefine.h"
 #import "HXPhotoModel.h"
 
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
@@ -16,10 +16,47 @@
 #import "UIImageView+WebCache.h"
 #endif
 
+#if __has_include(<YYWebImage/YYWebImage.h>)
+#import <YYWebImage/YYWebImage.h>
+#elif __has_include("YYWebImage.h")
+#import "YYWebImage.h"
+#endif
+
 @implementation UIImageView (HXExtension)
 - (void)hx_setImageWithModel:(HXPhotoModel *)model progress:(void (^)(CGFloat progress, HXPhotoModel *model))progressBlock completed:(void (^)(UIImage * image, NSError * error, HXPhotoModel * model))completedBlock {
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
-    __weak typeof(self) weakSelf = self;
+    HXWeakSelf
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    [self yy_setImageWithURL:model.networkPhotoUrl placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) { 
+        model.receivedSize = receivedSize;
+        model.expectedSize = expectedSize;
+        CGFloat progress = (CGFloat)receivedSize / expectedSize;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (progressBlock) {
+                progressBlock(progress, model);
+            }
+        });
+    } transform:^UIImage * _Nullable(UIImage * _Nonnull image, NSURL * _Nonnull url) {
+        
+        return image;
+    } completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+        if (error != nil) {
+            model.downloadError = YES;
+            model.downloadComplete = YES;
+        }else {
+            if (image) {
+                weakSelf.image = image;
+                model.imageSize = image.size;
+                model.thumbPhoto = image;
+                model.previewPhoto = image;
+                model.downloadComplete = YES;
+                model.downloadError = NO;
+            }
+        }
+        if (completedBlock) {
+            completedBlock(image,error,model);
+        }
+    }];
+#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     // 崩溃在这里说明SDWebImage版本过低
     [self sd_setImageWithURL:model.networkPhotoUrl placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
         model.receivedSize = receivedSize;
@@ -49,7 +86,7 @@
         }
     }];
 #else
-    NSAssert(NO, @"请导入SDWebImage后再使用网络图片功能");
+    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能");
 #endif
 }
 @end

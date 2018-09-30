@@ -116,7 +116,7 @@
     self.previewView.tapToFocusEnabled = self.cameraController.cameraSupportsTapToFocus;
     
     if (self.manager.configuration.navigationBar) {
-        self.manager.configuration.navigationBar(self.navigationController.navigationBar);
+        self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
     }
 }
 - (void)requestAccessForAudio {
@@ -492,7 +492,7 @@
         _cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"重拍"] forState:UIControlStateSelected];
         [_cancelBtn setTitle:@"" forState:UIControlStateNormal];
-        [_cancelBtn setImage:[HXPhotoTools hx_imageNamed:@"faceu_cancel@3x.png"] forState:UIControlStateNormal];
+        [_cancelBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_faceu_cancel@3x.png"] forState:UIControlStateNormal];
         [_cancelBtn setImage:[[UIImage alloc] init] forState:UIControlStateSelected];
         [_cancelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
         [_cancelBtn addTarget:self action:@selector(cancelClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -504,7 +504,7 @@
 - (UIButton *)changeCameraBtn {
     if (!_changeCameraBtn) {
         _changeCameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_changeCameraBtn setImage:[HXPhotoTools hx_imageNamed:@"faceu_camera@3x.png"] forState:UIControlStateNormal];
+        [_changeCameraBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_faceu_camera@3x.png"] forState:UIControlStateNormal];
         [_changeCameraBtn addTarget:self action:@selector(didchangeCameraClick) forControlEvents:UIControlEventTouchUpInside];
         _changeCameraBtn.hx_size = _changeCameraBtn.currentImage.size;
     }
@@ -513,8 +513,8 @@
 - (UIButton *)flashBtn {
     if (!_flashBtn) {
         _flashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_flashBtn setImage:[HXPhotoTools hx_imageNamed:@"camera_flashlight@2x的副本11.png"] forState:UIControlStateNormal];
-        [_flashBtn setImage:[HXPhotoTools hx_imageNamed:@"flash_pic_nopreview@2x.png"] forState:UIControlStateSelected];
+        [_flashBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_camera_flashlight@2x.png"] forState:UIControlStateNormal];
+        [_flashBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_flash_pic_nopreview@2x.png"] forState:UIControlStateSelected];
         _flashBtn.hx_size = _flashBtn.currentImage.size;
         [_flashBtn addTarget:self action:@selector(didFlashClick:) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -566,7 +566,9 @@
 }
 #pragma mark - < CLLocationManagerDelegate >
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
-    self.location = locations.lastObject;
+    if (locations.lastObject) {
+        self.location = locations.lastObject;
+    }
 }
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     if(error.code == kCLErrorLocationUnknown) {

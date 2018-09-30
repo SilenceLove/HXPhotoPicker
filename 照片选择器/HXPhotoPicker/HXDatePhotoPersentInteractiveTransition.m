@@ -24,25 +24,45 @@
 @property (nonatomic, assign) CGFloat beginX;
 @property (nonatomic, assign) CGFloat beginY;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
-@property (strong, nonatomic) HXPhotoView *photoView ;
+@property (strong, nonatomic) HXPhotoView *photoView;
+@property (assign, nonatomic) BOOL isPanGesture;
 @end
 
 @implementation HXDatePhotoPersentInteractiveTransition
 - (void)addPanGestureForViewController:(UIViewController *)viewController photoView:(HXPhotoView *)photoView {
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
-    pan.delegate = self;
+//    pan.delegate = self;
     self.vc = viewController;
     self.photoView = photoView;
     [viewController.view addGestureRecognizer:pan];
 //    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchView:)];
 //    pinchGestureRecognizer.delegate = self;
 //    [viewController.view addGestureRecognizer:pinchGestureRecognizer];
-//
-//    [viewController.view setMultipleTouchEnabled:YES];
+
+//    UIRotationGestureRecognizer *rotaitonGest = [[UIRotationGestureRecognizer alloc]initWithTarget:self action:@selector(rotationView:)];
+//    rotaitonGest.delegate =self;
+//    [viewController.view addGestureRecognizer:rotaitonGest];
+    
+    [viewController.view setMultipleTouchEnabled:YES];
 }
-/*
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        return NO;
+    }else if ([gestureRecognizer isKindOfClass:[UIPinchGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        return NO;
+    }else if ([gestureRecognizer isKindOfClass:[UIRotationGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        return NO;
+    }
+    
     return YES;
+}
+- (void)rotationView:(UIRotationGestureRecognizer *)rotationGest {
+    
+    CGFloat rotation = rotationGest.rotation;
+    NSSLog(@"旋转   %f",rotation);
+    self.tempImageView.transform = CGAffineTransformMakeRotation(rotation);
+    
 }
 - (void)pinchView:(UIPinchGestureRecognizer *)pinchGestureRecognizer {
     CGFloat scale = pinchGestureRecognizer.scale;
@@ -53,6 +73,7 @@
                 [pinchGestureRecognizer cancelsTouchesInView];
                 return;
             }
+            self.isPanGesture = NO;
             if (![(HXDatePhotoPreviewViewController *)self.vc bottomView].userInteractionEnabled) {
                 [[UIApplication sharedApplication] setStatusBarHidden:NO];
             }
@@ -63,12 +84,8 @@
             break;
         case UIGestureRecognizerStateChanged:
             if (self.interation) {
-                if (scale > 1.f) {
-                    scale = 1.f;
-                }
+                
                 self.tempImageView.transform = CGAffineTransformMakeScale(scale, scale);
-//                self.tempImageView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
-//                self.tempImageView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
                 
                 [self updateInterPercent:1 - scale];
                 
@@ -77,9 +94,7 @@
             break;
         case UIGestureRecognizerStateEnded:
             if (self.interation) {
-                if (scale > 1.f) {
-                    scale = 1.f;
-                }
+                
                 self.interation = NO;
                 if (scale > 0.7f){
                     [self cancelInteractiveTransition];
@@ -99,7 +114,7 @@
             break;
     }
 }
-*/
+
 - (void)gestureRecognizeDidUpdate:(UIPanGestureRecognizer *)gestureRecognizer {
     CGFloat scale = 0;
     
@@ -115,7 +130,7 @@
                 [gestureRecognizer cancelsTouchesInView];
                 return;
             }
-            
+            self.isPanGesture = YES;
             if (![(HXDatePhotoPreviewViewController *)self.vc bottomView].userInteractionEnabled) {
                 [[UIApplication sharedApplication] setStatusBarHidden:NO];
             }
@@ -198,12 +213,22 @@
     UIView *containerView = [transitionContext containerView];
     CGRect tempImageViewFrame;
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        self.tempImageView = fromCell.animatedImageView;
+        tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
+#else
         self.tempImageView = fromCell.imageView;
         tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+#endif
     }else {
         if (!fromCell.playerLayer.player) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") 
+            self.tempImageView = fromCell.animatedImageView;
+            tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
+#else
             self.tempImageView = fromCell.imageView;
             tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
+#endif
         }else {
             tempImageViewFrame = containerView.bounds;
             [fromCell.playerLayer removeFromSuperlayer];
@@ -212,7 +237,7 @@
             self.tempImageView.layer.masksToBounds = YES;
             [self.tempImageView.layer addSublayer:self.playerLayer];
         }
-        if (kDevice_Is_iPhoneX) {
+        if (HX_IS_IPhoneX_All) {
             tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + kTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
         }
     }
@@ -227,19 +252,24 @@
     self.bgView.backgroundColor = [UIColor whiteColor];
     CGFloat scaleX;
     CGFloat scaleY;
-    if (self.beginX < tempImageViewFrame.origin.x) {
-        scaleX = 0;
-    }else if (self.beginX > CGRectGetMaxX(tempImageViewFrame)) {
-        scaleX = 1.0f;
+    if (self.isPanGesture) {
+        if (self.beginX < tempImageViewFrame.origin.x) {
+            scaleX = 0;
+        }else if (self.beginX > CGRectGetMaxX(tempImageViewFrame)) {
+            scaleX = 1.0f;
+        }else {
+            scaleX = (self.beginX - tempImageViewFrame.origin.x) / tempImageViewFrame.size.width;
+        }
+        if (self.beginY < tempImageViewFrame.origin.y) {
+            scaleY = 0;
+        }else if (self.beginY > CGRectGetMaxY(tempImageViewFrame)){
+            scaleY = 1.0f;
+        }else {
+            scaleY = (self.beginY - tempImageViewFrame.origin.y) / tempImageViewFrame.size.height;
+        }
     }else {
-        scaleX = (self.beginX - tempImageViewFrame.origin.x) / tempImageViewFrame.size.width;
-    }
-    if (self.beginY < tempImageViewFrame.origin.y) {
-        scaleY = 0;
-    }else if (self.beginY > CGRectGetMaxY(tempImageViewFrame)){
-        scaleY = 1.0f;
-    }else {
-        scaleY = (self.beginY - tempImageViewFrame.origin.y) / tempImageViewFrame.size.height;
+        scaleX = 0.5f;
+        scaleY = 0.5f;
     }
     self.tempImageView.layer.anchorPoint = CGPointMake(scaleX, scaleY);
     

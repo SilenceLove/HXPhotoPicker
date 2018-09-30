@@ -123,6 +123,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
  */
 - (void)getAllPhotoAlbums:(void(^)(HXAlbumModel *firstAlbumModel))firstModel albums:(void(^)(NSArray *albums))albums isFirst:(BOOL)isFirst;
 
+- (void)fetchAlbums:(void (^)(HXAlbumModel *selectedModel))selectedModel albums:(void(^)(NSArray *albums))albums;
 /**
  根据某个相册模型获取照片列表
 

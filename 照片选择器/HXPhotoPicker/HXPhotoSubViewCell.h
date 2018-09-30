@@ -12,7 +12,7 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #elif __has_include("UIImageView+WebCache.h")
 #import "UIImageView+WebCache.h"
-#endif
+#endif 
 
 @protocol HXPhotoSubViewCellDelegate <NSObject>
 
@@ -23,6 +23,8 @@
 @interface HXPhotoSubViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXPhotoSubViewCellDelegate> delegate;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
+
+
 @property (strong, nonatomic) HXPhotoModel *model;
 /**  删除按钮图片  */
 @property (copy, nonatomic) NSString *deleteImageName;

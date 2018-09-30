@@ -54,7 +54,7 @@
 //        _manager.configuration.supportRotation = NO;
 //        _manager.configuration.cameraCellShowPreview = NO;
 //        _manager.configuration.themeColor = [UIColor redColor];
-        _manager.configuration.navigationBar = ^(UINavigationBar *navigationBar) {
+        _manager.configuration.navigationBar = ^(UINavigationBar *navigationBar, UIViewController *viewController) {
 //            [navigationBar setBackgroundImage:[UIImage imageNamed:@"APPCityPlayer_bannerGame"] forBarMetrics:UIBarMetricsDefault];
 //            navigationBar.barTintColor = [UIColor redColor];
         };
@@ -154,12 +154,14 @@
     // Do any additional setup after loading the view from its nib.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空选择" style:UIBarButtonItemStylePlain target:self action:@selector(didRightClick)];
     self.scrollView.delegate = self;
-    if ([UIScreen mainScreen].bounds.size.width == 320) {
-        self.clarityText.text = @"0.8";
+    if (HX_IS_IPhoneX_All) {
+        self.clarityText.text = @"2.4";
+    }else if ([UIScreen mainScreen].bounds.size.width == 320) {
+        self.clarityText.text = @"1.2";
     }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-        self.clarityText.text = @"1.4";
+        self.clarityText.text = @"1.8";
     }else {
-        self.clarityText.text = @"1.7";
+        self.clarityText.text = @"2.0";
     }
     
     NSArray *ifs = (__bridge_transfer NSArray *)CNCopySupportedInterfaces();

@@ -126,7 +126,7 @@
     if (hudW < 100) {
         hudW = 100;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110 + hudH - 15) imageName:@"alert_failed_icon@2x.png" text:text];
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110 + hudH - 15) imageName:@"hx_alert_failed@2x.png" text:text];
     hud.alpha = 0;
     hud.tag = 1008611;
     [self addSubview:hud];
@@ -150,7 +150,7 @@
         width = 95;
         height = 95;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:@"alert_failed_icon@2x.png" text:text];
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:@"hx_alert_failed@2x.png" text:text];
     [hud showloading];
     hud.alpha = 0;
     hud.tag = 10086;

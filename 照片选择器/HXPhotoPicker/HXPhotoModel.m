@@ -50,14 +50,18 @@
 
 - (NSData *)locationData {
     if (!_locationData) {
-        _locationData = [self.asset valueForKey:@"locationData"];
+        if (self.asset) {
+            _locationData = [self.asset valueForKey:@"locationData"];
+        }
     }
     return _locationData;
 }
 
 - (CLLocation *)location {
     if (!_location) {
-        _location = [self.asset valueForKey:@"location"];
+        if (self.asset) {
+            _location = [self.asset valueForKey:@"location"];
+        }
     }
     return _location;
 }
@@ -93,7 +97,7 @@
     if (self = [super init]) {
         self.type = HXPhotoModelMediaTypeCameraPhoto;
         self.subType = HXPhotoModelMediaSubTypePhoto;
-        self.thumbPhoto = [HXPhotoTools hx_imageNamed:@"qz_photolist_picture_fail@2x.png"];
+        self.thumbPhoto = [HXPhotoTools hx_imageNamed:@"hx_qz_photolist_picture_fail@2x.png"];
         self.previewPhoto = self.thumbPhoto;
         self.imageSize = self.thumbPhoto.size;
         self.networkPhotoUrl = imageURL;
@@ -273,7 +277,7 @@
         CGFloat height = [UIScreen mainScreen].bounds.size.height - kTopMargin - kBottomMargin;
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-            if (kDevice_Is_iPhoneX) {
+            if (HX_IS_IPhoneX_All) {
                 height = [UIScreen mainScreen].bounds.size.height - kTopMargin - 21;
             }
         }

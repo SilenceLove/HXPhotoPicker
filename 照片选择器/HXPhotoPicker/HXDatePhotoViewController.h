@@ -30,7 +30,11 @@
  @param videoList 已选的视频列表
  @param original 是否原图
  */
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original;
+- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController
+                 didDoneAllList:(NSArray<HXPhotoModel *> *)allList
+                         photos:(NSArray<HXPhotoModel *> *)photoList
+                         videos:(NSArray<HXPhotoModel *> *)videoList
+                       original:(BOOL)original;
 
 /**
  改变了选择
@@ -38,7 +42,8 @@
  @param model 改的模型
  @param selected 是否选中
  */
-- (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected;
+- (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model
+                                      selected:(BOOL)selected;
 @end
 
 @interface HXDatePhotoViewController : UIViewController

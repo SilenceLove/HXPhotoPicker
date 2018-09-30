@@ -65,7 +65,7 @@
 - (UIButton *)deleteBtn {
     if (!_deleteBtn) {
         _deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"compose_delete@2x.png"] forState:UIControlStateNormal];
+        [_deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_compose_delete@2x.png"] forState:UIControlStateNormal];
         [_deleteBtn addTarget:self action:@selector(didDeleteClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _deleteBtn;
@@ -153,9 +153,6 @@
     }else {
         self.deleteBtn.hidden = NO;
         if (model.networkPhotoUrl) {
-            //        if ([[model.networkPhotoUrl substringFromIndex:model.networkPhotoUrl.length - 3] isEqualToString:@"gif"]) {
-            //            self.gifIcon.hidden = NO;
-            //        }
             __weak typeof(self) weakSelf = self;
             self.progressView.hidden = model.downloadComplete;
             [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
@@ -197,6 +194,14 @@
             self.stateLb.hidden = NO;
             self.bottomMaskLayer.hidden = NO;
         }else {
+            if (model.networkPhotoUrl) {
+                if ([[model.networkPhotoUrl.absoluteString substringFromIndex:model.networkPhotoUrl.absoluteString.length - 3] isEqualToString:@"gif"]) {
+                    self.stateLb.text = @"GIF";
+                    self.stateLb.hidden = NO;
+                    self.bottomMaskLayer.hidden = NO;
+                    return;
+                }
+            }
             self.stateLb.hidden = YES;
             self.bottomMaskLayer.hidden = YES;
         }
@@ -218,6 +223,11 @@
     self.deleteBtn.frame = CGRectMake(width - deleteBtnW, 0, deleteBtnW, deleteBtnH);
     
     self.progressView.center = CGPointMake(width / 2, height / 2);
+}
+
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    
 }
 
 @end

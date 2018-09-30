@@ -283,6 +283,65 @@
     return requestID;
 }
 
++ (PHContentEditingInputRequestID)getImagePathWithModel:(HXPhotoModel *)model startRequestIcloud:(void (^)(HXPhotoModel *, PHContentEditingInputRequestID))startRequestIcloud progressHandler:(void (^)(HXPhotoModel *, double))progressHandler completion:(void (^)(HXPhotoModel *, NSString *))completion failed:(void (^)(HXPhotoModel *, NSDictionary *))failed {
+    
+    PHContentEditingInputRequestOptions *options = [[PHContentEditingInputRequestOptions alloc] init];
+    options.networkAccessAllowed = NO;
+    return [model.asset requestContentEditingInputWithOptions:options completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+        BOOL downloadFinined = (![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]);
+        
+        if (downloadFinined && contentEditingInput.fullSizeImageURL.relativePath) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) {
+                    completion(model, contentEditingInput.fullSizeImageURL.relativePath);
+                }
+            });
+        }else {
+            
+            if ([[info objectForKey:PHContentEditingInputResultIsInCloudKey] boolValue] && ![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]) {
+                PHContentEditingInputRequestOptions *iCloudOptions = [[PHContentEditingInputRequestOptions alloc] init];
+                iCloudOptions.networkAccessAllowed = YES;
+                iCloudOptions.progressHandler = ^(double progress, BOOL * _Nonnull stop) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (progressHandler) {
+                            progressHandler(model,progress);
+                        }
+                    });
+                };
+                
+                PHContentEditingInputRequestID iCloudRequestID = [model.asset requestContentEditingInputWithOptions:iCloudOptions completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]);
+                    
+                    if (downloadFinined && contentEditingInput.fullSizeImageURL.relativePath) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(model, contentEditingInput.fullSizeImageURL.relativePath);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (failed) {
+                                failed(model,info);
+                            }
+                        });
+                    }
+                }];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (startRequestIcloud) {
+                        startRequestIcloud(model,iCloudRequestID);
+                    }
+                });
+            }else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed(model,info);
+                    }
+                });
+            }
+        }
+    }];
+}
+
 + (PHImageRequestID)getPhotoForPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void(^)(UIImage *image,NSDictionary *info))completion {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
@@ -940,123 +999,7 @@
             }
         }
     }];
-}
-
-+ (PHImageRequestID)getMediumQualityAVAssetWithPHAsset:(PHAsset *)phAsset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVAsset *asset))completion failed:(void(^)(NSDictionary *info))failed{
-    
-    PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-    options.deliveryMode = PHVideoRequestOptionsDeliveryModeMediumQualityFormat;
-    options.networkAccessAllowed = NO;
-    return [[PHImageManager defaultManager] requestAVAssetForVideo:phAsset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-        if (downloadFinined && asset) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) {
-                    completion(asset);
-                }
-            });
-        }else {
-            if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
-                PHImageRequestID cloudRequestId = 0;
-                PHVideoRequestOptions *cloudOptions = [[PHVideoRequestOptions alloc] init];
-                cloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeMediumQualityFormat;
-                cloudOptions.networkAccessAllowed = YES;
-                cloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (progressHandler) {
-                            progressHandler(progress);
-                        }
-                    });
-                };
-                cloudRequestId = [[PHImageManager defaultManager] requestAVAssetForVideo:phAsset options:cloudOptions resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-                    if (downloadFinined && asset) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) {
-                                completion(asset);
-                            }
-                        });
-                    }else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (failed) {
-                                failed(info);
-                            }
-                        });
-                    }
-                }];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (startRequestIcloud) {
-                        startRequestIcloud(cloudRequestId);
-                    }
-                });
-            }else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (failed) {
-                        failed(info);
-                    }
-                });
-            }
-        }
-    }];
-    
-}
-
-+ (PHImageRequestID)getHighQualityAVAssetWithPHAsset:(PHAsset *)phAsset startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(AVAsset *asset))completion failed:(void(^)(NSDictionary *info))failed{
-    PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-    options.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
-    options.networkAccessAllowed = NO;
-    return [[PHImageManager defaultManager] requestAVAssetForVideo:phAsset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-        if (downloadFinined && asset) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) {
-                    completion(asset);
-                }
-            });
-        }else {
-            if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
-                PHImageRequestID cloudRequestId = 0;
-                PHVideoRequestOptions *cloudOptions = [[PHVideoRequestOptions alloc] init];
-                cloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
-                cloudOptions.networkAccessAllowed = YES;
-                cloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (progressHandler) {
-                            progressHandler(progress);
-                        }
-                    });
-                };
-                cloudRequestId = [[PHImageManager defaultManager] requestAVAssetForVideo:phAsset options:cloudOptions resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-                    if (downloadFinined && asset) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) {
-                                completion(asset);
-                            }
-                        });
-                    }else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (failed) {
-                                failed(info);
-                            }
-                        });
-                    }
-                }];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (startRequestIcloud) {
-                        startRequestIcloud(cloudRequestId);
-                    }
-                });
-            }else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (failed) {
-                        failed(info);
-                    }
-                });
-            }
-        }
-    }];
-}
+} 
 
 + (PHImageRequestID)getHighQualityFormatPhoto:(PHAsset *)asset size:(CGSize)size startRequestIcloud:(void (^)(PHImageRequestID cloudRequestId))startRequestIcloud progressHandler:(void (^)(double progress))progressHandler completion:(void(^)(UIImage *image))completion failed:(void(^)(NSDictionary *info))failed {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
