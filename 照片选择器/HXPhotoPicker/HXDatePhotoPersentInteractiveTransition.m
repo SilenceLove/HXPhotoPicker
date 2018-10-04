@@ -238,7 +238,7 @@
             [self.tempImageView.layer addSublayer:self.playerLayer];
         }
         if (HX_IS_IPhoneX_All) {
-            tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + kTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
+            tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + hxTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
         }
     }
     self.tempImageView.clipsToBounds = YES;

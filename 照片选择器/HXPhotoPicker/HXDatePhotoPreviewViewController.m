@@ -130,7 +130,7 @@ HXDateVideoEditViewControllerDelegate
         self.subTitleLb.frame = CGRectMake(0, 0, 200, 30);
         self.subTitleLb.text = [NSString stringWithFormat:@"%@  %@",model.barTitle,model.barSubTitle];
     }
-    CGFloat bottomMargin = kBottomMargin;
+    CGFloat bottomMargin = hxBottomMargin;
     //    CGFloat leftMargin = 0;
     //    CGFloat rightMargin = 0;
     CGFloat width = self.view.hx_w;
@@ -141,16 +141,16 @@ HXDateVideoEditViewControllerDelegate
         //        rightMargin = 35;
         //        width = self.view.hx_w - 70;
     }
-    self.flowLayout.itemSize = CGSizeMake(width, self.view.hx_h - kTopMargin - bottomMargin);
+    self.flowLayout.itemSize = CGSizeMake(width, self.view.hx_h - hxTopMargin - bottomMargin);
     self.flowLayout.minimumLineSpacing = itemMargin;
     
     [self.collectionView setCollectionViewLayout:self.flowLayout];
     
     //    self.collectionView.contentInset = UIEdgeInsetsMake(0, leftMargin, 0, rightMargin);
     if (self.outside) {
-        self.navBar.frame = CGRectMake(0, 0, self.view.hx_w, kNavigationBarHeight);
+        self.navBar.frame = CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight);
     }
-    self.collectionView.frame = CGRectMake(-(itemMargin / 2), kTopMargin,self.view.hx_w + itemMargin, self.view.hx_h - kTopMargin - bottomMargin);
+    self.collectionView.frame = CGRectMake(-(itemMargin / 2), hxTopMargin,self.view.hx_w + itemMargin, self.view.hx_h - hxTopMargin - bottomMargin);
     self.collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + itemMargin), 0);
     
     [self.collectionView setContentOffset:CGPointMake(self.beforeOrientationIndex * (self.view.hx_w + itemMargin), 0)];
@@ -846,7 +846,7 @@ HXDateVideoEditViewControllerDelegate
 #pragma mark - < 懒加载 >
 - (UIView *)dismissTempTopView {
     if (!_dismissTempTopView) {
-        _dismissTempTopView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, kNavigationBarHeight)];
+        _dismissTempTopView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight)];
         _dismissTempTopView.backgroundColor = [UIColor blackColor];
     }
     return _dismissTempTopView;
@@ -854,7 +854,7 @@ HXDateVideoEditViewControllerDelegate
 - (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, kNavigationBarHeight)];
+        _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, hxNavigationBarHeight)];
         _navBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [_navBar pushNavigationItem:self.navItem animated:NO];
         [_navBar setTintColor:self.manager.configuration.themeColor];
@@ -911,9 +911,9 @@ HXDateVideoEditViewControllerDelegate
 - (HXDatePhotoPreviewBottomView *)bottomView {
     if (!_bottomView) {
         if (self.outside) {
-            _bottomView = [[HXDatePhotoPreviewBottomView alloc] initWithFrame:CGRectMake(0, self.view.hx_h - 50 - kBottomMargin, self.view.hx_w, 50 + kBottomMargin) modelArray:self.manager.afterSelectedArray manager:self.manager];
+            _bottomView = [[HXDatePhotoPreviewBottomView alloc] initWithFrame:CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin) modelArray:self.manager.afterSelectedArray manager:self.manager];
         }else {
-            _bottomView = [[HXDatePhotoPreviewBottomView alloc] initWithFrame:CGRectMake(0, self.view.hx_h - 50 - kBottomMargin, self.view.hx_w, 50 + kBottomMargin) modelArray:self.manager.selectedArray manager:self.manager];
+            _bottomView = [[HXDatePhotoPreviewBottomView alloc] initWithFrame:CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin) modelArray:self.manager.selectedArray manager:self.manager];
         }
         _bottomView.delagate = self;
     }
@@ -943,7 +943,7 @@ HXDateVideoEditViewControllerDelegate
 }
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, kTopMargin,self.view.hx_w + 20, self.view.hx_h - kTopMargin - kBottomMargin) collectionViewLayout:self.flowLayout];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, hxTopMargin,self.view.hx_w + 20, self.view.hx_h - hxTopMargin - hxBottomMargin) collectionViewLayout:self.flowLayout];
         _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
@@ -993,15 +993,17 @@ HXDateVideoEditViewControllerDelegate
     return _modelArray;
 }
 - (void)dealloc {
-    HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-    [cell cancelRequest];
+    if (_collectionView) {
+        HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+        [cell cancelRequest];
+    }
     if ([UIApplication sharedApplication].statusBarHidden) {
         [self.navigationController setNavigationBarHidden:NO animated:NO];
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
-    if (showLog) NSSLog(@"dealloc");
+    if (HXShowLog) NSSLog(@"dealloc");
 }
 @end
 

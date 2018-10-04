@@ -326,7 +326,7 @@
 }
 
 - (void)dealloc {
-    if (showLog) NSSLog(@"%@",self);
+    if (HXShowLog) NSSLog(@"%@",self);
 }
 
 #if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")

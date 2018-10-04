@@ -37,7 +37,7 @@
         [self.dataArray addObject:model];
     }
     // Do any additional setup after loading the view.
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, kNavigationBarHeight, self.view.hx_w, self.view.hx_h - kNavigationBarHeight) style:UITableViewStyleGrouped];
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, hxNavigationBarHeight, self.view.hx_w, self.view.hx_h - hxNavigationBarHeight) style:UITableViewStyleGrouped];
 #ifdef __IPHONE_11_0
     if (@available(iOS 11.0, *)) {
         self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;

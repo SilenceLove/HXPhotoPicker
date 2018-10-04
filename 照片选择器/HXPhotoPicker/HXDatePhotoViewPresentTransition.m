@@ -69,17 +69,17 @@
     CGFloat imgWidht = model.endDateImageSize.width;
     CGFloat imgHeight = model.endDateImageSize.height;
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
-    CGFloat height = [UIScreen mainScreen].bounds.size.height - kTopMargin - kBottomMargin;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
         if (HX_IS_IPhoneX_All) {
-            height = [UIScreen mainScreen].bounds.size.height - kTopMargin - 21;
+            height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
         }
     }
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.75f initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + kTopMargin, imgWidht, imgHeight);
+        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + hxTopMargin, imgWidht, imgHeight);
     } completion:^(BOOL finished) {
         toVC.collectionView.hidden = NO;
         [tempBgView removeFromSuperview];

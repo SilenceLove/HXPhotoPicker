@@ -46,7 +46,10 @@
         });
     }
     self.view.backgroundColor = [UIColor grayColor];
-    [self.locationManager startUpdatingLocation];
+    
+    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+        [self.locationManager startUpdatingLocation];
+    }
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
     if (self.manager.configuration.videoMaximumDuration > self.manager.configuration.videoMaxDuration) {
         self.manager.configuration.videoMaximumDuration = self.manager.configuration.videoMaxDuration;
@@ -165,7 +168,7 @@
     }
 }
 - (void)changeSubviewFrame {
-    self.topView.frame = CGRectMake(0, 0, self.view.hx_w, kNavigationBarHeight);
+    self.topView.frame = CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight);
     self.topMaskLayer.frame = self.topView.bounds;
     self.bottomView.frame = CGRectMake(0, self.view.hx_h - 120, self.view.hx_w, 120);
 }
@@ -195,8 +198,10 @@
     [self.cameraController stopSession];
 } 
 - (void)dealloc {
-    [self.locationManager stopUpdatingLocation];
-    if (showLog) NSSLog(@"dealloc");
+    if (_locationManager) {
+        [self.locationManager stopUpdatingLocation];
+    }
+    if (HXShowLog) NSSLog(@"dealloc");
 }
 - (void)cancelClick:(UIButton *)button {
     if (button.selected) {
@@ -572,13 +577,13 @@
 }
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     if(error.code == kCLErrorLocationUnknown) {
-        if (showLog) NSSLog(@"定位失败，无法检索位置");
+        if (HXShowLog) NSSLog(@"定位失败，无法检索位置");
     }
     else if(error.code == kCLErrorNetwork) {
-        if (showLog) NSSLog(@"定位失败，网络问题");
+        if (HXShowLog) NSSLog(@"定位失败，网络问题");
     }
     else if(error.code == kCLErrorDenied) {
-        if (showLog) NSSLog(@"定位失败，定位权限的问题");
+        if (HXShowLog) NSSLog(@"定位失败，定位权限的问题");
         [self.locationManager stopUpdatingLocation];
         self.locationManager = nil;
     }

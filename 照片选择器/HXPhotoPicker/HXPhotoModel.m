@@ -231,7 +231,7 @@
 {
     if (_endImageSize.width == 0 || _endImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height - kNavigationBarHeight;
+        CGFloat height = [UIScreen mainScreen].bounds.size.height - hxNavigationBarHeight;
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;
@@ -274,11 +274,11 @@
 - (CGSize)endDateImageSize {
     if (_endDateImageSize.width == 0 || _endDateImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height - kTopMargin - kBottomMargin;
+        CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
             if (HX_IS_IPhoneX_All) {
-                height = [UIScreen mainScreen].bounds.size.height - kTopMargin - 21;
+                height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
             }
         }
         CGFloat imgWidth = self.imageSize.width;

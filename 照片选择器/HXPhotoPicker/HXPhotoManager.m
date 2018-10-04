@@ -95,7 +95,7 @@
     _localImageList = localImageList;
     if (!localImageList.count) return;
     if (![localImageList.firstObject isKindOfClass:[UIImage class]]) {
-        if (showLog) NSSLog(@"请传入装着UIImage对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着UIImage对象的数组");
         return;
     }
     for (UIImage *image in localImageList) {
@@ -112,7 +112,7 @@
 - (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray {
     if (!assetArray.count) return;
     if (![assetArray.firstObject isKindOfClass:[HXCustomAssetModel class]]) {
-        if (showLog) NSSLog(@"请传入装着HXCustomAssetModel对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着HXCustomAssetModel对象的数组");
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
@@ -198,7 +198,7 @@
 - (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected {
     if (!imageUrls.count) return;
     if (![imageUrls.firstObject isKindOfClass:[NSString class]]) {
-        if (showLog) NSSLog(@"请传入装着NSString对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着NSString对象的数组");
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
@@ -222,7 +222,7 @@
     _networkPhotoUrls = networkPhotoUrls;
     if (!networkPhotoUrls.count) return;
     if (![networkPhotoUrls.firstObject isKindOfClass:[NSString class]]) {
-        if (showLog) NSSLog(@"请传入装着NSString对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着NSString对象的数组");
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
@@ -236,7 +236,7 @@
 - (void)addModelArray:(NSArray<HXPhotoModel *> *)modelArray {
     if (!modelArray.count) return;
     if (![modelArray.firstObject isKindOfClass:[HXPhotoModel class]]) {
-        if (showLog) NSSLog(@"请传入装着HXPhotoModel对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着HXPhotoModel对象的数组");
         return;
     }
     for (HXPhotoModel *photoModel in modelArray) {
@@ -262,7 +262,7 @@
 - (void)addLocalVideo:(NSArray<NSURL *> *)urlArray selected:(BOOL)selected {
     if (!urlArray.count) return;
     if (![urlArray.firstObject isKindOfClass:[NSURL class]]) {
-        if (showLog) NSSLog(@"请传入装着NSURL对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着NSURL对象的数组");
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
@@ -285,7 +285,7 @@
 - (void)addLocalImage:(NSArray *)images selected:(BOOL)selected {
     if (!images.count) return;
     if (![images.firstObject isKindOfClass:[UIImage class]]) {
-        if (showLog) NSSLog(@"请传入装着UIImage对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着UIImage对象的数组");
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
@@ -308,7 +308,7 @@
 - (void)addLocalImageToAlbumWithImages:(NSArray *)images {
     if (!images.count) return;
     if (![images.firstObject isKindOfClass:[UIImage class]]) {
-        if (showLog) NSSLog(@"请传入装着UIImage对象的数组");
+        if (HXShowLog) NSSLog(@"请传入装着UIImage对象的数组");
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
@@ -1672,7 +1672,7 @@
     return self.iCloudUploadArray;
 }
 - (NSString *)version {
-    return @"2.2.2";
+    return @"2.2.2.1";
 }
 
 #pragma mark - < 保存草稿功能 >
@@ -1697,7 +1697,7 @@
                         if (failed) {
                             failed();
                         }
-                        if (showLog) NSSLog(@"保存草稿失败啦!");
+                        if (HXShowLog) NSSLog(@"保存草稿失败啦!");
                     });
                 }else {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1711,7 +1711,7 @@
                     if (failed) {
                         failed();
                     }
-                    if (showLog) NSSLog(@"保存草稿失败啦!");
+                    if (HXShowLog) NSSLog(@"保存草稿失败啦!");
                 });
             }];
         }else {
@@ -1721,7 +1721,7 @@
                     if (failed) {
                         failed();
                     }
-                    if (showLog) NSSLog(@"保存草稿失败啦!");
+                    if (HXShowLog) NSSLog(@"保存草稿失败啦!");
                 });
             }else {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -1763,7 +1763,7 @@
     NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
     
     if([data writeToFile:toFileName atomically:YES]){
-        if (showLog) NSSLog(@"归档成功");
+        if (HXShowLog) NSSLog(@"归档成功");
         return YES;
     }
     return NO;
@@ -1789,7 +1789,7 @@
     NSError *error;
     [[NSFileManager defaultManager] removeItemAtPath:toFileName error:&error];
     if (error) {
-        if (showLog) NSSLog(@"删除失败");
+        if (HXShowLog) NSSLog(@"删除失败");
         return NO;
     }
     return YES;

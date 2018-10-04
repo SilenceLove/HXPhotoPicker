@@ -99,7 +99,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.delegate = self;
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
-    YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, kTopMargin + 10, 100, 30)];
+    YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, hxTopMargin ? hxTopMargin - 10: 10 , 100, 30)];
     [[UIApplication sharedApplication].keyWindow addSubview:label]; 
     
     NSString *language = [NSLocale preferredLanguages].firstObject;

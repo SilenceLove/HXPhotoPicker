@@ -484,7 +484,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     if (cell) {
         [self cellDidDeleteClcik:cell];
     }else {
-        if (showLog) NSSLog(@"删除失败 - cell为空");
+        if (HXShowLog) NSSLog(@"删除失败 - cell为空");
     }
 }
 /**
@@ -887,7 +887,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
 }
 - (void)dealloc {
-    if (showLog) NSSLog(@"dealloc");
+    if (HXShowLog) NSSLog(@"dealloc");
 }
 
 @end

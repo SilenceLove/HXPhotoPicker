@@ -68,7 +68,7 @@
 
 - (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList requestType:(HXDatePhotoToolManagerRequestType)requestType success:(HXDatePhotoToolManagerSuccessHandler)success failed:(HXDatePhotoToolManagerFailedHandler)failed {
     if (self.writing) {
-        if (showLog) NSSLog(@"已有写入任务,请等待");
+        if (HXShowLog) NSSLog(@"已有写入任务,请等待");
         return;
     }
     self.requestType = requestType;
@@ -114,7 +114,7 @@
 
 - (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerSuccessHandler)success failed:(HXDatePhotoToolManagerFailedHandler)failed {
     if (self.writing) {
-        if (showLog) NSSLog(@"已有写入任务,请等待");
+        if (HXShowLog) NSSLog(@"已有写入任务,请等待");
         return;
     }
     self.writing = YES;
@@ -144,7 +144,7 @@
 }
 - (void)writeModelToTempPath {
     if (self.waitArray.count == 0) {
-        if (showLog) NSSLog(@"全部压缩成功");
+        if (HXShowLog) NSSLog(@"全部压缩成功");
         dispatch_async(dispatch_get_main_queue(), ^{
             self.writing = NO;
             if (self.successHandler) {
@@ -525,7 +525,7 @@
 }
 - (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed {
     if (self.gettingImageData) {
-        if (showLog) NSSLog(@"已有任务,请等待");
+        if (HXShowLog) NSSLog(@"已有任务,请等待");
         return;
     }
     [self cancelGetImageList];
@@ -550,7 +550,7 @@
         self.cancelGetImageData = NO;
         self.gettingImageData = NO;
         [self.downloadTokenArray removeAllObjects];
-        if (showLog) NSSLog(@"取消了");
+        if (HXShowLog) NSSLog(@"取消了");
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.imageDataFailedHandler) {
                 self.imageDataFailedHandler();
@@ -586,7 +586,7 @@
             if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
                 weakSelf.gettingImageData = NO;
                 weakSelf.cancelGetImageData = NO;
-                if (showLog) NSSLog(@"取消了请求了");
+                if (HXShowLog) NSSLog(@"取消了请求了");
                 if (weakSelf.imageDataFailedHandler) {
                     weakSelf.imageDataFailedHandler();
                 }
@@ -670,7 +670,7 @@
 
 - (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList requestType:(HXDatePhotoToolManagerRequestType)requestType success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed {
     if (self.gettingImage) {
-        if (showLog) NSSLog(@"已有任务,请等待");
+        if (HXShowLog) NSSLog(@"已有任务,请等待");
         return;
     }
     [self cancelGetImageDataList];
@@ -692,7 +692,7 @@
 }
 - (void)getSelectedImageList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageListFailedHandler)failed {
     if (self.gettingImage) {
-        if (showLog) NSSLog(@"已有任务,请等待");
+        if (HXShowLog) NSSLog(@"已有任务,请等待");
         return;
     }
     [self cancelGetImageDataList];
@@ -716,7 +716,7 @@
         self.cancelGetImage = NO;
         self.gettingImage = NO;
         [self.downloadTokenArray removeAllObjects];
-        if (showLog) NSSLog(@"取消了");
+        if (HXShowLog) NSSLog(@"取消了");
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.imageFailedHandler) {
@@ -765,7 +765,7 @@
             if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
                 weakSelf.gettingImage = NO;
                 weakSelf.cancelGetImage = NO;
-                if (showLog) NSSLog(@"取消了请求了");
+                if (HXShowLog) NSSLog(@"取消了请求了");
                 if (weakSelf.imageFailedHandler) {
                     weakSelf.imageFailedHandler();
                 }
@@ -996,6 +996,6 @@
 }
 
 - (void)dealloc {
-    if (showLog) NSSLog(@"dealloc");
+    if (HXShowLog) NSSLog(@"dealloc");
 }
 @end

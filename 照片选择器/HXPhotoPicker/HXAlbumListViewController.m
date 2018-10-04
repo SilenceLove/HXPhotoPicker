@@ -103,10 +103,10 @@ UITableViewDelegate
 }
 - (void)changeSubviewFrame {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    CGFloat navBarHeight = kNavigationBarHeight;
+    CGFloat navBarHeight = hxNavigationBarHeight;
     NSInteger lineCount = 2;
     if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
-        navBarHeight = kNavigationBarHeight;
+        navBarHeight = hxNavigationBarHeight;
         lineCount = 2;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
@@ -455,8 +455,8 @@ UITableViewDelegate
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _collectionView.alwaysBounceVertical = YES;
         [_collectionView registerClass:[HXAlbumListQuadrateViewCell class] forCellWithReuseIdentifier:@"cellId"];
-//        _collectionView.contentInset = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
-//        _collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
+//        _collectionView.contentInset = UIEdgeInsetsMake(hxNavigationBarHeight, 0, 0, 0);
+//        _collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(hxNavigationBarHeight, 0, 0, 0);
 #ifdef __IPHONE_11_0
         if (@available(iOS 11.0, *)) {
             if ([self navigationBarWhetherSetupBackground]) {
@@ -510,7 +510,7 @@ UITableViewDelegate
     return _authorizationLb;
 }
 - (void)dealloc {
-    if (showLog) NSSLog(@"dealloc");
+    if (HXShowLog) NSSLog(@"dealloc");
     if (self.manager.configuration.open3DTouchPreview) {
         if (self.previewingContext) {
             [self unregisterForPreviewingWithContext:self.previewingContext];

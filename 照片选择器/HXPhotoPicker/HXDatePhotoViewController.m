@@ -61,6 +61,7 @@ HXDatePhotoEditViewControllerDelegate
 @property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
 
 @property (weak, nonatomic) HXDatePhotoViewSectionFooterView *footerView;
+@property (assign, nonatomic) BOOL showBottomPhotoCount;
 @end
 
 @implementation HXDatePhotoViewController
@@ -96,10 +97,10 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)changeSubviewFrame {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    CGFloat navBarHeight = kNavigationBarHeight;
+    CGFloat navBarHeight = hxNavigationBarHeight;
     NSInteger lineCount = self.manager.configuration.rowCount;
     if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
-        navBarHeight = kNavigationBarHeight;
+        navBarHeight = hxNavigationBarHeight;
         lineCount = self.manager.configuration.rowCount;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
@@ -111,7 +112,7 @@ HXDatePhotoEditViewControllerDelegate
         }
         lineCount = self.manager.configuration.horizontalRowCount;
     }
-    CGFloat bottomMargin = kBottomMargin;
+    CGFloat bottomMargin = hxBottomMargin;
     CGFloat leftMargin = 0;
     CGFloat rightMargin = 0;
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
@@ -229,9 +230,9 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)scrollToPoint:(HXDatePhotoViewCell *)cell rect:(CGRect)rect {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    CGFloat navBarHeight = kNavigationBarHeight;
+    CGFloat navBarHeight = hxNavigationBarHeight;
     if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
-        navBarHeight = kNavigationBarHeight;
+        navBarHeight = hxNavigationBarHeight;
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
         if ([UIApplication sharedApplication].statusBarHidden) {
             navBarHeight = self.navigationController.navigationBar.hx_h;
@@ -244,11 +245,15 @@ HXDatePhotoEditViewControllerDelegate
     }
     if (rect.origin.y < navBarHeight) {
         [self.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - navBarHeight)];
-    }else if (rect.origin.y + rect.size.height > self.view.hx_h - 50.5 - kBottomMargin) {
-        [self.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - self.view.hx_h + 50.5 + kBottomMargin + rect.size.height)];
+    }else if (rect.origin.y + rect.size.height > self.view.hx_h - 50.5 - hxBottomMargin) {
+        [self.collectionView setContentOffset:CGPointMake(0, cell.frame.origin.y - self.view.hx_h + 50.5 + hxBottomMargin + rect.size.height)];
     }
 }
 - (void)getPhotoList {
+    if (self.manager.configuration.showBottomPhotoDetail) {
+        self.showBottomPhotoCount = YES;
+        self.manager.configuration.showBottomPhotoDetail = NO;
+    }
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         __weak typeof(self) weakSelf = self;
         [self.manager getPhotoListWithAlbumModel:self.albumModel complete:^(NSArray *allList, NSArray *previewList, NSArray *photoList, NSArray *videoList, NSArray *dateList, HXPhotoModel *firstSelectModel) {
@@ -256,6 +261,9 @@ HXDatePhotoEditViewControllerDelegate
             weakSelf.photoArray = [NSMutableArray arrayWithArray:photoList];
             weakSelf.videoArray = [NSMutableArray arrayWithArray:videoList];
             weakSelf.allArray = [NSMutableArray arrayWithArray:allList];
+            if (weakSelf.allArray.count && weakSelf.showBottomPhotoCount) {
+                weakSelf.manager.configuration.showBottomPhotoDetail = YES;
+            }
             weakSelf.previewArray = [NSMutableArray arrayWithArray:previewList];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [weakSelf.view handleLoading];
@@ -529,25 +537,25 @@ HXDatePhotoEditViewControllerDelegate
             }
             return;
         }
-        HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
         if (!self.manager.configuration.singleSelected) {
+            HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
             NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
             previewVC.delegate = self;
             previewVC.modelArray = self.previewArray;
             previewVC.manager = self.manager;
             previewVC.currentModelIndex = currentIndex;
-//            self.navigationController.delegate = previewVC;
-//            [self.navigationController pushViewController:previewVC animated:YES];
+            self.navigationController.delegate = previewVC;
+            [self.navigationController pushViewController:previewVC animated:YES];
         }else {
             if (!self.manager.configuration.singleJumpEdit) {
                 NSInteger currentIndex = [self.previewArray indexOfObject:cell.model];
-//                HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+                HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
                 previewVC.delegate = self;
                 previewVC.modelArray = self.previewArray;
                 previewVC.manager = self.manager;
                 previewVC.currentModelIndex = currentIndex;
-//                self.navigationController.delegate = previewVC;
-//                [self.navigationController pushViewController:previewVC animated:YES];
+                self.navigationController.delegate = previewVC;
+                [self.navigationController pushViewController:previewVC animated:YES];
             }else {
                 if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
                     HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
@@ -557,16 +565,16 @@ HXDatePhotoEditViewControllerDelegate
                     [self.navigationController pushViewController:vc animated:NO];
                     return;
                 }else {
-//                    HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
+                    HXDatePhotoPreviewViewController *previewVC = [[HXDatePhotoPreviewViewController alloc] init];
                     previewVC.delegate = self;
                     previewVC.modelArray = [NSMutableArray arrayWithObjects:cell.model, nil];
                     previewVC.manager = self.manager;
                     previewVC.currentModelIndex = 0;
+                    self.navigationController.delegate = previewVC;
+                    [self.navigationController pushViewController:previewVC animated:YES];
                 }
             }
         }
-        self.navigationController.delegate = previewVC;
-        [self.navigationController pushViewController:previewVC animated:YES];
     }
 }
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -910,7 +918,7 @@ HXDatePhotoEditViewControllerDelegate
 #pragma mark - < 懒加载 >
 - (HXDatePhotoBottomView *)bottomView {
     if (!_bottomView) {
-        _bottomView = [[HXDatePhotoBottomView alloc] initWithFrame:CGRectMake(0, self.view.hx_h - 50 - kBottomMargin, self.view.hx_w, 50 + kBottomMargin)];
+        _bottomView = [[HXDatePhotoBottomView alloc] initWithFrame:CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin)];
         _bottomView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         _bottomView.manager = self.manager;
         _bottomView.delegate = self;
@@ -1017,8 +1025,10 @@ HXDatePhotoEditViewControllerDelegate
     return _dateArray;
 }
 - (void)dealloc {
-    if (showLog) NSSLog(@"dealloc");
-    [self.collectionView.layer removeAllAnimations];
+    if (HXShowLog) NSSLog(@"dealloc");
+    if (_collectionView) {
+        [self.collectionView.layer removeAllAnimations];
+    }
     if (self.manager.configuration.open3DTouchPreview) {
         if (self.previewingContext) {
             [self unregisterForPreviewingWithContext:self.previewingContext];
@@ -1093,7 +1103,7 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)dealloc {
     [self stopRunning];
-    if (showLog) NSSLog(@"camera - dealloc");
+    if (HXShowLog) NSSLog(@"camera - dealloc");
 }
 - (UIButton *)cameraBtn {
     if (!_cameraBtn) {
@@ -1196,10 +1206,24 @@ HXDatePhotoEditViewControllerDelegate
             self.imageView.image = model.thumbPhoto;
         }
     }else {
+        if (!self.imageView.image) {
+            self.imageView.hidden = YES;
+            self.imageView.alpha = 0;
+            self.maskView.hidden = YES;
+            self.maskView.alpha = 0;
+        }
         self.imageView.image = nil;
         PHImageRequestID requestID = [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
             if (weakSelf.model == model) {
                 weakSelf.imageView.image = image;
+                if (weakSelf.maskView.hidden) {
+                    weakSelf.imageView.hidden = NO;
+                    weakSelf.maskView.hidden = NO;
+                    [UIView animateWithDuration:0.2 animations:^{
+                        weakSelf.maskView.alpha = 1;
+                        weakSelf.imageView.alpha = 1;
+                    }];
+                }
             }
         }];
         self.requestID = requestID;
@@ -1459,6 +1483,7 @@ HXDatePhotoEditViewControllerDelegate
         _imageView = [[UIImageView alloc] init];
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         _imageView.clipsToBounds = YES;
+        _imageView.backgroundColor = [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
     }
     return _imageView;
 }

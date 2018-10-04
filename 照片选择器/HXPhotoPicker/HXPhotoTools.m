@@ -648,14 +648,14 @@
             } error:&error];
             
             if (error) {
-                if (showLog) NSSLog(@"保存失败");
+                if (HXShowLog) NSSLog(@"保存失败");
                 return;
             }
             
             // 拿到自定义的相册对象
             PHAssetCollection *collection = [self createCollection:albumName];
             if (collection == nil) {
-                if (showLog) NSSLog(@"保存自定义相册失败");
+                if (HXShowLog) NSSLog(@"保存自定义相册失败");
                 return;
             }
             
@@ -664,9 +664,9 @@
             } error:&error];
             
             if (error) {
-                if (showLog) NSSLog(@"保存自定义相册失败");
+                if (HXShowLog) NSSLog(@"保存自定义相册失败");
             } else {
-               if (showLog)  NSSLog(@"保存成功");
+               if (HXShowLog)  NSSLog(@"保存成功");
             }
         });
     }];
@@ -691,14 +691,14 @@
             } error:&error];
             
             if (error) {
-                if (showLog) NSSLog(@"保存失败");
+                if (HXShowLog) NSSLog(@"保存失败");
                 return;
             }
             
             // 拿到自定义的相册对象
             PHAssetCollection *collection = [self createCollection:albumName];
             if (collection == nil) {
-                if (showLog) NSSLog(@"保存自定义相册失败");
+                if (HXShowLog) NSSLog(@"保存自定义相册失败");
                 return;
             }
             
@@ -707,9 +707,9 @@
             } error:&error];
             
             if (error) {
-                if (showLog) NSSLog(@"保存自定义相册失败");
+                if (HXShowLog) NSSLog(@"保存自定义相册失败");
             } else {
-                if (showLog) NSSLog(@"保存成功");
+                if (HXShowLog) NSSLog(@"保存成功");
             }
         });
     }];
@@ -736,7 +736,7 @@
         } error:&error1];
         
         if (error1) {
-            if (showLog) NSSLog(@"创建相册失败...");
+            if (HXShowLog) NSSLog(@"创建相册失败...");
             return nil;
         }
         // 创建相册之后我们还要获取此相册  因为我们要往进存储相片
@@ -1198,7 +1198,7 @@
 }
 + (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)(void))error {
     if (selectList.count == 0) {
-        if (showLog) NSSLog(@"请选择后再写入");
+        if (HXShowLog) NSSLog(@"请选择后再写入");
         if (error) {
             error();
         }
@@ -1275,7 +1275,7 @@
                     i++;
                     k++;
                     if (k == imageCount && !writeError) {
-                        if (showLog) NSSLog(@"图片写入成功");
+                        if (HXShowLog) NSSLog(@"图片写入成功");
                     }
                     if (i == count && !writeError) {
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1315,7 +1315,7 @@
                             i++;
                             j++;
                             if (j == videoCount && !writeError) {
-                                if (showLog) NSSLog(@"视频写入成功");
+                                if (HXShowLog) NSSLog(@"视频写入成功");
                             }
                             if (i == count && !writeError) {
                                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -1372,7 +1372,7 @@
                         i++;
                         j++;
                         if (j == videoCount && !writeError) {
-                            if (showLog) NSSLog(@"视频写入成功");
+                            if (HXShowLog) NSSLog(@"视频写入成功");
                         }
                         if (i == count && !writeError) {
                             dispatch_async(dispatch_get_main_queue(), ^{
@@ -1413,12 +1413,12 @@
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             // 根据asset获取imageData
             PHImageRequestID request_Id = [self getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-                if (showLog) NSSLog(@"正在请求下载iCloud");
+                if (HXShowLog) NSSLog(@"正在请求下载iCloud");
                 if (iCloudRequestId) {
                     iCloudRequestId(cloudRequestId);
                 }
             } progressHandler:^(double progress) {
-                if (showLog) NSSLog(@"iCloud下载进度 %f ",progress);
+                if (HXShowLog) NSSLog(@"iCloud下载进度 %f ",progress);
             } completion:^(NSData *imageData, UIImageOrientation orientation) {
                 // 将imageData 写入临时目录
                 if ([imageData writeToFile:model.fullPathToFile atomically:YES]) {
@@ -1451,12 +1451,12 @@
                 size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
             }
             PHImageRequestID request_Id = [self getHighQualityFormatPhoto:model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-                if (showLog) NSSLog(@"正在请求下载iCloud");
+                if (HXShowLog) NSSLog(@"正在请求下载iCloud");
                 if (iCloudRequestId) {
                     iCloudRequestId(cloudRequestId);
                 }
             } progressHandler:^(double progress) {
-                if (showLog) NSSLog(@"iCloud下载进度 %f ",progress);
+                if (HXShowLog) NSSLog(@"iCloud下载进度 %f ",progress);
             } completion:^(UIImage *image) {
                 NSData *imageData;
                 if (image.imageOrientation != UIImageOrientationUp) {

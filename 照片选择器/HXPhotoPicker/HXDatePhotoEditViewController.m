@@ -76,7 +76,7 @@
     [self stopTimer];
 }
 - (void)dealloc {
-    if (showLog) NSSLog(@"dealloc");
+    if (HXShowLog) NSSLog(@"dealloc");
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     
@@ -91,7 +91,7 @@
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
         
     }
-    CGFloat bottomMargin = kBottomMargin;
+    CGFloat bottomMargin = hxBottomMargin;
     CGFloat width = self.view.hx_w - 40;
     CGFloat imageY = 30;
     if (HX_IS_IPhoneX_All && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {

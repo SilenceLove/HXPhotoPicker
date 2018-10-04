@@ -64,15 +64,15 @@ HXDataVideoEditBottomViewDelegate
     }else {
         itemH = 50;
     }
-    CGFloat bottomMargin = kBottomMargin;
+    CGFloat bottomMargin = hxBottomMargin;
     CGFloat width = self.view.hx_w;
     CGFloat bottomX = 0;
     CGFloat videoX = 5;
-    CGFloat videoY = kTopMargin;
+    CGFloat videoY = hxTopMargin;
     CGFloat videoH;
     CGFloat bottomH = itemH + 5 + 50;
     if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
-        bottomX = kBottomMargin;
+        bottomX = hxBottomMargin;
         videoY = 0;
         videoX = 30;
         bottomH = itemH;
@@ -212,13 +212,13 @@ UICollectionViewDelegate
     CGFloat collectionViewW = 0;
     if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
         collectionViewY = 10;
-        self.cancelBtn.hx_y = self.hx_h - self.cancelBtn.hx_h - kBottomMargin;
+        self.cancelBtn.hx_y = self.hx_h - self.cancelBtn.hx_h - hxBottomMargin;
         collectionViewX = 5;
         collectionViewW = self.hx_w - collectionViewX * 2;
     }else {
         collectionViewX = CGRectGetMaxX(self.cancelBtn.frame);
         collectionViewW = self.hx_w - collectionViewX * 2;
-        self.cancelBtn.hx_y = self.hx_h - self.cancelBtn.hx_h - kBottomMargin + 5;
+        self.cancelBtn.hx_y = self.hx_h - self.cancelBtn.hx_h - hxBottomMargin + 5;
     }
     if (self.dataArray.count) {
         itemW = collectionViewW / self.dataArray.count;
