@@ -87,7 +87,7 @@
  
  @return 控制器
  */
-- (UIViewController*)viewController {
+- (UIViewController*)hx_viewController {
     for (UIView* next = [self superview]; next; next = next.superview) {
         UIResponder* nextResponder = [next nextResponder];
         if ([nextResponder isKindOfClass:[UINavigationController class]] || [nextResponder isKindOfClass:[UIViewController class]]) {
@@ -103,7 +103,7 @@
     vc.manager = manager;
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
-    [self.viewController presentViewController:nav animated:YES completion:nil];
+    [self.hx_viewController presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
@@ -114,7 +114,7 @@
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.isCamera = YES;
     nav.supportRotation = manager.configuration.supportRotation;
-    [self.viewController presentViewController:nav animated:YES completion:nil];
+    [self.hx_viewController presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)showImageHUDText:(NSString *)text {

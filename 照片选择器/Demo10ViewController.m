@@ -19,18 +19,20 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor whiteColor]; 
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, hxNavigationBarHeight + kPhotoViewMargin, self.view.hx_w - kPhotoViewMargin * 2, 0);
-    photoView.showAddCell = YES;
-    [photoView.collectionView reloadData];
+//    photoView.showAddCell = YES; 
     photoView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:photoView];
     self.photoView = photoView;
+    
     HXWeakSelf
     [self.manager getSelectedModelArrayComplete:^(NSArray<HXPhotoModel *> *modelArray) {
-        [weakSelf.manager addModelArray:modelArray];
-        [weakSelf.photoView refreshView];
+        if (modelArray.count) {
+            [weakSelf.manager addModelArray:modelArray];
+            [weakSelf.photoView refreshView];
+        }
     }];
     
     UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:@"保存草稿" style:UIBarButtonItemStylePlain target:self action:@selector(savaClick)];

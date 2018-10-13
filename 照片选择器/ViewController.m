@@ -21,6 +21,7 @@
 #import "HXPhotoPicker.h"
 #import "Demo11ViewController.h"
 #import "Demo12ViewController.h"
+#import "Demo13ViewController.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -70,7 +71,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                          subTitle:@"将已选模型(图片和视频)写入临时目录  一键写入^_^"
                                 viewControllClass: [Demo8ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo9"
-                                         subTitle:@"cell上添加photoView"
+                                         subTitle:@"cell上添加photoView(附带3DTouch预览)"
                                 viewControllClass: [Demo9ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo10"
                                          subTitle:@"保存草稿功能"
@@ -80,7 +81,10 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                 viewControllClass: [Demo11ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo12"
                                          subTitle:@"混合添加资源"
-                                viewControllClass: [Demo12ViewController class]]
+                                viewControllClass: [Demo12ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo13"
+                                         subTitle:@"嵌套其他第三方图片/视频编辑库"
+                                viewControllClass: [Demo13ViewController class]]
                   
                   ];
     }

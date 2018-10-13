@@ -172,6 +172,16 @@ const CGFloat HXZoomRate = 1.0f;
     }
     [self.captureSession commitConfiguration];
 }
+- (void)startSessionComplete:(void (^)(void))complete {
+    if (![self.captureSession isRunning]) {
+        dispatch_async(self.videoQueue, ^{
+            [self.captureSession startRunning];
+            if (complete) {
+                complete();
+            }
+        });
+    }
+}
 - (void)startSession {
     if (![self.captureSession isRunning]) {
         dispatch_async(self.videoQueue, ^{

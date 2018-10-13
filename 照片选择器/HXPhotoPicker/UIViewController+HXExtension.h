@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "HXAlbumListViewController.h"
+
 #import "HXCustomCameraViewController.h" 
 
 @interface UIViewController (HXExtension)
@@ -28,7 +28,16 @@
                  HXAlbumListViewController *viewController 相册列表控制器
  @param cancel 取消
  */
-- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager done:(HXAlbumListViewControllerDidDoneBlock)done cancel:(HXAlbumListViewControllerDidCancelBlock)cancel;
+
+/**
+ 跳转选择照片的控制器
+
+ @param manager 照片管理者
+ @param models 模型数组
+ @param images 已选的UIImage对象数组
+ @param cancel 取消选择
+ */
+- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager))models imageList:(void (^)(NSArray<UIImage *> *imageList,BOOL isOriginal))images cancel:(void (^)(UIViewController *viewController, HXPhotoManager *manager))cancel;
 
 /*  <HXCustomCameraViewControllerDelegate>
  *  delegate 不传则代表自己

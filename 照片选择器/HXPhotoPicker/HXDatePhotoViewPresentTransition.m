@@ -69,18 +69,28 @@
     CGFloat imgWidht = model.endDateImageSize.width;
     CGFloat imgHeight = model.endDateImageSize.height;
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
-    CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-        if (HX_IS_IPhoneX_All) {
-            height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
-        }
-    }
+//    CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+//    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+//    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+//        if (HX_IS_IPhoneX_All) {
+//            height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
+//        }
+//    }
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
-    
+    UIColor *tempColor = toVC.view.backgroundColor;
+    toVC.view.backgroundColor = [tempColor colorWithAlphaComponent:0];
+    cell.hidden = YES;
+    [toVC setupDarkBtnAlpha:0.f];
+    [UIView animateWithDuration:0.2 animations:^{
+        toVC.view.backgroundColor = [tempColor colorWithAlphaComponent:1.f];
+        [toVC setupDarkBtnAlpha:1.f];
+    }];
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.75f initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + hxTopMargin, imgWidht, imgHeight);
+//        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + hxTopMargin, imgWidht, imgHeight);
+        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
     } completion:^(BOOL finished) {
+        cell.hidden = NO;
         toVC.collectionView.hidden = NO;
         [tempBgView removeFromSuperview];
         [tempView removeFromSuperview];
@@ -112,7 +122,7 @@
     HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:self.photoView.currentIndexPath];
     HXPhotoModel *model = cell.model;
     if (model.asset) {
-        __weak typeof(self) weakSelf = self;
+        HXWeakSelf
         [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
             [weakSelf presentAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC cell:cell];
         } error:^(NSDictionary *info) {
@@ -192,9 +202,11 @@
     
     CGRect rect = [cell convertRect:cell.bounds toView:containerView];
     cell.hidden = YES;
-    fromVC.view.hidden = YES;
+    fromVC.collectionView.hidden = YES;
+//    fromVC.view.hidden = YES;
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+        fromVC.view.alpha = 0;
         if (cell) {
             tempView.frame = rect;
         }else {

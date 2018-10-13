@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <PhotosUI/PhotosUI.h>
 #import "HXPhotoManager.h"
+#import "HXPhotoView.h"
 
 #if __has_include(<YYWebImage/YYWebImage.h>)
 #import <YYWebImage/YYWebImage.h>
@@ -16,7 +17,7 @@
 #import "YYWebImage.h"
 #endif
 
-@class HXDatePhotoPreviewViewController,HXDatePhotoPreviewBottomView,HXDatePhotoPreviewViewCell,HXPhotoView;
+@class HXDatePhotoPreviewViewController,HXDatePhotoPreviewBottomView,HXDatePhotoPreviewViewCell;
 @protocol HXDatePhotoPreviewViewControllerDelegate <NSObject>
 @optional
 - (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
@@ -26,6 +27,7 @@
 - (void)datePhotoPreviewDownLoadICloudAssetComplete:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 - (void)datePhotoPreviewSelectLaterDidEditClick:(HXDatePhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
 - (void)datePhotoPreviewDidDeleteClick:(HXDatePhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model deleteIndex:(NSInteger)index;
+- (void)datePhotoPreviewCellDownloadImageComplete:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
 @end
 
 @interface HXDatePhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
@@ -42,8 +44,12 @@
 @property (assign, nonatomic) BOOL stopCancel;
 /**  预览大图时是否禁用手势返回  */
 @property (assign, nonatomic) BOOL disableaPersentInteractiveTransition;
+/**  使用HXPhotoView预览大图时的风格样式  */
+@property (assign, nonatomic) HXPhotoViewPreViewShowStyle exteriorPreviewStyle;
+
 - (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
+- (void)setupDarkBtnAlpha:(CGFloat)alpha;
 @end
 
 
@@ -63,6 +69,7 @@
 @property (nonatomic, copy) void (^cellTapClick)(void);
 @property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
 @property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXDatePhotoPreviewViewCell *myCell);
+@property (nonatomic, copy) void (^cellDownloadImageComplete)(HXDatePhotoPreviewViewCell *myCell);
 - (void)againAddImageView;
 - (void)resetScale;
 - (void)requestHDImage;

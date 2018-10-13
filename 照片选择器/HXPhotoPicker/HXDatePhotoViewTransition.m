@@ -61,13 +61,14 @@
     CGFloat imgWidht = model.endDateImageSize.width;
     CGFloat imgHeight = model.endDateImageSize.height;
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
-    CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-        if (HX_IS_IPhoneX_All) {
-            height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
-        }
-    }
+//    CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+//    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+//    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+//        if (HX_IS_IPhoneX_All) {
+//            height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
+//        }
+//    }
     UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
     UIView *tempBgView = [[UIView alloc] initWithFrame:containerView.bounds];
     tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
@@ -90,9 +91,13 @@
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
     UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
     
-    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + hxTopMargin, imgWidht, imgHeight);
+    [UIView animateWithDuration:0.2 animations:^{
         tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:1];
+    }];
+    
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
+//        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + hxTopMargin, imgWidht, imgHeight);
+        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
         toVC.bottomView.alpha = 1;
     } completion:^(BOOL finished) {
         fromCell.hidden = NO;
@@ -158,13 +163,7 @@
     
     UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
     
-    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
-        if (!contains || !toCell) {
-            tempView.transform = CGAffineTransformMakeScale(0.3, 0.3);
-            tempView.alpha = 0;
-        }else {
-            tempView.frame = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
-        }
+    [UIView animateWithDuration:0.2 animations:^{
         fromVC.view.backgroundColor = [UIColor clearColor];
         fromVC.bottomView.alpha = 0;
         if (!fromVC.bottomView.userInteractionEnabled) {
@@ -173,6 +172,15 @@
             //            toVC.bottomView.alpha = 1;
         }else {
             tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
+        }
+    }];
+    
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
+        if (!contains || !toCell) {
+            tempView.transform = CGAffineTransformMakeScale(0.3, 0.3);
+            tempView.alpha = 0;
+        }else {
+            tempView.frame = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
         }
     }completion:^(BOOL finished) {
         //由于加入了手势必须判断

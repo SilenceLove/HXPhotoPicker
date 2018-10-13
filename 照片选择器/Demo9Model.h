@@ -13,6 +13,10 @@
 @property (assign, nonatomic) CGFloat photoViewHeight;
 @property (copy, nonatomic) NSArray *photoUrls;
 
+@property (assign, nonatomic) BOOL addCustomAssetComplete;
+@property (copy, nonatomic) NSArray *customAssetModels;
+
+@property (assign, nonatomic) NSInteger section;
 
 @property (strong, nonatomic) NSMutableArray *endCameraList;
 @property (strong, nonatomic) NSMutableArray *endCameraPhotos;

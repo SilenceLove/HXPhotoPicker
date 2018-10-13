@@ -34,6 +34,7 @@
 @property (strong, nonatomic) NSURL *videoURL;
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (strong, nonatomic) CLLocation *location;
+@property (strong, nonatomic) UIVisualEffectView *effectView;
 @end
 
 @implementation HXCustomCameraViewController
@@ -90,7 +91,27 @@
                 [self.previewView addSwipeGesture];
             }
         }
-        [self.cameraController startSession];
+        if (self.manager.tempCameraView) { 
+            self.manager.tempCameraView.frame = self.view.bounds;
+            [self.previewView addSubview:self.manager.tempCameraView];
+            [self.previewView addSubview:self.effectView];
+        }
+        HXWeakSelf
+        self.bottomView.userInteractionEnabled = NO;
+        [self.cameraController startSessionComplete:^{
+            weakSelf.bottomView.userInteractionEnabled = YES;
+            if (weakSelf.manager.tempCameraView) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [UIView animateWithDuration:0.3 animations:^{
+                        weakSelf.manager.tempCameraView.alpha = 0;
+                        weakSelf.effectView.effect = nil;
+                    } completion:^(BOOL finished) {
+                        [weakSelf.effectView removeFromSuperview];
+                        [weakSelf.manager.tempCameraView removeFromSuperview];
+                    }];
+                });
+            }
+        }];
     }
     self.previewView.tapToFocusEnabled = self.cameraController.cameraSupportsTapToFocus;
     self.previewView.tapToExposeEnabled = self.cameraController.cameraSupportsTapToExpose;
@@ -195,6 +216,7 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [self stopTimer];
+    self.manager.tempCameraView = [self.previewView snapshotViewAfterScreenUpdates:YES];
     [self.cameraController stopSession];
 } 
 - (void)dealloc {
@@ -558,6 +580,14 @@
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _doneBtn;
+}
+- (UIVisualEffectView *)effectView {
+    if (!_effectView) {
+        UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+        _effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+        _effectView.frame = self.view.bounds;
+    }
+    return _effectView;
 }
 - (CLLocationManager *)locationManager {
     if (!_locationManager) {

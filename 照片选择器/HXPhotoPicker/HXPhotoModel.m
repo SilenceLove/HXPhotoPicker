@@ -82,7 +82,7 @@
 }
 
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL {
-    return [[self alloc] initWithImageURL:imageURL];
+    return [[self alloc] initWithImageURL:imageURL thumbURL:imageURL];
 }
 
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
@@ -93,14 +93,27 @@
     return [[self alloc] initWithVideoURL:videoURL];
 }
 
-- (instancetype)initWithImageURL:(NSURL *)imageURL {
++ (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL {
+    return [[self alloc] initWithImageURL:imageURL thumbURL:thumbURL];
+}
+- (instancetype)initWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL  {
     if (self = [super init]) {
         self.type = HXPhotoModelMediaTypeCameraPhoto;
         self.subType = HXPhotoModelMediaSubTypePhoto;
         self.thumbPhoto = [HXPhotoTools hx_imageNamed:@"hx_qz_photolist_picture_fail@2x.png"];
         self.previewPhoto = self.thumbPhoto;
         self.imageSize = self.thumbPhoto.size;
+        if (!imageURL && thumbURL) {
+            imageURL = thumbURL;
+        }else if (imageURL && !thumbURL) {
+            thumbURL = imageURL;
+        }
         self.networkPhotoUrl = imageURL;
+        self.networkThumbURL = thumbURL;
+        if (imageURL == thumbURL ||
+            [imageURL.absoluteString isEqualToString:thumbURL.absoluteString]) {
+            self.loadOriginalImage = YES;
+        }
     }
     return self;
 }
@@ -147,10 +160,8 @@
     if (self = [super init]) {
         self.type = HXPhotoModelMediaTypeCameraVideo;
         self.subType = HXPhotoModelMediaSubTypeVideo;
-        self.videoURL = videoURL;
-        MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:videoURL] ;
-        player.shouldAutoplay = NO;
-        UIImage  *image = [player thumbnailImageAtTime:0.1 timeOption:MPMovieTimeOptionNearestKeyFrame];
+        self.videoURL = videoURL; 
+        UIImage  *image = [HXPhotoTools thumbnailImageForVideo:videoURL atTime:0.1f];
         NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
                                                          forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
         AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:videoURL options:opts];
@@ -167,7 +178,6 @@
     }
     return self;
 }
-
 - (instancetype)initWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
     if (self = [super init]) {
         self.type = HXPhotoModelMediaTypeCameraVideo;
@@ -176,9 +186,7 @@
         if (videoTime <= 0) {
             videoTime = 1;
         }
-        MPMoviePlayerController *player = [[MPMoviePlayerController alloc]initWithContentURL:videoURL] ;
-        player.shouldAutoplay = NO;
-        UIImage  *image = [player thumbnailImageAtTime:0.1 timeOption:MPMovieTimeOptionNearestKeyFrame];
+        UIImage  *image = [HXPhotoTools thumbnailImageForVideo:videoURL atTime:0.1f];
         NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:videoTime];
         self.videoDuration = videoTime;
         self.videoURL = videoURL;
@@ -244,6 +252,12 @@
             w = width;
             h = imgHeight;
         }
+        if (w == NAN) {
+            w = 0;
+        }
+        if (h == NAN) {
+            h = 0;
+        }
         _endImageSize = CGSizeMake(w, h);
     }
     return _endImageSize;
@@ -274,13 +288,13 @@
 - (CGSize)endDateImageSize {
     if (_endDateImageSize.width == 0 || _endDateImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
-        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-        if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-            if (HX_IS_IPhoneX_All) {
-                height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
-            }
-        }
+        CGFloat height = [UIScreen mainScreen].bounds.size.height;
+//        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+//        if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+//            if (HX_IS_IPhoneX_All) {
+//                height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
+//            }
+//        }
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;
@@ -389,15 +403,19 @@
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
-        self.thumbPhoto = [aDecoder decodeObjectForKey:@"thumbPhoto"];
-        self.previewPhoto = [aDecoder decodeObjectForKey:@"previewPhoto"];
-        self.localIdentifier = [aDecoder decodeObjectForKey:@"localIdentifier"];
         self.type = [aDecoder decodeIntegerForKey:@"type"];
         self.subType = [aDecoder decodeIntegerForKey:@"subType"];
+        if (self.type == HXPhotoModelMediaTypeCameraPhoto ||
+            self.type == HXPhotoModelMediaTypeCameraVideo) {
+            self.thumbPhoto = [aDecoder decodeObjectForKey:@"thumbPhoto"];
+            self.previewPhoto = [aDecoder decodeObjectForKey:@"previewPhoto"];
+        }
+        self.localIdentifier = [aDecoder decodeObjectForKey:@"localIdentifier"];
         self.videoDuration = [aDecoder decodeFloatForKey:@"videoDuration"];
         self.selected = [aDecoder decodeBoolForKey:@"selected"];
         self.videoURL = [aDecoder decodeObjectForKey:@"videoURL"];
         self.networkPhotoUrl = [aDecoder decodeObjectForKey:@"networkPhotoUrl"];
+        self.networkThumbURL = [aDecoder decodeObjectForKey:@"networkThumbURL"];
         self.creationDate = [aDecoder decodeObjectForKey:@"creationDate"];
         self.modificationDate = [aDecoder decodeObjectForKey:@"modificationDate"];
         self.locationData = [aDecoder decodeObjectForKey:@"locationData"];
@@ -412,8 +430,11 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
-    [aCoder encodeObject:self.thumbPhoto forKey:@"thumbPhoto"];
-    [aCoder encodeObject:self.previewPhoto forKey:@"previewPhoto"];
+    if (self.type == HXPhotoModelMediaTypeCameraPhoto ||
+        self.type == HXPhotoModelMediaTypeCameraVideo) {
+        [aCoder encodeObject:self.thumbPhoto forKey:@"thumbPhoto"];
+        [aCoder encodeObject:self.previewPhoto forKey:@"previewPhoto"];
+    }
     [aCoder encodeObject:self.localIdentifier forKey:@"localIdentifier"];
     [aCoder encodeInteger:self.type forKey:@"type"];
     [aCoder encodeInteger:self.subType forKey:@"subType"];
@@ -421,6 +442,7 @@
     [aCoder encodeBool:self.selected forKey:@"selected"];
     [aCoder encodeObject:self.videoURL forKey:@"videoURL"];
     [aCoder encodeObject:self.networkPhotoUrl forKey:@"networkPhotoUrl"];
+    [aCoder encodeObject:self.networkThumbURL forKey:@"networkThumbURL"];
     [aCoder encodeObject:self.creationDate forKey:@"creationDate"];
     [aCoder encodeObject:self.modificationDate forKey:@"modificationDate"];
     [aCoder encodeObject:self.locationData forKey:@"locationData"];

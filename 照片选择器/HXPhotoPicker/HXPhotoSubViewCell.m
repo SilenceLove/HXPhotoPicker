@@ -91,8 +91,10 @@
             [alert show];
             return;
         }
-    }
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+    } 
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    [self.imageView yy_cancelCurrentImageRequest];
+#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
@@ -111,7 +113,7 @@
     self.model.downloadError = NO;
     self.model.downloadComplete = NO;
     __weak typeof(self) weakSelf = self;
-    [self.imageView hx_setImageWithModel:self.model progress:^(CGFloat progress, HXPhotoModel *model) {
+    [self.imageView hx_setImageWithModel:self.model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
         if (weakSelf.model == model) {
             weakSelf.progressView.progress = progress;
         }
@@ -142,20 +144,37 @@
     _deleteImageName = deleteImageName;
     [self.deleteBtn setImage:[HXPhotoTools hx_imageNamed:deleteImageName] forState:UIControlStateNormal];
 }
+- (void)resetNetworkImage {
+    if (self.model.networkPhotoUrl &&
+        self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        self.model.loadOriginalImage = YES;
+        HXWeakSelf
+        [self.imageView hx_setImageWithModel:self.model original:YES progress:nil completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+            if (weakSelf.model == model) {
+                weakSelf.imageView.image = image;
+            }
+        }];
+    }
+}
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
     self.imageView.image = nil;
+    
     if (model.type == HXPhotoModelMediaTypeCamera) {
         self.deleteBtn.hidden = YES;
         self.imageView.image = model.thumbPhoto;
     }else {
+        if (model.localIdentifier && !model.asset) {
+            PHFetchOptions *options = [[PHFetchOptions alloc] init];
+            model.asset = [[PHAsset fetchAssetsWithLocalIdentifiers:@[model.localIdentifier] options:options] firstObject];
+        }
         self.deleteBtn.hidden = NO;
         if (model.networkPhotoUrl) {
-            __weak typeof(self) weakSelf = self;
+            HXWeakSelf
             self.progressView.hidden = model.downloadComplete;
-            [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
+            [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
                 if (weakSelf.model == model) {
                     weakSelf.progressView.progress = progress;
                 }
@@ -175,8 +194,17 @@
         }else {
             if (model.previewPhoto) {
                 self.imageView.image = model.previewPhoto;
-            }else {
+            }else if (model.thumbPhoto) {
                 self.imageView.image = model.thumbPhoto;
+            }else {
+                HXWeakSelf
+                model.clarityScale = 1.5f;
+                model.rowCount = 3.f;
+                [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        weakSelf.imageView.image = image;
+                    }
+                }];
             }
         }
     }

@@ -46,6 +46,10 @@ HXDateVideoEditViewControllerDelegate
 @property (strong, nonatomic) UINavigationItem *navItem;
 @property (assign, nonatomic) BOOL isAddInteractiveTransition;
 @property (strong, nonatomic) UIView *dismissTempTopView;
+@property (strong, nonatomic) UIPageControl *bottomPageControl;
+@property (strong, nonatomic) UIButton *darkCancelBtn;
+@property (strong, nonatomic) UIButton *darkDeleteBtn;
+@property (assign, nonatomic) BOOL statusBarShouldBeHidden;
 @end
 
 @implementation HXDatePhotoPreviewViewController
@@ -60,7 +64,6 @@ HXDateVideoEditViewControllerDelegate
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
     [self setupUI];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     
@@ -141,16 +144,15 @@ HXDateVideoEditViewControllerDelegate
         //        rightMargin = 35;
         //        width = self.view.hx_w - 70;
     }
-    self.flowLayout.itemSize = CGSizeMake(width, self.view.hx_h - hxTopMargin - bottomMargin);
+//    self.flowLayout.itemSize = CGSizeMake(width, self.view.hx_h - hxTopMargin - bottomMargin);
+    self.flowLayout.itemSize = CGSizeMake(width, self.view.hx_h);
     self.flowLayout.minimumLineSpacing = itemMargin;
     
     [self.collectionView setCollectionViewLayout:self.flowLayout];
     
     //    self.collectionView.contentInset = UIEdgeInsetsMake(0, leftMargin, 0, rightMargin);
-    if (self.outside) {
-        self.navBar.frame = CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight);
-    }
-    self.collectionView.frame = CGRectMake(-(itemMargin / 2), hxTopMargin,self.view.hx_w + itemMargin, self.view.hx_h - hxTopMargin - bottomMargin);
+//    self.collectionView.frame = CGRectMake(-(itemMargin / 2), hxTopMargin,self.view.hx_w + itemMargin, self.view.hx_h - hxTopMargin - bottomMargin);
+    self.collectionView.frame = CGRectMake(-(itemMargin / 2), 0,self.view.hx_w + itemMargin, self.view.hx_h);
     self.collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + itemMargin), 0);
     
     [self.collectionView setContentOffset:CGPointMake(self.beforeOrientationIndex * (self.view.hx_w + itemMargin), 0)];
@@ -160,10 +162,42 @@ HXDateVideoEditViewControllerDelegate
     }];
     
     CGFloat bottomViewHeight = self.view.hx_h - 50 - bottomMargin;
-    self.bottomView.frame = CGRectMake(0, bottomViewHeight, self.view.hx_w, 50 + bottomMargin);
+    if (self.outside) {
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+            self.navBar.frame = CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight);
+            self.bottomView.frame = CGRectMake(0, bottomViewHeight, self.view.hx_w, 50 + bottomMargin);
+        }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            CGFloat topMargin = HX_IS_IPhoneX_All ? 45 : 30;
+            if (self.previewShowDeleteButton) {
+                self.darkDeleteBtn.frame = CGRectMake(self.view.hx_w - 100 - 15, topMargin, 100, 30);
+            }
+            self.darkCancelBtn.frame = CGRectMake(15, topMargin, 30, 30);
+            self.bottomPageControl.frame = CGRectMake(0, self.view.hx_h - 30, self.view.hx_w, 10);
+        }
+    }else {
+        self.bottomView.frame = CGRectMake(0, bottomViewHeight, self.view.hx_w, 50 + bottomMargin);
+    }
+    
     if (self.manager.configuration.previewCollectionView) {
         self.manager.configuration.previewCollectionView(self.collectionView);
     }
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        self.statusBarShouldBeHidden = YES;
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    }
+}
+- (BOOL)prefersStatusBarHidden {
+    if (!self) {
+        return [super prefersStatusBarHidden];
+    }
+    return self.statusBarShouldBeHidden;
+}
+- (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
+    return UIStatusBarAnimationFade;
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -200,6 +234,10 @@ HXDateVideoEditViewControllerDelegate
     }
 }
 - (void)viewWillDisappear:(BOOL)animated {
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        self.statusBarShouldBeHidden = NO;
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    }
     HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
     cell.stopCancel = self.stopCancel;
     [cell cancelRequest];
@@ -207,9 +245,13 @@ HXDateVideoEditViewControllerDelegate
 }
 - (void)setupUI {
     self.navigationItem.titleView = self.customTitleView;
-    self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.collectionView];
-    [self.view addSubview:self.bottomView];
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+        self.view.backgroundColor = [UIColor whiteColor];
+        [self.view addSubview:self.bottomView];
+    }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        self.view.backgroundColor = [UIColor blackColor];
+    }
     self.beforeOrientationIndex = self.currentModelIndex;
     [self changeSubviewFrame];
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
@@ -293,27 +335,39 @@ HXDateVideoEditViewControllerDelegate
         } else {
             self.bottomView.enabled = self.manager.configuration.photoCanEdit;
         }
-        [self.view addSubview:self.navBar];
-        [self.navBar setTintColor:self.manager.configuration.themeColor];
-        if (self.manager.configuration.navBarBackgroudColor) {
-            self.navBar.barTintColor = self.manager.configuration.navBarBackgroudColor;
-        }
-        if (self.manager.configuration.navigationBar) {
-            self.manager.configuration.navigationBar(self.navBar, self);
-        }
-        if (self.manager.configuration.navigationTitleSynchColor) {
-            self.titleLb.textColor = self.manager.configuration.themeColor;
-            self.subTitleLb.textColor = self.manager.configuration.themeColor;
-        }else {
-            UIColor *titleColor = [self.navBar.titleTextAttributes objectForKey:NSForegroundColorAttributeName];
-            if (titleColor) {
-                self.titleLb.textColor = titleColor;
-                self.subTitleLb.textColor = titleColor;
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+            [self.view addSubview:self.navBar];
+            [self.navBar setTintColor:self.manager.configuration.themeColor];
+            if (self.manager.configuration.navBarBackgroudColor) {
+                self.navBar.barTintColor = self.manager.configuration.navBarBackgroudColor;
             }
-            if (self.manager.configuration.navigationTitleColor) {
-                self.titleLb.textColor = self.manager.configuration.navigationTitleColor;
-                self.subTitleLb.textColor = self.manager.configuration.navigationTitleColor;
+            if (self.manager.configuration.navigationBar) {
+                self.manager.configuration.navigationBar(self.navBar, self);
             }
+            if (self.manager.configuration.navigationTitleSynchColor) {
+                self.titleLb.textColor = self.manager.configuration.themeColor;
+                self.subTitleLb.textColor = self.manager.configuration.themeColor;
+            }else {
+                UIColor *titleColor = [self.navBar.titleTextAttributes objectForKey:NSForegroundColorAttributeName];
+                if (titleColor) {
+                    self.titleLb.textColor = titleColor;
+                    self.subTitleLb.textColor = titleColor;
+                }
+                if (self.manager.configuration.navigationTitleColor) {
+                    self.titleLb.textColor = self.manager.configuration.navigationTitleColor;
+                    self.subTitleLb.textColor = self.manager.configuration.navigationTitleColor;
+                }
+            }
+        }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            
+            [self.view addSubview:self.darkCancelBtn];
+            if (self.previewShowDeleteButton) {
+                [self.view addSubview:self.darkDeleteBtn];
+            }
+            if ([self.manager.afterSelectedArray containsObject:model]) {
+                self.bottomPageControl.currentPage = [[self.manager afterSelectedArray] indexOfObject:model];
+            }
+            [self.view addSubview:self.bottomPageControl];
         }
     }
     if (self.manager.configuration.previewBottomView) {
@@ -398,8 +452,11 @@ HXDateVideoEditViewControllerDelegate
     HXDatePhotoPreviewViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewCellId" forIndexPath:indexPath];
     HXPhotoModel *model = self.modelArray[indexPath.item];
     cell.model = model;
-    __weak typeof(self) weakSelf = self;
+    HXWeakSelf
     [cell setCellDidPlayVideoBtn:^(BOOL play) {
+        if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            return;
+        }
         if (play) {
             if (weakSelf.bottomView.userInteractionEnabled) {
                 [weakSelf setSubviewAlphaAnimate:YES];
@@ -415,13 +472,26 @@ HXDateVideoEditViewControllerDelegate
             [weakSelf.delegate datePhotoPreviewDownLoadICloudAssetComplete:weakSelf model:myCell.model];
         }
     }];
+    cell.cellDownloadImageComplete = ^(HXDatePhotoPreviewViewCell *myCell) {
+        if ([weakSelf.delegate respondsToSelector:@selector(datePhotoPreviewCellDownloadImageComplete:model:)]) {
+            [weakSelf.delegate datePhotoPreviewCellDownloadImageComplete:weakSelf model:myCell.model];
+        }
+    };
     [cell setCellTapClick:^{
-        [weakSelf setSubviewAlphaAnimate:YES];
+        if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark &&
+            weakSelf.outside) {
+            [weakSelf dismissClick];
+        }else {
+            [weakSelf setSubviewAlphaAnimate:YES];
+        }
     }];
     return cell;
 }
 
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration {
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        return;
+    }
     BOOL hide = NO;
     if (self.bottomView.alpha == 1) {
         hide = YES;
@@ -429,7 +499,9 @@ HXDateVideoEditViewControllerDelegate
     if (!hide) {
         [self.navigationController setNavigationBarHidden:hide animated:NO];
     }
+    self.statusBarShouldBeHidden = hide;
     self.bottomView.userInteractionEnabled = !hide;
+    [self preferredStatusBarUpdateAnimation];
     if (animete) {
         [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
         [UIView animateWithDuration:duration animations:^{
@@ -483,6 +555,9 @@ HXDateVideoEditViewControllerDelegate
         currentIndex = 0;
     }
     if (self.modelArray.count > 0) {
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            self.bottomPageControl.currentPage = currentIndex;
+        }
         HXPhotoModel *model = self.modelArray[currentIndex];
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             // 为视频时
@@ -598,28 +673,41 @@ HXDateVideoEditViewControllerDelegate
             return;
         }
     }
+    HXPhotoModel *model = [self.modelArray objectAtIndex:self.currentModelIndex];
     if (self.currentModel.subType == HXPhotoModelMediaSubTypePhoto) {
-        HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
-        vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
-        vc.delegate = self;
-        vc.manager = self.manager;
-        if (self.outside) {
-            vc.outside = YES;
-            [self presentViewController:vc animated:NO completion:nil];
+        if (self.manager.configuration.replacePhotoEditViewController) {
+#pragma mark - < 替换图片编辑 >
+            if (self.manager.configuration.shouldUseEditAsset) {
+                self.manager.configuration.shouldUseEditAsset(self, self.outside, self.manager, model);
+            }
+            HXWeakSelf
+            self.manager.configuration.usePhotoEditComplete = ^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel) {
+                [weakSelf datePhotoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+            };
         }else {
-            [self.navigationController pushViewController:vc animated:NO];
+            HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+            vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
+            vc.delegate = self;
+            vc.manager = self.manager;
+            if (self.outside) {
+                vc.outside = YES;
+                [self presentViewController:vc animated:NO completion:nil];
+            }else {
+                [self.navigationController pushViewController:vc animated:NO];
+            }
         }
     }else {
         if (self.manager.configuration.replaceVideoEditViewController) {
 #pragma mark - < 替换视频编辑 >
-            if (self.manager.configuration.shouldUseVideoEdit) {
-                self.manager.configuration.shouldUseVideoEdit(self, self.manager, [self.modelArray objectAtIndex:self.currentModelIndex]);
+            if (self.manager.configuration.shouldUseEditAsset) {
+                self.manager.configuration.shouldUseEditAsset(self, self.outside, self.manager, model);
             }
             __weak typeof(self) weakSelf = self;
             self.manager.configuration.useVideoEditComplete = ^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel) {
                 [weakSelf datePhotoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
+//            [self.view showImageHUDText:[NSBundle hx_localizedStringForKey:@"功能还在开发中^_^"]];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"要使用视频编辑功能，请先替换视频编辑界面" message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"好的", nil];
             [alert show];
 //            HXDateVideoEditViewController *vc = [[HXDateVideoEditViewController alloc] init];
@@ -833,6 +921,9 @@ HXDateVideoEditViewControllerDelegate
         [weakSelf.modelArray removeObject:weakSelf.currentModel];
         [weakSelf.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:weakSelf.currentModelIndex inSection:0]]];
         [weakSelf.bottomView deleteModel:weakSelf.currentModel];
+        if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            weakSelf.bottomPageControl.numberOfPages = weakSelf.modelArray.count;
+        }
         if ([weakSelf.delegate respondsToSelector:@selector(datePhotoPreviewDidDeleteClick:deleteModel:deleteIndex:)]) {
             [weakSelf.delegate datePhotoPreviewDidDeleteClick:weakSelf deleteModel:tempModel deleteIndex:tempIndex];
         }
@@ -844,12 +935,48 @@ HXDateVideoEditViewControllerDelegate
     });
 }
 #pragma mark - < 懒加载 >
+- (UIPageControl *)bottomPageControl {
+    if (!_bottomPageControl) {
+        _bottomPageControl = [[UIPageControl alloc] init];
+        _bottomPageControl.currentPageIndicatorTintColor = [UIColor whiteColor];
+        _bottomPageControl.pageIndicatorTintColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5f];
+        _bottomPageControl.numberOfPages = self.modelArray.count;
+    }
+    return _bottomPageControl;
+}
 - (UIView *)dismissTempTopView {
     if (!_dismissTempTopView) {
         _dismissTempTopView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight)];
         _dismissTempTopView.backgroundColor = [UIColor blackColor];
     }
     return _dismissTempTopView;
+}
+- (void)setupDarkBtnAlpha:(CGFloat)alpha {
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        self.darkDeleteBtn.alpha = alpha;
+        self.darkCancelBtn.alpha = alpha;
+        self.bottomPageControl.alpha = alpha;
+    }
+}
+- (UIButton *)darkCancelBtn {
+    if (!_darkCancelBtn) {
+        _darkCancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_darkCancelBtn setBackgroundImage:[HXPhotoTools hx_imageNamed:@"hx_faceu_cancel@3x.png"] forState:UIControlStateNormal];
+        _darkCancelBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+        _darkCancelBtn.contentVerticalAlignment = UIControlContentVerticalAlignmentTop;
+        [_darkCancelBtn addTarget:self action:@selector(dismissClick) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _darkCancelBtn;
+}
+- (UIButton *)darkDeleteBtn {
+    if (!_darkDeleteBtn) {
+        _darkDeleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_darkDeleteBtn setTitle:[NSBundle hx_localizedStringForKey:@"删除"] forState:UIControlStateNormal];
+        _darkDeleteBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+        _darkDeleteBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+        [_darkDeleteBtn addTarget:self action:@selector(deleteClick) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _darkDeleteBtn;
 }
 - (HXPhotoCustomNavigationBar *)navBar {
     if (!_navBar) {
@@ -870,7 +997,9 @@ HXDateVideoEditViewControllerDelegate
         }else {
             _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
         }
-        _navItem.titleView = self.customTitleView;
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+            _navItem.titleView = self.customTitleView;
+        }
     }
     return _navItem;
 }
@@ -943,8 +1072,13 @@ HXDateVideoEditViewControllerDelegate
 }
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, hxTopMargin,self.view.hx_w + 20, self.view.hx_h - hxTopMargin - hxBottomMargin) collectionViewLayout:self.flowLayout];
-        _collectionView.backgroundColor = [UIColor whiteColor];
+//        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, hxTopMargin,self.view.hx_w + 20, self.view.hx_h - hxTopMargin - hxBottomMargin) collectionViewLayout:self.flowLayout];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, 0,self.view.hx_w + 20, self.view.hx_h) collectionViewLayout:self.flowLayout];
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+            _collectionView.backgroundColor = [UIColor whiteColor];
+        }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            _collectionView.backgroundColor = [UIColor blackColor];
+        }
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -1152,6 +1286,7 @@ HXDateVideoEditViewControllerDelegate
                         [weakSelf.progressView showError];
                     }else {
                         if (image) {
+                            if (weakSelf.cellDownloadImageComplete) weakSelf.cellDownloadImageComplete(weakSelf);
                             weakSelf.progressView.progress = 1;
                             weakSelf.progressView.hidden = YES;
                             weakSelf.animatedImageView.image = image;
@@ -1171,6 +1306,7 @@ HXDateVideoEditViewControllerDelegate
                         [weakSelf.progressView showError];
                     }else {
                         if (image) {
+                            if (weakSelf.cellDownloadImageComplete) weakSelf.cellDownloadImageComplete(weakSelf);
                             weakSelf.progressView.progress = 1;
                             weakSelf.progressView.hidden = YES;
                             weakSelf.imageView.image = image;
@@ -1278,7 +1414,7 @@ HXDateVideoEditViewControllerDelegate
     }
     
     if (imgHeight > imgWidth / 9 * 17) {
-        size = CGSizeMake(width * 1.5, height * 1.5);
+        size = CGSizeMake(width * scale, height * scale);
     }else {
         size = CGSizeMake(self.model.endImageSize.width * scale, self.model.endImageSize.height * scale);
     }

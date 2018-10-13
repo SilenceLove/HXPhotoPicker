@@ -38,6 +38,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *clarityText;
 @property (weak, nonatomic) IBOutlet UISwitch *photoCanEditSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *videoCanEditSwitch;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *albumShowModeSwitch;
 
 @end
 
@@ -291,21 +292,23 @@
     self.manager.configuration.navigationTitleSynchColor = self.synchTitleColor.on;
     self.manager.configuration.replaceCameraViewController = self.useCustomCamera.on;
     self.manager.configuration.openCamera = self.addCamera.on;
+    self.manager.configuration.albumShowMode = self.albumShowModeSwitch.selectedSegmentIndex;
     
 //    [self.view hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
     
 //    [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
     __weak typeof(self) weakSelf = self;
-    [self hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
+    [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
         weakSelf.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
-        weakSelf.original.text = original ? @"YES" : @"NO";
-        NSSLog(@"all - %@",allList);
-        NSSLog(@"photo - %@",photoList);
-        NSSLog(@"video - %@",videoList);
-        NSSLog(@"image - %@",imageList);
-    } cancel:^(HXAlbumListViewController *viewController) {
-        NSSLog(@"取消了");
-    }];
+        weakSelf.original.text = isOriginal ? @"YES" : @"NO";
+        NSSLog(@"block - all - %@",allList);
+        NSSLog(@"block - photo - %@",photoList);
+        NSSLog(@"block - video - %@",videoList);
+    } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
+        NSSLog(@"block - images - %@",imageList);
+    } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
+        NSSLog(@"block - 取消了");
+    }]; 
     
 //    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
 //    vc.delegate = self;
@@ -325,7 +328,7 @@
     [self.manager clearSelectedList];
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllImage:(NSArray<UIImage *> *)imageList {
-    NSSLog(@"imageList:%@",imageList);
+    NSSLog(@"delegate - imageList:%@",imageList);
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     self.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
@@ -333,9 +336,9 @@
     //    self.photo.text = [NSString stringWithFormat:@"%ld张",photos.count];
     //    self.video.text = [NSString stringWithFormat:@"%ld个",videos.count];
     self.original.text = original ? @"YES" : @"NO";
-    NSSLog(@"all - %@",allList);
-    NSSLog(@"photo - %@",photoList);
-    NSSLog(@"video - %@",videoList);
+    NSSLog(@"delegate - all - %@",allList);
+    NSSLog(@"delegate - photo - %@",photoList);
+    NSSLog(@"delegate - video - %@",videoList);
 }
 - (IBAction)tb:(id)sender {
     UISwitch *sw = (UISwitch *)sender;

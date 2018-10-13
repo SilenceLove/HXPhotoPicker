@@ -23,7 +23,7 @@
  
  @return 控制器
  */
-- (UIViewController *)viewController;
+- (UIViewController *)hx_viewController;
 
 - (void)showImageHUDText:(NSString *)text;
 - (void)showLoadingHUDText:(NSString *)text;

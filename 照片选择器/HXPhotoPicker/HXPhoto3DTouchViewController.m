@@ -10,6 +10,8 @@
 #import <PhotosUI/PhotosUI.h>
 #import "UIImage+HXExtension.h"
 #import "HXCircleProgressView.h"
+#import "UIImageView+HXExtension.h"
+
 @interface HXPhoto3DTouchViewController ()
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @property (strong, nonatomic) AVPlayer *player;
@@ -20,6 +22,14 @@
 @end
 
 @implementation HXPhoto3DTouchViewController
+
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
+    
+    if (self.previewActionItemsBlock) {
+        return self.previewActionItemsBlock();
+    }
+    return nil;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -88,11 +98,63 @@
 
 - (void)loadPhoto {
     if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
+        if (self.model.networkPhotoUrl) {
+            self.progressView.hidden = self.model.downloadComplete;
+            CGFloat progress = (CGFloat)self.model.receivedSize / self.model.expectedSize;
+            self.progressView.progress = progress;
+            HXWeakSelf
 #if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
-        self.animatedImageView.image = self.model.thumbPhoto;
+            [self.animatedImageView hx_setImageWithModel:self.model progress:^(CGFloat progress, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    weakSelf.progressView.progress = progress;
+                }
+            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    if (error != nil) {
+                        [weakSelf.progressView showError];
+                    }else {
+                        if (image) {
+                            if (weakSelf.downloadImageComplete) {
+                                weakSelf.downloadImageComplete(weakSelf, weakSelf.model);
+                            }
+                            weakSelf.progressView.progress = 1;
+                            weakSelf.progressView.hidden = YES;
+                            weakSelf.animatedImageView.image = image;
+                            
+                        }
+                    }
+                }
+            }];
 #else
-        self.imageView.image = self.model.thumbPhoto;
+            [self.imageView hx_setImageWithModel:self.model progress:^(CGFloat progress, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    weakSelf.progressView.progress = progress;
+                }
+            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                if (weakSelf.model == model) {
+                    if (error != nil) {
+                        [weakSelf.progressView showError];
+                    }else {
+                        if (image) {
+                            if (weakSelf.downloadImageComplete) {
+                                weakSelf.downloadImageComplete(weakSelf, weakSelf.model);
+                            }
+                            weakSelf.progressView.progress = 1;
+                            weakSelf.progressView.hidden = YES;
+                            weakSelf.imageView.image = image;
+                            
+                        }
+                    }
+                }
+            }];
 #endif
+        }else {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+            self.animatedImageView.image = self.model.thumbPhoto;
+#else
+            self.imageView.image = self.model.thumbPhoto;
+#endif
+        }
         return;
     }
     __weak typeof(self) weakSelf = self;

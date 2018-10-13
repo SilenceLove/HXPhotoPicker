@@ -237,9 +237,9 @@
             self.tempImageView.layer.masksToBounds = YES;
             [self.tempImageView.layer addSublayer:self.playerLayer];
         }
-        if (HX_IS_IPhoneX_All) {
-            tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + hxTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
-        }
+//        if (HX_IS_IPhoneX_All) {
+//            tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + hxTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
+//        }
     }
     self.tempImageView.clipsToBounds = YES;
     self.tempImageView.contentMode = UIViewContentModeScaleAspectFill;
@@ -249,7 +249,6 @@
 //        toCell = [toVC currentPreviewCell:model];
 //    }
     self.bgView = [[UIView alloc] initWithFrame:containerView.bounds];
-    self.bgView.backgroundColor = [UIColor whiteColor];
     CGFloat scaleX;
     CGFloat scaleY;
     if (self.isPanGesture) {
@@ -283,7 +282,11 @@
     if (!fromVC.bottomView.userInteractionEnabled) {
         self.bgView.backgroundColor = [UIColor blackColor];
     }else {
-        self.bgView.backgroundColor = [UIColor whiteColor];
+        if (fromVC.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            self.bgView.backgroundColor = [UIColor blackColor];
+        }else {
+            self.bgView.backgroundColor = [UIColor whiteColor];
+        }
     }
     fromVC.collectionView.hidden = YES;
     toCell.hidden = YES;
@@ -323,7 +326,11 @@
         if (!fromVC.bottomView.userInteractionEnabled) {
             fromVC.view.backgroundColor = [UIColor blackColor];
         }else {
-            fromVC.view.backgroundColor = [UIColor whiteColor];
+            if (fromVC.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+                fromVC.view.backgroundColor = [UIColor blackColor];
+            }else {
+                fromVC.view.backgroundColor = [UIColor whiteColor];
+            }
         }
         self.tempCell.hidden = NO;
         self.tempCell = nil;

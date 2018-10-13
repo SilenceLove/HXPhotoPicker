@@ -10,7 +10,13 @@
 #import "HXPhotoManager.h"
 #import "HXCustomCollectionReusableView.h"
 
-@class HXDatePhotoViewController,HXDatePhotoViewCell,HXDatePhotoBottomView,HXCustomCameraController;
+@class
+HXDatePhotoViewController ,
+HXDatePhotoViewCell ,
+HXDatePhotoBottomView ,
+HXCustomCameraController ,
+HXCustomPreviewView ,
+HXAlbumListViewController;
 @protocol HXDatePhotoViewControllerDelegate <NSObject>
 @optional
 
@@ -20,6 +26,24 @@
  @param datePhotoViewController self
  */
 - (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController;
+
+/**
+ 点击完成时获取图片image完成后的回调
+ 选中了原图返回的就是原图
+ 需 requestImageAfterFinishingSelection = YES 才会有回调
+ 
+ @param datePhotoViewController self
+ @param imageList 图片数组
+ */
+- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController
+                didDoneAllImage:(NSArray<UIImage *> *)imageList
+                       original:(BOOL)original;
+
+- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController
+                          allAssetList:(NSArray<PHAsset *> *)allAssetList
+                           photoAssets:(NSArray<PHAsset *> *)photoAssetList
+                           videoAssets:(NSArray<PHAsset *> *)videoAssetList
+                              original:(BOOL)original;
 
 /**
  点击完成按钮
@@ -47,6 +71,10 @@
 @end
 
 @interface HXDatePhotoViewController : UIViewController
+@property (copy, nonatomic) viewControllerDidDoneBlock doneBlock;
+@property (copy, nonatomic) viewControllerDidDoneAllImageBlock allImageBlock;
+@property (copy, nonatomic) viewControllerDidDoneAllAssetBlock allAssetBlock;
+@property (copy, nonatomic) viewControllerDidCancelBlock cancelBlock;
 @property (weak, nonatomic) id<HXDatePhotoViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXAlbumModel *albumModel;
@@ -72,6 +100,7 @@
 @property (assign, nonatomic) BOOL singleSelected;
 @property (strong, nonatomic) UIColor *selectBgColor;
 @property (strong, nonatomic) UIColor *selectedTitleColor;
+- (void)resetNetworkImage;
 - (void)cancelRequest;
 - (void)startRequestICloudAsset;
 - (void)bottomViewPrepareAnimation;
@@ -81,6 +110,7 @@
 @interface HXDatePhotoCameraViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic, readonly) HXCustomCameraController *cameraController;
+@property (strong, nonatomic, readonly) HXCustomPreviewView *previewView;
 - (void)starRunning;
 - (void)stopRunning;
 @end

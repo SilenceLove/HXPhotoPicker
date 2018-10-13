@@ -9,7 +9,6 @@
 #import "HXAlbumListViewController.h" 
 #import "HXDatePhotoViewController.h"
 #import "UIViewController+HXExtension.h"
-#import "HXDatePhotoToolManager.h"
 @interface HXAlbumListViewController ()
 <
 UICollectionViewDataSource,
@@ -31,7 +30,6 @@ UITableViewDelegate
 
 @property (assign, nonatomic) BOOL orientationDidChange;
 @property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
-@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 @end
 
 @implementation HXAlbumListViewController
@@ -41,7 +39,6 @@ UITableViewDelegate
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
     
     [self setPhotoManager];
     self.navigationController.popoverPresentationController.delegate = (id)self;
@@ -147,6 +144,10 @@ UITableViewDelegate
         }
     }
 }
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
+}
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if (self.albumModelArray.count == 0) {
@@ -190,74 +191,34 @@ UITableViewDelegate
         [self.delegate albumListViewControllerDidCancel:self];
     }
     if (self.cancelBlock) {
-        self.cancelBlock(self);
+        self.cancelBlock(self, self.manager);
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 #pragma mark - < HXDatePhotoViewControllerDelegate >
+- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController allAssetList:(NSArray<PHAsset *> *)allAssetList photoAssets:(NSArray<PHAsset *> *)photoAssetList videoAssets:(NSArray<PHAsset *> *)videoAssetList original:(BOOL)original {
+    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidDone:allAssetList:photoAssets:videoAssets:original:)]) {
+        [self.delegate albumListViewControllerDidDone:self allAssetList:allAssetList photoAssets:photoAssetList videoAssets:videoAssetList original:original];
+    }
+}
+- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllImage:(NSArray<UIImage *> *)imageList original:(BOOL)original  {
+    if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllImage:)]) {
+        [self.delegate albumListViewController:self didDoneAllImage:imageList];
+    }
+    if (self.allImageBlock) {
+        self.allImageBlock(imageList, original, self, self.manager);
+    }
+}
 - (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllList:photos:videos:original:)]) {
         [self.delegate albumListViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
-        
     }
-    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidDone:allAssetList:photoAssets:videoAssets:original:)]) {
-        NSMutableArray *allAsset = [NSMutableArray array];
-        NSMutableArray *photoAssets = [NSMutableArray array];
-        NSMutableArray *videoAssets = [NSMutableArray array];
-        for (HXPhotoModel *phMd in allList) {
-            if (phMd.asset) {
-                if (phMd.subType == HXPhotoModelMediaSubTypePhoto) {
-                    [photoAssets addObject:phMd.asset];
-                }else {
-                    [videoAssets addObject:phMd.asset];
-                }
-                [allAsset addObject:phMd.asset];
-            }
-        }
-        [self.delegate albumListViewControllerDidDone:self allAssetList:allAsset photoAssets:photoAssets videoAssets:videoAssets original:original];
-    }
-    if (self.manager.configuration.requestImageAfterFinishingSelection) {
-        [self.navigationController.viewControllers.lastObject.view showLoadingHUDText:nil];
-        __weak typeof(self) weakSelf = self;
-        HXDatePhotoToolManagerRequestType requestType;
-        if (original) {
-            requestType = HXDatePhotoToolManagerRequestTypeOriginal;
-        }else {
-            requestType = HXDatePhotoToolManagerRequestTypeHD;
-        }
-        [self.toolManager getSelectedImageList:allList requestType:requestType success:^(NSArray<UIImage *> *imageList) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            int i = 0;
-            for (HXPhotoModel *subModel in strongSelf.manager.afterSelectedArray) {
-                if (i < imageList.count) {
-                    subModel.thumbPhoto = imageList[i];
-                    subModel.previewPhoto = imageList[i];
-                }
-                i++;
-            }
-            if ([strongSelf.delegate respondsToSelector:@selector(albumListViewController:didDoneAllImage:)]) {
-                [strongSelf.delegate albumListViewController:weakSelf didDoneAllImage:imageList];
-            }
-            if (strongSelf.doneBlock) {
-                strongSelf.doneBlock(allList, photoList, videoList, imageList, original, self);
-            }
-            [strongSelf dismissViewControllerAnimated:YES completion:nil];
-        } failed:^{
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            [strongSelf.navigationController.viewControllers.lastObject.view handleLoading];
-            [strongSelf dismissViewControllerAnimated:YES completion:nil];
-        }];
-    }else {
-        if (self.doneBlock) {
-            self.doneBlock(allList, photoList, videoList, nil, original, self);
-        }
+    if (self.doneBlock) {
+        self.doneBlock(allList, photoList, videoList, original, self, self.manager);
     }
 }
 - (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController {
     [self cancelClick];
-//    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidCancel:)]) {
-//        [self.delegate albumListViewControllerDidCancel:self];
-//    }
 }
 - (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected {
     if (self.albumModelArray.count > 0) {
@@ -271,7 +232,9 @@ UITableViewDelegate
     }
 }
 - (void)getAlbumModelList:(BOOL)isFirst {
-    if (self.manager.albums.count > 0 && self.manager.configuration.saveSystemAblum && !self.manager.configuration.singleSelected) {
+    if (self.manager.albums.count > 0 &&
+        self.manager.configuration.saveSystemAblum &&
+        !self.manager.configuration.singleSelected) {
         [self.view handleLoading];
         self.albumModelArray = [NSMutableArray arrayWithArray:self.manager.albums];
         HXAlbumModel *model = self.albumModelArray.firstObject;
@@ -408,12 +371,6 @@ UITableViewDelegate
     [self.navigationController pushViewController:viewControllerToCommit animated:YES];
 }
 #pragma mark - < 懒加载 >
-- (HXDatePhotoToolManager *)toolManager {
-    if (!_toolManager) {
-        _toolManager = [[HXDatePhotoToolManager alloc] init];
-    }
-    return _toolManager;
-}
 - (UITableView *)tableView {
     if (!_tableView) {
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) style:UITableViewStylePlain];

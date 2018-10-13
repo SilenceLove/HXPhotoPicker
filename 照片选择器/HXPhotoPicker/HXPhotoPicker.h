@@ -18,6 +18,7 @@
 #import "HXDatePhotoEditViewController.h"
 #import "HXDateVideoEditViewController.h"
 #import "HXCustomCameraViewController.h"
+#import "HXPhoto3DTouchViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "HXPhotoTools.h"

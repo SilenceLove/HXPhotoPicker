@@ -47,6 +47,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.lineCount = 3;
+    photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
     photoView.outerCamera = YES;
     photoView.delegate = self;
     //    photoView.showAddCell = NO;
@@ -61,7 +62,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
     HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
     // 模拟视频数量超过视频最大选择数
-    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES]; 
     [self.manager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6]];
     [self.photoView refreshView];
 }

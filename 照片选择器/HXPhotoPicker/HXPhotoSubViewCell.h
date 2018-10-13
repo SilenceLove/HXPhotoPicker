@@ -8,11 +8,18 @@
 
 #import <UIKit/UIKit.h>
 #import "UIImageView+HXExtension.h"
+
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
 #elif __has_include("UIImageView+WebCache.h")
 #import "UIImageView+WebCache.h"
-#endif 
+#endif
+
+#if __has_include(<YYWebImage/YYWebImage.h>)
+#import <YYWebImage/YYWebImage.h>
+#elif __has_include("YYWebImage.h")
+#import "YYWebImage.h"
+#endif
 
 @protocol HXPhotoSubViewCellDelegate <NSObject>
 
@@ -36,4 +43,5 @@
 @property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
 // 重新下载
 - (void)againDownload;
+- (void)resetNetworkImage;
 @end

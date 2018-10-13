@@ -11,9 +11,6 @@
 #import "HXPhotoManager.h" 
 
 @class HXAlbumListViewController;
- 
-typedef void (^ HXAlbumListViewControllerDidDoneBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController);
-typedef void (^ HXAlbumListViewControllerDidCancelBlock)(HXAlbumListViewController *viewController);
 
 @protocol HXAlbumListViewControllerDelegate <NSObject>
 @optional
@@ -61,8 +58,10 @@ typedef void (^ HXAlbumListViewControllerDidCancelBlock)(HXAlbumListViewControll
 @interface HXAlbumListViewController : UIViewController
 @property (weak, nonatomic) id<HXAlbumListViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
-@property (copy, nonatomic) HXAlbumListViewControllerDidDoneBlock doneBlock;
-@property (copy, nonatomic) HXAlbumListViewControllerDidCancelBlock cancelBlock;
+@property (copy, nonatomic) viewControllerDidDoneBlock doneBlock;
+@property (copy, nonatomic) viewControllerDidDoneAllImageBlock allImageBlock;
+@property (copy, nonatomic) viewControllerDidDoneAllAssetBlock allAssetBlock;
+@property (copy, nonatomic) viewControllerDidCancelBlock cancelBlock;
 @end
 
 @interface HXAlbumListQuadrateViewCell : UICollectionViewCell

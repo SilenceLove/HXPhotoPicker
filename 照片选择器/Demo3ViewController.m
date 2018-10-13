@@ -26,8 +26,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
-        //        _manager.openCamera = NO;
-        _manager.configuration.showDeleteNetworkPhotoAlert = NO;
+        //        _manager.openCamera = NO; 
         _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.photoMaxNum = 9; //
         _manager.configuration.videoMaxNum = 5;  //

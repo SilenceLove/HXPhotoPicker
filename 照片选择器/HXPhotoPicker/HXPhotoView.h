@@ -10,10 +10,15 @@
 #import "HXPhotoManager.h"
 #import "HXCollectionView.h"
 
+typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
+    HXPhotoViewPreViewShowStyleDefault, //!< 默认
+    HXPhotoViewPreViewShowStyleDark     //!< 黑暗
+};
+
 /*
  *  使用选择照片之后自动布局的功能时就创建此块View. 初始化方法传入照片管理类
  */
-@class HXPhotoView;
+@class HXPhotoView, HXPhotoSubViewCell;
 
 /**
  照片/视频发生改变时调用 - 选择、移动顺序、删除
@@ -36,7 +41,7 @@ typedef void (^HXPhotoViewImageChangeCompleteBlock)(NSArray<UIImage *> *imageLis
 /**
  点击了添加cell的事件
  */
-typedef void (^HXPhotoViewDidAddCellBlock)(void);
+typedef void (^HXPhotoViewDidAddCellBlock)(HXPhotoView *myPhotoView);
 
 /**
  当view高度改变时调用
@@ -210,7 +215,14 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 //- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 @end
 
-@interface HXPhotoView : UIView 
+@interface HXPhotoView : UIView
+
+- (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
+- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
+- (instancetype)initWithManager:(HXPhotoManager *)manager;
++ (instancetype)photoManager:(HXPhotoManager *)manager;
+- (NSIndexPath *)currentModelIndexPath:(HXPhotoModel *)model;
+
 @property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
@@ -272,7 +284,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  */
 @property (copy, nonatomic) HXPhotoViewLongGestureRecognizerEndedBlock longGestureRecognizerEndedBlock;
 
-/**  是否把相机功能放在外面 默认 NO  */
+/**  是否把相机功能放在外面 默认NO  */
 @property (assign, nonatomic) BOOL outerCamera;
 /**  每行个数 默认 3  */
 @property (assign, nonatomic) NSInteger lineCount;
@@ -282,7 +294,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @property (assign, nonatomic) BOOL hideDeleteButton;
 /**  cell是否可以长按拖动编辑  */
 @property (assign, nonatomic) BOOL editEnabled;
-/**  是否显示添加的cell    默认 YES  */
+/**  是否显示添加的cell 默认 YES  */
 @property (assign, nonatomic) BOOL showAddCell;
 /**  预览大图时是否显示删除按钮  */
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
@@ -294,12 +306,12 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @property (copy, nonatomic) NSString *deleteImageName;
 /**  预览大图时是否禁用手势返回  默认NO  */
 @property (assign, nonatomic) BOOL disableaInteractiveTransition;
-
-- (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
-- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
-- (instancetype)initWithManager:(HXPhotoManager *)manager;
-+ (instancetype)photoManager:(HXPhotoManager *)manager;
-- (NSIndexPath *)currentModelIndexPath:(HXPhotoModel *)model;
+/**  是否拦截添加Cell的点击事件 默认NO  */
+@property (assign, nonatomic) BOOL interceptAddCellClick;
+/**  删除网络图片时是否显示Alert 默认NO  */
+@property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
+/**  预览大图时的风格样式  */
+@property (assign, nonatomic) HXPhotoViewPreViewShowStyle previewStyle;
 /**  跳转相册 如果需要选择相机/相册时 还是需要选择  */
 - (void)goPhotoViewController;
 /**  跳转相册 过滤掉选择 - 不管需不需要选择 直接前往相册  */
@@ -310,4 +322,11 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 - (void)deleteModelWithIndex:(NSInteger)index;
 /**  刷新view  */
 - (void)refreshView;
+/**  跳转预览大图的界面  */
+- (void)jumpPreviewViewControllerWithModel:(HXPhotoModel *)model;
+- (void)jumpPreviewViewControllerWithIndex:(NSInteger)index;
+/**  根据坐标获取cell
+ *   point 传入的坐标是在HXPhotoView上的坐标,里面已经做了转换处理
+ */
+- (HXPhotoSubViewCell *)previewingContextViewWithPoint:(CGPoint)point;
 @end

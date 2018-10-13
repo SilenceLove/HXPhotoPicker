@@ -157,7 +157,7 @@
             if (self.type == HXPhotoModelMediaSubTypeVideo) {
                 continue;
             }
-            HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImageURL:model.networkImageURL];
+            HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImageURL:model.networkImageURL thumbURL:model.networkThumbURL];
             photoModel.selected = canAddPhoto ? model.selected : NO;
             if (model.selected && canAddPhoto) {
                 [self.endCameraPhotos addObject:photoModel];
@@ -1615,10 +1615,6 @@
     }
      */
 }
-- (void)dealloc {
-    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
-    NSSLog(@"dealloc");
-}
 
 - (void)changeAfterCameraArray:(NSArray *)array {
     self.endCameraList = array.mutableCopy;
@@ -1672,7 +1668,7 @@
     return self.iCloudUploadArray;
 }
 - (NSString *)version {
-    return @"2.2.2.1";
+    return @"2.2.3";
 }
 
 #pragma mark - < 保存草稿功能 >
@@ -1682,54 +1678,20 @@
         return;
     }
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableArray *gifModel = [NSMutableArray array];
-        for (HXPhotoModel *model in self.afterSelectedArray) {
-            if (model.type == HXPhotoModelMediaTypePhotoGif && !model.gifImageData) {
-                [gifModel addObject:model];
-            }
-        }
-        if (gifModel.count) {
-            HXWeakSelf
-            [[[HXDatePhotoToolManager alloc] init] gifModelAssignmentData:gifModel success:^{
-                BOOL su = [weakSelf saveSelectModelArray];
-                if (!su) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (failed) {
-                            failed();
-                        }
-                        if (HXShowLog) NSSLog(@"保存草稿失败啦!");
-                    });
-                }else {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (success) {
-                            success();
-                        }
-                    });
+        BOOL su = [self saveSelectModelArray];
+        if (!su) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (failed) {
+                    failed();
                 }
-            } failed:^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (failed) {
-                        failed();
-                    }
-                    if (HXShowLog) NSSLog(@"保存草稿失败啦!");
-                });
-            }];
+                if (HXShowLog) NSSLog(@"保存草稿失败啦!");
+            });
         }else {
-            BOOL su = [self saveSelectModelArray];
-            if (!su) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (failed) {
-                        failed();
-                    }
-                    if (HXShowLog) NSSLog(@"保存草稿失败啦!");
-                });
-            }else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (success) {
-                        success();
-                    }
-                });
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (success) {
+                    success();
+                }
+            });
         }
     });
 }
@@ -1780,6 +1742,12 @@
     NSArray *tempArray = [unarchiver decodeObjectForKey:HXEncodeKey];
     //关闭解档
     [unarchiver finishDecoding];
+    for (HXPhotoModel *model in tempArray) {
+        if (model.localIdentifier && !model.asset) {
+//            PHFetchOptions *options = [[PHFetchOptions alloc] init];
+            model.asset = [[PHAsset fetchAssetsWithLocalIdentifiers:@[model.localIdentifier] options:nil] firstObject];
+        }
+    }
     return tempArray.copy;
 }
 
@@ -1795,4 +1763,8 @@
     return YES;
 }
 
+- (void)dealloc {
+    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
+    if (HXShowLog) NSSLog(@"dealloc");
+}
 @end

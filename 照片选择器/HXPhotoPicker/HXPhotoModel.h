@@ -124,6 +124,8 @@ typedef enum : NSUInteger {
 @property (strong, nonatomic) NSURL *videoURL;
 /**  网络图片的地址 */
 @property (copy, nonatomic) NSURL *networkPhotoUrl;
+/**  网络图片缩略图地址  */
+@property (strong, nonatomic) NSURL *networkThumbURL;
 /**  当前图片所在相册的下标 */
 @property (assign, nonatomic) NSInteger currentAlbumIndex;
 /**  网络图片已下载的大小 */
@@ -160,6 +162,10 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) NSString *fullPathToFile;;
 @property (strong, nonatomic) HXPhotoManager *photoManager;
 
+
+@property (strong, nonatomic) id tempAsset;
+@property (assign, nonatomic) BOOL loadOriginalImage;
+
 /**  通过image初始化 */
 + (instancetype)photoModelWithImage:(UIImage *)image;
 /**  通过视频地址和视频时长初始化 */
@@ -168,6 +174,7 @@ typedef enum : NSUInteger {
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset;
 /**  通过网络图片URL对象初始化 */
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL;
++ (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL;
 /**  通过本地视频地址URL对象初始化 */
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL;
 @end

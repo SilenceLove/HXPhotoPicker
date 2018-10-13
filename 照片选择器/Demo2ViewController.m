@@ -65,6 +65,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.requestImageAfterFinishingSelection = YES;
         __weak typeof(self) weakSelf = self;
 //        _manager.configuration.replaceCameraViewController = YES;
+        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
+        
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
             
             // 这里拿使用系统相机做例子
@@ -141,7 +143,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.delegate = self;
-    photoView.outerCamera = YES;
+//    photoView.outerCamera = YES;
+    photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
     photoView.previewShowDeleteButton = YES;
 //    photoView.hideDeleteButton = YES;
     photoView.showAddCell = YES;

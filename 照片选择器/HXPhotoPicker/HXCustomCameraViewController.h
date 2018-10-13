@@ -9,10 +9,10 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
-typedef enum : NSUInteger {
-    HXCustomCameraBottomViewModePhoto = 0,
-    HXCustomCameraBottomViewModeVideo = 1,
-} HXCustomCameraBottomViewMode;
+typedef NS_ENUM(NSUInteger, HXCustomCameraBottomViewMode) {
+    HXCustomCameraBottomViewModePhoto,      //!< 拍照
+    HXCustomCameraBottomViewModeVideo = 1,  //!< 录制
+};
 
 @class HXPhotoManager,HXCustomCameraViewController,HXPhotoModel;
  

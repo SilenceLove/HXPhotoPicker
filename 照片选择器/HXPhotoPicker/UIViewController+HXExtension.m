@@ -18,16 +18,45 @@
     nav.supportRotation = manager.configuration.supportRotation;
     [self presentViewController:nav animated:YES completion:nil];
 }
-
-- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager done:(HXAlbumListViewControllerDidDoneBlock)done cancel:(HXAlbumListViewControllerDidCancelBlock)cancel {
-    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-    vc.manager = manager;
-    vc.doneBlock = done;
-    vc.cancelBlock = cancel;
-    vc.delegate = (id)self;
-    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-    nav.supportRotation = manager.configuration.supportRotation;
-    [self presentViewController:nav animated:YES completion:nil];
+- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, BOOL, UIViewController *, HXPhotoManager *))models imageList:(void (^)(NSArray<UIImage *> *, BOOL))images cancel:(void (^)(UIViewController *, HXPhotoManager *))cancel {
+    
+    viewControllerDidDoneBlock modelBlock = ^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, UIViewController *viewController, HXPhotoManager *manager) {
+        if (models) {
+            models(allList, photoList, videoList, original, viewController, manager);
+        }
+    };
+    viewControllerDidDoneAllImageBlock imageBlock = ^(NSArray<UIImage *> *imageList, BOOL original, UIViewController *viewController, HXPhotoManager *manager) {
+        if (images) {
+            images(imageList, original);
+        }
+    };
+    viewControllerDidCancelBlock cancelBlock = ^(UIViewController *viewController, HXPhotoManager *manager) {
+        if (cancel) {
+            cancel(viewController, manager);
+        }
+    };
+    if (manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
+        HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
+        vc.manager = manager;
+        vc.doneBlock = modelBlock;
+        vc.allImageBlock = imageBlock;
+        vc.cancelBlock = cancelBlock;
+        vc.delegate = (id)self;
+        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+        nav.supportRotation = manager.configuration.supportRotation;
+        [self presentViewController:nav animated:YES completion:nil];
+    }else if (manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
+        HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
+        vc.manager = manager;
+        vc.doneBlock = modelBlock;
+        vc.allImageBlock = imageBlock;
+        vc.cancelBlock = cancelBlock;
+        vc.delegate = (id)self;
+        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+        nav.supportRotation = manager.configuration.supportRotation;
+        [self presentViewController:nav animated:YES completion:nil];
+    }
+    
 }
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {

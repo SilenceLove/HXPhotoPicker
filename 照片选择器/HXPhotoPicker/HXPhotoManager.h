@@ -13,6 +13,16 @@
 #import "HXPhotoTools.h"
 #import "HXPhotoConfiguration.h"
 #import "HXCustomAssetModel.h"
+
+
+typedef void (^ viewControllerDidDoneBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, UIViewController *viewController, HXPhotoManager *manager);
+
+typedef void (^ viewControllerDidDoneAllImageBlock)(NSArray<UIImage *> *imageList, BOOL original, UIViewController *viewController, HXPhotoManager *manager);
+
+typedef void (^ viewControllerDidDoneAllAssetBlock)(NSArray<PHAsset *> *allAsset, NSArray<PHAsset *> *photoAssets, NSArray<PHAsset *> *videoAssets, BOOL original, UIViewController *viewController, HXPhotoManager *manager);
+
+typedef void (^ viewControllerDidCancelBlock)(UIViewController *viewController, HXPhotoManager *manager);
+
 /**
  *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
  */
@@ -44,6 +54,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 
 @property (assign, nonatomic) HXPhotoManagerVideoSelectedType videoSelectedType;
 
+@property (strong, nonatomic) UIView *tempCameraPreviewView;
+@property (strong, nonatomic) UIView *tempCameraView;
 
 /**
  添加模型数组

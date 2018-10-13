@@ -14,12 +14,10 @@ typedef NS_ENUM(NSUInteger, HXPhotoConfigurationCameraType) {
     HXPhotoConfigurationCameraTypeTypePhotoAndVideo //!< 拍照和录制一起
 }; 
 
-/*
-typedef enum : NSUInteger {
-    HXPhotoConfigurationImageRequestTypeHD = 0,        // 高清
-    HXPhotoConfigurationImageRequestTypeOriginal = 1        // 原图
-} HXPhotoConfigurationImageRequestType;
-*/
+typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
+    HXPhotoAlbumShowModeDefault,    //!< 默认的
+    HXPhotoAlbumShowModePopup       //!< 弹窗
+};
 
 @class HXDatePhotoBottomView;
 @class HXDatePhotoPreviewBottomView;
@@ -29,11 +27,19 @@ typedef enum : NSUInteger {
 @interface HXPhotoConfiguration : NSObject
 
 /**
+ 相册列表展示方式
+ */
+@property (assign, nonatomic) HXPhotoAlbumShowMode albumShowMode;
+
+/**
  模型数组保存草稿时存在本地的文件名称 default HXPhotoPickerModelArray
  如果有多个地方保存了草稿请设置不同的fileName
  */
 @property (copy, nonatomic) NSString *localFileName;
 
+/**
+ 只针对 照片、视频不能同时选并且视频只能选择1个的时候隐藏掉视频cell右上角的选择按钮
+ */
 @property (assign, nonatomic) BOOL specialModeNeedHideVideoSelectBtn;
 
 /**
@@ -56,16 +62,24 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL replacePhotoEditViewController;
 
 /**
+ 图片编辑完成调用这个block 传入模型
+ beforeModel 编辑之前的模型
+ afterModel  编辑之后的模型
+ */
+@property (copy, nonatomic) void (^usePhotoEditComplete)(HXPhotoModel *beforeModel,  HXPhotoModel *afterModel);
+
+/**
  是否替换视频编辑界面   default NO
  
  */
 @property (assign, nonatomic) BOOL replaceVideoEditViewController;
 
 /**
- 将要跳转视频编辑界面 在block内实现跳转
+ 将要跳转编辑界面 在block内实现跳转
+ isOutside 是否是HXPhotoView预览时的编辑
  beforeModel 编辑之前的模型
  */
-@property (copy, nonatomic) void (^shouldUseVideoEdit)(UIViewController *viewController, HXPhotoManager *manager, HXPhotoModel *beforeModel);
+@property (copy, nonatomic) void (^shouldUseEditAsset)(UIViewController *viewController, BOOL isOutside, HXPhotoManager *manager, HXPhotoModel *beforeModel);
 
 /**
  视频编辑完成调用这个block 传入模型
@@ -128,7 +142,6 @@ typedef enum : NSUInteger {
  */
 @property (assign, nonatomic) BOOL replaceCameraViewController;
 
-
 /**
  将要跳转相机界面 在block内实现跳转
  demo1 里有示例（使用的是系统相机）
@@ -141,6 +154,56 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) void (^useCameraComplete)(HXPhotoModel *model);
 
 #pragma mark - < UI相关 >
+/**
+ 弹窗方式的相册列表竖屏时的高度
+ */
+@property (assign, nonatomic) CGFloat popupTableViewHeight;
+
+/**
+ 弹窗方式的相册列表横屏时的高度
+ */
+@property (assign, nonatomic) CGFloat popupTableViewHorizontalHeight;
+
+/**
+ 弹窗方式的相册列表Cell选中的颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewCellSelectColor;
+
+/**
+ 弹窗方式的相册列表Cell底部线的颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewCellLineColor;
+
+/**
+ 弹窗方式的相册列表Cell的背景颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewCellBgColor;
+
+/**
+ 弹窗方式的相册列表Cell上相册名称的颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewCellAlbumNameColor;
+
+/**
+ 弹窗方式的相册列表Cell上相册名称的字体
+ */
+@property (strong, nonatomic) UIFont *popupTableViewCellAlbumNameFont;
+
+/**
+ 弹窗方式的相册列表Cell上照片数量的颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewCellPhotoCountColor;
+
+/**
+ 弹窗方式的相册列表Cell上照片数量的字体
+ */
+@property (strong, nonatomic) UIFont *popupTableViewCellPhotoCountFont;
+
+/**
+ 弹窗方式的相册列表Cell的高度
+ */
+@property (assign, nonatomic) CGFloat popupTableViewCellHeight;
+
 /**
  显示底部照片详细信息 default YES
  */
@@ -305,10 +368,6 @@ typedef enum : NSUInteger {
 @property (assign, nonatomic) BOOL selectTogether;
 
 /**
- 删除网络图片时是否显示Alert // 默认不显示
- */
-@property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
-/**
  相机视频录制最大秒数  -  默认60s
  */
 @property (assign, nonatomic) NSTimeInterval videoMaximumDuration;
@@ -317,7 +376,7 @@ typedef enum : NSUInteger {
  *  删除临时的照片/视频 -
  注:相机拍摄的照片并没有保存到系统相册 或 是本地图片
  如果当这样的照片都没有被选中时会清空这些照片 有一张选中了就不会删..
- - 默认 YES
+ - 默认 NO
  */
 @property (assign, nonatomic) BOOL deleteTemporaryPhoto;
 
@@ -394,24 +453,30 @@ typedef enum : NSUInteger {
  相册列表的collectionView
  - 旋转屏幕时也会调用
  */
-@property (copy, nonatomic) void(^albumListCollectionView)(UICollectionView *collectionView);
+@property (copy, nonatomic) void (^albumListCollectionView)(UICollectionView *collectionView);
 
 /**
  相册列表的tableView
  - 旋转屏幕时也会调用
  */
-@property (copy, nonatomic) void(^albumListTableView)(UITableView *tableView);
+@property (copy, nonatomic) void (^albumListTableView)(UITableView *tableView);
+
+/**
+ 弹窗样式的相册列表
+ - 旋转屏幕时也会调用
+ */
+@property (copy, nonatomic) void (^popupAlbumTableView)(UITableView *tableView);
 
 /**
  相片列表的collectionView
  - 旋转屏幕时也会调用
  */
-@property (copy, nonatomic) void(^photoListCollectionView)(UICollectionView *collectionView);
+@property (copy, nonatomic) void (^photoListCollectionView)(UICollectionView *collectionView);
 
 /**
  预览界面的collectionView
  - 旋转屏幕时也会调用
  */
-@property (copy, nonatomic) void(^previewCollectionView)(UICollectionView *collectionView);
+@property (copy, nonatomic) void (^previewCollectionView)(UICollectionView *collectionView);
 
 @end

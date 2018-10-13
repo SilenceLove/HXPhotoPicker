@@ -22,4 +22,8 @@
 @property (strong, nonatomic) YYAnimatedImageView *animatedImageView;
 #endif
 @property (strong, nonatomic) NSIndexPath *indexPath;
+
+@property (copy, nonatomic) NSArray<id<UIPreviewActionItem>> *(^ previewActionItemsBlock)(void);
+@property (copy, nonatomic) void (^downloadImageComplete)(HXPhoto3DTouchViewController *vc, HXPhotoModel *model);
 @end
+

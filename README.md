@@ -5,7 +5,7 @@
 [![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
-<img src="https://user-images.githubusercontent.com/18083149/33309568-764a198c-d459-11e7-958f-8602445d740a.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32322874-fe149aa8-c000-11e7-8172-629de70f7089.PNG" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32438543-db479232-c325-11e7-87d9-48282914e752.gif" width="270" height="480">
+<img src="https://user-images.githubusercontent.com/18083149/33309568-764a198c-d459-11e7-958f-8602445d740a.gif" width="270" height="480"> <img src="http://thyrsi.com/t6/386/1539442503x-1404755516.gif" width="270" height="480"> <img src="http://thyrsi.com/t6/386/1539442552x-1404755516.gif" width="270" height="480">
 <img src="https://user-images.githubusercontent.com/18083149/32778022-585f3628-c973-11e7-8139-9d19c26f1515.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32778166-d2397300-c973-11e7-9135-8ba11b24636e.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/33060991-55f9abf4-ced5-11e7-8b97-609813c0e937.gif" width="270" height="480">
 
 ## 目录
@@ -42,7 +42,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.2'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.3'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.4.1``` || ```YYWebImage v1.0.5```
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -87,6 +87,7 @@
 - v2.2.0　-　添加xib使用示例（Demo11）、混合添加本地图片/网络图片/本地视频示例（Demo12）
 - v2.2.1　-　修改了一些问题、优化了一些效果，使用HXPhotoView预览大图时支持手势返回
 - v2.2.2　-　适配iphone XS - XSMax - XR、支持加载网络动图（需要YYWebImage）。支持YYWebImage（SD和YY同时存在时优先使用YY）
+- v2.2.3　-　Demo9 添加cell上使用网络图片、3DTouch预览，Demo13 导入其他第三方图片/视频编辑库，优化显示效果，添加相册列表弹窗方式
 
 ## <a id="例子"></a> 五.  应用示例 - Examples
 ### <a id="Demo1"></a> Demo1

@@ -43,14 +43,19 @@
 }
 
 + (instancetype)assetWithNetworkImageURL:(NSURL *)imageURL selected:(BOOL)selected {
-    return [[self alloc] initAssetWithNetworkImageURL:imageURL selected:selected];
+    return [[self alloc] initAssetWithNetworkImageURL:imageURL networkThumbURL:imageURL selected:selected];
 }
 
-- (instancetype)initAssetWithNetworkImageURL:(NSURL *)imageURL selected:(BOOL)selected {
++ (instancetype)assetWithNetworkImageURL:(NSURL *)imageURL networkThumbURL:(NSURL *)thumbURL selected:(BOOL)selected {
+    return [[self alloc] initAssetWithNetworkImageURL:imageURL networkThumbURL:thumbURL selected:selected];
+}
+
+- (instancetype)initAssetWithNetworkImageURL:(NSURL *)imageURL networkThumbURL:(NSURL *)thumbURL selected:(BOOL)selected {
     self = [super init];
     if (self) {
         self.type = HXCustomAssetModelTypeNetWorkImage;
         self.networkImageURL = imageURL;
+        self.networkThumbURL = thumbURL;
         self.selected = selected;
     }
     return self;

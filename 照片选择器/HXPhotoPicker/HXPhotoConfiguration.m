@@ -41,12 +41,11 @@
             self.rowCount = 4;
         }
     }
-    self.showDeleteNetworkPhotoAlert = NO;
     self.downloadICloudAsset = YES;
     self.videoMaxDuration = 3 * 60.f;
     self.videoMaximumDuration = 60.f;
     //    self.saveSystemAblum = NO;
-    self.deleteTemporaryPhoto = YES;
+//    self.deleteTemporaryPhoto = YES;
     self.showDateSectionHeader = YES;
     //    self.reverseDate = NO;
     if ([UIScreen mainScreen].bounds.size.width != 320) {
@@ -79,6 +78,14 @@
     self.localFileName = @"HXPhotoPickerModelArray";
     self.requestImageAfterFinishingSelection = YES;
     
+    self.popupTableViewCellHeight = 65.f;
+    if (HX_IS_IPhoneX_All) {
+        self.popupTableViewHeight = 450;
+    }else {
+        self.popupTableViewHeight = 350;
+    }
+    self.popupTableViewHorizontalHeight = 250;
+//    self.albumShowMode = HXPhotoAlbumShowModePopup;
 }
 
 //- (NSInteger)maxNum {

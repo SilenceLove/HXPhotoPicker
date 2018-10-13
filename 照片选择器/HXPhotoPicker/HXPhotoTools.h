@@ -42,6 +42,9 @@
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
                                  photo:(UIImage *)photo;
 
++ (UIImage *)thumbnailImageForVideo:(NSURL *)videoURL
+                             atTime:(NSTimeInterval)time;
+
 + (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model
                                                completion:(void (^)(CLPlacemark *placemark,HXPhotoDateModel *model))completion;
 
@@ -287,16 +290,22 @@
 + (CGFloat)getTextWidth:(NSString *)text
                  height:(CGFloat)height
                fontSize:(CGFloat)fontSize;
++ (CGFloat)getTextWidth:(NSString *)text
+                 height:(CGFloat)height
+                   font:(UIFont *)font;
 + (CGFloat)getTextHeight:(NSString *)text
                    width:(CGFloat)width
                 fontSize:(CGFloat)fontSize;
++ (CGFloat)getTextHeight:(NSString *)text
+                   width:(CGFloat)width
+                    font:(UIFont *)font;
 
 + (BOOL)platform;
 /**  iphone6, 6s, 7, 8  */
 + (BOOL)isIphone6;
 
 /**********************************/
-
++ (NSString *)uploadFileName;
 + (void)selectListWriteToTempPath:(NSArray *)selectList
                       requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList
                        completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion
