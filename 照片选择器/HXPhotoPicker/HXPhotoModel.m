@@ -459,6 +459,61 @@
 @implementation HXPhotoDateModel
 - (NSString *)dateString {
     if (!_dateString) {
+//        NSDateComponents *modelComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
+//                                        NSCalendarUnitMonth |
+//                                        NSCalendarUnitYear
+//                                                                       fromDate:self.date];
+//        NSUInteger modelMonth = [modelComponents month];
+//        NSUInteger modelYear  = [modelComponents year];
+//        NSUInteger modelDay   = [modelComponents day];
+//        
+//        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+//        NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%lu-%lu-%lu",
+//                                                      (unsigned long)modelYear,
+//                                                      (unsigned long)modelMonth,
+//                                                      (unsigned long)modelDay]];
+//        
+//        NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
+//                                        NSCalendarUnitMonth |
+//                                        NSCalendarUnitYear
+//                                                                       fromDate:[NSDate date]];
+//        NSUInteger month = [components month];
+//        NSUInteger year  = [components year];
+//        NSUInteger day   = [components day];
+//        
+//        NSString *localization = [NSBundle mainBundle].preferredLocalizations.firstObject;
+//        NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:localization];
+//        
+//        dateFormatter.locale    = locale;
+//        dateFormatter.dateStyle = kCFDateFormatterLongStyle;
+//        dateFormatter.timeStyle = NSDateFormatterNoStyle;
+//        
+//        if (year == modelYear)
+//        {
+//            NSString *longFormatWithoutYear = [NSDateFormatter dateFormatFromTemplate:@"MMMM d"
+//                                                                              options:0
+//                                                                               locale:locale];
+//            [dateFormatter setDateFormat:longFormatWithoutYear];
+//        }
+//        
+//        NSString *resultString = [dateFormatter stringFromDate:date];
+//        
+//        if (year == modelYear && month == modelMonth)
+//        {
+//            if (day == modelDay)
+//            {
+//                resultString = [NSBundle hx_localizedStringForKey:@"今天"];
+//            }
+//            else if (day - 1 == modelDay)
+//            {
+//                resultString = [NSBundle hx_localizedStringForKey:@"昨天"];
+//            }else if ([self.date isSameWeek]) {
+//                resultString = [self.date getNowWeekday];
+//            }
+//        }
+//        _dateString = resultString;
+//        return _dateString;
         
         NSString *language = [NSLocale preferredLanguages].firstObject;
         if ([self.date isToday]) {

@@ -44,6 +44,9 @@
     self.downloadICloudAsset = YES;
     self.videoMaxDuration = 3 * 60.f;
     self.videoMaximumDuration = 60.f;
+    
+    self.creationDateSort = YES;
+    
     //    self.saveSystemAblum = NO;
 //    self.deleteTemporaryPhoto = YES;
     self.showDateSectionHeader = YES;

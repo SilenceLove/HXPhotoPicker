@@ -2031,7 +2031,7 @@ HXDatePhotoEditViewControllerDelegate
     if (!_dateLb) {
         _dateLb = [[UILabel alloc] init];
         _dateLb.textColor = [UIColor blackColor];
-        _dateLb.font = [UIFont hx_pingFangFontOfSize:15];
+        _dateLb.font = [UIFont hx_helveticaNeueOfSize:16];
     }
     return _dateLb;
 }
@@ -2265,7 +2265,8 @@ HXDatePhotoEditViewControllerDelegate
     self.previewBtn.center = CGPointMake(self.previewBtn.center.x, 25);
     self.editBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, [HXPhotoTools getTextWidth:self.editBtn.currentTitle height:50 fontSize:16], 50);
     if (self.editBtn.hidden) {
-        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, 80, 50);
+        self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, [HXPhotoTools getTextWidth:self.originalBtn.currentTitle height:50 fontSize:16] + 20, 50);
+        self.originalBtn.imageEdgeInsets = UIEdgeInsetsMake(0, [HXPhotoTools getTextWidth:self.originalBtn.currentTitle height:50 fontSize:16] , 0, 0);
     }else {
         self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame) + 10, 0, [HXPhotoTools getTextWidth:self.originalBtn.currentTitle height:50 fontSize:16] + 20, 50);
         self.originalBtn.imageEdgeInsets = UIEdgeInsetsMake(0, [HXPhotoTools getTextWidth:self.originalBtn.currentTitle height:50 fontSize:16] , 0, 0);

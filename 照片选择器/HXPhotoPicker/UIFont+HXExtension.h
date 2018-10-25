@@ -9,5 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface UIFont (HXExtension)
-+ (UIFont *)hx_pingFangFontOfSize:(CGFloat)size;
++ (instancetype)hx_pingFangFontOfSize:(CGFloat)size;
++ (instancetype)hx_regularPingFangOfSize:(CGFloat)size;
++ (instancetype)hx_mediumPingFangOfSize:(CGFloat)size;
++ (instancetype)hx_boldPingFangOfSize:(CGFloat)size;
++ (instancetype)hx_helveticaNeueOfSize:(CGFloat)size;
 @end

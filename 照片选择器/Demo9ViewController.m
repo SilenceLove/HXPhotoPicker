@@ -128,7 +128,7 @@
     [cell setPhotoViewChangeHeightBlock:^(UITableViewCell *mycell) {
         NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:mycell];
         if (myIndexPath) {
-            [weakSelf.tableView reloadRowsAtIndexPaths:@[] withRowAnimation:0];
+            [weakSelf.tableView reloadRowsAtIndexPaths:@[myIndexPath] withRowAnimation:0];
         }
     }];
     return cell;

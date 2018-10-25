@@ -327,28 +327,32 @@
     [smartAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
         // 是否按创建时间排序
         PHFetchOptions *option = [[PHFetchOptions alloc] init];
-        option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        if (self.configuration.creationDateSort) {
+            option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        }
         if (self.type == HXPhotoManagerSelectedTypePhoto) {
             option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
         }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
             option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
         }
-        // 获取照片集合
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
-        
-        // 过滤掉空相册
-        if (result.count > 0 && ![[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"最近删除"]) {
-            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-            albumModel.count = result.count;
-            albumModel.albumName = collection.localizedTitle;
-            albumModel.result = result;
-            if ([[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"相机胶卷"] || [[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"所有照片"]) {
-                [self.albums insertObject:albumModel atIndex:0];
-                if (selectedModel) {
-                    selectedModel(albumModel);
+        @autoreleasepool {
+            // 获取照片集合
+            PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+            
+            // 过滤掉空相册
+            if (result.count > 0 && ![[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"最近删除"]) {
+                HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+                albumModel.count = result.count;
+                albumModel.albumName = collection.localizedTitle;
+                albumModel.result = result;
+                if ([[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"相机胶卷"] || [[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"所有照片"]) {
+                    [self.albums insertObject:albumModel atIndex:0];
+                    if (selectedModel) {
+                        selectedModel(albumModel);
+                    }
+                }else {
+                    [self.albums addObject:albumModel];
                 }
-            }else {
-                [self.albums addObject:albumModel];
             }
         }
     }];
@@ -357,22 +361,26 @@
     [userAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
         // 是否按创建时间排序
         PHFetchOptions *option = [[PHFetchOptions alloc] init];
-        option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        if (self.configuration.creationDateSort) {
+            option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        }
         if (self.type == HXPhotoManagerSelectedTypePhoto) {
             option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
         }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
             option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
         }
-        // 获取照片集合
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
-        
-        // 过滤掉空相册
-        if (result.count > 0) {
-            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-            albumModel.count = result.count;
-            albumModel.albumName = [HXPhotoTools transFormPhotoTitle:collection.localizedTitle];
-            albumModel.result = result;
-            [self.albums addObject:albumModel];
+        @autoreleasepool {
+            // 获取照片集合
+            PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+            
+            // 过滤掉空相册
+            if (result.count > 0) {
+                HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+                albumModel.count = result.count;
+                albumModel.albumName = [HXPhotoTools transFormPhotoTitle:collection.localizedTitle];
+                albumModel.result = result;
+                [self.albums addObject:albumModel];
+            }
         }
     }];
     for (int i = 0 ; i < self.albums.count; i++) {
@@ -439,15 +447,18 @@
                 
                 // 是否按创建时间排序
                 PHFetchOptions *option = [[PHFetchOptions alloc] init];
-                option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+                if (self.configuration.creationDateSort) {
+                    option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+                }
                 if (self.type == HXPhotoManagerSelectedTypePhoto) {
                     option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
                 }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
                     option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
                 }
-                // 获取照片集合
-                PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
-//                if (result.count) {
+                @autoreleasepool {
+                    // 获取照片集合
+                    PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+                    //                if (result.count) {
                     HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
                     albumModel.count = result.count;
                     albumModel.albumName = collection.localizedTitle;
@@ -457,30 +468,35 @@
                         firstModel(albumModel);
                     }
                     *stop = YES;
-//                }
+                    //                }
+                }
             }
         }else {
             // 是否按创建时间排序
             PHFetchOptions *option = [[PHFetchOptions alloc] init];
-            option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+            if (self.configuration.creationDateSort) {
+                option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+            }
             if (self.type == HXPhotoManagerSelectedTypePhoto) {
                 option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
             }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
                 option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
             }
-            // 获取照片集合
-            PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
-            
-            // 过滤掉空相册
-            if (result.count > 0 && ![[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"最近删除"]) {
-                HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-                albumModel.count = result.count;
-                albumModel.albumName = collection.localizedTitle;
-                albumModel.result = result;
-                if ([[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"相机胶卷"] || [[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"所有照片"]) {
-                    [self.albums insertObject:albumModel atIndex:0];
-                }else {
-                    [self.albums addObject:albumModel];
+            @autoreleasepool {
+                // 获取照片集合
+                PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+                
+                // 过滤掉空相册
+                if (result.count > 0 && ![[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"最近删除"]) {
+                    HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+                    albumModel.count = result.count;
+                    albumModel.albumName = collection.localizedTitle;
+                    albumModel.result = result;
+                    if ([[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"相机胶卷"] || [[HXPhotoTools transFormPhotoTitle:collection.localizedTitle] isEqualToString:@"所有照片"]) {
+                        [self.albums insertObject:albumModel atIndex:0];
+                    }else {
+                        [self.albums addObject:albumModel];
+                    }
                 }
             }
         }
@@ -509,22 +525,26 @@
     [userAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
         // 是否按创建时间排序
         PHFetchOptions *option = [[PHFetchOptions alloc] init];
-        option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        if (self.configuration.creationDateSort) {
+            option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        }
         if (self.type == HXPhotoManagerSelectedTypePhoto) {
             option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
         }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
             option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
         }
-        // 获取照片集合
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
-        
-        // 过滤掉空相册
-        if (result.count > 0) {
-            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-            albumModel.count = result.count;
-            albumModel.albumName = [HXPhotoTools transFormPhotoTitle:collection.localizedTitle];
-            albumModel.result = result;
-            [self.albums addObject:albumModel];
+        @autoreleasepool {
+            // 获取照片集合
+            PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+            
+            // 过滤掉空相册
+            if (result.count > 0) {
+                HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+                albumModel.count = result.count;
+                albumModel.albumName = [HXPhotoTools transFormPhotoTitle:collection.localizedTitle];
+                albumModel.result = result;
+                [self.albums addObject:albumModel];
+            }
         }
     }];
     for (int i = 0 ; i < self.albums.count; i++) {
@@ -581,47 +601,46 @@
             HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
             photoModel.clarityScale = self.configuration.clarityScale;
             photoModel.asset = asset;
-            if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
-                if (self.iCloudUploadArray.count) {
-//                    NSString *property = @"asset";
-//                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K = %@", property, asset];
-                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
-                    NSArray *newArray = [self.iCloudUploadArray filteredArrayUsingPredicate:pred];
-                    if (!newArray.count) {
-                        photoModel.isICloud = YES;
-                    }
-                }else {
-                    photoModel.isICloud = YES;
-                }
-            }
-            if (selectList.count > 0) {
-//                NSString *property = @"asset";
-//                NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K = %@", property, asset];
-                NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
-                NSArray *newArray = [selectList filteredArrayUsingPredicate:pred];
-                if (newArray.count > 0) {
-                    HXPhotoModel *model = newArray.firstObject;
-                    [selectList removeObject:model];
-                    photoModel.selected = YES;
-                    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeLivePhoto || model.type == HXPhotoModelMediaTypeCameraPhoto)) {
-                        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-                            [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:model] withObject:photoModel];
-                        }else {
-                            [self.selectedPhotos replaceObjectAtIndex:[self.selectedPhotos indexOfObject:model] withObject:photoModel];
+            
+            @autoreleasepool {
+                if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
+                    if (self.iCloudUploadArray.count) {
+                        NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
+                        NSArray *newArray = [self.iCloudUploadArray filteredArrayUsingPredicate:pred];
+                        if (!newArray.count) {
+                            photoModel.isICloud = YES;
                         }
                     }else {
-                        if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-                            [self.selectedCameraVideos replaceObjectAtIndex:[self.selectedCameraVideos indexOfObject:model] withObject:photoModel];
-                        }else {
-                            [self.selectedVideos replaceObjectAtIndex:[self.selectedVideos indexOfObject:model] withObject:photoModel];
-                        }
+                        photoModel.isICloud = YES;
                     }
-                    [self.selectedList replaceObjectAtIndex:[self.selectedList indexOfObject:model] withObject:photoModel];
-                    photoModel.thumbPhoto = model.thumbPhoto;
-                    photoModel.previewPhoto = model.previewPhoto;
-                    photoModel.selectIndexStr = model.selectIndexStr;
-                    if (!firstSelectModel) {
-                        firstSelectModel = photoModel;
+                }
+                if (selectList.count > 0) {
+                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
+                    NSArray *newArray = [selectList filteredArrayUsingPredicate:pred];
+                    if (newArray.count > 0) {
+                        HXPhotoModel *model = newArray.firstObject;
+                        [selectList removeObject:model];
+                        photoModel.selected = YES;
+                        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeLivePhoto || model.type == HXPhotoModelMediaTypeCameraPhoto)) {
+                            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                                [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:model] withObject:photoModel];
+                            }else {
+                                [self.selectedPhotos replaceObjectAtIndex:[self.selectedPhotos indexOfObject:model] withObject:photoModel];
+                            }
+                        }else {
+                            if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+                                [self.selectedCameraVideos replaceObjectAtIndex:[self.selectedCameraVideos indexOfObject:model] withObject:photoModel];
+                            }else {
+                                [self.selectedVideos replaceObjectAtIndex:[self.selectedVideos indexOfObject:model] withObject:photoModel];
+                            }
+                        }
+                        [self.selectedList replaceObjectAtIndex:[self.selectedList indexOfObject:model] withObject:photoModel];
+                        photoModel.thumbPhoto = model.thumbPhoto;
+                        photoModel.previewPhoto = model.previewPhoto;
+                        photoModel.selectIndexStr = model.selectIndexStr;
+                        if (!firstSelectModel) {
+                            firstSelectModel = photoModel;
+                        }
                     }
                 }
             }
@@ -646,15 +665,11 @@
                 }else {
                     photoModel.type = HXPhotoModelMediaTypePhoto;
                 }
-//                if (!photoModel.isICloud) {
-                    [photoArray addObject:photoModel];
-//                }
+                [photoArray addObject:photoModel];
             }else if (asset.mediaType == PHAssetMediaTypeVideo) {
                 photoModel.subType = HXPhotoModelMediaSubTypeVideo;
                 photoModel.type = HXPhotoModelMediaTypeVideo;
-//                if (!photoModel.isICloud) {
-                    [videoArray addObject:photoModel];
-//                }
+                [videoArray addObject:photoModel];
                 // 默认视频都是可选的
                 [self changeModelVideoState:photoModel];
             }
@@ -730,47 +745,45 @@
             HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
             photoModel.asset = asset;
             photoModel.clarityScale = self.configuration.clarityScale;
-            if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
-                if (self.iCloudUploadArray.count) {
-//                    NSString *property = @"asset";
-//                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K = %@", property, asset];
-                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
-                    NSArray *newArray = [self.iCloudUploadArray filteredArrayUsingPredicate:pred];
-                    if (!newArray.count) {
-                        photoModel.isICloud = YES;
-                    }
-                }else {
-                    photoModel.isICloud = YES;
-                }
-            }
-            if (selectList.count > 0) {
-//                NSString *property = @"asset";
-//                NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K = %@", property, asset];
-                NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
-                NSArray *newArray = [selectList filteredArrayUsingPredicate:pred];
-                if (newArray.count > 0) {
-                    HXPhotoModel *model = newArray.firstObject;
-                    [selectList removeObject:model];
-                    photoModel.selected = YES;
-                    if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeLivePhoto || model.type == HXPhotoModelMediaTypeCameraPhoto)) {
-                        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-                            [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:model] withObject:photoModel];
-                        }else {
-                            [self.selectedPhotos replaceObjectAtIndex:[self.selectedPhotos indexOfObject:model] withObject:photoModel];
+            @autoreleasepool {
+                if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
+                    if (self.iCloudUploadArray.count) {
+                        NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
+                        NSArray *newArray = [self.iCloudUploadArray filteredArrayUsingPredicate:pred];
+                        if (!newArray.count) {
+                            photoModel.isICloud = YES;
                         }
                     }else {
-                        if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-                            [self.selectedCameraVideos replaceObjectAtIndex:[self.selectedCameraVideos indexOfObject:model] withObject:photoModel];
-                        }else {
-                            [self.selectedVideos replaceObjectAtIndex:[self.selectedVideos indexOfObject:model] withObject:photoModel];
-                        }
+                        photoModel.isICloud = YES;
                     }
-                    [self.selectedList replaceObjectAtIndex:[self.selectedList indexOfObject:model] withObject:photoModel];
-                    photoModel.thumbPhoto = model.thumbPhoto;
-                    photoModel.previewPhoto = model.previewPhoto; 
-                    photoModel.selectIndexStr = model.selectIndexStr;
-                    if (!firstSelectModel) {
-                        firstSelectModel = photoModel;
+                }
+                if (selectList.count > 0) {
+                    NSPredicate *pred = [NSPredicate predicateWithFormat:@"localIdentifier = %@", asset.localIdentifier];
+                    NSArray *newArray = [selectList filteredArrayUsingPredicate:pred];
+                    if (newArray.count > 0) {
+                        HXPhotoModel *model = newArray.firstObject;
+                        [selectList removeObject:model];
+                        photoModel.selected = YES;
+                        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeLivePhoto || model.type == HXPhotoModelMediaTypeCameraPhoto)) {
+                            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+                                [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:model] withObject:photoModel];
+                            }else {
+                                [self.selectedPhotos replaceObjectAtIndex:[self.selectedPhotos indexOfObject:model] withObject:photoModel];
+                            }
+                        }else {
+                            if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+                                [self.selectedCameraVideos replaceObjectAtIndex:[self.selectedCameraVideos indexOfObject:model] withObject:photoModel];
+                            }else {
+                                [self.selectedVideos replaceObjectAtIndex:[self.selectedVideos indexOfObject:model] withObject:photoModel];
+                            }
+                        }
+                        [self.selectedList replaceObjectAtIndex:[self.selectedList indexOfObject:model] withObject:photoModel];
+                        photoModel.thumbPhoto = model.thumbPhoto;
+                        photoModel.previewPhoto = model.previewPhoto;
+                        photoModel.selectIndexStr = model.selectIndexStr;
+                        if (!firstSelectModel) {
+                            firstSelectModel = photoModel;
+                        }
                     }
                 }
             }
@@ -1668,7 +1681,7 @@
     return self.iCloudUploadArray;
 }
 - (NSString *)version {
-    return @"2.2.3";
+    return @"2.2.3.1";
 }
 
 #pragma mark - < 保存草稿功能 >

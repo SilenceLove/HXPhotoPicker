@@ -160,7 +160,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         for (HXPhotoModel *photoModel in self.manager.afterSelectedArray) {
             [self.imageList addObject:photoModel.thumbPhoto];
         }
-        [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
+        if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+            [self.delegate photoListViewControllerDidDone:self allList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
+        }
+        [self setupDataWithAllList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
     }
 }
 - (void)jumpPreviewViewControllerWithModel:(HXPhotoModel *)model {
@@ -213,7 +216,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         for (HXPhotoModel *photoModel in self.manager.afterSelectedArray) {
             [self.imageList addObject:photoModel.thumbPhoto];
         }
-        [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
+        if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+            [self.delegate photoListViewControllerDidDone:self allList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
+        }
+        [self setupDataWithAllList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
     }
 }
 
@@ -225,7 +231,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     _showAddCell = showAddCell;
     self.tempShowAddCell = showAddCell;
     if (self.manager.afterSelectedArray.count > 0) {
-        [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
+        [self setupDataWithAllList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
     }
 }
 - (NSString *)addImageName {
@@ -249,7 +255,7 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
  刷新视图
  */
 - (void)refreshView {
-    [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
+    [self setupDataWithAllList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
@@ -364,7 +370,6 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
  */
 - (void)goPhotoViewController {
     if (self.outerCamera) {
-//        self.manager.openCamera = NO;
             if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
                 self.manager.configuration.maxNum = self.manager.configuration.photoMaxNum;
             }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
@@ -386,9 +391,6 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         
         [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleCancel handler:nil]];
         [self.hx_viewController presentViewController:alertController animated:YES completion:nil];
-//        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] destructiveButtonTitle:nil otherButtonTitles:[NSBundle hx_localizedStringForKey:@"相机"],[NSBundle hx_localizedStringForKey:@"相册"], nil];
-//
-//        [sheet showInView:self];
         return;
     }
     [self directGoPhotoViewController];
@@ -526,7 +528,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             self.imageChangeCompleteBlock(self.imageList);
         }
     }
-    [self photoViewControllerDidNext:self.manager.afterSelectedArray.copy Photos:self.manager.afterSelectedPhotoArray.copy Videos:self.manager.afterSelectedVideoArray.copy Original:self.manager.afterOriginal];
+    if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+        [self.delegate photoListViewControllerDidDone:self allList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
+    }
+    [self setupDataWithAllList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
 }
 
 - (void)deleteModelWithIndex:(NSInteger)index {
@@ -600,7 +605,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
     }
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
-        [self.delegate photoView:self changeComplete:self.dataList photos:self.photos videos:self.videos original:self.original];
+        [self.delegate photoView:self changeComplete:self.dataList.copy photos:self.photos.copy videos:self.videos.copy original:self.original];
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+        [self.delegate photoListViewControllerDidDone:self allList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
     }
     if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:allAssetList:photoAssets:videoAssets:original:)]) {
         NSMutableArray *allAsset = [NSMutableArray array];
@@ -644,7 +653,10 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
 }
 - (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
-    [self photoViewControllerDidNext:allList Photos:photoList Videos:videoList Original:original];
+    if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+        [self.delegate photoListViewControllerDidDone:self allList:allList photos:photoList videos:videoList original:original];
+    }
+    [self setupDataWithAllList:allList photos:photoList videos:videoList original:original];
 }
 - (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllImage:(NSArray<UIImage *> *)imageList original:(BOOL)original {
     self.imageList = [NSMutableArray arrayWithArray:imageList];
@@ -669,9 +681,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
-    [self photoViewControllerDidNext:allList Photos:photoList Videos:videoList Original:original];
+    if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+        [self.delegate photoListViewControllerDidDone:self allList:allList photos:photoList videos:videoList original:original];
+    }
+    [self setupDataWithAllList:allList photos:photoList videos:videoList original:original];
 }
-- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original {
+- (void)setupDataWithAllList:(NSArray *)allList photos:(NSArray *)photos videos:(NSArray *)videos original:(BOOL)original {
     self.original = original;
     NSMutableArray *tempAllArray = [NSMutableArray array];
     NSMutableArray *tempPhotoArray = [NSMutableArray array];
@@ -732,6 +747,12 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
     [self setupNewFrame];
 }
+- (void)photoViewControllerDidNext:(NSArray<HXPhotoModel *> *)allList Photos:(NSArray<HXPhotoModel *> *)photos Videos:(NSArray<HXPhotoModel *> *)videos Original:(BOOL)original {
+    if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+        [self.delegate photoListViewControllerDidDone:self allList:allList.copy photos:photos.copy videos:videos.copy original:original];
+    }
+    [self setupDataWithAllList:allList photos:photos videos:videos original:original];
+}
 
 - (void)photoViewControllerDidCancel {
     if ([self.delegate respondsToSelector:@selector(photoViewDidCancel:)]) {
@@ -763,10 +784,6 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
             [self.imageList replaceObjectAtIndex:fromIndexPath.item withObject:toImage];
         }
     }
-//    [self.manager.endSelectedList removeObject:toModel];
-//    [self.manager.endSelectedList insertObject:toModel atIndex:toIndexPath.item];
-//    [self.manager.endSelectedList removeObject:fromModel];
-//    [self.manager.endSelectedList insertObject:fromModel atIndex:fromIndexPath.item];
     [self.photos removeAllObjects];
     [self.videos removeAllObjects];
     NSInteger i = 0;
@@ -781,20 +798,6 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
     }
     [self.manager setAfterSelectedPhotoArray:self.photos];
     [self.manager setAfterSelectedVideoArray:self.videos];
-//    int i = 0, j = 0, k = 0;
-//    for (HXPhotoModel *model in self.manager.endSelectedList) {
-//        model.selectIndexStr = [NSString stringWithFormat:@"%d",k + 1];
-//        if ((model.type == HXPhotoModelMediaTypePhoto || model.type == HXPhotoModelMediaTypePhotoGif) || (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeLivePhoto)) {
-//            model.endIndex = i++;
-//            [self.photos addObject:model];
-//        }else if (model.type == HXPhotoModelMediaTypeVideo || model.type == HXPhotoModelMediaTypeCameraVideo) {
-//            model.endIndex = j++;
-//            [self.videos addObject:model];
-//        }
-//        model.endCollectionIndex = k++;
-//    }
-//    self.manager.endSelectedPhotos = [NSMutableArray arrayWithArray:self.photos];
-//    self.manager.endSelectedVideos = [NSMutableArray arrayWithArray:self.videos];
 }
 
 - (void)dragCellCollectionViewCellEndMoving:(HXCollectionView *)collectionView {
@@ -807,9 +810,11 @@ static NSString *HXPhotoSubViewCellId = @"photoSubViewCellId";
         }
     }
     if ([self.delegate respondsToSelector:@selector(photoView:changeComplete:photos:videos:original:)]) {
-        [self.delegate photoView:self changeComplete:self.dataList.mutableCopy photos:self.photos.mutableCopy videos:self.videos.mutableCopy original:self.original];
+        [self.delegate photoView:self changeComplete:self.dataList.copy photos:self.photos.copy videos:self.videos.copy original:self.original];
     }
-    
+    if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
+        [self.delegate photoListViewControllerDidDone:self allList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
+    }
     if ([self.delegate respondsToSelector:@selector(photoViewChangeComplete:allAssetList:photoAssets:videoAssets:original:)]) {
         NSMutableArray *allAsset = [NSMutableArray array];
         NSMutableArray *photoAssets = [NSMutableArray array];

@@ -107,9 +107,10 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @optional
 
 /**
- 照片/视频发生改变时调用 - 选择、移动顺序、删除
-
- @param photoView 视图本身
+ 照片/视频发生改变、HXPohotView初始化、manager赋值时调用 - 选择、移动顺序、删除、刷新视图
+ 调用 refreshView 会触发此代理
+ 
+ @param photoView self
  @param allList 所有类型的模型数组
  @param photos 照片类型的模型数组
  @param videos 视频类型的模型数组
@@ -128,10 +129,26 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
                        original:(BOOL)isOriginal;
 
 /**
+ 相册相片列表点击了完成按钮/删除/移动、HXPohotView初始化且有数据、manager赋值且有数据时
+ 调用 refreshView 不会触发此代理
+
+ @param photoView self
+ @param allList 所有类型的模型数组
+ @param photos 照片类型的模型数组
+ @param videos 视频类型的模型数组
+ @param isOriginal 是否原图
+ */
+- (void)photoListViewControllerDidDone:(HXPhotoView *)photoView
+                               allList:(NSArray<HXPhotoModel *> *)allList
+                                photos:(NSArray<HXPhotoModel *> *)photos
+                                videos:(NSArray<HXPhotoModel *> *)videos
+                              original:(BOOL)isOriginal;
+
+/**
  照片/视频发生改变时调用 - 选择、移动顺序、删除
  requestImageAfterFinishingSelection == YES 时 才会有回调
  
- @param photoView 视图本身
+ @param photoView self
  @param imageList 图片数组
  */
 - (void)photoView:(HXPhotoView *)photoView imageChangeComplete:(NSArray<UIImage *> *)imageList;
@@ -146,7 +163,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /**
  当view高度改变时调用
 
- @param photoView 视图本身
+ @param photoView self
  @param frame 位置大小
  */
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame;
@@ -161,7 +178,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /**
  删除网络图片时调用
 
- @param photoView 视图本身
+ @param photoView self
  @param networkPhotoUrl 被删除的图片地址
  */
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl;
@@ -178,7 +195,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /**
  长按手势结束时是否删除当前拖动的cell
  
- @param photoView 视图本身
+ @param photoView self
  @return 是否删除
  */
 - (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView
@@ -188,7 +205,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /**
  长按手势发生改变时调用
 
- @param photoView 视图本身
+ @param photoView self
  @param longPgr 长按手势识别器
  */
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerChange:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
@@ -196,7 +213,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /**
  长按手势开始时调用
 
- @param photoView 视图本身
+ @param photoView self
  @param longPgr 长按手势识别器
  */
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
@@ -204,7 +221,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /**
  长按手势结束时调用
 
- @param photoView 视图本身
+ @param photoView self
  @param longPgr 长按手势识别器
  */
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;

@@ -27,6 +27,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
 @interface HXPhotoConfiguration : NSObject
 
 /**
+ 照片列表是否按照片日期排序  默认YES
+ */
+@property (assign, nonatomic) BOOL creationDateSort;
+
+/**
  相册列表展示方式
  */
 @property (assign, nonatomic) HXPhotoAlbumShowMode albumShowMode;

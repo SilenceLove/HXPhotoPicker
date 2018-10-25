@@ -315,7 +315,9 @@ HXDateVideoEditViewControllerDelegate
         }
         if (self.manager.configuration.singleSelected) {
             self.selectBtn.hidden = YES;
-            self.bottomView.hideEditBtn = self.manager.configuration.singleJumpEdit;
+            if (self.manager.configuration.singleJumpEdit) {
+                self.bottomView.hideEditBtn = YES;
+            }
         }else {
             #pragma mark - < 单选视频时隐藏选择按钮 >
             if (model.needHideSelectBtn) {
@@ -562,9 +564,25 @@ HXDateVideoEditViewControllerDelegate
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             // 为视频时
 //            self.bottomView.enabled = self.manager.configuration.videoCanEdit;
-            self.bottomView.hideEditBtn = !self.manager.configuration.videoCanEdit;
+            if (self.manager.configuration.singleSelected) {
+                if (!self.manager.configuration.singleJumpEdit) {
+                    self.bottomView.hideEditBtn = !self.manager.configuration.videoCanEdit;
+                }else {
+                    self.bottomView.hideEditBtn = YES;
+                }
+            }else {
+                self.bottomView.hideEditBtn = !self.manager.configuration.videoCanEdit;
+            }
         }else {
-            self.bottomView.hideEditBtn = !self.manager.configuration.photoCanEdit;
+            if (self.manager.configuration.singleSelected) {
+                if (!self.manager.configuration.singleJumpEdit) {
+                    self.bottomView.hideEditBtn = !self.manager.configuration.photoCanEdit;
+                }else {
+                    self.bottomView.hideEditBtn = YES;
+                }
+            }else {
+                self.bottomView.hideEditBtn = !self.manager.configuration.photoCanEdit;
+            }
             if (!self.manager.configuration.selectTogether) {
                 // 照片,视频不能同时选择时
                 if (self.manager.selectedVideoArray.count > 0) {
@@ -615,13 +633,15 @@ HXDateVideoEditViewControllerDelegate
                 [self.bottomView deselected];
             }
         }else {
-            #pragma mark - < 单选视频时隐藏选择按钮 >
-            if (model.needHideSelectBtn) {
-                self.selectBtn.hidden = YES;
-                self.selectBtn.userInteractionEnabled = NO;
-            }else {
-                self.selectBtn.hidden = NO;
-                self.selectBtn.userInteractionEnabled = YES;
+            if (!self.manager.configuration.singleSelected) {
+#pragma mark - < 单选视频时隐藏选择按钮 >
+                if (model.needHideSelectBtn) {
+                    self.selectBtn.hidden = YES;
+                    self.selectBtn.userInteractionEnabled = NO;
+                }else {
+                    self.selectBtn.hidden = NO;
+                    self.selectBtn.userInteractionEnabled = YES;
+                }
             }
             if ([[self.manager selectedArray] containsObject:model]) {
                 self.bottomView.currentIndex = [[self.manager selectedArray] indexOfObject:model];
