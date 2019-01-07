@@ -20,14 +20,30 @@
 @class HXDatePhotoPreviewViewController,HXDatePhotoPreviewBottomView,HXDatePhotoPreviewViewCell;
 @protocol HXDatePhotoPreviewViewControllerDelegate <NSObject>
 @optional
-- (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
+- (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController
+                                      model:(HXPhotoModel *)model;
+
 - (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController;
-- (void)datePhotoPreviewDidEditClick:(HXDatePhotoPreviewViewController *)previewController;
-- (void)datePhotoPreviewSingleSelectedClick:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
-- (void)datePhotoPreviewDownLoadICloudAssetComplete:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
-- (void)datePhotoPreviewSelectLaterDidEditClick:(HXDatePhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
-- (void)datePhotoPreviewDidDeleteClick:(HXDatePhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model deleteIndex:(NSInteger)index;
-- (void)datePhotoPreviewCellDownloadImageComplete:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model;
+
+- (void)datePhotoPreviewDidEditClick:(HXDatePhotoPreviewViewController *)previewController
+                               model:(HXPhotoModel *)model
+                         beforeModel:(HXPhotoModel *)beforeModel;
+
+- (void)datePhotoPreviewSingleSelectedClick:(HXDatePhotoPreviewViewController *)previewController
+                                      model:(HXPhotoModel *)model;
+
+- (void)datePhotoPreviewDownLoadICloudAssetComplete:(HXDatePhotoPreviewViewController *)previewController
+                                              model:(HXPhotoModel *)model;
+
+- (void)datePhotoPreviewSelectLaterDidEditClick:(HXDatePhotoPreviewViewController *)previewController
+                                    beforeModel:(HXPhotoModel *)beforeModel
+                                     afterModel:(HXPhotoModel *)afterModel;
+
+- (void)datePhotoPreviewDidDeleteClick:(HXDatePhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model
+                           deleteIndex:(NSInteger)index;
+
+- (void)datePhotoPreviewCellDownloadImageComplete:(HXDatePhotoPreviewViewController *)previewController
+                                            model:(HXPhotoModel *)model;
 @end
 
 @interface HXDatePhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
@@ -64,14 +80,19 @@
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic, readonly) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic, readonly) UIImage *gifImage;
+@property (strong, nonatomic, readonly) UIScrollView *scrollView;
 @property (strong, nonatomic) UIButton *videoPlayBtn;
+@property (assign, nonatomic) CGFloat zoomScale;
 @property (assign, nonatomic) BOOL dragging;
 @property (nonatomic, copy) void (^cellTapClick)(void);
 @property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
 @property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXDatePhotoPreviewViewCell *myCell);
 @property (nonatomic, copy) void (^cellDownloadImageComplete)(HXDatePhotoPreviewViewCell *myCell);
 - (void)againAddImageView;
-- (void)resetScale;
+- (void)refreshImageSize;
+- (void)resetScale:(BOOL)animated;
+- (void)resetScale:(CGFloat)scale animated:(BOOL)animated;
 - (void)requestHDImage;
 - (void)cancelRequest;
+- (CGSize)getImageSize;
 @end

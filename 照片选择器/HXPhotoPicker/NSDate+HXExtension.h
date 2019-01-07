@@ -15,30 +15,30 @@
 
  @return yes or no
  */
-- (BOOL)isToday;
+- (BOOL)hx_isToday;
 
 /**
  是否昨天
 
  @return yes or no
  */
-- (BOOL)isYesterday;
+- (BOOL)hx_isYesterday;
 
 /**
  是否今年
  
  @return yes or no
  */
-- (BOOL)isThisYear;
+- (BOOL)hx_isThisYear;
 
 /**
  和今天是否在同一周
  
  @return yes or no
  */
-- (BOOL)isSameWeek;
+- (BOOL)hx_isSameWeek;
 
-- (NSString *)getNowWeekday;
+- (NSString *)hx_getNowWeekday;
 
 /**
  按指定格式获取当前的时间
@@ -46,5 +46,13 @@
  @param format 格式
  @return 日期字符串
  */
-- (NSString *)dateStringWithFormat:(NSString *)format;
+- (NSString *)hx_dateStringWithFormat:(NSString *)format;
+
+/**
+ 是否是同一天
+
+ @param date 需要比较的NSDate
+ @return yes or no
+ */
+- (BOOL)hx_isSameDay:(NSDate*)date;
 @end

@@ -16,10 +16,20 @@
 #define NSSLog(...)
 #endif
 
+
+/**
+ 版本号 x.x.x
+ */
+#define HXVersion @"2.2.4"
+
 #define HXEncodeKey @"HXModelArray"
 
 #define HXShowLog YES
+
 #define HX_UI_IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+
+#define HX_IS_IPHONEX (CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(375, 812)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(812, 375)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(414, 896)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(896, 414)))
+
 // 判断iPhone X
 #define HX_Is_iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
 
@@ -32,21 +42,20 @@
 //判断iPhoneXs Max
 #define HX_Is_iPhoneXS_MAX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1242, 2688), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)
 
-#define HX_IS_IPhoneX_All (HX_Is_iPhoneX || HX_Is_iPhoneXR || HX_Is_iPhoneXS || HX_Is_iPhoneXS_MAX)
-
+#define HX_IS_IPhoneX_All (HX_Is_iPhoneX || HX_Is_iPhoneXR || HX_Is_iPhoneXS || HX_Is_iPhoneXS_MAX || HX_IS_IPHONEX) 
 
 // 导航栏 + 状态栏 的高度
 #define hxNavigationBarHeight (HX_IS_IPhoneX_All ? 88 : 64)
 #define hxTopMargin (HX_IS_IPhoneX_All ? 44 : 0)
 #define hxBottomMargin (HX_IS_IPhoneX_All ? 34 : 0)
 
-#define iOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)
+#define HX_IOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)
 
-#define iOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
+#define HX_IOS91Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 
-#define iOS9_Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
+#define HX_IOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
 
-#define iOS8_2Later ([UIDevice currentDevice].systemVersion.floatValue >= 8.2f)
+#define HX_IOS82Later ([UIDevice currentDevice].systemVersion.floatValue >= 8.2f)
 
 // 弱引用
 #define HXWeakSelf __weak typeof(self) weakSelf = self;

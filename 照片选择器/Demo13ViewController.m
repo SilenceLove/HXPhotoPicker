@@ -81,16 +81,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
                         [viewController presentViewController:nav animated:NO completion:nil];
                     }
                 }else {
-                    [viewController.view showLoadingHUDText:nil];
-                    [HXPhotoTools getImageData:beforeModel.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-                        
-                    } progressHandler:^(double progress) {
-                        
-                    } completion:^(NSData *imageData, UIImageOrientation orientation) {
-                        [viewController.view handleLoading];
+                    [viewController.view hx_showLoadingHUDText:nil];
+                    [beforeModel requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+                        [viewController.view hx_handleLoading];
                         UIImage *image = [UIImage imageWithData:imageData];
                         if (image.imageOrientation != UIImageOrientationUp) {
-                            image = [image normalizedImage];
+                            image = [image hx_normalizedImage];
                         }
                         LFPhotoEditingController *lfPhotoEditVC = [[LFPhotoEditingController alloc] init];
                         lfPhotoEditVC.oKButtonTitleColorNormal = weakSelf.manager.configuration.themeColor;
@@ -111,10 +107,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
                             [nav setNavigationBarHidden:YES];
                             [viewController presentViewController:nav animated:NO completion:nil];
                         }
-                    } failed:^(NSDictionary *info) {
-                        [viewController.view handleLoading];
-                        [viewController.view showImageHUDText:@"资源获取失败!"];
-                    }];
+                    } failed:^(NSDictionary *info, HXPhotoModel *model) {
+                        [viewController.view hx_handleLoading];
+                        [viewController.view hx_showImageHUDText:@"资源获取失败!"];
+                    }]; 
                 }
             }else {
                 weakSelf.beforeVideoModel = beforeModel;
@@ -137,15 +133,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
                         [viewController presentViewController:nav animated:NO completion:nil];
                     }
                 }else {
-                    [viewController.view showLoadingHUDText:nil];
-                    [HXPhotoTools getAVAssetWithPHAsset:beforeModel.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
+                    [viewController.view hx_showLoadingHUDText:nil];
+                    [beforeModel requestAVAssetStartRequestICloud:nil progressHandler:nil success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
                         
-                    } progressHandler:^(double progress) {
-                        
-                    } completion:^(AVAsset *asset) {
-                        [viewController.view handleLoading];
-                        if ([asset isKindOfClass:[AVURLAsset class]]) {
-                            NSURL *video = [(AVURLAsset *)asset URL];
+                        [viewController.view hx_handleLoading];
+                        if ([avAsset isKindOfClass:[AVURLAsset class]]) {
+                            NSURL *video = [(AVURLAsset *)avAsset URL];
                             
                             LFVideoEditingController *lfVideoEditVC = [[LFVideoEditingController alloc] init];
                             lfVideoEditVC.delegate = weakSelf;
@@ -153,7 +146,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                             if ([beforeModel.tempAsset isKindOfClass:[LFVideoEdit class]]) {
                                 lfVideoEditVC.videoEdit = beforeModel.tempAsset;
                             } else {
-                                [lfVideoEditVC setVideoURL:video placeholderImage:[HXPhotoTools thumbnailImageForVideo:video atTime:0.1f]];
+                                [lfVideoEditVC setVideoURL:video placeholderImage:[UIImage hx_thumbnailImageForVideo:video atTime:0.1f]];
                             }
                             if (!weakSelf.isOutside) {
                                 [viewController.navigationController setNavigationBarHidden:YES];
@@ -166,7 +159,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                             }
                         }else {
                             [weakSelf.toolManager writeSelectModelListToTempPathWithList:@[beforeModel] requestType:1 success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
-                                [viewController.view handleLoading];
+                                [viewController.view hx_handleLoading];
                                 NSURL *video = videoURL.firstObject;
                                 
                                 LFVideoEditingController *lfVideoEditVC = [[LFVideoEditingController alloc] init];
@@ -175,7 +168,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                                 if ([beforeModel.tempAsset isKindOfClass:[LFVideoEdit class]]) {
                                     lfVideoEditVC.videoEdit = beforeModel.tempAsset;
                                 } else {
-                                    [lfVideoEditVC setVideoURL:video placeholderImage:[HXPhotoTools thumbnailImageForVideo:video atTime:0.1f]];
+                                    [lfVideoEditVC setVideoURL:video placeholderImage:[UIImage hx_thumbnailImageForVideo:video atTime:0.1f]];
                                 }
                                 if (!weakSelf.isOutside) {
                                     [viewController.navigationController setNavigationBarHidden:YES];
@@ -187,13 +180,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
                                     [viewController presentViewController:nav animated:NO completion:nil];
                                 }
                             } failed:^{
-                                [viewController.view handleLoading];
-                                [viewController.view showImageHUDText:@"资源获取失败!"];
+                                [viewController.view hx_handleLoading];
+                                [viewController.view hx_showImageHUDText:@"资源获取失败!"];
                             }];
                         }
-                    } failed:^(NSDictionary *info) {
-                        [viewController.view handleLoading];
-                        [viewController.view showImageHUDText:@"资源获取失败!"];
+                    } failed:^(NSDictionary *info, HXPhotoModel *model) {
+                        [viewController.view hx_handleLoading];
+                        [viewController.view hx_showImageHUDText:@"资源获取失败!"];
                     }];
                 }
             }

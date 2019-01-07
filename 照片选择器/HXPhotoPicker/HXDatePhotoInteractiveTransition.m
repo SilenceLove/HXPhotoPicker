@@ -10,7 +10,7 @@
 #import "HXDatePhotoPreviewViewController.h"
 #import "HXDatePhotoViewController.h"
 #import "HXDatePhotoPreviewBottomView.h"
-@interface HXDatePhotoInteractiveTransition ()
+@interface HXDatePhotoInteractiveTransition ()<UIGestureRecognizerDelegate>
 @property (nonatomic, weak) id<UIViewControllerContextTransitioning> transitionContext;
 @property (nonatomic, weak) UIViewController *vc;
 @property (strong, nonatomic) UIImageView *imageView;
@@ -27,8 +27,38 @@
 @implementation HXDatePhotoInteractiveTransition
 - (void)addPanGestureForViewController:(UIViewController *)viewController{
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
+    pan.delegate = self;
     self.vc = viewController;
     [viewController.view addGestureRecognizer:pan];
+    
+//    [viewController.view setMultipleTouchEnabled:YES];
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    if ([otherGestureRecognizer.view isKindOfClass:[UIScrollView class]] &&
+        ![otherGestureRecognizer.view isKindOfClass:[UICollectionView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)otherGestureRecognizer.view;
+        if (scrollView.contentOffset.y <= 0 &&
+            !scrollView.dragging &&
+            !scrollView.zooming &&
+            !scrollView.isZoomBouncing) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    HXDatePhotoPreviewViewController *previewVC = (HXDatePhotoPreviewViewController *)self.vc;
+    HXDatePhotoPreviewViewCell *viewCell = [previewVC currentPreviewCell:previewVC.modelArray[previewVC.currentModelIndex]];
+    if (viewCell.scrollView.dragging ||
+        viewCell.scrollView.zooming ||
+        viewCell.scrollView.zoomScale < 1.0f ||
+        viewCell.scrollView.isZoomBouncing) {
+        [gestureRecognizer cancelsTouchesInView];
+        return NO;
+    } 
+    [viewCell.scrollView setContentOffset:viewCell.scrollView.contentOffset animated:NO];
+    return YES;
 }
 - (void)gestureRecognizeDidUpdate:(UIPanGestureRecognizer *)gestureRecognizer {
     CGFloat scale = 0;
@@ -40,20 +70,22 @@
         scale = 1.f;
     }
     switch (gestureRecognizer.state) {
-        case UIGestureRecognizerStateBegan:
+        case UIGestureRecognizerStateBegan: {
             if (scale < 0) {
                 [gestureRecognizer cancelsTouchesInView];
                 return;
             }
-            if (![(HXDatePhotoPreviewViewController *)self.vc bottomView].userInteractionEnabled && iOS11_Later) {
-                [(HXDatePhotoPreviewViewController *)self.vc setSubviewAlphaAnimate:NO duration:0.3f];
+            HXDatePhotoPreviewViewController *previewVC = (HXDatePhotoPreviewViewController *)self.vc;
+            if (![previewVC bottomView].userInteractionEnabled && HX_IOS11_Later) {
+                [previewVC setSubviewAlphaAnimate:NO duration:0.3f];
             }
-            [(HXDatePhotoPreviewViewController *)self.vc setStopCancel:YES];
+            [previewVC setStopCancel:YES];
             self.beginX = [gestureRecognizer locationInView:gestureRecognizer.view].x;
             self.beginY = [gestureRecognizer locationInView:gestureRecognizer.view].y;
             self.interation = YES;
             [self.vc.navigationController popViewControllerAnimated:YES];
-            break;
+            
+        }   break;
         case UIGestureRecognizerStateChanged:
             if (self.interation) {
                 if (scale < 0.f) {
@@ -87,6 +119,7 @@
             }
             break;
         default:
+            self.vc.view.userInteractionEnabled = YES;
             if (self.interation) {
                 self.interation = NO;
                 [self cancelInteractiveTransition];
@@ -107,6 +140,7 @@
     HXDatePhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     HXDatePhotoViewCell *toCell = [toVC currentPreviewCell:model];
     self.fromCell = fromCell;
+    self.fromCell.scrollView.scrollEnabled = NO;
     
     UIView *containerView = [transitionContext containerView];
     CGRect tempImageViewFrame;
@@ -139,6 +173,7 @@
 //            }
         }
     }
+    
     self.tempImageView.clipsToBounds = YES;
     self.tempImageView.contentMode = UIViewContentModeScaleAspectFill;
     BOOL contains = YES;
@@ -166,8 +201,13 @@
     }
     self.tempImageView.layer.anchorPoint = CGPointMake(scaleX, scaleY);
     
+    
+    [fromCell resetScale:NO];
+    [fromCell refreshImageSize];
+    
     self.tempImageView.frame = tempImageViewFrame;
     self.transitionImgViewCenter = self.tempImageView.center;
+    
     [containerView addSubview:toVC.view];
     [containerView addSubview:fromVC.view];
     [toVC.view insertSubview:self.bgView belowSubview:toVC.bottomView];
@@ -216,11 +256,14 @@
         fromVC.view.alpha = 1;
         self.tempImageView.transform = CGAffineTransformIdentity;
         self.tempImageView.center = self.transitionImgViewCenter;
+//        self.tempImageView.hx_size = [self.fromCell getImageSize];
+        
         self.bgView.alpha = 1;
         if (!fromVC.bottomView.userInteractionEnabled) {
             toVC.bottomView.alpha = 0;
         }
     } completion:^(BOOL finished) {
+        self.fromCell.scrollView.scrollEnabled = YES;
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
         fromVC.collectionView.hidden = NO;
         if (!fromVC.bottomView.userInteractionEnabled) {
@@ -232,7 +275,7 @@
         self.tempCell = nil;
         [self.tempImageView removeFromSuperview];
         self.tempImageView.layer.anchorPoint = CGPointMake(0.5f, 0.5f);
-        [self.fromCell againAddImageView];
+        [self.fromCell againAddImageView]; 
         self.playerLayer = nil;
         [self.bgView removeFromSuperview];
         self.bgView = nil;

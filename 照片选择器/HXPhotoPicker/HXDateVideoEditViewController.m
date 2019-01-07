@@ -89,17 +89,15 @@ HXDataVideoEditBottomViewDelegate
     [self getVideo];
 }
 - (void)getVideo {
-    [self.view showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
-    __weak typeof(self) weakSelf = self;
-    self.requestId = [HXPhotoTools getAVAssetWithModel:self.model startRequestIcloud:^(HXPhotoModel *model, PHImageRequestID cloudRequestId) {
-        weakSelf.requestId = cloudRequestId;
-    } progressHandler:^(HXPhotoModel *model, double progress) {
-        
-    } completion:^(HXPhotoModel *model, AVAsset *asset) {
-        [weakSelf getVideoEachFrame:asset];
-    } failed:^(HXPhotoModel *model, NSDictionary *info) {
-        [weakSelf.view handleLoading];
-    }];
+    [self.view hx_showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
+    HXWeakSelf
+    self.requestId = [self.model requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+        weakSelf.requestId = iCloudRequestId;
+    } progressHandler:nil success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
+        [weakSelf getVideoEachFrame:avAsset];
+    } failed:^(NSDictionary *info, HXPhotoModel *model) {
+        [weakSelf.view hx_handleLoading];
+    }]; 
 }
 - (void)getVideoEachFrame:(AVAsset *)asset {
     __weak typeof(self) weakSelf = self;
@@ -114,7 +112,7 @@ HXDataVideoEditBottomViewDelegate
     itemWidth = itemHeight / 16 * 9;
     NSInteger total = (self.view.hx_w - 10) / itemWidth;
     [HXPhotoTools getVideoEachFrameWithAsset:asset total:total size:CGSizeMake(itemWidth * 5, itemHeight * 5) complete:^(AVAsset *asset, NSArray<UIImage *> *images) {
-        [weakSelf.view handleLoading];
+        [weakSelf.view hx_handleLoading];
         weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
         weakSelf.playerLayer.player = weakSelf.player;
         [weakSelf.player play];

@@ -25,15 +25,15 @@
 }
 - (void)setAlbumModelArray:(NSMutableArray *)albumModelArray {
     _albumModelArray = albumModelArray;
-    [self.tableView reloadData];
+//    [self.tableView reloadData];
     self.currentSelectModel = albumModelArray.firstObject;
-    [self refreshCamearCount];
+//    [self refreshCamearCount];
 }
 - (void)refreshCamearCount {
     NSInteger i = 0;
     for (HXAlbumModel *albumMd in self.albumModelArray) {
         albumMd.cameraCount = [self.manager cameraCount];
-        if (i == 0 && !albumMd.result) {
+        if (i == 0 && !albumMd.result && !albumMd.collection) {
             albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
         }
         i++;
@@ -47,6 +47,19 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HXAlbumlistViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass([HXAlbumlistViewCell class])];
     cell.model = self.albumModelArray[indexPath.row];
+    
+    HXWeakSelf
+    cell.getResultCompleteBlock = ^(NSInteger count, HXAlbumlistViewCell *myCell) {
+        if (count <= 0) {
+            if ([weakSelf.albumModelArray containsObject:myCell.model]) {
+                NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
+                if (myIndexPath) {
+                    [weakSelf.albumModelArray removeObject:myCell.model];
+                    [weakSelf.tableView deleteRowsAtIndexPaths:@[myIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+                }
+            }
+        }
+    };
     return cell;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -113,21 +126,36 @@
 }
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
-    NSInteger photoCount = model.result.count;
-    if (!model.asset) {
-        model.asset = model.result.lastObject;
+    self.albumNameLb.text = model.albumName;
+    if (!model.result && model.collection) {
+        HXWeakSelf
+        [model getResultWithCompletion:^(HXAlbumModel *albumModel) {
+            if (albumModel == weakSelf.model) {
+                [weakSelf getAlbumImage];
+            }
+        }]; 
+    }else {
+        [self getAlbumImage];
     }
-    __weak typeof(self) weakSelf = self;
-    self.requestId = [HXPhotoTools getImageWithAlbumModel:model size:CGSizeMake(self.hx_h * 1.6, self.hx_h * 1.6) completion:^(UIImage *image, HXAlbumModel *model) {
-        if (weakSelf.model == model) {
+    if (!model.result || !model.count) {
+        self.coverView.image = model.tempImage ?: [UIImage hx_imageNamed:@"hx_yundian_tupian"];
+    }
+}
+- (void)getAlbumImage {
+    NSInteger photoCount = self.model.result.count;
+    if (!self.model.asset) {
+        self.model.asset = self.model.result.lastObject;
+    }
+    if (self.getResultCompleteBlock) {
+        self.getResultCompleteBlock(photoCount + self.model.cameraCount, self);
+    }
+    self.countLb.text = @(photoCount + self.model.cameraCount).stringValue;
+    HXWeakSelf
+    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset size:CGSizeMake(self.hx_h * 1.6, self.hx_h * 1.6) completion:^(UIImage *image, PHAsset *asset) {
+        if (asset == weakSelf.model.asset) {
             weakSelf.coverView.image = image;
         }
-    }];
-    self.albumNameLb.text = model.albumName;
-    self.countLb.text = @(photoCount + model.cameraCount).stringValue;
-    if (!model.result) {
-        self.coverView.image = model.tempImage ?: [HXPhotoTools hx_imageNamed:@"hx_yundian_tupian@3x.png"]; 
-    }
+    }]; 
 }
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
@@ -165,11 +193,11 @@
     self.coverView.frame = CGRectMake(12, 5, self.hx_h - 10, self.hx_h - 10);
     self.albumNameLb.hx_x = CGRectGetMaxX(self.coverView.frame) + 12;
     self.albumNameLb.hx_w = self.hx_w - self.albumNameLb.hx_x - 10;
-    self.albumNameLb.hx_h = [HXPhotoTools getTextHeight:self.albumNameLb.text width:self.albumNameLb.hx_w font:self.albumNameLb.font];
+    self.albumNameLb.hx_h = self.albumNameLb.hx_getTextHeight;
     
     self.countLb.hx_x = CGRectGetMaxX(self.coverView.frame) + 12;
     self.countLb.hx_w = self.hx_w - self.countLb.hx_x - 10;
-    self.countLb.hx_h = [HXPhotoTools getTextHeight:self.countLb.text width:self.countLb.hx_w font:self.countLb.font];
+    self.countLb.hx_h = 14;
     
     self.albumNameLb.hx_y = self.hx_h / 2 - self.albumNameLb.hx_h - 2;
     self.countLb.hx_y = self.hx_h / 2 + 2;
@@ -250,7 +278,7 @@
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
     self.titleLb.text = model.albumName;
-    CGFloat textWidth = [HXPhotoTools getTextWidth:self.titleLb.text height:20 font:[UIFont boldSystemFontOfSize:17]];
+    CGFloat textWidth = self.titleLb.hx_getTextWidth;
     if (textWidth > [UIScreen mainScreen].bounds.size.width - 120) {
         textWidth = [UIScreen mainScreen].bounds.size.width - 120;
     }
@@ -291,7 +319,7 @@
 }
 - (UIImageView *)arrowIcon {
     if (!_arrowIcon) {
-        _arrowIcon = [[UIImageView alloc] initWithImage:[[HXPhotoTools hx_imageNamed:@"hx_nav_arrow_down@2x.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+        _arrowIcon = [[UIImageView alloc] initWithImage:[[UIImage hx_imageNamed:@"hx_nav_arrow_down"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
         _arrowIcon.hx_size = _arrowIcon.image.size;
         _arrowIcon.tintColor = [UIColor blackColor];
         _arrowIcon.alpha = 0;

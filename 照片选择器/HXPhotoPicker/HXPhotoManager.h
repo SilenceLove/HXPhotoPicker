@@ -23,6 +23,12 @@ typedef void (^ viewControllerDidDoneAllAssetBlock)(NSArray<PHAsset *> *allAsset
 
 typedef void (^ viewControllerDidCancelBlock)(UIViewController *viewController, HXPhotoManager *manager);
 
+typedef void (^ getAllAlbumListBlock)(NSMutableArray<HXAlbumModel *> *albums);
+
+typedef void (^ getSelectAlbumBlock)(HXAlbumModel *selectedModel);
+
+typedef void (^ getPhotoListBlock)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
+
 /**
  *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
  */
@@ -39,23 +45,22 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 
 @interface HXPhotoManager : NSObject
 
+/**
+ 当前选择类型
+ */
 @property (assign, nonatomic) HXPhotoManagerSelectedType type;
+
+/**
+ 配置信息
+ */
+@property (strong, nonatomic) HXPhotoConfiguration *configuration;
 
 /**
  @param type 选择类型
  @return self
  */
 - (instancetype)initWithType:(HXPhotoManagerSelectedType)type;
-
-/**
- 配置信息
- */
-@property (strong, nonatomic) HXPhotoConfiguration *configuration; 
-
-@property (assign, nonatomic) HXPhotoManagerVideoSelectedType videoSelectedType;
-
-@property (strong, nonatomic) UIView *tempCameraPreviewView;
-@property (strong, nonatomic) UIView *tempCameraView;
++ (instancetype)managerWithType:(HXPhotoManagerSelectedType)type;
 
 /**
  添加模型数组
@@ -78,88 +83,107 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 - (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
 
 /**
+ 建议使用 addCustomAssetModel: 此方法
  添加本地视频数组   内部会将  deleteTemporaryPhoto 设置为NO
 
  @param urlArray <NSURL *> 本地视频地址
  @param selected 是否选中   选中的话HXPhotoView自动添加显示 没选中可以在相册里手动选中
  */
-- (void)addLocalVideo:(NSArray<NSURL *> *)urlArray selected:(BOOL)selected;
+- (void)addLocalVideo:(NSArray<NSURL *> *)urlArray selected:(BOOL)selected DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
 
 /**
+ *  建议使用 addCustomAssetModel: 此方法
  *  本地图片数组 <UIImage *> 装的是UIImage对象 - 已设置为选中状态
  */
-@property (copy, nonatomic) NSArray *localImageList;
+@property (copy, nonatomic) NSArray *localImageList DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
 
 /**
+ 建议使用 addCustomAssetModel: 此方法
  添加本地图片数组  内部会将  deleteTemporaryPhoto 设置为NO
 
  @param images <UIImage *> 装的是UIImage对象
  @param selected 是否选中   选中的话HXPhotoView自动添加显示 没选中可以在相册里手动选中
  */
-- (void)addLocalImage:(NSArray *)images selected:(BOOL)selected;
+- (void)addLocalImage:(NSArray *)images selected:(BOOL)selected DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
 
 /**
+ 建议使用 addCustomAssetModel: 此方法
  将本地图片添加到相册中  内部会将  configuration.deleteTemporaryPhoto 设置为NO
 
  @param images <UIImage *> 装的是UIImage对象
  */
-- (void)addLocalImageToAlbumWithImages:(NSArray *)images;
+- (void)addLocalImageToAlbumWithImages:(NSArray *)images DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
 
 /**
+ 建议使用 addCustomAssetModel: 此方法
  添加网络图片数组
 
  @param imageUrls 图片地址  NSString*
  @param selected 是否选中
  */
-- (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected;
+- (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
 
 /**
  相册列表
  */
 @property (strong, nonatomic,readonly) NSMutableArray *albums;
+@property (strong, nonatomic) HXAlbumModel *firstAlbumModel;
+
+
+@property (strong, nonatomic) dispatch_queue_t loadAssetQueue;
 
 /**
+ 建议使用 addCustomAssetModel: 此方法
  网络图片地址数组
  */
-@property (strong, nonatomic) NSArray<NSString *> *networkPhotoUrls;
+@property (strong, nonatomic) NSArray<NSString *> *networkPhotoUrls DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
+
 
 /**
- 源对象信息
+ 预加载数据
  */
-@property (strong, nonatomic) id sourceObject;
-
+- (void)preloadData;
 /**
  获取系统所有相册
- 
- @param albums 相册集合
- */
-- (void)getAllPhotoAlbums:(void(^)(HXAlbumModel *firstAlbumModel))firstModel albums:(void(^)(NSArray *albums))albums isFirst:(BOOL)isFirst;
+ */ 
+- (void)getAllAlbumModelFilter:(BOOL)filter select:(getSelectAlbumBlock)selectedModel completion:(getAllAlbumListBlock)completion; 
+- (void)getAllAlbumModelFilter:(BOOL)filter needSelect:(BOOL)needSelect select:(getSelectAlbumBlock)selectedModel completion:(getAllAlbumListBlock)completion;
+- (void)removeAllAlbum;
 
-- (void)fetchAlbums:(void (^)(HXAlbumModel *selectedModel))selectedModel albums:(void(^)(NSArray *albums))albums;
+/**
+ 获取所有照片的这个相册
+ */
+- (void)getCameraRollAlbumCompletion:(void (^)(HXAlbumModel *albumModel))completion;
+@property (copy, nonatomic) void (^ getCameraRollAlbumModel)(HXAlbumModel *albumModel);
+@property (assign, nonatomic) BOOL getCameraRoolAlbuming;
+@property (strong, nonatomic) HXAlbumModel *cameraRollAlbumModel;
+
+
 /**
  根据某个相册模型获取照片列表
 
  @param albumModel 相册模型
  @param complete 照片列表和首个选中的模型
  */
-- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(void (^)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel))complete;
-
+- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(getPhotoListBlock)complete;
+- (void)removeAllTempList;
 /**
  将下载完成的iCloud上的资源模型添加到数组中
  */
 - (void)addICloudModel:(HXPhotoModel *)model;
-
 /**
  判断最大值
  */
 - (NSString *)maximumOfJudgment:(HXPhotoModel *)model;
 
-- (BOOL)videoCanSelected;
+/**
+ 即将要选择模型时调用
+ return nil 则走判断是否达到最大值
+ return 任意字符串 则会提醒返回的字符串，并且禁止选择
+ */
+@property (copy, nonatomic) NSString * (^ shouldSelectModel)(HXPhotoModel *model);
 
-- (NSInteger)cameraCount;
-- (HXPhotoModel *)firstCameraModel;
-
-/**  关于选择完成之前的一些方法  **/
+#pragma mark - < 关于选择完成之前的一些方法>
 /**
  完成之前选择的总数量
  */
@@ -209,17 +233,17 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 /**
  完成之前添加某个模型到已选数组中
  */
-- (void)beforeSelectedListAddPhotoModel:(HXPhotoModel *)model;
+- (void)beforeSelectedListAddPhotoModel:(HXPhotoModel *)model; 
 /**
- 完成之前添加编辑之后的模型到已选数组中
+ 完成之前添加 相机拍照/录制/本地/编辑的照片模型到cameraList里
  */
-- (void)beforeSelectedListAddEditPhotoModel:(HXPhotoModel *)model;
+- (void)beforeListAddCameraPhotoModel:(HXPhotoModel *)model;
 /**
  完成之前将拍摄之后的模型添加到已选数组中
  */
 - (void)beforeListAddCameraTakePicturesModel:(HXPhotoModel *)model;
 
-/*--  关于选择完成之后的一些方法  --*/
+#pragma mark - < 关于选择完成之后的一些方法 >
 /**
  完成之后选择的总数是否达到最大
  */
@@ -285,22 +309,105 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
  */
 - (void)afterSelectedListAddPhotoModel:(HXPhotoModel *)model;
 
-
-
 - (void)selectedListTransformAfter;
 - (void)selectedListTransformBefore;
-
 /**
  取消选择
  */
 - (void)cancelBeforeSelectedList;
 
 /**
+ 刷新已选数组里模型下标
+ */
+- (void)sortSelectedListIndex;
+
+/**
  清空所有已选数组
  */
-- (void)clearSelectedList;
+- (void)clearSelectedList; 
 
-/**  cell上添加photoView时所需要用到的方法  */
+#pragma mark - < 保存本地的方法 >
+/**
+ 保存模型数组到本地
+ 
+ @param success 成功
+ @param failed 失败
+ */
+- (void)saveSelectModelArraySuccess:(void (^)(void))success failed:(void (^)(void))failed;
+/**
+ 删除本地保存的模型数组
+ 
+ @return success or failed
+ */
+- (BOOL)deleteLocalSelectModelArray;
+/**
+ 获取保存在本地的模型数组
+ 
+ */
+- (void)getSelectedModelArrayComplete:(void (^)(NSArray<HXPhotoModel *> *modelArray))complete;
+
+/**
+ 保存当前选择的模型到b本地
+
+ @return 成功 or 失败
+ */
+- (BOOL)saveSelectModelArray;
+
+/**
+ 获取保存本地的模型数组
+
+ @return array
+ */
+- (NSArray<HXPhotoModel *> *)getSelectedModelArray;
+
+/**
+ 删除保存本地的模型数组
+
+ @return 成功 or 失败
+ */
+- (BOOL)deleteSelectModelArray;
+
+#pragma mark - < 辅助属性 >
+@property (assign, nonatomic) HXPhotoManagerVideoSelectedType videoSelectedType;
+@property (strong, nonatomic) UIView *tempCameraPreviewView;
+@property (strong, nonatomic) UIView *tempCameraView;
+
+@property (assign, nonatomic) BOOL selectPhotoing;
+
+@property (assign, nonatomic) BOOL getAlbumListing;
+@property (assign, nonatomic) BOOL getPhotoListing;
+
+@property (copy, nonatomic) getSelectAlbumBlock selectAlbumBlock;
+@property (copy, nonatomic) getAllAlbumListBlock allAlbumListBlock;
+@property (copy, nonatomic) getPhotoListBlock photoListBlock;
+
+typedef void (^ getPhotoListBlock)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
+
+@property (copy, nonatomic) NSArray *tempAllList;
+@property (copy, nonatomic) NSArray *tempPreviewList;
+@property (copy, nonatomic) NSArray *tempPhotoList;
+@property (copy, nonatomic) NSArray *tempVideoList;
+@property (copy, nonatomic) NSArray *tempDateList;
+@property (strong, nonatomic) HXPhotoModel *tempFirstSelectModel;
+@property (strong, nonatomic) HXAlbumModel *tempAlbumModel;
+
+#pragma mark - < 辅助方法 >
+- (BOOL)videoCanSelected;
+/**
+ 本地图片数量
+ 
+ @return count
+ */
+- (NSInteger)cameraCount;
+
+/**
+ 获取本地模型数组里的第一个模型
+ 
+ @return model
+ */
+- (HXPhotoModel *)firstCameraModel;
+
+#pragma mark - < cell上添加photoView时所需要用到的方法 >
 - (void)changeAfterCameraArray:(NSArray *)array;
 - (void)changeAfterCameraPhotoArray:(NSArray *)array;
 - (void)changeAfterCameraVideoArray:(NSArray *)array;
@@ -318,34 +425,4 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 - (NSArray *)afterSelectedCameraPhotoArray;
 - (NSArray *)afterSelectedCameraVideoArray;
 - (NSArray *)afterICloudUploadArray;
-
-- (NSString *)version;
-
-/**
- 保存模型数组到本地
- 
- @param success 成功
- @param failed 失败
- */
-- (void)saveSelectModelArraySuccess:(void (^)(void))success failed:(void (^)(void))failed;
-
-/**
- 删除本地保存的模型数组
- 
- @return success or failed
- */
-- (BOOL)deleteLocalSelectModelArray;
-
-/**
- 获取保存在本地的模型数组
- 
- */
-- (void)getSelectedModelArrayComplete:(void (^)(NSArray<HXPhotoModel *> *modelArray))complete;
-
-- (BOOL)saveSelectModelArray;
-
-- (NSArray<HXPhotoModel *> *)getSelectedModelArray;
-
-- (BOOL)deleteSelectModelArray;
-
 @end

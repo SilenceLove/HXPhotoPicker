@@ -38,10 +38,10 @@
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 @end
 
-@interface HXEditGridLayer : CALayer
+@interface HXEditGridLayer : UIView
 @property (nonatomic, assign) CGRect clippingRect;
 @property (nonatomic, strong) UIColor *bgColor;
-@property (nonatomic, strong) UIColor *gridColor;
+@property (nonatomic, strong) UIColor *gridColor; 
 @end
 
 @interface HXEditCornerView : UIView

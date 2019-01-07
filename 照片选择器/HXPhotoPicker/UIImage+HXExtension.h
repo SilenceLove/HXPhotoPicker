@@ -9,13 +9,17 @@
 #import <UIKit/UIKit.h>
 
 @interface UIImage (HXExtension)
-+ (UIImage *)animatedGIFWithData:(NSData *)data;
-- (UIImage *)animatedImageByScalingAndCroppingToSize:(CGSize)size;
-- (UIImage *)normalizedImage;
-- (UIImage *)clipImage:(CGFloat)scale;
-- (UIImage *)scaleImagetoScale:(float)scaleSize;
-- (UIImage *)clipNormalizedImage:(CGFloat)scale;
-- (UIImage *)fullNormalizedImage;
-- (UIImage *)clipLeftOrRightImage:(CGFloat)scale;
-- (UIImage *)rotationImage:(UIImageOrientation)orient;
++ (UIImage *)hx_imageNamed:(NSString *)imageName;
++ (UIImage *)hx_thumbnailImageForVideo:(NSURL *)videoURL
+                             atTime:(NSTimeInterval)time;
++ (UIImage *)hx_animatedGIFWithData:(NSData *)data;
+- (UIImage *)hx_animatedImageByScalingAndCroppingToSize:(CGSize)size;
+- (UIImage *)hx_normalizedImage;
+- (UIImage *)hx_clipImage:(CGFloat)scale;
+- (UIImage *)hx_scaleImagetoScale:(float)scaleSize;
+- (UIImage *)hx_clipNormalizedImage:(CGFloat)scale;
+- (UIImage *)hx_fullNormalizedImage;
+- (UIImage *)hx_clipLeftOrRightImage:(CGFloat)scale;
+- (UIImage *)hx_rotationImage:(UIImageOrientation)orient;
+
 @end

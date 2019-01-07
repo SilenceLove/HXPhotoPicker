@@ -64,7 +64,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     // 模拟视频数量超过视频最大选择数
     HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES]; 
     [self.manager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6]];
-    [self.photoView refreshView];
+    [self.photoView refreshView]; 
 }
 
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame

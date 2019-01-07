@@ -7,10 +7,53 @@
 //
 
 #import "UIImage+HXExtension.h"
+#import "HXPhotoTools.h"
 #import <ImageIO/ImageIO.h>
 @implementation UIImage (HXExtension)
++ (UIImage *)hx_imageNamed:(NSString *)imageName {
+    if (!imageName) {
+        return nil;
+    }
+    UIImage *image;
+    NSBundle *myBundle = [NSBundle hx_photopickerBundle];
+    imageName = [imageName stringByAppendingString:@"@2x"];
+    NSString *imagePath = [myBundle pathForResource:imageName ofType:@"png"];
+    image = [UIImage imageWithContentsOfFile:imagePath];
+//    NSString *path = [NSString stringWithFormat:@"HXPhotoPicker.bundle/%@",imageName];
+//    image = [UIImage imageNamed:path];
+    if (image) {
+        return image;
+    } else {
+        imageName = [imageName stringByReplacingOccurrencesOfString:@"@2x" withString:@""];
+        image = [UIImage imageNamed:imageName];
+//        if (image) {
+//            return image;
+//        }
+//        NSString *path = [NSString stringWithFormat:@"Frameworks/HXPhotoPicker.framework/HXPhotoPicker.bundle/%@",imageName];
+//        image = [UIImage imageNamed:path];
+//        if (!image) {
+//            image = [UIImage imageNamed:imageName];
+//        }
+        return image;
+    }
+} 
++ (UIImage *)hx_thumbnailImageForVideo:(NSURL *)videoURL atTime:(NSTimeInterval)time {
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+    if (!asset) {
+        return nil;
+    }
+    AVAssetImageGenerator *assetImageGenerator =[[AVAssetImageGenerator alloc] initWithAsset:asset];
+    assetImageGenerator.appliesPreferredTrackTransform = YES;
+    assetImageGenerator.apertureMode = AVAssetImageGeneratorApertureModeEncodedPixels;
+    CGImageRef thumbnailImageRef = NULL;
+    CFTimeInterval thumbnailImageTime = time;
+    NSError *thumbnailImageGenerationError = nil;
+    thumbnailImageRef = [assetImageGenerator copyCGImageAtTime:CMTimeMake(thumbnailImageTime, 60)actualTime:NULL error:&thumbnailImageGenerationError];
+    UIImage*thumbnailImage = thumbnailImageRef ? [[UIImage alloc]initWithCGImage: thumbnailImageRef] : nil;
+    return thumbnailImage;
+}
 
-+ (UIImage *)animatedGIFWithData:(NSData *)data {
++ (UIImage *)hx_animatedGIFWithData:(NSData *)data {
     if (!data) {
         return nil;
     }
@@ -72,7 +115,7 @@
     return frameDuration;
 }
 
-- (UIImage *)animatedImageByScalingAndCroppingToSize:(CGSize)size {
+- (UIImage *)hx_animatedImageByScalingAndCroppingToSize:(CGSize)size {
     if (CGSizeEqualToSize(self.size, size) || CGSizeEqualToSize(size, CGSizeZero)) {
         return self;
     }
@@ -103,7 +146,7 @@
     return [UIImage animatedImageWithImages:scaledImages duration:self.duration];
 }
 
-- (UIImage *)normalizedImage
+- (UIImage *)hx_normalizedImage
 {
     if (self.imageOrientation == UIImageOrientationUp) return self;
     
@@ -113,7 +156,7 @@
     UIGraphicsEndImageContext();
     return normalizedImage;
 }
-- (UIImage *)fullNormalizedImage {
+- (UIImage *)hx_fullNormalizedImage {
     if (self.imageOrientation == UIImageOrientationUp) return self;
     
     CGAffineTransform transform = CGAffineTransformIdentity;
@@ -171,7 +214,7 @@
     return img;
 }
 
-- (UIImage *)clipImage:(CGFloat)scale {
+- (UIImage *)hx_clipImage:(CGFloat)scale {
     CGFloat width = self.size.width;
     CGFloat height = self.size.height;
     
@@ -182,7 +225,7 @@
     CGImageRelease(imagePartRef);
     return image;
 }
-- (UIImage *)clipLeftOrRightImage:(CGFloat)scale {
+- (UIImage *)hx_clipLeftOrRightImage:(CGFloat)scale {
     CGFloat width = self.size.width;
     CGFloat height = self.size.height;
     
@@ -194,7 +237,7 @@
     return image;
 }
 
-- (UIImage *)clipNormalizedImage:(CGFloat)scale {
+- (UIImage *)hx_clipNormalizedImage:(CGFloat)scale {
     CGFloat width = self.size.width;
     CGFloat height = self.size.height;
     
@@ -206,7 +249,7 @@
     return image;
 }
 
-- (UIImage *)scaleImagetoScale:(float)scaleSize {
+- (UIImage *)hx_scaleImagetoScale:(float)scaleSize {
     
     UIGraphicsBeginImageContext(CGSizeMake(self.size.width * scaleSize, self.size.height * scaleSize));
                                 
@@ -217,7 +260,7 @@
     return scaledImage;
 }
 
-- (UIImage *)rotationImage:(UIImageOrientation)orient {
+- (UIImage *)hx_rotationImage:(UIImageOrientation)orient {
     CGRect bnds = CGRectZero;
     UIImage* copy = nil;
     CGContextRef ctxt = nil;

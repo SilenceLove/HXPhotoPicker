@@ -12,6 +12,18 @@
 #import "UIImage+HXExtension.h"
 #import <MediaPlayer/MediaPlayer.h>
 
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>)
+#import <SDWebImage/UIImageView+WebCache.h>
+#elif __has_include("UIImageView+WebCache.h")
+#import "UIImageView+WebCache.h"
+#endif
+
+#if __has_include(<YYWebImage/YYWebImage.h>)
+#import <YYWebImage/YYWebImage.h>
+#elif __has_include("YYWebImage.h")
+#import "YYWebImage.h"
+#endif
+
 @implementation HXPhotoModel
 
 - (NSURL *)fileURL {
@@ -38,22 +50,22 @@
 
 - (NSDate *)modificationDate {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto || self.type == HXPhotoModelMediaTypeCameraVideo) {
-        if (!_modificationDate) {
-            _modificationDate = [NSDate date];
-        }
+//        if (!_modificationDate) {
+            return [NSDate date];
+//        }
     }
-    if (!_modificationDate) {
-        _modificationDate = [self.asset valueForKey:@"modificationDate"];
-    }
+//    if (!_modificationDate) {
+        return [self.asset valueForKey:@"modificationDate"];
+//    }
     return _modificationDate;
 }
 
 - (NSData *)locationData {
-    if (!_locationData) {
+//    if (!_locationData) {
         if (self.asset) {
-            _locationData = [self.asset valueForKey:@"locationData"];
+            return [self.asset valueForKey:@"locationData"];
         }
-    }
+//    }
     return _locationData;
 }
 
@@ -100,7 +112,7 @@
     if (self = [super init]) {
         self.type = HXPhotoModelMediaTypeCameraPhoto;
         self.subType = HXPhotoModelMediaSubTypePhoto;
-        self.thumbPhoto = [HXPhotoTools hx_imageNamed:@"hx_qz_photolist_picture_fail@2x.png"];
+        self.thumbPhoto = [UIImage hx_imageNamed:@"hx_qz_photolist_picture_fail"];
         self.previewPhoto = self.thumbPhoto;
         self.imageSize = self.thumbPhoto.size;
         if (!imageURL && thumbURL) {
@@ -120,63 +132,28 @@
 
 - (instancetype)initWithPHAsset:(PHAsset *)asset{
     if (self = [super init]) {
+        if (asset.mediaType == PHAssetMediaTypeImage) {
+            self.subType = HXPhotoModelMediaSubTypePhoto;
+            self.type = HXPhotoModelMediaTypePhoto;
+        }else if (asset.mediaType == PHAssetMediaTypeVideo) {
+            self.subType = HXPhotoModelMediaSubTypeVideo;
+            self.type = HXPhotoModelMediaTypeVideo;
+            self.videoDuration = asset.duration;
+            NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:self.videoDuration];
+            self.videoTime = time;
+        }
         self.asset = asset;
-        self.type = HXPhotoModelMediaTypePhoto;
-        self.subType = HXPhotoModelMediaSubTypePhoto;
     }
     return self;
-}
-
-- (void)setPhotoManager:(HXPhotoManager *)photoManager {
-    _photoManager = photoManager;
-    if (self.asset.mediaType == PHAssetMediaTypeImage) {
-        self.subType = HXPhotoModelMediaSubTypePhoto;
-        if ([[self.asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
-            if (photoManager.configuration.singleSelected) {
-                self.type = HXPhotoModelMediaTypePhoto;
-            }else {
-                self.type = photoManager.configuration.lookGifPhoto ? HXPhotoModelMediaTypePhotoGif : HXPhotoModelMediaTypePhoto;
-            }
-        }else if (self.asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive){
-            if (iOS9Later) {
-                if (!photoManager.configuration.singleSelected) {
-                    self.type = photoManager.configuration.lookLivePhoto ? HXPhotoModelMediaTypeLivePhoto : HXPhotoModelMediaTypePhoto;
-                }else {
-                    self.type = HXPhotoModelMediaTypePhoto;
-                }
-            }else {
-                self.type = HXPhotoModelMediaTypePhoto;
-            }
-        }else {
-            self.type = HXPhotoModelMediaTypePhoto;
-        }
-    }else if (self.asset.mediaType == PHAssetMediaTypeVideo) {
-        self.type = HXPhotoModelMediaTypeVideo;
-        self.subType = HXPhotoModelMediaSubTypeVideo;
-    }
 }
 
 - (instancetype)initWithVideoURL:(NSURL *)videoURL {
-    if (self = [super init]) {
-        self.type = HXPhotoModelMediaTypeCameraVideo;
-        self.subType = HXPhotoModelMediaSubTypeVideo;
-        self.videoURL = videoURL; 
-        UIImage  *image = [HXPhotoTools thumbnailImageForVideo:videoURL atTime:0.1f];
-        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
-        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:videoURL options:opts];
-        float second = 0;
-        second = urlAsset.duration.value/urlAsset.duration.timescale;
-        
-        NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:second];
-        self.videoDuration = second;
-        self.videoURL = videoURL;
-        self.videoTime = time;
-        self.thumbPhoto = image;
-        self.previewPhoto = image;
-        self.imageSize = self.thumbPhoto.size;
-    }
-    return self;
+    NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                     forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
+    AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:videoURL options:opts];
+    float second = 0;
+    second = urlAsset.duration.value / urlAsset.duration.timescale;
+    return [self initWithVideoURL:videoURL videoTime:second];
 }
 - (instancetype)initWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
     if (self = [super init]) {
@@ -186,7 +163,7 @@
         if (videoTime <= 0) {
             videoTime = 1;
         }
-        UIImage  *image = [HXPhotoTools thumbnailImageForVideo:videoURL atTime:0.1f];
+        UIImage  *image = [UIImage hx_thumbnailImageForVideo:videoURL atTime:0.1f];
         NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:videoTime];
         self.videoDuration = videoTime;
         self.videoURL = videoURL;
@@ -204,7 +181,7 @@
         self.type = HXPhotoModelMediaTypeCameraPhoto;
         self.subType = HXPhotoModelMediaSubTypePhoto;
         if (image.imageOrientation != UIImageOrientationUp) {
-            image = [image normalizedImage];
+            image = [image hx_normalizedImage];
         }
         self.thumbPhoto = image;
         self.previewPhoto = image;
@@ -313,8 +290,10 @@
 }
 - (CGSize)requestSize {
     if (_requestSize.width == 0 || _requestSize.height == 0) {
+        
         CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
         CGSize size = CGSizeMake(width * self.clarityScale, width * self.clarityScale);
+        
         _requestSize = size;
     }
     return _requestSize;
@@ -340,47 +319,47 @@
 - (NSString *)barTitle {
     if (!_barTitle) {
         NSString *language = [NSLocale preferredLanguages].firstObject;
-        if ([self.creationDate isToday]) {
+        if ([self.creationDate hx_isToday]) {
             _barTitle = [NSBundle hx_localizedStringForKey:@"今天"];
-        }else if ([self.creationDate isYesterday]) {
+        }else if ([self.creationDate hx_isYesterday]) {
             _barTitle = [NSBundle hx_localizedStringForKey:@"昨天"];
-        }else if ([self.creationDate isSameWeek]) {
-            _barTitle = [self.creationDate getNowWeekday];
-        }else if ([self.creationDate isThisYear]) {
+        }else if ([self.creationDate hx_isSameWeek]) {
+            _barTitle = [self.creationDate hx_getNowWeekday];
+        }else if ([self.creationDate hx_isThisYear]) {
             if ([language hasPrefix:@"en"]) {
                 // 英文
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MMM dd"],[self.creationDate getNowWeekday]];
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MMM dd"],[self.creationDate hx_getNowWeekday]];
             } else if ([language hasPrefix:@"zh"]) {
                 // 中文
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM月dd日"],[self.creationDate getNowWeekday]];
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM月dd日"],[self.creationDate hx_getNowWeekday]];
                 
             }else if ([language hasPrefix:@"ko"]) {
                 // 韩语
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM월dd일"],[self.creationDate getNowWeekday]];
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM월dd일"],[self.creationDate hx_getNowWeekday]];
             }else if ([language hasPrefix:@"ja"]) {
                 // 日语
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MM月dd日"],[self.creationDate getNowWeekday]];
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM月dd日"],[self.creationDate hx_getNowWeekday]];
             }else {
                 // 英文
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate dateStringWithFormat:@"MMM dd"],[self.creationDate getNowWeekday]];
+                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MMM dd"],[self.creationDate hx_getNowWeekday]];
             }
         }else {
             if ([language hasPrefix:@"en"]) {
                 // 英文
-                _barTitle = [self.creationDate dateStringWithFormat:@"MMM dd, yyyy"];
+                _barTitle = [self.creationDate hx_dateStringWithFormat:@"MMM dd, yyyy"];
             } else if ([language hasPrefix:@"zh"]) {
                 // 中文
-                _barTitle = [self.creationDate dateStringWithFormat:@"yyyy年MM月dd日"];
+                _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy年MM月dd日"];
                 
             }else if ([language hasPrefix:@"ko"]) {
                 // 韩语
-                _barTitle = [self.creationDate dateStringWithFormat:@"yyyy년MM월dd일"];
+                _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy년MM월dd일"];
             }else if ([language hasPrefix:@"ja"]) {
                 // 日语
-                _barTitle = [self.creationDate dateStringWithFormat:@"yyyy年MM月dd日"];
+                _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy年MM月dd日"];
             }else {
                 // 其他
-                _barTitle = [self.creationDate dateStringWithFormat:@"MMM dd, yyyy"];
+                _barTitle = [self.creationDate hx_dateStringWithFormat:@"MMM dd, yyyy"];
             }
         }
     }
@@ -388,7 +367,7 @@
 }
 - (NSString *)barSubTitle {
     if (!_barSubTitle) {
-        _barSubTitle = [self.creationDate dateStringWithFormat:@"HH:mm"];
+        _barSubTitle = [self.creationDate hx_dateStringWithFormat:@"HH:mm"];
     }
     return _barSubTitle;
 }
@@ -424,7 +403,6 @@
         self.selectIndexStr = [aDecoder decodeObjectForKey:@"videoTime"];
         self.cameraIdentifier = [aDecoder decodeObjectForKey:@"cameraIdentifier"];
         self.fileURL = [aDecoder decodeObjectForKey:@"fileURL"];
-        self.gifImageData = [aDecoder decodeObjectForKey:@"gifImageData"];
     }
     return self;
 }
@@ -451,114 +429,850 @@
     [aCoder encodeObject:self.selectIndexStr forKey:@"selectIndexStr"];
     [aCoder encodeObject:self.cameraIdentifier forKey:@"cameraIdentifier"];
     [aCoder encodeObject:self.fileURL forKey:@"fileURL"];
-    [aCoder encodeObject:self.gifImageData forKey:@"gifImageData"]; 
+}
+#pragma mark - < Request >
+
++ (id)requestImageWithURL:(NSURL *)url progress:(void (^) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:0 progress:progress transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+        if (completion) {
+            completion(image, url, error);
+        }
+    }];
+    return operation;
+#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+    SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+        if (completion) {
+            completion(image, url, error);
+        }
+    }];
+    return token;
+#endif
+    return nil;
+}
++ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *image, PHAsset *asset))completion; {
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+    return [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        if (downloadFinined && result) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(result, asset);
+            });
+        }
+    }];
+}
+- (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock)completion {
+    return [self requestThumbImageWithSize:self.requestSize completion:completion];
 }
 
+- (PHImageRequestID)requestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
+    if (self.type == HXPhotoModelMediaTypeCameraPhoto ||
+        self.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (!self.networkPhotoUrl) {
+            if (completion) completion(self.thumbPhoto, self, nil);
+        }else {
+            HXWeakSelf
+            [HXPhotoModel requestImageWithURL:self.networkPhotoUrl progress:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error) {
+                if (completion) completion(image, weakSelf, nil);
+            }];
+        }
+        return 0;
+    }
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+    HXWeakSelf
+    return [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        if (downloadFinined && result) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(result, weakSelf, info);
+            });
+        }
+    }];
+}
+- (PHImageRequestOptions *)imageHighQualityRequestOptions {
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+    return option;
+}
+- (PHImageRequestID)requestPreviewImageWithSize:(CGSize)size
+                             startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                progressHandler:(HXModelProgressHandler)progressHandler
+                                        success:(HXModelImageSuccessBlock)success
+                                         failed:(HXModelFailedBlock)failed {
+    HXWeakSelf
+    if (self.type == HXPhotoModelMediaTypeCameraPhoto ||
+        self.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (!self.networkPhotoUrl) {
+            if (success) success(self.previewPhoto, self, nil);
+        }else {
+            if (startRequestICloud) startRequestICloud(0, self);
+            [HXPhotoModel requestImageWithURL:self.networkPhotoUrl progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (progressHandler) {
+                        progressHandler((CGFloat)receivedSize / (CGFloat)expectedSize, weakSelf);
+                    }
+                });
+            } completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (image) {
+                        if (success) success(image, weakSelf, nil);
+                    }else {
+                        if (failed) failed(nil, weakSelf);
+                    }
+                });
+            }];
+        }
+        return 0;
+    }
+    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+    
+    PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
+    option.networkAccessAllowed = NO;
+    self.iCloudDownloading = YES;
+    PHImageRequestID requestId = [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        [weakSelf requestDataWithResult:result info:info size:size resultClass:[UIImage class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+            if (success) {
+                success(result, weakSelf, info);
+            }
+        } failed:failed];
+    }];
+    self.iCloudRequestID = requestId;
+    return requestId;
+}
+- (PHImageRequestID)requestLivePhotoWithSize:(CGSize)size
+                          startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                             progressHandler:(HXModelProgressHandler)progressHandler
+                                     success:(HXModelLivePhotoSuccessBlock)success
+                                      failed:(HXModelFailedBlock)failed {
+    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+    
+    PHLivePhotoRequestOptions *option = [[PHLivePhotoRequestOptions alloc] init];
+    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.networkAccessAllowed = NO;
+    PHImageRequestID requestId = 0;
+    self.iCloudDownloading = YES;
+    HXWeakSelf
+    requestId = [[PHImageManager defaultManager] requestLivePhotoForAsset:self.asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
+        [weakSelf requestDataWithResult:livePhoto info:info size:size resultClass:[PHLivePhoto class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+            if (success) {
+                success(result, weakSelf, info);
+            }
+        } failed:failed];
+    }];
+    self.iCloudRequestID = requestId;
+    return requestId;
+}
+
+- (PHImageRequestID)requestImageDataStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                       progressHandler:(HXModelProgressHandler)progressHandler
+                                               success:(HXModelImageDataSuccessBlock)success
+                                                failed:(HXModelFailedBlock)failed {
+    
+    HXWeakSelf
+    if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+        [[YYWebImageManager sharedManager] requestImageWithURL:self.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+            if (image) {
+                if (success) {
+                    NSData *imageData;
+                    if (UIImagePNGRepresentation(image)) {
+                        //返回为png图像。
+                        imageData = UIImagePNGRepresentation(image);
+                    }else {
+                        //返回为JPEG图像。
+                        imageData = UIImageJPEGRepresentation(image, 1.0);
+                    }
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        success(imageData, 0, weakSelf, nil);
+                    });
+                }
+            }else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed(nil, weakSelf);
+                    }
+                });
+            }
+        }];
+        return 0;
+#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+        [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+            if (data) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (success) {
+                        success(data, 0, weakSelf, nil);
+                    }
+                });
+            }else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed(nil, weakSelf);
+                    }
+                });
+            }
+        }];
+        return 0;
+#endif
+    }
+    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+    
+    PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
+    option.networkAccessAllowed = NO;
+    if (self.type == HXPhotoModelMediaTypePhotoGif) {
+        option.version = PHImageRequestOptionsVersionOriginal;
+    }
+    self.iCloudDownloading = YES;
+    PHImageRequestID requestID = [[PHImageManager defaultManager] requestImageDataForAsset:self.asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+        [weakSelf requestDataWithResult:imageData info:info size:CGSizeZero resultClass:[NSData class] orientation:orientation audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+            if (success) {
+                success(result, orientation, weakSelf, info);
+            }
+        } failed:failed];
+    }];
+    self.iCloudRequestID = requestID;
+    return requestID;
+}
+
+- (PHImageRequestID)requestAVAssetStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                     progressHandler:(HXModelProgressHandler)progressHandler
+                                             success:(HXModelAVAssetSuccessBlock)success
+                                              failed:(HXModelFailedBlock)failed {
+    if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (success) {
+            AVAsset *asset = [AVAsset assetWithURL:self.videoURL];
+            success(asset, nil, self, nil);
+        }
+        return 0;
+    }
+    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+    
+    PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+    options.networkAccessAllowed = NO;
+    PHImageRequestID requestId = 0;
+    self.iCloudDownloading = YES;
+    HXWeakSelf
+    requestId = [[PHImageManager defaultManager] requestAVAssetForVideo:self.asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+        [weakSelf requestDataWithResult:asset info:info size:CGSizeZero resultClass:[AVAsset class] orientation:0 audioMix:audioMix startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+            if (success) {
+                success(result, audioMix, weakSelf, info);
+            }
+        } failed:failed];
+    }];
+    self.iCloudRequestID = requestId;
+    return requestId;
+}
+- (PHImageRequestID)requestAVAssetExportSessionStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                                  progressHandler:(HXModelProgressHandler)progressHandler
+                                                          success:(HXModelAVExportSessionSuccessBlock)success
+                                                           failed:(HXModelFailedBlock)failed {
+    if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+        AVAssetExportSession *export = [AVAssetExportSession exportSessionWithAsset:[AVAsset assetWithURL:self.videoURL] presetName:AVAssetExportPresetHighestQuality];
+        if (success) {
+            success(export, self, nil);
+        }
+        return 0;
+    }
+    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+    
+    PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+    options.networkAccessAllowed = NO;
+    PHImageRequestID requestId = 0;
+    self.iCloudDownloading = YES;
+    
+    HXWeakSelf
+    requestId = [[PHImageManager defaultManager] requestExportSessionForVideo:self.asset options:options exportPreset:AVAssetExportPresetHighestQuality resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
+        [weakSelf requestDataWithResult:exportSession info:info size:CGSizeZero resultClass:[AVAssetExportSession class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+            if (success) {
+                success(result, weakSelf, info);
+            }
+        } failed:failed];
+    }];
+    return requestId;
+}
+
+- (PHImageRequestID)requestAVPlayerItemStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                          progressHandler:(HXModelProgressHandler)progressHandler
+                                                  success:(HXModelAVPlayerItemSuccessBlock)success
+                                                   failed:(HXModelFailedBlock)failed {
+    if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+        AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:self.videoURL];
+        if (success) {
+            success(playerItem, self, nil);
+        }
+        return 0;
+    }
+    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+    
+    PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+    options.networkAccessAllowed = NO;
+    PHImageRequestID requestId = 0;
+    self.iCloudDownloading = YES;
+    HXWeakSelf
+    requestId = [[PHImageManager defaultManager] requestPlayerItemForVideo:self.asset options:options resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
+        [weakSelf requestDataWithResult:playerItem info:info size:CGSizeZero resultClass:[AVPlayerItem class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+            if (success) {
+                success(result, weakSelf, info);
+            }
+        } failed:failed];
+    }];
+    return requestId;
+}
+
+- (void)requestDataWithResult:(id)results
+                         info:(NSDictionary *)info
+                         size:(CGSize)size
+                  resultClass:(Class)resultClass
+                  orientation:(UIImageOrientation)orientation
+                     audioMix:(AVAudioMix *)audioMix
+           startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+              progressHandler:(HXModelProgressHandler)progressHandler
+                      success:(void (^)(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix))success
+                       failed:(HXModelFailedBlock)failed {
+    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+    if (downloadFinined && results) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.isICloud = NO;
+            self.iCloudDownloading = NO;
+            if (success) {
+                success(results, info, orientation, audioMix);
+            }
+        });
+        return;
+    }else {
+        HXWeakSelf
+        if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
+            PHImageRequestID iCloudRequestId = 0;
+            if ([resultClass isEqual:[UIImage class]]) {
+                PHImageRequestOptions *iCloudOption = [self imageHighQualityRequestOptions];
+                iCloudOption.networkAccessAllowed = YES;
+                iCloudOption.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        weakSelf.iCloudProgress = progress;
+                        if (progressHandler) {
+                            progressHandler(progress, weakSelf);
+                        }
+                    });
+                };
+                iCloudRequestId = [weakSelf requestImageWithOptions:iCloudOption targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                    if (downloadFinined && result) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            weakSelf.isICloud = NO;
+                            weakSelf.iCloudDownloading = NO;
+                            if (success) {
+                                success(result, info, 0, nil);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                weakSelf.iCloudDownloading = NO;
+                            }
+                            if (failed) {
+                                failed(info, weakSelf);
+                            }
+                        });
+                    }
+                }];
+            }else if ([resultClass isEqual:[PHLivePhoto class]]) {
+                PHLivePhotoRequestOptions *iCloudOption = [[PHLivePhotoRequestOptions alloc] init];
+                iCloudOption.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+                iCloudOption.networkAccessAllowed = YES;
+                iCloudOption.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        weakSelf.iCloudProgress = progress;
+                        if (progressHandler) {
+                            progressHandler(progress, weakSelf);
+                        }
+                    });
+                };
+                iCloudRequestId = [[PHImageManager defaultManager] requestLivePhotoForAsset:self.asset targetSize:size contentMode:PHImageContentModeAspectFill options:iCloudOption resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                    if (downloadFinined && livePhoto) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            weakSelf.isICloud = NO;
+                            weakSelf.iCloudDownloading = NO;
+                            if (success) {
+                                success(livePhoto, info, 0, nil);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                weakSelf.iCloudDownloading = NO;
+                            }
+                            if (failed) {
+                                failed(info, weakSelf);
+                            }
+                        });
+                    }
+                }];
+            }else if ([resultClass isEqual:[NSData class]]) {
+                PHImageRequestOptions *iCloudOption = [self imageHighQualityRequestOptions];
+                iCloudOption.networkAccessAllowed = YES;
+                if (self.type == HXPhotoModelMediaTypePhotoGif) {
+                    iCloudOption.version = PHImageRequestOptionsVersionOriginal;
+                }
+                iCloudOption.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        weakSelf.iCloudProgress = progress;
+                        if (progressHandler) {
+                            progressHandler(progress, weakSelf);
+                        }
+                    });
+                };
+                iCloudRequestId = [[PHImageManager defaultManager] requestImageDataForAsset:self.asset options:iCloudOption resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                    if (downloadFinined && imageData) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            weakSelf.isICloud = NO;
+                            weakSelf.iCloudDownloading = NO;
+                            if (success) {
+                                success(imageData, info, orientation, nil);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                weakSelf.iCloudDownloading = NO;
+                            }
+                            if (failed) {
+                                failed(info, weakSelf);
+                            }
+                        });
+                    }
+                }];
+            }else if ([resultClass isEqual:[AVAsset class]]) {
+                PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
+                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+                iCloudOptions.networkAccessAllowed = YES;
+                iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        weakSelf.iCloudProgress = progress;
+                        if (progressHandler) {
+                            progressHandler(progress, weakSelf);
+                        }
+                    });
+                };
+                iCloudRequestId = [[PHImageManager defaultManager] requestAVAssetForVideo:self.asset options:iCloudOptions resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                    if (downloadFinined && asset) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            weakSelf.iCloudDownloading = NO;
+                            weakSelf.isICloud = NO;
+                            if (success) {
+                                success(asset, info, 0, audioMix);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                weakSelf.iCloudDownloading = NO;
+                            }
+                            if (failed) {
+                                failed(info, weakSelf);
+                            }
+                        });
+                    }
+                }];
+            }else if ([resultClass isEqual:[AVAssetExportSession class]]) {
+                PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
+                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+                iCloudOptions.networkAccessAllowed = YES;
+                iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        weakSelf.iCloudProgress = progress;
+                        if (progressHandler) {
+                            progressHandler(progress, weakSelf);
+                        }
+                    });
+                };
+                iCloudRequestId = [[PHImageManager defaultManager] requestExportSessionForVideo:self.asset options:iCloudOptions exportPreset:AVAssetExportPresetHighestQuality resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                    if (downloadFinined && exportSession) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            weakSelf.iCloudDownloading = NO;
+                            weakSelf.isICloud = NO;
+                            if (success) {
+                                success(exportSession, info, 0, nil);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                weakSelf.iCloudDownloading = NO;
+                            }
+                            if (failed) {
+                                failed(info, weakSelf);
+                            }
+                        });
+                    }
+                }];
+            }else if ([resultClass isEqual:[AVPlayerItem class]]) {
+                PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
+                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+                iCloudOptions.networkAccessAllowed = YES;
+                iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        weakSelf.iCloudProgress = progress;
+                        if (progressHandler) {
+                            progressHandler(progress, weakSelf);
+                        }
+                    });
+                };
+                iCloudRequestId = [[PHImageManager defaultManager] requestPlayerItemForVideo:self.asset options:iCloudOptions resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                    if (downloadFinined && playerItem) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            weakSelf.iCloudDownloading = NO;
+                            weakSelf.isICloud = NO;
+                            if (success) {
+                                success(playerItem, info, 0, nil);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                weakSelf.iCloudDownloading = NO;
+                            }
+                            if (failed) {
+                                failed(info, weakSelf);
+                            }
+                        });
+                    }
+                }];
+            }else if ([resultClass isEqual:[PHContentEditingInput class]]) {
+                
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.iCloudRequestID = iCloudRequestId;
+                if (startRequestICloud) {
+                    startRequestICloud(iCloudRequestId, weakSelf);
+                }
+            });
+            return;
+        }
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+            self.iCloudDownloading = NO;
+        }
+        if (failed) {
+            failed(info, self);
+        }
+    });
+}
+
+- (PHImageRequestID)requestImageWithOptions:(PHImageRequestOptions *)options targetSize:(CGSize)targetSize resultHandler:(void (^)(UIImage *__nullable result, NSDictionary *__nullable info))resultHandler {
+    
+    return [[PHImageManager defaultManager] requestImageForAsset:self.asset targetSize:targetSize contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        if (resultHandler) {
+            resultHandler(result, info);
+        }
+    }];
+}
+- (void)exportVideoWithPresetName:(NSString *)presetName
+               startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+            iCloudProgressHandler:(HXModelProgressHandler)iCloudProgressHandler
+            exportProgressHandler:(HXModelExportVideoProgressHandler)exportProgressHandler
+                          success:(HXModelExportVideoSuccessBlock)success
+                           failed:(HXModelFailedBlock)failed {
+    if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (success) {
+            success(self.videoURL, self);
+        }
+        return;
+    }
+    HXWeakSelf
+    [self requestAVAssetStartRequestICloud:startRequestICloud progressHandler:iCloudProgressHandler success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
+        
+        NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+        if ([presets containsObject:presetName]) {
+            AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:presetName];
+            NSString *fileName = [[HXPhotoTools uploadFileName] stringByAppendingString:@".mp4"];
+            NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+            NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
+            session.outputURL = videoURL;
+            session.shouldOptimizeForNetworkUse = YES;
+            
+            NSArray *supportedTypeArray = session.supportedFileTypes;
+            if ([supportedTypeArray containsObject:AVFileTypeMPEG4]) {
+                session.outputFileType = AVFileTypeMPEG4;
+            } else if (supportedTypeArray.count == 0) {
+                if (failed) {
+                    failed(nil, model);
+                }
+                if (HXShowLog) NSSLog(@"不支持导入该类型视频");
+                return;
+            }else {
+                session.outputFileType = [supportedTypeArray objectAtIndex:0];
+            }
+            
+            NSTimer *timer = [NSTimer hx_scheduledTimerWithTimeInterval:0.1f block:^{
+                if (exportProgressHandler) {
+                    exportProgressHandler(session.progress, weakSelf);
+                }
+            } repeats:YES];
+            
+            [session exportAsynchronouslyWithCompletionHandler:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if ([session status] == AVAssetExportSessionStatusCompleted) {
+                        if (HXShowLog) NSSLog(@"视频导出完成");
+                        [timer invalidate];
+                        if (success) {
+                            success(videoURL, weakSelf);
+                        }
+                    }else if ([session status] == AVAssetExportSessionStatusFailed){
+                        if (HXShowLog) NSSLog(@"视频导出失败");
+                        [timer invalidate];
+                        if (failed) {
+                            failed(nil, weakSelf);
+                        }
+                    }else if ([session status] == AVAssetExportSessionStatusCancelled) {
+                        if (HXShowLog) NSSLog(@"视频导出被取消");
+                        [timer invalidate];
+                        if (failed) {
+                            failed(nil, weakSelf);
+                        }
+                    }
+                });
+            }];
+        }else {
+            if (HXShowLog) NSSLog(@"该设备不支持:%@",presetName);
+        }
+    } failed:failed];
+//    [self requestAVAssetExportSessionStartRequestICloud:startRequestICloud
+//                                        progressHandler:iCloudProgressHandler
+//                                             completion:^(AVAssetExportSession *assetExportSession, HXPhotoModel *model, NSDictionary *info) {
+//
+//        NSString *fileName = [[HXPhotoTools uploadFileName] stringByAppendingString:@".mp4"];
+//        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+//        NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
+//        assetExportSession.outputURL = videoURL;
+//        assetExportSession.shouldOptimizeForNetworkUse = YES;
+//
+//        NSArray *supportedTypeArray = assetExportSession.supportedFileTypes;
+//        if ([supportedTypeArray containsObject:AVFileTypeMPEG4]) {
+//            assetExportSession.outputFileType = AVFileTypeMPEG4;
+//        } else if (supportedTypeArray.count == 0) {
+//            if (failed) {
+//                failed(nil, model);
+//            }
+//            if (HXShowLog) NSSLog(@"不支持导入该类型视频");
+//            return;
+//        }else {
+//            assetExportSession.outputFileType = [supportedTypeArray objectAtIndex:0];
+//        }
+//
+//        NSTimer *timer = [NSTimer hx_scheduledTimerWithTimeInterval:0.1f block:^{
+//            if (exportProgressHandler) {
+//                exportProgressHandler(assetExportSession.progress, weakSelf);
+//            }
+//        } repeats:YES];
+//
+//        [assetExportSession exportAsynchronouslyWithCompletionHandler:^{
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                if ([assetExportSession status] == AVAssetExportSessionStatusCompleted) {
+//                    if (HXShowLog) NSSLog(@"视频导出完成");
+//                    [timer invalidate];
+//                    if (success) {
+//                        success(videoURL, weakSelf);
+//                    }
+//                }else if ([assetExportSession status] == AVAssetExportSessionStatusFailed){
+//                    if (HXShowLog) NSSLog(@"视频导出失败");
+//                    [timer invalidate];
+//                    if (failed) {
+//                        failed(nil, weakSelf);
+//                    }
+//                }else if ([assetExportSession status] == AVAssetExportSessionStatusCancelled) {
+//                    if (HXShowLog) NSSLog(@"视频导出被取消");
+//                    [timer invalidate];
+//                    if (failed) {
+//                        failed(nil, weakSelf);
+//                    }
+//                }
+//            });
+//        }];
+//    } failed:failed];
+}
+- (PHContentEditingInputRequestID)requestImagePathStartRequestICloud:(void (^)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model))startRequestICloud
+                                                     progressHandler:(HXModelProgressHandler)progressHandler
+                                                             success:(HXModelImagePathSuccessBlock)success
+                                                              failed:(HXModelFailedBlock)failed {
+    if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
+        if (success) {
+            success(self.networkPhotoUrl.absoluteString, self, nil);
+        }
+        return 0;
+    }
+    
+    PHContentEditingInputRequestOptions *options = [[PHContentEditingInputRequestOptions alloc] init];
+    options.networkAccessAllowed = NO;
+    HXWeakSelf
+    return [self.asset requestContentEditingInputWithOptions:options completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+        BOOL downloadFinined = (![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]);
+        
+        if (downloadFinined && contentEditingInput.fullSizeImageURL.relativePath) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (success) {
+                    success(contentEditingInput.fullSizeImageURL.relativePath, weakSelf, info);
+                }
+            });
+        }else {
+            if ([[info objectForKey:PHContentEditingInputResultIsInCloudKey] boolValue] && ![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]) {
+                PHContentEditingInputRequestOptions *iCloudOptions = [[PHContentEditingInputRequestOptions alloc] init];
+                iCloudOptions.networkAccessAllowed = YES;
+                iCloudOptions.progressHandler = ^(double progress, BOOL * _Nonnull stop) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (progressHandler) {
+                            progressHandler(progress, weakSelf);
+                        }
+                    });
+                };
+                
+                PHContentEditingInputRequestID iCloudRequestID = [weakSelf.asset requestContentEditingInputWithOptions:iCloudOptions completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+                    BOOL downloadFinined = (![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]);
+                    
+                    if (downloadFinined && contentEditingInput.fullSizeImageURL.relativePath) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (success) {
+                                success(contentEditingInput.fullSizeImageURL.relativePath, weakSelf, nil);
+                            }
+                        });
+                    }else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (failed) {
+                                failed(info, weakSelf);
+                            }
+                        });
+                    }
+                }];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (startRequestICloud) {
+                        startRequestICloud(iCloudRequestID, weakSelf);
+                    }
+                });
+            }else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed(info, weakSelf);
+                    }
+                });
+            }
+        }
+    }];
+}
 @end
 
 @implementation HXPhotoDateModel
 - (NSString *)dateString {
     if (!_dateString) {
-//        NSDateComponents *modelComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
-//                                        NSCalendarUnitMonth |
-//                                        NSCalendarUnitYear
-//                                                                       fromDate:self.date];
-//        NSUInteger modelMonth = [modelComponents month];
-//        NSUInteger modelYear  = [modelComponents year];
-//        NSUInteger modelDay   = [modelComponents day];
-//        
-//        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-//        NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%lu-%lu-%lu",
-//                                                      (unsigned long)modelYear,
-//                                                      (unsigned long)modelMonth,
-//                                                      (unsigned long)modelDay]];
-//        
-//        NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
-//                                        NSCalendarUnitMonth |
-//                                        NSCalendarUnitYear
-//                                                                       fromDate:[NSDate date]];
-//        NSUInteger month = [components month];
-//        NSUInteger year  = [components year];
-//        NSUInteger day   = [components day];
-//        
-//        NSString *localization = [NSBundle mainBundle].preferredLocalizations.firstObject;
-//        NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:localization];
-//        
-//        dateFormatter.locale    = locale;
-//        dateFormatter.dateStyle = kCFDateFormatterLongStyle;
-//        dateFormatter.timeStyle = NSDateFormatterNoStyle;
-//        
-//        if (year == modelYear)
-//        {
-//            NSString *longFormatWithoutYear = [NSDateFormatter dateFormatFromTemplate:@"MMMM d"
-//                                                                              options:0
-//                                                                               locale:locale];
-//            [dateFormatter setDateFormat:longFormatWithoutYear];
-//        }
-//        
-//        NSString *resultString = [dateFormatter stringFromDate:date];
-//        
-//        if (year == modelYear && month == modelMonth)
-//        {
-//            if (day == modelDay)
-//            {
-//                resultString = [NSBundle hx_localizedStringForKey:@"今天"];
-//            }
-//            else if (day - 1 == modelDay)
-//            {
-//                resultString = [NSBundle hx_localizedStringForKey:@"昨天"];
-//            }else if ([self.date isSameWeek]) {
-//                resultString = [self.date getNowWeekday];
-//            }
-//        }
-//        _dateString = resultString;
-//        return _dateString;
+        NSDateComponents *modelComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
+                                        NSCalendarUnitMonth |
+                                        NSCalendarUnitYear
+                                                                       fromDate:self.date];
+        NSUInteger modelMonth = [modelComponents month];
+        NSUInteger modelYear  = [modelComponents year];
+        NSUInteger modelDay   = [modelComponents day];
         
-        NSString *language = [NSLocale preferredLanguages].firstObject;
-        if ([self.date isToday]) {
-            _dateString = [NSBundle hx_localizedStringForKey:@"今天"];
-        }else if ([self.date isYesterday]) {
-            _dateString = [NSBundle hx_localizedStringForKey:@"昨天"];
-        }else if ([self.date isSameWeek]) {
-            _dateString = [self.date getNowWeekday];
-        }else if ([self.date isThisYear]) {
-            if ([language hasPrefix:@"en"]) {
-                // 英文
-                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MMM dd"],[self.date getNowWeekday]];
-            } else if ([language hasPrefix:@"zh"]) {
-                // 中文
-                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM月dd日"],[self.date getNowWeekday]];
-            }else if ([language hasPrefix:@"ko"]) {
-                // 韩语
-                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM월dd일"],[self.date getNowWeekday]];
-            }else if ([language hasPrefix:@"ja"]) {
-                // 日语
-                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MM月dd日"],[self.date getNowWeekday]]; 
-            } else {
-                // 英文
-                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date dateStringWithFormat:@"MMM dd"],[self.date getNowWeekday]];
-            }
-        }else {
-            if ([language hasPrefix:@"en"]) {
-                // 英文
-                _dateString = [self.date dateStringWithFormat:@"MMMM dd, yyyy"];
-            } else if ([language hasPrefix:@"zh"]) {
-                // 中文
-                _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
-            }else if ([language hasPrefix:@"ko"]) {
-                // 韩语
-                _dateString = [self.date dateStringWithFormat:@"yyyy년MM월dd일"];
-            }else if ([language hasPrefix:@"ja"]) {
-                // 日语
-                _dateString = [self.date dateStringWithFormat:@"yyyy年MM月dd日"];
-            } else {
-                // 其他
-                _dateString = [self.date dateStringWithFormat:@"MMMM dd, yyyy"];
-            } 
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+        NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%lu-%lu-%lu",
+                                                      (unsigned long)modelYear,
+                                                      (unsigned long)modelMonth,
+                                                      (unsigned long)modelDay]];
+        
+        NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
+                                        NSCalendarUnitMonth |
+                                        NSCalendarUnitYear
+                                                                       fromDate:[NSDate date]];
+        NSUInteger month = [components month];
+        NSUInteger year  = [components year];
+        NSUInteger day   = [components day];
+        
+        NSString *localization = [NSBundle mainBundle].preferredLocalizations.firstObject;
+        NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:localization];
+        
+        dateFormatter.locale    = locale;
+        dateFormatter.dateStyle = kCFDateFormatterLongStyle;
+        dateFormatter.timeStyle = NSDateFormatterNoStyle;
+        
+        if (year == modelYear) {
+            NSString *longFormatWithoutYear = [NSDateFormatter dateFormatFromTemplate:@"MMMM d"
+                                                                              options:0
+                                                                               locale:locale];
+            [dateFormatter setDateFormat:longFormatWithoutYear];
         }
+        
+        NSString *resultString = [dateFormatter stringFromDate:date];
+        
+        if (year == modelYear && month == modelMonth)
+        {
+            if (day == modelDay)
+            {
+                resultString = [NSBundle hx_localizedStringForKey:@"今天"];
+            }
+            else if (day - 1 == modelDay)
+            {
+                resultString = [NSBundle hx_localizedStringForKey:@"昨天"];
+            }else if ([self.date hx_isSameWeek]) {
+                resultString = [self.date hx_getNowWeekday];
+            }
+        }
+        _dateString = resultString;
     }
     return _dateString;
+        
+//        NSString *language = [NSLocale preferredLanguages].firstObject;
+//        if ([self.date hx_isToday]) {
+//            _dateString = [NSBundle hx_localizedStringForKey:@"今天"];
+//        }else if ([self.date hx_isYesterday]) {
+//            _dateString = [NSBundle hx_localizedStringForKey:@"昨天"];
+//        }else if ([self.date hx_isSameWeek]) {
+//            _dateString = [self.date hx_getNowWeekday];
+//        }else if ([self.date hx_isThisYear]) {
+//            if ([language hasPrefix:@"en"]) {
+//                // 英文
+//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MMM dd"],[self.date hx_getNowWeekday]];
+//            } else if ([language hasPrefix:@"zh"]) {
+//                // 中文
+//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MM月dd日"],[self.date hx_getNowWeekday]];
+//            }else if ([language hasPrefix:@"ko"]) {
+//                // 韩语
+//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MM월dd일"],[self.date hx_getNowWeekday]];
+//            }else if ([language hasPrefix:@"ja"]) {
+//                // 日语
+//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MM月dd日"],[self.date hx_getNowWeekday]];
+//            } else {
+//                // 英文
+//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MMM dd"],[self.date hx_getNowWeekday]];
+//            }
+//        }else {
+//            if ([language hasPrefix:@"en"]) {
+//                // 英文
+//                _dateString = [self.date hx_dateStringWithFormat:@"MMMM dd, yyyy"];
+//            } else if ([language hasPrefix:@"zh"]) {
+//                // 中文
+//                _dateString = [self.date hx_dateStringWithFormat:@"yyyy年MM月dd日"];
+//            }else if ([language hasPrefix:@"ko"]) {
+//                // 韩语
+//                _dateString = [self.date hx_dateStringWithFormat:@"yyyy년MM월dd일"];
+//            }else if ([language hasPrefix:@"ja"]) {
+//                // 日语
+//                _dateString = [self.date hx_dateStringWithFormat:@"yyyy年MM月dd日"];
+//            } else {
+//                // 其他
+//                _dateString = [self.date hx_dateStringWithFormat:@"MMMM dd, yyyy"];
+//            }
+//        }
+//    }
+//    return _dateString;
 }
 - (NSMutableArray *)locationList {
     if (!_locationList) {

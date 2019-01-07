@@ -11,9 +11,8 @@
 
 @implementation UIViewController (HXExtension)
 - (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
-    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-    vc.delegate = delegate ? delegate : (id)self;
-    vc.manager = manager;
+    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] initWithManager:manager];
+    vc.delegate = delegate ? delegate : (id)self; 
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
     [self presentViewController:nav animated:YES completion:nil];
@@ -35,28 +34,8 @@
             cancel(viewController, manager);
         }
     };
-    if (manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
-        HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-        vc.manager = manager;
-        vc.doneBlock = modelBlock;
-        vc.allImageBlock = imageBlock;
-        vc.cancelBlock = cancelBlock;
-        vc.delegate = (id)self;
-        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-        nav.supportRotation = manager.configuration.supportRotation;
-        [self presentViewController:nav animated:YES completion:nil];
-    }else if (manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
-        HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
-        vc.manager = manager;
-        vc.doneBlock = modelBlock;
-        vc.allImageBlock = imageBlock;
-        vc.cancelBlock = cancelBlock;
-        vc.delegate = (id)self;
-        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-        nav.supportRotation = manager.configuration.supportRotation;
-        [self presentViewController:nav animated:YES completion:nil];
-    }
-    
+    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithManager:manager doneBlock:modelBlock allImageBlock:imageBlock cancelBlock:cancelBlock]; 
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
@@ -83,7 +62,7 @@
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (BOOL)navigationBarWhetherSetupBackground {
+- (BOOL)hx_navigationBarWhetherSetupBackground {
     if ([self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsDefault]) {
         return YES;
     }else if ([self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsCompact]) {

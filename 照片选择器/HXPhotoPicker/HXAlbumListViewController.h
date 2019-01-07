@@ -62,14 +62,18 @@
 @property (copy, nonatomic) viewControllerDidDoneAllImageBlock allImageBlock;
 @property (copy, nonatomic) viewControllerDidDoneAllAssetBlock allAssetBlock;
 @property (copy, nonatomic) viewControllerDidCancelBlock cancelBlock;
+- (instancetype)initWithManager:(HXPhotoManager *)manager;
 @end
 
 @interface HXAlbumListQuadrateViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXAlbumModel *model;
+@property (strong, nonatomic) NSIndexPath *indexPath;
+@property (copy, nonatomic) void (^getResultCompleteBlock)(NSInteger count, HXAlbumListQuadrateViewCell *myCell);
 - (void)cancelRequest ;
 @end
 
 @interface HXAlbumListSingleViewCell : UITableViewCell
 @property (strong, nonatomic) HXAlbumModel *model;
+@property (copy, nonatomic) void (^getResultCompleteBlock)(NSInteger count, HXAlbumListSingleViewCell *myCell);
 - (void)cancelRequest ;
 @end

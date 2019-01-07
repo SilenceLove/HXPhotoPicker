@@ -42,10 +42,10 @@
     HXDatePhotoViewController *fromVC = (HXDatePhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXDatePhotoPreviewViewController *toVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [toVC.modelArray objectAtIndex:toVC.currentModelIndex];
-    __weak typeof(self) weakSelf = self;
-    [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
+    HXWeakSelf
+    [model requestPreviewImageWithSize:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
         [weakSelf pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
-    } error:^(NSDictionary *info) {
+    } failed:^(NSDictionary *info, HXPhotoModel *model) {
         [weakSelf pushAnim:transitionContext image:model.thumbPhoto model:model fromVC:fromVC toVC:toVC];
     }];
 }
@@ -77,7 +77,8 @@
     if (fromCell) {
         tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView: containerView];
     }else {
-        tempView.center = CGPointMake(width / 2, height / 2);
+        tempView.hx_size = CGSizeMake(tempView.hx_w * 1.5, tempView.hx_h * 1.5);
+        tempView.center = CGPointMake(width / 2, height / 2); 
     }
     [tempBgView addSubview:tempView];
     [fromVC.view insertSubview:tempBgView belowSubview:fromVC.bottomView];

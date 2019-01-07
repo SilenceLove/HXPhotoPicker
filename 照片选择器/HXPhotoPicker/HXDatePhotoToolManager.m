@@ -88,30 +88,6 @@
     [self writeModelToTempPath];
 }
 
-- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray success:(void (^)(void))success failed:(void (^)(void))failed {
-    __block NSInteger count = 0;
-    __block NSInteger modelCount = gifModelArray.count;
-    for (HXPhotoModel *model in gifModelArray) {
-        [HXPhotoTools getImageDataWithModel:model startRequestIcloud:^(HXPhotoModel *model, PHImageRequestID cloudRequestId) {
-            
-        } progressHandler:^(HXPhotoModel *model, double progress) {
-            
-        } completion:^(HXPhotoModel *model, NSData *imageData, UIImageOrientation orientation) {
-            model.gifImageData = imageData;
-            count++;
-            if (count == modelCount) {
-                if (success) {
-                    success();
-                }
-            }
-        } failed:^(HXPhotoModel *model, NSDictionary *info) {
-            if (failed) {
-                failed();
-            }
-        }];
-    }
-}
-
 - (void)writeSelectModelListToTempPathWithList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerSuccessHandler)success failed:(HXDatePhotoToolManagerFailedHandler)failed {
     if (self.writing) {
         if (HXShowLog) NSSLog(@"已有写入任务,请等待");
@@ -165,31 +141,27 @@
             presetName = AVAssetExportPresetMediumQuality;
         }
         if (model.asset) {
-            [HXPhotoTools getExportSessionWithPHAsset:model.asset deliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic presetName:presetName startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-                
-            } progressHandler:^(double progress) {
-                
-            } completion:^(AVAssetExportSession *exportSession, NSDictionary *info) {
+            [model requestAVAssetExportSessionStartRequestICloud:nil progressHandler:nil success:^(AVAssetExportSession *assetExportSession, HXPhotoModel *model, NSDictionary *info) {
                 NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:@".mp4"];
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
-                exportSession.outputURL = videoURL;
-                exportSession.outputFileType = AVFileTypeMPEG4;
-                exportSession.shouldOptimizeForNetworkUse = YES;
+                assetExportSession.outputURL = videoURL;
+                assetExportSession.outputFileType = AVFileTypeMPEG4;
+                assetExportSession.shouldOptimizeForNetworkUse = YES;
                 
-                [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                [assetExportSession exportAsynchronouslyWithCompletionHandler:^{
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        if ([exportSession status] == AVAssetExportSessionStatusCompleted) {
+                        if ([assetExportSession status] == AVAssetExportSessionStatusCompleted) {
                             [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
                             [weakSelf.allURL addObject:videoURL];
                             [weakSelf.videoURL addObject:videoURL];
                             [weakSelf writeModelToTempPath];
-                        }else if ([exportSession status] == AVAssetExportSessionStatusFailed){
+                        }else if ([assetExportSession status] == AVAssetExportSessionStatusFailed){
                             if (weakSelf.failedHandler) {
                                 weakSelf.failedHandler();
                             }
                             [weakSelf cleanWriteList];
-                        }else if ([exportSession status] == AVAssetExportSessionStatusCancelled) {
+                        }else if ([assetExportSession status] == AVAssetExportSessionStatusCancelled) {
                             if (weakSelf.failedHandler) {
                                 weakSelf.failedHandler();
                             }
@@ -197,7 +169,7 @@
                         }
                     });
                 }];
-            } failed:^(NSDictionary *info) {
+            } failed:^(NSDictionary *info, HXPhotoModel *model) {
                 if (weakSelf.failedHandler) {
                     weakSelf.failedHandler();
                 }
@@ -306,60 +278,54 @@
             }
         });
     }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
-        if (model.asset) {
-            [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-                
-            } progressHandler:^(double progress) {
-                
-            } completion:^(NSData *imageData, UIImageOrientation orientation) {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
-                    
-                    NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-                    
-                    if ([imageData writeToFile:fullPathToFile atomically:YES]) {
-                        [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
-                        [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                        [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                        [weakSelf writeModelToTempPath];
-                    }else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (weakSelf.failedHandler) {
-                                weakSelf.failedHandler();
-                            }
-                            [weakSelf cleanWriteList];
-                        });
-                    }
-                });
-            } failed:^(NSDictionary *info) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (weakSelf.failedHandler) {
-                        weakSelf.failedHandler();
-                        [weakSelf cleanWriteList];
-                    }
-                });
-            }];
-        }else {
+//        if (model.asset) {
+        [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
+                NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
                 
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 
-                if ([model.gifImageData writeToFile:fullPathToFile atomically:YES]) {
-                    [self.allArray removeObject:self.writeArray.firstObject];
-                    [self.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                    [self.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
-                    [self writeModelToTempPath];
+                if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+                    [weakSelf.allArray removeObject:weakSelf.writeArray.firstObject];
+                    [weakSelf.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [weakSelf.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+                    [weakSelf writeModelToTempPath];
                 }else {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        if (self.failedHandler) {
-                            self.failedHandler();
+                        if (weakSelf.failedHandler) {
+                            weakSelf.failedHandler();
                         }
-                        [self cleanWriteList];
+                        [weakSelf cleanWriteList];
                     });
                 }
             });
-        }
+        } failed:^(NSDictionary *info, HXPhotoModel *model) {
+            if (weakSelf.failedHandler) {
+                weakSelf.failedHandler();
+                [weakSelf cleanWriteList];
+            }
+        }];
+//        }else {
+//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
+//
+//                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+//
+//                if ([model.gifImageData writeToFile:fullPathToFile atomically:YES]) {
+//                    [self.allArray removeObject:self.writeArray.firstObject];
+//                    [self.allURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+//                    [self.photoURL addObject:[NSURL fileURLWithPath:fullPathToFile]];
+//                    [self writeModelToTempPath];
+//                }else {
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        if (self.failedHandler) {
+//                            self.failedHandler();
+//                        }
+//                        [self cleanWriteList];
+//                    });
+//                }
+//            });
+//        }
     }else {
         if (model.asset) {
             CGSize size = CGSizeZero;
@@ -376,26 +342,21 @@
             }else {
                 size = PHImageManagerMaximumSize;
             }
-            
-            [HXPhotoTools getHighQualityFormatPhoto:model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-                
-            } progressHandler:^(double progress) {
-                
-            } completion:^(UIImage *image) {
+            [model requestPreviewImageWithSize:size startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     UIImage *tempImage = image;
                     if (tempImage.imageOrientation != UIImageOrientationUp) {
-                        tempImage = [tempImage normalizedImage];
+                        tempImage = [tempImage hx_normalizedImage];
                     }
                     NSData *imageData;
                     NSString *suffix;
                     
-//                    NSString *UTI = [model.asset valueForKey:@"uniformTypeIdentifier"];
-//                    BOOL isHEIF = NO;
-//                    isHEIF = [UTI isEqualToString:@"public.heif"] || [UTI isEqualToString:@"public.heic"];
-//                    if (isHEIF) {
-//
-//                    }
+                    //                    NSString *UTI = [model.asset valueForKey:@"uniformTypeIdentifier"];
+                    //                    BOOL isHEIF = NO;
+                    //                    isHEIF = [UTI isEqualToString:@"public.heif"] || [UTI isEqualToString:@"public.heic"];
+                    //                    if (isHEIF) {
+                    //
+                    //                    }
                     
                     if (UIImagePNGRepresentation(tempImage)) {
                         //返回为png图像。
@@ -425,13 +386,11 @@
                         });
                     }
                 });
-            } failed:^(NSDictionary *info) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (weakSelf.failedHandler) {
-                        weakSelf.failedHandler();
-                    }
-                    [weakSelf cleanWriteList];
-                });
+            } failed:^(NSDictionary *info, HXPhotoModel *model) {
+                if (weakSelf.failedHandler) {
+                    weakSelf.failedHandler();
+                }
+                [weakSelf cleanWriteList];
             }];
         }else {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -573,16 +532,14 @@
     [self.waitImageDataModelArray removeLastObject];
     HXPhotoModel *model = self.currentImageDataModelArray.firstObject;
     if (model.asset) {
-        __weak typeof(self) weakSelf = self;
-        self.currentImageDataRequestID = [HXPhotoTools getImageData:model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            weakSelf.currentImageDataRequestID = cloudRequestId;
-        } progressHandler:^(double progress) {
-            
-        } completion:^(NSData *imageData, UIImageOrientation orientation) {
+        HXWeakSelf
+        self.currentImageDataRequestID = [model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+            weakSelf.currentImageDataRequestID = iCloudRequestId;
+        } progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
             [weakSelf.imageDataArray addObject:imageData];
             [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
             [weakSelf getCurrentModelImageData];
-        } failed:^(NSDictionary *info) {
+        } failed:^(NSDictionary *info, HXPhotoModel *model) {
             if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
                 weakSelf.gettingImageData = NO;
                 weakSelf.cancelGetImageData = NO;
@@ -592,18 +549,18 @@
                 }
                 return;
             }
-            HXPhotoModel *model = weakSelf.currentImageDataModelArray.firstObject;
-            if (model.gifImageData) {
-                [weakSelf.imageDataArray addObject:model.gifImageData];
-                [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
-                [weakSelf getCurrentModelImageData];
-            }else {
-                weakSelf.gettingImageData = NO;
-                if (weakSelf.imageDataFailedHandler) {
-                    weakSelf.imageDataFailedHandler();
-                }
+            //            HXPhotoModel *model = weakSelf.currentImageDataModelArray.firstObject;
+            //            if (model.gifImageData) {
+            //                [weakSelf.imageDataArray addObject:model.gifImageData];
+            //                [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
+            //                [weakSelf getCurrentModelImageData];
+            //            }else {
+            weakSelf.gettingImageData = NO;
+            if (weakSelf.imageDataFailedHandler) {
+                weakSelf.imageDataFailedHandler();
             }
-        }];
+            //            }
+        }]; 
     }else {
         if (model.networkPhotoUrl) {
             __weak typeof(self) weakSelf = self;
@@ -613,7 +570,7 @@
                     if (!error && data) {
                         model.thumbPhoto = image;
                         model.previewPhoto = image;
-                        model.gifImageData = data;
+//                        model.gifImageData = data;
                         [weakSelf.imageDataArray addObject:data];
                         [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
                         [weakSelf getCurrentModelImageData];
@@ -635,7 +592,7 @@
                     if (!error && image) {
                         model.thumbPhoto = image;
                         model.previewPhoto = image;
-                        model.gifImageData = data;
+//                        model.gifImageData = data;
                         [weakSelf.imageDataArray addObject:data];
                         [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
                         [weakSelf getCurrentModelImageData];
@@ -652,19 +609,19 @@
                 return;
             }
         }
-        if (model.gifImageData) {
-            [self.imageDataArray addObject:model.gifImageData];
-            [self.allImageDataModelArray removeObject:self.currentImageDataModelArray.firstObject];
-            [self getCurrentModelImageData];
-        }else {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{ 
+//        if (model.gifImageData) {
+//            [self.imageDataArray addObject:model.gifImageData];
+//            [self.allImageDataModelArray removeObject:self.currentImageDataModelArray.firstObject];
+//            [self getCurrentModelImageData];
+//        }else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSData *imageData = UIImageJPEGRepresentation(model.thumbPhoto, 1.0f);
-                model.gifImageData = imageData;
+//                model.gifImageData = imageData;
                 [self.imageDataArray addObject:imageData];
                 [self.allImageDataModelArray removeObject:self.currentImageDataModelArray.firstObject];
                 [self getCurrentModelImageData];
             });
-        }
+//        }
     }
 }
 
@@ -753,15 +710,13 @@
         }else {
             size = PHImageManagerMaximumSize;
         }
-        self.currentImageRequestID = [HXPhotoTools getHighQualityFormatPhoto:model.asset size:size startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            weakSelf.currentImageRequestID = cloudRequestId;
-        } progressHandler:^(double progress) {
-            
-        } completion:^(UIImage *image) {
+        self.currentImageRequestID = [model requestPreviewImageWithSize:size startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+            weakSelf.currentImageRequestID = iCloudRequestId;
+        } progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
             [weakSelf.imageArray addObject:image];
             [weakSelf.allImageModelArray removeObject:weakSelf.currentImageModelArray.firstObject];
             [weakSelf getCurrentModelImage];
-        } failed:^(NSDictionary *info) {
+        } failed:^(NSDictionary *info, HXPhotoModel *model) {
             if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
                 weakSelf.gettingImage = NO;
                 weakSelf.cancelGetImage = NO;
@@ -771,9 +726,9 @@
                 }
                 return;
             }
-            HXPhotoModel *model = weakSelf.currentImageModelArray.firstObject;
-            if (model.thumbPhoto) {
-                [weakSelf.imageArray addObject:model.thumbPhoto];
+            HXPhotoModel *cModel = weakSelf.currentImageModelArray.firstObject;
+            if (cModel.thumbPhoto) {
+                [weakSelf.imageArray addObject:cModel.thumbPhoto];
                 [weakSelf.allImageModelArray removeObject:weakSelf.currentImageModelArray.firstObject];
                 [weakSelf getCurrentModelImage];
             }else {

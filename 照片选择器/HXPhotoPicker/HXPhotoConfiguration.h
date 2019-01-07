@@ -26,6 +26,16 @@ typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
 
 @interface HXPhotoConfiguration : NSObject
 
+
+/**
+ 如果选择完照片返回之后，
+ 原有界面继承UIScrollView的视图都往下偏移一个导航栏距离的话，
+ 那么请将这个属性设置为YES，即可恢复。
+ */
+@property (assign, nonatomic) BOOL restoreNavigationBar;
+
+@property (assign, nonatomic) BOOL changeAlbumListContentView;
+
 /**
  照片列表是否按照片日期排序  默认YES
  */
@@ -400,16 +410,21 @@ typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
 /**
  *  视频能选择的最大秒数  -  默认 3分钟/180秒
  */
-@property (assign, nonatomic) NSTimeInterval videoMaxDuration;
+@property (assign, nonatomic) NSTimeInterval videoMaximumSelectDuration;
 
 /**
- 是否为单选模式 默认 NO
+ *  视频能选择的最小秒数  -  默认 0秒 - 不限制
+ */
+@property (assign, nonatomic) NSTimeInterval videoMinimumSelectDuration;
+
+/**
+ 是否为单选模式 默认 NO  HXPhotoView 不支持
  会自动过滤掉gif、livephoto
  */
 @property (assign, nonatomic) BOOL singleSelected;
 
 /**
- 单选模式下选择图片时是否直接跳转到编辑界面  - 默认 YES
+ 单选模式下选择图片时是否直接跳转到编辑界面  - 默认 NO
  */
 @property (assign, nonatomic) BOOL singleJumpEdit;
 

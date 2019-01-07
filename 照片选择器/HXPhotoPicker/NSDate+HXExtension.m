@@ -12,7 +12,7 @@
 /**
  *  是否为今天
  */
-- (BOOL)isToday {
+- (BOOL)hx_isToday {
     NSCalendar *calendar = [NSCalendar currentCalendar];
     int unit = NSCalendarUnitDay | NSCalendarUnitMonth |  NSCalendarUnitYear;
     
@@ -29,7 +29,7 @@
 /**
  *  是否为昨天
  */
-- (BOOL)isYesterday {
+- (BOOL)hx_isYesterday {
     NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
     fmt.dateFormat = @"yyyyMMdd";
     
@@ -51,7 +51,7 @@
 /**
  *  是否为今年
  */
-- (BOOL)isThisYear {
+- (BOOL)hx_isThisYear {
     NSCalendar *calendar = [NSCalendar currentCalendar];
     int unit = NSCalendarUnitYear;
     
@@ -67,7 +67,7 @@
 /**
  是否为同一周内 
  */
-- (BOOL)isSameWeek {
+- (BOOL)hx_isSameWeek {
     NSCalendar *calendar = [NSCalendar currentCalendar];
     int unit = NSCalendarUnitWeekday | NSCalendarUnitMonth | NSCalendarUnitYear ;
     
@@ -79,7 +79,7 @@
     
     return (selfCmps.year == nowCmps.year) && (selfCmps.month == nowCmps.month) && (selfCmps.day == nowCmps.day);
 }
-- (NSString *)getNowWeekday {
+- (NSString *)hx_getNowWeekday {
     NSDateFormatter *dateday = [[NSDateFormatter alloc] init];
     NSString *language = [NSLocale preferredLanguages].firstObject;
     
@@ -107,9 +107,21 @@
     return [dateday stringFromDate:self];
 }
 
-- (NSString *)dateStringWithFormat:(NSString *)format {
+- (NSString *)hx_dateStringWithFormat:(NSString *)format {
     NSDateFormatter *formater = [[NSDateFormatter alloc] init];
     formater.dateFormat = format;
     return[formater stringFromDate:self];
+}
+
+- (BOOL)hx_isSameDay:(NSDate*)date {
+    NSCalendar* calendar = [NSCalendar currentCalendar];
+    
+    unsigned unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay;
+    NSDateComponents* comp1 = [calendar components:unitFlags fromDate:self];
+    NSDateComponents* comp2 = [calendar components:unitFlags fromDate:date];
+    
+    return [comp1 day]   == [comp2 day] &&
+    [comp1 month] == [comp2 month] &&
+    [comp1 year]  == [comp2 year];
 }
 @end

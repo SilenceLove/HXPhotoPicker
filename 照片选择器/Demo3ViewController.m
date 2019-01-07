@@ -91,7 +91,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 - (void)addNetworkPhoto {
     if (self.manager.afterSelectPhotoCountIsMaximum) {
-        [self.view showImageHUDText:@"图片已达到最大数"];
+        [self.view hx_showImageHUDText:@"图片已达到最大数"];
         return;
     }
     int x = arc4random() % 4;

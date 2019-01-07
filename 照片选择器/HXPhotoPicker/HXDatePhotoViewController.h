@@ -82,6 +82,7 @@ HXAlbumListViewController;
 - (HXDatePhotoViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (BOOL)scrollToModel:(HXPhotoModel *)model;
 - (void)scrollToPoint:(HXDatePhotoViewCell *)cell rect:(CGRect)rect;
+- (void)startGetAllPhotoModel;
 @end
 
 @protocol HXDatePhotoViewCellDelegate <NSObject>
@@ -111,6 +112,9 @@ HXAlbumListViewController;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic, readonly) HXCustomCameraController *cameraController;
 @property (strong, nonatomic, readonly) HXCustomPreviewView *previewView;
+@property (strong, nonatomic) UIView *tempCameraPreviewView;
+@property (strong, nonatomic) UIView *tempCameraView;
+@property (copy, nonatomic) void (^ stopRunningComplete)(UIView *tempCameraPreviewView);
 - (void)starRunning;
 - (void)stopRunning;
 @end

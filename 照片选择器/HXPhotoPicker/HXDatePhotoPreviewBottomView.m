@@ -152,7 +152,7 @@
 - (void)changeDoneBtnFrame {
     if (self.outside) {
         if (self.manager.afterSelectedPhotoArray.count && self.manager.afterSelectedVideoArray.count) {
-            if (self.manager.configuration.videoCanEdit && self.manager.configuration.photoCanEdit) {
+            if (!self.manager.configuration.videoCanEdit && !self.manager.configuration.photoCanEdit) {
                 self.collectionView.hx_w = self.hx_w - 12;
             }else {
                 self.editBtn.hx_x = self.hx_w - 12 - self.editBtn.hx_w;
@@ -167,7 +167,8 @@
             }
         }
     }else {
-        CGFloat width = [HXPhotoTools getTextWidth:self.doneBtn.currentTitle height:30 fontSize:14];
+        
+        CGFloat width = self.doneBtn.titleLabel.hx_getTextWidth;
         self.doneBtn.hx_w = width + 20;
         if (self.doneBtn.hx_w < 50) {
             self.doneBtn.hx_w = 50;
@@ -265,7 +266,7 @@
             [_doneBtn setTitleColor:self.manager.configuration.selectedTitleColor forState:UIControlStateNormal];
             [_doneBtn setTitleColor:[self.manager.configuration.selectedTitleColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         }
-        _doneBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
+        _doneBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         _doneBtn.layer.cornerRadius = 3;
         _doneBtn.backgroundColor = self.manager.configuration.themeColor;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
@@ -326,11 +327,11 @@
             }];
         }
     }else {
-        self.requestID = [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
+        self.requestID = [self.model requestThumbImageCompletion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
             if (weakSelf.model == model) {
                 weakSelf.imageView.image = image;
             }
-        }];
+        }]; 
     }
 }
 - (void)layoutSubviews {

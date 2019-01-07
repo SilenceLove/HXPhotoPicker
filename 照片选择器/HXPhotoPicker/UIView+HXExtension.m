@@ -98,9 +98,8 @@
 }
 
 - (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
-    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-    vc.delegate = delegate ? delegate : (id)self;
-    vc.manager = manager;
+    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] initWithManager:manager];
+    vc.delegate = delegate ? delegate : (id)self; 
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
     [self.hx_viewController presentViewController:nav animated:YES completion:nil];
@@ -117,16 +116,17 @@
     [self.hx_viewController presentViewController:nav animated:YES completion:nil];
 }
 
-- (void)showImageHUDText:(NSString *)text {
-    CGFloat hudW = [HXPhotoTools getTextWidth:text height:15 fontSize:14];
+- (void)hx_showImageHUDText:(NSString *)text {
+    CGFloat hudW = [UILabel hx_getTextWidthWithText:text height:15 fontSize:14];
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
     }
-    CGFloat hudH = [HXPhotoTools getTextHeight:text width:hudW fontSize:14];
+    
+    CGFloat hudH = [UILabel hx_getTextHeightWithText:text width:hudW fontSize:14];
     if (hudW < 100) {
         hudW = 100;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110 + hudH - 15) imageName:@"hx_alert_failed@2x.png" text:text];
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110 + hudH - 15) imageName:@"hx_alert_failed" text:text];
     hud.alpha = 0;
     hud.tag = 1008611;
     [self addSubview:hud];
@@ -136,44 +136,75 @@
     }];
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     [self performSelector:@selector(handleGraceTimer) withObject:nil afterDelay:1.5f inModes:@[NSRunLoopCommonModes]];
+} 
+
+- (void)hx_showLoadingHUDText:(NSString *)text {
+    [self hx_showLoadingHUDText:text delay:0.f];
 }
 
-- (void)showLoadingHUDText:(NSString *)text {
-    CGFloat hudW = [HXPhotoTools getTextWidth:text height:15 fontSize:14];
+- (void)hx_showLoadingHUDText:(NSString *)text delay:(NSTimeInterval)delay {
+    CGFloat hudW = [UILabel hx_getTextWidthWithText:text height:15 fontSize:14];
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
     }
-    CGFloat hudH = [HXPhotoTools getTextHeight:text width:hudW fontSize:14];
+    
+    CGFloat hudH = [UILabel hx_getTextHeightWithText:text width:hudW fontSize:14];
     CGFloat width = 110;
     CGFloat height = width + hudH - 15;
     if (!text) {
         width = 95;
         height = 95;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:@"hx_alert_failed@2x.png" text:text];
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:@"" text:text];
     [hud showloading];
     hud.alpha = 0;
     hud.tag = 10086;
     [self addSubview:hud];
     hud.center = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
-    [UIView animateWithDuration:0.25 animations:^{
-        hud.alpha = 1;
-    }];
-}
-
-- (void)handleLoading {
-    [UIView cancelPreviousPerformRequestsWithTarget:self];
-    for (UIView *view in self.subviews) {
-        if (view.tag == 10086) {
-            [UIView animateWithDuration:0.2f animations:^{
-                view.alpha = 0;
-            } completion:^(BOOL finished) {
-                [view removeFromSuperview];
+    if (delay) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [UIView animateWithDuration:0.25 animations:^{
+                hud.alpha = 1;
             }];
-        }
+        });
+    }else {
+        [UIView animateWithDuration:0.25 animations:^{
+            hud.alpha = 1;
+        }];
     }
 }
 
+- (void)hx_handleLoading {
+    [self hx_handleLoading:YES];
+} 
+- (void)hx_handleLoading:(BOOL)animation {
+    [self hx_handleLoading:animation duration:0.2f];
+}
+- (void)hx_handleLoading:(BOOL)animation duration:(NSTimeInterval)duration {
+    [UIView cancelPreviousPerformRequestsWithTarget:self];
+    for (UIView *view in self.subviews) {
+        if (view.tag == 10086) {
+            if (animation) {
+                [UIView animateWithDuration:duration animations:^{
+                    view.alpha = 0;
+                } completion:^(BOOL finished) {
+                    [view removeFromSuperview];
+                }];
+            }else {
+                [view removeFromSuperview];
+            } 
+        }
+    }
+}
+- (void)hx_handleImageWithDelay:(NSTimeInterval)delay {
+    if (delay) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self handleGraceTimer];
+        });
+    }else {
+        [self handleGraceTimer];
+    }
+}
 - (void)handleGraceTimer {
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
@@ -211,10 +242,12 @@
 }
 
 - (void)setup {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[HXPhotoTools hx_imageNamed:self.imageName]];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage hx_imageNamed:self.imageName]];
     [self addSubview:imageView];
     CGFloat imgW = imageView.image.size.width;
+    if (imgW <= 0) imgW = 37;
     CGFloat imgH = imageView.image.size.height;
+    if (imgH <= 0) imgH = 37;
     CGFloat imgCenterX = self.frame.size.width / 2;
     imageView.frame = CGRectMake(0, 20, imgW, imgH);
     imageView.center = CGPointMake(imgCenterX, imageView.center.y);
@@ -227,11 +260,13 @@
     label.font = [UIFont systemFontOfSize:14];
     label.numberOfLines = 0;
     [self addSubview:label];
-    CGFloat labelX = 10;
-    CGFloat labelY = CGRectGetMaxY(imageView.frame) + 10;
-    CGFloat labelW = self.frame.size.width - 20;
-    CGFloat labelH = [HXPhotoTools getTextHeight:self.text width:labelW fontSize:14];
-    label.frame = CGRectMake(labelX, labelY, labelW, labelH);
+    label.hx_x = 10;
+    label.hx_y = CGRectGetMaxY(imageView.frame) + 10;
+    label.hx_w = self.frame.size.width - 20;
+    label.hx_h = [label hx_getTextHeight];
+    if (self.text.length) {
+        self.hx_h = CGRectGetMaxY(label.frame) + 20;
+    }
 }
 
 - (void)showloading {

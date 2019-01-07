@@ -70,7 +70,7 @@
             CGFloat min = MIN(max, missingY);
             
             if (topY >= normalY && topY <= missingY + headerHeight) {
-                if (iOS9_Later) {
+                if (HX_IOS9Later) {
                     HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
                     if (headerView) {
                         headerView.changeState = YES;
@@ -78,7 +78,7 @@
                 }
                 self.hasSuspension = YES;
             }else {
-                if (iOS9_Later) {
+                if (HX_IOS9Later) {
                     HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
                     if (headerView) {
                         headerView.changeState = NO;

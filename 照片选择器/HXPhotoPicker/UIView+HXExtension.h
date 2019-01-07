@@ -25,9 +25,13 @@
  */
 - (UIViewController *)hx_viewController;
 
-- (void)showImageHUDText:(NSString *)text;
-- (void)showLoadingHUDText:(NSString *)text;
-- (void)handleLoading;
+- (void)hx_showImageHUDText:(NSString *)text;
+- (void)hx_showLoadingHUDText:(NSString *)text;
+- (void)hx_showLoadingHUDText:(NSString *)text delay:(NSTimeInterval)delay;
+- (void)hx_handleLoading;
+- (void)hx_handleLoading:(BOOL)animation;
+- (void)hx_handleLoading:(BOOL)animation duration:(NSTimeInterval)duration;
+- (void)hx_handleImageWithDelay:(NSTimeInterval)delay;
 
 /* <HXAlbumListViewControllerDelegate> */
 - (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;

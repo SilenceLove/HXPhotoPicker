@@ -50,9 +50,10 @@
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    HXWeakSelf
     if (buttonIndex == 0) {
         if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-            [self.view showImageHUDText:@"此设备不支持相机!"];
+            [self.view hx_showImageHUDText:@"此设备不支持相机!"];
             return;
         }
         AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
@@ -61,8 +62,6 @@
             [alert show];
             return;
         }
-//        [self hx_presentCustomCameraViewControllerWithManager:self.manager delegate:self];
-        __weak typeof(self) weakSelf = self;
         [self hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
             [weakSelf.manager afterListAddCameraTakePicturesModel:model];
             Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
@@ -72,7 +71,15 @@
             NSSLog(@"取消了");
         }];
     }else if (buttonIndex == 1){
-        [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
+        [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
+            Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
+            vc.manager = weakSelf.manager;
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+        } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
+            
+        } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
+            
+        }];
     }
 }
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -87,9 +94,6 @@
 //    [self.navigationController pushViewController:vc animated:YES];
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
-    Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
-    vc.manager = self.manager;
-    [self.navigationController pushViewController:vc animated:YES];
 }
 
 

@@ -85,12 +85,12 @@
 - (void)didRightBtn {
     self.completeArray = [NSMutableArray array];
     self.waitArray = [NSMutableArray arrayWithArray:self.dataArray];
-    [self.view showLoadingHUDText:@"写入中"];
+    [self.view hx_showLoadingHUDText:@"写入中"];
     [self startUpload];
 }
 - (void)startUpload {
     if (self.waitArray.count == 0) {
-        [self.view handleLoading];
+        [self.view hx_handleLoading];
         NSSLog(@"全部写入完毕");
         return;
     }
@@ -104,8 +104,8 @@
             [weakSelf.completeArray addObject:model];
             [weakSelf startUpload];
         } failed:^{
-            [weakSelf.view handleLoading];
-            [weakSelf.view showImageHUDText:[NSString stringWithFormat:@"第%ld个cell写入失败",[weakSelf.dataArray indexOfObject:model]]];
+            [weakSelf.view hx_handleLoading];
+            [weakSelf.view hx_showImageHUDText:[NSString stringWithFormat:@"第%ld个cell写入失败",[weakSelf.dataArray indexOfObject:model]]];
         }];
     }else {
         [self.completeArray addObject:model];
@@ -177,15 +177,15 @@
     vc.previewActionItemsBlock = ^NSArray<id<UIPreviewActionItem>> *{
         
         UIPreviewAction *action1 = [UIPreviewAction actionWithTitle:@"赞" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-            [weakSelf.view showImageHUDText:@"点赞成功!"];
+            [weakSelf.view hx_showImageHUDText:@"点赞成功!"];
             NSSLog(@"赞!!!");
         }];
         UIPreviewAction *action2 = [UIPreviewAction actionWithTitle:@"评论" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-            [weakSelf.view showImageHUDText:@"评论成功!"];
+            [weakSelf.view hx_showImageHUDText:@"评论成功!"];
             NSSLog(@"评论!!!");
         }];
         UIPreviewAction *action3 = [UIPreviewAction actionWithTitle:@"收藏" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-            [weakSelf.view showImageHUDText:@"收藏成功!"];
+            [weakSelf.view hx_showImageHUDText:@"收藏成功!"];
             NSSLog(@"收藏!!!");
         }];
         return @[action1, action2, action3];

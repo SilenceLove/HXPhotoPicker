@@ -26,8 +26,11 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     self.photoView1.delegate = self;
+    self.photoView1.lineCount = 5;
     self.photoView2.delegate = self;
-    self.photoView3.delegate = self; 
+    self.photoView2.lineCount = 4;
+    self.photoView3.delegate = self;
+    self.photoView3.lineCount = 3;
 }
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame {
     if (photoView == self.photoView1) {

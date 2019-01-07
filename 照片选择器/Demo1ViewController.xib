@@ -269,7 +269,7 @@
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Snx-lR-3pl">
+                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Snx-lR-3pl">
                                     <rect key="frame" x="255" y="510.66666666666663" width="51" height="31"/>
                                     <connections>
                                         <action selector="yc:" destination="-1" eventType="valueChanged" id="ogd-2m-ii0"/>

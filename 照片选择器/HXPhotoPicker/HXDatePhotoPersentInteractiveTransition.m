@@ -31,7 +31,7 @@
 @implementation HXDatePhotoPersentInteractiveTransition
 - (void)addPanGestureForViewController:(UIViewController *)viewController photoView:(HXPhotoView *)photoView {
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
-//    pan.delegate = self;
+    pan.delegate = self;
     self.vc = viewController;
     self.photoView = photoView;
     [viewController.view addGestureRecognizer:pan];
@@ -43,18 +43,33 @@
 //    rotaitonGest.delegate =self;
 //    [viewController.view addGestureRecognizer:rotaitonGest];
     
-    [viewController.view setMultipleTouchEnabled:YES];
+//    [viewController.view setMultipleTouchEnabled:YES];
 }
-
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
-        return NO;
-    }else if ([gestureRecognizer isKindOfClass:[UIPinchGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
-        return NO;
-    }else if ([gestureRecognizer isKindOfClass:[UIRotationGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+    if ([otherGestureRecognizer.view isKindOfClass:[UICollectionView class]]) {
         return NO;
     }
-    
+    if ([otherGestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)otherGestureRecognizer.view;
+        if (scrollView.contentOffset.y <= 0 &&
+            !scrollView.dragging &&
+            !scrollView.zooming) {
+            return YES;
+        }
+    }
+    return NO;
+}
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    HXDatePhotoPreviewViewController *previewVC = (HXDatePhotoPreviewViewController *)self.vc;
+    HXDatePhotoPreviewViewCell *viewCell = [previewVC currentPreviewCell:previewVC.modelArray[previewVC.currentModelIndex]];
+    if (viewCell.scrollView.dragging ||
+        viewCell.scrollView.zooming ||
+        viewCell.scrollView.zoomScale < 1.0f ||
+        viewCell.scrollView.isZoomBouncing) {
+        [gestureRecognizer cancelsTouchesInView];
+        return NO;
+    }
+    [viewCell.scrollView setContentOffset:viewCell.scrollView.contentOffset animated:NO];
     return YES;
 }
 - (void)rotationView:(UIRotationGestureRecognizer *)rotationGest {
@@ -68,20 +83,20 @@
     CGFloat scale = pinchGestureRecognizer.scale;
     NSLog(@"%f",scale);
     switch (pinchGestureRecognizer.state) {
-        case UIGestureRecognizerStateBegan:
+        case UIGestureRecognizerStateBegan: {
             if (scale > 1) {
                 [pinchGestureRecognizer cancelsTouchesInView];
                 return;
             }
             self.isPanGesture = NO;
-            if (![(HXDatePhotoPreviewViewController *)self.vc bottomView].userInteractionEnabled) {
+            HXDatePhotoPreviewViewController *previewVC = (HXDatePhotoPreviewViewController *)self.vc; 
+            if (![previewVC bottomView].userInteractionEnabled) {
                 [[UIApplication sharedApplication] setStatusBarHidden:NO];
             }
-            [(HXDatePhotoPreviewViewController *)self.vc setStopCancel:YES];
-            
+            [previewVC setStopCancel:YES];
             self.interation = YES;
             [self.vc dismissViewControllerAnimated:YES completion:nil];
-            break;
+        }   break;
         case UIGestureRecognizerStateChanged:
             if (self.interation) {
                 
@@ -209,6 +224,7 @@
     HXPhotoSubViewCell *toCell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:[self.photoView currentModelIndexPath:model]];
     
     self.fromCell = fromCell;
+    self.fromCell.scrollView.scrollEnabled = NO;
     
     UIView *containerView = [transitionContext containerView];
     CGRect tempImageViewFrame;
@@ -272,6 +288,9 @@
     }
     self.tempImageView.layer.anchorPoint = CGPointMake(scaleX, scaleY);
     
+    [fromCell resetScale:NO];
+    [fromCell refreshImageSize];
+    
     self.tempImageView.frame = tempImageViewFrame;
     self.transitionImgViewCenter = self.tempImageView.center;
     
@@ -332,6 +351,7 @@
                 fromVC.view.backgroundColor = [UIColor whiteColor];
             }
         }
+        self.fromCell.scrollView.scrollEnabled = YES;
         self.tempCell.hidden = NO;
         self.tempCell = nil;
         [self.tempImageView removeFromSuperview];

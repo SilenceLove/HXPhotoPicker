@@ -65,7 +65,7 @@
 - (UIButton *)deleteBtn {
     if (!_deleteBtn) {
         _deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_deleteBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_compose_delete@2x.png"] forState:UIControlStateNormal];
+        [_deleteBtn setImage:[UIImage hx_imageNamed:@"hx_compose_delete"] forState:UIControlStateNormal];
         [_deleteBtn addTarget:self action:@selector(didDeleteClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _deleteBtn;
@@ -142,7 +142,7 @@
 }
 - (void)setDeleteImageName:(NSString *)deleteImageName {
     _deleteImageName = deleteImageName;
-    [self.deleteBtn setImage:[HXPhotoTools hx_imageNamed:deleteImageName] forState:UIControlStateNormal];
+    [self.deleteBtn setImage:[UIImage hx_imageNamed:deleteImageName] forState:UIControlStateNormal];
 }
 - (void)resetNetworkImage {
     if (self.model.networkPhotoUrl &&
@@ -200,11 +200,11 @@
                 HXWeakSelf
                 model.clarityScale = 1.5f;
                 model.rowCount = 3.f;
-                [HXPhotoTools getImageWithModel:model completion:^(UIImage *image, HXPhotoModel *model) {
+                [self.model requestThumbImageCompletion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                     if (weakSelf.model == model) {
                         weakSelf.imageView.image = image;
                     }
-                }];
+                }]; 
             }
         }
     }

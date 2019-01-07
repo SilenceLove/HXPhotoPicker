@@ -23,10 +23,11 @@
         _manager.configuration.albumListTableView = ^(UITableView *tableView) {
 //            NSSLog(@"%@",tableView);
         };
-        _manager.configuration.singleJumpEdit = YES;
+        _manager.configuration.singleJumpEdit = NO;
         _manager.configuration.movableCropBox = YES;
         _manager.configuration.movableCropBoxEditSize = YES;
-        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
+        _manager.configuration.requestImageAfterFinishingSelection = NO;
+//        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
 //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
     }
     return _manager;
@@ -44,65 +45,39 @@
 }
 - (IBAction)selectedPhoto:(id)sender {
     self.manager.configuration.saveSystemAblum = YES;
-    
-    __weak typeof(self) weakSelf = self;
-    if (self.manager.configuration.requestImageAfterFinishingSelection) {
-        [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
-            
-        } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
-            // requestImageAfterFinishingSelection = YES 时 imageList才会有值
-            NSSLog(@"%@",imageList);
-            NSSLog(@"%ld张图片",imageList.count);
-        } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
-            NSSLog(@"取消了");
-        }];
-    }else {
-        [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
-            if (photoList.count > 0) {
-                //            HXPhotoModel *model = photoList.firstObject;
-                //            weakSelf.imageView.image = model.previewPhoto;
-                [weakSelf.view showLoadingHUDText:@"获取图片中"];
-                [weakSelf.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
-                    [weakSelf.view handleLoading];
-                    weakSelf.imageView.image = imageList.firstObject;
-                } failed:^{
-                    [weakSelf.view handleLoading];
-                    [weakSelf.view showImageHUDText:@"获取失败"];
-                }];
-                NSSLog(@"%ld张图片",photoList.count);
-            }else if (videoList.count > 0) {
-                [weakSelf.toolManager getSelectedImageList:allList success:^(NSArray<UIImage *> *imageList) {
-                    weakSelf.imageView.image = imageList.firstObject;
-                } failed:^{
-                    
-                }];
-                
-                // 通个这个方法将视频压缩写入临时目录获取视频URL  或者 通过这个获取视频在手机里的原路径 model.fileURL  可自己压缩
-                [weakSelf.view showLoadingHUDText:@"视频写入中"];
-                [weakSelf.toolManager writeSelectModelListToTempPathWithList:videoList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
-                    NSSLog(@"%@",videoURL);
-                    [weakSelf.view handleLoading];
-                } failed:^{
-                    [weakSelf.view handleLoading];
-                    [weakSelf.view showImageHUDText:@"写入失败"];
-                    NSSLog(@"写入失败");
-                }];
-                NSSLog(@"%ld个视频",videoList.count);
-            }
-        } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
-            // requestImageAfterFinishingSelection = YES 时 imageList才会有值
-        } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
-            NSSLog(@"取消了");
-        }]; 
-    }
-    
-//    [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
-//    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-//    vc.delegate = self;
-//    vc.manager = self.manager;
-//    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-//    nav.supportRotation = self.manager.configuration.supportRotation;
-//    [self presentViewController:nav animated:YES completion:nil];
+    HXWeakSelf
+    [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
+        HXPhotoModel *model = allList.firstObject;
+        
+        if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+            [weakSelf.view hx_showLoadingHUDText:@"获取图片中"];
+            [model requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                [weakSelf.view hx_handleLoading];
+                weakSelf.imageView.image = image;
+            } failed:^(NSDictionary *info, HXPhotoModel *model) {
+                [weakSelf.view hx_handleLoading];
+                [weakSelf.view hx_showImageHUDText:@"获取失败"];
+            }];
+        }else  if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            [weakSelf.view hx_showLoadingHUDText:@"获取视频中"];
+            [model exportVideoWithPresetName:AVAssetExportPresetHighestQuality startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:^(float progress, HXPhotoModel *model) {
+                NSSLog(@"视频导出进度 - %f",progress)
+            } success:^(NSURL *videoURL, HXPhotoModel *model) {
+                NSSLog(@"%@",videoURL);
+                UIImage *image = [UIImage hx_thumbnailImageForVideo:videoURL atTime:0.1f];
+                weakSelf.imageView.image = image;
+                [weakSelf.view hx_handleLoading];
+            } failed:^(NSDictionary *info, HXPhotoModel *model) {
+                [weakSelf.view hx_handleLoading];
+                [weakSelf.view hx_showImageHUDText:@"视频导出失败"];
+            }];
+            NSSLog(@"%ld个视频",videoList.count);
+        }
+    } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
+        // requestImageAfterFinishingSelection = YES 时 imageList才会有值
+    } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
+        NSSLog(@"取消了");
+    }];
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if (photoList.count > 0) {
@@ -118,13 +93,13 @@
         }];
         
         // 通个这个方法将视频压缩写入临时目录获取视频URL  或者 通过这个获取视频在手机里的原路径 model.fileURL  可自己压缩
-        [self.view showLoadingHUDText:@"视频写入中"];
+        [self.view hx_showLoadingHUDText:@"视频写入中"];
         [self.toolManager writeSelectModelListToTempPathWithList:videoList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
             NSSLog(@"%@",videoURL);
-            [weakSelf.view handleLoading];
+            [weakSelf.view hx_handleLoading];
         } failed:^{
-            [weakSelf.view handleLoading];
-            [weakSelf.view showImageHUDText:@"写入失败"];
+            [weakSelf.view hx_handleLoading];
+            [weakSelf.view hx_showImageHUDText:@"写入失败"];
             NSSLog(@"写入失败");
         }];
         NSSLog(@"%ld个视频",videoList.count);
@@ -144,13 +119,13 @@
         }];
         
         // 通个这个方法将视频压缩写入临时目录获取视频URL  或者 通过这个获取视频在手机里的原路径 model.fileURL  可自己压缩
-        [self.view showLoadingHUDText:@"视频写入中"];
+        [self.view hx_showLoadingHUDText:@"视频写入中"];
         [self.toolManager writeSelectModelListToTempPathWithList:videoList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
             NSSLog(@"%@",videoURL);
-            [weakSelf.view handleLoading];
+            [weakSelf.view hx_handleLoading];
         } failed:^{
-            [weakSelf.view handleLoading];
-            [weakSelf.view showImageHUDText:@"写入失败"];
+            [weakSelf.view hx_handleLoading];
+            [weakSelf.view hx_showImageHUDText:@"写入失败"];
             NSSLog(@"写入失败");
         }];
         NSSLog(@"%ld个视频",videoList.count);

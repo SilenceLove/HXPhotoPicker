@@ -10,7 +10,8 @@
 
 @implementation UIFont (HXExtension)
 + (instancetype)hx_pingFangFontOfSize:(CGFloat)size {
-    return [UIFont fontWithName:@"PingFang-SC-Regular" size:size];
+    UIFont *font = [self fontWithName:@"PingFangSC-Regular" size:size];
+    return font ? font : [UIFont systemFontOfSize:size];
 }
 + (instancetype)hx_regularPingFangOfSize:(CGFloat)size {
     UIFont *font = [self fontWithName:@"PingFangSC-Regular" size:size];

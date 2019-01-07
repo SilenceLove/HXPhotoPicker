@@ -116,6 +116,8 @@
 		7B81626920343E370084F4C3 /* Demo9ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626820343E370084F4C3 /* Demo9ViewController.m */; };
 		7B81626C20343E4C0084F4C3 /* Demo9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626B20343E4C0084F4C3 /* Demo9Model.m */; };
 		7B81626F20343EE10084F4C3 /* Demo9ViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */; };
+		7B91B93521D5BFAC000B3CED /* UILabel+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B91B93421D5BFAC000B3CED /* UILabel+HXExtension.m */; };
+		7B948F5C21DDC66700087C83 /* NSTimer+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B948F5B21DDC66700087C83 /* NSTimer+HXExtension.m */; };
 		7B9772E62143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9772E52143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7BA0E78E1FC80693007619A4 /* UIViewController+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BA0E78D1FC80693007619A4 /* UIViewController+HXExtension.m */; };
@@ -169,6 +171,7 @@
 		7BBE322C215F7F600069D2FB /* SDWebImageWebPCoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE31FC215F7F5F0069D2FB /* SDWebImageWebPCoder.m */; };
 		7BBE5A1F1F07994000715546 /* Demo4ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1D1F07994000715546 /* Demo4ViewController.m */; };
 		7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */; };
+		7BCA964421E32E1200B3EEE6 /* NSArray+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BCA964321E32E1200B3EEE6 /* NSArray+HXExtension.m */; };
 		7BD8F16E1F7F4F770054F2A5 /* HXCustomCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8F16D1F7F4F770054F2A5 /* HXCustomCameraViewController.m */; };
 		7BE1F1061FF7F925003CCBCD /* HXDateVideoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BE1F1051FF7F925003CCBCD /* HXDateVideoEditViewController.m */; };
 		7BEC0301215B5BFD0025AAF5 /* HXAlbumlistView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEC0300215B5BFD0025AAF5 /* HXAlbumlistView.m */; };
@@ -397,6 +400,10 @@
 		7B81626B20343E4C0084F4C3 /* Demo9Model.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo9Model.m; sourceTree = "<group>"; };
 		7B81626D20343EE10084F4C3 /* Demo9ViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo9ViewCell.h; sourceTree = "<group>"; };
 		7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo9ViewCell.m; sourceTree = "<group>"; };
+		7B91B93321D5BFAC000B3CED /* UILabel+HXExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UILabel+HXExtension.h"; sourceTree = "<group>"; };
+		7B91B93421D5BFAC000B3CED /* UILabel+HXExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UILabel+HXExtension.m"; sourceTree = "<group>"; };
+		7B948F5A21DDC66700087C83 /* NSTimer+HXExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSTimer+HXExtension.h"; sourceTree = "<group>"; };
+		7B948F5B21DDC66700087C83 /* NSTimer+HXExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+HXExtension.m"; sourceTree = "<group>"; };
 		7B9772E42143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXDatePhotoPersentInteractiveTransition.h; sourceTree = "<group>"; };
 		7B9772E52143B04200E1DDDD /* HXDatePhotoPersentInteractiveTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXDatePhotoPersentInteractiveTransition.m; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
@@ -506,6 +513,8 @@
 		7BBE5A1C1F07994000715546 /* Demo4ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo4ViewController.h; sourceTree = "<group>"; };
 		7BBE5A1D1F07994000715546 /* Demo4ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo4ViewController.m; sourceTree = "<group>"; };
 		7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Demo4ViewController.xib; sourceTree = "<group>"; };
+		7BCA964221E32E1200B3EEE6 /* NSArray+HXExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+HXExtension.h"; sourceTree = "<group>"; };
+		7BCA964321E32E1200B3EEE6 /* NSArray+HXExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+HXExtension.m"; sourceTree = "<group>"; };
 		7BD8F16C1F7F4F770054F2A5 /* HXCustomCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCustomCameraViewController.h; sourceTree = "<group>"; };
 		7BD8F16D1F7F4F770054F2A5 /* HXCustomCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCustomCameraViewController.m; sourceTree = "<group>"; };
 		7BE1F1041FF7F925003CCBCD /* HXDateVideoEditViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXDateVideoEditViewController.h; sourceTree = "<group>"; };
@@ -1057,6 +1066,10 @@
 				7B4A70B81F91ECBE00BC1423 /* NSDate+HXExtension.m */,
 				7B4A70BA1F91F70400BC1423 /* UIFont+HXExtension.h */,
 				7B4A70BB1F91F70400BC1423 /* UIFont+HXExtension.m */,
+				7B91B93321D5BFAC000B3CED /* UILabel+HXExtension.h */,
+				7B91B93421D5BFAC000B3CED /* UILabel+HXExtension.m */,
+				7BCA964221E32E1200B3EEE6 /* NSArray+HXExtension.h */,
+				7BCA964321E32E1200B3EEE6 /* NSArray+HXExtension.m */,
 				7B269E7B1E56FC3400AB813D /* HXPhotoView.h */,
 				7B269E7C1E56FC3400AB813D /* HXPhotoView.m */,
 				7B269E7E1E56FC9D00AB813D /* HXPhotoSubViewCell.h */,
@@ -1069,6 +1082,8 @@
 				7B269E821E56FE9400AB813D /* HXCollectionView.m */,
 				7B7271451F27262400405131 /* NSBundle+HXPhotoPicker.h */,
 				7B7271461F27262400405131 /* NSBundle+HXPhotoPicker.m */,
+				7B948F5A21DDC66700087C83 /* NSTimer+HXExtension.h */,
+				7B948F5B21DDC66700087C83 /* NSTimer+HXExtension.m */,
 			);
 			path = HXPhotoPicker;
 			sourceTree = "<group>";
@@ -1403,6 +1418,7 @@
 				7BBE3227215F7F600069D2FB /* SDImageCacheConfig.m in Sources */,
 				7BBE322B215F7F600069D2FB /* UIButton+WebCache.m in Sources */,
 				7B7E3E9C1E4AFD1F002234EE /* HXPhotoTools.m in Sources */,
+				7B948F5C21DDC66700087C83 /* NSTimer+HXExtension.m in Sources */,
 				7B6869FA1FBC1D040028F5F0 /* HXDatePhotoViewFlowLayout.m in Sources */,
 				7BBE321B215F7F600069D2FB /* SDWebImageCompat.m in Sources */,
 				7BBE320A215F7F600069D2FB /* UIButton+YYWebImage.m in Sources */,
@@ -1440,6 +1456,8 @@
 				7BBE3225215F7F600069D2FB /* NSImage+WebCache.m in Sources */,
 				7BBE3215215F7F600069D2FB /* UIImage+ForceDecode.m in Sources */,
 				7B200D32216D06B9004A5B0B /* LFVideoTrimmerView.m in Sources */,
+				7B91B93521D5BFAC000B3CED /* UILabel+HXExtension.m in Sources */,
+				7BCA964421E32E1200B3EEE6 /* NSArray+HXExtension.m in Sources */,
 				7B4A70C21F94A63100BC1423 /* HXDatePhotoPreviewBottomView.m in Sources */,
 				7B37688A1FA423FB00660C88 /* HXDatePhotoInteractiveTransition.m in Sources */,
 				7B200D26216D06B9004A5B0B /* LFScrollView.m in Sources */,
@@ -1585,7 +1603,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hong";
+				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1602,7 +1620,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hong";
+				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;

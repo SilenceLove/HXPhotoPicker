@@ -102,8 +102,4 @@ typedef void (^ HXDatePhotoToolManagerGetImageDataListFailedHandler)(void);
 - (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList
                          success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success
                           failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed;
-
-- (void)gifModelAssignmentData:(NSArray<HXPhotoModel *> *)gifModelArray
-                       success:(void (^)(void))success
-                        failed:(void (^)(void))failed;
 @end

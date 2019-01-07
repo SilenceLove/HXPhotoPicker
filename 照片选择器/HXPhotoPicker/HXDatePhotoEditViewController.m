@@ -12,6 +12,7 @@
 
 @interface HXDatePhotoEditViewController ()<HXDatePhotoEditBottomViewDelegate>
 @property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIImageView *tempImageView;
 @property (strong, nonatomic) HXDatePhotoEditBottomView *bottomView;
 @property (assign, nonatomic) BOOL orientationDidChange;
 @property (assign, nonatomic) PHImageRequestID requestId;
@@ -28,6 +29,7 @@
 @property (strong, nonatomic) UIImage *originalImage;
 @property (strong, nonatomic) UIPanGestureRecognizer *imagePanGesture;
 @property (assign, nonatomic) BOOL isSelectRatio;
+@property (assign, nonatomic) UIImageOrientation currentImageOrientaion;
 @end
 
 @implementation HXDatePhotoEditViewController
@@ -37,7 +39,6 @@
     self.imageWidth = self.model.imageSize.width;
     self.imageHeight = self.model.imageSize.height;
     [self setupUI];
-    [self setupModel];
     if (!self.manager.configuration.movableCropBox) {
         self.bottomView.enabled = NO;
     }else {
@@ -83,17 +84,11 @@
     [[PHImageManager defaultManager] cancelImageRequest:self.requestId];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 }
-- (void)changeSubviewFrame:(BOOL)animated {
+- (CGRect)getImageFrame {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    
-    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
-        
-    }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-        
-    }
     CGFloat bottomMargin = hxBottomMargin;
     CGFloat width = self.view.hx_w - 40;
-    CGFloat imageY = 30;
+    CGFloat imageY = HX_IS_IPhoneX_All ? 60 : 30;
     if (HX_IS_IPhoneX_All && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
         bottomMargin = 21;
         width = self.view.hx_w - 80;
@@ -119,19 +114,30 @@
         }
         h = imgHeight;
     }
+    
+    return CGRectMake((width - w) / 2 + 20, imageY + (height - h) / 2, w, h);
+}
+- (void)changeSubviewFrame:(BOOL)animated {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGFloat bottomMargin = hxBottomMargin;
+    if (HX_IS_IPhoneX_All && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+        bottomMargin = 21;
+    }
+    CGRect imageFrame = [self getImageFrame];
     if (animated) {
+        self.gridLayer.frame = CGRectMake(0, 0, imageFrame.size.width, imageFrame.size.height);
         [UIView animateWithDuration:0.25 animations:^{
-            self.imageView.frame = CGRectMake(0, imageY, w, h);
-            self.imageView.center = CGPointMake(self.view.hx_w / 2, imageY + height / 2);
-            self.gridLayer.frame = self.imageView.bounds;
+            self.imageView.frame = imageFrame;
+        } completion:^(BOOL finished) {
+            [self clippingRatioDidChange:animated];
         }];
     }else {
-        self.imageView.frame = CGRectMake(0, imageY, w, h);
-        self.imageView.center = CGPointMake(self.view.hx_w / 2, imageY + height / 2);
+        self.imageView.frame = imageFrame;
+//        self.imageView.center = CGPointMake(self.view.hx_w / 2, imageY + height / 2);
         self.gridLayer.frame = self.imageView.bounds;
+        [self clippingRatioDidChange:animated];
     }
     self.bottomView.frame = CGRectMake(0, self.view.hx_h - 100 - bottomMargin, self.view.hx_w, 100 + bottomMargin);
-    [self clippingRatioDidChange:animated];
 }
 - (void)setupUI {
     self.view.backgroundColor = [UIColor blackColor];
@@ -147,30 +153,24 @@
 - (void)setupModel {
     if (self.model.asset) {
         self.bottomView.userInteractionEnabled = NO;
-        __weak typeof(self) weakSelf = self;
-        [self.view showLoadingHUDText:nil];
-        self.requestId = [HXPhotoTools getImageData:self.model.asset startRequestIcloud:^(PHImageRequestID cloudRequestId) {
-            weakSelf.requestId = cloudRequestId;
-        } progressHandler:^(double progress) {
-            
-        } completion:^(NSData *imageData, UIImageOrientation orientation) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.bottomView.userInteractionEnabled = YES;
-                UIImage *image = [UIImage imageWithData:imageData];
-                if (image.imageOrientation != UIImageOrientationUp) {
-                    image = [image normalizedImage];
-                }
-                weakSelf.originalImage = image;
-                weakSelf.imageView.image = image;
-                [weakSelf.view handleLoading];
-                [weakSelf fixationEdit];
-            });
-        } failed:^(NSDictionary *info) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.view handleLoading];
-                weakSelf.bottomView.userInteractionEnabled = YES;
-            });
-        }];
+        HXWeakSelf
+        [self.view hx_showLoadingHUDText:nil];
+        self.requestId = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+            weakSelf.requestId = iCloudRequestId;
+        } progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+            weakSelf.bottomView.userInteractionEnabled = YES;
+            UIImage *image = [UIImage imageWithData:imageData];
+            if (image.imageOrientation != UIImageOrientationUp) {
+                image = [image hx_normalizedImage];
+            }
+            weakSelf.originalImage = image;
+            weakSelf.imageView.image = image;
+            [weakSelf.view hx_handleLoading];
+            [weakSelf fixationEdit];
+        } failed:^(NSDictionary *info, HXPhotoModel *model) {
+            [weakSelf.view hx_handleLoading];
+            weakSelf.bottomView.userInteractionEnabled = YES;
+        }]; 
     }else {
         self.imageView.image = self.model.thumbPhoto;
         self.originalImage = self.model.thumbPhoto;
@@ -230,14 +230,35 @@
         return;
     }
     UIImage *image = [self clipImage];
-    self.imageView.image = image;
-    CGFloat imgW = self.rightTopView.center.x - self.leftTopView.center.x;
-    CGFloat imgH = self.leftBottomView.center.y - self.leftTopView.center.y;
-    self.imageView.frame = CGRectMake(self.leftTopView.center.x, self.leftTopView.center.y, imgW, imgH);
-    self.gridLayer.frame = self.imageView.bounds;
     self.imageWidth = image.size.width;
     self.imageHeight = image.size.height;
-    [self changeSubviewFrame:YES];
+    CGRect imageRect = [self getImageFrame];
+    
+    
+    self.tempImageView = [[UIImageView alloc] initWithImage:image];
+    CGFloat imgW = self.rightTopView.center.x - self.leftTopView.center.x;
+    CGFloat imgH = self.leftBottomView.center.y - self.leftTopView.center.y;
+    self.tempImageView.frame = CGRectMake(self.leftTopView.center.x, self.leftTopView.center.y, imgW, imgH);
+    [self.view insertSubview:self.tempImageView aboveSubview:self.imageView];
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        self.leftTopView.alpha = 0;
+        self.leftBottomView.alpha = 0;
+        self.rightTopView.alpha = 0;
+        self.rightBottomView.alpha = 0;
+        self.imageView.alpha = 0.f;
+        self.gridLayer.alpha = 0.f;
+    } completion:^(BOOL finished) {
+        self.gridLayer.frame = CGRectMake(0, 0, imageRect.size.width, imageRect.size.height);
+        
+        [UIView animateWithDuration:0.3f animations:^{
+            self.tempImageView.frame = imageRect;
+        } completion:^(BOOL finished) {
+            self.imageView.image = image;
+            self.imageView.frame = imageRect;
+            [self clippingRatioDidChange:YES];
+        }];
+    }];
     [self stopTimer];
     self.bottomView.enabled = YES;
 }
@@ -306,9 +327,9 @@
 }
 - (void)clippingRatioDidChange:(BOOL)animated {
     CGRect rect = self.imageView.bounds;
-    if (self.clippingRatio) {
+    if (self.clippingRatio && self.clippingRatio.ratio != 0) {
         CGFloat H = rect.size.width * self.clippingRatio.ratio;
-        if (H<=rect.size.height) {
+        if (H <= rect.size.height) {
             rect.size.height = H;
         } else {
             rect.size.width *= rect.size.height / H;
@@ -322,38 +343,55 @@
 
 - (void)setClippingRect:(CGRect)clippingRect animated:(BOOL)animated {
     if (animated) {
-        [UIView animateWithDuration:0.2 animations:^{
-            self.leftTopView.center = [self.view convertPoint:CGPointMake(clippingRect.origin.x, clippingRect.origin.y) fromView:self.imageView];
-            self.leftBottomView.center = [self.view convertPoint:CGPointMake(clippingRect.origin.x, clippingRect.origin.y+clippingRect.size.height) fromView:self.imageView];
-            self.rightTopView.center = [self.view convertPoint:CGPointMake(clippingRect.origin.x+clippingRect.size.width, clippingRect.origin.y) fromView:self.imageView];
-            self.rightBottomView.center = [self.view convertPoint:CGPointMake(clippingRect.origin.x+clippingRect.size.width, clippingRect.origin.y+clippingRect.size.height) fromView:self.imageView];
-        } completion:^(BOOL finished) {
-            if (self.isSelectRatio) {
-                if (!self.manager.configuration.movableCropBox) {
-                    [self changeClipImageView];
-                }
-                self.isSelectRatio = NO;
-            }
-        }];
-        
-        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"clippingRect"];
-        animation.duration = 0.2;
-        animation.fromValue = [NSValue valueWithCGRect:_clippingRect];
-        animation.toValue = [NSValue valueWithCGRect:clippingRect];
-        [self.gridLayer addAnimation:animation forKey:nil];
-        
-        self.gridLayer.clippingRect = clippingRect;
-        self.clippingRect = clippingRect;
-        [self.gridLayer setNeedsDisplay];
+        if (self.isSelectRatio) {
+            [UIView animateWithDuration:0.1 animations:^{
+                self.clippingRect = clippingRect;
+            } completion:^(BOOL finished) {
+                [self clippingRectComplete:clippingRect];
+            }];
+        }else {
+            self.clippingRect = clippingRect;
+            [self clippingRectComplete:clippingRect];
+        }
     } else {
         self.clippingRect = clippingRect;
     }
+}
+- (void)clippingRectComplete:(CGRect)clippingRect {
+    
+    self.imageView.alpha = 1;
+    
+    if (self.isSelectRatio) {
+        if (CGPointEqualToPoint(self.manager.configuration.movableCropBoxCustomRatio, CGPointMake(0, 0))) {
+            _clippingRatio = nil;
+        }
+        if (!self.manager.configuration.movableCropBox) {
+            [self changeClipImageView];
+        }
+        self.isSelectRatio = NO;
+        return;
+    }
+    
+    [self.tempImageView removeFromSuperview];
+    self.tempImageView = nil;
+    [UIView animateWithDuration:0.2 animations:^{
+        self.leftTopView.alpha = 1;
+        self.leftBottomView.alpha = 1;
+        self.rightTopView.alpha = 1;
+        self.rightBottomView.alpha = 1;
+        self.gridLayer.alpha = 1;
+    }];
 }
 - (void)panCircleView:(UIPanGestureRecognizer*)sender {
     CGPoint point = [sender locationInView:self.imageView];
     CGPoint dp = [sender translationInView:self.imageView];
     
     CGRect rct = self.clippingRect;
+    if (self.imageView.hx_w <= 200 &&
+        self.imageView.hx_h <= 200) {
+        [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"图片尺寸过小!"]];
+        return;
+    }
     
     const CGFloat W = self.imageView.frame.size.width;
     const CGFloat H = self.imageView.frame.size.height;
@@ -379,8 +417,11 @@
                 point.x = MAX(minX, MIN(point.x, maxX));
                 point.y = MAX(minY, MIN(point.y, maxY));
                 
-                if(-dp.x*ratio + dp.y > 0){ point.x = (point.y - y0) / ratio; }
-                else{ point.y = point.x * ratio + y0; }
+                if(-dp.x * ratio + dp.y > 0){
+                    point.x = (point.y - y0) / ratio;
+                } else{
+                    point.y = point.x * ratio + y0;
+                }
             } else {
                 point.x = MAX(minX, MIN(point.x, maxX));
                 point.y = MAX(minY, MIN(point.y, maxY));
@@ -508,10 +549,26 @@
     [self stopTimer];
     self.clippingRatio = nil;
     self.bottomView.enabled = NO;
-    self.imageView.image = self.originalImage;
-    self.imageWidth = self.model.imageSize.width;
-    self.imageHeight = self.model.imageSize.height;
-    [self changeSubviewFrame:YES];
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        self.gridLayer.alpha = 0;
+        self.leftTopView.alpha = 0;
+        self.leftBottomView.alpha = 0;
+        self.rightTopView.alpha = 0;
+        self.rightBottomView.alpha = 0;
+    } completion:^(BOOL finished) {
+        self.imageView.image = self.originalImage;
+        self.imageWidth = self.model.imageSize.width;
+        self.imageHeight = self.model.imageSize.height;
+        CGRect imageRect = [self getImageFrame];
+        self.gridLayer.frame = CGRectMake(0, 0, imageRect.size.width, imageRect.size.height);
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            self.imageView.frame = imageRect;
+        } completion:^(BOOL finished) {
+            [self clippingRatioDidChange:YES];
+        }];
+    }];
 }
 - (void)bottomViewDidRotateClick {
     [self stopTimer];
@@ -519,17 +576,42 @@
         self.clippingRatio = nil;
     }
     self.bottomView.enabled = YES;
-    self.imageView.image = [self.imageView.image rotationImage:UIImageOrientationLeft];
-    self.imageWidth = self.imageView.image.size.width;
-    self.imageHeight = self.imageView.image.size.height;
-    [self changeSubviewFrame:YES];
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        self.gridLayer.alpha = 0;
+        self.leftTopView.alpha = 0;
+        self.leftBottomView.alpha = 0;
+        self.rightTopView.alpha = 0;
+        self.rightBottomView.alpha = 0;
+    } completion:^(BOOL finished) {
+        UIImage *image = [self.imageView.image hx_rotationImage:UIImageOrientationLeft];
+        self.imageWidth = image.size.width;
+        self.imageHeight = image.size.height;
+        CGRect imageRect = [self getImageFrame];
+        self.gridLayer.frame = CGRectMake(0, 0, imageRect.size.width, imageRect.size.height);
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            self.imageView.transform = CGAffineTransformMakeRotation(-M_PI_2);
+            self.imageView.frame = imageRect;
+        } completion:^(BOOL finished) {
+            self.imageView.transform = CGAffineTransformIdentity;
+            self.imageView.image = image;
+            self.imageView.frame = imageRect;
+            [self clippingRatioDidChange:YES];
+        }];
+    }];
 }
 - (void)bottomViewDidClipClick {
     [self stopTimer];
+    UIImage *image;
     if (self.manager.configuration.movableCropBox) {
-        [self changeClipImageView];
+        image = [self clipImage];
+        
+//        [self changeClipImageView];
+    }else {
+        image = self.imageView.image;
     }
-    HXPhotoModel *model = [HXPhotoModel photoModelWithImage:self.imageView.image];
+    HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
     if (self.outside) {
         [self dismissViewControllerAnimated:NO completion:^{
             if ([self.delegate respondsToSelector:@selector(datePhotoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
@@ -546,7 +628,7 @@
 - (void)bottomViewDidSelectRatioClick:(HXEditRatio *)ratio {
     [self stopTimer];
     self.isSelectRatio = YES;
-    if(ratio.ratio==0){
+    if(ratio.ratio == 0){
         [self bottomViewDidRestoreClick];
     } else {
         self.clippingRatio = ratio;
@@ -564,7 +646,7 @@
         _imageView.alpha = 0;
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         _imageView.clipsToBounds = YES;
-        [_imageView.layer addSublayer:self.gridLayer];
+        [_imageView addSubview:self.gridLayer];
         self.imagePanGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGridView:)];
         _imageView.userInteractionEnabled = YES;
         [_imageView addGestureRecognizer:self.imagePanGesture];
@@ -722,8 +804,12 @@
     self.rotateBtn.hx_x = self.hx_w / 2 + 20;
     self.rotateBtn.center = CGPointMake(self.rotateBtn.center.x, 30);
     
-    self.cancelBtn.frame = CGRectMake(20, 0, [HXPhotoTools getTextWidth:self.cancelBtn.currentTitle height:40 fontSize:15] + 20, 40);
-    self.clipBtn.hx_size = CGSizeMake([HXPhotoTools getTextWidth:self.clipBtn.currentTitle height:40 fontSize:15] + 20, 40);
+    self.cancelBtn.frame = CGRectMake(20, 0, 0 + 20, 40);
+    self.cancelBtn.hx_w = self.cancelBtn.titleLabel.hx_getTextWidth + 20;
+    
+    self.clipBtn.hx_h = 40;
+    self.clipBtn.hx_w = self.clipBtn.titleLabel.hx_getTextWidth;
+//    self.clipBtn.hx_size = CGSizeMake([HXPhotoTools getTextWidth:self.clipBtn.currentTitle height:40 fontSize:15] + 20, 40);
     self.clipBtn.hx_x = self.hx_w - 20 - self.clipBtn.hx_w;
     
     self.selectRatioBtn.center = CGPointMake(self.hx_w / 2, 20);
@@ -754,7 +840,7 @@
 - (UIButton *)selectRatioBtn {
     if (!_selectRatioBtn) {
         _selectRatioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_selectRatioBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_xiangce_xuanbili@2x.png"] forState:UIControlStateNormal];
+        [_selectRatioBtn setImage:[UIImage hx_imageNamed:@"hx_xiangce_xuanbili"] forState:UIControlStateNormal];
         _selectRatioBtn.hx_size = CGSizeMake(50, 40);
         [_selectRatioBtn addTarget:self action:@selector(didSelectRatioBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -763,7 +849,7 @@
 - (UIButton *)restoreBtn {
     if (!_restoreBtn) {
         _restoreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_restoreBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_paizhao_bianji_huanyuan@2x.png"] forState:UIControlStateNormal];
+        [_restoreBtn setImage:[UIImage hx_imageNamed:@"hx_paizhao_bianji_huanyuan"] forState:UIControlStateNormal];
         [_restoreBtn setTitle:[NSBundle hx_localizedStringForKey:@"还原"] forState:UIControlStateNormal];
         [_restoreBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_restoreBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
@@ -779,7 +865,7 @@
     if (!_rotateBtn) {
         _rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_rotateBtn setImage:[HXPhotoTools hx_imageNamed:@"hx_paizhao_bianji_xuanzhuan@2x.png"] forState:UIControlStateNormal];
+        [_rotateBtn setImage:[UIImage hx_imageNamed:@"hx_paizhao_bianji_xuanzhuan"] forState:UIControlStateNormal];
         [_rotateBtn setTitle:[NSBundle hx_localizedStringForKey:@"旋转"] forState:UIControlStateNormal];
         [_rotateBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         _rotateBtn.titleLabel.font = [UIFont systemFontOfSize:16];
@@ -830,24 +916,33 @@
 @end
 
 @implementation HXEditGridLayer
-+ (BOOL)needsDisplayForKey:(NSString*)key {
-    if ([key isEqualToString:@"clippingRect"]) {
-        return YES;
-    }
-    return [super needsDisplayForKey:key];
-}
-
-- (id)initWithLayer:(id)layer {
-    self = [super initWithLayer:layer];
-    if(self && [layer isKindOfClass:[HXEditGridLayer class]]){
-        self.bgColor   = ((HXEditGridLayer *)layer).bgColor;
-        self.gridColor = ((HXEditGridLayer *)layer).gridColor;
-        self.clippingRect = ((HXEditGridLayer *)layer).clippingRect;
+//+ (BOOL)needsDisplayForKey:(NSString*)key {
+//    if ([key isEqualToString:@"clippingRect"]) {
+//        return YES;
+//    }
+//    return [super needsDisplayForKey:key];
+//}
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.backgroundColor = [UIColor clearColor];
     }
     return self;
 }
-
-- (void)drawInContext:(CGContextRef)context {
+//- (id)initWithLayer:(id)layer {
+//    self = [super initWithLayer:layer];
+//    if(self && [layer isKindOfClass:[HXEditGridLayer class]]){
+//        self.bgColor   = ((HXEditGridLayer *)layer).bgColor;
+//        self.gridColor = ((HXEditGridLayer *)layer).gridColor;
+//        self.clippingRect = ((HXEditGridLayer *)layer).clippingRect;
+//    }
+//    return self;
+//}
+- (void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
     CGRect rct = self.bounds;
     CGContextSetFillColorWithColor(context, self.bgColor.CGColor);
     CGContextFillRect(context, rct);
@@ -855,7 +950,7 @@
     CGContextClearRect(context, _clippingRect);
     
     CGContextSetStrokeColorWithColor(context, self.gridColor.CGColor);
-    CGContextSetShadowWithColor(context, CGSizeMake(1, 2), 0.8f, [[UIColor blackColor] colorWithAlphaComponent:0.1].CGColor);
+    //    CGContextSetShadowWithColor(context, CGSizeMake(0, 0), 0, [UIColor clearColor].CGColor);
     CGContextSetLineWidth(context, 1);
     
     rct = self.clippingRect;
@@ -876,21 +971,64 @@
     }
     CGContextStrokePath(context);
 }
+//- (void)drawInContext:(CGContextRef)context {
+//    CGRect rct = self.bounds;
+//    CGContextSetFillColorWithColor(context, self.bgColor.CGColor);
+//    CGContextFillRect(context, rct);
+//
+//    CGContextClearRect(context, _clippingRect);
+//
+//    CGContextSetStrokeColorWithColor(context, self.gridColor.CGColor);
+////    CGContextSetShadowWithColor(context, CGSizeMake(0, 0), 0, [UIColor clearColor].CGColor);
+//    CGContextSetLineWidth(context, 1);
+//
+//    rct = self.clippingRect;
+//
+//    CGContextBeginPath(context);
+//    CGFloat dW = 0;
+//    for(int i = 0; i < 4; ++i){
+//        CGContextMoveToPoint(context, rct.origin.x+dW, rct.origin.y);
+//        CGContextAddLineToPoint(context, rct.origin.x+dW, rct.origin.y+rct.size.height);
+//        dW += _clippingRect.size.width/3;
+//    }
+//
+//    dW = 0;
+//    for(int i = 0; i < 4; ++i){
+//        CGContextMoveToPoint(context, rct.origin.x, rct.origin.y+dW);
+//        CGContextAddLineToPoint(context, rct.origin.x+rct.size.width, rct.origin.y+dW);
+//        dW += rct.size.height/3;
+//    }
+//    CGContextStrokePath(context);
+//}
 @end
 
 
 @implementation HXEditCornerView
 - (void)drawRect:(CGRect)rect {
-    CGContextRef context = UIGraphicsGetCurrentContext();
+    UIBezierPath *bezier = [UIBezierPath bezierPath];
+    bezier.lineWidth = 2.5f;
+    bezier.lineCapStyle = kCGLineCapButt;
+    CGFloat margin = bezier.lineWidth / 2.f;
+    if (self.tag == 0) {
+        [bezier moveToPoint:CGPointMake(self.hx_w / 2 - margin, self.hx_h)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w / 2 - margin, self.hx_h / 2 - margin)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w, self.hx_h / 2 - margin)];
+    }else if (self.tag == 1) {
+        [bezier moveToPoint:CGPointMake(self.hx_w / 2 - margin, 0)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w / 2 - margin, self.hx_h / 2 + margin)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w, self.hx_h / 2 + margin)];
+    }else if (self.tag == 2) {
+        [bezier moveToPoint:CGPointMake(0, self.hx_h / 2 - margin)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w / 2 + margin, self.hx_h / 2 - margin)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w / 2 + margin, self.hx_h)];
+    }else {
+        [bezier moveToPoint:CGPointMake(0, self.hx_h / 2 + margin)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w / 2 + margin, self.hx_h / 2 + margin)];
+        [bezier addLineToPoint:CGPointMake(self.hx_w / 2 + margin, 0)];
+    }
     
-    CGRect rct = self.bounds;
-    rct.origin.x = rct.size.width/2-rct.size.width/6;
-    rct.origin.y = rct.size.height/2-rct.size.height/6;
-    rct.size.width /= 3;
-    rct.size.height /= 3;
-    
-    CGContextSetFillColorWithColor(context, self.bgColor.CGColor);
-    CGContextFillEllipseInRect(context, rct);
+    [[UIColor whiteColor] set];
+    [bezier stroke];
 }
 
 @end

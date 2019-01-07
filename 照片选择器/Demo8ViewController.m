@@ -67,7 +67,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)didNavOneBtnClick {
-    [self.view showLoadingHUDText:@"写入中"];
+    [self.view hx_showLoadingHUDText:@"写入中"];
     __weak typeof(self) weakSelf = self;
     HXDatePhotoToolManagerRequestType requestType;
     if (self.original) {
@@ -82,10 +82,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
             UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
             NSSLog(@"%@",image);
         }
-        [weakSelf.view handleLoading];
+        [weakSelf.view hx_handleLoading];
     } failed:^{
-        [weakSelf.view handleLoading];
-        [weakSelf.view showImageHUDText:@"写入失败"];
+        [weakSelf.view hx_handleLoading];
+        [weakSelf.view hx_showImageHUDText:@"写入失败"];
         NSSLog(@"写入失败");
     }];
     

@@ -9,7 +9,23 @@
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 
-typedef enum : NSUInteger {
+@class HXPhotoManager;
+@class HXPhotoModel;
+
+typedef void (^ HXModelStartRequestICloud)(PHImageRequestID iCloudRequestId, HXPhotoModel *model);
+typedef void (^ HXModelProgressHandler)(double progress, HXPhotoModel *model);
+typedef void (^ HXModelImageSuccessBlock)(UIImage *image, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelImageDataSuccessBlock)(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelImagePathSuccessBlock)(NSString *path, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelLivePhotoSuccessBlock)(PHLivePhoto *livePhoto, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelAVAssetSuccessBlock)(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelAVPlayerItemSuccessBlock)(AVPlayerItem *playerItem, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelAVExportSessionSuccessBlock)(AVAssetExportSession * assetExportSession, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelFailedBlock)(NSDictionary *info, HXPhotoModel *model);
+typedef void (^ HXModelExportVideoSuccessBlock)(NSURL *videoURL, HXPhotoModel *model);
+typedef void (^ HXModelExportVideoProgressHandler)(float progress, HXPhotoModel *model);
+
+typedef NS_ENUM(NSUInteger, HXPhotoModelMediaType) {
     HXPhotoModelMediaTypePhoto          = 0,    //!< 照片
     HXPhotoModelMediaTypeLivePhoto      = 1,    //!< LivePhoto
     HXPhotoModelMediaTypePhotoGif       = 2,    //!< gif图
@@ -18,20 +34,29 @@ typedef enum : NSUInteger {
     HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的照片 
     HXPhotoModelMediaTypeCameraVideo    = 6,    //!< 通过相机录制的视频
     HXPhotoModelMediaTypeCamera         = 7     //!< 跳转相机
-} HXPhotoModelMediaType;
+};
 
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSUInteger, HXPhotoModelMediaSubType) {
     HXPhotoModelMediaSubTypePhoto = 0,  //!< 照片
     HXPhotoModelMediaSubTypeVideo       //!< 视频
-} HXPhotoModelMediaSubType;
+};
 
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraPhotoSubType) {
+    HXPhotoModelMediaTypeCameraPhotoSubTypeNormal = 0,  //!< 本地图片
+    HXPhotoModelMediaTypeCameraPhotoSubTypeNetWork      //!< 网络图片
+};
+
+typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraVideoSubType) {
+    HXPhotoModelMediaTypeCameraVideoSubTypeNormal = 0,  //!< 本地视频
+    HXPhotoModelMediaTypeCameraVideoSubTypeNetWork      //!< 网络视频
+};
+
+typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
     HXPhotoModelVideoStateNormal = 0,   //!< 普通状态
     HXPhotoModelVideoStateUndersize,    //!< 视频时长小于3秒
     HXPhotoModelVideoStateOversize      //!< 视频时长超出限制
-} HXPhotoModelVideoState;
+};
 
-@class HXPhotoManager;
 @interface HXPhotoModel : NSObject<NSCoding>
 /**
  文件在手机里的原路径(照片 或 视频)
@@ -76,8 +101,6 @@ typedef enum : NSUInteger {
 @property (copy, nonatomic) NSString *barSubTitle;
 /**  照片PHAsset对象  */
 @property (strong, nonatomic) PHAsset *asset;
-/**  视频AVAsset对象  */
-@property (strong, nonatomic) AVAsset *avAsset;
 /**  PHAsset对象唯一标示  */
 @property (copy, nonatomic) NSString *localIdentifier;
 /**  是否iCloud上的资源  */
@@ -158,13 +181,17 @@ typedef enum : NSUInteger {
 /**  如果当前为视频资源时的视频状态  */
 @property (assign, nonatomic) HXPhotoModelVideoState videoState;
 
-@property (strong, nonatomic) NSData *gifImageData;
+@property (copy, nonatomic) NSString *cameraNormalImageNamed;
+@property (copy, nonatomic) NSString *cameraPreviewImageNamed;
+
 @property (copy, nonatomic) NSString *fullPathToFile;;
-@property (strong, nonatomic) HXPhotoManager *photoManager;
+//@property (strong, nonatomic) HXPhotoManager *photoManager;
 
 
 @property (strong, nonatomic) id tempAsset;
 @property (assign, nonatomic) BOOL loadOriginalImage;
+
+#pragma mark - < init >
 
 /**  通过image初始化 */
 + (instancetype)photoModelWithImage:(UIImage *)image;
@@ -177,6 +204,123 @@ typedef enum : NSUInteger {
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL;
 /**  通过本地视频地址URL对象初始化 */
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL;
+
+#pragma mark - < Request >
+
++ (id)requestImageWithURL:(NSURL *)url progress:(void (^) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion;
+
++ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *image, PHAsset *asset))completion;
+
+- (PHImageRequestID)requestImageWithOptions:(PHImageRequestOptions *)options
+                                 targetSize:(CGSize)targetSize
+                              resultHandler:(void (^)(UIImage *__nullable result, NSDictionary *__nullable info))resultHandler;
+
+/**
+ 请求获取缩略图，主要用在列表上展示。此方法会回调多次，如果为视频的话就是视频封面
+ 
+ @param completion 完成后的回调
+ @return 请求的id，本地/网络图片返回 0
+         可用于取消请求 [[PHImageManager defaultManager] cancelImageRequest:(PHImageRequestID)];
+ */
+- (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock)completion;
+- (PHImageRequestID)requestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion;
+
+/**
+ 请求获取预览大图，此方法只会回调一次，如果为视频的话就是视频封面
+
+ @param size 请求大小
+ @param startRequestICloud 开始请求iCloud上的资源
+ @param progressHandler iCloud下载进度
+ @param success 完成后的回调
+ @param failed 失败后的回调，包含了详细信息
+ @return 请求的id，本地/网络图片返回 0
+         可用于取消请求 [[PHImageManager defaultManager] cancelImageRequest:(PHImageRequestID)];
+ */
+- (PHImageRequestID)requestPreviewImageWithSize:(CGSize)size
+                             startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                progressHandler:(HXModelProgressHandler)progressHandler
+                                        success:(HXModelImageSuccessBlock)success
+                                         failed:(HXModelFailedBlock)failed;
+
+/**
+ 请求获取LivePhoto
+
+ @param size 请求大小
+ @param startRequestICloud 开始请求iCloud上的资源
+ @param progressHandler iCloud下载进度
+ @param success 完成后的回调
+ @param failed 失败后的回调，包含了详细信息
+ @return 请求的id，本地/网络图片返回 0
+         可用于取消请求 [[PHImageManager defaultManager] cancelImageRequest:(PHImageRequestID)];
+ */
+- (PHImageRequestID)requestLivePhotoWithSize:(CGSize)size
+                          startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                             progressHandler:(HXModelProgressHandler)progressHandler
+                                     success:(HXModelLivePhotoSuccessBlock)success
+                                      failed:(HXModelFailedBlock)failed;
+/**
+ 请求获取ImageData - 本地图片和相机拍照的和网络图片会获取不到
+ */
+- (PHImageRequestID)requestImageDataStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                       progressHandler:(HXModelProgressHandler)progressHandler
+                                               success:(HXModelImageDataSuccessBlock)success
+                                                failed:(HXModelFailedBlock)failed;
+
+/**
+ 请求获取AVAsset
+ @return 请求的id，本地视频/相机录制的返回 0
+         可用于取消请求 [[PHImageManager defaultManager] cancelImageRequest:(PHImageRequestID)];
+ */
+- (PHImageRequestID)requestAVAssetStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                     progressHandler:(HXModelProgressHandler)progressHandler
+                                             success:(HXModelAVAssetSuccessBlock)success
+                                              failed:(HXModelFailedBlock)failed;
+
+/**
+ 请求获取AVAssetExportSession - 相机录制的视频/本地视频会获取不到
+ @return 请求的id，本地视频/相机录制的返回 0 
+ */
+- (PHImageRequestID)requestAVAssetExportSessionStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                                  progressHandler:(HXModelProgressHandler)progressHandler
+                                                       success:(HXModelAVExportSessionSuccessBlock)success
+                                                           failed:(HXModelFailedBlock)failed;
+/**
+ 请求获取AVPlayerItem
+ @return 请求的id，本地视频/相机录制的返回 0
+ */
+- (PHImageRequestID)requestAVPlayerItemStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                          progressHandler:(HXModelProgressHandler)progressHandler
+                                               success:(HXModelAVPlayerItemSuccessBlock)success
+                                                   failed:(HXModelFailedBlock)failed;
+
+/**
+ 导出视频
+
+ @param presetName AVAssetExportPresetHighestQuality
+ @param startRequestICloud 开始下载iCloud上的视频，如果视频是iCloud的视频则会先下载
+ @param iCloudProgressHandler iCloud下载进度
+ @param exportProgressHandler 视频导出进度
+ @param success 导出成功
+ @param failed 导出失败
+ */
+- (void)exportVideoWithPresetName:(NSString *)presetName
+               startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+            iCloudProgressHandler:(HXModelProgressHandler)iCloudProgressHandler
+            exportProgressHandler:(HXModelExportVideoProgressHandler)exportProgressHandler
+                          success:(HXModelExportVideoSuccessBlock)success
+                           failed:(HXModelFailedBlock)failed;
+
+/**
+ 获取imagePath
+ - 本地图片和相机拍照的会获取不到
+ - 网络图片的话返回的是网络图片地址
+ @return 请求的id，
+         可用于取消请求 [self.asset cancelContentEditingInputRequest:(PHContentEditingInputRequestID)];
+ */
+- (PHContentEditingInputRequestID)requestImagePathStartRequestICloud:(void (^)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model))startRequestICloud
+                                                     progressHandler:(HXModelProgressHandler)progressHandler
+                                                          success:(HXModelImagePathSuccessBlock)success
+                                                              failed:(HXModelFailedBlock)failed;
 @end
 
 @class CLGeocoder;
@@ -198,5 +342,6 @@ typedef enum : NSUInteger {
 
 @property (strong, nonatomic) NSMutableArray *locationList;
 @property (assign, nonatomic) BOOL hasLocationTitles;
+@property (assign, nonatomic) BOOL locationError;
 //@property (strong, nonatomic) CLGeocoder *geocoder;
 @end

@@ -53,7 +53,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.photoMaxNum = 9;
         _manager.configuration.videoMaxNum = 1;
         _manager.configuration.maxNum = 9;
-        _manager.configuration.videoMaxDuration = 500.f;
+        _manager.configuration.videoMaximumSelectDuration = 500.f;
+        _manager.configuration.videoMinimumSelectDuration = 0.f;
+        _manager.configuration.creationDateSort = NO;
         _manager.configuration.saveSystemAblum = YES;
 //        _manager.configuration.reverseDate = YES;
         _manager.configuration.showDateSectionHeader = NO;
@@ -65,7 +67,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.requestImageAfterFinishingSelection = YES;
         __weak typeof(self) weakSelf = self;
 //        _manager.configuration.replaceCameraViewController = YES;
-        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
+//        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
         
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
             
@@ -100,27 +102,44 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [picker dismissViewControllerAnimated:YES completion:nil];
     
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
-    HXPhotoModel *model;
+    HXWeakSelf
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-        model = [HXPhotoModel photoModelWithImage:image];
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto];
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image complete:^(HXPhotoModel *model, BOOL success) {
+                if (success) {
+                    if (weakSelf.manager.configuration.useCameraComplete) {
+                        weakSelf.manager.configuration.useCameraComplete(model);
+                    }
+                }else {
+                    [weakSelf.view hx_showImageHUDText:@"保存图片失败"];
+                }
+            }];
+        }else {
+            HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
+            if (self.manager.configuration.useCameraComplete) {
+                self.manager.configuration.useCameraComplete(model);
+            }
         }
     }else  if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
         NSURL *url = info[UIImagePickerControllerMediaURL];
-        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
-        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:opts];
-        float second = 0;
-        second = urlAsset.duration.value/urlAsset.duration.timescale;
-        model = [HXPhotoModel photoModelWithVideoURL:url videoTime:second];
+        
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url];
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url complete:^(HXPhotoModel *model, BOOL success) {
+                if (success) {
+                    if (weakSelf.manager.configuration.useCameraComplete) {
+                        weakSelf.manager.configuration.useCameraComplete(model);
+                    }
+                }else {
+                    [weakSelf.view hx_showImageHUDText:@"保存视频失败"];
+                }
+            }];
+        }else {
+            HXPhotoModel *model = [HXPhotoModel photoModelWithVideoURL:url];
+            if (self.manager.configuration.useCameraComplete) {
+                self.manager.configuration.useCameraComplete(model);
+            }
         }
-    }
-    if (self.manager.configuration.useCameraComplete) {
-        self.manager.configuration.useCameraComplete(model);
     }
 }
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
@@ -137,13 +156,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [self.view addSubview:scrollView];
     self.scrollView = scrollView;
     
-    
-    
     CGFloat width = scrollView.frame.size.width;
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.delegate = self;
-//    photoView.outerCamera = YES;
+    photoView.outerCamera = YES;
     photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
     photoView.previewShowDeleteButton = YES;
 //    photoView.hideDeleteButton = YES;
@@ -154,15 +171,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     
-//    [self.view showLoadingHUDText:nil];
-//    HXWeakSelf
-//    [HXPhotoTools getSelectedModelArrayWithManager:self.manager complete:^(NSArray<HXPhotoModel *> *modelArray) {
-//        [weakSelf.manager addModelArray:modelArray];
-//        [weakSelf.photoView refreshView];
-//        [weakSelf.view handleLoading];
-//    }];
-
-//    UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:@"草稿" style:UIBarButtonItemStylePlain target:self action:@selector(savaClick)];
     UIBarButtonItem *cameraItem = [[UIBarButtonItem alloc] initWithTitle:@"相册/相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
     
     self.navigationItem.rightBarButtonItems = @[cameraItem];
@@ -172,49 +180,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)dealloc {
     NSSLog(@"dealloc");
 }
-- (void)savaClick {
-//    [self.view showLoadingHUDText:@"保存中"];
-//    HXWeakSelf
-//    [HXPhotoTools saveSelectModelArrayWithManager:self.manager success:^{
-//        [weakSelf.view handleLoading];
-//    } failed:^{
-//        [weakSelf.view showImageHUDText:@"保存草稿失败啦!"];
-//    }];
-    
-    
-//    NSMutableArray *gifModel = [NSMutableArray array];
-//    for (HXPhotoModel *model in self.manager.afterSelectedArray) {
-//        if (model.type == HXPhotoModelMediaTypePhotoGif && !model.gifImageData) {
-//            [gifModel addObject:model];
-//        }
-//    }
-//    if (gifModel.count) {
-//        HXWeakSelf
-//        [self.toolManager gifModelAssignmentData:gifModel success:^{
-//            BOOL success = [HXPhotoTools saveSelectModelArray:weakSelf.manager.afterSelectedArray fileName:@"ModelArray"];
-//            if (!success) {
-//                [weakSelf.view showImageHUDText:@"保存草稿失败啦!"];
-//            }else {
-//                [weakSelf.view handleLoading];
-//            }
-//        } failed:^{
-//            [weakSelf.view showImageHUDText:@"保存草稿失败啦!"];
-//        }];
-//    }else {
-//        BOOL success = [HXPhotoTools saveSelectModelArray:self.manager.afterSelectedArray fileName:@"ModelArray"];
-//        if (!success) {
-//            [self.view showImageHUDText:@"保存草稿失败啦!"];
-//        }else {
-//            [self.view handleLoading];
-//        }
-//    }
-}
 - (void)didNavBtnClick {
-//    [HXPhotoTools deleteLocalSelectModelArrayWithManager:self.manager];
-    
     if (self.manager.configuration.specialModeNeedHideVideoSelectBtn && !self.manager.configuration.selectTogether && self.manager.configuration.videoMaxNum == 1) {
         if (self.manager.afterSelectedVideoArray.count) {
-            [self.view showImageHUDText:@"请先删除视频"];
+            [self.view hx_showImageHUDText:@"请先删除视频"];
             return;
         }
     }
@@ -222,43 +191,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
-//    NSSLog(@"所有:%ld - 照片:%ld - 视频:%ld",allList.count,photos.count,videos.count);
-//    NSSLog(@"所有:%@ - 照片:%@ - 视频:%@",allList,photos,videos); 
-//    HXWeakSelf
-//    [self.toolManager getSelectedImageDataList:allList success:^(NSArray<NSData *> *imageDataList) {
-//        NSSLog(@"%ld",imageDataList.count);
-//    } failed:^{
-//
-//    }];
-//    if (!self.showHud) {
-//        self.showHud = YES;
-//        [self.toolManager writeSelectModelListToTempPathWithList:allList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
-//            NSSLog(@"allUrl - %@\nimageUrls - %@\nvideoUrls - %@",allURL,photoURL,videoURL);
-//            NSMutableArray *array = [NSMutableArray array];
-//            for (NSURL *url in allURL) {
-//                [array addObject:url.absoluteString];
-//            }
-//            [[[UIAlertView alloc] initWithTitle:nil message:[array componentsJoinedByString:@"\n\n"] delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil] show];
-////            [weakSelf.view showImageHUDText:[array componentsJoinedByString:@"\n"]];
-//        } failed:^{
-//
-//        }];
-//    }
+    HXPhotoModel *photoModel = allList.firstObject;
+     
     
-    // 获取图片
-//    [self.toolManager getSelectedImageList:allList requestType:HXDatePhotoToolManagerRequestTypeOriginal success:^(NSArray<UIImage *> *imageList) {
-//
-//    } failed:^{
-//
+//    [photos hx_requestImageWithOriginal:isOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray) {
+//        NSSLog(@"%@",imageArray);
 //    }];
     
-//    [HXPhotoTools selectListWriteToTempPath:allList requestList:^(NSArray *imageRequestIds, NSArray *videoSessions) {
-//        NSSLog(@"requestIds - image : %@ \nsessions - video : %@",imageRequestIds,videoSessions);
-//    } completion:^(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls) {
-//        NSSLog(@"allUrl - %@\nimageUrls - %@\nvideoUrls - %@",allUrl,imageUrls,videoUrls);
-//    } error:^{
-//        NSSLog(@"失败");
-//    }];
 }
 
 - (void)photoView:(HXPhotoView *)photoView imageChangeComplete:(NSArray<UIImage *> *)imageList {

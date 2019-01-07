@@ -22,6 +22,7 @@
 @interface HXAlbumlistViewCell : UITableViewCell
 @property (strong, nonatomic) HXAlbumModel *model;
 @property (strong, nonatomic) HXPhotoManager *manager;
+@property (copy, nonatomic) void (^getResultCompleteBlock)(NSInteger count, HXAlbumlistViewCell *myCell);
 - (void)cancelRequest ;
 @end
 

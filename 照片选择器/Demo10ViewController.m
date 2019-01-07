@@ -42,16 +42,16 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 - (void)savaClick {
     if (!self.manager.afterSelectedArray.count) {
-        [self.view showImageHUDText:@"请先选择资源!"];
+        [self.view hx_showImageHUDText:@"请先选择资源!"];
         return;
     }
-    [self.view showLoadingHUDText:nil];
+    [self.view hx_showLoadingHUDText:nil];
     HXWeakSelf
     [self.manager saveSelectModelArraySuccess:^{
-        [weakSelf.view handleLoading];
+        [weakSelf.view hx_handleLoading];
     } failed:^{
-        [weakSelf.view handleLoading];
-        [weakSelf.view showImageHUDText:@"保存草稿失败"];
+        [weakSelf.view hx_handleLoading];
+        [weakSelf.view hx_showImageHUDText:@"保存草稿失败"];
     }];
 }
 - (void)didNavBtnClick {
@@ -68,7 +68,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.photoMaxNum = 9;
         _manager.configuration.videoMaxNum = 9;
         _manager.configuration.maxNum = 18;
-        _manager.configuration.videoMaxDuration = 500.f;
+        _manager.configuration.videoMaximumSelectDuration = 500.f;
         _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.showDateSectionHeader = NO;
         _manager.configuration.requestImageAfterFinishingSelection = YES;

@@ -14,7 +14,7 @@
 /*  <HXAlbumListViewControllerDelegate>
  *  delegate 不传则代表自己
  */
-- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;
+- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate DEPRECATED_MSG_ATTRIBUTE("Use 'hx_presentSelectPhotoControllerWithManager:' instead");
 
 /**
  跳转相册列表
@@ -46,5 +46,5 @@
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager  done:(HXCustomCameraViewControllerDidDoneBlock)done cancel:(HXCustomCameraViewControllerDidCancelBlock)cancel;
 
-- (BOOL)navigationBarWhetherSetupBackground;
+- (BOOL)hx_navigationBarWhetherSetupBackground;
 @end

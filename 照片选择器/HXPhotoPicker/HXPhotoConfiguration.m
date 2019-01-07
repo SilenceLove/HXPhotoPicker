@@ -20,15 +20,17 @@
 }
 
 - (void)setup {
+    self.changeAlbumListContentView = YES;
     self.open3DTouchPreview = YES;
     self.openCamera = YES;
     self.lookLivePhoto = NO;
     self.lookGifPhoto = YES;
-    self.selectTogether = YES;
+    self.selectTogether = NO;
     self.maxNum = 10;
     self.photoMaxNum = 9;
     self.videoMaxNum = 1;
     self.showBottomPhotoDetail = YES;
+//    self.reverseDate = YES;
     if ([UIScreen mainScreen].bounds.size.width == 320) {
         self.rowCount = 3;
         self.sectionHeaderShowPhotoLocation = NO;
@@ -42,15 +44,15 @@
         }
     }
     self.downloadICloudAsset = YES;
-    self.videoMaxDuration = 3 * 60.f;
+    self.videoMaximumSelectDuration = 3 * 60.f;
+    self.videoMinimumSelectDuration = 0.f;
     self.videoMaximumDuration = 60.f;
     
     self.creationDateSort = YES;
     
     //    self.saveSystemAblum = NO;
 //    self.deleteTemporaryPhoto = YES;
-    self.showDateSectionHeader = YES;
-    //    self.reverseDate = NO;
+//    self.showDateSectionHeader = YES; 
     if ([UIScreen mainScreen].bounds.size.width != 320) {
         self.cameraCellShowPreview = YES;
     }
@@ -76,10 +78,10 @@
     
     self.doneBtnShowDetail = YES;
 //    self.videoCanEdit = YES;
-    self.singleJumpEdit = YES;
+//    self.singleJumpEdit = YES;
     self.photoCanEdit = YES;
     self.localFileName = @"HXPhotoPickerModelArray";
-    self.requestImageAfterFinishingSelection = YES;
+//    self.requestImageAfterFinishingSelection = YES;
     
     self.popupTableViewCellHeight = 65.f;
     if (HX_IS_IPhoneX_All) {
@@ -113,7 +115,7 @@
         }else if ([UIScreen mainScreen].bounds.size.width == 375) {
             _clarityScale = 1.4;
         }else {
-            _clarityScale = 1.7;
+            _clarityScale = 2.4;
         }
     }else {
         _clarityScale = clarityScale;
@@ -121,21 +123,19 @@
 }
 - (UIColor *)themeColor {
     if (!_themeColor) {
-        _themeColor = [UIColor colorWithRed:0 green:0.478431 blue:1 alpha:1]; 
+        _themeColor = [UIColor colorWithRed:0 green:0.47843137254901963 blue:1 alpha:1]; 
     }
     return _themeColor;
 }
 - (NSString *)originalNormalImageName {
     if (!_originalNormalImageName) {
-        _originalNormalImageName = @"hx_original_normal@2x.png";
-        [HXPhotoTools hx_imageNamed:_originalNormalImageName];
+        _originalNormalImageName = @"hx_original_normal";
     }
     return _originalNormalImageName;
 }
 - (NSString *)originalSelectedImageName {
     if (!_originalSelectedImageName) {
-        _originalSelectedImageName = @"hx_original_selected@2x.png";
-        [HXPhotoTools hx_imageNamed:_originalSelectedImageName];
+        _originalSelectedImageName = @"hx_original_selected";
     }
     return _originalSelectedImageName;
 }

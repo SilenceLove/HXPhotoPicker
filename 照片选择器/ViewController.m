@@ -106,8 +106,9 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, hxTopMargin ? hxTopMargin - 10: 10 , 100, 30)];
     [[UIApplication sharedApplication].keyWindow addSubview:label]; 
     
-    NSString *language = [NSLocale preferredLanguages].firstObject;
-    NSSLog(@"%@",language);
+//    NSString *language = [NSLocale preferredLanguages].firstObject;
+//    NSSLog(@"%@",language);
+    
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

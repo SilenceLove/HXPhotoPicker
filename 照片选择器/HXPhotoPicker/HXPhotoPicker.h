@@ -25,3 +25,4 @@
 #import "HXPhotoDefine.h"
 #import "UIImage+HXExtension.h"
 #import "UIImageView+HXExtension.h"
+#import "NSArray+HXExtension.h"

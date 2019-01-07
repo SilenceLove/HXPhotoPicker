@@ -10,7 +10,7 @@
 #import "HXPhotoPicker.h"
 #import <SystemConfiguration/CaptiveNetwork.h>
 
-@interface Demo1ViewController ()<HXAlbumListViewControllerDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate>
+@interface Demo1ViewController ()<HXCustomNavigationControllerDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate>
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *total;
 //@property (weak, nonatomic) IBOutlet UILabel *photo;
@@ -65,7 +65,9 @@
 //        _manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
 //        _manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
 //        _manager.configuration.selectedTitleColor = [UIColor redColor];
-        _manager.configuration.requestImageAfterFinishingSelection = YES;
+        
+//        _manager.configuration.requestImageAfterFinishingSelection = YES;
+        
         __weak typeof(self) weakSelf = self;
         _manager.configuration.photoListBottomView = ^(HXDatePhotoBottomView *bottomView) {
             bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
@@ -113,7 +115,11 @@
             imagePickerController.modalPresentationStyle=UIModalPresentationOverCurrentContext;
             [viewController presentViewController:imagePickerController animated:YES completion:nil];
         };
-        
+//        _manager.shouldSelectModel = ^NSString *(HXPhotoModel *model) {
+//            // 如果return nil 则会走默认的判断是否达到最大值
+//            //return nil;
+//            return @"Demo1 116 - 120 行注释掉就能选啦~\(≧▽≦)/~";
+//        };
         _manager.configuration.videoCanEdit = NO;
         _manager.configuration.photoCanEdit = NO;
     }
@@ -124,27 +130,44 @@
     [picker dismissViewControllerAnimated:YES completion:nil];
     
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
-    HXPhotoModel *model;
+    HXWeakSelf
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-        model = [HXPhotoModel photoModelWithImage:image];
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto];
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image complete:^(HXPhotoModel *model, BOOL success) {
+                if (success) {
+                    if (weakSelf.manager.configuration.useCameraComplete) {
+                        weakSelf.manager.configuration.useCameraComplete(model);
+                    }
+                }else {
+                    [weakSelf.view hx_showImageHUDText:@"保存图片失败"];
+                }
+            }];
+        }else {
+            HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
+            if (self.manager.configuration.useCameraComplete) {
+                self.manager.configuration.useCameraComplete(model);
+            }
         }
     }else  if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
         NSURL *url = info[UIImagePickerControllerMediaURL];
-        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-                                                         forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
-        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:opts];
-        float second = 0;
-        second = urlAsset.duration.value/urlAsset.duration.timescale;
-        model = [HXPhotoModel photoModelWithVideoURL:url videoTime:second];
+        
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url];
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url complete:^(HXPhotoModel *model, BOOL success) {
+                if (success) {
+                    if (weakSelf.manager.configuration.useCameraComplete) {
+                        weakSelf.manager.configuration.useCameraComplete(model);
+                    }
+                }else {
+                    [weakSelf.view hx_showImageHUDText:@"保存视频失败"];
+                }
+            }];
+        }else {
+            HXPhotoModel *model = [HXPhotoModel photoModelWithVideoURL:url];
+            if (self.manager.configuration.useCameraComplete) {
+                self.manager.configuration.useCameraComplete(model);
+            }
         }
-    }
-    if (self.manager.configuration.useCameraComplete) {
-        self.manager.configuration.useCameraComplete(model);
     }
 }
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
@@ -163,18 +186,7 @@
         self.clarityText.text = @"1.8";
     }else {
         self.clarityText.text = @"2.0";
-    }
-    
-    NSArray *ifs = (__bridge_transfer NSArray *)CNCopySupportedInterfaces();
-    if (!ifs) {
-        
-    }
-    NSDictionary *info = nil;
-    for (NSString *ifnam in ifs) {
-        info = (__bridge_transfer NSDictionary *)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
-        if (info && [info count]) { break; }
-    }
-    NSSLog(@"%@",info);
+    } 
 }
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     [self.view endEditing:YES];
@@ -293,11 +305,7 @@
     self.manager.configuration.replaceCameraViewController = self.useCustomCamera.on;
     self.manager.configuration.openCamera = self.addCamera.on;
     self.manager.configuration.albumShowMode = self.albumShowModeSwitch.selectedSegmentIndex;
-    
-//    [self.view hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
-    
-//    [self hx_presentAlbumListViewControllerWithManager:self.manager delegate:self];
-    __weak typeof(self) weakSelf = self;
+    HXWeakSelf
     [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
         weakSelf.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
         weakSelf.original.text = isOriginal ? @"YES" : @"NO";
@@ -308,14 +316,7 @@
         NSSLog(@"block - images - %@",imageList);
     } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
         NSSLog(@"block - 取消了");
-    }]; 
-    
-//    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] init];
-//    vc.delegate = self;
-//    vc.manager = self.manager;
-//    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-
-//    [self presentViewController:nav animated:YES completion:nil];
+    }];
 }
 - (IBAction)selectTypeClick:(UISegmentedControl *)sender {
     if (sender.selectedSegmentIndex == 0) {
