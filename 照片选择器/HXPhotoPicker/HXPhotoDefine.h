@@ -88,4 +88,19 @@ CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
     return alertController;
 }
 
+
+#define HXAlbumCameraRoll @"HXAlbumCameraRoll"
+#define HXAlbumPanoramas @"HXAlbumPanoramas"
+#define HXAlbumVideos @"HXAlbumVideos"
+#define HXAlbumFavorites @"HXAlbumFavorites"
+#define HXAlbumTimelapses @"HXAlbumTimelapses"
+#define HXAlbumRecentlyAdded @"HXAlbumRecentlyAdded"
+#define HXAlbumBursts @"HXAlbumBursts"
+#define HXAlbumSlomoVideos @"HXAlbumSlomoVideos"
+#define HXAlbumSelfPortraits @"HXAlbumSelfPortraits"
+#define HXAlbumScreenshots @"HXAlbumScreenshots"
+#define HXAlbumDepthEffect @"HXAlbumDepthEffect"
+#define HXAlbumLivePhotos @"HXAlbumLivePhotos"
+#define HXAlbumAnimated @"HXAlbumAnimated"
+
 #endif /* HXPhotoDefine_h */

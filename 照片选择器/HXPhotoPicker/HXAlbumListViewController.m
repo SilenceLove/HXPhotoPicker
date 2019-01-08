@@ -205,21 +205,6 @@ UITableViewDelegate
 }
 
 #pragma mark - < HXDatePhotoViewControllerDelegate >
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController allAssetList:(NSArray<PHAsset *> *)allAssetList photoAssets:(NSArray<PHAsset *> *)photoAssetList videoAssets:(NSArray<PHAsset *> *)videoAssetList original:(BOOL)original {
-    if ([self.delegate respondsToSelector:@selector(albumListViewControllerDidDone:allAssetList:photoAssets:videoAssets:original:)]) {
-        [self.delegate albumListViewControllerDidDone:self allAssetList:allAssetList photoAssets:photoAssetList videoAssets:videoAssetList original:original];
-    }
-}
-
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllImage:(NSArray<UIImage *> *)imageList original:(BOOL)original  {
-    if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllImage:)]) {
-        [self.delegate albumListViewController:self didDoneAllImage:imageList];
-    }
-    if (self.allImageBlock) {
-        self.allImageBlock(imageList, original, self, self.manager);
-    }
-}
-
 - (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllList:photos:videos:original:)]) {
         [self.delegate albumListViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];

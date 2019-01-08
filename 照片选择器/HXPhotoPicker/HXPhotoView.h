@@ -31,14 +31,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
 typedef void (^HXPhotoViewChangeCompleteBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photos, NSArray<HXPhotoModel *> *videos, BOOL isOriginal);
 
 /**
- 照片/视频发生改变时调用 - 选择、移动顺序、删除
- requestImageAfterFinishingSelection == YES 时 才会有回调
-
- @param imageList 图片数组
- */
-typedef void (^HXPhotoViewImageChangeCompleteBlock)(NSArray<UIImage *> *imageList);
-
-/**
  点击了添加cell的事件
  */
 typedef void (^HXPhotoViewDidAddCellBlock)(HXPhotoView *myPhotoView);
@@ -145,15 +137,6 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
                               original:(BOOL)isOriginal;
 
 /**
- 照片/视频发生改变时调用 - 选择、移动顺序、删除
- requestImageAfterFinishingSelection == YES 时 才会有回调
- 
- @param photoView self
- @param imageList 图片数组
- */
-- (void)photoView:(HXPhotoView *)photoView imageChangeComplete:(NSArray<UIImage *> *)imageList;
-
-/**
  点击了添加cell的事件
 
  @param photoView self
@@ -233,8 +216,6 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @end
 
 @interface HXPhotoView : UIView
-
-- (instancetype)initWithFrame:(CGRect)frame WithManager:(HXPhotoManager *)manager;
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 + (instancetype)photoManager:(HXPhotoManager *)manager;
@@ -249,12 +230,6 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  照片/视频发生改变时调用 - 选择、移动顺序、删除
  */
 @property (copy, nonatomic) HXPhotoViewChangeCompleteBlock changeCompleteBlock;
-
-/**
- 照片/视频发生改变时调用 - 选择、移动顺序、删除
- requestImageAfterFinishingSelection == YES 时 才会有回调
- */
-@property (copy, nonatomic) HXPhotoViewImageChangeCompleteBlock imageChangeCompleteBlock;
 
 /**
  点击了添加cell
@@ -315,8 +290,6 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @property (assign, nonatomic) BOOL showAddCell;
 /**  预览大图时是否显示删除按钮  */
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
-/**  已选的image数组  */
-@property (strong, nonatomic) NSMutableArray *imageList;
 /**  添加按钮的图片  */
 @property (copy, nonatomic) NSString *addImageName;
 /**  删除按钮图片  */

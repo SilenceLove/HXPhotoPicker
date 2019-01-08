@@ -28,24 +28,6 @@ HXAlbumListViewController;
 - (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController;
 
 /**
- 点击完成时获取图片image完成后的回调
- 选中了原图返回的就是原图
- 需 requestImageAfterFinishingSelection = YES 才会有回调
- 
- @param datePhotoViewController self
- @param imageList 图片数组
- */
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController
-                didDoneAllImage:(NSArray<UIImage *> *)imageList
-                       original:(BOOL)original;
-
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController
-                          allAssetList:(NSArray<PHAsset *> *)allAssetList
-                           photoAssets:(NSArray<PHAsset *> *)photoAssetList
-                           videoAssets:(NSArray<PHAsset *> *)videoAssetList
-                              original:(BOOL)original;
-
-/**
  点击完成按钮
 
  @param datePhotoViewController self
@@ -72,8 +54,6 @@ HXAlbumListViewController;
 
 @interface HXDatePhotoViewController : UIViewController
 @property (copy, nonatomic) viewControllerDidDoneBlock doneBlock;
-@property (copy, nonatomic) viewControllerDidDoneAllImageBlock allImageBlock;
-@property (copy, nonatomic) viewControllerDidDoneAllAssetBlock allAssetBlock;
 @property (copy, nonatomic) viewControllerDidCancelBlock cancelBlock;
 @property (weak, nonatomic) id<HXDatePhotoViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;

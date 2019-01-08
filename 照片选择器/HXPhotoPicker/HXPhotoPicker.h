@@ -21,8 +21,7 @@
 #import "HXPhoto3DTouchViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
-#import "HXPhotoTools.h"
-#import "HXPhotoDefine.h"
+#import "HXPhotoTools.h" 
 #import "UIImage+HXExtension.h"
 #import "UIImageView+HXExtension.h"
 #import "NSArray+HXExtension.h"

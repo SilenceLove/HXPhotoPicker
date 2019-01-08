@@ -368,26 +368,24 @@
         option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
     }
     BOOL addTempAlbum = YES;
-//    if (self.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
-        PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
-        for (PHAssetCollection *collection in smartAlbums) {
-            if (![collection isKindOfClass:[PHAssetCollection class]]) continue;
-            if (collection.estimatedAssetCount <= 0) continue;
-            if ([self isCameraRollAlbum:collection]) {
-                HXAlbumModel *model = [self albumModelWithCollection:collection option:option fetchAssets:YES];
-                model.cameraCount = self.cameraList.count;
-                model.index = 0;
-                self.cameraRollAlbumModel = model;
-                if (self.getCameraRollAlbumModel) {
-                    self.getCameraRollAlbumModel(model);
-                }
-                if (completion) completion(model);
-                self.getCameraRoolAlbuming = NO;
-                addTempAlbum = NO;
-                break;
+    PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    for (PHAssetCollection *collection in smartAlbums) {
+        if (![collection isKindOfClass:[PHAssetCollection class]]) continue;
+        if (collection.estimatedAssetCount <= 0) continue;
+        if ([self isCameraRollAlbum:collection]) {
+            HXAlbumModel *model = [self albumModelWithCollection:collection option:option fetchAssets:YES];
+            model.cameraCount = self.cameraList.count;
+            model.index = 0;
+            self.cameraRollAlbumModel = model;
+            if (self.getCameraRollAlbumModel) {
+                self.getCameraRollAlbumModel(model);
             }
+            if (completion) completion(model);
+            self.getCameraRoolAlbuming = NO;
+            addTempAlbum = NO;
+            break;
         }
-//    }
+    }
     if (addTempAlbum) {
         HXPhotoModel *photoMd = self.cameraList.firstObject;
         HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
@@ -422,7 +420,8 @@
 }
 - (HXAlbumModel *)albumModelWithCollection:(PHAssetCollection *)collection option:(PHFetchOptions *)option fetchAssets:(BOOL)fetchAssets {
     HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-    albumModel.albumName = collection.localizedTitle;
+    albumModel.albumName = [self transFormAlbumNameWithCollection:collection];
+//    albumModel.albumName = collection.localizedTitle;
     if (fetchAssets) {
         PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
         albumModel.result = result;
@@ -433,11 +432,70 @@
     }
     return albumModel;
 }
-- (HXAlbumModel *)albumModelWithCollection:(PHAssetCollection *)collection result:(PHFetchResult *)result {
-    HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-    albumModel.albumName = collection.localizedTitle;
-    return albumModel;
+- (NSString *)transFormAlbumNameWithCollection:(PHAssetCollection *)collection {
+    if (collection.assetCollectionType == PHAssetCollectionTypeAlbum) {
+        return collection.localizedTitle;
+    }
+    NSString *albumName;
+    HXPhotoLanguageType type = [HXPhotoCommon photoCommon].languageType;
+    if (type == HXPhotoLanguageTypeSys) {
+        albumName = collection.localizedTitle;
+    }else {
+        if ([collection.localizedTitle isEqualToString:@"相机胶卷"]) {
+            return collection.localizedTitle;
+        }
+        switch (collection.assetCollectionSubtype) {
+            case PHAssetCollectionSubtypeSmartAlbumUserLibrary:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumCameraRoll]; 
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumPanoramas:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumPanoramas];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumVideos:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumVideos];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumFavorites:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumFavorites];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumTimelapses:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumTimelapses];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumRecentlyAdded:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumRecentlyAdded];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumBursts:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumBursts];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumSlomoVideos:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumSlomoVideos];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumSelfPortraits:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumSelfPortraits];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumScreenshots:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumScreenshots];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumDepthEffect:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumDepthEffect];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumLivePhotos:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumLivePhotos];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumAnimated:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumAnimated];
+                break;
+            default:
+                albumName = collection.localizedTitle;
+                break;
+        }
+    }
+    return albumName;
 }
+//- (HXAlbumModel *)albumModelWithCollection:(PHAssetCollection *)collection result:(PHFetchResult *)result {
+//    HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+//    albumModel.albumName = collection.localizedTitle;
+//    return albumModel;
+//}
 - (void)preloadData {
     dispatch_async(self.loadAssetQueue, ^{
         HXWeakSelf
@@ -1845,6 +1903,7 @@
 - (void)dealloc {
     [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
+     
     if (HXShowLog) NSSLog(@"dealloc");
 }
 @end

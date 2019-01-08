@@ -59,16 +59,16 @@ static const CGFloat kPhotoViewSectionMargin = 20.0;
     self.scrollView.alwaysBounceVertical = YES;
     [self.view addSubview:self.scrollView];
     
-    self.onePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, self.view.frame.size.width - kPhotoViewMargin * 2, 0) WithManager:self.oneManager];
+    self.onePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, self.view.frame.size.width - kPhotoViewMargin * 2, 0) manager:self.oneManager];
     self.onePhotoView.outerCamera = YES;
     self.onePhotoView.delegate = self;
     [self.scrollView addSubview:self.onePhotoView];
     
-    self.twoPhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, CGRectGetMaxY(self.onePhotoView.frame) + kPhotoViewSectionMargin, self.view.frame.size.width - kPhotoViewMargin * 2, 0) WithManager:self.twoManager];
+    self.twoPhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, CGRectGetMaxY(self.onePhotoView.frame) + kPhotoViewSectionMargin, self.view.frame.size.width - kPhotoViewMargin * 2, 0) manager:self.twoManager];
     self.twoPhotoView.delegate = self;
     [self.scrollView addSubview:self.twoPhotoView];
     
-    self.threePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, CGRectGetMaxY(self.twoPhotoView.frame) + kPhotoViewSectionMargin, self.view.frame.size.width - kPhotoViewMargin * 2, 0) WithManager:self.threeManager];
+    self.threePhotoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, CGRectGetMaxY(self.twoPhotoView.frame) + kPhotoViewSectionMargin, self.view.frame.size.width - kPhotoViewMargin * 2, 0) manager:self.threeManager];
     self.threePhotoView.delegate = self;
     [self.scrollView addSubview:self.threePhotoView];
     

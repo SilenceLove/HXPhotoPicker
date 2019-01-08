@@ -53,12 +53,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.photoMaxNum = 9;
         _manager.configuration.videoMaxNum = 1;
         _manager.configuration.maxNum = 9;
+//        _manager.configuration.languageType = HXPhotoLanguageTypeKo;
         _manager.configuration.videoMaximumSelectDuration = 500.f;
         _manager.configuration.videoMinimumSelectDuration = 0.f;
         _manager.configuration.creationDateSort = NO;
         _manager.configuration.saveSystemAblum = YES;
 //        _manager.configuration.reverseDate = YES;
-        _manager.configuration.showDateSectionHeader = NO;
+        _manager.configuration.showDateSectionHeader = YES;
         _manager.configuration.selectTogether = NO;
 //        _manager.configuration.rowCount = 3;
 //        _manager.configuration.movableCropBox = YES;
@@ -198,10 +199,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //        NSSLog(@"%@",imageArray);
 //    }];
     
-}
-
-- (void)photoView:(HXPhotoView *)photoView imageChangeComplete:(NSArray<UIImage *> *)imageList {
-    NSSLog(@"%@",imageList);
 }
 
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl {

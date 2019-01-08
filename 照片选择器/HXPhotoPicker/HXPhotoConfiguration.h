@@ -19,6 +19,15 @@ typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
     HXPhotoAlbumShowModePopup       //!< 弹窗
 };
 
+typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
+    HXPhotoLanguageTypeSys = 0, // 跟随系统语言
+    HXPhotoLanguageTypeSc,      // 中文简体
+    HXPhotoLanguageTypeTc,      // 中文繁体
+    HXPhotoLanguageTypeJa,      // 日文
+    HXPhotoLanguageTypeKo,      // 韩文
+    HXPhotoLanguageTypeEn       // 英文
+};
+
 @class HXDatePhotoBottomView;
 @class HXDatePhotoPreviewBottomView;
 @class HXPhotoManager;
@@ -26,6 +35,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
 
 @interface HXPhotoConfiguration : NSObject
 
+/**
+ 语言类型
+ 默认 跟随系统
+ */
+@property (assign, nonatomic) HXPhotoLanguageType languageType;
 
 /**
  如果选择完照片返回之后，
@@ -62,17 +76,15 @@ typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
  选中了原图则是原图，没选中则是高清图
  并赋值给model的 thumbPhoto 和 previewPhoto 属性
  */
-@property (assign, nonatomic) BOOL requestImageAfterFinishingSelection;
+@property (assign, nonatomic) BOOL requestImageAfterFinishingSelection DEPRECATED_MSG_ATTRIBUTE("该属性已无效' instead");
 
 /**
  视频是否可以编辑   default NO
- 
  */
 @property (assign, nonatomic) BOOL videoCanEdit;
 
 /**
  是否替换照片编辑界面   default NO
- 
  */
 @property (assign, nonatomic) BOOL replacePhotoEditViewController;
 

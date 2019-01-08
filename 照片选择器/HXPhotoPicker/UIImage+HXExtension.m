@@ -15,7 +15,7 @@
         return nil;
     }
     UIImage *image;
-    NSBundle *myBundle = [NSBundle hx_photopickerBundle];
+    NSBundle *myBundle = [NSBundle hx_photoPickerBundle];
     imageName = [imageName stringByAppendingString:@"@2x"];
     NSString *imagePath = [myBundle pathForResource:imageName ofType:@"png"];
     image = [UIImage imageWithContentsOfFile:imagePath];

@@ -86,4 +86,20 @@
 "相机胶卷" = "카메라 롤";
 "编辑后，GIF将会变为静态图，确定继续吗？" = "GIF는 편집 후 정적으로 변하게 되 는데 계속 진행 하시겠습니까?";
 "编辑后，LivePhoto将会变为静态图，确定继续吗？" = "편집 후 라이브 포토토는 정적인 그림으로 바 뀔 것 입니다. 계속 하시겠습니까?";
-"图片尺寸过小!" = "사진 사이즈 너무 작아요!"
+"图片尺寸过小!" = "사진 사이즈 너무 작아요!"; 
+
+
+"HXAlbumCameraRoll" = "모든 사진";
+"HXAlbumPanoramas" = "파노라마 사진";
+"HXAlbumVideos" = "동영상";
+"HXAlbumFavorites" = "개인 소장";
+"HXAlbumTimelapses" = "시간 지연 촬영";
+"HXAlbumRecentlyAdded" = "최근에 추가";
+"HXAlbumBursts" = "스냅을 연속으로 찍다";
+"HXAlbumSlomoVideos" = "느린 동작";
+"HXAlbumSelfPortraits" = "셀 카";
+"HXAlbumScreenshots" = "화면 스냅";
+"HXAlbumDepthEffect" = "콜 롬";
+"HXAlbumLivePhotos" = "Live Photo";
+"HXAlbumAnimated" = "발생시키다 투";
+

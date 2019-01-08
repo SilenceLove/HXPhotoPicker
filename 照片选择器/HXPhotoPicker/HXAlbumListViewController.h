@@ -23,17 +23,6 @@
 - (void)albumListViewControllerDidCancel:(HXAlbumListViewController *)albumListViewController;
 
 /**
- 点击完成时获取图片image完成后的回调
- 选中了原图返回的就是原图
- 需 requestImageAfterFinishingSelection = YES 才会有回调
- 
- @param albumListViewController self
- @param imageList 图片数组
- */
-- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController
-                didDoneAllImage:(NSArray<UIImage *> *)imageList;
-
-/**
  点击完成
 
  @param albumListViewController self
@@ -48,19 +37,12 @@
                          videos:(NSArray<HXPhotoModel *> *)videoList
                        original:(BOOL)original;
 
-- (void)albumListViewControllerDidDone:(HXAlbumListViewController *)albumListViewController
-                          allAssetList:(NSArray<PHAsset *> *)allAssetList
-                           photoAssets:(NSArray<PHAsset *> *)photoAssetList
-                           videoAssets:(NSArray<PHAsset *> *)videoAssetList
-                              original:(BOOL)original;
 @end
 
 @interface HXAlbumListViewController : UIViewController
 @property (weak, nonatomic) id<HXAlbumListViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (copy, nonatomic) viewControllerDidDoneBlock doneBlock;
-@property (copy, nonatomic) viewControllerDidDoneAllImageBlock allImageBlock;
-@property (copy, nonatomic) viewControllerDidDoneAllAssetBlock allAssetBlock;
 @property (copy, nonatomic) viewControllerDidCancelBlock cancelBlock;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 @end

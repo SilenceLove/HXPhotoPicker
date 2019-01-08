@@ -17,10 +17,6 @@
 
 typedef void (^ viewControllerDidDoneBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, UIViewController *viewController, HXPhotoManager *manager);
 
-typedef void (^ viewControllerDidDoneAllImageBlock)(NSArray<UIImage *> *imageList, BOOL original, UIViewController *viewController, HXPhotoManager *manager);
-
-typedef void (^ viewControllerDidDoneAllAssetBlock)(NSArray<PHAsset *> *allAsset, NSArray<PHAsset *> *photoAssets, NSArray<PHAsset *> *videoAssets, BOOL original, UIViewController *viewController, HXPhotoManager *manager);
-
 typedef void (^ viewControllerDidCancelBlock)(UIViewController *viewController, HXPhotoManager *manager);
 
 typedef void (^ getAllAlbumListBlock)(NSMutableArray<HXAlbumModel *> *albums);

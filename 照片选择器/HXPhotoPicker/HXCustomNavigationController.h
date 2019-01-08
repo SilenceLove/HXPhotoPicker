@@ -34,22 +34,6 @@
  */
 - (void)photoNavigationViewControllerDidCancel:(HXCustomNavigationController *)photoNavigationViewController;
 
-/**
- 点击完成时获取图片image完成后的回调
- 选中了原图返回的就是原图
- 需 requestImageAfterFinishingSelection = YES 才会有回调
- 
- @param photoNavigationViewController self
- @param imageList 图片数组
- */
-- (void)photoNavigationViewController:(HXCustomNavigationController *)photoNavigationViewController
-                      didDoneAllImage:(NSArray<UIImage *> *)imageList;
-
-- (void)photoNavigationViewControllerDidDone:(HXCustomNavigationController *)photoNavigationViewController
-                                allAssetList:(NSArray<PHAsset *> *)allAssetList
-                                 photoAssets:(NSArray<PHAsset *> *)photoAssetList
-                                 videoAssets:(NSArray<PHAsset *> *)videoAssetList
-                                    original:(BOOL)original;
 @end
 
 @interface HXCustomNavigationController : UINavigationController
@@ -58,19 +42,15 @@
 @property (assign, nonatomic) BOOL supportRotation;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (copy, nonatomic) viewControllerDidDoneBlock doneBlock;
-@property (copy, nonatomic) viewControllerDidDoneAllImageBlock allImageBlock;
-@property (copy, nonatomic) viewControllerDidDoneAllAssetBlock allAssetBlock;
 @property (copy, nonatomic) viewControllerDidCancelBlock cancelBlock;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 - (instancetype)initWithManager:(HXPhotoManager *)manager
                        delegate:(id<HXCustomNavigationControllerDelegate>)delegate;
 - (instancetype)initWithManager:(HXPhotoManager *)manager 
                       doneBlock:(viewControllerDidDoneBlock)doneBlock
-                  allImageBlock:(viewControllerDidDoneAllImageBlock)allImageBlock
                     cancelBlock:(viewControllerDidCancelBlock)cancelBlock;
 - (instancetype)initWithManager:(HXPhotoManager *)manager
                        delegate:(id<HXCustomNavigationControllerDelegate>)delegate
                       doneBlock:(viewControllerDidDoneBlock)doneBlock
-                  allImageBlock:(viewControllerDidDoneAllImageBlock)allImageBlock
                     cancelBlock:(viewControllerDidCancelBlock)cancelBlock;
 @end

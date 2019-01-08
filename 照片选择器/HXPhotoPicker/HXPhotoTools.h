@@ -19,6 +19,7 @@
 #import "NSTimer+HXExtension.h"
 #import <CoreLocation/CoreLocation.h>
 #import "HXPhotoDefine.h"
+#import "HXPhotoCommon.h"
 
 
 @class HXPhotoManager;
@@ -74,11 +75,6 @@
  获取视频的时长
  */
 + (NSString *)getNewTimeFromDurationSecond:(NSInteger)duration;
-
-/**
- 相册名称转换
- */
-+ (NSString *)transFormPhotoTitle:(NSString *)englishName;
 
 /**
  获取数组里面图片的大小

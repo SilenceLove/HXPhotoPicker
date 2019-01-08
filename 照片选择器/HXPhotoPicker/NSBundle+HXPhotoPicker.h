@@ -9,7 +9,8 @@
 #import <Foundation/Foundation.h>
 
 @interface NSBundle (HXPhotoPicker)
-+ (instancetype)hx_photopickerBundle;
++ (instancetype)hx_photoPickerBundle; 
++ (void)hx_languageBundleDealloc;
 + (NSString *)hx_localizedStringForKey:(NSString *)key value:(NSString *)value;
 + (NSString *)hx_localizedStringForKey:(NSString *)key;
 @end

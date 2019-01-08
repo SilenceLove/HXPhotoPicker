@@ -29,8 +29,7 @@
 #import "UIImageView+WebCache.h"
 #endif
 
-#import "HXAlbumlistView.h"
-#import "HXDatePhotoToolManager.h"
+#import "HXAlbumlistView.h" 
 #import "NSArray+HXExtension.h"
 
 @interface HXDatePhotoViewController ()
@@ -1158,14 +1157,12 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)datePhotoBottomViewDidDoneBtn {
     [self cleanSelectedList];
-    if (!self.manager.configuration.requestImageAfterFinishingSelection) {
-        self.manager.selectPhotoing = NO;
-        [self.manager removeAllAlbum];
-        [self.manager removeAllTempList];
-        [self dismissViewControllerAnimated:YES completion:nil];
-        if (self.manager.configuration.restoreNavigationBar) {
-            [UINavigationBar appearance].translucent = NO;
-        }
+    self.manager.selectPhotoing = NO;
+    [self.manager removeAllAlbum];
+    [self.manager removeAllTempList];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.manager.configuration.restoreNavigationBar) {
+        [UINavigationBar appearance].translucent = NO;
     }
 }
 - (void)datePhotoBottomViewDidEditBtn {
@@ -1245,67 +1242,7 @@ HXDatePhotoEditViewControllerDelegate
     }
     if (self.doneBlock) {
         self.doneBlock(allList, photoList, videoList, isOriginal, self, self.manager);
-    }
-    NSMutableArray *allAsset = [NSMutableArray array];
-    NSMutableArray *photoAssets = [NSMutableArray array];
-    NSMutableArray *videoAssets = [NSMutableArray array];
-    for (HXPhotoModel *phMd in allList) {
-        if (phMd.asset) {
-            if (phMd.subType == HXPhotoModelMediaSubTypePhoto) {
-                [photoAssets addObject:phMd.asset];
-            }else {
-                [videoAssets addObject:phMd.asset];
-            }
-            [allAsset addObject:phMd.asset];
-        }
-    }
-    if (self.allAssetBlock) {
-        self.allAssetBlock(allList, photoList, videoList, isOriginal, self, self.manager);
-    }
-    if ([self.delegate respondsToSelector:@selector(datePhotoViewController:allAssetList:photoAssets:videoAssets:original:)]) {
-        [self.delegate datePhotoViewController:self
-                                  allAssetList:allList
-                                   photoAssets:photoList
-                                   videoAssets:videoList
-                                      original:isOriginal];
-    }
-    if (self.manager.configuration.requestImageAfterFinishingSelection) {
-        [self.navigationController.viewControllers.lastObject.view hx_showLoadingHUDText:nil];
-        HXWeakSelf
-        [allList hx_requestImageWithOriginal:isOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray) {
-            BOOL tempOriginal;
-            NSArray *tempArray;
-            if (!weakSelf.manager.configuration.singleSelected) {
-                tempArray = weakSelf.manager.afterSelectedArray.copy;
-                tempOriginal = weakSelf.manager.afterOriginal;
-            }else {
-                tempArray = weakSelf.manager.selectedArray.copy;
-                tempOriginal = weakSelf.manager.original;
-            }
-            if (tempArray.count == imageArray.count) {
-                NSInteger index = 0;
-                for (HXPhotoModel *subModel in tempArray) {
-                    subModel.thumbPhoto = imageArray[index];
-                    subModel.previewPhoto = imageArray[index];
-                    index++;
-                }
-            }
-            if ([weakSelf.delegate respondsToSelector:@selector(datePhotoViewController:didDoneAllImage:original:)]) {
-                [weakSelf.delegate datePhotoViewController:weakSelf didDoneAllImage:imageArray original:tempOriginal];
-            }
-            if (weakSelf.allImageBlock) {
-                weakSelf.allImageBlock(imageArray, tempOriginal, weakSelf, weakSelf.manager);
-            }
-            weakSelf.manager.selectPhotoing = NO;
-            [weakSelf.manager removeAllAlbum];
-            [weakSelf.manager removeAllTempList];
-            [weakSelf.manager cancelBeforeSelectedList];
-            [weakSelf dismissViewControllerAnimated:YES completion:nil];
-            if (weakSelf.manager.configuration.restoreNavigationBar) {
-                [UINavigationBar appearance].translucent = NO;
-            }
-        }];
-    }
+    } 
 }
 #pragma mark - < 懒加载 >
 - (UILabel *)authorizationLb {
@@ -1715,10 +1652,17 @@ HXDatePhotoEditViewControllerDelegate
     if (model.type == HXPhotoModelMediaTypeCamera ||
         model.type == HXPhotoModelMediaTypeCameraPhoto ||
         model.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (self.maskView.hidden) {
+            self.imageView.hidden = NO;
+            self.imageView.alpha = 1;
+            self.maskView.hidden = NO;
+            self.maskView.alpha = 1;
+        }
         if (model.networkPhotoUrl) {
             self.progressView.hidden = model.downloadComplete;
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
+            self.imageView.image = nil;
             [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
                 if (weakSelf.model == model) {
                     weakSelf.progressView.progress = progress;
@@ -1740,12 +1684,6 @@ HXDatePhotoEditViewControllerDelegate
             self.imageView.image = model.thumbPhoto;
         }
     }else {
-        if (!self.imageView.image) {
-            self.imageView.hidden = YES;
-            self.imageView.alpha = 0;
-            self.maskView.hidden = YES;
-            self.maskView.alpha = 0;
-        }
         self.imageView.image = nil;
         self.requestID = [self.model requestThumbImageCompletion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
             if (weakSelf.model == model) {
@@ -1755,7 +1693,7 @@ HXDatePhotoEditViewControllerDelegate
                     weakSelf.maskView.hidden = NO;
                     [UIView animateWithDuration:0.05 animations:^{
                         weakSelf.maskView.alpha = 1;
-                        weakSelf.imageView.alpha = 1;
+                        weakSelf.imageView.alpha = 1; 
                     }];
                 }
             }
@@ -2017,6 +1955,8 @@ HXDatePhotoEditViewControllerDelegate
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         _imageView.clipsToBounds = YES;
         _imageView.backgroundColor = [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
+        _imageView.hidden = YES;
+        _imageView.alpha = 0.f;
     }
     return _imageView;
 }
@@ -2030,6 +1970,8 @@ HXDatePhotoEditViewControllerDelegate
         [_maskView addSubview:self.iCloudIcon];
         [_maskView addSubview:self.stateLb];
         [_maskView addSubview:self.selectBtn];
+        _maskView.hidden = YES;
+        _maskView.alpha = 0;
     }
     return _maskView;
 }

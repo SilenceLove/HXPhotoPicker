@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B0B8F2D21E44423001D47A0 /* HXPhotoCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B8F2C21E44423001D47A0 /* HXPhotoCommon.m */; };
 		7B152D671F78913500910987 /* HXPhoto3DTouchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B152D661F78913500910987 /* HXPhoto3DTouchViewController.m */; };
 		7B1EF3D91F28811300A4391C /* Demo6ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1EF3D81F28811300A4391C /* Demo6ViewController.m */; };
 		7B1EF3DC1F28812300A4391C /* Demo6SubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1EF3DB1F28812300A4391C /* Demo6SubViewController.m */; };
@@ -181,6 +182,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7B0B8F2B21E44423001D47A0 /* HXPhotoCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoCommon.h; sourceTree = "<group>"; };
+		7B0B8F2C21E44423001D47A0 /* HXPhotoCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoCommon.m; sourceTree = "<group>"; };
 		7B152D651F78913500910987 /* HXPhoto3DTouchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhoto3DTouchViewController.h; sourceTree = "<group>"; };
 		7B152D661F78913500910987 /* HXPhoto3DTouchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhoto3DTouchViewController.m; sourceTree = "<group>"; };
 		7B1B1D1B1F35E84F000E810D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -1002,6 +1005,8 @@
 				7B7E3E921E4AB081002234EE /* HXPhotoManager.m */,
 				7B3235EF1FC443AD00E8E8C4 /* HXPhotoConfiguration.h */,
 				7B3235F01FC443AD00E8E8C4 /* HXPhotoConfiguration.m */,
+				7B0B8F2B21E44423001D47A0 /* HXPhotoCommon.h */,
+				7B0B8F2C21E44423001D47A0 /* HXPhotoCommon.m */,
 				7B7E3E941E4AB377002234EE /* HXAlbumModel.h */,
 				7B7E3E951E4AB377002234EE /* HXAlbumModel.m */,
 				7B7E3E971E4AB397002234EE /* HXPhotoModel.h */,
@@ -1447,6 +1452,7 @@
 				7B1EF3D91F28811300A4391C /* Demo6ViewController.m in Sources */,
 				7B200D28216D06B9004A5B0B /* LFVideoExportSession.m in Sources */,
 				7B200D27216D06B9004A5B0B /* LFVideoPlayer.m in Sources */,
+				7B0B8F2D21E44423001D47A0 /* HXPhotoCommon.m in Sources */,
 				7B200D35216D06B9004A5B0B /* LFPhotoEdit.m in Sources */,
 				7BBE3226215F7F600069D2FB /* SDWebImageGIFCoder.m in Sources */,
 				7B200D37216D06B9004A5B0B /* LFEditingView.m in Sources */,

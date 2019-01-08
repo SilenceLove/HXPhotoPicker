@@ -102,7 +102,7 @@
 }
 - (HXPhotoView *)photoView {
     if (!_photoView) {
-        _photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(12, 0, [UIScreen mainScreen].bounds.size.width - 24, 0) WithManager:self.manager];
+        _photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(12, 0, [UIScreen mainScreen].bounds.size.width - 24, 0) manager:self.manager];
         _photoView.backgroundColor = [UIColor whiteColor];
         _photoView.delegate = self;
     }

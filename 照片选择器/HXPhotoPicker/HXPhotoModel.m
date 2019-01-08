@@ -11,6 +11,7 @@
 #import "HXPhotoManager.h"
 #import "UIImage+HXExtension.h"
 #import <MediaPlayer/MediaPlayer.h>
+#import "HXPhotoCommon.h" 
 
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
@@ -318,7 +319,6 @@
 }
 - (NSString *)barTitle {
     if (!_barTitle) {
-        NSString *language = [NSLocale preferredLanguages].firstObject;
         if ([self.creationDate hx_isToday]) {
             _barTitle = [NSBundle hx_localizedStringForKey:@"今天"];
         }else if ([self.creationDate hx_isYesterday]) {
@@ -326,40 +326,68 @@
         }else if ([self.creationDate hx_isSameWeek]) {
             _barTitle = [self.creationDate hx_getNowWeekday];
         }else if ([self.creationDate hx_isThisYear]) {
-            if ([language hasPrefix:@"en"]) {
-                // 英文
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MMM dd"],[self.creationDate hx_getNowWeekday]];
-            } else if ([language hasPrefix:@"zh"]) {
-                // 中文
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM月dd日"],[self.creationDate hx_getNowWeekday]];
-                
-            }else if ([language hasPrefix:@"ko"]) {
-                // 韩语
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM월dd일"],[self.creationDate hx_getNowWeekday]];
-            }else if ([language hasPrefix:@"ja"]) {
-                // 日语
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM月dd日"],[self.creationDate hx_getNowWeekday]];
-            }else {
-                // 英文
-                _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MMM dd"],[self.creationDate hx_getNowWeekday]];
+            HXPhotoLanguageType type = [HXPhotoCommon photoCommon].languageType;
+            switch (type) {
+                case HXPhotoLanguageTypeSc :
+                case HXPhotoLanguageTypeTc :
+                case HXPhotoLanguageTypeJa : {
+                    // 中 / 日 / 繁
+                    _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM月dd日"],[self.creationDate hx_getNowWeekday]];
+                } break;
+                case HXPhotoLanguageTypeKo : {
+                    // 韩语
+                    _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM월dd일"],[self.creationDate hx_getNowWeekday]];
+                } break;
+                case HXPhotoLanguageTypeEn : {
+                    // 英文
+                    _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MMM dd"],[self.creationDate hx_getNowWeekday]];
+                } break;
+                default : {
+                    NSString *language = [NSLocale preferredLanguages].firstObject;
+                    if ([language hasPrefix:@"zh"] ||
+                               [language hasPrefix:@"ja"]) {
+                        // 中 / 日 / 繁
+                        _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM月dd日"],[self.creationDate hx_getNowWeekday]];
+                    }else if ([language hasPrefix:@"ko"]) {
+                        // 韩语
+                        _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MM월dd일"],[self.creationDate hx_getNowWeekday]];
+                    } else {
+                        // 英文
+                        _barTitle = [NSString stringWithFormat:@"%@ %@",[self.creationDate hx_dateStringWithFormat:@"MMM dd"],[self.creationDate hx_getNowWeekday]];
+                    }
+                }break;
             }
         }else {
-            if ([language hasPrefix:@"en"]) {
-                // 英文
-                _barTitle = [self.creationDate hx_dateStringWithFormat:@"MMM dd, yyyy"];
-            } else if ([language hasPrefix:@"zh"]) {
-                // 中文
-                _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy年MM月dd日"];
-                
-            }else if ([language hasPrefix:@"ko"]) {
-                // 韩语
-                _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy년MM월dd일"];
-            }else if ([language hasPrefix:@"ja"]) {
-                // 日语
-                _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy年MM月dd日"];
-            }else {
-                // 其他
-                _barTitle = [self.creationDate hx_dateStringWithFormat:@"MMM dd, yyyy"];
+            HXPhotoLanguageType type = [HXPhotoCommon photoCommon].languageType;
+            switch (type) {
+                case HXPhotoLanguageTypeSc :
+                case HXPhotoLanguageTypeTc :
+                case HXPhotoLanguageTypeJa : {
+                    // 中 / 日 / 繁
+                    _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy年MM月dd日"];
+                } break;
+                case HXPhotoLanguageTypeKo : {
+                    // 韩语
+                    _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy년MM월dd일"];
+                } break;
+                case HXPhotoLanguageTypeEn : {
+                    // 英文
+                    _barTitle = [self.creationDate hx_dateStringWithFormat:@"MMM dd, yyyy"];
+                } break;
+                default : {
+                    NSString *language = [NSLocale preferredLanguages].firstObject;
+                    if ([language hasPrefix:@"zh"] ||
+                        [language hasPrefix:@"ja"]) {
+                        // 中 / 日 / 繁
+                        _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy年MM月dd日"];
+                    }else if ([language hasPrefix:@"ko"]) {
+                        // 韩语
+                        _barTitle = [self.creationDate hx_dateStringWithFormat:@"yyyy년MM월dd일"];
+                    } else {
+                        // 英文
+                        _barTitle = [self.creationDate hx_dateStringWithFormat:@"MMM dd, yyyy"];
+                    }
+                }break;
             }
         }
     }
@@ -1196,8 +1224,30 @@
         NSUInteger year  = [components year];
         NSUInteger day   = [components day];
         
-        NSString *localization = [NSBundle mainBundle].preferredLocalizations.firstObject;
-        NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:localization];
+        HXPhotoLanguageType type = [HXPhotoCommon photoCommon].languageType;
+        NSLocale *locale;
+        switch (type) {
+            case HXPhotoLanguageTypeEn:
+                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en"];
+                break;
+            case HXPhotoLanguageTypeSc:
+                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"zh-Hans"];
+                break;
+            case HXPhotoLanguageTypeTc:
+                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"zh-Hant"];
+                break;
+            case HXPhotoLanguageTypeJa:
+                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"ja"];
+                break;
+            case HXPhotoLanguageTypeKo:
+                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"ko"];
+                break;
+            default: {
+                NSString *localization = [NSBundle mainBundle].preferredLocalizations.firstObject;
+                locale = [[NSLocale alloc] initWithLocaleIdentifier:localization];
+            }
+                break;
+        }
         
         dateFormatter.locale    = locale;
         dateFormatter.dateStyle = kCFDateFormatterLongStyle;
@@ -1209,7 +1259,6 @@
                                                                                locale:locale];
             [dateFormatter setDateFormat:longFormatWithoutYear];
         }
-        
         NSString *resultString = [dateFormatter stringFromDate:date];
         
         if (year == modelYear && month == modelMonth)
@@ -1228,51 +1277,6 @@
         _dateString = resultString;
     }
     return _dateString;
-        
-//        NSString *language = [NSLocale preferredLanguages].firstObject;
-//        if ([self.date hx_isToday]) {
-//            _dateString = [NSBundle hx_localizedStringForKey:@"今天"];
-//        }else if ([self.date hx_isYesterday]) {
-//            _dateString = [NSBundle hx_localizedStringForKey:@"昨天"];
-//        }else if ([self.date hx_isSameWeek]) {
-//            _dateString = [self.date hx_getNowWeekday];
-//        }else if ([self.date hx_isThisYear]) {
-//            if ([language hasPrefix:@"en"]) {
-//                // 英文
-//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MMM dd"],[self.date hx_getNowWeekday]];
-//            } else if ([language hasPrefix:@"zh"]) {
-//                // 中文
-//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MM月dd日"],[self.date hx_getNowWeekday]];
-//            }else if ([language hasPrefix:@"ko"]) {
-//                // 韩语
-//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MM월dd일"],[self.date hx_getNowWeekday]];
-//            }else if ([language hasPrefix:@"ja"]) {
-//                // 日语
-//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MM月dd日"],[self.date hx_getNowWeekday]];
-//            } else {
-//                // 英文
-//                _dateString = [NSString stringWithFormat:@"%@ %@",[self.date hx_dateStringWithFormat:@"MMM dd"],[self.date hx_getNowWeekday]];
-//            }
-//        }else {
-//            if ([language hasPrefix:@"en"]) {
-//                // 英文
-//                _dateString = [self.date hx_dateStringWithFormat:@"MMMM dd, yyyy"];
-//            } else if ([language hasPrefix:@"zh"]) {
-//                // 中文
-//                _dateString = [self.date hx_dateStringWithFormat:@"yyyy年MM月dd日"];
-//            }else if ([language hasPrefix:@"ko"]) {
-//                // 韩语
-//                _dateString = [self.date hx_dateStringWithFormat:@"yyyy년MM월dd일"];
-//            }else if ([language hasPrefix:@"ja"]) {
-//                // 日语
-//                _dateString = [self.date hx_dateStringWithFormat:@"yyyy年MM月dd日"];
-//            } else {
-//                // 其他
-//                _dateString = [self.date hx_dateStringWithFormat:@"MMMM dd, yyyy"];
-//            }
-//        }
-//    }
-//    return _dateString;
 }
 - (NSMutableArray *)locationList {
     if (!_locationList) {

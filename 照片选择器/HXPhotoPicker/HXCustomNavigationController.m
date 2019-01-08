@@ -17,22 +17,20 @@
 
 @implementation HXCustomNavigationController
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
-    return [self initWithManager:manager delegate:nil doneBlock:nil allImageBlock:nil cancelBlock:nil];
+    return [self initWithManager:manager delegate:nil doneBlock:nil cancelBlock:nil];
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager
                        delegate:(id<HXCustomNavigationControllerDelegate>)delegate {
-    return [self initWithManager:manager delegate:delegate doneBlock:nil allImageBlock:nil cancelBlock:nil];
+    return [self initWithManager:manager delegate:delegate doneBlock:nil cancelBlock:nil];
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager
                       doneBlock:(viewControllerDidDoneBlock)doneBlock
-                  allImageBlock:(viewControllerDidDoneAllImageBlock)allImageBlock
                     cancelBlock:(viewControllerDidCancelBlock)cancelBlock {
-    return [self initWithManager:manager delegate:nil doneBlock:doneBlock allImageBlock:allImageBlock cancelBlock:cancelBlock];
+    return [self initWithManager:manager delegate:nil doneBlock:doneBlock cancelBlock:cancelBlock];
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager
                        delegate:(id<HXCustomNavigationControllerDelegate>)delegate
                       doneBlock:(viewControllerDidDoneBlock)doneBlock
-                  allImageBlock:(viewControllerDidDoneAllImageBlock)allImageBlock
                     cancelBlock:(viewControllerDidCancelBlock)cancelBlock {
     manager.selectPhotoing = YES;
     [manager selectedListTransformBefore];
@@ -47,11 +45,8 @@
             self.hx_delegate = delegate;
             self.manager = manager;
             self.doneBlock = doneBlock;
-            self.allImageBlock = allImageBlock;
             self.cancelBlock = cancelBlock;
             vc.doneBlock = self.doneBlock;
-            vc.allImageBlock = self.allImageBlock;
-            vc.allAssetBlock = self.allAssetBlock;
             vc.cancelBlock = self.cancelBlock;
             vc.delegate = self;
             
@@ -64,11 +59,8 @@
             self.hx_delegate = delegate;
             self.manager = manager;
             self.doneBlock = doneBlock;
-            self.allImageBlock = allImageBlock;
             self.cancelBlock = cancelBlock;
             vc.doneBlock = self.doneBlock;
-            vc.allImageBlock = self.allImageBlock;
-            vc.allAssetBlock = self.allAssetBlock;
             vc.cancelBlock = self.cancelBlock;
             vc.delegate = self;
         }
@@ -86,16 +78,6 @@
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
     }
 }
-- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllImage:(NSArray<UIImage *> *)imageList {
-    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllImage:)]) {
-        [self.hx_delegate photoNavigationViewController:self didDoneAllImage:imageList];
-    }
-}
-- (void)albumListViewControllerDidDone:(HXAlbumListViewController *)albumListViewController allAssetList:(NSArray<PHAsset *> *)allAssetList photoAssets:(NSArray<PHAsset *> *)photoAssetList videoAssets:(NSArray<PHAsset *> *)videoAssetList original:(BOOL)original {
-    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidDone:allAssetList:photoAssets:videoAssets:original:)]) {
-        [self.hx_delegate photoNavigationViewControllerDidDone:self allAssetList:allAssetList photoAssets:photoAssetList videoAssets:videoAssetList original:original];
-    }
-}
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllList:photos:videos:original:)]) {
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
@@ -110,11 +92,6 @@
 - (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllList:photos:videos:original:)]) {
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
-    }
-}
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllImage:(NSArray<UIImage *> *)imageList original:(BOOL)original {
-    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllImage:)]) {
-        [self.hx_delegate photoNavigationViewController:self didDoneAllImage:imageList];
     }
 }
 - (BOOL)shouldAutorotate{

@@ -75,8 +75,6 @@
             Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
             vc.manager = weakSelf.manager;
             [weakSelf.navigationController pushViewController:vc animated:YES];
-        } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
-            
         } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
             
         }];

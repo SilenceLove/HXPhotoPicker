@@ -86,4 +86,19 @@
 "相机胶卷" = "相機膠卷";
 "编辑后，GIF将会变为静态图，确定继续吗？" = "編輯後，GIF將會變為靜態圖，確定繼續嗎？";
 "编辑后，LivePhoto将会变为静态图，确定继续吗？" = "編輯後，LivePhoto將會變為靜態圖，確定繼續嗎？";
-"图片尺寸过小!" = "圖片尺寸過小!"
+"图片尺寸过小!" = "圖片尺寸過小!";
+
+
+"HXAlbumCameraRoll" = "所有照片";
+"HXAlbumPanoramas" = "全景照片";
+"HXAlbumVideos" = "視頻";
+"HXAlbumFavorites" = "個人收藏";
+"HXAlbumTimelapses" = "延時攝影";
+"HXAlbumRecentlyAdded" = "最近添加";
+"HXAlbumBursts" = "連拍快照";
+"HXAlbumSlomoVideos" = "慢動作";
+"HXAlbumSelfPortraits" = "自拍";
+"HXAlbumScreenshots" = "屏幕快照";
+"HXAlbumDepthEffect" = "人像";
+"HXAlbumLivePhotos" = "實況照片";
+"HXAlbumAnimated" = "動圖";

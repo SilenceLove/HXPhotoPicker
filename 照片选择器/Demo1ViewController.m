@@ -312,8 +312,6 @@
         NSSLog(@"block - all - %@",allList);
         NSSLog(@"block - photo - %@",photoList);
         NSSLog(@"block - video - %@",videoList);
-    } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
-        NSSLog(@"block - images - %@",imageList);
     } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
         NSSLog(@"block - 取消了");
     }];
@@ -327,9 +325,6 @@
         self.manager.type = HXPhotoManagerSelectedTypePhotoAndVideo;
     }
     [self.manager clearSelectedList];
-}
-- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllImage:(NSArray<UIImage *> *)imageList {
-    NSSLog(@"delegate - imageList:%@",imageList);
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     self.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];

@@ -19,7 +19,7 @@
     return self;
 }
 
-- (void)setup {
+- (void)setup { 
     self.changeAlbumListContentView = YES;
     self.open3DTouchPreview = YES;
     self.openCamera = YES;
@@ -81,7 +81,6 @@
 //    self.singleJumpEdit = YES;
     self.photoCanEdit = YES;
     self.localFileName = @"HXPhotoPickerModelArray";
-//    self.requestImageAfterFinishingSelection = YES;
     
     self.popupTableViewCellHeight = 65.f;
     if (HX_IS_IPhoneX_All) {
@@ -89,25 +88,16 @@
     }else {
         self.popupTableViewHeight = 350;
     }
-    self.popupTableViewHorizontalHeight = 250;
+    self.popupTableViewHorizontalHeight = 250; 
 //    self.albumShowMode = HXPhotoAlbumShowModePopup;
 }
-
-//- (NSInteger)maxNum {
-//    if (!_maxNum) {
-//        if (self.type == HXPhotoManagerSelectedTypePhoto) {
-//            _maxNum = self.photoMaxNum;
-//        }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
-//            _maxNum = self.videoMaxNum;
-//        }else {
-//            if (self.videoMaxNum + self.photoMaxNum != self.maxNum) {
-//                _maxNum = self.videoMaxNum + self.photoMaxNum;
-//            }
-//        }
-//    }
-//    return _maxNum;
-//}
-
+- (void)setLanguageType:(HXPhotoLanguageType)languageType {
+    if ([HXPhotoCommon photoCommon].languageType != languageType) {
+        [NSBundle hx_languageBundleDealloc];
+    }
+    _languageType = languageType;
+    [HXPhotoCommon photoCommon].languageType = languageType;
+}
 - (void)setClarityScale:(CGFloat)clarityScale {
     if (clarityScale <= 0.f) {
         if ([UIScreen mainScreen].bounds.size.width == 320) {

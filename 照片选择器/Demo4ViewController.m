@@ -73,8 +73,6 @@
             }];
             NSSLog(@"%ld个视频",videoList.count);
         }
-    } imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
-        // requestImageAfterFinishingSelection = YES 时 imageList才会有值
     } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
         NSSLog(@"取消了");
     }];

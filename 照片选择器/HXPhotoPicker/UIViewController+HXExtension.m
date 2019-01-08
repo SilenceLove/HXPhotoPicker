@@ -17,16 +17,11 @@
     nav.supportRotation = manager.configuration.supportRotation;
     [self presentViewController:nav animated:YES completion:nil];
 }
-- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, BOOL, UIViewController *, HXPhotoManager *))models imageList:(void (^)(NSArray<UIImage *> *, BOOL))images cancel:(void (^)(UIViewController *, HXPhotoManager *))cancel {
+- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, BOOL, UIViewController *, HXPhotoManager *))models cancel:(void (^)(UIViewController *, HXPhotoManager *))cancel {
     
     viewControllerDidDoneBlock modelBlock = ^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, UIViewController *viewController, HXPhotoManager *manager) {
         if (models) {
             models(allList, photoList, videoList, original, viewController, manager);
-        }
-    };
-    viewControllerDidDoneAllImageBlock imageBlock = ^(NSArray<UIImage *> *imageList, BOOL original, UIViewController *viewController, HXPhotoManager *manager) {
-        if (images) {
-            images(imageList, original);
         }
     };
     viewControllerDidCancelBlock cancelBlock = ^(UIViewController *viewController, HXPhotoManager *manager) {
@@ -34,7 +29,7 @@
             cancel(viewController, manager);
         }
     };
-    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithManager:manager doneBlock:modelBlock allImageBlock:imageBlock cancelBlock:cancelBlock]; 
+    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithManager:manager doneBlock:modelBlock cancelBlock:cancelBlock];
     [self presentViewController:nav animated:YES completion:nil];
 }
 
