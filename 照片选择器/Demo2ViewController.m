@@ -59,13 +59,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.creationDateSort = NO;
         _manager.configuration.saveSystemAblum = YES;
 //        _manager.configuration.reverseDate = YES;
-        _manager.configuration.showDateSectionHeader = YES;
+//        _manager.configuration.showDateSectionHeader = YES;
         _manager.configuration.selectTogether = NO;
 //        _manager.configuration.rowCount = 3;
 //        _manager.configuration.movableCropBox = YES;
 //        _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
-        _manager.configuration.requestImageAfterFinishingSelection = YES;
+//        _manager.configuration.requestImageAfterFinishingSelection = YES;
         __weak typeof(self) weakSelf = self;
 //        _manager.configuration.replaceCameraViewController = YES;
 //        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
@@ -107,7 +107,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image complete:^(HXPhotoModel *model, BOOL success) {
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image location:nil complete:^(HXPhotoModel *model, BOOL success) {
                 if (success) {
                     if (weakSelf.manager.configuration.useCameraComplete) {
                         weakSelf.manager.configuration.useCameraComplete(model);
@@ -126,7 +126,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         NSURL *url = info[UIImagePickerControllerMediaURL];
         
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url complete:^(HXPhotoModel *model, BOOL success) {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url location:nil complete:^(HXPhotoModel *model, BOOL success) {
                 if (success) {
                     if (weakSelf.manager.configuration.useCameraComplete) {
                         weakSelf.manager.configuration.useCameraComplete(model);

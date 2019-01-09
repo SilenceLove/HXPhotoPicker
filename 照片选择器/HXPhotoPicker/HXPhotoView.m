@@ -129,6 +129,7 @@
 }
 - (void)setup {
     if (_manager) {
+        _manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
         [_manager preloadData];
     }
     self.spacing = 3;
@@ -305,8 +306,8 @@
         vc.manager = self.manager;
         vc.exteriorPreviewStyle = self.previewStyle;
         vc.delegate = self;
-        vc.modelArray = [NSMutableArray arrayWithArray:self.manager.afterSelectedArray];
-        vc.currentModelIndex = [self.manager.afterSelectedArray indexOfObject:model];
+        vc.modelArray = [NSMutableArray arrayWithArray:self.dataList];
+        vc.currentModelIndex = [self.dataList indexOfObject:model];
         vc.previewShowDeleteButton = self.previewShowDeleteButton;
         vc.photoView = self;
         [[self hx_viewController] presentViewController:vc animated:YES completion:nil];
@@ -353,12 +354,16 @@
 - (void)goPhotoViewController {
     if (self.outerCamera) {
             if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
-                self.manager.configuration.maxNum = self.manager.configuration.photoMaxNum;
+                if (self.manager.configuration.photoMaxNum > 0) {
+                    self.manager.configuration.maxNum = self.manager.configuration.photoMaxNum;
+                }
             }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
-                self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum;
+                if (self.manager.configuration.videoMaxNum > 0) {
+                    self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum;
+                }
             }else {
-                // 防错
-                if (self.manager.configuration.videoMaxNum + self.manager.configuration.photoMaxNum != self.manager.configuration.maxNum) {
+                if (self.manager.configuration.photoMaxNum > 0 &&
+                    self.manager.configuration.videoMaxNum > 0) {
                     self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum + self.manager.configuration.photoMaxNum;
                 }
             }
@@ -493,7 +498,8 @@
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
         // 当选择图片个数没有达到最大个数时就添加到选中数组中
         if ([self.manager afterSelectPhotoCountIsMaximum]) {
-            [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld张图片"],self.manager.configuration.photoMaxNum]];
+            NSInteger maxCount = self.manager.configuration.photoMaxNum > 0 ? self.manager.configuration.photoMaxNum : self.manager.configuration.maxNum;
+            [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld张图片"],maxCount]];
             return;
         }
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
@@ -505,12 +511,13 @@
             [[self hx_viewController].view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
             return;
         }else if ([self.manager afterSelectVideoCountIsMaximum]) {
-            [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld个视频"],self.manager.configuration.videoMaxNum]];
+            NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;
+            [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld个视频"],maxCount]];
             return;
         }
     }
     [self.manager afterListAddCameraTakePicturesModel:model];
-    
+    [self.manager removeAllTempList];
     if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
         [self.delegate photoListViewControllerDidDone:self allList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
     }
@@ -619,6 +626,7 @@
 - (void)changeSelectedListModelIndex {
     int i = 0;
     for (HXPhotoModel *model in self.dataList) {
+        model.selectedIndex = i;
         model.selectIndexStr = [NSString stringWithFormat:@"%d",i + 1];
         i++;
     }
@@ -646,14 +654,16 @@
             }
         }else {
             if (photos.count > 0) {
-                if (photos.count == self.manager.configuration.photoMaxNum) {
-                    if (self.manager.configuration.photoMaxNum > 0) {
+                NSInteger maxCount = self.manager.configuration.photoMaxNum > 0 ? self.manager.configuration.photoMaxNum : self.manager.configuration.maxNum;
+                if (photos.count == maxCount) {
+                    if (maxCount > 0) {
                         self.tempShowAddCell = NO;
                     }
                 }
             }else if (videos.count > 0) {
-                if (videos.count == self.manager.configuration.videoMaxNum) {
-                    if (self.manager.configuration.videoMaxNum > 0) {
+                NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;
+                if (videos.count == maxCount) {
+                    if (maxCount > 0) {
                         self.tempShowAddCell = NO;
                     }
                 }

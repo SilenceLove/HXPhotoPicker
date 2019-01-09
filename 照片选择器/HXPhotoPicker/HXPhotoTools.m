@@ -191,6 +191,7 @@
 
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName
                               videoURL:(NSURL *)videoURL
+                              location:(CLLocation *)location
                               complete:(void (^)(HXPhotoModel *model, BOOL success))complete {
     if (!videoURL) {
         if (complete) {
@@ -213,6 +214,8 @@
                     UISaveVideoAtPathToSavedPhotosAlbum([videoURL path], nil, nil, nil);
                     if (complete) {
                         HXPhotoModel *photoModel = [HXPhotoModel photoModelWithVideoURL:videoURL];
+                        photoModel.creationDate = [NSDate date];
+                        photoModel.location = location;
                         complete(photoModel, YES);
                     }
                 }else {
@@ -226,7 +229,10 @@
             // 保存相片到相机胶卷
             __block PHObjectPlaceholder *createdAsset = nil;
             [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
-                createdAsset = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:videoURL].placeholderForCreatedAsset;
+                PHAssetCreationRequest *creationRequest = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:videoURL];
+                creationRequest.creationDate = [NSDate date];
+                creationRequest.location = location;
+                createdAsset = creationRequest.placeholderForCreatedAsset;
             } error:&error];
             
             if (error) {
@@ -239,6 +245,7 @@
                 if (createdAsset.localIdentifier) {
                     if (complete) {
                         HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                        photoModel.creationDate = [NSDate date];
                         complete(photoModel, YES);
                     }
                 }
@@ -265,9 +272,13 @@
 }
 
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL {
-    [self saveVideoToCustomAlbumWithName:albumName videoURL:videoURL complete:nil];
+    [self saveVideoToCustomAlbumWithName:albumName videoURL:videoURL location:nil complete:nil];
 }
-+ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo complete:(void (^)(HXPhotoModel *, BOOL))complete {
+
++ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
+                                 photo:(UIImage *)photo
+                              location:(CLLocation *)location
+                              complete:(void (^)(HXPhotoModel *model, BOOL success))complete {
     if (!photo) {
         if (complete) {
             complete(nil, NO);
@@ -286,6 +297,8 @@
                 UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
                 if (complete) {
                     HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:tempImage];
+                    photoModel.creationDate = [NSDate date];
+                    photoModel.location = location;
                     complete(photoModel, YES);
                 }
                 return;
@@ -294,7 +307,10 @@
             // 保存相片到相机胶卷
             __block PHObjectPlaceholder *createdAsset = nil;
             [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
-                createdAsset = [PHAssetCreationRequest creationRequestForAssetFromImage:photo].placeholderForCreatedAsset;
+                PHAssetCreationRequest *creationRequest = [PHAssetCreationRequest creationRequestForAssetFromImage:photo];
+                creationRequest.creationDate = [NSDate date];
+                creationRequest.location = location;
+                createdAsset = creationRequest.placeholderForCreatedAsset;
             } error:&error];
             
             if (error) {
@@ -306,6 +322,7 @@
             }else {
                 if (complete && createdAsset.localIdentifier) {
                     HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                    photoModel.creationDate = [NSDate date];
                     complete(photoModel, YES);
                 }
             }
@@ -328,9 +345,9 @@
             }
         });
     }];
-}
+} 
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo {
-    [self savePhotoToCustomAlbumWithName:albumName photo:photo complete:nil];
+    [self savePhotoToCustomAlbumWithName:albumName photo:photo location:nil complete:nil];
 }
 // 创建自己要创建的自定义相册
 + (PHAssetCollection * )createCollection:(NSString *)albumName {

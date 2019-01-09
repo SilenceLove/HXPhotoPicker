@@ -79,7 +79,7 @@
 // 获取 imageData
 // 如果为网络图片的话会先下载
 [photoModel requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 开始下载iCloud上的照片
+    // 开始下载iCloud上照片的imageData
 } progressHandler:^(double progress, HXPhotoModel *model) {
     // iCloud下载进度
 } success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
@@ -101,7 +101,7 @@
 
 // 获取 LivePhoto , PHImageManagerMaximumSize代表原图
 [photoModel requestLivePhotoWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 开始下载iCloud上的视频
+    // 开始下载iCloud上的 LivePhoto
 } progressHandler:^(double progress, HXPhotoModel *model) {
     // iCloud下载进度
 } success:^(PHLivePhoto *livePhoto, HXPhotoModel *model, NSDictionary *info) {
@@ -166,15 +166,12 @@ NSArray+HXExtension
 
 // 一个方法调用
 HXWeakSelf
-[self hx_presentSelectPhotoControllerWithManager:self.manager   didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList,     NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController   *viewController, HXPhotoManager *manager) {
+[self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
     weakSelf.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
     weakSelf.original.text = isOriginal ? @"YES" : @"NO";
     NSSLog(@"block - all - %@",allList);
     NSSLog(@"block - photo - %@",photoList);
     NSSLog(@"block - video - %@",videoList);
-} imageList:^(NSArray<UIImage *> *imageList, BOOL isOriginal) {
-    需 requestImageAfterFinishingSelection = YES 才会有回调
-    NSSLog(@"block - images - %@",imageList); 
 } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
     NSSLog(@"block - 取消了");
 }];
@@ -194,16 +191,6 @@ HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWi
 @param original 是否原图
 */
 - (void)photoNavigationViewController:(HXCustomNavigationController *)photoNavigationViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original;
-
-/**
-点击完成时获取图片image完成后的回调
-选中了原图返回的就是原图
-需 requestImageAfterFinishingSelection = YES 才会有回调
-
-@param photoNavigationViewController self
-@param imageList 图片数组
-*/
-- (void)photoNavigationViewController:(HXCustomNavigationController *)photoNavigationViewController didDoneAllImage:(NSArray<UIImage *> *)imageList;
 
 /**
 点击取消
@@ -336,9 +323,28 @@ photoView.backgroundColor = [UIColor whiteColor];
 // 完成后刷新HXPhotoView
 [self.photoView refreshView];  
 ```
+### <a id="更换语言"></a> 更换语言
+```objc
+HXPhotoConfiguration.h
+
+设置语言类型
+HXPhotoLanguageTypeSys = 0, // 跟随系统语言
+HXPhotoLanguageTypeSc,      // 中文简体
+HXPhotoLanguageTypeTc,      // 中文繁体
+HXPhotoLanguageTypeJa,      // 日文
+HXPhotoLanguageTypeKo,      // 韩文
+HXPhotoLanguageTypeEn       // 英文
+
+/**
+语言类型
+默认 跟随系统
+*/
+@property (assign, nonatomic) HXPhotoLanguageType languageType;
+```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- 2019-1-9  选择照片逻辑修改、保存相册时添加定位信息以及一些问题修复
 - 2019-1-7  优化了相册加载速度、调整一些显示效果、方法结构调整（旧版本更新会出现方法报错，请使用最新方法）、编辑完成后跳转逻辑修改、相机拍照逻辑修改（ios9以上版本，如果打开了保存相册开关会获取到刚刚拍照的PHAsset对象）
 - v2.2.3　-　Demo9 添加cell上使用网络图片、3DTouch预览，Demo13 导入其他第三方图片/视频编辑库，优化显示效果，添加相册列表弹窗方式
 - v2.2.2　-　适配iphone XS - XSMax - XR、支持加载网络动图（需要YYWebImage）。支持YYWebImage（SD和YY同时存在时优先使用YY）

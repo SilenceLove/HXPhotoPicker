@@ -14,7 +14,7 @@
 
 @implementation HXDatePhotoViewFlowLayout
 
-- (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
+- (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect { 
     NSArray *array = [super layoutAttributesForElementsInRect:rect];
     NSMutableArray *answer = [array mutableCopy];
     

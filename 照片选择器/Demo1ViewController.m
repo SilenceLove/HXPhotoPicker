@@ -20,6 +20,7 @@
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (weak, nonatomic) IBOutlet UITextField *photoText;
 @property (weak, nonatomic) IBOutlet UITextField *videoText;
+@property (weak, nonatomic) IBOutlet UITextField *totalText;
 @property (weak, nonatomic) IBOutlet UITextField *columnText;
 @property (weak, nonatomic) IBOutlet UISwitch *addCamera; 
 @property (weak, nonatomic) IBOutlet UISwitch *showHeaderSection;
@@ -39,6 +40,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *photoCanEditSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *videoCanEditSwitch;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *albumShowModeSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *createTimeSortSwitch;
 
 @end
 
@@ -51,7 +53,9 @@
         _manager.configuration.videoMaxNum = 5;
         _manager.configuration.deleteTemporaryPhoto = NO;
         _manager.configuration.lookLivePhoto = YES;
-        _manager.configuration.saveSystemAblum = YES; 
+        _manager.configuration.saveSystemAblum = YES;
+        _manager.configuration.selectTogether = YES;
+        _manager.configuration.creationDateSort = YES;
 //        _manager.configuration.supportRotation = NO;
 //        _manager.configuration.cameraCellShowPreview = NO;
 //        _manager.configuration.themeColor = [UIColor redColor];
@@ -134,7 +138,7 @@
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image complete:^(HXPhotoModel *model, BOOL success) {
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image location:nil complete:^(HXPhotoModel *model, BOOL success) {
                 if (success) {
                     if (weakSelf.manager.configuration.useCameraComplete) {
                         weakSelf.manager.configuration.useCameraComplete(model);
@@ -153,7 +157,7 @@
         NSURL *url = info[UIImagePickerControllerMediaURL];
         
         if (self.manager.configuration.saveSystemAblum) {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url complete:^(HXPhotoModel *model, BOOL success) {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:url location:nil complete:^(HXPhotoModel *model, BOOL success) {
                 if (success) {
                     if (weakSelf.manager.configuration.useCameraComplete) {
                         weakSelf.manager.configuration.useCameraComplete(model);
@@ -296,6 +300,7 @@
     self.manager.configuration.filtrationICloudAsset = self.icloudSwitch.on;
     self.manager.configuration.photoMaxNum = self.photoText.text.integerValue;
     self.manager.configuration.videoMaxNum = self.videoText.text.integerValue;
+    self.manager.configuration.maxNum = self.totalText.text.integerValue;
     self.manager.configuration.rowCount = self.columnText.text.integerValue;
     self.manager.configuration.downloadICloudAsset = self.downloadICloudAsset.on;
     self.manager.configuration.saveSystemAblum = self.saveAblum.on;
@@ -305,6 +310,9 @@
     self.manager.configuration.replaceCameraViewController = self.useCustomCamera.on;
     self.manager.configuration.openCamera = self.addCamera.on;
     self.manager.configuration.albumShowMode = self.albumShowModeSwitch.selectedSegmentIndex;
+    self.manager.configuration.photoCanEdit = self.photoCanEditSwitch.on;
+    self.manager.configuration.videoCanEdit = self.videoCanEditSwitch.on;
+    self.manager.configuration.creationDateSort = self.createTimeSortSwitch.on;
     HXWeakSelf
     [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
         weakSelf.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
@@ -369,6 +377,10 @@
     UISwitch *sw = (UISwitch *)sender;
     self.manager.configuration.openCamera = sw.on;
 } 
+- (IBAction)createTimeSortSwitch:(UISwitch *)sender {
+    [self.manager removeAllAlbum];
+    [self.manager removeAllTempList];
+}
 - (void)dealloc {
     NSSLog(@"dealloc");
 }

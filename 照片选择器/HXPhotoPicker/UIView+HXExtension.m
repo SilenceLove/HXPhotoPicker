@@ -155,7 +155,7 @@
         width = 95;
         height = 95;
     }
-    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:@"" text:text];
+    HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:nil text:text];
     [hud showloading];
     hud.alpha = 0;
     hud.tag = 10086;
@@ -242,7 +242,8 @@
 }
 
 - (void)setup {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage hx_imageNamed:self.imageName]];
+    UIImage *image = self.imageName.length ? [UIImage hx_imageNamed:self.imageName] : nil;
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
     [self addSubview:imageView];
     CGFloat imgW = imageView.image.size.width;
     if (imgW <= 0) imgW = 37;

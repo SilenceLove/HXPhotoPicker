@@ -357,22 +357,28 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
 /**
  相册列表每行多少个照片 默认4个 iphone 4s / 5  默认3个
  */
-@property (assign, nonatomic) NSInteger rowCount;
+@property (assign, nonatomic) NSUInteger rowCount;
 
 /**
- 最大选择数 等于 图片最大数 + 视频最大数 默认10 - 必填
+ 最大选择数 - 必填
+ 如果照片最大数和视频最大数都为0时，则可以混合添加
+    当照片选了1张时 视频就还可以选择9个
+    当照片选了5张时 视频就还可以选择5个
+    视频一样
  */
-@property (assign, nonatomic) NSInteger maxNum;
+@property (assign, nonatomic) NSUInteger maxNum;
 
 /**
- 图片最大选择数 默认9 - 必填
+ 照片最大选择数 默认9 - 必填
+ 如果为0时，最大数则为maxNum 减去 视频已选数
  */
-@property (assign, nonatomic) NSInteger photoMaxNum;
+@property (assign, nonatomic) NSUInteger photoMaxNum;
 
 /**
- 视频最大选择数 // 默认1 - 必填
+ 视频最大选择数 默认1 - 必填
+ 如果为0时，最大数则为maxNum 减去 照片已选数
  */
-@property (assign, nonatomic) NSInteger videoMaxNum;
+@property (assign, nonatomic) NSUInteger videoMaxNum;
 
 /**
  是否打开相机功能
@@ -390,7 +396,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
 @property (assign, nonatomic) BOOL lookLivePhoto;
 
 /**
- 图片和视频是否能够同时选择 默认支持
+ 图片和视频是否能够同时选择 默认 NO
  */
 @property (assign, nonatomic) BOOL selectTogether;
 
@@ -431,7 +437,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
 
 /**
  是否为单选模式 默认 NO  HXPhotoView 不支持
- 会自动过滤掉gif、livephoto
  */
 @property (assign, nonatomic) BOOL singleSelected;
 
@@ -461,6 +466,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
  default：[UIScreen mainScreen].bounds.size.width
  320    ->  0.8
  375    ->  1.4
+ x      ->  2.4
  other  ->  1.7
  */
 @property (assign, nonatomic) CGFloat clarityScale;

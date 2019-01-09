@@ -35,6 +35,7 @@
                               videoURL:(NSURL *)videoURL;
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName
                               videoURL:(NSURL *)videoURL
+                              location:(CLLocation *)location
                               complete:(void (^)(HXPhotoModel *model, BOOL success))complete;
 
 /**
@@ -47,6 +48,7 @@
                                  photo:(UIImage *)photo;
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
                                  photo:(UIImage *)photo
+                              location:(CLLocation *)location
                               complete:(void (^)(HXPhotoModel *model, BOOL success))complete;
  
 

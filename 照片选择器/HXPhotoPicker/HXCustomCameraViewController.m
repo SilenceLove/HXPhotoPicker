@@ -265,14 +265,16 @@
             [self.playVideoView stopPlay];
             model = [HXPhotoModel photoModelWithVideoURL:self.videoURL videoTime:self.time];
         }
+        model.creationDate = [NSDate date];
         model.location = self.location;
         [self doneCompleteWithModel:model];
     }else {
         HXWeakSelf
         [self.view hx_showLoadingHUDText:nil];
         if (!self.videoURL) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image complete:^(HXPhotoModel *model, BOOL success) {
-                [weakSelf.view hx_handleLoading];
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image location:self.location complete:^(HXPhotoModel *model, BOOL success) {
+//                model.location = weakSelf.location;
+                [weakSelf.view hx_handleLoading:NO];
                 if (success) {
                     [weakSelf doneCompleteWithModel:model];
                 }else {
@@ -280,8 +282,9 @@
                 }
             }];
         }else {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL complete:^(HXPhotoModel *model, BOOL success) {
-                [weakSelf.view hx_handleLoading];
+            [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL location:self.location complete:^(HXPhotoModel *model, BOOL success) {
+//                model.location = weakSelf.location;
+                [weakSelf.view hx_handleLoading:NO];
                 if (success) {
                     [weakSelf doneCompleteWithModel:model];
                 }else {

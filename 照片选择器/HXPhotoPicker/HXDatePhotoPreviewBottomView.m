@@ -92,9 +92,11 @@
         if (self.manager.configuration.doneBtnShowDetail) {
             if (!self.manager.configuration.selectTogether) {
                 if (self.manager.selectedPhotoCount > 0) {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
+                    NSInteger maxCount = self.manager.configuration.photoMaxNum > 0 ? self.manager.configuration.photoMaxNum : self.manager.configuration.maxNum;
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,maxCount] forState:UIControlStateNormal];
                 }else {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
+                    NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,maxCount] forState:UIControlStateNormal];
                 }
             }else {
                 [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];

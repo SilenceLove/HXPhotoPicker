@@ -14,4 +14,6 @@
 + (instancetype)hx_mediumPingFangOfSize:(CGFloat)size;
 + (instancetype)hx_boldPingFangOfSize:(CGFloat)size;
 + (instancetype)hx_helveticaNeueOfSize:(CGFloat)size;
++ (instancetype)hx_mediumHelveticaNeueOfSize:(CGFloat)size;
++ (instancetype)hx_mediumSFUITextOfSize:(CGFloat)size;
 @end

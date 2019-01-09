@@ -868,8 +868,7 @@ HXDatePhotoEditViewControllerDelegate
     }else {
         return self.manager.configuration.showBottomPhotoDetail ? CGSizeMake(self.view.hx_w, 50) : CGSizeZero;
     }
-}
-
+} 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
     if (!indexPath) {
@@ -2089,7 +2088,7 @@ HXDatePhotoEditViewControllerDelegate
             self.bgView.alpha = 0;
         }
         self.dateLb.textColor = [UIColor blackColor];
-        self.subTitleLb.textColor = [UIColor blackColor];
+        self.subTitleLb.textColor = [UIColor colorWithRed:140.f / 255.f green:140.f / 255.f blue:140.f / 255.f alpha:1];
     }
 }
 - (void)setTranslucent:(BOOL)translucent {
@@ -2162,7 +2161,7 @@ HXDatePhotoEditViewControllerDelegate
     }else {
         if (self.model.locationSubTitle) {
             self.dateLb.frame = CGRectMake(8, 4, self.hx_w - 16, 30);
-            self.subTitleLb.frame = CGRectMake(8, 26, self.hx_w - 16, 20);
+            self.subTitleLb.frame = CGRectMake(8, 28, self.hx_w - 16, 20);
             self.subTitleLb.hidden = NO;
             self.subTitleLb.text = self.model.locationSubTitle;
         }else {
@@ -2180,7 +2179,7 @@ HXDatePhotoEditViewControllerDelegate
     if (!_dateLb) {
         _dateLb = [[UILabel alloc] init];
         _dateLb.textColor = [UIColor blackColor];
-        _dateLb.font = [UIFont hx_helveticaNeueOfSize:16];
+        _dateLb.font = [UIFont hx_boldPingFangOfSize:16];
     }
     return _dateLb;
 }
@@ -2195,8 +2194,8 @@ HXDatePhotoEditViewControllerDelegate
 - (UILabel *)subTitleLb {
     if (!_subTitleLb) {
         _subTitleLb = [[UILabel alloc] init];
-        _subTitleLb.textColor = [UIColor blackColor];
-        _subTitleLb.font = [UIFont hx_pingFangFontOfSize:11];
+        _subTitleLb.textColor = [UIColor colorWithRed:140.f / 255.f green:140.f / 255.f blue:140.f / 255.f alpha:1];
+        _subTitleLb.font = [UIFont hx_regularPingFangOfSize:12];
     }
     return _subTitleLb;
 }
@@ -2220,6 +2219,15 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)setVideoCount:(NSInteger)videoCount {
     _videoCount = videoCount;
+    NSDictionary *dict = @{NSFontAttributeName : [UIFont hx_mediumSFUITextOfSize:15] ,
+                           NSForegroundColorAttributeName : [UIColor colorWithRed:51.f / 255.f green:51.f / 255.f blue:51.f / 255.f alpha:1]
+                           };
+    
+    NSAttributedString *photoCountStr = [[NSAttributedString alloc] initWithString:[self countNumAndChangeformat:@(self.photoCount).stringValue] attributes:dict];
+    
+    NSAttributedString *videoCountStr = [[NSAttributedString alloc] initWithString:[self countNumAndChangeformat:@(videoCount).stringValue] attributes:dict];
+    
+    
     if (self.photoCount > 0 && videoCount > 0) {
         NSString *photoStr;
         if (self.photoCount > 1) {
@@ -2233,7 +2241,17 @@ HXDatePhotoEditViewControllerDelegate
         }else {
             videoStr = @"Video";
         }
-        self.titleLb.text = [NSString stringWithFormat:@"%ld %@、%ld %@",self.photoCount,[NSBundle hx_localizedStringForKey:photoStr],videoCount,[NSBundle hx_localizedStringForKey:videoStr]];
+        NSMutableAttributedString *atbStr = [[NSMutableAttributedString alloc] init];
+        NSAttributedString *photoAtbStr = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@、",[NSBundle hx_localizedStringForKey:photoStr]] attributes:dict];
+        [atbStr appendAttributedString:photoCountStr];
+        [atbStr appendAttributedString:photoAtbStr];
+        
+        NSAttributedString *videoAtbStr = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@",[NSBundle hx_localizedStringForKey:videoStr]] attributes:dict];
+        [atbStr appendAttributedString:videoCountStr];
+        [atbStr appendAttributedString:videoAtbStr];
+
+        self.titleLb.attributedText = atbStr;
+//        self.titleLb.text = [NSString stringWithFormat:@"%ld %@、%ld %@",self.photoCount,[NSBundle hx_localizedStringForKey:photoStr],videoCount,[NSBundle hx_localizedStringForKey:videoStr]];
         
     }else if (self.photoCount > 0) {
         NSString *photoStr;
@@ -2242,7 +2260,14 @@ HXDatePhotoEditViewControllerDelegate
         }else {
             photoStr = @"Photo";
         }
-        self.titleLb.text = [NSString stringWithFormat:@"%ld %@",self.photoCount,[NSBundle hx_localizedStringForKey:photoStr]];
+        NSMutableAttributedString *atbStr = [[NSMutableAttributedString alloc] init];
+        NSAttributedString *photoAtbStr = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@",[NSBundle hx_localizedStringForKey:photoStr]] attributes:dict];
+        [atbStr appendAttributedString:photoCountStr];
+        [atbStr appendAttributedString:photoAtbStr];
+        
+        
+        self.titleLb.attributedText = atbStr;
+//        self.titleLb.text = [NSString stringWithFormat:@"%ld %@",self.photoCount,[NSBundle hx_localizedStringForKey:photoStr]];
     }else {
         NSString *videoStr;
         if (videoCount > 1) {
@@ -2250,9 +2275,38 @@ HXDatePhotoEditViewControllerDelegate
         }else {
             videoStr = @"Video";
         }
-        self.titleLb.text = [NSString stringWithFormat:@"%ld %@",videoCount,
-                             [NSBundle hx_localizedStringForKey:videoStr]];
+        NSMutableAttributedString *atbStr = [[NSMutableAttributedString alloc] init];
+        
+        NSAttributedString *videoAtbStr = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@",[NSBundle hx_localizedStringForKey:videoStr]] attributes:dict];
+        [atbStr appendAttributedString:videoCountStr];
+        [atbStr appendAttributedString:videoAtbStr];
+        
+        self.titleLb.attributedText = atbStr;
+//        self.titleLb.text = [NSString stringWithFormat:@"%ld %@",videoCount, [NSBundle hx_localizedStringForKey:videoStr]];
     }
+}
+- (NSString *)countNumAndChangeformat:(NSString *)num {
+    if (num.length < 3) {
+        return num;
+    }
+    int count = 0;
+    long long int a = num.longLongValue;
+    while (a != 0) {
+        count++;
+        a /= 10;
+    }
+    NSMutableString *string = [NSMutableString stringWithString:num];
+    NSMutableString *newstring = [NSMutableString string];
+    while (count > 3) {
+        count -= 3;
+        NSRange rang = NSMakeRange(string.length - 3, 3);
+        NSString *str = [string substringWithRange:rang];
+        [newstring insertString:str atIndex:0];
+        [newstring insertString:@"," atIndex:0];
+        [string deleteCharactersInRange:rang];
+    }
+    [newstring insertString:string atIndex:0];
+    return newstring;
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -2261,9 +2315,9 @@ HXDatePhotoEditViewControllerDelegate
 - (UILabel *)titleLb {
     if (!_titleLb) {
         _titleLb = [[UILabel alloc] init];
-        _titleLb.textColor = [UIColor blackColor];
+//        _titleLb.textColor = [UIColor blackColor];
         _titleLb.textAlignment = NSTextAlignmentCenter;
-        _titleLb.font = [UIFont systemFontOfSize:15];
+//        _titleLb.font = [UIFont hx_helveticaNeueOfSize:15];
     }
     return _titleLb;
 }
@@ -2354,9 +2408,11 @@ HXDatePhotoEditViewControllerDelegate
         if (self.manager.configuration.doneBtnShowDetail) {
             if (!self.manager.configuration.selectTogether) {
                 if (self.manager.selectedPhotoCount > 0) {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.photoMaxNum] forState:UIControlStateNormal];
+                    NSInteger maxCount = self.manager.configuration.photoMaxNum > 0 ? self.manager.configuration.photoMaxNum : self.manager.configuration.maxNum;
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,maxCount] forState:UIControlStateNormal];
                 }else {
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.videoMaxNum] forState:UIControlStateNormal];
+                    NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;
+                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,maxCount] forState:UIControlStateNormal];
                 }
             }else {
                 [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];

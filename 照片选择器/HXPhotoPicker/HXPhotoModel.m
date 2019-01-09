@@ -201,7 +201,11 @@
                 _imageSize = CGSizeMake(self.asset.pixelWidth, self.asset.pixelHeight);
             }
         }else {
-            _imageSize = self.thumbPhoto.size;
+            if (CGSizeEqualToSize(self.thumbPhoto.size, CGSizeZero)) {
+                _imageSize = CGSizeMake(200, 200);
+            }else {
+                _imageSize = self.thumbPhoto.size;
+            }
         }
     }
     return _imageSize;
