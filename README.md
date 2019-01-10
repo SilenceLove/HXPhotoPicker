@@ -9,15 +9,16 @@
 <img src="https://user-images.githubusercontent.com/18083149/32778022-585f3628-c973-11e7-8139-9d19c26f1515.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/32778166-d2397300-c973-11e7-9135-8ba11b24636e.gif" width="270" height="480"> <img src="https://user-images.githubusercontent.com/18083149/33060991-55f9abf4-ced5-11e7-8b97-609813c0e937.gif" width="270" height="480">
 
 ## 目录
-* [项目特性](#特性)
-* [安装方式](#安装)
-* [使用要求](#要求)
-* [应用示例](#例子)
+* [特性](#特性)
+* [安装](#安装)
+* [要求](#要求)
+* [示例](#例子)
     * [获取照片和视频](#如何获取照片和视频)
     * [跳转相册选择照片](#Demo1)
     * [使用HXPhotoView选照片后自动布局](#Demo2)
     * [保存草稿](#如何保存草稿)
     * [添加网络/本地图片、视频](#如何添加网络/本地图片、视频)
+    * [相关问题](#相关问题)
     * [更多请下载工程查看](#更多) 
 * [更新记录](#更新历史)
 * [更多](#更多)
@@ -323,7 +324,12 @@ photoView.backgroundColor = [UIColor whiteColor];
 // 完成后刷新HXPhotoView
 [self.photoView refreshView];  
 ```
-### <a id="更换语言"></a> 更换语言
+### <a id="相关问题"></a> 相关问题
+#### 1. pod YYWebImage与YYKit冲突
+```objc
+解决方案：将YYKit拆开分别导入
+```
+#### 2. 如何更换语言
 ```objc
 HXPhotoConfiguration.h
 
@@ -340,6 +346,46 @@ HXPhotoLanguageTypeEn       // 英文
 默认 跟随系统
 */
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
+```
+#### 3. 选择完照片后其他界面视图往下偏移
+```objc
+方法一：
+/**
+如果选择完照片返回之后，
+原有界面继承UIScrollView的视图都往下偏移一个导航栏距离的话，
+那么请将这个属性设置为YES，即可恢复。
+*/
+@Property (assign, nonatomic) BOOL restoreNavigationBar;
+
+方法二：
+在选择完照片之后加上
+[UINavigationBar appearance].translucent = NO;
+```
+#### 4. 关于图片
+```objc
+根据HXPhotoModel的type属性来区分图片类型
+HXPhotoModelMediaTypePhoto          = 0,    //!< 相册里的普通照片
+HXPhotoModelMediaTypeLivePhoto      = 1,    //!< LivePhoto
+HXPhotoModelMediaTypePhotoGif       = 2,    //!< gif图
+HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的临时照片、本地/网络图片
+当type为HXPhotoModelMediaTypeCameraPhoto时，如果networkPhotoUrl不为空的话，那么这张图片就是网络图片
+如果为本地图片时thumbPhoto/previewPhoto就是本地图片
+不为本地图片时thumbPhoto/previewPhoto的值都是临时存的只用于展示
+HXPhotoModel已提供方法获取image或者imageData
+```
+#### 5. 关于视频的URL
+```objc
+1.如果选择的HXPhotoModel的PHAsset有值，需要先获取AVAsset，再使用AVAssetExportSession根据AVAsset导出视频地址
+2.如果PHAsset为空的话，则代表此视频是本地视频。可以直接HXPhotoModel里的VideoURL属性
+HXPhotoModel已提供方法获取
+```
+#### 6. 关于相机拍照
+```objc
+当拍摄的照片/视频保存到系统相册
+如果系统版本为9.0及以上时，拍照后的照片/视频保存相册后会获取保存后的PHAsset，保存的时候如果有定位信息也会把定位信息保存到相册
+HXPhotoModel里PHAsset有值并且type为 HXPhotoModelMediaTypePhoto / HXPhotoModelMediaTypeVideo
+以下版本的和不保存相册的都只是存在本地的临时图片/视频 
+HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXPhotoModelMediaTypeCameraVideo
 ```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
