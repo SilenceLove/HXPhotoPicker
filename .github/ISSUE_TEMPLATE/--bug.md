@@ -3,7 +3,7 @@ name: 提交Bug
 about: 发现一个bug或疑似bug
 title: ''
 labels: ''
-assignees: SilenceLove
+assignees: ''
 
 ---
 
