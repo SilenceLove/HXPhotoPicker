@@ -387,6 +387,54 @@ HXPhotoModel里PHAsset有值并且type为 HXPhotoModelMediaTypePhoto / HXPhotoMo
 以下版本的和不保存相册的都只是存在本地的临时图片/视频 
 HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXPhotoModelMediaTypeCameraVideo
 ```
+#### 7. 关于原图
+```objc
+根据代理或者block回调里的 isOriginal 来判断是否选择了原图 
+// 如何获取高清图/原图
+方法一：
+CGSize size;
+if (isOriginal) {
+  // 选中了原图
+  size = PHImageManagerMaximumSize;
+}else {  
+  // 未选中原图
+  CGFloat width = [UIScreen mainScreen].bounds.size.width;
+  CGFloat height = [UIScreen mainScreen].bounds.size.height;
+  CGFloat imgWidth = model.imageSize.width;
+  CGFloat imgHeight = model.imageSize.height;
+  if (imgHeight > imgWidth / 9 * 17) {
+    // 这里处理一下长图
+    size = CGSizeMake(width, height);
+  }else {
+    // 普通图片
+    size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
+  }
+}
+[photoModel requestPreviewImageWithSize:size startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+    // 如果照片在iCloud上会去下载,此回调代表开始下载iCloud上的照片
+    // 如果照片在本地存在此回调则不会走
+} progressHandler:^(double progress, HXPhotoModel *model) {
+    // iCloud下载进度
+    // 如果为网络图片,则是网络图片的下载进度
+} success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+    // 获取成功
+} failed:^(NSDictionary *info, HXPhotoModel *model) {
+    // 获取失败
+}];
+方法二：
+// 获取 imageData 根据data来处理
+// 如果为网络图片的话会先下载
+[photoModel requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+    // 开始下载iCloud上照片的imageData
+} progressHandler:^(double progress, HXPhotoModel *model) {
+    // iCloud下载进度
+} success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+    // 获取成功
+    imageData...
+} failed:^(NSDictionary *info, HXPhotoModel *model) {
+    // 获取失败
+}];
+```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
