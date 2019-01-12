@@ -17,6 +17,7 @@
 #import "UIFont+HXExtension.h"
 #import "UIImage+HXExtension.h"
 #import "NSTimer+HXExtension.h"
+#import "NSString+HXExtension.h"
 #import <CoreLocation/CoreLocation.h>
 #import "HXPhotoDefine.h"
 #import "HXPhotoCommon.h"
@@ -58,6 +59,8 @@
 + (void)requestAuthorization:(UIViewController *)viewController
                      handler:(void (^)(PHAuthorizationStatus status))handler;
 
++ (BOOL)assetIsHEIF:(PHAsset *)asset;
+
 /**  -------  */
 /**
  根据AVAsset对象获取指定数量和大小的图片
@@ -88,8 +91,7 @@
 /**  iphone6, 6s, 7, 8  */
 + (BOOL)isIphone6;
  
-/**********************************/
-+ (NSString *)uploadFileName;
+/**********************************/ 
 
 + (void)selectListWriteToTempPath:(NSArray *)selectList
                       requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList

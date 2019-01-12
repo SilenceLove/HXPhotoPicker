@@ -209,8 +209,6 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  */
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 
-
-
 // 每次在相册选择的图片,不是所有选择的所有图片.
 //- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 @end
@@ -226,56 +224,29 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
 @property (strong, nonatomic) HXCollectionView *collectionView;
 
-/**
- 照片/视频发生改变时调用 - 选择、移动顺序、删除
- */
+#pragma mark - < Block >
+/**  照片/视频发生改变时调用 - 选择、移动顺序、删除  */
 @property (copy, nonatomic) HXPhotoViewChangeCompleteBlock changeCompleteBlock;
-
-/**
- 点击了添加cell
- */
+/**  点击了添加cell  */
 @property (copy, nonatomic) HXPhotoViewDidAddCellBlock didAddCellBlock;
-
-/**
- 当view高度改变时调用
- */
+/**  当view高度改变时调用  */
 @property (copy, nonatomic) HXPhotoViewUpdateFrameBlock updateFrameBlock;
-
-/**
- 点击取消时调用
- */
+/**  点击取消时调用  */
 @property (copy, nonatomic) HXPhotoViewDidCancelBlock didCancelBlock;
-
-/**
- 删除网络图片时调用
- */
+/**  删除网络图片时调用  */
 @property (copy, nonatomic) HXPhotoViewDeleteNetworkPhotoBlock deleteNetworkPhotoBlock;
-
-/**
- 当前删除的模型
- */
+/**  当前删除的模型  */
 @property (copy, nonatomic) HXPhotoViewCurrentDeleteModelBlock currentDeleteModelBlock;
-
-/**
- 长按手势结束时是否删除当前拖动的cell
- */
+/**  长按手势结束时是否删除当前拖动的cell  */
 @property (copy, nonatomic) HXPhotoViewShouldDeleteCurrentMoveItemBlock shouldDeleteCurrentMoveItemBlock;
-
-/**
- 长按手势发生改变时调用
- */
+/**  长按手势发生改变时调用  */
 @property (copy, nonatomic) HXPhotoViewLongGestureRecognizerChangeBlock longGestureRecognizerChangeBlock;
-
-/**
- 长按手势开始时调用
- */
+/**  长按手势开始时调用  */
 @property (copy, nonatomic) HXPhotoViewLongGestureRecognizerBeganBlock longGestureRecognizerBeganBlock;
-
-/**
- 长按手势结束时调用
- */
+/**  长按手势结束时调用  */
 @property (copy, nonatomic) HXPhotoViewLongGestureRecognizerEndedBlock longGestureRecognizerEndedBlock;
 
+#pragma mark - < Configuration >
 /**  是否把相机功能放在外面 默认NO  */
 @property (assign, nonatomic) BOOL outerCamera;
 /**  每行个数 默认 3  */

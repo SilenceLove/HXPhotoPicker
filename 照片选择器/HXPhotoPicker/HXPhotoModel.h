@@ -16,7 +16,7 @@ typedef void (^ HXModelStartRequestICloud)(PHImageRequestID iCloudRequestId, HXP
 typedef void (^ HXModelProgressHandler)(double progress, HXPhotoModel *model);
 typedef void (^ HXModelImageSuccessBlock)(UIImage *image, HXPhotoModel *model, NSDictionary *info);
 typedef void (^ HXModelImageDataSuccessBlock)(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info);
-typedef void (^ HXModelImagePathSuccessBlock)(NSString *path, HXPhotoModel *model, NSDictionary *info);
+typedef void (^ HXModelImageURLSuccessBlock)(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info);
 typedef void (^ HXModelLivePhotoSuccessBlock)(PHLivePhoto *livePhoto, HXPhotoModel *model, NSDictionary *info);
 typedef void (^ HXModelAVAssetSuccessBlock)(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info);
 typedef void (^ HXModelAVPlayerItemSuccessBlock)(AVPlayerItem *playerItem, HXPhotoModel *model, NSDictionary *info);
@@ -31,8 +31,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelMediaType) {
     HXPhotoModelMediaTypePhotoGif       = 2,    //!< gif图
     HXPhotoModelMediaTypeVideo          = 3,    //!< 视频
     HXPhotoModelMediaTypeAudio          = 4,    //!< 预留
-    HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的照片 
-    HXPhotoModelMediaTypeCameraVideo    = 6,    //!< 通过相机录制的视频
+    HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的临时照片、本地/网络图片
+    HXPhotoModelMediaTypeCameraVideo    = 6,    //!< 通过相机录制的视频、本地视频
     HXPhotoModelMediaTypeCamera         = 7     //!< 跳转相机
 };
 
@@ -53,7 +53,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraVideoSubType) {
 
 typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
     HXPhotoModelVideoStateNormal = 0,   //!< 普通状态
-    HXPhotoModelVideoStateUndersize,    //!< 视频时长小于3秒
+    HXPhotoModelVideoStateUndersize,    //!< 视频时长小于最小选择秒数
     HXPhotoModelVideoStateOversize      //!< 视频时长超出限制
 };
 
@@ -76,12 +76,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
  - 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
  */
 @property (strong, nonatomic) NSDate *modificationDate;
-/**
- 位置信息 NSData 对象
- 
- - 如果是通过相机拍摄的并且没有保存到相册(临时的) 没有值
- */
-@property (strong, nonatomic) NSData *locationData;
 /**
  位置信息 CLLocation 对象
  
@@ -117,7 +111,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (copy, nonatomic) NSString *albumName;
 /**  视频时长 */
 @property (copy, nonatomic) NSString *videoTime;
-/**  相机拍摄之后的视频秒数 */
+/**  视频秒数 */
 @property (nonatomic, assign) NSTimeInterval videoDuration;
 /**  选择的下标 */
 @property (assign, nonatomic) NSInteger selectedIndex;
@@ -185,8 +179,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (copy, nonatomic) NSString *cameraPreviewImageNamed;
 
 @property (copy, nonatomic) NSString *fullPathToFile;;
-//@property (strong, nonatomic) HXPhotoManager *photoManager;
-
 
 @property (strong, nonatomic) id tempAsset;
 @property (assign, nonatomic) BOOL loadOriginalImage;
@@ -312,15 +304,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 
 /**
  获取imagePath
- - 本地图片和相机拍照的会获取不到
- - 网络图片的话返回的是网络图片地址
+ - 本地图片和网络图片会获取不到，只针对有PHAsset
  @return 请求的id，
          可用于取消请求 [self.asset cancelContentEditingInputRequest:(PHContentEditingInputRequestID)];
  */
-- (PHContentEditingInputRequestID)requestImagePathStartRequestICloud:(void (^)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model))startRequestICloud
-                                                     progressHandler:(HXModelProgressHandler)progressHandler
-                                                          success:(HXModelImagePathSuccessBlock)success
-                                                              failed:(HXModelFailedBlock)failed;
+- (PHContentEditingInputRequestID)requestImageURLStartRequestICloud:(void (^)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model))startRequestICloud
+                                                    progressHandler:(HXModelProgressHandler)progressHandler
+                                                            success:(HXModelImageURLSuccessBlock)success
+                                                             failed:(HXModelFailedBlock)failed;
 @end
 
 @class CLGeocoder;

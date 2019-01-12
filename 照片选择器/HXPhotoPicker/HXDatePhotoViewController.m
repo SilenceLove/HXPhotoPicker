@@ -15,7 +15,7 @@
 #import "HXCustomNavigationController.h"
 #import "HXCustomCameraController.h"
 #import "HXCustomPreviewView.h"
-#import "HXDatePhotoEditViewController.h"
+#import "HXPhotoEditViewController.h"
 #import "HXDatePhotoViewFlowLayout.h"
 #import "HXCircleProgressView.h"
 #import "HXDownloadProgressView.h"
@@ -42,7 +42,7 @@ HXDatePhotoViewCellDelegate,
 HXDatePhotoBottomViewDelegate,
 HXDatePhotoPreviewViewControllerDelegate,
 HXCustomCameraViewControllerDelegate,
-HXDatePhotoEditViewControllerDelegate
+HXPhotoEditViewControllerDelegate
 >
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
@@ -490,7 +490,7 @@ HXDatePhotoEditViewControllerDelegate
     
     if (self.manager.configuration.singleSelected) {
         if (model.subType == HXPhotoModelMediaSubTypePhoto) {
-            HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
             vc.delegate = self;
             vc.manager = self.manager;
             vc.model = model;
@@ -804,7 +804,7 @@ HXDatePhotoEditViewControllerDelegate
                 [self.navigationController pushViewController:previewVC animated:YES];
             }else {
                 if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
-                    HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+                    HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
                     vc.model = cell.model;
                     vc.delegate = self;
                     vc.manager = self.manager;
@@ -942,7 +942,7 @@ HXDatePhotoEditViewControllerDelegate
             [self.navigationController pushViewController:previewVC animated:YES];
         }else {
             if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
-                HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+                HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
                 vc.model = cell.model;
                 vc.delegate = self;
                 vc.manager = self.manager;
@@ -1123,8 +1123,8 @@ HXDatePhotoEditViewControllerDelegate
     [self.manager beforeSelectedListAddPhotoModel:model];
     [self datePhotoBottomViewDidDoneBtn];
 }
-#pragma mark - < HXDatePhotoEditViewControllerDelegate >
-- (void)datePhotoEditViewControllerDidClipClick:(HXDatePhotoEditViewController *)datePhotoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+#pragma mark - < HXPhotoEditViewControllerDelegate >
+- (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
     if (self.manager.configuration.singleSelected) {
         [self.manager beforeSelectedListAddPhotoModel:afterModel];
         [self datePhotoBottomViewDidDoneBtn];
@@ -1189,10 +1189,10 @@ HXDatePhotoEditViewControllerDelegate
             }
             HXWeakSelf
             self.manager.configuration.usePhotoEditComplete = ^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel) {
-                [weakSelf datePhotoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+                [weakSelf photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
-            HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
             vc.model = self.manager.selectedPhotoArray.firstObject;
             vc.delegate = self;
             vc.manager = self.manager;
@@ -1206,7 +1206,7 @@ HXDatePhotoEditViewControllerDelegate
             }
             HXWeakSelf
             self.manager.configuration.useVideoEditComplete = ^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel) {
-                [weakSelf datePhotoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+                [weakSelf photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
             //            [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"功能还在开发中^_^"]];
@@ -2008,7 +2008,7 @@ HXDatePhotoEditViewControllerDelegate
         _stateLb = [[UILabel alloc] init];
         _stateLb.textColor = [UIColor whiteColor];
         _stateLb.textAlignment = NSTextAlignmentRight;
-        _stateLb.font = [UIFont systemFontOfSize:12];
+        _stateLb.font = [UIFont hx_mediumSFUITextOfSize:12];
     }
     return _stateLb;
 }
@@ -2016,12 +2016,14 @@ HXDatePhotoEditViewControllerDelegate
     if (!_bottomMaskLayer) {
         _bottomMaskLayer = [CAGradientLayer layer];
         _bottomMaskLayer.colors = @[
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor,
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor ,
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.15].CGColor ,
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor ,
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.6].CGColor
                                     ];
         _bottomMaskLayer.startPoint = CGPointMake(0, 0);
         _bottomMaskLayer.endPoint = CGPointMake(0, 1);
-        _bottomMaskLayer.locations = @[@(0.15f),@(0.9f)];
+        _bottomMaskLayer.locations = @[@(0.15f),@(0.35f),@(0.6f),@(0.9f)];
         _bottomMaskLayer.borderWidth  = 0.0;
     }
     return _bottomMaskLayer;
@@ -2223,9 +2225,9 @@ HXDatePhotoEditViewControllerDelegate
                            NSForegroundColorAttributeName : [UIColor colorWithRed:51.f / 255.f green:51.f / 255.f blue:51.f / 255.f alpha:1]
                            };
     
-    NSAttributedString *photoCountStr = [[NSAttributedString alloc] initWithString:[self countNumAndChangeformat:@(self.photoCount).stringValue] attributes:dict];
+    NSAttributedString *photoCountStr = [[NSAttributedString alloc] initWithString:[@(self.photoCount).stringValue hx_countStrBecomeComma] attributes:dict];
     
-    NSAttributedString *videoCountStr = [[NSAttributedString alloc] initWithString:[self countNumAndChangeformat:@(videoCount).stringValue] attributes:dict];
+    NSAttributedString *videoCountStr = [[NSAttributedString alloc] initWithString:[@(videoCount).stringValue hx_countStrBecomeComma] attributes:dict];
     
     
     if (self.photoCount > 0 && videoCount > 0) {
@@ -2284,29 +2286,6 @@ HXDatePhotoEditViewControllerDelegate
         self.titleLb.attributedText = atbStr;
 //        self.titleLb.text = [NSString stringWithFormat:@"%ld %@",videoCount, [NSBundle hx_localizedStringForKey:videoStr]];
     }
-}
-- (NSString *)countNumAndChangeformat:(NSString *)num {
-    if (num.length < 3) {
-        return num;
-    }
-    int count = 0;
-    long long int a = num.longLongValue;
-    while (a != 0) {
-        count++;
-        a /= 10;
-    }
-    NSMutableString *string = [NSMutableString stringWithString:num];
-    NSMutableString *newstring = [NSMutableString string];
-    while (count > 3) {
-        count -= 3;
-        NSRange rang = NSMakeRange(string.length - 3, 3);
-        NSString *str = [string substringWithRange:rang];
-        [newstring insertString:str atIndex:0];
-        [newstring insertString:@"," atIndex:0];
-        [string deleteCharactersInRange:rang];
-    }
-    [newstring insertString:string atIndex:0];
-    return newstring;
 }
 - (void)layoutSubviews {
     [super layoutSubviews];

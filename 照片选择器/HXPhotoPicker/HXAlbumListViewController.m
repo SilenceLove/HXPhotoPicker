@@ -352,18 +352,18 @@ UITableViewDelegate
     HXAlbumListSingleViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"tableViewCellId"];
     cell.model = self.albumModelArray[indexPath.row];
     
-    HXWeakSelf
-    cell.getResultCompleteBlock = ^(NSInteger count, HXAlbumListSingleViewCell *myCell) {
-        if (count <= 0) {
-            if ([weakSelf.albumModelArray containsObject:myCell.model]) {
-                NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
-                if (myIndexPath) {
-                    [weakSelf.albumModelArray removeObject:myCell.model];
-                    [weakSelf.tableView deleteRowsAtIndexPaths:@[myIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-                }
-            }
-        }
-    };
+//    HXWeakSelf
+//    cell.getResultCompleteBlock = ^(NSInteger count, HXAlbumListSingleViewCell *myCell) {
+//        if (count <= 0) {
+//            if ([weakSelf.albumModelArray containsObject:myCell.model]) {
+//                NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
+//                if (myIndexPath) {
+//                    [weakSelf.albumModelArray removeObject:myCell.model];
+//                    [weakSelf.tableView deleteRowsAtIndexPaths:@[myIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+//                }
+//            }
+//        }
+//    };
     return cell;
 }
 
@@ -599,7 +599,7 @@ UITableViewDelegate
     }
 }
 - (void)dealloc {
-    [self cancelRequest];
+//    [self cancelRequest];
 }
 #pragma mark - < cell懒加载 >
 - (UIImageView *)coverView {
@@ -708,7 +708,7 @@ UITableViewDelegate
         self.model.asset = self.model.result.lastObject;
     }
     HXWeakSelf
-    self.requestId1 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset size:CGSizeMake(self.hx_h * 1.5, self.hx_h * 1.5) completion:^(UIImage *image, PHAsset *asset) {
+    self.requestId1 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset size:CGSizeMake(150, 150) completion:^(UIImage *image, PHAsset *asset) {
         if (weakSelf.model.asset == asset) {
             weakSelf.coverView1.image = image;
         }
@@ -751,7 +751,7 @@ UITableViewDelegate
         }]; 
     }
     
-    self.photoNumberLb.text = @(photoCount + self.model.cameraCount).stringValue;
+    self.photoNumberLb.text = [@(photoCount + self.model.cameraCount).stringValue hx_countStrBecomeComma];
     if (self.getResultCompleteBlock) {
         self.getResultCompleteBlock(photoCount + self.model.cameraCount, self);
     }
@@ -768,10 +768,10 @@ UITableViewDelegate
     CGFloat albumNameLbX = CGRectGetMaxX(self.coverView1.frame) + 12;
     CGFloat albumNameLbY = self.hx_h / 2  - 16;
     self.albumNameLb.frame = CGRectMake(albumNameLbX, albumNameLbY, self.hx_w - albumNameLbX - 40, 14);
-    self.photoNumberLb.frame = CGRectMake(albumNameLbX, self.hx_h / 2 + 2, self.hx_w, 13);
+    self.photoNumberLb.frame = CGRectMake(albumNameLbX, self.hx_h / 2 + 4, self.hx_w, 13);
 }
 - (void)dealloc {
-    [self cancelRequest];
+//    [self cancelRequest];
 }
 #pragma mark - < cell懒加载 >
 - (UIImageView *)coverView1 {
@@ -808,7 +808,7 @@ UITableViewDelegate
     if (!_albumNameLb) {
         _albumNameLb = [[UILabel alloc] init];
         _albumNameLb.textColor = [UIColor blackColor];
-        _albumNameLb.font = [UIFont systemFontOfSize:13];
+        _albumNameLb.font = [UIFont hx_mediumSFUITextOfSize:13];
     }
     return _albumNameLb;
 }

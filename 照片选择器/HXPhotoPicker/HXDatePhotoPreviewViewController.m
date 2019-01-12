@@ -15,7 +15,7 @@
 #import "HXDatePhotoViewPresentTransition.h"
 #import "HXPhotoCustomNavigationBar.h"
 #import "HXCircleProgressView.h"
-#import "HXDatePhotoEditViewController.h"
+#import "HXPhotoEditViewController.h"
 #import "UIViewController+HXExtension.h"
 #import "HXDateVideoEditViewController.h"
 #import "HXDatePhotoPersentInteractiveTransition.h"
@@ -27,7 +27,7 @@
 UICollectionViewDataSource,
 UICollectionViewDelegate,
 HXDatePhotoPreviewBottomViewDelegate,
-HXDatePhotoEditViewControllerDelegate,
+HXPhotoEditViewControllerDelegate,
 HXDateVideoEditViewControllerDelegate
 >
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
@@ -727,10 +727,10 @@ HXDateVideoEditViewControllerDelegate
             }
             HXWeakSelf
             self.manager.configuration.usePhotoEditComplete = ^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel) {
-                [weakSelf datePhotoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+                [weakSelf photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
-            HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
             vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
             vc.delegate = self;
             vc.manager = self.manager;
@@ -749,7 +749,7 @@ HXDateVideoEditViewControllerDelegate
             }
             __weak typeof(self) weakSelf = self;
             self.manager.configuration.useVideoEditComplete = ^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel) {
-                [weakSelf datePhotoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+                [weakSelf photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
             //            [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"功能还在开发中^_^"]];
@@ -790,15 +790,8 @@ HXDateVideoEditViewControllerDelegate
         }
     }
     if (self.manager.configuration.singleSelected) {
-        if (model.type == HXPhotoModelMediaTypeVideo ) {
-            if (model.asset.duration > self.manager.configuration.videoMaximumSelectDuration) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
-                return;
-            }else if (model.asset.duration < self.manager.configuration.videoMinimumSelectDuration) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.manager.configuration.videoMinimumSelectDuration]]];
-                return;
-            }
-        }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            
             if (model.videoDuration > self.manager.configuration.videoMaximumSelectDuration) {
                 [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
                 return;
@@ -839,15 +832,7 @@ HXDateVideoEditViewControllerDelegate
         }
     }
     if ([self.manager selectedCount] == 0) {
-        if (model.type == HXPhotoModelMediaTypeVideo ) {
-            if (model.asset.duration > self.manager.configuration.videoMaximumSelectDuration) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
-                return;
-            }else if (model.asset.duration < self.manager.configuration.videoMinimumSelectDuration) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.manager.configuration.videoMinimumSelectDuration]]];
-                return;
-            }
-        }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (model.subType == HXPhotoModelMediaSubTypeVideo) { 
             if (model.videoDuration > self.manager.configuration.videoMaximumSelectDuration) {
                 [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
                 return;
@@ -893,8 +878,8 @@ HXDateVideoEditViewControllerDelegate
         [self.delegate datePhotoPreviewControllerDidDone:self];
     }
 }
-#pragma mark - < HXDatePhotoEditViewControllerDelegate >
-- (void)datePhotoEditViewControllerDidClipClick:(HXDatePhotoEditViewController *)datePhotoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+#pragma mark - < HXPhotoEditViewControllerDelegate >
+- (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
     if (self.outside) {
         [self.modelArray replaceObjectAtIndex:[self.modelArray indexOfObject:beforeModel] withObject:afterModel];
         if ([self.delegate respondsToSelector:@selector(datePhotoPreviewSelectLaterDidEditClick:beforeModel:afterModel:)]) {

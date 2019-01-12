@@ -10,29 +10,30 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class AVAsset;
+@class AVAsset, HXPhotoModel;
 
 @interface NSArray (HXExtension)
 
 /**
  获取image
+ 如果model是视频的话,获取的则是视频封面
 
  @param original 是否原图
- @param completion 完成回调，获取的失败不会添加到数组中
+ @param completion imageArray 获取成功的image数组, errorArray 获取失败的model数组
  */
-- (void)hx_requestImageWithOriginal:(BOOL)original completion:(void (^)(NSArray<UIImage *> * _Nullable imageArray))completion;
+- (void)hx_requestImageWithOriginal:(BOOL)original completion:(void (^)(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray))completion;
 
 /**
  获取imageData
-
- @param completion 完成回调，获取的失败不会添加到数组中
+ 会过滤掉视频
+ @param completion 完成回调，获取失败的不会添加到数组中
  */
 - (void)hx_requestImageDataWithCompletion:(void (^)(NSArray<NSData *> * _Nullable imageDataArray))completion;
 
 /**
  获取AVAsset
 
- @param completion 完成回调，获取的失败不会添加到数组中
+ @param completion 完成回调，获取失败的不会添加到数组中
  */
 - (void)hx_requestAVAssetWithCompletion:(void (^)(NSArray<AVAsset *> * _Nullable assetArray))completion;
 
@@ -40,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  获取视频地址
 
  @param presetName AVAssetExportPresetHighestQuality / AVAssetExportPresetMediumQuality
- @param completion 完成回调，获取的失败不会添加到数组中
+ @param completion 完成回调，获取失败的不会添加到数组中
  */
 - (void)hx_requestVideoURLWithPresetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable videoURLArray))completion;
 @end

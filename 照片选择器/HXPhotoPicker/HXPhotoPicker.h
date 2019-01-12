@@ -15,7 +15,7 @@
 #import "HXDatePhotoToolManager.h"
 #import "HXDatePhotoPreviewBottomView.h"
 #import "UIViewController+HXExtension.h"
-#import "HXDatePhotoEditViewController.h"
+#import "HXPhotoEditViewController.h"
 #import "HXDateVideoEditViewController.h"
 #import "HXCustomCameraViewController.h"
 #import "HXPhoto3DTouchViewController.h"

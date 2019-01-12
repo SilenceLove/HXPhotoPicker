@@ -7,12 +7,15 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/SilenceLove/HXPhotoPicker"
   s.license      = { :type => "MIT", :file => "LICENSE" }
   s.author       = { "SilenceLove" => "294005139@qq.com" }
+
   s.platform     = :ios, "8.0"
   s.source       = { :git => "https://github.com/SilenceLove/HXPhotoPicker.git", :tag => "#{s.version}" }
-  s.source_files = "照片选择器/HXPhotoPicker/*.{h,m}"
-  s.resources    = "照片选择器/HXPhotoPicker/*.{png,xib,nib,bundle}"
-  s.framework    = "UIKit"
+  s.source_files = "照片选择器/HXPhotoPicker/**/*.{h,m}"
+  s.resources    = "照片选择器/HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
+
+  s.framework    = 'UIKit','Photos','PhotosUI'
   s.requires_arc = true
+
   s.dependency "SDWebImage", "~> 4.4.1"
   s.dependency "YYWebImage"
 

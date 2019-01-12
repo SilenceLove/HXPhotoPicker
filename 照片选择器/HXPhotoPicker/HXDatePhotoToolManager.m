@@ -142,7 +142,7 @@
         }
         if (model.asset) {
             [model requestAVAssetExportSessionStartRequestICloud:nil progressHandler:nil success:^(AVAssetExportSession *assetExportSession, HXPhotoModel *model, NSDictionary *info) {
-                NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:@".mp4"];
+                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
                 assetExportSession.outputURL = videoURL;
@@ -259,7 +259,7 @@
                 scale = 1.0f;
             }
             NSData *imageData = UIImageJPEGRepresentation(model.thumbPhoto, scale);
-            NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".jpeg"]];
+            NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".jpeg"]];
             
             NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
             
@@ -281,7 +281,7 @@
 //        if (model.asset) {
         [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
+                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
                 
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 
@@ -307,7 +307,7 @@
         }];
 //        }else {
 //            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
+//                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".gif"]];
 //
 //                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
 //
@@ -368,7 +368,7 @@
                         suffix = @"jpeg";
                     }
                     
-                    NSString *fileName = [[weakSelf uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+                    NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
                     
                     NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                     
@@ -401,7 +401,7 @@
                     scale = 1.0f;
                 }
                 NSData *imageData = UIImageJPEGRepresentation(model.thumbPhoto, scale);
-                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".jpeg"]];
+                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".jpeg"]];
                 
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 
@@ -435,7 +435,7 @@
     if ([compatiblePresets containsObject:AVAssetExportPresetHighestQuality]) {
         AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetMediumQuality];
         
-        NSString *fileName = [[self uploadFileName] stringByAppendingString:@".mp4"];
+        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
         NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
         NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
         exportSession.outputURL = videoURL;
@@ -464,24 +464,7 @@
         }
         return nil;
     }
-}
-- (NSString *)uploadFileName {
-    CFUUIDRef uuid = CFUUIDCreate(nil);
-    NSString *uuidString = (__bridge_transfer NSString*)CFUUIDCreateString(nil, uuid);
-    CFRelease(uuid);
-    NSString *uuidStr = [[uuidString stringByReplacingOccurrencesOfString:@"-" withString:@""] lowercaseString];
-    NSString *name = [NSString stringWithFormat:@"%@",uuidStr];
-    
-    NSString *fileName = @"";
-    NSDate *nowDate = [NSDate date];
-    NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
-    NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
-    fileName = [fileName stringByAppendingString:@"hx"];
-    fileName = [fileName stringByAppendingString:dateStr];
-    fileName = [fileName stringByAppendingString:numStr];
-    
-    return [NSString stringWithFormat:@"%@%@",name,fileName];
-}
+} 
 - (void)getSelectedImageDataList:(NSArray<HXPhotoModel *> *)modelList success:(HXDatePhotoToolManagerGetImageDataListSuccessHandler)success failed:(HXDatePhotoToolManagerGetImageDataListFailedHandler)failed {
     if (self.gettingImageData) {
         if (HXShowLog) NSSLog(@"已有任务,请等待");

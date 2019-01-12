@@ -27,7 +27,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.videoMaxNum = 1;  //
         _manager.configuration.maxNum = 10;
         _manager.configuration.reverseDate = YES;
-//        _manager.configuration.selectTogether = NO;
+        _manager.configuration.selectTogether = YES;
     }
     return _manager;
 }
@@ -66,7 +66,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [self.manager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6]];
     [self.photoView refreshView]; 
 }
-
+- (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    
+//    [allList hx_requestImageWithOriginal:isOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray) {
+//        NSSLog(@"%@",imageArray);
+//    }];
+}
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame
 {
     NSSLog(@"%@",NSStringFromCGRect(frame));

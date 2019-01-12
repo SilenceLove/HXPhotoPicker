@@ -63,6 +63,25 @@
     return newTime;
 }
 
++ (BOOL)assetIsHEIF:(PHAsset *)asset {
+    if (!asset) return NO;
+    __block BOOL isHEIF = NO;
+    if (HX_IOS9Later) {
+        NSArray *resourceList = [PHAssetResource assetResourcesForAsset:asset];
+        [resourceList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            PHAssetResource *resource = obj;
+            NSString *UTI = resource.uniformTypeIdentifier;
+            if ([UTI isEqualToString:@"public.heif"] || [UTI isEqualToString:@"public.heic"]) {
+                isHEIF = YES;
+                *stop = YES;
+            }
+        }];
+    } else {
+        NSString *UTI = [asset valueForKey:@"uniformTypeIdentifier"];
+        isHEIF = [UTI isEqualToString:@"public.heif"] || [UTI isEqualToString:@"public.heic"];
+    }
+    return isHEIF;
+}
 + (void)FetchPhotosBytes:(NSArray *)photos completion:(void (^)(NSString *))completion
 {
     __block NSInteger dataLength = 0;
@@ -432,23 +451,6 @@
  
 
 /********************分割线*********************/
-+ (NSString *)uploadFileName {
-    CFUUIDRef uuid = CFUUIDCreate(nil);
-    NSString *uuidString = (__bridge_transfer NSString*)CFUUIDCreateString(nil, uuid);
-    CFRelease(uuid);
-    NSString *uuidStr = [[uuidString stringByReplacingOccurrencesOfString:@"-" withString:@""] lowercaseString];
-    NSString *name = [NSString stringWithFormat:@"%@",uuidStr];
-    
-    NSString *fileName = @"";
-    NSDate *nowDate = [NSDate date];
-    NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
-    NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
-    fileName = [fileName stringByAppendingString:@"hx"];
-    fileName = [fileName stringByAppendingString:dateStr];
-    fileName = [fileName stringByAppendingString:numStr];
-    
-    return [NSString stringWithFormat:@"%@%@",name,fileName];
-}
 + (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion error:(void (^)(void))error {
     if (selectList.count == 0) {
         if (HXShowLog) NSSLog(@"请选择后再写入");
@@ -482,13 +484,13 @@
                         suffix = @"jpeg";
                     }
                 }
-                NSString *fileName = [[self uploadFileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 photoModel.fullPathToFile = fullPathToFile;
                 [imageUrls addObject:[NSURL fileURLWithPath:fullPathToFile]];
                 [allUrl addObject:[NSURL fileURLWithPath:fullPathToFile]];
             }else {
-                NSString *fileName = [[self uploadFileName] stringByAppendingString:@".mp4"];
+                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
                 NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                 photoModel.fullPathToFile = fullPathToFile;
                 [videoUrls addObject:[NSURL fileURLWithPath:fullPathToFile]];

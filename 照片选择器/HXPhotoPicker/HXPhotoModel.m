@@ -59,17 +59,7 @@
         return [self.asset valueForKey:@"modificationDate"];
 //    }
     return _modificationDate;
-}
-
-- (NSData *)locationData {
-//    if (!_locationData) {
-        if (self.asset) {
-            return [self.asset valueForKey:@"locationData"];
-        }
-//    }
-    return _locationData;
-}
-
+} 
 - (CLLocation *)location {
     if (!_location) {
         if (self.asset) {
@@ -84,6 +74,14 @@
         return self.asset.localIdentifier;
     }
     return _localIdentifier;
+}
+
+- (NSTimeInterval)videoDuration {
+    if (self.asset) {
+        return self.asset.duration;
+    }else {
+        return _videoDuration;
+    }
 }
 
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset {
@@ -212,7 +210,7 @@
 }
 - (NSString *)videoTime {
     if (!_videoTime) {
-        NSString *timeLength = [NSString stringWithFormat:@"%0.0f",self.asset.duration];
+        NSString *timeLength = [NSString stringWithFormat:@"%0.0f",self.videoDuration];
         _videoTime = [HXPhotoTools getNewTimeFromDurationSecond:timeLength.integerValue];
     }
     return _videoTime;
@@ -429,7 +427,6 @@
         self.networkThumbURL = [aDecoder decodeObjectForKey:@"networkThumbURL"];
         self.creationDate = [aDecoder decodeObjectForKey:@"creationDate"];
         self.modificationDate = [aDecoder decodeObjectForKey:@"modificationDate"];
-        self.locationData = [aDecoder decodeObjectForKey:@"locationData"];
         self.location = [aDecoder decodeObjectForKey:@"location"];
         self.videoTime = [aDecoder decodeObjectForKey:@"videoTime"];
         self.selectIndexStr = [aDecoder decodeObjectForKey:@"videoTime"];
@@ -454,8 +451,7 @@
     [aCoder encodeObject:self.networkPhotoUrl forKey:@"networkPhotoUrl"];
     [aCoder encodeObject:self.networkThumbURL forKey:@"networkThumbURL"];
     [aCoder encodeObject:self.creationDate forKey:@"creationDate"];
-    [aCoder encodeObject:self.modificationDate forKey:@"modificationDate"];
-    [aCoder encodeObject:self.locationData forKey:@"locationData"];
+    [aCoder encodeObject:self.modificationDate forKey:@"modificationDate"]; 
     [aCoder encodeObject:self.location forKey:@"location"];
     [aCoder encodeObject:self.videoTime forKey:@"videoTime"];
     [aCoder encodeObject:self.selectIndexStr forKey:@"selectIndexStr"];
@@ -523,11 +519,14 @@
         }
     }];
 }
-- (PHImageRequestOptions *)imageHighQualityRequestOptions {
+- (PHImageRequestOptions *)imageRequestOptionsWithDeliveryMode:(PHImageRequestOptionsDeliveryMode)deliveryMode {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
-    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.deliveryMode = deliveryMode;
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     return option;
+}
+- (PHImageRequestOptions *)imageHighQualityRequestOptions {
+    return [self imageRequestOptionsWithDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
 }
 - (PHImageRequestID)requestPreviewImageWithSize:(CGSize)size
                              startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
@@ -550,6 +549,8 @@
             } completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (image) {
+                        if (!weakSelf.thumbPhoto) weakSelf.thumbPhoto = image;
+                        if (!weakSelf.previewPhoto) weakSelf.previewPhoto = image;
                         if (success) success(image, weakSelf, nil);
                     }else {
                         if (failed) failed(nil, weakSelf);
@@ -567,6 +568,8 @@
     PHImageRequestID requestId = [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         [weakSelf requestDataWithResult:result info:info size:size resultClass:[UIImage class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
             if (success) {
+                if (!weakSelf.thumbPhoto) weakSelf.thumbPhoto = result;
+                if (!weakSelf.previewPhoto) weakSelf.previewPhoto = result;
                 success(result, weakSelf, info);
             }
         } failed:failed];
@@ -1027,7 +1030,7 @@
         NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
         if ([presets containsObject:presetName]) {
             AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:presetName];
-            NSString *fileName = [[HXPhotoTools uploadFileName] stringByAppendingString:@".mp4"];
+            NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
             NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
             NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
             session.outputURL = videoURL;
@@ -1083,7 +1086,7 @@
 //                                        progressHandler:iCloudProgressHandler
 //                                             completion:^(AVAssetExportSession *assetExportSession, HXPhotoModel *model, NSDictionary *info) {
 //
-//        NSString *fileName = [[HXPhotoTools uploadFileName] stringByAppendingString:@".mp4"];
+//        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
 //        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
 //        NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
 //        assetExportSession.outputURL = videoURL;
@@ -1133,14 +1136,22 @@
 //        }];
 //    } failed:failed];
 }
-- (PHContentEditingInputRequestID)requestImagePathStartRequestICloud:(void (^)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model))startRequestICloud
+- (PHContentEditingInputRequestID)requestImageURLStartRequestICloud:(void (^)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model))startRequestICloud
                                                      progressHandler:(HXModelProgressHandler)progressHandler
-                                                             success:(HXModelImagePathSuccessBlock)success
+                                                             success:(HXModelImageURLSuccessBlock)success
                                                               failed:(HXModelFailedBlock)failed {
-    if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
-        if (success) {
-            success(self.networkPhotoUrl.absoluteString, self, nil);
+    if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
+        if (failed) {
+            failed(nil, self);
         }
+//        if (self.networkPhotoUrl) {
+//            if (success) {
+//                success(self.networkPhotoUrl, self, nil);
+//            }
+//        }else {
+//            //
+//
+//        }
         return 0;
     }
     
@@ -1150,10 +1161,10 @@
     return [self.asset requestContentEditingInputWithOptions:options completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
         BOOL downloadFinined = (![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]);
         
-        if (downloadFinined && contentEditingInput.fullSizeImageURL.relativePath) {
+        if (downloadFinined && contentEditingInput.fullSizeImageURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
-                    success(contentEditingInput.fullSizeImageURL.relativePath, weakSelf, info);
+                    success(contentEditingInput.fullSizeImageURL, weakSelf, info);
                 }
             });
         }else {
@@ -1171,10 +1182,10 @@
                 PHContentEditingInputRequestID iCloudRequestID = [weakSelf.asset requestContentEditingInputWithOptions:iCloudOptions completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
                     BOOL downloadFinined = (![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]);
                     
-                    if (downloadFinined && contentEditingInput.fullSizeImageURL.relativePath) {
+                    if (downloadFinined && contentEditingInput.fullSizeImageURL) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (success) {
-                                success(contentEditingInput.fullSizeImageURL.relativePath, weakSelf, nil);
+                                success(contentEditingInput.fullSizeImageURL, weakSelf, nil);
                             }
                         });
                     }else {

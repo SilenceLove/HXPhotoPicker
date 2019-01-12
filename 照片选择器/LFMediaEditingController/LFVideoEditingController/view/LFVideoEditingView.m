@@ -245,7 +245,7 @@ NSString *const kLFVideoEditingViewData_audioEnable = @"LFVideoEditingViewData_a
         }
     }
     
-    NSString *name = [HXPhotoTools uploadFileName];
+    NSString *name = [NSString hx_fileName];
     
 //    if ([self.asset isKindOfClass:[AVURLAsset class]]) {
 //        name = ((AVURLAsset *)self.asset).URL.lastPathComponent;

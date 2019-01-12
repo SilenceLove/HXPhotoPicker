@@ -1,16 +1,16 @@
 //
-//  HXDatePhotoEditViewController.m
+//  HXPhotoEditViewController.m
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/10/27.
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "HXDatePhotoEditViewController.h"
+#import "HXPhotoEditViewController.h"
 #import "UIImage+HXExtension.h"
 #import "UIButton+HXExtension.h"
 
-@interface HXDatePhotoEditViewController ()<HXDatePhotoEditBottomViewDelegate>
+@interface HXPhotoEditViewController ()<HXDatePhotoEditBottomViewDelegate>
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UIImageView *tempImageView;
 @property (strong, nonatomic) HXDatePhotoEditBottomView *bottomView;
@@ -32,7 +32,7 @@
 @property (assign, nonatomic) UIImageOrientation currentImageOrientaion;
 @end
 
-@implementation HXDatePhotoEditViewController
+@implementation HXPhotoEditViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -614,14 +614,14 @@
     HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
     if (self.outside) {
         [self dismissViewControllerAnimated:NO completion:^{
-            if ([self.delegate respondsToSelector:@selector(datePhotoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
-                [self.delegate datePhotoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+            if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+                [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
             }
         }];
         return;
     }
-    if ([self.delegate respondsToSelector:@selector(datePhotoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
-        [self.delegate datePhotoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+    if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+        [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
     }
     [self.navigationController popViewControllerAnimated:NO];
 }

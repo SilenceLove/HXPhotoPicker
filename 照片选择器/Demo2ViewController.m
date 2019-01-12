@@ -192,13 +192,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
-    HXPhotoModel *photoModel = allList.firstObject;
-     
+//    HXPhotoModel *photoModel = allList.firstObject;
     
-//    [photos hx_requestImageWithOriginal:isOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray) {
-//        NSSLog(@"%@",imageArray);
+//    [allList hx_requestImageWithOriginal:isOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
+//        // imageArray 获取成功的image数组
+//        // errorArray 获取失败的model数组
+//        NSSLog(@"\nimage: %@\nerror: %@",imageArray,errorArray);
 //    }];
-    
 }
 
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl {

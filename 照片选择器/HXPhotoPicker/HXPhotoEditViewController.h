@@ -1,5 +1,5 @@
 //
-//  HXDatePhotoEditViewController.h
+//  HXPhotoEditViewController.h
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/10/27.
@@ -9,14 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
 
-@class HXDatePhotoEditViewController;
-@protocol HXDatePhotoEditViewControllerDelegate <NSObject>
+@class HXPhotoEditViewController;
+@protocol HXPhotoEditViewControllerDelegate <NSObject>
 @optional
-- (void)datePhotoEditViewControllerDidClipClick:(HXDatePhotoEditViewController *)datePhotoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
+- (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
 @end
 
-@interface HXDatePhotoEditViewController : UIViewController
-@property (weak, nonatomic) id<HXDatePhotoEditViewControllerDelegate> delegate;
+@interface HXPhotoEditViewController : UIViewController
+@property (weak, nonatomic) id<HXPhotoEditViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (assign, nonatomic) BOOL outside;

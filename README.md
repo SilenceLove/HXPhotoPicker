@@ -100,7 +100,8 @@
     // 获取失败
 }];
 
-// 获取 LivePhoto , PHImageManagerMaximumSize代表原图
+// 获取 LivePhoto 
+// PHImageManagerMaximumSize代表原图
 [photoModel requestLivePhotoWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
     // 开始下载iCloud上的 LivePhoto
 } progressHandler:^(double progress, HXPhotoModel *model) {
@@ -111,7 +112,8 @@
     // 获取失败
 }];
 
-// 导出视频地址 presetName 视频导出的质量
+// 导出视频地址 
+// presetName 视频导出的质量
 [photoModel exportVideoWithPresetName:AVAssetExportPresetHighestQuality startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
     // 开始下载iCloud上的视频
 } iCloudProgressHandler:^(double progress, HXPhotoModel *model) {
@@ -127,23 +129,24 @@
 NSArray+HXExtension
 /**
 获取image
+如果model是视频的话,获取的则是视频封面
 
 @param original 是否原图
-@param completion 完成回调，获取的失败不会添加到数组中
+@param completion imageArray 获取成功的image数组, errorArray 获取失败的model数组
 */
-- (void)hx_requestImageWithOriginal:(BOOL)original completion:(void (^)(NSArray<UIImage *> * _Nullable imageArray))completion;
+- (void)hx_requestImageWithOriginal:(BOOL)original completion:(void (^)(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray))completion;
 
 /**
 获取imageData
 
-@param completion 完成回调，获取的失败不会添加到数组中
+@param completion 完成回调，获取失败的不会添加到数组中
 */
 - (void)hx_requestImageDataWithCompletion:(void (^)(NSArray<NSData *> * _Nullable imageDataArray))completion;
 
 /**
 获取AVAsset
 
-@param completion 完成回调，获取的失败不会添加到数组中
+@param completion 完成回调，获取失败的不会添加到数组中
 */
 - (void)hx_requestAVAssetWithCompletion:(void (^)(NSArray<AVAsset *> * _Nullable assetArray))completion;
 
@@ -151,7 +154,7 @@ NSArray+HXExtension
 获取视频地址
 
 @param presetName AVAssetExportPresetHighestQuality / AVAssetExportPresetMediumQuality
-@param completion 完成回调，获取的失败不会添加到数组中
+@param completion 完成回调，获取失败的不会添加到数组中
 */
 - (void)hx_requestVideoURLWithPresetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable videoURLArray))completion;
 ```
@@ -390,26 +393,37 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
 #### 7. 关于原图
 ```objc
 根据代理或者block回调里的 isOriginal 来判断是否选择了原图 
-// 如何获取高清图/原图
 方法一：
-CGSize size;
-if (isOriginal) {
-  // 选中了原图
-  size = PHImageManagerMaximumSize;
-}else {  
-  // 未选中原图
-  CGFloat width = [UIScreen mainScreen].bounds.size.width;
-  CGFloat height = [UIScreen mainScreen].bounds.size.height;
-  CGFloat imgWidth = model.imageSize.width;
-  CGFloat imgHeight = model.imageSize.height;
-  if (imgHeight > imgWidth / 9 * 17) {
-    // 这里处理一下长图
-    size = CGSizeMake(width, height);
-  }else {
-    // 普通图片
-    size = CGSizeMake(model.endImageSize.width * 1.5, model.endImageSize.height * 1.5);
-  }
-}
+// 获取原图
+// 本地图片、网络图片调用此方法会直接进入失败回调
+// 本地图片获取原图 model.thumbPhoto / model.previewPhoto
+// 网络图片获取原图 如果 model.thumbPhoto / model.previewPhoto 都为空的话，说明还没有下载完成或者下载失败了，重新下载即可。也可以直接用网络图片地址 model.networkPhotoUrl 下载 或者调用requestPreviewImageWithSize:progressHandler:success:failed
+// 这个方法只针对有photoModel.asset不为空的情况
+[photoModel requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) { 
+    // 如果照片在iCloud上会去下载,此回调代表开始下载iCloud上的照片
+    // 如果照片在本地存在此回调则不会走
+} progressHandler:^(double progress, HXPhotoModel *model) {
+    // iCloud下载进度
+} success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
+    // 获取成功
+    // imageURL图片地址
+    if ([imageURL.relativePath.pathExtension isEqualToString:@"HEIC"]) {
+        // 处理一下 HEIC 格式图片
+        CIImage *ciImage = [CIImage imageWithContentsOfURL:imageURL];
+        CIContext *context = [CIContext context];
+        NSString *key = (__bridge NSString *)kCGImageDestinationLossyCompressionQuality;
+        NSData *jpgData = [context JPEGRepresentationOfImage:ciImage colorSpace:ciImage.colorSpace options:@{key : @1}];
+        UIImage *image = [UIImage imageWithData:jpgData];
+    }else {
+        UIImage *image = [UIImage imageWithContentsOfFile:path]; 
+    }
+} failed:^(NSDictionary *info, HXPhotoModel *model) {
+    // 获取失败
+}];
+// 根据 size 获取高清图或者缩略图 , size只针对 PHAsset 有值的情况下有效
+// 如果 size (width <= 0, height <= 0) / PHImageManagerMaximumSize 则会获取原图
+// 本地图片直接返回本地图片的image
+// 网络图片直接返回网络图片下载完成后的image
 [photoModel requestPreviewImageWithSize:size startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
     // 如果照片在iCloud上会去下载,此回调代表开始下载iCloud上的照片
     // 如果照片在本地存在此回调则不会走
@@ -430,7 +444,13 @@ if (isOriginal) {
     // iCloud下载进度
 } success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
     // 获取成功
-    imageData...
+    if ([HXPhotoTools assetIsHEIF:model.asset]) {
+        // 处理一下 HEIC 格式图片
+        CIImage *ciImage = [CIImage imageWithData:imageData];
+        CIContext *context = [CIContext context];
+        NSData *jpgData = [context JPEGRepresentationOfImage:ciImage colorSpace:ciImage.colorSpace options:@{}];
+        // jpgData 转换后的imageData
+    } 
 } failed:^(NSDictionary *info, HXPhotoModel *model) {
     // 获取失败
 }];
@@ -438,6 +458,7 @@ if (isOriginal) {
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- 2019-1-12 获取原图时处理HEIC格式的照片
 - 2019-1-9  选择照片逻辑修改、保存相册时添加定位信息以及一些问题修复
 - 2019-1-7  优化了相册加载速度、调整一些显示效果、方法结构调整（旧版本更新会出现方法报错，请使用最新方法）、编辑完成后跳转逻辑修改、相机拍照逻辑修改（ios9以上版本，如果打开了保存相册开关会获取到刚刚拍照的PHAsset对象）
 - v2.2.3　-　Demo9 添加cell上使用网络图片、3DTouch预览，Demo13 导入其他第三方图片/视频编辑库，优化显示效果，添加相册列表弹窗方式

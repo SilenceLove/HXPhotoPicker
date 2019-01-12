@@ -1155,19 +1155,13 @@
             return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld个视频"],maxSelectCount];
         }
     }
-    if (model.type == HXPhotoModelMediaTypeVideo) {
-        if (model.asset.duration < self.configuration.videoMinimumSelectDuration) {
-            return [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.configuration.videoMinimumSelectDuration]];
-        }else if (model.asset.duration >= self.configuration.videoMaximumSelectDuration + 1) {
-            return [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"];
-        }
-    }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
+    if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         if (model.videoDuration < self.configuration.videoMinimumSelectDuration) {
             return [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.configuration.videoMinimumSelectDuration]];
         }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
             return [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"];
         }
-    }
+    } 
     return nil;
 }
 #pragma mark - < 改变模型的视频状态 >
@@ -1178,18 +1172,10 @@
         }
     }
     if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-        if (model.type == HXPhotoModelMediaTypeVideo) {
-            if (model.asset.duration < 3) {
-                model.videoState = HXPhotoModelVideoStateUndersize;
-            }else if (model.asset.duration >= self.configuration.videoMaximumSelectDuration + 1) {
-                model.videoState = HXPhotoModelVideoStateOversize;
-            }
-        }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
-            if (model.videoDuration < 3) {
-                model.videoState = HXPhotoModelVideoStateUndersize;
-            }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
-                model.videoState = HXPhotoModelVideoStateOversize;
-            }
+        if (model.videoDuration < self.configuration.videoMinimumSelectDuration) {
+            model.videoState = HXPhotoModelVideoStateUndersize;
+        }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
+            model.videoState = HXPhotoModelVideoStateOversize;
         }
     }
 }
