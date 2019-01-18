@@ -10,12 +10,12 @@
 #import "UIImage+HXExtension.h"
 #import "UIButton+HXExtension.h"
 
-@interface HXPhotoEditViewController ()<HXDatePhotoEditBottomViewDelegate>
+@interface HXPhotoEditViewController ()<HXPhotoEditBottomViewDelegate>
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UIImageView *tempImageView;
-@property (strong, nonatomic) HXDatePhotoEditBottomView *bottomView;
+@property (strong, nonatomic) HXPhotoEditBottomView *bottomView;
 @property (assign, nonatomic) BOOL orientationDidChange;
-@property (assign, nonatomic) PHImageRequestID requestId;
+@property (assign, nonatomic) PHContentEditingInputRequestID requestId;
 @property (strong, nonatomic) HXEditGridLayer *gridLayer;
 @property (strong, nonatomic) HXEditCornerView *leftTopView;
 @property (strong, nonatomic) HXEditCornerView *rightTopView;
@@ -59,7 +59,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self stopTimer];
-    [[PHImageManager defaultManager] cancelImageRequest:self.requestId];
+    [self.model.asset cancelContentEditingInputRequest:self.requestId];
     [self.navigationController setNavigationBarHidden:NO];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 }
@@ -81,7 +81,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     
-    [[PHImageManager defaultManager] cancelImageRequest:self.requestId];
+    [self.model.asset cancelContentEditingInputRequest:self.requestId];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 }
 - (CGRect)getImageFrame {
@@ -155,11 +155,11 @@
         self.bottomView.userInteractionEnabled = NO;
         HXWeakSelf
         [self.view hx_showLoadingHUDText:nil];
-        self.requestId = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+        self.requestId = [self.model requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
             weakSelf.requestId = iCloudRequestId;
-        } progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+        } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
             weakSelf.bottomView.userInteractionEnabled = YES;
-            UIImage *image = [UIImage imageWithData:imageData];
+            UIImage *image = [UIImage imageWithContentsOfFile:imageURL.relativePath];
             if (image.imageOrientation != UIImageOrientationUp) {
                 image = [image hx_normalizedImage];
             }
@@ -170,7 +170,23 @@
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
             [weakSelf.view hx_handleLoading];
             weakSelf.bottomView.userInteractionEnabled = YES;
-        }]; 
+        }];
+//        self.requestId = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+//            weakSelf.requestId = iCloudRequestId;
+//        } progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+//            weakSelf.bottomView.userInteractionEnabled = YES;
+//            UIImage *image = [UIImage imageWithData:imageData];
+//            if (image.imageOrientation != UIImageOrientationUp) {
+//                image = [image hx_normalizedImage];
+//            }
+//            weakSelf.originalImage = image;
+//            weakSelf.imageView.image = image;
+//            [weakSelf.view hx_handleLoading];
+//            [weakSelf fixationEdit];
+//        } failed:^(NSDictionary *info, HXPhotoModel *model) {
+//            [weakSelf.view hx_handleLoading];
+//            weakSelf.bottomView.userInteractionEnabled = YES;
+//        }];
     }else {
         self.imageView.image = self.model.thumbPhoto;
         self.originalImage = self.model.thumbPhoto;
@@ -522,7 +538,7 @@
         [self stopTimer];
     }
 }
-#pragma mark - < HXDatePhotoEditBottomViewDelegate >
+#pragma mark - < HXPhotoEditBottomViewDelegate >
 - (void)bottomViewDidCancelClick {
     [self stopTimer]; 
     if (self.outside) {
@@ -653,9 +669,9 @@
     }
     return _imageView;
 }
-- (HXDatePhotoEditBottomView *)bottomView {
+- (HXPhotoEditBottomView *)bottomView {
     if (!_bottomView) {
-        _bottomView = [[HXDatePhotoEditBottomView alloc] initWithManager:self.manager];
+        _bottomView = [[HXPhotoEditBottomView alloc] initWithManager:self.manager];
         _bottomView.delegate = self;
     }
     return _bottomView;
@@ -706,7 +722,7 @@
 }
 @end
 
-@interface HXDatePhotoEditBottomView ()
+@interface HXPhotoEditBottomView ()
 @property (strong, nonatomic) UIView *topView;
 @property (strong, nonatomic) UIView *bottomView;
 @property (strong, nonatomic) UIButton *restoreBtn;
@@ -717,7 +733,7 @@
 @property (strong, nonatomic) UIButton *selectRatioBtn;
 @end
 
-@implementation HXDatePhotoEditBottomView
+@implementation HXPhotoEditBottomView
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {

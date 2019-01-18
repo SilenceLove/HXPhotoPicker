@@ -1,15 +1,15 @@
 //
-//  HXDatePhotoPreviewBottomView.m
+//  HXPhotoPreviewBottomView.m
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/10/16.
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "HXDatePhotoPreviewBottomView.h"
+#import "HXPhotoPreviewBottomView.h"
 #import "HXPhotoManager.h"
 #import "UIImageView+HXExtension.h"
-@interface HXDatePhotoPreviewBottomView ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout>
+@interface HXPhotoPreviewBottomView ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout>
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath;
@@ -18,7 +18,7 @@
 @property (strong, nonatomic) HXPhotoManager *manager;
 @end
 
-@implementation HXDatePhotoPreviewBottomView
+@implementation HXPhotoPreviewBottomView
 - (instancetype)initWithFrame:(CGRect)frame modelArray:(NSArray *)modelArray manager:(HXPhotoManager *)manager {
     self = [super initWithFrame:frame];
     if (self) {
@@ -112,7 +112,7 @@
     return [self.modelArray count];
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    HXDatePhotoPreviewBottomViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewBottomViewCellId" forIndexPath:indexPath];
+    HXPhotoPreviewBottomViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewBottomViewCellId" forIndexPath:indexPath];
     cell.selectColor = self.manager.configuration.themeColor;
     HXPhotoModel *model = self.modelArray[indexPath.item];
     cell.model = model;
@@ -120,12 +120,12 @@
 }
 #pragma mark - < UICollectionViewDelegate >
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if ([self.delagate respondsToSelector:@selector(datePhotoPreviewBottomViewDidItem:currentIndex:beforeIndex:)]) {
-        [self.delagate datePhotoPreviewBottomViewDidItem:self.modelArray[indexPath.item] currentIndex:indexPath.item beforeIndex:self.currentIndex];
+    if ([self.delagate respondsToSelector:@selector(photoPreviewBottomViewDidItem:currentIndex:beforeIndex:)]) {
+        [self.delagate photoPreviewBottomViewDidItem:self.modelArray[indexPath.item] currentIndex:indexPath.item beforeIndex:self.currentIndex];
     }
 }
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    [(HXDatePhotoPreviewBottomViewCell *)cell cancelRequest];
+    [(HXPhotoPreviewBottomViewCell *)cell cancelRequest];
 }
 - (void)deselectedWithIndex:(NSInteger)index {
     if (index < 0 || index > self.modelArray.count - 1) {
@@ -142,13 +142,13 @@
 }
 
 - (void)didDoneBtnClick {
-    if ([self.delagate respondsToSelector:@selector(datePhotoPreviewBottomViewDidDone:)]) {
-        [self.delagate datePhotoPreviewBottomViewDidDone:self];
+    if ([self.delagate respondsToSelector:@selector(photoPreviewBottomViewDidDone:)]) {
+        [self.delagate photoPreviewBottomViewDidDone:self];
     }
 }
 - (void)didEditBtnClick {
-    if ([self.delagate respondsToSelector:@selector(datePhotoPreviewBottomViewDidEdit:)]) {
-        [self.delagate datePhotoPreviewBottomViewDidEdit:self];
+    if ([self.delagate respondsToSelector:@selector(photoPreviewBottomViewDidEdit:)]) {
+        [self.delagate photoPreviewBottomViewDidEdit:self];
     }
 }
 - (void)changeDoneBtnFrame {
@@ -237,7 +237,7 @@
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;
-            [_collectionView registerClass:[HXDatePhotoPreviewBottomViewCell class] forCellWithReuseIdentifier:@"DatePreviewBottomViewCellId"];
+            [_collectionView registerClass:[HXPhotoPreviewBottomViewCell class] forCellWithReuseIdentifier:@"DatePreviewBottomViewCellId"];
         }
     return _collectionView;
 }
@@ -289,12 +289,12 @@
 }
 @end
 
-@interface HXDatePhotoPreviewBottomViewCell ()
+@interface HXPhotoPreviewBottomViewCell ()
 @property (strong, nonatomic) UIImageView *imageView;
 @property (assign, nonatomic) PHImageRequestID requestID;
 @end
 
-@implementation HXDatePhotoPreviewBottomViewCell
+@implementation HXPhotoPreviewBottomViewCell
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];

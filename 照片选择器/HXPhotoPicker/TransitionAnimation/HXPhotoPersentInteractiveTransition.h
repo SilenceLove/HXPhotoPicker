@@ -1,5 +1,5 @@
 //
-//  HXDatePhotoPersentInteractiveTransition.h
+//  HXPhotoPersentInteractiveTransition.h
 //  照片选择器
 //
 //  Created by 洪欣 on 2018/9/8.
@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class HXPhotoView;
-@interface HXDatePhotoPersentInteractiveTransition : UIPercentDrivenInteractiveTransition
+@interface HXPhotoPersentInteractiveTransition : UIPercentDrivenInteractiveTransition
 @property (nonatomic, assign) BOOL interation;
 - (void)addPanGestureForViewController:(UIViewController *)viewController photoView:(HXPhotoView *)photoView ;
 @end

@@ -1,18 +1,18 @@
 //
-//  HXDatePhotoViewFlowLayout.m
+//  HXPhotoViewFlowLayout.m
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/11/15.
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "HXDatePhotoViewFlowLayout.h"
-#import "HXDatePhotoViewController.h"
-@interface HXDatePhotoViewFlowLayout ()
+#import "HXPhotoViewFlowLayout.h"
+#import "HXPhotoViewController.h"
+@interface HXPhotoViewFlowLayout ()
 @property (assign, nonatomic) BOOL hasSuspension;
 @end
 
-@implementation HXDatePhotoViewFlowLayout
+@implementation HXPhotoViewFlowLayout
 
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect { 
     NSArray *array = [super layoutAttributesForElementsInRect:rect];
@@ -71,7 +71,7 @@
             
             if (topY >= normalY && topY <= missingY + headerHeight) {
                 if (HX_IOS9Later) {
-                    HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
+                    HXPhotoViewSectionHeaderView *headerView = (HXPhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
                     if (headerView) {
                         headerView.changeState = YES;
                     }
@@ -79,7 +79,7 @@
                 self.hasSuspension = YES;
             }else {
                 if (HX_IOS9Later) {
-                    HXDatePhotoViewSectionHeaderView *headerView = (HXDatePhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
+                    HXPhotoViewSectionHeaderView *headerView = (HXPhotoViewSectionHeaderView *)[cv supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:layoutAttributes.indexPath];
                     if (headerView) {
                         headerView.changeState = NO;
                     }

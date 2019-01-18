@@ -28,8 +28,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
     HXPhotoLanguageTypeEn       // 英文
 };
 
-@class HXDatePhotoBottomView;
-@class HXDatePhotoPreviewBottomView;
+@class HXPhotoBottomView;
+@class HXPhotoPreviewBottomView;
 @class HXPhotoManager;
 @class HXPhotoModel;
 
@@ -480,12 +480,12 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
 /**
  照片列表底部View
  */
-@property (copy, nonatomic) void (^photoListBottomView)(HXDatePhotoBottomView *bottomView);
+@property (copy, nonatomic) void (^photoListBottomView)(HXPhotoBottomView *bottomView);
 
 /**
  预览界面底部View
  */
-@property (copy, nonatomic) void (^previewBottomView)(HXDatePhotoPreviewBottomView *bottomView);
+@property (copy, nonatomic) void (^previewBottomView)(HXPhotoPreviewBottomView *bottomView);
 
 /**
  相册列表的collectionView

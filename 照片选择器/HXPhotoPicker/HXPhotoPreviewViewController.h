@@ -1,5 +1,5 @@
 //
-//  HXDatePhotoPreviewViewController.h
+//  HXPhotoPreviewViewController.h
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/10/14.
@@ -17,44 +17,44 @@
 #import "YYWebImage.h"
 #endif
 
-@class HXDatePhotoPreviewViewController,HXDatePhotoPreviewBottomView,HXDatePhotoPreviewViewCell;
-@protocol HXDatePhotoPreviewViewControllerDelegate <NSObject>
+@class HXPhotoPreviewViewController,HXPhotoPreviewBottomView,HXPhotoPreviewViewCell;
+@protocol HXPhotoPreviewViewControllerDelegate <NSObject>
 @optional
-- (void)datePhotoPreviewControllerDidSelect:(HXDatePhotoPreviewViewController *)previewController
+- (void)photoPreviewControllerDidSelect:(HXPhotoPreviewViewController *)previewController
                                       model:(HXPhotoModel *)model;
 
-- (void)datePhotoPreviewControllerDidDone:(HXDatePhotoPreviewViewController *)previewController;
+- (void)photoPreviewControllerDidDone:(HXPhotoPreviewViewController *)previewController;
 
-- (void)datePhotoPreviewDidEditClick:(HXDatePhotoPreviewViewController *)previewController
+- (void)photoPreviewDidEditClick:(HXPhotoPreviewViewController *)previewController
                                model:(HXPhotoModel *)model
                          beforeModel:(HXPhotoModel *)beforeModel;
 
-- (void)datePhotoPreviewSingleSelectedClick:(HXDatePhotoPreviewViewController *)previewController
+- (void)photoPreviewSingleSelectedClick:(HXPhotoPreviewViewController *)previewController
                                       model:(HXPhotoModel *)model;
 
-- (void)datePhotoPreviewDownLoadICloudAssetComplete:(HXDatePhotoPreviewViewController *)previewController
+- (void)photoPreviewDownLoadICloudAssetComplete:(HXPhotoPreviewViewController *)previewController
                                               model:(HXPhotoModel *)model;
 
-- (void)datePhotoPreviewSelectLaterDidEditClick:(HXDatePhotoPreviewViewController *)previewController
+- (void)photoPreviewSelectLaterDidEditClick:(HXPhotoPreviewViewController *)previewController
                                     beforeModel:(HXPhotoModel *)beforeModel
                                      afterModel:(HXPhotoModel *)afterModel;
 
-- (void)datePhotoPreviewDidDeleteClick:(HXDatePhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model
+- (void)photoPreviewDidDeleteClick:(HXPhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model
                            deleteIndex:(NSInteger)index;
 
-- (void)datePhotoPreviewCellDownloadImageComplete:(HXDatePhotoPreviewViewController *)previewController
+- (void)photoPreviewCellDownloadImageComplete:(HXPhotoPreviewViewController *)previewController
                                             model:(HXPhotoModel *)model;
 @end
 
-@interface HXDatePhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
-@property (weak, nonatomic) id<HXDatePhotoPreviewViewControllerDelegate> delegate;
+@interface HXPhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
+@property (weak, nonatomic) id<HXPhotoPreviewViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSMutableArray *modelArray;
 @property (assign, nonatomic) NSInteger currentModelIndex;
 @property (assign, nonatomic) BOOL outside;
 @property (assign, nonatomic) BOOL selectPreview;
 @property (strong, nonatomic) UICollectionView *collectionView;
-@property (strong, nonatomic) HXDatePhotoPreviewBottomView *bottomView;
+@property (strong, nonatomic) HXPhotoPreviewBottomView *bottomView;
 @property (strong, nonatomic) HXPhotoView *photoView;
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
 @property (assign, nonatomic) BOOL stopCancel;
@@ -63,13 +63,13 @@
 /**  使用HXPhotoView预览大图时的风格样式  */
 @property (assign, nonatomic) HXPhotoViewPreViewShowStyle exteriorPreviewStyle;
 
-- (HXDatePhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
+- (HXPhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
 - (void)setupDarkBtnAlpha:(CGFloat)alpha;
 @end
 
 
-@interface HXDatePhotoPreviewViewCell : UICollectionViewCell
+@interface HXPhotoPreviewViewCell : UICollectionViewCell
 @property (assign, nonatomic) BOOL stopCancel;
 @property (strong, nonatomic) HXPhotoModel *model;
 
@@ -86,8 +86,8 @@
 @property (assign, nonatomic) BOOL dragging;
 @property (nonatomic, copy) void (^cellTapClick)(void);
 @property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
-@property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXDatePhotoPreviewViewCell *myCell);
-@property (nonatomic, copy) void (^cellDownloadImageComplete)(HXDatePhotoPreviewViewCell *myCell);
+@property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXPhotoPreviewViewCell *myCell);
+@property (nonatomic, copy) void (^cellDownloadImageComplete)(HXPhotoPreviewViewCell *myCell);
 - (void)againAddImageView;
 - (void)refreshImageSize;
 - (void)resetScale:(BOOL)animated;

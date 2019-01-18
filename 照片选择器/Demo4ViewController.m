@@ -9,7 +9,7 @@
 #import "Demo4ViewController.h"
 #import "HXPhotoPicker.h"
 
-@interface Demo4ViewController ()<HXAlbumListViewControllerDelegate, HXDatePhotoViewControllerDelegate>
+@interface Demo4ViewController ()<HXAlbumListViewControllerDelegate, HXPhotoViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
@@ -103,7 +103,7 @@
         NSSLog(@"%ld个视频",videoList.count);
     }
 }
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
+- (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if (photoList.count > 0) {
         HXPhotoModel *model = photoList.firstObject;
         self.imageView.image = model.previewPhoto;

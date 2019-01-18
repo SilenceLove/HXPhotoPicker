@@ -1,5 +1,5 @@
 //
-//  HXDatePhotoPreviewBottomView.h
+//  HXPhotoPreviewBottomView.h
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/10/16.
@@ -8,17 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
-@class HXPhotoModel, HXDatePhotoPreviewBottomView, HXPhotoManager;
-@protocol HXDatePhotoPreviewBottomViewDelegate <NSObject>
+@class HXPhotoModel, HXPhotoPreviewBottomView, HXPhotoManager;
+@protocol HXPhotoPreviewBottomViewDelegate <NSObject>
 @optional
-- (void)datePhotoPreviewBottomViewDidItem:(HXPhotoModel *)model currentIndex:(NSInteger)currentIndex beforeIndex:(NSInteger)beforeIndex;
-- (void)datePhotoPreviewBottomViewDidDone:(HXDatePhotoPreviewBottomView *)bottomView;
-- (void)datePhotoPreviewBottomViewDidEdit:(HXDatePhotoPreviewBottomView *)bottomView;
+- (void)photoPreviewBottomViewDidItem:(HXPhotoModel *)model currentIndex:(NSInteger)currentIndex beforeIndex:(NSInteger)beforeIndex;
+- (void)photoPreviewBottomViewDidDone:(HXPhotoPreviewBottomView *)bottomView;
+- (void)photoPreviewBottomViewDidEdit:(HXPhotoPreviewBottomView *)bottomView;
 @end
 
-@interface HXDatePhotoPreviewBottomView : UIView
+@interface HXPhotoPreviewBottomView : UIView
 @property (strong, nonatomic) UIToolbar *bgView;
-@property (weak, nonatomic) id<HXDatePhotoPreviewBottomViewDelegate> delagate;
+@property (weak, nonatomic) id<HXPhotoPreviewBottomViewDelegate> delagate;
 @property (strong, nonatomic) NSMutableArray *modelArray;
 @property (assign, nonatomic) NSInteger selectCount;
 @property (assign, nonatomic) NSInteger currentIndex;
@@ -39,7 +39,7 @@
 @end
 
 
-@interface HXDatePhotoPreviewBottomViewCell : UICollectionViewCell
+@interface HXPhotoPreviewBottomViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) UIColor *selectColor;
 - (void)cancelRequest;

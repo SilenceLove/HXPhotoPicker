@@ -13,12 +13,12 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"
 #import "HXAlbumListViewController.h"
-#import "HXDatePhotoPreviewViewController.h"
+#import "HXPhotoPreviewViewController.h"
 #import "HXCustomNavigationController.h"
 #import "HXCustomCameraViewController.h"
-#import "HXDatePhotoViewController.h"
+#import "HXPhotoViewController.h"
 
-@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXDatePhotoPreviewViewControllerDelegate, HXDatePhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
+@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
@@ -155,7 +155,7 @@
         NSSLog(@"model有误!!!");
         return;
     }
-    HXDatePhotoPreviewViewController *vc = [[HXDatePhotoPreviewViewController alloc] init];
+    HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
     vc.disableaPersentInteractiveTransition = self.disableaInteractiveTransition;
     vc.outside = YES;
     vc.manager = self.manager;
@@ -300,7 +300,7 @@
         }
         [self goPhotoViewController];
     }else {
-        HXDatePhotoPreviewViewController *vc = [[HXDatePhotoPreviewViewController alloc] init];
+        HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
         vc.disableaPersentInteractiveTransition = self.disableaInteractiveTransition;
         vc.outside = YES;
         vc.manager = self.manager;
@@ -314,18 +314,18 @@
     }
 }
 
-#pragma mark - < HXDatePhotoPreviewViewControllerDelegate >
-- (void)datePhotoPreviewCellDownloadImageComplete:(HXDatePhotoPreviewViewController *)previewController model:(HXPhotoModel *)model {
+#pragma mark - < HXPhotoPreviewViewControllerDelegate >
+- (void)photoPreviewCellDownloadImageComplete:(HXPhotoPreviewViewController *)previewController model:(HXPhotoModel *)model {
     if (!model.loadOriginalImage) {
         NSIndexPath *indexPath = [self currentModelIndexPath:model];
         HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
         [cell resetNetworkImage]; 
     }
 }
-- (void)datePhotoPreviewDidDeleteClick:(HXDatePhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model deleteIndex:(NSInteger)index {
+- (void)photoPreviewDidDeleteClick:(HXPhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model deleteIndex:(NSInteger)index {
     [self deleteModelWithIndex:index];
 }
-- (void)datePhotoPreviewSelectLaterDidEditClick:(HXDatePhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+- (void)photoPreviewSelectLaterDidEditClick:(HXPhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
     [self.manager afterSelectedArrayReplaceModelAtModel:beforeModel withModel:afterModel];
     [self.manager afterSelectedListAddEditPhotoModel:afterModel];
     
@@ -507,8 +507,8 @@
         if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
             [[self hx_viewController].view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.manager.configuration.videoMinimumSelectDuration]]];
             return;
-        }else if (model.videoDuration > self.manager.configuration.videoMaximumSelectDuration) {
-            [[self hx_viewController].view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频过大,无法选择"]];
+        }else if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
+            [[self hx_viewController].view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频大于%.0f秒，无法选择", self.manager.configuration.videoMaximumSelectDuration]]];
             return;
         }else if ([self.manager afterSelectVideoCountIsMaximum]) {
             NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;

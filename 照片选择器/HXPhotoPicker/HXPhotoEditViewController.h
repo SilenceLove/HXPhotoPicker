@@ -23,7 +23,7 @@
 @end
 
 @class HXEditRatio;
-@protocol HXDatePhotoEditBottomViewDelegate <NSObject>
+@protocol HXPhotoEditBottomViewDelegate <NSObject>
 @optional
 - (void)bottomViewDidCancelClick;
 - (void)bottomViewDidRestoreClick;
@@ -32,8 +32,8 @@
 - (void)bottomViewDidSelectRatioClick:(HXEditRatio *)ratio;
 @end
 
-@interface HXDatePhotoEditBottomView : UIView
-@property (weak, nonatomic) id<HXDatePhotoEditBottomViewDelegate> delegate;
+@interface HXPhotoEditBottomView : UIView
+@property (weak, nonatomic) id<HXPhotoEditBottomViewDelegate> delegate;
 @property (assign, nonatomic) BOOL enabled;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 @end

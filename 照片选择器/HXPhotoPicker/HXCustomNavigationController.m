@@ -8,10 +8,10 @@
 
 #import "HXCustomNavigationController.h"
 #import "HXAlbumListViewController.h"
-#import "HXDatePhotoViewController.h"
+#import "HXPhotoViewController.h"
 #import "HXPhotoTools.h"
 
-@interface HXCustomNavigationController ()<HXAlbumListViewControllerDelegate, HXDatePhotoViewControllerDelegate>
+@interface HXCustomNavigationController ()<HXAlbumListViewControllerDelegate, HXPhotoViewControllerDelegate>
 
 @end
 
@@ -52,7 +52,7 @@
             
         }
     }else if (manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
-        HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
+        HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
         vc.manager = manager;
         self = [super initWithRootViewController:vc];
         if (self) {
@@ -83,13 +83,13 @@
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }
 }
-#pragma mark - < HXDatePhotoViewControllerDelegate >
-- (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController {
+#pragma mark - < HXPhotoViewControllerDelegate >
+- (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController {
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidCancel:)]) {
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
     }
 }
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
+- (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllList:photos:videos:original:)]) {
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }

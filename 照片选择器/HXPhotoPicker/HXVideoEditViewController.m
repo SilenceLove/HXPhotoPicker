@@ -1,28 +1,28 @@
 //
-//  HXDateVideoEditViewController.m
+//  HXVideoEditViewController.m
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/12/31.
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "HXDateVideoEditViewController.h"
+#import "HXVideoEditViewController.h"
 
 #define hxItemHeight ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait || [[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown) ? 40 : 50
 #define hxItemWidth hxItemHeight/16*9
 
-@interface HXDateVideoEditViewController ()
+@interface HXVideoEditViewController ()
 <
-HXDataVideoEditBottomViewDelegate
+HXVideoEditBottomViewDelegate
 >
-@property (strong, nonatomic) HXDataVideoEditBottomView *bottomView;
+@property (strong, nonatomic) HXVideoEditBottomView *bottomView;
 @property (assign, nonatomic) BOOL orientationDidChange;
 @property (assign, nonatomic) PHImageRequestID requestId;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) AVPlayer *player;
 @end
 
-@implementation HXDateVideoEditViewController
+@implementation HXVideoEditViewController
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES];
@@ -100,7 +100,6 @@ HXDataVideoEditBottomViewDelegate
     }]; 
 }
 - (void)getVideoEachFrame:(AVAsset *)asset {
-    __weak typeof(self) weakSelf = self;
     CGFloat itemHeight = 0;
     CGFloat itemWidth = 0;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -111,6 +110,7 @@ HXDataVideoEditBottomViewDelegate
     }
     itemWidth = itemHeight / 16 * 9;
     NSInteger total = (self.view.hx_w - 10) / itemWidth;
+    HXWeakSelf
     [HXPhotoTools getVideoEachFrameWithAsset:asset total:total size:CGSizeMake(itemWidth * 5, itemHeight * 5) complete:^(AVAsset *asset, NSArray<UIImage *> *images) {
         [weakSelf.view hx_handleLoading];
         weakSelf.player = [AVPlayer playerWithPlayerItem:[AVPlayerItem playerItemWithAsset:asset]];
@@ -119,8 +119,8 @@ HXDataVideoEditBottomViewDelegate
         weakSelf.bottomView.dataArray = [NSMutableArray arrayWithArray:images];
     }]; 
 }
-#pragma mark - < HXDataVideoEditBottomViewDelegate >
-- (void)videoEditBottomViewDidCancelClick:(HXDataVideoEditBottomView *)bottomView {
+#pragma mark - < HXVideoEditBottomViewDelegate >
+- (void)videoEditBottomViewDidCancelClick:(HXVideoEditBottomView *)bottomView {
     
     if (self.outside) {
         [self dismissViewControllerAnimated:NO completion:nil];
@@ -128,7 +128,7 @@ HXDataVideoEditBottomViewDelegate
     }
     [self.navigationController popViewControllerAnimated:NO];
 }
-- (void)videoEditBottomViewDidDoneClick:(HXDataVideoEditBottomView *)bottomView {
+- (void)videoEditBottomViewDidDoneClick:(HXVideoEditBottomView *)bottomView {
     
     if (self.outside) {
         [self dismissViewControllerAnimated:NO completion:nil];
@@ -137,9 +137,9 @@ HXDataVideoEditBottomViewDelegate
     [self.navigationController popViewControllerAnimated:NO];
 }
 #pragma mark - < 懒加载 >
-- (HXDataVideoEditBottomView *)bottomView {
+- (HXVideoEditBottomView *)bottomView {
     if (!_bottomView) {
-        _bottomView = [[HXDataVideoEditBottomView alloc] initWithManager:self.manager];
+        _bottomView = [[HXVideoEditBottomView alloc] initWithManager:self.manager];
         _bottomView.delegate = self;
     }
     return _bottomView;
@@ -153,7 +153,7 @@ HXDataVideoEditBottomViewDelegate
 }
 @end
 
-@interface HXDataVideoEditBottomView ()
+@interface HXVideoEditBottomView ()
 <
 UICollectionViewDataSource,
 UICollectionViewDelegate
@@ -165,7 +165,7 @@ UICollectionViewDelegate
 @property (strong, nonatomic) HXPhotoManager *manager;
 @end
 
-@implementation HXDataVideoEditBottomView
+@implementation HXVideoEditBottomView
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {
@@ -194,7 +194,7 @@ UICollectionViewDelegate
     return self.dataArray.count;
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    HXDataVideoEditBottomViewCell * cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CellId" forIndexPath:indexPath];
+    HXVideoEditBottomViewCell * cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CellId" forIndexPath:indexPath];
     cell.imageView.image = self.dataArray[indexPath.item];
     return cell;
 }
@@ -259,13 +259,13 @@ UICollectionViewDelegate
         _collectionView.delegate = self;
         _collectionView.backgroundColor = [UIColor clearColor];
         _collectionView.showsHorizontalScrollIndicator = NO;
-        [_collectionView registerClass:[HXDataVideoEditBottomViewCell class] forCellWithReuseIdentifier:@"CellId"];
+        [_collectionView registerClass:[HXVideoEditBottomViewCell class] forCellWithReuseIdentifier:@"CellId"];
     }
     return _collectionView;
 }
 @end
 
-@implementation HXDataVideoEditBottomViewCell
+@implementation HXVideoEditBottomViewCell
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];

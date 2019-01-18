@@ -551,7 +551,7 @@
     } 
     self.getAlbumListing = YES;
     
-    [_iCloudUploadArray removeAllObjects];
+//    [_iCloudUploadArray removeAllObjects];
     
     PHFetchOptions *option = [[PHFetchOptions alloc] init];
     if (self.configuration.creationDateSort) {
@@ -769,9 +769,9 @@
             }
         }
     }
-    if (_iCloudUploadArray) {
+    if (self.iCloudUploadArray) {
         self.iCloudAssetArray = @[].mutableCopy;
-        for (HXPhotoModel *model in _iCloudUploadArray) {
+        for (HXPhotoModel *model in self.iCloudUploadArray) {
             if (model.asset) {
                 [self.iCloudAssetArray addObject:model.asset];
             }
@@ -1159,7 +1159,7 @@
         if (model.videoDuration < self.configuration.videoMinimumSelectDuration) {
             return [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.configuration.videoMinimumSelectDuration]];
         }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
-            return [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"];
+            return [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频大于%.0f秒，无法选择", self.configuration.videoMaximumSelectDuration]];
         }
     } 
     return nil;

@@ -73,10 +73,10 @@
 //        _manager.configuration.requestImageAfterFinishingSelection = YES;
         
         __weak typeof(self) weakSelf = self;
-        _manager.configuration.photoListBottomView = ^(HXDatePhotoBottomView *bottomView) {
+        _manager.configuration.photoListBottomView = ^(HXPhotoBottomView *bottomView) {
             bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
         };
-        _manager.configuration.previewBottomView = ^(HXDatePhotoPreviewBottomView *bottomView) {
+        _manager.configuration.previewBottomView = ^(HXPhotoPreviewBottomView *bottomView) {
             bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
         };
         _manager.configuration.albumListCollectionView = ^(UICollectionView *collectionView) {

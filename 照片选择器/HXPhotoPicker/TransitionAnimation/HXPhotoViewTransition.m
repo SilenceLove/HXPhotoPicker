@@ -1,26 +1,26 @@
 //
-//  HXDatePhotoViewTransition.m
+//  HXPhotoViewTransition.m
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/10/27.
 //  Copyright © 2017年 洪欣. All rights reserved.
 //
 
-#import "HXDatePhotoViewTransition.h"
-#import "HXDatePhotoViewController.h"
-#import "HXDatePhotoPreviewViewController.h"
-#import "HXDatePhotoPreviewBottomView.h"
-@interface HXDatePhotoViewTransition ()
-@property (assign, nonatomic) HXDatePhotoViewTransitionType type;
+#import "HXPhotoViewTransition.h"
+#import "HXPhotoViewController.h"
+#import "HXPhotoPreviewViewController.h"
+#import "HXPhotoPreviewBottomView.h"
+@interface HXPhotoViewTransition ()
+@property (assign, nonatomic) HXPhotoViewTransitionType type;
 @end
 
-@implementation HXDatePhotoViewTransition
+@implementation HXPhotoViewTransition
 
-+ (instancetype)transitionWithType:(HXDatePhotoViewTransitionType)type {
++ (instancetype)transitionWithType:(HXPhotoViewTransitionType)type {
     return [[self alloc] initWithTransitionType:type];
 }
 
-- (instancetype)initWithTransitionType:(HXDatePhotoViewTransitionType)type {
+- (instancetype)initWithTransitionType:(HXPhotoViewTransitionType)type {
     self = [super init];
     if (self)  {
         self.type = type;
@@ -29,7 +29,7 @@
 }
 - (void)animateTransition:(nonnull id<UIViewControllerContextTransitioning>)transitionContext {
     switch (self.type) {
-        case HXDatePhotoViewTransitionTypePush:
+        case HXPhotoViewTransitionTypePush:
             [self pushAnimation:transitionContext];
             break;
         default:
@@ -39,8 +39,8 @@
 }
 
 - (void)pushAnimation:(id<UIViewControllerContextTransitioning>)transitionContext {
-    HXDatePhotoViewController *fromVC = (HXDatePhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    HXDatePhotoPreviewViewController *toVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    HXPhotoViewController *fromVC = (HXPhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+    HXPhotoPreviewViewController *toVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [toVC.modelArray objectAtIndex:toVC.currentModelIndex];
     HXWeakSelf
     [model requestPreviewImageWithSize:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
@@ -49,9 +49,9 @@
         [weakSelf pushAnim:transitionContext image:model.thumbPhoto model:model fromVC:fromVC toVC:toVC];
     }];
 }
-- (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext image:(UIImage *)image model:(HXPhotoModel *)model fromVC:(HXDatePhotoViewController *)fromVC toVC:(HXDatePhotoPreviewViewController *)toVC {
+- (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext image:(UIImage *)image model:(HXPhotoModel *)model fromVC:(HXPhotoViewController *)fromVC toVC:(HXPhotoPreviewViewController *)toVC {
     model.tempImage = image;
-    HXDatePhotoViewCell *fromCell = [fromVC currentPreviewCell:model];
+    HXPhotoViewCell *fromCell = [fromVC currentPreviewCell:model];
     if (!image) {
         model.tempImage = fromCell.imageView.image;
         image = fromCell.imageView.image;
@@ -112,12 +112,12 @@
     }];
 }
 - (void)popAnimation:(id<UIViewControllerContextTransitioning>)transitionContext {
-    HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    HXDatePhotoViewController *toVC = (HXDatePhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+    HXPhotoViewController *toVC = (HXPhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [fromVC.modelArray objectAtIndex:fromVC.currentModelIndex];
     
-    HXDatePhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
-    HXDatePhotoViewCell *toCell = [toVC currentPreviewCell:model];
+    HXPhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
+    HXPhotoViewCell *toCell = [toVC currentPreviewCell:model];
     UIImageView *tempView;
 #if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
     tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
@@ -290,11 +290,11 @@
 }
 
 - (NSTimeInterval)transitionDuration:(nullable id<UIViewControllerContextTransitioning>)transitionContext {
-    if (self.type == HXDatePhotoViewTransitionTypePush) {
-        HXDatePhotoViewController *fromVC = (HXDatePhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+    if (self.type == HXPhotoViewTransitionTypePush) {
+        HXPhotoViewController *fromVC = (HXPhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
         return fromVC.manager.configuration.pushTransitionDuration;
     }else {
-        HXDatePhotoPreviewViewController *fromVC = (HXDatePhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
         return fromVC.manager.configuration.popTransitionDuration;
     }
 }

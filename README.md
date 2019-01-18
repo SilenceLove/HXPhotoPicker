@@ -91,7 +91,7 @@
 
 // 获取视频的 AVAsset
 [photoModel requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 开始下载iCloud上的视频
+    // 开始下载iCloud上的 AVAsset
 } progressHandler:^(double progress, HXPhotoModel *model) {
     // iCloud下载进度
 } success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
@@ -458,6 +458,7 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- 2019-1-18 修复预览大图时下载iCloud资源完成后未刷新列表cell问题。去除Date命名（有在外部使用的请去掉Date命名）
 - 2019-1-12 获取原图时处理HEIC格式的照片
 - 2019-1-9  选择照片逻辑修改、保存相册时添加定位信息以及一些问题修复
 - 2019-1-7  优化了相册加载速度、调整一些显示效果、方法结构调整（旧版本更新会出现方法报错，请使用最新方法）、编辑完成后跳转逻辑修改、相机拍照逻辑修改（ios9以上版本，如果打开了保存相册开关会获取到刚刚拍照的PHAsset对象）

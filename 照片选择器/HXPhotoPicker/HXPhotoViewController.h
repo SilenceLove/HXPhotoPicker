@@ -1,5 +1,5 @@
 //
-//  HXDatePhotoViewController.h
+//  HXPhotoViewController.h
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/10/14.
@@ -11,32 +11,32 @@
 #import "HXCustomCollectionReusableView.h"
 
 @class
-HXDatePhotoViewController ,
-HXDatePhotoViewCell ,
-HXDatePhotoBottomView ,
+HXPhotoViewController ,
+HXPhotoViewCell ,
+HXPhotoBottomView ,
 HXCustomCameraController ,
 HXCustomPreviewView ,
 HXAlbumListViewController;
-@protocol HXDatePhotoViewControllerDelegate <NSObject>
+@protocol HXPhotoViewControllerDelegate <NSObject>
 @optional
 
 /**
  点击取消
 
- @param datePhotoViewController self
+ @param photoViewController self
  */
-- (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController;
+- (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController;
 
 /**
  点击完成按钮
 
- @param datePhotoViewController self
+ @param photoViewController self
  @param allList 已选的所有列表(包含照片、视频)
  @param photoList 已选的照片列表
  @param videoList 已选的视频列表
  @param original 是否原图
  */
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController
+- (void)photoViewController:(HXPhotoViewController *)photoViewController
                  didDoneAllList:(NSArray<HXPhotoModel *> *)allList
                          photos:(NSArray<HXPhotoModel *> *)photoList
                          videos:(NSArray<HXPhotoModel *> *)videoList
@@ -48,31 +48,31 @@ HXAlbumListViewController;
  @param model 改的模型
  @param selected 是否选中
  */
-- (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model
+- (void)photoViewControllerDidChangeSelect:(HXPhotoModel *)model
                                       selected:(BOOL)selected;
 @end
 
-@interface HXDatePhotoViewController : UIViewController
+@interface HXPhotoViewController : UIViewController
 @property (copy, nonatomic) viewControllerDidDoneBlock doneBlock;
 @property (copy, nonatomic) viewControllerDidCancelBlock cancelBlock;
-@property (weak, nonatomic) id<HXDatePhotoViewControllerDelegate> delegate;
+@property (weak, nonatomic) id<HXPhotoViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXAlbumModel *albumModel;
-@property (strong, nonatomic) HXDatePhotoBottomView *bottomView;
-- (HXDatePhotoViewCell *)currentPreviewCell:(HXPhotoModel *)model;
+@property (strong, nonatomic) HXPhotoBottomView *bottomView;
+- (HXPhotoViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (BOOL)scrollToModel:(HXPhotoModel *)model;
-- (void)scrollToPoint:(HXDatePhotoViewCell *)cell rect:(CGRect)rect;
+- (void)scrollToPoint:(HXPhotoViewCell *)cell rect:(CGRect)rect;
 - (void)startGetAllPhotoModel;
 @end
 
-@protocol HXDatePhotoViewCellDelegate <NSObject>
+@protocol HXPhotoViewCellDelegate <NSObject>
 @optional
-- (void)datePhotoViewCell:(HXDatePhotoViewCell *)cell didSelectBtn:(UIButton *)selectBtn;
-- (void)datePhotoViewCellRequestICloudAssetComplete:(HXDatePhotoViewCell *)cell;
+- (void)photoViewCell:(HXPhotoViewCell *)cell didSelectBtn:(UIButton *)selectBtn;
+- (void)photoViewCellRequestICloudAssetComplete:(HXPhotoViewCell *)cell;
 @end
 
-@interface HXDatePhotoViewCell : UICollectionViewCell
-@property (weak, nonatomic) id<HXDatePhotoViewCellDelegate> delegate;
+@interface HXPhotoViewCell : UICollectionViewCell
+@property (weak, nonatomic) id<HXPhotoViewCellDelegate> delegate;
 @property (assign, nonatomic) NSInteger section;
 @property (assign, nonatomic) NSInteger item;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
@@ -88,7 +88,7 @@ HXAlbumListViewController;
 - (void)bottomViewStartAnimation;
 @end
 
-@interface HXDatePhotoCameraViewCell : UICollectionViewCell
+@interface HXPhotoCameraViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic, readonly) HXCustomCameraController *cameraController;
 @property (strong, nonatomic, readonly) HXCustomPreviewView *previewView;
@@ -99,7 +99,7 @@ HXAlbumListViewController;
 - (void)stopRunning;
 @end
 
-@interface HXDatePhotoViewSectionHeaderView : HXCustomCollectionReusableView
+@interface HXPhotoViewSectionHeaderView : HXCustomCollectionReusableView
 @property (strong, nonatomic) HXPhotoDateModel *model;
 @property (assign, nonatomic) BOOL changeState;
 @property (assign, nonatomic) BOOL translucent;
@@ -107,20 +107,20 @@ HXAlbumListViewController;
 @property (strong, nonatomic) UIColor *suspensionTitleColor;
 @end
 
-@interface HXDatePhotoViewSectionFooterView : UICollectionReusableView
+@interface HXPhotoViewSectionFooterView : UICollectionReusableView
 @property (assign, nonatomic) NSInteger photoCount;
 @property (assign, nonatomic) NSInteger videoCount;
 @end
 
-@protocol HXDatePhotoBottomViewDelegate <NSObject>
+@protocol HXPhotoBottomViewDelegate <NSObject>
 @optional
-- (void)datePhotoBottomViewDidPreviewBtn;
-- (void)datePhotoBottomViewDidDoneBtn;
-- (void)datePhotoBottomViewDidEditBtn;
+- (void)photoBottomViewDidPreviewBtn;
+- (void)photoBottomViewDidDoneBtn;
+- (void)photoBottomViewDidEditBtn;
 @end
 
-@interface HXDatePhotoBottomView : UIView
-@property (weak, nonatomic) id<HXDatePhotoBottomViewDelegate> delegate;
+@interface HXPhotoBottomView : UIView
+@property (weak, nonatomic) id<HXPhotoBottomViewDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (assign, nonatomic) BOOL previewBtnEnabled;
 @property (assign, nonatomic) BOOL doneBtnEnabled;

@@ -25,7 +25,7 @@
 
 - (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
     NSArray *items = @[];
-    if (self.previewActionItemsBlock) items= self.previewActionItemsBlock();
+    if (self.previewActionItemsBlock) items = self.previewActionItemsBlock();
     return items;
 }
 

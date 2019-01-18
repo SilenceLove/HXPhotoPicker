@@ -1,5 +1,5 @@
 //
-//  HXDatePhotoViewFlowLayout.h
+//  HXPhotoViewFlowLayout.h
 //  照片选择器
 //
 //  Created by 洪欣 on 2017/11/15.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HXDatePhotoViewFlowLayout : UICollectionViewFlowLayout
+@interface HXPhotoViewFlowLayout : UICollectionViewFlowLayout
 
 @end

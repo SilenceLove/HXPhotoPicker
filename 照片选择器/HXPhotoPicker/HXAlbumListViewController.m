@@ -7,7 +7,7 @@
 //
 
 #import "HXAlbumListViewController.h" 
-#import "HXDatePhotoViewController.h"
+#import "HXPhotoViewController.h"
 #import "UIViewController+HXExtension.h" 
 
 @interface HXAlbumListViewController ()
@@ -15,7 +15,7 @@
 UICollectionViewDataSource,
 UICollectionViewDelegate,
 UIViewControllerPreviewingDelegate,
-HXDatePhotoViewControllerDelegate,
+HXPhotoViewControllerDelegate,
 UITableViewDataSource,
 UITableViewDelegate
 >
@@ -204,8 +204,8 @@ UITableViewDelegate
     }
 }
 
-#pragma mark - < HXDatePhotoViewControllerDelegate >
-- (void)datePhotoViewController:(HXDatePhotoViewController *)datePhotoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
+#pragma mark - < HXPhotoViewControllerDelegate >
+- (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllList:photos:videos:original:)]) {
         [self.delegate albumListViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }
@@ -214,11 +214,11 @@ UITableViewDelegate
     }
 }
 
-- (void)datePhotoViewControllerDidCancel:(HXDatePhotoViewController *)datePhotoViewController {
+- (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController {
     [self cancelClick];
 }
 
-- (void)datePhotoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected {
+- (void)photoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected {
     if (self.albumModelArray.count > 0) {
 //        HXAlbumModel *albumModel = self.albumModelArray[model.currentAlbumIndex];
 //        if (selected) {
@@ -231,7 +231,7 @@ UITableViewDelegate
 }
 - (void)pushPhotoListViewControllerWithAlbumModel:(HXAlbumModel *)albumModel animated:(BOOL) animated {
     [self preloadPhotoListDataWithAlbumModel:albumModel];
-    HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
+    HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
     vc.manager = self.manager;
     vc.title = albumModel.albumName;
     vc.albumModel = albumModel;
@@ -399,7 +399,7 @@ UITableViewDelegate
     //设置突出区域
     CGRect frame = [self.collectionView cellForItemAtIndexPath:indexPath].frame;
     previewingContext.sourceRect = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.width);
-    HXDatePhotoViewController *vc = [[HXDatePhotoViewController alloc] init];
+    HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
     vc.manager = self.manager;
     vc.title = cell.model.albumName;
     vc.albumModel = cell.model;

@@ -772,7 +772,7 @@
     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
     if (downloadFinined && results) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.isICloud = NO;
+//            self.isICloud = NO;
             self.iCloudDownloading = NO;
             if (success) {
                 success(results, info, orientation, audioMix);
@@ -798,7 +798,7 @@
                     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
                     if (downloadFinined && result) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            weakSelf.isICloud = NO;
+//                            weakSelf.isICloud = NO;
                             weakSelf.iCloudDownloading = NO;
                             if (success) {
                                 success(result, info, 0, nil);
@@ -831,7 +831,7 @@
                     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
                     if (downloadFinined && livePhoto) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            weakSelf.isICloud = NO;
+//                            weakSelf.isICloud = NO;
                             weakSelf.iCloudDownloading = NO;
                             if (success) {
                                 success(livePhoto, info, 0, nil);
@@ -866,7 +866,7 @@
                     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
                     if (downloadFinined && imageData) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            weakSelf.isICloud = NO;
+//                            weakSelf.isICloud = NO;
                             weakSelf.iCloudDownloading = NO;
                             if (success) {
                                 success(imageData, info, orientation, nil);
@@ -900,7 +900,7 @@
                     if (downloadFinined && asset) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             weakSelf.iCloudDownloading = NO;
-                            weakSelf.isICloud = NO;
+//                            weakSelf.isICloud = NO;
                             if (success) {
                                 success(asset, info, 0, audioMix);
                             }
@@ -933,7 +933,7 @@
                     if (downloadFinined && exportSession) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             weakSelf.iCloudDownloading = NO;
-                            weakSelf.isICloud = NO;
+//                            weakSelf.isICloud = NO;
                             if (success) {
                                 success(exportSession, info, 0, nil);
                             }
@@ -966,7 +966,7 @@
                     if (downloadFinined && playerItem) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             weakSelf.iCloudDownloading = NO;
-                            weakSelf.isICloud = NO;
+//                            weakSelf.isICloud = NO;
                             if (success) {
                                 success(playerItem, info, 0, nil);
                             }
