@@ -229,7 +229,7 @@
     UIView *containerView = [transitionContext containerView];
     CGRect tempImageViewFrame;
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         self.tempImageView = fromCell.animatedImageView;
         tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
 #else
@@ -238,7 +238,7 @@
 #endif
     }else {
         if (!fromCell.playerLayer.player) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") 
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             self.tempImageView = fromCell.animatedImageView;
             tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
 #else

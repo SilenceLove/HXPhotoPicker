@@ -21,6 +21,10 @@
 #import <YYWebImage/YYWebImage.h>
 #elif __has_include("YYWebImage.h")
 #import "YYWebImage.h"
+#elif __has_include(<YYKit/YYKit.h>)
+#import <YYKit/YYKit.h>
+#elif __has_include("YYKit.h")
+#import "YYKit.h"
 #endif
 
 @implementation UIImageView (HXExtension)
@@ -32,7 +36,7 @@
 - (void)hx_setImageWithModel:(HXPhotoModel *)model original:(BOOL)original progress:(void (^)(CGFloat progress, HXPhotoModel *model))progressBlock completed:(void (^)(UIImage * image, NSError * error, HXPhotoModel * model))completedBlock {
     if (!model.networkThumbURL) model.networkThumbURL = model.networkPhotoUrl;
     HXWeakSelf
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     YYWebImageManager *manager = [YYWebImageManager sharedManager];
     UIImage *image = [manager.cache getImageForKey:[manager cacheKeyForURL:model.networkPhotoUrl] withType:YYImageCacheTypeAll];
     if (image) {
@@ -48,7 +52,11 @@
         }
     }else {
         NSURL *url = original ? model.networkPhotoUrl : model.networkThumbURL;
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
         [self yy_setImageWithURL:url placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+#else
+        [self setImageWithURL:url placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+#endif
             model.receivedSize = receivedSize;
             model.expectedSize = expectedSize;
             CGFloat progress = (CGFloat)receivedSize / expectedSize;

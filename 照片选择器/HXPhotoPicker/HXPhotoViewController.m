@@ -916,7 +916,7 @@ HXPhotoEditViewControllerDelegate
         previewVC.delegate = self;
         previewVC.modelArray = self.previewArray;
         previewVC.manager = self.manager;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         cell.model.tempImage = vc.animatedImageView.image;
 #else
         cell.model.tempImage = vc.imageView.image;
@@ -931,7 +931,7 @@ HXPhotoEditViewControllerDelegate
             previewVC.delegate = self;
             previewVC.modelArray = self.previewArray;
             previewVC.manager = self.manager;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             cell.model.tempImage = vc.animatedImageView.image;
 #else
             cell.model.tempImage = vc.imageView.image;
@@ -952,7 +952,7 @@ HXPhotoEditViewControllerDelegate
                 previewVC.delegate = self;
                 previewVC.modelArray = self.previewArray;
                 previewVC.manager = self.manager;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                 cell.model.tempImage = vc.animatedImageView.image;
 #else
                 cell.model.tempImage = vc.imageView.image;
@@ -1872,6 +1872,8 @@ HXPhotoEditViewControllerDelegate
 - (void)cancelRequest {
 #if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
     [self.imageView yy_cancelCurrentImageRequest];
+#elif __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+    [self.imageView cancelCurrentImageRequest];
 #elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif

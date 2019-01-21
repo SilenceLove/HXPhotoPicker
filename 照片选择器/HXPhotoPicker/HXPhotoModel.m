@@ -23,6 +23,10 @@
 #import <YYWebImage/YYWebImage.h>
 #elif __has_include("YYWebImage.h")
 #import "YYWebImage.h"
+#elif __has_include(<YYKit/YYKit.h>)
+#import <YYKit/YYKit.h>
+#elif __has_include("YYKit.h")
+#import "YYKit.h"
 #endif
 
 @implementation HXPhotoModel
@@ -461,7 +465,7 @@
 #pragma mark - < Request >
 
 + (id)requestImageWithURL:(NSURL *)url progress:(void (^) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:0 progress:progress transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
         if (completion) {
             completion(image, url, error);
@@ -608,7 +612,7 @@
     
     HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         [[YYWebImageManager sharedManager] requestImageWithURL:self.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
             if (image) {
                 if (success) {
