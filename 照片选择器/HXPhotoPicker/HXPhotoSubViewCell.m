@@ -94,6 +94,8 @@
     } 
 #if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
     [self.imageView yy_cancelCurrentImageRequest];
+#elif __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+    [self.imageView cancelCurrentImageRequest];
 #elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
