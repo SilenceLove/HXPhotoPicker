@@ -85,7 +85,7 @@
         fromCell = cell;
     }else if ([fromVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewCell *cell = [(HXPhotoPreviewViewController *)fromVC currentPreviewCell:self.model];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         tempView.image = cell.animatedImageView.image;
         if (cell) {
             tempView.frame = [cell.animatedImageView convertRect:cell.animatedImageView.bounds toView: containerView];
@@ -197,7 +197,7 @@
         
         [cell resetScale:NO];
         [cell refreshImageSize];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         toFrame = [cell.animatedImageView convertRect:cell.animatedImageView.bounds toView: containerView];
 #else
         toFrame = [cell.imageView convertRect:cell.imageView.bounds toView: containerView];
