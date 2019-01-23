@@ -132,7 +132,7 @@
     self.writeArray = [NSMutableArray arrayWithObjects:self.waitArray.lastObject, nil];
     [self.waitArray removeLastObject];
     HXPhotoModel *model = self.writeArray.firstObject;
-    __weak typeof(self) weakSelf = self;
+    HXWeakSelf
     if (model.type == HXPhotoModelMediaTypeVideo) {
         NSString *presetName;
         if (self.requestType == HXDatePhotoToolManagerRequestTypeOriginal) {
@@ -546,7 +546,7 @@
         }]; 
     }else {
         if (model.networkPhotoUrl) {
-            __weak typeof(self) weakSelf = self;
+            HXWeakSelf
             if (model.downloadError) {
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
@@ -680,7 +680,7 @@
     [self.waitImageModelArray removeLastObject];
     HXPhotoModel *model = self.currentImageModelArray.firstObject;
     if (model.asset) {
-        __weak typeof(self) weakSelf = self;
+        HXWeakSelf
         CGFloat imgWidth = model.imageSize.width;
         CGFloat imgHeight = model.imageSize.height;
         CGSize size;
@@ -723,7 +723,7 @@
         }];
     }else {
         if (model.networkPhotoUrl) {
-            __weak typeof(self) weakSelf = self;
+            HXWeakSelf
             if (model.downloadError) {
 #if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
                 YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:model.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {

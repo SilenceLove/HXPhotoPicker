@@ -15,11 +15,21 @@
 - (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
 @end
 
-@interface HXPhotoEditViewController : UIViewController
+@interface HXPhotoEditViewController : UIViewController<UIViewControllerTransitioningDelegate>
 @property (weak, nonatomic) id<HXPhotoEditViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (assign, nonatomic) BOOL outside;
+@property (assign, nonatomic) BOOL imageRequestComplete;
+@property (assign, nonatomic) BOOL transitionCompletion;
+@property (assign, nonatomic) BOOL isInside;
+@property (assign, nonatomic) BOOL isCancel;
+@property (strong, nonatomic, readonly) UIImage *originalImage;
+- (void)completeTransition:(UIImage *)image; 
+- (void)showBottomView;
+- (void)hideImageView;
+- (UIImage *)getCurrentImage;
+- (CGRect)getImageFrame;
 @end
 
 @class HXEditRatio;

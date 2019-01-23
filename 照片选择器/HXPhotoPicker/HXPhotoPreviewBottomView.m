@@ -29,7 +29,7 @@
     return self;
 }
 - (void)setupUI {
-    self.currentIndex = -1;
+    _currentIndex = -1;
     [self addSubview:self.bgView];
     [self addSubview:self.collectionView];
     [self addSubview:self.doneBtn];
@@ -67,44 +67,52 @@
     [self.modelArray addObject:model];
     [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.modelArray.count - 1 inSection:0]]];
     [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:self.modelArray.count - 1 inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
+    self.currentIndex = self.modelArray.count - 1;
 }
 - (void)deleteModel:(HXPhotoModel *)model {
-    if ([self.modelArray containsObject:model]) {
+    if ([self.modelArray containsObject:model] && self.currentIndex >= 0) {
         NSInteger index = [self.modelArray indexOfObject:model];
         [self.modelArray removeObject:model];
         [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
+        _currentIndex = -1;
     }
 }
 - (void)setCurrentIndex:(NSInteger)currentIndex {
-    _currentIndex = currentIndex;
+    if (_currentIndex == currentIndex) {
+        return;
+    }
     if (currentIndex < 0 || currentIndex > self.modelArray.count - 1) {
         return;
     }
+    _currentIndex = currentIndex;
     self.currentIndexPath = [NSIndexPath indexPathForItem:currentIndex inSection:0];
-//    [self.collectionView scrollToItemAtIndexPath:self.currentIndexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+    
     [self.collectionView selectItemAtIndexPath:self.currentIndexPath animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
 }
 - (void)setSelectCount:(NSInteger)selectCount {
     _selectCount = selectCount;
+    NSString *text;
     if (selectCount <= 0) {
+        text = @"";
         [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
     }else {
         if (self.manager.configuration.doneBtnShowDetail) {
             if (!self.manager.configuration.selectTogether) {
                 if (self.manager.selectedPhotoCount > 0) {
                     NSInteger maxCount = self.manager.configuration.photoMaxNum > 0 ? self.manager.configuration.photoMaxNum : self.manager.configuration.maxNum;
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,maxCount] forState:UIControlStateNormal];
+                    text = [NSString stringWithFormat:@"(%ld/%ld)", selectCount,maxCount];
                 }else {
                     NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;
-                    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,maxCount] forState:UIControlStateNormal];
+                    text = [NSString stringWithFormat:@"(%ld/%ld)", selectCount,maxCount];
                 }
             }else {
-                [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount,self.manager.configuration.maxNum] forState:UIControlStateNormal];
+                text = [NSString stringWithFormat:@"(%ld/%ld)", selectCount,self.manager.configuration.maxNum];
             }
         }else {
-            [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"完成"],selectCount] forState:UIControlStateNormal];
+            text = [NSString stringWithFormat:@"(%ld)", selectCount];
         }
     }
+    [self.doneBtn setTitle:[NSString stringWithFormat:@"%@%@",[NSBundle hx_localizedStringForKey:@"完成"], text] forState:UIControlStateNormal];
     [self changeDoneBtnFrame];
 }
 #pragma mark - < UICollectionViewDataSource >
@@ -128,10 +136,11 @@
     [(HXPhotoPreviewBottomViewCell *)cell cancelRequest];
 }
 - (void)deselectedWithIndex:(NSInteger)index {
-    if (index < 0 || index > self.modelArray.count - 1) {
+    if (index < 0 || index > self.modelArray.count - 1 || self.currentIndex < 0) {
         return;
     }
     [self.collectionView deselectItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0] animated:NO];
+    _currentIndex = -1;
 }
 
 - (void)deselected {
@@ -139,6 +148,7 @@
         return;
     }
     [self.collectionView deselectItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] animated:NO];
+    _currentIndex = -1;
 }
 
 - (void)didDoneBtnClick {
@@ -155,17 +165,17 @@
     if (self.outside) {
         if (self.manager.afterSelectedPhotoArray.count && self.manager.afterSelectedVideoArray.count) {
             if (!self.manager.configuration.videoCanEdit && !self.manager.configuration.photoCanEdit) {
-                self.collectionView.hx_w = self.hx_w - 12;
+                if (self.collectionView.hx_w != self.hx_w - 12) self.collectionView.hx_w = self.hx_w - 12;
             }else {
                 self.editBtn.hx_x = self.hx_w - 12 - self.editBtn.hx_w;
-                self.collectionView.hx_w = self.editBtn.hx_x;
+                if (self.collectionView.hx_w != self.editBtn.hx_x) self.collectionView.hx_w = self.editBtn.hx_x;
             }
         }else {
             if (self.hideEditBtn) {
-                self.collectionView.hx_w = self.hx_w - 12;
+                if (self.collectionView.hx_w != self.hx_w - 12) self.collectionView.hx_w = self.hx_w - 12;
             }else {
                 self.editBtn.hx_x = self.hx_w - 12 - self.editBtn.hx_w;
-                self.collectionView.hx_w = self.editBtn.hx_x;
+                if (self.collectionView.hx_w != self.editBtn.hx_x) self.collectionView.hx_w = self.editBtn.hx_x;
             }
         }
     }else {
@@ -179,15 +189,15 @@
         self.editBtn.hx_x = self.doneBtn.hx_x - self.editBtn.hx_w;
         if (self.manager.type == HXPhotoManagerSelectedTypePhoto || self.manager.type == HXPhotoManagerSelectedTypeVideo) {
             if (!self.hideEditBtn) {
-                self.collectionView.hx_w = self.editBtn.hx_x;
+                if (self.collectionView.hx_w != self.editBtn.hx_x) self.collectionView.hx_w = self.editBtn.hx_x;
             }else {
-                self.collectionView.hx_w = self.doneBtn.hx_x - 12;
+                if (self.collectionView.hx_w != self.doneBtn.hx_x - 12) self.collectionView.hx_w = self.doneBtn.hx_x - 12;
             }
         }else {
             if (!self.manager.configuration.videoCanEdit && !self.manager.configuration.photoCanEdit) {
-                self.collectionView.hx_w = self.doneBtn.hx_x - 12;
+                if (self.collectionView.hx_w != self.doneBtn.hx_x - 12) self.collectionView.hx_w = self.doneBtn.hx_x - 12;
             }else {
-                self.collectionView.hx_w = self.editBtn.hx_x;
+                if (self.collectionView.hx_w != self.editBtn.hx_x) self.collectionView.hx_w = self.editBtn.hx_x;
             }
         }
     }
@@ -195,7 +205,9 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.bgView.frame = self.bounds;
-    self.collectionView.frame = CGRectMake(0, 0,self.hx_w - 12 - 50, 50);
+//    if (self.collectionView.hx_w != self.hx_w - 12 - 50) {
+//        self.collectionView.frame = CGRectMake(0, 0, self.hx_w - 12 - 50, 50);
+//    }
     self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
     self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
     
@@ -237,7 +249,7 @@
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;
-            [_collectionView registerClass:[HXPhotoPreviewBottomViewCell class] forCellWithReuseIdentifier:@"DatePreviewBottomViewCellId"];
+        [_collectionView registerClass:[HXPhotoPreviewBottomViewCell class] forCellWithReuseIdentifier:@"DatePreviewBottomViewCellId"];
         }
     return _collectionView;
 }
@@ -309,7 +321,7 @@
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     
-    __weak typeof(self) weakSelf = self;
+    HXWeakSelf
     if (model.thumbPhoto) {
         self.imageView.image = model.thumbPhoto;
         if (model.networkPhotoUrl) {
@@ -334,7 +346,9 @@
                 weakSelf.imageView.image = image;
             }
         }]; 
-    }
+    } 
+    self.layer.borderWidth = self.selected ? 5 : 0;
+    self.layer.borderColor = self.selected ? [self.selectColor colorWithAlphaComponent:0.5].CGColor : nil;
 }
 - (void)layoutSubviews {
     [super layoutSubviews];

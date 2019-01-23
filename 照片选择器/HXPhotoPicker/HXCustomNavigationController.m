@@ -34,9 +34,9 @@
                     cancelBlock:(viewControllerDidCancelBlock)cancelBlock {
     manager.selectPhotoing = YES;
     [manager selectedListTransformBefore];
-    dispatch_async(manager.loadAssetQueue, ^{
+    if (!manager.cameraRollAlbumModel) {
         [manager preloadData];
-    });
+    }
     
     if (manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
         HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] initWithManager:manager];

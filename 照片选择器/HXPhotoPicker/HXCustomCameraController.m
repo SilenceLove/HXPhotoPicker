@@ -39,7 +39,7 @@ const CGFloat HXZoomRate = 1.0f;
 }
 - (void)startMontionUpdate {
     if (self.motionManager.deviceMotionAvailable) {
-        __weak typeof(self) weakSelf = self;
+        HXWeakSelf
         [self.motionManager startDeviceMotionUpdatesToQueue:[NSOperationQueue currentQueue] withHandler:^(CMDeviceMotion * _Nullable motion, NSError * _Nullable error) {
             [weakSelf performSelectorOnMainThread:@selector(handleDeviceMotion:) withObject:motion waitUntilDone:YES];
         }];

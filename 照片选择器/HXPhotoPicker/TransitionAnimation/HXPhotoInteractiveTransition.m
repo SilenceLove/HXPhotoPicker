@@ -76,9 +76,9 @@
                 return;
             }
             HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
-            if (![previewVC bottomView].userInteractionEnabled && HX_IOS11_Later) {
-                [previewVC setSubviewAlphaAnimate:NO duration:0.3f];
-            }
+//            if (![previewVC bottomView].userInteractionEnabled && HX_IOS11_Later) {
+//                [previewVC setSubviewAlphaAnimate:NO duration:0.3f];
+//            }
             [previewVC setStopCancel:YES];
             self.beginX = [gestureRecognizer locationInView:gestureRecognizer.view].x;
             self.beginY = [gestureRecognizer locationInView:gestureRecognizer.view].y;
@@ -214,11 +214,41 @@
     [toVC.view insertSubview:self.tempImageView belowSubview:toVC.bottomView];
     if (!fromVC.bottomView.userInteractionEnabled) {
         self.bgView.backgroundColor = [UIColor blackColor];
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
-        [toVC.navigationController setNavigationBarHidden:NO];
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        
+        if (HX_IOS11_Later) {
+            // 处理 ios11 当导航栏隐藏时手势返回的问题
+            [toVC.navigationController.navigationBar.layer removeAllAnimations];
+            // 找到动画异常的视图，然后移除layer动画。。 系统导航栏返回按钮真tm坑！！！！！
+            // 可以屏蔽下面代码看看效果!!!简直酷炫!!
+            // 一层一层的慢慢的找,把每个有动画的全部移除
+            for (UIView *navBarView in toVC.navigationController.navigationBar.subviews) {
+                [navBarView.layer removeAllAnimations];
+                for (UIView *navBarSubView in navBarView.subviews) {
+                    [navBarSubView.layer removeAllAnimations];
+                    for (UIView *backView in navBarSubView.subviews) {
+                        [backView.layer removeAllAnimations];
+                        for (UIView *backSubView in backView.subviews) {
+                            [backSubView.layer removeAllAnimations];
+                            for (UIView *backSSubView in backSubView.subviews) {
+                                [backSSubView.layer removeAllAnimations];
+                                for (CALayer *subLayer in backSSubView.layer.sublayers) {
+                                    // 这个地方是真tm的坑!!!!!!!!
+                                    [subLayer removeAllAnimations];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            [toVC.navigationController setNavigationBarHidden:NO animated:YES];
+        }else {
+            [toVC.navigationController setNavigationBarHidden:NO];
+        }
         toVC.navigationController.navigationBar.alpha = 0;
         toVC.bottomView.alpha = 0;
     }else {
+        toVC.bottomView.alpha = 1;
         self.bgView.backgroundColor = [UIColor whiteColor];
     }
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
@@ -261,13 +291,20 @@
         self.bgView.alpha = 1;
         if (!fromVC.bottomView.userInteractionEnabled) {
             toVC.bottomView.alpha = 0;
+        }else {
+            toVC.bottomView.alpha = 1;
         }
     } completion:^(BOOL finished) {
         self.fromCell.scrollView.scrollEnabled = YES;
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
+        
         fromVC.collectionView.hidden = NO;
         if (!fromVC.bottomView.userInteractionEnabled) {
             fromVC.view.backgroundColor = [UIColor blackColor];
+            if (HX_IOS11_Later) {
+                // 处理 ios11 当导航栏隐藏时手势返回的问题
+                [toVC.navigationController setNavigationBarHidden:YES];
+            }
         }else {
             fromVC.view.backgroundColor = [UIColor whiteColor];
         }
@@ -311,6 +348,12 @@
         toVC.bottomView.alpha = 1;
     }completion:^(BOOL finished) {
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
+        
+        if (!fromVC.bottomView.userInteractionEnabled && HX_IOS11_Later) {
+            // 处理 ios11 当导航栏隐藏时手势返回的问题
+            [toVC.navigationController.navigationBar.layer removeAllAnimations];
+            [toVC.navigationController setNavigationBarHidden:NO];
+        }
         [self.tempCell bottomViewPrepareAnimation];
         self.tempCell.hidden = NO;
         [self.tempCell bottomViewStartAnimation];

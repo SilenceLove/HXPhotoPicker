@@ -58,6 +58,28 @@
     return self.frame.size.height;
 }
 
+- (CGFloat)hx_centerX
+{
+    return self.center.x;
+}
+
+- (void)setHx_centerX:(CGFloat)hx_centerX {
+    CGPoint center = self.center;
+    center.x = hx_centerX;
+    self.center = center;
+}
+
+- (CGFloat)hx_centerY
+{
+    return self.center.y;
+}
+
+- (void)setHx_centerY:(CGFloat)hx_centerY {
+    CGPoint center = self.center;
+    center.y = hx_centerY;
+    self.center = center;
+}
+
 - (void)setHx_size:(CGSize)hx_size
 {
     CGRect frame = self.frame;

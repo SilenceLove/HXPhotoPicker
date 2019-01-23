@@ -64,6 +64,7 @@
 @property (assign, nonatomic) HXPhotoViewPreViewShowStyle exteriorPreviewStyle;
 
 - (HXPhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
+- (void)changeStatusBarWithHidden:(BOOL)hidden;
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
 - (void)setupDarkBtnAlpha:(CGFloat)alpha;
 @end

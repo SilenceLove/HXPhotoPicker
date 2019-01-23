@@ -51,17 +51,24 @@
                                  photo:(UIImage *)photo
                               location:(CLLocation *)location
                               complete:(void (^)(HXPhotoModel *model, BOOL success))complete;
- 
 
+/**
+ 获取定位信息 
+ */
 + (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model
                                                completion:(void (^)(CLPlacemark * _Nullable placemark, HXPhotoDateModel *model, NSError * _Nullable error))completion;
 
+/**
+ 请求相册权限
+ */
 + (void)requestAuthorization:(UIViewController *)viewController
                      handler:(void (^)(PHAuthorizationStatus status))handler;
 
+/**
+ 判断是否是HEIF格式的图片
+ */
 + (BOOL)assetIsHEIF:(PHAsset *)asset;
 
-/**  -------  */
 /**
  根据AVAsset对象获取指定数量和大小的图片
  (会根据视频时长平分)
@@ -90,11 +97,9 @@
 + (BOOL)platform;
 /**  iphone6, 6s, 7, 8  */
 + (BOOL)isIphone6;
- 
-/**********************************/ 
 
 + (void)selectListWriteToTempPath:(NSArray *)selectList
                       requestList:(void (^)(NSArray *imageRequestIds, NSArray *videoSessions))requestList
                        completion:(void (^)(NSArray<NSURL *> *allUrl, NSArray<NSURL *> *imageUrls, NSArray<NSURL *> *videoUrls))completion
-                            error:(void (^)(void))error;
+                            error:(void (^)(void))error DEPRECATED_MSG_ATTRIBUTE("该无效已无效' instead");
 @end

@@ -129,6 +129,7 @@
 		7B81626920343E370084F4C3 /* Demo9ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626820343E370084F4C3 /* Demo9ViewController.m */; };
 		7B81626C20343E4C0084F4C3 /* Demo9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626B20343E4C0084F4C3 /* Demo9Model.m */; };
 		7B81626F20343EE10084F4C3 /* Demo9ViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */; };
+		7B9B3C5821F4ABEE0054F920 /* HXPhotoEditTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9B3C5721F4ABEE0054F920 /* HXPhotoEditTransition.m */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */; };
 		7BBE31FE215F7F600069D2FB /* YYImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BBE319A215F7F5F0069D2FB /* YYImageCache.m */; };
@@ -430,6 +431,8 @@
 		7B81626B20343E4C0084F4C3 /* Demo9Model.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo9Model.m; sourceTree = "<group>"; };
 		7B81626D20343EE10084F4C3 /* Demo9ViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo9ViewCell.h; sourceTree = "<group>"; };
 		7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo9ViewCell.m; sourceTree = "<group>"; };
+		7B9B3C5621F4ABEE0054F920 /* HXPhotoEditTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoEditTransition.h; sourceTree = "<group>"; };
+		7B9B3C5721F4ABEE0054F920 /* HXPhotoEditTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditTransition.m; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
 		7BADE74F1F5A5C1F007AF1D9 /* Demo7ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo7ViewController.h; sourceTree = "<group>"; };
@@ -630,6 +633,8 @@
 				7B1AA38F21EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.m */,
 				7B1AA38C21EEE3BC00D0AA93 /* HXPhotoViewTransition.h */,
 				7B1AA39021EEE3BC00D0AA93 /* HXPhotoViewTransition.m */,
+				7B9B3C5621F4ABEE0054F920 /* HXPhotoEditTransition.h */,
+				7B9B3C5721F4ABEE0054F920 /* HXPhotoEditTransition.m */,
 			);
 			path = TransitionAnimation;
 			sourceTree = "<group>";
@@ -1469,6 +1474,7 @@
 				7B8060251FA6DC5B00882E34 /* YYWeakProxy.m in Sources */,
 				7B1AA3F921EEE3BD00D0AA93 /* HXCollectionView.m in Sources */,
 				7B200D40216D06B9004A5B0B /* LFClipToolbar.m in Sources */,
+				7B9B3C5821F4ABEE0054F920 /* HXPhotoEditTransition.m in Sources */,
 				7BBE3217215F7F600069D2FB /* SDWebImageDownloader.m in Sources */,
 				7BBE31FF215F7F600069D2FB /* YYDiskCache.m in Sources */,
 				7B200D1A216D06B9004A5B0B /* JRFilterModel.m in Sources */,

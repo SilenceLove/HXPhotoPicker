@@ -42,7 +42,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.3'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.5'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.4.1``` || ```YYWebImage v1.0.5```
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -458,6 +458,7 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.2.5　-　优化一些显示效果，一些问题修复，编辑照片时添加转场动画
 - 2019-1-18 修复预览大图时下载iCloud资源完成后未刷新列表cell问题。去除Date命名（有在外部使用的请去掉Date命名）
 - 2019-1-12 获取原图时处理HEIC格式的照片
 - 2019-1-9  选择照片逻辑修改、保存相册时添加定位信息以及一些问题修复

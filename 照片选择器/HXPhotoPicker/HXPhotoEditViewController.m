@@ -9,6 +9,7 @@
 #import "HXPhotoEditViewController.h"
 #import "UIImage+HXExtension.h"
 #import "UIButton+HXExtension.h"
+#import "HXPhotoEditTransition.h"
 
 @interface HXPhotoEditViewController ()<HXPhotoEditBottomViewDelegate>
 @property (strong, nonatomic) UIImageView *imageView;
@@ -30,10 +31,26 @@
 @property (strong, nonatomic) UIPanGestureRecognizer *imagePanGesture;
 @property (assign, nonatomic) BOOL isSelectRatio;
 @property (assign, nonatomic) UIImageOrientation currentImageOrientaion;
+@property (strong, nonatomic) HXPhotoModel *afterModel;
 @end
 
 @implementation HXPhotoEditViewController
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.transitioningDelegate = self;
+        self.modalPresentationStyle = UIModalPresentationCustom;
+    }
+    return self;
+}
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{
+    return [HXPhotoEditTransition transitionWithType:HXPhotoEditTransitionTypePresent model:self.model];
+}
+
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
+    return [HXPhotoEditTransition transitionWithType:HXPhotoEditTransitionTypeDismiss model:self.isCancel ? self.model : self.afterModel];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.imageWidth = self.model.imageSize.width;
@@ -147,14 +164,48 @@
     [self.view addSubview:self.leftBottomView];
     [self.view addSubview:self.rightTopView];
     [self.view addSubview:self.rightBottomView];
-
+    if (self.isInside) {
+        self.bottomView.alpha = 0;
+        self.gridLayer.alpha = 0;
+    }
+    CATransition *transition = [CATransition animation];
+    transition.duration = 0.2f;
+    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    transition.type = kCATransitionFade;
+    [self.imageView.layer addAnimation:transition forKey:nil];
+    self.imageView.image = self.model.tempImage;
     [self setupModel];
+}
+- (void)completeTransition:(UIImage *)image {
+    self.transitionCompletion = YES;
+    self.imageView.alpha = 1;
+    if (self.imageRequestComplete) {
+        [self fixationEdit];
+    }else {
+        self.imageView.image = image;
+        [self.view hx_showLoadingHUDText:nil];
+    }
+}
+- (void)showBottomView {
+    self.bottomView.alpha = 1; 
+}
+- (void)hideImageView { 
+    self.imageView.hidden = YES;
+    self.leftTopView.hidden = YES;
+    self.leftBottomView.hidden = YES;
+    self.rightTopView.hidden = YES;
+    self.rightBottomView.hidden = YES;
+}
+- (UIImage *)getCurrentImage {
+    return self.imageView.image;
 }
 - (void)setupModel {
     if (self.model.asset) {
         self.bottomView.userInteractionEnabled = NO;
         HXWeakSelf
-        [self.view hx_showLoadingHUDText:nil];
+        if (!self.isInside) {
+            [self.view hx_showLoadingHUDText:nil];
+        }
         self.requestId = [self.model requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
             weakSelf.requestId = iCloudRequestId;
         } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
@@ -166,31 +217,38 @@
             weakSelf.originalImage = image;
             weakSelf.imageView.image = image;
             [weakSelf.view hx_handleLoading];
-            [weakSelf fixationEdit];
+            weakSelf.imageRequestComplete = YES;
+            
+            if (!weakSelf.isInside) {
+                [weakSelf fixationEdit];
+            }else {
+                if (weakSelf.transitionCompletion) {
+                    [weakSelf fixationEdit];
+                }
+            }
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
             [weakSelf.view hx_handleLoading];
             weakSelf.bottomView.userInteractionEnabled = YES;
+            weakSelf.imageRequestComplete = YES;
+            if (!weakSelf.isInside) {
+                [weakSelf fixationEdit];
+            }else {
+                if (weakSelf.transitionCompletion) {
+                    [weakSelf fixationEdit];
+                }
+            }
         }];
-//        self.requestId = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-//            weakSelf.requestId = iCloudRequestId;
-//        } progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
-//            weakSelf.bottomView.userInteractionEnabled = YES;
-//            UIImage *image = [UIImage imageWithData:imageData];
-//            if (image.imageOrientation != UIImageOrientationUp) {
-//                image = [image hx_normalizedImage];
-//            }
-//            weakSelf.originalImage = image;
-//            weakSelf.imageView.image = image;
-//            [weakSelf.view hx_handleLoading];
-//            [weakSelf fixationEdit];
-//        } failed:^(NSDictionary *info, HXPhotoModel *model) {
-//            [weakSelf.view hx_handleLoading];
-//            weakSelf.bottomView.userInteractionEnabled = YES;
-//        }];
     }else {
         self.imageView.image = self.model.thumbPhoto;
         self.originalImage = self.model.thumbPhoto;
-        [self fixationEdit];
+        self.imageRequestComplete = YES;
+        if (!self.isInside) {
+            [self fixationEdit];
+        }else {
+            if (self.transitionCompletion) {
+                [self fixationEdit];
+            }
+        }
     }
 }
 - (void)fixationEdit {
@@ -208,6 +266,7 @@
         [self bottomViewDidSelectRatioClick:ratio];
         [UIView animateWithDuration:0.25 animations:^{
             self.imageView.alpha = 1;
+            self.gridLayer.alpha = 1;
             if (self.manager.configuration.movableCropBoxEditSize) {
                 self.leftTopView.alpha = 1;
                 self.leftBottomView.alpha = 1;
@@ -218,6 +277,7 @@
     }else {
         [UIView animateWithDuration:0.25 animations:^{
             self.imageView.alpha = 1;
+            self.gridLayer.alpha = 1;
             self.leftTopView.alpha = 1;
             self.leftBottomView.alpha = 1;
             self.rightTopView.alpha = 1;
@@ -540,12 +600,13 @@
 }
 #pragma mark - < HXPhotoEditBottomViewDelegate >
 - (void)bottomViewDidCancelClick {
-    [self stopTimer]; 
-    if (self.outside) {
-        [self dismissViewControllerAnimated:NO completion:nil];
-        return;
-    }
-    [self.navigationController popViewControllerAnimated:NO];
+    [self stopTimer];
+    self.isCancel = YES;
+//    if (self.outside) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+//        return;
+//    }
+//    [self.navigationController popViewControllerAnimated:NO];
 }
 - (void)bottomViewDidRestoreClick {
     if (self.manager.configuration.movableCropBox) {
@@ -636,10 +697,21 @@
         }];
         return;
     }
-    if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
-        [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+    self.isCancel = NO;
+    self.afterModel = model;
+    if (self.manager.configuration.singleSelected &&
+        self.manager.configuration.singleJumpEdit) {
+        [self dismissViewControllerAnimated:NO completion:^{
+            if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+                [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+            }
+        }];
+    }else {
+        if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+            [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+        }
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
-    [self.navigationController popViewControllerAnimated:NO];
 }
 - (void)bottomViewDidSelectRatioClick:(HXEditRatio *)ratio {
     [self stopTimer];
@@ -681,6 +753,7 @@
         _gridLayer = [[HXEditGridLayer alloc] init];
         _gridLayer.bgColor   = [[UIColor blackColor] colorWithAlphaComponent:.5];
         _gridLayer.gridColor = [UIColor whiteColor];
+        _gridLayer.alpha = 0.f;
     }
     return _gridLayer;
 }
@@ -704,7 +777,7 @@
 }
 - (HXEditCornerView *)rightBottomView {
     if (!_rightBottomView) {
-        _rightBottomView = [self editCornerViewWithTag:3];
+        _rightBottomView = [self editCornerViewWithTag:3]; 
     }
     return _rightBottomView;
 }

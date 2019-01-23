@@ -16,7 +16,7 @@
 // 进度扇形
 @property (nonatomic, strong) CAShapeLayer *progressLayer;
 @property (assign, nonatomic) CGFloat currentProgress;
-
+@property (assign, nonatomic) CGPoint progressCenter;
 @end
 
 @implementation HXFullScreenCameraPlayView
@@ -59,11 +59,12 @@
     circleLayer.hidden = YES;
     self.circleLayer = circleLayer;
     
+    self.progressCenter = CGPointMake(self.frame.size.width * 0.5, self.frame.size.height * 0.5);
     CAShapeLayer *progressLayer = [CAShapeLayer layer];
     progressLayer.strokeColor = self.color.CGColor;
     progressLayer.fillColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0].CGColor;
     progressLayer.lineWidth = 5;
-    progressLayer.path = [UIBezierPath bezierPathWithArcCenter:CGPointMake(self.frame.size.width * 0.5, self.frame.size.height * 0.5) radius:self.frame.size.width * 0.5 startAngle:-M_PI / 2 endAngle:-M_PI / 2 + M_PI * 2 * 1 clockwise:true].CGPath;
+    progressLayer.path = [UIBezierPath bezierPathWithArcCenter:self.progressCenter radius:self.frame.size.width * 0.5 startAngle:-M_PI / 2 endAngle:-M_PI / 2 + M_PI * 2 * 1 clockwise:true].CGPath;
     progressLayer.hidden = YES;
     [self.layer addSublayer:progressLayer];
     self.progressLayer = progressLayer;
@@ -83,14 +84,18 @@
     _progress = progress; 
     self.progressLayer.hidden = NO;
     self.circleLayer.hidden = NO;
+    [self.progressLayer removeAnimationForKey:@"circle"];
     CABasicAnimation *circleAnim = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     circleAnim.fromValue = @(self.currentProgress);
     circleAnim.toValue = @(progress);
-    circleAnim.duration = 1.0f;
+    circleAnim.duration = 0.2f;
     circleAnim.fillMode = kCAFillModeForwards;
     circleAnim.removedOnCompletion = NO;
     circleAnim.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
     [self.progressLayer addAnimation:circleAnim forKey:@"circle"];
+    
+//    self.progressLayer.path = [UIBezierPath bezierPathWithArcCenter:self.progressCenter radius:self.progressCenter.x startAngle:-M_PI / 2.f endAngle:-M_PI / 2.f + M_PI * 2.f * progress clockwise:true].CGPath;
+    
     self.currentProgress = progress;
 }
 - (UIBezierPath *)pathForProgress:(CGFloat)progress {

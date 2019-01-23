@@ -194,7 +194,9 @@
 
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
-    [manager preloadData];
+    if (!manager.cameraRollAlbumModel) {
+        [manager preloadData];
+    }
     manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
     if (self.manager.afterSelectedArray.count > 0) {
         if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
@@ -352,6 +354,9 @@
  添加按钮点击事件
  */
 - (void)goPhotoViewController {
+    if (!self.manager.cameraRollAlbumModel) {
+        [self.manager preloadData];
+    }
     if (self.outerCamera) {
             if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
                 if (self.manager.configuration.photoMaxNum > 0) {
@@ -411,7 +416,7 @@
         [[self hx_viewController].view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
         return;
     }
-    __weak typeof(self) weakSelf = self;
+    HXWeakSelf
     [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (granted) {

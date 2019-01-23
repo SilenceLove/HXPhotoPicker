@@ -28,12 +28,23 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
     HXPhotoLanguageTypeEn       // 英文
 };
 
-@class HXPhotoBottomView;
-@class HXPhotoPreviewBottomView;
-@class HXPhotoManager;
-@class HXPhotoModel;
+@class
+HXPhotoBottomView,
+HXPhotoPreviewBottomView,
+HXPhotoManager,
+HXPhotoModel,
+HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
+
+
+/**
+ 预览大图时的长按响应事件
+ previewViewController.outside
+ yes -> use HXPhotoView preview
+ no  -> use HXPhotoViewController preview
+ */
+@property (copy, nonatomic) void (^ previewRespondsToLongPress)(UILongPressGestureRecognizer *longPress, HXPhotoModel *photoModel, HXPhotoManager *manager, HXPhotoPreviewViewController *previewViewController);
 
 /**
  语言类型

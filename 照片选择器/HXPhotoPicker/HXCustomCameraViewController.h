@@ -45,7 +45,7 @@ typedef void (^ HXCustomCameraViewControllerDidCancelBlock)(HXCustomCameraViewCo
 @property (assign ,nonatomic) BOOL animating;
 @property (assign, nonatomic) HXCustomCameraBottomViewMode mode;
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager isOutside:(BOOL)isOutside;
-- (void)changeTime:(NSInteger)time;
+- (void)changeTime:(NSTimeInterval)time;
 - (void)startRecord;
 - (void)stopRecord;
 - (void)beganAnimate;

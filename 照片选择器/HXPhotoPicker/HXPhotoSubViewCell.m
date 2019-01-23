@@ -44,20 +44,22 @@
         _stateLb = [[UILabel alloc] init];
         _stateLb.textColor = [UIColor whiteColor];
         _stateLb.textAlignment = NSTextAlignmentRight;
-        _stateLb.font = [UIFont systemFontOfSize:12];
+        _stateLb.font = [UIFont hx_mediumSFUITextOfSize:12];
     }
     return _stateLb;
 }
 - (CAGradientLayer *)bottomMaskLayer {
     if (!_bottomMaskLayer) {
-        _bottomMaskLayer = [CAGradientLayer layer];
+        _bottomMaskLayer = [CAGradientLayer layer]; 
         _bottomMaskLayer.colors = @[
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor,
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor ,
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.15].CGColor ,
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor ,
+                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.6].CGColor
                                     ];
         _bottomMaskLayer.startPoint = CGPointMake(0, 0);
         _bottomMaskLayer.endPoint = CGPointMake(0, 1);
-        _bottomMaskLayer.locations = @[@(0.15f),@(0.9f)];
+        _bottomMaskLayer.locations = @[@(0.15f),@(0.35f),@(0.6f),@(0.9f)];
         _bottomMaskLayer.borderWidth  = 0.0;
     }
     return _bottomMaskLayer;
@@ -112,7 +114,7 @@
 - (void)againDownload {
     self.model.downloadError = NO;
     self.model.downloadComplete = NO;
-    __weak typeof(self) weakSelf = self;
+    HXWeakSelf
     [self.imageView hx_setImageWithModel:self.model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
         if (weakSelf.model == model) {
             weakSelf.progressView.progress = progress;
@@ -222,14 +224,12 @@
             self.stateLb.hidden = NO;
             self.bottomMaskLayer.hidden = NO;
         }else {
-            if (model.networkPhotoUrl) {
-                if ([[model.networkPhotoUrl.absoluteString substringFromIndex:model.networkPhotoUrl.absoluteString.length - 3] isEqualToString:@"gif"]) {
-                    self.stateLb.text = @"GIF";
-                    self.stateLb.hidden = NO;
-                    self.bottomMaskLayer.hidden = NO;
-                    return;
-                }
-            }
+            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+                self.stateLb.text = @"GIF";
+                self.stateLb.hidden = NO;
+                self.bottomMaskLayer.hidden = NO;
+                return;
+            } 
             self.stateLb.hidden = YES;
             self.bottomMaskLayer.hidden = YES;
         }

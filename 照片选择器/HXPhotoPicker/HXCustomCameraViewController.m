@@ -46,7 +46,7 @@
             [self.manager getAllAlbumModelFilter:NO select:nil completion:nil];
         });
     }
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor blackColor];
     
     if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
         [self.locationManager startUpdatingLocation];
@@ -298,6 +298,8 @@
     [self stopTimer];
     [self.cameraController stopMontionUpdate];
     [self.cameraController stopSession];
+    self.cameraController.flashMode = 0;
+    self.cameraController.torchMode = 0;
     if ([self.delegate respondsToSelector:@selector(customCameraViewController:didDone:)]) {
         [self.delegate customCameraViewController:self didDone:model];
     }
@@ -357,7 +359,7 @@
 - (void)startTimer {
     self.time = 0;
     [self.timer invalidate];
-    self.timer = [NSTimer timerWithTimeInterval:1.0f
+    self.timer = [NSTimer timerWithTimeInterval:0.2f
                                          target:self
                                        selector:@selector(updateTimeDisplay)
                                        userInfo:nil
@@ -367,12 +369,12 @@
 
 - (void)updateTimeDisplay {
     CMTime duration = self.cameraController.recordedDuration;
-    NSUInteger time = (NSUInteger)CMTimeGetSeconds(duration);
-    self.time = time;
+    NSTimeInterval time = CMTimeGetSeconds(duration);
+    self.time = (NSInteger)time;
     [self.bottomView changeTime:time];
-    if (time == self.manager.configuration.videoMaximumDuration) {
-        [self.cameraController stopRecording];
+    if (time + 0.4f >= self.manager.configuration.videoMaximumDuration) {
         [self stopTimer];
+        [self.cameraController stopRecording];
     }
 }
 
@@ -472,7 +474,9 @@
     if (!self.bottomView.animating) {
         dispatch_async(dispatch_queue_create("com.hxdatephotopicker.kamera", NULL), ^{
             [self.cameraController startRecording];
-            [self startTimer];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self startTimer];
+            });
         });
     }
 }
@@ -491,7 +495,9 @@
 }
 - (HXCustomPreviewView *)previewView {
     if (!_previewView) {
-        _previewView = [[HXCustomPreviewView alloc] initWithFrame:self.view.bounds];
+        _previewView = [[HXCustomPreviewView alloc] init];
+        _previewView.hx_size = CGSizeMake(self.view.hx_w, self.view.hx_w / 9 * 16);
+        _previewView.center = CGPointMake(self.view.hx_w / 2, self.view.hx_h / 2);
         _previewView.delegate = self;
     }
     return _previewView;
@@ -559,7 +565,7 @@
 }
 - (UIImageView *)imageView {
     if (!_imageView) {
-        _imageView = [[UIImageView alloc] initWithFrame:self.view.bounds];
+        _imageView = [[UIImageView alloc] initWithFrame:self.previewView.frame];
         _imageView.backgroundColor = [UIColor blackColor];
         _imageView.contentMode = UIViewContentModeScaleAspectFit;
     }
@@ -704,13 +710,13 @@
         [self.delegate playViewClick];
     }
 }
-- (void)changeTime:(NSInteger)time {
+- (void)changeTime:(NSTimeInterval)time {
     if (time < 3) {
         self.timeLb.text = [NSBundle hx_localizedStringForKey:@"3秒内的视频无效哦~"];
     }else {
-        self.timeLb.text = [NSString stringWithFormat:@"%lds",time];
+        self.timeLb.text = [NSString stringWithFormat:@"%.0fs",time];
     }
-    self.playView.progress = (CGFloat)time / self.manager.configuration.videoMaximumDuration;
+    self.playView.progress = time / self.manager.configuration.videoMaximumDuration;
 }
 - (void)beganAnimate {
     self.userInteractionEnabled = NO;

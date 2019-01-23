@@ -357,7 +357,7 @@
 }
 
 - (void)getCameraRollAlbumCompletion:(void (^)(HXAlbumModel *albumModel))completion {
-    if (self.cameraRollAlbumModel) {
+    if (self.cameraRollAlbumModel && self.cameraRollAlbumModel.count) {
         if (self.getCameraRollAlbumModel) {
             self.getCameraRollAlbumModel(self.cameraRollAlbumModel);
         }
@@ -395,7 +395,7 @@
             break;
         }
     }
-    if (addTempAlbum) {
+    if (addTempAlbum || !self.cameraRollAlbumModel) {
         HXPhotoModel *photoMd = self.cameraList.firstObject;
         HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
         albumModel.cameraCount = self.cameraList.count;
@@ -404,7 +404,9 @@
         albumModel.tempImage = photoMd.thumbPhoto;
         albumModel.result = [PHAsset fetchAssetsWithOptions:option];
         albumModel.count = albumModel.result.count;
-        self.cameraRollAlbumModel = albumModel;
+        if (albumModel.count) {
+            self.cameraRollAlbumModel = albumModel;
+        }
         if (self.getCameraRollAlbumModel) {
             self.getCameraRollAlbumModel(albumModel);
         }
@@ -506,6 +508,10 @@
 //    return albumModel;
 //}
 - (void)preloadData {
+    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    if (status != PHAuthorizationStatusAuthorized || self.getCameraRoolAlbuming || self.cameraRollAlbumModel) {
+        return;
+    }
     dispatch_async(self.loadAssetQueue, ^{
         HXWeakSelf
         [self getCameraRollAlbumCompletion:^(HXAlbumModel *albumModel) {
@@ -1557,7 +1563,7 @@
             [self.endCameraList addObject:model];
         }
         // 当选中视频个数没有达到最大个数时就添加到选中数组中
-        if (![self afterSelectVideoCountIsMaximum] && model.videoDuration <= self.configuration.videoMaximumSelectDuration) {
+        if (![self afterSelectVideoCountIsMaximum] && model.videoDuration < self.configuration.videoMaximumSelectDuration + 1) {
             if (!self.configuration.selectTogether) {
                 if (self.endSelectedList.count > 0) {
                     HXPhotoModel *phMd = self.endSelectedList.firstObject;

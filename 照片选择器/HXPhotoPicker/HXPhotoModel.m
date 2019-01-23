@@ -77,11 +77,12 @@
 }
 
 - (NSTimeInterval)videoDuration {
-    if (self.asset) {
-        return self.asset.duration;
-    }else {
-        return _videoDuration;
+    if (!_videoDuration) {
+        if (self.asset) {
+            return self.asset.duration;
+        }
     }
+    return _videoDuration;
 }
 
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset {
@@ -121,6 +122,11 @@
         }
         self.networkPhotoUrl = imageURL;
         self.networkThumbURL = thumbURL;
+        if (imageURL.absoluteString.length > 3 && [[imageURL.absoluteString substringFromIndex:imageURL.absoluteString.length - 3] isEqualToString:@"gif"]) {
+            self.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif;
+        }else {
+            self.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeNetWork;
+        } 
         if (imageURL == thumbURL ||
             [imageURL.absoluteString isEqualToString:thumbURL.absoluteString]) {
             self.loadOriginalImage = YES;
@@ -129,7 +135,7 @@
     return self;
 }
 
-- (instancetype)initWithPHAsset:(PHAsset *)asset{
+- (instancetype)initWithPHAsset:(PHAsset *)asset {
     if (self = [super init]) {
         if (asset.mediaType == PHAssetMediaTypeImage) {
             self.subType = HXPhotoModelMediaSubTypePhoto;
@@ -137,7 +143,7 @@
         }else if (asset.mediaType == PHAssetMediaTypeVideo) {
             self.subType = HXPhotoModelMediaSubTypeVideo;
             self.type = HXPhotoModelMediaTypeVideo;
-            self.videoDuration = asset.duration;
+            self.videoDuration = [[NSString stringWithFormat:@"%.0f",asset.duration] floatValue];
             NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:self.videoDuration];
             self.videoTime = time;
         }
@@ -158,6 +164,7 @@
     if (self = [super init]) {
         self.type = HXPhotoModelMediaTypeCameraVideo;
         self.subType = HXPhotoModelMediaSubTypeVideo;
+        self.cameraVideoType = HXPhotoModelMediaTypeCameraVideoTypeLocal;
         self.videoURL = videoURL;
         if (videoTime <= 0) {
             videoTime = 1;
@@ -178,6 +185,7 @@
     self = [super init];
     if (self) {
         self.type = HXPhotoModelMediaTypeCameraPhoto;
+        self.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeLocal;
         self.subType = HXPhotoModelMediaSubTypePhoto;
         if (image.imageOrientation != UIImageOrientationUp) {
             image = [image hx_normalizedImage];

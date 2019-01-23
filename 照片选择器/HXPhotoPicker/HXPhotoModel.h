@@ -41,14 +41,16 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelMediaSubType) {
     HXPhotoModelMediaSubTypeVideo       //!< 视频
 };
 
-typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraPhotoSubType) {
-    HXPhotoModelMediaTypeCameraPhotoSubTypeNormal = 0,  //!< 本地图片
-    HXPhotoModelMediaTypeCameraPhotoSubTypeNetWork      //!< 网络图片
+typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraPhotoType) {
+    HXPhotoModelMediaTypeCameraPhotoTypeLocal = 1,   //!< 本地图片
+    HXPhotoModelMediaTypeCameraPhotoTypeLocalGif,    //!< 本地gif图片
+    HXPhotoModelMediaTypeCameraPhotoTypeNetWork,     //!< 网络图片
+    HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif   //!< 网络gif图片
 };
 
-typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraVideoSubType) {
-    HXPhotoModelMediaTypeCameraVideoSubTypeNormal = 0,  //!< 本地视频
-    HXPhotoModelMediaTypeCameraVideoSubTypeNetWork      //!< 网络视频
+typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraVideoType) {
+    HXPhotoModelMediaTypeCameraVideoTypeLocal = 1,  //!< 本地视频
+    HXPhotoModelMediaTypeCameraVideoTypeNetWork     //!< 网络视频
 };
 
 typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
@@ -103,6 +105,10 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (assign, nonatomic) HXPhotoModelMediaType type;
 /**  照片子类型  */
 @property (assign, nonatomic) HXPhotoModelMediaSubType subType;
+
+@property (assign, nonatomic) HXPhotoModelMediaTypeCameraPhotoType cameraPhotoType;
+@property (assign, nonatomic) HXPhotoModelMediaTypeCameraVideoType cameraVideoType;
+
 /**  临时的列表小图  */
 @property (strong, nonatomic) UIImage *thumbPhoto;
 /**  临时的预览大图  */
@@ -177,8 +183,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 
 @property (copy, nonatomic) NSString *cameraNormalImageNamed;
 @property (copy, nonatomic) NSString *cameraPreviewImageNamed;
-
-@property (copy, nonatomic) NSString *fullPathToFile;;
 
 @property (strong, nonatomic) id tempAsset;
 @property (assign, nonatomic) BOOL loadOriginalImage;
