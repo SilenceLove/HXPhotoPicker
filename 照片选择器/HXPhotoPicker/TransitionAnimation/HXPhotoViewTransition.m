@@ -119,7 +119,7 @@
     HXPhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     HXPhotoViewCell *toCell = [toVC currentPreviewCell:model];
     UIImageView *tempView;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
 #else
     tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
@@ -151,7 +151,7 @@
     toCell.hidden = YES;
     fromVC.view.backgroundColor = [UIColor clearColor];
     
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     tempView.frame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
 #else
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];

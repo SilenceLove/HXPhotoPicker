@@ -447,7 +447,7 @@ HXVideoEditViewControllerDelegate
         }
         HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
         
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             if (cell.animatedImageView.image.images.count > 0) {
                 model.thumbPhoto = cell.animatedImageView.image.images.firstObject;
@@ -942,7 +942,7 @@ HXVideoEditViewControllerDelegate
         if (!self.selectBtn.selected && !max && self.modelArray.count > 0) {
 //            model.selected = YES;
             HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             if (model.type == HXPhotoModelMediaTypePhotoGif) {
                 if (cell.animatedImageView.image.images.count > 0) {
                     model.thumbPhoto = cell.animatedImageView.image.images.firstObject;
@@ -1228,7 +1228,7 @@ HXVideoEditViewControllerDelegate
 }
 - (void)setup {
     [self.contentView addSubview:self.scrollView];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     [self.scrollView addSubview:self.animatedImageView];
 #else
     [self.scrollView addSubview:self.imageView];
@@ -1248,7 +1248,7 @@ HXVideoEditViewControllerDelegate
 - (void)againAddImageView {
     [self refreshImageSize];
     [self.scrollView setZoomScale:1.0f];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     [self.scrollView addSubview:self.animatedImageView];
 #else
     [self.scrollView addSubview:self.imageView];
@@ -1299,7 +1299,7 @@ HXVideoEditViewControllerDelegate
         h = imgHeight;
         self.scrollView.maximumZoomScale = 2.5;
     }
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     self.animatedImageView.frame = CGRectMake(0, 0, w, h);
     self.animatedImageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.animatedImageView.frame;
@@ -1339,7 +1339,7 @@ HXVideoEditViewControllerDelegate
         self.scrollView.maximumZoomScale = 2.5;
     }
     
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
     self.animatedImageView.frame = CGRectMake(0, 0, w, h);
     self.animatedImageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.animatedImageView.frame;
@@ -1358,7 +1358,7 @@ HXVideoEditViewControllerDelegate
             self.progressView.hidden = model.downloadComplete;
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             [self.animatedImageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
                 if (weakSelf.model == model) {
                     weakSelf.progressView.progress = progress;
@@ -1400,7 +1400,7 @@ HXVideoEditViewControllerDelegate
             }];
 #endif
         }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             self.animatedImageView.image = model.thumbPhoto;
 #else
             self.imageView.image = model.thumbPhoto;
@@ -1410,7 +1410,7 @@ HXVideoEditViewControllerDelegate
     }else {
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             if (model.tempImage) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                 self.animatedImageView.image = model.tempImage;
 #else
                 self.imageView.image = model.tempImage;
@@ -1419,7 +1419,7 @@ HXVideoEditViewControllerDelegate
             }else {
                 self.requestID = [model requestThumbImageWithSize:CGSizeMake(self.hx_w * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                     
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                     weakSelf.animatedImageView.image = image;
 #else
                     weakSelf.imageView.image = image;
@@ -1428,7 +1428,7 @@ HXVideoEditViewControllerDelegate
             }
         }else {
             if (model.previewPhoto) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                 self.animatedImageView.image = model.previewPhoto;
 #else
                 self.imageView.image = model.previewPhoto;
@@ -1436,7 +1436,7 @@ HXVideoEditViewControllerDelegate
                 model.tempImage = nil;
             }else {
                 if (model.tempImage) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                     self.animatedImageView.image = model.tempImage;
 #else
                     self.imageView.image = model.tempImage;
@@ -1450,7 +1450,7 @@ HXVideoEditViewControllerDelegate
                         requestSize = CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8);
                     }
                     self.requestID =[model requestThumbImageWithSize:requestSize completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                         weakSelf.animatedImageView.image = image;
 #else
                         weakSelf.imageView.image = image;
@@ -1526,7 +1526,7 @@ HXVideoEditViewControllerDelegate
             weakSelf.progressView.progress = progress;
         } success:^(PHLivePhoto *livePhoto, HXPhotoModel *model, NSDictionary *info) {
             [weakSelf downloadICloudAssetComplete];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             weakSelf.livePhotoView.frame = weakSelf.animatedImageView.frame;
             weakSelf.animatedImageView.hidden = YES;
 #else
@@ -1560,7 +1560,7 @@ HXVideoEditViewControllerDelegate
             transition.duration = 0.2f;
             transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
             transition.type = kCATransitionFade;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             [weakSelf.animatedImageView.layer removeAllAnimations];
             weakSelf.animatedImageView.image = image;
             [weakSelf.animatedImageView.layer addAnimation:transition forKey:nil];
@@ -1574,7 +1574,7 @@ HXVideoEditViewControllerDelegate
         }]; 
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (self.gifImage) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             self.animatedImageView.image = self.gifImage;
 #else
             self.imageView.image = self.gifImage;
@@ -1601,7 +1601,7 @@ HXVideoEditViewControllerDelegate
                     weakSelf.gifFirstFrame = gifImage.images.firstObject;
                 }
                 weakSelf.model.tempImage = nil;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                 weakSelf.animatedImageView.image = gifImage;
 #else
                 weakSelf.imageView.image = gifImage;
@@ -1623,7 +1623,7 @@ HXVideoEditViewControllerDelegate
 //                    self.gifFirstFrame = gifImage.images.firstObject;
 //                }
 //                self.model.tempImage = nil;
-//#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+//#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
 //                self.animatedImageView.image = gifImage;
 //#else
 //                self.imageView.image = gifImage;
@@ -1682,7 +1682,7 @@ HXVideoEditViewControllerDelegate
         if (_livePhotoView.livePhoto) {
             self.livePhotoView.livePhoto = nil;
             [self.livePhotoView removeFromSuperview];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             self.animatedImageView.hidden = NO;
 #else
             self.imageView.hidden = NO;
@@ -1693,10 +1693,12 @@ HXVideoEditViewControllerDelegate
         
 #if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
         [self.animatedImageView yy_cancelCurrentImageRequest];
+#elif __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+        [self.animatedImageView cancelCurrentImageRequest];
 #endif
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (!self.stopCancel) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             self.animatedImageView.image = nil;
             self.gifImage = nil;
             self.animatedImageView.image = self.gifFirstFrame;
@@ -1736,7 +1738,7 @@ HXVideoEditViewControllerDelegate
         if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
             touchPoint = [tap locationInView:self.livePhotoView];
         }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             touchPoint = [tap locationInView:self.animatedImageView];
 #else
             touchPoint = [tap locationInView:self.imageView];
@@ -1767,7 +1769,7 @@ HXVideoEditViewControllerDelegate
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         return self.livePhotoView;
     }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         return self.animatedImageView;
 #else
         return self.imageView;
@@ -1781,7 +1783,7 @@ HXVideoEditViewControllerDelegate
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         self.livePhotoView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
     }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
         self.animatedImageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
 #else
         self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
@@ -1837,7 +1839,7 @@ HXVideoEditViewControllerDelegate
 - (CGFloat)zoomScale {
     return self.scrollView.zoomScale;
 }
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
 - (YYAnimatedImageView *)animatedImageView {
     if (!_animatedImageView) {
         _animatedImageView = [[YYAnimatedImageView alloc] init];

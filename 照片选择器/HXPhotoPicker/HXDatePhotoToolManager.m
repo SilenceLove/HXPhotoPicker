@@ -18,6 +18,10 @@
 #import <YYWebImage/YYWebImage.h>
 #elif __has_include("YYWebImage.h")
 #import "YYWebImage.h"
+#elif __has_include(<YYKit/YYKit.h>)
+#import <YYKit/YYKit.h>
+#elif __has_include("YYKit.h")
+#import "YYKit.h"
 #endif
 
 @interface HXDatePhotoToolManager ()
@@ -725,7 +729,7 @@
         if (model.networkPhotoUrl) {
             HXWeakSelf
             if (model.downloadError) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                 YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:model.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -763,7 +767,7 @@
                 return;
             }
             if (!model.downloadComplete) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
                 YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:model.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -818,7 +822,7 @@
             [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
         }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             [(YYWebImageOperation *)obj cancel];
 #endif
         }
@@ -837,7 +841,7 @@
             [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
         }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
             [(YYWebImageOperation *)obj cancel];
 #endif
         }
