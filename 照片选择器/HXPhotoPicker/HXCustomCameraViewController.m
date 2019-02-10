@@ -15,6 +15,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"
 #import <CoreLocation/CoreLocation.h>
+#import "HXPhotoCustomNavigationBar.h"
 
 @interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraBottomViewDelegate,HXCustomCameraControllerDelegate, CLLocationManagerDelegate>
 @property (strong, nonatomic) HXCustomCameraController *cameraController;
@@ -35,6 +36,9 @@
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (strong, nonatomic) CLLocation *location;
 @property (strong, nonatomic) UIVisualEffectView *effectView;
+@property (strong, nonatomic) UINavigationBar *customNavigationBar;
+@property (strong, nonatomic) UINavigationItem *navItem;
+@property (assign, nonatomic) BOOL statusBarShouldBeHidden;
 @end
 
 @implementation HXCustomCameraViewController
@@ -51,7 +55,7 @@
     if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
         [self.locationManager startUpdatingLocation];
     }
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
+//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
     if (self.manager.configuration.videoMaximumDuration > self.manager.configuration.videoMaximumSelectDuration) {
         self.manager.configuration.videoMaximumDuration = self.manager.configuration.videoMaximumSelectDuration;
     }else if (self.manager.configuration.videoMaximumDuration < 3.f) {
@@ -121,10 +125,10 @@
     UIBarButtonItem *rightBtn1 = [[UIBarButtonItem alloc] initWithCustomView:self.changeCameraBtn];
     UIBarButtonItem *rightBtn2 = [[UIBarButtonItem alloc] initWithCustomView:self.flashBtn];
     if ([self.cameraController canSwitchCameras] && [self.cameraController cameraHasFlash]) {
-        self.navigationItem.rightBarButtonItems = @[rightBtn1,rightBtn2];
+        self.navItem.rightBarButtonItems = @[rightBtn1,rightBtn2];
     }else {
         if ([self.cameraController cameraHasTorch] || [self.cameraController cameraHasFlash]) {
-            self.navigationItem.rightBarButtonItems = @[rightBtn2];
+            self.navItem.rightBarButtonItems = @[rightBtn2];
         }
     }
     [self changeSubviewFrame];
@@ -139,8 +143,10 @@
     self.previewView.tapToExposeEnabled = self.cameraController.cameraSupportsTapToExpose;
     self.previewView.tapToFocusEnabled = self.cameraController.cameraSupportsTapToFocus;
     
+    [self.view addSubview:self.customNavigationBar];
+    
     if (self.manager.configuration.navigationBar) {
-        self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
+        self.manager.configuration.navigationBar(self.customNavigationBar, self);
     }
 }
 - (void)requestAccessForAudio {
@@ -152,14 +158,12 @@
                     self.addAudioInputComplete = YES;
                 }
             }else {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用麦克风"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"] preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"麦克风添加失败,录制视频会没有声音哦!"]];
-                }]];
-                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"设置"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                HXWeakSelf
+                hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"无法使用麦克风"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], ^{
+                    [weakSelf.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"麦克风添加失败,录制视频会没有声音哦!"]];
+                }, ^{
                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }]];
-                [self presentViewController:alert animated:YES completion:nil];
+                }); 
             }
         });
     }];
@@ -189,25 +193,37 @@
     }
 }
 - (void)changeSubviewFrame {
-    self.topView.frame = CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight);
+    self.customNavigationBar.frame = CGRectMake(0, self.previewView.hx_y, self.view.hx_w, hxNavigationBarHeight);
+    if (!HX_IS_IPhoneX_All && HX_IOS11_Later) {
+        self.customNavigationBar.hx_y = self.previewView.hx_y + 10;
+    }
+    self.topView.frame = self.customNavigationBar.frame;
     self.topMaskLayer.frame = self.topView.bounds;
-    self.bottomView.frame = CGRectMake(0, self.view.hx_h - 120, self.view.hx_w, 120);
+    self.bottomView.frame = CGRectMake(0, self.view.hx_h - 120 - self.previewView.hx_y, self.view.hx_w, 120);
+}
+- (BOOL)prefersStatusBarHidden {
+    return self.statusBarShouldBeHidden;
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController.navigationBar setBackgroundColor:[UIColor clearColor]];
-    [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
-    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+    [self.navigationController setNavigationBarHidden:YES];
+    [self.customNavigationBar setBackgroundColor:[UIColor clearColor]];
+    [self.customNavigationBar setShadowImage:[[UIImage alloc] init]];
+    [self.customNavigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
+    [self.customNavigationBar setTintColor:[UIColor whiteColor]];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     AVCaptureConnection *previewLayerConnection = [(AVCaptureVideoPreviewLayer *)self.previewView.layer connection]; 
     if ([previewLayerConnection isVideoOrientationSupported])
         [previewLayerConnection setVideoOrientation:(AVCaptureVideoOrientation)[[UIApplication sharedApplication] statusBarOrientation]];
+    self.statusBarShouldBeHidden = YES;
+    [self preferredStatusBarUpdateAnimation];
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     [self.cameraController stopMontionUpdate];
+    self.statusBarShouldBeHidden = NO;
+    [self preferredStatusBarUpdateAnimation];
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -270,13 +286,13 @@
         [self doneCompleteWithModel:model];
     }else {
         HXWeakSelf
-        [self.view hx_showLoadingHUDText:nil];
+        [self.view hx_immediatelyShowLoadingHudWithText:nil];
         if (!self.videoURL) {
             [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image location:self.location complete:^(HXPhotoModel *model, BOOL success) {
 //                model.location = weakSelf.location;
-                [weakSelf.view hx_handleLoading:NO];
                 if (success) {
                     [weakSelf doneCompleteWithModel:model];
+                    [weakSelf.view hx_handleLoading:NO];
                 }else {
                     [weakSelf.view hx_showImageHUDText:@"保存失败!"];
                 }
@@ -437,16 +453,14 @@
             return;
         }else {
             if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio] != AVAuthorizationStatusAuthorized) {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用麦克风"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"] preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"继续录制"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"麦克风添加失败,录制视频会没有声音哦!"]];
-                    [self.bottomView beganAnimate];
-                    [self videoNeedHideViews];
-                }]];
-                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"设置"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                HXWeakSelf
+                hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"无法使用麦克风"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"], [NSBundle hx_localizedStringForKey:@"继续录制"], [NSBundle hx_localizedStringForKey:@"设置"], ^{
+                    [weakSelf.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"麦克风添加失败,录制视频会没有声音哦!"]];
+                    [weakSelf.bottomView beganAnimate];
+                    [weakSelf videoNeedHideViews];
+                }, ^{
                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }]];
-                [self presentViewController:alert animated:YES completion:nil];
+                }); 
             }else {
                 [self.bottomView beganAnimate];
                 [self videoNeedHideViews];
@@ -493,11 +507,30 @@
 - (void)pinchGestureScale:(CGFloat)scale {
     [self.cameraController setZoomValue:scale];
 }
+- (UINavigationBar *)customNavigationBar {
+    if (!_customNavigationBar) {
+        _customNavigationBar = [[UINavigationBar alloc] init];
+        _customNavigationBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [_customNavigationBar pushNavigationItem:self.navItem animated:NO];
+    }
+    return _customNavigationBar;
+}
+- (UINavigationItem *)navItem {
+    if (!_navItem) {
+        _navItem = [[UINavigationItem alloc] init];
+        _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
+    }
+    return _navItem;
+}
 - (HXCustomPreviewView *)previewView {
     if (!_previewView) {
         _previewView = [[HXCustomPreviewView alloc] init];
-        _previewView.hx_size = CGSizeMake(self.view.hx_w, self.view.hx_w / 9 * 16);
-        _previewView.center = CGPointMake(self.view.hx_w / 2, self.view.hx_h / 2);
+        if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+            _previewView.frame = self.view.bounds;
+        }else {
+            _previewView.hx_size = CGSizeMake(self.view.hx_w, self.view.hx_w / 9 * 16);
+            _previewView.center = CGPointMake(self.view.hx_w / 2, self.view.hx_h / 2);
+        }
         _previewView.delegate = self;
     }
     return _previewView;
@@ -585,7 +618,10 @@
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
         [_doneBtn setTitleShadowColor:[[UIColor blackColor] colorWithAlphaComponent:0.4] forState:UIControlStateNormal];
         [_doneBtn.titleLabel setShadowOffset:CGSizeMake(1, 2)];
-        _doneBtn.frame = CGRectMake(self.view.hx_w - 20 - 70, self.view.hx_h - 120 + 70, 70, 35);
+        _doneBtn.hx_h = 40;
+        _doneBtn.hx_w = [_doneBtn.titleLabel hx_getTextWidth];
+        _doneBtn.hx_x = self.view.hx_w - 15 - _doneBtn.hx_w;
+        _doneBtn.hx_y = self.view.hx_h - self.previewView.hx_y - _doneBtn.hx_h;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _doneBtn;
@@ -855,6 +891,7 @@
     }
     return _timeLb;
 }
+
 - (CAGradientLayer *)maskLayer {
     if (!_maskLayer) {
         _maskLayer = [CAGradientLayer layer];

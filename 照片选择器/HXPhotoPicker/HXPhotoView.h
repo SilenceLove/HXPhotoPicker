@@ -209,6 +209,15 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  */
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 
+/**
+ collectionView是否可以选择item（不包括添加按钮）
+
+ @param photoView self
+ @param indexPath 选择Cell的indexPath
+ @return yes 可以选 no 不可以,点击无反应
+ */
+- (BOOL)photoView:(HXPhotoView *)photoView collectionViewShouldSelectItemAtIndexPath:(NSIndexPath *)indexPath model:(HXPhotoModel *)model;
+
 // 每次在相册选择的图片,不是所有选择的所有图片.
 //- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal;
 @end

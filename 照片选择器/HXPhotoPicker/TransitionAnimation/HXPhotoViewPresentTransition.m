@@ -68,9 +68,9 @@
     [containerView addSubview:toVC.view];
     [toVC.view insertSubview:tempBgView atIndex:0];
     toVC.collectionView.hidden = YES;
-    model.endDateImageSize = CGSizeZero;
-    CGFloat imgWidht = model.endDateImageSize.width;
-    CGFloat imgHeight = model.endDateImageSize.height;
+    model.endImageSize = CGSizeZero;
+    CGFloat imgWidht = model.endImageSize.width;
+    CGFloat imgHeight = model.endImageSize.height;
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
     CGFloat height = [UIScreen mainScreen].bounds.size.height;
     
@@ -155,7 +155,7 @@
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         tempView = [[UIImageView alloc] initWithImage:model.thumbPhoto];
     }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
         tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
 #else
         tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
@@ -185,7 +185,7 @@
     
     
     UIView *containerView = [transitionContext containerView];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     tempView.frame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
 #else
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];

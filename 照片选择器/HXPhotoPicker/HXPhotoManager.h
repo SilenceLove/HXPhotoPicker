@@ -79,6 +79,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 - (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
 
 /**
+ 获取已选照片数组的照片总大小
+ 
+ @param completion 获取完成
+ */
+- (void)requestPhotosBytesWithCompletion:(void (^)(NSString *totalBytes, NSUInteger totalDataLengths))completion;
+@property (strong, nonatomic) NSOperationQueue *dataOperationQueue;
+
+/**
  建议使用 addCustomAssetModel: 此方法
  添加本地视频数组   内部会将  deleteTemporaryPhoto 设置为NO
 

@@ -13,7 +13,7 @@ static dispatch_once_t once;
 static dispatch_once_t once1;
 static id instance;
 
-@interface HXPhotoCommon ()
+@interface HXPhotoCommon () 
 
 @end
 
@@ -44,5 +44,4 @@ static id instance;
 - (void)dealloc {
     NSSLog(@"dealloc");
 }
-
 @end

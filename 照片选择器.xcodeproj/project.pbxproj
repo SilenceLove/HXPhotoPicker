@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B0EFFDA220598D100D614E8 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0EFFD8220598D100D614E8 /* SettingViewController.m */; };
+		7B0EFFDB220598D100D614E8 /* SettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B0EFFD9220598D100D614E8 /* SettingViewController.xib */; };
 		7B1AA3E421EEE3BD00D0AA93 /* HXCustomCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA38421EEE3BC00D0AA93 /* HXCustomCameraViewController.m */; };
 		7B1AA3E521EEE3BD00D0AA93 /* HXPhotoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA38521EEE3BC00D0AA93 /* HXPhotoConfiguration.m */; };
 		7B1AA3E621EEE3BD00D0AA93 /* HXDownloadProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA38621EEE3BC00D0AA93 /* HXDownloadProgressView.m */; };
@@ -15,7 +17,6 @@
 		7B1AA3E921EEE3BD00D0AA93 /* HXPhotoInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA38D21EEE3BC00D0AA93 /* HXPhotoInteractiveTransition.m */; };
 		7B1AA3EA21EEE3BD00D0AA93 /* HXPhotoViewPresentTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA38F21EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.m */; };
 		7B1AA3EB21EEE3BD00D0AA93 /* HXPhotoViewTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA39021EEE3BC00D0AA93 /* HXPhotoViewTransition.m */; };
-		7B1AA3EC21EEE3BD00D0AA93 /* HXPhotoPersentInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA39121EEE3BC00D0AA93 /* HXPhotoPersentInteractiveTransition.m */; };
 		7B1AA3ED21EEE3BD00D0AA93 /* NSString+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA39721EEE3BC00D0AA93 /* NSString+HXExtension.m */; };
 		7B1AA3EE21EEE3BD00D0AA93 /* UIViewController+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA39821EEE3BC00D0AA93 /* UIViewController+HXExtension.m */; };
 		7B1AA3EF21EEE3BD00D0AA93 /* NSArray+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA39921EEE3BC00D0AA93 /* NSArray+HXExtension.m */; };
@@ -113,6 +114,7 @@
 		7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B269E051E5695F200AB813D /* Demo1ViewController.xib */; };
 		7B269E0E1E56961500AB813D /* Demo2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E0C1E56961500AB813D /* Demo2ViewController.m */; };
 		7B269E121E56962700AB813D /* Demo3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B269E111E56962700AB813D /* Demo3ViewController.m */; };
+		7B56D30321FB7166009A8E3D /* HXPhotoPersentInteractiveTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B56D30221FB7166009A8E3D /* HXPhotoPersentInteractiveTransition.m */; };
 		7B5DA4C421030DB400489749 /* Demo10ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5DA4C321030DB400489749 /* Demo10ViewController.m */; };
 		7B5DA4CB21030DCF00489749 /* Demo11ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5DA4C921030DCF00489749 /* Demo11ViewController.m */; };
 		7B5DA4CC21030DCF00489749 /* Demo11ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B5DA4CA21030DCF00489749 /* Demo11ViewController.xib */; };
@@ -184,6 +186,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7B0EFFD7220598D100D614E8 /* SettingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingViewController.h; sourceTree = "<group>"; };
+		7B0EFFD8220598D100D614E8 /* SettingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
+		7B0EFFD9220598D100D614E8 /* SettingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingViewController.xib; sourceTree = "<group>"; };
 		7B1AA38421EEE3BC00D0AA93 /* HXCustomCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXCustomCameraViewController.m; sourceTree = "<group>"; };
 		7B1AA38521EEE3BC00D0AA93 /* HXPhotoConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoConfiguration.m; sourceTree = "<group>"; };
 		7B1AA38621EEE3BC00D0AA93 /* HXDownloadProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXDownloadProgressView.m; sourceTree = "<group>"; };
@@ -196,7 +201,6 @@
 		7B1AA38E21EEE3BC00D0AA93 /* HXPhotoPersentInteractiveTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoPersentInteractiveTransition.h; sourceTree = "<group>"; };
 		7B1AA38F21EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoViewPresentTransition.m; sourceTree = "<group>"; };
 		7B1AA39021EEE3BC00D0AA93 /* HXPhotoViewTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoViewTransition.m; sourceTree = "<group>"; };
-		7B1AA39121EEE3BC00D0AA93 /* HXPhotoPersentInteractiveTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoPersentInteractiveTransition.m; sourceTree = "<group>"; };
 		7B1AA39221EEE3BC00D0AA93 /* HXPhotoInteractiveTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoInteractiveTransition.h; sourceTree = "<group>"; };
 		7B1AA39321EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewPresentTransition.h; sourceTree = "<group>"; };
 		7B1AA39421EEE3BC00D0AA93 /* HXPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoView.h; sourceTree = "<group>"; };
@@ -402,6 +406,7 @@
 		7B269E0C1E56961500AB813D /* Demo2ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo2ViewController.m; sourceTree = "<group>"; };
 		7B269E101E56962700AB813D /* Demo3ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo3ViewController.h; sourceTree = "<group>"; };
 		7B269E111E56962700AB813D /* Demo3ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo3ViewController.m; sourceTree = "<group>"; };
+		7B56D30221FB7166009A8E3D /* HXPhotoPersentInteractiveTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoPersentInteractiveTransition.m; sourceTree = "<group>"; };
 		7B5DA4C221030DB400489749 /* Demo10ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo10ViewController.h; sourceTree = "<group>"; };
 		7B5DA4C321030DB400489749 /* Demo10ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo10ViewController.m; sourceTree = "<group>"; };
 		7B5DA4C821030DCF00489749 /* Demo11ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo11ViewController.h; sourceTree = "<group>"; };
@@ -628,7 +633,7 @@
 				7B1AA39221EEE3BC00D0AA93 /* HXPhotoInteractiveTransition.h */,
 				7B1AA38D21EEE3BC00D0AA93 /* HXPhotoInteractiveTransition.m */,
 				7B1AA38E21EEE3BC00D0AA93 /* HXPhotoPersentInteractiveTransition.h */,
-				7B1AA39121EEE3BC00D0AA93 /* HXPhotoPersentInteractiveTransition.m */,
+				7B56D30221FB7166009A8E3D /* HXPhotoPersentInteractiveTransition.m */,
 				7B1AA39321EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.h */,
 				7B1AA38F21EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.m */,
 				7B1AA38C21EEE3BC00D0AA93 /* HXPhotoViewTransition.h */,
@@ -1106,6 +1111,9 @@
 				7B6BC6B621073F1A00136D61 /* Demo12ViewController.m */,
 				7B200D4D216D074F004A5B0B /* Demo13ViewController.h */,
 				7B200D4E216D074F004A5B0B /* Demo13ViewController.m */,
+				7B0EFFD7220598D100D614E8 /* SettingViewController.h */,
+				7B0EFFD8220598D100D614E8 /* SettingViewController.m */,
+				7B0EFFD9220598D100D614E8 /* SettingViewController.xib */,
 				7B8060201FA6DC5A00882E34 /* YYFPSLabel.h */,
 				7B8060221FA6DC5A00882E34 /* YYFPSLabel.m */,
 				7B8060211FA6DC5A00882E34 /* YYWeakProxy.h */,
@@ -1324,6 +1332,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */,
+				7B0EFFDB220598D100D614E8 /* SettingViewController.xib in Resources */,
 				7B200D1F216D06B9004A5B0B /* LFMediaEditingController.bundle in Resources */,
 				7B5DA4CC21030DCF00489749 /* Demo11ViewController.xib in Resources */,
 				7B6BC6B92107408200136D61 /* QQ空间视频_20180301091047.mp4 in Resources */,
@@ -1363,6 +1372,7 @@
 				7B200D2B216D06B9004A5B0B /* LFVideoEditingView.m in Sources */,
 				7B200D39216D06B9004A5B0B /* LFSplashLayer.m in Sources */,
 				7B1AA40B21EEE3BD00D0AA93 /* HXAlbumlistView.m in Sources */,
+				7B56D30321FB7166009A8E3D /* HXPhotoPersentInteractiveTransition.m in Sources */,
 				7B1AA40121EEE3BD00D0AA93 /* HXPhotoViewController.m in Sources */,
 				7BBE3220215F7F600069D2FB /* SDImageCache.m in Sources */,
 				7B1AA3F521EEE3BD00D0AA93 /* NSDate+HXExtension.m in Sources */,
@@ -1382,6 +1392,7 @@
 				7B200D43216D06B9004A5B0B /* LFEditToolbar.m in Sources */,
 				7BBE322A215F7F600069D2FB /* SDWebImageImageIOCoder.m in Sources */,
 				7B7E3E811E4AACD1002234EE /* ViewController.m in Sources */,
+				7B0EFFDA220598D100D614E8 /* SettingViewController.m in Sources */,
 				7BBE3204215F7F600069D2FB /* YYSpriteSheetImage.m in Sources */,
 				7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */,
 				7B200D45216D06B9004A5B0B /* LFTextBar.m in Sources */,
@@ -1506,7 +1517,6 @@
 				7B200D38216D06B9004A5B0B /* LFMaskLayer.m in Sources */,
 				7B1AA3EE21EEE3BD00D0AA93 /* UIViewController+HXExtension.m in Sources */,
 				7B1AA3E421EEE3BD00D0AA93 /* HXCustomCameraViewController.m in Sources */,
-				7B1AA3EC21EEE3BD00D0AA93 /* HXPhotoPersentInteractiveTransition.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

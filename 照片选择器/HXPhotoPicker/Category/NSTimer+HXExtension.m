@@ -11,14 +11,14 @@
 @implementation NSTimer (HXExtension)
 + (id)hx_scheduledTimerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)())inBlock repeats:(BOOL)inRepeats
 {
-    void (^block)() = [inBlock copy];
+    void (^block)(void) = [inBlock copy];
     id ret = [self scheduledTimerWithTimeInterval:inTimeInterval target:self selector:@selector(hx_executeSimpleBlock:) userInfo:block repeats:inRepeats]; 
     return ret;
 }
 
 + (id)hx_timerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)())inBlock repeats:(BOOL)inRepeats
 {
-    void (^block)() = [inBlock copy];
+    void (^block)(void) = [inBlock copy];
     id ret = [self timerWithTimeInterval:inTimeInterval target:self selector:@selector(hx_executeSimpleBlock:) userInfo:block repeats:inRepeats];
     return ret;
 }
@@ -27,7 +27,7 @@
 {
     if([inTimer userInfo])
     {
-        void (^block)() = (void (^)())[inTimer userInfo];
+        void (^block)(void) = (void (^)(void))[inTimer userInfo];
         block();
     }
 }

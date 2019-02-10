@@ -130,7 +130,7 @@
 - (void)setup {
     if (_manager) {
         _manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
-        [_manager preloadData];
+//        [_manager preloadData];
     }
     self.spacing = 3;
     self.lineCount = 3;
@@ -194,9 +194,9 @@
 
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
-    if (!manager.cameraRollAlbumModel) {
-        [manager preloadData];
-    }
+//    if (!manager.cameraRollAlbumModel) {
+//        [manager preloadData];
+//    }
     manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
     if (self.manager.afterSelectedArray.count > 0) {
         if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
@@ -256,6 +256,7 @@
     }
     HXPhotoSubViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoSubViewCellId" forIndexPath:indexPath];
     cell.delegate = self;
+    cell.canEdit = self.collectionView.editEnabled;
     if (self.deleteImageName) {
         cell.deleteImageName = self.deleteImageName;
     }
@@ -264,7 +265,18 @@
     cell.hideDeleteButton = self.hideDeleteButton;
     return cell;
 }
-
+ 
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath { 
+    if (self.tempShowAddCell && indexPath.item == self.dataList.count) {
+        return YES; 
+    }
+    BOOL canSelect = YES;
+    if ([self.delegate respondsToSelector:@selector(photoView:collectionViewShouldSelectItemAtIndexPath:model:)]) {
+        HXPhotoModel *model = self.dataList[indexPath.item];
+        canSelect = [self.delegate photoView:self collectionViewShouldSelectItemAtIndexPath:indexPath model:model];
+    }
+    return canSelect;
+}
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self.tempShowAddCell) {
         if (indexPath.item == self.dataList.count) {
@@ -373,6 +385,12 @@
                 }
             }
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+            UIPopoverPresentationController *pop = [alertController popoverPresentationController];
+            pop.permittedArrowDirections = UIPopoverArrowDirectionAny;
+            pop.sourceView = self;
+            pop.sourceRect = self.bounds;
+        }
         [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"相机"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self goCameraViewController];
         }]];
@@ -408,6 +426,7 @@
         self.didCancelBlock();
     }
 }
+
 /**
  前往相机
  */
@@ -456,12 +475,9 @@
                 nav.supportRotation = weakSelf.manager.configuration.supportRotation;
                 [[weakSelf hx_viewController] presentViewController:nav animated:YES completion:nil];
             }else {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSBundle hx_localizedStringForKey:@"无法使用相机"] message:[NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"] preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIAlertActionStyleDefault handler:nil]];
-                [alert addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"设置"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                hx_showAlert([weakSelf hx_viewController], [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], nil, ^{
                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }]];
-                [[weakSelf hx_viewController] presentViewController:alert animated:YES completion:nil];
+                });
             }
         });
     }];
@@ -510,10 +526,11 @@
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         // 当选中视频个数没有达到最大个数时就添加到选中数组中 
         if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
-            [[self hx_viewController].view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.manager.configuration.videoMinimumSelectDuration]]];
+            
+            [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
             return;
         }else if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
-            [[self hx_viewController].view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频大于%.0f秒，无法选择", self.manager.configuration.videoMaximumSelectDuration]]];
+            [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
             return;
         }else if ([self.manager afterSelectVideoCountIsMaximum]) {
             NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;
@@ -836,6 +853,7 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    if (self.lineCount <= 0) self.lineCount = 1;
     NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
     NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
     

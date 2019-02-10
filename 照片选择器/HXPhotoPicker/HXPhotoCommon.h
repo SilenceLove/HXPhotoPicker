@@ -8,12 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import "HXPhotoConfiguration.h"
+#import "HXPhotoModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface HXPhotoCommon : NSObject
 
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
+
 + (instancetype)photoCommon;
 + (void)deallocPhotoCommon;
 @end

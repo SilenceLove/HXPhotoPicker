@@ -383,5 +383,6 @@
 }
 - (void)dealloc {
     NSSLog(@"dealloc");
+    self.scrollView.delegate = nil;
 }
 @end

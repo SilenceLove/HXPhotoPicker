@@ -28,8 +28,7 @@
 
 @property (strong, nonatomic) UIToolbar *tipView;
 @property (strong, nonatomic) UILabel *tipLb;
-@property (assign, nonatomic) BOOL showTipView;
-@property (copy, nonatomic) NSString *tipStr;
+- (void)changeTipViewState:(HXPhotoModel *)model;
 
 - (void)insertModel:(HXPhotoModel *)model;
 - (void)deleteModel:(HXPhotoModel *)model;

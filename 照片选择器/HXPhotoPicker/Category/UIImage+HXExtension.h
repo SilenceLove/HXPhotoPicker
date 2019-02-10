@@ -13,6 +13,7 @@
 + (UIImage *)hx_thumbnailImageForVideo:(NSURL *)videoURL
                              atTime:(NSTimeInterval)time;
 + (UIImage *)hx_animatedGIFWithData:(NSData *)data;
++ (UIImage *)hx_animatedGIFWithURL:(NSURL *)URL;
 - (UIImage *)hx_animatedImageByScalingAndCroppingToSize:(CGSize)size;
 - (UIImage *)hx_normalizedImage;
 - (UIImage *)hx_clipImage:(CGFloat)scale;

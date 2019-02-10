@@ -20,6 +20,42 @@
     }
     return YES;
 }
+- (void)hx_requestURLWithOriginal:(BOOL)original presetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable, NSArray<HXPhotoModel *> * _Nullable))completion {
+    if (![self hx_detection] || !self.count) {
+        if (completion) {
+            completion(nil, self);
+        }
+        if (HXShowLog) NSSLog(@"数组里装的不是HXPhotoModel对象或者为空");
+        return;
+    }
+    __block NSInteger index = 0;
+    NSInteger count = self.count;
+    __block NSMutableArray *errorArray;
+    for (HXPhotoModel *model in self) {
+        if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+            
+        }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            
+//            [model exportVideoWithPresetName:presetName startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL *videoURL, HXPhotoModel *model) {
+//                [dict setObject:videoURL forKey:model.selectIndexStr];
+//                index++;
+//                if (index == count) {
+//                    if (completion) {
+//                        completion([NSArray hx_dictHandler:dict]);
+//                    }
+//                }
+//            } failed:^(NSDictionary *info, HXPhotoModel *model) {
+//                index++;
+//                if (HXShowLog) NSSLog(@"一个获取失败!");
+//                if (index == count) {
+//                    if (completion) {
+//                        completion([NSArray hx_dictHandler:dict]);
+//                    }
+//                }
+//            }];
+        }
+    }
+}
 + (NSArray *)hx_dictHandler:(NSDictionary *)dict {
     NSMutableArray *dataArray = [NSMutableArray array];
     NSArray *keys = [dict.allKeys sortedArrayUsingSelector:@selector(compare:)];

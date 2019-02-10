@@ -552,7 +552,7 @@
         if (model.networkPhotoUrl) {
             HXWeakSelf
             if (model.downloadError) {
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#if HasSDWebImage
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && data) {
                         model.thumbPhoto = image;
@@ -574,7 +574,7 @@
                 return;
             }
             if (!model.downloadComplete) {
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#if HasSDWebImage
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -729,7 +729,7 @@
         if (model.networkPhotoUrl) {
             HXWeakSelf
             if (model.downloadError) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
                 YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:model.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -746,7 +746,7 @@
                     }
                 }];
                 [self.downloadTokenArray addObject:operation];
-#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#elif HasSDWebImage
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -767,7 +767,7 @@
                 return;
             }
             if (!model.downloadComplete) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
                 YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:model.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -784,7 +784,7 @@
                     }
                 }];
                 [self.downloadTokenArray addObject:operation];
-#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#elif HasSDWebImage
                 SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                     if (!error && image) {
                         model.thumbPhoto = image;
@@ -818,11 +818,11 @@
     self.cancelGetImage = YES;
     for (id obj in self.downloadTokenArray) {
         if ([obj isKindOfClass:NSClassFromString(@"SDWebImageDownloadToken")]) {
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#if HasSDWebImage
             [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
         }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             [(YYWebImageOperation *)obj cancel];
 #endif
         }
@@ -837,11 +837,11 @@
     self.cancelGetImageData = YES;
     for (id obj in self.downloadTokenArray) {
         if ([obj isKindOfClass:NSClassFromString(@"SDWebImageDownloadToken")]) {
-#if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#if HasSDWebImage
             [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
         }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             [(YYWebImageOperation *)obj cancel];
 #endif
         }

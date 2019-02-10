@@ -248,7 +248,7 @@
 @interface HXAlbumTitleView ()
 @property (strong, nonatomic) UIImageView *arrowIcon;
 @property (strong, nonatomic) UILabel *titleLb;
-@property (strong, nonatomic) UIButton *button;
+@property (strong, nonatomic) HXAlbumTitleButton *button;
 @end
 
 @implementation HXAlbumTitleView
@@ -326,14 +326,35 @@
     }
     return _arrowIcon;
 }
-- (UIButton *)button {
+- (HXAlbumTitleButton *)button {
     if (!_button) {
-        _button = [UIButton buttonWithType:UIButtonTypeCustom];
+        _button = [HXAlbumTitleButton buttonWithType:UIButtonTypeCustom];
         [_button addTarget:self action:@selector(didBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        HXWeakSelf
+        _button.highlightedBlock = ^(BOOL highlighted) {
+            UIColor *color = [UIColor blackColor];
+            if (weakSelf.manager.configuration.navigationTitleSynchColor) {
+                color = weakSelf.manager.configuration.themeColor;
+            }else {
+                if (weakSelf.manager.configuration.navigationTitleColor) {
+                    color = weakSelf.manager.configuration.navigationTitleColor;
+                }
+            }
+            if (weakSelf.manager.configuration.navigationTitleColor) {
+                color = weakSelf.manager.configuration.navigationTitleColor;
+            }
+            weakSelf.titleLb.textColor = highlighted ? [color colorWithAlphaComponent:0.5f] : color;
+            weakSelf.arrowIcon.tintColor = highlighted ? [color colorWithAlphaComponent:0.5f] : color;
+        };
     }
     return _button;
 } 
 - (void)didBtnClick:(UIButton *)button {
+    if (self.manager.getPhotoListing ||
+        self.manager.getAlbumListing ||
+        self.manager.getCameraRoolAlbuming) {
+        return;
+    }
     button.selected = !button.isSelected;
     button.userInteractionEnabled = NO;
     if (button.selected) {
@@ -356,4 +377,15 @@
 - (void)deSelect {
     [self didBtnClick:self.button];
 }
+@end
+
+@implementation HXAlbumTitleButton
+
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    if (self.highlightedBlock) {
+        self.highlightedBlock(highlighted);
+    }
+}
+    
 @end

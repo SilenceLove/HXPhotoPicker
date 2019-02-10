@@ -8,6 +8,7 @@
 
 #import "Demo2ViewController.h" 
 #import "HXPhotoPicker.h"
+#import "SettingViewController.h"
 
 static const CGFloat kPhotoViewMargin = 12.0;
 
@@ -54,11 +55,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.videoMaxNum = 1;
         _manager.configuration.maxNum = 9;
 //        _manager.configuration.languageType = HXPhotoLanguageTypeKo;
-        _manager.configuration.videoMaximumSelectDuration = 15.f;
-        _manager.configuration.videoMinimumSelectDuration = 0.f;
+        _manager.configuration.videoMaximumSelectDuration = 15;
+        _manager.configuration.videoMinimumSelectDuration = 0;
         _manager.configuration.videoMaximumDuration = 15.f;
         _manager.configuration.creationDateSort = NO;
         _manager.configuration.saveSystemAblum = YES;
+        _manager.configuration.showOriginalBytes = YES;
 //        _manager.configuration.reverseDate = YES;
 //        _manager.configuration.showDateSectionHeader = YES;
         _manager.configuration.selectTogether = NO;
@@ -67,10 +69,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //        _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
 //        _manager.configuration.requestImageAfterFinishingSelection = YES;
-        __weak typeof(self) weakSelf = self;
 //        _manager.configuration.replaceCameraViewController = YES;
 //        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
         
+        HXWeakSelf
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
             
             // 这里拿使用系统相机做例子
@@ -173,7 +175,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     
-    UIBarButtonItem *cameraItem = [[UIBarButtonItem alloc] initWithTitle:@"相册/相机" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
+    UIBarButtonItem *cameraItem = [[UIBarButtonItem alloc] initWithTitle:@"设置" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
     
     self.navigationItem.rightBarButtonItems = @[cameraItem];
     
@@ -183,13 +185,20 @@ static const CGFloat kPhotoViewMargin = 12.0;
     NSSLog(@"dealloc");
 }
 - (void)didNavBtnClick {
-    if (self.manager.configuration.specialModeNeedHideVideoSelectBtn && !self.manager.configuration.selectTogether && self.manager.configuration.videoMaxNum == 1) {
-        if (self.manager.afterSelectedVideoArray.count) {
-            [self.view hx_showImageHUDText:@"请先删除视频"];
-            return;
-        }
-    }
-    [self.photoView goPhotoViewController];
+    SettingViewController *vc = [[SettingViewController alloc] init];
+    vc.manager = self.manager;
+    HXWeakSelf
+    vc.saveCompletion = ^(HXPhotoManager * _Nonnull manager) {
+        weakSelf.manager = manager;
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+//    if (self.manager.configuration.specialModeNeedHideVideoSelectBtn && !self.manager.configuration.selectTogether && self.manager.configuration.videoMaxNum == 1) {
+//        if (self.manager.afterSelectedVideoArray.count) {
+//            [self.view hx_showImageHUDText:@"请先删除视频"];
+//            return;
+//        }
+//    }
+//    [self.photoView goPhotoViewController];
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
@@ -214,6 +223,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
 
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index {
     NSSLog(@"%@ --> index - %ld",model,index);
+}
+- (BOOL)photoView:(HXPhotoView *)photoView collectionViewShouldSelectItemAtIndexPath:(NSIndexPath *)indexPath model:(HXPhotoModel *)model {
+    return YES;
 }
 
 - (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView gestureRecognizer:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {

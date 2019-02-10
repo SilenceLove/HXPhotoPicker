@@ -21,7 +21,10 @@
 #import "YYKit.h"
 #endif
 
-@class HXPhotoPreviewViewController,HXPhotoPreviewBottomView,HXPhotoPreviewViewCell;
+@class
+HXPhotoPreviewViewController,
+HXPhotoPreviewBottomView,
+HXPhotoPreviewViewCell;
 @protocol HXPhotoPreviewViewControllerDelegate <NSObject>
 @optional
 - (void)photoPreviewControllerDidSelect:(HXPhotoPreviewViewController *)previewController
@@ -67,6 +70,9 @@
 /**  使用HXPhotoView预览大图时的风格样式  */
 @property (assign, nonatomic) HXPhotoViewPreViewShowStyle exteriorPreviewStyle;
 
+// 处理ios8 导航栏转场动画崩溃问题
+@property (strong, nonatomic) UIViewController *photoViewController;
+
 - (HXPhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (void)changeStatusBarWithHidden:(BOOL)hidden;
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
@@ -78,7 +84,7 @@
 @property (assign, nonatomic) BOOL stopCancel;
 @property (strong, nonatomic) HXPhotoModel *model;
 
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
 @property (strong, nonatomic) YYAnimatedImageView *animatedImageView;
 #endif
 
@@ -89,6 +95,7 @@
 @property (strong, nonatomic) UIButton *videoPlayBtn;
 @property (assign, nonatomic) CGFloat zoomScale;
 @property (assign, nonatomic) BOOL dragging;
+@property (strong, nonatomic) AVAsset *avAsset;
 @property (nonatomic, copy) void (^cellTapClick)(void);
 @property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
 @property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXPhotoPreviewViewCell *myCell);
@@ -100,4 +107,11 @@
 - (void)requestHDImage;
 - (void)cancelRequest;
 - (CGSize)getImageSize;
+
+- (CGFloat)getScrollViewZoomScale;
+- (void)setScrollViewZoomScale:(CGFloat)zoomScale;
+- (CGSize)getScrollViewContentSize;
+- (void)setScrollViewContnetSize:(CGSize)contentSize;
+- (CGPoint)getScrollViewContentOffset;
+- (void)setScrollViewContentOffset:(CGPoint)contentOffset;
 @end

@@ -53,7 +53,7 @@
     //    self.saveSystemAblum = NO;
 //    self.deleteTemporaryPhoto = YES;
 //    self.showDateSectionHeader = YES; 
-    if ([UIScreen mainScreen].bounds.size.width != 320) {
+    if ([UIScreen mainScreen].bounds.size.width != 320 && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         self.cameraCellShowPreview = YES;
     }
     //    self.horizontalHideStatusBar = NO;
@@ -77,7 +77,7 @@
     }
     
     self.doneBtnShowDetail = YES;
-//    self.videoCanEdit = YES;
+    self.videoCanEdit = YES;
 //    self.singleJumpEdit = YES;
     self.photoCanEdit = YES;
     self.localFileName = @"HXPhotoPickerModelArray";
@@ -90,6 +90,8 @@
     }
     self.popupTableViewHorizontalHeight = 250; 
 //    self.albumShowMode = HXPhotoAlbumShowModePopup;
+    
+    self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
 }
 - (void)setLanguageType:(HXPhotoLanguageType)languageType {
     if ([HXPhotoCommon photoCommon].languageType != languageType) {
@@ -140,5 +142,17 @@
 //        return CGPointMake(1, 1);
 //    }
     return _movableCropBoxCustomRatio;
+}
+- (NSInteger)minVideoClippingTime {
+    if (_minVideoClippingTime < 1) {
+        _minVideoClippingTime = 1;
+    }
+    return _minVideoClippingTime;
+}
+- (NSInteger)maxVideoClippingTime {
+    if (!_maxVideoClippingTime) {
+        _maxVideoClippingTime = 15;
+    }
+    return _maxVideoClippingTime;
 }
 @end

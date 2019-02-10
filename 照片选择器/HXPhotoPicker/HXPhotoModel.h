@@ -62,6 +62,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @interface HXPhotoModel : NSObject<NSCoding>
 /**
  文件在手机里的原路径(照片 或 视频)
+ 只有在手机存在的图片才会有值, iCloud上的没有
  
  - 如果是通过相机拍摄的并且没有保存到相册(临时的) 视频有值, 照片没有值
  */
@@ -134,16 +135,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 /**  照片原始宽高 */
 @property (assign, nonatomic) CGSize imageSize;
 /**  预览界面按比例缩小之后的宽高 */
-@property (assign, nonatomic) CGSize endImageSize;
-/**  预览界面按比例缩小之后的宽高 */
-@property (assign, nonatomic) CGSize endDateImageSize;
+@property (assign, nonatomic) CGSize endImageSize; 
 /**  3dTouch按比例缩小之后的宽高 */
 @property (assign, nonatomic) CGSize previewViewSize;
 /**  预览界面底部cell按比例缩小之后的宽高 */
 @property (assign, nonatomic) CGSize dateBottomImageSize;
 /**  拍照之后的唯一标示 */
 @property (copy, nonatomic) NSString *cameraIdentifier;
-/**  通过相机摄像的视频URL */
+/**  本地视频URL */
 @property (strong, nonatomic) NSURL *videoURL;
 /**  网络图片的地址 */
 @property (copy, nonatomic) NSURL *networkPhotoUrl;
@@ -193,13 +192,13 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 + (instancetype)photoModelWithImage:(UIImage *)image;
 /**  通过视频地址和视频时长初始化 */
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime;
+/**  通过本地视频地址URL对象初始化 */
++ (instancetype)photoModelWithVideoURL:(NSURL *)videoURL;
 /**  通过PHAsset对象初始化 */
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset;
 /**  通过网络图片URL对象初始化 */
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL;
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL;
-/**  通过本地视频地址URL对象初始化 */
-+ (instancetype)photoModelWithVideoURL:(NSURL *)videoURL;
 
 #pragma mark - < Request >
 

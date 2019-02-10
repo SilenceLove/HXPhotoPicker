@@ -35,7 +35,8 @@
 @property (weak, nonatomic) id<HXPhotoSubViewCellDelegate> delegate;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 
-
+@property (assign, nonatomic) BOOL canEdit;
+@property (strong, nonatomic) UIView *highlightMaskView;
 @property (strong, nonatomic) HXPhotoModel *model;
 /**  删除按钮图片  */
 @property (copy, nonatomic) NSString *deleteImageName;

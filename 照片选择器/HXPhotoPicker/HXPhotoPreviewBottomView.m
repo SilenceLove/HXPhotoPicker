@@ -34,6 +34,7 @@
     [self addSubview:self.collectionView];
     [self addSubview:self.doneBtn];
     [self addSubview:self.editBtn];
+    [self addSubview:self.tipView];
     [self changeDoneBtnFrame];
 }
 - (void)setEnabled:(BOOL)enabled {
@@ -55,13 +56,29 @@
         self.doneBtn.hidden = YES;
     }
 }
-- (void)setShowTipView:(BOOL)showTipView {
-    _showTipView = showTipView;
-    self.tipView.hidden = !showTipView;
-}
-- (void)setTipStr:(NSString *)tipStr {
-    _tipStr = tipStr;
-    self.tipLb.text = tipStr;
+- (void)changeTipViewState:(HXPhotoModel *)model {
+    NSString *tipText;
+    if (!self.manager.configuration.selectTogether) {
+        if (self.manager.selectedPhotoCount && model.subType == HXPhotoModelMediaSubTypeVideo) {
+            tipText = [NSBundle hx_localizedStringForKey:@"选择照片时不能选择视频"];
+        }else if (self.manager.selectedVideoCount && model.subType == HXPhotoModelMediaSubTypePhoto) {
+            tipText = [NSBundle hx_localizedStringForKey:@"选择视频时不能选择照片"];
+        }
+    }
+    if (model.subType == HXPhotoModelMediaSubTypeVideo && !tipText) {
+        if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
+            if (self.manager.configuration.videoCanEdit) {
+                tipText = [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"只能选择%ld秒内的视频，需进行编辑"], self.manager.configuration.videoMaximumSelectDuration];
+            }else {
+                tipText = [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration];
+            }
+        }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
+            tipText = [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration];
+        }
+    }
+    self.tipLb.text = tipText;
+    self.tipView.hidden = !tipText;
+    self.collectionView.hidden = tipText;
 }
 - (void)insertModel:(HXPhotoModel *)model {
     [self.modelArray addObject:model];
@@ -201,18 +218,17 @@
             }
         }
     }
+    self.tipView.frame = self.collectionView.frame;
+    
+    self.tipLb.frame = CGRectMake(12, 0, self.tipView.hx_w - 12, self.tipView.hx_h);
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.bgView.frame = self.bounds;
-//    if (self.collectionView.hx_w != self.hx_w - 12 - 50) {
-//        self.collectionView.frame = CGRectMake(0, 0, self.hx_w - 12 - 50, 50);
-//    }
+ 
     self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
     self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
     
-    self.tipView.frame = CGRectMake(0, -40, self.hx_w, 40);
-    self.tipLb.frame = CGRectMake(12, 0, self.hx_w - 24, 40);
     
     [self changeDoneBtnFrame];
 }
@@ -234,7 +250,7 @@
 - (UILabel *)tipLb {
     if (!_tipLb) {
         _tipLb = [[UILabel alloc] init];
-        _tipLb.text = [NSBundle hx_localizedStringForKey:@"选择照片时不能选择视频"];
+        _tipLb.numberOfLines = 0;
         _tipLb.textColor = self.manager.configuration.themeColor;
         _tipLb.font = [UIFont systemFontOfSize:14];
     }

@@ -84,6 +84,7 @@
     [self.contentView addSubview:self.stateLb];
     [self.contentView addSubview:self.deleteBtn];
     [self.contentView addSubview:self.progressView];
+    [self.contentView addSubview:self.highlightMaskView];
 }
 
 - (void)didDeleteClick {
@@ -93,12 +94,12 @@
             [alert show];
             return;
         }
-    } 
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+    }
+#if HasYYWebImage
     [self.imageView yy_cancelCurrentImageRequest];
-#elif __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#elif HasYYKit
     [self.imageView cancelCurrentImageRequest];
-#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#elif HasSDWebImage
     [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
@@ -202,9 +203,7 @@
                 self.imageView.image = model.thumbPhoto;
             }else {
                 HXWeakSelf
-                model.clarityScale = 1.5f;
-                model.rowCount = 3.f;
-                [self.model requestThumbImageCompletion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                [self.model requestThumbImageWithSize:CGSizeMake(200, 200) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                     if (weakSelf.model == model) {
                         weakSelf.imageView.image = image;
                     }
@@ -253,11 +252,23 @@
     self.deleteBtn.frame = CGRectMake(width - deleteBtnW, 0, deleteBtnW, deleteBtnH);
     
     self.progressView.center = CGPointMake(width / 2, height / 2);
+    self.highlightMaskView.frame = self.bounds;
 }
 
 - (void)setHighlighted:(BOOL)highlighted {
     [super setHighlighted:highlighted];
-    
+    if (self.model.type == HXPhotoModelMediaTypeCamera || self.canEdit) {
+        return;
+    }
+    self.highlightMaskView.hidden = !highlighted;
 }
 
+- (UIView *)highlightMaskView {
+    if (!_highlightMaskView) {
+        _highlightMaskView = [[UIView alloc] init];
+        _highlightMaskView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5f];
+        _highlightMaskView.hidden = YES;
+    }
+    return _highlightMaskView;
+}
 @end

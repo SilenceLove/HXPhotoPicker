@@ -367,7 +367,7 @@
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="ndm-Se-BdN">
+                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ndm-Se-BdN">
                                     <rect key="frame" x="255" y="1029.6666666666667" width="51" height="31"/>
                                     <connections>
                                         <action selector="addCamera:" destination="-1" eventType="valueChanged" id="HU6-Hk-cbd"/>

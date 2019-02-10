@@ -70,29 +70,31 @@
 + (BOOL)assetIsHEIF:(PHAsset *)asset;
 
 /**
- 根据AVAsset对象获取指定数量和大小的图片
- (会根据视频时长平分)
+ 导出裁剪的视频
 
- @param asset AVAsset
- @param total 总数
- @param size 图片大小
- @param complete 完成后的block
+ @param asset 视频AVAsset
+ @param timeRange 裁剪时间区域
+ @param presetName 导出的视频质量
+ @param success 成功
+ @param failed 失败
  */
-+ (void)getVideoEachFrameWithAsset:(AVAsset *)asset
-                             total:(NSInteger)total
-                              size:(CGSize)size
-                          complete:(void (^)(AVAsset *asset, NSArray<UIImage *> *images))complete;
++ (void)exportEditVideoForAVAsset:(AVAsset *)asset
+                        timeRange:(CMTimeRange)timeRange
+                       presetName:(NSString *)presetName
+                          success:(void (^)(NSURL *videoURL))success
+                           failed:(void (^)(NSError *error))failed;
 
 /**
  获取视频的时长
  */
-+ (NSString *)getNewTimeFromDurationSecond:(NSInteger)duration;
++ (NSString *)transformVideoTimeToString:(NSTimeInterval)duration;
 
 /**
  获取数组里面图片的大小
  */
 + (void)FetchPhotosBytes:(NSArray *)photos
               completion:(void (^)(NSString *totalBytes))completion;
++ (NSString *)getBytesFromDataLength:(NSInteger)dataLength;
 
 + (BOOL)platform;
 /**  iphone6, 6s, 7, 8  */

@@ -7,7 +7,7 @@
 //
 
 #import "UIView+HXExtension.h"
-#import "HXPhotoPicker.h"
+#import "HXPhotoPicker.h" 
 
 @implementation UIView (HXExtension)
 - (void)setHx_x:(CGFloat)hx_x
@@ -150,7 +150,6 @@
     }
     HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, hudW + 20, 110 + hudH - 15) imageName:@"hx_alert_failed" text:text];
     hud.alpha = 0;
-    hud.tag = 1008611;
     [self addSubview:hud];
     hud.center = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
     [UIView animateWithDuration:0.25 animations:^{
@@ -160,11 +159,19 @@
     [self performSelector:@selector(handleGraceTimer) withObject:nil afterDelay:1.5f inModes:@[NSRunLoopCommonModes]];
 } 
 
+- (void)hx_immediatelyShowLoadingHudWithText:(NSString *)text {
+    [self hx_showLoadingHudWithText:text delay:0 immediately:YES];
+}
+
 - (void)hx_showLoadingHUDText:(NSString *)text {
     [self hx_showLoadingHUDText:text delay:0.f];
 }
 
 - (void)hx_showLoadingHUDText:(NSString *)text delay:(NSTimeInterval)delay {
+    [self hx_showLoadingHudWithText:text delay:delay immediately:NO];
+}
+
+- (void)hx_showLoadingHudWithText:(NSString *)text delay:(NSTimeInterval)delay immediately:(BOOL)immediately {
     CGFloat hudW = [UILabel hx_getTextWidthWithText:text height:15 fontSize:14];
     if (hudW > self.frame.size.width - 60) {
         hudW = self.frame.size.width - 60;
@@ -180,19 +187,14 @@
     HXHUD *hud = [[HXHUD alloc] initWithFrame:CGRectMake(0, 0, width, height) imageName:nil text:text];
     [hud showloading];
     hud.alpha = 0;
-    hud.tag = 10086;
     [self addSubview:hud];
     hud.center = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
-    if (delay) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [UIView animateWithDuration:0.25 animations:^{
-                hud.alpha = 1;
-            }];
-        });
+    if (immediately) {
+        hud.alpha = 1;
     }else {
-        [UIView animateWithDuration:0.25 animations:^{
+        [UIView animateWithDuration:0.25 delay:delay options:0 animations:^{
             hud.alpha = 1;
-        }];
+        } completion:nil];
     }
 }
 
@@ -205,7 +207,7 @@
 - (void)hx_handleLoading:(BOOL)animation duration:(NSTimeInterval)duration {
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
-        if (view.tag == 10086) {
+        if ([view isKindOfClass:[HXHUD class]] && ![(HXHUD *)view isImage]) {
             if (animation) {
                 [UIView animateWithDuration:duration animations:^{
                     view.alpha = 0;
@@ -230,7 +232,7 @@
 - (void)handleGraceTimer {
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
-        if (view.tag == 1008611) {
+        if ([view isKindOfClass:[HXHUD class]] && [(HXHUD *)view isImage]) {
             [UIView animateWithDuration:0.2f animations:^{
                 view.alpha = 0;
             } completion:^(BOOL finished) {
@@ -265,6 +267,7 @@
 
 - (void)setup {
     UIImage *image = self.imageName.length ? [UIImage hx_imageNamed:self.imageName] : nil;
+    self.isImage = image;
     UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
     [self addSubview:imageView];
     CGFloat imgW = imageView.image.size.width;

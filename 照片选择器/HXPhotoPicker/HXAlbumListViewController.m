@@ -196,8 +196,6 @@ UITableViewDelegate
     }
     self.manager.selectPhotoing = NO;
     
-    [self.manager removeAllAlbum];
-    [self.manager removeAllTempList];
     [self dismissViewControllerAnimated:YES completion:nil];
     if (self.manager.configuration.restoreNavigationBar) {
         [UINavigationBar appearance].translucent = NO;
@@ -269,6 +267,7 @@ UITableViewDelegate
                 }
                 [weakSelf.view hx_handleLoading:YES];
             });
+            [weakSelf.manager removeAllAlbum];
         };
         dispatch_async(self.manager.loadAssetQueue, ^{
             if (!self.manager.getAlbumListing && !self.manager.albums) {
@@ -368,11 +367,6 @@ UITableViewDelegate
 }
 
 #pragma mark - < UITableViewDelegate >
-- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    HXAlbumModel *model = self.albumModelArray[indexPath.row];
-    [self preloadPhotoListDataWithAlbumModel:model];
-    return indexPath;
-}
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (self.navigationController.topViewController != self) {
@@ -651,6 +645,7 @@ UITableViewDelegate
 @property (assign, nonatomic) PHImageRequestID requestId1;
 @property (assign, nonatomic) PHImageRequestID requestId2;
 @property (assign, nonatomic) PHImageRequestID requestId3;
+@property (strong, nonatomic) UIView *lineView;
 @end
 
 @implementation HXAlbumListSingleViewCell
@@ -668,6 +663,7 @@ UITableViewDelegate
     [self.contentView addSubview:self.coverView1];
     [self.contentView addSubview:self.albumNameLb];
     [self.contentView addSubview:self.photoNumberLb];
+    [self.contentView addSubview:self.lineView];
 }
 - (void)cancelRequest {
     if (self.requestId1) {
@@ -769,11 +765,20 @@ UITableViewDelegate
     CGFloat albumNameLbY = self.hx_h / 2  - 16;
     self.albumNameLb.frame = CGRectMake(albumNameLbX, albumNameLbY, self.hx_w - albumNameLbX - 40, 14);
     self.photoNumberLb.frame = CGRectMake(albumNameLbX, self.hx_h / 2 + 4, self.hx_w, 13);
+    self.lineView.frame = CGRectMake(10, self.hx_h - 0.5f, self.hx_w - 22, 0.5f);
+//    self.lineView.hx_w = self.hx_w - self.lineView.hx_x - 12;
 }
 - (void)dealloc {
 //    [self cancelRequest];
 }
 #pragma mark - < cell懒加载 >
+- (UIView *)lineView {
+    if (!_lineView) {
+        _lineView = [[UIView alloc] init];
+        _lineView.backgroundColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.15];
+    }
+    return _lineView;
+}
 - (UIImageView *)coverView1 {
     if (!_coverView1) {
         _coverView1 = [[UIImageView alloc] init];

@@ -15,8 +15,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoConfigurationCameraType) {
 }; 
 
 typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
-    HXPhotoAlbumShowModeDefault,    //!< 默认的
-    HXPhotoAlbumShowModePopup       //!< 弹窗
+    HXPhotoAlbumShowModeDefault = 0,    //!< 默认的
+    HXPhotoAlbumShowModePopup           //!< 弹窗
 };
 
 typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
@@ -37,6 +37,27 @@ HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
 
+/**
+ 原图按钮显示已选照片的大小
+ */
+@property (assign, nonatomic) BOOL showOriginalBytes;
+
+/**
+ 导入裁剪视频的质量 - default AVAssetExportPresetHighestQuality
+ */
+@property (copy, nonatomic) NSString *editVideoExportPresetName;
+
+/**
+ 编辑视频时裁剪的最小秒数
+ 如果小于1秒,则为1秒
+ */
+@property (assign, nonatomic) NSInteger minVideoClippingTime;
+
+/**
+ 编辑视频时裁剪的最大秒数 - default 15s
+ 如果超过视频时长,则为视频时长
+ */
+@property (assign, nonatomic) NSInteger maxVideoClippingTime;
 
 /**
  预览大图时的长按响应事件
@@ -58,8 +79,6 @@ HXPhotoPreviewViewController;
  那么请将这个属性设置为YES，即可恢复。
  */
 @property (assign, nonatomic) BOOL restoreNavigationBar;
-
-@property (assign, nonatomic) BOOL changeAlbumListContentView;
 
 /**
  照片列表是否按照片日期排序  默认YES
@@ -243,7 +262,7 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) CGFloat popupTableViewCellHeight;
 
 /**
- 显示底部照片详细信息 default YES
+ 显示底部照片数量信息 default YES
  */
 @property (assign, nonatomic) BOOL showBottomPhotoDetail;
 
@@ -360,7 +379,7 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) BOOL showDateSectionHeader;
 
 /**
- 照片列表按日期倒序 默认 NO
+ 照片列表倒序 默认 NO
  */
 @property (assign, nonatomic) BOOL reverseDate;
 
@@ -439,12 +458,12 @@ HXPhotoPreviewViewController;
 /**
  *  视频能选择的最大秒数  -  默认 3分钟/180秒
  */
-@property (assign, nonatomic) NSTimeInterval videoMaximumSelectDuration;
+@property (assign, nonatomic) NSInteger videoMaximumSelectDuration;
 
 /**
  *  视频能选择的最小秒数  -  默认 0秒 - 不限制
  */
-@property (assign, nonatomic) NSTimeInterval videoMinimumSelectDuration;
+@property (assign, nonatomic) NSInteger videoMinimumSelectDuration;
 
 /**
  是否为单选模式 默认 NO  HXPhotoView 不支持
@@ -528,4 +547,6 @@ HXPhotoPreviewViewController;
  */
 @property (copy, nonatomic) void (^previewCollectionView)(UICollectionView *collectionView);
 
+
+@property (assign, nonatomic) BOOL changeAlbumListContentView;
 @end

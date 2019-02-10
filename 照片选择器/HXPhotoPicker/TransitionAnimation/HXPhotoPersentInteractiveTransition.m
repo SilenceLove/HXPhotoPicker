@@ -26,15 +26,22 @@
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) HXPhotoView *photoView;
 @property (assign, nonatomic) BOOL isPanGesture;
+
+
+@property (assign, nonatomic) CGFloat scrollViewZoomScale;
+@property (assign, nonatomic) CGSize scrollViewContentSize;
+@property (assign, nonatomic) CGPoint scrollViewContentOffset;
+@property (assign, nonatomic) CGRect imageInitialFrame;
+@property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
 @end
 
 @implementation HXPhotoPersentInteractiveTransition
 - (void)addPanGestureForViewController:(UIViewController *)viewController photoView:(HXPhotoView *)photoView {
-    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
-    pan.delegate = self;
+    self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
+    self.panGesture.delegate = self;
     self.vc = viewController;
     self.photoView = photoView;
-    [viewController.view addGestureRecognizer:pan];
+    [viewController.view addGestureRecognizer:self.panGesture];
 //    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchView:)];
 //    pinchGestureRecognizer.delegate = self;
 //    [viewController.view addGestureRecognizer:pinchGestureRecognizer];
@@ -52,7 +59,6 @@
     if ([otherGestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
         UIScrollView *scrollView = (UIScrollView *)otherGestureRecognizer.view;
         if (scrollView.contentOffset.y <= 0 &&
-            !scrollView.dragging &&
             !scrollView.zooming) {
             return YES;
         }
@@ -62,11 +68,9 @@
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
     HXPhotoPreviewViewCell *viewCell = [previewVC currentPreviewCell:previewVC.modelArray[previewVC.currentModelIndex]];
-    if (viewCell.scrollView.dragging ||
-        viewCell.scrollView.zooming ||
+    if (viewCell.scrollView.zooming ||
         viewCell.scrollView.zoomScale < 1.0f ||
         viewCell.scrollView.isZoomBouncing) {
-        [gestureRecognizer cancelsTouchesInView];
         return NO;
     }
     [viewCell.scrollView setContentOffset:viewCell.scrollView.contentOffset animated:NO];
@@ -85,7 +89,7 @@
     switch (pinchGestureRecognizer.state) {
         case UIGestureRecognizerStateBegan: {
             if (scale > 1) {
-                [pinchGestureRecognizer cancelsTouchesInView];
+                
                 return;
             }
             self.isPanGesture = NO;
@@ -141,8 +145,9 @@
     }
     switch (gestureRecognizer.state) {
         case UIGestureRecognizerStateBegan:
-            if (scale < 0) {
-                [gestureRecognizer cancelsTouchesInView];
+            if (scale <= 0) {
+                [self.vc.view removeGestureRecognizer:self.panGesture];
+                [self.vc.view addGestureRecognizer:self.panGesture];
                 return;
             }
             self.isPanGesture = YES;
@@ -224,21 +229,25 @@
     HXPhotoSubViewCell *toCell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:[self.photoView currentModelIndexPath:model]];
     
     self.fromCell = fromCell;
-    self.fromCell.scrollView.scrollEnabled = NO;
+    self.scrollViewZoomScale = [self.fromCell getScrollViewZoomScale];
+    self.scrollViewContentSize = [self.fromCell getScrollViewContentSize];
+    self.scrollViewContentOffset = [self.fromCell getScrollViewContentOffset];
     
     UIView *containerView = [transitionContext containerView];
     CGRect tempImageViewFrame;
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
         self.tempImageView = fromCell.animatedImageView;
+        self.imageInitialFrame = fromCell.animatedImageView.frame;
         tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
 #else
         self.tempImageView = fromCell.imageView;
+        self.imageInitialFrame = fromCell.imageView.frame;
         tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
 #endif
     }else {
         if (!fromCell.playerLayer.player) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             self.tempImageView = fromCell.animatedImageView;
             tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
 #else
@@ -351,12 +360,20 @@
                 fromVC.view.backgroundColor = [UIColor whiteColor];
             }
         }
-        self.fromCell.scrollView.scrollEnabled = YES;
         self.tempCell.hidden = NO;
         self.tempCell = nil;
-        [self.tempImageView removeFromSuperview];
+        
         self.tempImageView.layer.anchorPoint = CGPointMake(0.5f, 0.5f);
         [self.fromCell againAddImageView];
+         
+        [self.fromCell setScrollViewZoomScale:self.scrollViewZoomScale];
+        self.tempImageView.frame = self.imageInitialFrame;
+        [self.fromCell setScrollViewContnetSize:self.scrollViewContentSize];
+        if (self.scrollViewContentOffset.y < 0) {
+            self.scrollViewContentOffset = CGPointMake(self.scrollViewContentOffset.x, 0);
+        }
+        [self.fromCell setScrollViewContentOffset:self.scrollViewContentOffset];
+        
         self.playerLayer = nil;
         [self.bgView removeFromSuperview];
         self.bgView = nil;

@@ -20,13 +20,21 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.2.5"
+#define HXVersion @"2.2.6"
 
 #define HXEncodeKey @"HXModelArray"
 
 #define HXShowLog YES
 
 #define HX_UI_IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+
+#define HasYYWebImage (__has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h"))
+
+#define HasYYKit (__has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h"))
+
+#define HasYYKitOrWebImage (HasYYWebImage || HasYYKit)
+
+#define HasSDWebImage (__has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h"))
 
 #define HX_IS_IPHONEX (CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(375, 812)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(812, 375)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(414, 896)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(896, 414)))
 
@@ -51,11 +59,15 @@
 
 #define HX_IOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)
 
+#define HX_IOS10_Later ([UIDevice currentDevice].systemVersion.floatValue >= 10.0f)
+
 #define HX_IOS91Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)
 
 #define HX_IOS9Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.0f)
 
 #define HX_IOS82Later ([UIDevice currentDevice].systemVersion.floatValue >= 8.2f)
+
+#define HX_IOS9Earlier ([UIDevice currentDevice].systemVersion.floatValue < 9.0f)
 
 // 弱引用
 #define HXWeakSelf __weak typeof(self) weakSelf = self;
@@ -70,6 +82,14 @@ CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
                                                                              message:message
                                                                       preferredStyle:UIAlertControllerStyleAlert];
+    
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        UIPopoverPresentationController *pop = [alertController popoverPresentationController];
+        pop.permittedArrowDirections = UIPopoverArrowDirectionAny;
+        pop.sourceView = vc.view;
+        pop.sourceRect = vc.view.bounds;
+    }
+    
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:buttonTitle1
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction * _Nonnull action) {

@@ -25,7 +25,7 @@
         }
     }];
     return geoCoder;
-//    __block NSMutableArray *placemarkArray = [NSMutableArray array];
+//    NSMutableArray *placemarkArray = [NSMutableArray array];
 //    NSInteger locationCount = 0;
 //    for (HXPhotoModel *subModel in model.photoModelArray) {
 //        if (subModel.asset.location) {
@@ -41,19 +41,21 @@
 //            locationCount++;
 //        }
 //    }
-}  
+}
+
 /**
  获取视频的时长
- */
-+ (NSString *)getNewTimeFromDurationSecond:(NSInteger)duration {
+ */  
++ (NSString *)transformVideoTimeToString:(NSTimeInterval)duration {
+    NSInteger time = roundf(duration);
     NSString *newTime;
-    if (duration < 10) {
-        newTime = [NSString stringWithFormat:@"00:0%zd",duration];
-    } else if (duration < 60) {
-        newTime = [NSString stringWithFormat:@"00:%zd",duration];
+    if (time < 10) {
+        newTime = [NSString stringWithFormat:@"00:0%zd",time];
+    } else if (time < 60) {
+        newTime = [NSString stringWithFormat:@"00:%zd",time];
     } else {
-        NSInteger min = duration / 60;
-        NSInteger sec = duration - (min * 60);
+        NSInteger min = roundf(time / 60);
+        NSInteger sec = time - (min * 60);
         if (sec < 10) {
             newTime = [NSString stringWithFormat:@"%zd:0%zd",min,sec];
         } else {
@@ -129,47 +131,8 @@
             }
         }
     });
-}
-
-+ (void)getVideoEachFrameWithAsset:(AVAsset *)asset total:(NSInteger)total size:(CGSize)size complete:(void (^)(AVAsset *, NSArray<UIImage *> *))complete {
-    long duration = round(asset.duration.value) / asset.duration.timescale;
-    
-    NSTimeInterval average = (CGFloat)duration / (CGFloat)total;
-    
-    AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
-    generator.maximumSize = size;
-    generator.appliesPreferredTrackTransform = YES;
-    generator.requestedTimeToleranceBefore = kCMTimeZero;
-    generator.requestedTimeToleranceAfter = kCMTimeZero;
-    
-    NSMutableArray *arr = [NSMutableArray array];
-    for (int i = 1; i <= total; i++) {
-        CMTime time = CMTimeMake((i * average) * asset.duration.timescale, asset.duration.timescale);
-        NSValue *value = [NSValue valueWithCMTime:time];
-        [arr addObject:value];
-    }
-    NSMutableArray *arrImages = [NSMutableArray array];
-    __block long count = 0;
-    [generator generateCGImagesAsynchronouslyForTimes:arr completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
-        switch (result) {
-            case AVAssetImageGeneratorSucceeded:
-                [arrImages addObject:[UIImage imageWithCGImage:image]];
-                break;
-            case AVAssetImageGeneratorFailed:
-                
-                break;
-            case AVAssetImageGeneratorCancelled:
-                
-                break;
-        }
-        count++;
-        if (count == arr.count && complete) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                complete(asset, arrImages);
-            });
-        }
-    }];
-}
+} 
+ 
 
 + (void)requestAuthorization:(UIViewController *)viewController
                         handler:(void (^)(PHAuthorizationStatus status))handler {
@@ -195,6 +158,52 @@
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     });
 }
+
++ (void)exportEditVideoForAVAsset:(AVAsset *)asset
+                        timeRange:(CMTimeRange)timeRange
+                       presetName:(NSString *)presetName
+                          success:(void (^)(NSURL *))success
+                           failed:(void (^)(NSError *))failed {
+    
+    NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:asset];
+    if ([presets containsObject:presetName]) {
+        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
+        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+        NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
+        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:presetName];
+        exportSession.outputURL = videoURL;
+        NSArray *supportedTypeArray = exportSession.supportedFileTypes;
+        if ([supportedTypeArray containsObject:AVFileTypeMPEG4]) {
+            exportSession.outputFileType = AVFileTypeMPEG4;
+        } else if (supportedTypeArray.count == 0) {
+            if (failed) {
+                failed([NSError errorWithDomain:@"不支持导入该类型视频" code:-222 userInfo:nil]);
+            }
+            return;
+        }else {
+            exportSession.outputFileType = [supportedTypeArray objectAtIndex:0];
+        }
+        exportSession.timeRange = timeRange;
+        
+        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+                    if (success) {
+                        success(videoURL);
+                    }
+                }else {
+                    if (failed) {
+                        failed(exportSession.error);
+                    }
+                }
+            });
+        }];
+    }else {
+        if (failed) {
+            failed([NSError errorWithDomain:[NSString stringWithFormat:@"该设备不支持:%@",presetName] code:-111 userInfo:nil]); 
+        }
+    }
+}
 + (NSString *)getBytesFromDataLength:(NSInteger)dataLength {
     NSString *bytes;
     if (dataLength >= 0.1 * (1024 * 1024)) {
@@ -206,7 +215,6 @@
     }
     return bytes;
 }
-
 
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName
                               videoURL:(NSURL *)videoURL

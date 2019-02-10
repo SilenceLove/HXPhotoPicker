@@ -57,18 +57,11 @@
         image = fromCell.imageView.image;
     }
     UIView *containerView = [transitionContext containerView];
-    model.endDateImageSize = CGSizeZero;
-    CGFloat imgWidht = model.endDateImageSize.width;
-    CGFloat imgHeight = model.endDateImageSize.height;
+    model.endImageSize = CGSizeZero;
+    CGFloat imgWidht = model.endImageSize.width;
+    CGFloat imgHeight = model.endImageSize.height;
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
-//    CGFloat height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - hxBottomMargin;
-    CGFloat height = [UIScreen mainScreen].bounds.size.height;
-//    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-//    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-//        if (HX_IS_IPhoneX_All) {
-//            height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
-//        }
-//    }
+    CGFloat height = [UIScreen mainScreen].bounds.size.height; 
     UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
     UIView *tempBgView = [[UIView alloc] initWithFrame:containerView.bounds];
     tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
@@ -119,7 +112,7 @@
     HXPhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     HXPhotoViewCell *toCell = [toVC currentPreviewCell:model];
     UIImageView *tempView;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
 #else
     tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
@@ -151,7 +144,7 @@
     toCell.hidden = YES;
     fromVC.view.backgroundColor = [UIColor clearColor];
     
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     tempView.frame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
 #else
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];

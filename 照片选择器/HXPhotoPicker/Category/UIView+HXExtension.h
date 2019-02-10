@@ -30,6 +30,7 @@
 - (void)hx_showImageHUDText:(NSString *)text;
 - (void)hx_showLoadingHUDText:(NSString *)text;
 - (void)hx_showLoadingHUDText:(NSString *)text delay:(NSTimeInterval)delay;
+- (void)hx_immediatelyShowLoadingHudWithText:(NSString *)text;
 - (void)hx_handleLoading;
 - (void)hx_handleLoading:(BOOL)animation;
 - (void)hx_handleLoading:(BOOL)animation duration:(NSTimeInterval)duration;
@@ -45,6 +46,7 @@
 
 
 @interface HXHUD : UIView
+@property (assign, nonatomic) BOOL isImage;
 - (instancetype)initWithFrame:(CGRect)frame imageName:(NSString *)imageName text:(NSString *)text;
 - (void)showloading;
 @end

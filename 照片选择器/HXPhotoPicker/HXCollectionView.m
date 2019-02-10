@@ -75,6 +75,9 @@
     }
     if (longPgr.state == UIGestureRecognizerStateCancelled ||
         longPgr.state == UIGestureRecognizerStateEnded){
+        if ([(HXPhotoSubViewCell *)[self cellForItemAtIndexPath:self.originalIndexPath] model].type == HXPhotoModelMediaTypeCamera) {
+            return;
+        }
         if ([self.delegate respondsToSelector:@selector(collectionView:gestureRecognizerEnded:indexPath:)]) {
             [self.delegate collectionView:self gestureRecognizerEnded:longPgr indexPath:self.originalIndexPath];
         }

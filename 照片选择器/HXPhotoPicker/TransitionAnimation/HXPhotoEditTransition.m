@@ -62,7 +62,7 @@
     if ([toVC isKindOfClass:[HXPhotoEditViewController class]]) {
         toFrame = [(HXPhotoEditViewController *)toVC getImageFrame];
     }else if ([toVC isKindOfClass:[HXVideoEditViewController class]]) {
-        
+        toFrame = [(HXVideoEditViewController *)toVC getVideoRect];
     }
     UIView *tempBgView = [[UIView alloc] initWithFrame:containerView.bounds];
     tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
@@ -85,7 +85,8 @@
         fromCell = cell;
     }else if ([fromVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewCell *cell = [(HXPhotoPreviewViewController *)fromVC currentPreviewCell:self.model];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+        [cell cancelRequest];
+#if HasYYKitOrWebImage
         tempView.image = cell.animatedImageView.image;
         if (cell) {
             tempView.frame = [cell.animatedImageView convertRect:cell.animatedImageView.bounds toView: containerView];
@@ -119,7 +120,7 @@
         if ([toVC isKindOfClass:[HXPhotoEditViewController class]]) {
             [(HXPhotoEditViewController *)toVC showBottomView];
         }else if ([toVC isKindOfClass:[HXVideoEditViewController class]]) {
-            
+            [(HXVideoEditViewController *)toVC showBottomView];
         }
         if ([fromVC isKindOfClass:[HXPhotoViewController class]]) {
             [(HXPhotoViewController *)fromVC bottomView].alpha = 0;
@@ -133,7 +134,11 @@
         if ([toVC isKindOfClass:[HXPhotoEditViewController class]]) {
             [(HXPhotoEditViewController *)toVC completeTransition:tempView.image];
         }else if ([toVC isKindOfClass:[HXVideoEditViewController class]]) {
-            
+            HXVideoEditViewController *videoEditVC = (HXVideoEditViewController *)toVC;
+            videoEditVC.bgImageView = [[UIImageView alloc] initWithImage:tempView.image];
+            videoEditVC.bgImageView.frame = toFrame;
+            [videoEditVC.view addSubview:videoEditVC.bgImageView];
+            [videoEditVC completeTransition];
         }
         if ([fromVC isKindOfClass:[HXPhotoViewController class]]) {
             [(HXPhotoViewController *)fromVC bottomView].alpha = 1;
@@ -172,7 +177,10 @@
         tempView.frame = [(HXPhotoEditViewController *)fromVC getImageFrame];
         [(HXPhotoEditViewController *)fromVC hideImageView];
     }else if ([fromVC isKindOfClass:[HXVideoEditViewController class]]) {
-        
+        [tempView addSubview:[(HXVideoEditViewController *)fromVC videoView]];
+        tempView.frame = [(HXVideoEditViewController *)fromVC getVideoRect];
+        [(HXVideoEditViewController *)fromVC videoView].frame = tempView.bounds;
+        [(HXVideoEditViewController *)fromVC playerLayer].frame = tempView.bounds; 
     }
     
     
@@ -197,7 +205,7 @@
         
         [cell resetScale:NO];
         [cell refreshImageSize];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
         toFrame = [cell.animatedImageView convertRect:cell.animatedImageView.bounds toView: containerView];
 #else
         toFrame = [cell.imageView convertRect:cell.imageView.bounds toView: containerView];
@@ -245,6 +253,10 @@
             tempView.alpha = 0;
         }else {
             tempView.frame = toFrame;
+            if ([fromVC isKindOfClass:[HXVideoEditViewController class]]) {
+                [(HXVideoEditViewController *)fromVC videoView].frame = tempView.bounds;
+                [(HXVideoEditViewController *)fromVC playerLayer].frame = tempView.bounds;
+            }
         }
         fromVC.view.alpha = 0;
         tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
@@ -254,9 +266,10 @@
             [(HXPhotoViewCell *)toCell bottomViewPrepareAnimation];
             toCell.hidden = NO;
             [(HXPhotoViewCell *)toCell bottomViewStartAnimation];
-        }else {
-            toCell.hidden = NO;
+        }else if ([toCell isKindOfClass:[HXPhotoPreviewViewCell class]]){
+            [(HXPhotoPreviewViewCell *)toCell requestHDImage];
         }
+        toCell.hidden = NO;
         
         [tempView removeFromSuperview];
         [tempBgView removeFromSuperview];

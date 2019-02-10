@@ -57,6 +57,9 @@ HXVideoEditViewControllerDelegate
 #pragma mark - < transition delegate >
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
     if (operation == UINavigationControllerOperationPush) {
+        if (![toVC isKindOfClass:[self class]]) {
+            return nil;
+        }
         return [HXPhotoViewTransition transitionWithType:HXPhotoViewTransitionTypePush];
     }else {
         if (![fromVC isKindOfClass:[self class]]) {
@@ -87,6 +90,11 @@ HXVideoEditViewControllerDelegate
     return self;
 }
 - (void)dealloc {
+    if (self.photoViewController && HX_IOS9Earlier) {
+        // 处理ios8 导航栏转场动画崩溃问题
+        self.photoViewController.navigationController.delegate = nil;
+        self.photoViewController = nil;
+    }
     if (_collectionView) {
         HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
         [cell cancelRequest];
@@ -299,6 +307,7 @@ HXVideoEditViewControllerDelegate
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     self.currentModel = model;
     self.bottomView.outside = self.outside;
+    [self.bottomView changeTipViewState:model];
     
     if (self.manager.type == HXPhotoManagerSelectedTypeVideo && !self.manager.configuration.videoCanEdit) {
         self.bottomView.hideEditBtn = YES;
@@ -335,23 +344,7 @@ HXVideoEditViewControllerDelegate
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.bottomView.enabled = self.manager.configuration.videoCanEdit;
         } else {
-            if (!self.manager.configuration.selectTogether) {
-                if (self.manager.selectedVideoArray.count > 0) {
-                    self.bottomView.enabled = NO;
-                }else {
-                    if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                        self.bottomView.enabled = NO;
-                    }else {
-                        self.bottomView.enabled = self.manager.configuration.photoCanEdit;
-                    }
-                }
-            }else {
-                if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                    self.bottomView.enabled = NO;
-                }else {
-                    self.bottomView.enabled = self.manager.configuration.photoCanEdit;
-                }
-            }
+            self.bottomView.enabled = self.manager.configuration.photoCanEdit;
         }
         self.bottomView.selectCount = [self.manager selectedCount];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.selectBtn];
@@ -419,7 +412,9 @@ HXVideoEditViewControllerDelegate
             if ([self.manager.afterSelectedArray containsObject:model]) {
                 self.bottomPageControl.currentPage = [[self.manager afterSelectedArray] indexOfObject:model];
             }
-            [self.view addSubview:self.bottomPageControl];
+            if (self.manager.afterSelectedCount <= 15) {
+                [self.view addSubview:self.bottomPageControl];
+            }
         }
     }
 }
@@ -447,7 +442,7 @@ HXVideoEditViewControllerDelegate
         }
         HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
         
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
         if (model.type == HXPhotoModelMediaTypePhotoGif) {
             if (cell.animatedImageView.image.images.count > 0) {
                 model.thumbPhoto = cell.animatedImageView.image.images.firstObject;
@@ -667,9 +662,10 @@ HXVideoEditViewControllerDelegate
             self.bottomPageControl.currentPage = currentIndex;
         }
         HXPhotoModel *model = self.modelArray[currentIndex];
+        [self.bottomView changeTipViewState:model];
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             // 为视频时
-//            self.bottomView.enabled = self.manager.configuration.videoCanEdit;
+            self.bottomView.enabled = self.manager.configuration.videoCanEdit;
             if (self.manager.configuration.singleSelected) {
                 if (!self.manager.configuration.singleJumpEdit) {
                     self.bottomView.hideEditBtn = !self.manager.configuration.videoCanEdit;
@@ -689,31 +685,7 @@ HXVideoEditViewControllerDelegate
             }else {
                 self.bottomView.hideEditBtn = !self.manager.configuration.photoCanEdit;
             }
-            if (!self.manager.configuration.selectTogether) {
-                // 照片,视频不能同时选择时
-                if (self.manager.selectedVideoArray.count > 0) {
-                    // 如果有选择视频那么照片就不能编辑
-                    self.bottomView.enabled = NO;
-                }else {
-                    // 没有选择视频时
-                    if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                        // 当选择照片数达到最大数且当前照片没选中时就不能编辑
-                        self.bottomView.enabled = NO;
-                    }else {
-                        // 反之就能
-                        self.bottomView.enabled = self.manager.configuration.photoCanEdit;
-                    }
-                }
-            }else {
-                // 能同时选择时
-                if ([self.manager beforeSelectPhotoCountIsMaximum] && !model.selected) {
-                    // 当选择照片数达到最大数且当前照片没选中时就不能编辑
-                    self.bottomView.enabled = NO;
-                }else {
-                    // 反之就能
-                    self.bottomView.enabled = self.manager.configuration.photoCanEdit;
-                }
-            }
+            self.bottomView.enabled = self.manager.configuration.photoCanEdit;
         }
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
@@ -726,13 +698,6 @@ HXVideoEditViewControllerDelegate
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
         self.selectBtn.backgroundColor = self.selectBtn.selected ? self.manager.configuration.themeColor : nil;
         if (self.outside) {
-            /*
-             if ([[self.manager afterSelectedArray] containsObject:model]) {
-                self.bottomView.currentIndex = [[self.manager afterSelectedArray] indexOfObject:model];
-             }else {
-                [self.bottomView deselected];
-             }
-             */
             if ([self.modelArray containsObject:model] && self.layoutSubviewsCompletion) {
                 self.bottomView.currentIndex = [self.modelArray indexOfObject:model];
             }else {
@@ -779,9 +744,6 @@ HXVideoEditViewControllerDelegate
             [self scrollViewDidEndDecelerating:self.collectionView];
         });
     }else {
-//        if (beforeIndex == -1) {
-//            [self.bottomView deselectedWithIndex:currentIndex];
-//        }
         self.bottomView.currentIndex = beforeIndex;
     }
 }
@@ -834,9 +796,7 @@ HXVideoEditViewControllerDelegate
             vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
             vc.delegate = self;
             vc.manager = self.manager;
-            if (self.outside) {
-                vc.outside = YES;
-            }
+            vc.outside = self.outside;
             [self presentViewController:vc animated:YES completion:nil];
         }
     }else {
@@ -850,19 +810,15 @@ HXVideoEditViewControllerDelegate
                 [weakSelf photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
-            //            [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"功能还在开发中^_^"]];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"要使用视频编辑功能，请先替换视频编辑界面" message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"好的", nil];
-            [alert show];
-            //            HXVideoEditViewController *vc = [[HXVideoEditViewController alloc] init];
-            //            vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
-            //            vc.delegate = self;
-            //            vc.manager = self.manager;
-            //            if (self.outside) {
-            //                vc.outside = YES;
-            //                [self presentViewController:vc animated:NO completion:nil];
-            //            }else {
-            //                [self.navigationController pushViewController:vc animated:NO];
-            //            }
+            HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+            HXVideoEditViewController *vc = [[HXVideoEditViewController alloc] init];
+            vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
+            vc.avAsset = cell.avAsset;
+            vc.delegate = self;
+            vc.manager = self.manager;
+            vc.isInside = YES;
+            vc.outside = self.outside;
+            [self presentViewController:vc animated:YES completion:nil];
         }
     }
 }
@@ -889,12 +845,12 @@ HXVideoEditViewControllerDelegate
     }
     if (self.manager.configuration.singleSelected) {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-            
+            ;
             if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频大于%.0f秒，无法选择", self.manager.configuration.videoMaximumSelectDuration]]];
+                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
                 return;
             }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒,无法选择",self.manager.configuration.videoMinimumSelectDuration]]];
+                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
                 return;
             }
         }
@@ -932,17 +888,17 @@ HXVideoEditViewControllerDelegate
     if ([self.manager selectedCount] == 0) {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) { 
             if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频大于%.0f秒，无法选择", self.manager.configuration.videoMaximumSelectDuration]]];
+                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
                 return;
             }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
-                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:[NSString stringWithFormat:@"视频少于%.0f秒，无法选择",self.manager.configuration.videoMinimumSelectDuration]]];
+                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
                 return;
             }
         }
         if (!self.selectBtn.selected && !max && self.modelArray.count > 0) {
 //            model.selected = YES;
             HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             if (model.type == HXPhotoModelMediaTypePhotoGif) {
                 if (cell.animatedImageView.image.images.count > 0) {
                     model.thumbPhoto = cell.animatedImageView.image.images.firstObject;
@@ -992,7 +948,7 @@ HXVideoEditViewControllerDelegate
     }
     [self.manager beforeListAddCameraPhotoModel:afterModel];
     
-    if (!self.manager.configuration.singleSelected) {
+    if (!self.manager.configuration.singleSelected && !beforeModel.needHideSelectBtn) {
         NSString *str = [self.manager maximumOfJudgment:afterModel];
         if (!str) {
             [self.manager beforeSelectedListAddPhotoModel:afterModel];
@@ -1014,7 +970,10 @@ HXVideoEditViewControllerDelegate
         [self scrollViewDidScroll:self.collectionView];
     }
 }
-
+#pragma mark - < HXVideoEditViewControllerDelegate >
+- (void)videoEditViewControllerDidDoneClick:(HXVideoEditViewController *)videoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+    [self photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+}
 #pragma mark - < 懒加载 >
 - (UIPageControl *)bottomPageControl {
     if (!_bottomPageControl) {
@@ -1209,6 +1168,7 @@ HXVideoEditViewControllerDelegate
 @property (strong, nonatomic) UIImage *gifImage;
 @property (strong, nonatomic) UIImage *gifFirstFrame;
 @property (assign, nonatomic) PHImageRequestID requestID;
+@property (assign, nonatomic) PHContentEditingInputRequestID gifRequestID;
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @property (assign, nonatomic) BOOL livePhotoAnimating;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
@@ -1228,18 +1188,38 @@ HXVideoEditViewControllerDelegate
 }
 - (void)setup {
     [self.contentView addSubview:self.scrollView];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     [self.scrollView addSubview:self.animatedImageView];
 #else
     [self.scrollView addSubview:self.imageView];
 #endif
     [self.contentView.layer addSublayer:self.playerLayer];
     [self.contentView addSubview:self.videoPlayBtn];
-    //    [self.scrollView addSubview:self.livePhotoView];
     [self.contentView addSubview:self.progressView];
     [self.contentView addSubview:self.loadingView];
 }
+- (CGFloat)getScrollViewZoomScale {
+    return self.scrollView.zoomScale;
+}
+- (void)setScrollViewZoomScale:(CGFloat)zoomScale {
+    [self.scrollView setZoomScale:zoomScale];
+}
+- (CGSize)getScrollViewContentSize {
+    return self.scrollView.contentSize;
+}
+- (void)setScrollViewContnetSize:(CGSize)contentSize {
+    [self.scrollView setContentSize:contentSize];
+}
+- (CGPoint)getScrollViewContentOffset {
+    return self.scrollView.contentOffset;
+}
+- (void)setScrollViewContentOffset:(CGPoint)contentOffset {
+    [self.scrollView setContentOffset:contentOffset];
+}
 - (void)resetScale:(BOOL)animated {
+    if (self.model.type != HXPhotoModelMediaTypePhotoGif) {
+        self.gifImage = nil;
+    }
     [self resetScale:1.0f animated:animated];
 }
 - (void)resetScale:(CGFloat)scale animated:(BOOL)animated {
@@ -1248,7 +1228,7 @@ HXVideoEditViewControllerDelegate
 - (void)againAddImageView {
     [self refreshImageSize];
     [self.scrollView setZoomScale:1.0f];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     [self.scrollView addSubview:self.animatedImageView];
 #else
     [self.scrollView addSubview:self.imageView];
@@ -1299,7 +1279,7 @@ HXVideoEditViewControllerDelegate
         h = imgHeight;
         self.scrollView.maximumZoomScale = 2.5;
     }
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     self.animatedImageView.frame = CGRectMake(0, 0, w, h);
     self.animatedImageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.animatedImageView.frame;
@@ -1338,8 +1318,7 @@ HXVideoEditViewControllerDelegate
         h = imgHeight;
         self.scrollView.maximumZoomScale = 2.5;
     }
-    
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     self.animatedImageView.frame = CGRectMake(0, 0, w, h);
     self.animatedImageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.animatedImageView.frame;
@@ -1358,7 +1337,7 @@ HXVideoEditViewControllerDelegate
             self.progressView.hidden = model.downloadComplete;
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             [self.animatedImageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
                 if (weakSelf.model == model) {
                     weakSelf.progressView.progress = progress;
@@ -1400,7 +1379,7 @@ HXVideoEditViewControllerDelegate
             }];
 #endif
         }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             self.animatedImageView.image = model.thumbPhoto;
 #else
             self.imageView.image = model.thumbPhoto;
@@ -1410,7 +1389,7 @@ HXVideoEditViewControllerDelegate
     }else {
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             if (model.tempImage) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
                 self.animatedImageView.image = model.tempImage;
 #else
                 self.imageView.image = model.tempImage;
@@ -1418,8 +1397,8 @@ HXVideoEditViewControllerDelegate
                 model.tempImage = nil;
             }else {
                 self.requestID = [model requestThumbImageWithSize:CGSizeMake(self.hx_w * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-                    
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+                    if (weakSelf.model != model) return;
+#if HasYYKitOrWebImage
                     weakSelf.animatedImageView.image = image;
 #else
                     weakSelf.imageView.image = image;
@@ -1428,7 +1407,7 @@ HXVideoEditViewControllerDelegate
             }
         }else {
             if (model.previewPhoto) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
                 self.animatedImageView.image = model.previewPhoto;
 #else
                 self.imageView.image = model.previewPhoto;
@@ -1436,7 +1415,7 @@ HXVideoEditViewControllerDelegate
                 model.tempImage = nil;
             }else {
                 if (model.tempImage) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
                     self.animatedImageView.image = model.tempImage;
 #else
                     self.imageView.image = model.tempImage;
@@ -1444,13 +1423,15 @@ HXVideoEditViewControllerDelegate
                     model.tempImage = nil;
                 }else {
                     CGSize requestSize;
-                    if (imgHeight > imgWidth / 9 * 17) {
+                    if (imgHeight > imgWidth / 9 * 20 ||
+                        imgWidth > imgHeight / 9 * 20) {
                         requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6); 
                     }else {
-                        requestSize = CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8);
+                        requestSize = CGSizeMake(model.endImageSize.width, model.endImageSize.height);
                     }
                     self.requestID =[model requestThumbImageWithSize:requestSize completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+                        if (weakSelf.model != model) return;
+#if HasYYKitOrWebImage
                         weakSelf.animatedImageView.image = image;
 #else
                         weakSelf.imageView.image = image;
@@ -1462,13 +1443,14 @@ HXVideoEditViewControllerDelegate
     }
     if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         self.playerLayer.hidden = NO;
-        self.videoPlayBtn.hidden = YES;
+        self.videoPlayBtn.hidden = NO;
     }else {
         self.playerLayer.hidden = YES;
         self.videoPlayBtn.hidden = YES;
     }
 }
 - (void)requestHDImage {
+    self.avAsset = nil;
     if (self.requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
@@ -1490,7 +1472,8 @@ HXVideoEditViewControllerDelegate
         scale = 3.0;
     }
     
-    if (imgHeight > imgWidth / 9 * 17) {
+    if (imgHeight > imgWidth / 9 * 20 ||
+        imgWidth > imgHeight / 9 * 20) {
         size = CGSizeMake(width * scale, height * scale);
     }else {
         size = CGSizeMake(self.model.endImageSize.width * scale, self.model.endImageSize.height * scale);
@@ -1515,18 +1498,21 @@ HXVideoEditViewControllerDelegate
             self.model.iCloudRequestID = -1;
         }
         self.requestID = [self.model requestLivePhotoWithSize:self.model.endImageSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.requestID = iCloudRequestId;
         } progressHandler:^(double progress, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
         } success:^(PHLivePhoto *livePhoto, HXPhotoModel *model, NSDictionary *info) {
+            if (weakSelf.model != model) return;
             [weakSelf downloadICloudAssetComplete];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             weakSelf.livePhotoView.frame = weakSelf.animatedImageView.frame;
             weakSelf.animatedImageView.hidden = YES;
 #else
@@ -1537,30 +1523,31 @@ HXVideoEditViewControllerDelegate
             weakSelf.livePhotoView.livePhoto = livePhoto;
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             weakSelf.progressView.hidden = YES;
-            if (weakSelf.model.isICloud) {
-                //                [weakSelf.progressView showError];
-            }
         }]; 
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
         self.requestID = [self.model requestPreviewImageWithSize:size startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.requestID = iCloudRequestId;
         } progressHandler:^(double progress, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             if (weakSelf.model.isICloud) {
                 weakSelf.progressView.hidden = NO;
             }
             weakSelf.progressView.progress = progress;
         } success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+            if (weakSelf.model != model) return;
             [weakSelf downloadICloudAssetComplete];
             weakSelf.progressView.hidden = YES;
             CATransition *transition = [CATransition animation];
             transition.duration = 0.2f;
             transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
             transition.type = kCATransitionFade;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             [weakSelf.animatedImageView.layer removeAllAnimations];
             weakSelf.animatedImageView.image = image;
             [weakSelf.animatedImageView.layer addAnimation:transition forKey:nil];
@@ -1570,77 +1557,71 @@ HXVideoEditViewControllerDelegate
             [weakSelf.imageView.layer addAnimation:transition forKey:nil];
 #endif
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             weakSelf.progressView.hidden = YES;
         }]; 
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (self.gifImage) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
-            self.animatedImageView.image = self.gifImage;
+#if HasYYKitOrWebImage
+            if (self.animatedImageView.image != self.gifImage) {
+                 self.animatedImageView.image = self.gifImage;
+            }
 #else
-            self.imageView.image = self.gifImage;
+            if (self.imageView.image != self.gifImage) {
+                self.imageView.image = self.gifImage;
+            }
 #endif
         }else {
-//            if (self.model.asset) {
             self.requestID = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+                if (weakSelf.model != model) return;
                 if (weakSelf.model.isICloud) {
                     weakSelf.progressView.hidden = NO;
                 }
                 weakSelf.requestID = iCloudRequestId;
             } progressHandler:^(double progress, HXPhotoModel *model) {
+                if (weakSelf.model != model) return;
                 if (weakSelf.model.isICloud) {
                     weakSelf.progressView.hidden = NO;
                 }
                 weakSelf.progressView.progress = progress;
             } success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+                if (weakSelf.model != model) return;
                 [weakSelf downloadICloudAssetComplete];
                 weakSelf.progressView.hidden = YES;
+#if HasYYKitOrWebImage
+                YYImage *gifImage = [YYImage imageWithData:imageData];
+                weakSelf.animatedImageView.image = gifImage;
+                weakSelf.gifImage = gifImage;
+#else
                 UIImage *gifImage = [UIImage hx_animatedGIFWithData:imageData];
+                weakSelf.imageView.image = gifImage;
+                weakSelf.gifImage = gifImage;
                 if (gifImage.images.count == 0) {
                     weakSelf.gifFirstFrame = gifImage;
                 }else {
                     weakSelf.gifFirstFrame = gifImage.images.firstObject;
                 }
-                weakSelf.model.tempImage = nil;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
-                weakSelf.animatedImageView.image = gifImage;
-#else
-                weakSelf.imageView.image = gifImage;
 #endif
-                weakSelf.gifImage = gifImage;
+                weakSelf.model.tempImage = nil;
             } failed:^(NSDictionary *info, HXPhotoModel *model) {
-                
+                if (weakSelf.model != model) return;
                 weakSelf.progressView.hidden = YES;
-                if (weakSelf.model.isICloud) {
-                    //                        [weakSelf.progressView showError];
-                }
-            }]; 
-//            }else {
-//                self.progressView.hidden = YES;
-//                UIImage *gifImage = [UIImage hx_animatedGIFWithData:self.model.gifImageData];
-//                if (gifImage.images.count == 0) {
-//                    self.gifFirstFrame = gifImage;
-//                }else {
-//                    self.gifFirstFrame = gifImage.images.firstObject;
-//                }
-//                self.model.tempImage = nil;
-//#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
-//                self.animatedImageView.image = gifImage;
-//#else
-//                self.imageView.image = gifImage;
-//#endif
-//                self.gifImage = gifImage;
-//            }
+            }];
         }
     }
     if (self.player != nil) return;
     if (self.model.subType == HXPhotoModelMediaSubTypeVideo) {
         [self.model requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             [weakSelf.loadingView startAnimating];
             weakSelf.videoPlayBtn.hidden = YES;
             weakSelf.requestID = iCloudRequestId;
         } progressHandler:^(double progress, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             weakSelf.progressView.progress = progress;
         } success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
+            if (weakSelf.model != model) return;
+            weakSelf.avAsset = avAsset;
             [weakSelf downloadICloudAssetComplete];
             weakSelf.progressView.hidden = YES;
             [weakSelf.loadingView stopAnimating];
@@ -1649,6 +1630,7 @@ HXVideoEditViewControllerDelegate
             weakSelf.playerLayer.player = weakSelf.player;
             [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:weakSelf.player.currentItem];
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
+            if (weakSelf.model != model) return;
             [weakSelf.loadingView stopAnimating];
             weakSelf.videoPlayBtn.hidden = NO;
             weakSelf.progressView.hidden = YES;
@@ -1675,14 +1657,14 @@ HXVideoEditViewControllerDelegate
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
     }
-    self.videoPlayBtn.hidden = YES;
+//    self.videoPlayBtn.hidden = YES;
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         if (_livePhotoView.livePhoto) {
             self.livePhotoView.livePhoto = nil;
             [self.livePhotoView removeFromSuperview];
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             self.animatedImageView.hidden = NO;
 #else
             self.imageView.hidden = NO;
@@ -1690,18 +1672,17 @@ HXVideoEditViewControllerDelegate
             [self stopLivePhoto];
         }
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
-        
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h")
+#if HasYYWebImage
         [self.animatedImageView yy_cancelCurrentImageRequest];
-#elif __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#elif HasYYKit
         [self.animatedImageView cancelCurrentImageRequest];
+#elif HasSDWebImage
+        [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (!self.stopCancel) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
-            self.animatedImageView.image = nil;
-            self.gifImage = nil;
-            self.animatedImageView.image = self.gifFirstFrame;
+#if HasYYKitOrWebImage
+            self.animatedImageView.currentAnimatedImageIndex = 0;
 #else
             self.imageView.image = nil;
             self.gifImage = nil;
@@ -1738,7 +1719,7 @@ HXVideoEditViewControllerDelegate
         if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
             touchPoint = [tap locationInView:self.livePhotoView];
         }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
             touchPoint = [tap locationInView:self.animatedImageView];
 #else
             touchPoint = [tap locationInView:self.imageView];
@@ -1769,7 +1750,7 @@ HXVideoEditViewControllerDelegate
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         return self.livePhotoView;
     }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
         return self.animatedImageView;
 #else
         return self.imageView;
@@ -1783,7 +1764,7 @@ HXVideoEditViewControllerDelegate
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         self.livePhotoView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
     }else {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
         self.animatedImageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
 #else
         self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
@@ -1803,10 +1784,10 @@ HXVideoEditViewControllerDelegate
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
-//    self.playerLayer.frame = self.bounds;
-//    self.videoPlayBtn.frame = self.bounds;
-    self.scrollView.frame = self.bounds;
-    self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
+    if (!CGRectEqualToRect(self.scrollView.frame, self.bounds)) {
+        self.scrollView.frame = self.bounds;
+        self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
+    }
     self.progressView.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
     self.loadingView.center = self.progressView.center;
 }
@@ -1827,6 +1808,13 @@ HXVideoEditViewControllerDelegate
         _scrollView.delaysContentTouches = NO;
         _scrollView.canCancelContentTouches = YES;
         _scrollView.alwaysBounceVertical = NO;
+#ifdef __IPHONE_11_0
+        if (@available(iOS 11.0, *)) {
+            _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+#else
+            if ((NO)) {
+#endif
+        }
         UITapGestureRecognizer *tap1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTap:)];
         [_scrollView addGestureRecognizer:tap1];
         UITapGestureRecognizer *tap2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
@@ -1839,7 +1827,7 @@ HXVideoEditViewControllerDelegate
 - (CGFloat)zoomScale {
     return self.scrollView.zoomScale;
 }
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
 - (YYAnimatedImageView *)animatedImageView {
     if (!_animatedImageView) {
         _animatedImageView = [[YYAnimatedImageView alloc] init];
@@ -1868,7 +1856,6 @@ HXVideoEditViewControllerDelegate
         [_videoPlayBtn setImage:[UIImage hx_imageNamed:@"hx_multimedia_videocard_play"] forState:UIControlStateNormal];
         [_videoPlayBtn setImage:[[UIImage alloc] init] forState:UIControlStateSelected];
         [_videoPlayBtn addTarget:self action:@selector(didPlayBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        _videoPlayBtn.hidden = YES;
     }
     return _videoPlayBtn;
 }

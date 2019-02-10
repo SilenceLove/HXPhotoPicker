@@ -22,7 +22,7 @@
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) UIImage *image;
 @property (strong, nonatomic) UIImageView *imageView;
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
 @property (strong, nonatomic) YYAnimatedImageView *animatedImageView;
 #endif
 @property (strong, nonatomic) NSIndexPath *indexPath;

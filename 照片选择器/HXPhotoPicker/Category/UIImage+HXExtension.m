@@ -52,23 +52,14 @@
     UIImage*thumbnailImage = thumbnailImageRef ? [[UIImage alloc]initWithCGImage: thumbnailImageRef] : nil;
     return thumbnailImage;
 }
-
-+ (UIImage *)hx_animatedGIFWithData:(NSData *)data {
-    if (!data) {
-        return nil;
-    }
-    //通过CFData读取gif文件的数据
-    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
++ (UIImage *)hx_animatedGIFWithImageSourceRef:(CGImageSourceRef)source {
     //获取gif文件的帧数
     size_t count = CGImageSourceGetCount(source);
     UIImage *animatedImage;
-    if (count <= 1) {
-        animatedImage = [[UIImage alloc] initWithData:data];
-    }
-    else {//大于一张图片时
+    if (count > 1) { //大于一张图片时
         NSMutableArray *images = [NSMutableArray array];
         //设置gif播放的时间
-        NSTimeInterval duration = 0.0f;
+        NSTimeInterval duration = 0.0f; 
         for (size_t i = 0; i < count; i++) {
             //获取gif指定帧的像素位图
             CGImageRef image = CGImageSourceCreateImageAtIndex(source, i, NULL);
@@ -85,6 +76,34 @@
         }
         animatedImage = [UIImage animatedImageWithImages:images duration:duration];
     }
+    
+    return animatedImage;
+}
++ (UIImage *)hx_animatedGIFWithURL:(NSURL *)URL {
+    if (!URL) {
+        return nil;
+    }
+    CGImageSourceRef source = CGImageSourceCreateWithURL((__bridge CFURLRef)URL, NULL);
+    
+    UIImage *animatedImage = [self hx_animatedGIFWithImageSourceRef:source];
+    if (!animatedImage) {
+        animatedImage = [UIImage imageWithContentsOfFile:URL.relativePath];
+    }
+    CFRelease(source);
+    return animatedImage;
+}
++ (UIImage *)hx_animatedGIFWithData:(NSData *)data {
+    if (!data) {
+        return nil;
+    }
+    //通过CFData读取gif文件的数据
+    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    
+    UIImage *animatedImage = [self hx_animatedGIFWithImageSourceRef:source];
+    if (!animatedImage) {
+        animatedImage = [UIImage imageWithData:data];
+    }
+    
     CFRelease(source);
     return animatedImage;
 }

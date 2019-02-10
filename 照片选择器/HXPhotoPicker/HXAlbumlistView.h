@@ -35,3 +35,7 @@
 - (void)deSelect;
 - (void)setupAlpha:(BOOL)anima;
 @end
+
+@interface HXAlbumTitleButton : UIButton
+@property (copy, nonatomic) void (^ highlightedBlock)(BOOL highlighted);
+@end

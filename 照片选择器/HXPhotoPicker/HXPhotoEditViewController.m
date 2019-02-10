@@ -104,13 +104,14 @@
 - (CGRect)getImageFrame {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat bottomMargin = hxBottomMargin;
-    CGFloat width = self.view.hx_w - 40;
+    CGFloat leftRightMargin = 40;
     CGFloat imageY = HX_IS_IPhoneX_All ? 60 : 30;
     if (HX_IS_IPhoneX_All && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
         bottomMargin = 21;
-        width = self.view.hx_w - 80;
+        leftRightMargin = 80;
         imageY = 20;
     }
+    CGFloat width = self.view.hx_w - leftRightMargin;
     CGFloat height = self.view.frame.size.height - 100 - imageY - bottomMargin;
     CGFloat imgWidth = self.imageWidth;
     CGFloat imgHeight = self.imageHeight;
@@ -132,7 +133,7 @@
         h = imgHeight;
     }
     
-    return CGRectMake((width - w) / 2 + 20, imageY + (height - h) / 2, w, h);
+    return CGRectMake((width - w) / 2 + leftRightMargin / 2, imageY + (height - h) / 2, w, h);
 }
 - (void)changeSubviewFrame:(BOOL)animated {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -187,7 +188,7 @@
     }
 }
 - (void)showBottomView {
-    self.bottomView.alpha = 1; 
+    self.bottomView.alpha = 1;
 }
 - (void)hideImageView { 
     self.imageView.hidden = YES;
@@ -602,11 +603,11 @@
 - (void)bottomViewDidCancelClick {
     [self stopTimer];
     self.isCancel = YES;
-//    if (self.outside) {
+    if (self.navigationController.viewControllers.count > 1) {
+        [self.navigationController popViewControllerAnimated:NO];
+    }else {
         [self dismissViewControllerAnimated:YES completion:nil];
-//        return;
-//    }
-//    [self.navigationController popViewControllerAnimated:NO];
+    }
 }
 - (void)bottomViewDidRestoreClick {
     if (self.manager.configuration.movableCropBox) {
@@ -667,7 +668,7 @@
         CGRect imageRect = [self getImageFrame];
         self.gridLayer.frame = CGRectMake(0, 0, imageRect.size.width, imageRect.size.height);
         
-        [UIView animateWithDuration:0.3 animations:^{
+        [UIView animateWithDuration:0.2 animations:^{
             self.imageView.transform = CGAffineTransformMakeRotation(-M_PI_2);
             self.imageView.frame = imageRect;
         } completion:^(BOOL finished) {
@@ -690,27 +691,39 @@
     }
     HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
     if (self.outside) {
-        [self dismissViewControllerAnimated:NO completion:^{
-            if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
-                [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
-            }
-        }];
+        if (self.navigationController.viewControllers.count > 1) {
+            [self.navigationController popViewControllerAnimated:NO];
+        }else {
+            [self dismissViewControllerAnimated:NO completion:^{
+                if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+                    [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+                }
+            }];
+        }
         return;
     }
     self.isCancel = NO;
     self.afterModel = model;
     if (self.manager.configuration.singleSelected &&
         self.manager.configuration.singleJumpEdit) {
-        [self dismissViewControllerAnimated:NO completion:^{
-            if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
-                [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
-            }
-        }];
+        if (self.navigationController.viewControllers.count > 1) {
+            [self.navigationController popViewControllerAnimated:NO];
+        }else {
+            [self dismissViewControllerAnimated:NO completion:^{
+                if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+                    [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+                }
+            }];
+        }
     }else {
         if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
             [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
         }
-        [self dismissViewControllerAnimated:YES completion:nil];
+        if (self.navigationController.viewControllers.count > 1) {
+            [self.navigationController popViewControllerAnimated:NO];
+        }else {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
     }
 }
 - (void)bottomViewDidSelectRatioClick:(HXEditRatio *)ratio {
@@ -855,6 +868,12 @@
 - (void)didSelectRatioBtnClick {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        UIPopoverPresentationController *pop = [alertController popoverPresentationController];
+        pop.permittedArrowDirections = UIPopoverArrowDirectionAny;
+        pop.sourceView = self;
+        pop.sourceRect = self.bounds;
+    }
     [alertController addAction:[UIAlertAction actionWithTitle:[NSBundle hx_localizedStringForKey:@"原始值"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self setupRatioWithValue1:0 value2:0];
     }]];
@@ -1005,12 +1024,6 @@
 @end
 
 @implementation HXEditGridLayer
-//+ (BOOL)needsDisplayForKey:(NSString*)key {
-//    if ([key isEqualToString:@"clippingRect"]) {
-//        return YES;
-//    }
-//    return [super needsDisplayForKey:key];
-//}
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -1018,15 +1031,6 @@
     }
     return self;
 }
-//- (id)initWithLayer:(id)layer {
-//    self = [super initWithLayer:layer];
-//    if(self && [layer isKindOfClass:[HXEditGridLayer class]]){
-//        self.bgColor   = ((HXEditGridLayer *)layer).bgColor;
-//        self.gridColor = ((HXEditGridLayer *)layer).gridColor;
-//        self.clippingRect = ((HXEditGridLayer *)layer).clippingRect;
-//    }
-//    return self;
-//}
 - (void)drawRect:(CGRect)rect {
     [super drawRect:rect];
     
@@ -1060,35 +1064,6 @@
     }
     CGContextStrokePath(context);
 }
-//- (void)drawInContext:(CGContextRef)context {
-//    CGRect rct = self.bounds;
-//    CGContextSetFillColorWithColor(context, self.bgColor.CGColor);
-//    CGContextFillRect(context, rct);
-//
-//    CGContextClearRect(context, _clippingRect);
-//
-//    CGContextSetStrokeColorWithColor(context, self.gridColor.CGColor);
-////    CGContextSetShadowWithColor(context, CGSizeMake(0, 0), 0, [UIColor clearColor].CGColor);
-//    CGContextSetLineWidth(context, 1);
-//
-//    rct = self.clippingRect;
-//
-//    CGContextBeginPath(context);
-//    CGFloat dW = 0;
-//    for(int i = 0; i < 4; ++i){
-//        CGContextMoveToPoint(context, rct.origin.x+dW, rct.origin.y);
-//        CGContextAddLineToPoint(context, rct.origin.x+dW, rct.origin.y+rct.size.height);
-//        dW += _clippingRect.size.width/3;
-//    }
-//
-//    dW = 0;
-//    for(int i = 0; i < 4; ++i){
-//        CGContextMoveToPoint(context, rct.origin.x, rct.origin.y+dW);
-//        CGContextAddLineToPoint(context, rct.origin.x+rct.size.width, rct.origin.y+dW);
-//        dW += rct.size.height/3;
-//    }
-//    CGContextStrokePath(context);
-//}
 @end
 
 

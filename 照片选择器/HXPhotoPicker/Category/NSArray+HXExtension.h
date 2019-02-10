@@ -15,6 +15,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSArray (HXExtension)
 
 /**
+ 获取写入临时目录的URL, 已处理gif图片和网络图片
+ 网络图片根据URL http || https 来判断
+
+ @param original 是否原图
+ @param presetName 导出视频时的质量
+        AVAssetExportPresetHighestQuality / AVAssetExportPresetMediumQuality
+        if (presetName == nil)
+        original = yes  AVAssetExportPresetHighestQuality
+        original = no   AVAssetExportPresetMediumQuality
+ @param completion URLArray 获取成功的URL数组, errorArray 获取失败的model数组
+ */
+//- (void)hx_requestURLWithOriginal:(BOOL)original presetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable URLArray, NSArray<HXPhotoModel *> * _Nullable errorArray))completion;
+
+/**
  获取image
  如果model是视频的话,获取的则是视频封面
 

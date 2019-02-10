@@ -148,7 +148,7 @@
             self.subType = HXPhotoModelMediaSubTypeVideo;
             self.type = HXPhotoModelMediaTypeVideo;
             self.videoDuration = [[NSString stringWithFormat:@"%.0f",asset.duration] floatValue];
-            NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:self.videoDuration];
+            NSString *time = [HXPhotoTools transformVideoTimeToString:self.videoDuration];
             self.videoTime = time;
         }
         self.asset = asset;
@@ -174,7 +174,7 @@
             videoTime = 1;
         }
         UIImage  *image = [UIImage hx_thumbnailImageForVideo:videoURL atTime:0.1f];
-        NSString *time = [HXPhotoTools getNewTimeFromDurationSecond:videoTime];
+        NSString *time = [HXPhotoTools transformVideoTimeToString:videoTime];
         self.videoDuration = videoTime;
         self.videoURL = videoURL;
         self.videoTime = time;
@@ -221,9 +221,8 @@
     return _imageSize;
 }
 - (NSString *)videoTime {
-    if (!_videoTime) {
-        NSString *timeLength = [NSString stringWithFormat:@"%0.0f",self.videoDuration];
-        _videoTime = [HXPhotoTools getNewTimeFromDurationSecond:timeLength.integerValue];
+    if (!_videoTime) { 
+        _videoTime = [HXPhotoTools transformVideoTimeToString:self.videoDuration];
     }
     return _videoTime;
 }
@@ -231,7 +230,7 @@
 {
     if (_endImageSize.width == 0 || _endImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height - hxNavigationBarHeight;
+        CGFloat height = [UIScreen mainScreen].bounds.size.height;
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;
@@ -243,12 +242,6 @@
         }else {
             w = width;
             h = imgHeight;
-        }
-        if (w == NAN) {
-            w = 0;
-        }
-        if (h == NAN) {
-            h = 0;
         }
         _endImageSize = CGSizeMake(w, h);
     }
@@ -256,52 +249,13 @@
 }
 - (CGSize)previewViewSize {
     if (_previewViewSize.width == 0 || _previewViewSize.height == 0) {
-        CGFloat width = [UIScreen mainScreen].bounds.size.width;
+        _previewViewSize = self.endImageSize;
         CGFloat height = [UIScreen mainScreen].bounds.size.height;
-        CGFloat imgWidth = self.imageSize.width;
-        CGFloat imgHeight = self.imageSize.height;
-        CGFloat w;
-        CGFloat h;
-        
-        if (imgWidth > width) {
-            h = width / self.imageSize.width * imgHeight;
-            w = width;
-        }else {
-            w = width;
-            h = width / imgWidth * imgHeight;
-        }
-        if (h > height + 20) {
-            h = height;
-        }
-        _previewViewSize = CGSizeMake(w, h);
+        if (_previewViewSize.height > height + 20) {
+            _previewViewSize.height = height;
+        } 
     }
     return _previewViewSize;
-}
-- (CGSize)endDateImageSize {
-    if (_endDateImageSize.width == 0 || _endDateImageSize.height == 0) {
-        CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height;
-//        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-//        if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-//            if (HX_IS_IPhoneX_All) {
-//                height = [UIScreen mainScreen].bounds.size.height - hxTopMargin - 21;
-//            }
-//        }
-        CGFloat imgWidth = self.imageSize.width;
-        CGFloat imgHeight = self.imageSize.height;
-        CGFloat w;
-        CGFloat h;
-        imgHeight = width / imgWidth * imgHeight;
-        if (imgHeight > height) {
-            w = height / self.imageSize.height * imgWidth;
-            h = height;
-        }else {
-            w = width;
-            h = imgHeight;
-        }
-        _endDateImageSize = CGSizeMake(w, h);
-    }
-    return _endDateImageSize;
 }
 - (CGSize)requestSize {
     if (_requestSize.width == 0 || _requestSize.height == 0) {
@@ -473,14 +427,14 @@
 #pragma mark - < Request >
 
 + (id)requestImageWithURL:(NSURL *)url progress:(void (^) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
     YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:0 progress:progress transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
         if (completion) {
             completion(image, url, error);
         }
     }];
     return operation;
-#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#elif HasSDWebImage
     SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
         if (completion) {
             completion(image, url, error);
@@ -620,7 +574,7 @@
     
     HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
-#if __has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h")
+#if HasYYKitOrWebImage
         [[YYWebImageManager sharedManager] requestImageWithURL:self.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
             if (image) {
                 if (success) {
@@ -645,7 +599,7 @@
             }
         }];
         return 0;
-#elif __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
+#elif HasSDWebImage
         [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
             if (data) {
                 dispatch_async(dispatch_get_main_queue(), ^{
