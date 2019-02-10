@@ -851,7 +851,7 @@
                 }];
             }else if ([resultClass isEqual:[AVAsset class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+//                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -884,7 +884,7 @@
                 }];
             }else if ([resultClass isEqual:[AVAssetExportSession class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+//                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -917,7 +917,7 @@
                 }];
             }else if ([resultClass isEqual:[AVPlayerItem class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+//                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
                     dispatch_async(dispatch_get_main_queue(), ^{
