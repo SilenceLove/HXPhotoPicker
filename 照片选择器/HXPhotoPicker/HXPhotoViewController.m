@@ -159,7 +159,7 @@ HXVideoEditViewControllerDelegate
         [self.view addSubview:self.albumView];
         
     }
-    [self.navigationController.navigationBar setTintColor:self.manager.configuration.themeColor];
+    [self.navigationController.navigationBar setTintColor:self.manager.configuration.navigationTitleColor];
     if (self.manager.configuration.navBarBackgroudColor) {
         [self.navigationController.navigationBar setBackgroundColor:nil];
         [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];

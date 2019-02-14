@@ -163,7 +163,7 @@ UITableViewDelegate
     self.title = [NSBundle hx_localizedStringForKey:@"相册"];
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(cancelClick)];
-    [self.navigationController.navigationBar setTintColor:self.manager.configuration.themeColor];
+    [self.navigationController.navigationBar setTintColor:self.manager.configuration.navigationTitleColor];
     if (self.manager.configuration.navBarBackgroudColor) {
         [self.navigationController.navigationBar setBackgroundColor:nil];
         [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
