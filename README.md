@@ -46,7 +46,7 @@
 
 - Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.7'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
-- 网络图片加载使用的是```SDWebImage v4.4.1``` || ```YYWebImage v1.0.5```
+- 网络图片加载使用的是```SDWebImage``` || ```YYWebImage```
 - 如果想要加载网络gif图片请使用```YYWebImage```
 - 使用前导入头文件 "HXPhotoPicker.h"
 
