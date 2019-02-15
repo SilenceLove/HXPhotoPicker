@@ -177,7 +177,7 @@
         weakSelf.animatedImageView.image = image;
         [weakSelf.animatedImageView.layer addAnimation:transition forKey:nil];
 #else
-        [weakSelf.animatedImageView.layer removeAllAnimations];
+        [weakSelf.imageView.layer removeAllAnimations];
         weakSelf.imageView.image = image;
         [weakSelf.imageView.layer addAnimation:transition forKey:nil];
 #endif

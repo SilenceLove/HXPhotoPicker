@@ -11,6 +11,12 @@
 #import "HXPhotoManager.h"
 #import "HXPhotoView.h"
 
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>)
+#import <SDWebImage/UIImageView+WebCache.h>
+#elif __has_include("UIImageView+WebCache.h")
+#import "UIImageView+WebCache.h"
+#endif
+
 #if __has_include(<YYWebImage/YYWebImage.h>)
 #import <YYWebImage/YYWebImage.h>
 #elif __has_include("YYWebImage.h")

@@ -47,6 +47,9 @@
 @property (nonatomic) AVCaptureTorchMode torchMode;
 @property (nonatomic) AVCaptureFlashMode flashMode;
 
+
+@property (copy, nonatomic) NSString *videoCodecKey;
+
 - (void)focusAtPoint:(CGPoint)point;
 - (void)exposeAtPoint:(CGPoint)point;
 - (void)resetFocusAndExposureModes;

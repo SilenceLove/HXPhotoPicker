@@ -64,6 +64,7 @@
     
     [self.view addSubview:self.previewView];
     self.cameraController = [[HXCustomCameraController alloc] init];
+    self.cameraController.videoCodecKey = self.manager.configuration.videoCodecKey;
     self.cameraController.delegate = self;
     if ([self.cameraController setupSession:nil]) {
         [self.previewView setSession:self.cameraController.captureSession];

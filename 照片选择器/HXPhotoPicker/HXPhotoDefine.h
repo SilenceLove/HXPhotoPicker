@@ -32,7 +32,7 @@
 
 #define HasYYKit (__has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h"))
 
-#define HasYYKitOrWebImage (HasYYWebImage || HasYYKit)
+#define HasYYKitOrWebImage (__has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h"))
 
 #define HasSDWebImage (__has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h"))
 

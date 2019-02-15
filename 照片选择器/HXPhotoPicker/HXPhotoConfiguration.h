@@ -38,6 +38,16 @@ HXPhotoPreviewViewController;
 @interface HXPhotoConfiguration : NSObject
 
 /**
+ 使用框架自带的相机录制视频时设置的编码格式， ios11以上
+ iphone7及以上时系统默认AVVideoCodecHEVC
+ HEVC仅支持iPhone 7及以上设备
+ iphone6、6s 都不支持H.265，软解H265视频只有声音没有画面
+ 当iphone7以下机型出现只有声音没有画面的问题，请将这个值设置为AVVideoCodecH264
+ 替换成系统相机也可以解决
+ */
+@property (copy, nonatomic) NSString *videoCodecKey;
+
+/**
  原图按钮显示已选照片的大小
  */
 @property (assign, nonatomic) BOOL showOriginalBytes;

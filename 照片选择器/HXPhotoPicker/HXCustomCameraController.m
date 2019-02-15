@@ -473,6 +473,13 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     if (![self isRecording]) {
         AVCaptureConnection *videoConnection =
         [self.movieOutput connectionWithMediaType:AVMediaTypeVideo];
+
+        // 设置编码格式
+        if (HX_IOS11_Later && self.videoCodecKey) {
+            NSMutableDictionary* outputSettings = [NSMutableDictionary dictionary];
+            outputSettings[AVVideoCodecKey] = self.videoCodecKey;
+            [self.movieOutput setOutputSettings:outputSettings forConnection:videoConnection];
+        }
         
         if ([videoConnection isVideoOrientationSupported]) {
             videoConnection.videoOrientation = (AVCaptureVideoOrientation)_deviceOrientation;
