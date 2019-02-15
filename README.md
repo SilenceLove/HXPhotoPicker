@@ -35,6 +35,7 @@
 - [x] 查看/选择LivePhoto IOS9.1以上才有用
 - [x] 浏览网络图片
 - [x] 自定义裁剪图片
+- [x] 自定义裁剪视频时长
 - [x] 传入本地图片、视频
 - [x] 在线下载iCloud上的资源
 - [x] 两种相册展现方式（列表、弹窗）
@@ -43,7 +44,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.6'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.7'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage v4.4.1``` || ```YYWebImage v1.0.5```
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -416,7 +417,8 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
         NSData *jpgData = [context JPEGRepresentationOfImage:ciImage colorSpace:ciImage.colorSpace options:@{key : @1}];
         UIImage *image = [UIImage imageWithData:jpgData];
     }else {
-        UIImage *image = [UIImage imageWithContentsOfFile:path]; 
+        NSData *imageData = [NSData dataWithContentsOfFile:path];
+        UIImage *image = [UIImage imageWithData:imageData];  
     }
 } failed:^(NSDictionary *info, HXPhotoModel *model) {
     // 获取失败
@@ -459,6 +461,7 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.2.7　-　解决使用NSArray+HXExtension里方法可能会获取空的问题，部分机型系统编辑照片时可能会出现黑屏问题
 - v2.2.6　-　添加视频时长编辑功能，修复ipad、ios8的一些问题，显示效果和逻辑上的一些优化以及Demo的一些修改
 - v2.2.5　-　优化一些显示效果，一些问题修复，编辑照片时添加转场动画
 - 2019-1-18 修复预览大图时下载iCloud资源完成后未刷新列表cell问题。去除Date命名（有在外部使用的请去掉Date命名）

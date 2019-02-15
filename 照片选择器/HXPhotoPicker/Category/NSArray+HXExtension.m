@@ -61,7 +61,7 @@
     NSArray *keys = [dict.allKeys sortedArrayUsingSelector:@selector(compare:)];
     for (NSString *key in keys) {
         if ([dict[key] isKindOfClass:[NSError class]]) {
-            break;
+            continue;
         }
         if ([dict[key] isKindOfClass:[NSString class]]) {
             NSString *path = dict[key];
@@ -74,7 +74,9 @@
                 UIImage *image = [UIImage imageWithData:jpgData];
                 [dataArray addObject:image];
             }else {
-                UIImage *image = [UIImage imageWithContentsOfFile:path];
+                NSData *imageData = [NSData dataWithContentsOfFile:path];
+                UIImage *image = [UIImage imageWithData:imageData];
+//                UIImage *image = [UIImage imageWithContentsOfFile:path];
                 [dataArray addObject:image];
             }
         }else {
@@ -91,12 +93,13 @@
         if (HXShowLog) NSSLog(@"数组里装的不是HXPhotoModel对象或者为空");
         return;
     }
-    __block NSInteger index = 0;
     NSInteger count = self.count;
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     for (int i = 0 ; i < self.count; i++) {
-        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:@(i + 1).stringValue];
+        HXPhotoModel *model = self[i];
+        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:model.selectIndexStr];
     }
+    __block NSInteger index = 0;
     __block NSMutableArray *errorArray;
     for (HXPhotoModel *model in self) {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
@@ -215,7 +218,8 @@
     }
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     for (int i = 0 ; i < self.count; i++) {
-        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:@(i + 1).stringValue];
+        HXPhotoModel *model = self[i];
+        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:model.selectIndexStr];
     }
     __block NSInteger index = 0;
     NSInteger count = self.count;
@@ -260,7 +264,8 @@
     }
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     for (int i = 0 ; i < self.count; i++) {
-        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:@(i + 1).stringValue];
+        HXPhotoModel *model = self[i];
+        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:model.selectIndexStr];
     }
     __block NSInteger index = 0;
     NSInteger count = self.count;
@@ -295,7 +300,8 @@
     }
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     for (int i = 0 ; i < self.count; i++) {
-        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:@(i + 1).stringValue];
+        HXPhotoModel *model = self[i];
+        [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:model.selectIndexStr];
     }
     __block NSInteger index = 0;
     NSInteger count = self.count;

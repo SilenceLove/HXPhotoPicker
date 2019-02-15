@@ -211,7 +211,10 @@
             weakSelf.requestId = iCloudRequestId;
         } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
             weakSelf.bottomView.userInteractionEnabled = YES;
-            UIImage *image = [UIImage imageWithContentsOfFile:imageURL.relativePath];
+            NSData *imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
+            UIImage *image = [UIImage imageWithData:imageData];
+
+//            UIImage *image = [UIImage imageWithContentsOfFile:imageURL.relativePath];
             if (image.imageOrientation != UIImageOrientationUp) {
                 image = [image hx_normalizedImage];
             }

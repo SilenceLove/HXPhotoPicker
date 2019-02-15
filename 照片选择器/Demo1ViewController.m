@@ -320,6 +320,9 @@
         NSSLog(@"block - all - %@",allList);
         NSSLog(@"block - photo - %@",photoList);
         NSSLog(@"block - video - %@",videoList);
+//        [photoList hx_requestImageWithOriginal:NO completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
+//            NSSLog(@"images - %@", imageArray);
+//        }];
     } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
         NSSLog(@"block - 取消了");
     }];
