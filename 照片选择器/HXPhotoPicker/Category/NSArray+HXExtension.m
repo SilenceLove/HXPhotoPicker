@@ -61,7 +61,7 @@
     NSArray *keys = [dict.allKeys sortedArrayUsingSelector:@selector(compare:)];
     for (NSString *key in keys) {
         if ([dict[key] isKindOfClass:[NSError class]]) {
-            break;
+            continue;
         }
         if ([dict[key] isKindOfClass:[NSString class]]) {
             NSString *path = dict[key];
