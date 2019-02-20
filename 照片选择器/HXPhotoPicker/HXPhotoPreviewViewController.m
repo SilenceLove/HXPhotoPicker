@@ -302,7 +302,6 @@ HXVideoEditViewControllerDelegate
         self.view.backgroundColor = [UIColor blackColor];
     }
     self.beforeOrientationIndex = self.currentModelIndex;
-    [self changeSubviewFrame];
     
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     self.currentModel = model;
@@ -351,11 +350,6 @@ HXVideoEditViewControllerDelegate
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
         self.selectBtn.backgroundColor = self.selectBtn.selected ? self.manager.configuration.themeColor : nil;
-//        if ([self.manager.selectedArray containsObject:model]) {
-//            self.bottomView.currentIndex = [[self.manager selectedArray] indexOfObject:model];
-//        }else {
-//            [self.bottomView deselected];
-//        }
         if (self.manager.configuration.singleSelected) {
             self.selectBtn.hidden = YES;
             if (self.manager.configuration.singleJumpEdit) {
@@ -370,11 +364,6 @@ HXVideoEditViewControllerDelegate
         }
     }else {
         self.bottomView.selectCount = [self.manager afterSelectedCount];
-//        if ([self.manager.afterSelectedArray containsObject:model]) {
-//            self.bottomView.currentIndex = [[self.manager afterSelectedArray] indexOfObject:model];
-//        }else {
-//            [self.bottomView deselected];
-//        }
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.bottomView.enabled = self.manager.configuration.videoCanEdit;
         } else {
@@ -417,6 +406,7 @@ HXVideoEditViewControllerDelegate
             }
         }
     }
+    [self changeSubviewFrame];
 }
 - (void)didSelectClick:(UIButton *)button {
     if (self.modelArray.count <= 0 || self.outside) {
