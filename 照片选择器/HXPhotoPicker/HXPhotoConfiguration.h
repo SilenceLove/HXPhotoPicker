@@ -53,7 +53,7 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) BOOL showOriginalBytes;
 
 /**
- 导入裁剪视频的质量 - default AVAssetExportPresetHighestQuality
+ 导出裁剪视频的质量 - default AVAssetExportPresetHighestQuality
  */
 @property (copy, nonatomic) NSString *editVideoExportPresetName;
 

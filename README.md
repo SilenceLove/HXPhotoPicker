@@ -44,7 +44,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.7'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.8'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage``` || ```YYWebImage```
 - 如果想要加载网络gif图片请使用```YYWebImage```

@@ -429,6 +429,9 @@ HXVideoEditBottomViewDelegate
             [weakSelf updateBottomVideoTimeLbs];
         };
         _bottomView.startTimer = ^{
+            if (weakSelf.isCancel) {
+                return;
+            }
             [weakSelf startTimer];
             [weakSelf updateBottomVideoTimeLbs];
         };

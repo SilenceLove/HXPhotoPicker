@@ -195,10 +195,11 @@
 }
 - (void)changeSubviewFrame {
     self.customNavigationBar.frame = CGRectMake(0, self.previewView.hx_y, self.view.hx_w, hxNavigationBarHeight);
+    self.topView.frame = self.customNavigationBar.frame;
     if (!HX_IS_IPhoneX_All && HX_IOS11_Later) {
         self.customNavigationBar.hx_y = self.previewView.hx_y + 10;
+        self.topView.hx_y = -10;
     }
-    self.topView.frame = self.customNavigationBar.frame;
     self.topMaskLayer.frame = self.topView.bounds;
     self.bottomView.frame = CGRectMake(0, self.view.hx_h - 120 - self.previewView.hx_y, self.view.hx_w, 120);
 }
