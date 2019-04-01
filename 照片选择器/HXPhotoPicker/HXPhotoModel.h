@@ -86,6 +86,35 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
  */
 @property (strong, nonatomic) CLLocation *location;
 
+/**  照片类型  */
+@property (assign, nonatomic) HXPhotoModelMediaType type;
+/**  照片子类型  */
+@property (assign, nonatomic) HXPhotoModelMediaSubType subType;
+@property (assign, nonatomic) HXPhotoModelMediaTypeCameraPhotoType cameraPhotoType;
+@property (assign, nonatomic) HXPhotoModelMediaTypeCameraVideoType cameraVideoType;
+/**  照片PHAsset对象  */
+@property (strong, nonatomic) PHAsset *asset;
+/**  视频秒数 */
+@property (nonatomic, assign) NSTimeInterval videoDuration;
+/**  选择的下标 */
+@property (assign, nonatomic) NSInteger selectedIndex;
+/**  模型所对应的选中下标 */
+@property (copy, nonatomic) NSString *selectIndexStr;
+/**  照片原始宽高 */
+@property (assign, nonatomic) CGSize imageSize;
+/**  本地视频URL */
+@property (strong, nonatomic) NSURL *videoURL;
+/**  网络图片的地址 */
+@property (copy, nonatomic) NSURL *networkPhotoUrl;
+/**  网络图片缩略图地址  */
+@property (strong, nonatomic) NSURL *networkThumbURL;
+/**  临时的列表小图 - 本地图片才用这个上传  */
+@property (strong, nonatomic) UIImage *thumbPhoto;
+/**  临时的预览大图  - 本地图片才用这个上传 */
+@property (strong, nonatomic) UIImage *previewPhoto;
+
+
+#pragma mark - < Disabled >
 /**  是否正在下载iCloud上的资源  */
 @property (assign, nonatomic) BOOL iCloudDownloading;
 /**  iCloud下载进度  */
@@ -96,32 +125,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (copy, nonatomic) NSString *barTitle;
 /**  预览界面导航栏上的小标题  */
 @property (copy, nonatomic) NSString *barSubTitle;
-/**  照片PHAsset对象  */
-@property (strong, nonatomic) PHAsset *asset;
 /**  PHAsset对象唯一标示  */
 @property (copy, nonatomic) NSString *localIdentifier;
 /**  是否iCloud上的资源  */
 @property (nonatomic, assign) BOOL isICloud;
-/**  照片类型  */
-@property (assign, nonatomic) HXPhotoModelMediaType type;
-/**  照片子类型  */
-@property (assign, nonatomic) HXPhotoModelMediaSubType subType;
-
-@property (assign, nonatomic) HXPhotoModelMediaTypeCameraPhotoType cameraPhotoType;
-@property (assign, nonatomic) HXPhotoModelMediaTypeCameraVideoType cameraVideoType;
-
-/**  临时的列表小图  */
-@property (strong, nonatomic) UIImage *thumbPhoto;
-/**  临时的预览大图  */
-@property (strong, nonatomic) UIImage *previewPhoto;
 /**  当前照片所在相册的名称 */
 @property (copy, nonatomic) NSString *albumName;
 /**  视频时长 */
 @property (copy, nonatomic) NSString *videoTime;
-/**  视频秒数 */
-@property (nonatomic, assign) NSTimeInterval videoDuration;
-/**  选择的下标 */
-@property (assign, nonatomic) NSInteger selectedIndex;
 /**  模型对应的Section */
 @property (assign, nonatomic) NSInteger dateSection;
 /**  模型对应的item */
@@ -130,10 +141,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (assign, nonatomic) BOOL dateCellIsVisible;
 /**  是否选中 */
 @property (assign, nonatomic) BOOL selected;
-/**  模型所对应的选中下标 */
-@property (copy, nonatomic) NSString *selectIndexStr;
-/**  照片原始宽高 */
-@property (assign, nonatomic) CGSize imageSize;
 /**  预览界面按比例缩小之后的宽高 */
 @property (assign, nonatomic) CGSize endImageSize; 
 /**  3dTouch按比例缩小之后的宽高 */
@@ -142,12 +149,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (assign, nonatomic) CGSize dateBottomImageSize;
 /**  拍照之后的唯一标示 */
 @property (copy, nonatomic) NSString *cameraIdentifier;
-/**  本地视频URL */
-@property (strong, nonatomic) NSURL *videoURL;
-/**  网络图片的地址 */
-@property (copy, nonatomic) NSURL *networkPhotoUrl;
-/**  网络图片缩略图地址  */
-@property (strong, nonatomic) NSURL *networkThumbURL;
 /**  当前图片所在相册的下标 */
 @property (assign, nonatomic) NSInteger currentAlbumIndex;
 /**  网络图片已下载的大小 */
@@ -186,8 +187,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (strong, nonatomic) id tempAsset;
 @property (assign, nonatomic) BOOL loadOriginalImage;
 
-#pragma mark - < init >
 
+#pragma mark - < init >
 /**  通过image初始化 */
 + (instancetype)photoModelWithImage:(UIImage *)image;
 /**  通过视频地址和视频时长初始化 */
@@ -196,12 +197,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 + (instancetype)photoModelWithVideoURL:(NSURL *)videoURL;
 /**  通过PHAsset对象初始化 */
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset;
+/**  通过视频PHAsset对象初始化视频封面 */
++ (instancetype)videoCoverWithPHAsset:(PHAsset *)asset;
 /**  通过网络图片URL对象初始化 */
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL;
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL;
 
-#pragma mark - < Request >
 
+#pragma mark - < Request >
 + (id)requestImageWithURL:(NSURL *)url progress:(void (^) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion;
 
 + (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *image, PHAsset *asset))completion;
@@ -218,7 +221,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
          可用于取消请求 [[PHImageManager defaultManager] cancelImageRequest:(PHImageRequestID)];
  */
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock)completion;
-- (PHImageRequestID)requestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion;
+- (PHImageRequestID)requestThumbImageWithSize:(CGSize)size
+                                   completion:(HXModelImageSuccessBlock)completion;
 
 /**
  请求获取预览大图，此方法只会回调一次，如果为视频的话就是视频封面
@@ -254,7 +258,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
                                      success:(HXModelLivePhotoSuccessBlock)success
                                       failed:(HXModelFailedBlock)failed;
 /**
- 请求获取ImageData - 本地图片和相机拍照的和网络图片会获取不到
+ 请求获取ImageData - 本地图片和相机拍照的和网络图片会获取失败
  */
 - (PHImageRequestID)requestImageDataStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
                                        progressHandler:(HXModelProgressHandler)progressHandler

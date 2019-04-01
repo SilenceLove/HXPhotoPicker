@@ -42,7 +42,13 @@
 @end
 
 @implementation HXCustomCameraViewController
-
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.statusBarShouldBeHidden = YES;
+    }
+    return self;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     if (self.manager.configuration.saveSystemAblum && !self.manager.albums) {
@@ -149,6 +155,7 @@
     if (self.manager.configuration.navigationBar) {
         self.manager.configuration.navigationBar(self.customNavigationBar, self);
     }
+    [UINavigationBar appearance].translucent = YES;
 }
 - (void)requestAccessForAudio {
     [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
@@ -267,6 +274,9 @@
         if (self.cancelBlock) {
             self.cancelBlock(self);
         }
+        if (self.manager.configuration.restoreNavigationBar && self.isOutside) {
+            [UINavigationBar appearance].translucent = NO;
+        }
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
@@ -323,6 +333,9 @@
     }
     if (self.doneBlock) {
         self.doneBlock(model, self);
+    }
+    if (self.manager.configuration.restoreNavigationBar && self.isOutside) {
+        [UINavigationBar appearance].translucent = NO;
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }

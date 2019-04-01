@@ -94,7 +94,9 @@
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset {
     return [[self alloc] initWithPHAsset:asset];
 }
-
++ (instancetype)videoCoverWithPHAsset:(PHAsset *)asset {
+    return [[self alloc] initVideoCoverWithPHAsset:asset];
+}
 + (instancetype)photoModelWithImage:(UIImage *)image {
     return [[self alloc] initWithImage:image];
 }
@@ -153,6 +155,14 @@
             NSString *time = [HXPhotoTools transformVideoTimeToString:self.videoDuration];
             self.videoTime = time;
         }
+        self.asset = asset;
+    }
+    return self;
+}
+- (instancetype)initVideoCoverWithPHAsset:(PHAsset *)asset {
+    if (self = [super init]) {
+        self.subType = HXPhotoModelMediaSubTypePhoto;
+        self.type = HXPhotoModelMediaTypePhoto;
         self.asset = asset;
     }
     return self;
@@ -994,7 +1004,7 @@
     }
     HXWeakSelf
     [self requestAVAssetStartRequestICloud:startRequestICloud progressHandler:iCloudProgressHandler success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
-        
+        HXStrongSelf
         NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
         if ([presets containsObject:presetName]) {
             AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:presetName];
@@ -1019,7 +1029,7 @@
             
             NSTimer *timer = [NSTimer hx_scheduledTimerWithTimeInterval:0.1f block:^{
                 if (exportProgressHandler) {
-                    exportProgressHandler(session.progress, weakSelf);
+                    exportProgressHandler(session.progress, strongSelf);
                 }
             } repeats:YES];
             
@@ -1029,19 +1039,19 @@
                         if (HXShowLog) NSSLog(@"视频导出完成");
                         [timer invalidate];
                         if (success) {
-                            success(videoURL, weakSelf);
+                            success(videoURL, strongSelf);
                         }
                     }else if ([session status] == AVAssetExportSessionStatusFailed){
                         if (HXShowLog) NSSLog(@"视频导出失败");
                         [timer invalidate];
                         if (failed) {
-                            failed(nil, weakSelf);
+                            failed(nil, strongSelf);
                         }
                     }else if ([session status] == AVAssetExportSessionStatusCancelled) {
                         if (HXShowLog) NSSLog(@"视频导出被取消");
                         [timer invalidate];
                         if (failed) {
-                            failed(nil, weakSelf);
+                            failed(nil, strongSelf);
                         }
                     }
                 });

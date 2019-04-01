@@ -71,6 +71,8 @@
 
 // 弱引用
 #define HXWeakSelf __weak typeof(self) weakSelf = self;
+// 强引用
+#define HXStrongSelf __strong typeof(self) strongSelf = weakSelf;
 
 CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
                                           NSString *title,

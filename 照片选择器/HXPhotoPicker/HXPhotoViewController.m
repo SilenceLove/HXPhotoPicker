@@ -139,7 +139,7 @@ HXVideoEditViewControllerDelegate
                 [weakSelf.view addSubview:weakSelf.authorizationLb];
             }
         }];
-        [UINavigationBar appearance].translucent = YES; 
+        [UINavigationBar appearance].translucent = YES;
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }

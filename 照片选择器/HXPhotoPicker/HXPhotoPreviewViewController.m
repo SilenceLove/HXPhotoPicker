@@ -100,6 +100,7 @@ HXVideoEditViewControllerDelegate
         [cell cancelRequest];
     }
     if ([UIApplication sharedApplication].statusBarHidden) {
+        [self changeStatusBarWithHidden:NO];
         [self.navigationController setNavigationBarHidden:NO animated:NO];
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }
@@ -142,7 +143,7 @@ HXVideoEditViewControllerDelegate
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
-        self.statusBarShouldBeHidden = YES;
+        [self changeStatusBarWithHidden:YES];
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     }
 }
@@ -182,7 +183,7 @@ HXVideoEditViewControllerDelegate
 }
 - (void)viewWillDisappear:(BOOL)animated {
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
-        self.statusBarShouldBeHidden = NO;
+        [self changeStatusBarWithHidden:NO];
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }
     HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
@@ -201,6 +202,12 @@ HXVideoEditViewControllerDelegate
     [self addGesture];
 }
 #pragma mark - < private >
+- (void)setExteriorPreviewStyle:(HXPhotoViewPreViewShowStyle)exteriorPreviewStyle {
+    _exteriorPreviewStyle = exteriorPreviewStyle;
+    if (exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        self.statusBarShouldBeHidden = YES;
+    }
+}
 - (void)addGesture {
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(respondsToLongPress:)];
     [self.view addGestureRecognizer:longPress];
@@ -224,7 +231,13 @@ HXVideoEditViewControllerDelegate
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
-        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            [self changeStatusBarWithHidden:YES];
+            [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+        }else {
+            [self changeStatusBarWithHidden:NO];
+            [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        }
         self.titleLb.hidden = NO;
         self.customTitleView.frame = CGRectMake(0, 0, 150, 44);
         self.titleLb.frame = CGRectMake(0, 9, 150, 14);
@@ -232,7 +245,13 @@ HXVideoEditViewControllerDelegate
         self.titleLb.text = model.barTitle;
         self.subTitleLb.text = model.barSubTitle;
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            [self changeStatusBarWithHidden:YES];
+            [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+        }else {
+            [self changeStatusBarWithHidden:NO];
+            [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+        }
         self.customTitleView.frame = CGRectMake(0, 0, 200, 30);
         self.titleLb.hidden = YES;
         self.subTitleLb.frame = CGRectMake(0, 0, 200, 30);
@@ -538,11 +557,11 @@ HXVideoEditViewControllerDelegate
     if (self.bottomView.alpha == 1) {
         hide = YES;
     }
+    [self changeStatusBarWithHidden:hide];
     if (!hide) {
         [self.navigationController setNavigationBarHidden:hide animated:NO];
     }
     self.bottomView.userInteractionEnabled = !hide;
-    [self changeStatusBarWithHidden:hide];
     if (animete) {
         [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
         [UIView animateWithDuration:duration animations:^{
@@ -813,12 +832,12 @@ HXVideoEditViewControllerDelegate
     }
 }
 - (void)photoPreviewBottomViewDidDone:(HXPhotoPreviewBottomView *)bottomView {
+    if (self.manager.configuration.restoreNavigationBar) {
+        [UINavigationBar appearance].translucent = NO;
+    }
     if (self.outside) {
         self.manager.selectPhotoing = NO;
         [self dismissViewControllerAnimated:YES completion:nil];
-        if (self.manager.configuration.restoreNavigationBar) {
-            [UINavigationBar appearance].translucent = NO;
-        }
         return;
     }
     if (self.modelArray.count == 0) {
@@ -830,7 +849,7 @@ HXVideoEditViewControllerDelegate
         NSString *str = self.manager.shouldSelectModel(model);
         if (str) {
             [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:str]];
-            return; 
+            return;
         }
     }
     if (self.manager.configuration.singleSelected) {
@@ -876,7 +895,7 @@ HXVideoEditViewControllerDelegate
         }
     }
     if ([self.manager selectedCount] == 0) {
-        if (model.subType == HXPhotoModelMediaSubTypeVideo) { 
+        if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
                 [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
                 return;
@@ -886,7 +905,7 @@ HXVideoEditViewControllerDelegate
             }
         }
         if (!self.selectBtn.selected && !max && self.modelArray.count > 0) {
-//            model.selected = YES;
+            //            model.selected = YES;
             HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
 #if HasYYKitOrWebImage
             if (model.type == HXPhotoModelMediaTypePhotoGif) {
@@ -955,7 +974,7 @@ HXVideoEditViewControllerDelegate
     }
     [self.collectionView reloadData];
     if (self.selectPreview) {
-        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.modelArray.count - 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionRight animated:NO]; 
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.modelArray.count - 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionRight animated:NO];
     }else {
         [self scrollViewDidScroll:self.collectionView];
     }
@@ -1095,7 +1114,7 @@ HXVideoEditViewControllerDelegate
 }
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
-//        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, hxTopMargin,self.view.hx_w + 20, self.view.hx_h - hxTopMargin - hxBottomMargin) collectionViewLayout:self.flowLayout];
+        //        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, hxTopMargin,self.view.hx_w + 20, self.view.hx_h - hxTopMargin - hxBottomMargin) collectionViewLayout:self.flowLayout];
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, 0,self.view.hx_w + 20, self.view.hx_h) collectionViewLayout:self.flowLayout];
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
             _collectionView.backgroundColor = [UIColor whiteColor];
@@ -1113,7 +1132,7 @@ HXVideoEditViewControllerDelegate
         if (@available(iOS 11.0, *)) {
             _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #else
-        if ((NO)) {
+            if ((NO)) {
 #endif
         } else {
             self.automaticallyAdjustsScrollViewInsets = NO;
@@ -1123,26 +1142,26 @@ HXVideoEditViewControllerDelegate
 }
 - (UICollectionViewFlowLayout *)flowLayout {
     if (!_flowLayout) {
-        _flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        _flowLayout.minimumInteritemSpacing = 0;
-        _flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        
-        if (self.outside) {
-            _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
-        }else {
-#ifdef __IPHONE_11_0
-            if (@available(iOS 11.0, *)) {
-#else
-                if ((NO)) {
-#endif
-                    _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
-                }else {
-                    _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
-                }
+    _flowLayout = [[UICollectionViewFlowLayout alloc] init];
+    _flowLayout.minimumInteritemSpacing = 0;
+    _flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+
+    if (self.outside) {
+        _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
+    }else {
+    #ifdef __IPHONE_11_0
+        if (@available(iOS 11.0, *)) {
+    #else
+            if ((NO)) {
+    #endif
+                _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
+            }else {
+                _flowLayout.sectionInset = UIEdgeInsetsMake(0, 10, 0, 10);
             }
         }
-        return _flowLayout;
     }
+    return _flowLayout;
+}
 - (NSMutableArray *)modelArray {
     if (!_modelArray) {
         _modelArray = [NSMutableArray array];
@@ -1178,11 +1197,11 @@ HXVideoEditViewControllerDelegate
 }
 - (void)setup {
     [self.contentView addSubview:self.scrollView];
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
     [self.scrollView addSubview:self.animatedImageView];
-#else
+    #else
     [self.scrollView addSubview:self.imageView];
-#endif
+    #endif
     [self.contentView.layer addSublayer:self.playerLayer];
     [self.contentView addSubview:self.videoPlayBtn];
     [self.contentView addSubview:self.progressView];
@@ -1218,11 +1237,11 @@ HXVideoEditViewControllerDelegate
 - (void)againAddImageView {
     [self refreshImageSize];
     [self.scrollView setZoomScale:1.0f];
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
     [self.scrollView addSubview:self.animatedImageView];
-#else
+    #else
     [self.scrollView addSubview:self.imageView];
-#endif 
+    #endif
     if (self.model.subType == HXPhotoModelMediaSubTypeVideo) {
         self.videoPlayBtn.hidden = NO;
         [self.contentView.layer addSublayer:self.playerLayer];
@@ -1240,7 +1259,7 @@ HXVideoEditViewControllerDelegate
     CGFloat imgHeight = self.model.imageSize.height;
     CGFloat w;
     CGFloat h;
-    
+
     imgHeight = width / imgWidth * imgHeight;
     if (imgHeight > height) {
         w = height / self.model.imageSize.height * imgWidth;
@@ -1258,7 +1277,7 @@ HXVideoEditViewControllerDelegate
     CGFloat imgHeight = self.model.imageSize.height;
     CGFloat w;
     CGFloat h;
-    
+
     imgHeight = width / imgWidth * imgHeight;
     if (imgHeight > height) {
         w = height / self.model.imageSize.height * imgWidth;
@@ -1269,15 +1288,15 @@ HXVideoEditViewControllerDelegate
         h = imgHeight;
         self.scrollView.maximumZoomScale = 2.5;
     }
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
     self.animatedImageView.frame = CGRectMake(0, 0, w, h);
     self.animatedImageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.animatedImageView.frame;
-#else
+    #else
     self.imageView.frame = CGRectMake(0, 0, w, h);
     self.imageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.imageView.frame;
-#endif
+    #endif
     self.videoPlayBtn.frame = self.playerLayer.frame;
 }
 - (void)setModel:(HXPhotoModel *)model {
@@ -1288,16 +1307,16 @@ HXVideoEditViewControllerDelegate
     self.progressView.hidden = YES;
     [self.loadingView stopAnimating];
     self.progressView.progress = 0;
-    
+
     [self resetScale:NO];
-    
+
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
     CGFloat imgWidth = self.model.imageSize.width;
     CGFloat imgHeight = self.model.imageSize.height;
     CGFloat w;
     CGFloat h;
-    
+
     imgHeight = width / imgWidth * imgHeight;
     if (imgHeight > height) {
         w = height / self.model.imageSize.height * imgWidth;
@@ -1308,26 +1327,26 @@ HXVideoEditViewControllerDelegate
         h = imgHeight;
         self.scrollView.maximumZoomScale = 2.5;
     }
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
     self.animatedImageView.frame = CGRectMake(0, 0, w, h);
     self.animatedImageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.animatedImageView.frame;
     self.videoPlayBtn.frame = self.playerLayer.frame;
     self.animatedImageView.hidden = NO;
-#else
+    #else
     self.imageView.frame = CGRectMake(0, 0, w, h);
     self.imageView.center = CGPointMake(width / 2, height / 2);
     self.playerLayer.frame = self.imageView.frame;
     self.videoPlayBtn.frame = self.playerLayer.frame;
     self.imageView.hidden = NO;
-#endif
+    #endif
     HXWeakSelf
     if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
         if (model.networkPhotoUrl) {
             self.progressView.hidden = model.downloadComplete;
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             [self.animatedImageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
                 if (weakSelf.model == model) {
                     weakSelf.progressView.progress = progress;
@@ -1347,7 +1366,7 @@ HXVideoEditViewControllerDelegate
                     }
                 }
             }];
-#else
+    #else
             [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
                 if (weakSelf.model == model) {
                     weakSelf.progressView.progress = progress;
@@ -1367,65 +1386,65 @@ HXVideoEditViewControllerDelegate
                     }
                 }
             }];
-#endif
+    #endif
         }else {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             self.animatedImageView.image = model.thumbPhoto;
-#else
+    #else
             self.imageView.image = model.thumbPhoto;
-#endif
+    #endif
             model.tempImage = nil;
         }
     }else {
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             if (model.tempImage) {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
                 self.animatedImageView.image = model.tempImage;
-#else
+    #else
                 self.imageView.image = model.tempImage;
-#endif
+    #endif
                 model.tempImage = nil;
             }else {
                 self.requestID = [model requestThumbImageWithSize:CGSizeMake(self.hx_w * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                     if (weakSelf.model != model) return;
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
                     weakSelf.animatedImageView.image = image;
-#else
+    #else
                     weakSelf.imageView.image = image;
-#endif
+    #endif
                 }];
             }
         }else {
             if (model.previewPhoto) {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
                 self.animatedImageView.image = model.previewPhoto;
-#else
+    #else
                 self.imageView.image = model.previewPhoto;
-#endif
+    #endif
                 model.tempImage = nil;
             }else {
                 if (model.tempImage) {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
                     self.animatedImageView.image = model.tempImage;
-#else
+    #else
                     self.imageView.image = model.tempImage;
-#endif
+    #endif
                     model.tempImage = nil;
                 }else {
                     CGSize requestSize;
                     if (imgHeight > imgWidth / 9 * 20 ||
                         imgWidth > imgHeight / 9 * 20) {
-                        requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6); 
+                        requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6);
                     }else {
                         requestSize = CGSizeMake(model.endImageSize.width, model.endImageSize.height);
                     }
                     self.requestID =[model requestThumbImageWithSize:requestSize completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model != model) return;
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
                         weakSelf.animatedImageView.image = image;
-#else
+    #else
                         weakSelf.imageView.image = image;
-#endif
+    #endif
                     }];
                 }
             }
@@ -1461,7 +1480,7 @@ HXVideoEditViewControllerDelegate
     }else {
         scale = 3.0;
     }
-    
+
     if (imgHeight > imgWidth / 9 * 20 ||
         imgWidth > imgHeight / 9 * 20) {
         size = CGSizeMake(width * scale, height * scale);
@@ -1502,20 +1521,20 @@ HXVideoEditViewControllerDelegate
         } success:^(PHLivePhoto *livePhoto, HXPhotoModel *model, NSDictionary *info) {
             if (weakSelf.model != model) return;
             [weakSelf downloadICloudAssetComplete];
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             weakSelf.livePhotoView.frame = weakSelf.animatedImageView.frame;
             weakSelf.animatedImageView.hidden = YES;
-#else
+    #else
             weakSelf.livePhotoView.frame = weakSelf.imageView.frame;
             weakSelf.imageView.hidden = YES;
-#endif
+    #endif
             [weakSelf.scrollView addSubview:weakSelf.livePhotoView];
             weakSelf.livePhotoView.livePhoto = livePhoto;
             [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
             if (weakSelf.model != model) return;
             weakSelf.progressView.hidden = YES;
-        }]; 
+        }];
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
         self.requestID = [self.model requestPreviewImageWithSize:size startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
             if (weakSelf.model != model) return;
@@ -1537,30 +1556,30 @@ HXVideoEditViewControllerDelegate
             transition.duration = 0.2f;
             transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
             transition.type = kCATransitionFade;
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             [weakSelf.animatedImageView.layer removeAllAnimations];
             weakSelf.animatedImageView.image = image;
             [weakSelf.animatedImageView.layer addAnimation:transition forKey:nil];
-#else
+    #else
             [weakSelf.imageView.layer removeAllAnimations];
             weakSelf.imageView.image = image;
             [weakSelf.imageView.layer addAnimation:transition forKey:nil];
-#endif
+    #endif
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
             if (weakSelf.model != model) return;
             weakSelf.progressView.hidden = YES;
-        }]; 
+        }];
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (self.gifImage) {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             if (self.animatedImageView.image != self.gifImage) {
-                 self.animatedImageView.image = self.gifImage;
+                self.animatedImageView.image = self.gifImage;
             }
-#else
+    #else
             if (self.imageView.image != self.gifImage) {
                 self.imageView.image = self.gifImage;
             }
-#endif
+    #endif
         }else {
             self.requestID = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
                 if (weakSelf.model != model) return;
@@ -1578,11 +1597,11 @@ HXVideoEditViewControllerDelegate
                 if (weakSelf.model != model) return;
                 [weakSelf downloadICloudAssetComplete];
                 weakSelf.progressView.hidden = YES;
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
                 YYImage *gifImage = [YYImage imageWithData:imageData];
                 weakSelf.animatedImageView.image = gifImage;
                 weakSelf.gifImage = gifImage;
-#else
+    #else
                 UIImage *gifImage = [UIImage hx_animatedGIFWithData:imageData];
                 weakSelf.imageView.image = gifImage;
                 weakSelf.gifImage = gifImage;
@@ -1591,7 +1610,7 @@ HXVideoEditViewControllerDelegate
                 }else {
                     weakSelf.gifFirstFrame = gifImage.images.firstObject;
                 }
-#endif
+    #endif
                 weakSelf.model.tempImage = nil;
             } failed:^(NSDictionary *info, HXPhotoModel *model) {
                 if (weakSelf.model != model) return;
@@ -1647,37 +1666,37 @@ HXVideoEditViewControllerDelegate
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
     }
-//    self.videoPlayBtn.hidden = YES;
+    //    self.videoPlayBtn.hidden = YES;
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         if (_livePhotoView.livePhoto) {
             self.livePhotoView.livePhoto = nil;
             [self.livePhotoView removeFromSuperview];
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             self.animatedImageView.hidden = NO;
-#else
+    #else
             self.imageView.hidden = NO;
-#endif
+    #endif
             [self stopLivePhoto];
         }
     }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
-#if HasYYWebImage
+    #if HasYYWebImage
         [self.animatedImageView yy_cancelCurrentImageRequest];
-#elif HasYYKit
+    #elif HasYYKit
         [self.animatedImageView cancelCurrentImageRequest];
-#elif HasSDWebImage
+    #elif HasSDWebImage
         [self.imageView sd_cancelCurrentAnimationImagesLoad];
-#endif
+    #endif
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (!self.stopCancel) {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             self.animatedImageView.currentAnimatedImageIndex = 0;
-#else
+    #else
             self.imageView.image = nil;
             self.gifImage = nil;
             self.imageView.image = self.gifFirstFrame;
-#endif
+    #endif
         }else {
             self.stopCancel = NO;
         }
@@ -1709,11 +1728,11 @@ HXVideoEditViewControllerDelegate
         if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
             touchPoint = [tap locationInView:self.livePhotoView];
         }else {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
             touchPoint = [tap locationInView:self.animatedImageView];
-#else
+    #else
             touchPoint = [tap locationInView:self.imageView];
-#endif
+    #endif
         }
         CGFloat newZoomScale = self.scrollView.maximumZoomScale;
         CGFloat xsize = width / newZoomScale;
@@ -1740,26 +1759,26 @@ HXVideoEditViewControllerDelegate
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         return self.livePhotoView;
     }else {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
         return self.animatedImageView;
-#else
+    #else
         return self.imageView;
-#endif
+    #endif
     }
 }
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
     CGFloat offsetX = (scrollView.frame.size.width > scrollView.contentSize.width) ? (scrollView.frame.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
     CGFloat offsetY = (scrollView.frame.size.height > scrollView.contentSize.height) ? (scrollView.frame.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
-    
+
     if (self.model.type == HXPhotoModelMediaTypeLivePhoto) {
         self.livePhotoView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
     }else {
-#if HasYYKitOrWebImage
+    #if HasYYKitOrWebImage
         self.animatedImageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
-#else
+    #else
         self.imageView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX, scrollView.contentSize.height * 0.5 + offsetY);
-#endif
-    } 
+    #endif
+    }
 }
 - (void)didPlayBtnClick:(UIButton *)button {
     button.selected = !button.selected;
@@ -1783,26 +1802,26 @@ HXVideoEditViewControllerDelegate
 }
 #pragma mark - < 懒加载 >
 - (UIScrollView *)scrollView {
-    if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc] init];
-        _scrollView.showsHorizontalScrollIndicator = NO;
-        _scrollView.showsVerticalScrollIndicator = NO;
-        _scrollView.bouncesZoom = YES;
-        _scrollView.minimumZoomScale = 1;
-        _scrollView.multipleTouchEnabled = YES;
-        _scrollView.delegate = self;
-        _scrollView.scrollsToTop = NO;
-        _scrollView.showsHorizontalScrollIndicator = NO;
-        _scrollView.showsVerticalScrollIndicator = NO;
-        _scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _scrollView.delaysContentTouches = NO;
-        _scrollView.canCancelContentTouches = YES;
-        _scrollView.alwaysBounceVertical = NO;
+if (!_scrollView) {
+    _scrollView = [[UIScrollView alloc] init];
+    _scrollView.showsHorizontalScrollIndicator = NO;
+    _scrollView.showsVerticalScrollIndicator = NO;
+    _scrollView.bouncesZoom = YES;
+    _scrollView.minimumZoomScale = 1;
+    _scrollView.multipleTouchEnabled = YES;
+    _scrollView.delegate = self;
+    _scrollView.scrollsToTop = NO;
+    _scrollView.showsHorizontalScrollIndicator = NO;
+    _scrollView.showsVerticalScrollIndicator = NO;
+    _scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _scrollView.delaysContentTouches = NO;
+    _scrollView.canCancelContentTouches = YES;
+    _scrollView.alwaysBounceVertical = NO;
 #ifdef __IPHONE_11_0
-        if (@available(iOS 11.0, *)) {
-            _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    if (@available(iOS 11.0, *)) {
+        _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #else
-            if ((NO)) {
+        if ((NO)) {
 #endif
         }
         UITapGestureRecognizer *tap1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTap:)];
@@ -1875,4 +1894,4 @@ HXVideoEditViewControllerDelegate
     [self cancelRequest];
 }
 @end
-
+            

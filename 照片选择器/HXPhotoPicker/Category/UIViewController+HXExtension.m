@@ -34,27 +34,57 @@
 }
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
-    HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
-    vc.delegate = delegate ? delegate : (id)self;
-    vc.manager = manager;
-    vc.isOutside = YES;
-    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-    nav.isCamera = YES;
-    nav.supportRotation = manager.configuration.supportRotation;
-    [self presentViewController:nav animated:YES completion:nil];
+    if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
+        return;
+    }
+    HXWeakSelf
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (granted) {
+                HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
+                vc.delegate = delegate ? delegate : (id)weakSelf;
+                vc.manager = manager;
+                vc.isOutside = YES;
+                HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+                nav.isCamera = YES;
+                nav.supportRotation = manager.configuration.supportRotation;
+                [weakSelf presentViewController:nav animated:YES completion:nil];
+            }else {
+                hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                });
+            }
+        });
+    }];
 }
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager done:(HXCustomCameraViewControllerDidDoneBlock)done cancel:(HXCustomCameraViewControllerDidCancelBlock)cancel {
-    HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
-    vc.doneBlock = done;
-    vc.cancelBlock = cancel;
-    vc.manager = manager;
-    vc.isOutside = YES;
-    vc.delegate = (id)self;
-    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-    nav.isCamera = YES;
-    nav.supportRotation = manager.configuration.supportRotation;
-    [self presentViewController:nav animated:YES completion:nil];
+    if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
+        return;
+    }
+    HXWeakSelf
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (granted) {
+                HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
+                vc.doneBlock = done;
+                vc.cancelBlock = cancel;
+                vc.manager = manager;
+                vc.isOutside = YES;
+                vc.delegate = (id)weakSelf;
+                HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+                nav.isCamera = YES;
+                nav.supportRotation = manager.configuration.supportRotation;
+                [weakSelf presentViewController:nav animated:YES completion:nil];
+            }else {
+                hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                });
+            }
+        });
+    }];
 }
 
 - (BOOL)hx_navigationBarWhetherSetupBackground {
