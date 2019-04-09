@@ -72,12 +72,21 @@ HXVideoEditViewControllerDelegate
     return self.interactiveTransition.interation ? self.interactiveTransition : nil;
 }
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{
+    if (!self.photoView) {
+        return nil;
+    }
     return [HXPhotoViewPresentTransition transitionWithTransitionType:HXPhotoViewPresentTransitionTypePresent photoView:self.photoView];
 }
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
+    if (!self.photoView) {
+        return nil;
+    }
     return [HXPhotoViewPresentTransition transitionWithTransitionType:HXPhotoViewPresentTransitionTypeDismiss photoView:self.photoView];
 }
 - (id<UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id<UIViewControllerAnimatedTransitioning>)animator {
+    if (!self.photoView) {
+        return nil;
+    }
     return self.persentInteractiveTransition.interation ? self.persentInteractiveTransition : nil;
 }
 #pragma mark - < life cycle >
@@ -170,7 +179,7 @@ HXVideoEditViewControllerDelegate
                 //给当前控制器的视图添加手势
                 [self.interactiveTransition addPanGestureForViewController:self];
             });
-        }else if (!self.disableaPersentInteractiveTransition) {
+        }else if (!self.disableaPersentInteractiveTransition && self.photoView) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 //初始化手势过渡的代理
                 self.persentInteractiveTransition = [[HXPhotoPersentInteractiveTransition alloc] init];
@@ -1048,6 +1057,7 @@ HXVideoEditViewControllerDelegate
 - (UIView *)customTitleView {
     if (!_customTitleView) {
         _customTitleView = [[UIView alloc] init];
+        _customTitleView.hx_size = CGSizeMake(150, 44);
         [_customTitleView addSubview:self.titleLb];
         [_customTitleView addSubview:self.subTitleLb];
     }

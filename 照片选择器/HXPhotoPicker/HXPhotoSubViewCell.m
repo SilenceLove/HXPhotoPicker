@@ -207,7 +207,7 @@
                     if (weakSelf.model == model) {
                         weakSelf.imageView.image = image;
                     }
-                }]; 
+                }];
             }
         }
     }

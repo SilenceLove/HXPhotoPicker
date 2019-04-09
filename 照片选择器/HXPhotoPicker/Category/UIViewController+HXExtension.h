@@ -10,6 +10,7 @@
 
 #import "HXCustomCameraViewController.h" 
 
+@class HXPhotoView;
 @interface UIViewController (HXExtension)
 /*  <HXAlbumListViewControllerDelegate>
  *  delegate 不传则代表自己
@@ -20,22 +21,24 @@
  跳转相册列表
 
  @param manager 照片管理者
- @param done    NSArray<HXPhotoModel *> *allList - 所选的所有模型数组,
+ @param models  NSArray<HXPhotoModel *> *allList - 所选的所有模型数组,
                 NSArray<HXPhotoModel *> *videoList - 所选的视频模型数组
                 NSArray<HXPhotoModel *> *photoList - 所选的照片模型数组
                 BOOL original - 是否原图
                 UIViewController *viewController 相册列表控制器
- @param cancel 取消
- */
-
-/**
- 跳转选择照片的控制器
-
- @param manager 照片管理者
- @param models 模型数组
  @param cancel 取消选择
  */
 - (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager))models cancel:(void (^)(UIViewController *viewController, HXPhotoManager *manager))cancel;
+
+/**
+ 跳转预览照片界面
+
+ @param manager 照片管理者
+ @param models 模型数组
+ @param currentModel 当前预览的模型
+ @param photoView 照片展示视图
+ */
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager models:(NSArray<HXPhotoModel *> *)models currentModel:(HXPhotoModel * _Nullable)currentModel photoView:(HXPhotoView * _Nullable)photoView;
 
 /*  <HXCustomCameraViewControllerDelegate>
  *  delegate 不传则代表自己

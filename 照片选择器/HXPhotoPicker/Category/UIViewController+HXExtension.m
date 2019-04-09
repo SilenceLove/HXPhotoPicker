@@ -87,6 +87,23 @@
     }];
 }
 
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager models:(NSArray<HXPhotoModel *> *)models currentModel:(HXPhotoModel * _Nullable)currentModel photoView:(HXPhotoView * _Nullable)photoView {
+    
+    HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
+    vc.disableaPersentInteractiveTransition = photoView.disableaInteractiveTransition;
+    vc.outside = YES;
+    vc.manager = manager ?: photoView.manager;
+    vc.exteriorPreviewStyle = photoView.previewStyle;
+    vc.delegate = (id)self;
+    vc.modelArray = [NSMutableArray arrayWithArray:models];
+    if (currentModel && [models containsObject:currentModel]) {
+        vc.currentModelIndex = [models indexOfObject:currentModel];
+    }
+    vc.previewShowDeleteButton = photoView.previewShowDeleteButton;
+    vc.photoView = photoView;
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
 - (BOOL)hx_navigationBarWhetherSetupBackground {
     if ([self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsDefault]) {
         return YES;
