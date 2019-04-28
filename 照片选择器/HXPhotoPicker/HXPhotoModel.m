@@ -113,6 +113,10 @@
     return [[self alloc] initWithVideoURL:videoURL];
 }
 
++ (instancetype)photoModelWithNetWorkVideoURL:(NSURL *)videoURL {
+    return [[self alloc] initWithNetWorkVideoURL:videoURL];
+}
+
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL {
     return [[self alloc] initWithImageURL:imageURL thumbURL:thumbURL];
 }
@@ -164,6 +168,43 @@
         self.subType = HXPhotoModelMediaSubTypePhoto;
         self.type = HXPhotoModelMediaTypePhoto;
         self.asset = asset;
+    }
+    return self;
+}
+
+- (instancetype)initWithNetWorkVideoURL:(NSURL *)videoURL {
+  
+    if (self = [super init]) {
+        
+        NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
+        AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:videoURL options:opts];
+        float second = 0;
+        second = urlAsset.duration.value / urlAsset.duration.timescale;
+        self.type = HXPhotoModelMediaTypeCameraVideo;
+        self.subType = HXPhotoModelMediaSubTypeVideo;
+         self.cameraVideoType = HXPhotoModelMediaTypeCameraVideoTypeNetWork;
+        self.videoURL = videoURL;
+        if (second <= 0) {
+            second = 1;
+        }
+        AVAssetImageGenerator *imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:urlAsset];
+        NSString *times = [HXPhotoTools transformVideoTimeToString:second];
+        self.videoDuration = second;
+        self.videoURL = videoURL;
+        self.videoTime = times;
+        
+//        @weakify(self);
+        HXWeakSelf
+        [imageGenerator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:CMTimeMakeWithSeconds(1, 1)]] completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable cgImage, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
+            CMTimeShow(actualTime);
+            UIImage *image=[UIImage imageWithCGImage:cgImage];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.thumbPhoto = image;
+                weakSelf.previewPhoto = image;
+                weakSelf.imageSize = self.thumbPhoto.size;
+                weakSelf.VideoImageBlock(image);
+            });
+        }];
     }
     return self;
 }

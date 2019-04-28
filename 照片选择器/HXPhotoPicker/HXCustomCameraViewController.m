@@ -16,8 +16,8 @@
 #import "UIImage+HXExtension.h"
 #import <CoreLocation/CoreLocation.h>
 #import "HXPhotoCustomNavigationBar.h"
-
-@interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraBottomViewDelegate,HXCustomCameraControllerDelegate, CLLocationManagerDelegate>
+#import "HXPhotoEditViewController.h"
+@interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraBottomViewDelegate,HXCustomCameraControllerDelegate, CLLocationManagerDelegate,HXPhotoEditViewControllerDelegate>
 @property (strong, nonatomic) HXCustomCameraController *cameraController;
 @property (strong, nonatomic) HXCustomPreviewView *previewView;
 @property (strong, nonatomic) CAGradientLayer *topMaskLayer;
@@ -295,7 +295,17 @@
         }
         model.creationDate = [NSDate date];
         model.location = self.location;
-        [self doneCompleteWithModel:model];
+        
+        if (self.navigationController.topViewController == self && self.manager.configuration.singleSelected == YES && self.manager.configuration.photoCanEdit == YES) {
+            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
+            vc.delegate = self;
+            vc.manager = self.manager;
+            vc.model = model;
+           [self presentViewController:vc animated:NO completion:nil];
+        }  else {
+            
+            [self doneCompleteWithModel:model];
+        }
     }else {
         HXWeakSelf
         [self.view hx_immediatelyShowLoadingHudWithText:nil];
@@ -328,6 +338,7 @@
     [self.cameraController stopSession];
     self.cameraController.flashMode = 0;
     self.cameraController.torchMode = 0;
+    
     if ([self.delegate respondsToSelector:@selector(customCameraViewController:didDone:)]) {
         [self.delegate customCameraViewController:self didDone:model];
     }
@@ -339,6 +350,12 @@
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+
+- (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+    [self doneCompleteWithModel:afterModel];
+}
+
 - (void)didchangeCameraClick {
     if ([self.cameraController switchCameras]) {
         self.previewView.maxScale = [self.cameraController maxZoomFactor];

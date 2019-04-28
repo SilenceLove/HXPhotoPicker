@@ -26,14 +26,7 @@
     } else {
         imageName = [imageName stringByReplacingOccurrencesOfString:@"@2x" withString:@""];
         image = [UIImage imageNamed:imageName];
-//        if (image) {
-//            return image;
-//        }
-//        NSString *path = [NSString stringWithFormat:@"Frameworks/HXPhotoPicker.framework/HXPhotoPicker.bundle/%@",imageName];
-//        image = [UIImage imageNamed:path];
-//        if (!image) {
-//            image = [UIImage imageNamed:imageName];
-//        }
+
         return image;
     }
 } 

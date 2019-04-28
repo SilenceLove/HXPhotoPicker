@@ -235,6 +235,31 @@
                 [self.endCameraVideos addObject:photoModel];
                 [self.endCameraList addObject:photoModel];
             }
+        } else if (model.type == HXCustomAssetModelTypeNetWorVideo) {
+            if (self.type == HXPhotoManagerSelectedTypePhoto) {
+                continue;
+            }
+            // 网络视频
+            HXPhotoModel *photoModel = [HXPhotoModel photoModelWithNetWorkVideoURL:model.networkVideoURL];
+            if (photoModel.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
+                canAddVideo = NO;
+            }else if (photoModel.videoDuration < self.configuration.videoMinimumSelectDuration) {
+                canAddVideo = NO;
+            }
+            photoModel.selected = canAddVideo ? model.selected : NO;
+            if (model.selected && canAddVideo) {
+                [self.endCameraVideos addObject:photoModel];
+                [self.endSelectedCameraVideos addObject:photoModel];
+                [self.endCameraList addObject:photoModel];
+                [self.endSelectedCameraList addObject:photoModel];
+                [self.endSelectedVideos addObject:photoModel];
+                [self.endSelectedList addObject:photoModel];
+                firstModel = photoModel;
+                videoCount++;
+            }else {
+                [self.endCameraVideos addObject:photoModel];
+                [self.endCameraList addObject:photoModel];
+            }
         }
     }
     

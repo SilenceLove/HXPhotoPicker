@@ -199,6 +199,10 @@
         }else {
             if (model.previewPhoto) {
                 self.imageView.image = model.previewPhoto;
+            }else if (model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                model.VideoImageBlock = ^(UIImage *image) {
+                    self.imageView.image = image;
+                };
             }else if (model.thumbPhoto) {
                 self.imageView.image = model.thumbPhoto;
             }else {

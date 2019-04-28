@@ -1939,7 +1939,7 @@ HXVideoEditViewControllerDelegate
     self.maskView.frame = self.bounds;
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
-    self.selectBtn.frame = CGRectMake(self.hx_w - 27, 2, 25, 25);
+    self.selectBtn.frame = CGRectMake(self.hx_w - 32, 2, 30, 30);
     self.selectMaskLayer.frame = self.bounds;
     self.iCloudMaskLayer.frame = self.bounds;
     self.iCloudIcon.hx_x = self.hx_w - 3 - self.iCloudIcon.hx_w;
@@ -2064,7 +2064,7 @@ HXVideoEditViewControllerDelegate
         _selectBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
         [_selectBtn setEnlargeEdgeWithTop:0 right:0 bottom:15 left:15];
-        _selectBtn.layer.cornerRadius = 25 / 2;
+        _selectBtn.layer.cornerRadius = 30 / 2;
     }
     return _selectBtn;
 }

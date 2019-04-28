@@ -1300,7 +1300,7 @@
 				TargetAttributes = {
 					7B7E3E751E4AACD1002234EE = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 36YN45CVLK;
+						DevelopmentTeam = HXSKT393M6;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -1310,11 +1310,13 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				"zh-Hans",
 				ja,
 				ko,
+				"zh-Hant",
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
 			productRefGroup = 7B7E3E771E4AACD1002234EE /* Products */;
@@ -1651,7 +1653,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 36YN45CVLK;
+				DEVELOPMENT_TEAM = HXSKT393M6;
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1668,7 +1670,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 36YN45CVLK;
+				DEVELOPMENT_TEAM = HXSKT393M6;
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

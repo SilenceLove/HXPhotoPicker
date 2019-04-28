@@ -59,6 +59,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
     HXPhotoModelVideoStateOversize      //!< 视频时长超出限制
 };
 
+typedef void (^loadVideoImageSuccBlock)(UIImage *image);
+
 @interface HXPhotoModel : NSObject<NSCoding>
 /**
  文件在手机里的原路径(照片 或 视频)
@@ -104,6 +106,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (assign, nonatomic) CGSize imageSize;
 /**  本地视频URL */
 @property (strong, nonatomic) NSURL *videoURL;
+//异步拿回视频图片 主线程加载
+@property (copy, nonatomic) loadVideoImageSuccBlock VideoImageBlock;
 /**  网络图片的地址 */
 @property (copy, nonatomic) NSURL *networkPhotoUrl;
 /**  网络图片缩略图地址  */
@@ -202,7 +206,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 /**  通过网络图片URL对象初始化 */
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL;
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL;
-
+/**  通过网络视频URL对象初始化 */
++ (instancetype)photoModelWithNetWorkVideoURL:(NSURL *)videoURL;
 
 #pragma mark - < Request >
 + (id)requestImageWithURL:(NSURL *)url progress:(void (^) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion;
