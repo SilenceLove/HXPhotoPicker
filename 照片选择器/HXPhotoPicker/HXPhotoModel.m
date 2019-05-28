@@ -438,7 +438,7 @@
 }
 #pragma mark - < Request >
 
-+ (id)requestImageWithURL:(NSURL *)url progress:(void (^) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion {
++ (id)requestImageWithURL:(NSURL *)url progress:(void (^ _Nullable)(NSInteger, NSInteger))progress completion:(void (^ _Nullable)(UIImage * _Nullable, NSURL * _Nonnull, NSError * _Nullable))completion {
 #if HasYYKitOrWebImage
     YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:0 progress:progress transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
         if (completion) {
@@ -447,16 +447,16 @@
     }];
     return operation;
 #elif HasSDWebImage
-    SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:url options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+    SDWebImageCombinedOperation *operation = [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
         if (completion) {
             completion(image, url, error);
         }
     }];
-    return token;
+    return operation;
 #endif
     return nil;
 }
-+ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *image, PHAsset *asset))completion; {
++ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage * _Nullable, PHAsset * _Nullable))completion {
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     return [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
@@ -538,7 +538,7 @@
         }
         return 0;
     }
-    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
     option.networkAccessAllowed = NO;
@@ -560,7 +560,7 @@
                              progressHandler:(HXModelProgressHandler)progressHandler
                                      success:(HXModelLivePhotoSuccessBlock)success
                                       failed:(HXModelFailedBlock)failed {
-    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHLivePhotoRequestOptions *option = [[PHLivePhotoRequestOptions alloc] init];
     option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
@@ -612,7 +612,7 @@
         }];
         return 0;
 #elif HasSDWebImage
-        [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+        [[SDWebImageManager sharedManager] loadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
             if (data) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (success) {
@@ -630,7 +630,7 @@
         return 0;
 #endif
     }
-    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
     option.networkAccessAllowed = NO;
@@ -660,7 +660,7 @@
         }
         return 0;
     }
-    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
     options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
@@ -689,7 +689,7 @@
         }
         return 0;
     }
-    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
     options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
@@ -719,7 +719,7 @@
         }
         return 0;
     }
-    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
+//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
     options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;

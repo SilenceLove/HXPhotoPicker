@@ -52,8 +52,9 @@ HXPhotoPreviewViewCell;
                                     beforeModel:(HXPhotoModel *)beforeModel
                                      afterModel:(HXPhotoModel *)afterModel;
 
-- (void)photoPreviewDidDeleteClick:(HXPhotoPreviewViewController *)previewController deleteModel:(HXPhotoModel *)model
-                           deleteIndex:(NSInteger)index;
+- (void)photoPreviewDidDeleteClick:(HXPhotoPreviewViewController *)previewController
+                       deleteModel:(HXPhotoModel *)model
+                       deleteIndex:(NSInteger)index;
 
 - (void)photoPreviewCellDownloadImageComplete:(HXPhotoPreviewViewController *)previewController
                                             model:(HXPhotoModel *)model;

@@ -150,6 +150,7 @@ UITableViewDelegate
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
+    [UINavigationBar appearance].translucent = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

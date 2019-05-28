@@ -148,6 +148,8 @@
                 if (handler) handler(status);
                 if (status != PHAuthorizationStatusAuthorized) {
                     [self showNoAuthorizedAlertWithViewController:viewController];
+                }else {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
                 }
             });
         }];

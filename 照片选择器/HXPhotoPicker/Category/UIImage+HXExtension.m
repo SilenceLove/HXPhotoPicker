@@ -290,6 +290,11 @@
     rect.size.width = CGImageGetWidth(imag);
     rect.size.height = CGImageGetHeight(imag);
     
+    while (rect.size.width * rect.size.height > 4 * 1000 * 1000) {
+        rect.size.width /= 2;
+        rect.size.height /= 2;
+    }
+    
     bnds = rect;
     
     switch (orient)

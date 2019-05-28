@@ -40,11 +40,12 @@
 - [x] 在线下载iCloud上的资源
 - [x] 两种相册展现方式（列表、弹窗）
 - [x] 支持Cell上添加
+- [x] 支持草稿功能
 - [x] 同一界面多个不同选择器
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.2.9'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.0'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是```SDWebImage``` || ```YYWebImage```
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -461,6 +462,7 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.3.0　-　适配SDWebImage v5.0.0 、去掉警告
 - v2.2.9　-　UI显示问题的修改
 - v2.2.7　-　解决使用NSArray+HXExtension里方法可能会获取空的问题，部分机型系统编辑照片时可能会出现黑屏问题
 - v2.2.6　-　添加视频时长编辑功能，修复ipad、ios8的一些问题，显示效果和逻辑上的一些优化以及Demo的一些修改

@@ -150,6 +150,7 @@ HXVideoEditViewControllerDelegate
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [UINavigationBar appearance].translucent = YES;
     [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
         [self changeStatusBarWithHidden:YES];
@@ -617,8 +618,6 @@ HXVideoEditViewControllerDelegate
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoPreviewViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewCellId" forIndexPath:indexPath];
-    HXPhotoModel *model = self.modelArray[indexPath.item];
-    cell.model = model;
     HXWeakSelf
     [cell setCellDidPlayVideoBtn:^(BOOL play) {
         if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
@@ -652,6 +651,8 @@ HXVideoEditViewControllerDelegate
             [weakSelf setSubviewAlphaAnimate:YES];
         }
     }];
+    HXPhotoModel *model = self.modelArray[indexPath.item];
+    cell.model = model;
     return cell;
 }
 
@@ -1696,7 +1697,7 @@ HXVideoEditViewControllerDelegate
     #elif HasYYKit
         [self.animatedImageView cancelCurrentImageRequest];
     #elif HasSDWebImage
-        [self.imageView sd_cancelCurrentAnimationImagesLoad];
+//        [self.imageView sd_cancelCurrentAnimationImagesLoad];
     #endif
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (!self.stopCancel) {

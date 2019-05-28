@@ -100,7 +100,7 @@
 #elif HasYYKit
     [self.imageView cancelCurrentImageRequest];
 #elif HasSDWebImage
-    [self.imageView sd_cancelCurrentAnimationImagesLoad];
+//    [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
         [self.delegate cellDidDeleteClcik:self];

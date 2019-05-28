@@ -45,7 +45,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     for (int i = 0 ; i < 4; i++) {
         UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"%d",i]];
         
-        [images addObject:image];
+        HXCustomAssetModel *model = [HXCustomAssetModel assetWithLocalImage:image selected:YES];
+        [images addObject:model];
     }
 //    [self.manager addLocalImageToAlbumWithImages:images];
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
@@ -58,12 +59,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.delegate = self;
     photoView.backgroundColor = [UIColor whiteColor];
 //    self.manager.localImageList = images;
-    [self.manager addLocalImage:images selected:YES];
+    [self.manager addCustomAssetModel:images];
     
     /**  添加本地视频  **/
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
-    [self.manager addLocalVideo:@[url] selected:YES];
-    /**  添加本地视频  **/
+    HXCustomAssetModel *videoAsset = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+//    [self.manager addLocalVideo:@[url] selected:YES];
+    [self.manager addCustomAssetModel:@[videoAsset]];
     
     [photoView refreshView];
     [scrollView addSubview:photoView];
@@ -86,7 +88,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
         return;
     }
     int x = arc4random() % 4;
-    [self.manager addLocalImage:[NSArray arrayWithObjects:[UIImage imageNamed:@(x).stringValue], nil] selected:YES];
+    HXCustomAssetModel *asset = [HXCustomAssetModel assetWithLocaImageName:@(x).stringValue selected:YES];
+    [self.manager addCustomAssetModel:@[asset]];
+//    [self.manager addLocalImage:[NSArray arrayWithObjects:[UIImage imageNamed:@(x).stringValue], nil] selected:YES];
     [self.photoView refreshView];
 }
  

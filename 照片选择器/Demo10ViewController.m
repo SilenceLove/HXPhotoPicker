@@ -71,7 +71,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.videoMaximumSelectDuration = 500.f;
         _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.showDateSectionHeader = NO;
-        _manager.configuration.requestImageAfterFinishingSelection = YES;
+//        _manager.configuration.requestImageAfterFinishingSelection = YES;
         // 设置保存的文件名称
         _manager.configuration.localFileName = @"suibianshishi";
     }

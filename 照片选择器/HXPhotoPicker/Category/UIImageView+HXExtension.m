@@ -86,11 +86,11 @@
         }];
     }
 #elif HasSDWebImage
-    [[SDWebImageManager sharedManager] diskImageExistsForURL:model.networkPhotoUrl completion:^(BOOL isInCache) {
-        if (!original) model.loadOriginalImage = isInCache;
-        NSURL *url = (original || isInCache) ? model.networkPhotoUrl : model.networkThumbURL;
-        // 崩溃在这里说明SDWebImage版本过低
-        [weakSelf sd_setImageWithURL:url placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+    NSString *cacheKey = [[SDWebImageManager sharedManager] cacheKeyForURL:model.networkPhotoUrl];
+    [[SDWebImageManager sharedManager].imageCache queryImageForKey:cacheKey options:0 context:nil completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+        if (!original) model.loadOriginalImage = image;
+        NSURL *url = (original || image) ? model.networkPhotoUrl : model.networkThumbURL;
+        [weakSelf sd_setImageWithURL:url placeholderImage:model.thumbPhoto options:0 context:nil progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
             model.receivedSize = receivedSize;
             model.expectedSize = expectedSize;
             CGFloat progress = (CGFloat)receivedSize / expectedSize;
@@ -117,7 +117,7 @@
                 completedBlock(image,error,model);
             }
         }];
-    }];
+    }]; 
 #else
     NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能");
 #endif

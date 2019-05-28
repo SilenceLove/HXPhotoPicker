@@ -26,7 +26,7 @@
         _manager.configuration.singleJumpEdit = NO;
         _manager.configuration.movableCropBox = YES;
         _manager.configuration.movableCropBoxEditSize = YES;
-        _manager.configuration.requestImageAfterFinishingSelection = NO;
+//        _manager.configuration.requestImageAfterFinishingSelection = NO;
 //        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
 //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
     }

@@ -8,7 +8,7 @@
 
 #import "Demo3ViewController.h"
 #import "HXPhotoPicker.h"
-#import "SDWebImageManager.h"
+//#import "SDWebImageManager.h"
 
 static const CGFloat kPhotoViewMargin = 12.0;
 
@@ -64,7 +64,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     NSMutableArray *array = [NSMutableArray arrayWithObjects:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/shop/photos/857980fd0acd3caf9e258e42788e38f5_0.gif",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
-    [self.manager addNetworkingImageToAlbum:array selected:YES];
+    NSMutableArray *assets = @[].mutableCopy;
+    for (NSString *url in array) {
+        HXCustomAssetModel *asset = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:url] selected:YES];
+        [assets addObject:asset];
+    }
+    [self.manager addCustomAssetModel:assets];
+//    [self.manager addNetworkingImageToAlbum:array selected:YES];
     [self.photoView refreshView];
     // 可以在懒加载中赋值 ,  也可以这样赋值
 //    self.manager.networkPhotoUrls = ;
@@ -77,14 +83,17 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.navigationItem.rightBarButtonItems = @[item1,item2];
 }
 
-- (void)lookClick { 
+- (void)lookClick {
     [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
     [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
+//    [[SDWebImageManager sharedManager] cancelAll];
+//    [[SDWebImageManager sharedManager].imageCache clearWithCacheType:SDImageCacheTypeAll completion:^{
+//
+//    }];
+//    [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
 
-    [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
-
-    }];
-    [[SDImageCache sharedImageCache] clearMemory];
+//    }];
+//    [[SDImageCache sharedImageCache] clearMemory];
 //#if SDWebImageEmbed
 //#endif
     return;
@@ -103,7 +112,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     }else {
         url = @"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg";
     }
-    [self.manager addNetworkingImageToAlbum:@[url] selected:YES];
+    HXCustomAssetModel *asset = [HXCustomAssetModel assetWithLocalVideoURL:[NSURL URLWithString:url] selected:YES];
+    [self.manager addCustomAssetModel:@[asset]];
+//    [self.manager addNetworkingImageToAlbum:@[url] selected:YES];
     [self.photoView refreshView];
 }
 

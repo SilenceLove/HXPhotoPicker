@@ -555,11 +555,10 @@
             HXWeakSelf
             if (model.downloadError) {
 #if HasSDWebImage
-                SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                SDWebImageCombinedOperation *operation = [[SDWebImageManager sharedManager] loadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
                     if (!error && data) {
                         model.thumbPhoto = image;
                         model.previewPhoto = image;
-//                        model.gifImageData = data;
                         [weakSelf.imageDataArray addObject:data];
                         [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
                         [weakSelf getCurrentModelImageData];
@@ -571,17 +570,16 @@
                         }
                     }
                 }];
-                [self.downloadTokenArray addObject:token];
+                [self.downloadTokenArray addObject:operation];
 #endif
                 return;
             }
             if (!model.downloadComplete) {
 #if HasSDWebImage
-                SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                SDWebImageCombinedOperation *operation = [[SDWebImageManager sharedManager] loadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
                     if (!error && image) {
                         model.thumbPhoto = image;
                         model.previewPhoto = image;
-//                        model.gifImageData = data;
                         [weakSelf.imageDataArray addObject:data];
                         [weakSelf.allImageDataModelArray removeObject:weakSelf.currentImageDataModelArray.firstObject];
                         [weakSelf getCurrentModelImageData];
@@ -592,8 +590,8 @@
                             weakSelf.imageDataFailedHandler();
                         }
                     }
-                }];
-                [self.downloadTokenArray addObject:token];
+                }]; 
+                [self.downloadTokenArray addObject:operation];
 #endif
                 return;
             }
@@ -749,7 +747,7 @@
                 }];
                 [self.downloadTokenArray addObject:operation];
 #elif HasSDWebImage
-                SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                SDWebImageCombinedOperation *operation = [[SDWebImageManager sharedManager] loadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
                     if (!error && image) {
                         model.thumbPhoto = image;
                         model.previewPhoto = image;
@@ -764,7 +762,7 @@
                         }
                     }
                 }];
-                [self.downloadTokenArray addObject:token];
+                [self.downloadTokenArray addObject:operation];
 #endif
                 return;
             }
@@ -787,7 +785,7 @@
                 }];
                 [self.downloadTokenArray addObject:operation];
 #elif HasSDWebImage
-                SDWebImageDownloadToken *token = [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                SDWebImageCombinedOperation *operation = [[SDWebImageManager sharedManager] loadImageWithURL:model.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
                     if (!error && image) {
                         model.thumbPhoto = image;
                         model.previewPhoto = image;
@@ -802,7 +800,7 @@
                         }
                     }
                 }];
-                [self.downloadTokenArray addObject:token];
+                [self.downloadTokenArray addObject:operation]; 
 #endif
                 return;
             }
@@ -819,9 +817,11 @@
 - (void)cancelGetImageList {
     self.cancelGetImage = YES;
     for (id obj in self.downloadTokenArray) {
-        if ([obj isKindOfClass:NSClassFromString(@"SDWebImageDownloadToken")]) {
-#if HasSDWebImage
-            [[SDWebImageDownloader sharedDownloader] cancel:obj];
+        if ([obj isKindOfClass:NSClassFromString(@"SDWebImageCombinedOperation")]) {
+#if HasSDWebImage 
+            SDWebImageCombinedOperation *imageOperation = obj;
+            [imageOperation cancel];
+//            [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
         }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
 #if HasYYKitOrWebImage
@@ -838,9 +838,11 @@
 - (void)cancelGetImageDataList {
     self.cancelGetImageData = YES;
     for (id obj in self.downloadTokenArray) {
-        if ([obj isKindOfClass:NSClassFromString(@"SDWebImageDownloadToken")]) {
+        if ([obj isKindOfClass:NSClassFromString(@"SDWebImageCombinedOperation")]) {
 #if HasSDWebImage
-            [[SDWebImageDownloader sharedDownloader] cancel:obj];
+            SDWebImageCombinedOperation *imageOperation = obj;
+            [imageOperation cancel];
+//            [[SDWebImageDownloader sharedDownloader] cancel:obj];
 #endif
         }else if ([obj isKindOfClass:NSClassFromString(@"YYWebImageOperation")]) {
 #if HasYYKitOrWebImage

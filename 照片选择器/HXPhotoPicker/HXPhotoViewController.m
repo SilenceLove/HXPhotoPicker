@@ -101,6 +101,7 @@ HXVideoEditViewControllerDelegate
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [UINavigationBar appearance].translucent = YES;
     [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
     if (self.needChangeViewFrame) {
         self.needChangeViewFrame = NO;
@@ -1907,7 +1908,7 @@ HXVideoEditViewControllerDelegate
 #elif HasYYKit
     [self.imageView cancelCurrentImageRequest];
 #elif HasSDWebImage
-    [self.imageView sd_cancelCurrentAnimationImagesLoad];
+//    [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
     if (self.requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];

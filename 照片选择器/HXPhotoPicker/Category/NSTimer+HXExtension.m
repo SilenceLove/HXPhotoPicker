@@ -9,14 +9,14 @@
 #import "NSTimer+HXExtension.h"
 
 @implementation NSTimer (HXExtension)
-+ (id)hx_scheduledTimerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)())inBlock repeats:(BOOL)inRepeats
++ (id)hx_scheduledTimerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)(void))inBlock repeats:(BOOL)inRepeats
 {
     void (^block)(void) = [inBlock copy];
     id ret = [self scheduledTimerWithTimeInterval:inTimeInterval target:self selector:@selector(hx_executeSimpleBlock:) userInfo:block repeats:inRepeats]; 
     return ret;
 }
 
-+ (id)hx_timerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)())inBlock repeats:(BOOL)inRepeats
++ (id)hx_timerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)(void))inBlock repeats:(BOOL)inRepeats
 {
     void (^block)(void) = [inBlock copy];
     id ret = [self timerWithTimeInterval:inTimeInterval target:self selector:@selector(hx_executeSimpleBlock:) userInfo:block repeats:inRepeats];

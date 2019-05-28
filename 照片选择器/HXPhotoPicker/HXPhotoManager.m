@@ -52,6 +52,7 @@
 @property (assign, nonatomic) BOOL firstHasCameraAsset;
 @property (assign, nonatomic) BOOL supportLivePhoto;
 
+@property (assign, nonatomic) BOOL hasAuthorization;
 @end
 
 @implementation HXPhotoManager
@@ -109,10 +110,20 @@
     if (HX_IOS91Later) {
         self.supportLivePhoto = YES;
     }
-    
-    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
-    
+    if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        self.hasAuthorization = YES;
+        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+    }else {
+        self.hasAuthorization = NO;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestAuthorizationCompletion) name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
+    }
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+- (void)requestAuthorizationCompletion {
+    if (!self.hasAuthorization && [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        self.hasAuthorization = YES;
+        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+    }
 }
 - (HXPhotoConfiguration *)configuration {
     if (!_configuration) {
@@ -2020,6 +2031,7 @@
 - (void)dealloc {
     [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
     [self.dataOperationQueue cancelAllOperations];
     if (HXShowLog) NSSLog(@"dealloc");
 }
