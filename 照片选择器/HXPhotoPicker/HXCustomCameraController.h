@@ -49,6 +49,7 @@
 
 
 @property (copy, nonatomic) NSString *videoCodecKey;
+@property (copy, nonatomic) NSString *sessionPreset;
 
 - (void)focusAtPoint:(CGPoint)point;
 - (void)exposeAtPoint:(CGPoint)point;

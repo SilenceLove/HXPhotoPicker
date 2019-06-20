@@ -70,6 +70,7 @@
     
     [self.view addSubview:self.previewView];
     self.cameraController = [[HXCustomCameraController alloc] init];
+    self.cameraController.sessionPreset = self.manager.configuration.sessionPreset;
     self.cameraController.videoCodecKey = self.manager.configuration.videoCodecKey;
     self.cameraController.delegate = self;
     if ([self.cameraController setupSession:nil]) {

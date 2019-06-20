@@ -38,6 +38,12 @@ HXPhotoPreviewViewController;
 @interface HXPhotoConfiguration : NSObject
 
 /**
+ 拍摄的画质
+ 默认 AVCaptureSessionPreset1280x720
+ */
+@property (copy, nonatomic) NSString *sessionPreset;
+
+/**
  使用框架自带的相机录制视频时设置的编码格式， ios11以上
  iphone7及以上时系统默认AVVideoCodecHEVC
  HEVC仅支持iPhone 7及以上设备
@@ -91,7 +97,7 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) BOOL restoreNavigationBar;
 
 /**
- 照片列表是否按照片日期排序  默认YES
+ 照片列表是否按照片添加日期排序  默认YES
  */
 @property (assign, nonatomic) BOOL creationDateSort;
 

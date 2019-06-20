@@ -76,12 +76,12 @@ const CGFloat HXZoomRate = 1.0f;
 }
 - (BOOL)setupSession:(NSError *)error {
     self.captureSession = [[AVCaptureSession alloc] init];
-//    if ([self.captureSession canSetSessionPreset:AVCaptureSessionPreset3840x2160]) {
-//        self.captureSession.sessionPreset = AVCaptureSessionPreset3840x2160;
-//    }else {
+    if ([self.captureSession canSetSessionPreset:self.sessionPreset]) {
+        self.captureSession.sessionPreset = self.sessionPreset;
+    }else {
         self.captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
-//    }
-    
+    }
+
     AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
     if (videoInput) {
