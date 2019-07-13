@@ -177,6 +177,9 @@ UITableViewDelegate
             self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.manager.configuration.navigationTitleColor};
         }
     }
+    if (self.manager.configuration.navigationBar) {
+        self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
+    }
 }
 - (void)configTableView {
     if (self.manager.configuration.singleSelected ||
