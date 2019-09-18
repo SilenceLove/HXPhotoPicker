@@ -45,7 +45,8 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.2'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.3'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- ```v2.3.2 pod没有依赖sd和yy```  ```v2.3.3 pod依赖了yy```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是 ```YYWebImage``` || >=```v2.3.0```  -> ```SDWebImage v5.0``` || <```v2.3.0``` ->  ```SDWebImage v4.0```
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -478,12 +479,18 @@ photoManager.configuration.maxNum = 10;
 photoManager.configuration.selectTogether = YES;
 photoManager.configuration.photoCanEdit = NO;
 photoManager.configuration.videoCanEdit = NO;
+photoManager.configuration.previewRespondsToLongPress = ^(UILongPressGestureRecognizer *longPress, 
+                                                          HXPhotoModel *photoModel, 
+                                                          HXPhotoManager *manager, 
+                                                          HXPhotoPreviewViewController *previewViewController) {
+    hx_showAlert(previewViewController, @"提示", @"长按事件", @"确定", nil, nil, nil);
+};
 [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5]];
 
 [self hx_presentPreviewPhotoControllerWithManager:photoManager
-previewStyle:HXPhotoViewPreViewShowStyleDark
-currentIndex:0
-photoView:nil];
+                                     previewStyle:HXPhotoViewPreViewShowStyleDark
+                                     currentIndex:0
+                                     photoView:nil];
 
 
 UIViewController+HXExtension.h
@@ -500,6 +507,7 @@ UIViewController+HXExtension.h
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.3.3　-　pod依赖yy
 - v2.3.2　-　适配ios13
 - v2.3.1　-　pod去除依赖sd和yy
 - v2.3.0　-　适配SDWebImage v5.0.0 、去掉警告

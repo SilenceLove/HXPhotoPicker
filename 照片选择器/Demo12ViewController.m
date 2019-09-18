@@ -85,6 +85,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoManager.configuration.selectTogether = YES;
     photoManager.configuration.photoCanEdit = NO;
     photoManager.configuration.videoCanEdit = NO;
+    photoManager.configuration.previewRespondsToLongPress = ^(UILongPressGestureRecognizer *longPress, HXPhotoModel *photoModel, HXPhotoManager *manager, HXPhotoPreviewViewController *previewViewController) {
+        hx_showAlert(previewViewController, @"提示", @"长按事件", @"确定", nil, nil, nil);
+    };
     [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5]];
     
     [self hx_presentPreviewPhotoControllerWithManager:photoManager

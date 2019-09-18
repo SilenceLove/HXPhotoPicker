@@ -20,7 +20,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.3.2"
+#define HXVersion @"2.3.3"
 
 #define HXEncodeKey @"HXModelArray"
 
@@ -92,19 +92,22 @@ CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
         pop.sourceRect = vc.view.bounds;
     }
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:buttonTitle1
-                                                           style:UIAlertActionStyleCancel
+    if (buttonTitle1) {
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:buttonTitle1
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+                                                                 if (buttonTitle1Handler) buttonTitle1Handler();
+                                                             }];
+        [alertController addAction:cancelAction];
+    }
+    if (buttonTitle2) {
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:buttonTitle2
+                                                           style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction * _Nonnull action) {
-                                                             if (buttonTitle1Handler) buttonTitle1Handler();
+                                                             if (buttonTitle2Handler) buttonTitle2Handler();
                                                          }];
-    [alertController addAction:cancelAction];
-    
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:buttonTitle2
-                                                       style:UIAlertActionStyleDefault
-                                                     handler:^(UIAlertAction * _Nonnull action) {
-                                                         if (buttonTitle2Handler) buttonTitle2Handler();
-                                                     }];
-    [alertController addAction:okAction]; 
+        [alertController addAction:okAction]; 
+    }
     [vc presentViewController:alertController animated:YES completion:nil];
     return alertController;
 }
