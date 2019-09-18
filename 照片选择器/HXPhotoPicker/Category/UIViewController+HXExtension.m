@@ -15,6 +15,7 @@
     vc.delegate = delegate ? delegate : (id)self; 
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
+    nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:nav animated:YES completion:nil];
 }
 - (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, BOOL, UIViewController *, HXPhotoManager *))models cancel:(void (^)(UIViewController *, HXPhotoManager *))cancel {
@@ -30,6 +31,7 @@
         }
     };
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithManager:manager doneBlock:modelBlock cancelBlock:cancelBlock];
+    nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:nav animated:YES completion:nil];
 }
 
@@ -49,6 +51,7 @@
                 HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
                 nav.isCamera = YES;
                 nav.supportRotation = manager.configuration.supportRotation;
+                nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
                 [weakSelf presentViewController:nav animated:YES completion:nil];
             }else {
                 hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
@@ -77,6 +80,7 @@
                 HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
                 nav.isCamera = YES;
                 nav.supportRotation = manager.configuration.supportRotation;
+                nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
                 [weakSelf presentViewController:nav animated:YES completion:nil];
             }else {
                 hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
@@ -87,20 +91,28 @@
     }];
 }
 
-- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager models:(NSArray<HXPhotoModel *> *)models currentModel:(HXPhotoModel * _Nullable)currentModel photoView:(HXPhotoView * _Nullable)photoView {
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+                                       previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                                       currentIndex:(NSUInteger)currentIndex
+                                          photoView:(HXPhotoView * _Nullable)photoView {
     
     HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
     vc.disableaPersentInteractiveTransition = photoView.disableaInteractiveTransition;
     vc.outside = YES;
     vc.manager = manager ?: photoView.manager;
-    vc.exteriorPreviewStyle = photoView.previewStyle;
+    vc.exteriorPreviewStyle = photoView ? photoView.previewStyle : previewStyle;
     vc.delegate = (id)self;
-    vc.modelArray = [NSMutableArray arrayWithArray:models];
-    if (currentModel && [models containsObject:currentModel]) {
-        vc.currentModelIndex = [models indexOfObject:currentModel];
+    vc.modelArray = [NSMutableArray arrayWithArray:manager.afterSelectedArray];
+    if (currentIndex >= vc.modelArray.count) {
+        vc.currentModelIndex = vc.modelArray.count - 1;
+    }else if (currentIndex < 0) {
+        vc.currentModelIndex = 0;
+    }else {
+        vc.currentModelIndex = currentIndex;
     }
     vc.previewShowDeleteButton = photoView.previewShowDeleteButton;
     vc.photoView = photoView;
+    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:vc animated:YES completion:nil];
 }
 

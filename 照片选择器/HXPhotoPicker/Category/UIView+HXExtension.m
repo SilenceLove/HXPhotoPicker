@@ -124,6 +124,7 @@
     vc.delegate = delegate ? delegate : (id)self; 
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
+    nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self.hx_viewController presentViewController:nav animated:YES completion:nil];
 }
 
@@ -143,6 +144,7 @@
                 HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
                 nav.isCamera = YES;
                 nav.supportRotation = manager.configuration.supportRotation;
+                nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
                 [weakSelf.hx_viewController presentViewController:nav animated:YES completion:nil];
             }else {
                 hx_showAlert(weakSelf.hx_viewController, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{

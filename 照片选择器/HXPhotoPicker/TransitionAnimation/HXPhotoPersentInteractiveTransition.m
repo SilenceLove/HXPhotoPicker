@@ -33,6 +33,8 @@
 @property (assign, nonatomic) CGPoint scrollViewContentOffset;
 @property (assign, nonatomic) CGRect imageInitialFrame;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
+
+@property (assign, nonatomic) BOOL atFirstPan;
 @end
 
 @implementation HXPhotoPersentInteractiveTransition
@@ -40,6 +42,21 @@
     self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
     self.panGesture.delegate = self;
     self.vc = viewController;
+    if ([viewController isKindOfClass:[HXPhotoPreviewViewController class]]) {
+        HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
+        HXWeakSelf
+        previewVC.currentCellScrollViewDidScroll = ^(CGFloat offsetY) {
+            if (offsetY < 0) {
+                weakSelf.atFirstPan = YES;
+            }else if (offsetY == 0) {
+                if (self.interation) {
+                    weakSelf.atFirstPan = NO;
+                }
+            }else {
+                weakSelf.atFirstPan = NO;
+            }
+        };
+    }
     self.photoView = photoView;
     [viewController.view addGestureRecognizer:self.panGesture];
 //    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchView:)];
@@ -59,7 +76,7 @@
     if ([otherGestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
         UIScrollView *scrollView = (UIScrollView *)otherGestureRecognizer.view;
         if (scrollView.contentOffset.y <= 0 &&
-            !scrollView.zooming) {
+            !scrollView.zooming && self.atFirstPan) {
             return YES;
         }
     }
@@ -133,7 +150,6 @@
             break;
     }
 }
-
 - (void)gestureRecognizeDidUpdate:(UIPanGestureRecognizer *)gestureRecognizer {
     CGFloat scale = 0;
     
@@ -144,8 +160,8 @@
         scale = 1.f;
     }
     switch (gestureRecognizer.state) {
-        case UIGestureRecognizerStateBegan:
-            if (scale <= 0) {
+        case UIGestureRecognizerStateBegan: {
+            if (scale < 0) {
                 [self.vc.view removeGestureRecognizer:self.panGesture];
                 [self.vc.view addGestureRecognizer:self.panGesture];
                 return;
@@ -159,7 +175,7 @@
             self.beginY = [gestureRecognizer locationInView:gestureRecognizer.view].y;
             self.interation = YES;
             [self.vc dismissViewControllerAnimated:YES completion:nil];
-            break;
+        } break;
         case UIGestureRecognizerStateChanged:
             if (self.interation) {
                 if (scale < 0.f) {
@@ -211,7 +227,6 @@
     HXPhotoModel *model = [fromVC.modelArray objectAtIndex:fromVC.currentModelIndex];
     
     HXPhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
-    
     
     UICollectionView *collectionView = (UICollectionView *)self.photoView.collectionView;
     if ([toVC isKindOfClass:[UINavigationController class]]) {
@@ -268,11 +283,6 @@
     }
     self.tempImageView.clipsToBounds = YES;
     self.tempImageView.contentMode = UIViewContentModeScaleAspectFill;
-//    BOOL contains = YES;
-//    if (!toCell) {
-//        contains = [toVC scrollToModel:model];
-//        toCell = [toVC currentPreviewCell:model];
-//    }
     self.bgView = [[UIView alloc] initWithFrame:containerView.bounds];
     CGFloat scaleX;
     CGFloat scaleY;
@@ -325,11 +335,6 @@
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[self.transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     fromVC.view.alpha = scale;
     self.bgView.alpha = fromVC.view.alpha;
-    
-    if (!fromVC.bottomView.userInteractionEnabled) {
-//        UIViewController *toVC = [self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-//        toVC.navigationController.navigationBar.alpha = 1 - scale;
-    }
 }
 - (void)interPercentCancel{
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
@@ -345,11 +350,7 @@
         self.tempImageView.transform = CGAffineTransformIdentity;
         self.tempImageView.center = self.transitionImgViewCenter;
         self.bgView.alpha = 1;
-//        if (!fromVC.bottomView.userInteractionEnabled) {
-//            toVC.bottomView.alpha = 0;
-//        }
     } completion:^(BOOL finished) {
-//        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
         fromVC.collectionView.hidden = NO;
         if (!fromVC.bottomView.userInteractionEnabled) {
             fromVC.view.backgroundColor = [UIColor blackColor];
@@ -392,7 +393,9 @@
     UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
     
     CGRect tempImageViewFrame = self.tempImageView.frame;
-    self.tempImageView.layer.anchorPoint = CGPointMake(0.5, 0.5);
+    if (self.tempCell) {
+        self.tempImageView.layer.anchorPoint = CGPointMake(0.5, 0.5);
+    }
     self.tempImageView.transform = CGAffineTransformIdentity;
     self.tempImageView.frame = tempImageViewFrame;
     self.playerLayer.frame = CGRectMake(0, 0, self.tempCell.imageView.hx_w, self.tempCell.imageView.hx_h);
@@ -401,19 +404,15 @@
         if (self.tempCell) {
             self.tempImageView.frame = [self.tempCell.imageView convertRect:self.tempCell.imageView.bounds toView: containerView];
         }else {
-            self.tempImageView.center = self.transitionImgViewCenter;
+//            self.tempImageView.center = self.transitionImgViewCenter;
             self.tempImageView.alpha = 0;
             self.tempImageView.transform = CGAffineTransformMakeScale(0.3, 0.3);
         }
         fromVC.view.alpha = 0;
         self.bgView.alpha = 0;
         toVC.navigationController.navigationBar.alpha = 1;
-//        toVC.bottomView.alpha = 1;
     }completion:^(BOOL finished) {
-//        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
-//        [self.tempCell bottomViewPrepareAnimation];
         self.tempCell.hidden = NO;
-//        [self.tempCell bottomViewStartAnimation];
         self.playerLayer = nil;
         [self.tempImageView removeFromSuperview];
         [self.bgView removeFromSuperview];

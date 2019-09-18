@@ -147,6 +147,7 @@
         [self.cameraController rampZoomToValue:1.0f];
         [self.cameraController cancelZoom];
     }
+    self.cameraController.flashMode = 0;
     [self setupFlashAndTorchBtn];
     self.previewView.tapToExposeEnabled = self.cameraController.cameraSupportsTapToExpose;
     self.previewView.tapToFocusEnabled = self.cameraController.cameraSupportsTapToFocus;
@@ -598,9 +599,10 @@
 - (UIButton *)flashBtn {
     if (!_flashBtn) {
         _flashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_flashBtn setImage:[UIImage hx_imageNamed:@"hx_camera_flashlight"] forState:UIControlStateNormal];
-        [_flashBtn setImage:[UIImage hx_imageNamed:@"hx_flash_pic_nopreview"] forState:UIControlStateSelected];
-        _flashBtn.hx_size = _flashBtn.currentImage.size;
+        UIImage *normalImage = [UIImage hx_imageNamed:@"hx_camera_flashlight"];
+        [_flashBtn setImage:normalImage forState:UIControlStateNormal];
+        UIImage *selectedImage = [UIImage hx_imageNamed:@"hx_flash_pic_nopreview"];
+        [_flashBtn setImage:selectedImage forState:UIControlStateSelected];
         [_flashBtn addTarget:self action:@selector(didFlashClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _flashBtn;

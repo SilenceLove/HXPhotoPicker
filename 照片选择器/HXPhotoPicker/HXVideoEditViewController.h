@@ -15,18 +15,31 @@ HXVideoEditBottomView,
 HXEditFrameView;
 @protocol HXVideoEditViewControllerDelegate <NSObject>
 @optional
+
+/// 编辑完成
+/// @param videoEditViewController 视频编辑控制器
+/// @param beforeModel 编辑之前的模型
+/// @param afterModel 编辑之后的模型
 - (void)videoEditViewControllerDidDoneClick:(HXVideoEditViewController *)videoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
+
+/// 取消编辑
+/// @param videoEditViewController 视频编辑控制器
 - (void)videoEditViewControllerDidCancelClick:(HXVideoEditViewController *)videoEditViewController;
 @end
 @interface HXVideoEditViewController : UIViewController<UIViewControllerTransitioningDelegate>
 @property (weak, nonatomic) id<HXVideoEditViewControllerDelegate> delegate;
+
+/// 需要编辑的模型
 @property (strong, nonatomic) HXPhotoModel *model;
+/// 照片管理类
 @property (strong, nonatomic) HXPhotoManager *manager;
-@property (strong, nonatomic) AVPlayerLayer *playerLayer;
-@property (strong, nonatomic) UIView *videoView;
+
 @property (assign, nonatomic) BOOL outside;
 @property (assign, nonatomic) BOOL isInside;
+@property (strong, nonatomic) UIView *videoView;
+@property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) AVAsset *avAsset;
+
 @property (strong, nonatomic) UIImageView *bgImageView;
 @property (assign, nonatomic) BOOL requestComplete;
 @property (assign, nonatomic) BOOL transitionCompletion;

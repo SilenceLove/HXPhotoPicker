@@ -29,6 +29,7 @@
 @property (assign, nonatomic) CGSize scrollViewContentSize;
 @property (assign, nonatomic) CGPoint scrollViewContentOffset;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
+@property (assign, nonatomic) BOOL atFirstPan;
 @end
 
 @implementation HXPhotoInteractiveTransition
@@ -36,6 +37,21 @@
     self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
     self.panGesture.delegate = self;
     self.vc = viewController;
+    if ([viewController isKindOfClass:[HXPhotoPreviewViewController class]]) {
+        HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
+        HXWeakSelf
+        previewVC.currentCellScrollViewDidScroll = ^(CGFloat offsetY) {
+            if (offsetY < 0) {
+                weakSelf.atFirstPan = YES;
+            }else if (offsetY == 0) {
+                if (self.interation) {
+                    weakSelf.atFirstPan = NO;
+                }
+            }else {
+                weakSelf.atFirstPan = NO;
+            }
+        };
+    }
     [viewController.view addGestureRecognizer:self.panGesture];
 }
 
@@ -45,7 +61,7 @@
         UIScrollView *scrollView = (UIScrollView *)otherGestureRecognizer.view;
         if (scrollView.contentOffset.y <= 0 &&
             !scrollView.zooming &&
-            !scrollView.isZoomBouncing) {
+            !scrollView.isZoomBouncing && self.atFirstPan) {
             return YES;
         }
     }
@@ -68,7 +84,7 @@
     CGFloat scale = [self panGestureScale:gestureRecognizer];
     switch (gestureRecognizer.state) {
         case UIGestureRecognizerStateBegan: {
-            if (scale <= 0) {
+            if (scale < 0) {
                 [self.vc.view removeGestureRecognizer:self.panGesture];
                 [self.vc.view addGestureRecognizer:self.panGesture];
                 return;

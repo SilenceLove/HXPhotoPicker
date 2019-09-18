@@ -12,17 +12,30 @@
 @class HXPhotoEditViewController;
 @protocol HXPhotoEditViewControllerDelegate <NSObject>
 @optional
+
+/// 编辑完成
+/// @param photoEditViewController 照片编辑控制器
+/// @param beforeModel 编辑之前的模型
+/// @param afterModel 编辑之后的模型
 - (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel;
+
+/// 取消编辑
+/// @param photoEditViewController 照片编辑控制器
+- (void)photoEditViewControllerDidCancel:(HXPhotoEditViewController *)photoEditViewController;
 @end
 
 @interface HXPhotoEditViewController : UIViewController<UIViewControllerTransitioningDelegate>
 @property (weak, nonatomic) id<HXPhotoEditViewControllerDelegate> delegate;
+/// 需要编辑的照片模型
 @property (strong, nonatomic) HXPhotoModel *model;
+/// 照片管理类
 @property (strong, nonatomic) HXPhotoManager *manager;
+
+
 @property (assign, nonatomic) BOOL outside;
+@property (assign, nonatomic) BOOL isInside;
 @property (assign, nonatomic) BOOL imageRequestComplete;
 @property (assign, nonatomic) BOOL transitionCompletion;
-@property (assign, nonatomic) BOOL isInside;
 @property (assign, nonatomic) BOOL isCancel;
 @property (strong, nonatomic, readonly) UIImage *originalImage;
 - (void)completeTransition:(UIImage *)image; 

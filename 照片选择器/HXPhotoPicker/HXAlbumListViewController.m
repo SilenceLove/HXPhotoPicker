@@ -98,7 +98,7 @@ UITableViewDelegate
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
     NSInteger lineCount = 2;
-    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
         navBarHeight = hxNavigationBarHeight;
         lineCount = 2;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -176,6 +176,9 @@ UITableViewDelegate
         if (self.manager.configuration.navigationTitleColor) {
             self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.manager.configuration.navigationTitleColor};
         }
+    }
+    if (self.manager.configuration.navigationBar) {
+        self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
     }
 }
 - (void)configTableView {

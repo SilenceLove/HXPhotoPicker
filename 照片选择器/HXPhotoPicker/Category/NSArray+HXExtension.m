@@ -77,7 +77,9 @@
                 NSData *imageData = [NSData dataWithContentsOfFile:path];
                 UIImage *image = [UIImage imageWithData:imageData];
 //                UIImage *image = [UIImage imageWithContentsOfFile:path];
-                if (image) [dataArray addObject:image];
+                if (image) {
+                    [dataArray addObject:image];
+                }
             }
         }else {
             [dataArray addObject:dict[key]];

@@ -45,9 +45,9 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.1'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.2'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
-- 网络图片加载使用的是```SDWebImage v5.0``` || ```YYWebImage```
+- 网络图片加载使用的是 ```YYWebImage``` || >=```v2.3.0```  -> ```SDWebImage v5.0``` || <```v2.3.0``` ->  ```SDWebImage v4.0```
 - 如果想要加载网络gif图片请使用```YYWebImage```
 - 使用前导入头文件 "HXPhotoPicker.h"
 
@@ -459,9 +459,48 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
     // 获取失败
 }];
 ```
+#### 8. 单独使用HXPhotoPreviewViewController预览图片
+```objc
+HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
+// selected 为NO 的会过滤掉
+HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithLocaImageName:@"2" selected:NO];
+HXCustomAssetModel *assetModel3 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg"] selected:YES];
+// selected 为NO 的会过滤掉
+HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
+NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
+HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+
+HXPhotoManager *photoManager = [HXPhotoManager managerWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
+photoManager.configuration.saveSystemAblum = YES;
+photoManager.configuration.photoMaxNum = 0;
+photoManager.configuration.videoMaxNum = 0;
+photoManager.configuration.maxNum = 10;
+photoManager.configuration.selectTogether = YES;
+photoManager.configuration.photoCanEdit = NO;
+photoManager.configuration.videoCanEdit = NO;
+[photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5]];
+
+[self hx_presentPreviewPhotoControllerWithManager:photoManager
+previewStyle:HXPhotoViewPreViewShowStyleDark
+currentIndex:0
+photoView:nil];
+
+
+UIViewController+HXExtension.h
+/// 跳转预览照片界面
+/// @param manager 照片管理者
+/// @param previewStyle 预览样式
+/// @param currentIndex 当前预览的下标
+/// @param photoView 照片展示视图 - 没有就不传
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+                                       previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                                       currentIndex:(NSUInteger)currentIndex
+                                          photoView:(HXPhotoView * _Nullable)photoView;
+```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.3.2　-　适配ios13
 - v2.3.1　-　pod去除依赖sd和yy
 - v2.3.0　-　适配SDWebImage v5.0.0 、去掉警告
 - v2.2.9　-　UI显示问题的修改
@@ -513,4 +552,4 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
 
 - 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
 
-- [有兴趣可以加下创建的QQ群:531895229(有问题请先看Demo，因为工作很忙所以可能问问题没人回答!!)](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26) <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=294005139&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:294005139:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
+- [有兴趣可以加下创建的QQ群:531895229(有问题请先看Demo，因为工作很忙所以可能问问题没人回答!!)](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26)

@@ -64,7 +64,33 @@ static const CGFloat kPhotoViewMargin = 12.0;
     // 模拟视频数量超过视频最大选择数
     HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES]; 
     [self.manager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6]];
-    [self.photoView refreshView]; 
+    [self.photoView refreshView];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"外部预览" style:UIBarButtonItemStylePlain target:self action:@selector(previewClick)];
+}
+- (void)previewClick {
+    HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
+    // selected 为NO 的会过滤掉
+    HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithLocaImageName:@"2" selected:NO];
+    HXCustomAssetModel *assetModel3 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg"] selected:YES];
+    HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
+    HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+    
+    HXPhotoManager *photoManager = [HXPhotoManager managerWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
+    photoManager.configuration.saveSystemAblum = YES;
+    photoManager.configuration.photoMaxNum = 0;
+    photoManager.configuration.videoMaxNum = 0;
+    photoManager.configuration.maxNum = 10;
+    photoManager.configuration.selectTogether = YES;
+    photoManager.configuration.photoCanEdit = NO;
+    photoManager.configuration.videoCanEdit = NO;
+    [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5]];
+    
+    [self hx_presentPreviewPhotoControllerWithManager:photoManager
+                                         previewStyle:HXPhotoViewPreViewShowStyleDark
+                                         currentIndex:0
+                                            photoView:nil];
 }
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
     

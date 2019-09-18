@@ -920,7 +920,6 @@
     
     self.clipBtn.hx_h = 40;
     self.clipBtn.hx_w = self.clipBtn.titleLabel.hx_getTextWidth;
-//    self.clipBtn.hx_size = CGSizeMake([HXPhotoTools getTextWidth:self.clipBtn.currentTitle height:40 fontSize:15] + 20, 40);
     self.clipBtn.hx_x = self.hx_w - 20 - self.clipBtn.hx_w;
     
     self.selectRatioBtn.center = CGPointMake(self.hx_w / 2, 20);

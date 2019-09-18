@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-#import "HXCustomCameraViewController.h" 
+#import "HXCustomCameraViewController.h"
+#import "HXPhotoView.h"
 
 @class HXPhotoView;
 @interface UIViewController (HXExtension)
@@ -38,7 +39,16 @@
  @param currentModel 当前预览的模型
  @param photoView 照片展示视图
  */
-- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager models:(NSArray<HXPhotoModel *> *)models currentModel:(HXPhotoModel * _Nullable)currentModel photoView:(HXPhotoView * _Nullable)photoView;
+
+/// 跳转预览照片界面
+/// @param manager 照片管理者
+/// @param previewStyle 预览样式
+/// @param currentIndex 当前预览的下标
+/// @param photoView 照片展示视图 - 没有就不传
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+                                       previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                                       currentIndex:(NSUInteger)currentIndex
+                                          photoView:(HXPhotoView * _Nullable)photoView;
 
 /*  <HXCustomCameraViewControllerDelegate>
  *  delegate 不传则代表自己

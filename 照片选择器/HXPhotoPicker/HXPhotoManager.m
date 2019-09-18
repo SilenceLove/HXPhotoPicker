@@ -171,7 +171,7 @@
         }else {
             canAddPhoto = !(photoCount + videoCount >= maxCount);
         }
-        if (videoCount > 0) {
+        if (videoMaxCount > 0) {
             canAddVideo = !(videoCount >= videoMaxCount);
         }else {
             canAddVideo = !(videoCount + photoCount >= maxCount);
@@ -678,7 +678,7 @@
     }
     
     NSArray *allAlbums = @[smartAlbums,userAlbums];
-    for (PHFetchResult *fetchResult in allAlbums) {
+    for (PHFetchResult *fetchResult in allAlbums) { 
         for (PHAssetCollection *collection in fetchResult) {
             // 有可能是PHCollectionList类的的对象，过滤掉
             if (![collection isKindOfClass:[PHAssetCollection class]]) continue;

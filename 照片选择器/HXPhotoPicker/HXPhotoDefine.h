@@ -20,7 +20,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.3.0"
+#define HXVersion @"2.3.2"
 
 #define HXEncodeKey @"HXModelArray"
 
@@ -104,8 +104,7 @@ CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
                                                      handler:^(UIAlertAction * _Nonnull action) {
                                                          if (buttonTitle2Handler) buttonTitle2Handler();
                                                      }];
-    [alertController addAction:okAction];
-    
+    [alertController addAction:okAction]; 
     [vc presentViewController:alertController animated:YES completion:nil];
     return alertController;
 }

@@ -68,6 +68,10 @@
     [containerView addSubview:toVC.view];
     [toVC.view insertSubview:tempBgView atIndex:0];
     toVC.collectionView.hidden = YES;
+    if (!cell) {
+        toVC.collectionView.hidden = NO;
+        toVC.collectionView.alpha = 0;
+    }
     model.endImageSize = CGSizeZero;
     CGFloat imgWidht = model.endImageSize.width;
     CGFloat imgHeight = model.endImageSize.height;
@@ -82,6 +86,9 @@
     [UIView animateWithDuration:0.2 animations:^{
         toVC.view.backgroundColor = [tempColor colorWithAlphaComponent:1.f];
         [toVC setupDarkBtnAlpha:1.f];
+        if (!cell) {
+            toVC.collectionView.alpha = 1;
+        }
     }];
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.75f initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
@@ -117,17 +124,7 @@
     }
     HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:self.photoView.currentIndexPath];
     HXPhotoModel *model = cell.model;
-    
-//    if (model.asset) {
-//        HXWeakSelf
-//        [HXPhotoTools getHighQualityFormatPhotoForPHAsset:model.asset size:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) completion:^(UIImage *image, NSDictionary *info) {
-//            [weakSelf presentAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC cell:cell];
-//        } error:^(NSDictionary *info) {
-//            [weakSelf presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
-//        }];
-//    }else {
-        [self presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
-//    }
+    [self presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
 }
 
 /**
@@ -138,13 +135,11 @@
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     if (!fromVC.modelArray.count) {
         UIView *containerView = [transitionContext containerView];
-//        UIView *tempView = [fromVC.view snapshotViewAfterScreenUpdates:NO];
         [containerView addSubview:fromVC.view];
         [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
             fromVC.view.alpha = 0;
             fromVC.view.transform = CGAffineTransformMakeScale(1.5, 1.5);
         } completion:^(BOOL finished) {
-//            [tempView removeFromSuperview];
             [transitionContext completeTransition:YES];
         }];
         return;
@@ -191,16 +186,15 @@
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
 #endif
     [containerView addSubview:tempView];
-    if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-        CGPoint center = tempView.center;
-        tempView.hx_size = model.endImageSize;
-        tempView.center = center;
-    }
+//    if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+//        CGPoint center = tempView.center;
+//        tempView.hx_size = model.endImageSize;
+//        tempView.center = center;
+//    }
     
     CGRect rect = [cell convertRect:cell.bounds toView:containerView];
     cell.hidden = YES;
     fromVC.collectionView.hidden = YES;
-//    fromVC.view.hidden = YES;
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
         fromVC.view.alpha = 0;

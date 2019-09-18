@@ -718,10 +718,10 @@
 				7B1AA38D21EEE3BC00D0AA93 /* HXPhotoInteractiveTransition.m */,
 				7B1AA38E21EEE3BC00D0AA93 /* HXPhotoPersentInteractiveTransition.h */,
 				7B56D30221FB7166009A8E3D /* HXPhotoPersentInteractiveTransition.m */,
-				7B1AA39321EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.h */,
-				7B1AA38F21EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.m */,
 				7B1AA38C21EEE3BC00D0AA93 /* HXPhotoViewTransition.h */,
 				7B1AA39021EEE3BC00D0AA93 /* HXPhotoViewTransition.m */,
+				7B1AA39321EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.h */,
+				7B1AA38F21EEE3BC00D0AA93 /* HXPhotoViewPresentTransition.m */,
 				7B9B3C5621F4ABEE0054F920 /* HXPhotoEditTransition.h */,
 				7B9B3C5721F4ABEE0054F920 /* HXPhotoEditTransition.m */,
 			);
@@ -1467,11 +1467,13 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				"zh-Hans",
 				ja,
 				ko,
+				"zh-Hant",
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
 			productRefGroup = 7B7E3E771E4AACD1002234EE /* Products */;
