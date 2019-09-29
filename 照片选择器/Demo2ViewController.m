@@ -28,6 +28,34 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @end
 
 @implementation Demo2ViewController
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        [self preferredStatusBarUpdateAnimation];
+        [self changeStatus];
+    }
+}
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIStatusBarStyleLightContent;
+        }
+    }
+    return UIStatusBarStyleDefault;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self changeStatus];
+}
+- (void)changeStatus {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+            return;
+        }
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
 - (UIButton *)bottomView {
     if (!_bottomView) {
         _bottomView = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -50,27 +78,20 @@ static const CGFloat kPhotoViewMargin = 12.0;
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.configuration.openCamera = YES;
+        // 暗黑风格
+        _manager.configuration.photoStyle = HXPhotoStyleDark;
         _manager.configuration.lookLivePhoto = YES;
         _manager.configuration.photoMaxNum = 9;
         _manager.configuration.videoMaxNum = 1;
         _manager.configuration.maxNum = 9;
-//        _manager.configuration.languageType = HXPhotoLanguageTypeKo;
         _manager.configuration.videoMaximumSelectDuration = 15;
         _manager.configuration.videoMinimumSelectDuration = 0;
         _manager.configuration.videoMaximumDuration = 15.f;
         _manager.configuration.creationDateSort = NO;
         _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.showOriginalBytes = YES;
-//        _manager.configuration.reverseDate = YES;
-//        _manager.configuration.showDateSectionHeader = YES;
         _manager.configuration.selectTogether = NO;
-//        _manager.configuration.rowCount = 3;
-//        _manager.configuration.movableCropBox = YES;
-//        _manager.configuration.movableCropBoxEditSize = YES;
-//        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
 //        _manager.configuration.requestImageAfterFinishingSelection = YES;
-//        _manager.configuration.replaceCameraViewController = YES;
-//        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
         
         HXWeakSelf
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
@@ -152,8 +173,17 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    self.view.backgroundColor = [UIColor whiteColor];
-    
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return UIColor.blackColor;
+            }
+            return UIColor.whiteColor;
+        }];
+    } else {
+        // Fallback on earlier versions
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
     
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;
@@ -166,12 +196,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.delegate = self;
     photoView.outerCamera = YES;
     photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
-    photoView.previewShowDeleteButton = YES;
-//    photoView.hideDeleteButton = YES;
+    photoView.previewShowDeleteButton = YES; 
     photoView.showAddCell = YES;
-//    photoView.disableaInteractiveTransition = YES;
     [photoView.collectionView reloadData];
-    photoView.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     

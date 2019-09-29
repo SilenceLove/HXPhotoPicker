@@ -323,10 +323,13 @@
         if (fromVC.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             self.bgView.backgroundColor = [UIColor blackColor];
         }else {
-            self.bgView.backgroundColor = [UIColor whiteColor];
+            self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
         }
     }
     fromVC.collectionView.hidden = YES;
+    if (!toCell && fromVC.manager.configuration.customPreviewToView) {
+        toCell = (id)fromVC.manager.configuration.customPreviewToView(fromVC.currentModelIndex);
+    }
     toCell.hidden = YES;
     fromVC.view.backgroundColor = [UIColor clearColor];
     self.tempCell = toCell;
@@ -358,7 +361,7 @@
             if (fromVC.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
                 fromVC.view.backgroundColor = [UIColor blackColor];
             }else {
-                fromVC.view.backgroundColor = [UIColor whiteColor];
+                fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
             }
         }
         self.tempCell.hidden = NO;
@@ -398,11 +401,15 @@
     }
     self.tempImageView.transform = CGAffineTransformIdentity;
     self.tempImageView.frame = tempImageViewFrame;
-    self.playerLayer.frame = CGRectMake(0, 0, self.tempCell.imageView.hx_w, self.tempCell.imageView.hx_h);
     
+    self.playerLayer.frame = CGRectMake(0, 0, self.tempCell.hx_w, self.tempCell.hx_h);
+    
+    if (fromVC.manager.configuration.restoreNavigationBar) {
+        [UINavigationBar appearance].translucent = NO;
+    }
     [UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
         if (self.tempCell) {
-            self.tempImageView.frame = [self.tempCell.imageView convertRect:self.tempCell.imageView.bounds toView: containerView];
+            self.tempImageView.frame = [self.tempCell convertRect:self.tempCell.bounds toView: containerView];
         }else {
 //            self.tempImageView.center = self.transitionImgViewCenter;
             self.tempImageView.alpha = 0;

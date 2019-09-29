@@ -52,6 +52,9 @@
     }
 }
 - (void)presentAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(UIViewController *)fromVC ToVC:(HXPhotoPreviewViewController *)toVC cell:(HXPhotoSubViewCell *)cell{
+    if (!image && toVC.manager.configuration.customPreviewFromImage) {
+        image = toVC.manager.configuration.customPreviewFromImage(toVC.currentModelIndex);
+    }
     model.tempImage = image;
     UIView *containerView = [transitionContext containerView];
     UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
@@ -61,6 +64,10 @@
     tempView.frame = [cell.imageView convertRect:cell.imageView.bounds toView:containerView];
     if (!image) {
         tempView.image = cell.imageView.image;
+    }
+    if (!cell && toVC.manager.configuration.customPreviewFromView) {
+        cell = (id)toVC.manager.configuration.customPreviewFromView(toVC.currentModelIndex);
+        tempView.frame = [cell convertRect:cell.bounds toView:containerView];
     }
     [tempBgView addSubview:tempView];
     self.tempView = tempView;
@@ -124,6 +131,9 @@
     }
     HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:self.photoView.currentIndexPath];
     HXPhotoModel *model = cell.model;
+    if (!model && toVC.currentModelIndex >= 0 && toVC.modelArray.count > 0 && toVC.currentModelIndex < toVC.modelArray.count) {
+        model = toVC.modelArray[toVC.currentModelIndex];
+    }
     [self presentAnim:transitionContext Image:model.thumbPhoto Model:model FromVC:fromVC ToVC:toVC cell:cell];
 }
 
@@ -186,13 +196,12 @@
     tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
 #endif
     [containerView addSubview:tempView];
-//    if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-//        CGPoint center = tempView.center;
-//        tempView.hx_size = model.endImageSize;
-//        tempView.center = center;
-//    }
     
     CGRect rect = [cell convertRect:cell.bounds toView:containerView];
+    if (!cell && fromVC.manager.configuration.customPreviewToView) {
+        cell = (id)fromVC.manager.configuration.customPreviewToView(fromVC.currentModelIndex);
+        rect = [cell convertRect:cell.bounds toView:containerView];
+    }
     cell.hidden = YES;
     fromVC.collectionView.hidden = YES;
     

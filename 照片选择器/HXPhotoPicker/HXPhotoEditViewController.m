@@ -823,6 +823,20 @@
 @end
 
 @implementation HXPhotoEditBottomView
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            
+            UIColor *color = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : self.manager.configuration.themeColor;
+            if ([color isEqual:[UIColor blackColor]]) {
+                color = [UIColor whiteColor];
+            }
+            [self.clipBtn setTitleColor:color forState:UIControlStateNormal];
+            [self.clipBtn setTitleColor:[color colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        }
+    }
+}
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {
@@ -1011,7 +1025,7 @@
                 }
             }
         }
-        UIColor *color = self.manager.configuration.themeColor;
+        UIColor *color = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : self.manager.configuration.themeColor;
         if ([color isEqual:[UIColor blackColor]]) {
             color = [UIColor whiteColor];
         }

@@ -22,6 +22,35 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @end
 
 @implementation Demo13ViewController
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        [self preferredStatusBarUpdateAnimation];
+        [self changeStatus];
+    }
+}
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIStatusBarStyleLightContent;
+        }
+    }
+    return UIStatusBarStyleDefault;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self changeStatus];
+}
+- (void)changeStatus {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+            return;
+        }
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
 - (HXDatePhotoToolManager *)toolManager {
     if (!_toolManager) {
         _toolManager = [[HXDatePhotoToolManager alloc] init];
@@ -31,12 +60,20 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return UIColor.blackColor;
+            }
+            return UIColor.whiteColor;
+        }];
+    } else {
+        // Fallback on earlier versions
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, hxNavigationBarHeight + kPhotoViewMargin, self.view.hx_w - kPhotoViewMargin * 2, 0);
-    
-    
-    photoView.backgroundColor = [UIColor whiteColor];
+     
     [self.view addSubview:photoView];
     self.photoView = photoView;
 }

@@ -64,7 +64,7 @@
     CGFloat height = [UIScreen mainScreen].bounds.size.height; 
     UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
     UIView *tempBgView = [[UIView alloc] initWithFrame:containerView.bounds];
-    tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
+    tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:0] : [[UIColor whiteColor] colorWithAlphaComponent:0];
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
     if (fromCell) {
@@ -86,7 +86,7 @@
     UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
     
     [UIView animateWithDuration:0.2 animations:^{
-        tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:1];
+        tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:1] : [[UIColor whiteColor] colorWithAlphaComponent:1];
     }];
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
@@ -96,7 +96,7 @@
     } completion:^(BOOL finished) {
         fromCell.hidden = NO;
         
-        toVC.view.backgroundColor = [UIColor whiteColor];
+        toVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
         toVC.collectionView.hidden = NO;
         [tempBgView removeFromSuperview];
         [tempView removeFromSuperview];
@@ -136,7 +136,7 @@
         [containerView insertSubview:tempBgView belowSubview:fromVC.view];
     }else {
         [toVC.view insertSubview:tempBgView belowSubview:toVC.bottomView];
-        tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:1];
+        tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:1] : [[UIColor whiteColor] colorWithAlphaComponent:1];
     }
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
     
@@ -165,7 +165,7 @@
             //            toVC.navigationController.navigationBar.alpha = 1;
             //            toVC.bottomView.alpha = 1;
         }else {
-            tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
+            tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:0] : [[UIColor whiteColor] colorWithAlphaComponent:0];
         }
     }];
     
@@ -199,87 +199,6 @@
         
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
     }];
-    
-    /*
-    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:option animations:^{
-        if (!contains || !toCell) {
-            tempView.transform = CGAffineTransformMakeScale(0.3, 0.3);
-            tempView.alpha = 0;
-        }else {
-            tempView.frame = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
-        }
-        fromVC.view.backgroundColor = [UIColor clearColor];
-        fromVC.bottomView.alpha = 0;
-        if (!fromVC.bottomView.userInteractionEnabled) {
-            tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
-            //            toVC.navigationController.navigationBar.alpha = 1;
-            //            toVC.bottomView.alpha = 1;
-        }else {
-            tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
-        }
-    } completion:^(BOOL finished) {
-        //由于加入了手势必须判断
-        if ([transitionContext transitionWasCancelled]) {//手势取消了，原来隐藏的imageView要显示出来
-            //失败了隐藏tempView，显示fromVC.imageView
-            fromVC.collectionView.hidden = NO;
-            if (!fromVC.bottomView.userInteractionEnabled) {
-                fromVC.view.backgroundColor = [UIColor blackColor];
-                [toVC.navigationController setNavigationBarHidden:YES];
-                [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-            }
-        }else{//手势成功，cell的imageView也要显示出来
-            //成功了移除tempView，下一次pop的时候又要创建，然后显示cell的imageView
-            
-        }
-        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
-        [toCell bottomViewPrepareAnimation];
-        toCell.hidden = NO;
-        [toCell bottomViewStartAnimation];
-        [tempBgView removeFromSuperview];
-        [tempView removeFromSuperview];
-        
-        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-    }];
-    [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        if (!contains || !toCell) {
-            tempView.transform = CGAffineTransformMakeScale(0.3, 0.3);
-            tempView.alpha = 0;
-        }else {
-            tempView.frame = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
-        }
-        fromVC.view.backgroundColor = [UIColor clearColor];
-        fromVC.bottomView.alpha = 0;
-        if (!fromVC.bottomView.userInteractionEnabled) {
-            tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
-            //            toVC.navigationController.navigationBar.alpha = 1;
-            //            toVC.bottomView.alpha = 1;
-        }else {
-            tempBgView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0];
-        }
-    } completion:^(BOOL finished) {
-        //由于加入了手势必须判断
-        if ([transitionContext transitionWasCancelled]) {//手势取消了，原来隐藏的imageView要显示出来
-            //失败了隐藏tempView，显示fromVC.imageView
-            fromVC.collectionView.hidden = NO;
-            if (!fromVC.bottomView.userInteractionEnabled) {
-                fromVC.view.backgroundColor = [UIColor blackColor];
-                [toVC.navigationController setNavigationBarHidden:YES];
-                [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-            }
-        }else{//手势成功，cell的imageView也要显示出来
-            //成功了移除tempView，下一次pop的时候又要创建，然后显示cell的imageView
-            
-        }
-        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
-        [toCell bottomViewPrepareAnimation];
-        toCell.hidden = NO;
-        [toCell bottomViewStartAnimation];
-        [tempBgView removeFromSuperview];
-        [tempView removeFromSuperview];
-        
-        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-    }];
-     */
 }
 
 - (NSTimeInterval)transitionDuration:(nullable id<UIViewControllerContextTransitioning>)transitionContext {

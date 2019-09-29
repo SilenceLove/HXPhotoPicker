@@ -220,7 +220,7 @@
         toCell = [toVC currentPreviewCell:model];
     }
     self.bgView = [[UIView alloc] initWithFrame:containerView.bounds];
-    self.bgView.backgroundColor = [UIColor whiteColor];
+    self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
     CGFloat scaleX;
     CGFloat scaleY;
     if (self.beginX < tempImageViewFrame.origin.x) {
@@ -256,8 +256,7 @@
         if (HX_IOS11_Later) {
             // 处理 ios11 当导航栏隐藏时手势返回的问题
             [toVC.navigationController.navigationBar.layer removeAllAnimations];
-            // 找到动画异常的视图，然后移除layer动画。。 系统导航栏返回按钮真tm坑！！！！！
-            // 可以屏蔽下面代码看看效果!!!简直酷炫!!
+            // 找到动画异常的视图，然后移除layer动画 ！！！！！
             // 一层一层的慢慢的找,把每个有动画的全部移除
             for (UIView *navBarView in toVC.navigationController.navigationBar.subviews) {
                 [navBarView.layer removeAllAnimations];
@@ -270,7 +269,7 @@
                             for (UIView *backSSubView in backSubView.subviews) {
                                 [backSSubView.layer removeAllAnimations];
                                 for (CALayer *subLayer in backSSubView.layer.sublayers) {
-                                    // 这个地方是真tm的坑!!!!!!!!
+                                    // !!!!!!!!
                                     [subLayer removeAllAnimations];
                                 }
                             }
@@ -286,7 +285,7 @@
         toVC.bottomView.alpha = 0;
     }else {
         toVC.bottomView.alpha = 1;
-        self.bgView.backgroundColor = [UIColor whiteColor];
+        self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
     }
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
     fromVC.collectionView.hidden = YES;
@@ -342,7 +341,7 @@
                 [toVC.navigationController setNavigationBarHidden:YES];
             }
         }else {
-            fromVC.view.backgroundColor = [UIColor whiteColor];
+            fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
         }
         self.tempCell.hidden = NO;
         self.tempCell = nil;

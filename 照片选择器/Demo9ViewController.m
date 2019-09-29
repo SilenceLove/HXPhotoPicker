@@ -23,6 +23,34 @@
 
 @implementation Demo9ViewController
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        [self preferredStatusBarUpdateAnimation];
+        [self changeStatus];
+    }
+}
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIStatusBarStyleLightContent;
+        }
+    }
+    return UIStatusBarStyleDefault;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self changeStatus];
+}
+- (void)changeStatus {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+            return;
+        }
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
 - (HXDatePhotoToolManager *)toolManager {
     if (!_toolManager) {
         _toolManager = [[HXDatePhotoToolManager alloc] init];
@@ -32,7 +60,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 //    self.navigationController.navigationBar.translucent = YES;
+if (@available(iOS 13.0, *)) {
+    self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIColor.blackColor;
+        }
+        return UIColor.whiteColor;
+    }];
+} else {
+    // Fallback on earlier versions
     self.view.backgroundColor = [UIColor whiteColor];
+}
     self.dataArray = [NSMutableArray array];
     for (int i = 0; i < 10; i++) {
         Demo9Model *model = [[Demo9Model alloc] init];

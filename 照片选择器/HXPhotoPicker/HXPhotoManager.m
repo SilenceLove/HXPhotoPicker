@@ -586,6 +586,7 @@
     if (status != PHAuthorizationStatusAuthorized || self.getCameraRoolAlbuming || self.cameraRollAlbumModel) {
         return;
     }
+    self.getCameraRoolAlbuming = YES;
     dispatch_async(self.loadAssetQueue, ^{
         HXWeakSelf
         [self getCameraRollAlbumCompletion:^(HXAlbumModel *albumModel) {
@@ -1142,12 +1143,6 @@
     self.tempDateList = dateArray;
     self.tempFirstSelectModel = firstSelectModel;
     self.tempAlbumModel = albumModel;
-//    if (complete) {
-//        complete(allArray, previewArray, photoArray, videoArray, dateArray, firstSelectModel,  albumModel);
-//    }
-//    if (self.photoListBlock) {
-//        self.photoListBlock(allArray, previewArray, photoArray, videoArray, dateArray, firstSelectModel,  albumModel);
-//     }
     if (complete) {
         complete(self.tempAllList, self.tempPreviewList, self.tempPhotoList, self.tempVideoList, self.tempDateList, self.tempFirstSelectModel,  self.tempAlbumModel);
     }

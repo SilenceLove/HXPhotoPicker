@@ -18,6 +18,34 @@ static const CGFloat kPhotoViewMargin = 12.0;
 
 @implementation Demo12ViewController
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        [self preferredStatusBarUpdateAnimation];
+        [self changeStatus];
+    }
+}
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIStatusBarStyleLightContent;
+        }
+    }
+    return UIStatusBarStyleDefault;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self changeStatus];
+}
+- (void)changeStatus {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+            return;
+        }
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
@@ -34,7 +62,17 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return UIColor.blackColor;
+            }
+            return UIColor.whiteColor;
+        }];
+    } else {
+        // Fallback on earlier versions
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
     //    self.navigationController.navigationBar.translucent = NO;
     self.automaticallyAdjustsScrollViewInsets = YES;
     
@@ -50,8 +88,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
     photoView.outerCamera = YES;
     photoView.delegate = self;
-    //    photoView.showAddCell = NO;
-    photoView.backgroundColor = [UIColor whiteColor];
+    //    photoView.showAddCell = NO; 
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
@@ -85,8 +122,27 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoManager.configuration.selectTogether = YES;
     photoManager.configuration.photoCanEdit = NO;
     photoManager.configuration.videoCanEdit = NO;
+    
+    HXWeakSelf
+    // 长按事件
     photoManager.configuration.previewRespondsToLongPress = ^(UILongPressGestureRecognizer *longPress, HXPhotoModel *photoModel, HXPhotoManager *manager, HXPhotoPreviewViewController *previewViewController) {
         hx_showAlert(previewViewController, @"提示", @"长按事件", @"确定", nil, nil, nil);
+    };
+    
+    // 跳转预览界面时动画起始的view
+    photoManager.configuration.customPreviewFromView = ^UIView *(NSInteger currentIndex) {
+        HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
+        return viewCell;
+    };
+    // 跳转预览界面时展现动画的image
+    photoManager.configuration.customPreviewFromImage = ^UIImage *(NSInteger currentIndex) {
+        HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
+        return viewCell.imageView.image;
+    };
+    // 退出预览界面时终点view
+    photoManager.configuration.customPreviewToView = ^UIView *(NSInteger currentIndex) {
+        HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
+        return viewCell;
     };
     [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5]];
     

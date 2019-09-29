@@ -141,6 +141,7 @@
         if (handler) handler(status);
     }else if (status == PHAuthorizationStatusDenied ||
               status == PHAuthorizationStatusRestricted) {
+                  if (handler) handler(status);
         [self showNoAuthorizedAlertWithViewController:viewController];
     }else {
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {

@@ -54,11 +54,40 @@
 @property (weak, nonatomic) IBOutlet UITextField *maxVideoClippingTime;
 @property (weak, nonatomic) IBOutlet UITextField *minVideoClippingTime;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *languageType;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *photoStyleSegmented;
 
 @end
 
 @implementation SettingViewController
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        [self preferredStatusBarUpdateAnimation];
+        [self changeStatus];
+    }
+}
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIStatusBarStyleLightContent;
+        }
+    }
+    return UIStatusBarStyleDefault;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self changeStatus];
+}
+- (void)changeStatus {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+            return;
+        }
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -108,6 +137,7 @@
     self.maxVideoClippingTime.text = @(self.manager.configuration.maxVideoClippingTime).stringValue;
     self.minVideoClippingTime.text = @(self.manager.configuration.minVideoClippingTime).stringValue;
     self.languageType.selectedSegmentIndex = self.manager.configuration.languageType;
+    self.photoStyleSegmented.selectedSegmentIndex = self.manager.configuration.photoStyle;
 }
 - (void)didSaveClick {
     self.manager.configuration.photoMaxNum = self.photoMaxNum.text.integerValue;
@@ -153,6 +183,7 @@
     self.manager.configuration.minVideoClippingTime = self.minVideoClippingTime.text.integerValue;
     self.manager.configuration.maxVideoClippingTime = self.maxVideoClippingTime.text.integerValue;
     self.manager.configuration.languageType = self.languageType.selectedSegmentIndex;
+    self.manager.configuration.photoStyle = self.photoStyleSegmented.selectedSegmentIndex;
     
     
     self.manager.cameraRollAlbumModel = nil;

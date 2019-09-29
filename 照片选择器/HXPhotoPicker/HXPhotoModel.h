@@ -63,8 +63,17 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 /**
  文件在手机里的原路径(照片 或 视频)
  只有在手机存在的图片才会有值, iCloud上的没有
+ 如果是通过相机拍摄的并且没有保存到相册(临时的) 视频有值, 照片没有值
  
- - 如果是通过相机拍摄的并且没有保存到相册(临时的) 视频有值, 照片没有值
+ 此属性具有不稳定性可能为空，如想获取视频地址请根据model里的导出视频方法
+ | | | | | | | | | | | | | | | | | | | | | | | | |
+ v v v v v v v v v v v v v v v v v v v v v v v v v
+ - (void)exportVideoWithPresetName:(NSString * _Nullable)presetName
+                startRequestICloud:(HXModelStartRequestICloud _Nullable)startRequestICloud
+             iCloudProgressHandler:(HXModelProgressHandler _Nullable)iCloudProgressHandler
+             exportProgressHandler:(HXModelExportVideoProgressHandler _Nullable)exportProgressHandler
+                           success:(HXModelExportVideoSuccessBlock _Nullable)success
+                            failed:(HXModelFailedBlock _Nullable)failed
  */
 @property (strong, nonatomic) NSURL * _Nullable fileURL;
 /**

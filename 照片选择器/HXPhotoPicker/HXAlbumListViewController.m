@@ -8,7 +8,7 @@
 
 #import "HXAlbumListViewController.h" 
 #import "HXPhotoViewController.h"
-#import "UIViewController+HXExtension.h" 
+#import "UIViewController+HXExtension.h"
 
 @interface HXAlbumListViewController ()
 <
@@ -27,6 +27,7 @@ UITableViewDelegate
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 @property (assign, nonatomic) BOOL orientationDidChange;
 @property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
+@property (assign, nonatomic) BOOL preloadPhotoListCompletion;
 @end
 
 @implementation HXAlbumListViewController
@@ -42,6 +43,7 @@ UITableViewDelegate
     HXWeakSelf
     [self.view hx_showLoadingHUDText:nil delay:0.1f];
     [HXPhotoTools requestAuthorization:self handler:^(PHAuthorizationStatus status) {
+        NSSLog(@"相册授权---");
         if (status == PHAuthorizationStatusAuthorized) {
             [weakSelf getAlbumModelList:YES];
         }else {
@@ -51,12 +53,26 @@ UITableViewDelegate
     }];
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
+    if ([HXPhotoCommon photoCommon].isDark) {
+        return UIStatusBarStyleLightContent;
+    }
     return self.manager.configuration.statusBarStyle;
+}
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            [self changeColor];
+            [self changeStatusBarStyle];
+            [self setNeedsStatusBarAppearanceUpdate];
+            _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
+        }
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self requestData];
     self.navigationController.popoverPresentationController.delegate = (id)self;
+    [self requestData];
     [self setupUI];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
@@ -146,39 +162,64 @@ UITableViewDelegate
         self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
     }
 }
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
     [UINavigationBar appearance].translucent = YES;
+    [self changeStatusBarStyle];
 }
-
+- (void)changeStatusBarStyle {
+    if ([HXPhotoCommon photoCommon].isDark) {
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+        return;
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
+}
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (!self.albumModelArray.count) {
+    if (!self.albumModelArray.count && [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
         [self getAlbumModelList:NO];
     }
 }
-
 - (void)setupUI {
     self.title = [NSBundle hx_localizedStringForKey:@"相册"];
-    self.view.backgroundColor = [UIColor whiteColor];
+    [self changeColor];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(cancelClick)];
-    [self.navigationController.navigationBar setTintColor:self.manager.configuration.themeColor];
-    if (self.manager.configuration.navBarBackgroudColor) {
-        [self.navigationController.navigationBar setBackgroundColor:nil];
-        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.barTintColor = self.manager.configuration.navBarBackgroudColor;
-    }
-    if (self.manager.configuration.navigationTitleSynchColor) {
-        self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.manager.configuration.themeColor};
-    }else {
-        if (self.manager.configuration.navigationTitleColor) {
-            self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : self.manager.configuration.navigationTitleColor};
-        }
-    }
     if (self.manager.configuration.navigationBar) {
         self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
+    }
+}
+- (void)changeColor {
+    UIColor *backgroudColor;
+    UIColor *themeColor;
+    UIColor *navBarBackgroudColor;
+    UIColor *navigationTitleColor;
+    if ([HXPhotoCommon photoCommon].isDark) {
+        backgroudColor = [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1];
+        themeColor = [UIColor whiteColor];
+        navBarBackgroudColor = [UIColor blackColor];
+        navigationTitleColor = [UIColor whiteColor];
+    }else {
+        backgroudColor = [UIColor whiteColor];
+        themeColor = self.manager.configuration.themeColor;
+        navBarBackgroudColor = self.manager.configuration.navBarBackgroudColor;
+        navigationTitleColor = self.manager.configuration.navigationTitleColor;
+    }
+    self.view.backgroundColor = backgroudColor;
+    self.tableView.backgroundColor = backgroudColor;
+    [self.navigationController.navigationBar setTintColor:themeColor];
+    if (navBarBackgroudColor) {
+        [self.navigationController.navigationBar setBackgroundColor:nil];
+        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+    }
+    self.navigationController.navigationBar.barTintColor = navBarBackgroudColor;
+    if (self.manager.configuration.navigationTitleSynchColor) {
+        self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : themeColor};
+    }else {
+        if (navigationTitleColor) {
+            self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : navigationTitleColor};
+        }else {
+            self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor blackColor]};
+        }
     }
 }
 - (void)configTableView {
@@ -205,7 +246,6 @@ UITableViewDelegate
         [UINavigationBar appearance].translucent = NO;
     }
 }
-
 #pragma mark - < HXPhotoViewControllerDelegate >
 - (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneAllList:photos:videos:original:)]) {
@@ -215,11 +255,9 @@ UITableViewDelegate
         self.doneBlock(allList, photoList, videoList, original, self, self.manager);
     }
 }
-
 - (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController {
     [self cancelClick];
 }
-
 - (void)photoViewControllerDidChangeSelect:(HXPhotoModel *)model selected:(BOOL)selected {
     if (self.albumModelArray.count > 0) {
 //        HXAlbumModel *albumModel = self.albumModelArray[model.currentAlbumIndex];
@@ -232,7 +270,10 @@ UITableViewDelegate
     }
 }
 - (void)pushPhotoListViewControllerWithAlbumModel:(HXAlbumModel *)albumModel animated:(BOOL) animated {
-    [self preloadPhotoListDataWithAlbumModel:albumModel];
+    if (!self.preloadPhotoListCompletion) {
+        [self preloadPhotoListDataWithAlbumModel:albumModel];
+        self.preloadPhotoListCompletion = YES;
+    }
     HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
     vc.manager = self.manager;
     vc.title = albumModel.albumName;
@@ -254,6 +295,10 @@ UITableViewDelegate
             [self pushPhotoListViewControllerWithAlbumModel:self.manager.cameraRollAlbumModel animated:NO]; 
         }else {
             if (!self.manager.getCameraRoolAlbuming) {
+                if (self.preloadPhotoListCompletion) {
+                    return;
+                }
+                self.preloadPhotoListCompletion = YES;
                 [self.manager preloadData];
             }
         }
@@ -338,6 +383,7 @@ UITableViewDelegate
     if (self.navigationController.topViewController != self) {
         return;
     }
+    self.preloadPhotoListCompletion = NO;
     HXAlbumModel *model = self.albumModelArray[indexPath.item];
     [self pushPhotoListViewControllerWithAlbumModel:model animated:YES];
 }
@@ -376,6 +422,7 @@ UITableViewDelegate
     if (self.navigationController.topViewController != self) {
         return;
     }
+    self.preloadPhotoListCompletion = NO;
     HXAlbumModel *model = self.albumModelArray[indexPath.row];
     [self pushPhotoListViewControllerWithAlbumModel:model animated:YES]; 
 }
@@ -417,7 +464,6 @@ UITableViewDelegate
         _tableView.estimatedRowHeight = 0;
         _tableView.estimatedSectionFooterHeight = 0;
         _tableView.estimatedSectionHeaderHeight = 0;
-        _tableView.backgroundColor = [UIColor whiteColor];
         _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [_tableView registerClass:[HXAlbumListSingleViewCell class] forCellReuseIdentifier:@"tableViewCellId"];
@@ -444,7 +490,7 @@ UITableViewDelegate
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) collectionViewLayout:self.flowLayout];
-        _collectionView.backgroundColor = [UIColor whiteColor];
+//        _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -494,7 +540,7 @@ UITableViewDelegate
         _authorizationLb.text = [NSBundle hx_localizedStringForKey:@"无法访问照片\n请点击这里前往设置中允许访问照片"];
         _authorizationLb.textAlignment = NSTextAlignmentCenter;
         _authorizationLb.numberOfLines = 0;
-        _authorizationLb.textColor = [UIColor blackColor];
+        _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
         _authorizationLb.font = [UIFont systemFontOfSize:15];
         _authorizationLb.userInteractionEnabled = YES;
         [_authorizationLb addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(goSetup)]];
@@ -650,6 +696,7 @@ UITableViewDelegate
 @property (assign, nonatomic) PHImageRequestID requestId2;
 @property (assign, nonatomic) PHImageRequestID requestId3;
 @property (strong, nonatomic) UIView *lineView;
+@property (strong, nonatomic) UIView *selectBgView;
 @end
 
 @implementation HXAlbumListSingleViewCell
@@ -658,6 +705,7 @@ UITableViewDelegate
     if (self) {
         self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         [self setupUI];
+        [self changeColor];
     }
     return self;
 }
@@ -756,6 +804,9 @@ UITableViewDelegate
         self.getResultCompleteBlock(photoCount + self.model.cameraCount, self);
     }
 }
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    [super setHighlighted:highlighted animated:animated];
+}
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.coverView1.frame = CGRectMake(10, 5, self.hx_h - 10, self.hx_h - 10);
@@ -770,7 +821,8 @@ UITableViewDelegate
     self.albumNameLb.frame = CGRectMake(albumNameLbX, albumNameLbY, self.hx_w - albumNameLbX - 40, 14);
     self.photoNumberLb.frame = CGRectMake(albumNameLbX, self.hx_h / 2 + 4, self.hx_w, 13);
     self.lineView.frame = CGRectMake(10, self.hx_h - 0.5f, self.hx_w - 22, 0.5f);
-//    self.lineView.hx_w = self.hx_w - self.lineView.hx_x - 12;
+    
+    self.selectBgView.frame = self.bounds;
 }
 - (void)dealloc {
 //    [self cancelRequest];
@@ -779,7 +831,6 @@ UITableViewDelegate
 - (UIView *)lineView {
     if (!_lineView) {
         _lineView = [[UIView alloc] init];
-        _lineView.backgroundColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.15];
     }
     return _lineView;
 }
@@ -816,7 +867,6 @@ UITableViewDelegate
 - (UILabel *)albumNameLb {
     if (!_albumNameLb) {
         _albumNameLb = [[UILabel alloc] init];
-        _albumNameLb.textColor = [UIColor blackColor];
         _albumNameLb.font = [UIFont hx_mediumSFUITextOfSize:13];
     }
     return _albumNameLb;
@@ -829,4 +879,33 @@ UITableViewDelegate
     }
     return _photoNumberLb;
 }
+- (UIView *)selectBgView {
+    if (!_selectBgView) {
+        _selectBgView = [[UIView alloc] init];
+        _selectBgView.backgroundColor = [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1];
+    }
+    return _selectBgView;
+}
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            [self changeColor];
+        }
+    }
+}
+- (void)changeAlbumNameTextColor {
+    if ([HXPhotoCommon photoCommon].isDark) {
+        self.albumNameLb.textColor = [UIColor whiteColor];
+    }else {
+        self.albumNameLb.textColor = [UIColor blackColor];
+    }
+}
+- (void)changeColor {
+    self.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
+    self.selectedBackgroundView = [HXPhotoCommon photoCommon].isDark ? self.selectBgView : nil;
+    self.lineView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] colorWithAlphaComponent:1] : [[UIColor lightGrayColor] colorWithAlphaComponent:0.15];
+    [self changeAlbumNameTextColor];
+}
+    
 @end

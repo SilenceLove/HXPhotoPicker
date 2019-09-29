@@ -14,26 +14,17 @@
     if (!imageName) {
         return nil;
     }
-    UIImage *image;
+    UIImage *image = [self imageNamed:imageName];;
+    if (image) return image;
     NSBundle *myBundle = [NSBundle hx_photoPickerBundle];
     imageName = [imageName stringByAppendingString:@"@2x"];
     NSString *imagePath = [myBundle pathForResource:imageName ofType:@"png"];
-    image = [UIImage imageWithContentsOfFile:imagePath];
-//    NSString *path = [NSString stringWithFormat:@"HXPhotoPicker.bundle/%@",imageName];
-//    image = [UIImage imageNamed:path];
+    image = [self imageWithContentsOfFile:imagePath];
     if (image) {
         return image;
     } else {
         imageName = [imageName stringByReplacingOccurrencesOfString:@"@2x" withString:@""];
-        image = [UIImage imageNamed:imageName];
-//        if (image) {
-//            return image;
-//        }
-//        NSString *path = [NSString stringWithFormat:@"Frameworks/HXPhotoPicker.framework/HXPhotoPicker.bundle/%@",imageName];
-//        image = [UIImage imageNamed:path];
-//        if (!image) {
-//            image = [UIImage imageNamed:imageName];
-//        }
+        image = [self imageNamed:imageName];
         return image;
     }
 } 

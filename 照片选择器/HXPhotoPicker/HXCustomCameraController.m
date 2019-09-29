@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
 #import "HXPhotoTools.h"
+#import "HXCustomPreviewView.h"
 
 const CGFloat HXZoomRate = 1.0f;
 
@@ -92,20 +93,6 @@ const CGFloat HXZoomRate = 1.0f;
     }else {
         return NO;
     }
-    
-//    self.imageOutput = [[AVCaptureStillImageOutput alloc] init];
-//    self.imageOutput.outputSettings = @{AVVideoCodecKey : AVVideoCodecJPEG};
-//    if ([self.captureSession canAddOutput:self.imageOutput]) {
-//        [self.captureSession addOutput:self.imageOutput];
-//    }
-    
-//    self.movieOutput = [[AVCaptureMovieFileOutput alloc] init];
-//    if ([self.captureSession canAddOutput:self.movieOutput]) {
-//        [self.captureSession addOutput:self.movieOutput];
-//    }
-    
-    self.videoQueue = dispatch_queue_create("com.hxphotopicker.VideoQueue", NULL);
-    
     return YES;
 }
 - (AVCaptureMovieFileOutput *)movieOutput {
@@ -173,27 +160,36 @@ const CGFloat HXZoomRate = 1.0f;
     [self.captureSession commitConfiguration];
 }
 - (void)startSessionComplete:(void (^)(void))complete {
-    if (![self.captureSession isRunning]) {
-        dispatch_async(self.videoQueue, ^{
-            [self.captureSession startRunning];
+    AVCaptureSession *session = self.captureSession;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if (![session isRunning]) {
+            [session startRunning];
             if (complete) {
                 complete();
             }
-        });
-    }
+        }
+    });
+    //        dispatch_async(self.videoQueue, ^{
+    //        })
 }
 - (void)startSession {
-    if (![self.captureSession isRunning]) {
-        dispatch_async(self.videoQueue, ^{
-            [self.captureSession startRunning];
-        });
-    }
+    AVCaptureSession *session = self.captureSession;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if (![session isRunning]) {
+            [session startRunning];
+        }
+    });
+//    if (![self.captureSession isRunning]) {
+//        dispatch_async(self.videoQueue, ^{
+//            [self.captureSession startRunning];
+//        });
+//    }
 }
 - (void)stopSession {
-    
+    AVCaptureSession *session = self.captureSession;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        if (self.captureSession.running) {
-            [self.captureSession stopRunning];
+        if (session.running) {
+            [session stopRunning];
         }
     });
     

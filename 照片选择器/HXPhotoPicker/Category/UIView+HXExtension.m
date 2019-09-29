@@ -125,6 +125,7 @@
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
     nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    nav.modalPresentationCapturesStatusBarAppearance = YES;
     [self.hx_viewController presentViewController:nav animated:YES completion:nil];
 }
 
@@ -145,6 +146,7 @@
                 nav.isCamera = YES;
                 nav.supportRotation = manager.configuration.supportRotation;
                 nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
+                nav.modalPresentationCapturesStatusBarAppearance = YES;
                 [weakSelf.hx_viewController presentViewController:nav animated:YES completion:nil];
             }else {
                 hx_showAlert(weakSelf.hx_viewController, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
@@ -169,11 +171,13 @@
     hud.alpha = 0;
     [self addSubview:hud];
     hud.center = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
-    [UIView animateWithDuration:0.25 animations:^{
+    hud.transform = CGAffineTransformMakeScale(0.4, 0.4);
+    [UIView animateWithDuration:0.25 delay:0 usingSpringWithDamping:0.5 initialSpringVelocity:1.0 options:0 animations:^{
         hud.alpha = 1;
-    }];
+        hud.transform = CGAffineTransformIdentity;
+    } completion:nil];
     [UIView cancelPreviousPerformRequestsWithTarget:self];
-    [self performSelector:@selector(handleGraceTimer) withObject:nil afterDelay:1.5f inModes:@[NSRunLoopCommonModes]];
+    [self performSelector:@selector(handleGraceTimer) withObject:nil afterDelay:1.75f inModes:@[NSRunLoopCommonModes]];
 } 
 
 - (void)hx_immediatelyShowLoadingHudWithText:(NSString *)text {
@@ -209,8 +213,10 @@
     if (immediately) {
         hud.alpha = 1;
     }else {
-        [UIView animateWithDuration:0.25 delay:delay options:0 animations:^{
+        hud.transform = CGAffineTransformMakeScale(0.4, 0.4);
+        [UIView animateWithDuration:0.25 delay:delay usingSpringWithDamping:0.5 initialSpringVelocity:1 options:0 animations:^{
             hud.alpha = 1;
+            hud.transform = CGAffineTransformIdentity;
         } completion:nil];
     }
 }
@@ -228,6 +234,7 @@
             if (animation) {
                 [UIView animateWithDuration:duration animations:^{
                     view.alpha = 0;
+                    view.transform = CGAffineTransformMakeScale(0.5, 0.5);
                 } completion:^(BOOL finished) {
                     [view removeFromSuperview];
                 }];
@@ -250,8 +257,9 @@
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
         if ([view isKindOfClass:[HXHUD class]] && [(HXHUD *)view isImage]) {
-            [UIView animateWithDuration:0.2f animations:^{
+            [UIView animateWithDuration:0.25f animations:^{
                 view.alpha = 0;
+                view.transform = CGAffineTransformMakeScale(0.5, 0.5);
             } completion:^(BOOL finished) {
                 [view removeFromSuperview];
             }];
@@ -265,6 +273,7 @@
 @property (copy, nonatomic) NSString *imageName;
 @property (copy, nonatomic) NSString *text;
 @property (weak, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIVisualEffectView *visualEffectView;
 @end
 
 @implementation HXHUD
@@ -276,7 +285,7 @@
         self.imageName = imageName;
         self.layer.masksToBounds = YES;
         self.layer.cornerRadius = 5;
-        self.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.85];
+        [self addSubview:self.visualEffectView];
         [self setup];
     }
     return self;
@@ -284,7 +293,10 @@
 
 - (void)setup {
     UIImage *image = self.imageName.length ? [UIImage hx_imageNamed:self.imageName] : nil;
-    self.isImage = image;
+    self.isImage = image != nil;
+    if ([HXPhotoCommon photoCommon].isDark) {
+        image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    }
     UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
     [self addSubview:imageView];
     CGFloat imgW = imageView.image.size.width;
@@ -294,11 +306,14 @@
     CGFloat imgCenterX = self.frame.size.width / 2;
     imageView.frame = CGRectMake(0, 20, imgW, imgH);
     imageView.center = CGPointMake(imgCenterX, imageView.center.y);
+    if ([HXPhotoCommon photoCommon].isDark) {
+        imageView.tintColor = [UIColor blackColor];
+    }
     self.imageView = imageView;
     
     UILabel *label = [[UILabel alloc] init];
     label.text = self.text;
-    label.textColor = [UIColor whiteColor];
+    label.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
     label.textAlignment = NSTextAlignmentCenter;
     label.font = [UIFont systemFontOfSize:14];
     label.numberOfLines = 0;
@@ -314,6 +329,14 @@
 
 - (void)showloading {
     UIActivityIndicatorView *loading = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    if ([HXPhotoCommon photoCommon].isDark) {
+        if (@available(iOS 13.0, *)) {
+            loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleLarge;
+        } else {
+            loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+        }
+        loading.color = [UIColor blackColor];
+    }
     [loading startAnimating];
     [self addSubview:loading];
     if (self.text) {
@@ -322,5 +345,19 @@
         loading.frame = self.bounds;
     }
     self.imageView.hidden = YES;
+}
+
+- (UIVisualEffectView *)visualEffectView {
+    if (!_visualEffectView) {
+        if ([HXPhotoCommon photoCommon].isDark) {
+            UIBlurEffect *blurEffrct =[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+            _visualEffectView = [[UIVisualEffectView alloc]initWithEffect:blurEffrct];
+        }else {
+            UIBlurEffect *blurEffrct =[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+            _visualEffectView = [[UIVisualEffectView alloc]initWithEffect:blurEffrct];
+        }
+        _visualEffectView.frame = self.bounds;
+    }
+    return _visualEffectView;
 }
 @end

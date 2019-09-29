@@ -42,11 +42,12 @@
 - [x] 支持Cell上添加
 - [x] 支持草稿功能
 - [x] 同一界面多个不同选择器
+- [x] 支持暗黑模式
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.3'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
-- ```v2.3.2 pod没有依赖sd和yy```  ```v2.3.3 pod依赖了yy```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.4'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- ```v2.3.2 pod没有依赖sd和yy```  ```>= v2.3.3 pod依赖了yy```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是 ```YYWebImage``` || >=```v2.3.0```  -> ```SDWebImage v5.0``` || <```v2.3.0``` ->  ```SDWebImage v4.0```
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -479,11 +480,29 @@ photoManager.configuration.maxNum = 10;
 photoManager.configuration.selectTogether = YES;
 photoManager.configuration.photoCanEdit = NO;
 photoManager.configuration.videoCanEdit = NO;
+
+HXWeakSelf
+// 长按事件
 photoManager.configuration.previewRespondsToLongPress = ^(UILongPressGestureRecognizer *longPress, 
                                                           HXPhotoModel *photoModel, 
                                                           HXPhotoManager *manager, 
                                                           HXPhotoPreviewViewController *previewViewController) {
     hx_showAlert(previewViewController, @"提示", @"长按事件", @"确定", nil, nil, nil);
+};
+// 跳转预览界面时动画起始的view
+photoManager.configuration.customPreviewFromView = ^UIView *(NSInteger currentIndex) {
+    HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
+    return viewCell;
+};
+// 跳转预览界面时展现动画的image
+photoManager.configuration.customPreviewFromImage = ^UIImage *(NSInteger currentIndex) {
+    HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
+    return viewCell.imageView.image;
+};
+// 退出预览界面时终点view
+photoManager.configuration.customPreviewToView = ^UIView *(NSInteger currentIndex) {
+    HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
+    return viewCell;
 };
 [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5]];
 
@@ -504,9 +523,14 @@ UIViewController+HXExtension.h
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView;
 ```
+#### 9. 建议
+```objc
+建议将 HXPhotoPicker.bundle 里的图片资源手动添加到项目的 Assets.xcassets 里
+```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.3.4　-　适配ios13暗黑模式（可跟随系统也可自己设置）、恢复requestImageAfterFinishingSelection属性功能、单独使用预览大图时添加block回调、修复一些问题
 - v2.3.3　-　pod依赖yy
 - v2.3.2　-　适配ios13
 - v2.3.1　-　pod去除依赖sd和yy

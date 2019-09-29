@@ -14,10 +14,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface HXPhotoCommon : NSObject
 
+/**
+相册风格
+*/
+@property (assign, nonatomic) HXPhotoStyle photoStyle;
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
 
 + (instancetype)photoCommon;
 + (void)deallocPhotoCommon;
+
+- (BOOL)isDark;
 @end
 
 NS_ASSUME_NONNULL_END

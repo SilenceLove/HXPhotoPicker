@@ -7,6 +7,7 @@
 //
 
 #import "HXPhotoView.h"
+#import "HXPhotoSubViewCell.h"
 #import "HXPhotoManager.h"
 #import "HXCustomNavigationController.h"
 #import "HXAlbumListViewController.h"

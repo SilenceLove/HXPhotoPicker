@@ -38,18 +38,49 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 @interface ViewController ()<UITableViewDataSource,UITableViewDelegate>
 
 @property (copy, nonatomic) NSArray *list;
+@property (nonatomic, strong) YYFPSLabel *label;
 
 @end
 
 @implementation ViewController
-
+ 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIStatusBarStyleLightContent;
+        }
+    }
+    return UIStatusBarStyleDefault;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self changeStatus];
+}
+- (void)changeStatus {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+            return;
+        }
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        [self preferredStatusBarUpdateAnimation];
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+        self.label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor blackColor];
+        [self changeStatus];
+    }
+}
 - (NSArray *)list
 {
     if (!_list) {
         _list = @[[[ListItem alloc] initWithTitle:@"Demo1"
                                          subTitle:@"只使用照片选择器功能,不带选好后自动布局(可扩展)"
                                 viewControllClass: [Demo1ViewController class]],
-                  [[ListItem alloc] initWithTitle:@"Demo2"
+                  [[ListItem alloc] initWithTitle:@"Demo2(暗黑风格，可跟随系统)"
                                          subTitle:@"使用照片选择器功能并且选好后自动布局"
                                 viewControllClass: [Demo2ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo3"
@@ -95,7 +126,6 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     self.title = @"Demo 1 ~ 12";
-
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     tableView.tableFooterView = [[UIView alloc] init];
@@ -104,10 +134,16 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
     YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, hxTopMargin ? hxTopMargin - 10: 10 , 100, 30)];
-    [[UIApplication sharedApplication].keyWindow addSubview:label]; 
-    
-//    NSString *language = [NSLocale preferredLanguages].firstObject;
-//    NSSLog(@"%@",language);
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+        label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor blackColor];
+    } else {
+        // Fallback on earlier versions
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
+    [[UIApplication sharedApplication].keyWindow addSubview:label];
+    self.label = label;
+     
     
 }
 

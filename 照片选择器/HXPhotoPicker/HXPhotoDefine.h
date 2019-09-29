@@ -20,7 +20,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.3.3"
+#define HXVersion @"2.3.4"
 
 #define HXEncodeKey @"HXModelArray"
 

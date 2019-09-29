@@ -31,15 +31,6 @@
  */
 - (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager))models cancel:(void (^)(UIViewController *viewController, HXPhotoManager *manager))cancel;
 
-/**
- 跳转预览照片界面
-
- @param manager 照片管理者
- @param models 模型数组
- @param currentModel 当前预览的模型
- @param photoView 照片展示视图
- */
-
 /// 跳转预览照片界面
 /// @param manager 照片管理者
 /// @param previewStyle 预览样式

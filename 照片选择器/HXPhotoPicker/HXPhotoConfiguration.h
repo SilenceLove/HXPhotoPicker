@@ -20,12 +20,17 @@ typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
 };
 
 typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
-    HXPhotoLanguageTypeSys = 0, // 跟随系统语言
-    HXPhotoLanguageTypeSc,      // 中文简体
-    HXPhotoLanguageTypeTc,      // 中文繁体
-    HXPhotoLanguageTypeJa,      // 日文
-    HXPhotoLanguageTypeKo,      // 韩文
-    HXPhotoLanguageTypeEn       // 英文
+    HXPhotoLanguageTypeSys = 0, //!< 跟随系统语言
+    HXPhotoLanguageTypeSc,      //!< 中文简体
+    HXPhotoLanguageTypeTc,      //!< 中文繁体
+    HXPhotoLanguageTypeJa,      //!< 日文
+    HXPhotoLanguageTypeKo,      //!< 韩文
+    HXPhotoLanguageTypeEn       //!< 英文
+};
+
+typedef NS_ENUM(NSUInteger, HXPhotoStyle) {
+    HXPhotoStyleDefault = 0,    //!< 默认
+    HXPhotoStyleDark            //!< 暗黑
 };
 
 @class
@@ -36,6 +41,32 @@ HXPhotoModel,
 HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
+
+/// 跳转预览界面时动画起始的view，使用方法参考demo12里的外部预览功能
+@property (copy, nonatomic) UIView * (^customPreviewFromView)(NSInteger currentIndex);
+
+/// 跳转预览界面时展现动画的image，使用方法参考demo12里的外部预览功能
+@property (copy, nonatomic) UIImage * (^customPreviewFromImage)(NSInteger currentIndex);
+
+/// 退出预览界面时终点view，使用方法参考demo12里的外部预览功能
+@property (copy, nonatomic) UIView * (^customPreviewToView)(NSInteger currentIndex);
+
+/// 暗黑模式下照片列表cell上选择按钮选中之后的数字标题颜色
+@property (strong, nonatomic) UIColor *cellDarkSelectTitleColor;
+
+/// 暗黑模式下照片列表cell上选择按钮选中之后的按钮背景颜色
+@property (strong, nonatomic) UIColor *cellDarkSelectBgColor;
+
+/// 暗黑模式下预览大图右上角选择按钮选中之后的数字标题颜色
+@property (strong, nonatomic) UIColor *previewDarkSelectTitleColor;
+
+/// 暗黑模式下预览大图右上角选择按钮选中之后的按钮背景颜色
+@property (strong, nonatomic) UIColor *previewDarkSelectBgColor;
+
+/**
+相册风格
+*/
+@property (assign, nonatomic) HXPhotoStyle photoStyle;
 
 /**
  拍摄的画质
@@ -122,7 +153,7 @@ HXPhotoPreviewViewController;
  选中了原图则是原图，没选中则是高清图
  并赋值给model的 thumbPhoto 和 previewPhoto 属性
  */
-@property (assign, nonatomic) BOOL requestImageAfterFinishingSelection DEPRECATED_MSG_ATTRIBUTE("该属性已无效' instead");
+@property (assign, nonatomic) BOOL requestImageAfterFinishingSelection;
 
 /**
  视频是否可以编辑   default NO

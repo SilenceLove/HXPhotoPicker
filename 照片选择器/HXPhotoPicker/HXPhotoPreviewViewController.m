@@ -54,6 +54,17 @@ HXVideoEditViewControllerDelegate
 @end
 
 @implementation HXPhotoPreviewViewController
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            [self changeColor];
+            [self changeStatusBarStyle];
+            [self setNeedsStatusBarAppearanceUpdate];
+            [self.collectionView reloadData];
+        }
+    }
+}
 #pragma mark - < transition delegate >
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
     if (operation == UINavigationControllerOperationPush) {
@@ -109,6 +120,9 @@ HXVideoEditViewControllerDelegate
     if (HXShowLog) NSSLog(@"dealloc");
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
+    if ([HXPhotoCommon photoCommon].isDark) {
+        return UIStatusBarStyleLightContent;
+    }
     return self.manager.configuration.statusBarStyle;
 }
 - (BOOL)prefersStatusBarHidden {
@@ -139,10 +153,17 @@ HXVideoEditViewControllerDelegate
     }
     self.layoutSubviewsCompletion = YES;
 }
+- (void)changeStatusBarStyle {
+    if ([HXPhotoCommon photoCommon].isDark) {
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+        return;
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
+}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [UINavigationBar appearance].translucent = YES;
-    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
+    [self changeStatusBarStyle];
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
         [self changeStatusBarWithHidden:YES];
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
@@ -313,16 +334,110 @@ HXVideoEditViewControllerDelegate
         }
     }
 }
-- (void)setupUI {
-    [self.view addSubview:self.collectionView];
+- (void)changeColor {
+    UIColor *backgroundColor;
+    UIColor *themeColor;
+    UIColor *navBarBackgroudColor;
+    UIColor *navigationTitleColor;
+    UIColor *selectedTitleColor;
+    UIColor *selectBtnBgColor;
+    UIColor *selectBtnTitleColor;
+    if ([HXPhotoCommon photoCommon].isDark) {
+        backgroundColor = [UIColor blackColor];
+        themeColor = [UIColor whiteColor];
+        navBarBackgroudColor = [UIColor blackColor];
+        navigationTitleColor = [UIColor whiteColor];
+        selectedTitleColor = [UIColor blackColor];
+        selectBtnBgColor = self.manager.configuration.previewDarkSelectBgColor;
+        selectBtnTitleColor = self.manager.configuration.previewDarkSelectTitleColor;
+    }else {
+        backgroundColor = (_bottomView && _bottomView.alpha == 0) ? [UIColor blackColor] : [UIColor whiteColor];
+        themeColor = self.manager.configuration.themeColor;
+        navBarBackgroudColor = self.manager.configuration.navBarBackgroudColor;
+        navigationTitleColor = self.manager.configuration.navigationTitleColor;
+        selectedTitleColor = self.manager.configuration.selectedTitleColor;
+        selectBtnTitleColor = selectedTitleColor;
+        selectBtnBgColor = themeColor;
+    }
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
-        self.view.backgroundColor = [UIColor whiteColor];
+        self.collectionView.backgroundColor = backgroundColor;
+    }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        self.collectionView.backgroundColor = [UIColor blackColor];
+    }
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+        self.view.backgroundColor = backgroundColor;
         [self.view addSubview:self.bottomView];
     }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
         self.view.backgroundColor = [UIColor blackColor];
     }
+    if (!self.outside) {
+        [self.navigationController.navigationBar setTintColor:themeColor];
+        if (navBarBackgroudColor) {
+            [self.navigationController.navigationBar setBackgroundColor:nil];
+            [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+        }
+        self.navigationController.navigationBar.barTintColor = navBarBackgroudColor;
+        if (self.manager.configuration.navigationTitleSynchColor) {
+            self.titleLb.textColor = themeColor;
+            self.subTitleLb.textColor = themeColor;
+        }else {
+            UIColor *titleColor = [self.navigationController.navigationBar.titleTextAttributes objectForKey:NSForegroundColorAttributeName];
+            if (titleColor) {
+                self.titleLb.textColor = titleColor;
+                self.subTitleLb.textColor = titleColor;
+            }
+            if (navigationTitleColor) {
+                self.titleLb.textColor = navigationTitleColor;
+                self.subTitleLb.textColor = navigationTitleColor;
+            }else {
+                self.titleLb.textColor = [UIColor blackColor];
+                self.subTitleLb.textColor = [UIColor blackColor];
+            }
+        }
+        self.selectBtn.backgroundColor = self.selectBtn.selected ? selectBtnBgColor : nil;
+    }else {
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+            [self.navBar setTintColor:themeColor];
+            if (navBarBackgroudColor) {
+                [self.navBar setBackgroundColor:nil];
+                [self.navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+            }
+            self.navBar.barTintColor = navBarBackgroudColor;
+            
+            if (self.manager.configuration.navigationTitleSynchColor) {
+                self.titleLb.textColor = themeColor;
+                self.subTitleLb.textColor = themeColor;
+            }else {
+                UIColor *titleColor = [self.navBar.titleTextAttributes objectForKey:NSForegroundColorAttributeName];
+                if (titleColor) {
+                    self.titleLb.textColor = titleColor;
+                    self.subTitleLb.textColor = titleColor;
+                }
+                if (navigationTitleColor) {
+                    self.titleLb.textColor = navigationTitleColor;
+                    self.subTitleLb.textColor = navigationTitleColor;
+                }else {
+                    self.titleLb.textColor = [UIColor blackColor];
+                    self.subTitleLb.textColor = [UIColor blackColor];
+                }
+            }
+        }
+    }
+    if ([selectBtnBgColor isEqual:[UIColor whiteColor]]) {
+        [_selectBtn setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
+    }else {
+        [_selectBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    }
+    if (selectBtnTitleColor) {
+        [_selectBtn setTitleColor:selectBtnTitleColor forState:UIControlStateSelected];
+    }
+}
+- (void)setupUI {
+    [self.view addSubview:self.collectionView];
     self.beforeOrientationIndex = self.currentModelIndex;
-    
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
+        [self.view addSubview:self.bottomView];
+    }
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     self.currentModel = model;
     self.bottomView.outside = self.outside;
@@ -340,26 +455,6 @@ HXVideoEditViewControllerDelegate
     
     if (!self.outside) {
         self.navigationItem.titleView = self.customTitleView;
-        [self.navigationController.navigationBar setTintColor:self.manager.configuration.themeColor];
-        if (self.manager.configuration.navBarBackgroudColor) {
-            [self.navigationController.navigationBar setBackgroundColor:nil];
-            [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-            self.navigationController.navigationBar.barTintColor = self.manager.configuration.navBarBackgroudColor;
-        }
-        if (self.manager.configuration.navigationTitleSynchColor) {
-            self.titleLb.textColor = self.manager.configuration.themeColor;
-            self.subTitleLb.textColor = self.manager.configuration.themeColor;
-        }else {
-            UIColor *titleColor = [self.navigationController.navigationBar.titleTextAttributes objectForKey:NSForegroundColorAttributeName];
-            if (titleColor) {
-                self.titleLb.textColor = titleColor;
-                self.subTitleLb.textColor = titleColor;
-            }
-            if (self.manager.configuration.navigationTitleColor) {
-                self.titleLb.textColor = self.manager.configuration.navigationTitleColor;
-                self.subTitleLb.textColor = self.manager.configuration.navigationTitleColor;
-            }
-        }
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.bottomView.enabled = self.manager.configuration.videoCanEdit;
         } else {
@@ -369,7 +464,6 @@ HXVideoEditViewControllerDelegate
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.selectBtn];
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
-        self.selectBtn.backgroundColor = self.selectBtn.selected ? self.manager.configuration.themeColor : nil;
         if (self.manager.configuration.singleSelected) {
             self.selectBtn.hidden = YES;
             if (self.manager.configuration.singleJumpEdit) {
@@ -391,27 +485,6 @@ HXVideoEditViewControllerDelegate
         }
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
             [self.view addSubview:self.navBar];
-            [self.navBar setTintColor:self.manager.configuration.themeColor];
-            if (self.manager.configuration.navBarBackgroudColor) {
-                [self.navBar setBackgroundColor:nil];
-                [self.navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-                self.navBar.barTintColor = self.manager.configuration.navBarBackgroudColor;
-            }
-            
-            if (self.manager.configuration.navigationTitleSynchColor) {
-                self.titleLb.textColor = self.manager.configuration.themeColor;
-                self.subTitleLb.textColor = self.manager.configuration.themeColor;
-            }else {
-                UIColor *titleColor = [self.navBar.titleTextAttributes objectForKey:NSForegroundColorAttributeName];
-                if (titleColor) {
-                    self.titleLb.textColor = titleColor;
-                    self.subTitleLb.textColor = titleColor;
-                }
-                if (self.manager.configuration.navigationTitleColor) {
-                    self.titleLb.textColor = self.manager.configuration.navigationTitleColor;
-                    self.subTitleLb.textColor = self.manager.configuration.navigationTitleColor;
-                }
-            }
         }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             
             [self.view addSubview:self.darkCancelBtn];
@@ -426,6 +499,7 @@ HXVideoEditViewControllerDelegate
             }
         }
     }
+    [self changeColor];
     [self changeSubviewFrame];
 }
 - (void)didSelectClick:(UIButton *)button {
@@ -487,7 +561,8 @@ HXVideoEditViewControllerDelegate
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [button.layer addAnimation:anim forKey:@""];
     }
-    button.backgroundColor = button.selected ? self.manager.configuration.themeColor : nil;
+    UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : self.manager.configuration.themeColor;
+    button.backgroundColor = button.selected ? themeColor : nil;
     if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidSelect:model:)]) {
         [self.delegate photoPreviewControllerDidSelect:self model:model];
     }
@@ -563,6 +638,7 @@ HXVideoEditViewControllerDelegate
         [self.navigationController setNavigationBarHidden:hide animated:NO];
     }
     self.bottomView.userInteractionEnabled = !hide;
+    UIColor *bgColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
     if (animete) {
         [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
         [UIView animateWithDuration:duration animations:^{
@@ -570,8 +646,8 @@ HXVideoEditViewControllerDelegate
             if (self.outside) {
                 self.navBar.alpha = hide ? 0 : 1;
             }
-            self.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
-            self.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+            self.view.backgroundColor = hide ? [UIColor blackColor] : bgColor;
+            self.collectionView.backgroundColor = hide ? [UIColor blackColor] : bgColor;
             self.bottomView.alpha = hide ? 0 : 1;
         } completion:^(BOOL finished) {
             if (hide) {
@@ -584,8 +660,8 @@ HXVideoEditViewControllerDelegate
         if (self.outside) {
             self.navBar.alpha = hide ? 0 : 1;
         }
-        self.view.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
-        self.collectionView.backgroundColor = hide ? [UIColor blackColor] : [UIColor whiteColor];
+        self.view.backgroundColor = hide ? [UIColor blackColor] : bgColor;
+        self.collectionView.backgroundColor = hide ? [UIColor blackColor] : bgColor;
         self.bottomView.alpha = hide ? 0 : 1;
         if (hide) {
             [self.navigationController setNavigationBarHidden:hide];
@@ -711,7 +787,9 @@ HXVideoEditViewControllerDelegate
         }
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
-        self.selectBtn.backgroundColor = self.selectBtn.selected ? self.manager.configuration.themeColor : nil;
+        
+        UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? self.manager.configuration.previewDarkSelectBgColor : self.manager.configuration.themeColor;
+        self.selectBtn.backgroundColor = self.selectBtn.selected ? themeColor : nil;
         if (self.outside) {
             if ([self.modelArray containsObject:model] && self.layoutSubviewsCompletion) {
                 self.bottomView.currentIndex = [self.modelArray indexOfObject:model];
@@ -813,6 +891,7 @@ HXVideoEditViewControllerDelegate
             vc.manager = self.manager;
             vc.outside = self.outside;
             vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+            vc.modalPresentationCapturesStatusBarAppearance = YES;
             [self presentViewController:vc animated:YES completion:nil];
         }
     }else {
@@ -835,6 +914,7 @@ HXVideoEditViewControllerDelegate
             vc.isInside = YES;
             vc.outside = self.outside;
             vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+            vc.modalPresentationCapturesStatusBarAppearance = YES;
             [self presentViewController:vc animated:YES completion:nil];
         }
     }
@@ -1034,7 +1114,6 @@ HXVideoEditViewControllerDelegate
         _navBar = [[HXPhotoCustomNavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, hxNavigationBarHeight)];
         _navBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [_navBar pushNavigationItem:self.navItem animated:NO];
-        [_navBar setTintColor:self.manager.configuration.themeColor];
     }
     return _navBar;
 }
@@ -1071,7 +1150,6 @@ HXVideoEditViewControllerDelegate
         }else {
             _titleLb.font = [UIFont systemFontOfSize:14];
         }
-        _titleLb.textColor = [UIColor blackColor];
     }
     return _titleLb;
 }
@@ -1084,7 +1162,6 @@ HXVideoEditViewControllerDelegate
         }else {
             _subTitleLb.font = [UIFont systemFontOfSize:11];
         }
-        _subTitleLb.textColor = [UIColor blackColor];
     }
     return _subTitleLb;
 }
@@ -1104,14 +1181,6 @@ HXVideoEditViewControllerDelegate
         _selectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_selectBtn setBackgroundImage:[UIImage hx_imageNamed:@"hx_compose_guide_check_box_default_2"] forState:UIControlStateNormal];
         [_selectBtn setBackgroundImage:[[UIImage alloc] init] forState:UIControlStateSelected];
-        if ([self.manager.configuration.themeColor isEqual:[UIColor whiteColor]]) {
-            [_selectBtn setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
-        }else {
-            [_selectBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-        }
-        if (self.manager.configuration.selectedTitleColor) {
-            [_selectBtn setTitleColor:self.manager.configuration.selectedTitleColor forState:UIControlStateSelected];
-        }
         _selectBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         _selectBtn.adjustsImageWhenDisabled = YES;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -1125,11 +1194,6 @@ HXVideoEditViewControllerDelegate
     if (!_collectionView) {
         //        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, hxTopMargin,self.view.hx_w + 20, self.view.hx_h - hxTopMargin - hxBottomMargin) collectionViewLayout:self.flowLayout];
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, 0,self.view.hx_w + 20, self.view.hx_h) collectionViewLayout:self.flowLayout];
-        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
-            _collectionView.backgroundColor = [UIColor whiteColor];
-        }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
-            _collectionView.backgroundColor = [UIColor blackColor];
-        }
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

@@ -12,7 +12,7 @@
 
 typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
     HXPhotoViewPreViewShowStyleDefault, //!< 默认
-    HXPhotoViewPreViewShowStyleDark     //!< 黑暗
+    HXPhotoViewPreViewShowStyleDark     //!< 暗黑
 };
 
 /*
@@ -299,4 +299,5 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  *   point 传入的坐标是在HXPhotoView上的坐标,里面已经做了转换处理
  */
 - (HXPhotoSubViewCell *)previewingContextViewWithPoint:(CGPoint)point;
+- (HXPhotoSubViewCell *)collectionViewCellWithIndex:(NSInteger)index;
 @end

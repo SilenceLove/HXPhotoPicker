@@ -46,6 +46,34 @@
 
 @implementation Demo1ViewController
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        [self preferredStatusBarUpdateAnimation];
+        [self changeStatus];
+    }
+}
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return UIStatusBarStyleLightContent;
+        }
+    }
+    return UIStatusBarStyleDefault;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self changeStatus];
+}
+- (void)changeStatus {
+    if (@available(iOS 13.0, *)) {
+        if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+            return;
+        }
+    }
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
 - (HXPhotoManager *)manager
 {
     if (!_manager) {
@@ -74,10 +102,14 @@
         
         __weak typeof(self) weakSelf = self;
         _manager.configuration.photoListBottomView = ^(HXPhotoBottomView *bottomView) {
-            bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
+            if (weakSelf.manager.configuration.photoStyle != HXPhotoStyleDark) {
+                bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
+            }
         };
         _manager.configuration.previewBottomView = ^(HXPhotoPreviewBottomView *bottomView) {
-            bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
+            if (weakSelf.manager.configuration.photoStyle != HXPhotoStyleDark) {
+                bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
+            }
         };
         _manager.configuration.albumListCollectionView = ^(UICollectionView *collectionView) {
 //            NSSLog(@"albumList:%@",collectionView);
@@ -180,6 +212,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        // Fallback on earlier versions
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空选择" style:UIBarButtonItemStylePlain target:self action:@selector(didRightClick)];
     self.scrollView.delegate = self;
     if (HX_IS_IPhoneX_All) {
@@ -194,10 +232,6 @@
 }
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     [self.view endEditing:YES];
-}
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
 }
 - (void)didRightClick {
     [self.manager clearSelectedList];
