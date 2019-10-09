@@ -54,7 +54,7 @@
         }
     }else {
         NSURL *url = original ? model.networkPhotoUrl : model.networkThumbURL;
-        [self yy_setImageWithURL:url placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        [self setImageWithURL:url placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
             model.receivedSize = receivedSize;
             model.expectedSize = expectedSize;
             CGFloat progress = (CGFloat)receivedSize / expectedSize;

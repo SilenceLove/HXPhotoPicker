@@ -16,6 +16,6 @@ Pod::Spec.new do |s|
   s.framework    = 'UIKit','Photos','PhotosUI'
   s.requires_arc = true
 
-  s.dependency "YYWebImage"
+  s.dependency "YYKit"
 
 end
