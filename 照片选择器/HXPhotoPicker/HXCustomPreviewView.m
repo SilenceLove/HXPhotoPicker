@@ -39,8 +39,6 @@
     self.beginGestureScale = 1.0f;
     self.effectiveScale = 1.0f;
     
-    [(AVCaptureVideoPreviewLayer *)self.layer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
-    
     _pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
     _pinch.delegate = self;
     [self addGestureRecognizer:_pinch];
@@ -148,7 +146,10 @@
     _pinchToZoomEnabled = pinchToZoomEnabled;
     self.pinch.enabled = pinchToZoomEnabled;
 }
-
+- (void)setupPreviewLayer {
+    self.previewLayer.frame = self.bounds;
+    [self.layer insertSublayer:self.previewLayer atIndex:0];
+}
 - (UIView *)viewWithColor:(UIColor *)color {
     UIView *view = [[UIView alloc] initWithFrame:BOX_BOUNDS];
     view.backgroundColor = [UIColor clearColor];
@@ -156,22 +157,15 @@
     view.layer.borderWidth = 5.0f;
     view.hidden = YES;
     return view;
-}
-+ (Class)layerClass {
-    return [AVCaptureVideoPreviewLayer class];
-}
+} 
 
-- (void)setSession:(AVCaptureSession *)session {
-    [(AVCaptureVideoPreviewLayer *)self.layer setSession:session];
-}
 
 - (AVCaptureSession *)session {
-    return [(AVCaptureVideoPreviewLayer *)self.layer session];
+    return self.previewLayer.session;
 }
 
 - (CGPoint)captureDevicePointForPoint:(CGPoint)point {
-    AVCaptureVideoPreviewLayer *layer = (AVCaptureVideoPreviewLayer *)self.layer;
-    return [layer captureDevicePointOfInterestForPoint:point];
+    return [self.previewLayer captureDevicePointOfInterestForPoint:point];
 }
 
 @end

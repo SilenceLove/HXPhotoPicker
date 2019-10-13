@@ -258,15 +258,20 @@
 }
 - (void)requestPhotosBytesWithCompletion:(void (^)(NSString *, NSUInteger))completion {
     [self.dataOperationQueue cancelAllOperations];
+    self.selectPhotoTotalDataLengths = 0;
     if (!self.selectedPhotos.count) {
+        if (completion) completion(nil, 0);
         return;
     }
-    __block NSInteger dataLength = 0;
-    __block NSInteger assetCount = 0;
+    __block NSUInteger dataLength = 0;
+    __block NSUInteger assetCount = 0;
     HXWeakSelf
     NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         for (int i = 0 ; i < weakSelf.selectedPhotos.count ; i++) {
             HXPhotoModel *model = weakSelf.selectedPhotos[i];
+            if (model.subType != HXPhotoModelMediaSubTypePhoto) {
+                continue;
+            }
             if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
                 NSData *imageData;
                 if (UIImagePNGRepresentation(model.thumbPhoto)) {
@@ -279,6 +284,7 @@
                 dataLength += imageData.length;
                 assetCount ++;
                 if (assetCount >= weakSelf.selectedPhotos.count) {
+                    weakSelf.selectPhotoTotalDataLengths = &(dataLength);
                     NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if (completion) completion(bytes, dataLength);
@@ -289,6 +295,7 @@
                     dataLength += imageData.length;
                     assetCount ++;
                     if (assetCount >= weakSelf.selectedPhotos.count) {
+                        weakSelf.selectPhotoTotalDataLengths = &(dataLength);
                         NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (completion) completion(bytes, dataLength);
@@ -298,6 +305,7 @@
                     dataLength += 0;
                     assetCount ++;
                     if (assetCount >= weakSelf.selectedPhotos.count) {
+                        weakSelf.selectPhotoTotalDataLengths = &(dataLength);
                         NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (completion) completion(bytes, dataLength);
@@ -1204,6 +1212,10 @@
             }
         }
     }else if (self.type == HXPhotoManagerSelectedTypePhoto) {
+        if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            // 已经选择了图片,不能再选视频
+            return [NSBundle hx_localizedStringForKey:@"视频不能和图片同时选择"];
+        }
         if ([self beforeSelectPhotoCountIsMaximum]) {
             NSUInteger maxSelectCount;
             if (self.configuration.photoMaxNum > 0) {
@@ -1215,6 +1227,10 @@
             return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"最多只能选择%ld张图片"],maxSelectCount];
         }
     }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
+        if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+            // 已经选择了图片,不能再选视频
+            return [NSBundle hx_localizedStringForKey:@"图片不能和视频同时选择"];
+        }
         if ([self beforeSelectVideoCountIsMaximum]) {
             NSUInteger maxSelectCount;
             if (self.configuration.videoMaxNum > 0) {
@@ -1402,6 +1418,9 @@
         }
     }
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        if (self.type == HXPhotoManagerSelectedTypeVideo) {
+            return;
+        }
         if (![self beforeSelectPhotoCountIsMaximum]) {
             if (!self.configuration.selectTogether) {
                 if (self.selectedList.count > 0) {
@@ -1438,6 +1457,9 @@
             }
         }
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+        if (self.type == HXPhotoManagerSelectedTypePhoto) {
+            return;
+        }
         // 当选中视频个数没有达到最大个数时就添加到选中数组中
         if (![self beforeSelectVideoCountIsMaximum] && model.videoDuration <= self.configuration.videoMaximumSelectDuration) {
             if (!self.configuration.selectTogether) {
@@ -1583,6 +1605,9 @@
     [self changeModelVideoState:model];
     
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        if (self.type == HXPhotoManagerSelectedTypeVideo) {
+            return;
+        }
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
             [self.endCameraPhotos addObject:model];
             [self.endCameraList addObject:model];
@@ -1624,6 +1649,9 @@
             }
         }
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+        if (self.type == HXPhotoManagerSelectedTypePhoto) {
+            return;
+        }
         if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             [self.endCameraVideos addObject:model];
             [self.endCameraList addObject:model];
@@ -1779,6 +1807,8 @@
         self.endSelectedCameraVideos = [NSMutableArray arrayWithArray:self.selectedCameraVideos];
         self.endIsOriginal = self.isOriginal;
         self.endPhotosTotalBtyes = self.photosTotalBtyes;
+        
+        [self cancelBeforeSelectedList];
     }
 }
 - (void)cancelBeforeSelectedList {

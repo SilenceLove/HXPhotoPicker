@@ -75,25 +75,33 @@ const CGFloat HXZoomRate = 1.0f;
         }
     }
 }
-- (BOOL)setupSession:(NSError *)error {
+- (void)initSeesion {
     self.captureSession = [[AVCaptureSession alloc] init];
+}
+- (void)setupPreviewLayer:(AVCaptureVideoPreviewLayer *)previewLayer startSessionCompletion:(void (^)(BOOL success))completion {
     if ([self.captureSession canSetSessionPreset:self.sessionPreset]) {
         self.captureSession.sessionPreset = self.sessionPreset;
     }else {
         self.captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
     }
-
     AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
+    AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:nil];
     if (videoInput) {
         if ([self.captureSession canAddInput:videoInput]) {
             [self.captureSession addInput:videoInput];
             self.activeVideoInput = videoInput;
         }
     }else {
-        return NO;
+        if (completion) {
+            completion(NO);
+        }
+        return;
     }
-    return YES;
+    previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    [self.captureSession startRunning];
+    if (completion) {
+        completion(YES);
+    }
 }
 - (AVCaptureMovieFileOutput *)movieOutput {
     if (!_movieOutput) {
@@ -158,19 +166,6 @@ const CGFloat HXZoomRate = 1.0f;
         }
     }
     [self.captureSession commitConfiguration];
-}
-- (void)startSessionComplete:(void (^)(void))complete {
-    AVCaptureSession *session = self.captureSession;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        if (![session isRunning]) {
-            [session startRunning];
-            if (complete) {
-                complete();
-            }
-        }
-    });
-    //        dispatch_async(self.videoQueue, ^{
-    //        })
 }
 - (void)startSession {
     AVCaptureSession *session = self.captureSession;

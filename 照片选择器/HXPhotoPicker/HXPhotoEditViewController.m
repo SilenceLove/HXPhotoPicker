@@ -825,6 +825,7 @@
 @implementation HXPhotoEditBottomView
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             
@@ -836,6 +837,7 @@
             [self.clipBtn setTitleColor:[color colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         }
     }
+#endif
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];

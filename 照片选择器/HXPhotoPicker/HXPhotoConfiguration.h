@@ -8,11 +8,21 @@
 
 #import <UIKit/UIKit.h>
 
+
+/// 当使用了自定义相机类型时会过滤掉内部按 HXPhotoManagerSelectedType 来设置的逻辑，
+/// 将会使用自定义类型的逻辑进行设置
+typedef NS_ENUM(NSUInteger, HXPhotoCustomCameraType) {
+    HXPhotoCustomCameraTypeUnused = 0,      //!< 不使用自定义相机类型，按默认逻辑设置
+    HXPhotoCustomCameraTypePhoto = 1,       //!< 拍照
+    HXPhotoCustomCameraTypeVideo = 2,       //!< 录制
+    HXPhotoCustomCameraTypePhotoAndVideo    //!< 拍照和录制一起
+};
+
 typedef NS_ENUM(NSUInteger, HXPhotoConfigurationCameraType) {
     HXPhotoConfigurationCameraTypePhoto = 0,        //!< 拍照
     HXPhotoConfigurationCameraTypeVideo = 1,        //!< 录制
-    HXPhotoConfigurationCameraTypeTypePhotoAndVideo //!< 拍照和录制一起
-}; 
+    HXPhotoConfigurationCameraTypePhotoAndVideo     //!< 拍照和录制一起
+};
 
 typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
     HXPhotoAlbumShowModeDefault = 0,    //!< 默认的
@@ -42,6 +52,9 @@ HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
 
+/// 自定义相机内部拍照/录制类型
+@property (assign, nonatomic) HXPhotoCustomCameraType customCameraType;
+
 /// 跳转预览界面时动画起始的view，使用方法参考demo12里的外部预览功能
 @property (copy, nonatomic) UIView * (^customPreviewFromView)(NSInteger currentIndex);
 
@@ -62,6 +75,15 @@ HXPhotoPreviewViewController;
 
 /// 暗黑模式下预览大图右上角选择按钮选中之后的按钮背景颜色
 @property (strong, nonatomic) UIColor *previewDarkSelectBgColor;
+
+/**
+ 在照片列表选择照片完后点击完成时是否请求图片和视频地址
+ 选中了原图则是原图，没选中则是高清图
+ 并赋值给model的 thumbPhoto / previewPhoto / videoURL 属性
+ 如果资源为视频 thumbPhoto 和 previewPhoto 就是视频封面
+ model.videoURL 为视频地址
+ */
+@property (assign, nonatomic) BOOL requestImageAfterFinishingSelection;
 
 /**
 相册风格
@@ -88,6 +110,9 @@ HXPhotoPreviewViewController;
  原图按钮显示已选照片的大小
  */
 @property (assign, nonatomic) BOOL showOriginalBytes;
+
+/// 原图按钮显示已选照片大小时是否显示加载菊花
+@property (assign, nonatomic) BOOL showOriginalBytesLoading;
 
 /**
  导出裁剪视频的质量 - default AVAssetExportPresetHighestQuality
@@ -147,13 +172,6 @@ HXPhotoPreviewViewController;
  只针对 照片、视频不能同时选并且视频只能选择1个的时候隐藏掉视频cell右上角的选择按钮
  */
 @property (assign, nonatomic) BOOL specialModeNeedHideVideoSelectBtn;
-
-/**
- 在照片列表选择照片完后点击完成时是否请求图片
- 选中了原图则是原图，没选中则是高清图
- 并赋值给model的 thumbPhoto 和 previewPhoto 属性
- */
-@property (assign, nonatomic) BOOL requestImageAfterFinishingSelection;
 
 /**
  视频是否可以编辑   default NO

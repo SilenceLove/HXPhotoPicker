@@ -403,10 +403,18 @@
     self.tempImageView.frame = tempImageViewFrame;
     
     self.playerLayer.frame = CGRectMake(0, 0, self.tempCell.hx_w, self.tempCell.hx_h);
-    
+
+    if ([fromVC.delegate respondsToSelector:@selector(photoPreviewControllerDidCancel:model:)]) {
+        HXPhotoModel *model;
+        if (fromVC.modelArray.count) {
+            model = fromVC.modelArray[fromVC.currentModelIndex];
+        }
+        [fromVC.delegate photoPreviewControllerDidCancel:fromVC model:model];
+    }
     if (fromVC.manager.configuration.restoreNavigationBar) {
         [UINavigationBar appearance].translucent = NO;
     }
+    fromVC.manager.selectPhotoing = NO;
     [UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
         if (self.tempCell) {
             self.tempImageView.frame = [self.tempCell convertRect:self.tempCell.bounds toView: containerView];

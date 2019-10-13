@@ -25,8 +25,9 @@
 @property (weak, nonatomic) id<HXCustomCameraControllerDelegate> delegate;
 @property (strong, nonatomic, readonly) AVCaptureSession *captureSession;
 
-- (BOOL)setupSession:(NSError *)error;
-- (void)startSessionComplete:(void (^)(void))complete;
+- (void)initSeesion;
+- (void)setupPreviewLayer:(AVCaptureVideoPreviewLayer *)previewLayer startSessionCompletion:(void (^)(BOOL success))completion;
+
 - (void)startSession;
 - (void)stopSession;
 

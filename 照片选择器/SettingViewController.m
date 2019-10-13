@@ -55,6 +55,8 @@
 @property (weak, nonatomic) IBOutlet UITextField *minVideoClippingTime;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *languageType;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *photoStyleSegmented;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *customCameraTypeSegmented;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *selectTypeSegmented;
 
 @end
 
@@ -62,17 +64,21 @@
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         [self preferredStatusBarUpdateAnimation];
         [self changeStatus];
     }
+#endif
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return UIStatusBarStyleLightContent;
         }
     }
+#endif
     return UIStatusBarStyleDefault;
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -80,12 +86,14 @@
     [self changeStatus];
 }
 - (void)changeStatus {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
             return;
         }
     }
+#endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
 - (void)viewDidLoad {
@@ -138,6 +146,8 @@
     self.minVideoClippingTime.text = @(self.manager.configuration.minVideoClippingTime).stringValue;
     self.languageType.selectedSegmentIndex = self.manager.configuration.languageType;
     self.photoStyleSegmented.selectedSegmentIndex = self.manager.configuration.photoStyle;
+    self.customCameraTypeSegmented.selectedSegmentIndex = self.manager.configuration.customCameraType;
+    self.selectTypeSegmented.selectedSegmentIndex = self.manager.type;
 }
 - (void)didSaveClick {
     self.manager.configuration.photoMaxNum = self.photoMaxNum.text.integerValue;
@@ -184,6 +194,12 @@
     self.manager.configuration.maxVideoClippingTime = self.maxVideoClippingTime.text.integerValue;
     self.manager.configuration.languageType = self.languageType.selectedSegmentIndex;
     self.manager.configuration.photoStyle = self.photoStyleSegmented.selectedSegmentIndex;
+    if (self.selectTypeSegmented.selectedSegmentIndex != self.manager.type) {
+        [self.manager clearSelectedList];
+    }
+
+    self.manager.type = self.selectTypeSegmented.selectedSegmentIndex;
+    self.manager.configuration.customCameraType = self.customCameraTypeSegmented.selectedSegmentIndex;
     
     
     self.manager.cameraRollAlbumModel = nil;

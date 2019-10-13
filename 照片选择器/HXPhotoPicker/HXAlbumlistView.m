@@ -16,11 +16,13 @@
 @implementation HXAlbumlistView
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             self.tableView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
         }
     }
+#endif
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
@@ -36,6 +38,12 @@
 //    [self.tableView reloadData];
     self.currentSelectModel = albumModelArray.firstObject;
 //    [self refreshCamearCount];
+}
+- (void)selectCellScrollToCenter {
+    if (self.albumModelArray.count <= self.currentSelectModel.index) {
+        return;
+    }
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectModel.index inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 - (void)refreshCamearCount {
     NSInteger i = 0;
@@ -122,11 +130,13 @@
 @implementation HXAlbumlistViewCell
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             [self setManager:self.manager];
         }
     }
+#endif
 }
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -285,11 +295,13 @@
 @implementation HXAlbumTitleView
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             [self changeColor];
         }
     }
+#endif
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];

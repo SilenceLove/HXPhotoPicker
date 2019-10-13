@@ -30,30 +30,40 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @implementation Demo2ViewController
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         [self preferredStatusBarUpdateAnimation];
         [self changeStatus];
     }
+#endif
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return UIStatusBarStyleLightContent;
         }
     }
+#endif
     return UIStatusBarStyleDefault;
+}
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self changeStatus];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self changeStatus];
 }
 - (void)changeStatus {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
             return;
         }
     }
+#endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
 - (UIButton *)bottomView {
@@ -80,6 +90,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.openCamera = YES;
         // 暗黑风格
         _manager.configuration.photoStyle = HXPhotoStyleDark;
+//        _manager.configuration.showOriginalBytesLoading = YES;
         _manager.configuration.lookLivePhoto = YES;
         _manager.configuration.photoMaxNum = 9;
         _manager.configuration.videoMaxNum = 1;
@@ -173,6 +184,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    // Fallback on earlier versions
+    self.view.backgroundColor = [UIColor whiteColor];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
             if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
@@ -180,10 +194,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
             }
             return UIColor.whiteColor;
         }];
-    } else {
-        // Fallback on earlier versions
-        self.view.backgroundColor = [UIColor whiteColor];
     }
+#endif
     
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;
@@ -191,13 +203,15 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.scrollView = scrollView;
     
     CGFloat width = scrollView.frame.size.width;
-    HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
-    photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
+    HXPhotoView *photoView = [HXPhotoView photoManager:self.manager scrollDirection:UICollectionViewScrollDirectionHorizontal];
+    photoView.frame = CGRectMake(0, kPhotoViewMargin, width, 0);
+    photoView.collectionView.contentInset = UIEdgeInsetsMake(0, kPhotoViewMargin, 0, kPhotoViewMargin);
     photoView.delegate = self;
     photoView.outerCamera = YES;
     photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
     photoView.previewShowDeleteButton = YES; 
     photoView.showAddCell = YES;
+//    photoView.adaptiveDarkness = NO;
     [photoView.collectionView reloadData];
     [scrollView addSubview:photoView];
     self.photoView = photoView;
@@ -217,6 +231,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXWeakSelf
     vc.saveCompletion = ^(HXPhotoManager * _Nonnull manager) {
         weakSelf.manager = manager;
+        [weakSelf.photoView refreshView];
     };
     [self.navigationController pushViewController:vc animated:YES];
 //    if (self.manager.configuration.specialModeNeedHideVideoSelectBtn && !self.manager.configuration.selectTogether && self.manager.configuration.videoMaxNum == 1) {
@@ -229,6 +244,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    [self changeStatus];
+//    NSSLog(@"%@",[videos.firstObject videoURL]);
 //    HXPhotoModel *photoModel = allList.firstObject;
     
 //    [allList hx_requestImageWithOriginal:isOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
@@ -237,7 +254,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //        NSSLog(@"\nimage: %@\nerror: %@",imageArray,errorArray);
 //    }];
 }
-
+- (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
+    for (HXPhotoModel *photoModel in allList) {
+        NSSLog(@"当前选择----> %@", photoModel.selectIndexStr);
+    }
+}
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl {
     NSSLog(@"%@",networkPhotoUrl);
 }
@@ -247,7 +268,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width, CGRectGetMaxY(frame) + kPhotoViewMargin);
     
 }
-
+- (void)photoViewPreviewDismiss:(HXPhotoView *)photoView {
+    [self changeStatus];
+}
+- (void)photoViewDidCancel:(HXPhotoView *)photoView {
+    [self changeStatus];
+}
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index {
     NSSLog(@"%@ --> index - %ld",model,index);
 }

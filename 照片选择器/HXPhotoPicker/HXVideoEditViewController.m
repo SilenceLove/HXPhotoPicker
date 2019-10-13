@@ -327,6 +327,7 @@ HXVideoEditBottomViewDelegate
 }
 #pragma mark - < HXVideoEditBottomViewDelegate >
 - (void)videoEditBottomViewDidCancelClick:(HXVideoEditBottomView *)bottomView {
+    [self.bottomView.collectionView setContentOffset:self.bottomView.collectionView.contentOffset animated:NO];
     self.isCancel = YES;
     if ([self.delegate respondsToSelector:@selector(videoEditViewControllerDidCancelClick:)]) {
         [self.delegate videoEditViewControllerDidCancelClick:self];
@@ -335,9 +336,12 @@ HXVideoEditBottomViewDelegate
 }
 - (void)videoEditBottomViewDidDoneClick:(HXVideoEditBottomView *)bottomView {
     self.isCancel = NO;
+    [self.bottomView.collectionView setContentOffset:self.bottomView.collectionView.contentOffset animated:NO];
     [self.view hx_showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"处理中"]];
+    self.bottomView.userInteractionEnabled = NO;
     HXWeakSelf
     [HXPhotoTools exportEditVideoForAVAsset:self.avAsset timeRange:[self getTimeRange] presetName:self.manager.configuration.editVideoExportPresetName success:^(NSURL *videoURL) {
+        weakSelf.bottomView.userInteractionEnabled = YES;
         HXPhotoModel *photoModel = [HXPhotoModel photoModelWithVideoURL:videoURL];
         weakSelf.afterModel = photoModel;
         if (!weakSelf.outside) {
@@ -353,6 +357,7 @@ HXVideoEditBottomViewDelegate
             }];
         }
     } failed:^(NSError *error) {
+        weakSelf.bottomView.userInteractionEnabled = YES;
         [weakSelf.view hx_handleLoading];
         [weakSelf.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"处理失败，请重试"]];
     }];

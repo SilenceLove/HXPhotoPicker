@@ -15,6 +15,7 @@
 * [要求](#要求)
 * [示例](#例子)
     * [获取照片和视频](#如何获取照片和视频)
+    * [判断两个HXPhotoModel是否为同一资源](#判断两个HXPhotoModel是否为同一资源)
     * [跳转相册选择照片](#Demo1)
     * [使用HXPhotoView选照片后自动布局](#Demo2)
     * [保存草稿](#如何保存草稿)
@@ -22,17 +23,18 @@
     * [相关问题](#相关问题)
     * [更多请下载工程查看](#更多) 
 * [更新记录](#更新历史)
+* [后续计划](#后续计划)
 * [更多](#更多)
 
 ## <a id="特性"></a> 一.  特性 - Features
 
-- [x] 查看/选择GIF图片
+- [x] 查看、选择GIF图片
 - [x] 照片、视频可同时多选/原图
 - [x] 3DTouch预览照片
 - [x] 长按拖动改变顺序
-- [x] 自定义相机拍照/录制视频
+- [x] 自定义相机拍照、录制视频
 - [x] 自定义转场动画
-- [x] 查看/选择LivePhoto IOS9.1以上才有用
+- [x] 查看、选择LivePhoto IOS9.1以上才有用
 - [x] 浏览网络图片
 - [x] 自定义裁剪图片
 - [x] 自定义裁剪视频时长
@@ -43,13 +45,14 @@
 - [x] 支持草稿功能
 - [x] 同一界面多个不同选择器
 - [x] 支持暗黑模式
+- [x] 支持横向布局
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.4'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.5'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - ```v2.3.2 pod没有依赖sd和yy```  ```>= v2.3.3 pod依赖了yy```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
-- 网络图片加载使用的是 ```YYWebImage``` || >=```v2.3.0```  -> ```SDWebImage v5.0``` || <```v2.3.0``` ->  ```SDWebImage v4.0```
+- 网络图片加载使用的是 ```YYWebImage``` || ```>= v2.3.0```  -> ```SDWebImage v5.0``` || ```< v2.3.0``` ->  ```SDWebImage v4.0```
 - 如果想要加载网络gif图片请使用```YYWebImage```
 - 使用前导入头文件 "HXPhotoPicker.h"
 
@@ -64,6 +67,14 @@
 ## <a id="例子"></a> 四.  应用示例 - Examples
 ### <a id="如何获取照片和视频"> 如何获取照片和视频
 ```objc
+方法一：
+将 HXPhotoConfiguration 里的 requestImageAfterFinishingSelection 设置为YES
+在点击完成的时候会自动获取当前选择的图片和视频并赋值给 HXPhotoModel 里的 thumbPhoto、previewPhoto、videoURL
+如果资源为视频时  thumbPhoto 和 previewPhoto 则是视频封面
+如果选择了原图 thumbPhoto 和 previewPhoto 就是原图 videoURL 就是高质量视频
+没有选择原图 thumbPhoto 和 previewPhoto 就是高清图 videoURL 就是中等质量视频
+
+方法二：
 根据选择完成后返回的 HXPhotoModel 对象获取
 
 // 获取 image
@@ -162,6 +173,13 @@ NSArray+HXExtension
 @param completion 完成回调，获取失败的不会添加到数组中
 */
 - (void)hx_requestVideoURLWithPresetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable videoURLArray))completion;
+```
+### <a id="判断两个HXPhotoModel是否为同一资源"> 判断两个HXPhotoModel是否为同一资源
+```
+HXPhotoModel对象方法
+/// 判断两个HXPhotoModel是否是同一个
+/// @param photoModel 模型
+- (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
 ```
 ### <a id="Demo1"></a> 跳转相册选择照片
 ```objc
@@ -530,6 +548,7 @@ UIViewController+HXExtension.h
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.3.5　-　requestImageAfterFinishingSelection 为YES时也可获取视频地址、HXPhotoView支持横向布局、替换系统ActionSheet为自定义view、可自定义相机拍摄和录制选项、解决相机卡顿问题、完善ios13适配、提升稳定性等...
 - v2.3.4　-　适配ios13暗黑模式（可跟随系统也可自己设置）、恢复requestImageAfterFinishingSelection属性功能、单独使用预览大图时添加block回调、修复一些问题
 - v2.3.3　-　pod依赖yy
 - v2.3.2　-　适配ios13
@@ -576,7 +595,16 @@ UIViewController+HXExtension.h
 - 2017-03-06　　第一次提交
 ```
 
-## <a id="更多"></a> 六.  更多 - More
+## <a id="后续计划"></a> 六.  后续计划 - Plan
+```
+- [ ] 视频添加进度条
+- [ ] 支持添加网络视频
+- [ ] 视频查看时支持放大缩小
+- [ ] HXPhotoView支持单选模式
+...
+```
+
+## <a id="更多"></a> 七.  更多 - More
 
 - 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
 
@@ -585,3 +613,5 @@ UIViewController+HXExtension.h
 - 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
 
 - [有兴趣可以加下创建的QQ群:531895229(有问题请先看Demo，因为工作很忙所以可能问问题没人回答!!)](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26)
+
+[回到顶部](#readme)

@@ -41,11 +41,13 @@ static id instance;
     if (self.photoStyle == HXPhotoStyleDark) {
         return YES;
     }
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return YES;
         }
     }
+#endif
     return NO;
 }
 

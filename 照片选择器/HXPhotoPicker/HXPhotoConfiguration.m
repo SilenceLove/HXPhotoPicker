@@ -26,6 +26,7 @@
     self.lookLivePhoto = NO;
     self.lookGifPhoto = YES;
     self.selectTogether = NO;
+    self.showOriginalBytesLoading = NO;
     self.maxNum = 10;
     self.photoMaxNum = 9;
     self.videoMaxNum = 1;
