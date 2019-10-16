@@ -230,7 +230,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
                           videos:(NSArray<HXPhotoModel *> *)videos
                         original:(BOOL)isOriginal;
 
-/// 取消预览大图
+/// 取消预览大图的回调
 /// @param photoView self
 - (void)photoViewPreviewDismiss:(HXPhotoView *)photoView;
 @end

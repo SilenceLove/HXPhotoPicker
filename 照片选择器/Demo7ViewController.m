@@ -100,8 +100,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.scrollView = scrollView;
     
     CGFloat width = scrollView.frame.size.width;
-    HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0) manager:self.manager];
-    photoView.delegate = self; 
+    HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(0, 0, width, 0) manager:self.manager];
+    photoView.delegate = self;
+    photoView.spacing = 20;
+    photoView.lineCount = 2;
+    photoView.collectionView.contentInset = UIEdgeInsetsMake(20, 20, 20, 20);
 //    self.manager.localImageList = images;
     [self.manager addCustomAssetModel:images];
     

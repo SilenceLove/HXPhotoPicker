@@ -380,6 +380,9 @@ HXVideoEditViewControllerDelegate
     if ([self.delegate respondsToSelector:@selector(photoViewControllerDidCancel:)]) {
         [self.delegate photoViewControllerDidCancel:self];
     }
+    if (self.cancelBlock) {
+        self.cancelBlock(self, self.manager);
+    }
     self.manager.selectPhotoing = NO;
     [self dismissViewControllerAnimated:YES completion:nil];
     if (self.manager.configuration.restoreNavigationBar) {
@@ -741,12 +744,11 @@ HXVideoEditViewControllerDelegate
         HXPhotoCameraViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DateCameraCellId" forIndexPath:indexPath];
         cell.model = model;
         if (self.manager.configuration.cameraCellShowPreview && !cell.startSession) {
-            cell.tempCameraView = self.manager.tempCameraView;
-            cell.tempCameraPreviewView = self.manager.tempCameraPreviewView;
+            cell.tempCameraView = [HXPhotoCommon photoCommon].tempCameraView;
+            cell.tempCameraPreviewView = [HXPhotoCommon photoCommon].tempCameraPreviewView;
             [cell starRunning];
-            HXWeakSelf
             cell.stopRunningComplete = ^(UIView *tempCameraPreviewView) {
-                weakSelf.manager.tempCameraPreviewView = tempCameraPreviewView;
+                [HXPhotoCommon photoCommon].tempCameraPreviewView = tempCameraPreviewView;
             };
         }
         return cell;
@@ -850,8 +852,8 @@ HXVideoEditViewControllerDelegate
                     }
                     HXPhotoCameraViewCell *cameraCell = (HXPhotoCameraViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
                     if (cameraCell.session &&
-                        !weakSelf.manager.tempCameraView) {
-                        weakSelf.manager.tempCameraView = [cameraCell.previewView snapshotViewAfterScreenUpdates:YES];
+                        ![HXPhotoCommon photoCommon].tempCameraView) {
+                        [HXPhotoCommon photoCommon].tempCameraView = [cameraCell.previewView snapshotViewAfterScreenUpdates:YES];
                     }
                     HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
                     vc.delegate = weakSelf;
@@ -1309,51 +1311,54 @@ HXVideoEditViewControllerDelegate
         self.navigationController.viewControllers.lastObject.view.userInteractionEnabled = NO;
         [self.navigationController.viewControllers.lastObject.view hx_showLoadingHUDText:nil];
         HXWeakSelf
-        [self.manager.selectedArray hx_requestImageWithOriginal:self.manager.original completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
-            if (!weakSelf) {
-                return;
-            }
-            NSArray *endPhotoModels = weakSelf.manager.selectedArray;
-            if (!errorArray && imageArray.count == endPhotoModels.count) {
-                int index = 0;
-                for (HXPhotoModel *photoMd in endPhotoModels) {
-                    photoMd.thumbPhoto = imageArray[index];
-                    photoMd.previewPhoto = imageArray[index];
-                    index++;
+        if (self.manager.original) {
+            [self.manager.selectedArray hx_requestImageSeparatelyWithOriginal:self.manager.original completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
+                if (!weakSelf) {
+                    return;
                 }
-            }
-            NSArray *videoArray = weakSelf.manager.selectedVideoArray;
-            if (videoArray.count) {
-                __block NSInteger videoCount = videoArray.count;
-                __block NSInteger videoIndex = 0;
-                BOOL endOriginal = weakSelf.manager.original;
-                for (HXPhotoModel *pm in videoArray) {
-                    [pm exportVideoWithPresetName:endOriginal ? AVAssetExportPresetHighestQuality : AVAssetExportPresetMediumQuality startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
-                        if (!weakSelf) {
-                            return;
-                        }
-                        model.videoURL = videoURL;
-                        videoIndex++;
-                        if (videoIndex == videoCount) {
-                            [weakSelf dismissVC];
-                        }
-                    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
-                        if (!weakSelf) {
-                            return;
-                        }
-                        videoIndex++;
-                        if (videoIndex == videoCount) {
-                            [weakSelf dismissVC];
-                        }
-                    }];
+                [weakSelf afterFinishingGetVideoURL];
+            }];
+        }else {
+            [self.manager.selectedArray hx_requestImageWithOriginal:self.manager.original completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
+                if (!weakSelf) {
+                    return;
                 }
-            }else {
-                [weakSelf dismissVC];
-            }
-        }];
+                [weakSelf afterFinishingGetVideoURL];
+            }];
+        }
         return;
     }
     [self dismissVC];
+}
+- (void)afterFinishingGetVideoURL {
+    NSArray *videoArray = self.manager.selectedVideoArray;
+    if (videoArray.count) {
+        HXWeakSelf
+        __block NSInteger videoCount = videoArray.count;
+        __block NSInteger videoIndex = 0;
+        BOOL endOriginal = self.manager.configuration.exportVideoURLForHighestQuality ? self.manager.original : NO;
+        for (HXPhotoModel *pm in videoArray) {
+            [pm exportVideoWithPresetName:endOriginal ? AVAssetExportPresetHighestQuality : AVAssetExportPresetMediumQuality startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
+                if (!weakSelf) {
+                    return;
+                }
+                videoIndex++;
+                if (videoIndex == videoCount) {
+                    [weakSelf dismissVC];
+                }
+            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                if (!weakSelf) {
+                    return;
+                }
+                videoIndex++;
+                if (videoIndex == videoCount) {
+                    [weakSelf dismissVC];
+                }
+            }];
+        }
+    }else {
+        [self dismissVC];
+    }
 }
 - (void)dismissVC {
     [self.manager selectedListTransformAfter];

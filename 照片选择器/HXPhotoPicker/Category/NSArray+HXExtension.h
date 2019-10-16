@@ -29,13 +29,19 @@ NS_ASSUME_NONNULL_BEGIN
 //- (void)hx_requestURLWithOriginal:(BOOL)original presetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable URLArray, NSArray<HXPhotoModel *> * _Nullable errorArray))completion;
 
 /**
- 获取image
+ 获取image，同时获取
  如果model是视频的话,获取的则是视频封面
-
+ 如果图片或者视频选择了获取时内存峰值过大。建议一个一个的获取,当前面一个获取完了再去获取第二个
+ 
  @param original 是否原图
  @param completion imageArray 获取成功的image数组, errorArray 获取失败的model数组
  */
 - (void)hx_requestImageWithOriginal:(BOOL)original completion:(void (^)(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray))completion;
+
+/// 分别获取image，前面一个获取完了再去获取第二个
+/// @param original 是否原图
+/// @param completion imageArray 获取成功的image数组, errorArray 获取失败的model数组
+- (void)hx_requestImageSeparatelyWithOriginal:(BOOL)original completion:(void (^)(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray))completion;
 
 /**
  获取imageData

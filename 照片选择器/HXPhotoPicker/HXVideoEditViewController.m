@@ -332,6 +332,9 @@ HXVideoEditBottomViewDelegate
     if ([self.delegate respondsToSelector:@selector(videoEditViewControllerDidCancelClick:)]) {
         [self.delegate videoEditViewControllerDidCancelClick:self];
     }
+    if (self.cancelBlock) {
+        self.cancelBlock(self);
+    }
     [self dismissViewControllerCompletion:nil];
 }
 - (void)videoEditBottomViewDidDoneClick:(HXVideoEditBottomView *)bottomView {
@@ -348,12 +351,18 @@ HXVideoEditBottomViewDelegate
             if ([weakSelf.delegate respondsToSelector:@selector(videoEditViewControllerDidDoneClick:beforeModel:afterModel:)]) {
                 [weakSelf.delegate videoEditViewControllerDidDoneClick:weakSelf beforeModel:weakSelf.model afterModel:weakSelf.afterModel];
             }
+            if (weakSelf.doneBlock) {
+                weakSelf.doneBlock(weakSelf.model, weakSelf.afterModel, weakSelf);
+            }
             [weakSelf dismissViewControllerCompletion:nil];
         }else {
             [weakSelf dismissViewControllerCompletion:^{
                 if ([weakSelf.delegate respondsToSelector:@selector(videoEditViewControllerDidDoneClick:beforeModel:afterModel:)]) {
                     [weakSelf.delegate videoEditViewControllerDidDoneClick:weakSelf beforeModel:weakSelf.model afterModel:weakSelf.afterModel];
-                } 
+                }
+                if (weakSelf.doneBlock) {
+                    weakSelf.doneBlock(weakSelf.model, weakSelf.afterModel, weakSelf);
+                }
             }];
         }
     } failed:^(NSError *error) {

@@ -73,9 +73,9 @@
     self.cameraController.sessionPreset = self.manager.configuration.sessionPreset;
     self.cameraController.videoCodecKey = self.manager.configuration.videoCodecKey;
     self.cameraController.delegate = self;
-    if (self.manager.tempCameraView) {
-        self.manager.tempCameraView.frame = self.previewView.bounds;
-        [self.previewView addSubview:self.manager.tempCameraView];
+    if ([HXPhotoCommon photoCommon].tempCameraView) {
+        [HXPhotoCommon photoCommon].tempCameraView.frame = self.previewView.bounds;
+        [self.previewView addSubview:[HXPhotoCommon photoCommon].tempCameraView];
         [self.previewView addSubview:self.effectView];
     }
     
@@ -156,13 +156,13 @@
     }
     
     self.bottomView.userInteractionEnabled = YES;
-    if (self.manager.tempCameraView) {
+    if ([HXPhotoCommon photoCommon].tempCameraView) {
             [UIView animateWithDuration:0.2 animations:^{
-                self.manager.tempCameraView.alpha = 0;
+                [HXPhotoCommon photoCommon].tempCameraView.alpha = 0;
                 self.effectView.effect = nil;
             } completion:^(BOOL finished) {
                 [self.effectView removeFromSuperview];
-                [self.manager.tempCameraView removeFromSuperview];
+                [[HXPhotoCommon photoCommon].tempCameraView removeFromSuperview];
             }];
     }
     
@@ -277,7 +277,7 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [self stopTimer];
-    self.manager.tempCameraView = [self.previewView snapshotViewAfterScreenUpdates:YES];
+    [HXPhotoCommon photoCommon].tempCameraView = [self.previewView snapshotViewAfterScreenUpdates:YES];
     [self.cameraController stopSession];
 } 
 - (void)dealloc {

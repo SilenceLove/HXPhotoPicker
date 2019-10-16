@@ -51,10 +51,6 @@
         self.previewPhoto == photoModel.previewPhoto) {
         return YES;
     }
-    if (self.videoURL && photoModel.videoURL &&
-        [self.videoURL.absoluteString isEqualToString:photoModel.videoURL.absoluteString]) {
-        return YES;
-    }
     if (self.thumbPhoto && photoModel.previewPhoto &&
         self.thumbPhoto == photoModel.previewPhoto) {
         return YES;
@@ -63,11 +59,19 @@
         self.previewPhoto == photoModel.thumbPhoto) {
         return YES;
     }
+    if (self.videoURL && photoModel.videoURL &&
+        [self.videoURL.absoluteString isEqualToString:photoModel.videoURL.absoluteString]) {
+        return YES;
+    }
+    if (self.networkPhotoUrl && photoModel.networkPhotoUrl &&
+        [self.networkPhotoUrl.absoluteString isEqualToString:photoModel.networkPhotoUrl.absoluteString]) {
+        return YES;
+    }
     return NO;
 }
 
 
-/// 重写 isEqual 方法 会因为 isEqualPhotoModel 这个导致一点点卡顿所以屏蔽
+/// 重写 isEqual 方法 会因为 isEqualPhotoModel 这个在选择照片的时候导致一点点卡顿所以屏蔽
 /// 想要判断两个model是否相容请在需要的时候调用 isEqualPhotoModel 方法来判断
 //- (BOOL)isEqual:(id)object {
 //    if (self == object) {
@@ -79,17 +83,17 @@
 //    return [self isEqualPhotoModel:object];
 //}
 
-- (NSURL *)fileURL {
-    if (self.type == HXPhotoModelMediaTypeCameraVideo && !_fileURL) {
-        _fileURL = self.videoURL;
-    }
-    if (self.type != HXPhotoModelMediaTypeCameraPhoto) {
-        if (self.asset && !_fileURL) {
-            _fileURL = [self.asset valueForKey:@"mainFileURL"];
-        }
-    }
-    return _fileURL;
-}
+//- (NSURL *)fileURL {
+//    if (self.type == HXPhotoModelMediaTypeCameraVideo && !_fileURL) {
+//        _fileURL = self.videoURL;
+//    }
+//    if (self.type != HXPhotoModelMediaTypeCameraPhoto) {
+//        if (self.asset && !_fileURL) {
+//            _fileURL = [self.asset valueForKey:@"mainFileURL"];
+//        }
+//    }
+//    return _fileURL;
+//}
 
 - (NSDate *)creationDate {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto || self.type == HXPhotoModelMediaTypeCameraVideo) {
@@ -484,7 +488,7 @@
 }
 #pragma mark - < Request >
 
-+ (id)requestImageWithURL:(NSURL *)url progress:(void (^ _Nullable)(NSInteger, NSInteger))progress completion:(void (^ _Nullable)(UIImage * _Nullable, NSURL * _Nonnull, NSError * _Nullable))completion {
++ (id)requestImageWithURL:(NSURL *)url progress:(void (^ _Nullable)(NSInteger, NSInteger))progress completion:(void (^ _Nullable)(UIImage * _Nullable, NSURL * _Nullable, NSError * _Nullable))completion {
 #if HasYYKitOrWebImage
     YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:0 progress:progress transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
         if (completion) {
@@ -598,8 +602,8 @@
     PHImageRequestID requestId = [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         [weakSelf requestDataWithResult:result info:info size:size resultClass:[UIImage class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
             if (success) {
-                if (!weakSelf.thumbPhoto) weakSelf.thumbPhoto = result;
-                if (!weakSelf.previewPhoto) weakSelf.previewPhoto = result;
+                weakSelf.thumbPhoto = result;
+                weakSelf.previewPhoto = result;
                 success(result, weakSelf, info);
             }
         } failed:failed];
@@ -1099,6 +1103,7 @@
                     if ([session status] == AVAssetExportSessionStatusCompleted) {
                         if (HXShowLog) NSSLog(@"视频导出完成");
                         [timer invalidate];
+                        strongSelf.videoURL = videoURL;
                         if (success) {
                             success(videoURL, strongSelf);
                         }
@@ -1126,9 +1131,9 @@
     } failed:failed];
 }
 - (PHContentEditingInputRequestID)requestImageURLStartRequestICloud:(void (^)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model))startRequestICloud
-                                                     progressHandler:(HXModelProgressHandler)progressHandler
-                                                             success:(HXModelImageURLSuccessBlock)success
-                                                              failed:(HXModelFailedBlock)failed {
+                                                    progressHandler:(HXModelProgressHandler)progressHandler
+                                                            success:(HXModelImageURLSuccessBlock)success
+                                                             failed:(HXModelFailedBlock)failed {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
         if (failed) {
             failed(nil, self);
@@ -1157,7 +1162,9 @@
                 }
             });
         }else {
-            if ([[info objectForKey:PHContentEditingInputResultIsInCloudKey] boolValue] && ![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] && ![info objectForKey:PHContentEditingInputErrorKey]) {
+            if ([[info objectForKey:PHContentEditingInputResultIsInCloudKey] boolValue] &&
+                ![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] &&
+                ![info objectForKey:PHContentEditingInputErrorKey]) {
                 PHContentEditingInputRequestOptions *iCloudOptions = [[PHContentEditingInputRequestOptions alloc] init];
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, BOOL * _Nonnull stop) {

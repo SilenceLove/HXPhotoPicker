@@ -102,7 +102,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.showOriginalBytes = YES;
         _manager.configuration.selectTogether = NO;
-//        _manager.configuration.requestImageAfterFinishingSelection = YES;
+        _manager.configuration.requestImageAfterFinishingSelection = YES;
         
         HXWeakSelf
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
@@ -203,9 +203,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.scrollView = scrollView;
     
     CGFloat width = scrollView.frame.size.width;
-    HXPhotoView *photoView = [HXPhotoView photoManager:self.manager scrollDirection:UICollectionViewScrollDirectionHorizontal];
+    HXPhotoView *photoView = [HXPhotoView photoManager:self.manager scrollDirection:UICollectionViewScrollDirectionVertical];
     photoView.frame = CGRectMake(0, kPhotoViewMargin, width, 0);
     photoView.collectionView.contentInset = UIEdgeInsetsMake(0, kPhotoViewMargin, 0, kPhotoViewMargin);
+//    photoView.spacing = kPhotoViewMargin;
     photoView.delegate = self;
     photoView.outerCamera = YES;
     photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;

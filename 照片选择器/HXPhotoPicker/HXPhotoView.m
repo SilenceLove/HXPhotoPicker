@@ -81,12 +81,7 @@
     return [[self alloc] initWithManager:manager scrollDirection:scrollDirection];
 }
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
-    self = [super initWithFrame:frame];
-    if (self) {
-        _manager = manager;
-        [self setup];
-    }
-    return self;
+    return [self initWithFrame:frame manager:manager scrollDirection:UICollectionViewScrollDirectionVertical];
 }
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager scrollDirection:(UICollectionViewScrollDirection)scrollDirection {
     self = [super initWithFrame:frame];
@@ -98,24 +93,13 @@
     return self;
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
-    self = [super init];
-    if (self) {
-        _manager = manager;
-        [self setup];
-    }
-    return self;
+    return [self initWithManager:manager scrollDirection:UICollectionViewScrollDirectionVertical];
 }
 - (instancetype)initWithManager:(HXPhotoManager *)manager scrollDirection:(UICollectionViewScrollDirection)scrollDirection {
     self = [super init];
     if (self) {
         self.scrollDirection = scrollDirection;
         _manager = manager;
-        [self setup];
-    }
-    return self;
-}
-- (instancetype)init {
-    if (self = [super init]) {
         [self setup];
     }
     return self;
@@ -933,6 +917,7 @@
     if (self.lineCount != 0) numOfLinesNew = (dataCount / self.lineCount) + 1;
     if (dataCount % self.lineCount == 0) numOfLinesNew -= 1;
     self.flowLayout.minimumLineSpacing = self.spacing;
+    self.flowLayout.minimumInteritemSpacing = self.spacing;
     
     if (numOfLinesNew != self.numOfLinesOld) {
         self.numOfLinesOld = numOfLinesNew;

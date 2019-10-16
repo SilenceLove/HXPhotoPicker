@@ -76,7 +76,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
                             failed:(HXModelFailedBlock _Nullable)failed
  或者将配置类里的 requestImageAfterFinishingSelection 设为YES，点击完成后会自动获取视频地址并且赋值给videoURL
  */
-@property (strong, nonatomic) NSURL * _Nullable fileURL;
+@property (strong, nonatomic) NSURL * _Nullable fileURL DEPRECATED_MSG_ATTRIBUTE("Use 'exportVideoWithPresetName:startRequestICloud:iCloudProgressHandler:exportProgressHandler:success:failed' instead");
 /**
  创建日期
  
@@ -218,7 +218,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 - (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
 
 #pragma mark - < Request >
-+ (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion;
++ (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 + (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset * _Nullable)asset size:(CGSize)size completion:(void (^ _Nullable)(UIImage *_Nullable image, PHAsset * _Nullable asset))completion;
 

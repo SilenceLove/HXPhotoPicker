@@ -376,8 +376,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 
 #pragma mark - < 辅助属性 >
 @property (assign, nonatomic) HXPhotoManagerVideoSelectedType videoSelectedType;
-@property (strong, nonatomic) UIView *tempCameraPreviewView;
-@property (strong, nonatomic) UIView *tempCameraView;
 
 @property (assign, nonatomic) BOOL selectPhotoing;
 

@@ -82,7 +82,9 @@
     [button addTarget:self action:@selector(didBtnClick) forControlEvents:UIControlEventTouchUpInside];
     button.center = CGPointMake(self.view.hx_w / 2, self.view.hx_h / 2 - 50);
     [self.view addSubview:button];
+    
 }
+
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];

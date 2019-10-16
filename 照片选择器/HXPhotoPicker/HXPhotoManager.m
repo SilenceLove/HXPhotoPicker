@@ -8,7 +8,6 @@
 
 #import "HXPhotoManager.h"
 #import <mach/mach_time.h>
-#import "HXDatePhotoToolManager.h"
 
 
 @interface HXPhotoManager ()<PHPhotoLibraryChangeObserver>
@@ -2034,9 +2033,14 @@
                 [modelArray addObject:model];
             }
             // asset为空代表这张图片已经被删除了,这里过滤掉
+            continue;
         }else {
-            [modelArray addObject:model];
+            if (model.videoURL && ![[NSFileManager defaultManager] fileExistsAtPath:model.videoURL.path]) {
+                // 如果本地视频，但是视频地址已不存在也过滤掉
+                continue;
+            }
         }
+        [modelArray addObject:model];
     }
     return modelArray.copy;
 }
@@ -2058,6 +2062,28 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
     [self.dataOperationQueue cancelAllOperations];
+    self.allPhotos = nil;
+    self.allObjs = nil;
+    self.selectedList = nil;
+    self.selectedPhotos = nil;
+    self.selectedVideos = nil;
+    self.cameraList = nil;
+    self.cameraPhotos = nil;
+    self.cameraVideos = nil;
+    self.endCameraList = nil;
+    self.endCameraPhotos = nil;
+    self.endCameraVideos = nil;
+    self.selectedCameraList = nil;
+    self.selectedCameraPhotos = nil;
+    self.selectedCameraVideos = nil;
+    self.endSelectedCameraList = nil;
+    self.endSelectedCameraPhotos = nil;
+    self.endSelectedCameraVideos = nil;
+    self.endSelectedList = nil;
+    self.endSelectedPhotos = nil;
+    self.endSelectedVideos = nil;
+    self.selectedAssetList = nil;
+    self.tempSelectedModelList = nil;
     if (HXShowLog) NSSLog(@"dealloc");
 }
 @end

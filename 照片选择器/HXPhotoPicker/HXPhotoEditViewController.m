@@ -606,6 +606,12 @@
 - (void)bottomViewDidCancelClick {
     [self stopTimer];
     self.isCancel = YES;
+    if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidCancel:)]) {
+        [self.delegate photoEditViewControllerDidCancel:self];
+    }
+    if (self.cancelBlock) {
+        self.cancelBlock(self);
+    }
     if (self.navigationController.viewControllers.count > 1) {
         [self.navigationController popViewControllerAnimated:NO];
     }else {
@@ -695,11 +701,20 @@
     HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
     if (self.outside) {
         if (self.navigationController.viewControllers.count > 1) {
+            if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+                [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+            }
+            if (self.doneBlock) {
+                self.doneBlock(self.model, model, self);
+            }
             [self.navigationController popViewControllerAnimated:NO];
         }else {
             [self dismissViewControllerAnimated:NO completion:^{
                 if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
                     [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+                }
+                if (self.doneBlock) {
+                    self.doneBlock(self.model, model, self);
                 }
             }];
         }
@@ -710,17 +725,29 @@
     if (self.manager.configuration.singleSelected &&
         self.manager.configuration.singleJumpEdit) {
         if (self.navigationController.viewControllers.count > 1) {
+            if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
+                [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+            }
+            if (self.doneBlock) {
+                self.doneBlock(self.model, model, self);
+            }
             [self.navigationController popViewControllerAnimated:NO];
         }else {
             [self dismissViewControllerAnimated:NO completion:^{
                 if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
                     [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
                 }
+                if (self.doneBlock) {
+                    self.doneBlock(self.model, model, self);
+                }
             }];
         }
     }else {
         if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {
             [self.delegate photoEditViewControllerDidClipClick:self beforeModel:self.model afterModel:model];
+        }
+        if (self.doneBlock) {
+            self.doneBlock(self.model, model, self);
         }
         if (self.navigationController.viewControllers.count > 1) {
             [self.navigationController popViewControllerAnimated:NO];
