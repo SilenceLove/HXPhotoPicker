@@ -86,13 +86,16 @@ HXPhotoPreviewViewCell;
 /// @param model 当前预览的model
 - (void)photoPreviewCellDownloadImageComplete:(HXPhotoPreviewViewController *)previewController
                                             model:(HXPhotoModel *)model;
+
+/// 取消预览
+/// @param previewController self
+/// @param model 取消时展示的model
+- (void)photoPreviewControllerDidCancel:(HXPhotoPreviewViewController *)previewController
+                                  model:(HXPhotoModel *)model;
 @end
 
 /// 单独使用 HXPhotoPreviewViewController 来预览图片
 /// 请使用 <UIViewController+HXExtension> 中的方法
-/// - (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle currentIndex:(NSUInteger)currentIndex photoView:(HXPhotoView * _Nullable)photoView;
-/// 如果预览的是自己添加的自定义资源的话请按照以下示例来预览
-///
 ///
 ///
 @interface HXPhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>

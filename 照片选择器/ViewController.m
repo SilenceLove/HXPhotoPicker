@@ -45,11 +45,13 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 @implementation ViewController
  
 - (UIStatusBarStyle)preferredStatusBarStyle {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return UIStatusBarStyleLightContent;
         }
     }
+#endif
     return UIStatusBarStyleDefault;
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -57,22 +59,26 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     [self changeStatus];
 }
 - (void)changeStatus {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
             return;
         }
     }
+#endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         [self preferredStatusBarUpdateAnimation];
         self.view.backgroundColor = [UIColor systemBackgroundColor];
         self.label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor blackColor];
         [self changeStatus];
     }
+#endif
 }
 - (NSArray *)list
 {
@@ -125,6 +131,10 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    // 请不要设置导航栏的背景图片为空
+//    [[UINavigationBar appearance] setShadowImage:[UIImage new]];
+//    [[UINavigationBar appearance] setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+    
     self.title = @"Demo 1 ~ 12";
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -134,13 +144,13 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
     YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, hxTopMargin ? hxTopMargin - 10: 10 , 100, 30)];
+    self.view.backgroundColor = [UIColor whiteColor];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         self.view.backgroundColor = [UIColor systemBackgroundColor];
         label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor blackColor];
-    } else {
-        // Fallback on earlier versions
-        self.view.backgroundColor = [UIColor whiteColor];
     }
+#endif
     [[UIApplication sharedApplication].keyWindow addSubview:label];
     self.label = label;
      

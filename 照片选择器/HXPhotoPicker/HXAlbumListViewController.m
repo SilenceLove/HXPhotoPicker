@@ -43,7 +43,6 @@ UITableViewDelegate
     HXWeakSelf
     [self.view hx_showLoadingHUDText:nil delay:0.1f];
     [HXPhotoTools requestAuthorization:self handler:^(PHAuthorizationStatus status) {
-        NSSLog(@"相册授权---");
         if (status == PHAuthorizationStatusAuthorized) {
             [weakSelf getAlbumModelList:YES];
         }else {
@@ -60,6 +59,7 @@ UITableViewDelegate
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             [self changeColor];
@@ -68,6 +68,7 @@ UITableViewDelegate
             _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
         }
     }
+#endif
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -141,6 +142,7 @@ UITableViewDelegate
         self.manager.configuration.changeAlbumListContentView) {
         self.tableView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
+        self.tableView.frame = self.view.bounds;
         if (self.manager.configuration.albumListTableView) {
             self.manager.configuration.albumListTableView(self.tableView);
         }
@@ -888,11 +890,13 @@ UITableViewDelegate
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             [self changeColor];
         }
     }
+#endif
 }
 - (void)changeAlbumNameTextColor {
     if ([HXPhotoCommon photoCommon].isDark) {

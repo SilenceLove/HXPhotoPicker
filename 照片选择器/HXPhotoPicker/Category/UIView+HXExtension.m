@@ -307,13 +307,13 @@
     imageView.frame = CGRectMake(0, 20, imgW, imgH);
     imageView.center = CGPointMake(imgCenterX, imageView.center.y);
     if ([HXPhotoCommon photoCommon].isDark) {
-        imageView.tintColor = [UIColor blackColor];
+        imageView.tintColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
     }
     self.imageView = imageView;
     
     UILabel *label = [[UILabel alloc] init];
     label.text = self.text;
-    label.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+    label.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : [UIColor whiteColor];
     label.textAlignment = NSTextAlignmentCenter;
     label.font = [UIFont systemFontOfSize:14];
     label.numberOfLines = 0;
@@ -329,14 +329,16 @@
 
 - (void)showloading {
     UIActivityIndicatorView *loading = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+#ifdef __IPHONE_13_0
     if ([HXPhotoCommon photoCommon].isDark) {
         if (@available(iOS 13.0, *)) {
             loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleLarge;
         } else {
             loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
         }
-        loading.color = [UIColor blackColor];
+        loading.color = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
     }
+#endif
     [loading startAnimating];
     [self addSubview:loading];
     if (self.text) {

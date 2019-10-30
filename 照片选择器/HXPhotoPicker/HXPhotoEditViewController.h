@@ -10,6 +10,10 @@
 #import "HXPhotoManager.h"
 
 @class HXPhotoEditViewController;
+
+typedef void (^ HXPhotoEditViewControllerDidDoneBlock)(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController);
+typedef void (^ HXPhotoEditViewControllerDidCancelBlock)(HXPhotoEditViewController *viewController);
+
 @protocol HXPhotoEditViewControllerDelegate <NSObject>
 @optional
 
@@ -31,6 +35,8 @@
 /// 照片管理类
 @property (strong, nonatomic) HXPhotoManager *manager;
 
+@property (copy, nonatomic) HXPhotoEditViewControllerDidDoneBlock doneBlock;
+@property (copy, nonatomic) HXPhotoEditViewControllerDidCancelBlock cancelBlock;
 
 @property (assign, nonatomic) BOOL outside;
 @property (assign, nonatomic) BOOL isInside;

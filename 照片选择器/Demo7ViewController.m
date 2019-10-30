@@ -22,17 +22,21 @@ static const CGFloat kPhotoViewMargin = 12.0;
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         [self preferredStatusBarUpdateAnimation];
         [self changeStatus];
     }
+#endif
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return UIStatusBarStyleLightContent;
         }
     }
+#endif
     return UIStatusBarStyleDefault;
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -40,12 +44,14 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [self changeStatus];
 }
 - (void)changeStatus {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
             return;
         }
     }
+#endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
 - (HXPhotoManager *)manager {
@@ -63,6 +69,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    // Fallback on earlier versions
+    self.view.backgroundColor = [UIColor whiteColor];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
             if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
@@ -70,10 +79,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
             }
             return UIColor.whiteColor;
         }];
-    } else {
-        // Fallback on earlier versions
-        self.view.backgroundColor = [UIColor whiteColor];
     }
+#endif
     //    self.navigationController.navigationBar.translucent = NO;
     self.automaticallyAdjustsScrollViewInsets = YES;
     
@@ -93,8 +100,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.scrollView = scrollView;
     
     CGFloat width = scrollView.frame.size.width;
-    HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0) manager:self.manager];
-    photoView.delegate = self; 
+    HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(0, 0, width, 0) manager:self.manager];
+    photoView.delegate = self;
+    photoView.spacing = 20;
+    photoView.lineCount = 2;
+    photoView.collectionView.contentInset = UIEdgeInsetsMake(20, 20, 20, 20);
 //    self.manager.localImageList = images;
     [self.manager addCustomAssetModel:images];
     

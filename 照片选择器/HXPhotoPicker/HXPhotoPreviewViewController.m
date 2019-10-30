@@ -56,6 +56,7 @@ HXVideoEditViewControllerDelegate
 @implementation HXPhotoPreviewViewController
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             [self changeColor];
@@ -64,6 +65,7 @@ HXVideoEditViewControllerDelegate
             [self.collectionView reloadData];
         }
     }
+#endif
 }
 #pragma mark - < transition delegate >
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
@@ -575,6 +577,13 @@ HXVideoEditViewControllerDelegate
 }
 - (void)dismissClick {
     self.manager.selectPhotoing = NO;
+    if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidCancel:model:)]) {
+        HXPhotoModel *model;
+        if (self.modelArray.count) {
+            model = self.modelArray[self.currentModelIndex];
+        }
+        [self.delegate photoPreviewControllerDidCancel:self model:model];
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
     if (self.manager.configuration.restoreNavigationBar) {
         [UINavigationBar appearance].translucent = NO;
@@ -924,8 +933,18 @@ HXVideoEditViewControllerDelegate
         [UINavigationBar appearance].translucent = NO;
     }
     if (self.outside) {
+        if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidCancel:model:)]) {
+            HXPhotoModel *model;
+            if (self.modelArray.count) {
+                model = self.modelArray[self.currentModelIndex];
+            }
+            [self.delegate photoPreviewControllerDidCancel:self model:model];
+        }
         self.manager.selectPhotoing = NO;
         [self dismissViewControllerAnimated:YES completion:nil];
+        if (self.manager.configuration.restoreNavigationBar) {
+            [UINavigationBar appearance].translucent = NO;
+        }
         return;
     }
     if (self.modelArray.count == 0) {

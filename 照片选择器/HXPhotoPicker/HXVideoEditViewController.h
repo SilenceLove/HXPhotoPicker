@@ -13,6 +13,10 @@
 HXVideoEditViewController,
 HXVideoEditBottomView,
 HXEditFrameView;
+
+typedef void (^ HXVideoEditViewControllerDidDoneBlock)(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXVideoEditViewController *viewController);
+typedef void (^ HXVideoEditViewControllerDidCancelBlock)(HXVideoEditViewController *viewController);
+
 @protocol HXVideoEditViewControllerDelegate <NSObject>
 @optional
 
@@ -33,6 +37,9 @@ HXEditFrameView;
 @property (strong, nonatomic) HXPhotoModel *model;
 /// 照片管理类
 @property (strong, nonatomic) HXPhotoManager *manager;
+
+@property (copy, nonatomic) HXVideoEditViewControllerDidDoneBlock doneBlock;
+@property (copy, nonatomic) HXVideoEditViewControllerDidCancelBlock cancelBlock;
 
 @property (assign, nonatomic) BOOL outside;
 @property (assign, nonatomic) BOOL isInside;

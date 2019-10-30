@@ -17,17 +17,21 @@
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         [self preferredStatusBarUpdateAnimation];
         [self changeStatus];
     }
+#endif
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return UIStatusBarStyleLightContent;
         }
     }
+#endif
     return UIStatusBarStyleDefault;
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -35,12 +39,14 @@
     [self changeStatus];
 }
 - (void)changeStatus {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
             return;
         }
     }
+#endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
 - (HXPhotoManager *)manager {
@@ -55,7 +61,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    // Fallback on earlier versions
+    self.view.backgroundColor = [UIColor whiteColor];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
             if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
@@ -63,10 +72,8 @@
             }
             return UIColor.whiteColor;
         }];
-    } else {
-        // Fallback on earlier versions
-        self.view.backgroundColor = [UIColor whiteColor];
     }
+#endif
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:@"相机📷/相册" forState:UIControlStateNormal];
@@ -75,7 +82,9 @@
     [button addTarget:self action:@selector(didBtnClick) forControlEvents:UIControlEventTouchUpInside];
     button.center = CGPointMake(self.view.hx_w / 2, self.view.hx_h / 2 - 50);
     [self.view addSubview:button];
+    
 }
+
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];

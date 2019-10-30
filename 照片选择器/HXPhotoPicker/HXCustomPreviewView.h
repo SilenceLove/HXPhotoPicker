@@ -21,9 +21,12 @@
 @property (strong, nonatomic) AVCaptureSession *session;
 @property (weak, nonatomic) id<HXCustomPreviewViewDelegate> delegate;
 
-@property(nonatomic,assign) CGFloat beginGestureScale;
-@property(nonatomic,assign) CGFloat effectiveScale;
-@property(nonatomic,assign) CGFloat maxScale;
+@property (nonatomic, assign) CGFloat beginGestureScale;
+@property (nonatomic, assign) CGFloat effectiveScale;
+@property (nonatomic, assign) CGFloat maxScale;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
+
+- (void)setupPreviewLayer;
 
 - (void)addSwipeGesture;
 

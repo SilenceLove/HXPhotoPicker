@@ -21,7 +21,15 @@ typedef void (^ HXCustomCameraViewControllerDidCancelBlock)(HXCustomCameraViewCo
 
 @protocol HXCustomCameraViewControllerDelegate <NSObject>
 @optional
-- (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model;
+
+/// 拍照/录制完成
+/// @param viewController self
+/// @param model 资源模型
+- (void)customCameraViewController:(HXCustomCameraViewController *)viewController
+                           didDone:(HXPhotoModel *)model;
+
+/// 取消
+/// @param viewController self
 - (void)customCameraViewControllerDidCancel:(HXCustomCameraViewController *)viewController;
 @end
 

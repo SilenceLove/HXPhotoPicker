@@ -11,7 +11,6 @@
 #import "UIImage+HXExtension.h"
 #import "HXPhotoManager.h"
 #import <sys/utsname.h>
-#import "HXDatePhotoToolManager.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 @implementation HXPhotoTools
 

@@ -54,7 +54,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraVideoType) {
 };
 
 typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
-    HXPhotoModelVideoStateNormal = 0,   //!< 普通状态
+    HXPhotoModelVideoStateNormal = 0,   //!< 正常状态
     HXPhotoModelVideoStateUndersize,    //!< 视频时长小于最小选择秒数
     HXPhotoModelVideoStateOversize      //!< 视频时长超出限制
 };
@@ -74,8 +74,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
              exportProgressHandler:(HXModelExportVideoProgressHandler _Nullable)exportProgressHandler
                            success:(HXModelExportVideoSuccessBlock _Nullable)success
                             failed:(HXModelFailedBlock _Nullable)failed
+ 或者将配置类里的 requestImageAfterFinishingSelection 设为YES，点击完成后会自动获取视频地址并且赋值给videoURL
  */
-@property (strong, nonatomic) NSURL * _Nullable fileURL;
+@property (strong, nonatomic) NSURL * _Nullable fileURL DEPRECATED_MSG_ATTRIBUTE("Use 'exportVideoWithPresetName:startRequestICloud:iCloudProgressHandler:exportProgressHandler:success:failed' instead");
 /**
  创建日期
  
@@ -212,9 +213,12 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 + (instancetype _Nullable )photoModelWithImageURL:(NSURL * _Nullable)imageURL;
 + (instancetype _Nullable)photoModelWithImageURL:(NSURL * _Nullable)imageURL thumbURL:(NSURL * _Nullable)thumbURL;
 
+/// 判断两个HXPhotoModel是否是同一个
+/// @param photoModel 模型
+- (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
 
 #pragma mark - < Request >
-+ (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nonnull url, NSError * _Nullable error))completion;
++ (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 + (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset * _Nullable)asset size:(CGSize)size completion:(void (^ _Nullable)(UIImage *_Nullable image, PHAsset * _Nullable asset))completion;
 
@@ -324,7 +328,10 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
  @return 请求的id，
          可用于取消请求 [self.asset cancelContentEditingInputRequest:(PHContentEditingInputRequestID)];
  */
-- (PHContentEditingInputRequestID)requestImageURLStartRequestICloud:(void (^ _Nullable)(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel * _Nullable model))startRequestICloud
+- (PHContentEditingInputRequestID)requestImageURLStartRequestICloud:(void (^ _Nullable)(
+                                                                                        PHContentEditingInputRequestID iCloudRequestId,
+                                                                                        HXPhotoModel * _Nullable model)
+                                                                     )startRequestICloud
                                                     progressHandler:(HXModelProgressHandler _Nullable)progressHandler
                                                             success:(HXModelImageURLSuccessBlock _Nullable)success
                                                              failed:(HXModelFailedBlock _Nullable)failed;

@@ -10,7 +10,8 @@
 #import "HXPhotoPicker.h" 
 
 @implementation UIViewController (HXExtension)
-- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
+- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager
+                                            delegate:(id)delegate {
     HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] initWithManager:manager];
     vc.delegate = delegate ? delegate : (id)self; 
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
@@ -19,7 +20,9 @@
     nav.modalPresentationCapturesStatusBarAppearance = YES;
     [self presentViewController:nav animated:YES completion:nil];
 }
-- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager didDone:(void (^)(NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, BOOL, UIViewController *, HXPhotoManager *))models cancel:(void (^)(UIViewController *, HXPhotoManager *))cancel {
+- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager
+                                           didDone:(void (^)(NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, BOOL, UIViewController *, HXPhotoManager *))models
+                                            cancel:(void (^)(UIViewController *, HXPhotoManager *))cancel {
     
     viewControllerDidDoneBlock modelBlock = ^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, UIViewController *viewController, HXPhotoManager *manager) {
         if (models) {
@@ -37,7 +40,8 @@
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager
+                                               delegate:(id)delegate {
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
         return;
@@ -65,7 +69,9 @@
     }];
 }
 
-- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager done:(HXCustomCameraViewControllerDidDoneBlock)done cancel:(HXCustomCameraViewControllerDidCancelBlock)cancel {
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager
+                                                   done:(HXCustomCameraViewControllerDidDoneBlock)done
+                                                 cancel:(HXCustomCameraViewControllerDidCancelBlock)cancel {
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"无法使用相机!"]];
         return;
@@ -121,6 +127,39 @@
     [self presentViewController:vc animated:YES completion:nil];
 }
 
+- (void)hx_presentPhotoEditViewControllerWithManager:(HXPhotoManager *)manager
+                                          photoModel:(HXPhotoModel *)photomodel
+                                            delegate:(id)delegate
+                                                done:(HXPhotoEditViewControllerDidDoneBlock)done
+                                              cancel:(HXPhotoEditViewControllerDidCancelBlock)cancel {
+    HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
+    vc.isInside = YES;
+    vc.delegate = delegate ?: self;
+    vc.manager = manager;
+    vc.model = photomodel;
+    vc.doneBlock = done;
+    vc.cancelBlock = cancel;
+    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    vc.modalPresentationCapturesStatusBarAppearance = YES;
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)hx_presentVideoEditViewControllerWithManager:(HXPhotoManager *)manager
+                                          videoModel:(HXPhotoModel *)videoModel
+                                            delegate:(id)delegate
+                                                done:(HXVideoEditViewControllerDidDoneBlock)done
+                                              cancel:(HXVideoEditViewControllerDidCancelBlock)cancel {
+    HXVideoEditViewController *vc = [[HXVideoEditViewController alloc] init];
+    vc.model = videoModel;
+    vc.delegate = delegate ?: self;
+    vc.manager = manager;
+    vc.isInside = YES;
+    vc.doneBlock = done;
+    vc.cancelBlock = cancel;
+    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    vc.modalPresentationCapturesStatusBarAppearance = YES;
+    [self presentViewController:vc animated:YES completion:nil];
+}
 - (BOOL)hx_navigationBarWhetherSetupBackground {
     if ([self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsDefault]) {
         return YES;

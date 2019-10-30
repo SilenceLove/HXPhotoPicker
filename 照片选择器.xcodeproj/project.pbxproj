@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B051C3723419B4100D4B43C /* HXPhotoBottomSelectView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B051C3623419B4100D4B43C /* HXPhotoBottomSelectView.m */; };
 		7B0EFFDA220598D100D614E8 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0EFFD8220598D100D614E8 /* SettingViewController.m */; };
 		7B0EFFDB220598D100D614E8 /* SettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B0EFFD9220598D100D614E8 /* SettingViewController.xib */; };
 		7B1AA3E421EEE3BD00D0AA93 /* HXCustomCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1AA38421EEE3BC00D0AA93 /* HXCustomCameraViewController.m */; };
@@ -213,6 +214,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7B051C3523419B4100D4B43C /* HXPhotoBottomSelectView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoBottomSelectView.h; sourceTree = "<group>"; };
+		7B051C3623419B4100D4B43C /* HXPhotoBottomSelectView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoBottomSelectView.m; sourceTree = "<group>"; };
 		7B0EFFD7220598D100D614E8 /* SettingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingViewController.h; sourceTree = "<group>"; };
 		7B0EFFD8220598D100D614E8 /* SettingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
 		7B0EFFD9220598D100D614E8 /* SettingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingViewController.xib; sourceTree = "<group>"; };
@@ -707,6 +710,8 @@
 				7B1AA3D221EEE3BD00D0AA93 /* HXPhotoSubViewCell.m */,
 				7B1AA39421EEE3BC00D0AA93 /* HXPhotoView.h */,
 				7B1AA3CC21EEE3BD00D0AA93 /* HXPhotoView.m */,
+				7B051C3523419B4100D4B43C /* HXPhotoBottomSelectView.h */,
+				7B051C3623419B4100D4B43C /* HXPhotoBottomSelectView.m */,
 			);
 			path = HXPhotoPicker;
 			sourceTree = "<group>";
@@ -1561,6 +1566,7 @@
 				7BA9E54A229CE5E400614CC3 /* SDWebImageDownloaderConfig.m in Sources */,
 				7B200D43216D06B9004A5B0B /* LFEditToolbar.m in Sources */,
 				7B7E3E811E4AACD1002234EE /* ViewController.m in Sources */,
+				7B051C3723419B4100D4B43C /* HXPhotoBottomSelectView.m in Sources */,
 				7B0EFFDA220598D100D614E8 /* SettingViewController.m in Sources */,
 				7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */,
 				7BA9E536229CE5E400614CC3 /* SDImageCodersManager.m in Sources */,
@@ -1841,7 +1847,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.3.4;
+				MARKETING_VERSION = 2.3.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1861,7 +1867,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.3.4;
+				MARKETING_VERSION = 2.3.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -18,17 +18,21 @@
 @implementation Demo4ViewController
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         [self preferredStatusBarUpdateAnimation];
         [self changeStatus];
     }
+#endif
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return UIStatusBarStyleLightContent;
         }
     }
+#endif
     return UIStatusBarStyleDefault;
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -36,12 +40,14 @@
     [self changeStatus];
 }
 - (void)changeStatus {
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if (UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
             return;
         }
     }
+#endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
 - (HXPhotoManager *)manager {
@@ -70,6 +76,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    // Fallback on earlier versions
+    self.view.backgroundColor = [UIColor whiteColor];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
             if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
@@ -77,10 +86,42 @@
             }
             return UIColor.whiteColor;
         }];
-    } else {
-        // Fallback on earlier versions
-        self.view.backgroundColor = [UIColor whiteColor];
     }
+#endif
+    
+    UIBarButtonItem *photo = [[UIBarButtonItem alloc] initWithTitle:@"编辑照片" style:UIBarButtonItemStylePlain target:self action:@selector(editPhoto)];
+    
+    UIBarButtonItem *video = [[UIBarButtonItem alloc] initWithTitle:@"编辑视频" style:UIBarButtonItemStylePlain target:self action:@selector(editVideo)];
+    
+    self.navigationItem.rightBarButtonItems = @[photo, video];
+}
+
+- (void)editPhoto {
+    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:[UIImage imageNamed:@"1"]];
+    
+    HXWeakSelf
+    [self hx_presentPhotoEditViewControllerWithManager:self.manager photoModel:photoModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
+        weakSelf.imageView.image = afterModel.thumbPhoto;
+        NSSLog(@"%@", afterModel);
+    } cancel:^(HXPhotoEditViewController *viewController) {
+        NSSLog(@"%@", viewController);
+    }];
+}
+
+- (void)editVideo {
+    
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
+    HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
+    
+    HXWeakSelf
+    [self hx_presentVideoEditViewControllerWithManager:self.manager videoModel:videoModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXVideoEditViewController *viewController) {
+        
+        weakSelf.imageView.image = afterModel.thumbPhoto;
+        NSSLog(@"%@", afterModel);
+    } cancel:^(HXVideoEditViewController *viewController) {
+        NSSLog(@"%@", viewController);
+    }];
+    
 }
 - (IBAction)selectedPhoto:(id)sender {
     self.manager.configuration.saveSystemAblum = YES;
