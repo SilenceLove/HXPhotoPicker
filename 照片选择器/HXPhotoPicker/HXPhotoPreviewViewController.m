@@ -178,7 +178,14 @@ HXVideoEditViewControllerDelegate
     HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
     if (!cell) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            HXPhotoPreviewViewCell *tempCell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+            NSIndexPath * indexPath;
+            if ([UIView appearance].semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+                indexPath = [NSIndexPath indexPathForItem:self.modelArray.count - 1 - self.currentModelIndex inSection:0];
+            }else{
+                indexPath = [NSIndexPath indexPathForItem:self.currentModelIndex inSection:0];
+            }
+            
+            HXPhotoPreviewViewCell *tempCell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
             self.tempCell = tempCell;
             [tempCell requestHDImage];
         });
@@ -204,6 +211,7 @@ HXVideoEditViewControllerDelegate
         }
         self.isAddInteractiveTransition = YES;
     }
+
 }
 - (void)viewWillDisappear:(BOOL)animated {
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
@@ -732,7 +740,15 @@ HXVideoEditViewControllerDelegate
             [weakSelf setSubviewAlphaAnimate:YES];
         }
     }];
-    HXPhotoModel *model = self.modelArray[indexPath.item];
+    
+    NSInteger index;
+    if ([UIView appearance].semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+        index = self.modelArray.count - 1 - indexPath.item;
+    }else{
+        index = indexPath.item;
+    }
+    
+    HXPhotoModel *model = self.modelArray[index];
     cell.model = model;
     return cell;
 }

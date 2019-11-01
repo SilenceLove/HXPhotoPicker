@@ -150,7 +150,13 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoPreviewBottomViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewBottomViewCellId" forIndexPath:indexPath];
     cell.selectColor = self.manager.configuration.themeColor;
-    HXPhotoModel *model = self.modelArray[indexPath.item];
+    HXPhotoModel *model;
+    if ([UIView appearance].semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+        model = self.modelArray[self.modelArray.count - 1 - indexPath.item];
+    }else{
+        model = self.modelArray[indexPath.item];
+    }
+    
     cell.model = model;
     return cell;
 }
