@@ -133,7 +133,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     // Do any additional setup after loading the view, typically from a nib.
     // 请不要设置导航栏的背景图片为空
 //    [[UINavigationBar appearance] setShadowImage:[UIImage new]];
-//    [[UINavigationBar appearance] setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+//    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"APPCityPlayer_bannerGame"] forBarMetrics:UIBarMetricsDefault];
     
     self.title = @"Demo 1 ~ 12";
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
@@ -153,8 +153,8 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 #endif
     [[UIApplication sharedApplication].keyWindow addSubview:label];
     self.label = label;
-     
-    
+
+//     [UINavigationBar appearance].translucent = NO;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

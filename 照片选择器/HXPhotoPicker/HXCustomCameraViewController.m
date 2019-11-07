@@ -51,6 +51,8 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.extendedLayoutIncludesOpaqueBars = YES;
+    self.edgesForExtendedLayout = UIRectEdgeAll;
     if (self.manager.configuration.saveSystemAblum && !self.manager.albums) {
         dispatch_async(self.manager.loadAssetQueue, ^{
             [self.manager getAllAlbumModelFilter:NO select:nil completion:nil];
@@ -70,6 +72,7 @@
     
     [self.view addSubview:self.previewView];
     self.cameraController = [[HXCustomCameraController alloc] init];
+    self.cameraController.defaultFrontCamera = self.manager.configuration.defaultFrontCamera;
     self.cameraController.sessionPreset = self.manager.configuration.sessionPreset;
     self.cameraController.videoCodecKey = self.manager.configuration.videoCodecKey;
     self.cameraController.delegate = self;
@@ -105,7 +108,7 @@
     if (self.manager.configuration.navigationBar) {
         self.manager.configuration.navigationBar(self.customNavigationBar, self);
     }
-    [UINavigationBar appearance].translucent = YES;
+    self.customNavigationBar.translucent = YES;
 }
 - (void)setupImageOutput {
     [self.cameraController initImageOutput];
@@ -255,6 +258,7 @@
     [self.customNavigationBar setShadowImage:[[UIImage alloc] init]];
     [self.customNavigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     [self.customNavigationBar setTintColor:[UIColor whiteColor]];
+    [self.customNavigationBar setBarTintColor:nil];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     AVCaptureConnection *previewLayerConnection = [(AVCaptureVideoPreviewLayer *)self.previewView.previewLayer connection];
     if ([previewLayerConnection isVideoOrientationSupported])
@@ -309,9 +313,6 @@
         }
         if (self.cancelBlock) {
             self.cancelBlock(self);
-        }
-        if (self.manager.configuration.restoreNavigationBar && self.isOutside) {
-            [UINavigationBar appearance].translucent = NO;
         }
         [self dismissViewControllerAnimated:YES completion:nil];
     }
@@ -369,9 +370,6 @@
     }
     if (self.doneBlock) {
         self.doneBlock(model, self);
-    }
-    if (self.manager.configuration.restoreNavigationBar && self.isOutside) {
-        [UINavigationBar appearance].translucent = NO;
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }

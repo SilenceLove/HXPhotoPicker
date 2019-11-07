@@ -49,7 +49,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.6'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.7'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - ```v2.3.2 pod没有依赖sd和yy```  ```>= v2.3.3 pod依赖了yy```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是 ```YYWebImage``` || ```>= v2.3.0```  -> ```SDWebImage v5.0``` || ```< v2.3.0``` ->  ```SDWebImage v4.0```
@@ -564,13 +564,21 @@ HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
     // 取消
 }];
 ```
-#### 10. 建议
+#### 10. HXPhotoView使用约束布局
+```objc
+使用约束布局HXPhotoView的话需要在 
+- (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame 这个代理回调里更新约束的高度
+frame.size.height 就是 HXPhotoView 的正确高度
+代码参考demo11
+```
+#### 11. 建议
 ```objc
 建议将 HXPhotoPicker.bundle 里的图片资源手动添加到项目的 Assets.xcassets 里
 ```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.3.7　-　彻底解决视图因导航栏半透明效果向下偏移问题，选择时照片/视频可限制大小，优化快速滑动列表
 - v2.3.6　-　添加单独跳转编辑界面方法、废弃HXPhotoModel里的fileURL属性、修复布局失败、取消回调无效问题
 - v2.3.5　-　requestImageAfterFinishingSelection 为YES时也可获取视频地址、HXPhotoView支持横向布局、替换系统ActionSheet为自定义view、可自定义相机拍摄和录制选项、解决相机卡顿问题、完善ios13适配、提升稳定性等...
 - v2.3.4　-　适配ios13暗黑模式（可跟随系统也可自己设置）、恢复requestImageAfterFinishingSelection属性功能、单独使用预览大图时添加block回调、修复一些问题

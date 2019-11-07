@@ -16,6 +16,7 @@
 @property (strong, nonatomic) UIButton *doneBtn;
 @property (strong, nonatomic) UIButton *editBtn;
 @property (strong, nonatomic) HXPhotoManager *manager;
+@property (strong, nonatomic) UIColor *barTintColor;
 @end
 
 @implementation HXPhotoPreviewBottomView
@@ -37,6 +38,12 @@
         [self setupUI];
     }
     return self;
+}
+- (void)setManager:(HXPhotoManager *)manager {
+    _manager = manager;
+    self.barTintColor = manager.configuration.bottomViewBgColor;
+    self.bgView.translucent = manager.configuration.bottomViewTranslucent;
+    self.tipView.translucent = manager.configuration.bottomViewTranslucent;
 }
 - (void)setupUI {
     _currentIndex = -1;
@@ -254,8 +261,8 @@
     }else {
         themeColor = self.manager.configuration.themeColor;
         selectedTitleColor = self.manager.configuration.selectedTitleColor;
-        self.bgView.barTintColor = nil;
-        self.tipView.barTintColor = nil;
+        self.bgView.barTintColor = self.barTintColor;
+        self.tipView.barTintColor = self.barTintColor;
     }
     _tipLb.textColor = themeColor;
     if ([themeColor isEqual:[UIColor whiteColor]]) {

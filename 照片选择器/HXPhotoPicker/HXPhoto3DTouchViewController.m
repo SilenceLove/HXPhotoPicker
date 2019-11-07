@@ -28,7 +28,6 @@
     if (self.previewActionItemsBlock) items = self.previewActionItemsBlock();
     return items;
 }
-
 - (void)viewDidLoad {
     [super viewDidLoad];
 #if HasYYKitOrWebImage

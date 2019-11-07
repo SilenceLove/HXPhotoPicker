@@ -203,55 +203,61 @@
 - (void)setupModel {
     if (self.model.asset) {
         self.bottomView.userInteractionEnabled = NO;
-        HXWeakSelf
         if (!self.isInside) {
             [self.view hx_showLoadingHUDText:nil];
         }
-        self.requestId = [self.model requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
-            weakSelf.requestId = iCloudRequestId;
-        } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
-            weakSelf.bottomView.userInteractionEnabled = YES;
-            NSData *imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
-            UIImage *image = [UIImage imageWithData:imageData];
-
-//            UIImage *image = [UIImage imageWithContentsOfFile:imageURL.relativePath];
-            if (image.imageOrientation != UIImageOrientationUp) {
-                image = [image hx_normalizedImage];
-            }
-            weakSelf.originalImage = image;
-            weakSelf.imageView.image = image;
-            [weakSelf.view hx_handleLoading];
-            weakSelf.imageRequestComplete = YES;
-            
-            if (!weakSelf.isInside) {
-                [weakSelf fixationEdit];
-            }else {
-                if (weakSelf.transitionCompletion) {
-                    [weakSelf fixationEdit];
-                }
-            }
-        } failed:^(NSDictionary *info, HXPhotoModel *model) {
-            [weakSelf.view hx_handleLoading];
-            weakSelf.bottomView.userInteractionEnabled = YES;
-            weakSelf.imageRequestComplete = YES;
-            if (!weakSelf.isInside) {
-                [weakSelf fixationEdit];
-            }else {
-                if (weakSelf.transitionCompletion) {
-                    [weakSelf fixationEdit];
-                }
-            }
-        }];
+        [self requestImaegURL];
     }else {
         self.imageView.image = self.model.thumbPhoto;
         self.originalImage = self.model.thumbPhoto;
-        self.imageRequestComplete = YES;
-        if (!self.isInside) {
+        [self loadImageCompletion];
+    }
+}
+- (void)requestImaegURL {
+    HXWeakSelf
+    self.requestId = [self.model requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
+        weakSelf.requestId = iCloudRequestId;
+    } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
+        weakSelf.bottomView.userInteractionEnabled = YES;
+        NSData *imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
+        UIImage *image = [UIImage imageWithData:imageData];
+        if (image.imageOrientation != UIImageOrientationUp) {
+            image = [image hx_normalizedImage];
+        }
+        weakSelf.originalImage = image;
+        weakSelf.imageView.image = image;
+        [weakSelf.view hx_handleLoading];
+        [weakSelf loadImageCompletion];
+    } failed:^(NSDictionary *info, HXPhotoModel *model) {
+        [weakSelf requenstImage];
+    }];
+}
+- (void)requenstImage {
+    HXWeakSelf
+    self.requestId = [self.model requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
+        weakSelf.requestId = iCloudRequestId;
+    } progressHandler:nil success:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        weakSelf.bottomView.userInteractionEnabled = YES;
+        if (image.imageOrientation != UIImageOrientationUp) {
+            image = [image hx_normalizedImage];
+        }
+        weakSelf.originalImage = image;
+        weakSelf.imageView.image = image;
+        [weakSelf.view hx_handleLoading];
+        [weakSelf loadImageCompletion];
+    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+        [weakSelf.view hx_handleLoading];
+        weakSelf.bottomView.userInteractionEnabled = YES;
+        [weakSelf loadImageCompletion];
+    }];
+}
+- (void)loadImageCompletion {
+    self.imageRequestComplete = YES;
+    if (!self.isInside) {
+        [self fixationEdit];
+    }else {
+        if (self.transitionCompletion) {
             [self fixationEdit];
-        }else {
-            if (self.transitionCompletion) {
-                [self fixationEdit];
-            }
         }
     }
 }

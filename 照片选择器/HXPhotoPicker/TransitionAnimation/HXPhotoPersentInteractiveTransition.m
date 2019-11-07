@@ -411,9 +411,6 @@
         }
         [fromVC.delegate photoPreviewControllerDidCancel:fromVC model:model];
     }
-    if (fromVC.manager.configuration.restoreNavigationBar) {
-        [UINavigationBar appearance].translucent = NO;
-    }
     fromVC.manager.selectPhotoing = NO;
     [UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
         if (self.tempCell) {

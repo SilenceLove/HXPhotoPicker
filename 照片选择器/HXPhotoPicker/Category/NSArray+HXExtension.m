@@ -243,7 +243,8 @@
             return;
         }
     }
-    if (original && photoModel.type != HXPhotoModelMediaTypeVideo) {
+    if ((original && photoModel.type != HXPhotoModelMediaTypeVideo) ||
+        photoModel.type == HXPhotoModelMediaTypePhotoGif) {
         // 如果选择了原图，就换一种获取方式
 //        [photoModel requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
 //            if (successful) {

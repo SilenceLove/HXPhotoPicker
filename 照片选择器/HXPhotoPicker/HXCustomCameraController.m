@@ -85,6 +85,9 @@ const CGFloat HXZoomRate = 1.0f;
         self.captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
     }
     AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    if (self.defaultFrontCamera) {
+        videoDevice = [self cameraWithPosition:AVCaptureDevicePositionFront];
+    }
     AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:nil];
     if (videoInput) {
         if ([self.captureSession canAddInput:videoInput]) {

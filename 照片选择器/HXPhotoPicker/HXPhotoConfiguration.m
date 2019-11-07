@@ -100,6 +100,15 @@
     self.previewDarkSelectBgColor = [UIColor whiteColor];
     self.previewDarkSelectTitleColor = [UIColor blackColor];
     [HXPhotoCommon photoCommon].photoStyle = HXPhotoStyleDefault;
+    self.defaultFrontCamera = NO;
+    
+    self.limitPhotoSize = 0;
+    self.limitVideoSize = 0;
+    self.selectPhotoLimitSize = NO;
+    self.selectVideoLimitSize = NO;
+    self.navBarTranslucent = YES;
+    self.bottomViewTranslucent = YES;
+    self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
 }
 - (void)setPhotoStyle:(HXPhotoStyle)photoStyle {
     _photoStyle = photoStyle;

@@ -89,7 +89,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.configuration.openCamera = YES;
         // 暗黑风格
-        _manager.configuration.photoStyle = HXPhotoStyleDark;
+//        _manager.configuration.photoStyle = HXPhotoStyleDark;
 //        _manager.configuration.showOriginalBytesLoading = YES;
         _manager.configuration.lookLivePhoto = YES;
         _manager.configuration.photoMaxNum = 9;
@@ -103,8 +103,38 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.showOriginalBytes = YES;
         _manager.configuration.selectTogether = NO;
         _manager.configuration.requestImageAfterFinishingSelection = YES;
-        
+        _manager.configuration.navBarBackgroudColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
+        _manager.configuration.themeColor = [UIColor whiteColor];
+        _manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
+        _manager.configuration.navigationTitleColor = [UIColor whiteColor];
+        _manager.configuration.cellSelectedBgColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
+        _manager.configuration.cellSelectedTitleColor = [UIColor whiteColor];
+        _manager.configuration.selectedTitleColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
+        _manager.configuration.navBarTranslucent = NO;
+        _manager.configuration.bottomViewBgColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
+        _manager.configuration.bottomViewTranslucent = NO;
+        _manager.configuration.selectVideoBeyondTheLimitTimeAutoEdit = YES;
+//        _manager.configuration.navBarBackgroundImage = [UIImage imageNamed:@"APPCityPlayer_bannerGame"];
         HXWeakSelf
+        _manager.configuration.photoListBottomView = ^(HXPhotoBottomView *bottomView) {
+//            bottomView.bgView.translucent = NO;
+//            if ([HXPhotoCommon photoCommon].isDark) {
+//                bottomView.bgView.barTintColor = [UIColor blackColor];
+//            }else {
+//                bottomView.bgView.barTintColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
+//            }
+        };
+        _manager.configuration.previewBottomView = ^(HXPhotoPreviewBottomView *bottomView) {
+//            bottomView.bgView.translucent = NO;
+//            bottomView.tipView.translucent = NO;
+//            if ([HXPhotoCommon photoCommon].isDark) {
+//                bottomView.bgView.barTintColor = [UIColor blackColor];
+//                bottomView.tipView.barTintColor = [UIColor blackColor];
+//            }else {
+//                bottomView.bgView.barTintColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
+//                bottomView.tipView.barTintColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
+//            }
+        };
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
             
             // 这里拿使用系统相机做例子
@@ -222,6 +252,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.navigationItem.rightBarButtonItems = @[cameraItem];
     
     [self.view addSubview:self.bottomView];
+//    [UINavigationBar appearance].translucent = NO;
 }
 - (void)dealloc {
     NSSLog(@"dealloc");

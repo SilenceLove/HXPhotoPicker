@@ -72,14 +72,14 @@ UITableViewDelegate
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.extendedLayoutIncludesOpaqueBars = YES;
+    self.edgesForExtendedLayout = UIRectEdgeAll;
     self.navigationController.popoverPresentationController.delegate = (id)self;
     [self requestData];
     [self setupUI];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(customCameraViewControllerDidDoneClick) name:@"CustomCameraViewControllerDidDoneNotification" object:nil];
-    
-    [UINavigationBar appearance].translucent = YES;
 }
 - (void)customCameraViewControllerDidDoneClick {
     NSInteger i = 0;
@@ -141,7 +141,15 @@ UITableViewDelegate
     if (self.manager.configuration.singleSelected ||
         self.manager.configuration.changeAlbumListContentView) {
         self.tableView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
+    
+#ifdef __IPHONE_13_0
+        if (@available(iOS 13.0, *)) {
+        }else {
+            self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
+        }
+#else
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
+#endif
         self.tableView.frame = self.view.bounds;
         if (self.manager.configuration.albumListTableView) {
             self.manager.configuration.albumListTableView(self.tableView);
@@ -160,13 +168,13 @@ UITableViewDelegate
             self.manager.configuration.albumListCollectionView(self.collectionView);
         }
     }
+    self.navigationController.navigationBar.translucent = self.manager.configuration.navBarTranslucent;
     if (self.manager.configuration.navigationBar) {
         self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
     }
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [UINavigationBar appearance].translucent = YES;
     [self changeStatusBarStyle];
 }
 - (void)changeStatusBarStyle {
@@ -209,11 +217,16 @@ UITableViewDelegate
     self.view.backgroundColor = backgroudColor;
     self.tableView.backgroundColor = backgroudColor;
     [self.navigationController.navigationBar setTintColor:themeColor];
-    if (navBarBackgroudColor) {
-        [self.navigationController.navigationBar setBackgroundColor:nil];
-        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-    }
     self.navigationController.navigationBar.barTintColor = navBarBackgroudColor;
+    
+    if (self.manager.configuration.navBarBackgroundImage) {
+        [self.navigationController.navigationBar setBackgroundImage:self.manager.configuration.navBarBackgroundImage forBarMetrics:UIBarMetricsDefault];
+    }
+//    if (navBarBackgroudColor) {
+//        [self.navigationController.navigationBar setBackgroundColor:navBarBackgroudColor];
+//        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+//    }
+    
     if (self.manager.configuration.navigationTitleSynchColor) {
         self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : themeColor};
     }else {
@@ -244,9 +257,6 @@ UITableViewDelegate
     self.manager.selectPhotoing = NO;
     
     [self dismissViewControllerAnimated:YES completion:nil];
-    if (self.manager.configuration.restoreNavigationBar) {
-        [UINavigationBar appearance].translucent = NO;
-    }
 }
 #pragma mark - < HXPhotoViewControllerDelegate >
 - (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
@@ -471,20 +481,20 @@ UITableViewDelegate
         [_tableView registerClass:[HXAlbumListSingleViewCell class] forCellReuseIdentifier:@"tableViewCellId"];
 #ifdef __IPHONE_11_0
         if (@available(iOS 11.0, *)) {
-            if ([self hx_navigationBarWhetherSetupBackground]) {
-                self.navigationController.navigationBar.translucent = NO;
-            }else {
+//            if ([self hx_navigationBarWhetherSetupBackground]) {
+//                self.navigationController.navigationBar.translucent = NO;
+//            }else {
                 _tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-            }
+//            }
 #else
             if ((NO)) {
 #endif
             } else {
-                if ([self hx_navigationBarWhetherSetupBackground]) {
-                    self.navigationController.navigationBar.translucent = NO;
-                }else {
+//                if ([self hx_navigationBarWhetherSetupBackground]) {
+//                    self.navigationController.navigationBar.translucent = NO;
+//                }else {
                     self.automaticallyAdjustsScrollViewInsets = NO;
-                }
+//                }
             }
     }
     return _tableView;
@@ -502,17 +512,17 @@ UITableViewDelegate
 //        _collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(hxNavigationBarHeight, 0, 0, 0);
 #ifdef __IPHONE_11_0
         if (@available(iOS 11.0, *)) {
-            if ([self hx_navigationBarWhetherSetupBackground]) {
-                self.navigationController.navigationBar.translucent = YES;
-            }
+//            if ([self hx_navigationBarWhetherSetupBackground]) {
+//                self.navigationController.navigationBar.translucent = YES;
+//            }
             _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 #else
             if ((NO)) {
 #endif
             } else {
-                if ([self hx_navigationBarWhetherSetupBackground]) {
-                    self.navigationController.navigationBar.translucent = YES;
-                }
+//                if ([self hx_navigationBarWhetherSetupBackground]) {
+//                    self.navigationController.navigationBar.translucent = YES;
+//                }
                 self.automaticallyAdjustsScrollViewInsets = NO;
             }
             if (self.manager.configuration.open3DTouchPreview) {
@@ -770,7 +780,7 @@ UITableViewDelegate
         if (!self.model.asset2) {
             self.model.asset2 = self.model.result[1];
         }
-        self.requestId2 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset2 size:CGSizeMake(self.hx_h * 0.7, self.hx_h * 0.7) completion:^(UIImage *image, PHAsset *asset) {
+        self.requestId2 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset2 size:CGSizeMake(40, 40) completion:^(UIImage *image, PHAsset *asset) {
             if (weakSelf.model.asset2 == asset) {
                 weakSelf.coverView2.image = image;
             }
@@ -787,14 +797,14 @@ UITableViewDelegate
         self.coverView2.hidden = NO;
         self.coverView3.hidden = NO;
         
-        self.requestId2 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset2 size:CGSizeMake(self.hx_h * 0.7, self.hx_h * 0.7) completion:^(UIImage *image, PHAsset *asset) {
+        self.requestId2 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset2 size:CGSizeMake(40, 40) completion:^(UIImage *image, PHAsset *asset) {
             if (weakSelf.model.asset2 == asset) {
                 weakSelf.coverView2.image = image;
             }
         }];
         
         
-        self.requestId3 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset3 size:CGSizeMake(self.hx_h * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, PHAsset *asset) {
+        self.requestId3 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset3 size:CGSizeMake(20, 20) completion:^(UIImage *image, PHAsset *asset) {
             if (weakSelf.model.asset3 == asset) {
                 weakSelf.coverView3.image = image;
             }

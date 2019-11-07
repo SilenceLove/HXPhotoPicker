@@ -59,6 +59,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
     HXPhotoModelVideoStateOversize      //!< 视频时长超出限制
 };
 
+typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
+    HXPhotoModelFormatUnknown = 0,  //!< 未知格式
+    HXPhotoModelFormatPNG,          //!< PNG格式
+    HXPhotoModelFormatJPG,          //!< JPG格式
+    HXPhotoModelFormatGIF,          //!< GIF格式
+    HXPhotoModelFormatHEIC          //!< HEIC格式
+};
+
 @interface HXPhotoModel : NSObject<NSCoding>
 /**
  文件在手机里的原路径(照片 或 视频)
@@ -104,6 +112,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (assign, nonatomic) HXPhotoModelMediaTypeCameraVideoType cameraVideoType;
 /**  照片PHAsset对象  */
 @property (strong, nonatomic) PHAsset * _Nullable asset;
+/// 照片格式
+@property (assign, nonatomic) HXPhotoModelFormat photoFormat;
 /**  视频秒数 */
 @property (nonatomic, assign) NSTimeInterval videoDuration;
 /**  选择的下标 */
@@ -118,11 +128,17 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (copy, nonatomic) NSURL * _Nullable networkPhotoUrl;
 /**  网络图片缩略图地址  */
 @property (strong, nonatomic) NSURL * _Nullable networkThumbURL;
+/// 网络图片的大小
+@property (assign, nonatomic) NSUInteger networkImageSize;
 /**  临时的列表小图 - 本地图片才用这个上传  */
 @property (strong, nonatomic) UIImage * _Nullable thumbPhoto;
 /**  临时的预览大图  - 本地图片才用这个上传 */
 @property (strong, nonatomic) UIImage * _Nullable previewPhoto;
-
+/// 图片本地地址
+/// 正常情况下为空
+/// 1.调用过 requestImageURLStartRequestICloud 这个方法会有值
+/// 2.HXPhotoConfiguration.requestImageAfterFinishingSelection = YES 时，并且选择了原图或者 tpye = HXPhotoModelMediaTypePhotoGif 有值
+@property (strong, nonatomic) NSURL * _Nullable imageURL;
 
 #pragma mark - < Disabled >
 /**  是否正在下载iCloud上的资源  */
@@ -169,6 +185,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 @property (assign, nonatomic) BOOL downloadComplete;
 /**  网络图片是否下载错误 */
 @property (assign, nonatomic) BOOL downloadError;
+
+/// 当前资源的大小 单位：b 字节
+/// 网络图片只有下载成功之后才获取的到大小
+/// 本地图片获取的大小可能不准确
+@property (assign, nonatomic) NSUInteger assetByte;
+@property (assign, nonatomic) BOOL requestAssetByte;
+
+
 /**  临时图片 */
 @property (strong, nonatomic) UIImage * _Nullable tempImage;
 /**  行数 */
@@ -190,13 +214,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 
 /**  如果当前为视频资源时的视频状态  */
 @property (assign, nonatomic) HXPhotoModelVideoState videoState;
-
 @property (copy, nonatomic) NSString * _Nullable cameraNormalImageNamed;
 @property (copy, nonatomic) NSString * _Nullable cameraPreviewImageNamed;
 
 @property (strong, nonatomic) id _Nullable tempAsset;
 @property (assign, nonatomic) BOOL loadOriginalImage;
-
 
 #pragma mark - < init >
 /**  通过image初始化 */
@@ -236,6 +258,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock _Nullable)completion;
 - (PHImageRequestID)requestThumbImageWithSize:(CGSize)size
                                    completion:(HXModelImageSuccessBlock _Nullable)completion;
+- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion;
 
 /**
  请求获取预览大图，此方法只会回调一次，如果为视频的话就是视频封面

@@ -138,6 +138,9 @@ HXVideoEditViewControllerDelegate
 }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    if (!CGRectEqualToRect(self.view.frame, [UIScreen mainScreen].bounds)) {
+        self.view.frame = [UIScreen mainScreen].bounds;
+    }
     if (self.orientationDidChange) {
         self.orientationDidChange = NO;
         [self changeSubviewFrame];
@@ -164,7 +167,6 @@ HXVideoEditViewControllerDelegate
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [UINavigationBar appearance].translucent = YES;
     [self changeStatusBarStyle];
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
         [self changeStatusBarWithHidden:YES];
@@ -217,7 +219,9 @@ HXVideoEditViewControllerDelegate
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    // Do any additional setup after loading the view
+    self.extendedLayoutIncludesOpaqueBars = YES;
+    self.edgesForExtendedLayout = UIRectEdgeAll;
     [self setupUI];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     
@@ -295,6 +299,7 @@ HXVideoEditViewControllerDelegate
     self.collectionView.frame = CGRectMake(-(itemMargin / 2), 0,self.view.hx_w + itemMargin, self.view.hx_h);
     self.collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + itemMargin), 0);
     
+    
     [self.collectionView setContentOffset:CGPointMake(self.beforeOrientationIndex * (self.view.hx_w + itemMargin), 0)];
     
     [UIView performWithoutAnimation:^{
@@ -324,11 +329,13 @@ HXVideoEditViewControllerDelegate
     if (self.manager.configuration.previewCollectionView) {
         self.manager.configuration.previewCollectionView(self.collectionView);
     }
+    self.navigationController.navigationBar.translucent = self.manager.configuration.navBarTranslucent;
     if (!self.outside) {
         if (self.manager.configuration.navigationBar) {
             self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
         }
     }else {
+        self.navBar.translucent = self.manager.configuration.navBarTranslucent;
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
             if (self.manager.configuration.navigationBar) {
                 self.manager.configuration.navigationBar(self.navBar, self);
@@ -374,11 +381,17 @@ HXVideoEditViewControllerDelegate
     }
     if (!self.outside) {
         [self.navigationController.navigationBar setTintColor:themeColor];
-        if (navBarBackgroudColor) {
-            [self.navigationController.navigationBar setBackgroundColor:nil];
-            [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-        }
+        
+//        if (navBarBackgroudColor) {
+//            [self.navigationController.navigationBar setBackgroundColor:navBarBackgroudColor];
+//            [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+//        }
         self.navigationController.navigationBar.barTintColor = navBarBackgroudColor;
+
+        if (self.manager.configuration.navBarBackgroundImage) {
+            [self.navigationController.navigationBar setBackgroundImage:self.manager.configuration.navBarBackgroundImage forBarMetrics:UIBarMetricsDefault];
+        }
+        
         if (self.manager.configuration.navigationTitleSynchColor) {
             self.titleLb.textColor = themeColor;
             self.subTitleLb.textColor = themeColor;
@@ -400,11 +413,15 @@ HXVideoEditViewControllerDelegate
     }else {
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
             [self.navBar setTintColor:themeColor];
-            if (navBarBackgroudColor) {
-                [self.navBar setBackgroundColor:nil];
-                [self.navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-            }
+            
+//            if (navBarBackgroudColor) {
+//                [self.navBar setBackgroundColor:navBarBackgroudColor];
+//                [self.navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+//            }
             self.navBar.barTintColor = navBarBackgroudColor;
+            if (self.manager.configuration.navBarBackgroundImage) {
+                [self.navBar setBackgroundImage:self.manager.configuration.navBarBackgroundImage forBarMetrics:UIBarMetricsDefault];
+            }
             
             if (self.manager.configuration.navigationTitleSynchColor) {
                 self.titleLb.textColor = themeColor;
@@ -502,7 +519,7 @@ HXVideoEditViewControllerDelegate
         }
     }
     [self changeColor];
-    [self changeSubviewFrame];
+    self.orientationDidChange = YES;
 }
 - (void)didSelectClick:(UIButton *)button {
     if (self.modelArray.count <= 0 || self.outside) {
@@ -523,7 +540,11 @@ HXVideoEditViewControllerDelegate
     }else {
         NSString *str = [self.manager maximumOfJudgment:model];
         if (str) {
-            [self.view hx_showImageHUDText:str];
+            if ([str isEqualToString:@"selectVideoBeyondTheLimitTimeAutoEdit"]) {
+                [self jumpVideoEdit];
+            }else {
+                [self.view hx_showImageHUDText:str];
+            }
             return;
         }
         HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
@@ -585,9 +606,6 @@ HXVideoEditViewControllerDelegate
         [self.delegate photoPreviewControllerDidCancel:self model:model];
     }
     [self dismissViewControllerAnimated:YES completion:nil];
-    if (self.manager.configuration.restoreNavigationBar) {
-        [UINavigationBar appearance].translucent = NO;
-    }
 }
 - (void)deleteClick {
     if (!self.modelArray.count) {
@@ -914,24 +932,24 @@ HXVideoEditViewControllerDelegate
                 [weakSelf photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
-            HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-            HXVideoEditViewController *vc = [[HXVideoEditViewController alloc] init];
-            vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
-            vc.avAsset = cell.avAsset;
-            vc.delegate = self;
-            vc.manager = self.manager;
-            vc.isInside = YES;
-            vc.outside = self.outside;
-            vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
-            vc.modalPresentationCapturesStatusBarAppearance = YES;
-            [self presentViewController:vc animated:YES completion:nil];
+            [self jumpVideoEdit];
         }
     }
 }
+- (void)jumpVideoEdit {
+    HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+    HXVideoEditViewController *vc = [[HXVideoEditViewController alloc] init];
+    vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
+    vc.avAsset = cell.avAsset;
+    vc.delegate = self;
+    vc.manager = self.manager;
+    vc.isInside = YES;
+    vc.outside = self.outside;
+    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    vc.modalPresentationCapturesStatusBarAppearance = YES;
+    [self presentViewController:vc animated:YES completion:nil];
+}
 - (void)photoPreviewBottomViewDidDone:(HXPhotoPreviewBottomView *)bottomView {
-    if (self.manager.configuration.restoreNavigationBar) {
-        [UINavigationBar appearance].translucent = NO;
-    }
     if (self.outside) {
         if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidCancel:model:)]) {
             HXPhotoModel *model;
@@ -942,9 +960,6 @@ HXVideoEditViewControllerDelegate
         }
         self.manager.selectPhotoing = NO;
         [self dismissViewControllerAnimated:YES completion:nil];
-        if (self.manager.configuration.restoreNavigationBar) {
-            [UINavigationBar appearance].translucent = NO;
-        }
         return;
     }
     if (self.modelArray.count == 0) {
@@ -961,12 +976,16 @@ HXVideoEditViewControllerDelegate
     }
     if (self.manager.configuration.singleSelected) {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-            ;
             if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
                 [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
                 return;
             }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
-                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
+                if (self.manager.configuration.selectVideoBeyondTheLimitTimeAutoEdit &&
+                    self.manager.configuration.videoCanEdit) {
+                    [self jumpVideoEdit];
+                }else {
+                    [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
+                }
                 return;
             }
         }
@@ -1002,14 +1021,14 @@ HXVideoEditViewControllerDelegate
         }
     }
     if ([self.manager selectedCount] == 0) {
-        if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-            if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
-                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
-                return;
-            }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
-                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
-                return;
+        NSString *str = [self.manager maximumOfJudgment:model];
+        if (str) {
+            if ([str isEqualToString:@"selectVideoBeyondTheLimitTimeAutoEdit"]) {
+                [self jumpVideoEdit];
+            }else {
+                [self.view hx_showImageHUDText:str];
             }
+            return;
         }
         if (!self.selectBtn.selected && !max && self.modelArray.count > 0) {
             //            model.selected = YES;
@@ -1211,8 +1230,7 @@ HXVideoEditViewControllerDelegate
 }
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
-        //        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, hxTopMargin,self.view.hx_w + 20, self.view.hx_h - hxTopMargin - hxBottomMargin) collectionViewLayout:self.flowLayout];
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, 0,self.view.hx_w + 20, self.view.hx_h) collectionViewLayout:self.flowLayout];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-10, 0,self.view.hx_w + 20, [UIScreen mainScreen].bounds.size.height) collectionViewLayout:self.flowLayout];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

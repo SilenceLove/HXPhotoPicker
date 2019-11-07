@@ -122,6 +122,8 @@
 		7B6BC6B721073F1A00136D61 /* Demo12ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6BC6B621073F1A00136D61 /* Demo12ViewController.m */; };
 		7B6BC6B92107408200136D61 /* QQ空间视频_20180301091047.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */; };
 		7B6C2F331F6A283D0044E3D6 /* Demo8ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */; };
+		7B752DE82372ADF000580F35 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE72372ADF000580F35 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		7B752DEA2372ADF300580F35 /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE92372ADF300580F35 /* PhotosUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7B7E3E7B1E4AACD1002234EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7A1E4AACD1002234EE /* main.m */; };
 		7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */; };
 		7B7E3E811E4AACD1002234EE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E801E4AACD1002234EE /* ViewController.m */; };
@@ -134,6 +136,8 @@
 		7B81626F20343EE10084F4C3 /* Demo9ViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B81626E20343EE10084F4C3 /* Demo9ViewCell.m */; };
 		7B9B3C5821F4ABEE0054F920 /* HXPhotoEditTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9B3C5721F4ABEE0054F920 /* HXPhotoEditTransition.m */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
+		7BA25EA423692BDB005212A4 /* HXPhotoBottomConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BA25EA323692BDB005212A4 /* HXPhotoBottomConfiguration.m */; };
+		7BA25EA723693481005212A4 /* HXPhotoPreviewBottomConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BA25EA623693481005212A4 /* HXPhotoPreviewBottomConfiguration.m */; };
 		7BA9E49F229CE3FC00614CC3 /* YYImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BA9E477229CE3FB00614CC3 /* YYImageCache.m */; };
 		7BA9E4A0229CE3FC00614CC3 /* YYDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BA9E479229CE3FB00614CC3 /* YYDiskCache.m */; };
 		7BA9E4A1229CE3FC00614CC3 /* YYCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BA9E47B229CE3FC00614CC3 /* YYCache.m */; };
@@ -447,6 +451,8 @@
 		7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QQ空间视频_20180301091047.mp4"; sourceTree = SOURCE_ROOT; };
 		7B6C2F311F6A283D0044E3D6 /* Demo8ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo8ViewController.h; sourceTree = "<group>"; };
 		7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo8ViewController.m; sourceTree = "<group>"; };
+		7B752DE72372ADF000580F35 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
+		7B752DE92372ADF300580F35 /* PhotosUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotosUI.framework; path = System/Library/Frameworks/PhotosUI.framework; sourceTree = SDKROOT; };
 		7B7E3E761E4AACD1002234EE /* 照片选择器.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "照片选择器.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B7E3E7A1E4AACD1002234EE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7B7E3E7C1E4AACD1002234EE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -470,6 +476,10 @@
 		7B9B3C5721F4ABEE0054F920 /* HXPhotoEditTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditTransition.m; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
+		7BA25EA223692BDB005212A4 /* HXPhotoBottomConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoBottomConfiguration.h; sourceTree = "<group>"; };
+		7BA25EA323692BDB005212A4 /* HXPhotoBottomConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoBottomConfiguration.m; sourceTree = "<group>"; };
+		7BA25EA523693481005212A4 /* HXPhotoPreviewBottomConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoPreviewBottomConfiguration.h; sourceTree = "<group>"; };
+		7BA25EA623693481005212A4 /* HXPhotoPreviewBottomConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoPreviewBottomConfiguration.m; sourceTree = "<group>"; };
 		7BA9E477229CE3FB00614CC3 /* YYImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYImageCache.m; sourceTree = "<group>"; };
 		7BA9E479229CE3FB00614CC3 /* YYDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYDiskCache.m; sourceTree = "<group>"; };
 		7BA9E47A229CE3FB00614CC3 /* YYKVStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYKVStorage.h; sourceTree = "<group>"; };
@@ -631,6 +641,7 @@
 		7BEA307E20DD533600A559A6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		7BEA307F20DD535C00A559A6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		7BEA308020DD536300A559A6 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		7BEB0D9F237018470009061B /* HXPhotoProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -638,6 +649,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B752DEA2372ADF300580F35 /* PhotosUI.framework in Frameworks */,
+				7B752DE82372ADF000580F35 /* Photos.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -656,6 +669,11 @@
 				7B1AA3C021EEE3BD00D0AA93 /* HXPhotoManager.m */,
 				7B1AA3C621EEE3BD00D0AA93 /* HXPhotoConfiguration.h */,
 				7B1AA38521EEE3BC00D0AA93 /* HXPhotoConfiguration.m */,
+				7BEB0D9F237018470009061B /* HXPhotoProtocol.h */,
+				7BA25EA223692BDB005212A4 /* HXPhotoBottomConfiguration.h */,
+				7BA25EA323692BDB005212A4 /* HXPhotoBottomConfiguration.m */,
+				7BA25EA523693481005212A4 /* HXPhotoPreviewBottomConfiguration.h */,
+				7BA25EA623693481005212A4 /* HXPhotoPreviewBottomConfiguration.m */,
 				7B1AA3D321EEE3BD00D0AA93 /* HXPhotoTools.h */,
 				7B1AA3BA21EEE3BD00D0AA93 /* HXPhotoTools.m */,
 				7B1AA3D821EEE3BD00D0AA93 /* HXPhotoCommon.h */,
@@ -1138,11 +1156,21 @@
 			path = subView;
 			sourceTree = "<group>";
 		};
+		7B752DE62372ADEF00580F35 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7B752DE92372ADF300580F35 /* PhotosUI.framework */,
+				7B752DE72372ADF000580F35 /* Photos.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		7B7E3E6D1E4AACD1002234EE = {
 			isa = PBXGroup;
 			children = (
 				7B7E3E781E4AACD1002234EE /* 照片选择器 */,
 				7B7E3E771E4AACD1002234EE /* Products */,
+				7B752DE62372ADEF00580F35 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1540,6 +1568,7 @@
 				7B200D29216D06B9004A5B0B /* LFVideoEditingController.m in Sources */,
 				7B1AA40021EEE3BD00D0AA93 /* HXPhotoViewFlowLayout.m in Sources */,
 				7B1AA3F821EEE3BD00D0AA93 /* UILabel+HXExtension.m in Sources */,
+				7BA25EA723693481005212A4 /* HXPhotoPreviewBottomConfiguration.m in Sources */,
 				7B1AA3E721EEE3BD00D0AA93 /* HXPhoto3DTouchViewController.m in Sources */,
 				7B200D2B216D06B9004A5B0B /* LFVideoEditingView.m in Sources */,
 				7BA9E559229CE5E400614CC3 /* SDWebImageCacheKeyFilter.m in Sources */,
@@ -1684,6 +1713,7 @@
 				7BA9E49F229CE3FC00614CC3 /* YYImageCache.m in Sources */,
 				7BA9E4A0229CE3FC00614CC3 /* YYDiskCache.m in Sources */,
 				7B1EF3D91F28811300A4391C /* Demo6ViewController.m in Sources */,
+				7BA25EA423692BDB005212A4 /* HXPhotoBottomConfiguration.m in Sources */,
 				7B200D28216D06B9004A5B0B /* LFVideoExportSession.m in Sources */,
 				7BA9E549229CE5E400614CC3 /* UIColor+HexString.m in Sources */,
 				7B200D27216D06B9004A5B0B /* LFVideoPlayer.m in Sources */,
@@ -1847,7 +1877,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.3.6;
+				MARKETING_VERSION = 2.3.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1867,7 +1897,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.3.6;
+				MARKETING_VERSION = 2.3.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

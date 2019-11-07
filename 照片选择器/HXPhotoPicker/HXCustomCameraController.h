@@ -25,6 +25,9 @@
 @property (weak, nonatomic) id<HXCustomCameraControllerDelegate> delegate;
 @property (strong, nonatomic, readonly) AVCaptureSession *captureSession;
 
+/// 相机界面默认前置摄像头
+@property (assign, nonatomic) BOOL defaultFrontCamera;
+
 - (void)initSeesion;
 - (void)setupPreviewLayer:(AVCaptureVideoPreviewLayer *)previewLayer startSessionCompletion:(void (^)(BOOL success))completion;
 

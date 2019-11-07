@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param selectCompletion 选择完成
 /// @param cancelClick 取消选择
 + (instancetype)showSelectViewWithTitles:(NSArray * _Nullable)titles cancelTitle:(NSString * _Nullable)cancelTitle adaptiveDarkness:(BOOL)adaptiveDarkness selectCompletion:(void (^)(NSInteger index, NSString *title))selectCompletion cancelClick:(void (^ _Nullable)(void))cancelClick;
++ (instancetype)showSelectViewWithTitles:(NSArray * _Nullable)titles headerView:(UIView *)headerView selectCompletion:(void (^)(NSInteger index, NSString *title))selectCompletion cancelClick:(void (^ _Nullable)(void))cancelClick;
 - (void)showView;
 - (void)hideView;
 

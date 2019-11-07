@@ -271,26 +271,9 @@
             if (model.subType != HXPhotoModelMediaSubTypePhoto) {
                 continue;
             }
-            if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-                NSData *imageData;
-                if (UIImagePNGRepresentation(model.thumbPhoto)) {
-                    //返回为png图像。
-                    imageData = UIImagePNGRepresentation(model.thumbPhoto);
-                }else {
-                    //返回为JPEG图像。
-                    imageData = UIImageJPEGRepresentation(model.thumbPhoto, 1.0);
-                }
-                dataLength += imageData.length;
-                assetCount ++;
-                if (assetCount >= weakSelf.selectedPhotos.count) {
-                    weakSelf.selectPhotoTotalDataLengths = &(dataLength);
-                    NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (completion) completion(bytes, dataLength);
-                    });
-                }
-            }else {
+            if (model.assetByte == 0 && model.type != HXPhotoModelMediaTypeCameraPhoto) {
                 [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+                    model.assetByte = imageData.length;
                     dataLength += imageData.length;
                     assetCount ++;
                     if (assetCount >= weakSelf.selectedPhotos.count) {
@@ -311,6 +294,16 @@
                         });
                     }
                 }];
+            }else {
+                dataLength += model.assetByte;
+                assetCount ++;
+                if (assetCount >= weakSelf.selectedPhotos.count) {
+                    weakSelf.selectPhotoTotalDataLengths = &(dataLength);
+                    NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (completion) completion(bytes, dataLength);
+                    });
+                }
             }
         }
     }];
@@ -1164,6 +1157,35 @@
     }
 }
 - (NSString *)maximumOfJudgment:(HXPhotoModel *)model {
+    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        if (self.configuration.selectPhotoLimitSize && self.configuration.limitPhotoSize > 0) {
+            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork &&
+                !model.downloadComplete) {
+                return [NSBundle hx_localizedStringForKey:@"正在下载网络图片，请稍等"];
+            }
+            if (model.assetByte == 0 && !model.requestAssetByte && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+                model.requestAssetByte = YES;
+                [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    model.assetByte = imageData.length;
+                    model.requestAssetByte = NO;
+                } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                    model.requestAssetByte = NO;
+                }];
+            }
+            if (model.requestAssetByte) {
+                return [NSBundle hx_localizedStringForKey:@"正在获取照片大小，请稍等"];
+            }
+            if (model.assetByte > self.configuration.limitPhotoSize) {
+                return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"照片大小超过最大限制%@"], [HXPhotoTools getBytesFromDataLength:self.configuration.limitPhotoSize]];
+            }
+        }
+    }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+        if (self.configuration.selectVideoLimitSize && self.configuration.limitVideoSize > 0) {
+            if (model.assetByte > self.configuration.limitVideoSize) {
+                return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大小超过最大限制%@"], [HXPhotoTools getBytesFromDataLength:self.configuration.limitVideoSize]];
+            }
+        }
+    }
     if (self.shouldSelectModel) {
         if (self.shouldSelectModel(model)) {
             return self.shouldSelectModel(model);
@@ -1245,7 +1267,12 @@
         if (model.videoDuration < self.configuration.videoMinimumSelectDuration) { 
             return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.configuration.videoMinimumSelectDuration];
         }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
-            return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.configuration.videoMaximumSelectDuration];
+            if (self.configuration.selectVideoBeyondTheLimitTimeAutoEdit &&
+                self.configuration.videoCanEdit) {
+                return @"selectVideoBeyondTheLimitTimeAutoEdit";
+            }else {
+                return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.configuration.videoMaximumSelectDuration];
+            }
         }
     } 
     return nil;

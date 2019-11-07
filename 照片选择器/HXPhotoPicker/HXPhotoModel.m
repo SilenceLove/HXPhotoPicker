@@ -32,7 +32,83 @@
 #endif
 
 @implementation HXPhotoModel
-
+- (NSUInteger)assetByte {
+    if (_assetByte > 0) {
+        return _assetByte;
+    }
+    NSUInteger byte = 0;
+    if (self.asset) {
+        if (self.type == HXPhotoModelMediaTypeLivePhoto) {
+            NSArray *resources = [PHAssetResource assetResourcesForAsset:self.asset];
+            for (PHAssetResource *resource in resources) {
+                byte += [[resource valueForKey:@"fileSize"] unsignedIntegerValue];
+            }
+        }else {
+            byte = [[[[PHAssetResource assetResourcesForAsset:self.asset] firstObject] valueForKey:@"fileSize"] unsignedIntegerValue];
+        }
+    }else {
+        if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
+            if (self.networkPhotoUrl || self.networkThumbURL) {
+                byte = self.networkImageSize;
+            }else {
+                NSData *imageData;
+                if (UIImagePNGRepresentation(self.thumbPhoto)) {
+                    //返回为png图像。
+                    imageData = UIImagePNGRepresentation(self.thumbPhoto);
+                }else {
+                    //返回为JPEG图像。
+                    imageData = UIImageJPEGRepresentation(self.thumbPhoto, 0.7);
+                }
+                byte = imageData.length;
+            }
+        }else if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+            AVURLAsset* urlAsset = [AVURLAsset assetWithURL:self.videoURL];
+            NSNumber *size;
+            [urlAsset.URL getResourceValue:&size forKey:NSURLFileSizeKey error:nil];
+            byte = size.unsignedIntegerValue;
+        }
+    }
+    
+    return byte;
+}
+- (HXPhotoModelFormat)photoFormat {
+    if (self.subType == HXPhotoModelMediaSubTypePhoto) {
+        if (self.asset) {
+            if ([[self.asset valueForKey:@"filename"] hasSuffix:@"PNG"]) {
+                return HXPhotoModelFormatPNG;
+            }
+            if ([[self.asset valueForKey:@"filename"] hasSuffix:@"JPG"]) {
+                return HXPhotoModelFormatJPG;
+            }
+            if ([[self.asset valueForKey:@"filename"] hasSuffix:@"HEIC"]) {
+                return HXPhotoModelFormatHEIC;
+            }
+            if ([[self.asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
+                return HXPhotoModelFormatGIF;
+            }
+        }else {
+            if (self.thumbPhoto) {
+                if (UIImagePNGRepresentation(self.thumbPhoto)) {
+                    return HXPhotoModelFormatPNG;
+                }else {
+                    return HXPhotoModelFormatJPG;
+                }
+            }
+            if (self.networkPhotoUrl) {
+                if ([[self.networkPhotoUrl.absoluteString lowercaseString] hasSuffix:@"png"]) {
+                    return HXPhotoModelFormatPNG;
+                }
+                if ([[self.networkPhotoUrl.absoluteString lowercaseString] hasSuffix:@"jpg"]) {
+                    return HXPhotoModelFormatJPG;
+                }
+                if ([[self.networkPhotoUrl.absoluteString lowercaseString] hasSuffix:@"gif"]) {
+                    return HXPhotoModelFormatGIF;
+                }
+            }
+        }
+    }
+    return HXPhotoModelFormatUnknown;
+}
 - (BOOL)isEqualPhotoModel:(HXPhotoModel *)photoModel {
     if (!photoModel) {
         return NO;
@@ -83,6 +159,8 @@
 //    return [self isEqualPhotoModel:object];
 //}
 
+
+/// 避免造成误解去掉此属性
 //- (NSURL *)fileURL {
 //    if (self.type == HXPhotoModelMediaTypeCameraVideo && !_fileURL) {
 //        _fileURL = self.videoURL;
@@ -459,7 +537,7 @@
         self.videoTime = [aDecoder decodeObjectForKey:@"videoTime"];
         self.selectIndexStr = [aDecoder decodeObjectForKey:@"videoTime"];
         self.cameraIdentifier = [aDecoder decodeObjectForKey:@"cameraIdentifier"];
-        self.fileURL = [aDecoder decodeObjectForKey:@"fileURL"];
+//        self.fileURL = [aDecoder decodeObjectForKey:@"fileURL"];
     }
     return self;
 }
@@ -484,7 +562,7 @@
     [aCoder encodeObject:self.videoTime forKey:@"videoTime"];
     [aCoder encodeObject:self.selectIndexStr forKey:@"selectIndexStr"];
     [aCoder encodeObject:self.cameraIdentifier forKey:@"cameraIdentifier"];
-    [aCoder encodeObject:self.fileURL forKey:@"fileURL"];
+//    [aCoder encodeObject:self.fileURL forKey:@"fileURL"];
 }
 #pragma mark - < Request >
 
@@ -526,6 +604,19 @@
 }
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock)completion {
     return [self requestThumbImageWithSize:self.requestSize completion:completion];
+}
+- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
+    PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
+    option.resizeMode = PHImageRequestOptionsResizeModeFast;
+    HXWeakSelf
+    return [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        if (downloadFinined && result) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(result, weakSelf, info);
+            });
+        }
+    }];
 }
 
 - (PHImageRequestID)requestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
@@ -1158,6 +1249,7 @@
         if (downloadFinined && contentEditingInput.fullSizeImageURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
+                    weakSelf.imageURL = contentEditingInput.fullSizeImageURL;
                     success(contentEditingInput.fullSizeImageURL, weakSelf, info);
                 }
             });
@@ -1181,6 +1273,7 @@
                     if (downloadFinined && contentEditingInput.fullSizeImageURL) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (success) {
+                                weakSelf.imageURL = contentEditingInput.fullSizeImageURL;
                                 success(contentEditingInput.fullSizeImageURL, weakSelf, nil);
                             }
                         });

@@ -94,7 +94,7 @@
  */
 + (void)FetchPhotosBytes:(NSArray * _Nullable)photos
               completion:(void (^ _Nullable)(NSString * _Nullable totalBytes))completion;
-+ (NSString * _Nullable)getBytesFromDataLength:(NSInteger)dataLength;
++ (NSString * _Nullable)getBytesFromDataLength:(NSUInteger)dataLength;
 
 + (BOOL)platform;
 /**  iphone6, 6s, 7, 8  */

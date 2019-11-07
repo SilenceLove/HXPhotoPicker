@@ -38,6 +38,17 @@
     return selectView;
 }
 
++ (instancetype)showSelectViewWithTitles:(NSArray *)titles headerView:(UIView *)headerView selectCompletion:(void (^)(NSInteger, NSString * _Nonnull))selectCompletion cancelClick:(void (^)(void))cancelClick {
+    HXPhotoBottomSelectView *selectView = [[HXPhotoBottomSelectView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    selectView.adaptiveDarkness = NO;
+    selectView.headerView = headerView;
+    selectView.titles = titles;
+    selectView.selectCompletion = selectCompletion;
+    selectView.cancelClick = cancelClick;
+    [[UIApplication sharedApplication].keyWindow addSubview:selectView];
+    [selectView showView];
+    return selectView;
+}
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -54,6 +65,10 @@
     _titles = titles;
     [self changeColor];
     [self recalculateHeight];
+}
+- (void)setHeaderView:(UIView *)headerView {
+    _headerView = headerView;
+    self.tableView.tableHeaderView = headerView;
 }
 - (void)setCancelTitle:(NSString *)cancelTitle {
     _cancelTitle = cancelTitle;
@@ -116,6 +131,7 @@
 - (UIButton *)cancelBtn {
     if (!_cancelBtn) {
         _cancelBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+        [_cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"取消"] forState:UIControlStateNormal];
         _cancelBtn.titleLabel.font = [UIFont hx_helveticaNeueOfSize:17];;
         [_cancelBtn addTarget:self action:@selector(didCancelBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
