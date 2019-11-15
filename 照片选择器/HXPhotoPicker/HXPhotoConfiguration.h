@@ -53,6 +53,9 @@ HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
 
+/// 相机聚焦框颜色
+@property (strong, nonatomic) UIColor *cameraFocusBoxColor;
+
 /// 选择视频时超出限制时长是否自动跳转编辑界面
 /// 视频可以编辑时有效
 @property (assign, nonatomic) BOOL selectVideoBeyondTheLimitTimeAutoEdit;

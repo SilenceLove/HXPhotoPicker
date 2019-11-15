@@ -19,6 +19,7 @@
 #import "HXPhotoViewController.h"
 #import "HXPhotoBottomSelectView.h"
 
+
 @interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
@@ -79,6 +80,12 @@
 }
 + (instancetype)photoManager:(HXPhotoManager *)manager scrollDirection:(UICollectionViewScrollDirection)scrollDirection {
     return [[self alloc] initWithManager:manager scrollDirection:scrollDirection];
+}
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+        [self setup];
+    }
+    return self;
 }
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager {
     return [self initWithFrame:frame manager:manager scrollDirection:UICollectionViewScrollDirectionVertical];
@@ -954,7 +961,9 @@
     if (dataCount == 1) {
         UIEdgeInsets insets = self.collectionView.contentInset;
         CGFloat itemW = (width - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
-        if ((int)height != (int)itemW) {
+        CGFloat roundH = roundf(height);
+        CGFloat roundW = roundf(itemW);
+        if (roundH != roundW) {
             self.hx_h = itemW;
         }
     }

@@ -36,7 +36,16 @@ static id instance;
     }
     return instance;
 }
-
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        NSData *imageData = [[NSUserDefaults standardUserDefaults] objectForKey:HXCameraImageKey];
+        if (imageData) {
+            self.cameraImage = [NSKeyedUnarchiver unarchiveObjectWithData:imageData];
+        }
+    }
+    return self;
+}
 - (BOOL)isDark {
     if (self.photoStyle == HXPhotoStyleDark) {
         return YES;
@@ -49,6 +58,15 @@ static id instance;
     }
 #endif
     return NO;
+}
+- (void)saveCamerImage {
+    if (self.cameraImage) {
+        NSData *imageData = [NSKeyedArchiver archivedDataWithRootObject:self.cameraImage];
+        [[NSUserDefaults standardUserDefaults] setObject:imageData forKey:HXCameraImageKey];
+    }
+}
+- (void)setCameraImage:(UIImage *)cameraImage {
+    _cameraImage = cameraImage;
 }
 
 + (void)deallocPhotoCommon {

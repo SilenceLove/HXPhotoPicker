@@ -277,7 +277,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /// 重新设置需要调用 refreshView 刷新界面
 @property (nonatomic) UICollectionViewScrollDirection scrollDirection;
 /**  是否把相机功能放在外面 默认NO  */
-@property (assign, nonatomic) BOOL outerCamera;
+@property (assign, nonatomic) IBInspectable BOOL outerCamera;
 /** 每行个数 默认 3
  *  cell的宽高取决于 每行个数 与 HXPhotoView 的宽度 和 item间距
  *  cell.width = (view.width - (lineCount - 1) * spacing - contentInset.left - contentInset.right) / lineCount

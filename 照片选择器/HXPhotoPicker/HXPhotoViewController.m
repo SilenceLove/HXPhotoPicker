@@ -129,10 +129,7 @@ HXVideoEditViewControllerDelegate
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if (self.manager.configuration.cameraCellShowPreview && !self.cameraCell.startSession) {
-        [self.cameraCell starRunning];
-        self.cameraCell.stopRunningComplete = ^(UIView *tempCameraPreviewView) {
-            [HXPhotoCommon photoCommon].tempCameraPreviewView = tempCameraPreviewView;
-        };
+        [self.cameraCell starRunning]; 
     }
 }
 - (void)changeStatusBarStyle {
@@ -762,8 +759,7 @@ HXVideoEditViewControllerDelegate
     if (model.type == HXPhotoModelMediaTypeCamera) {
         HXPhotoCameraViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DateCameraCellId" forIndexPath:indexPath];
         cell.model = model;
-        cell.tempCameraView = [HXPhotoCommon photoCommon].tempCameraView;
-        cell.tempCameraPreviewView = [HXPhotoCommon photoCommon].tempCameraPreviewView;
+        cell.cameraImage = [HXPhotoCommon photoCommon].cameraImage;
         if (!self.cameraCell) {
             self.cameraCell = cell;
         }
@@ -867,10 +863,6 @@ HXVideoEditViewControllerDelegate
                         return;
                     }
                     HXPhotoCameraViewCell *cameraCell = (HXPhotoCameraViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
-                    if (cameraCell.session &&
-                        ![HXPhotoCommon photoCommon].tempCameraView) {
-                        [HXPhotoCommon photoCommon].tempCameraView = [cameraCell.previewView snapshotViewAfterScreenUpdates:YES];
-                    }
                     HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
                     vc.delegate = weakSelf;
                     vc.manager = weakSelf.manager;
@@ -1165,19 +1157,6 @@ HXVideoEditViewControllerDelegate
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [selectBtn.layer addAnimation:anim forKey:@""];
     }
-    UIColor *cellSelectedBgColor;
-    if ([HXPhotoCommon photoCommon].isDark) {
-        cellSelectedBgColor = self.manager.configuration.cellDarkSelectBgColor;
-    }else {
-        cellSelectedBgColor = self.manager.configuration.cellSelectedBgColor;
-    }
-    UIColor *bgColor;
-    if (cellSelectedBgColor) {
-        bgColor = cellSelectedBgColor;
-    }else {
-        bgColor = self.manager.configuration.themeColor;
-    }
-    selectBtn.backgroundColor = selectBtn.selected ? bgColor : nil;
     
     NSMutableArray *indexPathList = [NSMutableArray array];
     if (!selectBtn.selected) {
@@ -1698,13 +1677,15 @@ HXVideoEditViewControllerDelegate
     return _dateArray;
 }
 @end
-@interface HXPhotoCameraViewCell ()
+@interface HXPhotoCameraViewCell ()<AVCaptureVideoDataOutputSampleBufferDelegate>
 @property (strong, nonatomic) UIButton *cameraBtn;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
 @property (strong, nonatomic) UIVisualEffectView *effectView;
 @property (strong, nonatomic) UIView *previewView;
+@property (strong, nonatomic) UIImageView *tempCameraView;
+@property (strong, nonatomic) AVCaptureVideoDataOutput *captureDataOutput;
 @end
-
+    
 @implementation HXPhotoCameraViewCell
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
@@ -1735,8 +1716,8 @@ HXVideoEditViewControllerDelegate
         self.cameraBtn.selected = YES;
     }
 }
-- (void)setTempCameraPreviewView:(UIView *)tempCameraPreviewView {
-    _tempCameraPreviewView = tempCameraPreviewView;
+- (void)setCameraImage:(UIImage *)cameraImage {
+    _cameraImage = cameraImage;
     if (self.startSession) return;
     if (![UIImagePickerController isSourceTypeAvailable:
           UIImagePickerControllerSourceTypeCamera]) {
@@ -1745,10 +1726,11 @@ HXVideoEditViewControllerDelegate
     if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] != AVAuthorizationStatusAuthorized) {
         return;
     }
-    if (self.tempCameraPreviewView) {
-        self.cameraBtn.selected = YES;
-        [self.previewView addSubview:self.tempCameraPreviewView];
+    if (cameraImage) {
+        self.tempCameraView.image = cameraImage;
+        [self.previewView addSubview:self.tempCameraView];
         [self.previewView addSubview:self.effectView];
+        self.cameraBtn.selected = YES;
     }
 }
 - (void)starRunning {
@@ -1773,21 +1755,17 @@ HXVideoEditViewControllerDelegate
                                 weakSelf.previewLayer.frame = weakSelf.bounds;
                                 [weakSelf.previewView.layer insertSublayer:weakSelf.previewLayer atIndex:0];
                                 weakSelf.cameraBtn.selected = YES;
-                                if (weakSelf.tempCameraPreviewView) {
+                                if (weakSelf.tempCameraView.image) {
                                     [UIView animateWithDuration:0.2 animations:^{
-                                        weakSelf.tempCameraPreviewView.alpha = 0;
+                                        weakSelf.tempCameraView.alpha = 0;
                                         weakSelf.effectView.effect = nil;
                                     } completion:^(BOOL finished) {
-                                        [weakSelf.tempCameraPreviewView removeFromSuperview];
+                                        [weakSelf.tempCameraView removeFromSuperview];
                                         [weakSelf.effectView removeFromSuperview];
                                     }];
                                 }
-                                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                                    if (weakSelf.stopRunningComplete) {
-                                        weakSelf.stopRunningComplete([weakSelf.previewView snapshotViewAfterScreenUpdates:YES]);
-                                    }
-                                });
                             });
+
                         }
                     }];
                 });
@@ -1796,12 +1774,15 @@ HXVideoEditViewControllerDelegate
     }];
 }
 - (void)setupSeestion:(AVCaptureSession *)session startSessionCompletion:(void (^)(BOOL success))completion {
-    session.sessionPreset = AVCaptureSessionPreset1280x720;
+    session.sessionPreset = AVCaptureSessionPresetMedium;
     AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:nil];
     if (videoInput) {
         if ([session canAddInput:videoInput]) {
             [session addInput:videoInput];
+        }
+        if (HXGetCameraContentInRealTime && [session canAddOutput:self.captureDataOutput]) {
+            [session addOutput:self.captureDataOutput];
         }
     }else {
         if (completion) {
@@ -1832,9 +1813,64 @@ HXVideoEditViewControllerDelegate
         if (session.isRunning) {
             [session stopRunning];
         }
+        for (AVCaptureInput *input in session.inputs) {
+            [session removeInput:input];
+        }
+        for (AVCaptureOutput *output in session.outputs) {
+            [session removeOutput:output];
+        }
     });
+    if (HXGetCameraContentInRealTime) {
+        [self.captureDataOutput setSampleBufferDelegate:nil queue:NULL];
+        self.captureDataOutput = nil;
+    }
+    
     self.session = nil;
     self.cameraBtn.selected = NO;
+}
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+
+    UIImage *image = [self imageFromSampleBuffer:sampleBuffer];
+    image = [image hx_rotationImage:UIImageOrientationRight];
+    [HXPhotoCommon photoCommon].cameraImage = image;
+}
+- (UIImage *) imageFromSampleBuffer:(CMSampleBufferRef) sampleBuffer {
+    // Get a CMSampleBuffer's Core Video image buffer for the media data
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // Lock the base address of the pixel buffer
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+
+    // Get the number of bytes per row for the pixel buffer
+    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+
+    // Get the number of bytes per row for the pixel buffer
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    // Get the pixel buffer width and height
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+
+    // Create a device-dependent RGB color space
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+
+    // Create a bitmap graphics context with the sample buffer data
+    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8,
+                                             bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    // Create a Quartz image from the pixel data in the bitmap graphics context
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    // Unlock the pixel buffer
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+
+    // Free up the context and color space
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+
+    // Create an image object from the Quartz image
+    UIImage *image = [UIImage imageWithCGImage:quartzImage];
+
+    // Release the Quartz image
+    CGImageRelease(quartzImage);
+
+    return (image);
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
@@ -1853,11 +1889,24 @@ HXVideoEditViewControllerDelegate
     self.previewView.frame = self.bounds;
     self.previewLayer.frame = self.bounds;
     self.effectView.frame = self.bounds;
-    self.tempCameraPreviewView.frame = self.bounds;
+    self.tempCameraView.frame = self.bounds;
 }
 - (void)dealloc {
     [self stopRunning];
     if (HXShowLog) NSSLog(@"camera - dealloc");
+}
+- (AVCaptureVideoDataOutput *)captureDataOutput {
+    if (!_captureDataOutput) {
+        _captureDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+        _captureDataOutput.alwaysDiscardsLateVideoFrames = YES;
+        dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
+        [_captureDataOutput setSampleBufferDelegate:self queue:queue];
+        NSString* formatKey = (NSString*)kCVPixelBufferPixelFormatTypeKey;
+        NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
+        NSDictionary* videoSettings = [NSDictionary dictionaryWithObject:value forKey:formatKey];
+        [_captureDataOutput setVideoSettings:videoSettings];
+    }
+    return _captureDataOutput;
 }
 - (UIButton *)cameraBtn {
     if (!_cameraBtn) {
@@ -1878,6 +1927,14 @@ HXVideoEditViewControllerDelegate
         _previewView = [[UIView alloc] init];
     }
     return _previewView;
+}
+- (UIImageView *)tempCameraView {
+    if (!_tempCameraView) {
+        _tempCameraView = [[UIImageView alloc] init];
+        _tempCameraView.contentMode = UIViewContentModeScaleAspectFill;
+        _tempCameraView.clipsToBounds = YES;
+    }
+    return _tempCameraView;
 }
 @end
 @interface HXPhotoViewCell ()
@@ -1925,7 +1982,7 @@ HXVideoEditViewControllerDelegate
             }else {
                 [self.selectBtn setTitleColor:cellSelectedTitleColor forState:UIControlStateSelected];
             }
-            self.selectBtn.backgroundColor = self.model.selected ? cellSelectedBgColor : nil;
+            self.selectBtn.tintColor = cellSelectedBgColor;
         }
     }
 #endif
@@ -2045,7 +2102,6 @@ HXVideoEditViewControllerDelegate
     self.selectMaskLayer.hidden = !model.selected;
     self.selectBtn.selected = model.selected;
     [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
-    self.selectBtn.backgroundColor = model.selected ? ([HXPhotoCommon photoCommon].isDark ? self.darkSelectBgColor : self.selectBgColor) :nil;
     
     self.iCloudIcon.hidden = !model.isICloud;
     self.iCloudMaskLayer.hidden = !model.isICloud;
@@ -2090,6 +2146,7 @@ HXVideoEditViewControllerDelegate
     if ([HXPhotoCommon photoCommon].isDark) {
         selectBgColor = self.darkSelectBgColor;
     }
+    self.selectBtn.tintColor = selectBgColor;
     if ([selectBgColor isEqual:[UIColor whiteColor]] && !self.selectedTitleColor) {
         [self.selectBtn setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
     }
@@ -2228,7 +2285,9 @@ HXVideoEditViewControllerDelegate
     self.maskView.frame = self.bounds;
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
-    self.selectBtn.frame = CGRectMake(self.hx_w - 27, 2, 25, 25);
+    self.selectBtn.hx_size = CGSizeMake(30, 30);
+    self.selectBtn.hx_x = self.hx_w - self.selectBtn.hx_w;
+    self.selectBtn.hx_y = 0;
     self.selectMaskLayer.frame = self.bounds;
     self.iCloudMaskLayer.frame = self.bounds;
     self.iCloudIcon.hx_x = self.hx_w - 3 - self.iCloudIcon.hx_w;
@@ -2347,13 +2406,13 @@ HXVideoEditViewControllerDelegate
     if (!_selectBtn) {
         _selectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_selectBtn setBackgroundImage:[UIImage hx_imageNamed:@"hx_compose_guide_check_box_default"] forState:UIControlStateNormal];
-        [_selectBtn setBackgroundImage:[[UIImage alloc] init] forState:UIControlStateSelected];
+        UIImage *bgImage = [[UIImage hx_imageNamed:@"hx_compose_guide_check_box_selected"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        [_selectBtn setBackgroundImage:bgImage forState:UIControlStateSelected];
         [_selectBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-        _selectBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        _selectBtn.titleLabel.font = [UIFont systemFontOfSize:15];
         _selectBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
         [_selectBtn setEnlargeEdgeWithTop:0 right:0 bottom:15 left:15];
-        _selectBtn.layer.cornerRadius = 25 / 2;
     }
     return _selectBtn;
 }

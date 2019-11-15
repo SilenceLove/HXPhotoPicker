@@ -19,12 +19,11 @@ NS_ASSUME_NONNULL_BEGIN
 */
 @property (assign, nonatomic) HXPhotoStyle photoStyle;
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
-@property (strong, nonatomic) UIView *tempCameraPreviewView;
-@property (strong, nonatomic) UIView *tempCameraView;
+@property (strong, nonatomic) UIImage *cameraImage;
 
 + (instancetype)photoCommon;
 + (void)deallocPhotoCommon;
-
+- (void)saveCamerImage;
 - (BOOL)isDark;
 @end
 

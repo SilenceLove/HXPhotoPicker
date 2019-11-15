@@ -43,7 +43,8 @@
     [manager.cache getImageDataForKey:[manager cacheKeyForURL:model.networkPhotoUrl] withBlock:^(NSData * _Nullable imageData) {
         if (imageData) {
             if (!original) model.loadOriginalImage = YES;
-            weakSelf.image = [UIImage imageWithData:imageData];
+            UIImage *image = [manager.cache getImageForKey:[manager cacheKeyForURL:model.networkPhotoUrl] withType:YYImageCacheTypeAll];
+            weakSelf.image = image;
             model.networkImageSize = imageData.length;
             model.imageSize = weakSelf.image.size;
             model.thumbPhoto = weakSelf.image;
@@ -55,7 +56,7 @@
             }
         }else {
             NSURL *url = original ? model.networkPhotoUrl : model.networkThumbURL;
-            [self yy_setImageWithURL:url placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+            [weakSelf yy_setImageWithURL:url placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
                 model.receivedSize = receivedSize;
                 model.expectedSize = expectedSize;
                 model.networkImageSize = expectedSize;

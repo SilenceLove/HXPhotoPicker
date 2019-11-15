@@ -109,6 +109,13 @@
     self.navBarTranslucent = YES;
     self.bottomViewTranslucent = YES;
     self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
+    
+}
+- (UIColor *)cameraFocusBoxColor {
+    if (!_cameraFocusBoxColor) {
+        _cameraFocusBoxColor = [UIColor colorWithRed:0 green:0.47843137254901963 blue:1 alpha:1];
+    }
+    return _cameraFocusBoxColor;
 }
 - (void)setPhotoStyle:(HXPhotoStyle)photoStyle {
     _photoStyle = photoStyle;

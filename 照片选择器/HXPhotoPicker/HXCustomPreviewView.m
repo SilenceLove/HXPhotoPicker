@@ -7,10 +7,11 @@
 //
 
 #import "HXCustomPreviewView.h"
-#define BOX_BOUNDS CGRectMake(0.0f, 0.0f, 150, 150.0f)
+#import "UIImage+HXExtension.h"
+#define BOX_BOUNDS CGRectMake(0.0f, 0.0f, 100, 100)
 
-@interface HXCustomPreviewView ()<UIGestureRecognizerDelegate>
-@property (strong, nonatomic) UIView *focusBox;
+@interface HXCustomPreviewView ()<UIGestureRecognizerDelegate, CAAnimationDelegate>
+@property (strong, nonatomic) UIImageView *focusBox;
 @property (strong, nonatomic) UITapGestureRecognizer *singleTapRecognizer;
 @property (strong, nonatomic) UIPinchGestureRecognizer *pinch;
 @property (strong, nonatomic) UISwipeGestureRecognizer *leftSwipe;
@@ -48,8 +49,14 @@
     
     [self addGestureRecognizer:_singleTapRecognizer];
     
-    _focusBox = [self viewWithColor:[UIColor colorWithRed:0.102 green:0.636 blue:1.000 alpha:1.000]];
+    _focusBox = [[UIImageView alloc] initWithFrame:BOX_BOUNDS];
+    _focusBox.hidden = YES;
+    _focusBox.image = [[UIImage hx_imageNamed:@"hx_camera_focusbox"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self addSubview:_focusBox];
+}
+- (void)setThemeColor:(UIColor *)themeColor {
+    _themeColor = themeColor;
+    self.focusBox.tintColor = themeColor;
 }
 - (UISwipeGestureRecognizer *)leftSwipe {
     if (!_leftSwipe) {
@@ -116,21 +123,46 @@
 }
 
 - (void)runBoxAnimationOnView:(UIView *)view point:(CGPoint)point {
+    [view.layer removeAnimationForKey:@"boxAnimation"];
     view.center = point;
     view.hidden = NO;
     view.transform = CGAffineTransformIdentity;
     view.alpha = 1;
-    [UIView animateWithDuration:0.15f
-                          delay:0.0f
-                        options:UIViewAnimationOptionCurveEaseInOut
-                     animations:^{
-                         view.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1.0);
-                     }
-                     completion:^(BOOL complete) {
-                         [UIView animateWithDuration:0.5 animations:^{
-                             view.alpha = 0;
-                         }];
-                     }];
+    
+    
+    CAKeyframeAnimation *scaleAnim = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+    scaleAnim.duration = 1.0f;
+    scaleAnim.values = @[@(0.8),@(1.0),@(0.85),@(1.0),@(0.85),@(0.9),@(1.0)];
+    
+    
+    CAKeyframeAnimation *opacityAnim = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
+    opacityAnim.duration = 1.0f;
+    opacityAnim.values = @[@(0.6),@(1.0),@(0.6),@(1.0),@(0.6),@(0.9),@(0.7),@(0)];
+    
+    CAAnimationGroup *annimaGroup = [CAAnimationGroup animation];
+    annimaGroup.animations = @[scaleAnim, opacityAnim];
+    annimaGroup.duration = 1.0f;
+    annimaGroup.removedOnCompletion = NO;
+    annimaGroup.fillMode = kCAFillModeForwards;
+    annimaGroup.delegate = self;
+    [view.layer addAnimation:annimaGroup forKey:@"boxAnimation"];
+    
+//    [UIView animateWithDuration:0.15f
+//                          delay:0.0f
+//                        options:UIViewAnimationOptionCurveEaseInOut
+//                     animations:^{
+//                         view.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1.0);
+//                     }
+//                     completion:^(BOOL complete) {
+//                         [UIView animateWithDuration:0.5 animations:^{
+//                             view.alpha = 0;
+//                         }];
+//                     }];
+}
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
+    if (flag) {
+        self.focusBox.hidden = YES;
+    }
 }
 - (void)setTapToFocusEnabled:(BOOL)enabled {
     _tapToFocusEnabled = enabled;
@@ -150,15 +182,6 @@
     self.previewLayer.frame = self.bounds;
     [self.layer insertSublayer:self.previewLayer atIndex:0];
 }
-- (UIView *)viewWithColor:(UIColor *)color {
-    UIView *view = [[UIView alloc] initWithFrame:BOX_BOUNDS];
-    view.backgroundColor = [UIColor clearColor];
-    view.layer.borderColor = color.CGColor;
-    view.layer.borderWidth = 5.0f;
-    view.hidden = YES;
-    return view;
-} 
-
 
 - (AVCaptureSession *)session {
     return self.previewLayer.session;

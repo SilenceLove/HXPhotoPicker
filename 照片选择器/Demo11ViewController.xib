@@ -15,6 +15,9 @@
                 <outlet property="photoView2HeightConstraint" destination="5Gx-uc-GzT" id="GRy-K7-Zxj"/>
                 <outlet property="photoView3" destination="hlk-6g-HBV" id="i0y-mt-7zH"/>
                 <outlet property="photoView3HeightConstraint" destination="bf5-IP-RwT" id="HTA-H4-p5a"/>
+                <outlet property="placeTopConstraint" destination="YjE-Eo-PPr" id="9rS-Q1-f1i"/>
+                <outlet property="placeView" destination="R7y-lU-GKg" id="g7Q-bQ-qvo"/>
+                <outlet property="scrollView" destination="ZJW-EU-ulb" id="uKp-Y3-4yU"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -23,26 +26,33 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
             <subviews>
-                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZJW-EU-ulb">
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZJW-EU-ulb">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Uiy-5h-30Y" customClass="HXPhotoView">
                             <rect key="frame" x="12" y="20" width="351" height="80"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="80" id="b8z-tw-98y"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n9d-Hr-pGc" customClass="HXPhotoView">
                             <rect key="frame" x="12" y="120" width="351" height="80"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="80" id="5Gx-uc-GzT"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hlk-6g-HBV" customClass="HXPhotoView">
                             <rect key="frame" x="12" y="220" width="351" height="80"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="80" id="bf5-IP-RwT"/>
                             </constraints>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="outerCamera" value="YES"/>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="previewShowDeleteButton" value="YES"/>
+                            </userDefinedRuntimeAttributes>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="占位" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R7y-lU-GKg">
                             <rect key="frame" x="12" y="320" width="351" height="30"/>
@@ -80,7 +90,7 @@
                 <constraint firstItem="ZJW-EU-ulb" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="PiO-OH-ARw"/>
                 <constraint firstAttribute="bottom" secondItem="ZJW-EU-ulb" secondAttribute="bottom" id="bKu-rQ-0bW"/>
             </constraints>
-            <point key="canvasLocation" x="24.5" y="51.5"/>
+            <point key="canvasLocation" x="-1543" y="-330"/>
         </view>
     </objects>
 </document>

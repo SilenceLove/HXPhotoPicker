@@ -2111,6 +2111,8 @@
     self.endSelectedVideos = nil;
     self.selectedAssetList = nil;
     self.tempSelectedModelList = nil;
+    
+    [[HXPhotoCommon photoCommon] saveCamerImage];
     if (HXShowLog) NSSLog(@"dealloc");
 }
 @end

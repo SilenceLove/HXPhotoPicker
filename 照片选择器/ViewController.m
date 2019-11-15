@@ -114,7 +114,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                          subTitle:@"保存草稿功能"
                                 viewControllClass: [Demo10ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo11"
-                                         subTitle:@"xib上使用HXPhotoView"
+                                         subTitle:@"Xib和Masonry混合使用HXPhotoView"
                                 viewControllClass: [Demo11ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo12"
                                          subTitle:@"混合添加资源"

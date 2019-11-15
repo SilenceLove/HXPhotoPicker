@@ -20,7 +20,7 @@
 @interface HXCustomPreviewView : UIView
 @property (strong, nonatomic) AVCaptureSession *session;
 @property (weak, nonatomic) id<HXCustomPreviewViewDelegate> delegate;
-
+@property (strong, nonatomic) UIColor *themeColor;
 @property (nonatomic, assign) CGFloat beginGestureScale;
 @property (nonatomic, assign) CGFloat effectiveScale;
 @property (nonatomic, assign) CGFloat maxScale;

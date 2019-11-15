@@ -20,9 +20,13 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.3.7"
+#define HXVersion @"2.3.8"
+
+#define HXGetCameraContentInRealTime 1
 
 #define HXEncodeKey @"HXModelArray"
+
+#define HXCameraImageKey @"HXCameraImageKey"
 
 #define HXShowLog YES
 

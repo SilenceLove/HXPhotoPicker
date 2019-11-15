@@ -20,6 +20,7 @@
 @interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraBottomViewDelegate,HXCustomCameraControllerDelegate, CLLocationManagerDelegate>
 @property (strong, nonatomic) HXCustomCameraController *cameraController;
 @property (strong, nonatomic) HXCustomPreviewView *previewView;
+@property (strong, nonatomic) UIImageView *previewImageView;
 @property (strong, nonatomic) CAGradientLayer *topMaskLayer;
 @property (strong, nonatomic) UIView *topView;
 @property (strong, nonatomic) UIButton *cancelBtn;
@@ -69,16 +70,16 @@
     }else if (self.manager.configuration.videoMaximumDuration < 3.f) {
         self.manager.configuration.videoMaximumDuration = 4.f;
     }
-    
+    self.previewView.themeColor = self.manager.configuration.cameraFocusBoxColor;
     [self.view addSubview:self.previewView];
     self.cameraController = [[HXCustomCameraController alloc] init];
     self.cameraController.defaultFrontCamera = self.manager.configuration.defaultFrontCamera;
     self.cameraController.sessionPreset = self.manager.configuration.sessionPreset;
     self.cameraController.videoCodecKey = self.manager.configuration.videoCodecKey;
     self.cameraController.delegate = self;
-    if ([HXPhotoCommon photoCommon].tempCameraView) {
-        [HXPhotoCommon photoCommon].tempCameraView.frame = self.previewView.bounds;
-        [self.previewView addSubview:[HXPhotoCommon photoCommon].tempCameraView];
+    if ([HXPhotoCommon photoCommon].cameraImage) {
+        self.previewImageView.image = [HXPhotoCommon photoCommon].cameraImage;
+        [self.previewView addSubview:self.previewImageView];
         [self.previewView addSubview:self.effectView];
     }
     
@@ -159,13 +160,13 @@
     }
     
     self.bottomView.userInteractionEnabled = YES;
-    if ([HXPhotoCommon photoCommon].tempCameraView) {
+    if (_previewImageView) {
             [UIView animateWithDuration:0.2 animations:^{
-                [HXPhotoCommon photoCommon].tempCameraView.alpha = 0;
+                self.previewImageView.alpha = 0;
                 self.effectView.effect = nil;
             } completion:^(BOOL finished) {
                 [self.effectView removeFromSuperview];
-                [[HXPhotoCommon photoCommon].tempCameraView removeFromSuperview];
+                [self.previewImageView removeFromSuperview];
             }];
     }
     
@@ -281,7 +282,6 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [self stopTimer];
-    [HXPhotoCommon photoCommon].tempCameraView = [self.previewView snapshotViewAfterScreenUpdates:YES];
     [self.cameraController stopSession];
 } 
 - (void)dealloc {
@@ -582,6 +582,15 @@
         }
     }
     return _previewView;
+}
+- (UIImageView *)previewImageView {
+    if (!_previewImageView) {
+        _previewImageView = [[UIImageView alloc] init];
+        _previewImageView.frame = self.previewView.bounds;
+        _previewImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _previewImageView.clipsToBounds = YES;
+    }
+    return _previewImageView;
 }
 - (UIView *)topView {
     if (!_topView) {

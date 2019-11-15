@@ -22,5 +22,5 @@
 - (UIImage *)hx_fullNormalizedImage;
 - (UIImage *)hx_clipLeftOrRightImage:(CGFloat)scale;
 - (UIImage *)hx_rotationImage:(UIImageOrientation)orient;
-
++ (UIImage *)hx_imageWithColor:(UIColor *)color havingSize:(CGSize)size;
 @end

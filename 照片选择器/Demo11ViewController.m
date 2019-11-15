@@ -8,8 +8,10 @@
 
 #import "Demo11ViewController.h"
 #import "HXPhotoPicker.h"
+#import "Masonry.h"
 
 @interface Demo11ViewController ()<HXPhotoViewDelegate>
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet HXPhotoView *photoView1;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *photoView1HeightConstraint;
 
@@ -18,6 +20,11 @@
 
 @property (weak, nonatomic) IBOutlet HXPhotoView *photoView3;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *photoView3HeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *placeTopConstraint;
+
+@property (weak, nonatomic) IBOutlet UILabel *placeView;
+
+@property (strong, nonatomic) HXPhotoView *masonryPhotoView;
 @end
 
 @implementation Demo11ViewController
@@ -77,6 +84,20 @@
     self.photoView2.lineCount = 4;
     self.photoView3.delegate = self;
     self.photoView3.lineCount = 3;
+    
+    self.masonryPhotoView = [HXPhotoView photoManager:[[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo]];
+    self.masonryPhotoView.delegate = self;
+    [self.scrollView addSubview:self.masonryPhotoView];
+    [self.masonryPhotoView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(self.photoView3.mas_bottom).mas_offset(15);
+        make.left.mas_equalTo(self.scrollView).mas_offset(12);
+        make.right.mas_equalTo(self.scrollView).mas_offset(-12);
+        make.height.mas_equalTo(0);
+    }];
+    
+    [self.scrollView removeConstraint:self.placeTopConstraint];
+    NSLayoutConstraint *topCons = [NSLayoutConstraint constraintWithItem:self.placeView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.masonryPhotoView attribute:NSLayoutAttributeBottom multiplier:1 constant:15];
+    [self.scrollView addConstraint:topCons];
 }
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame {
     if (photoView == self.photoView1) {
@@ -92,6 +113,13 @@
     }else if (photoView == self.photoView3) {
         [UIView animateWithDuration:0.25 animations:^{
             self.photoView3HeightConstraint.constant = frame.size.height;
+            [self.view layoutIfNeeded];
+        }];
+    }else if (photoView == self.masonryPhotoView) {
+        [UIView animateWithDuration:0.25 animations:^{
+            [self.masonryPhotoView mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.height.mas_equalTo(frame.size.height);
+            }];
             [self.view layoutIfNeeded];
         }];
     }

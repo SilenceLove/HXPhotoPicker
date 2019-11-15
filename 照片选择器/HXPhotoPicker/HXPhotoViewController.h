@@ -92,11 +92,9 @@ HXAlbumListViewController;
 @interface HXPhotoCameraViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (nonatomic, strong) AVCaptureSession *session;
-@property (strong, nonatomic, readonly) UIView *previewView;
-@property (strong, nonatomic) UIView *tempCameraPreviewView;
-@property (strong, nonatomic) UIView *tempCameraView;
+@property (strong, nonatomic, readonly) UIView *previewView; 
+@property (strong, nonatomic) UIImage *cameraImage;
 @property (assign, nonatomic) BOOL startSession;
-@property (copy, nonatomic) void (^ stopRunningComplete)(UIView *tempCameraPreviewView);
 - (void)starRunning;
 - (void)stopRunning;
 @end
