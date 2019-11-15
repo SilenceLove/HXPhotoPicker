@@ -963,7 +963,8 @@
         CGFloat itemW = (width - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
         CGFloat roundH = roundf(height);
         CGFloat roundW = roundf(itemW);
-        if (roundH != roundW) {
+        
+        if (roundH != roundW && fabs(height - itemW) >= 2) {
             self.hx_h = itemW;
         }
     }
