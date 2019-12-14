@@ -13,6 +13,39 @@
 @end
 
 @implementation HXCustomAssetModel
+
++ (instancetype)assetWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration selected:(BOOL)selected {
+    return [[self alloc] initNetworkVideoWithURL:videoURL videoCoverURL:videoCoverURL videoDuration:videoDuration selected:selected];
+}
+
+- (instancetype)initNetworkVideoWithURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration selected:(BOOL)selected {
+    self = [super init];
+    if (self) {
+        self.type = HXCustomAssetModelTypeNetWorkVideo;
+        self.networkVideoURL = videoURL;
+        self.networkImageURL = videoCoverURL;
+        self.networkThumbURL = videoCoverURL;
+        self.videoDuration = videoDuration;
+        self.selected = selected;
+    }
+    return self;
+}
+
++ (instancetype)livePhotoAssetWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected {
+    return [[self alloc] initLivePhotoWithLocalImage:image localVideoURL:videoURL selected:selected];
+}
+
+- (instancetype)initLivePhotoWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected {
+    self = [super init];
+    if (self) {
+        self.type = HXCustomAssetModelTypeLivePhoto;
+        self.localVideoURL = videoURL;
+        self.localImage = image;
+        self.selected = selected;
+    }
+    return self;
+}
+
 + (instancetype)assetWithLocaImageName:(NSString *)imageName selected:(BOOL)selected {
     return [[self alloc] initAssetWithLocaImageName:imageName selected:selected];
 }

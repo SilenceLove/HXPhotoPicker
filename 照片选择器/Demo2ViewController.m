@@ -17,7 +17,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXPhotoView *photoView;
 @property (strong, nonatomic) UIScrollView *scrollView;
-@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 
 @property (strong, nonatomic) UIButton *bottomView;
 
@@ -76,18 +75,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _bottomView.alpha = 0;
     }
     return _bottomView;
-}
-- (HXDatePhotoToolManager *)toolManager {
-    if (!_toolManager) {
-        _toolManager = [[HXDatePhotoToolManager alloc] init];
-    }
-    return _toolManager;
-}
-
+} 
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        _manager.configuration.openCamera = YES;
+//        _manager.configuration.openCamera = NO;
         // 暗黑风格
 //        _manager.configuration.photoStyle = HXPhotoStyleDark;
 //        _manager.configuration.showOriginalBytesLoading = YES;

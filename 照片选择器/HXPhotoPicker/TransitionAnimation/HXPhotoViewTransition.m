@@ -43,7 +43,15 @@
     HXPhotoPreviewViewController *toVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [toVC.modelArray objectAtIndex:toVC.currentModelIndex];
     HXWeakSelf
-    [model requestPreviewImageWithSize:CGSizeMake(model.endImageSize.width * 0.8, model.endImageSize.height * 0.8) startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+    CGFloat width = model.endImageSize.width;
+    CGFloat height = model.endImageSize.height;
+    if (width > HX_ScreenWidth) {
+        width = HX_ScreenWidth;
+    }
+    if (height > HX_ScreenHeight) {
+        height = HX_ScreenHeight;
+    }
+    [model requestPreviewImageWithSize:CGSizeMake(width * 0.8, height * 0.8) startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
         [weakSelf pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
     } failed:^(NSDictionary *info, HXPhotoModel *model) {
         [weakSelf pushAnim:transitionContext image:model.thumbPhoto model:model fromVC:fromVC toVC:toVC];
@@ -81,17 +89,20 @@
     toVC.view.backgroundColor = [UIColor clearColor];
     toVC.bottomView.alpha = 0;
     fromCell.hidden = YES;
-    // 弹簧动画，参数分别为：时长，延时，弹性（越小弹性越大），初始速度
+    
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
-    UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
+    UIViewAnimationOptions option = UIViewAnimationOptionLayoutSubviews;
     
     [UIView animateWithDuration:0.2 animations:^{
         tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:1] : [[UIColor whiteColor] colorWithAlphaComponent:1];
     }];
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
-//        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2 + hxTopMargin, imgWidht, imgHeight);
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
+        if (imgHeight < height) {
+            tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
+        }else {
+            tempView.frame = CGRectMake(0, 0, imgWidht, imgHeight);
+        }
         toVC.bottomView.alpha = 1;
     } completion:^(BOOL finished) {
         fromCell.hidden = NO;
@@ -113,9 +124,9 @@
     HXPhotoViewCell *toCell = [toVC currentPreviewCell:model];
     UIImageView *tempView;
 #if HasYYKitOrWebImage
-    tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
+    tempView = [[UIImageView alloc] initWithImage:fromCell.previewContentView.image];
 #else
-    tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
+    tempView = [[UIImageView alloc] initWithImage:fromCell.previewContentView.image];
 #endif
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
@@ -143,19 +154,15 @@
     fromVC.collectionView.hidden = YES;
     toCell.hidden = YES;
     fromVC.view.backgroundColor = [UIColor clearColor];
-    
-#if HasYYKitOrWebImage
-    tempView.frame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
-#else
-    tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
-#endif
+     
+    tempView.frame = [fromCell.previewContentView convertRect:fromCell.previewContentView.bounds toView:containerView];
     
     CGRect rect = [toCell.imageView convertRect:toCell.imageView.bounds toView: containerView];
     if (toCell) {
         [toVC scrollToPoint:toCell rect:rect];
     }
     
-    UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
+    UIViewAnimationOptions option = UIViewAnimationOptionLayoutSubviews;
     
     [UIView animateWithDuration:0.2 animations:^{
         fromVC.view.backgroundColor = [UIColor clearColor];

@@ -53,12 +53,12 @@
     [self.centerView.layer addAnimation:scaleAnima forKey:@"centerScale"];
 }
 - (void)setProgress:(CGFloat)progress {
-    _progress = progress;
-    self.label.text = [NSString stringWithFormat:@"%d%%",(int)(progress * 100)];
     if (progress >= 1) {
         progress = 1;
-        [self animationComplete];
     }
+    _progress = progress;
+    self.label.text = [NSString stringWithFormat:@"%d%%",(int)(progress * 100)];
+    [self animationComplete];
 }
 - (void)animationComplete {
     self.label.text = nil;

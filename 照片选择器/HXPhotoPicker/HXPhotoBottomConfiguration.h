@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 预览按钮的状态，当状态改变时都会调用这个block
 /// .previewButtonStatus = ^(BOOL enabled) {
 ///     在回调里改变预览按钮状态
-///}
+/// }
 @property (copy, nonatomic) void (^ previewButtonStatus)(BOOL enabled);
 
 /// 编辑事件，点击编辑时调用这个block
@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 编辑按钮的状态，当状态改变时都会调用这个block
 /// .editButtonStatus = ^(BOOL enabled) {
 ///     在回调里改变编辑按钮状态
-///}
+/// }
 @property (copy, nonatomic) void (^ editButtonStatus)(BOOL enabled);
 
 /// 原图事件，点击原图按钮时调用这个block，传入是否选中状态
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// .doneButtonStatus = ^(BOOL enabled, NSInteger total, NSInteger selectCount) {
 ///     在回调里改变完成按钮状态
 ///     enabled->按钮状态，total->总数，selectCount->已选数量
-///}
+/// }
 @property (copy, nonatomic) void (^ doneButtonStatus)(BOOL enabled, NSInteger total, NSInteger selectCount);
 
 @end

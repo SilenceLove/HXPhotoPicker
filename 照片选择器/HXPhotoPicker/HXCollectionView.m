@@ -214,7 +214,7 @@
     
     NSArray *totalArray = [self findAllLastIndexPathInVisibleSection];
     //找到目标空白区域
-    CGRect rect;
+//    CGRect rect;
     _moveIndexPath = nil;
     
     NSMutableArray *sourceArray = nil;
@@ -240,7 +240,7 @@
         }
         
         if (CGRectContainsPoint(tempRect, _tempMoveCell.center)) {
-            rect = tempRect;
+//            rect = tempRect;
             _moveIndexPath = indexPath;
             break;
         }

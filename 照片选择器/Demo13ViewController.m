@@ -18,7 +18,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (strong, nonatomic) HXPhotoModel *beforePhotoModel;
 @property (strong, nonatomic) HXPhotoModel *beforeVideoModel;
 @property (assign, nonatomic) BOOL isOutside;
-@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 @end
 
 @implementation Demo13ViewController
@@ -56,12 +55,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     }
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-}
-- (HXDatePhotoToolManager *)toolManager {
-    if (!_toolManager) {
-        _toolManager = [[HXDatePhotoToolManager alloc] init];
-    }
-    return _toolManager;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -204,9 +197,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
                                 [viewController presentViewController:nav animated:NO completion:nil];
                             }
                         }else {
-                            [weakSelf.toolManager writeSelectModelListToTempPathWithList:@[beforeModel] requestType:1 success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
+                            [beforeModel exportVideoWithPresetName:@"" startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
                                 [viewController.view hx_handleLoading];
-                                NSURL *video = videoURL.firstObject;
+                                NSURL *video = videoURL;
                                 
                                 LFVideoEditingController *lfVideoEditVC = [[LFVideoEditingController alloc] init];
                                 lfVideoEditVC.delegate = weakSelf;
@@ -225,7 +218,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                                     [nav setNavigationBarHidden:YES];
                                     [viewController presentViewController:nav animated:NO completion:nil];
                                 }
-                            } failed:^{
+                            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
                                 [viewController.view hx_handleLoading];
                                 [viewController.view hx_showImageHUDText:@"资源获取失败!"];
                             }];

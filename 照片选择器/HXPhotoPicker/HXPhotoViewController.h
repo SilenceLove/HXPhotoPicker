@@ -36,10 +36,10 @@ HXAlbumListViewController;
  @param original 是否原图
  */
 - (void)photoViewController:(HXPhotoViewController *)photoViewController
-                 didDoneAllList:(NSArray<HXPhotoModel *> *)allList
-                         photos:(NSArray<HXPhotoModel *> *)photoList
-                         videos:(NSArray<HXPhotoModel *> *)videoList
-                       original:(BOOL)original;
+             didDoneAllList:(NSArray<HXPhotoModel *> *)allList
+                     photos:(NSArray<HXPhotoModel *> *)photoList
+                     videos:(NSArray<HXPhotoModel *> *)videoList
+                   original:(BOOL)original;
 
 /**
  改变了选择
@@ -48,7 +48,7 @@ HXAlbumListViewController;
  @param selected 是否选中
  */
 - (void)photoViewControllerDidChangeSelect:(HXPhotoModel *)model
-                                      selected:(BOOL)selected;
+                                  selected:(BOOL)selected;
 @end
 
 @interface HXPhotoViewController : UIViewController
@@ -97,6 +97,8 @@ HXAlbumListViewController;
 @property (assign, nonatomic) BOOL startSession;
 - (void)starRunning;
 - (void)stopRunning;
+- (void)addOutputDelegate;
+- (void)removeOutputDelegate;
 @end
 
 @interface HXPhotoViewSectionHeaderView : HXCustomCollectionReusableView

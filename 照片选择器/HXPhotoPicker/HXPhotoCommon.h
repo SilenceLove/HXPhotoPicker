@@ -9,17 +9,45 @@
 #import <Foundation/Foundation.h>
 #import "HXPhotoConfiguration.h"
 #import "HXPhotoModel.h"
+#if __has_include(<AFNetworking/AFNetworking.h>)
+#import <AFNetworking/AFNetworking.h>
+#elif __has_include("AFNetworking.h")
+#import "AFNetworking.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface HXPhotoCommon : NSObject
+typedef void (^ HXPhotoCommonGetUrlFileLengthSuccess)(NSUInteger length);
+typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 
-/**
-相册风格
-*/
+@interface HXPhotoCommon : NSObject
+@property (strong, nonatomic, nullable) NSBundle *languageBundle;
+/// 相册风格
 @property (assign, nonatomic) HXPhotoStyle photoStyle;
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
 @property (strong, nonatomic) UIImage *cameraImage;
+
+/// 预览视频时是否自动播放
+@property (assign, nonatomic) HXVideoAutoPlayType videoAutoPlayType;
+
+/// 预览视频时是否先下载视频再播放
+@property (assign, nonatomic) BOOL downloadNetworkVideo;
+
+@property (assign, nonatomic) BOOL isVCBasedStatusBarAppearance;
+
+@property (assign, nonatomic) BOOL isHapticTouch;
+
+@property (assign, nonatomic) AFNetworkReachabilityStatus netStatus;
+@property (copy, nonatomic) void (^ reachabilityStatusChangeBlock)(AFNetworkReachabilityStatus netStatus);
+
+- (void)getURLFileLengthWithURL:(NSURL *)url
+                        success:(HXPhotoCommonGetUrlFileLengthSuccess)success
+                        failure:(HXPhotoCommonGetUrlFileLengthFailure)failure;
+
+- (NSURLSessionDownloadTask * _Nullable)downloadVideoWithURL:(NSURL *)videoURL
+                                          progress:(void (^ _Nullable)(float progress, long long downloadLength, long long totleLength, NSURL * _Nullable videoURL))progress
+                                   downloadSuccess:(void (^ _Nullable)(NSURL * _Nullable filePath, NSURL * _Nullable videoURL))success
+                                   downloadFailure:(void (^ _Nullable)(NSError * _Nullable error, NSURL * _Nullable videoURL))failure;
 
 + (instancetype)photoCommon;
 + (void)deallocPhotoCommon;

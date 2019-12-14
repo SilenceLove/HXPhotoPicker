@@ -12,7 +12,7 @@
 #import "HXCircleProgressView.h"
 #import "UIImageView+HXExtension.h"
 
-@interface HXPhoto3DTouchViewController ()
+@interface HXPhoto3DTouchViewController ()<PHLivePhotoViewDelegate>
 @property (strong, nonatomic) PHLivePhotoView *livePhotoView;
 @property (strong, nonatomic) AVPlayer *player;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
@@ -69,27 +69,40 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [[PHImageManager defaultManager] cancelImageRequest:self.requestId];
-    [self.player pause];
-    [self.player seekToTime:kCMTimeZero];
-    self.playerLayer.player = nil;
-    self.player = nil;
-    [self.playerLayer removeFromSuperlayer];
+    if (self.requestId) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestId];
+    }
     if (_livePhotoView) {
+        self.livePhotoView.delegate = nil;
         [self.livePhotoView stopPlayback];
         [self.livePhotoView removeFromSuperview];
         self.livePhotoView.livePhoto = nil;
         self.livePhotoView = nil;
     }
-    [self.progressView removeFromSuperview];
-    [self.loadingView stopAnimating];
+    if (_progressView) {
+        [self.progressView removeFromSuperview];
+    }
+    if (_loadingView) {
+        [self.loadingView stopAnimating];
+    }
 #if HasYYKitOrWebImage
-    [self.view addSubview:self.animatedImageView];
+    if (_animatedImageView) {
+        [self.view addSubview:self.animatedImageView];
+    }
 #else
-    [self.view addSubview:self.imageView];
+    if (_imageView) {
+        [self.view addSubview:self.imageView];
+    }
 #endif
-    if (self.player) {
+    if (_player) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
+        [self.player pause];
+        [self.player seekToTime:kCMTimeZero];
+        self.player = nil;
+    }
+    if (_playerLayer) {
+        self.playerLayer.player = nil;
+        [self.playerLayer removeFromSuperlayer];
     }
 }
 
@@ -216,6 +229,7 @@
 
 - (void)loadLivePhoto { 
     self.livePhotoView = [[PHLivePhotoView alloc] initWithFrame:CGRectMake(0, 0, self.model.previewViewSize.width, self.model.previewViewSize.height)];
+    self.livePhotoView.delegate = self;
     self.livePhotoView.clipsToBounds = YES;
     self.livePhotoView.hidden = YES;
     self.livePhotoView.contentMode = UIViewContentModeScaleAspectFill;
@@ -235,7 +249,7 @@
         weakSelf.progressView.hidden = YES;
         weakSelf.livePhotoView.hidden = NO;
         weakSelf.livePhotoView.livePhoto = livePhoto;
-        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleHint];
+        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
 #if HasYYKitOrWebImage
         [weakSelf.animatedImageView removeFromSuperview];
 #else
@@ -246,7 +260,9 @@
         
     }]; 
 }
-
+- (void)livePhotoView:(PHLivePhotoView *)livePhotoView didEndPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
+    [self.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+}
 - (void)loadVideo {
     HXWeakSelf
     self.requestId = [self.model requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
@@ -273,6 +289,7 @@
 }
 - (void)playVideo {
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
+    self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     self.playerLayer.frame = CGRectMake(0, 0, self.model.previewViewSize.width, self.model.previewViewSize.height);
     [self.view.layer insertSublayer:self.playerLayer atIndex:0];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

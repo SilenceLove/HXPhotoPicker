@@ -112,7 +112,9 @@
     vc.manager = manager ?: photoView.manager;
     vc.exteriorPreviewStyle = photoView ? photoView.previewStyle : previewStyle;
     vc.delegate = (id)self;
-    vc.modelArray = [NSMutableArray arrayWithArray:manager.afterSelectedArray];
+    if (manager.afterSelectedArray) {
+        vc.modelArray = [NSMutableArray arrayWithArray:manager.afterSelectedArray];
+    }
     if (currentIndex >= vc.modelArray.count) {
         vc.currentModelIndex = vc.modelArray.count - 1;
     }else if (currentIndex < 0) {

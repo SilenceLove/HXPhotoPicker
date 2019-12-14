@@ -122,14 +122,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 @property (copy, nonatomic) NSString * _Nullable selectIndexStr;
 /**  照片原始宽高 */
 @property (assign, nonatomic) CGSize imageSize;
-/**  本地视频URL */
+/**  本地视频URL / 网络视频地址 */
 @property (strong, nonatomic) NSURL * _Nullable videoURL;
 /**  网络图片的地址 */
 @property (copy, nonatomic) NSURL * _Nullable networkPhotoUrl;
 /**  网络图片缩略图地址  */
 @property (strong, nonatomic) NSURL * _Nullable networkThumbURL;
 /// 网络图片的大小
-@property (assign, nonatomic) NSUInteger networkImageSize;
+//@property (assign, nonatomic) NSUInteger networkImageSize;
 /**  临时的列表小图 - 本地图片才用这个上传  */
 @property (strong, nonatomic) UIImage * _Nullable thumbPhoto;
 /**  临时的预览大图  - 本地图片才用这个上传 */
@@ -186,8 +186,10 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 /**  网络图片是否下载错误 */
 @property (assign, nonatomic) BOOL downloadError;
 
+/**  视频当前播放的时间 */
+@property (assign, nonatomic) NSTimeInterval videoCurrentTime;
+
 /// 当前资源的大小 单位：b 字节
-/// 网络图片只有下载成功之后才获取的到大小
 /// 本地图片获取的大小可能不准确
 @property (assign, nonatomic) NSUInteger assetByte;
 @property (assign, nonatomic) BOOL requestAssetByte;
@@ -235,6 +237,12 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 + (instancetype _Nullable )photoModelWithImageURL:(NSURL * _Nullable)imageURL;
 + (instancetype _Nullable)photoModelWithImageURL:(NSURL * _Nullable)imageURL thumbURL:(NSURL * _Nullable)thumbURL;
 
+/// 网络视频初始化
+/// @param videoURL 网络视频地址
+/// @param videoCoverURL 视频封面地址
+/// @param videoDuration 视频时长
++ (instancetype _Nullable )photoModelWithNetworkVideoURL:(NSURL *_Nonnull)videoURL videoCoverURL:(NSURL *_Nonnull)videoCoverURL videoDuration:(NSTimeInterval)videoDuration;
+
 /// 判断两个HXPhotoModel是否是同一个
 /// @param photoModel 模型
 - (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
@@ -258,7 +266,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock _Nullable)completion;
 - (PHImageRequestID)requestThumbImageWithSize:(CGSize)size
                                    completion:(HXModelImageSuccessBlock _Nullable)completion;
-- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion;
+- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock _Nullable )completion;
 
 /**
  请求获取预览大图，此方法只会回调一次，如果为视频的话就是视频封面
@@ -358,6 +366,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
                                                     progressHandler:(HXModelProgressHandler _Nullable)progressHandler
                                                             success:(HXModelImageURLSuccessBlock _Nullable)success
                                                              failed:(HXModelFailedBlock _Nullable)failed;
+
+@property (assign, nonatomic) CGFloat previewContentOffsetX;
+
 @end
 
 @class CLGeocoder;

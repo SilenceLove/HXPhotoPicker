@@ -458,7 +458,30 @@
     } 
     return have;
 }
-+ (void)selectListWriteToTempPath:(NSArray *)selectList requestList:(void (^)(NSArray *, NSArray *))requestList completion:(void (^)(NSArray<NSURL *> *, NSArray<NSURL *> *, NSArray<NSURL *> *))completion error:(void (^)(void))error {
-    NSSLog(@"该方法无效!!!");
+
++ (BOOL)FileExistsAtVideoURL:(NSURL *)videoURL {
+    if (!videoURL) {
+        return NO;
+    }
+    NSString * downloadPath = HXPhotoPickerDownloadVideosPath;
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+    NSString *fullPathToFile = [self getVideoURLFilePath:videoURL];
+    if (![fileManager fileExistsAtPath:downloadPath]) {
+        [fileManager createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }else {
+        if ([fileManager fileExistsAtPath:fullPathToFile]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (NSString *)getVideoURLFilePath:(NSURL *)videoURL {
+    if (!videoURL) {
+        return nil;
+    }
+    NSString * fileName = [videoURL.absoluteString stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    NSString *fullPathToFile = [HXPhotoPickerDownloadVideosPath stringByAppendingPathComponent:fileName];
+    return fullPathToFile;
 }
 @end

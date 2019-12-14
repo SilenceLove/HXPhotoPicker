@@ -58,7 +58,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //        _manager.configuration.openCamera = NO;
         _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.photoMaxNum = 9; //
-        _manager.configuration.videoMaxNum = 1;  //
+        _manager.configuration.videoMaxNum = 0;  //
         _manager.configuration.maxNum = 10;
         _manager.configuration.reverseDate = YES;
         _manager.configuration.selectTogether = YES;
@@ -105,9 +105,15 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXCustomAssetModel *assetModel3 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg"] selected:YES];
     HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
     HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
-    // 模拟视频数量超过视频最大选择数
-    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES]; 
-    [self.manager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6]];
+    
+     
+    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+    
+    HXCustomAssetModel *assetModel7 = [HXCustomAssetModel assetWithNetworkVideoURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/fff42798-8025-4170-a36d-3257be267f29.mp4"] videoCoverURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/d3c3bbe6-02ce-4f17-a75b-3387d52b0a4a.jpg"] videoDuration:13 selected:YES];
+    
+    HXCustomAssetModel *assetModel8 = [HXCustomAssetModel assetWithNetworkVideoURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/2280ec38-5873-4b3f-8784-a361645c8854.mp4"] videoCoverURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/5ed15ef7-3411-4f5e-839b-10664d796919.jpg"] videoDuration:61 selected:YES];
+    
+    [self.manager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6, assetModel7, assetModel8]];
     [self.photoView refreshView];
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"外部预览" style:UIBarButtonItemStylePlain target:self action:@selector(previewClick)];
@@ -120,6 +126,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
     HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+    
+    HXCustomAssetModel *assetModel7 = [HXCustomAssetModel assetWithNetworkVideoURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/fff42798-8025-4170-a36d-3257be267f29.mp4"] videoCoverURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/d3c3bbe6-02ce-4f17-a75b-3387d52b0a4a.jpg"] videoDuration:13 selected:YES];
+    
+    HXCustomAssetModel *assetModel8 = [HXCustomAssetModel assetWithNetworkVideoURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/2280ec38-5873-4b3f-8784-a361645c8854.mp4"] videoCoverURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/5ed15ef7-3411-4f5e-839b-10664d796919.jpg"] videoDuration:61 selected:YES];
     
     HXPhotoManager *photoManager = [HXPhotoManager managerWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
     photoManager.configuration.saveSystemAblum = YES;
@@ -151,11 +162,15 @@ static const CGFloat kPhotoViewMargin = 12.0;
         HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
         return viewCell;
     };
-    [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5]];
-    
+    [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6, assetModel7, assetModel8]];
+    /// 这里需要注意一下
+    /// 这里的photoManager 和 self.manager 不是同一个
+    /// 虽然展示的是一样的内容但是是两个单独的东西
+    /// 所以会出现通过外部预览时,网络图片是正方形被裁剪过了样子.这是因为photoManager这个里面的网络图片还未下载的原因
+    /// 如果将 photoManager 换成 self.manager 则不会出现这样的现象
     [self hx_presentPreviewPhotoControllerWithManager:photoManager
                                          previewStyle:HXPhotoViewPreViewShowStyleDark
-                                         currentIndex:0
+                                         currentIndex:7
                                             photoView:nil];
 }
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {

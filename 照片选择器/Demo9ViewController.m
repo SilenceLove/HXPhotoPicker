@@ -17,7 +17,6 @@
 @property (nonatomic, strong) NSMutableArray *uploadArray;
 @property (nonatomic, strong) NSMutableArray *waitArray;
 @property (nonatomic, strong) NSMutableArray *completeArray;
-@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 @end
 
@@ -56,12 +55,6 @@
     }
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-}
-- (HXDatePhotoToolManager *)toolManager {
-    if (!_toolManager) {
-        _toolManager = [[HXDatePhotoToolManager alloc] init];
-    }
-    return _toolManager;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -144,15 +137,7 @@
     [self.waitArray removeObjectAtIndex:0];
     __weak typeof(self) weakSelf = self;
     if (model.endSelectedList.count > 0) {
-        [self.toolManager writeSelectModelListToTempPathWithList:model.endSelectedList requestType:0 success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
-            NSSLog(@"\n第%ld个cell写入完成\n%@",[weakSelf.dataArray indexOfObject:model],allURL);
-            model.photoUrls = allURL;
-            [weakSelf.completeArray addObject:model];
-            [weakSelf startUpload];
-        } failed:^{
-            [weakSelf.view hx_handleLoading];
-            [weakSelf.view hx_showImageHUDText:[NSString stringWithFormat:@"第%ld个cell写入失败",[weakSelf.dataArray indexOfObject:model]]];
-        }];
+        
     }else {
         [self.completeArray addObject:model];
         [self startUpload];

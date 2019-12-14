@@ -271,9 +271,10 @@
 
 @interface HXHUD ()
 @property (copy, nonatomic) NSString *imageName;
-@property (copy, nonatomic) NSString *text;
-@property (weak, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UIVisualEffectView *visualEffectView;
+@property (strong, nonatomic) UILabel *titleLb;
+@property (strong, nonatomic) UIActivityIndicatorView *loading;
 @end
 
 @implementation HXHUD
@@ -281,7 +282,7 @@
 - (instancetype)initWithFrame:(CGRect)frame imageName:(NSString *)imageName text:(NSString *)text {
     self = [super initWithFrame:frame];
     if (self) {
-        self.text = text;
+        _text = text;
         self.imageName = imageName;
         self.layer.masksToBounds = YES;
         self.layer.cornerRadius = 5;
@@ -297,55 +298,69 @@
     if ([HXPhotoCommon photoCommon].isDark) {
         image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     }
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-    [self addSubview:imageView];
-    CGFloat imgW = imageView.image.size.width;
+    self.imageView = [[UIImageView alloc] initWithImage:image];
+    [self addSubview:self.imageView];
+    if ([HXPhotoCommon photoCommon].isDark) {
+        self.imageView.tintColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
+    }
+    
+    self.titleLb = [[UILabel alloc] init];
+    self.titleLb.text = self.text;
+    self.titleLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : [UIColor whiteColor];
+    self.titleLb.textAlignment = NSTextAlignmentCenter;
+    self.titleLb.font = [UIFont systemFontOfSize:14];
+    self.titleLb.numberOfLines = 0;
+    [self addSubview:self.titleLb];
+}
+- (void)setText:(NSString *)text {
+    _text = text;
+    self.titleLb.text = text;
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    CGFloat imgW = self.imageView.image.size.width;
     if (imgW <= 0) imgW = 37;
-    CGFloat imgH = imageView.image.size.height;
+    CGFloat imgH = self.imageView.image.size.height;
     if (imgH <= 0) imgH = 37;
     CGFloat imgCenterX = self.frame.size.width / 2;
-    imageView.frame = CGRectMake(0, 20, imgW, imgH);
-    imageView.center = CGPointMake(imgCenterX, imageView.center.y);
-    if ([HXPhotoCommon photoCommon].isDark) {
-        imageView.tintColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
-    }
-    self.imageView = imageView;
+    self.imageView.frame = CGRectMake(0, 20, imgW, imgH);
+    self.imageView.center = CGPointMake(imgCenterX, self.imageView.center.y);
     
-    UILabel *label = [[UILabel alloc] init];
-    label.text = self.text;
-    label.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : [UIColor whiteColor];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.font = [UIFont systemFontOfSize:14];
-    label.numberOfLines = 0;
-    [self addSubview:label];
-    label.hx_x = 10;
-    label.hx_y = CGRectGetMaxY(imageView.frame) + 10;
-    label.hx_w = self.frame.size.width - 20;
-    label.hx_h = [label hx_getTextHeight];
+    self.titleLb.hx_x = 10;
+    self.titleLb.hx_y = CGRectGetMaxY(self.imageView.frame) + 10;
+    self.titleLb.hx_w = self.frame.size.width - 20;
+    self.titleLb.hx_h = [self.titleLb hx_getTextHeight];
     if (self.text.length) {
-        self.hx_h = CGRectGetMaxY(label.frame) + 20;
+        self.hx_h = CGRectGetMaxY(self.titleLb.frame) + 20;
+    }
+    if (_loading) {
+        if (self.text) {
+            self.loading.frame = self.imageView.frame;
+        }else {
+            self.loading.frame = self.bounds;
+        }
     }
 }
-
-- (void)showloading {
-    UIActivityIndicatorView *loading = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+- (UIActivityIndicatorView *)loading {
+    if (!_loading) {
+        _loading = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
 #ifdef __IPHONE_13_0
-    if ([HXPhotoCommon photoCommon].isDark) {
-        if (@available(iOS 13.0, *)) {
-            loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleLarge;
-        } else {
-            loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+        if ([HXPhotoCommon photoCommon].isDark) {
+            if (@available(iOS 13.0, *)) {
+                _loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleLarge;
+            } else {
+                _loading.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+            }
+            _loading.color = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
         }
-        loading.color = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
-    }
 #endif
-    [loading startAnimating];
-    [self addSubview:loading];
-    if (self.text) {
-        loading.frame = self.imageView.frame;
-    }else {
-        loading.frame = self.bounds;
+        [_loading startAnimating];
     }
+    return _loading;
+}
+- (void)showloading {
+    [self addSubview:self.loading];
     self.imageView.hidden = YES;
 }
 

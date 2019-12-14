@@ -47,6 +47,7 @@
 
 @interface HXHUD : UIView
 @property (assign, nonatomic) BOOL isImage;
+@property (copy, nonatomic) NSString *text;
 - (instancetype)initWithFrame:(CGRect)frame imageName:(NSString *)imageName text:(NSString *)text;
 - (void)showloading;
 @end

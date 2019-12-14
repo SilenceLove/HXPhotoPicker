@@ -11,9 +11,56 @@
 #import "HXPhotoDefine.h"
 #import "UIView+HXExtension.h"
 #import "UIFont+HXExtension.h"
+#import "UIColor+HXExtension.h"
+#import "UILabel+HXExtension.h"
 #import "NSBundle+HXPhotoPicker.h"
 
 #define Hx_ViewHeight 55.f
+
+@implementation HXPhotoBottomViewModel
+- (UIColor *)backgroundColor {
+    if (!_backgroundColor) {
+        _backgroundColor = [UIColor whiteColor];
+    }
+    return _backgroundColor;
+}
+- (UIColor *)titleColor {
+    if (!_titleColor) {
+        _titleColor = [UIColor colorWithRed:32.f/255.f green:32.f/255.f blue:32.f/255.f alpha:1];
+    }
+    return _titleColor;
+}
+- (UIColor *)subTitleColor {
+    if (!_subTitleColor) {
+        _subTitleColor = [UIColor hx_colorWithHexStr:@"#999999"];
+    }
+    return _subTitleColor;
+}
+- (UIColor *)lineColor {
+    if (!_lineColor) {
+        _lineColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1];
+    }
+    return _lineColor;
+}
+- (UIColor *)selectColor {
+    if (!_selectColor) {
+        _selectColor = [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
+    }
+    return _selectColor;
+}
+- (UIFont *)titleFont {
+    if (!_titleFont) {
+        _titleFont = [UIFont hx_helveticaNeueOfSize:17];
+    }
+    return _titleFont;
+}
+- (UIFont *)subTitleFont {
+    if (!_subTitleFont) {
+        _subTitleFont = [UIFont hx_helveticaNeueOfSize:13];
+    }
+    return _subTitleFont;
+}
+@end
 
 @interface HXPhotoBottomSelectView ()<UITableViewDataSource, UITableViewDelegate>
 @property (strong, nonatomic) UITableView *tableView;
@@ -21,28 +68,19 @@
 @property (strong, nonatomic) UIButton *cancelBtn;
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *contentView;
-@property (assign, nonatomic) BOOL adaptiveDarkness;
 @end
 
 @implementation HXPhotoBottomSelectView
 
-+ (instancetype)showSelectViewWithTitles:(NSArray *)titles cancelTitle:(NSString *)cancelTitle adaptiveDarkness:(BOOL)adaptiveDarkness selectCompletion:(void (^)(NSInteger, NSString * _Nonnull))selectCompletion cancelClick:(void (^)(void))cancelClick {
++ (instancetype)showSelectViewWithModels:(NSArray *)models
+                              headerView:(UIView *)headerView
+                             cancelTitle:(NSString *)cancelTitle
+                        selectCompletion:(void (^)(NSInteger, HXPhotoBottomSelectView * _Nonnull))selectCompletion
+                             cancelClick:(void (^)(void))cancelClick {
     HXPhotoBottomSelectView *selectView = [[HXPhotoBottomSelectView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    selectView.adaptiveDarkness = adaptiveDarkness;
-    selectView.titles = titles;
+    selectView.modelArray = models;
+    selectView.adaptiveDarkness = YES;
     selectView.cancelTitle = cancelTitle;
-    selectView.selectCompletion = selectCompletion;
-    selectView.cancelClick = cancelClick;
-    [[UIApplication sharedApplication].keyWindow addSubview:selectView];
-    [selectView showView];
-    return selectView;
-}
-
-+ (instancetype)showSelectViewWithTitles:(NSArray *)titles headerView:(UIView *)headerView selectCompletion:(void (^)(NSInteger, NSString * _Nonnull))selectCompletion cancelClick:(void (^)(void))cancelClick {
-    HXPhotoBottomSelectView *selectView = [[HXPhotoBottomSelectView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    selectView.adaptiveDarkness = NO;
-    selectView.headerView = headerView;
-    selectView.titles = titles;
     selectView.selectCompletion = selectCompletion;
     selectView.cancelClick = cancelClick;
     [[UIApplication sharedApplication].keyWindow addSubview:selectView];
@@ -61,14 +99,22 @@
 - (void)deviceOrientationChanged:(NSNotification *)notify {
     [self didCancelBtnClick:self.cancelBtn];
 }
-- (void)setTitles:(NSArray *)titles {
-    _titles = titles;
+- (void)setModelArray:(NSArray *)modelArray {
+    _modelArray = modelArray;
     [self changeColor];
     [self recalculateHeight];
 }
-- (void)setHeaderView:(UIView *)headerView {
-    _headerView = headerView;
-    self.tableView.tableHeaderView = headerView;
+- (void)setAdaptiveDarkness:(BOOL)adaptiveDarkness {
+    if (_adaptiveDarkness == adaptiveDarkness) {
+        return;
+    }
+    _adaptiveDarkness = adaptiveDarkness;
+    [self changeColor];
+    [self.tableView reloadData];
+}
+- (void)setTableHeaderView:(UIView *)tableHeaderView {
+    _tableHeaderView = tableHeaderView;
+    self.tableView.tableHeaderView = tableHeaderView;
 }
 - (void)setCancelTitle:(NSString *)cancelTitle {
     _cancelTitle = cancelTitle;
@@ -76,7 +122,7 @@
     [self.cancelBtn setTitle:cancelTitle forState:UIControlStateNormal];
 }
 - (void)recalculateHeight {
-    CGFloat height = self.titles.count * Hx_ViewHeight + self.tableView.tableHeaderView.hx_h + self.tableView.tableFooterView.hx_h;
+    CGFloat height = self.modelArray.count * Hx_ViewHeight + self.tableView.tableHeaderView.hx_h + self.tableView.tableFooterView.hx_h;
     if (height > self.hx_h - Hx_ViewHeight * 4) {
         height = self.hx_h - Hx_ViewHeight * 4;
         self.tableView.scrollEnabled = YES;
@@ -158,12 +204,12 @@
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     HXPhotoBottomSelectViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CellId"];
     cell.adaptiveDarkness = self.adaptiveDarkness;
-    cell.title = self.titles[indexPath.row];
+    cell.model = self.modelArray[indexPath.row];
     return cell;
 }
 
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.titles.count;
+    return self.modelArray.count;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return Hx_ViewHeight;
@@ -171,7 +217,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (self.selectCompletion) {
-        self.selectCompletion(indexPath.row, self.titles[indexPath.row]);
+        self.selectCompletion(indexPath.row, self.modelArray[indexPath.row]);
     }
     [self hideView];
 }
@@ -202,6 +248,7 @@
 
 @interface HXPhotoBottomSelectViewCell ()
 @property (strong, nonatomic) UILabel *titleLb;
+@property (strong, nonatomic) UILabel *subTitleLb;
 @property (strong, nonatomic) UIView *selectBgView;
 @property (strong, nonatomic) UIView *lineView;
 @end
@@ -211,30 +258,60 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         self.selectedBackgroundView = self.selectBgView;
-        [self addSubview:self.titleLb];
-        [self addSubview:self.lineView];
+        [self.contentView addSubview:self.titleLb];
+        [self.contentView addSubview:self.subTitleLb];
+        [self.contentView addSubview:self.lineView];
     }
     return self;
 }
-- (void)setTitle:(NSString *)title {
-    _title = title;
-    self.titleLb.text = title;
+- (void)setModel:(HXPhotoBottomViewModel *)model {
+    _model = model;
+    
+    self.titleLb.text = model.title;
+    self.titleLb.font = model.titleFont;
+    self.titleLb.numberOfLines = model.subTitle.length ? 1 : 0;
+    
+    self.subTitleLb.text = model.subTitle;
+    self.subTitleLb.font = model.subTitleFont;
+    self.subTitleLb.hidden = !model.subTitle.length;
+    
     [self changeColor];
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
-    self.titleLb.frame = CGRectMake(10, 0, self.hx_w - 20, self.hx_h);
+    if (self.model.subTitle.length) {
+        self.titleLb.hx_x = 10;
+        self.titleLb.hx_w = self.hx_w - 20;
+        self.titleLb.hx_h = [self.titleLb hx_getTextHeight];
+        
+        self.subTitleLb.hx_x = 10;
+        self.subTitleLb.hx_w = self.hx_w - 20;
+        self.subTitleLb.hx_h = [self.subTitleLb hx_getTextHeight];
+        
+        self.titleLb.hx_y = (self.hx_h - (self.titleLb.hx_h + self.subTitleLb.hx_h + 3)) / 2;
+        self.subTitleLb.hx_y = CGRectGetMaxY(self.titleLb.frame) + 3;
+    }else {
+        self.titleLb.frame = CGRectMake(10, 0, self.hx_w - 20, self.hx_h);
+    }
+    
     self.lineView.frame = CGRectMake(0, 0, self.hx_w, 0.5f);
 }
 - (UILabel *)titleLb {
     if (!_titleLb) {
         _titleLb = [[UILabel alloc] init];
         _titleLb.textAlignment = NSTextAlignmentCenter;
-        _titleLb.font = [UIFont hx_helveticaNeueOfSize:17];
-        _titleLb.numberOfLines = 0;
         _titleLb.adjustsFontSizeToFitWidth = YES;
     }
     return _titleLb;
+}
+- (UILabel *)subTitleLb {
+    if (!_subTitleLb) {
+        _subTitleLb = [[UILabel alloc] init];
+        _subTitleLb.textAlignment = NSTextAlignmentCenter;
+        _subTitleLb.numberOfLines = 1;
+        _subTitleLb.adjustsFontSizeToFitWidth = YES;
+    }
+    return _subTitleLb;
 }
 - (UIView *)selectBgView {
     if (!_selectBgView) {
@@ -250,10 +327,11 @@
 }
 - (void)changeColor {
     BOOL isDark = self.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
-    self.backgroundColor = isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
-    self.titleLb.textColor = isDark ? [UIColor whiteColor] : [UIColor colorWithRed:32.f/255.f green:32.f/255.f blue:32.f/255.f alpha:1];
-    self.selectBgView.backgroundColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
-    self.lineView.backgroundColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1];
+    self.backgroundColor = isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : self.model.backgroundColor;
+    self.titleLb.textColor = isDark ? [UIColor whiteColor] : self.model.titleColor;
+    self.selectBgView.backgroundColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : self.model.selectColor;
+    self.lineView.backgroundColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : self.model.lineColor;
+    self.subTitleLb.textColor = isDark ? [[UIColor whiteColor] colorWithAlphaComponent:0.8] : self.model.subTitleColor;
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];

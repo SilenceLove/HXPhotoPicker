@@ -100,8 +100,13 @@
 /**  iphone6, 6s, 7, 8  */
 + (BOOL)isIphone6;
 
-+ (void)selectListWriteToTempPath:(NSArray * _Nullable)selectList
-                      requestList:(void (^ _Nullable)(NSArray * _Nullable imageRequestIds, NSArray * _Nullable videoSessions))requestList
-                       completion:(void (^ _Nullable)(NSArray<NSURL *> * _Nullable allUrl, NSArray<NSURL *> * _Nullable imageUrls, NSArray<NSURL *> * _Nullable videoUrls))completion
-                            error:(void (^ _Nullable)(void))error DEPRECATED_MSG_ATTRIBUTE("该无效已无效' instead");
+
+/// 判断网络地址是否在本地存在
+/// 如果文件夹不存在则会创建文件夹
+/// @param videoURL 网络视频地址
++ (BOOL)FileExistsAtVideoURL:(NSURL * _Nullable)videoURL;
+
+/// 将网络视频地址转换成本地文件名
+/// @param videoURL 网络视频地址
++ (NSString * _Nullable)getVideoURLFilePath:(NSURL * _Nullable)videoURL;
 @end

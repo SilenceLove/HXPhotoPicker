@@ -13,8 +13,11 @@ static dispatch_once_t once;
 static dispatch_once_t once1;
 static id instance;
 
-@interface HXPhotoCommon () 
-
+@interface HXPhotoCommon ()<NSURLConnectionDataDelegate>
+@property (strong, nonatomic) AFURLSessionManager *sessionManager;
+@property (strong, nonatomic) NSURLConnection *urlFileLengthConnection;
+@property (copy, nonatomic) HXPhotoCommonGetUrlFileLengthSuccess fileLengthSuccessBlock;
+@property (copy, nonatomic) HXPhotoCommonGetUrlFileLengthFailure fileLengthFailureBlock;
 @end
 
 @implementation HXPhotoCommon
@@ -39,12 +42,61 @@ static id instance;
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.isVCBasedStatusBarAppearance = [[[NSBundle mainBundle]objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"] boolValue];
+        self.sessionManager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+        [self listenNetWorkStatus];
         NSData *imageData = [[NSUserDefaults standardUserDefaults] objectForKey:HXCameraImageKey];
         if (imageData) {
             self.cameraImage = [NSKeyedUnarchiver unarchiveObjectWithData:imageData];
         }
     }
     return self;
+}
+- (NSBundle *)languageBundle {
+    if (!_languageBundle) {
+        NSString *language = [NSLocale preferredLanguages].firstObject;
+        HXPhotoLanguageType type = self.languageType;
+        switch (type) {
+            case HXPhotoLanguageTypeSc : {
+                language = @"zh-Hans"; // 简体中文
+            } break;
+            case HXPhotoLanguageTypeTc : {
+                language = @"zh-Hant"; // 繁體中文
+            } break;
+            case HXPhotoLanguageTypeJa : {
+                // 日文
+                language = @"ja";
+            } break;
+            case HXPhotoLanguageTypeKo : {
+                // 韩文
+                language = @"ko";
+            } break;
+            case HXPhotoLanguageTypeEn : {
+                language = @"en";
+            } break;
+            default : {
+                if ([language hasPrefix:@"en"]) {
+                    language = @"en";
+                } else if ([language hasPrefix:@"zh"]) {
+                    if ([language rangeOfString:@"Hans"].location != NSNotFound) {
+                        language = @"zh-Hans"; // 简体中文
+                    } else { // zh-Hant\zh-HK\zh-TW
+                        language = @"zh-Hant"; // 繁體中文
+                    }
+                } else if ([language hasPrefix:@"ja"]){
+                    // 日文
+                    language = @"ja";
+                }else if ([language hasPrefix:@"ko"]) {
+                    // 韩文
+                    language = @"ko";
+                }else {
+                    language = @"en";
+                }
+            }break;
+        }
+        [HXPhotoCommon photoCommon].languageBundle = [NSBundle bundleWithPath:[[NSBundle hx_photoPickerBundle] pathForResource:language ofType:@"lproj"]];
+    }
+    return _languageBundle;
 }
 - (BOOL)isDark {
     if (self.photoStyle == HXPhotoStyleDark) {
@@ -69,12 +121,92 @@ static id instance;
     _cameraImage = cameraImage;
 }
 
+- (void)getURLFileLengthWithURL:(NSURL *)url success:(HXPhotoCommonGetUrlFileLengthSuccess)success failure:(HXPhotoCommonGetUrlFileLengthFailure)failure {
+    if (self.urlFileLengthConnection) {
+        [self.urlFileLengthConnection cancel];
+    }
+    NSMutableURLRequest *mURLRequest = [NSMutableURLRequest requestWithURL:url];
+    [mURLRequest setHTTPMethod:@"HEAD"];
+    mURLRequest.timeoutInterval = 5.0;
+    self.urlFileLengthConnection = [NSURLConnection connectionWithRequest:mURLRequest delegate:self];
+    [self.urlFileLengthConnection start];
+}
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    NSDictionary *dict = [(NSHTTPURLResponse *)response allHeaderFields];
+    NSNumber *length = [dict objectForKey:@"Content-Length"];
+    [connection cancel];
+    if (self.fileLengthSuccessBlock) {
+        self.fileLengthSuccessBlock(length.unsignedIntegerValue);
+    }
+}
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    [connection cancel];
+    if (self.fileLengthFailureBlock) {
+        self.fileLengthFailureBlock();
+    }
+}
+/** 初始化并监听网络变化 */
+- (void)listenNetWorkStatus {
+    AFNetworkReachabilityManager *manager = [AFNetworkReachabilityManager sharedManager];
+    self.netStatus = manager.networkReachabilityStatus;
+    [manager startMonitoring];
+    HXWeakSelf
+    [manager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        weakSelf.netStatus = status;
+        if (weakSelf.reachabilityStatusChangeBlock) {
+            weakSelf.reachabilityStatusChangeBlock(status);
+        }
+    }];
+}
+
+- (NSURLSessionDownloadTask * _Nullable)downloadVideoWithURL:(NSURL *)videoURL
+                                          progress:(void (^)(float progress, long long downloadLength, long long totleLength, NSURL * _Nullable videoURL))progress
+                                   downloadSuccess:(void (^)(NSURL * _Nullable filePath, NSURL * _Nullable videoURL))success
+                                   downloadFailure:(void (^)(NSError * _Nullable error, NSURL * _Nullable videoURL))failure {
+    NSString *videoFilePath = [HXPhotoTools getVideoURLFilePath:videoURL];
+    NSURL *videoFileURL = [NSURL fileURLWithPath:videoFilePath];
+    if ([HXPhotoTools FileExistsAtVideoURL:videoURL]) {
+        if (success) {
+            success(videoFileURL, videoURL);
+        }
+        return nil;
+    }
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:videoURL];
+    /* 开始请求下载 */
+    NSURLSessionDownloadTask *downloadTask = [self.sessionManager downloadTaskWithRequest:request progress:^(NSProgress * _Nonnull downloadProgress) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+        if (progress) {
+            progress(downloadProgress.fractionCompleted, downloadProgress.completedUnitCount, downloadProgress.totalUnitCount, videoURL);
+            }
+        });
+//        NSLog(@"下载进度：%.0f％", downloadProgress.fractionCompleted * 100);
+    } destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
+        return videoFileURL;
+    } completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!error) {
+                if (success) {
+                    success(filePath, videoURL);
+                }
+            }else {
+                if (failure) {
+                    failure(error, videoURL);
+                }
+            }
+        });
+//        NSLog(@"下载完成");
+    }];
+    [downloadTask resume];
+    return downloadTask;
+}
 + (void)deallocPhotoCommon {
     once = 0;
     once1 = 0;
-    instance = nil; 
+    instance = nil;
 }
 - (void)dealloc {
-    NSSLog(@"dealloc");
+//    NSSLog(@"dealloc");
+    [[AFNetworkReachabilityManager sharedManager] stopMonitoring];
 }
 @end

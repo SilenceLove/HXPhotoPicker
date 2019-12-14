@@ -52,7 +52,7 @@
     }
 }
 - (void)presentAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(UIViewController *)fromVC ToVC:(HXPhotoPreviewViewController *)toVC cell:(HXPhotoSubViewCell *)cell{
-    if (!image && toVC.manager.configuration.customPreviewFromImage) {
+    if ((!image || (model.networkPhotoUrl && (model.downloadError || !model.downloadComplete))) && toVC.manager.configuration.customPreviewFromImage) {
         image = toVC.manager.configuration.customPreviewFromImage(toVC.currentModelIndex);
     }
     model.tempImage = image;
@@ -98,7 +98,11 @@
         }
     }];
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.75f initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
+        if (imgHeight < height) {
+            tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
+        }else {
+            tempView.frame = CGRectMake(0, 0, imgWidht, imgHeight);
+        }
     } completion:^(BOOL finished) {
         cell.hidden = NO;
         toVC.collectionView.hidden = NO;
@@ -142,7 +146,6 @@
  */
 - (void)dismissAnimation:(id<UIViewControllerContextTransitioning>)transitionContext {
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     if (!fromVC.modelArray.count) {
         UIView *containerView = [transitionContext containerView];
         [containerView addSubview:fromVC.view];
@@ -160,26 +163,9 @@
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         tempView = [[UIImageView alloc] initWithImage:model.thumbPhoto];
     }else {
-#if HasYYKitOrWebImage
-        tempView = [[UIImageView alloc] initWithImage:fromCell.animatedImageView.image];
-#else
-        tempView = [[UIImageView alloc] initWithImage:fromCell.imageView.image];
-#endif
+        tempView = [[UIImageView alloc] initWithImage:fromCell.previewContentView.image];
     }
     UICollectionView *collectionView = (UICollectionView *)self.photoView.collectionView;
-    
-    if ([toVC isKindOfClass:[UINavigationController class]]) {
-        UINavigationController *nav = (UINavigationController *)toVC;
-        toVC = nav.viewControllers.lastObject;
-    }else if ([toVC isKindOfClass:[UITabBarController class]]) {
-        UITabBarController *tabBar = (UITabBarController *)toVC;
-        if ([tabBar.selectedViewController isKindOfClass:[UINavigationController class]]) {
-            UINavigationController *nav = (UINavigationController *)tabBar.selectedViewController;
-            toVC = nav.viewControllers.lastObject;
-        }else {
-            toVC = tabBar.selectedViewController;
-        }
-    }
     
     HXPhotoSubViewCell *cell = (HXPhotoSubViewCell *)[collectionView cellForItemAtIndexPath:[self.photoView currentModelIndexPath:model]];
     if (!tempView.image) {
@@ -190,11 +176,7 @@
     
     
     UIView *containerView = [transitionContext containerView];
-#if HasYYKitOrWebImage
-    tempView.frame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
-#else
-    tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
-#endif
+    tempView.frame = [fromCell.previewContentView convertRect:fromCell.previewContentView.bounds toView:containerView];
     [containerView addSubview:tempView];
     
     CGRect rect = [cell convertRect:cell.bounds toView:containerView];

@@ -41,6 +41,7 @@
     NSError *thumbnailImageGenerationError = nil;
     thumbnailImageRef = [assetImageGenerator copyCGImageAtTime:CMTimeMake(thumbnailImageTime, 60)actualTime:NULL error:&thumbnailImageGenerationError];
     UIImage*thumbnailImage = thumbnailImageRef ? [[UIImage alloc]initWithCGImage: thumbnailImageRef] : nil;
+    CGImageRelease(thumbnailImageRef);
     return thumbnailImage;
 }
 + (UIImage *)hx_animatedGIFWithImageSourceRef:(CGImageSourceRef)source {
@@ -156,8 +157,7 @@
     return [UIImage animatedImageWithImages:scaledImages duration:self.duration];
 }
 
-- (UIImage *)hx_normalizedImage
-{
+- (UIImage *)hx_normalizedImage {
     if (self.imageOrientation == UIImageOrientationUp) return self;
     
     UIGraphicsBeginImageContextWithOptions(self.size, NO, self.scale);

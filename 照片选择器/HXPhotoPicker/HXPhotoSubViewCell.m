@@ -90,7 +90,7 @@
 - (void)didDeleteClick {
     if (self.model.networkPhotoUrl) {
         if (self.showDeleteNetworkPhotoAlert) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"提示"] message:[NSBundle hx_localizedStringForKey:@"是否删除此照片"] delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"提示"] message:[NSBundle hx_localizedStringForKey:@"是否删除此资源"] delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
             [alert show];
             return;
         }
@@ -151,7 +151,8 @@
 }
 - (void)resetNetworkImage {
     if (self.model.networkPhotoUrl &&
-        self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
+       (self.model.type == HXPhotoModelMediaTypeCameraPhoto ||
+        self.model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork)) {
         self.model.loadOriginalImage = YES;
         HXWeakSelf
         [self.imageView hx_setImageWithModel:self.model original:YES progress:nil completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {

@@ -86,17 +86,10 @@
     }else if ([fromVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewCell *cell = [(HXPhotoPreviewViewController *)fromVC currentPreviewCell:self.model];
         [cell cancelRequest];
-#if HasYYKitOrWebImage
-        tempView.image = cell.animatedImageView.image;
+        tempView.image = cell.previewContentView.image;
         if (cell) {
-            tempView.frame = [cell.animatedImageView convertRect:cell.animatedImageView.bounds toView: containerView];
+            tempView.frame = [cell.previewContentView convertRect:cell.previewContentView.bounds toView: containerView];
         }
-#else
-        tempView.image = cell.imageView.image;
-        if (cell) {
-            tempView.frame = [cell.imageView convertRect:cell.imageView.bounds toView: containerView];
-        }
-#endif
         fromCell = cell;
         if ([(HXPhotoPreviewViewController *)fromVC bottomView].alpha != 0) {
             [(HXPhotoPreviewViewController *)fromVC setSubviewAlphaAnimate:YES duration:0.15f];
@@ -210,11 +203,7 @@
         
         [cell resetScale:NO];
         [cell refreshImageSize];
-#if HasYYKitOrWebImage
-        toFrame = [cell.animatedImageView convertRect:cell.animatedImageView.bounds toView: containerView];
-#else
-        toFrame = [cell.imageView convertRect:cell.imageView.bounds toView: containerView];
-#endif
+        toFrame = [cell.previewContentView convertRect:cell.previewContentView.bounds toView: containerView];
         toCell = cell;
         [tempBgView addSubview:tempView];
         [toVC.view insertSubview:tempBgView atIndex:1];

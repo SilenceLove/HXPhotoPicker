@@ -44,6 +44,12 @@ typedef NS_ENUM(NSUInteger, HXPhotoStyle) {
     HXPhotoStyleDark            //!< 暗黑
 };
 
+typedef NS_ENUM(NSUInteger, HXVideoAutoPlayType) {
+    HXVideoAutoPlayTypeNormal = 0, //!< 不自动播放
+    HXVideoAutoPlayTypeWiFi,       //!< wifi网络下自动播放
+    HXVideoAutoPlayTypeAll         //!< 蜂窝移动和wifi网络下自动播放
+};
+
 @class
 HXPhotoBottomView,
 HXPhotoPreviewBottomView,
@@ -52,6 +58,12 @@ HXPhotoModel,
 HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
+
+/// 预览视频时是否先下载视频再播放
+@property (assign, nonatomic) BOOL downloadNetworkVideo;
+
+/// 预览视频时是否自动播放
+@property (assign, nonatomic) HXVideoAutoPlayType videoAutoPlayType;
 
 /// 相机聚焦框颜色
 @property (strong, nonatomic) UIColor *cameraFocusBoxColor;
@@ -65,6 +77,7 @@ HXPhotoPreviewViewController;
 
 /// 限制视频的大小 单位：b 字节
 /// 默认 0字节 不限制
+/// 网络视频不限制
 @property (assign, nonatomic) NSUInteger limitVideoSize;
 
 /// 选择照片时是否限制照片大小
@@ -72,6 +85,7 @@ HXPhotoPreviewViewController;
 
 /// 限制照片的大小 单位：b 字节
 /// 默认 0字节 不限制
+/// 网络图片不限制
 @property (assign, nonatomic) NSUInteger limitPhotoSize;
 
 /// 相机界面默认前置摄像头
@@ -196,14 +210,6 @@ HXPhotoPreviewViewController;
 
 /// 照片是否可以编辑   default YES
 @property (assign, nonatomic) BOOL photoCanEdit;
-
-/// 过渡动画枚举
-/// 时间函数曲线相关
-/// UIViewAnimationOptionCurveEaseInOut
-/// UIViewAnimationOptionCurveEaseIn
-/// UIViewAnimationOptionCurveEaseOut   -->    default
-/// UIViewAnimationOptionCurveLinear
-@property (assign, nonatomic) UIViewAnimationOptions transitionAnimationOption;
 
 /// push动画时长 default 0.45f
 @property (assign, nonatomic) NSTimeInterval pushTransitionDuration;

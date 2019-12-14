@@ -20,13 +20,17 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.3.8"
+#define HXVersion @"2.3.9"
 
-#define HXGetCameraContentInRealTime 1
+#define HXGetCameraContentInRealTime HX_IS_IPhoneX_All
 
 #define HXEncodeKey @"HXModelArray"
 
 #define HXCameraImageKey @"HXCameraImageKey"
+
+#define HXPhotoPickerDownloadPath [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]
+
+#define HXPhotoPickerDownloadVideosPath [HXPhotoPickerDownloadPath stringByAppendingPathComponent:@"HXPhotoPickerDownload/Videos"]
 
 #define HXShowLog YES
 
@@ -39,6 +43,9 @@
 #define HasYYKitOrWebImage (__has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h") || __has_include(<YYKit/YYKit.h>) || __has_include("YYKit.h"))
 
 #define HasSDWebImage (__has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h"))
+
+#define HX_ScreenWidth [UIScreen mainScreen].bounds.size.width
+#define HX_ScreenHeight [UIScreen mainScreen].bounds.size.height
 
 #define HX_IS_IPHONEX (CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(375, 812)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(812, 375)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(414, 896)) || CGSizeEqualToSize([UIScreen mainScreen].bounds.size, CGSizeMake(896, 414)))
 

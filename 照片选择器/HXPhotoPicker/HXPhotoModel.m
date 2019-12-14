@@ -49,7 +49,7 @@
     }else {
         if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
             if (self.networkPhotoUrl || self.networkThumbURL) {
-                byte = self.networkImageSize;
+                byte = 0;
             }else {
                 NSData *imageData;
                 if (UIImagePNGRepresentation(self.thumbPhoto)) {
@@ -62,13 +62,16 @@
                 byte = imageData.length;
             }
         }else if (self.type == HXPhotoModelMediaTypeCameraVideo) {
-            AVURLAsset* urlAsset = [AVURLAsset assetWithURL:self.videoURL];
-            NSNumber *size;
-            [urlAsset.URL getResourceValue:&size forKey:NSURLFileSizeKey error:nil];
-            byte = size.unsignedIntegerValue;
+            if (self.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                byte = 0;
+            }else {
+                AVURLAsset* urlAsset = [AVURLAsset assetWithURL:self.videoURL];
+                NSNumber *size;
+                [urlAsset.URL getResourceValue:&size forKey:NSURLFileSizeKey error:nil];
+                byte = size.unsignedIntegerValue;
+            }
         }
     }
-    
     return byte;
 }
 - (HXPhotoModelFormat)photoFormat {
@@ -244,6 +247,33 @@
 + (instancetype)photoModelWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL {
     return [[self alloc] initWithImageURL:imageURL thumbURL:thumbURL];
 }
+
++ (instancetype)photoModelWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration {
+    return [[self alloc] initWithNetworkVideoURL:videoURL videoCoverURL:videoCoverURL videoDuration:videoDuration];
+}
+
+- (instancetype)initWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration {
+    if (self = [super init]) {
+        self.type = HXPhotoModelMediaTypeCameraVideo;
+        self.subType = HXPhotoModelMediaSubTypeVideo;
+        self.cameraVideoType = HXPhotoModelMediaTypeCameraVideoTypeNetWork;
+        if (videoDuration <= 0) {
+            videoDuration = 1;
+        }
+        NSString *time = [HXPhotoTools transformVideoTimeToString:videoDuration];
+        self.videoDuration = videoDuration;
+        self.videoURL = videoURL;
+        self.videoTime = time;
+        self.thumbPhoto = [UIImage hx_imageNamed:@"hx_qz_photolist_picture_fail"];
+        self.previewPhoto = self.thumbPhoto;
+        self.imageSize = self.thumbPhoto.size;
+        self.networkPhotoUrl = videoCoverURL;
+        self.networkThumbURL = videoCoverURL;
+        self.loadOriginalImage = YES;
+    }
+    return self;
+}
+
 - (instancetype)initWithImageURL:(NSURL *)imageURL thumbURL:(NSURL *)thumbURL  {
     if (self = [super init]) {
         self.type = HXPhotoModelMediaTypeCameraPhoto;
@@ -376,13 +406,13 @@
         CGFloat w;
         CGFloat h;
         imgHeight = width / imgWidth * imgHeight;
-        if (imgHeight > height) {
-            w = height / self.imageSize.height * imgWidth;
-            h = height;
-        }else {
+//        if (imgHeight > height) {
+//            w = height / self.imageSize.height * imgWidth;
+//            h = height;
+//        }else {
             w = width;
             h = imgHeight;
-        }
+//        }
         _endImageSize = CGSizeMake(w, h);
     }
     return _endImageSize;
@@ -391,9 +421,15 @@
     if (_previewViewSize.width == 0 || _previewViewSize.height == 0) {
         _previewViewSize = self.endImageSize;
         CGFloat height = [UIScreen mainScreen].bounds.size.height;
-        if (_previewViewSize.height > height + 20) {
-            _previewViewSize.height = height;
-        } 
+        if ([HXPhotoCommon photoCommon].isHapticTouch) {
+            if (_previewViewSize.height > height * 0.6f) {
+                _previewViewSize.height = height * 0.6f;
+            }
+        }else {
+            if (_previewViewSize.height > height + 20) {
+                _previewViewSize.height = height;
+            }
+        }
     }
     return _previewViewSize;
 }
@@ -537,7 +573,8 @@
         self.videoTime = [aDecoder decodeObjectForKey:@"videoTime"];
         self.selectIndexStr = [aDecoder decodeObjectForKey:@"videoTime"];
         self.cameraIdentifier = [aDecoder decodeObjectForKey:@"cameraIdentifier"];
-//        self.fileURL = [aDecoder decodeObjectForKey:@"fileURL"];
+        self.cameraPhotoType = [aDecoder decodeIntegerForKey:@"cameraPhotoType"];
+        self.cameraVideoType = [aDecoder decodeIntegerForKey:@"cameraVideoType"];
     }
     return self;
 }
@@ -551,6 +588,8 @@
     [aCoder encodeObject:self.localIdentifier forKey:@"localIdentifier"];
     [aCoder encodeInteger:self.type forKey:@"type"];
     [aCoder encodeInteger:self.subType forKey:@"subType"];
+    [aCoder encodeInteger:self.cameraPhotoType forKey:@"cameraPhotoType"];
+    [aCoder encodeInteger:self.cameraVideoType forKey:@"cameraVideoType"];
     [aCoder encodeFloat:self.videoDuration forKey:@"videoDuration"];
     [aCoder encodeBool:self.selected forKey:@"selected"];
     [aCoder encodeObject:self.videoURL forKey:@"videoURL"];

@@ -231,9 +231,9 @@
 
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
-//    if (!manager.cameraRollAlbumModel) {
-//        [manager preloadData];
-//    }
+    if (!manager.cameraRollAlbumModel) {
+        [manager preloadData];
+    }
     manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
     if (self.manager.afterSelectedArray.count > 0) {
         if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
@@ -414,6 +414,8 @@
         [self.manager preloadData];
     }
     if (self.outerCamera) {
+        HXPhotoBottomViewModel *shootingModel = [[HXPhotoBottomViewModel alloc] init];
+        shootingModel.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
         if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
             if (self.manager.configuration.photoMaxNum > 0) {
                 self.manager.configuration.maxNum = self.manager.configuration.photoMaxNum;
@@ -427,15 +429,20 @@
                 self.manager.configuration.videoMaxNum > 0) {
                 self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum + self.manager.configuration.photoMaxNum;
             }
+            shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
         }
+        HXPhotoBottomViewModel *selectModel = [[HXPhotoBottomViewModel alloc] init];
+        selectModel.title = [NSBundle hx_localizedStringForKey:@"从手机相册选择"];
+        
         HXWeakSelf
-        [HXPhotoBottomSelectView showSelectViewWithTitles:@[[NSBundle hx_localizedStringForKey:@"拍摄"], [NSBundle hx_localizedStringForKey:@"从手机相册选择"]] cancelTitle:nil adaptiveDarkness:self.adaptiveDarkness selectCompletion:^(NSInteger index, NSString * _Nonnull title) {
+        HXPhotoBottomSelectView *selectView = [HXPhotoBottomSelectView showSelectViewWithModels:@[shootingModel, selectModel] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomSelectView * _Nonnull model) {
             if (index == 0) {
                 [weakSelf goCameraViewController];
             }else if (index == 1) {
                 [weakSelf directGoPhotoViewController];
             }
         } cancelClick:nil];
+        selectView.adaptiveDarkness = self.adaptiveDarkness;
         return;
     }
     [self directGoPhotoViewController];
@@ -951,7 +958,7 @@
     [super layoutSubviews];
     if (self.lineCount <= 0) self.lineCount = 1;
     NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
-    NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
+//    NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
     
     [self setupNewFrame];
     
@@ -968,9 +975,9 @@
             self.hx_h = itemW;
         }
     }
-    if (dataCount % self.lineCount == 0) {
-        numOfLinesNew -= 1;
-    }
+//    if (dataCount % self.lineCount == 0) {
+//        numOfLinesNew -= 1;
+//    }
     self.collectionView.frame = self.bounds;
     if (self.collectionView.hx_h <= 0) {
         self.numOfLinesOld = 0;

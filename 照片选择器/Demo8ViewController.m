@@ -8,7 +8,6 @@
 
 #import "Demo8ViewController.h" 
 #import "HXPhotoView.h"
-#import "HXDatePhotoToolManager.h"
 static const CGFloat kPhotoViewMargin = 12.0;
 @interface Demo8ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
@@ -20,8 +19,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @property (copy, nonatomic) NSArray *videoSessions;
 
 @property (assign, nonatomic) BOOL original;
-
-@property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
+ 
 @end
 
 @implementation Demo8ViewController
@@ -70,12 +68,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     }
     return _manager;
 }
-- (HXDatePhotoToolManager *)toolManager {
-    if (!_toolManager) {
-        _toolManager = [[HXDatePhotoToolManager alloc] init];
-    }
-    return _toolManager;
-}
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -112,68 +104,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)didNavOneBtnClick {
-    [self.view hx_showLoadingHUDText:@"写入中"];
-    __weak typeof(self) weakSelf = self;
-    HXDatePhotoToolManagerRequestType requestType;
-    if (self.original) {
-        requestType = HXDatePhotoToolManagerRequestTypeOriginal;
-    }else {
-        requestType = HXDatePhotoToolManagerRequestTypeHD;
-    }
-    [self.toolManager writeSelectModelListToTempPathWithList:self.selectList requestType:requestType success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
-        NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
-        NSURL *url = photoURL.firstObject;
-        if (url) {
-            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
-            NSSLog(@"%@",image);
-        }
-        [weakSelf.view hx_handleLoading];
-    } failed:^{
-        [weakSelf.view hx_handleLoading];
-        [weakSelf.view hx_showImageHUDText:@"写入失败"];
-        NSSLog(@"写入失败");
-    }];
-    
-    /*
-     
-     [self.toolManager getSelectedImageList:self.selectList requestType:HXDatePhotoToolManagerRequestTypeOriginal success:^(NSArray<UIImage *> *imageList) {
-     NSSLog(@"%@",imageList);
-     } failed:^{
-     
-     }];
-     
-    [self.toolManager writeSelectModelListToTempPathWithList:self.selectList success:^(NSArray<NSURL *> *allURL, NSArray<NSURL *> *photoURL, NSArray<NSURL *> *videoURL) {
-        NSSLog(@"\nall : %@ \nimage : %@ \nvideo : %@",allURL,photoURL,videoURL);
-        NSURL *url = photoURL.firstObject;
-        if (url) {
-            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
-            NSSLog(@"%@",image);
-        }
-        [weakSelf.view handleLoading];
-    } failed:^{
-        [weakSelf.view handleLoading];
-        [weakSelf.view showImageHUDText:@"写入失败"];
-        NSSLog(@"写入失败");
-    }];
-     */
 }
 
-- (void)didNavTwoBtnClick {
-    /**
-        关于取消!!!
-        
-        图片：只能取消 正在请求资源的 不能取消正在写入临时目录的  简而言之就是图片写入取消不了 🤣🤣🤣
-             当请求到结果后是取消不了的。这个也什么影响 图片请求速度很快写入也很快只有视频比较慢
-     
-        视频：可以取消正在压缩写入文件的
-     
-     */
-    for (NSNumber *number in self.imageRequestIds) {
-        [[PHImageManager defaultManager] cancelImageRequest:[number intValue]];
-    }
-    for (AVAssetExportSession *session in self.videoSessions) {
-        [session cancelExport];
-    }
+- (void)didNavTwoBtnClick { 
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {

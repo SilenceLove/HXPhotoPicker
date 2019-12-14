@@ -29,6 +29,7 @@ HXVideoEditBottomViewDelegate
 @property (assign, nonatomic) CGFloat validRectX;
 @property (strong, nonatomic) HXPhotoModel *afterModel;
 @property (strong, nonatomic) UITapGestureRecognizer *cancelTap;
+@property (strong, nonatomic) NSURLSessionDownloadTask *downloadTask;
 @end
 
 @implementation HXVideoEditViewController
@@ -44,6 +45,9 @@ HXVideoEditBottomViewDelegate
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self stopTimer];
+    if (self.downloadTask) {
+        [self.downloadTask cancel];
+    }
     [[PHImageManager defaultManager] cancelImageRequest:self.requestId];
     [self.navigationController setNavigationBarHidden:NO];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -179,6 +183,29 @@ HXVideoEditBottomViewDelegate
             [self.view hx_showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"加载中"]];
         }
         HXWeakSelf
+        if (self.model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+            self.downloadTask = [[HXPhotoCommon photoCommon] downloadVideoWithURL:self.model.videoURL progress:nil downloadSuccess:^(NSURL * _Nullable filePath, NSURL * _Nullable videoURL) {
+                [weakSelf.view removeGestureRecognizer:weakSelf.cancelTap];
+                [weakSelf.view hx_handleLoading];
+                weakSelf.avAsset = [AVAsset assetWithURL:filePath];
+                weakSelf.requestComplete = YES;
+                if (!weakSelf.isInside) {
+                    [weakSelf setupVideo];
+                }else {
+                    if (weakSelf.transitionCompletion) {
+                        [weakSelf setupVideo];
+                    }
+                }
+            } downloadFailure:^(NSError * _Nullable error, NSURL * _Nullable videoURL) {
+                [weakSelf.view hx_handleLoading];
+                hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"获取视频失败!"], nil, [NSBundle hx_localizedStringForKey:@"返回"], [NSBundle hx_localizedStringForKey:@"获取"], ^{
+                    [weakSelf videoEditBottomViewDidCancelClick:nil];
+                }, ^{
+                    [weakSelf getVideo];
+                });
+            }];
+            return;
+        }
         self.requestId = [self.model requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
             weakSelf.requestId = iCloudRequestId;
         } progressHandler:nil success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {

@@ -13,16 +13,14 @@
 @interface HXPhotoInteractiveTransition ()<UIGestureRecognizerDelegate>
 @property (nonatomic, weak) id<UIViewControllerContextTransitioning> transitionContext;
 @property (nonatomic, weak) UIViewController *vc;
-@property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) HXPreviewContentView *contentView;
 @property (strong, nonatomic) UIView *bgView;
 @property (weak, nonatomic) HXPhotoViewCell *tempCell;
 @property (weak, nonatomic) HXPhotoPreviewViewCell *fromCell;
-@property (strong, nonatomic) UIImageView *tempImageView;
 @property (assign, nonatomic) CGRect imageInitialFrame;
 @property (assign, nonatomic) CGPoint transitionImgViewCenter;
 @property (assign, nonatomic) CGFloat beginX;
 @property (assign, nonatomic) CGFloat beginY;
-@property (strong, nonatomic) AVPlayerLayer *playerLayer;
 
 
 @property (assign, nonatomic) CGFloat scrollViewZoomScale;
@@ -131,8 +129,8 @@
         if (imageViewScale < 0.4) {
             imageViewScale = 0.4;
         }
-        self.tempImageView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
-        self.tempImageView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
+        self.contentView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
+        self.contentView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
         
         [self updateInterPercent:1 - scale * scale];
         
@@ -180,43 +178,12 @@
     
     UIView *containerView = [transitionContext containerView];
     CGRect tempImageViewFrame;
-    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
-#if HasYYKitOrWebImage
-        self.tempImageView = fromCell.animatedImageView;
-        self.imageInitialFrame = fromCell.animatedImageView.frame;
-        tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
-#else
-        self.tempImageView = fromCell.imageView;
-        self.imageInitialFrame = fromCell.imageView.frame;
-        tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
-#endif
-    }else {
-        if (!fromCell.playerLayer.player) {
-#if HasYYKitOrWebImage
-            self.tempImageView = fromCell.animatedImageView;
-            tempImageViewFrame = [fromCell.animatedImageView convertRect:fromCell.animatedImageView.bounds toView:containerView];
-#else
-            self.tempImageView = fromCell.imageView;
-            tempImageViewFrame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView:containerView];
-#endif
-        }else {
-            tempImageViewFrame = containerView.bounds;
-            [fromCell.playerLayer removeFromSuperlayer];
-            self.playerLayer = fromCell.playerLayer;
-            self.tempImageView = [[UIImageView alloc] init];
-            self.tempImageView.layer.masksToBounds = YES;
-            [self.tempImageView.layer addSublayer:self.playerLayer];
-//            if (HX_IS_IPhoneX_All) {
-//                tempImageViewFrame = CGRectMake(tempImageViewFrame.origin.x, tempImageViewFrame.origin.y + hxTopMargin, tempImageViewFrame.size.width, tempImageViewFrame.size.height);
-//            }
-        }
-    }
+    self.contentView = fromCell.previewContentView;
+    self.imageInitialFrame = fromCell.previewContentView.frame;
+    tempImageViewFrame = [fromCell.previewContentView convertRect:fromCell.previewContentView.bounds toView:containerView];
     
-    self.tempImageView.clipsToBounds = YES;
-    self.tempImageView.contentMode = UIViewContentModeScaleAspectFill;
-    BOOL contains = YES;
     if (!toCell) {
-        contains = [toVC scrollToModel:model];
+        [toVC scrollToModel:model];
         toCell = [toVC currentPreviewCell:model];
     }
     self.bgView = [[UIView alloc] initWithFrame:containerView.bounds];
@@ -237,18 +204,18 @@
     }else {
         scaleY = (self.beginY - tempImageViewFrame.origin.y) / tempImageViewFrame.size.height;
     }
-    self.tempImageView.layer.anchorPoint = CGPointMake(scaleX, scaleY);
+    self.contentView.layer.anchorPoint = CGPointMake(scaleX, scaleY);
     
     [fromCell resetScale:NO];
     [fromCell refreshImageSize];
     
-    self.tempImageView.frame = tempImageViewFrame;
-    self.transitionImgViewCenter = self.tempImageView.center;
+    self.contentView.frame = tempImageViewFrame;
+    self.transitionImgViewCenter = self.contentView.center;
     
     [containerView addSubview:toVC.view];
     [containerView addSubview:fromVC.view];
     [toVC.view insertSubview:self.bgView belowSubview:toVC.bottomView];
-    [toVC.view insertSubview:self.tempImageView belowSubview:toVC.bottomView];
+    [toVC.view insertSubview:self.contentView belowSubview:toVC.bottomView];
     if (!fromVC.bottomView.userInteractionEnabled) {
         self.bgView.backgroundColor = [UIColor blackColor];
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -296,7 +263,10 @@
     if (toCell) {
         [toVC scrollToPoint:toCell rect:rect];
     }
-    self.tempCell = toCell; 
+    self.tempCell = toCell;
+    if (self.contentView.model.subType == HXPhotoModelMediaSubTypeVideo) {
+        [self.contentView.videoView hideOtherView:YES];
+    }
 }
 - (void)updateInterPercent:(CGFloat)scale{
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[self.transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -318,11 +288,13 @@
         [toVC.navigationController setNavigationBarHidden:YES];
         toVC.navigationController.navigationBar.alpha = 1;
     }
+    if (self.contentView.model.subType == HXPhotoModelMediaSubTypeVideo) {
+        [self.contentView.videoView showOtherView];
+    }
     [UIView animateWithDuration:0.2f animations:^{
         fromVC.view.alpha = 1;
-        self.tempImageView.transform = CGAffineTransformIdentity;
-        self.tempImageView.center = self.transitionImgViewCenter;
-//        self.tempImageView.hx_size = [self.fromCell getImageSize];
+        self.contentView.transform = CGAffineTransformIdentity;
+        self.contentView.center = self.transitionImgViewCenter;
         
         self.bgView.alpha = 1;
         if (!fromVC.bottomView.userInteractionEnabled) {
@@ -332,35 +304,35 @@
         }
     } completion:^(BOOL finished) {
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
-        
-        fromVC.collectionView.hidden = NO;
-        if (!fromVC.bottomView.userInteractionEnabled) {
-            fromVC.view.backgroundColor = [UIColor blackColor];
-            if (HX_IOS11_Later) {
-                // 处理 ios11 当导航栏隐藏时手势返回的问题
-                [toVC.navigationController setNavigationBarHidden:YES];
+        if (finished) {
+            fromVC.collectionView.hidden = NO;
+            if (!fromVC.bottomView.userInteractionEnabled) {
+                fromVC.view.backgroundColor = [UIColor blackColor];
+                if (HX_IOS11_Later) {
+                    // 处理 ios11 当导航栏隐藏时手势返回的问题
+                    [toVC.navigationController setNavigationBarHidden:YES];
+                }
+            }else {
+                fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
             }
-        }else {
-            fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+            self.tempCell.hidden = NO;
+            self.tempCell = nil;
+            
+            self.contentView.layer.anchorPoint = CGPointMake(0.5f, 0.5f);
+            [self.fromCell againAddImageView];
+            [self.fromCell setScrollViewZoomScale:self.scrollViewZoomScale];
+            self.contentView.frame = self.imageInitialFrame;
+            [self.fromCell setScrollViewContnetSize:self.scrollViewContentSize];
+            if (self.scrollViewContentOffset.y < 0) {
+                self.scrollViewContentOffset = CGPointMake(self.scrollViewContentOffset.x, 0);
+            }
+            [self.fromCell setScrollViewContentOffset:self.scrollViewContentOffset];
+             
+            [self.bgView removeFromSuperview];
+            self.bgView = nil;
+            self.fromCell = nil;
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }
-        self.tempCell.hidden = NO;
-        self.tempCell = nil;
-        
-        self.tempImageView.layer.anchorPoint = CGPointMake(0.5f, 0.5f);
-        [self.fromCell againAddImageView];
-        [self.fromCell setScrollViewZoomScale:self.scrollViewZoomScale];
-        self.tempImageView.frame = self.imageInitialFrame;
-        [self.fromCell setScrollViewContnetSize:self.scrollViewContentSize];
-        if (self.scrollViewContentOffset.y < 0) {
-            self.scrollViewContentOffset = CGPointMake(self.scrollViewContentOffset.x, 0);
-        }
-        [self.fromCell setScrollViewContentOffset:self.scrollViewContentOffset];
-        
-        self.playerLayer = nil;
-        [self.bgView removeFromSuperview];
-        self.bgView = nil;
-        self.fromCell = nil;
-        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
     }];
 }
 //完成
@@ -370,21 +342,24 @@
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXPhotoViewController *toVC = (HXPhotoViewController *)[self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     NSTimeInterval duration = fromVC.manager.configuration.popInteractiveTransitionDuration;
-    UIViewAnimationOptions option = fromVC.manager.configuration.transitionAnimationOption;
+    UIViewAnimationOptions option = UIViewAnimationOptionLayoutSubviews;
     
-    CGRect tempImageViewFrame = self.tempImageView.frame;
-    self.tempImageView.layer.anchorPoint = CGPointMake(0.5, 0.5);
-    self.tempImageView.transform = CGAffineTransformIdentity;
-    self.tempImageView.frame = tempImageViewFrame;
-    self.playerLayer.frame = CGRectMake(0, 0, self.tempCell.imageView.hx_w, self.tempCell.imageView.hx_h);
+    if (self.contentView.model.subType == HXPhotoModelMediaSubTypeVideo) {
+        [self.contentView.videoView hideOtherView:NO];
+    }
+    CGRect tempImageViewFrame = self.contentView.frame;
+    self.contentView.layer.anchorPoint = CGPointMake(0.5, 0.5);
+    self.contentView.transform = CGAffineTransformIdentity;
+    self.contentView.frame = tempImageViewFrame;
+    [self.contentView layoutIfNeeded];
     
     [UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
         if (self.tempCell) {
-            self.tempImageView.frame = [self.tempCell.imageView convertRect:self.tempCell.imageView.bounds toView: containerView];
+            self.contentView.frame = [self.tempCell.imageView convertRect:self.tempCell.imageView.bounds toView: containerView]; 
         }else {
-            self.tempImageView.center = self.transitionImgViewCenter;
-            self.tempImageView.alpha = 0;
-            self.tempImageView.transform = CGAffineTransformMakeScale(0.3, 0.3);
+            self.contentView.center = self.transitionImgViewCenter;
+            self.contentView.alpha = 0;
+            self.contentView.transform = CGAffineTransformMakeScale(0.3, 0.3);
         }
         fromVC.view.alpha = 0;
         self.bgView.alpha = 0;
@@ -392,20 +367,21 @@
         toVC.bottomView.alpha = 1;
     }completion:^(BOOL finished) {
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
-        
-        if (!fromVC.bottomView.userInteractionEnabled && HX_IOS11_Later) {
-            // 处理 ios11 当导航栏隐藏时手势返回的问题
-            [toVC.navigationController.navigationBar.layer removeAllAnimations];
-            [toVC.navigationController setNavigationBarHidden:NO];
-        }
-        [self.tempCell bottomViewPrepareAnimation];
-        self.tempCell.hidden = NO;
-        [self.tempCell bottomViewStartAnimation];
-        self.playerLayer = nil;
-        [self.tempImageView removeFromSuperview];
-        [self.bgView removeFromSuperview];
+        if (finished) {
+            if (!fromVC.bottomView.userInteractionEnabled && HX_IOS11_Later) {
+                // 处理 ios11 当导航栏隐藏时手势返回的问题
+                [toVC.navigationController.navigationBar.layer removeAllAnimations];
+                [toVC.navigationController setNavigationBarHidden:NO];
+            }
+            [self.tempCell bottomViewPrepareAnimation];
+            self.tempCell.hidden = NO;
+            [self.tempCell bottomViewStartAnimation];
+            [self.contentView removeFromSuperview];
+            [self.bgView removeFromSuperview];
+            self.contentView = nil;
 
-        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+        }
     }];  
 }
 - (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {

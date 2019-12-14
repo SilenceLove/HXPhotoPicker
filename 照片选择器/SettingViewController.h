@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 @class HXPhotoManager;
 @interface SettingViewController : UIViewController
-@property (strong, nonatomic) HXPhotoManager *manager;
+@property (weak, nonatomic) HXPhotoManager *manager;
 @property (copy, nonatomic) void (^ saveCompletion)(HXPhotoManager *manager);
 @end
 

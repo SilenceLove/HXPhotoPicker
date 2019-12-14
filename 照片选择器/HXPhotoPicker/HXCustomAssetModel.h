@@ -9,9 +9,11 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
-    HXCustomAssetModelTypeLocalImage = 1,   //!< 本地图片
-    HXCustomAssetModelTypeLocalVideo = 2,   //!< 本地视频
-    HXCustomAssetModelTypeNetWorkImage = 3  //!< 网络图片
+    HXCustomAssetModelTypeLocalImage    = 1,    //!< 本地图片
+    HXCustomAssetModelTypeLocalVideo    = 2,    //!< 本地视频
+    HXCustomAssetModelTypeNetWorkImage  = 3,    //!< 网络图片
+    HXCustomAssetModelTypeNetWorkVideo  = 4,    //!< 网络视频
+    HXCustomAssetModelTypeLivePhoto     = 5     //!< livePhoto
 };
 
 @interface HXCustomAssetModel : NSObject
@@ -22,12 +24,12 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
 @property (assign, nonatomic) HXCustomAssetModelType type;
 
 /**
- 网络图片地址
+ 网络图片地址 or 网络视频封面
  */
 @property (strong, nonatomic) NSURL *networkImageURL;
 
 /**
- 网络图片缩略图地址
+ 网络图片缩略图地址 or 网络视频封面
  */
 @property (strong, nonatomic) NSURL *networkThumbURL;
 
@@ -40,6 +42,12 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
  本地视频地址
  */
 @property (strong, nonatomic) NSURL *localVideoURL;
+
+/// 网络视频地址
+@property (strong, nonatomic) NSURL *networkVideoURL;
+
+/// 视频时长
+@property (assign, nonatomic) NSTimeInterval videoDuration;
 
 /**
  是否选中
@@ -91,4 +99,17 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
  @return HXCustomAssetModel
  */
 + (instancetype)assetWithLocalVideoURL:(NSURL *)videoURL selected:(BOOL)selected;
+
+/// 根据网络视频地址、视频封面初始化
+/// @param videoURL 视频地址
+/// @param videoCoverURL 视频封面地址
+/// @param videoDuration 视频时长
+/// @param selected 是否选中
++ (instancetype)assetWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration selected:(BOOL)selected;
+
+/// 根据本地图片和本地视频生成LivePhoto
+/// @param image 本地图片
+/// @param videoURL 本地视频地址
+/// @param selected 是否选中
++ (instancetype)livePhotoAssetWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected;
 @end
