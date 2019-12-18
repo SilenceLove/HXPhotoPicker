@@ -105,7 +105,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                          subTitle:@"传入本地image/video并展示"
                                 viewControllClass: [Demo7ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo8"
-                                         subTitle:@"将已选模型(图片和视频)写入临时目录  一键写入^_^"
+                                         subTitle:@"如何获取已选的照片和视频，具体请看代码"
                                 viewControllClass: [Demo8ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo9"
                                          subTitle:@"cell上添加photoView(附带3DTouch预览)"

@@ -11,5 +11,6 @@
 @class HXPhotoView;
 @interface HXPhotoPersentInteractiveTransition : UIPercentDrivenInteractiveTransition
 @property (nonatomic, assign) BOOL interation;
+@property (assign, nonatomic) BOOL atFirstPan;
 - (void)addPanGestureForViewController:(UIViewController *)viewController photoView:(HXPhotoView *)photoView ;
 @end

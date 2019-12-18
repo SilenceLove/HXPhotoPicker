@@ -164,6 +164,7 @@ static id instance;
                                    downloadSuccess:(void (^)(NSURL * _Nullable filePath, NSURL * _Nullable videoURL))success
                                    downloadFailure:(void (^)(NSError * _Nullable error, NSURL * _Nullable videoURL))failure {
     NSString *videoFilePath = [HXPhotoTools getVideoURLFilePath:videoURL];
+    
     NSURL *videoFileURL = [NSURL fileURLWithPath:videoFilePath];
     if ([HXPhotoTools FileExistsAtVideoURL:videoURL]) {
         if (success) {

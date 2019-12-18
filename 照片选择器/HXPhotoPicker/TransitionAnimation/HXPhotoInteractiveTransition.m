@@ -27,7 +27,6 @@
 @property (assign, nonatomic) CGSize scrollViewContentSize;
 @property (assign, nonatomic) CGPoint scrollViewContentOffset;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
-@property (assign, nonatomic) BOOL atFirstPan;
 @end
 
 @implementation HXPhotoInteractiveTransition
@@ -108,9 +107,6 @@
     if (scale > 1.f) {
         scale = 1.f;
     }
-    if (scale < 0.f) {
-        scale = 0.f;
-    }
     return scale;
 }
 - (void)panGestureBegan:(UIPanGestureRecognizer *)panGesture {
@@ -124,6 +120,9 @@
 - (void)panGestureChanged:(UIPanGestureRecognizer *)panGesture {
     if (self.interation) {
         CGFloat scale = [self panGestureScale:panGesture];
+        if (scale < 0.f) {
+            scale = 0.f;
+        }
         CGPoint translation = [panGesture translationInView:panGesture.view];
         CGFloat imageViewScale = 1 - scale * 0.5;
         if (imageViewScale < 0.4) {
@@ -141,6 +140,9 @@
     
     if (self.interation) {
         CGFloat scale = [self panGestureScale:panGesture];
+        if (scale < 0.f) {
+            scale = 0.f;
+        }
         self.interation = NO;
         if (scale < 0.15f){
             [self cancelInteractiveTransition];
@@ -291,6 +293,7 @@
     if (self.contentView.model.subType == HXPhotoModelMediaSubTypeVideo) {
         [self.contentView.videoView showOtherView];
     }
+    self.panGesture.enabled = NO;
     [UIView animateWithDuration:0.2f animations:^{
         fromVC.view.alpha = 1;
         self.contentView.transform = CGAffineTransformIdentity;
@@ -332,6 +335,9 @@
             self.bgView = nil;
             self.fromCell = nil;
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                self.panGesture.enabled = YES;
+            });
         }
     }];
 }
@@ -376,10 +382,10 @@
             [self.tempCell bottomViewPrepareAnimation];
             self.tempCell.hidden = NO;
             [self.tempCell bottomViewStartAnimation];
+            [self.contentView cancelRequest];
             [self.contentView removeFromSuperview];
             [self.bgView removeFromSuperview];
             self.contentView = nil;
-
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }
     }];  

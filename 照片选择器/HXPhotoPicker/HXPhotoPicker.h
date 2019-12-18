@@ -26,3 +26,4 @@
 #import "UIImageView+HXExtension.h"
 #import "NSArray+HXExtension.h"
 #import "UIColor+HexString.h"
+#import "HXPhotoBottomSelectView.h"

@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 选中颜色
 @property (strong, nonatomic) UIColor *selectColor;
+
+/// 自定义属性
+@property (strong, nonatomic) id customData;
 @end
 
 @interface HXPhotoBottomSelectView : UIView

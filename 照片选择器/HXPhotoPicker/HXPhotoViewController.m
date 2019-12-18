@@ -2081,6 +2081,7 @@ HXVideoEditViewControllerDelegate
     [self.contentView addSubview:self.highlightMaskView];
 }
 - (void)bottomViewPrepareAnimation {
+    [self.maskView.layer removeAllAnimations];
     self.maskView.alpha = 0;
 }
 - (void)bottomViewStartAnimation {

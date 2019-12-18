@@ -144,7 +144,15 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXWeakSelf
     // 长按事件
     photoManager.configuration.previewRespondsToLongPress = ^(UILongPressGestureRecognizer *longPress, HXPhotoModel *photoModel, HXPhotoManager *manager, HXPhotoPreviewViewController *previewViewController) {
-        hx_showAlert(previewViewController, @"提示", @"长按事件", @"确定", nil, nil, nil);
+        HXPhotoBottomViewModel *model = [[HXPhotoBottomViewModel alloc] init];
+        model.title = @"保存";
+        model.subTitle = @"这是一个长按事件";
+        [HXPhotoBottomSelectView showSelectViewWithModels:@[model] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomSelectView * _Nonnull model) {
+            if (index == 0) {
+                // 保存，处理...
+            }
+        } cancelClick:nil];
+//        hx_showAlert(previewViewController, @"提示", @"长按事件", @"确定", nil, nil, nil);
     };
     
     // 跳转预览界面时动画起始的view

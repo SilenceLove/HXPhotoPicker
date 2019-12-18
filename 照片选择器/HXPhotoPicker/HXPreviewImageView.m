@@ -95,6 +95,7 @@ HXWeakSelf
                         [weakSelf.progressView showError];
                     }else {
                         if (image) {
+                            weakSelf.model.imageSize = image.size;
                             weakSelf.progressView.progress = 1;
                             weakSelf.progressView.hidden = YES;
                             weakSelf.animatedImageView.image = image;

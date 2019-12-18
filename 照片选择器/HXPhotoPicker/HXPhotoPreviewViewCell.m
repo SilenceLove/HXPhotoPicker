@@ -59,7 +59,7 @@
 }
 - (CGSize)getImageSize {
     CGFloat width = self.frame.size.width;
-    CGFloat height = self.frame.size.height;
+//    CGFloat height = self.frame.size.height;
     CGFloat imgWidth = self.model.imageSize.width;
     CGFloat imgHeight = self.model.imageSize.height;
     CGFloat w;
@@ -99,7 +99,7 @@
         self.previewContentView.center = CGPointMake(width / 2, height / 2);
         self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
     }else {
-        self.scrollView.contentSize = self.hx_size;
+        self.scrollView.contentSize = self.previewContentView.hx_size;
     }
 }
 - (void)setModel:(HXPhotoModel *)model {
@@ -130,7 +130,7 @@
         self.previewContentView.center = CGPointMake(width / 2, height / 2);
         self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
     }else {
-        self.scrollView.contentSize = self.hx_size;
+        self.scrollView.contentSize = self.previewContentView.hx_size;
     }
     self.previewContentView.model = model;
 }

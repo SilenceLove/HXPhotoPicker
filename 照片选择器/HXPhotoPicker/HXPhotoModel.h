@@ -339,7 +339,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 /**
  导出视频
 
- @param presetName AVAssetExportPresetHighestQuality
+ @param presetName AVAssetExportPresetHighestQuality // 为空时默认 AVAssetExportPresetMediumQuality
  @param startRequestICloud 开始下载iCloud上的视频，如果视频是iCloud的视频则会先下载
  @param iCloudProgressHandler iCloud下载进度
  @param exportProgressHandler 视频导出进度

@@ -32,7 +32,6 @@
 @property (assign, nonatomic) CGRect imageInitialFrame;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
 
-@property (assign, nonatomic) BOOL atFirstPan;
 @end
 
 @implementation HXPhotoPersentInteractiveTransition
@@ -309,6 +308,7 @@
     if (self.contentView.model.subType == HXPhotoModelMediaSubTypeVideo) {
         [self.contentView.videoView showOtherView];
     }
+    self.panGesture.enabled = NO;
     [UIView animateWithDuration:0.2f animations:^{
         fromVC.view.alpha = 1;
         self.contentView.transform = CGAffineTransformIdentity;
@@ -343,6 +343,9 @@
             [self.bgView removeFromSuperview];
             self.bgView = nil;
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                self.panGesture.enabled = YES;
+            });
         }
     }];
 }
@@ -380,7 +383,6 @@
         if (self.tempCell) {
             self.contentView.frame = [self.tempCell convertRect:self.tempCell.bounds toView: containerView];
         }else {
-//            self.tempImageView.center = self.transitionImgViewCenter;
             self.contentView.alpha = 0;
             self.contentView.transform = CGAffineTransformMakeScale(0.3, 0.3);
         }
@@ -390,9 +392,11 @@
     }completion:^(BOOL finished) {
         if (finished) {
             self.tempCell.hidden = NO;
+            [self.contentView cancelRequest];
             [self.contentView removeFromSuperview];
             [self.bgView removeFromSuperview];
             self.contentView = nil;
+            self.bgView = nil;
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }
     }];

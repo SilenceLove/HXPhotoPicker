@@ -35,7 +35,7 @@
 - [x] 自定义相机拍照、录制视频
 - [x] 自定义转场动画
 - [x] 查看、选择LivePhoto IOS9.1以上才有用
-- [x] 浏览网络图片
+- [x] 浏览网络图片、网络视频
 - [x] 自定义裁剪图片
 - [x] 自定义裁剪视频时长
 - [x] 传入本地图片、视频
@@ -50,7 +50,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.8'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.9'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - ```v2.3.2 pod没有依赖sd和yy```  ```>= v2.3.3 pod依赖了yy```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是 ```YYWebImage``` || ```>= v2.3.0```  -> ```SDWebImage v5.0``` || ```< v2.3.0``` ->  ```SDWebImage v4.0```
@@ -332,6 +332,13 @@ photoView.backgroundColor = [UIColor whiteColor];
 */
 + (instancetype)assetWithLocalVideoURL:(NSURL *)videoURL selected:(BOOL)selected;
 
+/// 根据网络视频地址、视频封面初始化
+/// @param videoURL 视频地址
+/// @param videoCoverURL 视频封面地址
+/// @param videoDuration 视频时长
+/// @param selected 是否选中
++ (instancetype)assetWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration selected:(BOOL)selected;
+
 创建HXCustomAssetModel完成后，通过HXPhotoManager对象的这个方法进行添加
 /**
 添加自定义资源模型
@@ -579,7 +586,8 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
-- v2.3.8　-　支持HXPhotoView支持Masonry，Demo添加Xib和Masonry混合布局示例、优化暗黑模式
+- v2.3.8　-　支持添加网络视频、视频添加进度条，demo8添加获取图片/视频详细注释
+- v2.3.8　-　HXPhotoView支持Masonry，Demo添加Xib和Masonry混合布局示例、优化暗黑模式
 - v2.3.7　-　彻底解决视图因导航栏半透明效果向下偏移问题，选择时照片/视频可限制大小，优化快速滑动列表
 - v2.3.6　-　添加单独跳转编辑界面方法、废弃HXPhotoModel里的fileURL属性、修复布局失败、取消回调无效问题
 - v2.3.5　-　requestImageAfterFinishingSelection 为YES时也可获取视频地址、HXPhotoView支持横向布局、替换系统ActionSheet为自定义view、可自定义相机拍摄和录制选项、解决相机卡顿问题、完善ios13适配、提升稳定性等...
@@ -631,9 +639,9 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 ## <a id="后续计划"></a> 六.  后续计划 - Plan
 ```
-- [ ] 视频添加进度条
-- [ ] 支持添加网络视频
-- [ ] 视频查看时支持放大缩小
+- [x] 视频添加进度条
+- [x] 支持添加网络视频
+- [x] 视频查看时支持放大缩小
 - [ ] HXPhotoView支持单选模式
 ...
 ```

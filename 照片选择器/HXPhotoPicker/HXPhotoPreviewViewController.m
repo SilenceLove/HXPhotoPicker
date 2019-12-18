@@ -798,6 +798,8 @@ HXVideoEditViewControllerDelegate
 
 #pragma mark - < UICollectionViewDelegate >
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    self.persentInteractiveTransition.atFirstPan = NO;
+    self.interactiveTransition.atFirstPan = NO;
     [(HXPhotoPreviewViewCell *)cell resetScale:NO];
 }
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
