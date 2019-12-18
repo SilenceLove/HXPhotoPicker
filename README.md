@@ -50,7 +50,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.3.9'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.0'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - ```v2.3.2 pod没有依赖sd和yy```  ```>= v2.3.3 pod依赖了yy```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是 ```YYWebImage``` || ```>= v2.3.0```  -> ```SDWebImage v5.0``` || ```< v2.3.0``` ->  ```SDWebImage v4.0```
@@ -586,7 +586,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
-- v2.3.8　-　支持添加网络视频、视频添加进度条，demo8添加获取图片/视频详细注释
+- v2.4.0　-　支持添加网络视频、视频添加进度条，demo8添加获取图片/视频详细注释
 - v2.3.8　-　HXPhotoView支持Masonry，Demo添加Xib和Masonry混合布局示例、优化暗黑模式
 - v2.3.7　-　彻底解决视图因导航栏半透明效果向下偏移问题，选择时照片/视频可限制大小，优化快速滑动列表
 - v2.3.6　-　添加单独跳转编辑界面方法、废弃HXPhotoModel里的fileURL属性、修复布局失败、取消回调无效问题
