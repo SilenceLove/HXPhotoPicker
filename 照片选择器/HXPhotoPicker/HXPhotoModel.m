@@ -400,7 +400,7 @@
 {
     if (_endImageSize.width == 0 || _endImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height;
+//        CGFloat height = [UIScreen mainScreen].bounds.size.height;
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;
