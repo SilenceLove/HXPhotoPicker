@@ -935,15 +935,25 @@
     
     if (numOfLinesNew != self.numOfLinesOld) {
         self.numOfLinesOld = numOfLinesNew;
-        CGFloat newHeight = numOfLinesNew * itemW + self.spacing * (numOfLinesNew - 1);
-        if (newHeight <= 0) {
-            newHeight = 0;
-            self.numOfLinesOld = 0;
-        }
-        if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal) {
-            self.hx_h = itemW;
-        }else {
+        CGFloat newHeight;
+        if ([self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
+            newHeight = [self.delegate photoViewHeight:self];
+            if (newHeight <= 0) {
+                newHeight = 0;
+                self.numOfLinesOld = 0;
+            }
             self.hx_h = newHeight;
+        }else {
+            newHeight = numOfLinesNew * itemW + self.spacing * (numOfLinesNew - 1);
+            if (newHeight <= 0) {
+                newHeight = 0;
+                self.numOfLinesOld = 0;
+            }
+            if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal) {
+                self.hx_h = itemW;
+            }else {
+                self.hx_h = newHeight;
+            }
         }
         if ([self.delegate respondsToSelector:@selector(photoView:updateFrame:)]) {
             [self.delegate photoView:self updateFrame:self.frame]; 
@@ -958,7 +968,6 @@
     [super layoutSubviews];
     if (self.lineCount <= 0) self.lineCount = 1;
     NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
-//    NSInteger numOfLinesNew = (dataCount / self.lineCount) + 1;
     
     [self setupNewFrame];
     
@@ -966,18 +975,18 @@
     CGFloat height = self.frame.size.height;
     
     if (dataCount == 1) {
-        UIEdgeInsets insets = self.collectionView.contentInset;
-        CGFloat itemW = (width - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
-        CGFloat roundH = roundf(height);
-        CGFloat roundW = roundf(itemW);
-        
-        if (roundH != roundW && fabs(height - itemW) >= 2) {
-            self.hx_h = itemW;
+        if ([self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
+            self.hx_h = [self.delegate photoViewHeight:self];
+        }else {
+            UIEdgeInsets insets = self.collectionView.contentInset;
+            CGFloat itemW = (width - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
+            CGFloat roundH = roundf(height);
+            CGFloat roundW = roundf(itemW);
+            if (roundH != roundW && fabs(height - itemW) >= 2) {
+                self.hx_h = itemW;
+            }
         }
     }
-//    if (dataCount % self.lineCount == 0) {
-//        numOfLinesNew -= 1;
-//    }
     self.collectionView.frame = self.bounds;
     if (self.collectionView.hx_h <= 0) {
         self.numOfLinesOld = 0;

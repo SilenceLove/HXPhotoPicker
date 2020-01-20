@@ -699,12 +699,27 @@
     UIImage *image;
     if (self.manager.configuration.movableCropBox) {
         image = [self clipImage];
-        
 //        [self changeClipImageView];
     }else {
         image = self.imageView.image;
     }
-    HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
+    if (self.manager.configuration.editAssetSaveSystemAblum) {
+        HXWeakSelf
+        [self.view hx_showLoadingHUDText:nil];
+        [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image location:nil complete:^(HXPhotoModel * _Nullable model, BOOL success) {
+            [weakSelf.view hx_handleLoading:YES];
+            if (model) {
+                [weakSelf editPhotoCompletionWithModel:model];
+            }else {
+                [weakSelf.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"处理失败，请重试"]];
+            }
+        }];
+    }else {
+        HXPhotoModel *model = [HXPhotoModel photoModelWithImage:image];
+        [self editPhotoCompletionWithModel:model];
+    }
+}
+- (void)editPhotoCompletionWithModel:(HXPhotoModel *)model {
     if (self.outside) {
         if (self.navigationController.viewControllers.count > 1) {
             if ([self.delegate respondsToSelector:@selector(photoEditViewControllerDidClipClick:beforeModel:afterModel:)]) {

@@ -423,7 +423,7 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     }else {
         connection.videoMirrored = NO;
     }
-    
+    HXWeakSelf
     id handler = ^(CMSampleBufferRef sampleBuffer, NSError *error) {
         if (sampleBuffer != NULL) {
             
@@ -432,12 +432,12 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
              jpegStillImageNSDataRepresentation:sampleBuffer];
             
             UIImage *image = [[UIImage alloc] initWithData:imageData];
-            if ([self.delegate respondsToSelector:@selector(takePicturesComplete:)]) {
-                [self.delegate takePicturesComplete:image];
+            if ([weakSelf.delegate respondsToSelector:@selector(takePicturesComplete:)]) {
+                [weakSelf.delegate takePicturesComplete:image];
             }
         } else {
-            if ([self.delegate respondsToSelector:@selector(takePicturesFailed)]) {
-                [self.delegate takePicturesFailed];
+            if ([weakSelf.delegate respondsToSelector:@selector(takePicturesFailed)]) {
+                [weakSelf.delegate takePicturesFailed];
             }
         }
     };
@@ -494,7 +494,6 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
         self.outputURL = [self uniqueURL];
         [self.movieOutput startRecordingToOutputFileURL:self.outputURL
                                       recordingDelegate:self];
-        
     }
 }
 
@@ -506,13 +505,7 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     return [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@%@", NSTemporaryDirectory(), [NSString stringWithFormat:@"hx%@.mov",[self videoOutFutFileName]]]];
 }
 - (NSString *)videoOutFutFileName {
-    NSString *fileName = @"";
-    NSDate *nowDate = [NSDate date];
-    NSString *dateStr = [NSString stringWithFormat:@"%ld", (long)[nowDate timeIntervalSince1970]];
-    NSString *numStr = [NSString stringWithFormat:@"%d",arc4random()%10000];
-    fileName = [fileName stringByAppendingString:dateStr];
-    fileName = [fileName stringByAppendingString:numStr];
-    return fileName;
+    return [NSString hx_fileName];
 }
 - (void)stopRecording {
     if ([self isRecording]) {

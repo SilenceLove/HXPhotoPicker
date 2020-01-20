@@ -14,7 +14,9 @@ static dispatch_once_t once1;
 static id instance;
 
 @interface HXPhotoCommon ()<NSURLConnectionDataDelegate>
+#if HasAFNetworking
 @property (strong, nonatomic) AFURLSessionManager *sessionManager;
+#endif
 @property (strong, nonatomic) NSURLConnection *urlFileLengthConnection;
 @property (copy, nonatomic) HXPhotoCommonGetUrlFileLengthSuccess fileLengthSuccessBlock;
 @property (copy, nonatomic) HXPhotoCommonGetUrlFileLengthFailure fileLengthFailureBlock;
@@ -43,8 +45,10 @@ static id instance;
     self = [super init];
     if (self) {
         self.isVCBasedStatusBarAppearance = [[[NSBundle mainBundle]objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"] boolValue];
+#if HasAFNetworking
         self.sessionManager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
         [self listenNetWorkStatus];
+#endif
         NSData *imageData = [[NSUserDefaults standardUserDefaults] objectForKey:HXCameraImageKey];
         if (imageData) {
             self.cameraImage = [NSKeyedUnarchiver unarchiveObjectWithData:imageData];
@@ -147,6 +151,7 @@ static id instance;
 }
 /** 初始化并监听网络变化 */
 - (void)listenNetWorkStatus {
+#if HasAFNetworking
     AFNetworkReachabilityManager *manager = [AFNetworkReachabilityManager sharedManager];
     self.netStatus = manager.networkReachabilityStatus;
     [manager startMonitoring];
@@ -157,6 +162,7 @@ static id instance;
             weakSelf.reachabilityStatusChangeBlock(status);
         }
     }];
+#endif
 }
 
 - (NSURLSessionDownloadTask * _Nullable)downloadVideoWithURL:(NSURL *)videoURL
@@ -172,7 +178,7 @@ static id instance;
         }
         return nil;
     }
-    
+#if HasAFNetworking
     NSURLRequest *request = [NSURLRequest requestWithURL:videoURL];
     /* 开始请求下载 */
     NSURLSessionDownloadTask *downloadTask = [self.sessionManager downloadTaskWithRequest:request progress:^(NSProgress * _Nonnull downloadProgress) {
@@ -200,6 +206,10 @@ static id instance;
     }];
     [downloadTask resume];
     return downloadTask;
+#else
+    NSSLog(@"没有导入AFNetworking网络框架无法下载视频");
+    return nil;
+#endif
 }
 + (void)deallocPhotoCommon {
     once = 0;
@@ -208,6 +218,8 @@ static id instance;
 }
 - (void)dealloc {
 //    NSSLog(@"dealloc");
+#if HasAFNetworking
     [[AFNetworkReachabilityManager sharedManager] stopMonitoring];
+#endif
 }
 @end

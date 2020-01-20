@@ -111,5 +111,5 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
 /// @param image 本地图片
 /// @param videoURL 本地视频地址
 /// @param selected 是否选中
-+ (instancetype)livePhotoAssetWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected;
+//+ (instancetype)livePhotoAssetWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected; // 暂不支持本地生成LivePhoto
 @end

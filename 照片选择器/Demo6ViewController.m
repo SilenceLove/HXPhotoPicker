@@ -91,12 +91,17 @@
 }
 
 - (void)didBtnClick {
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"相机",@"相册", nil];
-    
-    [sheet showInView:self.view];
+    HXPhotoBottomViewModel *model1 = [[HXPhotoBottomViewModel alloc] init];
+    model1.title = @"相机";
+    HXPhotoBottomViewModel *model2 = [[HXPhotoBottomViewModel alloc] init];
+    model2.title = @"相册";
+    HXWeakSelf
+    [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomSelectView * _Nonnull model) {
+        [weakSelf actionClickedButtonAtIndex:index];
+    } cancelClick:nil];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)actionClickedButtonAtIndex:(NSInteger)buttonIndex {
     HXWeakSelf
     if (buttonIndex == 0) {
         if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {

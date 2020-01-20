@@ -86,14 +86,15 @@
     
     self.popupTableViewCellHeight = 65.f;
     if (HX_IS_IPhoneX_All) {
+        self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
         self.popupTableViewHeight = 450;
     }else {
+        self.editVideoExportPresetName = AVAssetExportPresetMediumQuality;
         self.popupTableViewHeight = 350;
     }
     self.popupTableViewHorizontalHeight = 250; 
 //    self.albumShowMode = HXPhotoAlbumShowModePopup;
     
-    self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
     
     self.cellDarkSelectTitleColor = [UIColor whiteColor];
     self.cellDarkSelectBgColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1];
@@ -112,6 +113,8 @@
     self.videoAutoPlayType = HXVideoAutoPlayTypeWiFi;
     
     self.downloadNetworkVideo = YES;
+    
+    self.editAssetSaveSystemAblum = YES;
 }
 - (UIColor *)cameraFocusBoxColor {
     if (!_cameraFocusBoxColor) {

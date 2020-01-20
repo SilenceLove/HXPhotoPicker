@@ -59,7 +59,12 @@ HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
 
+/// 编辑后的照片/视频是否添加到系统相册中
+/// 默认为NO
+@property (assign, nonatomic) BOOL editAssetSaveSystemAblum;
+
 /// 预览视频时是否先下载视频再播放
+/// 只有当项目有AFNetworking网络框架的时候才有用
 @property (assign, nonatomic) BOOL downloadNetworkVideo;
 
 /// 预览视频时是否自动播放
@@ -147,7 +152,8 @@ HXPhotoPreviewViewController;
 /// 原图按钮显示已选照片大小时是否显示加载菊花
 @property (assign, nonatomic) BOOL showOriginalBytesLoading;
 
-/// 导出裁剪视频的质量 - default AVAssetExportPresetHighestQuality
+/// 导出裁剪视频的质量
+/// iPhoneX -> AVAssetExportPresetHighestQuality
 @property (copy, nonatomic) NSString *editVideoExportPresetName;
 
 /// 编辑视频时裁剪的最小秒数，如果小于1秒，则为1秒
@@ -534,7 +540,7 @@ HXPhotoPreviewViewController;
 /// 小图照片清晰度 越大越清晰、越消耗性能
 /// 设置太大的话获取图片资源时耗时长且内存消耗大可能会引起界面卡顿
 /// default：[UIScreen mainScreen].bounds.size.width
-/// 320    ->  0.8  |  375    ->  1.4  |  x      ->  2.4  |  other  ->  1.7
+/// 320    ->  0.8  |  375    ->  1.4  |  x      ->  3.0  |  other  ->  1.7
 @property (assign, nonatomic) CGFloat clarityScale;
 
 #pragma mark - < block返回的视图 >

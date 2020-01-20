@@ -92,7 +92,7 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     [weakSelf.previewView setupPreviewLayer];
-                    weakSelf.previewView.delegate = self;
+                    weakSelf.previewView.delegate = weakSelf;
                     [weakSelf setupCamera];
                 }
             });
@@ -197,16 +197,16 @@
     self.previewView.tapToFocusEnabled = self.cameraController.cameraSupportsTapToFocus;
 }
 - (void)requestAccessForAudio {
+    HXWeakSelf
     [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (granted) {
-                if (!self.addAudioInputComplete) {
-                    [self.cameraController addAudioInput];
-                    self.addAudioInputComplete = YES;
+                if (!weakSelf.addAudioInputComplete) {
+                    [weakSelf.cameraController addAudioInput];
+                    weakSelf.addAudioInputComplete = YES;
                 }
             }else {
-                HXWeakSelf
-                hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"无法使用麦克风"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], ^{
+                hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用麦克风"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问麦克风"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], ^{
                     [weakSelf.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"麦克风添加失败,录制视频会没有声音哦!"]];
                 }, ^{
                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
@@ -995,7 +995,7 @@
 }
 - (HXFullScreenCameraPlayView *)playView {
     if (!_playView) {
-        _playView = [[HXFullScreenCameraPlayView alloc] initWithFrame:CGRectMake(0, 0, 70, 70) color:self.manager.configuration.themeColor];
+        _playView = [[HXFullScreenCameraPlayView alloc] initWithFrame:CGRectMake(0, 0, 70, 70) color:self.manager.configuration.cameraFocusBoxColor];
         self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(takePictures)];
         [_playView addGestureRecognizer:self.tap];
     }

@@ -233,6 +233,11 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /// 取消预览大图的回调
 /// @param photoView self
 - (void)photoViewPreviewDismiss:(HXPhotoView *)photoView;
+
+/// 实现这个代理返回的高度就是HXPhotoView的高度，不会进行自动计算高度.
+/// 每次需要更新高度的时候触发，请确保高度正确
+/// @param photoView self
+- (CGFloat)photoViewHeight:(HXPhotoView *)photoView;
 @end
 
 @interface HXPhotoView : UIView

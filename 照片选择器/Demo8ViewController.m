@@ -121,6 +121,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
             // 再判断具体类型
             if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
                 // 到这里就说明这张图片不是手机相册里的图片，可能是本地的也可能是网络图片
+                // 关于相机拍照的的问题，当系统 < ios9.0的时候拍的照片虽然保存到了相册但是在列表里存的是本地的，没有PHAsset
+                // 当系统 >= ios9.0 的时候拍的照片就不是本地照片了，而是手机相册里带有PHAsset对象的照片
                 // 这里的 model.asset PHAsset是空的
                 // 判断具体类型
                 if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocal) {
@@ -150,7 +152,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
                 // 到这里就是手机相册里的图片了 model.asset PHAsset对象是有值的
                 // 如果需要上传 Gif 或者 LivePhoto 需要具体判断
                 if (model.type == HXPhotoModelMediaTypePhoto) {
-                    // 普通的照片，不是gif也是livephoto
+                    // 普通的照片，如果不可以查看和livePhoto的时候，这就也可能是GIF或者LivePhoto了，
+                    // 如果你的项目不支持动图那就不要取NSData或URL，因为如果本质是动图的话还是会变成动图传上去
+                    // 这样判断是不是GIF model.photoFormat == HXPhotoModelFormatGIF
+                    
                     // 如果 requestImageAfterFinishingSelection = YES 的话，直接取 model.previewPhoto 或者 model.thumbPhoto 在选择完成时候已经获取并且赋值了
                     // 获取image
                     // size 就是获取图片的质量大小，原图的话就是 PHImageManagerMaximumSize，其他质量可设置size来获取
@@ -245,6 +250,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                     // avAsset
                     // 自己根据avAsset去导出视频
                 } failed:nil];
+                
                 // 获取 AVAssetExportSession
                 [model requestAVAssetExportSessionStartRequestICloud:nil progressHandler:nil success:^(AVAssetExportSession * _Nullable assetExportSession, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
                     

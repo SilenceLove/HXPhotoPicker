@@ -1034,6 +1034,7 @@ HXVideoEditViewControllerDelegate
     }
 }
 #pragma mark - < preview Haptic Touch >
+#ifdef __IPHONE_13_0
 - (UIContextMenuConfiguration *)collectionView:(UICollectionView *)collectionView contextMenuConfigurationForItemAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)) {
     HXPhotoModel *_model;
     if (self.manager.configuration.showDateSectionHeader) {
@@ -1051,6 +1052,7 @@ HXVideoEditViewControllerDelegate
 - (void)collectionView:(UICollectionView *)collectionView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator API_AVAILABLE(ios(13.0)) {
     [self pushPreviewControler:animator.previewViewController];
 }
+#endif
 - (UIViewController *)previewViewControlerWithIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isICloud) {

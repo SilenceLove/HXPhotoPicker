@@ -50,7 +50,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.0'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.1'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - ```v2.3.2 pod没有依赖sd和yy```  ```>= v2.3.3 pod依赖了yy```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 网络图片加载使用的是 ```YYWebImage``` || ```>= v2.3.0```  -> ```SDWebImage v5.0``` || ```< v2.3.0``` ->  ```SDWebImage v4.0```
@@ -68,112 +68,178 @@
 ## <a id="例子"></a> 四.  应用示例 - Examples
 ### <a id="如何获取照片和视频"> 如何获取照片和视频
 ```objc
-方法一：
-将 HXPhotoConfiguration 里的 requestImageAfterFinishingSelection 设置为YES
-在点击完成的时候会自动获取当前选择的图片和视频并赋值给 HXPhotoModel 里的 thumbPhoto、previewPhoto、videoURL
-如果资源为视频时  thumbPhoto 和 previewPhoto 则是视频封面
-如果选择了原图 thumbPhoto 和 previewPhoto 就是原图 videoURL 就是高质量视频
-没有选择原图 thumbPhoto 和 previewPhoto 就是高清图 videoURL 就是中等质量视频
-
-方法二：
-根据选择完成后返回的 HXPhotoModel 对象获取
-
-// 获取 image
-// 如果为网络图片的话会先下载
-// size 代表获取image的质量
-// PHImageManagerMaximumSize 获取原图
-[photoModel requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 如果照片在iCloud上会去下载,此回调代表开始下载iCloud上的照片
-    // 如果照片在本地存在此回调则不会走
-} progressHandler:^(double progress, HXPhotoModel *model) {
-    // iCloud下载进度
-    // 如果为网络图片,则是网络图片的下载进度
-} success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-    // 获取成功
-} failed:^(NSDictionary *info, HXPhotoModel *model) {
-    // 获取失败
-}];
-
-// 获取 imageData
-// 如果为网络图片的话会先下载
-[photoModel requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 开始下载iCloud上照片的imageData
-} progressHandler:^(double progress, HXPhotoModel *model) {
-    // iCloud下载进度
-} success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
-    // 获取成功
-} failed:^(NSDictionary *info, HXPhotoModel *model) {
-    // 获取失败
-}];
-
-// 获取视频的 AVAsset
-[photoModel requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 开始下载iCloud上的 AVAsset
-} progressHandler:^(double progress, HXPhotoModel *model) {
-    // iCloud下载进度
-} success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
-    // 获取成功
-} failed:^(NSDictionary *info, HXPhotoModel *model) {
-    // 获取失败
-}];
-
-// 获取 LivePhoto 
-// PHImageManagerMaximumSize代表原图
-[photoModel requestLivePhotoWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 开始下载iCloud上的 LivePhoto
-} progressHandler:^(double progress, HXPhotoModel *model) {
-    // iCloud下载进度
-} success:^(PHLivePhoto *livePhoto, HXPhotoModel *model, NSDictionary *info) {
-    // 获取成功
-} failed:^(NSDictionary *info, HXPhotoModel *model) {
-    // 获取失败
-}];
-
-// 导出视频地址 
-// presetName 视频导出的质量
-[photoModel exportVideoWithPresetName:AVAssetExportPresetHighestQuality startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-    // 开始下载iCloud上的视频
-} iCloudProgressHandler:^(double progress, HXPhotoModel *model) {
-    // iCloud下载进度
-} exportProgressHandler:^(float progress, HXPhotoModel *model) {
-    // 视频导出进度
-} success:^(NSURL *videoURL, HXPhotoModel *model) {
-    // 导出成功
-} failed:^(NSDictionary *info, HXPhotoModel *model) {
-    // 导出失败
-}];
-
-NSArray+HXExtension
-/**
-获取image
-如果model是视频的话,获取的则是视频封面
-
-@param original 是否原图
-@param completion imageArray 获取成功的image数组, errorArray 获取失败的model数组
-*/
-- (void)hx_requestImageWithOriginal:(BOOL)original completion:(void (^)(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray))completion;
-
-/**
-获取imageData
-
-@param completion 完成回调，获取失败的不会添加到数组中
-*/
-- (void)hx_requestImageDataWithCompletion:(void (^)(NSArray<NSData *> * _Nullable imageDataArray))completion;
-
-/**
-获取AVAsset
-
-@param completion 完成回调，获取失败的不会添加到数组中
-*/
-- (void)hx_requestAVAssetWithCompletion:(void (^)(NSArray<AVAsset *> * _Nullable assetArray))completion;
-
-/**
-获取视频地址
-
-@param presetName AVAssetExportPresetHighestQuality / AVAssetExportPresetMediumQuality
-@param completion 完成回调，获取失败的不会添加到数组中
-*/
-- (void)hx_requestVideoURLWithPresetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable videoURLArray))completion;
+// 如果将_manager.configuration.requestImageAfterFinishingSelection 设为YES，
+// 那么在选择完成的时候就会获取图片和视频地址
+// 如果选中了原图那么获取图片时就是原图
+// 获取视频时如果设置 exportVideoURLForHighestQuality 为YES，则会去获取高等质量的视频。其他情况为中等质量的视频
+// 个人建议不在选择完成的时候去获取，可以在要上传的时候再去获取
+for (HXPhotoModel *model in self.selectList) {
+    // 数组里装的是所有类型的资源，需要判断
+    // 先判断资源类型
+    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        // 当前为图片
+        // 再判断具体类型
+        if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
+            // 到这里就说明这张图片不是手机相册里的图片，可能是本地的也可能是网络图片
+            // 关于相机拍照的的问题，当系统 < ios9.0的时候拍的照片虽然保存到了相册但是在列表里存的是本地的，没有PHAsset
+            // 当系统 >= ios9.0 的时候拍的照片就不是本地照片了，而是手机相册里带有PHAsset对象的照片
+            // 这里的 model.asset PHAsset是空的
+            // 判断具体类型
+            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocal) {
+                // 本地图片
+            
+            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalGif) {
+                // 本地gif图片
+                
+            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork) {
+                // 网络图片
+            
+            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+                // 网络gif图片
+                
+            }
+            // 上传图片的话可以不用判断具体类型，按下面操作取出图片
+            if (model.networkPhotoUrl) {
+                // 如果网络图片地址有值就说明是网络图片，可直接拿此地址直接使用。避免重复上传
+                // 这里需要注意一下，先要判断是否为图片。因为如果是网络视频的话此属性代表视频封面地址
+                
+            }else {
+                // 网络图片地址为空了，那就肯定是本地图片了
+                // 直接取 model.previewPhoto 或者 model.thumbPhoto，这两个是同一个image
+                
+            }
+        }else {
+            // 到这里就是手机相册里的图片了 model.asset PHAsset对象是有值的
+            // 如果需要上传 Gif 或者 LivePhoto 需要具体判断
+            if (model.type == HXPhotoModelMediaTypePhoto) {
+                // 普通的照片，如果不可以查看和livePhoto的时候，这就也可能是GIF或者LivePhoto了，
+                // 如果你的项目不支持动图那就不要取NSData或URL，因为如果本质是动图的话还是会变成动图传上去
+                // 这样判断是不是GIF model.photoFormat == HXPhotoModelFormatGIF
+                
+                // 如果 requestImageAfterFinishingSelection = YES 的话，直接取 model.previewPhoto 或者 model.thumbPhoto 在选择完成时候已经获取并且赋值了
+                // 获取image
+                // size 就是获取图片的质量大小，原图的话就是 PHImageManagerMaximumSize，其他质量可设置size来获取
+                CGSize size;
+                if (self.original) {
+                    size = PHImageManagerMaximumSize;
+                }else {
+                    size = CGSizeMake(model.imageSize.width * 0.5, model.imageSize.height * 0.5);
+                }
+                [model requestPreviewImageWithSize:size startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
+                    // 如果图片是在iCloud上的话会先走这个方法再去下载
+                } progressHandler:^(double progress, HXPhotoModel * _Nullable model) {
+                    // iCloud的下载进度
+                } success:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    // image
+                } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                    // 获取失败
+                }];
+            }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
+                // 动图，如果 requestImageAfterFinishingSelection = YES 的话，直接取 model.imageURL。因为在选择完成的时候已经获取了不用再去获取
+                model.imageURL;
+                // 上传动图时，不要直接拿image上传哦。可以获取url或者data上传
+                // 获取url
+                [model requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    // 下载完成，imageURL 本地地址
+                } failed:nil];
+                
+                // 获取data
+                [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    // imageData
+                } failed:nil];
+            }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+                // LivePhoto，requestImageAfterFinishingSelection = YES 时没有处理livephoto，需要自己处理
+                // 如果需要上传livephoto的话，需要上传livephoto里的图片和视频
+                // 展示的时候需要根据图片和视频生成livephoto
+                [model requestLivePhotoWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:^(PHLivePhoto * _Nullable livePhoto, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    NSArray *resoures = [PHAssetResource assetResourcesForLivePhoto:livePhoto];
+                    // resoures 里面有两个 PHAssetResource 一个图片，一个视频
+                    PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
+                    // 没有处理iCloud上的情况，需要自己处理
+                    // options.networkAccessAllowed = YES;
+                    // options.progressHandler = ^(double progress) {
+                    //
+                    // };
+                    
+                    NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
+                    NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                    // 导出livePhoto视频的本地地址
+                    NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
+                    for (PHAssetResource *assetResource in resoures) {
+                        if (assetResource.type == PHAssetResourceTypePhoto) {
+                            // LivePhoto的封面
+                            [[PHAssetResourceManager defaultManager] requestDataForAssetResource:assetResource options:options dataReceivedHandler:^(NSData * _Nonnull data) {
+                                UIImage *livePhoto_image = [UIImage imageWithData:data];
+                                // livePhoto_image 需要上传的LIvePhoto封面
+                                NSSLog(@"LivePhoto_image - %@", livePhoto_image);
+                            } completionHandler:^(NSError * _Nullable error) {
+                                if (error) {
+                                    NSSLog(@"LivePhoto_image - 失败%@",error.localizedDescription);
+                                }else {
+                                    NSSLog(@"LivePhoto_image - 成功");
+                                }
+                            }];
+                        }else if (assetResource.type == PHAssetResourceTypePairedVideo) {
+                            // LivePhoto的视频内容
+                            [[PHAssetResourceManager defaultManager] writeDataForAssetResource:assetResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
+                                if (!error) {
+                                    // videoURL 需要上传的LIvePhoto视频地址，已经在本地存在的
+                                    NSSLog(@"LivePhoto_video - %@", videoURL);
+                                }else {
+                                    NSSLog(@"LivePhoto_video - 失败%@",error.localizedDescription);
+                                }
+                            }];
+                        }
+                    }
+                } failed:nil];
+            }
+            // 也可以不用上面的判断和方法获取，自己根据 model.asset 这个PHAsset对象来获取想要的东西
+            PHAsset *asset = model.asset;
+            // 自由发挥
+        }
+    }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+        // 当前为视频
+        if (model.type == HXPhotoModelMediaTypeVideo) {
+            // 为手机相册里的视频
+            // requestImageAfterFinishingSelection = YES 时，直接去 model.videoURL，在选择完成时已经获取了
+            model.videoURL;
+            // 获取视频时可以获取 AVAsset，也可以获取 AVAssetExportSession，获取之后再导出视频
+            // 获取 AVAsset
+            [model requestAVAssetStartRequestICloud:nil progressHandler:nil success:^(AVAsset * _Nullable avAsset, AVAudioMix * _Nullable audioMix, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                // avAsset
+                // 自己根据avAsset去导出视频
+            } failed:nil];
+            
+            // 获取 AVAssetExportSession
+            [model requestAVAssetExportSessionStartRequestICloud:nil progressHandler:nil success:^(AVAssetExportSession * _Nullable assetExportSession, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                
+            } failed:nil];
+            
+            // HXPhotoModel也提供直接导出视频地址的方法
+            // presetName 导出视频的质量，自己根据需求设置
+            [model exportVideoWithPresetName:AVAssetExportPresetMediumQuality startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:^(float progress, HXPhotoModel * _Nullable model) {
+                // 导出视频时的进度，在iCloud下载完成之后
+            } success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
+                // 导出完成, videoURL
+                
+            } failed:nil];
+            
+            // 也可以不用上面的方法获取，自己根据 model.asset 这个PHAsset对象来获取想要的东西
+            PHAsset *asset = model.asset;
+            // 自由发挥
+        }else {
+            // 本地视频或者网络视频
+            if (model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeLocal) {
+                // 本地视频
+                // model.videoURL 视频的本地地址
+            }else if (model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                // 网络视频
+                // model.videoURL 视频的网络地址
+                // model.networkPhotoUrl 视频封面网络地址
+            }
+        }
+    }
+}
 ```
 ### <a id="判断两个HXPhotoModel是否为同一资源"> 判断两个HXPhotoModel是否为同一资源
 ```
@@ -586,6 +652,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.4.1　-　添加属性控制编辑之后的照片/视频是否添加到系统相册、pod移除AFNetworking依赖
 - v2.4.0　-　支持添加网络视频、视频添加进度条，demo8添加获取图片/视频详细注释
 - v2.3.8　-　HXPhotoView支持Masonry，Demo添加Xib和Masonry混合布局示例、优化暗黑模式
 - v2.3.7　-　彻底解决视图因导航栏半透明效果向下偏移问题，选择时照片/视频可限制大小，优化快速滑动列表
@@ -638,13 +705,11 @@ frame.size.height 就是 HXPhotoView 的正确高度
 ```
 
 ## <a id="后续计划"></a> 六.  后续计划 - Plan
-```
 - [x] 视频添加进度条
 - [x] 支持添加网络视频
 - [x] 视频查看时支持放大缩小
 - [ ] HXPhotoView支持单选模式
 ...
-```
 
 ## <a id="更多"></a> 七.  更多 - More
 

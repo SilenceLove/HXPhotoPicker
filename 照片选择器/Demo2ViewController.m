@@ -15,7 +15,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 @interface Demo2ViewController ()<HXPhotoViewDelegate,UIImagePickerControllerDelegate>
 
 @property (strong, nonatomic) HXPhotoManager *manager;
-@property (strong, nonatomic) HXPhotoView *photoView;
+@property (weak, nonatomic) HXPhotoView *photoView;
 @property (strong, nonatomic) UIScrollView *scrollView;
 
 @property (strong, nonatomic) UIButton *bottomView;
@@ -287,6 +287,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     NSSLog(@"%@",networkPhotoUrl);
 }
 
+//- (CGFloat)photoViewHeight:(HXPhotoView *)photoView {
+//    return 140;
+//}
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame {
     NSSLog(@"%@",NSStringFromCGRect(frame));
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width, CGRectGetMaxY(frame) + kPhotoViewMargin);

@@ -371,32 +371,48 @@ HXVideoEditBottomViewDelegate
     self.bottomView.userInteractionEnabled = NO;
     HXWeakSelf
     [HXPhotoTools exportEditVideoForAVAsset:self.avAsset timeRange:[self getTimeRange] presetName:self.manager.configuration.editVideoExportPresetName success:^(NSURL *videoURL) {
-        weakSelf.bottomView.userInteractionEnabled = YES;
-        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithVideoURL:videoURL];
-        weakSelf.afterModel = photoModel;
-        if (!weakSelf.outside) {
-            if ([weakSelf.delegate respondsToSelector:@selector(videoEditViewControllerDidDoneClick:beforeModel:afterModel:)]) {
-                [weakSelf.delegate videoEditViewControllerDidDoneClick:weakSelf beforeModel:weakSelf.model afterModel:weakSelf.afterModel];
-            }
-            if (weakSelf.doneBlock) {
-                weakSelf.doneBlock(weakSelf.model, weakSelf.afterModel, weakSelf);
-            }
-            [weakSelf dismissViewControllerCompletion:nil];
-        }else {
-            [weakSelf dismissViewControllerCompletion:^{
-                if ([weakSelf.delegate respondsToSelector:@selector(videoEditViewControllerDidDoneClick:beforeModel:afterModel:)]) {
-                    [weakSelf.delegate videoEditViewControllerDidDoneClick:weakSelf beforeModel:weakSelf.model afterModel:weakSelf.afterModel];
-                }
-                if (weakSelf.doneBlock) {
-                    weakSelf.doneBlock(weakSelf.model, weakSelf.afterModel, weakSelf);
+        if (weakSelf.manager.configuration.editAssetSaveSystemAblum) {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:weakSelf.manager.configuration.customAlbumName videoURL:videoURL location:nil complete:^(HXPhotoModel * _Nullable model, BOOL success) {
+                weakSelf.bottomView.userInteractionEnabled = YES;
+                [weakSelf.view hx_handleLoading];
+                if (model) {
+                    weakSelf.afterModel = model;
+                    [weakSelf editVideoCompletion];
+                }else {
+                    [weakSelf.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"处理失败，请重试"]];
                 }
             }];
+        }else {
+            weakSelf.bottomView.userInteractionEnabled = YES;
+            HXPhotoModel *photoModel = [HXPhotoModel photoModelWithVideoURL:videoURL];
+            weakSelf.afterModel = photoModel;
+            [weakSelf editVideoCompletion];
         }
     } failed:^(NSError *error) {
         weakSelf.bottomView.userInteractionEnabled = YES;
         [weakSelf.view hx_handleLoading];
         [weakSelf.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"处理失败，请重试"]];
     }];
+}
+- (void)editVideoCompletion {
+    if (!self.outside) {
+        if ([self.delegate respondsToSelector:@selector(videoEditViewControllerDidDoneClick:beforeModel:afterModel:)]) {
+            [self.delegate videoEditViewControllerDidDoneClick:self beforeModel:self.model afterModel:self.afterModel];
+        }
+        if (self.doneBlock) {
+            self.doneBlock(self.model, self.afterModel, self);
+        }
+        [self dismissViewControllerCompletion:nil];
+    }else {
+        [self dismissViewControllerCompletion:^{
+            if ([self.delegate respondsToSelector:@selector(videoEditViewControllerDidDoneClick:beforeModel:afterModel:)]) {
+                [self.delegate videoEditViewControllerDidDoneClick:self beforeModel:self.model afterModel:self.afterModel];
+            }
+            if (self.doneBlock) {
+                self.doneBlock(self.model, self.afterModel, self);
+            }
+        }];
+    }
 }
 - (void)dismissViewControllerCompletion:(void (^)(void))completion {
     [self stopTimer];

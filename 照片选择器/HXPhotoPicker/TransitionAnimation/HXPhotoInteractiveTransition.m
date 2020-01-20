@@ -41,7 +41,7 @@
             if (offsetY < 0) {
                 weakSelf.atFirstPan = YES;
             }else if (offsetY == 0) {
-                if (self.interation) {
+                if (weakSelf.interation) {
                     weakSelf.atFirstPan = NO;
                 }
             }else {

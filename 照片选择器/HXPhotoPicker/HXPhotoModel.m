@@ -1297,8 +1297,7 @@
             });
         }else {
             if ([[info objectForKey:PHContentEditingInputResultIsInCloudKey] boolValue] &&
-                ![[info objectForKey:PHContentEditingInputCancelledKey] boolValue] &&
-                ![info objectForKey:PHContentEditingInputErrorKey]) {
+                ![[info objectForKey:PHContentEditingInputCancelledKey] boolValue]) {
                 PHContentEditingInputRequestOptions *iCloudOptions = [[PHContentEditingInputRequestOptions alloc] init];
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, BOOL * _Nonnull stop) {

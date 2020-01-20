@@ -20,7 +20,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.3.9"
+#define HXVersion @"2.4.1"
 
 #define HXGetCameraContentInRealTime HX_IS_IPhoneX_All
 
@@ -35,6 +35,8 @@
 #define HXShowLog YES
 
 #define HX_UI_IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+
+#define HasAFNetworking (__has_include(<AFNetworking/AFNetworking.h>) || __has_include("AFNetworking.h"))
 
 #define HasYYWebImage (__has_include(<YYWebImage/YYWebImage.h>) || __has_include("YYWebImage.h"))
 

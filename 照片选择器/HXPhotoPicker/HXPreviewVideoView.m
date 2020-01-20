@@ -61,6 +61,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
     
+#if HasAFNetworking
     HXWeakSelf
     [HXPhotoCommon photoCommon].reachabilityStatusChangeBlock = ^(AFNetworkReachabilityStatus netStatus) {
         if (weakSelf.videoLoadFailed) {
@@ -71,6 +72,7 @@
             }
         }
     };
+#endif
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
@@ -258,12 +260,18 @@
         if (self.playerLayer.readyForDisplay) {
             if (self.player) {
                 if ([HXPhotoCommon photoCommon].videoAutoPlayType == HXVideoAutoPlayTypeWiFi) {
+#if HasAFNetworking
                     if ([HXPhotoCommon photoCommon].netStatus == AFNetworkReachabilityStatusReachableViaWiFi) {
                         [self videoDidPlay];
                         self.playBtnDidPlay = YES;
                     }else {
                         self.playBtn.hidden = NO;
                     }
+#else
+                    if (!self.isDismiss) {
+                        self.playBtn.hidden = NO;
+                    }
+#endif
                 }else if ([HXPhotoCommon photoCommon].videoAutoPlayType == HXVideoAutoPlayTypeAll) {
                     [self videoDidPlay];
                     self.playBtnDidPlay = YES;
