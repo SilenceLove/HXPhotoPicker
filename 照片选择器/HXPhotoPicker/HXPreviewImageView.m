@@ -8,6 +8,7 @@
 
 #import "HXPreviewImageView.h"
 #import "UIImageView+HXExtension.h"
+#import "UIImage+HXExtension.h"
 #import "HXPhotoModel.h"
 #import "HXPhotoDefine.h"
 #import "HXCircleProgressView.h"
