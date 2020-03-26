@@ -59,20 +59,21 @@
 }
 - (CGSize)getImageSize {
     CGFloat width = self.frame.size.width;
-//    CGFloat height = self.frame.size.height;
+    CGFloat height = self.frame.size.height;
     CGFloat imgWidth = self.model.imageSize.width;
     CGFloat imgHeight = self.model.imageSize.height;
     CGFloat w;
     CGFloat h;
-
-    imgHeight = width / imgWidth * imgHeight;
-//    if (imgHeight > height) {
-//        w = height / self.model.imageSize.height * imgWidth;
-//        h = height;
-//    }else {
+    
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
+        w = height / self.model.imageSize.height * imgWidth;
+        h = height;
+    }else {
+        imgHeight = width / imgWidth * imgHeight;
         w = width;
         h = imgHeight;
-//    }
+    }
     return CGSizeMake(w, h);
 }
 - (void)refreshImageSize {
@@ -82,24 +83,27 @@
     CGFloat imgHeight = self.model.imageSize.height;
     CGFloat w;
     CGFloat h;
-
-    imgHeight = width / imgWidth * imgHeight;
-//    if (imgHeight > height) {
-//        w = height / self.model.imageSize.height * imgWidth;
-//        h = height;
-//        self.scrollView.maximumZoomScale = width / w + 0.5;
-//    }else {
-        w = width;
-        h = imgHeight;
-        self.scrollView.maximumZoomScale = 2.5;
-//    }
-
-    self.previewContentView.frame = CGRectMake(0, 0, w, h);
-    if (h < height) {
+    
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
+        w = height / self.model.imageSize.height * imgWidth;
+        h = height;
+        self.scrollView.maximumZoomScale = width / w + 0.5;
+        self.previewContentView.frame = CGRectMake(0, 0, w, h);
         self.previewContentView.center = CGPointMake(width / 2, height / 2);
         self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
     }else {
-        self.scrollView.contentSize = self.previewContentView.hx_size;
+        imgHeight = width / imgWidth * imgHeight;
+        w = width;
+        h = imgHeight;
+        self.scrollView.maximumZoomScale = 2.5;
+        self.previewContentView.frame = CGRectMake(0, 0, w, h);
+        if (h < height) {
+            self.previewContentView.center = CGPointMake(width / 2, height / 2);
+            self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
+        }else {
+            self.scrollView.contentSize = self.previewContentView.hx_size;
+        }
     }
 }
 - (void)setModel:(HXPhotoModel *)model {
@@ -114,24 +118,31 @@
     CGFloat w;
     CGFloat h;
     
-    imgHeight = width / imgWidth * imgHeight;
-//    if (imgHeight > height) {
-//        w = height / self.model.imageSize.height * imgWidth;
-//        h = height;
-//        self.scrollView.maximumZoomScale = width / w + 0.5;
-//    }else {
-        w = width;
-        h = imgHeight;
-        self.scrollView.maximumZoomScale = 2.5;
-//    }
+    
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
+        w = height / self.model.imageSize.height * imgWidth;
+        h = height;
+        self.scrollView.maximumZoomScale = width / w + 0.5;
 
-    self.previewContentView.frame = CGRectMake(0, 0, w, h);
-    if (h < height) {
+        self.previewContentView.frame = CGRectMake(0, 0, w, h);
         self.previewContentView.center = CGPointMake(width / 2, height / 2);
         self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
     }else {
-        self.scrollView.contentSize = self.previewContentView.hx_size;
+        imgHeight = width / imgWidth * imgHeight;
+        w = width;
+        h = imgHeight;
+        self.scrollView.maximumZoomScale = 2.5;
+
+        self.previewContentView.frame = CGRectMake(0, 0, w, h);
+        if (h < height) {
+            self.previewContentView.center = CGPointMake(width / 2, height / 2);
+            self.scrollView.contentSize = CGSizeMake(self.hx_w, self.hx_h);
+        }else {
+            self.scrollView.contentSize = self.previewContentView.hx_size;
+        }
     }
+    
     self.previewContentView.model = model;
 }
 - (void)requestHDImage {

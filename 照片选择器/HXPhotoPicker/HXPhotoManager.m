@@ -61,7 +61,7 @@
 }
 - (instancetype)initWithType:(HXPhotoManagerSelectedType)type {
     if (self = [super init]) {
-        self.type = type;
+        _type = type;
         [self setup];
     }
     return self;
@@ -72,6 +72,7 @@
 - (void)setType:(HXPhotoManagerSelectedType)type {
     if (_type != type) {
         self.cameraRollAlbumModel = nil;
+        [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
     }
     _type = type;
 }
@@ -459,6 +460,9 @@
 }
 
 - (void)getCameraRollAlbumCompletion:(void (^)(HXAlbumModel *albumModel))completion {
+    if ([HXPhotoCommon photoCommon].cameraRollAlbumModel) {
+        self.cameraRollAlbumModel = [HXPhotoCommon photoCommon].cameraRollAlbumModel;
+    }
     if (self.cameraRollAlbumModel && self.cameraRollAlbumModel.count) {
         if (self.getCameraRollAlbumModel) {
             self.getCameraRollAlbumModel(self.cameraRollAlbumModel);
@@ -489,6 +493,7 @@
                 model.cameraCount = self.cameraList.count;
                 model.index = 0;
                 self.cameraRollAlbumModel = model;
+                [HXPhotoCommon photoCommon].cameraRollAlbumModel = model;
                 if (self.getCameraRollAlbumModel) {
                     self.getCameraRollAlbumModel(model);
                 }
@@ -510,6 +515,7 @@
         albumModel.count = albumModel.result.count;
         if (albumModel.count) {
             self.cameraRollAlbumModel = albumModel;
+            [HXPhotoCommon photoCommon].cameraRollAlbumModel = albumModel;
         }
         if (self.getCameraRollAlbumModel) {
             self.getCameraRollAlbumModel(albumModel);
@@ -609,6 +615,9 @@
     return albumName;
 } 
 - (void)preloadData {
+    if ([HXPhotoCommon photoCommon].cameraRollAlbumModel) {
+        self.cameraRollAlbumModel = [HXPhotoCommon photoCommon].cameraRollAlbumModel;
+    }
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     if (status != PHAuthorizationStatusAuthorized || self.getCameraRoolAlbuming || self.cameraRollAlbumModel) {
         return;

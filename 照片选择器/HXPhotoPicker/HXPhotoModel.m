@@ -400,19 +400,21 @@
 {
     if (_endImageSize.width == 0 || _endImageSize.height == 0) {
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
-//        CGFloat height = [UIScreen mainScreen].bounds.size.height;
+        CGFloat height = [UIScreen mainScreen].bounds.size.height;
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;
         CGFloat h;
-        imgHeight = width / imgWidth * imgHeight;
-//        if (imgHeight > height) {
-//            w = height / self.imageSize.height * imgWidth;
-//            h = height;
-//        }else {
+
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
+            w = height / self.imageSize.height * imgWidth;
+            h = height;
+        }else {
+            imgHeight = width / imgWidth * imgHeight;
             w = width;
             h = imgHeight;
-//        }
+        }
         _endImageSize = CGSizeMake(w, h);
     }
     return _endImageSize;

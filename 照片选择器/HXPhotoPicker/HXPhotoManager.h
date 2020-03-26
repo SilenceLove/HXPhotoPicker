@@ -386,8 +386,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 @property (copy, nonatomic) getAllAlbumListBlock allAlbumListBlock;
 @property (copy, nonatomic) getPhotoListBlock photoListBlock;
 
-typedef void (^ getPhotoListBlock)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
-
 @property (copy, nonatomic) NSArray *tempAllList;
 @property (copy, nonatomic) NSArray *tempPreviewList;
 @property (copy, nonatomic) NSArray *tempPhotoList;

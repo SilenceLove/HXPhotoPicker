@@ -8,6 +8,7 @@
 
 #import "Demo9ViewCell.h"
 #import "HXPhotoPicker.h"
+#import "Masonry.h"
 
 @interface Demo9ViewCell ()<HXPhotoViewDelegate>
 /**  照片管理  */
@@ -32,6 +33,12 @@
     
     self.selectionStyle = UITableViewCellSelectionStyleNone;
     [self.contentView addSubview:self.photoView];
+    [self.photoView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(self.contentView).mas_offset(0);
+        make.left.mas_equalTo(self.contentView).mas_offset(12);
+        make.right.mas_equalTo(self.contentView).mas_offset(-12);
+        make.height.mas_equalTo(0);
+    }];
 }
 - (void)setModel:(Demo9Model *)model {
     _model = model;
@@ -89,6 +96,9 @@
     if (frame.size.height == self.model.photoViewHeight) {
         return;
     }
+    [self.photoView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(frame.size.height);
+    }];
     self.model.photoViewHeight = frame.size.height;
     if (self.photoViewChangeHeightBlock) {
         self.photoViewChangeHeightBlock(self);

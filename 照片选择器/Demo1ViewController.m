@@ -83,7 +83,7 @@
 - (HXPhotoManager *)manager
 {
     if (!_manager) {
-        _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
+        _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.configuration.videoMaxNum = 5;
         _manager.configuration.deleteTemporaryPhoto = NO;
         _manager.configuration.lookLivePhoto = YES;
@@ -225,6 +225,7 @@
         self.view.backgroundColor = [UIColor systemBackgroundColor];
     }
 #endif
+    self.selectedTypeView.selectedSegmentIndex = 2;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空选择" style:UIBarButtonItemStylePlain target:self action:@selector(didRightClick)];
     self.scrollView.delegate = self;
     if (HX_IS_IPhoneX_All) {

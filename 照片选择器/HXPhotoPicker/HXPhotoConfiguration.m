@@ -50,7 +50,7 @@
     self.videoMinimumSelectDuration = 0.f;
     self.videoMaximumDuration = 60.f;
     
-    self.creationDateSort = YES;
+//    self.creationDateSort = YES;
     
     //    self.saveSystemAblum = NO;
 //    self.deleteTemporaryPhoto = YES;
@@ -114,7 +114,16 @@
     
     self.downloadNetworkVideo = YES;
     
-    self.editAssetSaveSystemAblum = YES;
+    self.editAssetSaveSystemAblum = NO;
+    self.photoEditCustomRatios = @[@{@"原始值" : @"{0, 0}"}, @{@"正方形" : @"{1, 1}"}, @{@"2:3" : @"{2, 3}"}, @{@"3:4" : @"{3, 4}"}, @{@"9:16" : @"{9, 16}"}, @{@"16:9" : @"{16, 9}"}];
+}
+- (void)setShowDateSectionHeader:(BOOL)showDateSectionHeader {
+    _showDateSectionHeader = showDateSectionHeader;
+    if (showDateSectionHeader) {
+        self.creationDateSort = YES;
+    }else {
+        self.creationDateSort = NO;
+    }
 }
 - (UIColor *)cameraFocusBoxColor {
     if (!_cameraFocusBoxColor) {

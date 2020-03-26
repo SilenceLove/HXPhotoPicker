@@ -20,7 +20,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.4.1"
+#define HXVersion @"2.4.2"
 
 #define HXGetCameraContentInRealTime HX_IS_IPhoneX_All
 

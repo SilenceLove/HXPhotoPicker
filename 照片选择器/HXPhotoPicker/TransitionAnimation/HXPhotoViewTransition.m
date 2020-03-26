@@ -98,7 +98,7 @@
     }];
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
-        if (imgHeight < height) {
+        if (imgHeight <= height) {
             tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
         }else {
             tempView.frame = CGRectMake(0, 0, imgWidht, imgHeight);

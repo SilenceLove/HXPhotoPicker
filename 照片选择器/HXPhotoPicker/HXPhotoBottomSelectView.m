@@ -170,6 +170,8 @@
         [_footerCancelView addSubview:self.cancelBtn];
         _footerCancelView.userInteractionEnabled = YES;
         [_footerCancelView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideView)]];
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        BOOL isLandscape = orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight;
         self.cancelBtn.frame = CGRectMake(0, 0, self.hx_w, 60.f);
     }
     return _footerCancelView;
@@ -279,22 +281,32 @@
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    BOOL isLandscape = orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight;
+    CGFloat margin = isLandscape ? hxBottomMargin + 10 : 10;
+    if (HX_IS_IPhoneX_All) {
+        margin += 10;
+    }
     if (self.model.subTitle.length) {
         self.titleLb.hx_x = 10;
-        self.titleLb.hx_w = self.hx_w - 20;
+        self.titleLb.hx_w = self.hx_w - margin * 2;
         self.titleLb.hx_h = [self.titleLb hx_getTextHeight];
         
         self.subTitleLb.hx_x = 10;
-        self.subTitleLb.hx_w = self.hx_w - 20;
+        self.subTitleLb.hx_w = self.hx_w - margin * 2;
         self.subTitleLb.hx_h = [self.subTitleLb hx_getTextHeight];
         
         self.titleLb.hx_y = (self.hx_h - (self.titleLb.hx_h + self.subTitleLb.hx_h + 3)) / 2;
         self.subTitleLb.hx_y = CGRectGetMaxY(self.titleLb.frame) + 3;
     }else {
-        self.titleLb.frame = CGRectMake(10, 0, self.hx_w - 20, self.hx_h);
+        self.titleLb.frame = CGRectMake(10, 0, self.hx_w - margin * 2, self.hx_h);
+    }
+    if (isLandscape) {
+        self.lineView.frame = CGRectMake(0, 0, self.hx_w - hxBottomMargin * 2, 0.5f);
+    }else {
+        self.lineView.frame = CGRectMake(0, 0, self.hx_w, 0.5f);
     }
     
-    self.lineView.frame = CGRectMake(0, 0, self.hx_w, 0.5f);
 }
 - (UILabel *)titleLb {
     if (!_titleLb) {

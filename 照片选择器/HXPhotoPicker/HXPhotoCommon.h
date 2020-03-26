@@ -10,6 +10,7 @@
 #import "HXPhotoConfiguration.h"
 #import "HXPhotoDefine.h"
 #import "HXPhotoModel.h"
+#import "HXAlbumModel.h"
 #if __has_include(<AFNetworking/AFNetworking.h>)
 #import <AFNetworking/AFNetworking.h>
 #elif __has_include("AFNetworking.h")
@@ -42,6 +43,8 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 @property (assign, nonatomic) AFNetworkReachabilityStatus netStatus;
 @property (copy, nonatomic) void (^ reachabilityStatusChangeBlock)(AFNetworkReachabilityStatus netStatus);
 #endif
+
+@property (strong, nonatomic) HXAlbumModel * _Nullable cameraRollAlbumModel;
 
 - (void)getURLFileLengthWithURL:(NSURL *)url
                         success:(HXPhotoCommonGetUrlFileLengthSuccess)success

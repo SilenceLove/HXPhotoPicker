@@ -76,7 +76,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
         self.bottomSliderView.frame = CGRectMake(15, self.hx_h - hxBottomMargin - 60, self.hx_w - 30, 35);
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
         self.bottomSliderView.frame = CGRectMake(15, self.hx_h - 60, self.hx_w - 15 - hxBottomMargin, 35);

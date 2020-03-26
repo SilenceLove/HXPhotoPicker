@@ -59,6 +59,15 @@ HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
 
+/// 照片编辑时底部比例选项
+/// 默认: @[@{@"原始值" : @"{0, 0}"},
+///        @{@"正方形" : @"{1, 1}"},
+///        @{@"2:3" : @"{2, 3}"},
+///        @{@"3:4" : @"{3, 4}"},
+///        @{@"9:16" : @"{9, 16}"},
+///        @{@"16:9" : @"{16, 9}"}]
+@property (copy, nonatomic) NSArray *photoEditCustomRatios;
+
 /// 编辑后的照片/视频是否添加到系统相册中
 /// 默认为NO
 @property (assign, nonatomic) BOOL editAssetSaveSystemAblum;
@@ -175,9 +184,13 @@ HXPhotoPreviewViewController;
 /// 如果选择完照片返回之后
 /// 原有界面继承UIScrollView的视图都往下偏移一个导航栏距离的话
 /// 那么请将这个属性设置为YES，即可恢复。
+/// v2.3.7 之后的版本内部自动修复了
 @property (assign, nonatomic) BOOL restoreNavigationBar DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
-/// 照片列表是否按照片添加日期排序  默认YES
+/// 照片列表是否按照片创建日期排序
+/// 如果按日期分隔显示时为YES
+/// 列表显示 默认NO
+/// 需要在 showDateSectionHeader set之后设置
 @property (assign, nonatomic) BOOL creationDateSort;
 
 /// 相册列表展示方式
@@ -437,7 +450,7 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) NSInteger horizontalRowCount;
 
 /**
- 是否需要显示日期section  默认YES
+ 是否需要显示日期section  默认NO
  */
 @property (assign, nonatomic) BOOL showDateSectionHeader;
 

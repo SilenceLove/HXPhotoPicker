@@ -176,13 +176,13 @@ HXVideoEditViewControllerDelegate
     }
 
     if (self.manager.configuration.open3DTouchPreview) {
-#ifdef __IPHONE_13_0
-        if (@available(iOS 13.0, *)) {
-            [HXPhotoCommon photoCommon].isHapticTouch = YES;
-#else
-        if ((NO)) {
-#endif
-        }else {
+//#ifdef __IPHONE_13_0
+//        if (@available(iOS 13.0, *)) {
+//            [HXPhotoCommon photoCommon].isHapticTouch = YES;
+//#else
+//        if ((NO)) {
+//#endif
+//        }else {
             if ([self respondsToSelector:@selector(traitCollection)]) {
                 if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
                     if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
@@ -191,7 +191,7 @@ HXVideoEditViewControllerDelegate
                     }
                 }
             }
-        }
+//        }
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
@@ -264,7 +264,7 @@ HXVideoEditViewControllerDelegate
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
     NSInteger lineCount = self.manager.configuration.rowCount;
-    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
         navBarHeight = hxNavigationBarHeight;
         lineCount = self.manager.configuration.rowCount;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -438,7 +438,7 @@ HXVideoEditViewControllerDelegate
 - (void)scrollToPoint:(HXPhotoViewCell *)cell rect:(CGRect)rect {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
-    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
         navBarHeight = hxNavigationBarHeight;
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
         if ([UIApplication sharedApplication].statusBarHidden) {
@@ -1034,25 +1034,25 @@ HXVideoEditViewControllerDelegate
     }
 }
 #pragma mark - < preview Haptic Touch >
-#ifdef __IPHONE_13_0
-- (UIContextMenuConfiguration *)collectionView:(UICollectionView *)collectionView contextMenuConfigurationForItemAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)) {
-    HXPhotoModel *_model;
-    if (self.manager.configuration.showDateSectionHeader) {
-        HXPhotoDateModel *dateModel = [self.dateArray objectAtIndex:indexPath.section];
-        _model = [dateModel.photoModelArray objectAtIndex:indexPath.item];
-    }else {
-        _model = [self.allArray objectAtIndex:indexPath.item];
-    }
-    HXWeakSelf
-    UIContextMenuConfiguration *menuConfiguration = [UIContextMenuConfiguration configurationWithIdentifier:_model.localIdentifier ?: _model.cameraIdentifier previewProvider:^UIViewController * _Nullable{
-        return [weakSelf previewViewControlerWithIndexPath:indexPath];
-    } actionProvider:nil];
-    return menuConfiguration;
-}
-- (void)collectionView:(UICollectionView *)collectionView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator API_AVAILABLE(ios(13.0)) {
-    [self pushPreviewControler:animator.previewViewController];
-}
-#endif
+//#ifdef __IPHONE_13_0
+//- (UIContextMenuConfiguration *)collectionView:(UICollectionView *)collectionView contextMenuConfigurationForItemAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)) {
+//    HXPhotoModel *_model;
+//    if (self.manager.configuration.showDateSectionHeader) {
+//        HXPhotoDateModel *dateModel = [self.dateArray objectAtIndex:indexPath.section];
+//        _model = [dateModel.photoModelArray objectAtIndex:indexPath.item];
+//    }else {
+//        _model = [self.allArray objectAtIndex:indexPath.item];
+//    }
+//    HXWeakSelf
+//    UIContextMenuConfiguration *menuConfiguration = [UIContextMenuConfiguration configurationWithIdentifier:_model.localIdentifier ?: _model.cameraIdentifier previewProvider:^UIViewController * _Nullable{
+//        return [weakSelf previewViewControlerWithIndexPath:indexPath];
+//    } actionProvider:nil];
+//    return menuConfiguration;
+//}
+//- (void)collectionView:(UICollectionView *)collectionView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator API_AVAILABLE(ios(13.0)) {
+//    [self pushPreviewControler:animator.previewViewController];
+//}
+//#endif
 - (UIViewController *)previewViewControlerWithIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isICloud) {
@@ -1611,7 +1611,7 @@ HXVideoEditViewControllerDelegate
                 weakSelf.albumBgView.alpha = 0;
                 UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
                 CGFloat navBarHeight = hxNavigationBarHeight;
-                if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
+                if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
                     navBarHeight = hxNavigationBarHeight;
                 }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
                     if ([UIApplication sharedApplication].statusBarHidden) {
@@ -1791,6 +1791,10 @@ HXVideoEditViewControllerDelegate
 - (void)starRunning {
     if (![UIImagePickerController isSourceTypeAvailable:
           UIImagePickerControllerSourceTypeCamera]) {
+        return;
+    }
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus != AVAuthorizationStatusAuthorized) {
         return;
     }
     if (self.session) {
