@@ -82,7 +82,7 @@
     if (model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
         NSString *videoFilePath = [HXPhotoTools getVideoURLFilePath:model.videoURL];
         NSURL *videoFileURL = [NSURL fileURLWithPath:videoFilePath];
-        if ([HXPhotoTools FileExistsAtVideoURL:model.videoURL]) {
+        if ([HXPhotoTools fileExistsAtVideoURL:model.videoURL]) {
             [self requestAVAssetComplete:[AVAsset assetWithURL:videoFileURL]];
             return;
         }

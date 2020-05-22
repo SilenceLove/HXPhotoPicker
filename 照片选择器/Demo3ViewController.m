@@ -121,8 +121,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)lookClick {
-    [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
-    [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
+//    [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
+//    [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
 //    [[SDWebImageManager sharedManager] cancelAll];
 //    [[SDWebImageManager sharedManager].imageCache clearWithCacheType:SDImageCacheTypeAll completion:^{
 //

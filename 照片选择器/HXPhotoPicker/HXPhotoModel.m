@@ -405,8 +405,11 @@
         CGFloat imgHeight = self.imageSize.height;
         CGFloat w;
         CGFloat h;
-
-        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        NSThread *thread = [NSThread currentThread];
+        UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
+        if (thread.isMainThread) {
+            orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        }
         if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
             w = height / self.imageSize.height * imgWidth;
             h = height;

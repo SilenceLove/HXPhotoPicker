@@ -12,7 +12,7 @@
 
 typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
     HXPhotoViewPreViewShowStyleDefault, //!< 默认
-    HXPhotoViewPreViewShowStyleDark     //!< 暗黑
+    HXPhotoViewPreViewShowStyleDark     //!< 暗黑，此模式下视频会有进度条
 };
 
 /*
@@ -238,16 +238,44 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /// 每次需要更新高度的时候触发，请确保高度正确
 /// @param photoView self
 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView;
+
+/// 自定义每个item的大小，实现此代码必须将 HXPhotoViewCustomItemSize 此宏的值修改为 1
+/// 并且必须实现 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView 此代理返回HXPhotoView的高度，如果不实现则HXPhotoView的高度为0
+/// @param collectionView collectionView
+/// @param collectionViewLayout layout
+/// @param indexPath indexPath
+/// @param isAddItem 是否是添加按钮的item
+/// @param photoView self
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+               isAddItem:(BOOL)isAddItem
+               photoView:(HXPhotoView *)photoView;
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView
+                   layout:(UICollectionViewLayout *)collectionViewLayout
+minimumLineSpacingForSectionAtIndex:(NSInteger)section
+                photoView:(HXPhotoView *)photoView;
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView
+                   layout:(UICollectionViewLayout *)collectionViewLayout
+minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
+                photoView:(HXPhotoView *)photoView;
 @end
 
 @interface HXPhotoView : UIView
 #pragma mark - < init >
-- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
-- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
+- (instancetype)initWithFrame:(CGRect)frame
+                      manager:(HXPhotoManager *)manager;
+- (instancetype)initWithFrame:(CGRect)frame
+                      manager:(HXPhotoManager *)manager
+              scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
-- (instancetype)initWithManager:(HXPhotoManager *)manager scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
+- (instancetype)initWithManager:(HXPhotoManager *)manager
+                scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
 + (instancetype)photoManager:(HXPhotoManager *)manager;
-+ (instancetype)photoManager:(HXPhotoManager *)manager scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
++ (instancetype)photoManager:(HXPhotoManager *)manager
+             scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
 
 - (NSIndexPath *)currentModelIndexPath:(HXPhotoModel *)model;
 @property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;

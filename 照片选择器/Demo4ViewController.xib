@@ -20,7 +20,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ay6-X6-g7F">
-                    <rect key="frame" x="164.5" y="80" width="46" height="30"/>
+                    <rect key="frame" x="164.5" y="95" width="46" height="30"/>
                     <state key="normal" title="选照片"/>
                     <connections>
                         <action selector="selectedPhoto:" destination="-1" eventType="touchUpInside" id="bOg-Rj-7wJ"/>
@@ -34,7 +34,7 @@
                     </constraints>
                 </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EsM-mz-BHG" customClass="HXPreviewVideoView">
-                    <rect key="frame" x="12" y="155" width="351" height="200"/>
+                    <rect key="frame" x="12" y="170" width="351" height="200"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="200" id="yFu-1R-oBe"/>
@@ -43,7 +43,7 @@
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="ay6-X6-g7F" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="80" id="4sf-O9-gY6"/>
+                <constraint firstItem="ay6-X6-g7F" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="95" id="4sf-O9-gY6"/>
                 <constraint firstItem="EsM-mz-BHG" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="12" id="99c-Af-s9v"/>
                 <constraint firstItem="EsM-mz-BHG" firstAttribute="top" secondItem="ay6-X6-g7F" secondAttribute="bottom" constant="45" id="PJD-kV-BG9"/>
                 <constraint firstAttribute="trailing" secondItem="EsM-mz-BHG" secondAttribute="trailing" constant="12" id="Xlq-V6-RnS"/>

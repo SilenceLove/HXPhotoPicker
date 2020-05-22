@@ -50,7 +50,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.2'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.3'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - Pod分三个版本:```pod 'HXPhotoPicker' 不依赖其他第三方库```、```pod 'HXPhotoPicker_SD' 只依赖SDWebImage```、```pod 'HXPhotoPicker_YY' 只依赖YYWebImage```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -648,9 +648,14 @@ frame.size.height 就是 HXPhotoView 的正确高度
 ```objc
 建议将 HXPhotoPicker.bundle 里的图片资源手动添加到项目的 Assets.xcassets 里
 ```
+#### 12.pod v2.4.2版本提示找不到SDWebImage或YYWebImage
+```objc
+pod v2.4.2版本提示找不到SDWebImage或YYWebImage，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到
+```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.4.3　-　添加Demo14，HXPhotoView自定义Item大小的示例代码
 - v2.4.2　-　修复横屏布局问题
 - v2.4.1　-　添加属性控制编辑之后的照片/视频是否添加到系统相册、pod移除AFNetworking依赖
 - v2.4.0　-　支持添加网络视频、视频添加进度条，demo8添加获取图片/视频详细注释

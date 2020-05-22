@@ -542,7 +542,6 @@
 - (HXAlbumModel *)albumModelWithCollection:(PHAssetCollection *)collection option:(PHFetchOptions *)option fetchAssets:(BOOL)fetchAssets {
     HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
     albumModel.albumName = [self transFormAlbumNameWithCollection:collection];
-//    albumModel.albumName = collection.localizedTitle;
     if (fetchAssets) {
         PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:option];
         albumModel.result = result;
@@ -562,7 +561,8 @@
     if (type == HXPhotoLanguageTypeSys) {
         albumName = collection.localizedTitle;
     }else {
-        if ([collection.localizedTitle isEqualToString:@"相机胶卷"]) {
+        if ([collection.localizedTitle isEqualToString:@"相机胶卷"] ||
+            [collection.localizedTitle isEqualToString:@"最近项目"]) {
             return collection.localizedTitle;
         }else if ([collection.localizedTitle isEqualToString:@"Camera Roll"]) {
             return [NSBundle hx_localizedStringForKey:HXAlbumCameraRoll];

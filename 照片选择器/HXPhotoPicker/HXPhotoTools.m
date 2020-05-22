@@ -459,7 +459,7 @@
     return have;
 }
 
-+ (BOOL)FileExistsAtVideoURL:(NSURL *)videoURL {
++ (BOOL)fileExistsAtVideoURL:(NSURL *)videoURL {
     if (!videoURL) {
         return NO;
     }

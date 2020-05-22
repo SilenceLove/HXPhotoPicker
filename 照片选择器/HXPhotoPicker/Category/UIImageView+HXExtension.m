@@ -188,7 +188,7 @@
         }
     }]; 
 #else
-    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能");
+    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到");
 #endif
 }
 @end

@@ -285,7 +285,7 @@
     BOOL isLandscape = orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight;
     CGFloat margin = isLandscape ? hxBottomMargin + 10 : 10;
     if (HX_IS_IPhoneX_All) {
-        margin += 10;
+//        margin += 10;
     }
     if (self.model.subTitle.length) {
         self.titleLb.hx_x = 10;

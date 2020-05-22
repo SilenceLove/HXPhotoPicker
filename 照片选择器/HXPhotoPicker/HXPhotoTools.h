@@ -104,7 +104,7 @@
 /// 判断网络地址是否在本地存在
 /// 如果文件夹不存在则会创建文件夹
 /// @param videoURL 网络视频地址
-+ (BOOL)FileExistsAtVideoURL:(NSURL * _Nullable)videoURL;
++ (BOOL)fileExistsAtVideoURL:(NSURL * _Nullable)videoURL;
 
 /// 将网络视频地址转换成本地文件名
 /// @param videoURL 网络视频地址

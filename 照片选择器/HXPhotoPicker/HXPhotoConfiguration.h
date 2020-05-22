@@ -233,7 +233,7 @@ HXPhotoPreviewViewController;
 /// push动画时长 default 0.45f
 @property (assign, nonatomic) NSTimeInterval pushTransitionDuration;
 
-/// po动画时长 default 0.35f
+/// pop动画时长 default 0.35f
 @property (assign, nonatomic) NSTimeInterval popTransitionDuration;
 
 /// 手势松开时返回的动画时长 default 0.35f
@@ -242,23 +242,15 @@ HXPhotoPreviewViewController;
 /// 是否可移动的裁剪框
 @property (assign, nonatomic) BOOL movableCropBox;
 
-/**
- 可移动的裁剪框是否可以编辑大小
- */
+/// 可移动的裁剪框是否可以编辑大小
 @property (assign, nonatomic) BOOL movableCropBoxEditSize;
 
-/**
- 可移动裁剪框的比例 (w,h)
- 一定要是宽比高哦!!!
- 当 movableCropBox = YES && movableCropBoxEditSize = YES
- 如果不设置比例即可自由编辑大小
- */
+/// 可移动裁剪框的比例 (w,h) 一定要是宽比高哦!!!
+/// 当 movableCropBox = YES && movableCropBoxEditSize = YES 如果不设置比例即可自由编辑大小
 @property (assign, nonatomic) CGPoint movableCropBoxCustomRatio;
 
-/**
- 是否替换相机控制器
- 使用自己的相机时需要调用下面两个block
- */
+/// 是否替换相机控制器
+/// 使用自己的相机时需要调用下面两个block
 @property (assign, nonatomic) BOOL replaceCameraViewController;
 
 /**
@@ -530,6 +522,7 @@ HXPhotoPreviewViewController;
 @property (copy, nonatomic) NSString *customAlbumName;
 
 /// 视频能选择的最大秒数  -  默认 3分钟/180秒
+/// 当视频超过能选的最大时长，如果视频可以编辑那么在列表选择的时候会自动跳转视频裁剪界面
 @property (assign, nonatomic) NSInteger videoMaximumSelectDuration;
 
 /// 视频能选择的最小秒数  -  默认 0秒 - 不限制

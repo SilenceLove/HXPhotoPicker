@@ -210,7 +210,7 @@ static id instance;
     NSString *videoFilePath = [HXPhotoTools getVideoURLFilePath:videoURL];
     
     NSURL *videoFileURL = [NSURL fileURLWithPath:videoFilePath];
-    if ([HXPhotoTools FileExistsAtVideoURL:videoURL]) {
+    if ([HXPhotoTools fileExistsAtVideoURL:videoURL]) {
         if (success) {
             success(videoFileURL, videoURL);
         }

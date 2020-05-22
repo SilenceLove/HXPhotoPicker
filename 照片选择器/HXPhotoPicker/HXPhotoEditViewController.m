@@ -270,9 +270,6 @@
             self.rightBottomView.hidden = YES;
         }
         HXEditRatio *ratio = [[HXEditRatio alloc] initWithValue1:self.manager.configuration.movableCropBoxCustomRatio.x value2:self.manager.configuration.movableCropBoxCustomRatio.y];
-        if (self.manager.configuration.movableCropBoxCustomRatio.x > self.manager.configuration.movableCropBoxCustomRatio.y) {
-            ratio.isLandscape = YES;
-        }
         [self bottomViewDidSelectRatioClick:ratio];
         [UIView animateWithDuration:0.25 animations:^{
             self.imageView.alpha = 1;
@@ -414,11 +411,22 @@
 - (void)clippingRatioDidChange:(BOOL)animated {
     CGRect rect = self.imageView.bounds;
     if (self.clippingRatio && self.clippingRatio.ratio != 0) {
-        CGFloat H = rect.size.width * self.clippingRatio.ratio;
-        if (H <= rect.size.height) {
-            rect.size.height = H;
-        } else {
-            rect.size.width *= rect.size.height / H;
+        if (self.clippingRatio.isLandscape) {
+            CGFloat W = rect.size.height * self.clippingRatio.ratio;
+            if (W <= rect.size.width) {
+                rect.size.width = W;
+            }else {
+                CGFloat scale = rect.size.width / W;
+                rect.size.height *= scale;
+            }
+        }else {
+            CGFloat H = rect.size.width * self.clippingRatio.ratio;
+            if (H <= rect.size.height) {
+                rect.size.height = H;
+            } else {
+                CGFloat scale = rect.size.height / H;
+                rect.size.width *= scale;
+            }
         }
         
         rect.origin.x = (self.imageView.bounds.size.width - rect.size.width) / 2;
@@ -955,7 +963,6 @@
 }
 - (void)setupRatioWithValue1:(CGFloat)value1 value2:(CGFloat)value2 {
     HXEditRatio *ratio = [[HXEditRatio alloc] initWithValue1:value1 value2:value2];
-    ratio.isLandscape = NO;
     
     if ([self.delegate respondsToSelector:@selector(bottomViewDidSelectRatioClick:)]) {
         [self.delegate bottomViewDidSelectRatioClick:ratio];
@@ -1166,6 +1173,9 @@
 //        _shortSide = MIN(fabs(value1), fabs(value2));
         _longSide  = value2;
         _shortSide = value1;
+        if (value1 > value2) {
+            self.isLandscape = YES;
+        }
     }
     return self;
 }
@@ -1178,7 +1188,7 @@
     return [NSString stringWithFormat:format, _shortSide, _longSide];
 }
 - (CGFloat)ratio {
-    if(_longSide==0 || _shortSide==0){
+    if(_longSide == 0 || _shortSide == 0){
         return 0;
     }
     if(self.isLandscape){

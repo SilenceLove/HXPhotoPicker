@@ -20,7 +20,7 @@
 #import "HXPhotoBottomSelectView.h"
 
 
-@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
+@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate, UICollectionViewDelegateFlowLayout,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
@@ -365,6 +365,31 @@
         vc.modalPresentationCapturesStatusBarAppearance = YES;
         [[self hx_viewController] presentViewController:vc animated:YES completion:nil];
     }
+}
+#if HXPhotoViewCustomItemSize
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    BOOL isAddItem = NO;
+    if (self.tempShowAddCell && indexPath.item == self.dataList.count) {
+        isAddItem =  YES;
+    }
+    CGSize size = CGSizeMake(100, 100);
+    if ([self.delegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:isAddItem:photoView:)]) {
+        size = [self.delegate collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPath isAddItem:isAddItem photoView:self];
+    }
+    return size;
+}
+#endif
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    if ([self.delegate respondsToSelector:@selector(collectionView:layout:minimumLineSpacingForSectionAtIndex:photoView:)]) {
+        return [self.delegate collectionView:collectionView layout:collectionViewLayout minimumLineSpacingForSectionAtIndex:section photoView:self];
+    }
+    return self.spacing;
+}
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
+    if ([self.delegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:photoView:)]) {
+        return [self.delegate collectionView:collectionView layout:collectionViewLayout minimumInteritemSpacingForSectionAtIndex:section photoView:self];
+    }
+    return self.spacing;
 }
 
 #pragma mark - < HXPhotoPreviewViewControllerDelegate >
@@ -923,9 +948,19 @@
 - (void)setupNewFrame {
     UIEdgeInsets insets = self.collectionView.contentInset;
     CGFloat itemW = (self.hx_w - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
-    if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal) itemW -= 10;
-    if (itemW) self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
-    
+    if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal &&
+        itemW > 20) {
+        itemW -= 10;
+    }
+    if (itemW <= 0) {
+        itemW = 100;
+    }
+    if (!HXPhotoViewCustomItemSize) {
+        self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
+    }else {
+        itemW = 100;
+    }
+
     NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
     NSInteger numOfLinesNew = 0;
     if (self.lineCount != 0) numOfLinesNew = (dataCount / self.lineCount) + 1;
@@ -936,7 +971,11 @@
     if (numOfLinesNew != self.numOfLinesOld) {
         self.numOfLinesOld = numOfLinesNew;
         CGFloat newHeight;
-        if ([self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
+        if ([self.delegate respondsToSelector:@selector(photoViewHeight:)] ||
+            [self.delegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:isAddItem:photoView:)]) {
+            if (![self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
+                NSAssert(NO, @"请实现此代理 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView");
+            }
             newHeight = [self.delegate photoViewHeight:self];
             if (newHeight <= 0) {
                 newHeight = 0;
@@ -975,7 +1014,11 @@
     CGFloat height = self.frame.size.height;
     
     if (dataCount == 1) {
-        if ([self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
+        if ([self.delegate respondsToSelector:@selector(photoViewHeight:)] ||
+                   [self.delegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:isAddItem:photoView:)]) {
+            if (![self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
+                NSAssert(NO, @"请实现此代理 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView");
+            }
             self.hx_h = [self.delegate photoViewHeight:self];
         }else {
             UIEdgeInsets insets = self.collectionView.contentInset;
