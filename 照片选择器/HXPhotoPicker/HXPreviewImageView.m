@@ -318,9 +318,9 @@ HXWeakSelf
     }
     if (self.model.type == HXPhotoModelMediaTypePhoto) {
 #if HasYYWebImage
-        [self.animatedImageView yy_cancelCurrentImageRequest];
+//        [self.animatedImageView yy_cancelCurrentImageRequest];
 #elif HasYYKit
-        [self.animatedImageView cancelCurrentImageRequest];
+//        [self.animatedImageView cancelCurrentImageRequest];
 #elif HasSDWebImage
 //        [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif

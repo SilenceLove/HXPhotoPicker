@@ -142,7 +142,6 @@
             self.scrollView.contentSize = self.previewContentView.hx_size;
         }
     }
-    
     self.previewContentView.model = model;
 }
 - (void)requestHDImage {
@@ -235,8 +234,18 @@
         tap2.numberOfTapsRequired = 2;
         [tap1 requireGestureRecognizerToFail:tap2];
         [_scrollView addGestureRecognizer:tap2];
+        [self addGesture];
     }
     return _scrollView;
+}
+- (void)addGesture {
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(respondsToLongPress:)];
+    [self.scrollView addGestureRecognizer:longPress];
+}
+- (void)respondsToLongPress:(UILongPressGestureRecognizer *)sender {
+    if (self.cellViewLongPressGestureRecognizerBlock) {
+        self.cellViewLongPressGestureRecognizerBlock(sender);
+    }
 }
 - (UIImage *)image {
     return self.previewContentView.image;

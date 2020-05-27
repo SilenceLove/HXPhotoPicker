@@ -460,7 +460,7 @@
         selectModel.title = [NSBundle hx_localizedStringForKey:@"从手机相册选择"];
         
         HXWeakSelf
-        HXPhotoBottomSelectView *selectView = [HXPhotoBottomSelectView showSelectViewWithModels:@[shootingModel, selectModel] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomSelectView * _Nonnull model) {
+        HXPhotoBottomSelectView *selectView = [HXPhotoBottomSelectView showSelectViewWithModels:@[shootingModel, selectModel] headerView:nil showTopLineView:NO cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
             if (index == 0) {
                 [weakSelf goCameraViewController];
             }else if (index == 1) {
@@ -997,6 +997,10 @@
         if ([self.delegate respondsToSelector:@selector(photoView:updateFrame:)]) {
             [self.delegate photoView:self updateFrame:self.frame]; 
         }
+        BOOL hasConstraints = self.constraints.count;
+        if (hasConstraints) {
+            self.collectionView.frame = self.bounds;
+        }
         if (self.updateFrameBlock) {
             self.updateFrameBlock(self.frame);
         }
@@ -1013,28 +1017,40 @@
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
     
+    BOOL hasConstraints = self.constraints.count;
+    
     if (dataCount == 1) {
         if ([self.delegate respondsToSelector:@selector(photoViewHeight:)] ||
                    [self.delegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:isAddItem:photoView:)]) {
             if (![self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
                 NSAssert(NO, @"请实现此代理 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView");
             }
-            self.hx_h = [self.delegate photoViewHeight:self];
+            if (self.constraints.count) {
+                NSAssert(NO, @"自定义HXPhotoView高度时，请不要使用约束布局");
+            }
+            CGFloat height = [self.delegate photoViewHeight:self];
+            if (height != self.hx_h) {
+                self.hx_h = height;
+            }
         }else {
             UIEdgeInsets insets = self.collectionView.contentInset;
             CGFloat itemW = (width - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
             CGFloat roundH = roundf(height);
             CGFloat roundW = roundf(itemW);
             if (roundH != roundW && fabs(height - itemW) >= 2) {
-                self.hx_h = itemW;
+                if (itemW != self.hx_h && !hasConstraints) {
+                    self.hx_h = itemW;
+                }
             }
         }
     }
-    self.collectionView.frame = self.bounds;
-    if (self.collectionView.hx_h <= 0) {
-        self.numOfLinesOld = 0;
-        [self setupNewFrame];
+    if (!hasConstraints) {
         self.collectionView.frame = self.bounds;
+        if (self.collectionView.hx_h <= 0) {
+            self.numOfLinesOld = 0;
+            [self setupNewFrame];
+            self.collectionView.frame = self.bounds;
+        }
     }
 }
 - (void)dealloc {

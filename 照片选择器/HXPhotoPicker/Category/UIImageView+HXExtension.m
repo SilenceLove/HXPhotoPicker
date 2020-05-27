@@ -55,7 +55,7 @@
             }
         }else {
             NSURL *url = original ? model.networkPhotoUrl : model.networkThumbURL;
-            [weakSelf yy_setImageWithURL:url placeholder:model.thumbPhoto options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+            [weakSelf yy_setImageWithURL:url placeholder:model.thumbPhoto options:YYWebImageOptionShowNetworkActivity progress:^(NSInteger receivedSize, NSInteger expectedSize) {
                 model.receivedSize = receivedSize;
                 model.expectedSize = expectedSize;
 //                model.networkImageSize = expectedSize;

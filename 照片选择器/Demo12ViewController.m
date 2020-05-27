@@ -147,7 +147,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         HXPhotoBottomViewModel *model = [[HXPhotoBottomViewModel alloc] init];
         model.title = @"保存";
         model.subTitle = @"这是一个长按事件";
-        [HXPhotoBottomSelectView showSelectViewWithModels:@[model] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomSelectView * _Nonnull model) {
+        [HXPhotoBottomSelectView showSelectViewWithModels:@[model] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
             if (index == 0) {
                 // 保存，处理...
             }

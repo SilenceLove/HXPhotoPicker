@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^cellDidPlayVideoBtn)(BOOL play);
 @property (nonatomic, copy) void (^cellDownloadICloudAssetComplete)(HXPhotoPreviewViewCell *myCell);
 @property (nonatomic, copy) void (^cellDownloadImageComplete)(HXPhotoPreviewViewCell *myCell);
+@property (copy, nonatomic) void (^ cellViewLongPressGestureRecognizerBlock)(UILongPressGestureRecognizer *longPress);
 - (void)againAddImageView;
 - (void)refreshImageSize;
 - (void)resetScale:(BOOL)animated;

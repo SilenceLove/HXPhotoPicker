@@ -115,6 +115,7 @@
     for (HXPhotoModel *model in self) {
         [self requestImageWithOriginal:original photoModel:model successful:^(UIImage * _Nullable image, NSURL * _Nullable imagePath, HXPhotoModel *photoModel) {
             if (image) {
+                // 如果photoModel 为nil可能是数组里的模型被移除了
                 [dict setObject:image forKey:photoModel.selectIndexStr];
             }else if (imagePath) {
                 UIImage *hImage = [NSArray hx_disposeHEICWithPath:imagePath.relativePath];

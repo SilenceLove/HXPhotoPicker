@@ -234,6 +234,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
     photoView.previewShowDeleteButton = YES; 
     photoView.showAddCell = YES;
+//    photoView.showDeleteNetworkPhotoAlert = YES;
 //    photoView.adaptiveDarkness = NO;
     [photoView.collectionView reloadData];
     [scrollView addSubview:photoView];

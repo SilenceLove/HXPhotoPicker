@@ -204,6 +204,7 @@
 		7B6C2F331F6A283D0044E3D6 /* Demo8ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */; };
 		7B752DE82372ADF000580F35 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE72372ADF000580F35 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7B752DEA2372ADF300580F35 /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE92372ADF300580F35 /* PhotosUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		7B7783D8247E04230013025F /* Demo15ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7783D7247E04230013025F /* Demo15ViewController.m */; };
 		7B7E3E7B1E4AACD1002234EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7A1E4AACD1002234EE /* main.m */; };
 		7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */; };
 		7B7E3E811E4AACD1002234EE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E801E4AACD1002234EE /* ViewController.m */; };
@@ -655,6 +656,8 @@
 		7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo8ViewController.m; sourceTree = "<group>"; };
 		7B752DE72372ADF000580F35 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		7B752DE92372ADF300580F35 /* PhotosUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotosUI.framework; path = System/Library/Frameworks/PhotosUI.framework; sourceTree = SDKROOT; };
+		7B7783D6247E04230013025F /* Demo15ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo15ViewController.h; sourceTree = "<group>"; };
+		7B7783D7247E04230013025F /* Demo15ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo15ViewController.m; sourceTree = "<group>"; };
 		7B7E3E761E4AACD1002234EE /* 照片选择器.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "照片选择器.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B7E3E7A1E4AACD1002234EE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7B7E3E7C1E4AACD1002234EE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1588,6 +1591,8 @@
 				7B200D4E216D074F004A5B0B /* Demo13ViewController.m */,
 				7B829B262477B5CC00CFD427 /* Demo14ViewController.h */,
 				7B829B272477B5CC00CFD427 /* Demo14ViewController.m */,
+				7B7783D6247E04230013025F /* Demo15ViewController.h */,
+				7B7783D7247E04230013025F /* Demo15ViewController.m */,
 				7B0EFFD7220598D100D614E8 /* SettingViewController.h */,
 				7B0EFFD8220598D100D614E8 /* SettingViewController.m */,
 				7B0EFFD9220598D100D614E8 /* SettingViewController.xib */,
@@ -1928,6 +1933,7 @@
 				7B28A0572466871700F90F37 /* SDImageIOCoder.m in Sources */,
 				7B28A0A42466871D00F90F37 /* YYMemoryCache.m in Sources */,
 				7B200D37216D06B9004A5B0B /* LFEditingView.m in Sources */,
+				7B7783D8247E04230013025F /* Demo15ViewController.m in Sources */,
 				7B28A0442466871700F90F37 /* SDAnimatedImage.m in Sources */,
 				7B200D2C216D06B9004A5B0B /* LFVideoClipToolbar.m in Sources */,
 				7B28A0722466871700F90F37 /* UIView+WebCacheOperation.m in Sources */,
@@ -2095,7 +2101,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.4.3;
+				MARKETING_VERSION = 2.4.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2121,7 +2127,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.4.3;
+				MARKETING_VERSION = 2.4.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -13,12 +13,12 @@
     _cellHeight = self.photoViewHeight;
     return _cellHeight;
 }
-- (CGFloat)photoViewHeight {
-    if (_photoViewHeight == 0) {
-        _photoViewHeight = (([UIScreen mainScreen].bounds.size.width - 24) - 3 * (3 - 1)) / 3;
-    }
-    return _photoViewHeight;
-}
+//- (CGFloat)photoViewHeight {
+//    if (_photoViewHeight == 0) {
+//        _photoViewHeight = (([UIScreen mainScreen].bounds.size.width - 24) - 3 * (3 - 1)) / 3;
+//    }
+//    return _photoViewHeight;
+//}
 - (NSMutableArray *)endCameraList {
     if (!_endCameraList) {
         _endCameraList = [NSMutableArray array];

@@ -31,7 +31,7 @@ typedef void (^ getPhotoListBlock)(NSArray *allList , NSArray *previewList,NSArr
 typedef NS_ENUM(NSUInteger, HXPhotoManagerSelectedType) {
     HXPhotoManagerSelectedTypePhoto = 0,        //!< 只显示图片
     HXPhotoManagerSelectedTypeVideo = 1,        //!< 只显示视频
-    HXPhotoManagerSelectedTypePhotoAndVideo     //!< 图片和视频一起显示
+    HXPhotoManagerSelectedTypePhotoAndVideo = 2 //!< 图片和视频一起显示
 };
 
 typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {

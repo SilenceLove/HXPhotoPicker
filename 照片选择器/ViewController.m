@@ -23,6 +23,7 @@
 #import "Demo12ViewController.h"
 #import "Demo13ViewController.h"
 #import "Demo14ViewController.h"
+#import "Demo15ViewController.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -40,6 +41,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 
 @property (copy, nonatomic) NSArray *list;
 @property (nonatomic, strong) YYFPSLabel *label;
+@property (nonatomic, assign) BOOL showAlertCompletion;
 
 @end
 
@@ -54,6 +56,13 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     }
 #endif
     return UIStatusBarStyleDefault;
+}
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if (!self.showAlertCompletion) {
+        hx_showAlert(self, @"提示", @"关于如何获取照片和视频，在README和Demo8中都写有很详细的说明", @"了解", nil, nil, nil);
+        self.showAlertCompletion = YES;
+    }
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -124,8 +133,11 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                          subTitle:@"嵌套其他第三方图片/视频编辑库"
                                 viewControllClass: [Demo13ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo14"
-                                                       subTitle:@"HXPhotoView自定义item大小"
-                                              viewControllClass: [Demo14ViewController class]]
+                                         subTitle:@"HXPhotoView自定义item大小"
+                                viewControllClass: [Demo14ViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo15"
+                                         subTitle:@"底部选择弹窗"
+                                viewControllClass: [Demo15ViewController class]]
                   
                   ];
     }
@@ -138,8 +150,9 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     // 请不要设置导航栏的背景图片为空
 //    [[UINavigationBar appearance] setShadowImage:[UIImage new]];
 //    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"APPCityPlayer_bannerGame"] forBarMetrics:UIBarMetricsDefault];
-    
-    self.title = @"Demo 1 ~ 14";
+
+    self.showAlertCompletion = NO;
+    self.title = @"Demo 1 ~ 15";
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     tableView.tableFooterView = [[UIView alloc] init];

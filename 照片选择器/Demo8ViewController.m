@@ -112,7 +112,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     // 那么在选择完成的时候就会获取图片和视频地址
     // 如果选中了原图那么获取图片时就是原图
     // 获取视频时如果设置 exportVideoURLForHighestQuality 为YES，则会去获取高等质量的视频。其他情况为中等质量的视频
-    // 个人建议不在选择完成的时候去获取，可以在要上传的时候再去获取
+    // 个人建议不在选择完成的时候去获取，因为每次选择完都会去获取。获取过程中可能会耗时过长
+    // 可以在要上传的时候再去获取
     for (HXPhotoModel *model in self.selectList) {
         // 数组里装的是所有类型的资源，需要判断
         // 先判断资源类型
@@ -210,7 +211,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                                 // LivePhoto的封面
                                 [[PHAssetResourceManager defaultManager] requestDataForAssetResource:assetResource options:options dataReceivedHandler:^(NSData * _Nonnull data) {
                                     UIImage *livePhoto_image = [UIImage imageWithData:data];
-                                    // livePhoto_image 需要上传的LIvePhoto封面
+                                    // livePhoto_image - 需要上传的LivePhoto封面
                                     NSSLog(@"LivePhoto_image - %@", livePhoto_image);
                                 } completionHandler:^(NSError * _Nullable error) {
                                     if (error) {
@@ -223,7 +224,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                                 // LivePhoto的视频内容
                                 [[PHAssetResourceManager defaultManager] writeDataForAssetResource:assetResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
                                     if (!error) {
-                                        // videoURL 需要上传的LIvePhoto视频地址，已经在本地存在的
+                                        // videoURL - 需要上传的LivePhoto视频地址，已经在本地存在的
                                         NSSLog(@"LivePhoto_video - %@", videoURL);
                                     }else {
                                         NSSLog(@"LivePhoto_video - 失败%@",error.localizedDescription);

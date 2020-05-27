@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 底部线颜色
 @property (strong, nonatomic) UIColor *lineColor;
 
-/// 选中颜色
+/// 长按选中颜色
 @property (strong, nonatomic) UIColor *selectColor;
 
 /// 自定义属性
@@ -45,23 +45,50 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface HXPhotoBottomSelectView : UIView
 @property (copy, nonatomic) NSArray *modelArray;
-@property (strong, nonatomic) UIView *tableHeaderView;
-@property (assign, nonatomic) BOOL adaptiveDarkness;
-@property (copy, nonatomic) NSString *cancelTitle;
-@property (copy, nonatomic) void (^ selectCompletion)(NSInteger index, HXPhotoBottomSelectView * _Nullable model);
+@property (copy, nonatomic) void (^ selectCompletion)(NSInteger index, HXPhotoBottomViewModel * _Nullable model);
 @property (copy, nonatomic) void (^ cancelClick)(void);
+
+/// 如果单独设置tableViewHeaderView，设置之后需要调用 recalculateHeight 方法重新计算高度
+@property (strong, nonatomic) UIView *tableHeaderView;
+/// 是否自适应暗黑模式
+@property (assign, nonatomic) BOOL adaptiveDarkness;
+/// 取消按钮的文字
+@property (copy, nonatomic) NSString *cancelTitle;
+/// 是否显示顶部横条视图，显示可拖动隐藏视图
+@property (assign, nonatomic) BOOL showTopLineView;
+
 
 
 /// 显示底部选择视图
 /// @param models 模型数组
-/// @param headerView headerView
+/// @param headerView tableViewHeaderView
+/// @param showTopLineView 显示可拖动隐藏的视图
 /// @param cancelTitle 取消按钮标题
 /// @param selectCompletion 选择完成
 /// @param cancelClick 取消选择
 + (instancetype)showSelectViewWithModels:(NSArray * _Nullable)models
                               headerView:(UIView * _Nullable)headerView
+                         showTopLineView:(BOOL)showTopLineView
                              cancelTitle:(NSString * _Nullable)cancelTitle
-                        selectCompletion:(void (^ _Nullable)(NSInteger index, HXPhotoBottomSelectView *model))selectCompletion
+                        selectCompletion:(void (^ _Nullable)(NSInteger index, HXPhotoBottomViewModel *model))selectCompletion
+                             cancelClick:(void (^ _Nullable)(void))cancelClick;
+
++ (instancetype)showSelectViewWithModels:(NSArray * _Nullable)models
+                              headerView:(UIView * _Nullable)headerView
+                             cancelTitle:(NSString * _Nullable)cancelTitle
+                        selectCompletion:(void (^ _Nullable)(NSInteger index, HXPhotoBottomViewModel *model))selectCompletion
+                             cancelClick:(void (^ _Nullable)(void))cancelClick;
+
++ (instancetype)showSelectViewWithModels:(NSArray * _Nullable)models
+                        selectCompletion:(void (^ _Nullable)(NSInteger index, HXPhotoBottomViewModel *model))selectCompletion
+                             cancelClick:(void (^ _Nullable)(void))cancelClick;
+
+/// 显示底部选择视图
+/// @param titles 标题数组，标题颜色大小都是默认的
+/// @param selectCompletion 选择完成
+/// @param cancelClick 取消选择
++ (instancetype)showSelectViewWithTitles:(NSArray * _Nullable)titles
+                        selectCompletion:(void (^ _Nullable)(NSInteger index, HXPhotoBottomViewModel *model))selectCompletion
                              cancelClick:(void (^ _Nullable)(void))cancelClick;
 
 - (void)showView;
@@ -74,5 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HXPhotoBottomSelectViewCell : UITableViewCell
 @property (assign, nonatomic) BOOL adaptiveDarkness;
 @property (strong, nonatomic) HXPhotoBottomViewModel *model;
+@property (assign, nonatomic) BOOL showSelectBgView;
+@property (copy, nonatomic) void (^ didCellBlock)(HXPhotoBottomSelectViewCell *myCell);
 @end
 NS_ASSUME_NONNULL_END

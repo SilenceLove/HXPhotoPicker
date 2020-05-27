@@ -698,6 +698,7 @@ HXVideoEditViewControllerDelegate
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoModel *model = self.modelArray[indexPath.item];
     HXPhotoPreviewViewCell *cell;
+    HXWeakSelf
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewLivePhotoCell" forIndexPath:indexPath];
@@ -707,7 +708,9 @@ HXVideoEditViewControllerDelegate
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewVideoViewCell" forIndexPath:indexPath];
     }
-    HXWeakSelf
+    cell.cellViewLongPressGestureRecognizerBlock = ^(UILongPressGestureRecognizer * _Nonnull longPress) {
+        [weakSelf respondsToLongPress:longPress];
+    };
     cell.scrollViewDidScroll = ^(CGFloat offsetY) {
         if (weakSelf.currentCellScrollViewDidScroll) {
             weakSelf.currentCellScrollViewDidScroll(offsetY);

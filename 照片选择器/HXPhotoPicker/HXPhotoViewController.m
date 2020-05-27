@@ -2335,9 +2335,9 @@ HXVideoEditViewControllerDelegate
 }
 - (void)cancelRequest {
 #if HasYYWebImage
-    [self.imageView yy_cancelCurrentImageRequest];
+//    [self.imageView yy_cancelCurrentImageRequest];
 #elif HasYYKit
-    [self.imageView cancelCurrentImageRequest];
+//    [self.imageView cancelCurrentImageRequest];
 #elif HasSDWebImage
 //    [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif

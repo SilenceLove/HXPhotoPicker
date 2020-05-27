@@ -52,6 +52,11 @@
                               location:(CLLocation * _Nullable)location
                               complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
 
+//+ (void)saveNetWorkingPhotoToCustomAlbumWithName:(NSString * _Nullable)albumName
+//                                             URL:(NSURL * _Nullable)URL
+//                                        location:(CLLocation * _Nullable)location
+//                                        complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
+
 /**
  获取定位信息 
  */
@@ -92,7 +97,7 @@
 /**
  获取数组里面图片的大小
  */
-+ (void)FetchPhotosBytes:(NSArray * _Nullable)photos
++ (void)fetchPhotosBytes:(NSArray * _Nullable)photos
               completion:(void (^ _Nullable)(NSString * _Nullable totalBytes))completion;
 + (NSString * _Nullable)getBytesFromDataLength:(NSUInteger)dataLength;
 

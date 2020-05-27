@@ -97,6 +97,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.frame = CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0);
     photoView.lineCount = 5;
     photoView.delegate = self;
+    photoView.showDeleteNetworkPhotoAlert = YES;
 //    photoView.showAddCell = NO;  
     [scrollView addSubview:photoView];
     self.photoView = photoView;
@@ -121,19 +122,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)lookClick {
-//    [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
-//    [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
-//    [[SDWebImageManager sharedManager] cancelAll];
-//    [[SDWebImageManager sharedManager].imageCache clearWithCacheType:SDImageCacheTypeAll completion:^{
-//
-//    }];
-//    [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
+    [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
+    [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
+    [[SDWebImageManager sharedManager] cancelAll];
+    [[SDWebImageManager sharedManager].imageCache clearWithCacheType:SDImageCacheTypeAll completion:^{
 
-//    }];
-//    [[SDImageCache sharedImageCache] clearMemory];
-//#if SDWebImageEmbed
-//#endif
-    return;
+    }];
 }
 - (void)addNetworkPhoto {
     if (self.manager.afterSelectPhotoCountIsMaximum) {

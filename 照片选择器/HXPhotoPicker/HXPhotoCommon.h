@@ -45,6 +45,7 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 #endif
 
 @property (strong, nonatomic) HXAlbumModel * _Nullable cameraRollAlbumModel;
+@property (assign, nonatomic) NSInteger selectedType;
 
 - (void)getURLFileLengthWithURL:(NSURL *)url
                         success:(HXPhotoCommonGetUrlFileLengthSuccess)success

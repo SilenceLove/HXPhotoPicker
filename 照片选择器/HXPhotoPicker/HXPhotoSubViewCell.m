@@ -10,7 +10,8 @@
 #import "HXPhotoModel.h"
 #import "HXCircleProgressView.h"
 #import "HXPhotoTools.h"
-@interface HXPhotoSubViewCell ()<UIAlertViewDelegate>
+#import "HXPhotoBottomSelectView.h"
+@interface HXPhotoSubViewCell ()
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UIButton *deleteBtn;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
@@ -90,27 +91,36 @@
 - (void)didDeleteClick {
     if (self.model.networkPhotoUrl) {
         if (self.showDeleteNetworkPhotoAlert) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"提示"] message:[NSBundle hx_localizedStringForKey:@"是否删除此资源"] delegate:self cancelButtonTitle:[NSBundle hx_localizedStringForKey:@"取消"] otherButtonTitles:[NSBundle hx_localizedStringForKey:@"确定"], nil];
-            [alert show];
+            UILabel *titleLb = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 40)];
+            titleLb.backgroundColor = [UIColor whiteColor];
+            titleLb.text = [NSBundle hx_localizedStringForKey:@"是否删除此资源"];
+            titleLb.textColor = [UIColor lightGrayColor];
+            titleLb.textAlignment = NSTextAlignmentCenter;
+            titleLb.font = [UIFont hx_pingFangFontOfSize:14];
+            UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0, 39.5, titleLb.hx_w, 0.5)];
+            lineView.backgroundColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1];
+            [titleLb addSubview:lineView];
+            HXPhotoBottomViewModel *model = [[HXPhotoBottomViewModel alloc] init];
+            model.title = [NSBundle hx_localizedStringForKey:@"删除"];
+            model.titleColor = [[UIColor redColor] colorWithAlphaComponent:0.8];
+            HXWeakSelf
+            [HXPhotoBottomSelectView showSelectViewWithModels:@[model] headerView:titleLb cancelTitle:[NSBundle hx_localizedStringForKey:@"取消"] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
+                if ([weakSelf.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
+                    [weakSelf.delegate cellDidDeleteClcik:weakSelf];
+                }
+            } cancelClick:nil];
             return;
         }
     }
 #if HasYYWebImage
-    [self.imageView yy_cancelCurrentImageRequest];
+//    [self.imageView yy_cancelCurrentImageRequest];
 #elif HasYYKit
-    [self.imageView cancelCurrentImageRequest];
+//    [self.imageView cancelCurrentImageRequest];
 #elif HasSDWebImage
 //    [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
         [self.delegate cellDidDeleteClcik:self];
-    }
-}
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 1) {
-        if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
-            [self.delegate cellDidDeleteClcik:self];
-        }
     }
 }
 

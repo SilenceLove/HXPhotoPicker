@@ -73,6 +73,7 @@
     if (_type != type) {
         self.cameraRollAlbumModel = nil;
         [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
+        [HXPhotoCommon photoCommon].selectedType = -1;
     }
     _type = type;
 }
@@ -85,7 +86,8 @@
 }
 - (void)setup {
 //    self.albums = [NSMutableArray array];
-    self.loadAssetQueue = dispatch_queue_create("com.hxphotopicker.LoadAssetQueue", NULL);
+//    NSString *queueLabel = [NSString stringWithFormat:@"com.hxphotopicker.%@", self];
+    self.loadAssetQueue = dispatch_queue_create("com.hxphotopicker.loadassetqueue", NULL);
     
     self.selectedList = [NSMutableArray array];
     self.selectedPhotos = [NSMutableArray array];
@@ -460,8 +462,12 @@
 }
 
 - (void)getCameraRollAlbumCompletion:(void (^)(HXAlbumModel *albumModel))completion {
-    if ([HXPhotoCommon photoCommon].cameraRollAlbumModel) {
+    if ([HXPhotoCommon photoCommon].cameraRollAlbumModel &&
+        [HXPhotoCommon photoCommon].selectedType == self.type) {
         self.cameraRollAlbumModel = [HXPhotoCommon photoCommon].cameraRollAlbumModel;
+    }else {
+        [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
+        [HXPhotoCommon photoCommon].selectedType = -1;
     }
     if (self.cameraRollAlbumModel && self.cameraRollAlbumModel.count) {
         if (self.getCameraRollAlbumModel) {
@@ -494,6 +500,7 @@
                 model.index = 0;
                 self.cameraRollAlbumModel = model;
                 [HXPhotoCommon photoCommon].cameraRollAlbumModel = model;
+                [HXPhotoCommon photoCommon].selectedType = self.type;
                 if (self.getCameraRollAlbumModel) {
                     self.getCameraRollAlbumModel(model);
                 }
@@ -516,6 +523,7 @@
         if (albumModel.count) {
             self.cameraRollAlbumModel = albumModel;
             [HXPhotoCommon photoCommon].cameraRollAlbumModel = albumModel;
+            [HXPhotoCommon photoCommon].selectedType = self.type;
         }
         if (self.getCameraRollAlbumModel) {
             self.getCameraRollAlbumModel(albumModel);
@@ -615,8 +623,12 @@
     return albumName;
 } 
 - (void)preloadData {
-    if ([HXPhotoCommon photoCommon].cameraRollAlbumModel) {
+    if ([HXPhotoCommon photoCommon].cameraRollAlbumModel &&
+        [HXPhotoCommon photoCommon].selectedType == self.type) {
         self.cameraRollAlbumModel = [HXPhotoCommon photoCommon].cameraRollAlbumModel;
+    }else {
+        [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
+        [HXPhotoCommon photoCommon].selectedType = -1;
     }
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     if (status != PHAuthorizationStatusAuthorized || self.getCameraRoolAlbuming || self.cameraRollAlbumModel) {

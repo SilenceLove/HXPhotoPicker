@@ -96,7 +96,7 @@
     HXPhotoBottomViewModel *model2 = [[HXPhotoBottomViewModel alloc] init];
     model2.title = @"相册";
     HXWeakSelf
-    [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomSelectView * _Nonnull model) {
+    [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
         [weakSelf actionClickedButtonAtIndex:index];
     } cancelClick:nil];
 }
@@ -118,7 +118,7 @@
             [weakSelf.manager afterListAddCameraTakePicturesModel:model];
             Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
             vc.manager = weakSelf.manager;
-            [weakSelf.navigationController pushViewController:vc animated:YES];
+            [weakSelf.navigationController pushViewController:vc animated:NO];
         } cancel:^(HXCustomCameraViewController *viewController) {
             NSSLog(@"取消了");
         }];
@@ -126,7 +126,7 @@
         [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
             Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
             vc.manager = weakSelf.manager;
-            [weakSelf.navigationController pushViewController:vc animated:YES];
+            [weakSelf.navigationController pushViewController:vc animated:NO];
         } cancel:^(UIViewController *viewController, HXPhotoManager *manager) {
             
         }];

@@ -12,6 +12,27 @@
 #import "HXPhotoManager.h"
 #import <sys/utsname.h>
 #import <MobileCoreServices/MobileCoreServices.h>
+
+
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>)
+#import <SDWebImage/UIImageView+WebCache.h>
+#import <SDWebImage/SDWebImageManager.h>
+#elif __has_include("UIImageView+WebCache.h")
+#import "UIImageView+WebCache.h"
+#import "SDWebImageManager.h"
+#endif
+
+
+#if __has_include(<YYWebImage/YYWebImage.h>)
+#import <YYWebImage/YYWebImage.h>
+#elif __has_include("YYWebImage.h")
+#import "YYWebImage.h"
+#elif __has_include(<YYKit/YYKit.h>)
+#import <YYKit/YYKit.h>
+#elif __has_include("YYKit.h")
+#import "YYKit.h"
+#endif
+
 @implementation HXPhotoTools
 
 + (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model
@@ -83,7 +104,7 @@
     }
     return isHEIF;
 }
-+ (void)FetchPhotosBytes:(NSArray *)photos completion:(void (^)(NSString *))completion
++ (void)fetchPhotosBytes:(NSArray *)photos completion:(void (^)(NSString *))completion
 {
     __block NSInteger dataLength = 0;
     __block NSInteger assetCount = 0;
@@ -228,6 +249,9 @@
         }
         return;
     }
+    if (!albumName) {
+        albumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
+    }
     // 判断授权状态
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -303,7 +327,18 @@
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL {
     [self saveVideoToCustomAlbumWithName:albumName videoURL:videoURL location:nil complete:nil];
 }
-
++ (void)saveNetWorkingPhotoToCustomAlbumWithName:(NSString * _Nullable)albumName
+                                             URL:(NSURL * _Nullable)URL
+                                        location:(CLLocation * _Nullable)location
+                                        complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete {
+    [self downloadImageWithURL:URL completed:^(UIImage *image, NSError *error) {
+        if (image) {
+            
+        }else {
+            
+        }
+    }];
+}
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
                                  photo:(UIImage *)photo
                               location:(CLLocation *)location
@@ -313,6 +348,9 @@
             complete(nil, NO);
         }
         return;
+    }
+    if (!albumName) {
+        albumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     }
     // 判断授权状态
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
@@ -483,5 +521,43 @@
     NSString * fileName = [videoURL.absoluteString stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     NSString *fullPathToFile = [HXPhotoPickerDownloadVideosPath stringByAppendingPathComponent:fileName];
     return fullPathToFile;
+}
++ (void)downloadImageWithURL:(NSURL *)URL completed:(void (^)(UIImage * image, NSError * error))completedBlock {
+#if HasYYKitOrWebImage
+    YYWebImageManager *manager = [YYWebImageManager sharedManager];
+    [manager.cache getImageForKey:[manager cacheKeyForURL:URL]  withType:YYImageCacheTypeAll withBlock:^(UIImage * _Nullable image, YYImageCacheType type) {
+        if (image) {
+            if (completedBlock) {
+                completedBlock(image, nil);
+            }
+        }else {
+            [manager requestImageWithURL:URL options:kNilOptions progress:nil transform:^UIImage * _Nullable(UIImage * _Nonnull image, NSURL * _Nonnull url) {
+                return image;
+            } completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+                if (completedBlock) {
+                    completedBlock(image, error);
+                }
+            }];
+        }
+    }];
+#elif HasSDWebImage
+    NSString *cacheKey = [[SDWebImageManager sharedManager] cacheKeyForURL:URL];
+    [[SDWebImageManager sharedManager].imageCache queryImageForKey:cacheKey options:SDWebImageQueryMemoryData context:nil completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+        if (image) {
+            if (completedBlock) {
+                completedBlock(image, nil);
+            }
+        }else {
+            NSURL *url = URL;
+            [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+                if (completedBlock) {
+                    completedBlock(image,error);
+                }
+            }];
+        }
+    }];
+#else
+    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到");
+#endif
 }
 @end

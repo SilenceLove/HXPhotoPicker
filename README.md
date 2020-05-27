@@ -47,10 +47,11 @@
 - [x] 支持暗黑模式
 - [x] 支持横向布局
 - [x] 支持Xib和Masonry布局
+- [x] 支持自定义item的大小
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.3'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.4'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - ```pod 'HXPhotoPicker' 不依赖其他第三方库，如有需要请自行依赖```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 如果想要加载网络gif图片请使用```YYWebImage```
@@ -71,7 +72,8 @@
 // 那么在选择完成的时候就会获取图片和视频地址
 // 如果选中了原图那么获取图片时就是原图
 // 获取视频时如果设置 exportVideoURLForHighestQuality 为YES，则会去获取高等质量的视频。其他情况为中等质量的视频
-// 个人建议不在选择完成的时候去获取，可以在要上传的时候再去获取
+// 个人建议不在选择完成的时候去获取，因为每次选择完都会去获取。获取过程中可能会耗时过长
+// 可以在要上传的时候再去获取
 for (HXPhotoModel *model in self.selectList) {
     // 数组里装的是所有类型的资源，需要判断
     // 先判断资源类型
@@ -655,6 +657,7 @@ pod v2.4.2版本提示找不到SDWebImage或YYWebImage，HXPhotoPicker为pod导�
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.4.4　-　修复了一些bug（HXPhotoView使用约束布局的问题等...），添加Demo15显示底部弹窗视图的示例代码
 - v2.4.3　-　添加Demo14，HXPhotoView自定义Item大小的示例代码
 - v2.4.2　-　修复横屏布局问题
 - v2.4.1　-　添加属性控制编辑之后的照片/视频是否添加到系统相册、pod移除AFNetworking依赖

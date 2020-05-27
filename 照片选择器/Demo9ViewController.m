@@ -82,7 +82,7 @@
             HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://goss.veer.com/creative/vcg/veer/1600water/veer-129342703.jpg"]  networkThumbURL:nil selected:YES];
             
             HXCustomAssetModel *assetModel3 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3935625616,3616422245&fm=27&gp=0.jpg"] selected:YES];
-            HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539156831133&di=2f917f5242bcd54aeb16e74c19732b16&imgtype=0&src=http%3A%2F%2Fimg.bqatj.com%2Fimg%2F1650c759c7315250.jpg"] selected:YES];
+            HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://user-images.githubusercontent.com/9622345/82725518-0bba0780-9d10-11ea-81fb-c5b29a0f7394.gif"] selected:YES];
             HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539156872167&di=93cd047350dfc7a60fa9e89e30079b25&imgtype=0&src=http%3A%2F%2Fpic.9ht.com%2Fup%2F2018-5%2F15252310743961744.gif"] selected:YES];
             HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
             

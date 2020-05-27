@@ -65,7 +65,65 @@
             [self.manager addCustomAssetModel:model.customAssetModels];
             model.addCustomAssetComplete = YES;
         }
+        HXWeakSelf
+        self.manager.configuration.previewRespondsToLongPress = ^(UILongPressGestureRecognizer *longPress, HXPhotoModel *photoModel, HXPhotoManager *manager, HXPhotoPreviewViewController *previewViewController) {
+            HXPhotoBottomViewModel *saveModel = [[HXPhotoBottomViewModel alloc] init];
+            saveModel.title = @"保存";
+            saveModel.customData = photoModel.tempImage;
+            [HXPhotoBottomSelectView showSelectViewWithModels:@[saveModel] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
+
+                if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                    if (photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
+                        photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+                        NSSLog(@"需要自行保存网络图片");
+                        return;
+                    }
+                }else if (photoModel.subType == HXPhotoModelMediaSubTypeVideo) {
+                    if (photoModel.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                        NSSLog(@"需要自行保存网络视频");
+                        return;
+                    }
+                }
+                [previewViewController.view hx_showLoadingHUDText:@"保存中"];
+                if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                    [HXPhotoTools savePhotoToCustomAlbumWithName:weakSelf.manager.configuration.customAlbumName photo:model.customData location:nil complete:^(HXPhotoModel * _Nullable model, BOOL success) {
+                        [previewViewController.view hx_handleLoading];
+                        if (success) {
+                            [previewViewController.view hx_showImageHUDText:@"保存成功"];
+                        }else {
+                            [previewViewController.view hx_showImageHUDText:@"保存失败"];
+                        }
+                    }];
+                }else if (photoModel.subType == HXPhotoModelMediaSubTypeVideo) {
+                    if (photoModel.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                        [[HXPhotoCommon photoCommon] downloadVideoWithURL:photoModel.videoURL progress:nil downloadSuccess:^(NSURL * _Nullable filePath, NSURL * _Nullable videoURL) {
+                            [HXPhotoTools saveVideoToCustomAlbumWithName:nil videoURL:filePath location:nil complete:^(HXPhotoModel * _Nullable model, BOOL success) {
+                                [previewViewController.view hx_handleLoading];
+                                if (success) {
+                                    [previewViewController.view hx_showImageHUDText:@"保存成功"];
+                                }else {
+                                    [previewViewController.view hx_showImageHUDText:@"保存失败"];
+                                }
+                            }];
+                        } downloadFailure:^(NSError * _Nullable error, NSURL * _Nullable videoURL) {
+                            [previewViewController.view hx_handleLoading];
+                            [previewViewController.view hx_showImageHUDText:@"保存失败"];
+                        }];
+                        return;
+                    }
+                    [HXPhotoTools saveVideoToCustomAlbumWithName:nil videoURL:photoModel.videoURL location:nil complete:^(HXPhotoModel * _Nullable model, BOOL success) {
+                        [previewViewController.view hx_handleLoading];
+                        if (success) {
+                            [previewViewController.view hx_showImageHUDText:@"保存成功"];
+                        }else {
+                            [previewViewController.view hx_showImageHUDText:@"保存失败"];
+                        }
+                    }];
+                }
+            } cancelClick:nil];
+        };
     }else {
+        self.manager.configuration.previewRespondsToLongPress = nil;
         self.manager.configuration.albumShowMode = HXPhotoAlbumShowModeDefault;
         self.photoView.previewStyle = HXPhotoViewPreViewShowStyleDefault;
         self.photoView.collectionView.editEnabled = YES;
@@ -94,6 +152,17 @@
         return;
     }
     if (frame.size.height == self.model.photoViewHeight) {
+        for (NSLayoutConstraint *heightConstraint in self.photoView.constraints) {
+            if (heightConstraint.firstAttribute != NSLayoutAttributeHeight) {
+                continue;
+            }
+            if (heightConstraint.constant != frame.size.height) {
+                // 不清楚为什么 mas_updateConstraints 更新高度约束无效
+                // 如果高度约束不对，在这里修正高度的约束
+                heightConstraint.constant = frame.size.height;
+                return;
+            }
+        }
         return;
     }
     [self.photoView mas_updateConstraints:^(MASConstraintMaker *make) {
