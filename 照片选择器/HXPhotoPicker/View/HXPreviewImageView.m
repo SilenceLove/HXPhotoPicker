@@ -56,7 +56,7 @@
         [self addSubview:self.sdImageView];
 #elif HasYYKitOrWebImage
         [self addSubview:self.animatedImageView];
-#elif
+#else
         [self addSubview:self.imageView];
 #endif
         [self addSubview:self.progressView];
