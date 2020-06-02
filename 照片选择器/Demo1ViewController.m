@@ -115,6 +115,7 @@
         _manager.configuration.previewBottomView = ^(HXPhotoPreviewBottomView *bottomView) {
             if (weakSelf.manager.configuration.photoStyle != HXPhotoStyleDark) {
                 bottomView.bgView.barTintColor = weakSelf.bottomViewBgColor;
+                bottomView.tipView.barTintColor = bottomView.bgView.barTintColor;
             }
         };
         _manager.configuration.albumListCollectionView = ^(UICollectionView *collectionView) {
@@ -130,7 +131,7 @@
 //        _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
         
-        // 使用自动的相机  这里拿系统相机做示例 
+        // 使用自定义的相机  这里拿系统相机做示例
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
             
             // 这里拿使用系统相机做例子

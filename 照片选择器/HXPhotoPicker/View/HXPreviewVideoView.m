@@ -158,13 +158,13 @@
             self.changePlayBtnState(NO);
         }
         self.videoManualPause = NO;
-        self.canRemovePlayerObservers = NO;
         [self.player pause];
         [self.player seekToTime:kCMTimeZero];
         [self.player cancelPendingPrerolls];
         [self.player.currentItem cancelPendingSeeks];
         [self.player.currentItem.asset cancelLoading];
         [self removePlayerObservers];
+        self.canRemovePlayerObservers = NO;
         [self.player replaceCurrentItemWithPlayerItem:nil];
         self.playerLayer.player = nil;
     }

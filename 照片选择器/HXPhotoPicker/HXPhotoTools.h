@@ -51,12 +51,6 @@
                                  photo:(UIImage * _Nullable)photo
                               location:(CLLocation * _Nullable)location
                               complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
-
-//+ (void)saveNetWorkingPhotoToCustomAlbumWithName:(NSString * _Nullable)albumName
-//                                             URL:(NSURL * _Nullable)URL
-//                                        location:(CLLocation * _Nullable)location
-//                                        complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
-
 /**
  获取定位信息 
  */

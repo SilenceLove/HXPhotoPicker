@@ -151,8 +151,7 @@
             }
         }
     });
-} 
- 
+}
 
 + (void)requestAuthorization:(UIViewController *)viewController
                         handler:(void (^)(PHAuthorizationStatus status))handler {
@@ -198,9 +197,9 @@
         NSArray *supportedTypeArray = exportSession.supportedFileTypes;
         if ([supportedTypeArray containsObject:AVFileTypeMPEG4]) {
             exportSession.outputFileType = AVFileTypeMPEG4;
-        } else if (supportedTypeArray.count == 0) {
+        }else if (supportedTypeArray.count == 0) {
             if (failed) {
-                failed([NSError errorWithDomain:@"不支持导入该类型视频" code:-222 userInfo:nil]);
+                failed([NSError errorWithDomain:@"不支持导出该类型视频" code:-222 userInfo:nil]);
             }
             return;
         }else {
@@ -327,18 +326,7 @@
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL {
     [self saveVideoToCustomAlbumWithName:albumName videoURL:videoURL location:nil complete:nil];
 }
-+ (void)saveNetWorkingPhotoToCustomAlbumWithName:(NSString * _Nullable)albumName
-                                             URL:(NSURL * _Nullable)URL
-                                        location:(CLLocation * _Nullable)location
-                                        complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete {
-    [self downloadImageWithURL:URL completed:^(UIImage *image, NSError *error) {
-        if (image) {
-            
-        }else {
-            
-        }
-    }];
-}
+
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
                                  photo:(UIImage *)photo
                               location:(CLLocation *)location
@@ -523,7 +511,23 @@
     return fullPathToFile;
 }
 + (void)downloadImageWithURL:(NSURL *)URL completed:(void (^)(UIImage * image, NSError * error))completedBlock {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+    NSString *cacheKey = [[SDWebImageManager sharedManager] cacheKeyForURL:URL];
+    [[SDWebImageManager sharedManager].imageCache queryImageForKey:cacheKey options:SDWebImageQueryMemoryData context:nil completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+        if (image) {
+            if (completedBlock) {
+                completedBlock(image, nil);
+            }
+        }else {
+            NSURL *url = URL;
+            [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+                if (completedBlock) {
+                    completedBlock(image,error);
+                }
+            }];
+        }
+    }];
+#elif HasYYKitOrWebImage
     YYWebImageManager *manager = [YYWebImageManager sharedManager];
     [manager.cache getImageForKey:[manager cacheKeyForURL:URL]  withType:YYImageCacheTypeAll withBlock:^(UIImage * _Nullable image, YYImageCacheType type) {
         if (image) {
@@ -536,22 +540,6 @@
             } completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
                 if (completedBlock) {
                     completedBlock(image, error);
-                }
-            }];
-        }
-    }];
-#elif HasSDWebImage
-    NSString *cacheKey = [[SDWebImageManager sharedManager] cacheKeyForURL:URL];
-    [[SDWebImageManager sharedManager].imageCache queryImageForKey:cacheKey options:SDWebImageQueryMemoryData context:nil completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
-        if (image) {
-            if (completedBlock) {
-                completedBlock(image, nil);
-            }
-        }else {
-            NSURL *url = URL;
-            [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
-                if (completedBlock) {
-                    completedBlock(image,error);
                 }
             }];
         }

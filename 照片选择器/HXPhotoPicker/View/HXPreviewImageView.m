@@ -16,8 +16,14 @@
 
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
+#import <SDWebImage/SDAnimatedImageView.h>
+#import <SDWebImage/SDAnimatedImageView+WebCache.h>
+#import <SDWebImage/UIImage+GIF.h>
 #elif __has_include("UIImageView+WebCache.h")
 #import "UIImageView+WebCache.h"
+#import "UIImage+GIF.h"
+#import "SDAnimatedImageView.h"
+#import "SDAnimatedImageView+WebCache.h"
 #endif
 
 #if __has_include(<YYWebImage/YYWebImage.h>)
@@ -34,6 +40,9 @@
 #if HasYYKitOrWebImage
 @property (strong, nonatomic) YYAnimatedImageView *animatedImageView;
 #endif
+#if HasSDWebImage
+@property (strong, nonatomic) SDAnimatedImageView *sdImageView;
+#endif
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
@@ -43,9 +52,11 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+        [self addSubview:self.sdImageView];
+#elif HasYYKitOrWebImage
         [self addSubview:self.animatedImageView];
-#else
+#elif
         [self addSubview:self.imageView];
 #endif
         [self addSubview:self.progressView];
@@ -54,7 +65,17 @@
 }
 - (UIImage *)image {
     UIImage *image;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+            if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
+                if (self.sdImageView.image.images.count > 0) {
+                    image = self.sdImageView.image.images.firstObject;
+                }else {
+                    image = self.sdImageView.image;
+                }
+            }else {
+                image = self.sdImageView.image;
+            }
+#elif HasYYKitOrWebImage
             if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
                 if (self.animatedImageView.image.images.count > 0) {
                     image = self.animatedImageView.image.images.firstObject;
@@ -85,7 +106,39 @@ HXWeakSelf
             self.progressView.hidden = model.downloadComplete;
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+            [self.sdImageView sd_setImageWithURL:model.networkPhotoUrl placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+                model.receivedSize = receivedSize;
+                model.expectedSize = expectedSize;
+                CGFloat progress = (CGFloat)receivedSize / expectedSize;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.progressView.progress = progress;
+                });
+            } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+                if (error != nil) {
+                    model.downloadError = YES;
+                    model.downloadComplete = YES;
+                    [weakSelf.progressView showError];
+                }else {
+                    if (image) {
+                        model.imageSize = image.size;
+                        model.thumbPhoto = image;
+                        model.previewPhoto = image;
+                        model.downloadComplete = YES;
+                        model.downloadError = NO;
+                        weakSelf.model.imageSize = image.size;
+                        weakSelf.progressView.progress = 1;
+                        weakSelf.progressView.hidden = YES;
+                        weakSelf.sdImageView.image = image;
+                        if (weakSelf.downloadICloudAssetComplete) { weakSelf.downloadICloudAssetComplete();
+                        }
+                        if (weakSelf.downloadNetworkImageComplete) {
+                            weakSelf.downloadNetworkImageComplete();
+                        }
+                    }
+                }
+            }];
+#elif HasYYKitOrWebImage
             [self.animatedImageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
                 if (weakSelf.model == model) {
                     weakSelf.progressView.progress = progress;
@@ -134,7 +187,9 @@ HXWeakSelf
             }];
 #endif
         }else {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+            self.sdImageView.image = model.thumbPhoto;
+#elif HasYYKitOrWebImage
             self.animatedImageView.image = model.thumbPhoto;
 #else
             self.imageView.image = model.thumbPhoto;
@@ -144,7 +199,9 @@ HXWeakSelf
     }else {
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             if (model.tempImage) {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+                self.sdImageView.image = model.tempImage;
+#elif HasYYKitOrWebImage
                 self.animatedImageView.image = model.tempImage;
 #else
                 self.imageView.image = model.tempImage;
@@ -153,7 +210,9 @@ HXWeakSelf
             }else {
                 self.requestID = [model requestThumbImageWithSize:CGSizeMake(self.hx_w * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                     if (weakSelf.model != model) return;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+                    weakSelf.sdImageView.image = image;
+#elif HasYYKitOrWebImage
                     weakSelf.animatedImageView.image = image;
 #else
                     weakSelf.imageView.image = image;
@@ -162,7 +221,9 @@ HXWeakSelf
             }
         }else {
             if (model.previewPhoto) {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+                self.sdImageView.image = model.previewPhoto;
+#elif HasYYKitOrWebImage
                 self.animatedImageView.image = model.previewPhoto;
 #else
                 self.imageView.image = model.previewPhoto;
@@ -170,7 +231,9 @@ HXWeakSelf
                 model.tempImage = nil;
             }else {
                 if (model.tempImage) {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+                    self.sdImageView.image = model.tempImage;
+#elif HasYYKitOrWebImage
                     self.animatedImageView.image = model.tempImage;
 #else
                     self.imageView.image = model.tempImage;
@@ -186,7 +249,9 @@ HXWeakSelf
                     }
                     self.requestID =[model requestThumbImageWithSize:requestSize completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model != model) return;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+                        weakSelf.sdImageView.image = image;
+#elif HasYYKitOrWebImage
                         weakSelf.animatedImageView.image = image;
 #else
                         weakSelf.imageView.image = image;
@@ -247,7 +312,11 @@ HXWeakSelf
             transition.duration = 0.2f;
             transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
             transition.type = kCATransitionFade;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+            [weakSelf.sdImageView.layer removeAllAnimations];
+            weakSelf.sdImageView.image = image;
+            [weakSelf.sdImageView.layer addAnimation:transition forKey:nil];
+#elif HasYYKitOrWebImage
             [weakSelf.animatedImageView.layer removeAllAnimations];
             weakSelf.animatedImageView.image = image;
             [weakSelf.animatedImageView.layer addAnimation:transition forKey:nil];
@@ -262,7 +331,11 @@ HXWeakSelf
         }];
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (self.gifImage) {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+            if (self.sdImageView.image != self.gifImage) {
+                self.sdImageView.image = self.gifImage;
+            }
+#elif HasYYKitOrWebImage
             if (self.animatedImageView.image != self.gifImage) {
                 self.animatedImageView.image = self.gifImage;
             }
@@ -288,7 +361,16 @@ HXWeakSelf
                 if (weakSelf.model != model) return;
                 [weakSelf downloadICloudAssetComplete];
                 weakSelf.progressView.hidden = YES;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+                UIImage *gifImage = [UIImage sd_imageWithGIFData:imageData];
+                weakSelf.sdImageView.image = gifImage;
+                weakSelf.gifImage = gifImage;
+                if (gifImage.images.count == 0) {
+                    weakSelf.gifFirstFrame = gifImage;
+                }else {
+                    weakSelf.gifFirstFrame = gifImage.images.firstObject;
+                }
+#elif HasYYKitOrWebImage
                 YYImage *gifImage = [YYImage imageWithData:imageData];
                 weakSelf.animatedImageView.image = gifImage;
                 weakSelf.gifImage = gifImage;
@@ -326,7 +408,9 @@ HXWeakSelf
 #endif
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (!self.stopCancel) {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+            self.sdImageView.image = self.gifFirstFrame;
+#elif HasYYKitOrWebImage
             self.animatedImageView.currentAnimatedImageIndex = 0;
 #else
             self.imageView.image = self.gifFirstFrame;
@@ -339,7 +423,11 @@ HXWeakSelf
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+    if (!CGRectEqualToRect(self.sdImageView.frame, self.bounds)) {
+        self.sdImageView.frame = self.bounds;
+    }
+#elif HasYYKitOrWebImage
     if (!CGRectEqualToRect(self.animatedImageView.frame, self.bounds)) {
         self.animatedImageView.frame = self.bounds;
     }
@@ -361,6 +449,18 @@ HXWeakSelf
     return _animatedImageView;
 }
 #endif
+
+#if HasSDWebImage
+- (SDAnimatedImageView *)sdImageView {
+    if (!_sdImageView) {
+        _sdImageView = [[SDAnimatedImageView alloc] init];
+        _sdImageView.clipsToBounds = YES;
+        _sdImageView.contentMode = UIViewContentModeScaleAspectFill;
+    }
+    return _sdImageView;
+}
+#endif
+
 - (UIImageView *)imageView {
     if (!_imageView) {
         _imageView = [[UIImageView alloc] init];

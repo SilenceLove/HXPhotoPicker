@@ -34,6 +34,7 @@
     _model = model;
     if (self.requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        [PHLivePhoto cancelLivePhotoRequestWithRequestID:self.requestID];
         self.requestID = -1;
     }
     if (_livePhotoView.livePhoto) {
@@ -46,6 +47,19 @@
         self.model.iCloudRequestID = -1;
     }
     HXWeakSelf
+    if (model.type == HXPhotoModelMediaTypeCameraPhoto &&
+        model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+        self.requestID = [model requestLocalLivePhotoWithCompletion:^(PHLivePhoto * _Nullable livePhoto, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            if (weakSelf.model != model) return;
+            if (weakSelf.downloadICloudAssetComplete) {
+                weakSelf.downloadICloudAssetComplete();
+            }
+            [weakSelf.livePhotoView stopPlayback];
+            weakSelf.livePhotoView.livePhoto = livePhoto;
+            [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        }];
+        return;
+    }
     self.requestID = [self.model requestLivePhotoWithSize:self.model.endImageSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
         if (weakSelf.model != model) return;
         if (weakSelf.model.isICloud) {
@@ -72,7 +86,12 @@
 }
 - (void)cancelLivePhoto {
     if (self.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        if (self.model.type == HXPhotoModelMediaTypeCameraPhoto &&
+            self.model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+                [PHLivePhoto cancelLivePhotoRequestWithRequestID:self.requestID];
+        }else {
+            [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        }
         self.requestID = -1;
     }
     if (!self.stopCancel) {

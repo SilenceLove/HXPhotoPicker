@@ -59,6 +59,12 @@ HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
 
+/// 相机拍照点击完成之后是否跳转编辑界面进行编辑
+@property (assign, nonatomic) BOOL cameraPhotoJumpEdit;
+
+/// 相机录制点击完成之后是否跳转编辑界面进行编辑
+@property (assign, nonatomic) BOOL cameraVideoJumpEdit;
+
 /// 照片编辑时底部比例选项
 /// 默认: @[@{@"原始值" : @"{0, 0}"},
 ///        @{@"正方形" : @"{1, 1}"},
@@ -106,6 +112,7 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) BOOL defaultFrontCamera;
 
 /// 在照片列表选择照片完后点击完成时是否请求图片和视频地址
+/// 如果需要下载网络图片 [HXPhotoCommon photoCommon].requestNetworkAfter 设置为YES;
 /// 选中了原图则是原图，没选中则是高清图
 /// 并赋值给model的 thumbPhoto / previewPhoto / videoURL 属性
 /// 如果资源为视频 thumbPhoto 和 previewPhoto 就是视频封面

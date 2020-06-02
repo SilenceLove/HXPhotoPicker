@@ -261,6 +261,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
                    layout:(UICollectionViewLayout *)collectionViewLayout
 minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
                 photoView:(HXPhotoView *)photoView;
+
+///
+/// @param photoView self
+/// @param model 模型
+- (void)photoViewCameraTakePictureCompletion:(HXPhotoView *)photoView model:(HXPhotoModel *)model;
 @end
 
 @interface HXPhotoView : UIView

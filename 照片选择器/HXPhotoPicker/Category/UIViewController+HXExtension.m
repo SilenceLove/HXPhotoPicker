@@ -146,6 +146,14 @@
     [self presentViewController:vc animated:YES completion:nil];
 }
 
+- (void)hx_presentPhotoEditViewControllerWithManager:(HXPhotoManager * _Nonnull)manager
+                                           editPhoto:(UIImage * _Nonnull)editPhoto
+                                                done:(HXPhotoEditViewControllerDidDoneBlock _Nullable)done
+                                              cancel:(HXPhotoEditViewControllerDidCancelBlock _Nullable)cancel {
+    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:editPhoto];
+    [self hx_presentPhotoEditViewControllerWithManager:manager photoModel:photoModel delegate:nil done:done cancel:cancel];
+}
+
 - (void)hx_presentVideoEditViewControllerWithManager:(HXPhotoManager *)manager
                                           videoModel:(HXPhotoModel *)videoModel
                                             delegate:(id)delegate
@@ -162,6 +170,15 @@
     vc.modalPresentationCapturesStatusBarAppearance = YES;
     [self presentViewController:vc animated:YES completion:nil];
 }
+
+- (void)hx_presentVideoEditViewControllerWithManager:(HXPhotoManager * _Nonnull)manager
+                                            videoURL:(NSURL * _Nonnull)videoURL
+                                                done:(HXVideoEditViewControllerDidDoneBlock _Nullable)done
+                                              cancel:(HXVideoEditViewControllerDidCancelBlock _Nullable)cancel {
+    HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:videoURL];
+    [self hx_presentVideoEditViewControllerWithManager:manager videoModel:videoModel delegate:nil done:done cancel:cancel];
+}
+
 - (BOOL)hx_navigationBarWhetherSetupBackground {
     if ([self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsDefault]) {
         return YES;

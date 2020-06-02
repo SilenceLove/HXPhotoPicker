@@ -8,6 +8,20 @@
 
 #import <UIKit/UIKit.h>
 #import "HXPhotoTools.h"
+
+
+#if __has_include(<SDWebImage/UIImageView+WebCache.h>)
+#import <SDWebImage/UIImageView+WebCache.h>
+#import <SDWebImage/SDAnimatedImageView.h>
+#import <SDWebImage/SDAnimatedImageView+WebCache.h>
+#import <SDWebImage/UIImage+GIF.h>
+#elif __has_include("UIImageView+WebCache.h")
+#import "UIImageView+WebCache.h"
+#import "UIImage+GIF.h"
+#import "SDAnimatedImageView.h"
+#import "SDAnimatedImageView+WebCache.h"
+#endif
+
 #if __has_include(<YYWebImage/YYWebImage.h>)
 #import <YYWebImage/YYWebImage.h>
 #elif __has_include("YYWebImage.h")
@@ -22,7 +36,9 @@
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) UIImage *image;
 @property (strong, nonatomic) UIImageView *imageView;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+@property (strong, nonatomic) SDAnimatedImageView *sdImageView;
+#elif HasYYKitOrWebImage
 @property (strong, nonatomic) YYAnimatedImageView *animatedImageView;
 #endif
 @property (strong, nonatomic) NSIndexPath *indexPath;

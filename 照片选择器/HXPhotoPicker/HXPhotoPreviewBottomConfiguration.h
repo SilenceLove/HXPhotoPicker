@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 编辑按钮的状态，当状态改变时都会调用这个block
 /// .editButtonStatus = ^(BOOL enabled) {
 ///     在回调里改变编辑按钮状态
-///}
+/// }
 @property (copy, nonatomic) void (^ editButtonStatus)(BOOL enabled);
 
 @end

@@ -16,6 +16,7 @@
 #import "UIImage+HXExtension.h"
 #import <CoreLocation/CoreLocation.h>
 #import "HXPhotoCustomNavigationBar.h"
+#import "UIViewController+HXExtension.h"
 
 @interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraBottomViewDelegate,HXCustomCameraControllerDelegate, CLLocationManagerDelegate>
 @property (strong, nonatomic) HXCustomCameraController *cameraController;
@@ -318,45 +319,105 @@
     }
 }
 - (void)didDoneBtnClick {
-    if (!self.manager.configuration.saveSystemAblum) {
-        HXPhotoModel *model;
-        if (!self.videoURL) {
-            model = [HXPhotoModel photoModelWithImage:self.imageView.image];
-        }else {
-            if (self.time < 3) {
-                [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
-                return;
-            }
-            [self.playVideoView stopPlay];
-            model = [HXPhotoModel photoModelWithVideoURL:self.videoURL videoTime:self.time];
-        }
-        model.creationDate = [NSDate date];
-        model.location = self.location;
-        [self doneCompleteWithModel:model];
+    HXPhotoModel *cameraModel;
+    if (!self.videoURL) {
+        cameraModel = [HXPhotoModel photoModelWithImage:self.imageView.image];
     }else {
-        HXWeakSelf
-        [self.view hx_immediatelyShowLoadingHudWithText:nil];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (!self.videoURL) {
-                [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image location:self.location complete:^(HXPhotoModel *model, BOOL success) {
-                    if (success) {
-                        [weakSelf doneCompleteWithModel:model];
-                        [weakSelf.view hx_handleLoading:NO];
-                    }else {
-                        [weakSelf.view hx_showImageHUDText:@"保存失败!"];
-                    }
+        if (self.time < 3) {
+            [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
+            return;
+        }
+        [self.playVideoView stopPlay];
+        cameraModel = [HXPhotoModel photoModelWithVideoURL:self.videoURL videoTime:self.time];
+    }
+    cameraModel.creationDate = [NSDate date];
+    cameraModel.location = self.location;
+    HXWeakSelf
+    if (!self.manager.configuration.saveSystemAblum) {
+        if (cameraModel.subType == HXPhotoModelMediaSubTypePhoto) {
+            if (self.manager.configuration.cameraPhotoJumpEdit) {
+                [self hx_presentPhotoEditViewControllerWithManager:self.manager photoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
+                    [weakSelf doneCompleteWithModel:afterModel];
+                } cancel:^(HXPhotoEditViewController *viewController) {
+                    [weakSelf cancelClick:weakSelf.cancelBtn];
                 }];
             }else {
-                [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL location:self.location complete:^(HXPhotoModel *model, BOOL success) {
-                    [weakSelf.view hx_handleLoading:NO];
-                    if (success) {
-                        [weakSelf doneCompleteWithModel:model];
-                    }else {
-                        [weakSelf.view hx_showImageHUDText:@"保存失败!"];
-                    }
-                }];
+                [self doneCompleteWithModel:cameraModel];
             }
-        });
+        }else if (cameraModel.subType == HXPhotoModelMediaSubTypeVideo) {
+            if (self.manager.configuration.cameraVideoJumpEdit) {
+                [self hx_presentVideoEditViewControllerWithManager:self.manager videoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXVideoEditViewController *viewController) {
+                    [weakSelf doneCompleteWithModel:afterModel];
+                } cancel:^(HXVideoEditViewController *viewController) {
+                    [weakSelf cancelClick:weakSelf.cancelBtn];
+                }];
+            }else {
+                [self doneCompleteWithModel:cameraModel];
+            }
+        }
+    }else {
+        if (self.manager.configuration.editAssetSaveSystemAblum) {
+            if (cameraModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                if (self.manager.configuration.cameraPhotoJumpEdit) {
+                    [self hx_presentPhotoEditViewControllerWithManager:self.manager photoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
+                        [weakSelf doneCompleteWithModel:afterModel];
+                    } cancel:^(HXPhotoEditViewController *viewController) {
+                        [weakSelf cancelClick:weakSelf.cancelBtn];
+                    }];
+                }else {
+                    [self doneCompleteWithModel:cameraModel];
+                }
+            }else if (cameraModel.subType == HXPhotoModelMediaSubTypeVideo) {
+                if (self.manager.configuration.cameraVideoJumpEdit) {
+                    [self hx_presentVideoEditViewControllerWithManager:self.manager videoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXVideoEditViewController *viewController) {
+                        [weakSelf doneCompleteWithModel:afterModel];
+                    } cancel:^(HXVideoEditViewController *viewController) {
+                        [weakSelf cancelClick:weakSelf.cancelBtn];
+                    }];
+                }else {
+                    [self doneCompleteWithModel:cameraModel];
+                }
+            }
+        }else {
+            [self.view hx_immediatelyShowLoadingHudWithText:nil];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if (!self.videoURL) {
+                    [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image location:self.location complete:^(HXPhotoModel *model, BOOL success) {
+                        if (success) {
+                            if (weakSelf.manager.configuration.cameraPhotoJumpEdit) {
+                                [weakSelf hx_presentPhotoEditViewControllerWithManager:weakSelf.manager photoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
+                                    [weakSelf doneCompleteWithModel:afterModel];
+                                } cancel:^(HXPhotoEditViewController *viewController) {
+                                    [weakSelf cancelClick:weakSelf.cancelBtn];
+                                }];
+                            }else {
+                                [weakSelf doneCompleteWithModel:model];
+                            }
+                            [weakSelf.view hx_handleLoading:NO];
+                        }else {
+                            [weakSelf.view hx_showImageHUDText:@"保存失败!"];
+                        }
+                    }];
+                }else {
+                    [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL location:self.location complete:^(HXPhotoModel *model, BOOL success) {
+                        [weakSelf.view hx_handleLoading:NO];
+                        if (success) {
+                            if (weakSelf.manager.configuration.cameraVideoJumpEdit) {
+                                [weakSelf hx_presentVideoEditViewControllerWithManager:weakSelf.manager videoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXVideoEditViewController *viewController) {
+                                    [weakSelf doneCompleteWithModel:afterModel];
+                                } cancel:^(HXVideoEditViewController *viewController) {
+                                    [weakSelf cancelClick:weakSelf.cancelBtn];
+                                }];
+                            }else {
+                                [weakSelf doneCompleteWithModel:model];
+                            }
+                        }else {
+                            [weakSelf.view hx_showImageHUDText:@"保存失败!"];
+                        }
+                    }];
+                }
+            });
+        }
     }
 }
 - (void)doneCompleteWithModel:(HXPhotoModel *)model {
@@ -371,7 +432,12 @@
     if (self.doneBlock) {
         self.doneBlock(model, self);
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.manager.configuration.cameraPhotoJumpEdit ||
+        self.manager.configuration.cameraVideoJumpEdit) {
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    }else {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 - (void)didchangeCameraClick {
     if ([self.cameraController switchCameras]) {

@@ -1122,7 +1122,9 @@ HXVideoEditViewControllerDelegate
         previewVC.delegate = self;
         previewVC.modelArray = self.previewArray;
         previewVC.manager = self.manager;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+        cell.model.tempImage = vc.sdImageView.image;
+#elif HasYYKitOrWebImage
         cell.model.tempImage = vc.animatedImageView.image;
 #else
         cell.model.tempImage = vc.imageView.image;
@@ -1140,7 +1142,9 @@ HXVideoEditViewControllerDelegate
             previewVC.delegate = self;
             previewVC.modelArray = self.previewArray;
             previewVC.manager = self.manager;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+            cell.model.tempImage = vc.sdImageView.image;
+#elif HasYYKitOrWebImage
             cell.model.tempImage = vc.animatedImageView.image;
 #else
             cell.model.tempImage = vc.imageView.image;
@@ -1166,7 +1170,9 @@ HXVideoEditViewControllerDelegate
                 previewVC.delegate = self;
                 previewVC.modelArray = self.previewArray;
                 previewVC.manager = self.manager;
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+                cell.model.tempImage = vc.sdImageView.image;
+#elif HasYYKitOrWebImage
                 cell.model.tempImage = vc.animatedImageView.image;
 #else
                 cell.model.tempImage = vc.imageView.image;
@@ -1843,8 +1849,10 @@ HXVideoEditViewControllerDelegate
         if ([session canAddInput:videoInput]) {
             [session addInput:videoInput];
         }
-        if (HXGetCameraContentInRealTime && [session canAddOutput:self.captureDataOutput]) {
-            [session addOutput:self.captureDataOutput];
+        if (HXGetCameraContentInRealTime) {
+            if ([session canAddOutput:self.captureDataOutput]) {
+                [session addOutput:self.captureDataOutput];
+            }
         }
     }else {
         if (completion) {
@@ -2104,11 +2112,17 @@ HXVideoEditViewControllerDelegate
 - (void)resetNetworkImage {
     if (self.model.networkPhotoUrl &&
         self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
-        self.model.loadOriginalImage = YES;
+        self.model.previewViewSize = CGSizeZero;
+        self.model.endImageSize = CGSizeZero;
         HXWeakSelf
         [self.imageView hx_setImageWithModel:self.model original:YES progress:nil completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
             if (weakSelf.model == model) {
-                weakSelf.imageView.image = image;
+                if (image.images.count) {
+                    weakSelf.imageView.image = nil;
+                    weakSelf.imageView.image = image.images.firstObject;
+                }else {
+                    weakSelf.imageView.image = image;
+                }
             }
         }];
     }
@@ -2138,7 +2152,12 @@ HXVideoEditViewControllerDelegate
                     }else {
                         if (image) {
                             weakSelf.maskView.hidden = NO;
-                            weakSelf.imageView.image = image;
+                            if (image.images.count) {
+                                weakSelf.imageView.image = nil;
+                                weakSelf.imageView.image = image.images.firstObject;
+                            }else {
+                                weakSelf.imageView.image = image;
+                            }
                             weakSelf.progressView.progress = 1;
                             weakSelf.progressView.hidden = YES;
                         }
@@ -2177,6 +2196,10 @@ HXVideoEditViewControllerDelegate
         }else {
             if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
                 self.stateLb.text = @"GIF";
+                self.stateLb.hidden = NO;
+                self.bottomMaskLayer.hidden = NO;
+            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+                self.stateLb.text = @"Live";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;
             }else {

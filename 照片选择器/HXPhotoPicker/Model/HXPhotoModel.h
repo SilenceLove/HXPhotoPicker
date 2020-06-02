@@ -41,11 +41,14 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelMediaSubType) {
     HXPhotoModelMediaSubTypeVideo       //!< 视频
 };
 
+typedef void (^ HXModelURLHandler)(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType,  BOOL isNetwork, HXPhotoModel * _Nullable model);
+
 typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraPhotoType) {
-    HXPhotoModelMediaTypeCameraPhotoTypeLocal = 1,   //!< 本地图片
-    HXPhotoModelMediaTypeCameraPhotoTypeLocalGif,    //!< 本地gif图片
-    HXPhotoModelMediaTypeCameraPhotoTypeNetWork,     //!< 网络图片
-    HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif   //!< 网络gif图片
+    HXPhotoModelMediaTypeCameraPhotoTypeLocal = 1,          //!< 本地图片
+    HXPhotoModelMediaTypeCameraPhotoTypeLocalGif,           //!< 本地gif图片
+    HXPhotoModelMediaTypeCameraPhotoTypeNetWork,            //!< 网络图片
+    HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif,         //!< 网络gif图片
+    HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto      //!< 本地LivePhoto
 };
 
 typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraVideoType) {
@@ -85,55 +88,52 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
  或者将配置类里的 requestImageAfterFinishingSelection 设为YES，点击完成后会自动获取视频地址并且赋值给videoURL
  */
 @property (strong, nonatomic) NSURL * _Nullable fileURL DEPRECATED_MSG_ATTRIBUTE("Use 'exportVideoWithPresetName:startRequestICloud:iCloudProgressHandler:exportProgressHandler:success:failed' instead");
-/**
- 创建日期
- 
- - 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
- */
+
+/// 创建日期
+/// 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
 @property (strong, nonatomic) NSDate * _Nullable creationDate;
-/**
- 修改日期
- 
- - 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
- */
+
+/// 修改日期
+/// 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
 @property (strong, nonatomic) NSDate * _Nullable modificationDate;
-/**
- 位置信息 CLLocation 对象
- 
- - 通过相机拍摄的时候有定位权限的话就有值
- */
+
+/// 位置信息 CLLocation 对象
+/// 通过相机拍摄的时候有定位权限的话就有值
 @property (strong, nonatomic) CLLocation * _Nullable location;
 
-/**  照片类型  */
+/// 照片类型
 @property (assign, nonatomic) HXPhotoModelMediaType type;
-/**  照片子类型  */
+
+/// 照片子类型
 @property (assign, nonatomic) HXPhotoModelMediaSubType subType;
 @property (assign, nonatomic) HXPhotoModelMediaTypeCameraPhotoType cameraPhotoType;
 @property (assign, nonatomic) HXPhotoModelMediaTypeCameraVideoType cameraVideoType;
-/**  照片PHAsset对象  */
+
+/// PHAsset对象
 @property (strong, nonatomic) PHAsset * _Nullable asset;
 /// 照片格式
 @property (assign, nonatomic) HXPhotoModelFormat photoFormat;
-/**  视频秒数 */
+/// 视频秒数
 @property (nonatomic, assign) NSTimeInterval videoDuration;
-/**  选择的下标 */
+/// 选择的下标
 @property (assign, nonatomic) NSInteger selectedIndex;
-/**  模型所对应的选中下标 */
+/// 模型所对应的选中下标
 @property (copy, nonatomic) NSString * _Nullable selectIndexStr;
-/**  照片原始宽高 */
+/// 照片原始宽高
 @property (assign, nonatomic) CGSize imageSize;
-/**  本地视频URL / 网络视频地址 */
+/// 本地视频URL / 网络视频地址
 @property (strong, nonatomic) NSURL * _Nullable videoURL;
-/**  网络图片的地址 */
+/// 网络图片的地址
 @property (copy, nonatomic) NSURL * _Nullable networkPhotoUrl;
-/**  网络图片缩略图地址  */
+/// 网络图片缩略图地址
 @property (strong, nonatomic) NSURL * _Nullable networkThumbURL;
 /// 网络图片的大小
 //@property (assign, nonatomic) NSUInteger networkImageSize;
-/**  临时的列表小图 - 本地图片才用这个上传  */
+/// 临时的列表小图 - 本地图片才用这个上传
 @property (strong, nonatomic) UIImage * _Nullable thumbPhoto;
-/**  临时的预览大图  - 本地图片才用这个上传 */
+/// 临时的预览大图  - 本地图片才用这个上传
 @property (strong, nonatomic) UIImage * _Nullable previewPhoto;
+
 /// 图片本地地址
 /// 正常情况下为空
 /// 1.调用过 requestImageURLStartRequestICloud 这个方法会有值
@@ -141,19 +141,19 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 @property (strong, nonatomic) NSURL * _Nullable imageURL;
 
 #pragma mark - < Disabled >
-/**  是否正在下载iCloud上的资源  */
+/// 是否正在下载iCloud上的资源
 @property (assign, nonatomic) BOOL iCloudDownloading;
-/**  iCloud下载进度  */
+/// iCloud下载进度
 @property (assign, nonatomic) CGFloat iCloudProgress;
-/**  下载iCloud的请求id  */
+/// 下载iCloud的请求id
 @property (assign, nonatomic) PHImageRequestID iCloudRequestID;
-/**  预览界面导航栏上的大标题  */
+/// 预览界面导航栏上的大标题
 @property (copy, nonatomic) NSString * _Nullable barTitle;
-/**  预览界面导航栏上的小标题  */
+/// 预览界面导航栏上的小标题
 @property (copy, nonatomic) NSString * _Nullable barSubTitle;
-/**  PHAsset对象唯一标示  */
+/// PHAsset对象唯一标示
 @property (copy, nonatomic) NSString * _Nullable localIdentifier;
-/**  是否iCloud上的资源  */
+/// 是否iCloud上的资源
 @property (nonatomic, assign) BOOL isICloud;
 /**  当前照片所在相册的名称 */
 @property (copy, nonatomic) NSString * _Nullable albumName;
@@ -234,14 +234,22 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 /**  通过视频PHAsset对象初始化视频封面 */
 + (instancetype _Nullable)videoCoverWithPHAsset:(PHAsset * _Nullable)asset;
 /**  通过网络图片URL对象初始化 */
-+ (instancetype _Nullable )photoModelWithImageURL:(NSURL * _Nullable)imageURL;
++ (instancetype _Nullable)photoModelWithImageURL:(NSURL * _Nullable)imageURL;
 + (instancetype _Nullable)photoModelWithImageURL:(NSURL * _Nullable)imageURL thumbURL:(NSURL * _Nullable)thumbURL;
 
 /// 网络视频初始化
 /// @param videoURL 网络视频地址
 /// @param videoCoverURL 视频封面地址
 /// @param videoDuration 视频时长
-+ (instancetype _Nullable )photoModelWithNetworkVideoURL:(NSURL *_Nonnull)videoURL videoCoverURL:(NSURL *_Nonnull)videoCoverURL videoDuration:(NSTimeInterval)videoDuration;
++ (instancetype _Nullable)photoModelWithNetworkVideoURL:(NSURL *_Nonnull)videoURL
+                                          videoCoverURL:(NSURL *_Nonnull)videoCoverURL
+                                          videoDuration:(NSTimeInterval)videoDuration;
+
+/// 通过本地图片和视频生成本地LivePhoto
+/// @param image 本地图片
+/// @param videoURL 本地视频地址
++ (instancetype _Nullable)photoModelWithLivePhotoImage:(UIImage * _Nullable)image
+                                              videoURL:(NSURL * _Nullable)videoURL;
 
 /// 判断两个HXPhotoModel是否是同一个
 /// @param photoModel 模型
@@ -271,7 +279,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 /**
  请求获取预览大图，此方法只会回调一次，如果为视频的话就是视频封面
 
- @param size 请求大小
+ @param size 请求图片质量大小，不是尺寸的大小
  @param startRequestICloud 开始请求iCloud上的资源
  @param progressHandler iCloud下载进度
  @param success 完成后的回调
@@ -301,6 +309,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
                              progressHandler:(HXModelProgressHandler _Nullable)progressHandler
                                      success:(HXModelLivePhotoSuccessBlock _Nullable)success
                                       failed:(HXModelFailedBlock _Nullable)failed;
+
+/// 请求获取本地LivePhoto
+/// @param completion 完成
+- (PHLivePhotoRequestID)requestLocalLivePhotoWithCompletion:(HXModelLivePhotoSuccessBlock _Nullable)completion;
+
 /**
  请求获取ImageData - 本地图片和相机拍照的和网络图片会获取失败
  */
@@ -353,12 +366,13 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
                           success:(HXModelExportVideoSuccessBlock _Nullable)success
                            failed:(HXModelFailedBlock _Nullable)failed;
 
-/**
- 获取imagePath
- - 本地图片和网络图片会获取不到，只针对有PHAsset
- @return 请求的id，
-         可用于取消请求 [self.asset cancelContentEditingInputRequest:(PHContentEditingInputRequestID)];
- */
+/// 获取imagePath
+/// 本地图片和网络图片会获取不到，只针对有PHAsset
+/// @return 请求的id，可用于取消请求 [self.asset cancelContentEditingInputRequest:(PHContentEditingInputRequestID)];
+/// @param startRequestICloud 开始下载iCloud上的视频，如果视频是iCloud的视频则会先下载
+/// @param progressHandler iCloud下载进度
+/// @param success 成功
+/// @param failed 失败
 - (PHContentEditingInputRequestID)requestImageURLStartRequestICloud:(void (^ _Nullable)(
                                                                                         PHContentEditingInputRequestID iCloudRequestId,
                                                                                         HXPhotoModel * _Nullable model)
@@ -366,6 +380,28 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
                                                     progressHandler:(HXModelProgressHandler _Nullable)progressHandler
                                                             success:(HXModelImageURLSuccessBlock _Nullable)success
                                                              failed:(HXModelFailedBlock _Nullable)failed;
+
+/// 获取本地图片的URL，内部会将image写入临时目录然后生成文件路径
+/// 不是本地图片的会走失败回调
+/// @param success 成功
+/// @param failed 失败
+- (void)fetchCameraImageURLWithSuccess:(HXModelImageURLSuccessBlock _Nullable)success
+                                failed:(HXModelFailedBlock _Nullable)failed;
+
+/// 获取当前资源的URL，包括本地/网络图片、视频
+/// 此方法导出手机里的视频质量为中等质量
+/// @param success 成功
+/// @param failed 失败
+- (void)fetchAssetURLWithSuccess:(HXModelURLHandler _Nullable)success
+                          failed:(HXModelFailedBlock _Nullable)failed;
+
+/// 获取当前资源的URL，包括本地/网络图片、视频
+/// @param presetName 视频质量，为空的话默认 AVAssetExportPresetMediumQuality
+/// @param success 成功
+/// @param failed 失败
+- (void)fetchAssetURLWithVideoPresetName:(NSString * _Nullable)presetName
+                                 success:(HXModelURLHandler _Nullable)success
+                                  failed:(HXModelFailedBlock _Nullable)failed;
 
 @property (assign, nonatomic) CGFloat previewContentOffsetX;
 

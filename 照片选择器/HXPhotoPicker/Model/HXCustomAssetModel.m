@@ -31,21 +31,6 @@
     return self;
 }
 
-+ (instancetype)livePhotoAssetWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected {
-    return [[self alloc] initLivePhotoWithLocalImage:image localVideoURL:videoURL selected:selected];
-}
-
-- (instancetype)initLivePhotoWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected {
-    self = [super init];
-    if (self) {
-        self.type = HXCustomAssetModelTypeLivePhoto;
-        self.localVideoURL = videoURL;
-        self.localImage = image;
-        self.selected = selected;
-    }
-    return self;
-}
-
 + (instancetype)assetWithLocaImageName:(NSString *)imageName selected:(BOOL)selected {
     return [[self alloc] initAssetWithLocaImageName:imageName selected:selected];
 }
@@ -103,6 +88,22 @@
     if (self) {
         self.type = HXCustomAssetModelTypeLocalVideo;
         self.localVideoURL = videoURL;
+        self.selected = selected;
+    }
+    return self;
+}
+
++ (instancetype)livePhotoAssetWithLocalImagePath:(NSURL *)imagePath localVideoURL:(NSURL *)videoURL selected:(BOOL)selected {
+    return [[self alloc] initLivePhotoAssetWithLocalImagePath:imagePath localVideoURL:videoURL selected:selected];
+}
+
+- (instancetype)initLivePhotoAssetWithLocalImagePath:(NSURL *)imagePath localVideoURL:(NSURL *)videoURL selected:(BOOL)selected {
+    self = [super init];
+    if (self) {
+        self.type = HXCustomAssetModelTypeLivePhoto;
+        self.localVideoURL = videoURL;
+        self.localImagePath = imagePath;
+        self.localImage = [UIImage imageWithContentsOfFile:imagePath.path];
         self.selected = selected;
     }
     return self;

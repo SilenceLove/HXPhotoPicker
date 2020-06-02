@@ -51,10 +51,9 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.4'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
-- ```pod 'HXPhotoPicker' 不依赖其他第三方库，如有需要请自行依赖```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.5'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- ```pod 'HXPhotoPicker' 不依赖第三方、'HXPhotoPicker/SDWebImage' 依赖SD v5.0、'HXPhotoPicker/YYWebImage' 依赖YY v1.05```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
-- 如果想要加载网络gif图片请使用```YYWebImage```
 - 使用前导入头文件 "HXPhotoPicker.h"
 
 ## <a id="要求"></a> 三.  要求 - Requirements
@@ -652,11 +651,12 @@ frame.size.height 就是 HXPhotoView 的正确高度
 ```
 #### 12.pod v2.4.2版本提示找不到SDWebImage或YYWebImage
 ```objc
-pod v2.4.2版本提示找不到SDWebImage或YYWebImage，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到
+v2.4.5 pod已依赖SDWebImage v5.0
 ```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v2.4.5　-　pod添加 SDWebImage/YYWebImage 子库，修复已知问题
 - v2.4.4　-　修复了一些bug（HXPhotoView使用约束布局的问题等...），添加Demo15显示底部弹窗视图的示例代码
 - v2.4.3　-　添加Demo14，HXPhotoView自定义Item大小的示例代码
 - v2.4.2　-　修复横屏布局问题

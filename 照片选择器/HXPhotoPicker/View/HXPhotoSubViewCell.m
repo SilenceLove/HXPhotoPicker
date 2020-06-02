@@ -164,10 +164,17 @@
        (self.model.type == HXPhotoModelMediaTypeCameraPhoto ||
         self.model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork)) {
         self.model.loadOriginalImage = YES;
+        self.model.previewViewSize = CGSizeZero;
+        self.model.endImageSize = CGSizeZero;
         HXWeakSelf
         [self.imageView hx_setImageWithModel:self.model original:YES progress:nil completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
             if (weakSelf.model == model) {
-                weakSelf.imageView.image = image;
+                if (image.images.count) {
+                    weakSelf.imageView.image = nil;
+                    weakSelf.imageView.image = image.images.firstObject;
+                }else {
+                    weakSelf.imageView.image = image;
+                }
             }
         }];
     }
@@ -202,7 +209,12 @@
                         if (image) {
                             weakSelf.progressView.progress = 1;
                             weakSelf.progressView.hidden = YES;
-                            weakSelf.imageView.image = image;
+                            if (image.images.count) {
+                                weakSelf.imageView.image = nil;
+                                weakSelf.imageView.image = image.images.firstObject;
+                            }else {
+                                weakSelf.imageView.image = image;
+                            }
                         }
                     }
                 }
@@ -241,7 +253,12 @@
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;
                 return;
-            } 
+            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+                self.stateLb.text = @"Live";
+                self.stateLb.hidden = NO;
+                self.bottomMaskLayer.hidden = NO;
+                return;
+            }
             self.stateLb.hidden = YES;
             self.bottomMaskLayer.hidden = YES;
         }

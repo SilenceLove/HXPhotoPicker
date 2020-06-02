@@ -13,7 +13,7 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
     HXCustomAssetModelTypeLocalVideo    = 2,    //!< 本地视频
     HXCustomAssetModelTypeNetWorkImage  = 3,    //!< 网络图片
     HXCustomAssetModelTypeNetWorkVideo  = 4,    //!< 网络视频
-    HXCustomAssetModelTypeLivePhoto     = 5     //!< livePhoto
+    HXCustomAssetModelTypeLivePhoto     = 5     //!< LivePhoto
 };
 
 @interface HXCustomAssetModel : NSObject
@@ -42,6 +42,11 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
  本地视频地址
  */
 @property (strong, nonatomic) NSURL *localVideoURL;
+
+/**
+ 本地图片地址
+ */
+@property (strong, nonatomic) NSURL *localImagePath;
 
 /// 网络视频地址
 @property (strong, nonatomic) NSURL *networkVideoURL;
@@ -108,8 +113,8 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
 + (instancetype)assetWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration selected:(BOOL)selected;
 
 /// 根据本地图片和本地视频生成LivePhoto
-/// @param image 本地图片
+/// @param imagePath 本地图片地址
 /// @param videoURL 本地视频地址
 /// @param selected 是否选中
-//+ (instancetype)livePhotoAssetWithLocalImage:(UIImage *)image localVideoURL:(NSURL *)videoURL selected:(BOOL)selected; // 暂不支持本地生成LivePhoto
+//+ (instancetype)livePhotoAssetWithLocalImagePath:(NSURL *)imagePath localVideoURL:(NSURL *)videoURL selected:(BOOL)selected;
 @end

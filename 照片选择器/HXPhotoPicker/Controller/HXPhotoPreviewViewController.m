@@ -703,7 +703,12 @@ HXVideoEditViewControllerDelegate
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewLivePhotoCell" forIndexPath:indexPath];
         }else {
-            cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewImageViewCell" forIndexPath:indexPath];
+            if (model.type == HXPhotoModelMediaTypeCameraPhoto &&
+                model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+                    cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewLivePhotoCell" forIndexPath:indexPath];
+            }else {
+                cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewImageViewCell" forIndexPath:indexPath];
+            }
         }
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewVideoViewCell" forIndexPath:indexPath];

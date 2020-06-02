@@ -138,6 +138,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
                 }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
                     // 网络gif图片
                     
+                }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+                    // 本地livePhoto
+                    
                 }
                 // 上传图片的话可以不用判断具体类型，按下面操作取出图片
                 if (model.networkPhotoUrl) {

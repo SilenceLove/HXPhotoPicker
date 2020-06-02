@@ -83,6 +83,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
         // 暗黑风格
 //        _manager.configuration.photoStyle = HXPhotoStyleDark;
 //        _manager.configuration.showOriginalBytesLoading = YES;
+//        _manager.configuration.cameraPhotoJumpEdit = YES;
+//        _manager.configuration.editAssetSaveSystemAblum = YES;
+//        _manager.configuration.cameraVideoJumpEdit = YES;
         _manager.configuration.lookLivePhoto = YES;
         _manager.configuration.photoMaxNum = 9;
         _manager.configuration.videoMaxNum = 1;

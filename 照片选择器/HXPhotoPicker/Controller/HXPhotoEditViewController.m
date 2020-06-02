@@ -714,7 +714,7 @@
     if (self.manager.configuration.editAssetSaveSystemAblum) {
         HXWeakSelf
         [self.view hx_showLoadingHUDText:nil];
-        [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image location:nil complete:^(HXPhotoModel * _Nullable model, BOOL success) {
+        [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:image location:self.model.location complete:^(HXPhotoModel * _Nullable model, BOOL success) {
             [weakSelf.view hx_handleLoading:YES];
             if (model) {
                 [weakSelf editPhotoCompletionWithModel:model];

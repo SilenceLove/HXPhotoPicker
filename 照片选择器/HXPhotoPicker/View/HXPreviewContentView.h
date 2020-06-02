@@ -14,8 +14,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, HXPreviewContentViewType) {
-    HXPreviewContentViewTypeImage       = 0, //!< 图片
-    HXPreviewContentViewTypeLivePhoto   = 1, //!< LivePhoto
+    HXPreviewContentViewTypeImage       = 0,    //!< 图片
+    HXPreviewContentViewTypeLivePhoto   = 1,    //!< LivePhoto
     HXPreviewContentViewTypeVideo       = 2     //!< 视频
 };
 @class HXPhotoModel;

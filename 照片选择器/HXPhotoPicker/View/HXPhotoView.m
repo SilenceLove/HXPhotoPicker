@@ -655,6 +655,9 @@
     }
     [self.manager afterListAddCameraTakePicturesModel:model];
     [self.manager removeAllTempList];
+    if ([self.delegate respondsToSelector:@selector(photoViewCameraTakePictureCompletion:model:)]) {
+        [self.delegate photoViewCameraTakePictureCompletion:self model:model];
+    }
     if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
         [self.delegate photoListViewControllerDidDone:self allList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
     }

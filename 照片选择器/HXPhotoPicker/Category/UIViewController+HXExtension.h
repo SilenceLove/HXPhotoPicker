@@ -25,8 +25,16 @@
 ///               UIViewController *viewController 相册列表控制器
 /// @param cancel 取消选择
 - (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *_Nullable)manager
-                                           didDone:(void (^_Nullable)(NSArray<HXPhotoModel *> * _Nullable allList, NSArray<HXPhotoModel *> * _Nullable photoList, NSArray<HXPhotoModel *> * _Nullable videoList, BOOL isOriginal, UIViewController * _Nullable viewController, HXPhotoManager * _Nullable manager))models
-                                            cancel:(void (^_Nullable)(UIViewController * _Nullable viewController, HXPhotoManager * _Nullable manager))cancel;
+                                           didDone:(void (^_Nullable)
+                                                    (NSArray<HXPhotoModel *> * _Nullable allList,
+                                                     NSArray<HXPhotoModel *> * _Nullable photoList,
+                                                     NSArray<HXPhotoModel *> * _Nullable videoList,
+                                                     BOOL isOriginal,
+                                                     UIViewController * _Nullable viewController,
+                                                     HXPhotoManager * _Nullable manager))models
+                                            cancel:(void (^_Nullable)
+                                                    (UIViewController * _Nullable viewController,
+                                                     HXPhotoManager * _Nullable manager))cancel;
 
 /// 跳转预览照片界面
 /// @param manager 照片管理者
@@ -50,30 +58,50 @@
 /// @param done 完成回调
 /// @param cancel 取消回调
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *_Nullable)manager
-                                                   done:(HXCustomCameraViewControllerDidDoneBlock _Nonnull )done
+                                                   done:(HXCustomCameraViewControllerDidDoneBlock _Nullable )done
                                                  cancel:(HXCustomCameraViewControllerDidCancelBlock _Nullable )cancel;
 
 /// 跳转照片编辑界面
-/// @param manager 照片管理者
+/// @param manager 照片管理者，主要设置编辑参数
 /// @param photomodel 需要编辑的照片模型
 /// @param delegate 代理
 /// @param done 完成回调
 /// @param cancel 取消回调
-- (void)hx_presentPhotoEditViewControllerWithManager:(HXPhotoManager * _Nullable)manager
-                                          photoModel:(HXPhotoModel * _Nullable)photomodel
+- (void)hx_presentPhotoEditViewControllerWithManager:(HXPhotoManager * _Nonnull)manager
+                                          photoModel:(HXPhotoModel * _Nonnull)photomodel
                                             delegate:(id _Nullable )delegate
                                                 done:(HXPhotoEditViewControllerDidDoneBlock _Nullable)done
                                               cancel:(HXPhotoEditViewControllerDidCancelBlock _Nullable)cancel;
 
+/// 跳转照片编辑界面
+/// @param manager 照片管理者，主要设置编辑参数
+/// @param editPhoto 需要编辑的照片
+/// @param done 完成回调
+/// @param cancel 取消回调
+- (void)hx_presentPhotoEditViewControllerWithManager:(HXPhotoManager * _Nonnull)manager
+                                           editPhoto:(UIImage * _Nonnull)editPhoto
+                                                done:(HXPhotoEditViewControllerDidDoneBlock _Nullable)done
+                                              cancel:(HXPhotoEditViewControllerDidCancelBlock _Nullable)cancel;
+
 /// 跳转视频编辑界面
-/// @param manager 照片管理者
+/// @param manager 照片管理者，主要设置编辑参数
 /// @param videoModel 需要编辑的视频模型
 /// @param delegate 代理
 /// @param done 完成后的回调
 /// @param cancel 取消回调
-- (void)hx_presentVideoEditViewControllerWithManager:(HXPhotoManager * _Nullable)manager
-                                          videoModel:(HXPhotoModel * _Nullable)videoModel
+- (void)hx_presentVideoEditViewControllerWithManager:(HXPhotoManager * _Nonnull)manager
+                                          videoModel:(HXPhotoModel * _Nonnull)videoModel
                                             delegate:(id _Nullable )delegate
+                                                done:(HXVideoEditViewControllerDidDoneBlock _Nullable)done
+                                              cancel:(HXVideoEditViewControllerDidCancelBlock _Nullable)cancel;
+
+/// 跳转视频编辑界面
+/// @param manager 照片管理者，主要设置编辑参数
+/// @param videoURL 需要编辑的视频本地地址
+/// @param done 完成后的回调
+/// @param cancel 取消回调
+- (void)hx_presentVideoEditViewControllerWithManager:(HXPhotoManager * _Nonnull)manager
+                                            videoURL:(NSURL * _Nonnull)videoURL
                                                 done:(HXVideoEditViewControllerDidDoneBlock _Nullable)done
                                               cancel:(HXVideoEditViewControllerDidCancelBlock _Nullable)cancel;
 

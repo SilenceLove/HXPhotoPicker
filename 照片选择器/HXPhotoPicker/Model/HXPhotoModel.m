@@ -41,10 +41,16 @@
         if (self.type == HXPhotoModelMediaTypeLivePhoto) {
             NSArray *resources = [PHAssetResource assetResourcesForAsset:self.asset];
             for (PHAssetResource *resource in resources) {
-                byte += [[resource valueForKey:@"fileSize"] unsignedIntegerValue];
+                id fileSize = [resource valueForKey:@"fileSize"];
+                if (fileSize && ![fileSize isKindOfClass:[NSNull class]]) {
+                    byte += [fileSize unsignedIntegerValue];
+                }
             }
         }else {
-            byte = [[[[PHAssetResource assetResourcesForAsset:self.asset] firstObject] valueForKey:@"fileSize"] unsignedIntegerValue];
+            id fileSize = [[[PHAssetResource assetResourcesForAsset:self.asset] firstObject] valueForKey:@"fileSize"];
+            if (fileSize && ![fileSize isKindOfClass:[NSNull class]]) {
+                byte = [fileSize unsignedIntegerValue];
+            }
         }
     }else {
         if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
@@ -250,6 +256,25 @@
 
 + (instancetype)photoModelWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration {
     return [[self alloc] initWithNetworkVideoURL:videoURL videoCoverURL:videoCoverURL videoDuration:videoDuration];
+}
+
++ (instancetype _Nullable)photoModelWithLivePhotoImage:(UIImage * _Nullable)image
+                                              videoURL:(NSURL * _Nullable)videoURL {
+    return [[self alloc] initLivePhotoWithImage:image videoURL:videoURL];
+}
+
+- (instancetype)initLivePhotoWithImage:(UIImage * _Nullable)image
+                              videoURL:(NSURL * _Nullable)videoURL {
+    if (self = [super init]) {
+        self.type = HXPhotoModelMediaTypeCameraPhoto;
+        self.subType = HXPhotoModelMediaSubTypePhoto;
+        self.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto;
+        self.thumbPhoto = image;
+        self.previewPhoto = image;
+        self.videoURL = videoURL;
+        self.imageSize = self.thumbPhoto.size;
+    }
+    return self;
 }
 
 - (instancetype)initWithNetworkVideoURL:(NSURL *)videoURL videoCoverURL:(NSURL *)videoCoverURL videoDuration:(NSTimeInterval)videoDuration {
@@ -611,15 +636,15 @@
 #pragma mark - < Request >
 
 + (id)requestImageWithURL:(NSURL *)url progress:(void (^ _Nullable)(NSInteger, NSInteger))progress completion:(void (^ _Nullable)(UIImage * _Nullable, NSURL * _Nullable, NSError * _Nullable))completion {
-#if HasYYKitOrWebImage
-    YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:0 progress:progress transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+#if HasSDWebImage
+    SDWebImageCombinedOperation *operation = [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
         if (completion) {
             completion(image, url, error);
         }
     }];
     return operation;
-#elif HasSDWebImage
-    SDWebImageCombinedOperation *operation = [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+#elif HasYYKitOrWebImage
+    YYWebImageOperation *operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:0 progress:progress transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
         if (completion) {
             completion(image, url, error);
         }
@@ -770,6 +795,17 @@
     return requestId;
 }
 
+- (PHLivePhotoRequestID)requestLocalLivePhotoWithCompletion:(HXModelLivePhotoSuccessBlock _Nullable)completion {
+    HXWeakSelf
+    return [PHLivePhoto requestLivePhotoWithResourceFileURLs:[NSArray arrayWithObjects:self.videoURL, self.imageURL, nil] placeholderImage:self.thumbPhoto targetSize:self.endImageSize contentMode:PHImageContentModeAspectFill resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nonnull info) {
+        BOOL downloadFinined = (![[info objectForKey:PHLivePhotoInfoCancelledKey] boolValue] && ![info objectForKey:PHLivePhotoInfoErrorKey]);
+        if (downloadFinined && livePhoto) {
+            if (completion) {
+                completion(livePhoto, weakSelf, info);
+            }
+        }
+    }];
+}
 - (PHImageRequestID)requestImageDataStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
                                        progressHandler:(HXModelProgressHandler)progressHandler
                                                success:(HXModelImageDataSuccessBlock)success
@@ -777,7 +813,24 @@
     
     HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
-#if HasYYKitOrWebImage
+#if HasSDWebImage
+    [[SDWebImageManager sharedManager] loadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+        if (data) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (success) {
+                    success(data, 0, weakSelf, nil);
+                }
+            });
+        }else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (failed) {
+                    failed(nil, weakSelf);
+                }
+            });
+        }
+    }];
+    return 0;
+#elif HasYYKitOrWebImage
         [[YYWebImageManager sharedManager] requestImageWithURL:self.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
             if (image) {
                 if (success) {
@@ -793,23 +846,6 @@
                         success(imageData, 0, weakSelf, nil);
                     });
                 }
-            }else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (failed) {
-                        failed(nil, weakSelf);
-                    }
-                });
-            }
-        }];
-        return 0;
-#elif HasSDWebImage
-        [[SDWebImageManager sharedManager] loadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
-            if (data) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (success) {
-                        success(data, 0, weakSelf, nil);
-                    }
-                });
             }else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (failed) {
@@ -1345,6 +1381,115 @@
             }
         }
     }];
+}
+
+- (void)fetchCameraImageURLWithSuccess:(HXModelImageURLSuccessBlock _Nullable)success
+                                failed:(HXModelFailedBlock _Nullable)failed {
+    if (self.type != HXPhotoModelMediaTypeCameraPhoto) {
+        if (failed) {
+            failed(nil, self);
+        }
+        return;
+    }
+    if (self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+        if (success) {
+            success(self.imageURL, self, nil);
+        }
+        return;
+    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSData *imageData;
+        NSString *suffix;
+        if (UIImagePNGRepresentation(self.thumbPhoto)) {
+            //返回为png图像。
+            imageData = UIImagePNGRepresentation(self.thumbPhoto);
+            suffix = @"png";
+        }else {
+            //返回为JPEG图像。
+            imageData = UIImageJPEGRepresentation(self.thumbPhoto, 0.8);
+            suffix = @"jpeg";
+        }
+        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+        
+        if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+            NSURL *imageURL = [NSURL fileURLWithPath:fullPathToFile];
+            self.imageURL = imageURL;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (success) {
+                    success(imageURL, self, nil);
+                }
+            });
+        }else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (failed) {
+                    failed(nil, self);
+                }
+            });
+        }
+    });
+}
+
+- (void)fetchAssetURLWithSuccess:(HXModelURLHandler)success failed:(HXModelFailedBlock)failed {
+    [self fetchAssetURLWithVideoPresetName:nil success:success failed:failed];
+}
+
+- (void)fetchAssetURLWithVideoPresetName:(NSString * _Nullable)presetName
+                                 success:(HXModelURLHandler _Nullable)success
+                                  failed:(HXModelFailedBlock _Nullable)failed {
+    HXWeakSelf
+    if (self.subType == HXPhotoModelMediaSubTypePhoto) {
+        if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
+            if (self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
+                self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+                    if (success) {
+                        success(self.networkPhotoUrl, HXPhotoModelMediaSubTypePhoto, YES, self);
+                    }
+            }else {
+                [self fetchCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    if (success) {
+                        success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+                    }
+                } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                    if (failed) {
+                        failed(nil, weakSelf);
+                    }
+                }];
+            }
+        }else {
+            [self requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                if (success) {
+                    success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+                }
+            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                if (failed) {
+                    failed(nil, weakSelf);
+                }
+            }];
+        }
+    }else if (self.subType == HXPhotoModelMediaSubTypeVideo) {
+        if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+            if (self.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeLocal) {
+                if (success) {
+                    success(self.videoURL, HXPhotoModelMediaSubTypeVideo, NO, self);
+                }
+            }else if (self.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                if (success) {
+                    success(self.videoURL, HXPhotoModelMediaSubTypeVideo, YES, self);
+                }
+            }
+        }else {
+            [self exportVideoWithPresetName:presetName startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
+                if (success) {
+                    success(videoURL, HXPhotoModelMediaSubTypeVideo, NO, weakSelf);
+                }
+            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                if (failed) {
+                    failed(nil, weakSelf);
+                }
+            }];
+        }
+    }
 }
 @end
 

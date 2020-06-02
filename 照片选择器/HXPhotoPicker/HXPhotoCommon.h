@@ -39,6 +39,8 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 
 @property (assign, nonatomic) BOOL isHapticTouch;
 
+@property (assign, nonatomic) BOOL requestNetworkAfter;
+
 #if HasAFNetworking
 @property (assign, nonatomic) AFNetworkReachabilityStatus netStatus;
 @property (copy, nonatomic) void (^ reachabilityStatusChangeBlock)(AFNetworkReachabilityStatus netStatus);

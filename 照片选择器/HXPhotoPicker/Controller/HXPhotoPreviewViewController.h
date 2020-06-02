@@ -83,8 +83,6 @@ HXPhotoPreviewViewCell;
 
 /// 单独使用 HXPhotoPreviewViewController 来预览图片
 /// 请使用 <UIViewController+HXExtension> 中的方法
-///
-///
 @interface HXPhotoPreviewViewController : UIViewController<UIViewControllerTransitioningDelegate,UINavigationControllerDelegate>
 @property (weak, nonatomic) id<HXPhotoPreviewViewControllerDelegate> delegate;
 @property (strong, nonatomic) HXPhotoManager *manager;
