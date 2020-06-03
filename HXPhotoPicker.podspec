@@ -14,20 +14,22 @@ Pod::Spec.new do |s|
 
   s.framework    = 'UIKit','Photos','PhotosUI'
   s.requires_arc = true
-  s.default_subspec = 'default'
-  s.resource = 'HXPhotoPicker/Resource/HXPhotoPicker.bundle'
+  s.default_subspec = 'Default'
   
-  s.subspec 'default' do |de|
+  s.subspec 'Default' do |de|
     de.source_files = "HXPhotoPicker/**/*.{h,m}"
+    de.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
   end
   
   s.subspec 'SDWebImage' do |sd|
     sd.source_files = "HXPhotoPicker/**/*.{h,m}"
+    sd.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
     sd.dependency 'SDWebImage', '~> 5.0'
   end
   
   s.subspec 'YYWebImage' do |yy|
     yy.source_files = "HXPhotoPicker/**/*.{h,m}"
+    yy.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
     yy.dependency 'YYWebImage', '~> 1.0.5'
   end
 
