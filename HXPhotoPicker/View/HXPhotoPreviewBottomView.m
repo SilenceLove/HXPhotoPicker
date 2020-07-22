@@ -42,6 +42,7 @@
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
     self.barTintColor = manager.configuration.bottomViewBgColor;
+    self.bgView.barStyle = manager.configuration.bottomViewBarStyle;
     self.bgView.translucent = manager.configuration.bottomViewTranslucent;
     self.tipView.translucent = manager.configuration.bottomViewTranslucent;
 }
@@ -97,6 +98,12 @@
     self.tipLb.text = tipText;
     self.tipView.hidden = !tipText;
     self.collectionView.hidden = tipText;
+}
+- (void)reloadData {
+    [self.collectionView reloadData];
+    if (self.currentIndex >= 0 && self.currentIndex < self.modelArray.count) {
+        [self.collectionView selectItemAtIndexPath:self.currentIndexPath animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
+    }
 }
 - (void)insertModel:(HXPhotoModel *)model {
     [self.modelArray addObject:model];
@@ -260,7 +267,11 @@
         self.tipView.barTintColor = [UIColor blackColor];
     }else {
         themeColor = self.manager.configuration.themeColor;
-        selectedTitleColor = self.manager.configuration.selectedTitleColor;
+        if (self.manager.configuration.bottomDoneBtnTitleColor) {
+            selectedTitleColor = self.manager.configuration.bottomDoneBtnTitleColor;
+        }else {
+            selectedTitleColor = self.manager.configuration.selectedTitleColor;
+        }
         self.bgView.barTintColor = self.barTintColor;
         self.tipView.barTintColor = self.barTintColor;
     }
@@ -276,7 +287,8 @@
         [_doneBtn setTitleColor:selectedTitleColor forState:UIControlStateNormal];
         [_doneBtn setTitleColor:[selectedTitleColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
     }
-    _doneBtn.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1] : themeColor;
+    UIColor *doneBgColor = self.manager.configuration.bottomDoneBtnBgColor ?: themeColor;
+    _doneBtn.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1] : doneBgColor;
     [_editBtn setTitleColor:themeColor forState:UIControlStateNormal];
     [_editBtn setTitleColor:[themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
 }
@@ -313,7 +325,7 @@
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;
         [_collectionView registerClass:[HXPhotoPreviewBottomViewCell class] forCellWithReuseIdentifier:@"DatePreviewBottomViewCellId"];
-        }
+    }
     return _collectionView;
 }
 - (UICollectionViewFlowLayout *)flowLayout {
@@ -352,6 +364,8 @@
 
 @interface HXPhotoPreviewBottomViewCell ()
 @property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) UIView *editTipView;
+@property (strong, nonatomic) UIImageView *editTipIcon;
 @property (assign, nonatomic) PHImageRequestID requestID;
 @end
 
@@ -379,10 +393,11 @@
 }
 - (void)setupUI {
     [self.contentView addSubview:self.imageView];
+    [self.contentView addSubview:self.editTipView];
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
-    
+    self.editTipView.hidden = !(model.photoEdit);
     HXWeakSelf
     if (model.thumbPhoto) {
         self.imageView.image = model.thumbPhoto;
@@ -415,6 +430,8 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.imageView.frame = self.bounds;
+    self.editTipView.frame = self.imageView.frame;
+    self.editTipIcon.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
 }
 - (UIImageView *)imageView {
     if (!_imageView) {
@@ -423,6 +440,21 @@
         _imageView.clipsToBounds = YES;
     }
     return _imageView;
+}
+- (UIView *)editTipView {
+    if (!_editTipView) {
+        _editTipView = [[UIView alloc] init];
+        _editTipView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3f];
+        [_editTipView addSubview:self.editTipIcon];
+    }
+    return _editTipView;;
+}
+- (UIImageView *)editTipIcon {
+    if (!_editTipIcon) {
+        _editTipIcon = [[UIImageView alloc] initWithImage:[UIImage hx_imageNamed:@"hx_photo_edit_show_tip"]];
+        _editTipIcon.hx_size = CGSizeMake(15.5, 11);
+    }
+    return _editTipIcon;
 }
 - (void)setSelectColor:(UIColor *)selectColor {
     _selectColor = selectColor;

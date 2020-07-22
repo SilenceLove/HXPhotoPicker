@@ -9,6 +9,7 @@
 #import "Demo8ViewController.h" 
 #import "HXPhotoView.h"
 #import "HXPreviewVideoView.h"
+#import "HXPhotoEdit.h"
 static const CGFloat kPhotoViewMargin = 12.0;
 @interface Demo8ViewController ()<HXPhotoViewDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
@@ -119,6 +120,14 @@ static const CGFloat kPhotoViewMargin = 12.0;
         // 先判断资源类型
         if (model.subType == HXPhotoModelMediaSubTypePhoto) {
             // 当前为图片
+            if (model.photoEdit) {
+                // 如果有编辑数据，则说明这张图篇被编辑过了
+                // 需要这样才能获取到编辑之后的图片
+                model.photoEdit.editPreviewImage;
+                // 编辑之后的图片数据
+                model.photoEdit.editPreviewData;
+                return;
+            }
             // 再判断具体类型
             if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
                 // 到这里就说明这张图片不是手机相册里的图片，可能是本地的也可能是网络图片

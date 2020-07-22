@@ -37,28 +37,28 @@ HXPhotoPreviewViewCell;
 /// @param model 编辑之后的模型
 /// @param beforeModel 编辑之前的模型
 - (void)photoPreviewDidEditClick:(HXPhotoPreviewViewController *)previewController
-                               model:(HXPhotoModel *)model
-                         beforeModel:(HXPhotoModel *)beforeModel;
+                         model:(HXPhotoModel *)model
+                    beforeModel:(HXPhotoModel *)beforeModel;
 
 /// 单选模式下选择了某个model
 /// @param previewController 照片预览控制器
 /// @param model 当前选择的model
 - (void)photoPreviewSingleSelectedClick:(HXPhotoPreviewViewController *)previewController
-                                      model:(HXPhotoModel *)model;
+                                  model:(HXPhotoModel *)model;
 
 /// 预览界面加载iCloud上的照片完成后的回调
 /// @param previewController 照片预览控制器
 /// @param model 当前model
 - (void)photoPreviewDownLoadICloudAssetComplete:(HXPhotoPreviewViewController *)previewController
-                                              model:(HXPhotoModel *)model;
+                                          model:(HXPhotoModel *)model;
 
 /// 在HXPhotoView上预览时编辑model完成之后的回调
 /// @param previewController 照片预览控制器
 /// @param beforeModel 编辑之前的model
 /// @param afterModel 编辑之后的model
 - (void)photoPreviewSelectLaterDidEditClick:(HXPhotoPreviewViewController *)previewController
-                                    beforeModel:(HXPhotoModel *)beforeModel
-                                     afterModel:(HXPhotoModel *)afterModel;
+                                beforeModel:(HXPhotoModel *)beforeModel
+                                 afterModel:(HXPhotoModel *)afterModel;
 
 /// 在HXPhotoView上预览时删除model的回调
 /// @param previewController 照片预览控制器
@@ -72,7 +72,7 @@ HXPhotoPreviewViewCell;
 /// @param previewController 照片预览控制器
 /// @param model 当前预览的model
 - (void)photoPreviewCellDownloadImageComplete:(HXPhotoPreviewViewController *)previewController
-                                            model:(HXPhotoModel *)model;
+                                        model:(HXPhotoModel *)model;
 
 /// 取消预览
 /// @param previewController self
@@ -102,7 +102,7 @@ HXPhotoPreviewViewCell;
 
 // 处理ios8 导航栏转场动画崩溃问题
 @property (strong, nonatomic) UIViewController *photoViewController;
-@property (copy, nonatomic) void (^ currentCellScrollViewDidScroll)(CGFloat offsetY);
+@property (copy, nonatomic) void (^ currentCellScrollViewDidScroll)(UIScrollView *scrollView);
 
 - (HXPhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (void)changeStatusBarWithHidden:(BOOL)hidden;

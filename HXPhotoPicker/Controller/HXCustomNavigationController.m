@@ -119,9 +119,11 @@
 }
 
 - (void)dealloc {
-    self.manager.selectPhotoing = NO;
-    [self.manager removeAllTempList];
-    [self.manager removeAllAlbum];
+    if (_manager) {
+        self.manager.selectPhotoing = NO;
+        [self.manager removeAllTempList];
+        [self.manager removeAllAlbum];
+    }
     if (HXShowLog) NSSLog(@"dealloc");
 }
 

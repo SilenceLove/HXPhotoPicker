@@ -27,3 +27,4 @@
 #import "NSArray+HXExtension.h"
 #import "UIColor+HXExtension.h"
 #import "HXPhotoBottomSelectView.h"
+#import "HX_PhotoEditViewController.h"

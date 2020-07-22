@@ -60,6 +60,8 @@
  @param longPgr 长按手势识别器
  */
 - (void)collectionView:(UICollectionView *)collectionView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
+
+- (void)collectionViewNeedReloadData:(UICollectionView *)collectionView;
 @end
 
 @protocol HXCollectionViewDataSource<UICollectionViewDataSource>

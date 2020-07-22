@@ -78,9 +78,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
     
     CGFloat width = scrollView.frame.size.width;
     HXPhotoView *photoView = [[HXPhotoView alloc] initWithFrame:CGRectMake(kPhotoViewMargin, kPhotoViewMargin, width - kPhotoViewMargin * 2, 0) manager:self.manager];
-    photoView.delegate = self; 
+    photoView.delegate = self;
+    photoView.outerCamera = YES;
+    photoView.previewShowDeleteButton = YES;
     [scrollView addSubview:photoView];
-    [photoView refreshView];
 }
 
 - (void)dealloc { 

@@ -42,7 +42,8 @@
     if ([viewController isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
         HXWeakSelf
-        previewVC.currentCellScrollViewDidScroll = ^(CGFloat offsetY) {
+        previewVC.currentCellScrollViewDidScroll = ^(UIScrollView *scrollView) {
+            CGFloat offsetY = scrollView.contentOffset.y;
             if (offsetY < 0) {
                 weakSelf.atFirstPan = YES;
             }else if (offsetY == 0) {
@@ -277,7 +278,7 @@
         if (fromVC.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             self.bgView.backgroundColor = [UIColor blackColor];
         }else {
-            self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+            self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : fromVC.manager.configuration.previewPhotoViewBgColor;
         }
     }
     fromVC.collectionView.hidden = YES;
@@ -323,7 +324,7 @@
                 if (fromVC.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
                     fromVC.view.backgroundColor = [UIColor blackColor];
                 }else {
-                    fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+                    fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : fromVC.manager.configuration.previewPhotoViewBgColor;
                 }
             }
             self.tempCell.hidden = NO;

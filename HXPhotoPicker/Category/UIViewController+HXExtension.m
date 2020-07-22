@@ -129,6 +129,35 @@
     [self presentViewController:vc animated:YES completion:nil];
 }
 
+- (void)hx_presentWxPhotoEditViewControllerWithConfiguration:(HXPhotoEditConfiguration * _Nonnull)configuration
+                                                  photoModel:(HXPhotoModel * _Nonnull)photomodel
+                                                    delegate:(id _Nullable)delegate
+                                                      finish:(HX_PhotoEditViewControllerDidFinishBlock _Nullable)finish
+                                                      cancel:(HX_PhotoEditViewControllerDidCancelBlock _Nullable)cancel {
+    HX_PhotoEditViewController *vc = [[HX_PhotoEditViewController alloc] initWithConfiguration:configuration];
+    vc.delegate = delegate ?: self;
+    vc.photoModel = photomodel;
+    vc.finishBlock = finish;
+    vc.cancelBlock = cancel;
+    vc.supportRotation = YES;
+    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    vc.modalPresentationCapturesStatusBarAppearance = YES;
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)hx_presentWxPhotoEditViewControllerWithConfiguration:(HXPhotoEditConfiguration * _Nonnull)configuration
+                                             editImage:(UIImage * _Nonnull)editImage
+                                             photoEdit:(HXPhotoEdit * _Nullable)photoEdit
+                                                finish:(HX_PhotoEditViewControllerDidFinishBlock _Nullable)finish
+                                                cancel:(HX_PhotoEditViewControllerDidCancelBlock _Nullable)cancel {
+    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:editImage];
+    photoModel.photoEdit = photoEdit;
+    [self hx_presentWxPhotoEditViewControllerWithConfiguration:configuration
+                                                    photoModel:photoModel
+                                                      delegate:nil
+                                                        finish:finish
+                                                        cancel:cancel];
+}
 - (void)hx_presentPhotoEditViewControllerWithManager:(HXPhotoManager *)manager
                                           photoModel:(HXPhotoModel *)photomodel
                                             delegate:(id)delegate

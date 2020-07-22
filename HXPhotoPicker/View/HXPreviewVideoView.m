@@ -15,6 +15,7 @@
 #import "NSString+HXExtension.h"
 #import "HXPhotoTools.h"
 #import "UIButton+HXExtension.h"
+#import "HXPhotoBottomSelectView.h"
 
 @interface HXPreviewVideoView ()
 @property (strong, nonatomic) AVPlayer *player;
@@ -813,6 +814,9 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     self.state = UIGestureRecognizerStateBegan;
+    if ([self.delegate isKindOfClass:[HXPhotoBottomSelectView class]]) {
+        [(HXPhotoBottomSelectView *)self.delegate panGestureReconClick:self];
+    }
 }
 @end
 

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "UIImageView+HXExtension.h"
+#import "HXPhotoViewCellCustomProtocol.h"
 
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
@@ -34,7 +35,7 @@
 @interface HXPhotoSubViewCell : UICollectionViewCell
 @property (weak, nonatomic) id<HXPhotoSubViewCellDelegate> delegate;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
-
+@property (weak, nonatomic) id<HXPhotoViewCellCustomProtocol> customProtocol;
 @property (assign, nonatomic) BOOL canEdit;
 @property (strong, nonatomic) UIView *highlightMaskView;
 @property (strong, nonatomic) HXPhotoModel *model;
@@ -44,6 +45,8 @@
 @property (assign, nonatomic) BOOL hideDeleteButton;
 /**  删除网络图片时是否显示Alert  */
 @property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
+
+@property (assign, nonatomic) NSInteger index;
 // 重新下载
 - (void)againDownload;
 - (void)resetNetworkImage;

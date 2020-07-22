@@ -46,6 +46,8 @@
 /// @param radius 圆角尺寸
 /// @param corner 圆角位置
 - (void)hx_radiusWithRadius:(CGFloat)radius corner:(UIRectCorner)corner;
+- (UIImage *)hx_captureImageAtFrame:(CGRect)rect;
+- (UIColor *)hx_colorOfPoint:(CGPoint)point;
 @end
 
 

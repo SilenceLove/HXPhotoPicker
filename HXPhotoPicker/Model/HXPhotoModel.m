@@ -31,12 +31,22 @@
 #import "YYKit.h"
 #endif
 
+#import "HXPhotoEdit.h"
+
 @implementation HXPhotoModel
+- (void)setSelectIndexStr:(NSString *)selectIndexStr {
+    _selectIndexStr = selectIndexStr;
+    self.selectedIndex = selectIndexStr.integerValue - 1;
+}
 - (NSUInteger)assetByte {
     if (_assetByte > 0) {
         return _assetByte;
     }
     NSUInteger byte = 0;
+    if (self.photoEdit) {
+        _assetByte = self.photoEdit.editPreviewData.length;
+        return _assetByte;
+    }
     if (self.asset) {
         if (self.type == HXPhotoModelMediaTypeLivePhoto) {
             NSArray *resources = [PHAssetResource assetResourcesForAsset:self.asset];
@@ -82,6 +92,9 @@
 }
 - (HXPhotoModelFormat)photoFormat {
     if (self.subType == HXPhotoModelMediaSubTypePhoto) {
+        if (self.photoEdit) {
+            return HXPhotoModelFormatJPG;
+        }
         if (self.asset) {
             if ([[self.asset valueForKey:@"filename"] hasSuffix:@"PNG"]) {
                 return HXPhotoModelFormatPNG;
@@ -395,9 +408,16 @@
     }
     return self;
 }
-
-- (CGSize)imageSize
-{
+- (void)setPhotoEdit:(HXPhotoEdit *)photoEdit {
+    _photoEdit = photoEdit;
+    if (!photoEdit) {
+        _imageSize = CGSizeZero;
+    }
+}
+- (CGSize)imageSize {
+    if (self.photoEdit) {
+        _imageSize = self.photoEdit.editPreviewImage.size;
+    }
     if (_imageSize.width == 0 || _imageSize.height == 0) {
         if (self.asset) {
             if (self.asset.pixelWidth == 0 || self.asset.pixelHeight == 0) {
@@ -605,6 +625,7 @@
         self.cameraIdentifier = [aDecoder decodeObjectForKey:@"cameraIdentifier"];
         self.cameraPhotoType = [aDecoder decodeIntegerForKey:@"cameraPhotoType"];
         self.cameraVideoType = [aDecoder decodeIntegerForKey:@"cameraVideoType"];
+        self.photoEdit = [aDecoder decodeObjectForKey:@"photoEdit"];
     }
     return self;
 }
@@ -631,6 +652,7 @@
     [aCoder encodeObject:self.videoTime forKey:@"videoTime"];
     [aCoder encodeObject:self.selectIndexStr forKey:@"selectIndexStr"];
     [aCoder encodeObject:self.cameraIdentifier forKey:@"cameraIdentifier"];
+    [aCoder encodeObject:self.photoEdit forKey:@"photoEdit"];
 //    [aCoder encodeObject:self.fileURL forKey:@"fileURL"];
 }
 #pragma mark - < Request >
@@ -675,6 +697,10 @@
     return [self requestThumbImageWithSize:self.requestSize completion:completion];
 }
 - (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
+    if (self.photoEdit) {
+        if (completion) completion(self.photoEdit.editPreviewImage, self, nil);
+        return 0;
+    }
     PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
     HXWeakSelf
@@ -689,6 +715,10 @@
 }
 
 - (PHImageRequestID)requestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
+    if (self.photoEdit) {
+        if (completion) completion(self.photoEdit.editPosterImage, self, nil);
+        return 0;
+    }
     if (self.type == HXPhotoModelMediaTypeCameraPhoto ||
         self.type == HXPhotoModelMediaTypeCameraVideo) {
         if (!self.networkPhotoUrl) {
@@ -727,6 +757,10 @@
                                 progressHandler:(HXModelProgressHandler)progressHandler
                                         success:(HXModelImageSuccessBlock)success
                                          failed:(HXModelFailedBlock)failed {
+    if (self.photoEdit) {
+        if (success) success(self.photoEdit.editPreviewImage, self, nil);
+        return 0;
+    }
     HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto ||
         self.type == HXPhotoModelMediaTypeCameraVideo) {
@@ -810,7 +844,10 @@
                                        progressHandler:(HXModelProgressHandler)progressHandler
                                                success:(HXModelImageDataSuccessBlock)success
                                                 failed:(HXModelFailedBlock)failed {
-    
+    if (self.photoEdit) {
+        if (success) success(self.photoEdit.editPreviewData, self.photoEdit.editPreviewImage.imageOrientation, self, nil);
+        return 0;
+    }
     HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
 #if HasSDWebImage
@@ -1218,7 +1255,12 @@
 }
 
 - (PHImageRequestID)requestImageWithOptions:(PHImageRequestOptions *)options targetSize:(CGSize)targetSize resultHandler:(void (^)(UIImage *__nullable result, NSDictionary *__nullable info))resultHandler {
-    
+    if (self.photoEdit) {
+        if (resultHandler) {
+            resultHandler(self.photoEdit.editPreviewImage, nil);
+        }
+        return 0;
+    }
     return [[PHImageManager defaultManager] requestImageForAsset:self.asset targetSize:targetSize contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         if (resultHandler) {
             resultHandler(result, info);
@@ -1308,6 +1350,19 @@
                                                     progressHandler:(HXModelProgressHandler)progressHandler
                                                             success:(HXModelImageURLSuccessBlock)success
                                                              failed:(HXModelFailedBlock)failed {
+    if (self.photoEdit) {
+//        HXWeakSelf
+        [self fetchCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            if (success) {
+                success(imageURL, model, nil);
+            }
+        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+            if (failed) {
+                failed(info, model);
+            }
+        }];
+        return 0;
+    }
     if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
         if (failed) {
             failed(nil, self);
@@ -1385,6 +1440,20 @@
 
 - (void)fetchCameraImageURLWithSuccess:(HXModelImageURLSuccessBlock _Nullable)success
                                 failed:(HXModelFailedBlock _Nullable)failed {
+                                    HXWeakSelf
+    if (self.photoEdit) {
+        [self getImageURLWithImage:self.photoEdit.editPreviewImage success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            weakSelf.imageURL = imageURL;
+            if (success) {
+                success(imageURL, weakSelf, nil);
+            }
+        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+            if (failed) {
+                failed(nil, weakSelf);
+            }
+        }];
+        return;
+    }
     if (self.type != HXPhotoModelMediaTypeCameraPhoto) {
         if (failed) {
             failed(nil, self);
@@ -1397,24 +1466,42 @@
         }
         return;
     }
+    [self getImageURLWithImage:self.thumbPhoto success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        weakSelf.imageURL = imageURL;
+        if (success) {
+            success(imageURL, weakSelf, nil);
+        }
+    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+        if (failed) {
+            failed(nil, weakSelf);
+        }
+    }];
+}
+- (void)getImageURLWithImage:(UIImage *)image
+                     success:(HXModelImageURLSuccessBlock _Nullable)success
+                      failed:(HXModelFailedBlock _Nullable)failed{
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSData *imageData;
         NSString *suffix;
-        if (UIImagePNGRepresentation(self.thumbPhoto)) {
-            //返回为png图像。
-            imageData = UIImagePNGRepresentation(self.thumbPhoto);
-            suffix = @"png";
-        }else {
-            //返回为JPEG图像。
-            imageData = UIImageJPEGRepresentation(self.thumbPhoto, 0.8);
+        if (self.photoEdit) {
+            imageData = self.photoEdit.editPreviewData;
             suffix = @"jpeg";
+        }else {
+            if (UIImagePNGRepresentation(image)) {
+                //返回为png图像。
+                imageData = UIImagePNGRepresentation(image);
+                suffix = @"png";
+            }else {
+                //返回为JPEG图像。
+                imageData = UIImageJPEGRepresentation(image, 0.8);
+                suffix = @"jpeg";
+            }
         }
         NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
         NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
         
         if ([imageData writeToFile:fullPathToFile atomically:YES]) {
             NSURL *imageURL = [NSURL fileURLWithPath:fullPathToFile];
-            self.imageURL = imageURL;
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     success(imageURL, self, nil);
@@ -1429,7 +1516,6 @@
         }
     });
 }
-
 - (void)fetchAssetURLWithSuccess:(HXModelURLHandler)success failed:(HXModelFailedBlock)failed {
     [self fetchAssetURLWithVideoPresetName:nil success:success failed:failed];
 }
@@ -1437,7 +1523,19 @@
 - (void)fetchAssetURLWithVideoPresetName:(NSString * _Nullable)presetName
                                  success:(HXModelURLHandler _Nullable)success
                                   failed:(HXModelFailedBlock _Nullable)failed {
-    HXWeakSelf
+                                      HXWeakSelf
+    if (self.photoEdit) {
+        [self fetchCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            if (success) {
+                success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+            }
+        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+            if (failed) {
+                failed(nil, weakSelf);
+            }
+        }];
+        return;
+    }
     if (self.subType == HXPhotoModelMediaSubTypePhoto) {
         if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
             if (self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||

@@ -45,4 +45,14 @@
         return @"";
     }
 }
+- (BOOL)hx_colorIsWhite {
+    CGFloat red = 0;
+    CGFloat green = 0;
+    CGFloat blue = 0;
+    [self getRed:&red green:&green blue:&blue alpha:NULL];
+    if (red >= 0.99 && green >= 0.99 & blue >= 0.99) {
+        return YES;
+    }
+    return NO;
+}
 @end

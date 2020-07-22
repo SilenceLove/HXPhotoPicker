@@ -58,6 +58,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 - (instancetype)initWithType:(HXPhotoManagerSelectedType)type;
 + (instancetype)managerWithType:(HXPhotoManagerSelectedType)type;
 
+/// 只使用相机功能不加载相册信息
+@property (assign, nonatomic) BOOL onlyCamera;
+
 /**
  添加模型数组
 

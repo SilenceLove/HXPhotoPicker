@@ -39,6 +39,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// 长按选中颜色
 @property (strong, nonatomic) UIColor *selectColor;
 
+/// cell高度
+@property (assign, nonatomic) CGFloat cellHeight;
+
+/// 是否可以选择
+@property (assign, nonatomic) BOOL canSelected;
+
 /// 自定义属性
 @property (strong, nonatomic) id customData;
 @end
@@ -96,12 +102,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 重新计算视图高度
 - (void)recalculateHeight;
+
+
+- (void)panGestureReconClick:(UIPanGestureRecognizer *)panGesture;
 @end
 
 @interface HXPhotoBottomSelectViewCell : UITableViewCell
 @property (assign, nonatomic) BOOL adaptiveDarkness;
 @property (strong, nonatomic) HXPhotoBottomViewModel *model;
 @property (assign, nonatomic) BOOL showSelectBgView;
+@property (assign, nonatomic) BOOL hiddenBottomLine;;
 @property (copy, nonatomic) void (^ didCellBlock)(HXPhotoBottomSelectViewCell *myCell);
 @end
 NS_ASSUME_NONNULL_END

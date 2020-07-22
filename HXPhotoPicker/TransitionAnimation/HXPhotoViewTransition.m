@@ -72,7 +72,7 @@
     CGFloat height = [UIScreen mainScreen].bounds.size.height; 
     UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
     UIView *tempBgView = [[UIView alloc] initWithFrame:containerView.bounds];
-    tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:0] : [[UIColor whiteColor] colorWithAlphaComponent:0];
+    tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:0] : [toVC.manager.configuration.previewPhotoViewBgColor colorWithAlphaComponent:0];
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
     if (fromCell) {
@@ -94,7 +94,7 @@
     UIViewAnimationOptions option = UIViewAnimationOptionLayoutSubviews;
     
     [UIView animateWithDuration:0.2 animations:^{
-        tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:1] : [[UIColor whiteColor] colorWithAlphaComponent:1];
+        tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:1] : [toVC.manager.configuration.previewPhotoViewBgColor colorWithAlphaComponent:1];
     }];
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
@@ -107,7 +107,7 @@
     } completion:^(BOOL finished) {
         fromCell.hidden = NO;
         
-        toVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+        toVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : toVC.manager.configuration.previewPhotoViewBgColor;
         toVC.collectionView.hidden = NO;
         [tempBgView removeFromSuperview];
         [tempView removeFromSuperview];
@@ -147,7 +147,7 @@
         [containerView insertSubview:tempBgView belowSubview:fromVC.view];
     }else {
         [toVC.view insertSubview:tempBgView belowSubview:toVC.bottomView];
-        tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:1] : [[UIColor whiteColor] colorWithAlphaComponent:1];
+        tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:1] : [fromVC.manager.configuration.previewPhotoViewBgColor colorWithAlphaComponent:1];
     }
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
     
@@ -172,7 +172,7 @@
             //            toVC.navigationController.navigationBar.alpha = 1;
             //            toVC.bottomView.alpha = 1;
         }else {
-            tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:0] : [[UIColor whiteColor] colorWithAlphaComponent:0];
+            tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:0] : [fromVC.manager.configuration.previewPhotoViewBgColor colorWithAlphaComponent:0];
         }
     }];
     

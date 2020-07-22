@@ -52,9 +52,7 @@
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        _manager.configuration.openCamera = YES;
-        _manager.configuration.saveSystemAblum = NO;
-        _manager.configuration.themeColor = [UIColor blackColor];
+        _manager.configuration.type = HXConfigurationTypeWXMoment;
     }
     return _manager;
 }
@@ -92,9 +90,12 @@
 
 - (void)didBtnClick {
     HXPhotoBottomViewModel *model1 = [[HXPhotoBottomViewModel alloc] init];
-    model1.title = @"相机";
+    model1.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
+    model1.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
+    model1.cellHeight = 65.f;
+    
     HXPhotoBottomViewModel *model2 = [[HXPhotoBottomViewModel alloc] init];
-    model2.title = @"相册";
+    model2.title = [NSBundle hx_localizedStringForKey:@"从手机相册选择"];
     HXWeakSelf
     [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
         [weakSelf actionClickedButtonAtIndex:index];
@@ -131,19 +132,6 @@
             
         }];
     }
-}
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 1) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-    }
-}
-- (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model {
-//    [self.manager afterListAddCameraTakePicturesModel:model];
-//    Demo6SubViewController *vc = [[Demo6SubViewController alloc] init];
-//    vc.manager = self.manager;
-//    [self.navigationController pushViewController:vc animated:YES];
-}
-- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
 }
 
 

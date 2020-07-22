@@ -16,11 +16,13 @@
 #import "HXPhotoCustomNavigationBar.h"
 #import "HXCircleProgressView.h"
 #import "HXPhotoEditViewController.h"
+#import "HX_PhotoEditViewController.h"
 #import "UIViewController+HXExtension.h"
 #import "HXVideoEditViewController.h"
 #import "HXPhotoPersentInteractiveTransition.h"
-
+#import "HXPhotoBottomSelectView.h"
 #import "UIImageView+HXExtension.h"
+#import "UIColor+HXExtension.h"
 
 @interface HXPhotoPreviewViewController ()
 <
@@ -28,7 +30,8 @@ UICollectionViewDataSource,
 UICollectionViewDelegate,
 HXPhotoPreviewBottomViewDelegate,
 HXPhotoEditViewControllerDelegate,
-HXVideoEditViewControllerDelegate
+HXVideoEditViewControllerDelegate,
+HX_PhotoEditViewControllerDelegate
 >
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) HXPhotoModel *currentModel;
@@ -304,12 +307,13 @@ HXVideoEditViewControllerDelegate
     [self.collectionView setCollectionViewLayout:self.flowLayout];
     
     self.collectionView.frame = CGRectMake(-(itemMargin / 2), 0,self.view.hx_w + itemMargin, self.view.hx_h);
-    self.collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + itemMargin), 0);
+    
+    self.collectionView.contentSize = CGSizeMake(self.modelArray.count * (self.view.hx_w + itemMargin), self.view.hx_h);
     
     
     [self.collectionView setContentOffset:CGPointMake(self.beforeOrientationIndex * (self.view.hx_w + itemMargin), 0)];
     if (self.orientationDidChange) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             HXPhotoPreviewViewCell *cell = [self currentPreviewCellWithIndex:self.currentModelIndex];
             [UIView animateWithDuration:0.25 animations:^{
                 [cell refreshImageSize];
@@ -324,9 +328,9 @@ HXVideoEditViewControllerDelegate
             self.bottomView.frame = CGRectMake(0, bottomViewHeight, self.view.hx_w, 50 + bottomMargin);
         }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             CGFloat topMargin = HX_IS_IPhoneX_All ? 45 : 30;
-//            if (self.previewShowDeleteButton) {
-//                self.darkDeleteBtn.frame = CGRectMake(self.view.hx_w - 100 - 15, topMargin, 100, 30);
-//            }
+            if (self.previewShowDeleteButton) {
+                self.darkDeleteBtn.frame = CGRectMake(self.view.hx_w - 100 - 15, topMargin, 100, 30);
+            }
             self.darkCancelBtn.frame = CGRectMake(15, topMargin, 35, 35);
             self.bottomPageControl.frame = CGRectMake(0, self.view.hx_h - 30, self.view.hx_w, 10);
         }
@@ -371,13 +375,17 @@ HXVideoEditViewControllerDelegate
         selectBtnBgColor = self.manager.configuration.previewDarkSelectBgColor;
         selectBtnTitleColor = self.manager.configuration.previewDarkSelectTitleColor;
     }else {
-        backgroundColor = (_bottomView && _bottomView.alpha == 0) ? [UIColor blackColor] : [UIColor whiteColor];
+        backgroundColor = (_bottomView && _bottomView.alpha == 0) ? [UIColor blackColor] : self.manager.configuration.previewPhotoViewBgColor;
         themeColor = self.manager.configuration.themeColor;
         navBarBackgroudColor = self.manager.configuration.navBarBackgroudColor;
         navigationTitleColor = self.manager.configuration.navigationTitleColor;
         selectedTitleColor = self.manager.configuration.selectedTitleColor;
         selectBtnTitleColor = selectedTitleColor;
-        selectBtnBgColor = themeColor;
+        if (self.manager.configuration.previewSelectedBtnBgColor) {
+            selectBtnBgColor = self.manager.configuration.previewSelectedBtnBgColor;
+        }else {
+            selectBtnBgColor = themeColor;
+        }
     }
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
         self.collectionView.backgroundColor = backgroundColor;
@@ -393,6 +401,7 @@ HXVideoEditViewControllerDelegate
     if (!self.outside) {
         [self.navigationController.navigationBar setTintColor:themeColor];
         self.navigationController.navigationBar.barTintColor = navBarBackgroudColor;
+        self.navigationController.navigationBar.barStyle = self.manager.configuration.navBarStyle;
 
         if (self.manager.configuration.navBarBackgroundImage) {
             [self.navigationController.navigationBar setBackgroundImage:self.manager.configuration.navBarBackgroundImage forBarMetrics:UIBarMetricsDefault];
@@ -421,6 +430,7 @@ HXVideoEditViewControllerDelegate
             [self.navBar setTintColor:themeColor];
             
             self.navBar.barTintColor = navBarBackgroudColor;
+            self.navBar.barStyle = self.manager.configuration.navBarStyle;
             if (self.manager.configuration.navBarBackgroundImage) {
                 [self.navBar setBackgroundImage:self.manager.configuration.navBarBackgroundImage forBarMetrics:UIBarMetricsDefault];
             }
@@ -509,9 +519,9 @@ HXVideoEditViewControllerDelegate
         }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             
             [self.view addSubview:self.darkCancelBtn];
-//            if (self.previewShowDeleteButton) {
-//                [self.view addSubview:self.darkDeleteBtn];
-//            }
+            if (self.previewShowDeleteButton) {
+                [self.view addSubview:self.darkDeleteBtn];
+            }
             if ([self.manager.afterSelectedArray containsObject:model]) {
                 self.bottomPageControl.currentPage = [[self.manager afterSelectedArray] indexOfObject:model];
             }
@@ -560,7 +570,8 @@ HXVideoEditViewControllerDelegate
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [button.layer addAnimation:anim forKey:@""];
     }
-    UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : self.manager.configuration.themeColor;
+    UIColor *btnBgColor = self.manager.configuration.previewSelectedBtnBgColor ?: self.manager.configuration.themeColor;
+    UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : btnBgColor;
     button.backgroundColor = button.selected ? themeColor : nil;
     if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidSelect:model:)]) {
         [self.delegate photoPreviewControllerDidSelect:self model:model];
@@ -594,15 +605,27 @@ HXVideoEditViewControllerDelegate
     }else {
         message = [NSBundle hx_localizedStringForKey:@"确定删除这个视频吗?"];
     }
+    HXPhotoBottomViewModel *titleModel = [[HXPhotoBottomViewModel alloc] init];
+    titleModel.title = message;
+    titleModel.titleFont = [UIFont systemFontOfSize:13];
+    titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
+    titleModel.cellHeight = 60.f;
+    titleModel.canSelected = NO;
+    
+    HXPhotoBottomViewModel *deleteModel = [[HXPhotoBottomViewModel alloc] init];
+    deleteModel.title = [NSBundle hx_localizedStringForKey:@"删除"];
+    deleteModel.titleColor = [UIColor redColor];
     HXWeakSelf
-    hx_showAlert(self, message, nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"删除"], ^{
-        
-    }, ^{
+    [HXPhotoBottomSelectView showSelectViewWithModels:@[titleModel, deleteModel] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
         HXPhotoModel *tempModel = weakSelf.currentModel;
         NSInteger tempIndex = weakSelf.currentModelIndex;
         
         [weakSelf.modelArray removeObject:weakSelf.currentModel];
         [weakSelf.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:weakSelf.currentModelIndex inSection:0]]];
+        dispatch_async(dispatch_get_main_queue(),^{
+            [weakSelf scrollViewDidScroll:weakSelf.collectionView];
+            [weakSelf scrollViewDidEndDecelerating:weakSelf.collectionView];
+        });
         [weakSelf.bottomView deleteModel:weakSelf.currentModel];
         if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             weakSelf.bottomPageControl.numberOfPages = weakSelf.modelArray.count;
@@ -610,12 +633,10 @@ HXVideoEditViewControllerDelegate
         if ([weakSelf.delegate respondsToSelector:@selector(photoPreviewDidDeleteClick:deleteModel:deleteIndex:)]) {
             [weakSelf.delegate photoPreviewDidDeleteClick:weakSelf deleteModel:tempModel deleteIndex:tempIndex];
         }
-        [weakSelf scrollViewDidScroll:weakSelf.collectionView];
-        [weakSelf scrollViewDidEndDecelerating:weakSelf.collectionView];
         if (!weakSelf.modelArray.count) {
             [weakSelf dismissClick];
         }
-    });
+    } cancelClick:nil];
 }
 #pragma mark - < public >
 - (HXPhotoPreviewViewCell *)currentPreviewCellWithIndex:(NSInteger)index {
@@ -650,7 +671,7 @@ HXVideoEditViewControllerDelegate
         [self.navigationController setNavigationBarHidden:hide animated:NO];
     }
     self.bottomView.userInteractionEnabled = !hide;
-    UIColor *bgColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+    UIColor *bgColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : self.manager.configuration.previewPhotoViewBgColor;
     if (animete) {
         [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
         [UIView animateWithDuration:duration animations:^{
@@ -716,9 +737,9 @@ HXVideoEditViewControllerDelegate
     cell.cellViewLongPressGestureRecognizerBlock = ^(UILongPressGestureRecognizer * _Nonnull longPress) {
         [weakSelf respondsToLongPress:longPress];
     };
-    cell.scrollViewDidScroll = ^(CGFloat offsetY) {
+    cell.scrollViewDidScroll = ^(UIScrollView *scrollView) {
         if (weakSelf.currentCellScrollViewDidScroll) {
-            weakSelf.currentCellScrollViewDidScroll(offsetY);
+            weakSelf.currentCellScrollViewDidScroll(scrollView);
         }
     };
     [cell setCellDidPlayVideoBtn:^(BOOL play) {
@@ -883,7 +904,7 @@ HXVideoEditViewControllerDelegate
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
         
-        UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? self.manager.configuration.previewDarkSelectBgColor : self.manager.configuration.themeColor;
+        UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? self.manager.configuration.previewDarkSelectBgColor : self.manager.configuration.previewSelectedBtnBgColor;
         self.selectBtn.backgroundColor = self.selectBtn.selected ? themeColor : nil;
         if (self.outside) {
             if ([self.modelArray containsObject:model] && self.layoutSubviewsCompletion) {
@@ -975,16 +996,24 @@ HXVideoEditViewControllerDelegate
     HXPhotoModel *model = [self.modelArray objectAtIndex:self.currentModelIndex];
     if (model.type == HXPhotoModelMediaTypePhotoGif ||
         model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
-        HXWeakSelf
-        hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"编辑后，GIF将会变为静态图，确定继续吗？"], nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"确定"], nil, ^{
-            [weakSelf jumpEditViewControllerWithModel:model];
-        });
+        if (model.photoEdit) {
+            [self jumpEditViewControllerWithModel:model];
+        }else {
+            HXWeakSelf
+            hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"编辑后，GIF将会变为静态图，确定继续吗？"], nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"确定"], nil, ^{
+                [weakSelf jumpEditViewControllerWithModel:model];
+            });
+        }
         return;
     }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
-        HXWeakSelf
-        hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"编辑后，LivePhoto将会变为静态图，确定继续吗？"], nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"确定"], nil, ^{
-            [weakSelf jumpEditViewControllerWithModel:model];
-        });
+        if (model.photoEdit) {
+            [self jumpEditViewControllerWithModel:model];
+        }else {
+            HXWeakSelf
+            hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"编辑后，LivePhoto将会变为静态图，确定继续吗？"], nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"确定"], nil, ^{
+                [weakSelf jumpEditViewControllerWithModel:model];
+            });
+        }
     }else {
         [self jumpEditViewControllerWithModel:model];
     }
@@ -1001,15 +1030,25 @@ HXVideoEditViewControllerDelegate
                 [weakSelf photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
             };
         }else {
-            HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
-            vc.isInside = YES;
-            vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
-            vc.delegate = self;
-            vc.manager = self.manager;
-            vc.outside = self.outside;
-            vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
-            vc.modalPresentationCapturesStatusBarAppearance = YES;
-            [self presentViewController:vc animated:YES completion:nil];
+            if (self.manager.configuration.useWxPhotoEdit) {
+                HX_PhotoEditViewController *vc = [[HX_PhotoEditViewController alloc] initWithConfiguration:self.manager.configuration.photoEditConfigur];
+                vc.photoModel = [self.modelArray objectAtIndex:self.currentModelIndex];
+                vc.delegate = self;
+                vc.supportRotation = YES;
+                vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+                vc.modalPresentationCapturesStatusBarAppearance = YES;
+                [self presentViewController:vc animated:YES completion:nil];
+            }else {
+                HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
+                vc.isInside = YES;
+                vc.model = [self.modelArray objectAtIndex:self.currentModelIndex];
+                vc.delegate = self;
+                vc.manager = self.manager;
+                vc.outside = self.outside;
+                vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+                vc.modalPresentationCapturesStatusBarAppearance = YES;
+                [self presentViewController:vc animated:YES completion:nil];
+            }
         }
     }else {
         if (self.manager.configuration.replaceVideoEditViewController) {
@@ -1132,6 +1171,38 @@ HXVideoEditViewControllerDelegate
         [self.delegate photoPreviewControllerDidDone:self];
     }
 }
+#pragma mark - < HX_PhotoEditViewControllerDelegate >
+- (void)photoEditingController:(HX_PhotoEditViewController *)photoEditingVC didFinishPhotoEdit:(HXPhotoEdit *)photoEdit photoModel:(nonnull HXPhotoModel *)photoModel {
+    [self.collectionView reloadData];
+    if (self.outside) {
+        [self.bottomView reloadData];
+        if ([self.delegate respondsToSelector:@selector(photoPreviewSelectLaterDidEditClick:beforeModel:afterModel:)]) {
+            [self.delegate photoPreviewSelectLaterDidEditClick:self beforeModel:photoModel afterModel:photoModel];
+        }
+    }else {
+        if (!photoModel.selected && !self.manager.configuration.singleSelected) {
+            NSString *str = [self.manager maximumOfJudgment:photoModel];
+            if (!str) {
+                [self.manager beforeSelectedListAddPhotoModel:photoModel];
+                self.selectBtn.selected = YES;
+                [self.selectBtn setTitle:photoModel.selectIndexStr forState:UIControlStateSelected];
+                UIColor *btnBgColor = self.manager.configuration.previewSelectedBtnBgColor ?: self.manager.configuration.themeColor;
+                UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : btnBgColor;
+                self.selectBtn.backgroundColor = themeColor;
+                if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidSelect:model:)]) {
+                    [self.delegate photoPreviewControllerDidSelect:self model:photoModel];
+                }
+                self.bottomView.selectCount = [self.manager selectedCount];
+                [self.bottomView insertModel:photoModel];
+            }
+        }else {
+            [self.bottomView reloadData];
+        }
+        if ([self.delegate respondsToSelector:@selector(photoPreviewDidEditClick:model:beforeModel:)]) {
+            [self.delegate photoPreviewDidEditClick:self model:photoModel beforeModel:photoModel];
+        }
+    }
+}
 #pragma mark - < HXPhotoEditViewControllerDelegate >
 - (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
     if (self.outside) {
@@ -1227,12 +1298,12 @@ HXVideoEditViewControllerDelegate
 - (UINavigationItem *)navItem {
     if (!_navItem) {
         _navItem = [[UINavigationItem alloc] init];
-//        if (self.previewShowDeleteButton) {
-//            _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"返回"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
-//            _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"删除"] style:UIBarButtonItemStylePlain target:self action:@selector(deleteClick)];
-//        }else {
+        if (self.previewShowDeleteButton) {
+            _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+            _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"删除"] style:UIBarButtonItemStylePlain target:self action:@selector(deleteClick)];
+        }else {
             _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
-//        }
+        }
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
             _navItem.titleView = self.customTitleView;
         }

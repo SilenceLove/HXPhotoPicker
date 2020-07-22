@@ -8,6 +8,7 @@
 
 #import "HXPhotoConfiguration.h"
 #import "HXPhotoTools.h"
+#import "UIColor+HXExtension.h"
 
 @implementation HXPhotoConfiguration
 
@@ -103,6 +104,16 @@
     [HXPhotoCommon photoCommon].photoStyle = HXPhotoStyleDefault;
     self.defaultFrontCamera = NO;
     
+    self.popupTableViewBgColor = [UIColor whiteColor];
+    self.albumListViewBgColor = [UIColor whiteColor];
+    self.photoListViewBgColor = [UIColor whiteColor];
+    self.previewPhotoViewBgColor = [UIColor whiteColor];
+    self.albumListViewCellBgColor = [UIColor whiteColor];
+    self.albumListViewCellTextColor = [UIColor blackColor];
+    self.albumListViewCellSelectBgColor = nil;
+    self.albumListViewCellLineColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.15];
+    self.photoListBottomPhotoCountTextColor = [UIColor colorWithRed:51.f / 255.f green:51.f / 255.f blue:51.f / 255.f alpha:1];
+    
     self.limitPhotoSize = 0;
     self.limitVideoSize = 0;
     self.selectPhotoLimitSize = NO;
@@ -111,11 +122,14 @@
     self.bottomViewTranslucent = YES;
     self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
     self.videoAutoPlayType = HXVideoAutoPlayTypeWiFi;
+    self.previewSelectedBtnBgColor = self.themeColor;
     
     self.downloadNetworkVideo = YES;
-    
+    self.cameraCanLocation = YES;
     self.editAssetSaveSystemAblum = NO;
     self.photoEditCustomRatios = @[@{@"原始值" : @"{0, 0}"}, @{@"正方形" : @"{1, 1}"}, @{@"2:3" : @"{2, 3}"}, @{@"3:4" : @"{3, 4}"}, @{@"9:16" : @"{9, 16}"}, @{@"16:9" : @"{16, 9}"}];
+    
+    self.useWxPhotoEdit = YES;
 }
 - (void)setShowDateSectionHeader:(BOOL)showDateSectionHeader {
     _showDateSectionHeader = showDateSectionHeader;
@@ -210,5 +224,77 @@
         _maxVideoClippingTime = 15;
     }
     return _maxVideoClippingTime;
+}
+- (void)setType:(HXConfigurationType)type {
+    _type = type;
+    
+    self.videoCanEdit = YES;
+    self.specialModeNeedHideVideoSelectBtn = YES;
+    self.cameraPhotoJumpEdit = YES;
+//    self.openCamera = NO;
+    self.saveSystemAblum = YES;
+    self.albumShowMode = HXPhotoAlbumShowModePopup;
+    
+    // 颜色设置
+    self.statusBarStyle = UIStatusBarStyleLightContent;
+    self.themeColor = [UIColor whiteColor];
+    self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
+    
+    self.cameraFocusBoxColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    
+    self.navigationTitleSynchColor = YES;
+    self.cellSelectedBgColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.cellSelectedTitleColor = [UIColor whiteColor];
+    self.previewSelectedBtnBgColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.selectedTitleColor = [UIColor whiteColor];
+    self.bottomDoneBtnBgColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.bottomDoneBtnTitleColor = [UIColor whiteColor];
+    
+    self.bottomViewBgColor = [UIColor hx_colorWithHexStr:@"#141414"];
+    
+    self.popupTableViewCellBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
+    self.popupTableViewCellLineColor = [[UIColor hx_colorWithHexStr:@"#434344"] colorWithAlphaComponent:0.6];
+    self.popupTableViewCellSelectColor = [UIColor clearColor];
+    self.popupTableViewCellSelectIconColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.popupTableViewCellHighlightedColor = [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1];
+    self.popupTableViewBgColor = [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1];
+    self.popupTableViewCellPhotoCountColor = [UIColor whiteColor];
+    self.popupTableViewCellAlbumNameColor = [UIColor whiteColor];
+    self.popupTableViewHeight = HX_ScreenHeight * 0.65;
+    
+    self.albumListViewBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
+    self.albumListViewCellBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
+    self.albumListViewCellSelectBgColor = [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1];
+    self.albumListViewCellLineColor = [[UIColor hx_colorWithHexStr:@"#434344"] colorWithAlphaComponent:0.6];
+    self.albumListViewCellTextColor = [UIColor whiteColor];
+    
+    self.photoListViewBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
+    self.photoListBottomPhotoCountTextColor = [UIColor whiteColor];
+    self.previewPhotoViewBgColor = [UIColor blackColor];
+    
+    if (type == HXConfigurationTypeWXChat) {
+        self.videoMaximumSelectDuration = 60.f * 5.f;
+        self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
+        self.photoMaxNum = 0;
+        self.videoMaxNum = 0;
+        self.maxNum = 9;
+        self.selectTogether = YES;
+    }else if (type == HXConfigurationTypeWXMoment) {
+        self.videoMaximumDuration = 15;
+        self.videoMaximumSelectDuration = 15;
+        self.selectVideoBeyondTheLimitTimeAutoEdit = YES;
+        self.photoMaxNum = 9;
+        self.videoMaxNum = 1;
+        self.maxNum = 9;
+        self.selectTogether = NO;
+    }
+}
+- (HXPhotoEditConfiguration *)photoEditConfigur {
+    if (!_photoEditConfigur) {
+        _photoEditConfigur = [[HXPhotoEditConfiguration alloc] init];
+        _photoEditConfigur.themeColor = self.themeColor;
+        _photoEditConfigur.supportRotation = self.supportRotation;
+    }
+    return _photoEditConfigur;
 }
 @end

@@ -50,7 +50,6 @@ HXVideoEditBottomViewDelegate
     }
     [[PHImageManager defaultManager] cancelImageRequest:self.requestId];
     [self.navigationController setNavigationBarHidden:NO];
-    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
@@ -787,12 +786,12 @@ HXEditFrameViewDelegate
         self.editView.validRect = CGRectMake(hxValidRectX + hxImageWidth, 0, collectionViewW - hxValidRectX * 2 - hxImageWidth * 2, self.itemHeight);
     }
     
-    self.cancelBtn.frame = CGRectMake(12, CGRectGetMaxY(self.collectionView.frame) + 15, 0 + 20, 40);
+    self.cancelBtn.frame = CGRectMake(20, CGRectGetMaxY(self.collectionView.frame) + 15, 0 + 20, 40);
     self.cancelBtn.hx_w = [self.cancelBtn.titleLabel hx_getTextWidth];
     
     self.doneBtn.hx_h = 40;
     self.doneBtn.hx_w = [self.doneBtn.titleLabel hx_getTextWidth];
-    self.doneBtn.hx_x = self.hx_w - 12 - self.doneBtn.hx_w;
+    self.doneBtn.hx_x = self.hx_w - 20 - self.doneBtn.hx_w;
     self.doneBtn.hx_centerY = self.cancelBtn.hx_centerY;
     
 }

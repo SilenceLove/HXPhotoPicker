@@ -10,6 +10,7 @@
 
 #import "HXCustomCameraViewController.h"
 #import "HXPhotoEditViewController.h"
+#import "HX_PhotoEditViewController.h"
 #import "HXVideoEditViewController.h"
 #import "HXPhotoView.h"
 
@@ -104,6 +105,32 @@
                                             videoURL:(NSURL * _Nonnull)videoURL
                                                 done:(HXVideoEditViewControllerDidDoneBlock _Nullable)done
                                               cancel:(HXVideoEditViewControllerDidCancelBlock _Nullable)cancel;
+
+/// 跳转仿微信照片编辑界面
+/// @param configuration 配置
+/// @param photomodel 需要编辑的照片模型
+///                   如果需要在原有编辑的基础上进行编辑，直接将之前编辑model传入即可
+///                   如果不需要在原有基础上编辑，请将 model.photoEdit 置为nil
+/// @param delegate 代理
+/// @param finish 完成后的回调
+/// @param cancel 取消回调
+- (void)hx_presentWxPhotoEditViewControllerWithConfiguration:(HXPhotoEditConfiguration * _Nonnull)configuration
+                                                  photoModel:(HXPhotoModel * _Nonnull)photomodel
+                                                    delegate:(id _Nullable)delegate
+                                                      finish:(HX_PhotoEditViewControllerDidFinishBlock _Nullable)finish
+                                                      cancel:(HX_PhotoEditViewControllerDidCancelBlock _Nullable)cancel;
+
+/// 跳转仿微信照片编辑界面
+/// @param configuration 配置
+/// @param editImage 需要编辑的图片
+/// @param photoEdit 之前编辑的数据，为nil则重新开始编辑
+/// @param finish 完成后的回调
+/// @param cancel 取消回调
+- (void)hx_presentWxPhotoEditViewControllerWithConfiguration:(HXPhotoEditConfiguration * _Nonnull)configuration
+                                                   editImage:(UIImage * _Nonnull)editImage
+                                                   photoEdit:(HXPhotoEdit * _Nullable)photoEdit
+                                                      finish:(HX_PhotoEditViewControllerDidFinishBlock _Nullable)finish
+                                                      cancel:(HX_PhotoEditViewControllerDidCancelBlock _Nullable)cancel;
 
 - (BOOL)hx_navigationBarWhetherSetupBackground;
 

@@ -209,7 +209,7 @@ UITableViewDelegate
         navBarBackgroudColor = [UIColor blackColor];
         navigationTitleColor = [UIColor whiteColor];
     }else {
-        backgroudColor = [UIColor whiteColor];
+        backgroudColor = self.manager.configuration.albumListViewBgColor;
         themeColor = self.manager.configuration.themeColor;
         navBarBackgroudColor = self.manager.configuration.navBarBackgroudColor;
         navigationTitleColor = self.manager.configuration.navigationTitleColor;
@@ -218,6 +218,7 @@ UITableViewDelegate
     self.tableView.backgroundColor = backgroudColor;
     [self.navigationController.navigationBar setTintColor:themeColor];
     self.navigationController.navigationBar.barTintColor = navBarBackgroudColor;
+    self.navigationController.navigationBar.barStyle = self.manager.configuration.navBarStyle;
     
     if (self.manager.configuration.navBarBackgroundImage) {
         [self.navigationController.navigationBar setBackgroundImage:self.manager.configuration.navBarBackgroundImage forBarMetrics:UIBarMetricsDefault];
@@ -411,6 +412,10 @@ UITableViewDelegate
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     HXAlbumListSingleViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"tableViewCellId"];
+    cell.bgColor = self.manager.configuration.albumListViewCellBgColor;
+    cell.textColor = self.manager.configuration.albumListViewCellTextColor;
+    cell.selectedBgColor = self.manager.configuration.albumListViewCellSelectBgColor;
+    cell.lineViewColor = self.manager.configuration.albumListViewCellLineColor;
     cell.model = self.albumModelArray[indexPath.row];
     
 //    HXWeakSelf
@@ -717,7 +722,6 @@ UITableViewDelegate
     if (self) {
         self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         [self setupUI];
-        [self changeColor];
     }
     return self;
 }
@@ -745,6 +749,7 @@ UITableViewDelegate
 }
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
+    [self changeColor];
     self.albumNameLb.text = self.model.albumName;
     if (!model.result && model.collection) {
         HXWeakSelf
@@ -912,13 +917,18 @@ UITableViewDelegate
     if ([HXPhotoCommon photoCommon].isDark) {
         self.albumNameLb.textColor = [UIColor whiteColor];
     }else {
-        self.albumNameLb.textColor = [UIColor blackColor];
+        self.albumNameLb.textColor = self.textColor;
     }
 }
 - (void)changeColor {
-    self.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
-    self.selectedBackgroundView = [HXPhotoCommon photoCommon].isDark ? self.selectBgView : nil;
-    self.lineView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] colorWithAlphaComponent:1] : [[UIColor lightGrayColor] colorWithAlphaComponent:0.15];
+    self.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : self.bgColor;
+    if (self.selectedBgColor) {
+        self.selectBgView.backgroundColor = self.selectedBgColor;
+        self.selectedBackgroundView = self.selectBgView;
+    }else {
+        self.selectedBackgroundView = [HXPhotoCommon photoCommon].isDark ? self.selectBgView : nil;
+    }
+    self.lineView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] colorWithAlphaComponent:1] : self.lineViewColor;
     [self changeAlbumNameTextColor];
 }
     

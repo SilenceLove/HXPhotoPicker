@@ -155,8 +155,10 @@ static id instance;
 }
 - (void)saveCamerImage {
     if (self.cameraImage) {
-        NSData *imageData = [NSKeyedArchiver archivedDataWithRootObject:self.cameraImage];
-        [[NSUserDefaults standardUserDefaults] setObject:imageData forKey:HXCameraImageKey];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSData *imageData = [NSKeyedArchiver archivedDataWithRootObject:self.cameraImage];
+            [[NSUserDefaults standardUserDefaults] setObject:imageData forKey:HXCameraImageKey];
+        });
     }
 }
 - (void)setCameraImage:(UIImage *)cameraImage {

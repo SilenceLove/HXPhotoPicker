@@ -7,6 +7,7 @@
 //
 
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
 
 @class HXPhotoManager;
 @protocol HXCustomCameraControllerDelegate <NSObject>
@@ -18,6 +19,7 @@
 - (void)videoFinishRecording:(NSURL *)videoURL;
 - (void)takePicturesComplete:(UIImage *)image;
 - (void)takePicturesFailed;
+- (void)handleDeviceMotion:(UIDeviceOrientation)deviceOrientation;
 //- (void)rampedZoomToValue:(CGFloat)value;
 @end
 
@@ -36,9 +38,11 @@
 
 - (void)initImageOutput;
 - (void)initMovieOutput;
+- (void)removeMovieOutput;
 
-- (void)addImageOutput;
-- (void)addMovieOutput;
+- (void)addDataOutput;
+- (void)removeDataOutput;
+
 - (BOOL)addAudioInput;
 
 - (BOOL)switchCameras;
@@ -72,8 +76,10 @@
 - (BOOL)cameraSupportsZoom;                                               
 
 - (CGFloat)maxZoomFactor;
+- (CGFloat)currentZoomFacto;
 
 - (void)setZoomValue:(CGFloat)zoomValue;                                   
 - (void)rampZoomToValue:(CGFloat)zoomValue;
 - (void)cancelZoom;
+
 @end

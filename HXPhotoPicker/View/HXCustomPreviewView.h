@@ -33,4 +33,6 @@
 @property (nonatomic) BOOL tapToFocusEnabled;
 @property (nonatomic) BOOL tapToExposeEnabled;
 @property (nonatomic) BOOL pinchToZoomEnabled;
+
+- (void)firstFocusing;
 @end

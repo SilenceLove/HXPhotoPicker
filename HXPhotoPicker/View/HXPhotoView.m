@@ -231,7 +231,7 @@
 
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
-    if (!manager.cameraRollAlbumModel) {
+    if (!manager.cameraRollAlbumModel && self.showAddCell) {
         [manager preloadData];
     }
     manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
@@ -287,11 +287,14 @@
     if (self.tempShowAddCell) {
         if (indexPath.item == self.dataList.count) {
             HXPhotoSubViewCell *addCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"addCell" forIndexPath:indexPath];
+            addCell.index = indexPath.item;
             addCell.model = self.addModel;
             return addCell;
         }
     }
     HXPhotoSubViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoSubViewCellId" forIndexPath:indexPath];
+    cell.index = indexPath.item;
+    cell.customProtocol = self.cellCustomProtocol;
     cell.delegate = self;
     cell.canEdit = self.collectionView.editEnabled;
     if (self.deleteImageName) {
@@ -409,6 +412,11 @@
     [self deleteModelWithIndex:index];
 }
 - (void)photoPreviewSelectLaterDidEditClick:(HXPhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+    if (self.manager.configuration.useWxPhotoEdit) {
+        [self.collectionView reloadData];
+        [self dragCellCollectionViewCellEndMoving:self.collectionView];
+        return;
+    }
     [self.manager afterSelectedArrayReplaceModelAtModel:beforeModel withModel:afterModel];
     [self.manager afterSelectedListAddEditPhotoModel:afterModel];
     
@@ -450,11 +458,22 @@
                 self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum;
             }
         }else {
+            shootingModel.cellHeight = 65.f;
             if (self.manager.configuration.photoMaxNum > 0 &&
                 self.manager.configuration.videoMaxNum > 0) {
                 self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum + self.manager.configuration.photoMaxNum;
             }
-            shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
+            if (!self.manager.configuration.selectTogether) {
+                if (self.manager.afterSelectedPhotoArray.count) {
+                    shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片"];
+                }else if (self.manager.afterSelectedVideoArray.count) {
+                    shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"视频"];
+                }else {
+                    shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
+                }
+            }else {
+                shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
+            }
         }
         HXPhotoBottomViewModel *selectModel = [[HXPhotoBottomViewModel alloc] init];
         selectModel.title = [NSBundle hx_localizedStringForKey:@"从手机相册选择"];
@@ -706,14 +725,26 @@
         [mirrorView removeFromSuperview];
     }];
     [self.dataList removeObjectAtIndex:indexPath.item];
-    [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
-    [self changeSelectedListModelIndex];
-    if (self.showAddCell) {
-        if (!self.tempShowAddCell) {
-            self.tempShowAddCell = YES;
+
+    [self.collectionView performBatchUpdates:^{
+        [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+    } completion:^(BOOL finished) {
+        BOOL collectionReload = YES;
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        if (self.showAddCell) {
+            if (!self.tempShowAddCell) {
+                self.tempShowAddCell = YES;
+                [self.collectionView reloadData];
+                collectionReload = NO;
+            }
+        }
+        if (self.cellCustomProtocol && collectionReload) {
             [self.collectionView reloadData];
         }
-    }
+        [CATransaction commit];
+    }];
+    [self changeSelectedListModelIndex];
     if (model.networkPhotoUrl) {
         if ([self.delegate respondsToSelector:@selector(photoView:deleteNetworkPhoto:)]) {
             [self.delegate photoView:self deleteNetworkPhoto:model.networkPhotoUrl.absoluteString];
@@ -897,6 +928,11 @@
         self.changeCompleteBlock(self.dataList.copy, self.photos.copy, self.videos.copy, self.original);
     }
 }
+- (void)collectionViewNeedReloadData:(UICollectionView *)collectionView {
+    if (self.cellCustomProtocol) {
+        [self.collectionView reloadData];
+    }
+}
 - (BOOL)collectionViewShouldDeleteCurrentMoveItem:(UICollectionView *)collectionView gestureRecognizer:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
     if ([self.delegate respondsToSelector:@selector(photoViewShouldDeleteCurrentMoveItem:gestureRecognizer:indexPath:)]) {
         return [self.delegate photoViewShouldDeleteCurrentMoveItem:self gestureRecognizer:longPgr indexPath:indexPath];
@@ -1012,6 +1048,9 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    if (self.hx_w <= 0) {
+        return;
+    }
     if (self.lineCount <= 0) self.lineCount = 1;
     NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
     

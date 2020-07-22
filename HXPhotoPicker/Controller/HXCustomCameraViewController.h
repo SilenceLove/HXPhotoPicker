@@ -39,26 +39,14 @@ typedef void (^ HXCustomCameraViewControllerDidCancelBlock)(HXCustomCameraViewCo
 @property (assign, nonatomic) BOOL isOutside;
 @property (copy, nonatomic) HXCustomCameraViewControllerDidDoneBlock doneBlock;
 @property (copy, nonatomic) HXCustomCameraViewControllerDidCancelBlock cancelBlock;
-@end
 
-@protocol HXCustomCameraBottomViewDelegate <NSObject>
-@optional
-- (void)playViewClick;
-- (void)playViewAnimateCompletion;
-- (void)playViewChangeMode:(HXCustomCameraBottomViewMode)mode;
-@end
-
-@interface HXCustomCameraBottomView : UIView
-@property (weak, nonatomic) id<HXCustomCameraBottomViewDelegate> delegate;
-@property (assign ,nonatomic) BOOL animating;
-@property (assign, nonatomic) HXCustomCameraBottomViewMode mode;
-- (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager isOutside:(BOOL)isOutside;
-- (void)changeTime:(NSTimeInterval)time;
-- (void)startRecord;
-- (void)stopRecord;
-- (void)beganAnimate;
-- (void)leftAnimate;
-- (void)rightAnimate;
+#pragma mark - < other >
+- (UIImage *)jumpImage;
+- (CGRect)jumpRect;
+- (void)hidePlayerView;
+- (void)showPlayerView;
+- (void)hiddenTopBottomView;
+- (void)showTopBottomView;
 @end
 
 @interface HXCustomCameraPlayVideoView : UIView

@@ -35,6 +35,7 @@
 #elif __has_include("YYKit.h")
 #import "YYKit.h"
 #endif
+#import "HXPhotoEdit.h"
 
 @interface HXPreviewImageView ()
 #if HasYYKitOrWebImage
@@ -64,6 +65,9 @@
     return self;
 }
 - (UIImage *)image {
+    if (self.model.photoEdit) {
+        return self.model.photoEdit.editPreviewImage;
+    }
     UIImage *image;
 #if HasSDWebImage
             if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
@@ -100,59 +104,62 @@
 }
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
+    if (model.photoEdit) {
+#if HasSDWebImage
+        self.sdImageView.image = model.photoEdit.editPreviewImage;
+#elif HasYYKitOrWebImage
+        self.animatedImageView.image = model.photoEdit.editPreviewImage;
+#else
+        self.imageView.image = model.photoEdit.editPreviewImage;
+#endif
+        model.tempImage = nil;
+        return;
+    }
 HXWeakSelf
     if (model.type == HXPhotoModelMediaTypeCameraPhoto || model.type == HXPhotoModelMediaTypeCameraVideo) {
         if (model.networkPhotoUrl) {
             self.progressView.hidden = model.downloadComplete;
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
+            if (model.downloadComplete && !model.downloadError) {
 #if HasSDWebImage
-            [self.sdImageView sd_setImageWithURL:model.networkPhotoUrl placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-                model.receivedSize = receivedSize;
-                model.expectedSize = expectedSize;
-                CGFloat progress = (CGFloat)receivedSize / expectedSize;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    weakSelf.progressView.progress = progress;
-                });
-            } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-                if (error != nil) {
-                    model.downloadError = YES;
-                    model.downloadComplete = YES;
-                    [weakSelf.progressView showError];
-                }else {
-                    if (image) {
-                        model.imageSize = image.size;
-                        model.thumbPhoto = image;
-                        model.previewPhoto = image;
-                        model.downloadComplete = YES;
-                        model.downloadError = NO;
-                        weakSelf.model.imageSize = image.size;
-                        weakSelf.progressView.progress = 1;
-                        weakSelf.progressView.hidden = YES;
-                        weakSelf.sdImageView.image = image;
-                        if (weakSelf.downloadICloudAssetComplete) { weakSelf.downloadICloudAssetComplete();
-                        }
-                        if (weakSelf.downloadNetworkImageComplete) {
-                            weakSelf.downloadNetworkImageComplete();
-                        }
-                    }
-                }
-            }];
+                self.sdImageView.image = model.previewPhoto;
 #elif HasYYKitOrWebImage
-            [self.animatedImageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
-                    weakSelf.progressView.progress = progress;
+                self.animatedImageView.image = model.previewPhoto;
+#else
+                self.imageView.image = model.previewPhoto;
+#endif
+                if (self.downloadICloudAssetComplete) {
+                    self.downloadICloudAssetComplete();
                 }
-            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
+                if (self.downloadNetworkImageComplete) {
+                    self.downloadNetworkImageComplete();
+                }
+            }else {
+#if HasSDWebImage
+                [self.sdImageView sd_setImageWithURL:model.networkPhotoUrl placeholderImage:model.thumbPhoto options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+                    model.receivedSize = receivedSize;
+                    model.expectedSize = expectedSize;
+                    CGFloat progress = (CGFloat)receivedSize / expectedSize;
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        weakSelf.progressView.progress = progress;
+                    });
+                } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                     if (error != nil) {
+                        model.downloadError = YES;
+                        model.downloadComplete = YES;
                         [weakSelf.progressView showError];
                     }else {
                         if (image) {
+                            model.imageSize = image.size;
+                            model.thumbPhoto = image;
+                            model.previewPhoto = image;
+                            model.downloadComplete = YES;
+                            model.downloadError = NO;
                             weakSelf.model.imageSize = image.size;
                             weakSelf.progressView.progress = 1;
                             weakSelf.progressView.hidden = YES;
-                            weakSelf.animatedImageView.image = image;
+                            weakSelf.sdImageView.image = image;
                             if (weakSelf.downloadICloudAssetComplete) { weakSelf.downloadICloudAssetComplete();
                             }
                             if (weakSelf.downloadNetworkImageComplete) {
@@ -160,32 +167,56 @@ HXWeakSelf
                             }
                         }
                     }
-                }
-            }];
+                }];
+#elif HasYYKitOrWebImage
+                [self.animatedImageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        weakSelf.progressView.progress = progress;
+                    }
+                } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        if (error != nil) {
+                            [weakSelf.progressView showError];
+                        }else {
+                            if (image) {
+                                weakSelf.model.imageSize = image.size;
+                                weakSelf.progressView.progress = 1;
+                                weakSelf.progressView.hidden = YES;
+                                weakSelf.animatedImageView.image = image;
+                                if (weakSelf.downloadICloudAssetComplete) { weakSelf.downloadICloudAssetComplete();
+                                }
+                                if (weakSelf.downloadNetworkImageComplete) {
+                                    weakSelf.downloadNetworkImageComplete();
+                                }
+                            }
+                        }
+                    }
+                }];
 #else
-            [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
-                    weakSelf.progressView.progress = progress;
-                }
-            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
-                    if (error != nil) {
-                        [weakSelf.progressView showError];
-                    }else {
-                        if (image) {
-                            weakSelf.progressView.progress = 1;
-                            weakSelf.progressView.hidden = YES;
-                            weakSelf.imageView.image = image;
-                            if (weakSelf.downloadICloudAssetComplete) { weakSelf.downloadICloudAssetComplete();
-                            }
-                            if (weakSelf.downloadNetworkImageComplete) {
-                                weakSelf.downloadNetworkImageComplete();
+                [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        weakSelf.progressView.progress = progress;
+                    }
+                } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        if (error != nil) {
+                            [weakSelf.progressView showError];
+                        }else {
+                            if (image) {
+                                weakSelf.progressView.progress = 1;
+                                weakSelf.progressView.hidden = YES;
+                                weakSelf.imageView.image = image;
+                                if (weakSelf.downloadICloudAssetComplete) { weakSelf.downloadICloudAssetComplete();
+                                }
+                                if (weakSelf.downloadNetworkImageComplete) {
+                                    weakSelf.downloadNetworkImageComplete();
+                                }
                             }
                         }
                     }
-                }
-            }];
+                }];
 #endif
+            }
         }else {
 #if HasSDWebImage
             self.sdImageView.image = model.thumbPhoto;
@@ -263,6 +294,17 @@ HXWeakSelf
     }
 }
 - (void)requestHDImage {
+    if (self.model.photoEdit) {
+#if HasSDWebImage
+        self.sdImageView.image = self.model.photoEdit.editPreviewImage;
+#elif HasYYKitOrWebImage
+        self.animatedImageView.image = self.model.photoEdit.editPreviewImage;
+#else
+        self.imageView.image = self.model.photoEdit.editPreviewImage;
+#endif
+        [self downloadICloudAssetComplete];
+        return;
+    }
     CGSize size;
     CGFloat scale;
     if (HX_IS_IPhoneX_All) {

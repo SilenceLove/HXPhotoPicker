@@ -55,6 +55,11 @@
 @end
 
 @interface HXAlbumListSingleViewCell : UITableViewCell
+@property (strong, nonatomic) UIColor *bgColor;
+@property (strong, nonatomic) UIColor *textColor;
+@property (strong, nonatomic) UIColor *selectedBgColor;
+@property (strong, nonatomic) UIColor *lineViewColor;
+
 @property (strong, nonatomic) HXAlbumModel *model;
 @property (copy, nonatomic) void (^getResultCompleteBlock)(NSInteger count, HXAlbumListSingleViewCell *myCell);
 - (void)cancelRequest ;

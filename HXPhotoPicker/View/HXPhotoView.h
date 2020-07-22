@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
 #import "HXCollectionView.h"
+#import "HXPhotoViewCellCustomProtocol.h"
 
 typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
     HXPhotoViewPreViewShowStyleDefault, //!< 默认
@@ -282,12 +283,6 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 + (instancetype)photoManager:(HXPhotoManager *)manager
              scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
 
-- (NSIndexPath *)currentModelIndexPath:(HXPhotoModel *)model;
-@property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
-@property (strong, nonatomic) HXPhotoManager *manager;
-@property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
-@property (strong, nonatomic) HXCollectionView *collectionView;
-
 #pragma mark - < Block >
 /**  照片/视频发生改变时调用 - 选择、移动顺序、删除  */
 @property (copy, nonatomic) HXPhotoViewChangeCompleteBlock changeCompleteBlock;
@@ -311,9 +306,11 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 @property (copy, nonatomic) HXPhotoViewLongGestureRecognizerEndedBlock longGestureRecognizerEndedBlock;
 
 #pragma mark - < Configuration >
+/// 自定义cell协议
+@property (weak, nonatomic) id<HXPhotoViewCellCustomProtocol> cellCustomProtocol;
 /// default is UICollectionViewScrollDirectionVertical
 /// 重新设置需要调用 refreshView 刷新界面
-@property (nonatomic) UICollectionViewScrollDirection scrollDirection;
+@property (assign, nonatomic) UICollectionViewScrollDirection scrollDirection;
 /**  是否把相机功能放在外面 默认NO  */
 @property (assign, nonatomic) IBInspectable BOOL outerCamera;
 /** 每行个数 默认 3
@@ -365,4 +362,12 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
  */
 - (HXPhotoSubViewCell *)previewingContextViewWithPoint:(CGPoint)point;
 - (HXPhotoSubViewCell *)collectionViewCellWithIndex:(NSInteger)index;
+
+
+#pragma mark - < other >
+- (NSIndexPath *)currentModelIndexPath:(HXPhotoModel *)model;
+@property (weak, nonatomic) id<HXPhotoViewDelegate> delegate;
+@property (strong, nonatomic) HXPhotoManager *manager;
+@property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
+@property (strong, nonatomic) HXCollectionView *collectionView;
 @end

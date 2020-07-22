@@ -187,7 +187,7 @@
 #pragma mark - < UIScrollViewDelegate >
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (self.scrollViewDidScroll) {
-        self.scrollViewDidScroll(scrollView.contentOffset.y);
+        self.scrollViewDidScroll(scrollView);
     }
 }
 - (nullable UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {

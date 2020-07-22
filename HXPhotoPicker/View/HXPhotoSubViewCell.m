@@ -11,6 +11,9 @@
 #import "HXCircleProgressView.h"
 #import "HXPhotoTools.h"
 #import "HXPhotoBottomSelectView.h"
+#import "HXPhotoEdit.h"
+#import "UIColor+HXExtension.h"
+
 @interface HXPhotoSubViewCell ()
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UIButton *deleteBtn;
@@ -18,6 +21,8 @@
 @property (assign, nonatomic) int32_t requestID;
 @property (strong, nonatomic) UILabel *stateLb;
 @property (strong, nonatomic) CAGradientLayer *bottomMaskLayer;
+@property (assign, nonatomic) BOOL addCustomViewCompletion;
+@property (strong, nonatomic) UIView *customView;
 @end
 
 @implementation HXPhotoSubViewCell
@@ -91,20 +96,18 @@
 - (void)didDeleteClick {
     if (self.model.networkPhotoUrl) {
         if (self.showDeleteNetworkPhotoAlert) {
-            UILabel *titleLb = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 40)];
-            titleLb.backgroundColor = [UIColor whiteColor];
-            titleLb.text = [NSBundle hx_localizedStringForKey:@"是否删除此资源"];
-            titleLb.textColor = [UIColor lightGrayColor];
-            titleLb.textAlignment = NSTextAlignmentCenter;
-            titleLb.font = [UIFont hx_pingFangFontOfSize:14];
-            UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0, 39.5, titleLb.hx_w, 0.5)];
-            lineView.backgroundColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1];
-            [titleLb addSubview:lineView];
-            HXPhotoBottomViewModel *model = [[HXPhotoBottomViewModel alloc] init];
-            model.title = [NSBundle hx_localizedStringForKey:@"删除"];
-            model.titleColor = [[UIColor redColor] colorWithAlphaComponent:0.8];
+            HXPhotoBottomViewModel *titleModel = [[HXPhotoBottomViewModel alloc] init];
+            titleModel.title = [NSBundle hx_localizedStringForKey:@"是否删除此资源"];;
+            titleModel.titleFont = [UIFont systemFontOfSize:13];
+            titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
+            titleModel.cellHeight = 60.f;
+            titleModel.canSelected = NO;
+            
+            HXPhotoBottomViewModel *deleteModel = [[HXPhotoBottomViewModel alloc] init];
+            deleteModel.title = [NSBundle hx_localizedStringForKey:@"删除"];
+            deleteModel.titleColor = [UIColor redColor];
             HXWeakSelf
-            [HXPhotoBottomSelectView showSelectViewWithModels:@[model] headerView:titleLb cancelTitle:[NSBundle hx_localizedStringForKey:@"取消"] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
+            [HXPhotoBottomSelectView showSelectViewWithModels:@[titleModel, deleteModel] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
                 if ([weakSelf.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
                     [weakSelf.delegate cellDidDeleteClcik:weakSelf];
                 }
@@ -184,7 +187,6 @@
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
     self.imageView.image = nil;
-    
     if (model.type == HXPhotoModelMediaTypeCamera) {
         self.deleteBtn.hidden = YES;
         self.imageView.image = model.thumbPhoto;
@@ -197,48 +199,65 @@
         if (model.networkPhotoUrl) {
             HXWeakSelf
             self.progressView.hidden = model.downloadComplete;
-            [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
-                    weakSelf.progressView.progress = progress;
+            if (model.downloadComplete && !model.downloadError) {
+                if (model.previewPhoto.images.count) {
+                    self.imageView.image = nil;
+                    self.imageView.image = model.previewPhoto.images.firstObject;
+                }else {
+                    self.imageView.image = model.previewPhoto;
                 }
-            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
-                    if (error != nil) {
-                        [weakSelf.progressView showError];
-                    }else {
-                        if (image) {
-                            weakSelf.progressView.progress = 1;
-                            weakSelf.progressView.hidden = YES;
-                            if (image.images.count) {
-                                weakSelf.imageView.image = nil;
-                                weakSelf.imageView.image = image.images.firstObject;
-                            }else {
-                                weakSelf.imageView.image = image;
+            }else {
+                [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        weakSelf.progressView.progress = progress;
+                    }
+                } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        if (error != nil) {
+                            [weakSelf.progressView showError];
+                        }else {
+                            if (image) {
+                                weakSelf.progressView.progress = 1;
+                                weakSelf.progressView.hidden = YES;
+                                if (image.images.count) {
+                                    weakSelf.imageView.image = nil;
+                                    weakSelf.imageView.image = image.images.firstObject;
+                                }else {
+                                    weakSelf.imageView.image = image;
+                                }
                             }
                         }
                     }
-                }
-            }];
-        }else {
-            if (model.previewPhoto) {
-                self.imageView.image = model.previewPhoto;
-            }else if (model.thumbPhoto) {
-                self.imageView.image = model.thumbPhoto;
-            }else {
-                HXWeakSelf
-                [self.model requestThumbImageWithSize:CGSizeMake(200, 200) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-                    if (weakSelf.model == model) {
-                        weakSelf.imageView.image = image;
-                    }
                 }];
+            }
+        }else {
+            if (model.photoEdit) {
+                self.imageView.image = model.photoEdit.editPosterImage;
+            }else {
+                if (model.previewPhoto) {
+                    self.imageView.image = model.previewPhoto;
+                }else if (model.thumbPhoto) {
+                    self.imageView.image = model.thumbPhoto;
+                }else {
+                    HXWeakSelf
+                    [self.model requestThumbImageWithSize:CGSizeMake(200, 200) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                        if (weakSelf.model == model) {
+                            weakSelf.imageView.image = image;
+                        }
+                    }];
+                }
             }
         }
     }
-    if (model.type == HXPhotoModelMediaTypePhotoGif) {
+    if (self.customProtocol) {
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+    }
+    if (model.type == HXPhotoModelMediaTypePhotoGif && !model.photoEdit) {
         self.stateLb.text = @"GIF";
         self.stateLb.hidden = NO;
         self.bottomMaskLayer.hidden = NO;
-    }else if (model.type == HXPhotoModelMediaTypeLivePhoto) {
+    }else if (model.type == HXPhotoModelMediaTypeLivePhoto && !model.photoEdit) {
         self.stateLb.text = @"Live";
         self.stateLb.hidden = NO;
         self.bottomMaskLayer.hidden = NO;
@@ -248,12 +267,12 @@
             self.stateLb.hidden = NO;
             self.bottomMaskLayer.hidden = NO;
         }else {
-            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif && !model.photoEdit) {
                 self.stateLb.text = @"GIF";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;
                 return;
-            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto && !model.photoEdit) {
                 self.stateLb.text = @"Live";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;
@@ -262,6 +281,36 @@
             self.stateLb.hidden = YES;
             self.bottomMaskLayer.hidden = YES;
         }
+    }
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:self.index inSection:0];
+    if ([self.customProtocol respondsToSelector:@selector(customView:indexPath:)]) {
+        if (!self.addCustomViewCompletion) {
+            UIView *customView = [self.customProtocol customView:self indexPath:indexPath];
+            [self.contentView addSubview:customView];
+            self.customView = customView;
+            self.addCustomViewCompletion = YES;
+        }
+    }
+    if ([self.customProtocol respondsToSelector:@selector(setCustomViewData:model:indexPath:)]) {
+        [self.customProtocol setCustomViewData:self.customView model:model indexPath:indexPath];
+    }
+    if ([self.customProtocol respondsToSelector:@selector(shouldHiddenBottomType:indexPath:)]) {
+        BOOL hiddenState = [self.customProtocol shouldHiddenBottomType:self indexPath:indexPath];
+        if (hiddenState) {
+            self.stateLb.hidden = hiddenState;
+            self.bottomMaskLayer.hidden = hiddenState;
+        }
+    }
+    if ([self.customProtocol respondsToSelector:@selector(customViewFrame:indexPath:)]) {
+        CGRect customViewFrame = [self.customProtocol customViewFrame:self indexPath:indexPath];
+        self.customView.frame = customViewFrame;
+    }
+    if ([self.customProtocol respondsToSelector:@selector(customDeleteButtonFrame:indexPath:)]) {
+        CGRect deleteFrame = [self.customProtocol customDeleteButtonFrame:self indexPath:indexPath];
+        self.deleteBtn.frame = deleteFrame;
+    }
+    if (self.customProtocol) {
+        [CATransaction commit];
     }
 }
 
@@ -272,12 +321,14 @@
     
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
-    
+
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
-    CGFloat deleteBtnW = self.deleteBtn.currentImage.size.width;
-    CGFloat deleteBtnH = self.deleteBtn.currentImage.size.height;
-    self.deleteBtn.frame = CGRectMake(width - deleteBtnW, 0, deleteBtnW, deleteBtnH);
+    if (![self.customProtocol respondsToSelector:@selector(customDeleteButtonFrame:indexPath:)]) {
+        CGFloat deleteBtnW = self.deleteBtn.currentImage.size.width;
+        CGFloat deleteBtnH = self.deleteBtn.currentImage.size.height;
+        self.deleteBtn.frame = CGRectMake(width - deleteBtnW, 0, deleteBtnW, deleteBtnH);
+    }
     
     self.progressView.center = CGPointMake(width / 2, height / 2);
     self.highlightMaskView.frame = self.bounds;
@@ -299,4 +350,5 @@
     }
     return _highlightMaskView;
 }
+
 @end

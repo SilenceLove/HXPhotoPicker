@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setScrollViewContnetSize:(CGSize)contentSize;
 - (CGPoint)getScrollViewContentOffset;
 - (void)setScrollViewContentOffset:(CGPoint)contentOffset;
-@property (copy, nonatomic) void (^ scrollViewDidScroll)(CGFloat offsetY);
+@property (copy, nonatomic) void (^ scrollViewDidScroll)(UIScrollView *scrollView);
 
 @property (strong, nonatomic) HXPreviewContentView *previewContentView;
 - (UIImage *)image;

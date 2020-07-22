@@ -15,7 +15,8 @@ HXPhotoViewController ,
 HXPhotoViewCell ,
 HXPhotoBottomView ,
 HXCustomPreviewView ,
-HXAlbumListViewController;
+HXAlbumListViewController,
+HXCustomCameraController;
 @protocol HXPhotoViewControllerDelegate <NSObject>
 @optional
 
@@ -87,18 +88,18 @@ HXAlbumListViewController;
 - (void)startRequestICloudAsset;
 - (void)bottomViewPrepareAnimation;
 - (void)bottomViewStartAnimation;
+- (void)setModel:(HXPhotoModel *)model clearImage:(BOOL)clearImage;
+- (void)setModelDataWithHighQuality:(BOOL)highQuality completion:(void (^)(HXPhotoViewCell *myCell))completion;
 @end
 
 @interface HXPhotoCameraViewCell : UICollectionViewCell
 @property (strong, nonatomic) HXPhotoModel *model;
-@property (nonatomic, strong) AVCaptureSession *session;
-@property (strong, nonatomic, readonly) UIView *previewView; 
+@property (strong, nonatomic, readonly) HXCustomCameraController *cameraController;
 @property (strong, nonatomic) UIImage *cameraImage;
+@property (assign, nonatomic) BOOL cameraSelected;
 @property (assign, nonatomic) BOOL startSession;
 - (void)starRunning;
 - (void)stopRunning;
-- (void)addOutputDelegate;
-- (void)removeOutputDelegate;
 @end
 
 @interface HXPhotoViewSectionHeaderView : HXCustomCollectionReusableView
@@ -112,6 +113,8 @@ HXAlbumListViewController;
 @interface HXPhotoViewSectionFooterView : UICollectionReusableView
 @property (assign, nonatomic) NSInteger photoCount;
 @property (assign, nonatomic) NSInteger videoCount;
+@property (strong, nonatomic) UIColor *bgColor;
+@property (strong, nonatomic) UIColor *textColor;
 @end
 
 @protocol HXPhotoBottomViewDelegate <NSObject>
@@ -129,4 +132,5 @@ HXAlbumListViewController;
 @property (assign, nonatomic) NSInteger selectCount;
 @property (strong, nonatomic) UIButton *originalBtn;
 @property (strong, nonatomic) UIToolbar *bgView;
+- (void)requestPhotosBytes;
 @end

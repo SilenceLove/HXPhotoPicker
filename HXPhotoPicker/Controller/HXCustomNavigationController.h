@@ -37,7 +37,7 @@
 @end
 
 @interface HXCustomNavigationController : UINavigationController
-@property (nonatomic) BOOL isCamera;
+@property (assign ,nonatomic) BOOL isCamera;
 @property (weak, nonatomic) id<HXCustomNavigationControllerDelegate> hx_delegate;
 @property (assign, nonatomic) BOOL supportRotation;
 @property (strong, nonatomic) HXPhotoManager *manager;

@@ -16,7 +16,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditTransitionType) {
 };
 @class HXPhotoModel;
 @interface HXPhotoEditTransition : NSObject<UIViewControllerAnimatedTransitioning>
-+ (instancetype)transitionWithType:(HXPhotoEditTransitionType)type model:(HXPhotoModel *)model ;
++ (instancetype)transitionWithType:(HXPhotoEditTransitionType)type model:(HXPhotoModel *)model;
 @end
 
 NS_ASSUME_NONNULL_END

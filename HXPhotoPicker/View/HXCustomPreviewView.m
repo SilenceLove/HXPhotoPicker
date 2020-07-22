@@ -8,7 +8,7 @@
 
 #import "HXCustomPreviewView.h"
 #import "UIImage+HXExtension.h"
-#define BOX_BOUNDS CGRectMake(0.0f, 0.0f, 100, 100)
+#define HXCustomCameraViewBOX_BOUNDS CGRectMake(0.0f, 0.0f, 100, 100)
 
 @interface HXCustomPreviewView ()<UIGestureRecognizerDelegate, CAAnimationDelegate>
 @property (strong, nonatomic) UIImageView *focusBox;
@@ -49,7 +49,7 @@
     
     [self addGestureRecognizer:_singleTapRecognizer];
     
-    _focusBox = [[UIImageView alloc] initWithFrame:BOX_BOUNDS];
+    _focusBox = [[UIImageView alloc] initWithFrame:HXCustomCameraViewBOX_BOUNDS];
     _focusBox.hidden = YES;
     _focusBox.image = [[UIImage hx_imageNamed:@"hx_camera_focusbox"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self addSubview:_focusBox];
@@ -113,6 +113,14 @@
         self.beginGestureScale = self.effectiveScale;
     }
     return YES;
+}
+
+- (void)firstFocusing {
+    CGPoint point = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
+    [self runBoxAnimationOnView:self.focusBox point:point];
+    if ([self.delegate respondsToSelector:@selector(tappedToFocusAtPoint:)]) {
+        [self.delegate tappedToFocusAtPoint:[self captureDevicePointForPoint:point]];
+    }
 }
 - (void)handleSingleTap:(UIGestureRecognizer *)recognizer {
     CGPoint point = [recognizer locationInView:self];

@@ -9,8 +9,12 @@
 #import "HXAlbumlistView.h"
 #import "HXPhotoManager.h"
 #import "HXPhotoTools.h"
+#import "UIButton+HXExtension.h"
 
 @interface HXAlbumlistView ()<UITableViewDataSource, UITableViewDelegate>
+@property (assign, nonatomic) BOOL cellCanSetModel;
+@property (copy, nonatomic) NSArray *tableVisibleCells;
+@property (strong, nonatomic) NSMutableArray *deleteCellArray;
 @end
 
 @implementation HXAlbumlistView
@@ -19,7 +23,7 @@
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-            self.tableView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
+            self.tableView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : self.manager.configuration.popupTableViewBgColor;
         }
     }
 #endif
@@ -27,8 +31,9 @@
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {
+        self.cellCanSetModel = YES;
         self.manager = manager;
-        self.tableView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
+        self.tableView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : self.manager.configuration.popupTableViewBgColor;
         [self addSubview:self.tableView];
     }
     return self;
@@ -54,8 +59,67 @@
         }
         i++;
     }
+    self.cellCanSetModel = NO;
     [self.tableView reloadData];
     [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectModel.index inSection:0] animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+    dispatch_async(dispatch_get_main_queue(),^{
+        self.deleteCellArray = [NSMutableArray array];
+        self.tableVisibleCells = [self.tableView.visibleCells sortedArrayUsingComparator:^NSComparisonResult(HXAlbumlistViewCell *obj1, HXAlbumlistViewCell *obj2) {
+            // visibleCells 这个数组的数据顺序是乱的，所以在获取image之前先将可见cell排序
+            NSIndexPath *indexPath1 = [self.tableView indexPathForCell:obj1];
+            NSIndexPath *indexPath2 = [self.tableView indexPathForCell:obj2];
+            if (indexPath1.item > indexPath2.item) {
+                return NSOrderedDescending;
+            }else {
+                return NSOrderedAscending;
+            }
+        }];
+        [self cellSetModelData:self.tableVisibleCells.firstObject];
+    });
+}
+
+- (void)cellSetModelData:(HXAlbumlistViewCell *)cell {
+    if ([cell isKindOfClass:[HXAlbumlistViewCell class]]) {
+        HXWeakSelf
+        cell.alpha = 0;
+        [cell setAlbumImageWithCompletion:^(NSInteger count, HXAlbumlistViewCell *myCell) {
+            [UIView animateWithDuration:0.125 animations:^{
+                myCell.alpha = 1;
+            }];
+            if (count <= 0) {
+                if ([weakSelf.albumModelArray containsObject:myCell.model]) {
+                    [weakSelf.albumModelArray removeObject:myCell.model];
+                    [weakSelf.deleteCellArray addObject:[weakSelf.tableView indexPathForCell:myCell]];
+                }
+            }
+            NSInteger cellCount = weakSelf.tableVisibleCells.count;
+            NSInteger index = [weakSelf.tableVisibleCells indexOfObject:myCell];
+            if (index < cellCount - 1) {
+                [weakSelf cellSetModelData:weakSelf.tableVisibleCells[index + 1]];
+            }else {
+                // 可见cell已全部设置
+                weakSelf.cellCanSetModel = YES;
+                weakSelf.tableVisibleCells = nil;
+                if (weakSelf.deleteCellArray.count) {
+                    [weakSelf.tableView deleteRowsAtIndexPaths:weakSelf.deleteCellArray withRowAnimation:UITableViewRowAnimationFade];
+                }
+                weakSelf.deleteCellArray = nil;
+            }
+        }];
+    }else {
+        NSInteger count = self.tableVisibleCells.count;
+        NSInteger index = [self.tableVisibleCells indexOfObject:cell];
+        if (index < count - 1) {
+            [self cellSetModelData:self.tableVisibleCells[index + 1]];
+        }else {
+            self.cellCanSetModel = YES;
+            self.tableVisibleCells = nil;
+            if (self.deleteCellArray.count) {
+                [self.tableView deleteRowsAtIndexPaths:self.deleteCellArray withRowAnimation:UITableViewRowAnimationFade];
+            }
+            self.deleteCellArray = nil;
+        }
+    }
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.albumModelArray.count;
@@ -65,17 +129,20 @@
     cell.model = self.albumModelArray[indexPath.row];
     cell.manager = self.manager;
     HXWeakSelf
-    cell.getResultCompleteBlock = ^(NSInteger count, HXAlbumlistViewCell *myCell) {
-        if (count <= 0) {
-            if ([weakSelf.albumModelArray containsObject:myCell.model]) {
-                NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
-                if (myIndexPath) {
-                    [weakSelf.albumModelArray removeObject:myCell.model];
-                    [weakSelf.tableView deleteRowsAtIndexPaths:@[myIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+    if (self.cellCanSetModel) {
+        [cell setAlbumImageWithCompletion:^(NSInteger count, HXAlbumlistViewCell *myCell) {
+            if (count <= 0) {
+                if ([weakSelf.albumModelArray containsObject:myCell.model]) {
+                    NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
+                    if (myIndexPath) {
+                        [weakSelf.albumModelArray removeObject:myCell.model];
+                        [weakSelf.tableView deleteRowsAtIndexPaths:@[myIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+                    }
                 }
             }
-        }
-    };
+        }];
+    }
+        
     return cell;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -125,6 +192,7 @@
 @property (assign, nonatomic) PHImageRequestID requestId;
 @property (strong, nonatomic) UIView *lineView;
 @property (strong, nonatomic) UIView *selectedBgView;
+@property (strong, nonatomic) UIImageView *selectIcon;
 @end
 
 @implementation HXAlbumlistViewCell
@@ -149,36 +217,58 @@
     }
     return self;
 }
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    [super setHighlighted:highlighted animated:animated];
+    UIColor *selectedBgColor;
+    if (self.manager.configuration.popupTableViewCellSelectColor) {
+        selectedBgColor = self.manager.configuration.popupTableViewCellSelectColor;
+    }else {
+        selectedBgColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1.f];
+    }
+    self.selectedBgView.backgroundColor = highlighted ? (self.manager.configuration.popupTableViewCellHighlightedColor ?: selectedBgColor) : selectedBgColor;
+}
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
-    self.albumNameLb.text = model.albumName;
-    if (!model.result && model.collection) {
-        HXWeakSelf
-        [model getResultWithCompletion:^(HXAlbumModel *albumModel) {
+    self.albumNameLb.text = self.model.albumName;
+}
+- (void)setAlbumImageWithCompletion:(void (^)(NSInteger, HXAlbumlistViewCell *))completion {
+    HXWeakSelf
+    if (!self.model.result && self.model.collection) {
+        [self.model getResultWithCompletion:^(HXAlbumModel *albumModel) {
             if (albumModel == weakSelf.model) {
-                [weakSelf getAlbumImage];
+                [weakSelf getAlbumImageWithCompletion:^(UIImage *image, PHAsset *asset) {
+                    NSInteger photoCount = weakSelf.model.result.count;
+                    if (completion) {
+                        completion(photoCount + weakSelf.model.cameraCount, weakSelf);
+                    }
+                }];
             }
-        }]; 
+        }];
     }else {
-        [self getAlbumImage];
+        [self getAlbumImageWithCompletion:^(UIImage *image, PHAsset *asset) {
+            NSInteger photoCount = weakSelf.model.result.count;
+            if (completion) {
+                completion(photoCount + weakSelf.model.cameraCount, weakSelf);
+            }
+        }];
     }
-    if (!model.result || !model.count) {
-        self.coverView.image = model.tempImage ?: [UIImage hx_imageNamed:@"hx_yundian_tupian"];
+    if (!self.model.result || !self.model.count) {
+        self.coverView.image = self.model.tempImage ?: [UIImage hx_imageNamed:@"hx_yundian_tupian"];
     }
 }
-- (void)getAlbumImage {
+- (void)getAlbumImageWithCompletion:(void (^)(UIImage *image, PHAsset *asset))completion {
     NSInteger photoCount = self.model.result.count;
     if (!self.model.asset) {
         self.model.asset = self.model.result.lastObject;
-    }
-    if (self.getResultCompleteBlock) {
-        self.getResultCompleteBlock(photoCount + self.model.cameraCount, self);
     }
     self.countLb.text = @(photoCount + self.model.cameraCount).stringValue;
     HXWeakSelf
     self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset size:CGSizeMake(self.hx_h * 1.6, self.hx_h * 1.6) completion:^(UIImage *image, PHAsset *asset) {
         if (asset == weakSelf.model.asset) {
             weakSelf.coverView.image = image;
+        }
+        if (completion) {
+            completion(image, asset);
         }
     }]; 
 }
@@ -190,6 +280,9 @@
         self.backgroundColor = [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1];
         self.albumNameLb.textColor = [UIColor whiteColor];
         self.countLb.textColor = [UIColor whiteColor];
+        if (manager.configuration.popupTableViewCellSelectIconColor) {
+            self.selectIcon.tintColor = [UIColor whiteColor];
+        }
     }else {
         if (manager.configuration.popupTableViewCellSelectColor) {
             self.selectedBgView.backgroundColor = manager.configuration.popupTableViewCellSelectColor;
@@ -216,6 +309,11 @@
         }else {
             self.countLb.textColor = [UIColor blackColor];
         }
+        if (manager.configuration.popupTableViewCellSelectIconColor) {
+            self.selectIcon.tintColor = manager.configuration.popupTableViewCellSelectIconColor;
+        }else {
+            self.selectIcon.hidden = YES;;
+        }
     }
     if (manager.configuration.popupTableViewCellPhotoCountFont) {
         self.countLb.font = manager.configuration.popupTableViewCellPhotoCountFont;
@@ -227,6 +325,7 @@
     }else {
         self.albumNameLb.font = [UIFont systemFontOfSize:14];
     }
+    
 }
 - (void)cancelRequest {
     if (self.requestId) {
@@ -237,6 +336,10 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.selectedBgView.frame = self.bounds;
+    
+    self.selectIcon.hx_x = self.hx_w - 20 - self.selectIcon.hx_w;
+    self.selectIcon.hx_centerY = self.hx_h / 2;
+    
     self.coverView.frame = CGRectMake(12, 5, self.hx_h - 10, self.hx_h - 10);
     self.albumNameLb.hx_x = CGRectGetMaxX(self.coverView.frame) + 12;
     self.albumNameLb.hx_w = self.hx_w - self.albumNameLb.hx_x - 10;
@@ -254,6 +357,7 @@
 - (UIView *)selectedBgView {
     if (!_selectedBgView) {
         _selectedBgView = [[UIView alloc] init];
+        [_selectedBgView addSubview:self.selectIcon];
     }
     return _selectedBgView;
 }
@@ -282,6 +386,14 @@
         _lineView = [[UIView alloc] init];
     }
     return _lineView;
+}
+- (UIImageView *)selectIcon {
+    if (!_selectIcon) {
+        UIImage *image = [[UIImage hx_imageNamed:@"hx_photo_edit_clip_confirm"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        _selectIcon = [[UIImageView alloc] initWithImage:image];
+        _selectIcon.hx_size = CGSizeMake(image.size.width * 0.75, image.size.height * 0.75);;
+    }
+    return _selectIcon;
 }
 @end
 
@@ -344,7 +456,11 @@
         textWidth = [UIScreen mainScreen].bounds.size.width - 120;
     }
     self.titleLb.hx_w = textWidth;
-    self.frame = CGRectMake(0, 0, self.titleLb.hx_w + (3 + self.arrowIcon.hx_w) * 2, 30);
+    CGFloat width = self.titleLb.hx_w + (3 + self.arrowIcon.hx_w) * 2;
+    if (width < 200.f) {
+        width = 200.f;
+    }
+    self.frame = CGRectMake(0, 0, width, 30);
 } 
 - (BOOL)selected {
     return self.button.selected;

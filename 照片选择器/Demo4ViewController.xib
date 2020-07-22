@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,21 +20,21 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ay6-X6-g7F">
-                    <rect key="frame" x="164.5" y="95" width="46" height="30"/>
+                    <rect key="frame" x="164.5" y="88" width="46" height="30"/>
                     <state key="normal" title="选照片"/>
                     <connections>
                         <action selector="selectedPhoto:" destination="-1" eventType="touchUpInside" id="bOg-Rj-7wJ"/>
                     </connections>
                 </button>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jyR-QO-wgP">
-                    <rect key="frame" x="87.5" y="457" width="200" height="200"/>
+                    <rect key="frame" x="37.5" y="133" width="300" height="300"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="200" id="8i0-Kw-r8X"/>
-                        <constraint firstAttribute="width" constant="200" id="VXF-Cs-aPg"/>
+                        <constraint firstAttribute="width" constant="300" id="WRF-wt-VHe"/>
+                        <constraint firstAttribute="height" constant="300" id="XAK-ku-lwZ"/>
                     </constraints>
                 </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EsM-mz-BHG" customClass="HXPreviewVideoView">
-                    <rect key="frame" x="12" y="170" width="351" height="200"/>
+                    <rect key="frame" x="12" y="443" width="351" height="200"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="200" id="yFu-1R-oBe"/>
@@ -43,15 +43,15 @@
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="ay6-X6-g7F" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="95" id="4sf-O9-gY6"/>
+                <constraint firstItem="ay6-X6-g7F" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="88" id="4sf-O9-gY6"/>
                 <constraint firstItem="EsM-mz-BHG" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="12" id="99c-Af-s9v"/>
-                <constraint firstItem="EsM-mz-BHG" firstAttribute="top" secondItem="ay6-X6-g7F" secondAttribute="bottom" constant="45" id="PJD-kV-BG9"/>
+                <constraint firstItem="jyR-QO-wgP" firstAttribute="top" secondItem="ay6-X6-g7F" secondAttribute="bottom" constant="15" id="Peg-gr-49w"/>
+                <constraint firstItem="EsM-mz-BHG" firstAttribute="top" secondItem="jyR-QO-wgP" secondAttribute="bottom" constant="10" id="RbG-wg-bpO"/>
                 <constraint firstAttribute="trailing" secondItem="EsM-mz-BHG" secondAttribute="trailing" constant="12" id="Xlq-V6-RnS"/>
                 <constraint firstItem="jyR-QO-wgP" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="lDL-jx-CVq"/>
                 <constraint firstItem="ay6-X6-g7F" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="smf-oY-YOX"/>
-                <constraint firstAttribute="bottom" secondItem="jyR-QO-wgP" secondAttribute="bottom" constant="10" id="xUT-gW-1jo"/>
             </constraints>
-            <point key="canvasLocation" x="130" y="153"/>
+            <point key="canvasLocation" x="128.80000000000001" y="152.47376311844079"/>
         </view>
     </objects>
 </document>

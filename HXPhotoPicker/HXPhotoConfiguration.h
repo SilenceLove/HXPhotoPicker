@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "HXPhotoBottomConfiguration.h"
+#import "HXPhotoEditConfiguration.h"
 
 
 /// 当使用了自定义相机类型时会过滤掉内部按 HXPhotoManagerSelectedType 来设置的逻辑，
@@ -50,6 +50,11 @@ typedef NS_ENUM(NSUInteger, HXVideoAutoPlayType) {
     HXVideoAutoPlayTypeAll         //!< 蜂窝移动和wifi网络下自动播放
 };
 
+typedef NS_ENUM(NSUInteger, HXConfigurationType) {
+    HXConfigurationTypeWXChat,  //!< 微信聊天
+    HXConfigurationTypeWXMoment //!< 微信朋友圈
+};
+
 @class
 HXPhotoBottomView,
 HXPhotoPreviewBottomView,
@@ -59,12 +64,26 @@ HXPhotoPreviewViewController;
 
 @interface HXPhotoConfiguration : NSObject
 
+/// 配置类型
+/// 一键配置UI和选择逻辑
+@property (assign, nonatomic) HXConfigurationType type;
+
+/// 照片编辑配置
+@property (strong, nonatomic) HXPhotoEditConfiguration *photoEditConfigur;
+
+/// 相机界面是否开启定位 默认 YES
+@property (assign, nonatomic) BOOL cameraCanLocation;
+
+/// 是否使用仿微信的照片编辑 默认YES
+@property (assign, nonatomic) BOOL useWxPhotoEdit;
+
+/// 选择网络视频时超出限制时长时是否裁剪 默认NO
+@property (assign, nonatomic) BOOL selectNetworkVideoCanEdit;
+
 /// 相机拍照点击完成之后是否跳转编辑界面进行编辑
 @property (assign, nonatomic) BOOL cameraPhotoJumpEdit;
 
-/// 相机录制点击完成之后是否跳转编辑界面进行编辑
-@property (assign, nonatomic) BOOL cameraVideoJumpEdit;
-
+/// 旧版照片编辑才有效
 /// 照片编辑时底部比例选项
 /// 默认: @[@{@"原始值" : @"{0, 0}"},
 ///        @{@"正方形" : @"{1, 1}"},
@@ -75,17 +94,19 @@ HXPhotoPreviewViewController;
 @property (copy, nonatomic) NSArray *photoEditCustomRatios;
 
 /// 编辑后的照片/视频是否添加到系统相册中
+/// 只对旧版编辑有效
 /// 默认为NO
 @property (assign, nonatomic) BOOL editAssetSaveSystemAblum;
 
 /// 预览视频时是否先下载视频再播放
 /// 只有当项目有AFNetworking网络框架的时候才有用
+/// pod导入时为 HXPhotoPicker/SDWebImage_AF 或 HXPhotoPicker/YYWebImage_AF
 @property (assign, nonatomic) BOOL downloadNetworkVideo;
 
 /// 预览视频时是否自动播放
 @property (assign, nonatomic) HXVideoAutoPlayType videoAutoPlayType;
 
-/// 相机聚焦框颜色
+/// 相机聚焦框、完成按钮、录制进度的颜色
 @property (strong, nonatomic) UIColor *cameraFocusBoxColor;
 
 /// 选择视频时超出限制时长是否自动跳转编辑界面
@@ -129,6 +150,9 @@ HXPhotoPreviewViewController;
 
 /// 跳转预览界面时动画起始的view，使用方法参考demo12里的外部预览功能
 @property (copy, nonatomic) UIView * (^customPreviewFromView)(NSInteger currentIndex);
+
+/// 跳转预览界面时动画起始的frame
+@property (copy, nonatomic) CGRect (^customPreviewFromRect)(NSInteger currentIndex);
 
 /// 跳转预览界面时展现动画的image，使用方法参考demo12里的外部预览功能
 @property (copy, nonatomic) UIImage * (^customPreviewFromImage)(NSInteger currentIndex);
@@ -210,7 +234,7 @@ HXPhotoPreviewViewController;
 /// 只针对 照片、视频不能同时选并且视频只能选择1个的时候隐藏掉视频cell右上角的选择按钮
 @property (assign, nonatomic) BOOL specialModeNeedHideVideoSelectBtn;
 
-/// 视频是否可以编辑   default NO
+/// 视频是否可以编辑   default YES
 @property (assign, nonatomic) BOOL videoCanEdit;
 
 /// 是否替换照片编辑界面   default NO
@@ -246,12 +270,15 @@ HXPhotoPreviewViewController;
 /// 手势松开时返回的动画时长 default 0.35f
 @property (assign, nonatomic) NSTimeInterval popInteractiveTransitionDuration;
 
+/// 旧版照片编辑才有效
 /// 是否可移动的裁剪框
 @property (assign, nonatomic) BOOL movableCropBox;
 
+/// 旧版照片编辑才有效
 /// 可移动的裁剪框是否可以编辑大小
 @property (assign, nonatomic) BOOL movableCropBoxEditSize;
 
+/// 旧版照片编辑才有效
 /// 可移动裁剪框的比例 (w,h) 一定要是宽比高哦!!!
 /// 当 movableCropBox = YES && movableCropBoxEditSize = YES 如果不设置比例即可自由编辑大小
 @property (assign, nonatomic) CGPoint movableCropBoxCustomRatio;
@@ -278,6 +305,11 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) CGFloat popupTableViewHeight;
 
 /**
+ 弹窗方式的相册列表的背景颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewBgColor;
+
+/**
  弹窗方式的相册列表横屏时的高度
  */
 @property (assign, nonatomic) CGFloat popupTableViewHorizontalHeight;
@@ -286,6 +318,16 @@ HXPhotoPreviewViewController;
  弹窗方式的相册列表Cell选中的颜色
  */
 @property (strong, nonatomic) UIColor *popupTableViewCellSelectColor;
+
+/**
+ 弹窗方式的相册列表Cell选中时的图标颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewCellSelectIconColor;
+
+/**
+ 弹窗方式的相册列表Cell高亮的颜色
+ */
+@property (strong, nonatomic) UIColor *popupTableViewCellHighlightedColor;
 
 /**
  弹窗方式的相册列表Cell底部线的颜色
@@ -358,6 +400,9 @@ HXPhotoPreviewViewController;
  */
 @property (strong, nonatomic) UIColor *selectedTitleColor;
 
+/// 预览界面选择按钮的背景颜色
+@property (strong, nonatomic) UIColor *previewSelectedBtnBgColor;
+
 /**
  sectionHeader悬浮时的标题颜色 ios9以上才有效果
  */
@@ -383,10 +428,37 @@ HXPhotoPreviewViewController;
  */
 @property (strong, nonatomic) UIColor *navBarBackgroudColor;
 
+/// 导航栏样式
+@property(nonatomic,assign) UIBarStyle navBarStyle;
+
 /**
  导航栏背景图片
  */
 @property (strong, nonatomic) UIImage *navBarBackgroundImage;
+
+/// 照片列表背景颜色
+@property (strong, nonatomic) UIColor *photoListViewBgColor;
+
+/// 照片列表底部照片数量文字颜色
+@property (strong, nonatomic) UIColor *photoListBottomPhotoCountTextColor;
+
+/// 预览照片界面背景颜色
+@property (strong, nonatomic) UIColor *previewPhotoViewBgColor;
+
+/// 相册列表背景颜色
+@property (strong, nonatomic) UIColor *albumListViewBgColor;
+
+/// 相册列表cell背景颜色
+@property (strong, nonatomic) UIColor *albumListViewCellBgColor;
+
+/// 相册列表cell上文字颜色
+@property (strong, nonatomic) UIColor *albumListViewCellTextColor;
+
+/// 相册列表cell选中颜色
+@property (strong, nonatomic) UIColor *albumListViewCellSelectBgColor;
+
+/// 相册列表cell底部线颜色
+@property (strong, nonatomic) UIColor *albumListViewCellLineColor;
 
 /**
  headerSection 半透明毛玻璃效果  默认YES  ios9以上才有效果
@@ -402,6 +474,15 @@ HXPhotoPreviewViewController;
 /// 底部视图的背景颜色
 @property (strong, nonatomic) UIColor *bottomViewBgColor;
 
+/// 底部视图的样式
+@property(nonatomic,assign) UIBarStyle bottomViewBarStyle;
+
+/// 底部完成按钮背景颜色
+@property (strong, nonatomic) UIColor *bottomDoneBtnBgColor;
+
+/// 底部完成按钮文字颜色
+@property (strong, nonatomic) UIColor *bottomDoneBtnTitleColor;
+
 /// 底部视图是否半透明效果 默认YES
 @property (assign, nonatomic) BOOL bottomViewTranslucent;
 
@@ -414,6 +495,9 @@ HXPhotoPreviewViewController;
  - 改变主题颜色后建议也改下原图按钮的图标
  */
 @property (copy, nonatomic) NSString *originalNormalImageName;
+
+/// 原图按钮图片的tintColor,设置这个颜色可改变图片的颜色
+@property (strong, nonatomic) UIColor *originalBtnImageTintColor;
 
 /**
  原图按钮选中状态下的按钮图标名

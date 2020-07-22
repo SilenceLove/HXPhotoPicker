@@ -29,7 +29,7 @@
 @property (strong, nonatomic) UIToolbar *tipView;
 @property (strong, nonatomic) UILabel *tipLb;
 - (void)changeTipViewState:(HXPhotoModel *)model;
-
+- (void)reloadData;
 - (void)insertModel:(HXPhotoModel *)model;
 - (void)deleteModel:(HXPhotoModel *)model;
 - (instancetype)initWithFrame:(CGRect)frame modelArray:(NSArray *)modelArray manager:(HXPhotoManager *)manager;

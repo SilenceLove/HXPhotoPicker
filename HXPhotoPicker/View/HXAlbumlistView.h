@@ -23,12 +23,12 @@
 @interface HXAlbumlistViewCell : UITableViewCell
 @property (strong, nonatomic) HXAlbumModel *model;
 @property (strong, nonatomic) HXPhotoManager *manager;
-@property (copy, nonatomic) void (^getResultCompleteBlock)(NSInteger count, HXAlbumlistViewCell *myCell);
+- (void)setAlbumImageWithCompletion:(void (^)(NSInteger count, HXAlbumlistViewCell *myCell))completion;
 - (void)cancelRequest ;
 @end
 
 @interface HXAlbumTitleView : UIView
-@property (strong, nonatomic) HXPhotoManager *manager;
+@property (weak, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXAlbumModel *model;
 @property (assign, nonatomic, readonly) BOOL selected;
 @property (copy, nonatomic) void (^didTitleViewBlock)(BOOL selected);

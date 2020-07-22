@@ -834,6 +834,7 @@
     if (_selectedAssetList) {
         if ([_selectedAssetList containsObject:asset]) {
             HXPhotoModel *selectModel = [self.tempSelectedModelList objectAtIndex:[_selectedAssetList indexOfObject:asset]];
+            photoModel.photoEdit = selectModel.photoEdit;
             if (selectModel.subType == HXPhotoModelMediaSubTypePhoto) {
                 if (selectModel.type == HXPhotoModelMediaTypeCameraPhoto) {
                     [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:selectModel] withObject:photoModel];
@@ -1327,7 +1328,13 @@
         }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
             if (self.configuration.selectVideoBeyondTheLimitTimeAutoEdit &&
                 self.configuration.videoCanEdit) {
-                return @"selectVideoBeyondTheLimitTimeAutoEdit";
+                if (model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                    if (self.configuration.selectNetworkVideoCanEdit) {
+                        return @"selectVideoBeyondTheLimitTimeAutoEdit";
+                    }
+                }else {
+                    return @"selectVideoBeyondTheLimitTimeAutoEdit";
+                }
             }else {
                 return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.configuration.videoMaximumSelectDuration];
             }
@@ -2172,7 +2179,6 @@
     self.selectedAssetList = nil;
     self.tempSelectedModelList = nil;
     
-    [[HXPhotoCommon photoCommon] saveCamerImage];
     if (HXShowLog) NSSLog(@"dealloc");
 }
 @end

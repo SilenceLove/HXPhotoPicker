@@ -10,7 +10,7 @@
 #import <Photos/Photos.h>
 
 @class HXPhotoManager;
-@class HXPhotoModel;
+@class HXPhotoModel, HXPhotoEdit;
 
 typedef void (^ HXModelStartRequestICloud)(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model);
 typedef void (^ HXModelProgressHandler)(double progress, HXPhotoModel * _Nullable model);
@@ -194,6 +194,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 @property (assign, nonatomic) NSUInteger assetByte;
 @property (assign, nonatomic) BOOL requestAssetByte;
 
+/// 编辑的数据
+/// 传入之前的编辑数据可以在原有基础上继续编辑
+@property (strong, nonatomic) HXPhotoEdit * _Nullable photoEdit;
 
 /**  临时图片 */
 @property (strong, nonatomic) UIImage * _Nullable tempImage;
@@ -274,7 +277,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock _Nullable)completion;
 - (PHImageRequestID)requestThumbImageWithSize:(CGSize)size
                                    completion:(HXModelImageSuccessBlock _Nullable)completion;
-- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock _Nullable )completion;
+- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size
+                                              completion:(HXModelImageSuccessBlock _Nullable )completion;
 
 /**
  请求获取预览大图，此方法只会回调一次，如果为视频的话就是视频封面

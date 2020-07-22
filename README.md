@@ -51,7 +51,7 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 2.4.5'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 3.0.0'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - ```pod 'HXPhotoPicker' 不依赖第三方、'HXPhotoPicker/SDWebImage' 依赖SD v5.0、'HXPhotoPicker/YYWebImage' 依赖YY v1.05```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 使用前导入头文件 "HXPhotoPicker.h"
@@ -59,7 +59,7 @@
 ## <a id="要求"></a> 三.  要求 - Requirements
 
 - iOS8及以上系统可使用. ARC环境. - iOS 8 or later. Requires ARC
-- 在Xcode8环境下将项目运行在iOS11的设备/模拟器中，访问相册和相机需要配置四个info.plist文件
+- 访问相册和相机需要配置四个info.plist文件
 - Privacy - Photo Library Usage Description 和 Privacy - Camera Usage Description 以及 Privacy - Microphone Usage Description
 - Privacy - Location When In Use Usage Description 使用相机拍照时会获取位置信息
 - 相机拍照功能请使用真机调试
@@ -78,6 +78,14 @@ for (HXPhotoModel *model in self.selectList) {
     // 先判断资源类型
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
         // 当前为图片
+        if (model.photoEdit) {
+            // 如果有编辑数据，则说明这张图篇被编辑过了
+            // 需要这样才能获取到编辑之后的图片
+            model.photoEdit.editPreviewImage;
+            // 编辑之后的图片数据
+            model.photoEdit.editPreviewData;
+            return;
+        }
         // 再判断具体类型
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
             // 到这里就说明这张图片不是手机相册里的图片，可能是本地的也可能是网络图片
@@ -627,6 +635,21 @@ HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:[UIImage imageNamed
     // 取消
 }];
 
+// 单独使用仿微信编辑功能
+[self hx_presentWxPhotoEditViewControllerWithConfiguration:self.manager.configuration.photoEditConfigur photoModel:photoModel delegate:nil finish:^(HXPhotoEdit * _Nonnull photoEdit, HXPhotoModel * _Nonnull photoModel, HX_PhotoEditViewController * _Nonnull viewController) {
+    if (photoEdit) {
+        // 有编辑过
+        weakSelf.imageView.image = photoEdit.editPreviewImage;
+    }else {
+        // 为空则未进行编辑
+        weakSelf.imageView.image = photoModel.thumbPhoto;
+    }
+    // 记录下当前编辑的记录，再次编辑可在上一次基础上进行编辑
+    weakSelf.photoEdit = photoEdit;
+} cancel:^(HX_PhotoEditViewController * _Nonnull viewController) {
+    // 取消
+}];
+
 // 单独使用视频编辑功能
 NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
 HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
@@ -649,13 +672,11 @@ frame.size.height 就是 HXPhotoView 的正确高度
 ```objc
 建议将 HXPhotoPicker.bundle 里的图片资源手动添加到项目的 Assets.xcassets 里
 ```
-#### 12.pod v2.4.2版本提示找不到SDWebImage或YYWebImage
-```objc
-v2.4.5 pod已依赖SDWebImage v5.0
-```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v3.0.0　-　添加仿微信图片编辑功能、相机界面更变为微信样式、添加一键配置微信样式
+...
 - v2.4.5　-　pod添加 SDWebImage/YYWebImage 子库，修复已知问题
 - v2.4.4　-　修复了一些bug（HXPhotoView使用约束布局的问题等...），添加Demo15显示底部弹窗视图的示例代码
 - v2.4.3　-　添加Demo14，HXPhotoView自定义Item大小的示例代码

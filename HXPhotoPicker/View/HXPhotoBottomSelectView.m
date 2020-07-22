@@ -15,10 +15,17 @@
 #import "UILabel+HXExtension.h"
 #import "NSBundle+HXPhotoPicker.h"
 #import "HXPreviewVideoView.h"
-
-#define Hx_ViewHeight 55.f
+#import "UIImage+HXExtension.h"
+#import "HXAlbumlistView.h"
 
 @implementation HXPhotoBottomViewModel
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.canSelected = YES;
+    }
+    return self;
+}
 - (UIColor *)backgroundColor {
     if (!_backgroundColor) {
         _backgroundColor = [UIColor whiteColor];
@@ -45,7 +52,7 @@
 }
 - (UIColor *)selectColor {
     if (!_selectColor) {
-        _selectColor = [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
+        _selectColor = [UIColor hx_colorWithHexStr:@"#E5E5E5"];
     }
     return _selectColor;
 }
@@ -61,12 +68,18 @@
     }
     return _subTitleFont;
 }
+- (CGFloat)cellHeight {
+    if (_cellHeight <= 0) {
+        _cellHeight = 55.f;
+    }
+    return _cellHeight;
+}
 @end
 
 @interface HXPhotoBottomSelectView ()<UITableViewDataSource, UITableViewDelegate, UIGestureRecognizerDelegate>
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) UIView *footerCancelView;
-@property (strong, nonatomic) UIButton *cancelBtn;
+@property (strong, nonatomic) HXAlbumTitleButton *cancelBtn;
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *contentView;
 @property (strong, nonatomic) UIView *topView;
@@ -81,6 +94,7 @@
 @property (assign, nonatomic) BOOL canPanGesture;
 @property (assign, nonatomic) BOOL tableViewDidScroll;
 @property (strong, nonatomic) HXPhotoBottomSelectViewCell *currentSelectCell;
+@property (assign, nonatomic) BOOL shouldHidden;
 @end
 
 @implementation HXPhotoBottomSelectView
@@ -140,9 +154,10 @@
         self.tableViewDidScroll = NO;
         self.panPointY = 0;
         self.locationPointY = 0;
-        
+        self.shouldHidden = NO;
         self.panGesture = [[HXPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureReconClick:)];
         self.panGesture.delegate = self;
+        self.panGesture.cancelsTouchesInView = NO;
         [self.contentView addGestureRecognizer:self.panGesture];
         
         [self addSubview:self.bgView];
@@ -156,13 +171,25 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return YES;
 }
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if ([touch.view isKindOfClass:[UIButton class]]) {
+        return NO;
+    }
+    return YES;
+}
 - (void)panGestureReconClick:(UIPanGestureRecognizer *)panGesture {
     CGPoint point = [panGesture translationInView:self.contentView];
+    if (self.shouldHidden) {
+        return;
+    }
     if (panGesture.state == UIGestureRecognizerStateBegan) {
         self.tableViewDidScroll = NO;
         self.contentView.hx_centerY = self.centerY + point.y;
         CGPoint locationPoint = [panGesture locationInView:self.contentView];
         self.locationPointY = locationPoint.y;
+        if (self.currentSelectCell) {
+            self.currentSelectCell.showSelectBgView = NO;
+        }
         if (locationPoint.y >= 15) {
             CGPoint convertPoint = [self.tableView convertPoint:locationPoint fromView:self.contentView];
             NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:convertPoint];
@@ -179,8 +206,13 @@
             }
         }
         if (self.currentSelectCell) {
-            self.currentSelectCell.showSelectBgView = NO;
-            self.currentSelectCell = nil;
+            CGPoint locationPoint = [panGesture locationInView:self.contentView];
+            CGPoint convertPoint = [self.tableView convertPoint:locationPoint fromView:self.contentView];
+            if (CGRectContainsPoint(self.currentSelectCell.frame, convertPoint)) {
+                self.currentSelectCell.showSelectBgView = YES;
+            }else {
+                self.currentSelectCell.showSelectBgView = NO;
+            }
         }
         if (self.tableView.contentOffset.y > 0 && !self.canPanGesture) {
             CGFloat y = self.hx_h - self.contentView.hx_h;
@@ -268,9 +300,18 @@
     [self.cancelBtn setTitle:cancelTitle forState:UIControlStateNormal];
 }
 - (void)recalculateHeight {
-    CGFloat height = self.modelArray.count * Hx_ViewHeight + self.tableView.tableHeaderView.hx_h + self.tableView.tableFooterView.hx_h;
-    if (height > self.hx_h - Hx_ViewHeight * 4 - hxBottomMargin) {
-        height = self.hx_h - Hx_ViewHeight * 4 - hxBottomMargin;
+    CGFloat height = self.tableView.tableHeaderView.hx_h + self.tableView.tableFooterView.hx_h;
+    NSInteger index = 0;
+    CGFloat canScrollHeight = 0;
+    for (HXPhotoBottomViewModel *model in self.modelArray) {
+        height += model.cellHeight;
+        index++;
+        if (index <= 4) {
+            canScrollHeight += model.cellHeight;
+        }
+    }
+    if (height > self.hx_h - canScrollHeight - hxBottomMargin) {
+        height = self.hx_h - canScrollHeight - hxBottomMargin;
         self.tableView.scrollEnabled = YES;
     }
     self.tableView.hx_h = height;
@@ -298,7 +339,6 @@
             self.bgView.alpha = 0.f;
             self.contentView.hx_y = self.hx_h;
         }
-        [self.layer removeAllAnimations];
         [UIView animateWithDuration:0.25 animations:^{
             self.bgView.alpha = 1.f;
             self.contentView.hx_y = self.hx_h - self.contentViewHeight;
@@ -323,6 +363,7 @@
     }];
 }
 - (void)hideView {
+    self.shouldHidden = YES;
     self.showViewCompletion = NO;
     [UIView animateWithDuration:0.2 animations:^{
         self.bgView.alpha = 0.f;
@@ -371,16 +412,26 @@
         [_footerCancelView addSubview:self.cancelBtn];
         _footerCancelView.userInteractionEnabled = YES;
         [_footerCancelView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideView)]];
-        self.cancelBtn.frame = CGRectMake(0, 0, self.hx_w, 60.f);
+        self.cancelBtn.frame = CGRectMake(0, 0, self.hx_w, _footerCancelView.hx_h);
+        self.cancelBtn.titleEdgeInsets = UIEdgeInsetsMake(-hxBottomMargin, 0, 0, 0);
     }
     return _footerCancelView;
 }
 - (UIButton *)cancelBtn {
     if (!_cancelBtn) {
-        _cancelBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+        _cancelBtn = [HXAlbumTitleButton buttonWithType:UIButtonTypeCustom];
         [_cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"取消"] forState:UIControlStateNormal];
         _cancelBtn.titleLabel.font = [UIFont hx_helveticaNeueOfSize:17];;
         [_cancelBtn addTarget:self action:@selector(didCancelBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        HXWeakSelf
+        _cancelBtn.highlightedBlock = ^(BOOL highlighted) {
+            if (highlighted) {
+                BOOL isDark = weakSelf.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
+                [weakSelf.cancelBtn setBackgroundColor:isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : [UIColor hx_colorWithHexStr:@"#E5E5E5"]];
+            }else {
+                [weakSelf.cancelBtn setBackgroundColor:[UIColor clearColor]];
+            }
+        };
     }
     return _cancelBtn;
 }
@@ -406,6 +457,16 @@
     HXPhotoBottomSelectViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CellId"];
     cell.adaptiveDarkness = self.adaptiveDarkness;
     cell.model = self.modelArray[indexPath.row];
+    if (indexPath.row == self.modelArray.count - 1) {
+        cell.hiddenBottomLine = YES;
+    }else {
+        cell.hiddenBottomLine = NO;
+    }
+    if (self.showTopLineView) {
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }else {
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+    }
     HXWeakSelf
     cell.didCellBlock = ^(HXPhotoBottomSelectViewCell * _Nonnull myCell) {
         NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
@@ -418,12 +479,17 @@
     return self.modelArray.count;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return Hx_ViewHeight;
+    HXPhotoBottomViewModel *model = self.modelArray[indexPath.row];
+    return model.cellHeight;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    HXPhotoBottomViewModel *model = self.modelArray[indexPath.row];
+    if (!model.canSelected) {
+        return;
+    }
     if (self.selectCompletion) {
-        self.selectCompletion(indexPath.row, self.modelArray[indexPath.row]);
+        self.selectCompletion(indexPath.row, model);
     }
     [self hideView];
 }
@@ -457,6 +523,11 @@
     self.tableView.backgroundColor = isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : [UIColor whiteColor];
     self.footerCancelView.backgroundColor = isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
     [self.cancelBtn setTitleColor:isDark ? [UIColor whiteColor] : [UIColor colorWithRed:32.f/255.f green:32.f/255.f blue:32.f/255.f alpha:1] forState:UIControlStateNormal];
+    if (self.cancelBtn.isHighlighted) {
+        [self.cancelBtn setBackgroundColor:isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : [UIColor hx_colorWithHexStr:@"#E5E5E5"]];
+    }else {
+        [self.cancelBtn setBackgroundColor:[UIColor clearColor]];
+    }
     self.topView.backgroundColor = self.footerCancelView.backgroundColor;
     self.lineView.backgroundColor = isDark ? [UIColor whiteColor] : [UIColor lightGrayColor];
 }
@@ -470,22 +541,34 @@
 @property (strong, nonatomic) UILabel *titleLb;
 @property (strong, nonatomic) UILabel *subTitleLb;
 @property (strong, nonatomic) UIView *selectBgView;
+@property (strong, nonatomic) UIView *cellSelectBgView;
 @property (strong, nonatomic) UIView *lineView;
+@property (strong, nonatomic) UITapGestureRecognizer *tap;
 @end
 
 @implementation HXPhotoBottomSelectViewCell
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        self.selectedBackgroundView = self.cellSelectBgView;
         [self.contentView addSubview:self.selectBgView];
         [self.contentView addSubview:self.titleLb];
         [self.contentView addSubview:self.subTitleLb];
         [self.contentView addSubview:self.lineView];
         
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerClick:)];
-        [self addGestureRecognizer:tap];
+        self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerClick:)];
+        self.tap.enabled = NO;
+        [self addGestureRecognizer:self.tap];
     }
     return self;
+}
+- (void)setSelectionStyle:(UITableViewCellSelectionStyle)selectionStyle {
+    [super setSelectionStyle:selectionStyle];
+    if (selectionStyle == UITableViewCellSelectionStyleNone) {
+        self.tap.enabled = YES;
+    }else {
+        self.tap.enabled = NO;
+    }
 }
 - (void)setShowSelectBgView:(BOOL)showSelectBgView {
     _showSelectBgView = showSelectBgView;
@@ -498,7 +581,7 @@
 }
 - (void)setModel:(HXPhotoBottomViewModel *)model {
     _model = model;
-    
+    [self setSelectBgViewColor];
     self.titleLb.text = model.title;
     self.titleLb.font = model.titleFont;
     self.titleLb.numberOfLines = model.subTitle.length ? 1 : 0;
@@ -508,6 +591,10 @@
     self.subTitleLb.hidden = !model.subTitle.length;
     
     [self changeColor];
+}
+- (void)setHiddenBottomLine:(BOOL)hiddenBottomLine {
+    _hiddenBottomLine = hiddenBottomLine;
+    self.lineView.hidden = hiddenBottomLine;
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -537,6 +624,8 @@
         self.lineView.frame = CGRectMake(0, self.hx_h - 0.5f, self.hx_w, 0.5f);
     }
     self.selectBgView.frame = self.bounds;
+    self.cellSelectBgView.frame = self.bounds;
+    
 }
 - (UILabel *)titleLb {
     if (!_titleLb) {
@@ -562,17 +651,33 @@
     }
     return _selectBgView;
 }
+- (UIView *)cellSelectBgView {
+    if (!_cellSelectBgView) {
+        _cellSelectBgView = [[UIView alloc] init];
+    }
+    return _cellSelectBgView;
+}
+
 - (UIView *)lineView {
     if (!_lineView) {
         _lineView = [[UIView alloc] init];
     }
     return _lineView;
 }
+- (void)setSelectBgViewColor {
+    BOOL isDark = self.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
+    UIColor *selectBgColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : self.model.selectColor;
+    if (!self.model.canSelected) {
+        selectBgColor = [UIColor clearColor];
+    }
+    self.selectBgView.backgroundColor =selectBgColor ;
+    self.cellSelectBgView.backgroundColor = selectBgColor;
+}
 - (void)changeColor {
     BOOL isDark = self.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
     self.backgroundColor = isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : self.model.backgroundColor;
     self.titleLb.textColor = isDark ? [UIColor whiteColor] : self.model.titleColor;
-    self.selectBgView.backgroundColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : self.model.selectColor;
+    [self setSelectBgViewColor];
     self.lineView.backgroundColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : self.model.lineColor;
     self.subTitleLb.textColor = isDark ? [[UIColor whiteColor] colorWithAlphaComponent:0.8] : self.model.subTitleColor;
 }

@@ -12,7 +12,7 @@
 
 static const CGFloat kPhotoViewMargin = 12.0;
 
-@interface Demo2ViewController ()<HXPhotoViewDelegate,UIImagePickerControllerDelegate>
+@interface Demo2ViewController ()<HXPhotoViewDelegate,UIImagePickerControllerDelegate, HXPhotoViewCellCustomProtocol>
 
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (weak, nonatomic) HXPhotoView *photoView;
@@ -71,7 +71,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         [_bottomView setTitle:@"删除" forState:UIControlStateNormal];
         [_bottomView setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_bottomView setBackgroundColor:[UIColor redColor]];
-        _bottomView.frame = CGRectMake(0, self.view.hx_h - 50, self.view.hx_w, 50);
+        _bottomView.frame = CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin);
         _bottomView.alpha = 0;
     }
     return _bottomView;
@@ -80,37 +80,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
 //        _manager.configuration.openCamera = NO;
-        // 暗黑风格
-//        _manager.configuration.photoStyle = HXPhotoStyleDark;
-//        _manager.configuration.showOriginalBytesLoading = YES;
-//        _manager.configuration.cameraPhotoJumpEdit = YES;
-//        _manager.configuration.editAssetSaveSystemAblum = YES;
-//        _manager.configuration.cameraVideoJumpEdit = YES;
-        _manager.configuration.lookLivePhoto = YES;
-        _manager.configuration.photoMaxNum = 9;
-        _manager.configuration.videoMaxNum = 1;
-        _manager.configuration.maxNum = 9;
-        _manager.configuration.videoMaximumSelectDuration = 15;
-        _manager.configuration.videoMinimumSelectDuration = 0;
-        _manager.configuration.videoMaximumDuration = 15.f;
-        _manager.configuration.creationDateSort = NO;
-        _manager.configuration.saveSystemAblum = YES;
-        _manager.configuration.showOriginalBytes = YES;
-        _manager.configuration.selectTogether = NO;
-        _manager.configuration.requestImageAfterFinishingSelection = YES;
-        _manager.configuration.navBarBackgroudColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
-        _manager.configuration.themeColor = [UIColor whiteColor];
-        _manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
-        _manager.configuration.navigationTitleColor = [UIColor whiteColor];
-        _manager.configuration.cellSelectedBgColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
-        _manager.configuration.cellSelectedTitleColor = [UIColor whiteColor];
-        _manager.configuration.selectedTitleColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
-        _manager.configuration.navBarTranslucent = NO;
-        _manager.configuration.bottomViewBgColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
-        _manager.configuration.bottomViewTranslucent = NO;
-        _manager.configuration.selectVideoBeyondTheLimitTimeAutoEdit = YES;
+        _manager.configuration.type = HXConfigurationTypeWXChat;
+//        _manager.configuration.photoEditConfigur.onlyCliping = YES;
 //        _manager.configuration.navBarBackgroundImage = [UIImage imageNamed:@"APPCityPlayer_bannerGame"];
         HXWeakSelf
+//        _manager.configuration.showOriginalBytes = YES;
+//        _manager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_Original;
+//        _manager.configuration.photoEditConfigur.customAspectRatio = CGSizeMake(1, 1);
         _manager.configuration.photoListBottomView = ^(HXPhotoBottomView *bottomView) {
 //            bottomView.bgView.translucent = NO;
 //            if ([HXPhotoCommon photoCommon].isDark) {
@@ -233,8 +209,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.collectionView.contentInset = UIEdgeInsetsMake(0, kPhotoViewMargin, 0, kPhotoViewMargin);
 //    photoView.spacing = kPhotoViewMargin;
     photoView.delegate = self;
+    photoView.cellCustomProtocol = self;
     photoView.outerCamera = YES;
-    photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
+//    photoView.previewStyle = HXPhotoViewPreViewShowStyleDark;
     photoView.previewShowDeleteButton = YES; 
     photoView.showAddCell = YES;
 //    photoView.showDeleteNetworkPhotoAlert = YES;
@@ -272,7 +249,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)photoView:(HXPhotoView *)photoView changeComplete:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photos videos:(NSArray<HXPhotoModel *> *)videos original:(BOOL)isOriginal {
-    [self changeStatus];
+//    [self changeStatus];
 //    NSSLog(@"%@",[videos.firstObject videoURL]);
 //    HXPhotoModel *photoModel = allList.firstObject;
     
@@ -300,10 +277,10 @@ static const CGFloat kPhotoViewMargin = 12.0;
     
 }
 - (void)photoViewPreviewDismiss:(HXPhotoView *)photoView {
-    [self changeStatus];
+//    [self changeStatus];
 }
 - (void)photoViewDidCancel:(HXPhotoView *)photoView {
-    [self changeStatus];
+//    [self changeStatus];
 }
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index {
     NSSLog(@"%@ --> index - %ld",model,index);
@@ -348,5 +325,25 @@ static const CGFloat kPhotoViewMargin = 12.0;
     }];
 }
 
+#pragma mark - < HXPhotoViewCellCustomProtocol >
+//- (UIView *)customView:(HXPhotoSubViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+//    
+//    UIView *view = [[UIView alloc] init];
+//    view.backgroundColor = [UIColor redColor];
+//    
+//    return view;
+//}
+//- (CGRect)customViewFrame:(HXPhotoSubViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+//    if (indexPath.item == 4) {
+//        return CGRectMake(40, 40, 40, 40);
+//    }
+//    return CGRectMake(10, 10, 40, 40);
+//}
+//- (BOOL)shouldHiddenBottomType:(HXPhotoSubViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+//    if (indexPath.item == 2) {
+//        return YES;
+//    }
+//    return NO;
+//}
 
 @end

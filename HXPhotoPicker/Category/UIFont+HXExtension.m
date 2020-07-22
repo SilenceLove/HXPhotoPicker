@@ -34,8 +34,9 @@
     return font ? font : [UIFont systemFontOfSize:size];
 }
 + (instancetype)hx_mediumSFUITextOfSize:(CGFloat)size {
-    UIFont *font = [self fontWithName:@".SFUIText-Medium" size:size];
-    return font ? font : [UIFont systemFontOfSize:size];
+    return [self hx_mediumPingFangOfSize:size];
+//    UIFont *font = [self fontWithName:@".SFUIText-Medium" size:size];
+//    return font ? font : [UIFont systemFontOfSize:size];
 }
 
 @end

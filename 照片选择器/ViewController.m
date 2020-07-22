@@ -21,7 +21,7 @@
 #import "HXPhotoPicker.h"
 #import "Demo11ViewController.h"
 #import "Demo12ViewController.h"
-#import "Demo13ViewController.h"
+//#import "Demo13ViewController.h"
 #import "Demo14ViewController.h"
 #import "Demo15ViewController.h"
 
@@ -130,12 +130,9 @@ static NSString *const kCellIdentifier = @"cell_identifier";
                                          subTitle:@"混合添加资源"
                                 viewControllClass: [Demo12ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo13"
-                                         subTitle:@"嵌套其他第三方图片/视频编辑库"
-                                viewControllClass: [Demo13ViewController class]],
-                  [[ListItem alloc] initWithTitle:@"Demo14"
                                          subTitle:@"HXPhotoView自定义item大小"
                                 viewControllClass: [Demo14ViewController class]],
-                  [[ListItem alloc] initWithTitle:@"Demo15"
+                  [[ListItem alloc] initWithTitle:@"Demo14"
                                          subTitle:@"底部选择弹窗"
                                 viewControllClass: [Demo15ViewController class]]
                   
@@ -152,7 +149,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 //    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"APPCityPlayer_bannerGame"] forBarMetrics:UIBarMetricsDefault];
 
     self.showAlertCompletion = NO;
-    self.title = @"Demo 1 ~ 15";
+    self.title = @"Demo 1 ~ 14";
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     tableView.tableFooterView = [[UIView alloc] init];

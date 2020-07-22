@@ -114,6 +114,9 @@
             } completion:^(BOOL finished) {
                 [self.tempMoveCell removeFromSuperview];
                 self.dragCell.hidden = NO;
+                if ([self.delegate respondsToSelector:@selector(collectionViewNeedReloadData:)]) {
+                    [self.delegate collectionViewNeedReloadData:self];
+                }
             }];
             return;
         }
@@ -170,6 +173,9 @@
         [self.tempMoveCell removeFromSuperview];
         self.dragCell.hidden = NO;
         self.userInteractionEnabled = YES;
+        if ([self.delegate respondsToSelector:@selector(collectionViewNeedReloadData:)]) {
+            [self.delegate collectionViewNeedReloadData:self];
+        }
     }];
 }
 

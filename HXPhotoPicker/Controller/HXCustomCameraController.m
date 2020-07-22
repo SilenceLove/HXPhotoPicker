@@ -7,14 +7,13 @@
 //
 
 #import "HXCustomCameraController.h"
-#import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
 #import "HXPhotoTools.h"
 #import "HXCustomPreviewView.h"
 
 const CGFloat HXZoomRate = 1.0f;
 
-@interface HXCustomCameraController ()<AVCaptureFileOutputRecordingDelegate>
+@interface HXCustomCameraController ()<AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
 @property (strong, nonatomic) dispatch_queue_t videoQueue;
 @property (strong, nonatomic) AVCaptureSession *captureSession;
 @property (weak, nonatomic) AVCaptureDeviceInput *activeVideoInput;
@@ -25,6 +24,7 @@ const CGFloat HXZoomRate = 1.0f;
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, assign) UIDeviceOrientation deviceOrientation;
 @property (nonatomic, assign) UIDeviceOrientation imageOrientation;
+@property (strong, nonatomic) AVCaptureVideoDataOutput *captureDataOutput;
 @end
 
 @implementation HXCustomCameraController
@@ -61,31 +61,58 @@ const CGFloat HXZoomRate = 1.0f;
         if (y >= 0) {
             _imageOrientation = UIDeviceOrientationPortraitUpsideDown;
             _deviceOrientation = UIDeviceOrientationPortraitUpsideDown;
+            if ([self.delegate respondsToSelector:@selector(handleDeviceMotion:)]) {
+                [self.delegate handleDeviceMotion:UIDeviceOrientationPortraitUpsideDown];
+            }
         } else {
             _imageOrientation = UIDeviceOrientationPortrait;
             _deviceOrientation = UIDeviceOrientationPortrait;
+            if ([self.delegate respondsToSelector:@selector(handleDeviceMotion:)]) {
+                [self.delegate handleDeviceMotion:UIDeviceOrientationPortrait];
+            }
         }
     } else {
-        if (x >= 0) {
+        if (x >= 0) { // Home键左侧水平拍摄
             _imageOrientation = UIDeviceOrientationLandscapeRight;
-            _deviceOrientation = UIDeviceOrientationLandscapeRight;    // Home键左侧水平拍摄
+            _deviceOrientation = UIDeviceOrientationLandscapeRight;
+            if ([self.delegate respondsToSelector:@selector(handleDeviceMotion:)]) {
+                [self.delegate handleDeviceMotion:UIDeviceOrientationLandscapeRight];
+            }
         } else {
             _imageOrientation = UIDeviceOrientationLandscapeLeft;
             _deviceOrientation = UIDeviceOrientationLandscapeLeft;     // Home键右侧水平拍摄
+            if ([self.delegate respondsToSelector:@selector(handleDeviceMotion:)]) {
+                [self.delegate handleDeviceMotion:UIDeviceOrientationLandscapeLeft];
+            }
         }
     }
 }
 - (void)initSeesion {
     self.captureSession = [[AVCaptureSession alloc] init];
 }
+
+- (AVCaptureVideoDataOutput *)captureDataOutput {
+    if (!_captureDataOutput) {
+        _captureDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+        _captureDataOutput.alwaysDiscardsLateVideoFrames = YES;
+        dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
+        [_captureDataOutput setSampleBufferDelegate:self queue:queue];
+        _captureDataOutput.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], kCVPixelBufferPixelFormatTypeKey,
+                                nil];
+    }
+    return _captureDataOutput;
+}
 - (void)setupPreviewLayer:(AVCaptureVideoPreviewLayer *)previewLayer startSessionCompletion:(void (^)(BOOL success))completion {
     if ([self.captureSession canSetSessionPreset:self.sessionPreset]) {
         self.captureSession.sessionPreset = self.sessionPreset;
     }else {
-        if ([self.captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
+        if ([self.captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+            self.captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
+        }else if ([self.captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
             self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;
         }else {
-            self.captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
+            self.captureSession.sessionPreset = AVCaptureSessionPreset640x480;
         }
     }
     AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
@@ -105,7 +132,6 @@ const CGFloat HXZoomRate = 1.0f;
         return;
     }
     previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-    [self.captureSession startRunning];
     if (completion) {
         completion(YES);
     }
@@ -120,6 +146,7 @@ const CGFloat HXZoomRate = 1.0f;
     if (!_imageOutput) {
         _imageOutput = [[AVCaptureStillImageOutput alloc] init];
         _imageOutput.outputSettings = @{AVVideoCodecKey : AVVideoCodecJPEG};
+        _imageOutput.highResolutionStillImageOutputEnabled = YES;
     }
     return _imageOutput;
 }
@@ -137,13 +164,16 @@ const CGFloat HXZoomRate = 1.0f;
         }
     }
 }
-- (void)addImageOutput {
-    [self.captureSession beginConfiguration];
+- (void)removeMovieOutput {
     [self.captureSession removeOutput:self.movieOutput];
-    if ([self.captureSession canAddOutput:self.imageOutput]) {
-        [self.captureSession addOutput:self.imageOutput];
+}
+- (void)addDataOutput {
+    if ([self.captureSession canAddOutput:self.captureDataOutput]) {
+        [self.captureSession addOutput:self.captureDataOutput];
     }
-    [self.captureSession commitConfiguration];
+}
+- (void)removeDataOutput {
+    [self.captureSession removeOutput:self.captureDataOutput];
 }
 - (BOOL)addAudioInput {
     NSError *error;
@@ -161,18 +191,6 @@ const CGFloat HXZoomRate = 1.0f;
     }else {
         return YES;
     }
-}
-- (void)addMovieOutput {
-    [self.captureSession beginConfiguration];
-    [self.captureSession removeOutput:self.imageOutput];
-    if ([self.captureSession canAddOutput:self.movieOutput]) {
-        [self.captureSession addOutput:self.movieOutput];
-        AVCaptureConnection *videoConnection = [self.movieOutput connectionWithMediaType:AVMediaTypeVideo];
-        if ([videoConnection isVideoStabilizationSupported]) {
-            videoConnection.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeAuto;
-        }
-    }
-    [self.captureSession commitConfiguration];
 }
 - (void)startSession {
     AVCaptureSession *session = self.captureSession;
@@ -513,6 +531,14 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     }
 }
 
+- (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
+    if (CMSampleBufferIsValid(sampleBuffer)) {
+        UIImage *image = [[UIImage hx_imageFromSampleBuffer:sampleBuffer] hx_rotationImage:UIImageOrientationRight];
+        if (image) {
+            [HXPhotoCommon photoCommon].cameraImage = image;
+        }
+    }
+}
 #pragma mark - AVCaptureFileOutputRecordingDelegate
 // 开始录制
 - (void)captureOutput:(AVCaptureFileOutput *)output didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray<AVCaptureConnection *> *)connections {
@@ -550,10 +576,16 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
 }
 
 - (CGFloat)maxZoomFactor {
-    return MIN(self.activeCamera.activeFormat.videoMaxZoomFactor, 4.0f);
+    return MIN(self.activeCamera.activeFormat.videoMaxZoomFactor, 5.0f);
 }
 
+- (CGFloat)currentZoomFacto {
+    return self.activeCamera.videoZoomFactor;
+}
 - (void)setZoomValue:(CGFloat)zoomValue {
+    if (zoomValue > self.maxZoomFactor) {
+        zoomValue = self.maxZoomFactor;
+    }
     if (!self.activeCamera.isRampingVideoZoom) {
         
         NSError *error;

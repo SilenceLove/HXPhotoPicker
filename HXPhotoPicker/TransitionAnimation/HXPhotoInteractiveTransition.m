@@ -37,7 +37,8 @@
     if ([viewController isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
         HXWeakSelf
-        previewVC.currentCellScrollViewDidScroll = ^(CGFloat offsetY) {
+        previewVC.currentCellScrollViewDidScroll = ^(UIScrollView *scrollView) {
+            CGFloat offsetY = scrollView.contentOffset.y;
             if (offsetY < 0) {
                 weakSelf.atFirstPan = YES;
             }else if (offsetY == 0) {
@@ -58,7 +59,8 @@
         UIScrollView *scrollView = (UIScrollView *)otherGestureRecognizer.view;
         if (scrollView.contentOffset.y <= 0 &&
             !scrollView.zooming &&
-            !scrollView.isZoomBouncing && self.atFirstPan) {
+            !scrollView.isZoomBouncing &&
+            self.atFirstPan) {
             return YES;
         }
     }
@@ -189,7 +191,7 @@
         toCell = [toVC currentPreviewCell:model];
     }
     self.bgView = [[UIView alloc] initWithFrame:containerView.bounds];
-    self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+    self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : fromVC.manager.configuration.previewPhotoViewBgColor;
     CGFloat scaleX;
     CGFloat scaleY;
     if (self.beginX < tempImageViewFrame.origin.x) {
@@ -254,7 +256,7 @@
         toVC.bottomView.alpha = 0;
     }else {
         toVC.bottomView.alpha = 1;
-        self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+        self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : fromVC.manager.configuration.previewPhotoViewBgColor;
     }
     toVC.navigationController.navigationBar.userInteractionEnabled = NO;
     fromVC.collectionView.hidden = YES;
@@ -316,7 +318,7 @@
                     [toVC.navigationController setNavigationBarHidden:YES];
                 }
             }else {
-                fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
+                fromVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : fromVC.manager.configuration.previewPhotoViewBgColor;
             }
             self.tempCell.hidden = NO;
             self.tempCell = nil;

@@ -20,7 +20,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"2.4.5"
+#define HXVersion @"3.0.0"
 
 /// 如果想要HXPhotoView的item大小自定义设置，请修改为 1
 /// 并且实现HXPhotoView的代理
@@ -28,7 +28,12 @@
 /// 如果不实现此代理，item的小大将默认 (100, 100)
 #define HXPhotoViewCustomItemSize 0
 
-#define HXGetCameraContentInRealTime HX_IS_IPhoneX_All
+#define HXRound(x) (round(x*100000)/100000)
+#define HXRoundHundreds(x) (round(x*100)/100)
+#define HXRoundDecade(x) (round(x*10)/10)
+
+#define HXRoundFrame(rect) CGRectMake(HXRound(rect.origin.x), HXRound(rect.origin.y), HXRound(rect.size.width), HXRound(rect.size.height))
+#define HXRoundFrameHundreds(rect) CGRectMake(HXRoundHundreds(rect.origin.x), HXRoundHundreds(rect.origin.y), HXRoundHundreds(rect.size.width), HXRoundHundreds(rect.size.height))
 
 #define HXEncodeKey @"HXModelArray"
 

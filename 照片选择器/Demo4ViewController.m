@@ -14,6 +14,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (weak, nonatomic) IBOutlet HXPreviewVideoView *videoView;
+@property (strong, nonatomic) HXPhotoEdit *photoEdit;
 @end
 
 @implementation Demo4ViewController
@@ -58,8 +59,10 @@
         _manager.configuration.albumListTableView = ^(UITableView *tableView) {
 //            NSSLog(@"%@",tableView);
         };
-        _manager.configuration.singleJumpEdit = NO;
+        _manager.configuration.singleJumpEdit = YES;
         _manager.configuration.movableCropBox = YES;
+        _manager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_Custom;
+        _manager.configuration.photoEditConfigur.customAspectRatio = CGSizeMake(1, 1);
 //        _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.requestImageAfterFinishingSelection = NO;
 //        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
@@ -93,14 +96,37 @@
 
 - (void)editPhoto {
     HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:[UIImage imageNamed:@"1"]];
-    
+    photoModel.photoEdit = self.photoEdit;
     HXWeakSelf
-    [self hx_presentPhotoEditViewControllerWithManager:self.manager photoModel:photoModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
-        weakSelf.imageView.image = afterModel.thumbPhoto;
-        NSSLog(@"%@", afterModel);
-    } cancel:^(HXPhotoEditViewController *viewController) {
-        NSSLog(@"%@", viewController);
-    }];
+    if (self.manager.configuration.useWxPhotoEdit) {
+        [self hx_presentWxPhotoEditViewControllerWithConfiguration:self.manager.configuration.photoEditConfigur photoModel:photoModel delegate:nil finish:^(HXPhotoEdit * _Nonnull photoEdit, HXPhotoModel * _Nonnull photoModel, HX_PhotoEditViewController * _Nonnull viewController) {
+            if (photoEdit) {
+                // 有编辑过
+                weakSelf.imageView.image = photoEdit.editPreviewImage;
+            }else {
+                // 为空则未进行编辑
+                weakSelf.imageView.image = photoModel.thumbPhoto;
+            }
+            // 记录下当前编辑的记录，再次编辑可在上一次基础上进行编辑
+            weakSelf.photoEdit = photoEdit;
+            NSSLog(@"%@", photoModel);
+        } cancel:^(HX_PhotoEditViewController * _Nonnull viewController) {
+            NSSLog(@"取消：%@", viewController);
+        }];
+        
+//        [self hx_presentWxPhotoEditViewControllerWithConfiguration:self.manager.configuration.photoEditConfigur editImage:photoModel.thumbPhoto photoEdit:self.photoEdit finish:^(HXPhotoEdit * _Nonnull photoEdit, HXPhotoModel * _Nonnull photoModel, HX_PhotoEditViewController * _Nonnull viewController) {
+//
+//        } cancel:^(HX_PhotoEditViewController * _Nonnull viewController) {
+//
+//        }];
+    }else {
+        [self hx_presentPhotoEditViewControllerWithManager:self.manager photoModel:photoModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
+            weakSelf.imageView.image = afterModel.thumbPhoto;
+            NSSLog(@"%@", afterModel);
+        } cancel:^(HXPhotoEditViewController *viewController) {
+            NSSLog(@"取消：%@", viewController);
+        }];
+    }
 }
 
 - (void)editVideo {
@@ -110,7 +136,8 @@
     
     HXWeakSelf
     [self hx_presentVideoEditViewControllerWithManager:self.manager videoModel:videoModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXVideoEditViewController *viewController) {
-        
+        // 编辑之前的视频地址  beforeModel.videoURL
+        // 编辑之后的视频地址  afterModel.videoURL
         weakSelf.imageView.image = afterModel.thumbPhoto;
         NSSLog(@"%@", afterModel);
     } cancel:^(HXVideoEditViewController *viewController) {
@@ -129,6 +156,7 @@
             [model requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                 [weakSelf.view hx_handleLoading];
                 weakSelf.imageView.image = image;
+                weakSelf.photoEdit = nil;
             } failed:^(NSDictionary *info, HXPhotoModel *model) {
                 [weakSelf.view hx_handleLoading];
                 [weakSelf.view hx_showImageHUDText:@"获取失败"];
@@ -157,6 +185,7 @@
     if (photoList.count > 0) {
         HXPhotoModel *model = photoList.firstObject;
         self.imageView.image = model.previewPhoto;
+        self.photoEdit = nil;
         NSSLog(@"%ld张图片",photoList.count);
     }else if (videoList.count > 0) {
         
@@ -166,6 +195,7 @@
     if (photoList.count > 0) {
         HXPhotoModel *model = photoList.firstObject;
         self.imageView.image = model.previewPhoto;
+        self.photoEdit = nil;
         NSSLog(@"%ld张图片",photoList.count);
     }else if (videoList.count > 0) {
         __weak typeof(self) weakSelf = self;
