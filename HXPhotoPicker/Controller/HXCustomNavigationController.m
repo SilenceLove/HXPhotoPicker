@@ -105,6 +105,15 @@
     }
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return [self.topViewController preferredStatusBarStyle];
+}
+- (BOOL)prefersStatusBarHidden {
+    return [self.topViewController prefersStatusBarHidden];
+}
+- (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
+    return UIStatusBarAnimationFade;
+}
 //支持的方向
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {

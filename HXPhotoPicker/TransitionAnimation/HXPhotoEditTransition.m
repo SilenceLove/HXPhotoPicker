@@ -87,6 +87,7 @@
             tempView.frame = [cell.imageView convertRect:cell.imageView.bounds toView: containerView];
         }
         fromCell = cell;
+        [fromVC.navigationController setNavigationBarHidden:YES];
     }else if ([fromVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewCell *cell = [(HXPhotoPreviewViewController *)fromVC currentPreviewCell:self.model];
         [cell cancelRequest];
@@ -97,6 +98,7 @@
         fromCell = cell;
         if ([(HXPhotoPreviewViewController *)fromVC bottomView].alpha != 0) {
             [(HXPhotoPreviewViewController *)fromVC setSubviewAlphaAnimate:YES duration:0.15f];
+            [fromVC.navigationController setNavigationBarHidden:YES];
         }
     }else if ([fromVC isKindOfClass:[HXCustomCameraViewController class]]) {
         tempView.image = [(HXCustomCameraViewController *)fromVC jumpImage];
@@ -140,11 +142,11 @@
         }else if ([toVC isKindOfClass:[HXVideoEditViewController class]]) {
             [(HXVideoEditViewController *)toVC showBottomView];
         }else if ([toVC isKindOfClass:[HX_PhotoEditViewController class]]) {
-            [(HX_PhotoEditViewController *)toVC showBgViews];
+            [(HX_PhotoEditViewController *)toVC showTopBottomView];
         }
+        
         if ([fromVC isKindOfClass:[HXPhotoViewController class]]) {
             [(HXPhotoViewController *)fromVC bottomView].alpha = 0;
-            fromVC.navigationController.navigationBar.alpha = 0;
         }else if ([fromVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
             
         }
@@ -162,18 +164,18 @@
         }else if ([toVC isKindOfClass:[HX_PhotoEditViewController class]]) {
             [(HX_PhotoEditViewController *)toVC completeTransition:tempView.image];
         }
+        [tempBgView removeFromSuperview];
+        toVC.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:1];
+        [transitionContext completeTransition:YES];
         if ([fromVC isKindOfClass:[HXPhotoViewController class]]) {
             [(HXPhotoViewController *)fromVC bottomView].alpha = 1;
-            fromVC.navigationController.navigationBar.alpha = 1;
+            [fromVC.navigationController setNavigationBarHidden:NO];
         }else if ([fromVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
             
         }else if ([fromVC isKindOfClass:[HXCustomCameraViewController class]] &&
                   [toVC isKindOfClass:[HXVideoEditViewController class]]) {
             [(HXCustomCameraViewController *)fromVC showPlayerView];
         }
-        [tempBgView removeFromSuperview];
-        toVC.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:1];
-        [transitionContext completeTransition:YES];
     }];
 }
 
@@ -229,6 +231,7 @@
         toCell = cell;
         [containerView addSubview:tempView];
         fromVC.view.backgroundColor =  [[UIColor blackColor] colorWithAlphaComponent:1];
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }else if ([toVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewCell *cell = [(HXPhotoPreviewViewController *)toVC currentPreviewCell:self.model];
         if (![(HXPhotoEditViewController *)fromVC isCancel]) {
@@ -259,6 +262,7 @@
             }
         }
         fromVC.view.backgroundColor =  [[UIColor blackColor] colorWithAlphaComponent:0];
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }else if ([toVC isKindOfClass:[HXCustomCameraViewController class]] &&
               [fromVC isKindOfClass:[HXVideoEditViewController class]]) {
         toFrame = [(HXCustomCameraViewController *)toVC jumpRect];

@@ -128,7 +128,6 @@
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     if (self.requestId) {
         [self.photoModel.asset cancelContentEditingInputRequest:self.requestId];
     }
@@ -153,24 +152,19 @@
     // Do any additional setup after loading the view.
     self.orientationDidChange = NO;
     [self setupUI];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationWillChanged:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     
+    [self hiddenTopBottomView];
 }
-
 - (void)setupUI {
     if (!self.onlyCliping) {
         self.onlyCliping = self.configuration.onlyCliping;
     }
-    self.editingView.hidden = YES;
-    self.backBtn.userInteractionEnabled = NO;
-    self.toolsView.userInteractionEnabled = NO;
-    self.graffitiColorView.userInteractionEnabled = NO;
-    self.mosaicView.userInteractionEnabled = NO;
     self.backBtn.alpha = 0;
+    self.clippingToolBar.alpha = 0;
     self.toolsView.alpha = 0;
-    self.graffitiColorView.alpha = 0;
-    self.mosaicView.alpha = 0;
     self.topMaskView.alpha = 0;
     self.bottomMaskView.alpha = 0;
     
@@ -198,7 +192,6 @@
         [self.view addSubview:self.clippingToolBar];
         [self.view addSubview:self.rotateBtn];
     }
-    [self changeSubviewFrame];
 }
 - (void)deviceOrientationWillChanged:(NSNotification *)notify {
     if (self.editingView.clipping) {
@@ -211,8 +204,6 @@
 }
 - (void)deviceOrientationChanged:(NSNotification *)notify {
     self.orientationDidChange = YES;
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-    [self setNeedsStatusBarAppearanceUpdate];
 }
 - (void)changeSubviewFrame {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -393,6 +384,23 @@
         self.editingView.image = image;
         [self.view hx_showLoadingHUDText:nil];
     }
+}
+- (void)hiddenTopBottomView {
+    self.backBtn.hx_y = -self.backBtn.hx_h;
+    self.clippingToolBar.hx_y = self.view.hx_h;
+    self.toolsView.hx_y = self.view.hx_h;
+    self.topMaskView.hx_y = -hxNavigationBarHeight;
+    self.bottomMaskView.hx_y = self.view.hx_h;
+}
+- (void)showTopBottomView {
+    [self changeSubviewFrame];
+    self.backBtn.alpha = 1;
+    if (self.onlyCliping) {
+        self.clippingToolBar.alpha = 1;
+    }
+    self.toolsView.alpha = 1;
+    self.topMaskView.alpha = 1;
+    self.bottomMaskView.alpha = 1;
 }
 - (void)showBgViews {
     self.backBtn.userInteractionEnabled = YES;

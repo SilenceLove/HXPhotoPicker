@@ -20,7 +20,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"3.0.0"
+#define HXVersion @"3.0.1"
 
 /// 如果想要HXPhotoView的item大小自定义设置，请修改为 1
 /// 并且实现HXPhotoView的代理

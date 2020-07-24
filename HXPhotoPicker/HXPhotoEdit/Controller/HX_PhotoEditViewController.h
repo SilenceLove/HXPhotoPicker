@@ -79,6 +79,8 @@ typedef void (^ HX_PhotoEditViewControllerDidCancelBlock)(HX_PhotoEditViewContro
 - (CGRect)getDismissImageFrame;
 - (UIImage *)getCurrentImage;
 - (void)hideImageView;
+- (void)hiddenTopBottomView;
+- (void)showTopBottomView;
 @end
 
 NS_ASSUME_NONNULL_END

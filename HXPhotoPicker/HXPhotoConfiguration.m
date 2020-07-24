@@ -238,6 +238,7 @@
     // 颜色设置
     self.statusBarStyle = UIStatusBarStyleLightContent;
     self.themeColor = [UIColor whiteColor];
+    self.photoEditConfigur.themeColor = [UIColor hx_colorWithHexStr:@"#07C160"];
     self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
     
     self.cameraFocusBoxColor = [UIColor hx_colorWithHexStr:@"#07C160"];

@@ -125,9 +125,13 @@ HX_PhotoEditViewControllerDelegate
 - (BOOL)prefersStatusBarHidden {
     return NO;
 }
+- (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
+    return UIStatusBarAnimationFade;
+}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self changeStatusBarStyle];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     if (self.needChangeViewFrame) {
         self.needChangeViewFrame = NO;
     }
