@@ -63,6 +63,8 @@
 + (void)requestAuthorization:(UIViewController * _Nullable)viewController
                      handler:(void (^ _Nullable)(PHAuthorizationStatus status))handler;
 
++ (PHAuthorizationStatus)authorizationStatus;
+
 /**
  判断是否是HEIF格式的图片
  */

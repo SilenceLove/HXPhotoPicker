@@ -15,7 +15,8 @@
 #import "HXPhotoEditChartletContentViewCell.h"
 #import "UIImageView+HXExtension.h"
 
-#define HXclViewHeight ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait || [[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown) ? 350 : 200
+#define HXclViewHeight ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait || [[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown) ? (HX_IS_IPhoneX_All ? 400 : 350) : 200
+
 
 @interface HXPhotoEditChartletListView ()<UICollectionViewDataSource, UICollectionViewDelegate>
 @property (weak, nonatomic) IBOutlet UIView *bgView;
@@ -123,10 +124,10 @@
         self.contentViewBottomConstraint.constant = self.contentViewBottom - point.y;
     }else if (panPgr.state == UIGestureRecognizerStateChanged) {
         CGFloat contentViewBottom = self.contentViewBottom - point.y;
-        self.contentViewBottomConstraint.constant = contentViewBottom;
-        if (self.contentViewBottomConstraint.constant > 0) {
-            self.contentViewBottomConstraint.constant = 0;
+        if (contentViewBottom > 0) {
+            contentViewBottom = 0;
         }
+        self.contentViewBottomConstraint.constant = contentViewBottom;
     }else if (panPgr.state == UIGestureRecognizerStateEnded ||
               panPgr.state == UIGestureRecognizerStateCancelled) {
         if (self.contentViewBottomConstraint.constant < -100.f) {

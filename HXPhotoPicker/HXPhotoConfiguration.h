@@ -299,6 +299,10 @@ HXPhotoPreviewViewController;
 @property (copy, nonatomic) void (^useCameraComplete)(HXPhotoModel *model);
 
 #pragma mark - < UI相关 >
+
+/// 未授权时界面上提示文字显示的颜色
+@property (strong, nonatomic) UIColor *authorizationTipColor;
+
 /**
  弹窗方式的相册列表竖屏时的高度
  */
@@ -423,18 +427,31 @@ HXPhotoPreviewViewController;
  */
 @property (assign, nonatomic) BOOL navBarTranslucent;
 
-/**
- 导航栏背景颜色
- */
+/// 导航栏背景颜色
 @property (strong, nonatomic) UIColor *navBarBackgroudColor;
 
 /// 导航栏样式
 @property(nonatomic,assign) UIBarStyle navBarStyle;
 
-/**
- 导航栏背景图片
- */
+/// 导航栏背景图片
 @property (strong, nonatomic) UIImage *navBarBackgroundImage;
+
+#pragma mark - < 自定义titleView >
+/// 自定义照片列表导航栏titleView
+/// albumShowMode == HXPhotoAlbumShowModePopup 时才有效
+@property (copy, nonatomic) UIView *(^ photoListTitleView)(NSString *title);
+
+/// 更新照片列表导航栏title
+@property (copy, nonatomic) void (^ updatePhotoListTitle)(NSString *title);
+
+/// 照片列表改变titleView选中状态
+@property (copy, nonatomic) void (^ photoListChangeTitleViewSelected)(BOOL selected);
+
+/// 获取照片列表导航栏titleView的选中状态
+@property (copy, nonatomic) BOOL (^ photoListTitleViewSelected)(void);
+
+/// 照片列表titleView点击事件
+@property (copy, nonatomic) void (^ photoListTitleViewAction)(BOOL selected);
 
 /// 照片列表背景颜色
 @property (strong, nonatomic) UIColor *photoListViewBgColor;
@@ -553,7 +570,7 @@ HXPhotoPreviewViewController;
  如果照片最大数和视频最大数都为0时，则可以混合添加
     当照片选了1张时 视频就还可以选择9个
     当照片选了5张时 视频就还可以选择5个
-    视频一样
+    视频同理
  */
 @property (assign, nonatomic) NSUInteger maxNum;
 

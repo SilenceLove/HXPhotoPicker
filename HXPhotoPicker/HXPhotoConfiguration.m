@@ -225,6 +225,12 @@
     }
     return _maxVideoClippingTime;
 }
+- (UIColor *)authorizationTipColor {
+    if (!_authorizationTipColor) {
+        _authorizationTipColor = [UIColor blackColor];
+    }
+    return _authorizationTipColor;
+}
 - (void)setType:(HXConfigurationType)type {
     _type = type;
     
@@ -243,6 +249,7 @@
     
     self.cameraFocusBoxColor = [UIColor hx_colorWithHexStr:@"#07C160"];
     
+    self.authorizationTipColor = [UIColor whiteColor];
     self.navigationTitleSynchColor = YES;
     self.cellSelectedBgColor = [UIColor hx_colorWithHexStr:@"#07C160"];
     self.cellSelectedTitleColor = [UIColor whiteColor];

@@ -1,4 +1,4 @@
-<img src="http://thyrsi.com/t6/669/1549792194x1822611383.png" width="800" height="130">
+<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tip.png" width="800" height="130">
 
 [![Platform](http://img.shields.io/badge/platform-ios-blue.svg?style=flat
              )](https://developer.apple.com/iphone/index.action)
@@ -6,8 +6,9 @@
 [![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 
-<img src="http://thyrsi.com/t6/669/1549791821x1822611383.png" width="208" height="404"><img src="http://thyrsi.com/t6/669/1549791987x1822611383.png" width="208" height="404"><img src="http://thyrsi.com/t6/669/1549792014x1822611383.png" width="208" height="404"><img src="http://thyrsi.com/t6/669/1549792030x1822611383.png" width="208" height="404">
-<img src="http://thyrsi.com/t6/669/1549792043x1822611383.png" width="208" height="404"><img src="http://thyrsi.com/t6/669/1549792055x1822611383.png" width="208" height="404"><img src="http://thyrsi.com/t6/669/1549792069x1822611383.png" width="208" height="404"><img src="http://thyrsi.com/t6/669/1549792082x1822611383.png" width="208" height="404">
+| <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_1.PNG" width="208" height="450"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_2.PNG" width="208" height="450"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_3.PNG" width="208" height="450"> |
+| ------ | ------ | ------ |
+| <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_gif_tag_1.gif" width="208" height="450"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_gif_tag_2.gif" width="208" height="450"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_gif_tag_3.gif" width="208" height="450"> |
 
 ## 目录
 * [特性](#特性)
@@ -51,8 +52,10 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 3.0.1'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
-- ```pod 'HXPhotoPicker' 不依赖第三方、'HXPhotoPicker/SDWebImage' 依赖SD v5.0、'HXPhotoPicker/YYWebImage' 依赖YY v1.05```
+- Cocoapods：```pod 'HXPhotoPicker', '~> 3.0.2'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- ```pod 不依赖第三方：'HXPhotoPicker'```
+- ```pod 依赖SD v5.0：'HXPhotoPicker/SDWebImage'```
+- ```pod 依赖YY v1.05：'HXPhotoPicker/YYWebImage' ```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 使用前导入头文件 "HXPhotoPicker.h"
 
@@ -668,13 +671,19 @@ HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
 frame.size.height 就是 HXPhotoView 的正确高度
 代码参考demo11
 ```
-#### 11. 建议
+#### 11. ios14预览大图显示空白
+```objc
+1、将SDWebImage升级到最新版
+2、将YYWebImage换成SDWebImage
+```
+#### 12. 建议
 ```objc
 建议将 HXPhotoPicker.bundle 里的图片资源手动添加到项目的 Assets.xcassets 里
 ```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v3.0.2　-　适配ios14、照片列表导航栏支持自定义titleView
 - v3.0.0　-　添加仿微信图片编辑功能、相机界面更变为微信样式、添加一键配置微信样式
 ...
 - v2.4.5　-　pod添加 SDWebImage/YYWebImage 子库，修复已知问题

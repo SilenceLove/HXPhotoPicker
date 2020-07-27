@@ -46,6 +46,13 @@ UITableViewDelegate
         if (status == PHAuthorizationStatusAuthorized) {
             [weakSelf getAlbumModelList:YES];
         }else {
+#ifdef __IPHONE_14_0
+                if (@available(iOS 14, *)) {
+                    if (status == PHAuthorizationStatusLimited) {
+                        weakSelf.authorizationLb.text = [NSBundle hx_localizedStringForKey:@"无法访问所有照片\n请点击这里前往设置中允许访问所有照片"];
+                    }
+                }
+#endif
             [weakSelf.view hx_handleLoading];
             [weakSelf.view addSubview:weakSelf.authorizationLb];
         }
@@ -65,7 +72,8 @@ UITableViewDelegate
             [self changeColor];
             [self changeStatusBarStyle];
             [self setNeedsStatusBarAppearanceUpdate];
-            _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
+            UIColor *authorizationColor = self.manager.configuration.authorizationTipColor;
+            _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : authorizationColor;
         }
     }
 #endif
@@ -186,7 +194,7 @@ UITableViewDelegate
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (!self.albumModelArray.count && [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+    if (!self.albumModelArray.count && [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
         [self getAlbumModelList:NO];
     }
 }
@@ -557,7 +565,8 @@ UITableViewDelegate
         _authorizationLb.text = [NSBundle hx_localizedStringForKey:@"无法访问照片\n请点击这里前往设置中允许访问照片"];
         _authorizationLb.textAlignment = NSTextAlignmentCenter;
         _authorizationLb.numberOfLines = 0;
-        _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
+        UIColor *authorizationColor = self.manager.configuration.authorizationTipColor;
+        _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : authorizationColor;
         _authorizationLb.font = [UIFont systemFontOfSize:15];
         _authorizationLb.userInteractionEnabled = YES;
         [_authorizationLb addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(goSetup)]];

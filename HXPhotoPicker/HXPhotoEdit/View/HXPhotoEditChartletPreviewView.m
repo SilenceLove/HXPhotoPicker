@@ -93,10 +93,20 @@
         CGFloat height = width;
         CGFloat imgWidth = self.imageSize.width;
         CGFloat imgHeight = self.imageSize.height;
-        if (imgWidth > imgHeight) {
-            width = HX_ScreenWidth - 40;
-        }else if (imgHeight > imgWidth) {
-            height = HX_ScreenWidth - 40;
+        if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait || [[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown) {
+            if (imgWidth > imgHeight) {
+                width = HX_ScreenWidth - 40;
+            }else if (imgHeight > imgWidth) {
+                height = HX_ScreenWidth - 40;
+            }
+        }else {
+            width = HX_ScreenHeight / 2;
+            height = width;
+            if (imgWidth > imgHeight) {
+                width = HX_ScreenHeight - 40;
+            }else if (imgHeight > imgWidth) {
+                height = HX_ScreenHeight - 40;
+            }
         }
         CGFloat w;
         CGFloat h;

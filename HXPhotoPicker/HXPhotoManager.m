@@ -112,7 +112,7 @@
     if (HX_IOS91Later) {
         self.supportLivePhoto = YES;
     }
-    if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+    if ([HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
         self.hasAuthorization = YES;
         [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     }else {
@@ -122,7 +122,7 @@
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 - (void)requestAuthorizationCompletion {
-    if (!self.hasAuthorization && [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+    if (!self.hasAuthorization && [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
         self.hasAuthorization = YES;
         [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     }
@@ -650,7 +650,7 @@
         [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
         [HXPhotoCommon photoCommon].selectedType = -1;
     }
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
     if (status != PHAuthorizationStatusAuthorized || self.getCameraRoolAlbuming || self.cameraRollAlbumModel) {
         return;
     }
@@ -717,7 +717,7 @@
         self.configuration.saveSystemAblum &&
         !smartAlbums.count &&
         !userAlbums.count &&
-        [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
         // 防止直接打开相机并没有打开相册,导致相册列表为空,拍的照片没有保存到相册列表
         if (!self.albums.count && self.cameraList.count) {
             HXPhotoModel *photoMd = self.cameraList.firstObject;
@@ -787,7 +787,7 @@
         }
     }
     if (!self.albums.count &&
-        [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
         HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
         albumModel.cameraCount = [self cameraCount];
         albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];

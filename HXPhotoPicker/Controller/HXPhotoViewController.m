@@ -111,7 +111,8 @@ HX_PhotoEditViewControllerDelegate
             [self changeColor];
             [self changeStatusBarStyle];
             [self setNeedsStatusBarAppearanceUpdate];
-            _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
+            UIColor *authorizationColor = self.manager.configuration.authorizationTipColor;
+            _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : authorizationColor;
         }
     }
 #endif
@@ -182,6 +183,13 @@ HX_PhotoEditViewControllerDelegate
             if (status == PHAuthorizationStatusAuthorized) {
                 [weakSelf getAlbumList];
             }else {
+#ifdef __IPHONE_14_0
+                if (@available(iOS 14, *)) {
+                    if (status == PHAuthorizationStatusLimited) {
+                        weakSelf.authorizationLb.text = [NSBundle hx_localizedStringForKey:@"无法访问所有照片\n请点击这里前往设置中允许访问所有照片"];
+                    }
+                }
+#endif
                 [weakSelf.view hx_handleLoading];
                 [weakSelf.view addSubview:weakSelf.authorizationLb];
             }
@@ -217,8 +225,16 @@ HX_PhotoEditViewControllerDelegate
         [self.view addSubview:self.bottomView];
     }
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
-        [self.albumTitleView layoutSubviews];
-        self.navigationItem.titleView = self.albumTitleView;
+        if (self.manager.configuration.photoListTitleView) {
+            self.navigationItem.titleView = self.manager.configuration.photoListTitleView(self.albumModel.albumName);
+            HXWeakSelf
+            self.manager.configuration.photoListTitleViewAction = ^(BOOL selected) {
+                [weakSelf albumTitleViewDidAction:selected];
+            };
+        }else {
+            [self.albumTitleView layoutSubviews];
+            self.navigationItem.titleView = self.albumTitleView;
+        }
         [self.view addSubview:self.albumBgView];
         [self.view addSubview:self.albumView];
     }
@@ -344,7 +360,19 @@ HX_PhotoEditViewControllerDelegate
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
         self.albumView.hx_w = viewWidth;
         self.albumView.hx_h = albumHeight;
-        if (self.albumTitleView.selected) {
+        BOOL titleViewSeleted = NO;
+        if (self.manager.configuration.photoListTitleView) {
+            if (self.manager.configuration.photoListTitleViewSelected) {
+                titleViewSeleted = self.manager.configuration.photoListTitleViewSelected();
+            }
+            if (self.manager.configuration.updatePhotoListTitle) {
+                self.manager.configuration.updatePhotoListTitle(self.albumModel.albumName);
+            }
+        }else {
+            titleViewSeleted = self.albumTitleView.selected;
+            self.albumTitleView.model = self.albumModel;
+        }
+        if (titleViewSeleted) {
             self.albumView.hx_y = navBarHeight;
         }else {
             self.albumView.hx_y = -(navBarHeight + self.albumView.hx_h);
@@ -353,7 +381,6 @@ HX_PhotoEditViewControllerDelegate
         if (self.manager.configuration.popupAlbumTableView) {
             self.manager.configuration.popupAlbumTableView(self.albumView.tableView);
         }
-        self.albumTitleView.model = self.albumModel;
     }
     
     self.navigationController.navigationBar.translucent = self.manager.configuration.navBarTranslucent;
@@ -381,16 +408,24 @@ HX_PhotoEditViewControllerDelegate
     self.manager.getCameraRollAlbumModel = ^(HXAlbumModel *albumModel) {
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.albumModel = albumModel;
-            weakSelf.albumTitleView.model = albumModel;
-            [weakSelf.albumTitleView setupAlpha:YES];
+            if (weakSelf.manager.configuration.updatePhotoListTitle) {
+                weakSelf.manager.configuration.updatePhotoListTitle(albumModel.albumName);
+            }else {
+                weakSelf.albumTitleView.model = albumModel;
+                [weakSelf.albumTitleView setupAlpha:YES];
+            }
             [weakSelf getPhotoList];
         });
     };
     
     if (self.manager.cameraRollAlbumModel) {
-        [self.albumTitleView setupAlpha:YES];
         self.albumModel = self.manager.cameraRollAlbumModel;
-        self.albumTitleView.model = self.albumModel;
+        if (self.manager.configuration.updatePhotoListTitle) {
+            self.manager.configuration.updatePhotoListTitle(self.albumModel.albumName);
+        }else {
+            [self.albumTitleView setupAlpha:YES];
+            self.albumTitleView.model = self.albumModel;
+        }
         [self getPhotoList];
     }else {
         if (!self.manager.getCameraRoolAlbuming) {
@@ -427,6 +462,9 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)didCancelClick {
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
+        if (self.manager.configuration.photoListChangeTitleViewSelected) {
+            self.manager.configuration.photoListChangeTitleViewSelected(NO);
+        }
         [self.manager cancelBeforeSelectedList];
     }
     if ([self.delegate respondsToSelector:@selector(photoViewControllerDidCancel:)]) {
@@ -583,6 +621,7 @@ HX_PhotoEditViewControllerDelegate
             }
         }];
     }else {
+        cell.hidden = NO;
         NSInteger count = self.collectionVisibleCells.count;
         NSInteger index = [self.collectionVisibleCells indexOfObject:cell];
         if (index < count - 1) {
@@ -860,6 +899,9 @@ HX_PhotoEditViewControllerDelegate
         cell.cameraImage = [HXPhotoCommon photoCommon].cameraImage;
         if (!self.cameraCell) {
             self.cameraCell = cell;
+        }
+        if (!self.cellCanSetModel) {
+            cell.hidden = YES;
         }
         return cell;
     }else {
@@ -1510,7 +1552,11 @@ HX_PhotoEditViewControllerDelegate
             self.navigationController.navigationBar.userInteractionEnabled = NO;
         }
         if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
-            self.albumTitleView.userInteractionEnabled = NO;
+            if (self.manager.configuration.photoListTitleView) {
+                self.navigationController.navigationItem.titleView.userInteractionEnabled = NO;
+            }else {
+                self.albumTitleView.userInteractionEnabled = NO;
+            }
         }
         self.navigationController.viewControllers.lastObject.view.userInteractionEnabled = NO;
         [self.navigationController.viewControllers.lastObject.view hx_showLoadingHUDText:nil];
@@ -1567,7 +1613,14 @@ HX_PhotoEditViewControllerDelegate
 - (void)dismissVC {
     [self.manager selectedListTransformAfter];
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
-        self.albumTitleView.userInteractionEnabled = YES;
+        if (self.manager.configuration.photoListChangeTitleViewSelected) {
+            self.manager.configuration.photoListChangeTitleViewSelected(NO);
+        }
+        if (self.manager.configuration.photoListTitleView) {
+            self.navigationItem.titleView.userInteractionEnabled = YES;
+        }else {
+            self.albumTitleView.userInteractionEnabled = YES;
+        }
     }
     self.navigationController.navigationBar.userInteractionEnabled = YES;
     self.navigationController.viewControllers.lastObject.view.userInteractionEnabled = YES;
@@ -1707,7 +1760,8 @@ HX_PhotoEditViewControllerDelegate
         _authorizationLb.text = [NSBundle hx_localizedStringForKey:@"无法访问照片\n请点击这里前往设置中允许访问照片"];
         _authorizationLb.textAlignment = NSTextAlignmentCenter;
         _authorizationLb.numberOfLines = 0;
-        _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
+        UIColor *authorizationColor = self.manager.configuration.authorizationTipColor;
+        _authorizationLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : authorizationColor;
         _authorizationLb.font = [UIFont systemFontOfSize:15];
         _authorizationLb.userInteractionEnabled = YES;
         [_authorizationLb addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(goSetup)]];
@@ -1727,19 +1781,32 @@ HX_PhotoEditViewControllerDelegate
     return _albumBgView;
 }
 - (void)didAlbumBgViewClick {
-    [self.albumTitleView deSelect];
+    if (self.manager.configuration.photoListChangeTitleViewSelected) {
+        self.manager.configuration.photoListChangeTitleViewSelected(NO);
+    }else {
+        [self.albumTitleView deSelect];
+    }
 }
 - (HXAlbumlistView *)albumView {
     if (!_albumView) {
         _albumView = [[HXAlbumlistView alloc] initWithManager:self.manager];
         HXWeakSelf
         _albumView.didSelectRowBlock = ^(HXAlbumModel *model) {
-            [weakSelf.albumTitleView deSelect];
+            if (weakSelf.manager.configuration.photoListChangeTitleViewSelected) {
+                weakSelf.manager.configuration.photoListChangeTitleViewSelected(NO);
+                [weakSelf albumTitleViewDidAction:NO];
+            }else {
+                [weakSelf.albumTitleView deSelect];
+            }
             if (weakSelf.albumModel == model) {
                 return;
             }
             weakSelf.albumModel = model;
-            weakSelf.albumTitleView.model = model;
+            if (weakSelf.manager.configuration.updatePhotoListTitle) {
+                weakSelf.manager.configuration.updatePhotoListTitle(model.albumName);
+            }else {
+                weakSelf.albumTitleView.model = model;
+            }
             [weakSelf.view hx_showLoadingHUDText:nil];
             weakSelf.collectionViewReloadCompletion = NO;
             [weakSelf.manager getPhotoListWithAlbumModel:weakSelf.albumModel complete:nil];
@@ -1752,45 +1819,48 @@ HX_PhotoEditViewControllerDelegate
         _albumTitleView = [[HXAlbumTitleView alloc] initWithManager:self.manager];
         HXWeakSelf
         _albumTitleView.didTitleViewBlock = ^(BOOL selected) {
-            if (!weakSelf.allArray.count) {
-                return;
-            }
-            if (selected) {
-                if (!weakSelf.firstDidAlbumTitleView) {
-                    [weakSelf.albumView refreshCamearCount];
-                    weakSelf.firstDidAlbumTitleView = YES;
-                }
-                weakSelf.albumBgView.hidden = NO;
-                weakSelf.albumBgView.alpha = 0;
-                UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-                CGFloat navBarHeight = hxNavigationBarHeight;
-                if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
-                    navBarHeight = hxNavigationBarHeight;
-                }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-                    if ([UIApplication sharedApplication].statusBarHidden) {
-                        navBarHeight = weakSelf.navigationController.navigationBar.hx_h;
-                    }else {
-                        navBarHeight = weakSelf.navigationController.navigationBar.hx_h + 20;
-                    }
-                }
-                [weakSelf.albumView selectCellScrollToCenter];
-                [UIView animateWithDuration:0.25 animations:^{
-                    weakSelf.albumBgView.alpha = 1;
-                    weakSelf.albumView.hx_y = navBarHeight;
-                }];
-            }else {
-                [UIView animateWithDuration:0.25 animations:^{
-                    weakSelf.albumBgView.alpha = 0;
-                    weakSelf.albumView.hx_y = -CGRectGetMaxY(weakSelf.albumView.frame);
-                } completion:^(BOOL finished) {
-                    if (!selected) {
-                        weakSelf.albumBgView.hidden = YES;
-                    }
-                }];
-            }
+            [weakSelf albumTitleViewDidAction:selected];
         };
     }
     return _albumTitleView;
+}
+- (void)albumTitleViewDidAction:(BOOL)selected {
+    if (!self.allArray.count) {
+        return;
+    }
+    if (selected) {
+        if (!self.firstDidAlbumTitleView) {
+            [self.albumView refreshCamearCount];
+            self.firstDidAlbumTitleView = YES;
+        }
+        self.albumBgView.hidden = NO;
+        self.albumBgView.alpha = 0;
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        CGFloat navBarHeight = hxNavigationBarHeight;
+        if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+            navBarHeight = hxNavigationBarHeight;
+        }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+            if ([UIApplication sharedApplication].statusBarHidden) {
+                navBarHeight = self.navigationController.navigationBar.hx_h;
+            }else {
+                navBarHeight = self.navigationController.navigationBar.hx_h + 20;
+            }
+        }
+        [self.albumView selectCellScrollToCenter];
+        [UIView animateWithDuration:0.25 animations:^{
+            self.albumBgView.alpha = 1;
+            self.albumView.hx_y = navBarHeight;
+        }];
+    }else {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.albumBgView.alpha = 0;
+            self.albumView.hx_y = -CGRectGetMaxY(self.albumView.frame);
+        } completion:^(BOOL finished) {
+            if (!selected) {
+                self.albumBgView.hidden = YES;
+            }
+        }];
+    }
 }
 - (HXPhotoBottomView *)bottomView {
     if (!_bottomView) {

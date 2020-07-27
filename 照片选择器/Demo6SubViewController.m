@@ -70,6 +70,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //    self.navigationController.navigationBar.translucent = NO;
     self.automaticallyAdjustsScrollViewInsets = YES;
     
+    
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;
     scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, 0);
@@ -83,7 +84,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.previewShowDeleteButton = YES;
     [scrollView addSubview:photoView];
 }
-
 - (void)dealloc { 
     [self.manager clearSelectedList];
 }

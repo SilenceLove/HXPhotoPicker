@@ -155,32 +155,83 @@
 
 + (void)requestAuthorization:(UIViewController *)viewController
                         handler:(void (^)(PHAuthorizationStatus status))handler {
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    PHAuthorizationStatus status = [self authorizationStatus];
+#ifdef __IPHONE_14_0
+    if (@available(iOS 14, *)) {
+        if (status == PHAuthorizationStatusLimited) {
+            if (handler) handler(status);
+            [self showNoAuthorizedAlertWithViewController:viewController status:status];
+            return;
+        }
+    }
+#endif
     if (status == PHAuthorizationStatusAuthorized) {
         if (handler) handler(status);
     }else if (status == PHAuthorizationStatusDenied ||
               status == PHAuthorizationStatusRestricted) {
-                  if (handler) handler(status);
-        [self showNoAuthorizedAlertWithViewController:viewController];
+        if (handler) handler(status);
+        [self showNoAuthorizedAlertWithViewController:viewController status:status];
     }else {
-        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (handler) handler(status);
-                if (status != PHAuthorizationStatusAuthorized) {
-                    [self showNoAuthorizedAlertWithViewController:viewController];
-                }else {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
-                }
-            });
-        }];
+#ifdef __IPHONE_14_0
+        if (@available(iOS 14, *)) {
+            [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelAddOnly handler:^(PHAuthorizationStatus status) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (handler) handler(status);
+                    if (status != PHAuthorizationStatusAuthorized) {
+                        [self showNoAuthorizedAlertWithViewController:viewController status:status];
+                    }else {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
+                    }
+                });
+            }];
+        }
+#else
+        if (NO) {}
+#endif
+        else {
+            [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (handler) handler(status);
+                    if (status != PHAuthorizationStatusAuthorized) {
+                        [self showNoAuthorizedAlertWithViewController:viewController status:status];
+                    }else {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
+                    }
+                });
+            }];
+        }
     }
 }
-+ (void)showNoAuthorizedAlertWithViewController:(UIViewController *)viewController {
++ (void)showNoAuthorizedAlertWithViewController:(UIViewController *)viewController
+                                         status:(PHAuthorizationStatus)status {
+    if (!viewController) {
+        return;
+    }
+    
+#ifdef __IPHONE_14_0
+    if (@available(iOS 14, *)) {
+        if (status == PHAuthorizationStatusLimited) {
+            hx_showAlert(viewController, [NSBundle hx_localizedStringForKey:@"无法访问所有照片"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相册中允许访问所有照片"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], nil, ^{
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            });
+            return;;
+        }
+    }
+#endif
     hx_showAlert(viewController, [NSBundle hx_localizedStringForKey:@"无法访问相册"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相册中允许访问相册"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], nil, ^{
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     });
 }
 
++ (PHAuthorizationStatus)authorizationStatus {
+    PHAuthorizationStatus status;
+    if (@available(iOS 14, *)) {
+        status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
+    }else {
+        status = [PHPhotoLibrary authorizationStatus];
+    }
+    return status;
+}
 + (void)exportEditVideoForAVAsset:(AVAsset *)asset
                         timeRange:(CMTimeRange)timeRange
                        presetName:(NSString *)presetName
@@ -252,7 +303,7 @@
         albumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     }
     // 判断授权状态
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+    [self requestAuthorization:nil handler:^(PHAuthorizationStatus status) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (status != PHAuthorizationStatusAuthorized) {
                 if (complete) {
@@ -341,7 +392,7 @@
         albumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     }
     // 判断授权状态
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+    [self requestAuthorization:nil handler:^(PHAuthorizationStatus status) {
         if (status != PHAuthorizationStatusAuthorized) return;
         dispatch_async(dispatch_get_main_queue(), ^{
             if (!HX_IOS9Later) {

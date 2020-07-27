@@ -381,8 +381,8 @@
     if (self.imageRequestComplete) {
         [self loadImageCompletion];
     }else {
-        self.editingView.image = image;
         [self.view hx_showLoadingHUDText:nil];
+        self.editingView.image = image;
     }
 }
 - (void)hiddenTopBottomView {

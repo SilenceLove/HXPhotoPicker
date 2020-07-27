@@ -11,6 +11,7 @@
 #import "HXPhotoPicker.h"
 @interface Demo6ViewController ()<UIActionSheetDelegate,UIAlertViewDelegate,HXCustomCameraViewControllerDelegate,HXAlbumListViewControllerDelegate>
 @property (strong, nonatomic) HXPhotoManager *manager;
+@property (strong, nonatomic) UIButton *titleBtn;
 @end
 
 @implementation Demo6ViewController
@@ -81,8 +82,33 @@
     button.center = CGPointMake(self.view.hx_w / 2, self.view.hx_h / 2 - 50);
     [self.view addSubview:button];
     
+    
+//    self.titleBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [self.titleBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//    self.titleBtn.hx_size = CGSizeMake(200, 30);
+//    [self.titleBtn addTarget:self action:@selector(didButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+//
+//    HXWeakSelf
+//    self.manager.configuration.photoListTitleView = ^UIView *(NSString *title) {
+//        [weakSelf.titleBtn setTitle:title forState:UIControlStateNormal];
+//        return weakSelf.titleBtn;
+//    };
+//    self.manager.configuration.photoListChangeTitleViewSelected = ^(BOOL selected) {
+//        weakSelf.titleBtn.selected = selected;
+//    };
+//    self.manager.configuration.photoListTitleViewSelected = ^BOOL{
+//        return weakSelf.titleBtn.selected;
+//    };
+//    self.manager.configuration.updatePhotoListTitle = ^(NSString *title) {
+//        [weakSelf.titleBtn setTitle:title forState:UIControlStateNormal];
+//    };
+    
 }
 
+- (void)didButtonClick:(UIButton *)button {
+    button.selected = !button.selected;
+    self.manager.configuration.photoListTitleViewAction(button.selected);
+}
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];

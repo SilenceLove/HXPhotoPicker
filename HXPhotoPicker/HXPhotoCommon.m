@@ -55,7 +55,7 @@ static id instance;
             self.cameraImage = [NSKeyedUnarchiver unarchiveObjectWithData:imageData];
         }
 
-        if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        if ([HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
             [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
         }else {
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestAuthorizationCompletion) name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
@@ -64,7 +64,7 @@ static id instance;
     return self;
 }
 - (void)requestAuthorizationCompletion {
-    if (!self.hasAuthorization && [PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+    if (!self.hasAuthorization && [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
         self.hasAuthorization = YES;
         [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     }

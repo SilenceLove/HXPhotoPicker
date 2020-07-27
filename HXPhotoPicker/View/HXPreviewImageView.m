@@ -404,7 +404,8 @@ HXWeakSelf
                 [weakSelf downloadICloudAssetComplete];
                 weakSelf.progressView.hidden = YES;
 #if HasSDWebImage
-                UIImage *gifImage = [UIImage sd_imageWithGIFData:imageData];
+                SDAnimatedImage *gifImage = [SDAnimatedImage imageWithData:imageData];
+//                UIImage *gifImage = [UIImage sd_imageWithGIFData:imageData];
                 weakSelf.sdImageView.image = gifImage;
                 weakSelf.gifImage = gifImage;
                 if (gifImage.images.count == 0) {
