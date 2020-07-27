@@ -225,8 +225,13 @@
 
 + (PHAuthorizationStatus)authorizationStatus {
     PHAuthorizationStatus status;
+    
+#ifdef __IPHONE_14_0
     if (@available(iOS 14, *)) {
         status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
+#else
+    if(NO) {
+#endif
     }else {
         status = [PHPhotoLibrary authorizationStatus];
     }
