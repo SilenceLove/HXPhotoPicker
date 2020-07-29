@@ -54,13 +54,13 @@
 
 - Cocoapods：
   ```
-  不使用网络图片功能 
+  // 不使用网络图片功能 
   pod 'HXPhotoPicker', '~> 3.0'
   
-  使用SDWebImage加载网络图片
+  // 使用SDWebImage加载网络图片
   pod 'HXPhotoPicker/SDWebImage', '~> 3.0'
   
-  使用YYWebImage加载网络图片
+  // 使用YYWebImage加载网络图片
   pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
   ```
 - 搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
