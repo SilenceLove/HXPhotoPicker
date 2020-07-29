@@ -2265,7 +2265,12 @@ HX_PhotoEditViewControllerDelegate
         if (model.type == HXPhotoModelMediaTypeCamera ||
             model.type == HXPhotoModelMediaTypeCameraPhoto ||
             model.type == HXPhotoModelMediaTypeCameraVideo) {
-            self.imageView.image = model.thumbPhoto;
+            if (model.thumbPhoto.images.count) {
+                self.imageView.image = nil;
+                self.imageView.image = model.thumbPhoto.images.firstObject;
+            }else {
+                self.imageView.image = model.thumbPhoto;
+            }
             if (model.networkPhotoUrl) {
                 self.progressView.hidden = model.downloadComplete;
                 CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
@@ -2367,7 +2372,8 @@ HX_PhotoEditViewControllerDelegate
             self.stateLb.hidden = NO;
             self.bottomMaskLayer.hidden = NO;
         }else {
-            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif && !model.photoEdit) {
+            if ((model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
+                 model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalGif) && !model.photoEdit) {
                 self.stateLb.text = @"GIF";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;

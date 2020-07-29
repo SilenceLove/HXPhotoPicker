@@ -18,10 +18,12 @@
         //使用framework形式
         if (!path) {
             NSURL *associateBundleURL = [[NSBundle mainBundle] URLForResource:@"Frameworks" withExtension:nil];
-            associateBundleURL = [associateBundleURL URLByAppendingPathComponent:@"HXPhotoPicker"];
-            associateBundleURL = [associateBundleURL URLByAppendingPathExtension:@"framework"];
-            NSBundle *associateBunle = [NSBundle bundleWithURL:associateBundleURL];
-            path = [associateBunle pathForResource:@"HXPhotoPicker" ofType:@"bundle"];
+            if (associateBundleURL) {
+                associateBundleURL = [associateBundleURL URLByAppendingPathComponent:@"HXPhotoPicker"];
+                associateBundleURL = [associateBundleURL URLByAppendingPathExtension:@"framework"];
+                NSBundle *associateBunle = [NSBundle bundleWithURL:associateBundleURL];
+                path = [associateBunle pathForResource:@"HXPhotoPicker" ofType:@"bundle"];
+            }
         }
         hxBundle = path ? [NSBundle bundleWithPath:path] : [NSBundle mainBundle];
     }
@@ -34,16 +36,5 @@
     NSBundle *bundle = [HXPhotoCommon photoCommon].languageBundle;
     value = [bundle localizedStringForKey:key value:value table:nil];
     return value;
-}
-+ (instancetype)hx_languageBundle {
-    static NSBundle *hxBundle = nil;
-    if (hxBundle == nil) {
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"HXPhotoPickerAsset" ofType:@"bundle"];
-        if (!path) {
-            path = [[NSBundle mainBundle] pathForResource:@"HXPhotoPickerAsset" ofType:@"bundle" inDirectory:@"Frameworks/HXPhotoPicker.framework/"];
-        }
-        hxBundle = [NSBundle bundleWithPath:path];
-    }
-    return hxBundle;
 }
 @end

@@ -100,8 +100,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [scrollView addSubview:photoView];
     self.photoView = photoView;
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
-    NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"0AA996F1-6566-4CA3-845F-5698DD9726A0" withExtension:@"jpg"];
-    NSURL *url1 = [[NSBundle mainBundle] URLForResource:@"IMG_5833" withExtension:@"MP4"];
+//    NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"0AA996F1-6566-4CA3-845F-5698DD9726A0" withExtension:@"jpg"];
+//    NSURL *url1 = [[NSBundle mainBundle] URLForResource:@"IMG_5833" withExtension:@"MP4"];
+    NSURL *gifURL = [[NSBundle mainBundle] URLForResource:@"IMG_0168" withExtension:@"GIF"];
     
     HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
     HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithLocaImageName:@"2" selected:NO];
@@ -109,8 +110,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
     HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
     
-     
-    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url1 selected:YES];
+
+     HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithImagePath:gifURL selected:YES];
+//    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url1 selected:YES];
     
     HXCustomAssetModel *assetModel7 = [HXCustomAssetModel assetWithNetworkVideoURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/fff42798-8025-4170-a36d-3257be267f29.mp4"] videoCoverURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/d3c3bbe6-02ce-4f17-a75b-3387d52b0a4a.jpg"] videoDuration:13 selected:YES];
     
@@ -132,7 +134,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
     HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
-    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
+    NSURL *gifURL = [[NSBundle mainBundle] URLForResource:@"IMG_0168" withExtension:@"GIF"];
+    HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithImagePath:gifURL selected:YES];
     
     HXCustomAssetModel *assetModel7 = [HXCustomAssetModel assetWithNetworkVideoURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/fff42798-8025-4170-a36d-3257be267f29.mp4"] videoCoverURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/d3c3bbe6-02ce-4f17-a75b-3387d52b0a4a.jpg"] videoDuration:13 selected:YES];
     

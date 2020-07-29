@@ -52,10 +52,18 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：```pod 'HXPhotoPicker', '~> 3.0.2'```搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
-- ```pod 不依赖第三方：'HXPhotoPicker'```
-- ```pod 依赖SD v5.0：'HXPhotoPicker/SDWebImage'```
-- ```pod 依赖YY v1.05：'HXPhotoPicker/YYWebImage' ```
+- Cocoapods：
+  ```
+  不使用网络图片功能 
+  pod 'HXPhotoPicker', '~> 3.0'
+  
+  使用SDWebImage加载网络图片
+  pod 'HXPhotoPicker/SDWebImage', '~> 3.0'
+  
+  使用YYWebImage加载网络图片
+  pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
+  ```
+- 搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 使用前导入头文件 "HXPhotoPicker.h"
 
@@ -458,21 +466,7 @@ HXPhotoLanguageTypeEn       // 英文
 */
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
 ```
-#### 3. 选择完照片后其他界面视图往下偏移
-```objc
-方法一：
-/**
-如果选择完照片返回之后，
-原有界面继承UIScrollView的视图都往下偏移一个导航栏距离的话，
-那么请将这个属性设置为YES，即可恢复。
-*/
-@Property (assign, nonatomic) BOOL restoreNavigationBar;
-
-方法二：
-在选择完照片之后加上
-[UINavigationBar appearance].translucent = NO;
-```
-#### 4. 关于图片
+#### 3. 关于图片
 ```objc
 根据HXPhotoModel的type属性来区分图片类型
 HXPhotoModelMediaTypePhoto          = 0,    //!< 相册里的普通照片
@@ -484,13 +478,13 @@ HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的临时照片�
 不为本地图片时thumbPhoto/previewPhoto的值都是临时存的只用于展示
 HXPhotoModel已提供方法获取image或者imageData
 ```
-#### 5. 关于视频的URL
+#### 4. 关于视频的URL
 ```objc
 1.如果选择的HXPhotoModel的PHAsset有值，需要先获取AVAsset，再使用AVAssetExportSession根据AVAsset导出视频地址
 2.如果PHAsset为空的话，则代表此视频是本地视频。可以直接HXPhotoModel里的VideoURL属性
 HXPhotoModel已提供方法获取
 ```
-#### 6. 关于相机拍照
+#### 5. 关于相机拍照
 ```objc
 当拍摄的照片/视频保存到系统相册
 如果系统版本为9.0及以上时，拍照后的照片/视频保存相册后会获取保存后的PHAsset，保存的时候如果有定位信息也会把定位信息保存到相册
@@ -498,7 +492,7 @@ HXPhotoModel里PHAsset有值并且type为 HXPhotoModelMediaTypePhoto / HXPhotoMo
 以下版本的和不保存相册的都只是存在本地的临时图片/视频 
 HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXPhotoModelMediaTypeCameraVideo
 ```
-#### 7. 关于原图
+#### 6. 关于原图
 ```objc
 根据代理或者block回调里的 isOriginal 来判断是否选择了原图 
 方法一：
@@ -564,7 +558,7 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
     // 获取失败
 }];
 ```
-#### 8. 单独使用HXPhotoPreviewViewController预览图片
+#### 7. 单独使用HXPhotoPreviewViewController预览图片
 ```objc
 HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
 // selected 为NO 的会过滤掉
@@ -626,7 +620,7 @@ UIViewController+HXExtension.h
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView;
 ```
-#### 9. 单独使用照片、视频编辑功能
+#### 8. 单独使用照片、视频编辑功能
 ```objc
 // 单独使用照片编辑功能
 HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:[UIImage imageNamed:@"1"]];
@@ -664,25 +658,22 @@ HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
     // 取消
 }];
 ```
-#### 10. HXPhotoView使用约束布局
+#### 9. HXPhotoView使用约束布局
 ```objc
 使用约束布局HXPhotoView的话需要在 
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame 这个代理回调里更新约束的高度
 frame.size.height 就是 HXPhotoView 的正确高度
 代码参考demo11
 ```
-#### 11. ios14预览大图显示空白
+#### 10. ios14预览大图显示空白
 ```objc
 1、将SDWebImage升级到最新版
 2、将YYWebImage换成SDWebImage
 ```
-#### 12. 建议
-```objc
-建议将 HXPhotoPicker.bundle 里的图片资源手动添加到项目的 Assets.xcassets 里
-```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v3.0.3　-　解决pod加载xib报错的问题、支持添加本地gif图片
 - v3.0.2　-　适配ios14、照片列表导航栏支持自定义titleView
 - v3.0.0　-　添加仿微信图片编辑功能、相机界面更变为微信样式、添加一键配置微信样式
 ...

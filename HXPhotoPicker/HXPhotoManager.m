@@ -185,11 +185,15 @@
                 canAddPhoto = NO;
             }
         }
-        if (model.type == HXCustomAssetModelTypeLocalImage && model.localImage) {
+        if (model.type == HXCustomAssetModelTypeLocalImage && (model.localImage || model.localImagePath)) {
             if (self.type == HXPhotoManagerSelectedTypeVideo) {
                 continue;
             }
             HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:model.localImage];
+            if ([[[model.localImagePath pathExtension] lowercaseString] isEqualToString:@"gif"]) {
+                photoModel.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeLocalGif;
+            }
+            photoModel.imageURL = model.localImagePath;
             photoModel.selected = canAddPhoto ? model.selected : NO;
             if (model.selected && canAddPhoto) {
                 [self.endCameraPhotos addObject:photoModel];

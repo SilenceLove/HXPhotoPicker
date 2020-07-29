@@ -96,6 +96,9 @@
             return HXPhotoModelFormatJPG;
         }
         if (self.asset) {
+            if (self.type == HXPhotoModelMediaTypePhotoGif) {
+                return HXPhotoModelFormatGIF;
+            }
             if ([[self.asset valueForKey:@"filename"] hasSuffix:@"PNG"]) {
                 return HXPhotoModelFormatPNG;
             }
@@ -109,6 +112,10 @@
                 return HXPhotoModelFormatGIF;
             }
         }else {
+            if (self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalGif ||
+                self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+                    return HXPhotoModelFormatGIF;
+            }
             if (self.thumbPhoto) {
                 if (UIImagePNGRepresentation(self.thumbPhoto)) {
                     return HXPhotoModelFormatPNG;
@@ -397,7 +404,11 @@
     self = [super init];
     if (self) {
         self.type = HXPhotoModelMediaTypeCameraPhoto;
-        self.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeLocal;
+        if (image.images.count) {
+            self.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeLocalGif;
+        }else {
+            self.cameraPhotoType = HXPhotoModelMediaTypeCameraPhotoTypeLocal;
+        }
         self.subType = HXPhotoModelMediaSubTypePhoto;
         if (image.imageOrientation != UIImageOrientationUp) {
             image = [image hx_normalizedImage];

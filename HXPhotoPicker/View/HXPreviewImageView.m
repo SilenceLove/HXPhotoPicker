@@ -218,13 +218,24 @@ HXWeakSelf
 #endif
             }
         }else {
+            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalGif &&
+                model.imageURL) {
 #if HasSDWebImage
-            self.sdImageView.image = model.thumbPhoto;
+                self.sdImageView.image = [UIImage hx_animatedGIFWithURL:model.imageURL];
 #elif HasYYKitOrWebImage
-            self.animatedImageView.image = model.thumbPhoto;
+                self.animatedImageView.image = [UIImage hx_animatedGIFWithURL:model.imageURL];
 #else
-            self.imageView.image = model.thumbPhoto;
+                self.imageView.image = [UIImage hx_animatedGIFWithURL:model.imageURL];
 #endif
+            }else {
+#if HasSDWebImage
+                self.sdImageView.image = model.thumbPhoto;
+#elif HasYYKitOrWebImage
+                self.animatedImageView.image = model.thumbPhoto;
+#else
+                self.imageView.image = model.thumbPhoto;
+#endif
+            }
             model.tempImage = nil;
         }
     }else {

@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.default_subspec = 'Default'
   
   s.subspec 'Default' do |de|
-    de.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
+    de.source_files = "HXPhotoPicker/**/*.{h,m}"
     de.resource_bundles = {
         'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']
     }
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'SDWebImage_AF' do |sd_af|
-    sd_af.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
+    sd_af.source_files = "HXPhotoPicker/**/*.{h,m}"
     sd_af.dependency 'SDWebImage', '~> 5.0'
     sd_af.dependency 'AFNetworking'
     sd_af.resource_bundles = {
@@ -41,7 +41,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'YYWebImage' do |yy|
-    yy.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
+    yy.source_files = "HXPhotoPicker/**/*.{h,m}"
     yy.dependency 'YYWebImage', '~> 1.0.5'
     yy.resource_bundles = {
         'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']
@@ -49,7 +49,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'YYWebImage_AF' do |yy_af|
-    yy_af.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
+    yy_af.source_files = "HXPhotoPicker/**/*.{h,m}"
     yy_af.dependency 'YYWebImage', '~> 1.0.5'
     yy_af.dependency 'AFNetworking'
     yy_af.resource_bundles = {

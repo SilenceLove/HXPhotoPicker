@@ -38,9 +38,6 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
  */
 @property (strong, nonatomic) UIImage *localImage;
 
-/// 本地图片路径
-@property (strong, nonatomic) NSURL *imagePath;
-
 /**
  本地视频地址
  */

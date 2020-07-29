@@ -235,9 +235,19 @@
                 self.imageView.image = model.photoEdit.editPosterImage;
             }else {
                 if (model.previewPhoto) {
-                    self.imageView.image = model.previewPhoto;
+                    if (model.previewPhoto.images.count) {
+                        self.imageView.image = nil;
+                        self.imageView.image = model.previewPhoto.images.firstObject;
+                    }else {
+                        self.imageView.image = model.previewPhoto;
+                    }
                 }else if (model.thumbPhoto) {
-                    self.imageView.image = model.thumbPhoto;
+                    if (model.thumbPhoto.images.count) {
+                        self.imageView.image = nil;
+                        self.imageView.image = model.thumbPhoto.images.firstObject;
+                    }else {
+                        self.imageView.image = model.thumbPhoto;
+                    }
                 }else {
                     HXWeakSelf
                     [self.model requestThumbImageWithSize:CGSizeMake(200, 200) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
@@ -267,7 +277,8 @@
             self.stateLb.hidden = NO;
             self.bottomMaskLayer.hidden = NO;
         }else {
-            if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif && !model.photoEdit) {
+            if ((model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
+                 model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalGif) && !model.photoEdit) {
                 self.stateLb.text = @"GIF";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;

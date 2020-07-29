@@ -68,7 +68,8 @@
     self = [super init];
     if (self) {
         self.type = HXCustomAssetModelTypeLocalImage;
-        self.imagePath = imagePath;
+        self.localImagePath = imagePath;
+        self.localImage = [UIImage imageWithContentsOfFile:imagePath.path];
         self.selected = selected;
     }
     return self;

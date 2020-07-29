@@ -24,6 +24,7 @@
 		7B06B2D524D02DA000FDD794 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2D024D02DA000FDD794 /* en.lproj */; };
 		7B06B2D624D02DA000FDD794 /* ko.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2D124D02DA000FDD794 /* ko.lproj */; };
 		7B06B2D724D02DA000FDD794 /* zh-Hant.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2D224D02DA000FDD794 /* zh-Hant.lproj */; };
+		7B06B2DB24D11A1500FDD794 /* IMG_0168.GIF in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2DA24D11A1500FDD794 /* IMG_0168.GIF */; };
 		7B0D306024C8186400092B84 /* HXPhotoBottomConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0D305C24C8186300092B84 /* HXPhotoBottomConfiguration.m */; };
 		7B0D306124C8186400092B84 /* HXPhotoPreviewBottomConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0D305E24C8186300092B84 /* HXPhotoPreviewBottomConfiguration.m */; };
 		7B0EFFDA220598D100D614E8 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0EFFD8220598D100D614E8 /* SettingViewController.m */; };
@@ -275,6 +276,7 @@
 		7B06B2D024D02DA000FDD794 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
 		7B06B2D124D02DA000FDD794 /* ko.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ko.lproj; sourceTree = "<group>"; };
 		7B06B2D224D02DA000FDD794 /* zh-Hant.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zh-Hant.lproj"; sourceTree = "<group>"; };
+		7B06B2DA24D11A1500FDD794 /* IMG_0168.GIF */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = IMG_0168.GIF; sourceTree = "<group>"; };
 		7B0D305C24C8186300092B84 /* HXPhotoBottomConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoBottomConfiguration.m; sourceTree = "<group>"; };
 		7B0D305D24C8186300092B84 /* HXPhotoBottomConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoBottomConfiguration.h; sourceTree = "<group>"; };
 		7B0D305E24C8186300092B84 /* HXPhotoPreviewBottomConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoPreviewBottomConfiguration.m; sourceTree = "<group>"; };
@@ -1291,6 +1293,7 @@
 			children = (
 				7BFE13502484B17000170F21 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg */,
 				7BFE134A24849FA400170F21 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg */,
+				7B06B2DA24D11A1500FDD794 /* IMG_0168.GIF */,
 				7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */,
 				7B7E3E7A1E4AACD1002234EE /* main.m */,
 			);
@@ -1635,6 +1638,7 @@
 				7B005AC524D008C500607111 /* HXPhotoEditTextView.xib in Resources */,
 				7B06B2D624D02DA000FDD794 /* ko.lproj in Resources */,
 				7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */,
+				7B06B2DB24D11A1500FDD794 /* IMG_0168.GIF in Resources */,
 				7B005AC324D008C500607111 /* HXPhotoEditGraffitiColorViewCell.xib in Resources */,
 				7B06B2D324D02DA000FDD794 /* zh-Hans.lproj in Resources */,
 				7B005AC424D008C500607111 /* HXPhotoEditMosaicView.xib in Resources */,
@@ -2028,7 +2032,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.0.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2055,7 +2059,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.2;
+				MARKETING_VERSION = 3.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
