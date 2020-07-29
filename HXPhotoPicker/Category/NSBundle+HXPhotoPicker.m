@@ -25,7 +25,7 @@
                 path = [associateBunle pathForResource:@"HXPhotoPicker" ofType:@"bundle"];
             }
         }
-        hxBundle = path ? [NSBundle bundleWithPath:path] : [NSBundle mainBundle];
+        hxBundle = path ? [NSBundle bundleWithPath:path]: [NSBundle mainBundle];
     }
     return hxBundle;
 }

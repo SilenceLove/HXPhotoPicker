@@ -124,6 +124,7 @@
     self.videoAutoPlayType = HXVideoAutoPlayTypeWiFi;
     self.previewSelectedBtnBgColor = self.themeColor;
     
+    self.changeOriginalTinColor = YES;
     self.downloadNetworkVideo = YES;
     self.cameraCanLocation = YES;
     self.editAssetSaveSystemAblum = NO;
@@ -247,6 +248,11 @@
     self.themeColor = [UIColor whiteColor];
     self.photoEditConfigur.themeColor = [UIColor hx_colorWithHexStr:@"#07C160"];
     self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
+    
+    // 原图按钮设置
+    self.changeOriginalTinColor = NO;
+    self.originalNormalImageName = @"hx_original_normal_wx";
+    self.originalSelectedImageName = @"hx_original_selected_wx";
     
     self.cameraFocusBoxColor = [UIColor hx_colorWithHexStr:@"#07C160"];
     

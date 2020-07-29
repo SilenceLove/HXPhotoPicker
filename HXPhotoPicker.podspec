@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'SDWebImage' do |sd|
-    sd.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
+    sd.source_files = "HXPhotoPicker/**/*.{h,m}"
     sd.dependency 'SDWebImage', '~> 5.0'
     sd.resource_bundles = {
         'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']

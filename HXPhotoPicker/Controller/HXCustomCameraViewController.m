@@ -829,7 +829,7 @@
         _doneBtn.hx_centerY = 50.f / 2;
         [_doneBtn setBackgroundColor:self.manager.configuration.cameraFocusBoxColor];
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
-        _doneBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:15];
+        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
         [_doneBtn hx_radiusWithRadius:3 corner:UIRectCornerAllCorners];
     }
     return _doneBtn;

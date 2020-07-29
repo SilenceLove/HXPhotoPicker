@@ -344,7 +344,7 @@
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
-        _doneBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:14];
         _doneBtn.layer.cornerRadius = 3;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }

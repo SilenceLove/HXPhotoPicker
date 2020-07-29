@@ -18,34 +18,22 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
 
 @interface HXCustomAssetModel : NSObject
 
-/**
- 资源类型
- */
+/// 资源类型
 @property (assign, nonatomic) HXCustomAssetModelType type;
 
-/**
- 网络图片地址 or 网络视频封面
- */
+/// 网络图片地址 or 网络视频封面
 @property (strong, nonatomic) NSURL *networkImageURL;
 
-/**
- 网络图片缩略图地址 or 网络视频封面
- */
+/// 网络图片缩略图地址 or 网络视频封面
 @property (strong, nonatomic) NSURL *networkThumbURL;
 
-/**
- 本地图片UIImage
- */
+/// 本地图片UIImage
 @property (strong, nonatomic) UIImage *localImage;
 
-/**
- 本地视频地址
- */
+/// 本地视频地址
 @property (strong, nonatomic) NSURL *localVideoURL;
 
-/**
- 本地图片地址
- */
+/// 本地图片地址
 @property (strong, nonatomic) NSURL *localImagePath;
 
 /// 网络视频地址
@@ -54,60 +42,38 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
 /// 视频时长
 @property (assign, nonatomic) NSTimeInterval videoDuration;
 
-/**
- 是否选中
- */
+/// 是否选中
 @property (assign, nonatomic) BOOL selected;
 
-/**
- 根据本地图片名初始化
-
- @param imageName 本地图片名
- @param selected 是否选中
- @return HXCustomAssetModel
- */
+/// 根据本地图片名初始化
+/// @param imageName 本地图片名
+/// @param selected 是否选中
 + (instancetype)assetWithLocaImageName:(NSString *)imageName selected:(BOOL)selected;
 
-/**
- 根据本地UIImage初始化
-
- @param image 本地图片
- @param selected 是否选中
- @return HXCustomAssetModel
- */
+/// 根据本地UIImage初始化
+/// @param image 本地图片
+/// @param selected 是否选中
 + (instancetype)assetWithLocalImage:(UIImage *)image selected:(BOOL)selected;
 
-/// 根据本地图片路径生成图片
+/// 根据本地图片路径生成图片，本地GIF图片可根据此方法导入
 /// @param imagePath 图片路径
 /// @param selected 是否选中
 + (instancetype)assetWithImagePath:(NSURL *)imagePath selected:(BOOL)selected;
 
-/**
- 根据网络图片地址初始化
-
- @param imageURL 网络图片地址
- @param selected 是否选中
- @return HXCustomAssetModel
- */
+/// 根据网络图片地址初始化
+/// @param imageURL 网络图片地址
+/// @param selected 是否选中
 + (instancetype)assetWithNetworkImageURL:(NSURL *)imageURL selected:(BOOL)selected;
 
-/**
- 根据网络图片地址初始化
-
- @param imageURL 网络图片地址
- @param thumbURL 网络图片缩略图地址
- @param selected 是否选中
- @return HXCustomAssetModel
- */
+/// 根据网络图片地址初始化
+/// @param imageURL 网络图片地址
+/// @param thumbURL 网络图片缩略图地址
+/// @param selected 是否选中
 + (instancetype)assetWithNetworkImageURL:(NSURL *)imageURL networkThumbURL:(NSURL *)thumbURL selected:(BOOL)selected;
 
-/**
- 根据本地视频地址初始化
-
- @param videoURL 本地视频地址
- @param selected 是否选中
- @return HXCustomAssetModel
- */
+/// 根据本地视频地址初始化
+/// @param videoURL 本地视频地址
+/// @param selected 是否选中
 + (instancetype)assetWithLocalVideoURL:(NSURL *)videoURL selected:(BOOL)selected;
 
 /// 根据网络视频地址、视频封面初始化

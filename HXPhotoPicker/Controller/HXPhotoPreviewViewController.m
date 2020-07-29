@@ -1359,7 +1359,7 @@ HX_PhotoEditViewControllerDelegate
         _selectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_selectBtn setBackgroundImage:[UIImage hx_imageNamed:@"hx_compose_guide_check_box_default_2"] forState:UIControlStateNormal];
         [_selectBtn setBackgroundImage:[[UIImage alloc] init] forState:UIControlStateSelected];
-        _selectBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        _selectBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];;
         _selectBtn.adjustsImageWhenDisabled = YES;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
         _selectBtn.hx_size = CGSizeMake(24, 24);

@@ -1,4 +1,4 @@
-<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tip_1.png">
+<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tip_2.png">
 
 [![Platform](http://img.shields.io/badge/platform-ios-blue.svg?style=flat
              )](https://developer.apple.com/iphone/index.action)
@@ -63,7 +63,7 @@
   // 使用YYWebImage加载网络图片
   pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
   ```
-- 搜索不到库或最新版请执行```pod repo update``` ```rm ~/Library/Caches/CocoaPods/search_index.json```
+- 搜索不到库或最新版请执行```pod repo update```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 使用前导入头文件 "HXPhotoPicker.h"
 

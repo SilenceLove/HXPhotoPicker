@@ -507,6 +507,9 @@ HXPhotoPreviewViewController;
 /// 改变主题颜色后建议也改下原图按钮的图标
 @property (strong, nonatomic) UIColor *themeColor;
 
+/// 是否可以改变原图按钮的tinColor
+@property (assign, nonatomic) BOOL changeOriginalTinColor;
+
 /**
  原图按钮普通状态下的按钮图标名
  - 改变主题颜色后建议也改下原图按钮的图标

@@ -10,6 +10,7 @@
 #import "UIView+HXExtension.h"
 #import "UIImage+HXExtension.h"
 #import "NSBundle+HXPhotoPicker.h"
+#import "UIFont+HXExtension.h"
 
 @interface HX_PhotoEditBottomView ()
 @property (weak, nonatomic) IBOutlet UIButton *graffitiBtn;
@@ -50,6 +51,7 @@
     
     [self.doneBtn hx_radiusWithRadius:3 corner:UIRectCornerAllCorners];
     [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
+    self.doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
 }
 - (void)setThemeColor:(UIColor *)themeColor {
     _themeColor = themeColor;

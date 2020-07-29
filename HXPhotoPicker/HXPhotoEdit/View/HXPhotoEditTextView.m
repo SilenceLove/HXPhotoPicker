@@ -14,6 +14,7 @@
 #import "UIColor+HXExtension.h"
 #import "HXPhotoEditConfiguration.h"
 #import "NSBundle+HXPhotoPicker.h"
+#import "UIFont+HXExtension.h"
 
 #define HXEditTextBlankWidth 22
 #define HXEditTextRadius 8.f
@@ -87,6 +88,7 @@
     [super awakeFromNib];
     [self.cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"取消"] forState:UIControlStateNormal];
     [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
+    self.doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
     self.textBtn.layer.cornerRadius = 1.f;
     [self.textBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_text_ normal"] forState:UIControlStateNormal];
     [self.textBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_text_selected"] forState:UIControlStateSelected];

@@ -2165,11 +2165,11 @@ HX_PhotoEditViewControllerDelegate
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-            if ([HXPhotoCommon photoCommon].isDark) {
-                self.selectMaskLayer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.2].CGColor;
-            }else {
-                self.selectMaskLayer.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.2].CGColor;
-            }
+//            if ([HXPhotoCommon photoCommon].isDark) {
+//                self.selectMaskLayer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.2].CGColor;
+//            }else {
+                self.selectMaskLayer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
+//            }
 //            self.imageView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
 
             UIColor *cellSelectedTitleColor;
@@ -2661,11 +2661,7 @@ HX_PhotoEditViewControllerDelegate
     if (!_selectMaskLayer) {
         _selectMaskLayer = [CALayer layer];
         _selectMaskLayer.hidden = YES;
-        if ([HXPhotoCommon photoCommon].isDark) {
-            _selectMaskLayer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.2].CGColor;
-        }else {
-            _selectMaskLayer.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.3].CGColor;
-        }
+        _selectMaskLayer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
     }
     return _selectMaskLayer;
 }
@@ -2679,7 +2675,7 @@ HX_PhotoEditViewControllerDelegate
 - (CALayer *)videoMaskLayer {
     if (!_videoMaskLayer) {
         _videoMaskLayer = [CALayer layer];
-        _videoMaskLayer.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
+        _videoMaskLayer.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.7].CGColor;
     }
     return _videoMaskLayer;
 }
@@ -2715,9 +2711,9 @@ HX_PhotoEditViewControllerDelegate
         UIImage *bgImage = [[UIImage hx_imageNamed:@"hx_compose_guide_check_box_selected"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         [_selectBtn setBackgroundImage:bgImage forState:UIControlStateSelected];
         [_selectBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-        _selectBtn.titleLabel.font = [UIFont systemFontOfSize:15];
+        _selectBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];
         _selectBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
-        _selectBtn.hx_size = CGSizeMake(25, 25);
+        _selectBtn.hx_size = _selectBtn.currentBackgroundImage.size;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
         [_selectBtn hx_setEnlargeEdgeWithTop:0 right:0 bottom:15 left:15];
     }
@@ -3093,8 +3089,9 @@ HX_PhotoEditViewControllerDelegate
     [self.originalBtn setTitleColor:themeColor forState:UIControlStateNormal];
     [self.originalBtn setTitleColor:[themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
     
-    UIImage *originalNormalImage = [[UIImage hx_imageNamed:self.manager.configuration.originalNormalImageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    UIImage *originalSelectedImage = [[UIImage hx_imageNamed:self.manager.configuration.originalSelectedImageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImageRenderingMode rederingMode = self.manager.configuration.changeOriginalTinColor ? UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAlwaysOriginal;
+    UIImage *originalNormalImage = [[UIImage hx_imageNamed:self.manager.configuration.originalNormalImageName] imageWithRenderingMode:rederingMode];
+    UIImage *originalSelectedImage = [[UIImage hx_imageNamed:self.manager.configuration.originalSelectedImageName] imageWithRenderingMode:rederingMode];
     [self.originalBtn setImage:originalNormalImage forState:UIControlStateNormal];
     [self.originalBtn setImage:originalSelectedImage forState:UIControlStateSelected];
     self.originalBtn.imageView.tintColor = originalBtnImageTintColor;
@@ -3295,7 +3292,7 @@ HX_PhotoEditViewControllerDelegate
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
-        _doneBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:14];
         [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _doneBtn.layer.cornerRadius = 3;
