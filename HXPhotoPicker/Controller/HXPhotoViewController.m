@@ -2583,9 +2583,8 @@ HX_PhotoEditViewControllerDelegate
     self.maskView.frame = self.bounds;
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
-    self.selectBtn.hx_size = CGSizeMake(30, 30);
-    self.selectBtn.hx_x = self.hx_w - self.selectBtn.hx_w;
-    self.selectBtn.hx_y = 0;
+    self.selectBtn.hx_x = self.hx_w - self.selectBtn.hx_w - 5;
+    self.selectBtn.hx_y = 5;
     self.selectMaskLayer.frame = self.bounds;
     self.iCloudMaskLayer.frame = self.bounds;
     self.iCloudIcon.hx_x = self.hx_w - 3 - self.iCloudIcon.hx_w;
@@ -2712,6 +2711,7 @@ HX_PhotoEditViewControllerDelegate
         [_selectBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
         _selectBtn.titleLabel.font = [UIFont systemFontOfSize:15];
         _selectBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
+        _selectBtn.hx_size = CGSizeMake(25, 25);
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
         [_selectBtn hx_setEnlargeEdgeWithTop:0 right:0 bottom:15 left:15];
     }

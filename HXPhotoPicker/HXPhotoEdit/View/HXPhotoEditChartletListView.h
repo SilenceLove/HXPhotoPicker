@@ -9,8 +9,10 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@class HXPhotoEditChartletModel, HXPhotoEditChartletTitleModel;
+@class HXPhotoEditChartletModel, HXPhotoEditChartletTitleModel, HXPhotoEditConfiguration;
 @interface HXPhotoEditChartletListView : UIView
++ (void)showEmojiViewWithConfiguration:(HXPhotoEditConfiguration *)configuration
+                            completion:(void (^ _Nullable)(UIImage *image))completion;
 + (void)showEmojiViewWithModels:(NSArray<HXPhotoEditChartletTitleModel *> *)models
                      completion:(void (^ _Nullable)(UIImage *image))completion;
 @end

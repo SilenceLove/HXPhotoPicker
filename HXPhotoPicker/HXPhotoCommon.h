@@ -24,6 +24,9 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 
 @interface HXPhotoCommon : NSObject
 @property (strong, nonatomic, nullable) NSBundle *languageBundle;
+@property (strong, nonatomic, nullable) NSBundle *photoPickerBundle;
+
+
 /// 相册风格
 @property (assign, nonatomic) HXPhotoStyle photoStyle;
 @property (assign, nonatomic) HXPhotoLanguageType languageType;

@@ -8,6 +8,7 @@
 
 #import "HXPhotoEditMosaicView.h"
 #import "UIImage+HXExtension.h"
+#import "NSBundle+HXPhotoPicker.h"
 
 @interface HXPhotoEditMosaicView ()
 @property (weak, nonatomic) IBOutlet UIButton *normalBtn;
@@ -19,7 +20,7 @@
 @implementation HXPhotoEditMosaicView
 
 + (instancetype)initView {
-    return [[[NSBundle mainBundle] loadNibNamed:NSStringFromClass([self class]) owner:nil options:nil] lastObject];
+    return [[[NSBundle hx_photoPickerBundle] loadNibNamed:NSStringFromClass(self) owner:nil options:nil] lastObject];
 }
 
 - (void)awakeFromNib {

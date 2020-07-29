@@ -47,6 +47,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditAspectRatio) {
 /// 贴图模型数组
 @property (copy, nonatomic) NSArray<HXPhotoEditChartletTitleModel *> *chartletModels;
 
+/// 请求获取贴图模型
+/// 内部没有做缓存处理，需要自己去做贴图资源的缓存
+/// 优先级高于 chartletModels
+@property (copy, nonatomic) void (^ requestChartletModels)(void(^ chartletModels)(NSArray<HXPhotoEditChartletTitleModel *> *chartletModels));
+
 #pragma mark - < 文字贴图相关 >
 /// 文字颜色数组
 @property (copy, nonatomic) NSArray<UIColor *> *textColors;

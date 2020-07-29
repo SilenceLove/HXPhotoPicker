@@ -517,7 +517,7 @@
                 }
             }else if (tag == 1) {
                 // 贴图
-                [HXPhotoEditChartletListView showEmojiViewWithModels:weakSelf.configuration.chartletModels completion:^(UIImage * _Nonnull image) {
+                [HXPhotoEditChartletListView showEmojiViewWithConfiguration:weakSelf.configuration completion:^(UIImage * _Nonnull image) {
                     HXPhotoEditStickerItem *item = [[HXPhotoEditStickerItem alloc] init];
                     item.image = image;
                     [weakSelf.editingView.clippingView.imageView.stickerView addStickerItem:item isSelected:YES];

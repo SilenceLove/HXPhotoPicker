@@ -2,7 +2,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "HXPhotoPicker"
-  s.version      = "3.0.2"
+  s.version      = "3.0.3"
   s.summary      = "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义裁剪照片/视频、3DTouch预览、浏览网络图片/网络视频 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function"
   s.homepage     = "https://github.com/SilenceLove/HXPhotoPicker"
   s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -18,33 +18,43 @@ Pod::Spec.new do |s|
   
   s.subspec 'Default' do |de|
     de.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
-    de.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
+    de.resource_bundles = {
+        'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']
+    }
   end
   
   s.subspec 'SDWebImage' do |sd|
     sd.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
-    sd.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
     sd.dependency 'SDWebImage', '~> 5.0'
+    sd.resource_bundles = {
+        'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']
+    }
   end
   
   s.subspec 'SDWebImage_AF' do |sd_af|
     sd_af.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
-    sd_af.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
     sd_af.dependency 'SDWebImage', '~> 5.0'
     sd_af.dependency 'AFNetworking'
+    sd_af.resource_bundles = {
+        'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']
+    }
   end
   
   s.subspec 'YYWebImage' do |yy|
     yy.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
-    yy.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
     yy.dependency 'YYWebImage', '~> 1.0.5'
+    yy.resource_bundles = {
+        'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']
+    }
   end
   
   s.subspec 'YYWebImage_AF' do |yy_af|
     yy_af.source_files = "HXPhotoPicker/**/*.{h,m,xib}"
-    yy_af.resources    = "HXPhotoPicker/Resource/*.{png,xib,nib,bundle}"
     yy_af.dependency 'YYWebImage', '~> 1.0.5'
     yy_af.dependency 'AFNetworking'
+    yy_af.resource_bundles = {
+        'HXPhotoPicker' => ['HXPhotoPicker/Assets/*{xib,xcassets,storyboard,lproj}']
+    }
   end
 
 end

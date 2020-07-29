@@ -228,7 +228,7 @@
     
 #ifdef __IPHONE_14_0
     if (@available(iOS 14, *)) {
-        status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
+        status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelAddOnly];
 #else
     if(NO) {
 #endif

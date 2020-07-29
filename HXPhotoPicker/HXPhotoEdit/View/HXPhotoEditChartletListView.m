@@ -14,6 +14,8 @@
 #import "HXPhotoEditChartletModel.h"
 #import "HXPhotoEditChartletContentViewCell.h"
 #import "UIImageView+HXExtension.h"
+#import "HXPhotoEditConfiguration.h"
+#import "NSBundle+HXPhotoPicker.h"
 
 #define HXclViewHeight ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait || [[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown) ? (HX_IS_IPhoneX_All ? 400 : 350) : 200
 
@@ -35,9 +37,22 @@
 @property (strong, nonatomic) NSIndexPath *currentSelectTitleIndexPath;
 @property (assign, nonatomic) CGFloat contentViewBottom;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *arrowRightConstraint;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingView;
+@property (strong, nonatomic) HXPhotoEditConfiguration *configuration;
 @end
 
 @implementation HXPhotoEditChartletListView
+
+
++ (void)showEmojiViewWithConfiguration:(HXPhotoEditConfiguration *)configuration
+                            completion:(void (^ _Nullable)(UIImage *image))completion {
+    HXPhotoEditChartletListView *view = [HXPhotoEditChartletListView initView];
+    view.selectImageCompletion = completion;
+    view.configuration = configuration;
+    view.frame = [UIScreen mainScreen].bounds;
+    [[UIApplication sharedApplication].keyWindow addSubview:view];
+    [view show];
+}
 
 + (void)showEmojiViewWithModels:(NSArray<HXPhotoEditChartletTitleModel *> *)models
                      completion:(void (^ _Nullable)(UIImage *image))completion {
@@ -50,7 +65,7 @@
 }
 
 + (instancetype)initView {
-    return [[[NSBundle mainBundle] loadNibNamed:NSStringFromClass([self class]) owner:nil options:nil] lastObject];
+    return [[[NSBundle hx_photoPickerBundle] loadNibNamed:NSStringFromClass(self) owner:nil options:nil] lastObject];
 }
 
 - (void)dealloc {
@@ -59,6 +74,7 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+    self.loadingView.hidesWhenStopped = YES;
     if (@available(iOS 11.0, *)){
         [self.collectionView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
         [self.titleCollectionView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
@@ -95,7 +111,9 @@
     self.collectionView.pagingEnabled = YES;
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    [self.collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([HXPhotoEditChartletContentViewCell class]) bundle:nil] forCellWithReuseIdentifier:@"HXPhotoEditChartletContentViewCellId"];
+    
+    [self.collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([HXPhotoEditChartletContentViewCell class]) bundle:[NSBundle hx_photoPickerBundle]] forCellWithReuseIdentifier:@"HXPhotoEditChartletContentViewCellId"];
+     
     
     UILongPressGestureRecognizer *longPgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressGestureRecongizerClick:)];
     [self addGestureRecognizer:longPgr];
@@ -108,6 +126,25 @@
 }
 - (void)deviceOrientationWillChanged {
     [self removeFromSuperview];
+}
+- (void)setConfiguration:(HXPhotoEditConfiguration *)configuration {
+    _configuration = configuration;
+    
+    if (configuration.requestChartletModels) {
+        [self.loadingView startAnimating];
+        HXWeakSelf
+        configuration.requestChartletModels(^(NSArray<HXPhotoEditChartletTitleModel *> * _Nonnull chartletModels) {
+            if (!weakSelf) {
+                return;
+            }
+            [weakSelf.loadingView stopAnimating];
+            weakSelf.models = chartletModels;
+            [weakSelf.collectionView reloadData];
+            [weakSelf.titleCollectionView reloadData];
+        });
+    }else {
+        self.models = configuration.chartletModels;
+    }
 }
 - (void)setModels:(NSArray *)models {
     _models = models;
@@ -319,21 +356,23 @@
 }
 - (void)setTitleModel:(HXPhotoEditChartletTitleModel *)titleModel {
     _titleModel = titleModel;
-    self.loadingView.hidden = YES;
-    [self.loadingView stopAnimating];
     if (titleModel.type == HXPhotoEditChartletModelType_Image) {
+        [self.loadingView stopAnimating];
         self.imageView.image = titleModel.image;
     }else if (titleModel.type == HXPhotoEditChartletModelType_ImageNamed) {
+        [self.loadingView stopAnimating];
         self.imageView.image = [UIImage hx_imageNamed:titleModel.imageNamed];
     }else if (titleModel.type == HXPhotoEditChartletModelType_NetworkURL) {
         HXWeakSelf
+        if (!titleModel.loadCompletion) {
+            [self.loadingView startAnimating];
+        }
         [self.imageView hx_setImageWithURL:titleModel.networkURL progress:^(CGFloat progress) {
             if (progress < 1) {
-                weakSelf.loadingView.hidden = NO;
                 [weakSelf.loadingView startAnimating];
             }
         } completed:^(UIImage *image, NSError *error) {
-            weakSelf.loadingView.hidden = YES;
+            weakSelf.titleModel.loadCompletion = YES;
             [weakSelf.loadingView stopAnimating];
         }];
     }
@@ -342,21 +381,23 @@
 }
 - (void)setModel:(HXPhotoEditChartletModel *)model {
     _model = model;
-    self.loadingView.hidden = YES;
-    [self.loadingView stopAnimating];
     if (model.type == HXPhotoEditChartletModelType_Image) {
+        [self.loadingView stopAnimating];
         self.imageView.image = model.image;
     }else if (model.type == HXPhotoEditChartletModelType_ImageNamed) {
+        [self.loadingView stopAnimating];
         self.imageView.image = [UIImage hx_imageNamed:model.imageNamed];
     }else if (model.type == HXPhotoEditChartletModelType_NetworkURL) {
+        if (!model.loadCompletion) {
+            [self.loadingView startAnimating];
+        }
         HXWeakSelf
         [self.imageView hx_setImageWithURL:model.networkURL progress:^(CGFloat progress) {
             if (progress < 1) {
-                weakSelf.loadingView.hidden = NO;
                 [weakSelf.loadingView startAnimating];
             }
         } completed:^(UIImage *image, NSError *error) {
-            weakSelf.loadingView.hidden = YES;
+            weakSelf.model.loadCompletion = YES;
             [weakSelf.loadingView stopAnimating];
         }];
     }
@@ -401,7 +442,7 @@
 - (UIActivityIndicatorView *)loadingView {
     if (!_loadingView) {
         _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-        _loadingView.hidden = YES;
+        _loadingView.hidesWhenStopped = YES;
     }
     return _loadingView;
 }

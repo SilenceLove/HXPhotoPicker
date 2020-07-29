@@ -159,6 +159,7 @@
 }
 - (void)setLanguageType:(HXPhotoLanguageType)languageType {
     if ([HXPhotoCommon photoCommon].languageType != languageType) {
+        [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
         [HXPhotoCommon photoCommon].languageBundle = nil;
     }
     _languageType = languageType;

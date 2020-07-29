@@ -106,6 +106,23 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //                bottomView.tipView.barTintColor = [UIColor colorWithRed:60.f / 255.f green:131.f / 255.f blue:238.f / 255.f alpha:1];
 //            }
         };
+        
+//        _manager.configuration.photoEditConfigur.requestChartletModels = ^(void (^ _Nonnull chartletModels)(NSArray<HXPhotoEditChartletTitleModel *> * _Nonnull)) {
+//            // 模仿网络请求获取贴图资源
+//            HXPhotoEditChartletTitleModel *netModel = [HXPhotoEditChartletTitleModel modelWithNetworkNURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy_s_highlighted.png"]];
+//            NSString *prefix = @"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy%d.png";
+//            NSMutableArray *netModels = @[].mutableCopy;
+//            for (int i = 1; i <= 40; i++) {
+//                [netModels addObject:[HXPhotoEditChartletModel modelWithNetworkNURL:[NSURL URLWithString:[NSString stringWithFormat:prefix ,i]]]];
+//            }
+//            netModel.models = netModels.copy;
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                // 这里没有模仿做缓存处理，需要自己做缓存处理
+//                if (chartletModels) {
+//                    chartletModels(@[netModel]);
+//                }
+//            });
+//        };
         _manager.configuration.shouldUseCamera = ^(UIViewController *viewController, HXPhotoConfigurationCameraType cameraType, HXPhotoManager *manager) {
             
             // 这里拿使用系统相机做例子

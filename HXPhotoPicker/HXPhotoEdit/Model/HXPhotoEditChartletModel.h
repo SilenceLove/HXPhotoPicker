@@ -29,12 +29,18 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditChartletModelType) {
 + (instancetype)modelWithImage:(UIImage *)image;
 + (instancetype)modelWithImageNamed:(NSString *)imageNamed;
 + (instancetype)modelWithNetworkNURL:(NSURL *)networkURL;
+
+
+// other
+@property (assign, nonatomic) BOOL loadCompletion;
 @end
 
 
 @interface HXPhotoEditChartletTitleModel : HXPhotoEditChartletModel
 // 贴图数组
 @property (copy, nonatomic) NSArray<HXPhotoEditChartletModel *> *models;
+
+// other
 @property (assign, nonatomic) BOOL selected;
 @end
 

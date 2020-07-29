@@ -60,6 +60,20 @@
     return self;
 }
 
++ (instancetype)assetWithImagePath:(NSURL *)imagePath selected:(BOOL)selected {
+    return [[self alloc] initAssetWithImagePath:imagePath selected:selected];
+}
+
+- (instancetype)initAssetWithImagePath:(NSURL *)imagePath selected:(BOOL)selected {
+    self = [super init];
+    if (self) {
+        self.type = HXCustomAssetModelTypeLocalImage;
+        self.imagePath = imagePath;
+        self.selected = selected;
+    }
+    return self;
+}
+
 + (instancetype)assetWithNetworkImageURL:(NSURL *)imageURL selected:(BOOL)selected {
     return [[self alloc] initAssetWithNetworkImageURL:imageURL networkThumbURL:imageURL selected:selected];
 }

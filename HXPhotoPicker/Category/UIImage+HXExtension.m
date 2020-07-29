@@ -16,20 +16,29 @@
     if (!imageName) {
         return nil;
     }
-    UIImage *image = [self imageNamed:imageName];;
-    if (image) return image;
-    NSBundle *myBundle = [NSBundle hx_photoPickerBundle];
-    imageName = [imageName stringByAppendingString:@"@2x"];
-    NSString *imagePath = [myBundle pathForResource:imageName ofType:@"png"];
-    image = [self imageWithContentsOfFile:imagePath];
+    UIImage *image = [self imageNamed:imageName];
     if (image) {
         return image;
-    } else {
-        imageName = [imageName stringByReplacingOccurrencesOfString:@"@2x" withString:@""];
-        imagePath = [myBundle pathForResource:imageName ofType:@"png"];
-        image = [self imageWithContentsOfFile:imagePath];
-        return image;
     }
+    NSBundle *bundle = [NSBundle hx_photoPickerBundle];
+    if (bundle) {
+        image = [UIImage imageNamed:imageName inBundle:bundle compatibleWithTraitCollection:nil];
+    }
+    return image;
+//    UIImage *image = [self imageNamed:imageName];;
+//    if (image) return image;
+//    NSBundle *myBundle = [NSBundle hx_photoPickerBundle];
+//    imageName = [imageName stringByAppendingString:@"@2x"];
+//    NSString *imagePath = [myBundle pathForResource:imageName ofType:@"png"];
+//    image = [self imageWithContentsOfFile:imagePath];
+//    if (image) {
+//        return image;
+//    } else {
+//        imageName = [imageName stringByReplacingOccurrencesOfString:@"@2x" withString:@""];
+//        imagePath = [myBundle pathForResource:imageName ofType:@"png"];
+//        image = [self imageWithContentsOfFile:imagePath];
+//        return image;
+//    }
 } 
 + (UIImage *)hx_thumbnailImageForVideo:(NSURL *)videoURL atTime:(NSTimeInterval)time {
     AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];

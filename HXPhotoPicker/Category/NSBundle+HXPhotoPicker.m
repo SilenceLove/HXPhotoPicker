@@ -13,11 +13,17 @@
 + (instancetype)hx_photoPickerBundle {
     static NSBundle *hxBundle = nil;
     if (hxBundle == nil) {
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"HXPhotoPicker" ofType:@"bundle"];
+        NSBundle *bundle = [NSBundle bundleForClass:NSClassFromString(@"HXPhotoPicker")];
+        NSString *path = [bundle pathForResource:@"HXPhotoPicker" ofType:@"bundle"];
+        //使用framework形式
         if (!path) {
-            path = [[NSBundle mainBundle] pathForResource:@"HXPhotoPicker" ofType:@"bundle" inDirectory:@"Frameworks/HXPhotoPicker.framework/"];
+            NSURL *associateBundleURL = [[NSBundle mainBundle] URLForResource:@"Frameworks" withExtension:nil];
+            associateBundleURL = [associateBundleURL URLByAppendingPathComponent:@"HXPhotoPicker"];
+            associateBundleURL = [associateBundleURL URLByAppendingPathExtension:@"framework"];
+            NSBundle *associateBunle = [NSBundle bundleWithURL:associateBundleURL];
+            path = [associateBunle pathForResource:@"HXPhotoPicker" ofType:@"bundle"];
         }
-        hxBundle = [NSBundle bundleWithPath:path];
+        hxBundle = path ? [NSBundle bundleWithPath:path] : [NSBundle mainBundle];
     }
     return hxBundle;
 }
@@ -27,6 +33,17 @@
 + (NSString *)hx_localizedStringForKey:(NSString *)key value:(NSString *)value {
     NSBundle *bundle = [HXPhotoCommon photoCommon].languageBundle;
     value = [bundle localizedStringForKey:key value:value table:nil];
-    return [[NSBundle mainBundle] localizedStringForKey:key value:value table:nil];
+    return value;
+}
++ (instancetype)hx_languageBundle {
+    static NSBundle *hxBundle = nil;
+    if (hxBundle == nil) {
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"HXPhotoPickerAsset" ofType:@"bundle"];
+        if (!path) {
+            path = [[NSBundle mainBundle] pathForResource:@"HXPhotoPickerAsset" ofType:@"bundle" inDirectory:@"Frameworks/HXPhotoPicker.framework/"];
+        }
+        hxBundle = [NSBundle bundleWithPath:path];
+    }
+    return hxBundle;
 }
 @end

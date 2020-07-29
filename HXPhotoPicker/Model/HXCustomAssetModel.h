@@ -38,6 +38,9 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
  */
 @property (strong, nonatomic) UIImage *localImage;
 
+/// 本地图片路径
+@property (strong, nonatomic) NSURL *imagePath;
+
 /**
  本地视频地址
  */
@@ -76,6 +79,11 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
  @return HXCustomAssetModel
  */
 + (instancetype)assetWithLocalImage:(UIImage *)image selected:(BOOL)selected;
+
+/// 根据本地图片路径生成图片
+/// @param imagePath 图片路径
+/// @param selected 是否选中
++ (instancetype)assetWithImagePath:(NSURL *)imagePath selected:(BOOL)selected;
 
 /**
  根据网络图片地址初始化

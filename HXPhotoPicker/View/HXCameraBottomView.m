@@ -11,6 +11,7 @@
 #import "HXFullScreenCameraPlayView.h"
 #import "HXPhotoManager.h"
 #import "UIView+HXExtension.h"
+#import "NSBundle+HXPhotoPicker.h"
 
 @interface HXCameraBottomView ()
 @property (weak, nonatomic) IBOutlet UIView *zoomInBgView;
@@ -32,7 +33,7 @@
 @implementation HXCameraBottomView
 
 + (instancetype)initView {
-    return [[[NSBundle mainBundle] loadNibNamed:NSStringFromClass([self class]) owner:nil options:nil] lastObject];
+    return [[[NSBundle hx_photoPickerBundle] loadNibNamed:NSStringFromClass(self) owner:nil options:nil] lastObject];
 }
 
 - (void)awakeFromNib {

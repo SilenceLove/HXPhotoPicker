@@ -13,6 +13,7 @@
 #import "UIImage+HXExtension.h"
 #import "UIColor+HXExtension.h"
 #import "HXPhotoEditConfiguration.h"
+#import "NSBundle+HXPhotoPicker.h"
 
 #define HXEditTextBlankWidth 22
 #define HXEditTextRadius 8.f
@@ -22,6 +23,7 @@
 @property (nonatomic, strong) NSMutableArray *rectArray;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet UIButton *doneBtn;
+@property (weak, nonatomic) IBOutlet UIButton *cancelBtn;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewLeftConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewRightConstraint;
@@ -76,13 +78,15 @@
     return view;
 }
 + (instancetype)initView {
-    return [[[NSBundle mainBundle] loadNibNamed:NSStringFromClass([self class]) owner:nil options:nil] lastObject];
+    return [[[NSBundle hx_photoPickerBundle] loadNibNamed:NSStringFromClass(self) owner:nil options:nil] lastObject];
 }
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 - (void)awakeFromNib {
     [super awakeFromNib];
+    [self.cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"取消"] forState:UIControlStateNormal];
+    [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
     self.textBtn.layer.cornerRadius = 1.f;
     [self.textBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_text_ normal"] forState:UIControlStateNormal];
     [self.textBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_text_selected"] forState:UIControlStateSelected];
@@ -123,7 +127,7 @@
     
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    [self.collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class]) bundle:nil] forCellWithReuseIdentifier:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class])];
+    [self.collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class]) bundle:[NSBundle hx_photoPickerBundle]] forCellWithReuseIdentifier:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class])];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillAppearance:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillDismiss:) name:UIKeyboardWillHideNotification object:nil];

@@ -9,6 +9,7 @@
 #import "HXPhotoEditGraffitiColorView.h"
 #import "HXPhotoEditGraffitiColorViewCell.h"
 #import "UIImage+HXExtension.h"
+#import "NSBundle+HXPhotoPicker.h"
 
 @interface HXPhotoEditGraffitiColorView ()<UICollectionViewDataSource, UICollectionViewDelegate>
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
@@ -21,7 +22,7 @@
 @implementation HXPhotoEditGraffitiColorView
 
 + (instancetype)initView {
-    return [[[NSBundle mainBundle] loadNibNamed:NSStringFromClass([self class]) owner:nil options:nil] lastObject];
+    return [[[NSBundle hx_photoPickerBundle] loadNibNamed:NSStringFromClass(self) owner:nil options:nil] lastObject];
 }
 
 - (void)awakeFromNib {
@@ -37,7 +38,7 @@
     
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    [self.collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class]) bundle:nil] forCellWithReuseIdentifier:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class])];
+    [self.collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class]) bundle:[NSBundle hx_photoPickerBundle]] forCellWithReuseIdentifier:NSStringFromClass([HXPhotoEditGraffitiColorViewCell class])];
 }
 - (void)setUndo:(BOOL)undo {
     _undo = undo;

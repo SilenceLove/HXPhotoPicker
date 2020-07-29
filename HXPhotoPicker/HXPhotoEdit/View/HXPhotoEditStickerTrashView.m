@@ -9,6 +9,7 @@
 #import "HXPhotoEditStickerTrashView.h"
 #import "UIView+HXExtension.h"
 #import "UIImage+HXExtension.h"
+#import "NSBundle+HXPhotoPicker.h"
 
 @interface HXPhotoEditStickerTrashView ()
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
@@ -21,7 +22,7 @@
 @implementation HXPhotoEditStickerTrashView
 
 + (instancetype)initView {
-    return [[[NSBundle mainBundle] loadNibNamed:NSStringFromClass([self class]) owner:nil options:nil] lastObject];
+    return [[[NSBundle hx_photoPickerBundle] loadNibNamed:NSStringFromClass(self) owner:nil options:nil] lastObject];
 }
 
 - (void)awakeFromNib {

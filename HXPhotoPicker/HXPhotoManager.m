@@ -589,10 +589,11 @@
     if (type == HXPhotoLanguageTypeSys) {
         albumName = collection.localizedTitle;
     }else {
-        if ([collection.localizedTitle isEqualToString:@"相机胶卷"] ||
-            [collection.localizedTitle isEqualToString:@"最近项目"]) {
-            return collection.localizedTitle;
-        }else if ([collection.localizedTitle isEqualToString:@"Camera Roll"]) {
+        if ([collection.localizedTitle isEqualToString:@"最近项目"] ||
+            [collection.localizedTitle isEqualToString:@"最近添加"]) {
+            return [NSBundle hx_localizedStringForKey:HXAlbumRecents];
+        }else if ([collection.localizedTitle isEqualToString:@"Camera Roll"] ||
+                  [collection.localizedTitle isEqualToString:@"相机胶卷"]) {
             return [NSBundle hx_localizedStringForKey:HXAlbumCameraRoll];
         }
         switch (collection.assetCollectionSubtype) {

@@ -143,6 +143,7 @@ CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
 #define HXAlbumFavorites @"HXAlbumFavorites"
 #define HXAlbumTimelapses @"HXAlbumTimelapses"
 #define HXAlbumRecentlyAdded @"HXAlbumRecentlyAdded"
+#define HXAlbumRecents @"HXAlbumRecents"
 #define HXAlbumBursts @"HXAlbumBursts"
 #define HXAlbumSlomoVideos @"HXAlbumSlomoVideos"
 #define HXAlbumSelfPortraits @"HXAlbumSelfPortraits"
