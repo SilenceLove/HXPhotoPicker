@@ -146,7 +146,7 @@
     if (!model && toVC.currentModelIndex >= 0 && toVC.modelArray.count > 0 && toVC.currentModelIndex < toVC.modelArray.count) {
         model = toVC.modelArray[toVC.currentModelIndex];
     }
-    UIImage *image = model.photoEdit ? model.photoEdit.editPosterImage : model.thumbPhoto;
+    UIImage *image = model.photoEdit ? model.photoEdit.editPreviewImage : model.thumbPhoto;
     [self presentAnim:transitionContext Image:image Model:model FromVC:fromVC ToVC:toVC cell:cell];
 }
 

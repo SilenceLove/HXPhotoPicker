@@ -231,9 +231,6 @@
 
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
-    if (!manager.cameraRollAlbumModel && self.showAddCell) {
-        [manager preloadData];
-    }
     manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
     if (self.manager.afterSelectedArray.count > 0) {
         if ([self.delegate respondsToSelector:@selector(photoListViewControllerDidDone:allList:photos:videos:original:)]) {
@@ -443,9 +440,6 @@
  添加按钮点击事件
  */
 - (void)goPhotoViewController {
-    if (!self.manager.cameraRollAlbumModel) {
-        [self.manager preloadData];
-    }
     if (self.outerCamera) {
         HXPhotoBottomViewModel *shootingModel = [[HXPhotoBottomViewModel alloc] init];
         shootingModel.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
@@ -673,7 +667,6 @@
         }
     }
     [self.manager afterListAddCameraTakePicturesModel:model];
-    [self.manager removeAllTempList];
     if ([self.delegate respondsToSelector:@selector(photoViewCameraTakePictureCompletion:model:)]) {
         [self.delegate photoViewCameraTakePictureCompletion:self model:model];
     }

@@ -166,7 +166,6 @@
         }
         [tempBgView removeFromSuperview];
         toVC.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:1];
-        [transitionContext completeTransition:YES];
         if ([fromVC isKindOfClass:[HXPhotoViewController class]]) {
             [(HXPhotoViewController *)fromVC bottomView].alpha = 1;
             [fromVC.navigationController setNavigationBarHidden:NO];
@@ -176,6 +175,7 @@
                   [toVC isKindOfClass:[HXVideoEditViewController class]]) {
             [(HXCustomCameraViewController *)fromVC showPlayerView];
         }
+        [transitionContext completeTransition:YES];
     }];
 }
 

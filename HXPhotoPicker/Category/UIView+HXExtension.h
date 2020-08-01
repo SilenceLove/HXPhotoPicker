@@ -37,10 +37,10 @@
 - (void)hx_handleImageWithDelay:(NSTimeInterval)delay;
 
 /* <HXAlbumListViewControllerDelegate> */
-- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;
+- (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate DEPRECATED_MSG_ATTRIBUTE("Use UIViewController+HXEXtension 'hx_presentSelectPhotoControllerWithManager:' instead");
 
 /* <HXCustomCameraViewControllerDelegate> */
-- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate;
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate DEPRECATED_MSG_ATTRIBUTE("Use UIViewController+HXEXtension 'hx_presentCustomCameraViewControllerWithManager:' instead");
 
 /// 设置圆角。使用自动布局，需要在layoutsubviews 中使用
 /// @param radius 圆角尺寸

@@ -28,7 +28,15 @@
 }
 + (NSArray *)hx_dictHandler:(NSDictionary *)dict {
     NSMutableArray *dataArray = [NSMutableArray array];
-    NSArray *keys = [dict.allKeys sortedArrayUsingSelector:@selector(compare:)];
+    NSArray *keys = [dict.allKeys sortedArrayUsingComparator:^NSComparisonResult(NSString * obj1, NSString * obj2) {
+        if (obj1.integerValue > obj2.integerValue) {
+            return NSOrderedDescending;
+        }else if (obj1.integerValue < obj2.integerValue) {
+            return NSOrderedAscending;
+        }else {
+            return NSOrderedSame;
+        }
+    }];
     for (NSString *key in keys) {
         if ([dict[key] isKindOfClass:[NSError class]]) {
             continue;

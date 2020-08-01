@@ -50,10 +50,11 @@ static id instance;
         self.sessionManager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
         [self listenNetWorkStatus];
 #endif
-        NSData *imageData = [[NSUserDefaults standardUserDefaults] objectForKey:HXCameraImageKey];
-        if (imageData) {
-            self.cameraImage = [NSKeyedUnarchiver unarchiveObjectWithData:imageData];
+        NSURL *imageURL = [[NSUserDefaults standardUserDefaults] URLForKey:HXCameraImageKey];
+        if (imageURL) {
+            self.cameraImageURL = imageURL;
         }
+        self.cameraRollLocalIdentifier = [[NSUserDefaults standardUserDefaults] objectForKey:@"HXCameraRollLocalIdentifier"];
 
         if ([HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
             [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
@@ -62,6 +63,12 @@ static id instance;
         }
     }
     return self;
+}
+- (void)setCameraRollLocalIdentifier:(NSString *)cameraRollLocalIdentifier {
+    _cameraRollLocalIdentifier = cameraRollLocalIdentifier;
+    if (cameraRollLocalIdentifier) {
+        [[NSUserDefaults standardUserDefaults] setObject:cameraRollLocalIdentifier forKey:@"HXCameraRollLocalIdentifier"];
+    }
 }
 - (void)requestAuthorizationCompletion {
     if (!self.hasAuthorization && [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
@@ -72,18 +79,17 @@ static id instance;
 
 #pragma mark - < PHPhotoLibraryChangeObserver >
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.cameraRollAlbumModel.result];
+    PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.cameraRollResult];
     if (collectionChanges) {
         if ([collectionChanges hasIncrementalChanges]) {
             PHFetchResult *result = collectionChanges.fetchResultAfterChanges;
-            self.cameraRollAlbumModel.result = result;
-            self.cameraRollAlbumModel.count = result.count;
+            self.cameraRollResult = result;
             if (collectionChanges.insertedObjects.count > 0) {
                 // 添加照片了
             }
             if (collectionChanges.removedObjects.count > 0) {
                 // 删除照片了
-                
+
             }
             if (collectionChanges.changedObjects.count > 0) {
                 // 改变照片了
@@ -156,15 +162,32 @@ static id instance;
 - (void)saveCamerImage {
     if (self.cameraImage) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSData *imageData = [NSKeyedArchiver archivedDataWithRootObject:self.cameraImage];
-            [[NSUserDefaults standardUserDefaults] setObject:imageData forKey:HXCameraImageKey];
+            NSData *imageData;
+            NSString *suffix;
+            if (UIImagePNGRepresentation(self.cameraImage)) {
+                //返回为png图像。
+                imageData = UIImagePNGRepresentation(self.cameraImage);
+                suffix = @"png";
+            }else {
+                //返回为JPEG图像。
+                imageData = UIImageJPEGRepresentation(self.cameraImage, 0.5);
+                suffix = @"jpeg";
+            }
+            NSString *fileName = [HXCameraImageKey stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+            NSArray *array = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *fullPathToFile = [array.firstObject stringByAppendingPathComponent:fileName];
+            
+            if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+                NSURL *imageURL = [NSURL fileURLWithPath:fullPathToFile];
+                [[NSUserDefaults standardUserDefaults] setURL:imageURL forKey:HXCameraImageKey];
+            }
+            self.cameraImage = nil;
         });
     }
 }
 - (void)setCameraImage:(UIImage *)cameraImage {
-    _cameraImage = cameraImage;
+    _cameraImage = [cameraImage hx_scaleImagetoScale:0.4];
 }
-
 - (void)getURLFileLengthWithURL:(NSURL *)url success:(HXPhotoCommonGetUrlFileLengthSuccess)success failure:(HXPhotoCommonGetUrlFileLengthFailure)failure {
     if (self.urlFileLengthConnection) {
         [self.urlFileLengthConnection cancel];

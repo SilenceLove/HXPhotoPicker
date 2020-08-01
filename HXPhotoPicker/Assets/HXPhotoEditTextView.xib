@@ -68,10 +68,10 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5OS-C4-WMw">
-                                        <rect key="frame" x="339" y="22" width="55" height="30"/>
+                                        <rect key="frame" x="334" y="22" width="60" height="30"/>
                                         <color key="backgroundColor" red="0.027450980392156862" green="0.75686274509803919" blue="0.37647058823529411" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="55" id="CDa-wu-vZ6"/>
+                                            <constraint firstAttribute="width" constant="60" id="CDa-wu-vZ6"/>
                                             <constraint firstAttribute="height" constant="30" id="b4V-Rm-wq0"/>
                                         </constraints>
                                         <state key="normal" title="完成">

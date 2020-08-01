@@ -12,13 +12,14 @@
 @implementation UIViewController (HXExtension)
 - (void)hx_presentAlbumListViewControllerWithManager:(HXPhotoManager *)manager
                                             delegate:(id)delegate {
-    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] initWithManager:manager];
-    vc.delegate = delegate ? delegate : (id)self; 
-    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-    nav.supportRotation = manager.configuration.supportRotation;
-    nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    nav.modalPresentationCapturesStatusBarAppearance = YES;
-    [self presentViewController:nav animated:YES completion:nil];
+    NSSLog(@"Use 'hx_presentSelectPhotoControllerWithManager:'");
+//    HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] initWithManager:manager];
+//    vc.delegate = delegate ? delegate : (id)self; 
+//    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+//    nav.supportRotation = manager.configuration.supportRotation;
+//    nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
+//    nav.modalPresentationCapturesStatusBarAppearance = YES;
+//    [self presentViewController:nav animated:YES completion:nil];
 }
 - (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *)manager
                                            didDone:(void (^)(NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, NSArray<HXPhotoModel *> *, BOOL, UIViewController *, HXPhotoManager *))models
@@ -221,5 +222,12 @@
         return YES;
     }
     return NO;
+}
+
+- (HXCustomNavigationController *)hx_customNavigationController {
+    if ([self.navigationController isKindOfClass:[HXCustomNavigationController class]]) {
+        return (HXCustomNavigationController *)self.navigationController;
+    }
+    return nil;
 }
 @end

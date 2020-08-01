@@ -219,11 +219,8 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) BOOL restoreNavigationBar DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
 /// 照片列表是否按照片创建日期排序
-/// 如果按日期分隔显示时为YES
-/// 列表显示 默认NO
-/// 需要在 showDateSectionHeader set之后设置
 @property (assign, nonatomic) BOOL creationDateSort;
-
+ 
 /// 相册列表展示方式
 @property (assign, nonatomic) HXPhotoAlbumShowMode albumShowMode;
 
@@ -530,10 +527,9 @@ HXPhotoPreviewViewController;
  */
 @property (assign, nonatomic) BOOL hideOriginalBtn;
 
-/**
- sectionHeader 是否显示照片的位置信息 默认 5、6不显示，其余的显示
- */
-@property (assign, nonatomic) BOOL sectionHeaderShowPhotoLocation;
+/// sectionHeader 是否显示照片的位置信息
+/// 3.0.3之后的版本已去掉此功能
+@property (assign, nonatomic) BOOL sectionHeaderShowPhotoLocation DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
 /**
  相机cell是否显示预览
@@ -557,9 +553,7 @@ HXPhotoPreviewViewController;
  */
 @property (assign, nonatomic) BOOL showDateSectionHeader;
 
-/**
- 照片列表倒序 默认 NO
- */
+/// 照片列表倒序
 @property (assign, nonatomic) BOOL reverseDate;
 
 #pragma mark - < 基本配置 >
@@ -648,16 +642,16 @@ HXPhotoPreviewViewController;
 /// 是否开启3DTouch预览功能 默认 YES
 @property (assign, nonatomic) BOOL open3DTouchPreview;
 
-/// 下载iCloud上的资源  默认YES
-@property (assign, nonatomic) BOOL downloadICloudAsset;
+/// 下载iCloud上的资源
+/// 3.0.3 之后的版本已无效
+@property (assign, nonatomic) BOOL downloadICloudAsset DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
-/// 是否过滤iCloud上的资源 默认NO
-@property (assign, nonatomic) BOOL filtrationICloudAsset;
+/// 是否过滤iCloud上的资源
+/// 3.0.3 之后的版本已无效
+@property (assign, nonatomic) BOOL filtrationICloudAsset DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
 /// 小图照片清晰度 越大越清晰、越消耗性能
 /// 设置太大的话获取图片资源时耗时长且内存消耗大可能会引起界面卡顿
-/// default：[UIScreen mainScreen].bounds.size.width
-/// 320    ->  0.8  |  375    ->  1.4  |  x      ->  3.0  |  other  ->  1.7
 @property (assign, nonatomic) CGFloat clarityScale;
 
 #pragma mark - < block返回的视图 >
@@ -690,6 +684,4 @@ HXPhotoPreviewViewController;
 /// 旋转屏幕时也会调用
 @property (copy, nonatomic) void (^previewCollectionView)(UICollectionView *collectionView);
 
-
-@property (assign, nonatomic) BOOL changeAlbumListContentView;
 @end

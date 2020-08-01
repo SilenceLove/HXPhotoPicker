@@ -71,24 +71,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 };
 
 @interface HXPhotoModel : NSObject<NSCoding>
-/**
- 文件在手机里的原路径(照片 或 视频)
- 只有在手机存在的图片才会有值, iCloud上的没有
- 如果是通过相机拍摄的并且没有保存到相册(临时的) 视频有值, 照片没有值
- 
- 此属性具有不稳定性可能为空，如想获取视频地址请根据model里的导出视频方法
- | | | | | | | | | | | | | | | | | | | | | | | | |
- v v v v v v v v v v v v v v v v v v v v v v v v v
- - (void)exportVideoWithPresetName:(NSString * _Nullable)presetName
-                startRequestICloud:(HXModelStartRequestICloud _Nullable)startRequestICloud
-             iCloudProgressHandler:(HXModelProgressHandler _Nullable)iCloudProgressHandler
-             exportProgressHandler:(HXModelExportVideoProgressHandler _Nullable)exportProgressHandler
-                           success:(HXModelExportVideoSuccessBlock _Nullable)success
-                            failed:(HXModelFailedBlock _Nullable)failed
- 或者将配置类里的 requestImageAfterFinishingSelection 设为YES，点击完成后会自动获取视频地址并且赋值给videoURL
- */
-@property (strong, nonatomic) NSURL * _Nullable fileURL DEPRECATED_MSG_ATTRIBUTE("Use 'exportVideoWithPresetName:startRequestICloud:iCloudProgressHandler:exportProgressHandler:success:failed' instead");
-
 /// 创建日期
 /// 如果是通过相机拍摄的并且没有保存到相册(临时的) 为当前时间([NSDate date])
 @property (strong, nonatomic) NSDate * _Nullable creationDate;
@@ -159,10 +141,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 @property (copy, nonatomic) NSString * _Nullable albumName;
 /**  视频时长 */
 @property (copy, nonatomic) NSString * _Nullable videoTime;
-/**  模型对应的Section */
-@property (assign, nonatomic) NSInteger dateSection;
-/**  模型对应的item */
-@property (assign, nonatomic) NSInteger dateItem;
 /**  cell是否显示过 */
 @property (assign, nonatomic) BOOL dateCellIsVisible;
 /**  是否选中 */
@@ -200,18 +178,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 
 /**  临时图片 */
 @property (strong, nonatomic) UIImage * _Nullable tempImage;
-/**  行数 */
-@property (assign, nonatomic) NSInteger rowCount;
-/**  照片列表请求的资源的大小 */
-@property (assign, nonatomic) CGSize requestSize;
-/**
- 小图照片清晰度 越大越清晰、越消耗性能。太大可能会引起界面卡顿
- 默认设置：[UIScreen mainScreen].bounds.size.width
- 320    ->  0.8
- 375    ->  1.4
- other  ->  1.7
- */
-@property (assign, nonatomic) CGFloat clarityScale;
+
 /**  如果当前为视频资源时是禁止选择  */
 @property (assign, nonatomic) BOOL videoUnableSelect;
 /**  是否隐藏选择按钮  */
@@ -222,7 +189,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 @property (copy, nonatomic) NSString * _Nullable cameraNormalImageNamed;
 @property (copy, nonatomic) NSString * _Nullable cameraPreviewImageNamed;
 
-@property (strong, nonatomic) id _Nullable tempAsset;
 @property (assign, nonatomic) BOOL loadOriginalImage;
 
 #pragma mark - < init >

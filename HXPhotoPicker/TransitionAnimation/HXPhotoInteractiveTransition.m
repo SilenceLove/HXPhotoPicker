@@ -13,7 +13,7 @@
 @interface HXPhotoInteractiveTransition ()<UIGestureRecognizerDelegate>
 @property (nonatomic, weak) id<UIViewControllerContextTransitioning> transitionContext;
 @property (nonatomic, weak) UIViewController *vc;
-@property (strong, nonatomic) HXPreviewContentView *contentView;
+@property (weak, nonatomic) HXPreviewContentView *contentView;
 @property (strong, nonatomic) UIView *bgView;
 @property (weak, nonatomic) HXPhotoViewCell *tempCell;
 @property (weak, nonatomic) HXPhotoPreviewViewCell *fromCell;

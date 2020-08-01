@@ -92,12 +92,12 @@
     [super viewDidLoad];
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.edgesForExtendedLayout = UIRectEdgeAll;
-    if (self.manager.configuration.saveSystemAblum && !self.manager.albums &&
-        !self.manager.onlyCamera) {
-        dispatch_async(self.manager.loadAssetQueue, ^{
-            [self.manager getAllAlbumModelFilter:NO select:nil completion:nil];
-        });
-    }
+//    if (self.manager.configuration.saveSystemAblum && !self.manager.albums &&
+//        !self.manager.onlyCamera) {
+//        dispatch_async(self.manager.loadAssetQueue, ^{
+//            [self.manager getAllAlbumModelFilter:NO select:nil completion:nil];
+//        });
+//    }
     self.view.backgroundColor = [UIColor blackColor];
     
     if (self.manager.configuration.cameraCanLocation) {
@@ -117,10 +117,14 @@
     self.cameraController.sessionPreset = self.manager.configuration.sessionPreset;
     self.cameraController.videoCodecKey = self.manager.configuration.videoCodecKey;
     self.cameraController.delegate = self;
-    if ([HXPhotoCommon photoCommon].cameraImage) {
-        self.previewImageView.image = [HXPhotoCommon photoCommon].cameraImage;
-        [self.previewView addSubview:self.previewImageView];
-        [self.previewView addSubview:self.effectView];
+    NSData *imageData = [NSData dataWithContentsOfURL:[HXPhotoCommon photoCommon].cameraImageURL];
+    if (imageData) {
+        UIImage *image = [UIImage imageWithData:imageData scale:1];
+        if (image) {
+            self.previewImageView.image = image;
+            [self.previewView addSubview:self.previewImageView];
+            [self.previewView addSubview:self.effectView];
+        }
     }
     
     self.bottomView.userInteractionEnabled = NO;

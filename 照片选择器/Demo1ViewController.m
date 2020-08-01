@@ -230,13 +230,13 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"清空选择" style:UIBarButtonItemStylePlain target:self action:@selector(didRightClick)];
     self.scrollView.delegate = self;
     if (HX_IS_IPhoneX_All) {
-        self.clarityText.text = @"2.4";
+        self.clarityText.text = @"1.8";
     }else if ([UIScreen mainScreen].bounds.size.width == 320) {
         self.clarityText.text = @"1.2";
     }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-        self.clarityText.text = @"1.8";
+        self.clarityText.text = @"1.5";
     }else {
-        self.clarityText.text = @"2.0";
+        self.clarityText.text = @"1.4";
     } 
 }
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
@@ -340,12 +340,12 @@
         self.manager.configuration.navigationTitleColor = nil;
     }
     self.manager.configuration.hideOriginalBtn = self.hideOriginal.on;
-    self.manager.configuration.filtrationICloudAsset = self.icloudSwitch.on;
+//    self.manager.configuration.filtrationICloudAsset = self.icloudSwitch.on;
     self.manager.configuration.photoMaxNum = self.photoText.text.integerValue;
     self.manager.configuration.videoMaxNum = self.videoText.text.integerValue;
     self.manager.configuration.maxNum = self.totalText.text.integerValue;
     self.manager.configuration.rowCount = self.columnText.text.integerValue;
-    self.manager.configuration.downloadICloudAsset = self.downloadICloudAsset.on;
+//    self.manager.configuration.downloadICloudAsset = self.downloadICloudAsset.on;
     self.manager.configuration.saveSystemAblum = self.saveAblum.on;
     self.manager.configuration.showDateSectionHeader = self.showHeaderSection.on;
     self.manager.configuration.reverseDate = self.reverse.on;
@@ -424,8 +424,7 @@
     self.manager.configuration.openCamera = sw.on;
 } 
 - (IBAction)createTimeSortSwitch:(UISwitch *)sender {
-    [self.manager removeAllAlbum];
-    [self.manager removeAllTempList];
+    
 }
 - (void)dealloc {
     NSSLog(@"dealloc");

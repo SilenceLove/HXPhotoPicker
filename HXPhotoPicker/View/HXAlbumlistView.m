@@ -51,10 +51,13 @@
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectModel.index inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 - (void)refreshCamearCount {
+    if (!self.albumModelArray.count) {
+        return;;
+    }
     NSInteger i = 0;
     for (HXAlbumModel *albumMd in self.albumModelArray) {
         albumMd.cameraCount = [self.manager cameraCount];
-        if (i == 0 && !albumMd.result && !albumMd.collection) {
+        if (i == 0 && !albumMd.assetResult && !albumMd.localIdentifier) {
             albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
         }
         i++;
@@ -81,11 +84,7 @@
 - (void)cellSetModelData:(HXAlbumlistViewCell *)cell {
     if ([cell isKindOfClass:[HXAlbumlistViewCell class]]) {
         HXWeakSelf
-        cell.alpha = 0;
         [cell setAlbumImageWithCompletion:^(NSInteger count, HXAlbumlistViewCell *myCell) {
-            [UIView animateWithDuration:0.125 animations:^{
-                myCell.alpha = 1;
-            }];
             if (count <= 0) {
                 if ([weakSelf.albumModelArray containsObject:myCell.model]) {
                     [weakSelf.albumModelArray removeObject:myCell.model];
@@ -103,6 +102,7 @@
                 if (weakSelf.deleteCellArray.count) {
                     [weakSelf.tableView deleteRowsAtIndexPaths:weakSelf.deleteCellArray withRowAnimation:UITableViewRowAnimationFade];
                 }
+                [weakSelf.deleteCellArray removeAllObjects];
                 weakSelf.deleteCellArray = nil;
             }
         }];
@@ -117,6 +117,7 @@
             if (self.deleteCellArray.count) {
                 [self.tableView deleteRowsAtIndexPaths:self.deleteCellArray withRowAnimation:UITableViewRowAnimationFade];
             }
+            [self.deleteCellArray removeAllObjects];
             self.deleteCellArray = nil;
         }
     }
@@ -233,11 +234,11 @@
 }
 - (void)setAlbumImageWithCompletion:(void (^)(NSInteger, HXAlbumlistViewCell *))completion {
     HXWeakSelf
-    if (!self.model.result && self.model.collection) {
+    if (!self.model.assetResult && self.model.localIdentifier) {
         [self.model getResultWithCompletion:^(HXAlbumModel *albumModel) {
             if (albumModel == weakSelf.model) {
                 [weakSelf getAlbumImageWithCompletion:^(UIImage *image, PHAsset *asset) {
-                    NSInteger photoCount = weakSelf.model.result.count;
+                    NSInteger photoCount = weakSelf.model.count;
                     if (completion) {
                         completion(photoCount + weakSelf.model.cameraCount, weakSelf);
                     }
@@ -246,25 +247,23 @@
         }];
     }else {
         [self getAlbumImageWithCompletion:^(UIImage *image, PHAsset *asset) {
-            NSInteger photoCount = weakSelf.model.result.count;
+            NSInteger photoCount = weakSelf.model.count;
             if (completion) {
                 completion(photoCount + weakSelf.model.cameraCount, weakSelf);
             }
         }];
     }
-    if (!self.model.result || !self.model.count) {
+    if (!self.model.assetResult || !self.model.count) {
         self.coverView.image = self.model.tempImage ?: [UIImage hx_imageNamed:@"hx_yundian_tupian"];
     }
 }
 - (void)getAlbumImageWithCompletion:(void (^)(UIImage *image, PHAsset *asset))completion {
-    NSInteger photoCount = self.model.result.count;
-    if (!self.model.asset) {
-        self.model.asset = self.model.result.lastObject;
-    }
+    NSInteger photoCount = self.model.count;
+
     self.countLb.text = @(photoCount + self.model.cameraCount).stringValue;
     HXWeakSelf
-    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset size:CGSizeMake(self.hx_h * 1.6, self.hx_h * 1.6) completion:^(UIImage *image, PHAsset *asset) {
-        if (asset == weakSelf.model.asset) {
+    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject size:CGSizeMake(self.hx_h * 1.4, self.hx_h * 1.4) completion:^(UIImage *image, PHAsset *asset) {
+        if (asset == weakSelf.model.assetResult.lastObject) {
             weakSelf.coverView.image = image;
         }
         if (completion) {
@@ -530,11 +529,6 @@
     return _button;
 } 
 - (void)didBtnClick:(UIButton *)button {
-    if (self.manager.getPhotoListing ||
-        self.manager.getAlbumListing ||
-        self.manager.getCameraRoolAlbuming) {
-        return;
-    }
     button.selected = !button.isSelected;
     button.userInteractionEnabled = NO;
     if (button.selected) {

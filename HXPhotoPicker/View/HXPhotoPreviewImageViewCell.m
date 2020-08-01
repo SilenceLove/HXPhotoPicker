@@ -18,6 +18,9 @@
         self.previewContentView = [[HXPreviewContentView alloc] initWithType:HXPreviewContentViewTypeImage];
         HXWeakSelf
         self.previewContentView.downloadNetworkImageComplete = ^{
+            if (weakSelf.cellDownloadImageComplete) {
+                weakSelf.cellDownloadImageComplete(weakSelf);
+            }
             [weakSelf refreshImageSize];
         };
         [self.scrollView addSubview:self.previewContentView];

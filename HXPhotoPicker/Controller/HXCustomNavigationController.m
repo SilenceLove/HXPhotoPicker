@@ -33,9 +33,6 @@
                       doneBlock:(viewControllerDidDoneBlock)doneBlock
                     cancelBlock:(viewControllerDidCancelBlock)cancelBlock {
     [manager selectedListTransformBefore];
-    if (!manager.cameraRollAlbumModel && !manager.selectPhotoing) {
-        [manager preloadData];
-    }
     manager.selectPhotoing = YES;
     
     if (manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
@@ -44,12 +41,12 @@
         if (self) {
             self.hx_delegate = delegate;
             self.manager = manager;
+            [self requestAuthorization];
             self.doneBlock = doneBlock;
             self.cancelBlock = cancelBlock;
             vc.doneBlock = self.doneBlock;
             vc.cancelBlock = self.cancelBlock;
             vc.delegate = self;
-            
         }
     }else if (manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
@@ -58,6 +55,7 @@
         if (self) {
             self.hx_delegate = delegate;
             self.manager = manager;
+            [self requestAuthorization];
             self.doneBlock = doneBlock;
             self.cancelBlock = cancelBlock;
             vc.doneBlock = self.doneBlock;
@@ -66,6 +64,35 @@
         }
     }
     return self;
+}
+- (void)requestAuthorization {
+    HXWeakSelf
+    [HXPhotoTools requestAuthorization:nil handler:^(PHAuthorizationStatus status) {
+        if (status == PHAuthorizationStatusAuthorized) {
+            [weakSelf requestModel];
+        }
+    }];
+}
+- (void)requestModel {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        HXWeakSelf
+        [self.manager getCameraRollAlbumCompletion:^(HXAlbumModel *albumModel) {
+            weakSelf.cameraRollAlbumModel = albumModel;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (weakSelf.requestCameraRollCompletion) {
+                    weakSelf.requestCameraRollCompletion();
+                }
+            });
+        }];
+        [self.manager getAllAlbumModelWithCompletion:^(NSMutableArray<HXAlbumModel *> *albums) {
+            weakSelf.albums = albums.mutableCopy;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (weakSelf.requestAllAlbumCompletion) {
+                    weakSelf.requestAllAlbumCompletion();
+                }
+            });
+        }];
+    });
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -130,8 +157,6 @@
 - (void)dealloc {
     if (_manager) {
         self.manager.selectPhotoing = NO;
-        [self.manager removeAllTempList];
-        [self.manager removeAllAlbum];
     }
     if (HXShowLog) NSSLog(@"dealloc");
 }

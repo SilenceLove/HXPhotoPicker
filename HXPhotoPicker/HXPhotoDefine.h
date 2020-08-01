@@ -37,7 +37,7 @@
 
 #define HXEncodeKey @"HXModelArray"
 
-#define HXCameraImageKey @"HXCameraImageKey"
+#define HXCameraImageKey @"HXCameraImageURLKey"
 
 #define HXPhotoPickerDownloadPath [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]
 

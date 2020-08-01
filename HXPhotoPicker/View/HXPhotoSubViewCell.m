@@ -232,7 +232,7 @@
             }
         }else {
             if (model.photoEdit) {
-                self.imageView.image = model.photoEdit.editPosterImage;
+                self.imageView.image = model.photoEdit.editPreviewImage;
             }else {
                 if (model.previewPhoto) {
                     if (model.previewPhoto.images.count) {
@@ -302,8 +302,8 @@
             self.addCustomViewCompletion = YES;
         }
     }
-    if ([self.customProtocol respondsToSelector:@selector(setCustomViewData:model:indexPath:)]) {
-        [self.customProtocol setCustomViewData:self.customView model:model indexPath:indexPath];
+    if ([self.customProtocol respondsToSelector:@selector(setCustomViewData:cell:model:indexPath:)]) {
+        [self.customProtocol setCustomViewData:self.customView cell:self model:model indexPath:indexPath];
     }
     if ([self.customProtocol respondsToSelector:@selector(shouldHiddenBottomType:indexPath:)]) {
         BOOL hiddenState = [self.customProtocol shouldHiddenBottomType:self indexPath:indexPath];

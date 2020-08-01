@@ -790,6 +790,7 @@
 		7BB23C0B24CEB33A00726A7A /* SDImageAssetManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDImageAssetManager.h; sourceTree = "<group>"; };
 		7BB23C0C24CEB33A00726A7A /* SDAsyncBlockOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDAsyncBlockOperation.m; sourceTree = "<group>"; };
 		7BB23C0D24CEB33A00726A7A /* SDAssociatedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDAssociatedObject.m; sourceTree = "<group>"; };
+		7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewProtocol.h; sourceTree = "<group>"; };
 		7BBE5A1C1F07994000715546 /* Demo4ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo4ViewController.h; sourceTree = "<group>"; };
 		7BBE5A1D1F07994000715546 /* Demo4ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo4ViewController.m; sourceTree = "<group>"; };
 		7BBE5A1E1F07994000715546 /* Demo4ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Demo4ViewController.xib; sourceTree = "<group>"; };
@@ -1134,6 +1135,7 @@
 				7B4E65F72487AD5B00077EE1 /* HXPhotoModel.h */,
 				7B4E65F32487AD5B00077EE1 /* HXPhotoModel.m */,
 				7BE8DFD624C68B2800306042 /* HXPhotoViewCellCustomProtocol.h */,
+				7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2034,7 +2036,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 3.0.3;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
+				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxxxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -2060,7 +2062,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 3.0.3;
-				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxx";
+				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxxxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;

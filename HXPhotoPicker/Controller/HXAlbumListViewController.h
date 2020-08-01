@@ -47,13 +47,6 @@
 - (instancetype)initWithManager:(HXPhotoManager *)manager;
 @end
 
-@interface HXAlbumListQuadrateViewCell : UICollectionViewCell
-@property (strong, nonatomic) HXAlbumModel *model;
-@property (strong, nonatomic) NSIndexPath *indexPath;
-@property (copy, nonatomic) void (^getResultCompleteBlock)(NSInteger count, HXAlbumListQuadrateViewCell *myCell);
-- (void)cancelRequest ;
-@end
-
 @interface HXAlbumListSingleViewCell : UITableViewCell
 @property (strong, nonatomic) UIColor *bgColor;
 @property (strong, nonatomic) UIColor *textColor;

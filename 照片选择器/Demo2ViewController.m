@@ -81,6 +81,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
 //        _manager.configuration.openCamera = NO;
         _manager.configuration.type = HXConfigurationTypeWXChat;
+        _manager.configuration.lookLivePhoto = YES;
 //        _manager.configuration.photoEditConfigur.onlyCliping = YES;
 //        _manager.configuration.navBarBackgroundImage = [UIImage imageNamed:@"APPCityPlayer_bannerGame"];
         HXWeakSelf

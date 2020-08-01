@@ -224,8 +224,8 @@
         
         CGFloat width = self.doneBtn.titleLabel.hx_getTextWidth;
         self.doneBtn.hx_w = width + 20;
-        if (self.doneBtn.hx_w < 50) {
-            self.doneBtn.hx_w = 50;
+        if (self.doneBtn.hx_w < 60) {
+            self.doneBtn.hx_w = 60;
         }
         self.doneBtn.hx_x = self.hx_w - 12 - self.doneBtn.hx_w;
         self.editBtn.hx_x = self.doneBtn.hx_x - self.editBtn.hx_w;
@@ -251,7 +251,7 @@
     [super layoutSubviews];
     self.bgView.frame = self.bounds;
  
-    self.doneBtn.frame = CGRectMake(0, 0, 50, 30);
+    self.doneBtn.frame = CGRectMake(0, 0, 60, 30);
     self.doneBtn.center = CGPointMake(self.doneBtn.center.x, 25);
     
     
@@ -344,7 +344,7 @@
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
-        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:14];
+        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
         _doneBtn.layer.cornerRadius = 3;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }

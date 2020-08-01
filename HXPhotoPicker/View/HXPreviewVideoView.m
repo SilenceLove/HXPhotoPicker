@@ -106,7 +106,9 @@
                 }
                 weakSelf.videoLoadFailed = YES;
                 [weakSelf hideLoading];
-                [weakSelf showLoadFailedView];
+                if (error.code != NSURLErrorCancelled) {
+                    [weakSelf showLoadFailedView];
+                }
             }];
             return;
         }
@@ -124,7 +126,9 @@
         if (weakSelf.model != model) return;
         weakSelf.videoLoadFailed = YES;
         [weakSelf hideLoading];
-        [weakSelf showLoadFailedView];
+        if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+            [weakSelf showLoadFailedView];
+        }
     }];
 }
 - (void)requestAVAssetComplete:(AVAsset *)avAsset {

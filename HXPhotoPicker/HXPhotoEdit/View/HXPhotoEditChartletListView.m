@@ -158,7 +158,11 @@
 - (void)panPressGestureRecongizerClick:(UIPanGestureRecognizer *)panPgr {
     CGPoint point = [panPgr translationInView:self.titleView];
     if (panPgr.state == UIGestureRecognizerStateBegan) {
-        self.contentViewBottomConstraint.constant = self.contentViewBottom - point.y;
+        CGFloat contentViewBottom = self.contentViewBottom - point.y;
+        if (contentViewBottom > 0) {
+            contentViewBottom = 0;
+        }
+        self.contentViewBottomConstraint.constant = contentViewBottom;
     }else if (panPgr.state == UIGestureRecognizerStateChanged) {
         CGFloat contentViewBottom = self.contentViewBottom - point.y;
         if (contentViewBottom > 0) {

@@ -66,7 +66,6 @@
                 completedBlock(image, nil, model);
             }
         }else {
-            if (!original) model.loadOriginalImage = NO;
             NSURL *url = (original || image) ? model.networkPhotoUrl : model.networkThumbURL;
             [weakSelf sd_setImageWithURL:url placeholderImage:model.thumbPhoto options:0 context:nil progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
                 model.receivedSize = receivedSize;
@@ -100,7 +99,6 @@
     YYWebImageManager *manager = [YYWebImageManager sharedManager];
     [manager.cache getImageForKey:[manager cacheKeyForURL:model.networkPhotoUrl]  withType:YYImageCacheTypeAll withBlock:^(UIImage * _Nullable image, YYImageCacheType type) {
         if (image) {
-            if (!original) model.loadOriginalImage = YES;
             weakSelf.image = image;
             model.imageSize = weakSelf.image.size;
             model.thumbPhoto = weakSelf.image;

@@ -121,7 +121,7 @@ HXWeakSelf
             self.progressView.hidden = model.downloadComplete;
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
-            if (model.downloadComplete && !model.downloadError) {
+            if (model.downloadComplete && !model.downloadError && model.loadOriginalImage) {
 #if HasSDWebImage
                 self.sdImageView.image = model.previewPhoto;
 #elif HasYYKitOrWebImage
@@ -160,7 +160,8 @@ HXWeakSelf
                             weakSelf.progressView.progress = 1;
                             weakSelf.progressView.hidden = YES;
                             weakSelf.sdImageView.image = image;
-                            if (weakSelf.downloadICloudAssetComplete) { weakSelf.downloadICloudAssetComplete();
+                            if (weakSelf.downloadICloudAssetComplete) {
+                                weakSelf.downloadICloudAssetComplete();
                             }
                             if (weakSelf.downloadNetworkImageComplete) {
                                 weakSelf.downloadNetworkImageComplete();
@@ -282,13 +283,13 @@ HXWeakSelf
 #endif
                     model.tempImage = nil;
                 }else {
-                    CGSize requestSize;
-                    if (self.hx_h > self.hx_w / 9 * 20 ||
-                        self.hx_w > self.hx_h / 9 * 20) {
-                        requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6);
-                    }else {
-                        requestSize = CGSizeMake(model.endImageSize.width, model.endImageSize.height);
-                    }
+                    CGSize requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6);
+//                    if (self.hx_h > self.hx_w / 9 * 20 ||
+//                        self.hx_w > self.hx_h / 9 * 20) {
+//                        requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6);
+//                    }else {
+//                        requestSize = CGSizeMake(model.endImageSize.width, model.endImageSize.height);
+//                    }
                     self.requestID =[model requestThumbImageWithSize:requestSize completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model != model) return;
 #if HasSDWebImage
@@ -319,21 +320,28 @@ HXWeakSelf
     CGSize size;
     CGFloat scale;
     if (HX_IS_IPhoneX_All) {
-        scale = 3.0f;
+        scale = 2.0f;
     }else if ([UIScreen mainScreen].bounds.size.width == 320) {
-        scale = 2.0;
+        scale = 1.2;
     }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-        scale = 2.5;
+        scale = 1.5;
     }else {
-        scale = 3.0;
+        scale = 1.4;
     }
-    
-    if (self.hx_h > self.hx_w / 9 * 20 ||
-        self.hx_w > self.hx_h / 9 * 20) {
-        size = CGSizeMake(self.superview.hx_w * scale, self.superview.hx_h * scale);
-    }else {
-        size = CGSizeMake(self.model.endImageSize.width * scale, self.model.endImageSize.height * scale);
+
+    CGFloat photoWidth = self.hx_w;
+    CGFloat aspectRatio = self.model.asset.pixelWidth / (CGFloat)self.model.asset.pixelHeight;
+    CGFloat pixelWidth = photoWidth * scale;
+    // 超宽图片
+    if (aspectRatio > 1.8) {
+        pixelWidth = pixelWidth * aspectRatio;
     }
+    // 超高图片
+    if (aspectRatio < 0.2) {
+        pixelWidth = pixelWidth * 0.5;
+    }
+    CGFloat pixelHeight = pixelWidth / aspectRatio;
+    size = CGSizeMake(pixelWidth, pixelHeight);
     HXWeakSelf
     if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
         if (self.model.networkPhotoUrl) {

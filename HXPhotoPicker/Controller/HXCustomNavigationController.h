@@ -37,6 +37,14 @@
 @end
 
 @interface HXCustomNavigationController : UINavigationController
+@property (strong, nonatomic) NSMutableArray *albums;
+@property (strong, nonatomic) HXAlbumModel *cameraRollAlbumModel;
+
+@property (copy, nonatomic) void (^requestCameraRollPhotoListCompletion)(void);
+
+@property (copy, nonatomic) void (^requestCameraRollCompletion)(void);
+@property (copy, nonatomic) void (^requestAllAlbumCompletion)(void);
+
 @property (assign ,nonatomic) BOOL isCamera;
 @property (weak, nonatomic) id<HXCustomNavigationControllerDelegate> hx_delegate;
 @property (assign, nonatomic) BOOL supportRotation;

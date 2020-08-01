@@ -110,7 +110,7 @@
     }
 
     self.bottomViewBottomConstraint.constant = HXEditTextBottomViewMargin;
-    [self.doneBtn hx_radiusWithRadius:5 corner:UIRectCornerAllCorners];
+    [self.doneBtn hx_radiusWithRadius:3 corner:UIRectCornerAllCorners];
     
     self.textView.backgroundColor = [UIColor clearColor];
     self.textView.delegate = self;

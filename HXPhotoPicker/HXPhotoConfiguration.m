@@ -21,7 +21,6 @@
 }
 
 - (void)setup { 
-    self.changeAlbumListContentView = YES;
     self.open3DTouchPreview = YES;
     self.openCamera = YES;
     self.lookLivePhoto = NO;
@@ -34,19 +33,8 @@
     self.videoMaxNum = 1;
     self.showBottomPhotoDetail = YES;
 //    self.reverseDate = YES;
-    if ([UIScreen mainScreen].bounds.size.width == 320) {
-        self.rowCount = 3;
-        self.sectionHeaderShowPhotoLocation = NO;
-    }else {
-        if ([HXPhotoTools isIphone6]) {
-            self.rowCount = 3;
-            self.sectionHeaderShowPhotoLocation = NO;
-        }else {
-            self.sectionHeaderShowPhotoLocation = YES;
-            self.rowCount = 4;
-        }
-    }
-    self.downloadICloudAsset = YES;
+    
+    
     self.videoMaximumSelectDuration = 3 * 60.f;
     self.videoMinimumSelectDuration = 0.f;
     self.videoMaximumDuration = 60.f;
@@ -55,7 +43,6 @@
     
     //    self.saveSystemAblum = NO;
 //    self.deleteTemporaryPhoto = YES;
-//    self.showDateSectionHeader = YES; 
     if ([UIScreen mainScreen].bounds.size.width != 320 && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         self.cameraCellShowPreview = YES;
     }
@@ -68,16 +55,6 @@
     self.pushTransitionDuration = 0.45f;
     self.popTransitionDuration = 0.35f;
     self.popInteractiveTransitionDuration = 0.35f;
-    
-    if (HX_IS_IPhoneX_All) {
-        self.clarityScale = 3;
-    }else if ([UIScreen mainScreen].bounds.size.width == 320) {
-        self.clarityScale = 1.2;
-    }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-        self.clarityScale = 1.8;
-    }else {
-        self.clarityScale = 2.0;
-    }
     
     self.doneBtnShowDetail = YES;
     self.videoCanEdit = YES;
@@ -96,6 +73,7 @@
     self.popupTableViewHorizontalHeight = 250; 
 //    self.albumShowMode = HXPhotoAlbumShowModePopup;
     
+    self.languageType = HXPhotoLanguageTypeSys;
     
     self.cellDarkSelectTitleColor = [UIColor whiteColor];
     self.cellDarkSelectBgColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1];
@@ -131,13 +109,23 @@
     self.photoEditCustomRatios = @[@{@"原始值" : @"{0, 0}"}, @{@"正方形" : @"{1, 1}"}, @{@"2:3" : @"{2, 3}"}, @{@"3:4" : @"{3, 4}"}, @{@"9:16" : @"{9, 16}"}, @{@"16:9" : @"{16, 9}"}];
     
     self.useWxPhotoEdit = YES;
-}
-- (void)setShowDateSectionHeader:(BOOL)showDateSectionHeader {
-    _showDateSectionHeader = showDateSectionHeader;
-    if (showDateSectionHeader) {
-        self.creationDateSort = YES;
+    
+    if ([UIScreen mainScreen].bounds.size.width == 320) {
+        _clarityScale = 0.8;
+    }else if (HX_IS_IPhoneX_All) {
+        _clarityScale = 1.8;
     }else {
-        self.creationDateSort = NO;
+        _clarityScale = 1.5;
+    }
+    
+    if ([UIScreen mainScreen].bounds.size.width == 320) {
+        self.rowCount = 3;
+    }else {
+        if ([HXPhotoTools isIphone6]) {
+            self.rowCount = 3;
+        }else {
+            self.rowCount = 4;
+        }
     }
 }
 - (UIColor *)cameraFocusBoxColor {
@@ -160,7 +148,6 @@
 }
 - (void)setLanguageType:(HXPhotoLanguageType)languageType {
     if ([HXPhotoCommon photoCommon].languageType != languageType) {
-        [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
         [HXPhotoCommon photoCommon].languageBundle = nil;
     }
     _languageType = languageType;
@@ -170,14 +157,23 @@
     if (clarityScale <= 0.f) {
         if ([UIScreen mainScreen].bounds.size.width == 320) {
             _clarityScale = 0.8;
-        }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-            _clarityScale = 1.4;
+        }else if (HX_IS_IPhoneX_All) {
+            _clarityScale = 1.8;
         }else {
-            _clarityScale = 2.4;
+            _clarityScale = 1.5;
         }
     }else {
         _clarityScale = clarityScale;
     }
+    CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
+    CGSize size = CGSizeMake(width * clarityScale, width * clarityScale);
+    [HXPhotoCommon photoCommon].requestSize = size;
+}
+- (void)setRowCount:(NSUInteger)rowCount {
+    _rowCount = rowCount;
+    CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * rowCount - 1 ) / rowCount;
+    CGSize size = CGSizeMake(width * self.clarityScale, width * self.clarityScale);
+    [HXPhotoCommon photoCommon].requestSize = size;
 }
 - (UIColor *)themeColor {
     if (!_themeColor) {

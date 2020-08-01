@@ -23,7 +23,7 @@ typedef void (^ getAllAlbumListBlock)(NSMutableArray<HXAlbumModel *> *albums);
 
 typedef void (^ getSelectAlbumBlock)(HXAlbumModel *selectedModel);
 
-typedef void (^ getPhotoListBlock)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
+typedef void (^ getPhotoListBlock)(NSMutableArray *allList , NSMutableArray *previewList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
 
 /**
  *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
@@ -134,40 +134,20 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 - (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
 
 /**
- 相册列表
- */
-@property (strong, nonatomic,readonly) NSMutableArray *albums;
-@property (strong, nonatomic) HXAlbumModel *firstAlbumModel;
-
-
-@property (strong, nonatomic) dispatch_queue_t loadAssetQueue;
-
-/**
  建议使用 addCustomAssetModel: 此方法
  网络图片地址数组
  */
 @property (strong, nonatomic) NSArray<NSString *> *networkPhotoUrls DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
 
-
-/**
- 预加载数据
- */
-- (void)preloadData;
 /**
  获取系统所有相册
- */ 
-- (void)getAllAlbumModelFilter:(BOOL)filter select:(getSelectAlbumBlock)selectedModel completion:(getAllAlbumListBlock)completion; 
-- (void)getAllAlbumModelFilter:(BOOL)filter needSelect:(BOOL)needSelect select:(getSelectAlbumBlock)selectedModel completion:(getAllAlbumListBlock)completion;
-- (void)removeAllAlbum;
+ */
+- (void)getAllAlbumModelWithCompletion:(getAllAlbumListBlock)completion;
 
 /**
  获取所有照片的这个相册
  */
 - (void)getCameraRollAlbumCompletion:(void (^)(HXAlbumModel *albumModel))completion;
-@property (copy, nonatomic) void (^ getCameraRollAlbumModel)(HXAlbumModel *albumModel);
-@property (assign, nonatomic) BOOL getCameraRoolAlbuming;
-@property (strong, nonatomic) HXAlbumModel *cameraRollAlbumModel;
-
 
 /**
  根据某个相册模型获取照片列表
@@ -176,7 +156,6 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
  @param complete 照片列表和首个选中的模型
  */
 - (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(getPhotoListBlock)complete;
-- (void)removeAllTempList;
 /**
  将下载完成的iCloud上的资源模型添加到数组中
  */
@@ -382,29 +361,26 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 
 @property (assign, nonatomic) BOOL selectPhotoing;
 
-@property (assign, nonatomic) BOOL getAlbumListing;
-@property (assign, nonatomic) BOOL getPhotoListing;
-
-@property (copy, nonatomic) getSelectAlbumBlock selectAlbumBlock;
-@property (copy, nonatomic) getAllAlbumListBlock allAlbumListBlock;
-@property (copy, nonatomic) getPhotoListBlock photoListBlock;
-
-@property (copy, nonatomic) NSArray *tempAllList;
-@property (copy, nonatomic) NSArray *tempPreviewList;
-@property (copy, nonatomic) NSArray *tempPhotoList;
-@property (copy, nonatomic) NSArray *tempVideoList;
-@property (copy, nonatomic) NSArray *tempDateList;
-@property (strong, nonatomic) HXPhotoModel *tempFirstSelectModel;
-@property (strong, nonatomic) HXAlbumModel *tempAlbumModel;
-
 #pragma mark - < 辅助方法 >
 - (BOOL)videoCanSelected;
+/**
+ 本地资源数量
+ 
+ @return count
+ */
+- (NSInteger)cameraCount;
 /**
  本地图片数量
  
  @return count
  */
-- (NSInteger)cameraCount;
+- (NSInteger)cameraPhotoCount;
+/**
+ 本地视频数量
+ 
+ @return count
+ */
+- (NSInteger)cameraVideoCount;
 
 /**
  获取本地模型数组里的第一个模型

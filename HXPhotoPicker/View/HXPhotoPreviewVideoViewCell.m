@@ -37,6 +37,9 @@
             weakSelf.bottomSliderView.playBtnSelected = isSelected;
         };
         self.previewContentView.downloadNetworkImageComplete = ^{
+            if (weakSelf.cellDownloadImageComplete) {
+                weakSelf.cellDownloadImageComplete(weakSelf);
+            }
             [weakSelf refreshImageSize];
         };
         [self.scrollView addSubview:self.previewContentView];

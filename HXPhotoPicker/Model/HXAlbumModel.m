@@ -10,16 +10,46 @@
 #import "HXPhotoTools.h"
 @implementation HXAlbumModel
 
+- (void)fetchAssetResult {
+    if ([self.localIdentifier isEqualToString:[HXPhotoCommon photoCommon].cameraRollLocalIdentifier] &&
+        [HXPhotoCommon photoCommon].cameraRollResult) {
+        self.assetResult = [HXPhotoCommon photoCommon].cameraRollResult;
+        self.count = [HXPhotoCommon photoCommon].cameraRollResult.count;
+        return;
+    }
+    PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:self.assetCollection options:self.option];
+    self.assetResult = result;
+    self.count = result.count;
+}
+
 - (void)getResultWithCompletion:(void (^)(HXAlbumModel *albumModel))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:self.collection options:self.option];
-        self.result = result;
-        self.count = result.count;
+        [self fetchAssetResult];
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 completion(self);
             });
         }
     });
+}
+- (PHAssetCollection *)assetCollection {
+    if (!_assetCollection) {
+        _assetCollection = [[PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[self.localIdentifier] options:nil] firstObject];
+    }
+    return _assetCollection;
+}
+- (PHFetchOptions *)option {
+    if (!_option) {
+        _option = [[PHFetchOptions alloc] init];
+        if (self.creationDateSort) {
+            _option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        }
+        if (self.selectType == 0) {
+            _option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+        }else if (self.selectType == 1) {
+            _option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+        }
+    }
+    return _option;
 }
 @end

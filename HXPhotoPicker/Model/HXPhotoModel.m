@@ -142,6 +142,9 @@
     if (!photoModel) {
         return NO;
     }
+    if (self == photoModel ){
+        return YES;
+    }
     
     if (self.localIdentifier &&
         photoModel.localIdentifier &&
@@ -188,46 +191,25 @@
 //    return [self isEqualPhotoModel:object];
 //}
 
-
-/// 避免造成误解去掉此属性
-//- (NSURL *)fileURL {
-//    if (self.type == HXPhotoModelMediaTypeCameraVideo && !_fileURL) {
-//        _fileURL = self.videoURL;
-//    }
-//    if (self.type != HXPhotoModelMediaTypeCameraPhoto) {
-//        if (self.asset && !_fileURL) {
-//            _fileURL = [self.asset valueForKey:@"mainFileURL"];
-//        }
-//    }
-//    return _fileURL;
-//}
-
 - (NSDate *)creationDate {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto || self.type == HXPhotoModelMediaTypeCameraVideo) {
         return _creationDate ?: [NSDate date];
     }
-    if (!_creationDate) {
-        _creationDate = [self.asset valueForKey:@"creationDate"];
+    if (self.asset) {
+        return [self.asset valueForKey:@"creationDate"];
     }
     return _creationDate;
 }
 
 - (NSDate *)modificationDate {
     if (self.type == HXPhotoModelMediaTypeCameraPhoto || self.type == HXPhotoModelMediaTypeCameraVideo) {
-//        if (!_modificationDate) {
             return [NSDate date];
-//        }
     }
-//    if (!_modificationDate) {
-        return [self.asset valueForKey:@"modificationDate"];
-//    }
-    return _modificationDate;
+    return [self.asset valueForKey:@"modificationDate"];
 } 
 - (CLLocation *)location {
-    if (!_location) {
-        if (self.asset) {
-            _location = [self.asset valueForKey:@"location"];
-        }
+    if (self.asset) {
+        return [self.asset valueForKey:@"location"];
     }
     return _location;
 }
@@ -494,16 +476,6 @@
     }
     return _previewViewSize;
 }
-- (CGSize)requestSize {
-    if (_requestSize.width == 0 || _requestSize.height == 0) {
-        
-        CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
-        CGSize size = CGSizeMake(width * self.clarityScale, width * self.clarityScale);
-        
-        _requestSize = size;
-    }
-    return _requestSize;
-}
 - (CGSize)dateBottomImageSize {
     if (_dateBottomImageSize.width == 0 || _dateBottomImageSize.height == 0) {
         CGFloat width = 0;
@@ -705,7 +677,7 @@
     }];
 }
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock)completion {
-    return [self requestThumbImageWithSize:self.requestSize completion:completion];
+    return [self requestThumbImageWithSize:[HXPhotoCommon photoCommon].requestSize completion:completion];
 }
 - (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
     if (self.photoEdit) {
@@ -713,7 +685,6 @@
         return 0;
     }
     PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
-    option.resizeMode = PHImageRequestOptionsResizeModeFast;
     HXWeakSelf
     return [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
@@ -744,6 +715,7 @@
     }
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
+    option.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
     HXWeakSelf
     return [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);

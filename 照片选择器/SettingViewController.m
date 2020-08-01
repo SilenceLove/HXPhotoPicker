@@ -106,8 +106,8 @@
     self.totalMaxNum.text = @(self.manager.configuration.maxNum).stringValue;
     self.photoListCount.text = @(self.manager.configuration.rowCount).stringValue;
     self.clarityScale.text = @(self.manager.configuration.clarityScale).stringValue;
-    self.downloadICloudAsset.on = self.manager.configuration.downloadICloudAsset;
-    self.filtrationICloudAsset.on = self.manager.configuration.filtrationICloudAsset;
+//    self.downloadICloudAsset.on = self.manager.configuration.downloadICloudAsset;
+//    self.filtrationICloudAsset.on = self.manager.configuration.filtrationICloudAsset;
     self.open3DTouchPreview.on = self.manager.configuration.open3DTouchPreview;
     self.singleJumpEdit.on = self.manager.configuration.singleJumpEdit;
     self.singleSelected.on = self.manager.configuration.singleSelected;
@@ -155,8 +155,8 @@
     self.manager.configuration.maxNum = self.totalMaxNum.text.integerValue;
     self.manager.configuration.rowCount = self.photoListCount.text.integerValue;
     self.manager.configuration.clarityScale = self.clarityScale.text.floatValue;
-    self.manager.configuration.downloadICloudAsset = self.downloadICloudAsset.on;
-    self.manager.configuration.filtrationICloudAsset = self.filtrationICloudAsset.on;
+//    self.manager.configuration.downloadICloudAsset = self.downloadICloudAsset.on;
+//    self.manager.configuration.filtrationICloudAsset = self.filtrationICloudAsset.on;
     self.manager.configuration.open3DTouchPreview = self.open3DTouchPreview.on;
     self.manager.configuration.singleJumpEdit = self.singleJumpEdit.on;
     self.manager.configuration.singleSelected = self.singleSelected.on;
@@ -202,7 +202,6 @@
     self.manager.configuration.customCameraType = self.customCameraTypeSegmented.selectedSegmentIndex;
     
     
-    self.manager.cameraRollAlbumModel = nil;
     if (self.saveCompletion) {
         self.saveCompletion(self.manager);
     }

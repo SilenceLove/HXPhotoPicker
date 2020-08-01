@@ -15,14 +15,14 @@
 @interface HXPhotoPersentInteractiveTransition () <UIGestureRecognizerDelegate>
 @property (nonatomic, weak) id<UIViewControllerContextTransitioning> transitionContext;
 @property (nonatomic, weak) UIViewController *vc;
-@property (strong, nonatomic) HXPreviewContentView *contentView;
+@property (weak, nonatomic) HXPreviewContentView *contentView;
 @property (strong, nonatomic) UIView *bgView;
 @property (weak, nonatomic) HXPhotoSubViewCell *tempCell;
 @property (weak, nonatomic) HXPhotoPreviewViewCell *fromCell;
 @property (nonatomic, assign) CGPoint transitionImgViewCenter;
 @property (nonatomic, assign) CGFloat beginX;
 @property (nonatomic, assign) CGFloat beginY;
-@property (strong, nonatomic) HXPhotoView *photoView;
+@property (weak, nonatomic) HXPhotoView *photoView;
 @property (assign, nonatomic) BOOL isPanGesture;
 
 

@@ -26,11 +26,13 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 @property (strong, nonatomic, nullable) NSBundle *languageBundle;
 @property (strong, nonatomic, nullable) NSBundle *photoPickerBundle;
 
+@property (assign, nonatomic) CGSize requestSize;
 
 /// 相册风格
 @property (assign, nonatomic) HXPhotoStyle photoStyle;
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
-@property (strong, nonatomic) UIImage *cameraImage;
+@property (strong, nonatomic) UIImage * _Nullable cameraImage;
+@property (strong, nonatomic) NSURL * _Nullable cameraImageURL;
 
 /// 预览视频时是否自动播放
 @property (assign, nonatomic) HXVideoAutoPlayType videoAutoPlayType;
@@ -49,8 +51,9 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 @property (copy, nonatomic) void (^ reachabilityStatusChangeBlock)(AFNetworkReachabilityStatus netStatus);
 #endif
 
-@property (strong, nonatomic) HXAlbumModel * _Nullable cameraRollAlbumModel;
-@property (assign, nonatomic) NSInteger selectedType;
+@property (copy, nonatomic) NSString * _Nullable cameraRollLocalIdentifier;
+@property (copy, nonatomic) PHFetchResult * _Nullable cameraRollResult;
+@property (assign, nonatomic) NSInteger selectType;
 
 - (void)getURLFileLengthWithURL:(NSURL *)url
                         success:(HXPhotoCommonGetUrlFileLengthSuccess)success

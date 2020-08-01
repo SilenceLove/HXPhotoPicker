@@ -13,6 +13,7 @@
 #import "HX_PhotoEditViewController.h"
 #import "HXVideoEditViewController.h"
 #import "HXPhotoView.h"
+#import "HXCustomNavigationController.h"
 
 @class HXPhotoView;
 @interface UIViewController (HXExtension)
@@ -133,6 +134,8 @@
                                                       cancel:(HX_PhotoEditViewControllerDidCancelBlock _Nullable)cancel;
 
 - (BOOL)hx_navigationBarWhetherSetupBackground;
+
+- (HXCustomNavigationController *_Nullable)hx_customNavigationController;
 
 #pragma mark - < obsoleting >
 /*  <HXAlbumListViewControllerDelegate>

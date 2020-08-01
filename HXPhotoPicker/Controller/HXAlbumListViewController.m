@@ -12,22 +12,15 @@
 
 @interface HXAlbumListViewController ()
 <
-UICollectionViewDataSource,
-UICollectionViewDelegate,
-UIViewControllerPreviewingDelegate,
 HXPhotoViewControllerDelegate,
 UITableViewDataSource,
 UITableViewDelegate
 >
-@property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
-@property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *albumModelArray;
 @property (strong, nonatomic) UILabel *authorizationLb;
-@property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 @property (assign, nonatomic) BOOL orientationDidChange;
 @property (strong, nonatomic) NSIndexPath *beforeOrientationIndexPath;
-@property (assign, nonatomic) BOOL preloadPhotoListCompletion;
 @end
 
 @implementation HXAlbumListViewController
@@ -93,17 +86,12 @@ UITableViewDelegate
     NSInteger i = 0;
     for (HXAlbumModel *albumMd in self.albumModelArray) {
         albumMd.cameraCount = [self.manager cameraCount];
-        if (i == 0 && !albumMd.result) {
+        if (i == 0 && !albumMd.localIdentifier) {
             albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
         }
         i++;
     }
-    if (self.manager.configuration.singleSelected ||
-        self.manager.configuration.changeAlbumListContentView) {
-        [self.tableView reloadData];
-    }else {
-        [self.collectionView reloadData];
-    }
+    [self.tableView reloadData];
 }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
@@ -113,10 +101,6 @@ UITableViewDelegate
     }
 }
 - (void)deviceOrientationChanged:(NSNotification *)notify {
-    if (!self.manager.configuration.singleSelected  &&
-        !self.manager.configuration.changeAlbumListContentView) {
-        self.beforeOrientationIndexPath = [self.collectionView indexPathsForVisibleItems].firstObject;
-    }
     self.orientationDidChange = YES;
 }
 - (void)changeSubviewFrame {
@@ -146,8 +130,7 @@ UITableViewDelegate
         width = self.view.hx_w - 70;
         bottomMargin = 0;
     }
-    if (self.manager.configuration.singleSelected ||
-        self.manager.configuration.changeAlbumListContentView) {
+    
         self.tableView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, bottomMargin, rightMargin);
     
 #ifdef __IPHONE_13_0
@@ -162,20 +145,7 @@ UITableViewDelegate
         if (self.manager.configuration.albumListTableView) {
             self.manager.configuration.albumListTableView(self.tableView);
         }
-    }else {
-        CGFloat itemWidth = (width - (lineCount + 1) * 15) / lineCount;
-        CGFloat itemHeight = itemWidth + 6 + 14 + 4 + 14;
-        self.flowLayout.itemSize = CGSizeMake(itemWidth, itemHeight);
-
-        self.collectionView.contentInset = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
-        self.collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(navBarHeight, leftMargin, 0, rightMargin);
-        if (self.orientationDidChange) {
-            [self.collectionView scrollToItemAtIndexPath:self.beforeOrientationIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
-        }
-        if (self.manager.configuration.albumListCollectionView) {
-            self.manager.configuration.albumListCollectionView(self.collectionView);
-        }
-    }
+        
     self.navigationController.navigationBar.translucent = self.manager.configuration.navBarTranslucent;
     if (self.manager.configuration.navigationBar) {
         self.manager.configuration.navigationBar(self.navigationController.navigationBar, self);
@@ -184,6 +154,9 @@ UITableViewDelegate
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self changeStatusBarStyle];
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
 }
 - (void)changeStatusBarStyle {
     if ([HXPhotoCommon photoCommon].isDark) {
@@ -247,12 +220,8 @@ UITableViewDelegate
     }
 }
 - (void)configTableView {
-    if (self.manager.configuration.singleSelected ||
-        self.manager.configuration.changeAlbumListContentView) {
-        [self.view addSubview:self.tableView];
-    }else {
-        [self.view addSubview:self.collectionView];
-    }
+    [self.view addSubview:self.tableView];
+        
     [self changeSubviewFrame];
 }
 - (void)cancelClick {
@@ -291,10 +260,6 @@ UITableViewDelegate
     }
 }
 - (void)pushPhotoListViewControllerWithAlbumModel:(HXAlbumModel *)albumModel animated:(BOOL) animated {
-    if (!self.preloadPhotoListCompletion) {
-        [self preloadPhotoListDataWithAlbumModel:albumModel];
-        self.preloadPhotoListCompletion = YES;
-    }
     HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
     vc.manager = self.manager;
     vc.title = albumModel.albumName;
@@ -305,112 +270,30 @@ UITableViewDelegate
 - (void)getAlbumModelList:(BOOL)isFirst {
     HXWeakSelf
     if (isFirst) {
-        self.manager.getCameraRollAlbumModel = ^(HXAlbumModel *albumModel) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.view hx_handleLoading];
-                [weakSelf pushPhotoListViewControllerWithAlbumModel:albumModel animated:NO];
-            });
-        };
-        if (self.manager.cameraRollAlbumModel) {
+        if (self.hx_customNavigationController.cameraRollAlbumModel) {
             [self.view hx_handleLoading];
-            [self pushPhotoListViewControllerWithAlbumModel:self.manager.cameraRollAlbumModel animated:NO]; 
+            [self pushPhotoListViewControllerWithAlbumModel:self.hx_customNavigationController.cameraRollAlbumModel animated:NO];
         }else {
-            if (!self.manager.getCameraRoolAlbuming) {
-                if (self.preloadPhotoListCompletion) {
-                    return;
-                }
-                self.preloadPhotoListCompletion = YES;
-                [self.manager preloadData];
-            }
+            self.hx_customNavigationController.requestCameraRollCompletion = ^{
+                [weakSelf.view hx_handleLoading];
+                [weakSelf pushPhotoListViewControllerWithAlbumModel:weakSelf.hx_customNavigationController.cameraRollAlbumModel animated:NO];
+            };
         }
     }else {
         [self configTableView];
         [self.view hx_showLoadingHUDText:nil];
-        self.manager.allAlbumListBlock = ^(NSMutableArray<HXAlbumModel *> *albums) {
-            weakSelf.albumModelArray = albums;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (weakSelf.manager.configuration.singleSelected ||
-                    weakSelf.manager.configuration.changeAlbumListContentView) {
-                    [weakSelf.tableView reloadData];
-                }else {
-                    [weakSelf.collectionView reloadData];
-                }
+        if (self.hx_customNavigationController.albums) {
+            self.albumModelArray = self.hx_customNavigationController.albums;
+            [self.tableView reloadData];
+            [self.view hx_handleLoading:YES];
+        }else {
+            self.hx_customNavigationController.requestAllAlbumCompletion = ^{
+                weakSelf.albumModelArray = weakSelf.hx_customNavigationController.albums;
+                [weakSelf.tableView reloadData];
                 [weakSelf.view hx_handleLoading:YES];
-            });
-            [weakSelf.manager removeAllAlbum];
-        };
-        dispatch_async(self.manager.loadAssetQueue, ^{
-            if (!self.manager.getAlbumListing && !self.manager.albums) {
-                [self.manager getAllAlbumModelFilter:NO needSelect:YES select:nil completion:nil];
-            }else {
-                if (self.manager.albums) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.view hx_handleLoading];
-                        self.albumModelArray = self.manager.albums;
-                        if (self.manager.configuration.singleSelected ||
-                            self.manager.configuration.changeAlbumListContentView) {
-                            [self.tableView reloadData];
-                        }else {
-                            [self.collectionView reloadData];
-                        }
-                    });
-                }
-            }
-        });
+            };
+        }
     }
-}
-- (void)preloadPhotoListDataWithAlbumModel:(HXAlbumModel *)albumModel {
-    dispatch_async(self.manager.loadAssetQueue, ^{
-        if (!albumModel.result && albumModel.collection && !self.manager.getPhotoListing) {
-            // 提前加载照片列表数据
-            PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:albumModel.collection options:albumModel.option];
-            albumModel.result = result;
-            albumModel.count = result.count;
-        }
-        
-        if (!self.manager.getPhotoListing && !self.manager.tempAlbumModel) {
-            [self.manager getPhotoListWithAlbumModel:albumModel complete:nil];
-        }
-    });
-}
-#pragma mark - < UICollectionViewDataSource >
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.albumModelArray.count;
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    HXAlbumListQuadrateViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cellId" forIndexPath:indexPath];
-    cell.indexPath = indexPath;
-    cell.model = self.albumModelArray[indexPath.item];
-    
-    HXWeakSelf
-    cell.getResultCompleteBlock = ^(NSInteger count, HXAlbumListQuadrateViewCell *myCell) {
-        if (count <= 0) {
-            if ([weakSelf.albumModelArray containsObject:myCell.model]) {
-                NSIndexPath *myIndexPath = [weakSelf.collectionView indexPathForCell:myCell];
-                if (myIndexPath) {
-                    [weakSelf.albumModelArray removeObject:myCell.model];
-                    [weakSelf.collectionView deleteItemsAtIndexPaths:@[myIndexPath]];
-                }
-            }
-        }
-    };
-    
-    return cell;
-}
-
-#pragma mark - < UICollectionViewDelegate >
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.navigationController.topViewController != self) {
-        return;
-    }
-    self.preloadPhotoListCompletion = NO;
-    HXAlbumModel *model = self.albumModelArray[indexPath.item];
-    [self pushPhotoListViewControllerWithAlbumModel:model animated:YES];
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    [(HXAlbumListQuadrateViewCell *)cell cancelRequest];
 }
 
 #pragma mark - < UITableViewDataSource >
@@ -426,18 +309,18 @@ UITableViewDelegate
     cell.lineViewColor = self.manager.configuration.albumListViewCellLineColor;
     cell.model = self.albumModelArray[indexPath.row];
     
-//    HXWeakSelf
-//    cell.getResultCompleteBlock = ^(NSInteger count, HXAlbumListSingleViewCell *myCell) {
-//        if (count <= 0) {
-//            if ([weakSelf.albumModelArray containsObject:myCell.model]) {
-//                NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
-//                if (myIndexPath) {
-//                    [weakSelf.albumModelArray removeObject:myCell.model];
-//                    [weakSelf.tableView deleteRowsAtIndexPaths:@[myIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-//                }
-//            }
-//        }
-//    };
+    HXWeakSelf
+    cell.getResultCompleteBlock = ^(NSInteger count, HXAlbumListSingleViewCell *myCell) {
+        if (count <= 0) {
+            if ([weakSelf.albumModelArray containsObject:myCell.model]) {
+                NSIndexPath *myIndexPath = [weakSelf.tableView indexPathForCell:myCell];
+                if (myIndexPath) {
+                    [weakSelf.albumModelArray removeObject:myCell.model];
+                    [weakSelf.tableView deleteRowsAtIndexPaths:@[myIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+                }
+            }
+        }
+    };
     return cell;
 }
 
@@ -447,7 +330,6 @@ UITableViewDelegate
     if (self.navigationController.topViewController != self) {
         return;
     }
-    self.preloadPhotoListCompletion = NO;
     HXAlbumModel *model = self.albumModelArray[indexPath.row];
     [self pushPhotoListViewControllerWithAlbumModel:model animated:YES]; 
 }
@@ -460,26 +342,6 @@ UITableViewDelegate
     [(HXAlbumListSingleViewCell *)cell cancelRequest];
 }
 
-- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
-    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
-    if (!indexPath) {
-        return nil;
-    }
-    HXAlbumListQuadrateViewCell *cell = (HXAlbumListQuadrateViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-    //设置突出区域
-    CGRect frame = [self.collectionView cellForItemAtIndexPath:indexPath].frame;
-    previewingContext.sourceRect = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.width);
-    HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
-    vc.manager = self.manager;
-    vc.title = cell.model.albumName;
-    vc.albumModel = cell.model;
-    vc.delegate = self;
-    return vc;
-}
-
-- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
-    [self.navigationController pushViewController:viewControllerToCommit animated:YES];
-}
 #pragma mark - < 懒加载 >
 - (UITableView *)tableView {
     if (!_tableView) {
@@ -512,53 +374,6 @@ UITableViewDelegate
     }
     return _tableView;
 }
-- (UICollectionView *)collectionView {
-    if (!_collectionView) {
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.hx_w, self.view.hx_h) collectionViewLayout:self.flowLayout];
-//        _collectionView.backgroundColor = [UIColor whiteColor];
-        _collectionView.dataSource = self;
-        _collectionView.delegate = self;
-        _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _collectionView.alwaysBounceVertical = YES;
-        [_collectionView registerClass:[HXAlbumListQuadrateViewCell class] forCellWithReuseIdentifier:@"cellId"];
-//        _collectionView.contentInset = UIEdgeInsetsMake(hxNavigationBarHeight, 0, 0, 0);
-//        _collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(hxNavigationBarHeight, 0, 0, 0);
-#ifdef __IPHONE_11_0
-        if (@available(iOS 11.0, *)) {
-//            if ([self hx_navigationBarWhetherSetupBackground]) {
-//                self.navigationController.navigationBar.translucent = YES;
-//            }
-            _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-#else
-            if ((NO)) {
-#endif
-            } else {
-//                if ([self hx_navigationBarWhetherSetupBackground]) {
-//                    self.navigationController.navigationBar.translucent = YES;
-//                }
-                self.automaticallyAdjustsScrollViewInsets = NO;
-            }
-            if (self.manager.configuration.open3DTouchPreview) {
-                if ([self respondsToSelector:@selector(traitCollection)]) {
-                    if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
-                        if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-                            self.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:_collectionView];
-                        }
-                    }
-                }
-            }
-    }
-    return _collectionView;
-}
-- (UICollectionViewFlowLayout *)flowLayout {
-    if (!_flowLayout) {
-        _flowLayout = [[UICollectionViewFlowLayout alloc] init]; 
-        _flowLayout.minimumLineSpacing = 15;
-        _flowLayout.minimumInteritemSpacing = 15;
-        _flowLayout.sectionInset = UIEdgeInsetsMake(15, 15, 15, 15);
-    }
-    return _flowLayout;
-}
 - (UILabel *)authorizationLb {
     if (!_authorizationLb) {
         _authorizationLb = [[UILabel alloc] initWithFrame:CGRectMake(0, 200, self.view.frame.size.width, 100)];
@@ -575,13 +390,7 @@ UITableViewDelegate
 }
 - (void)dealloc {
     if (HXShowLog) NSSLog(@"dealloc");
-    if (self.manager.configuration.open3DTouchPreview) {
-        if (self.previewingContext) {
-            [self unregisterForPreviewingWithContext:self.previewingContext];
-        }
-    }
     self.manager.selectPhotoing = NO;
-    [self.manager removeAllAlbum];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CustomCameraViewControllerDidDoneNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
@@ -589,133 +398,9 @@ UITableViewDelegate
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
 }
 @end
-
-@interface HXAlbumListQuadrateViewCell ()
-@property (strong, nonatomic) UIImageView *coverView;
-@property (strong, nonatomic) UIButton *selectNumberBtn;
-@property (strong, nonatomic) UILabel *albumNameLb;
-@property (strong, nonatomic) UILabel *photoNumberLb;
-@property (assign, nonatomic) PHImageRequestID requestID;
-@end
-
-@implementation HXAlbumListQuadrateViewCell
-
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self setupUI];
-    }
-    return self;
-}
-- (void)setupUI {
-    [self.contentView addSubview:self.coverView];
-    [self.contentView addSubview:self.albumNameLb];
-    [self.contentView addSubview:self.photoNumberLb];
-//    [self.contentView addSubview:self.selectNumberBtn];
-}
-- (void)setModel:(HXAlbumModel *)model {
-    _model = model;
-    
-    self.albumNameLb.text = self.model.albumName;
-    if (!model.result && model.collection) {
-        HXWeakSelf
-        [model getResultWithCompletion:^(HXAlbumModel *albumModel) {
-            if (albumModel == weakSelf.model) {
-                [weakSelf setAlbumImage];
-            }
-        }];
-    }else {
-        [self setAlbumImage];
-    }
-    if (!model.result || !model.count) {
-        self.coverView.image = model.tempImage ?: [UIImage hx_imageNamed:@"hx_yundian_tupian"];
-    }
-//    if (model.selectedCount == 0) {
-//        self.selectNumberBtn.hidden = YES;
-//    }else {
-//        self.selectNumberBtn.hidden = NO;
-//    }
-//    [self.selectNumberBtn setTitle:@(model.selectedCount).stringValue forState:UIControlStateNormal];
-}
-- (void)setAlbumImage {
-    if (!self.model.asset) {
-        self.model.asset = self.model.result.lastObject;
-    }
-    if (self.getResultCompleteBlock) {
-        self.getResultCompleteBlock(self.model.result.count + self.model.cameraCount, self);
-    }
-    HXWeakSelf
-    self.requestID = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset size:CGSizeMake(self.hx_w * 1.5, self.hx_w * 1.5) completion:^(UIImage *image, PHAsset *asset) {
-        if (weakSelf.model.asset == asset) {
-            weakSelf.coverView.image = image;
-        }
-    }];
-    self.photoNumberLb.text = @(self.model.result.count + self.model.cameraCount).stringValue;
-}
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    self.coverView.frame = CGRectMake(0, 0, self.hx_w, self.hx_w);
-    self.albumNameLb.frame = CGRectMake(0, self.hx_w + 6, self.hx_w, 14);
-    self.photoNumberLb.frame = CGRectMake(0, CGRectGetMaxY(self.albumNameLb.frame) + 4, self.hx_w, 14);
-    self.selectNumberBtn.hx_size = CGSizeMake(12, 12);
-    self.selectNumberBtn.hx_x = self.hx_w - 5 - self.selectNumberBtn.hx_w;
-    CGFloat margin = (self.hx_h - self.hx_w) / 2 + 3;
-    self.selectNumberBtn.center = CGPointMake(self.selectNumberBtn.center.x, self.hx_w + margin);
-}
-- (void)cancelRequest {
-    if (self.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
-        self.requestID = -1;
-    }
-}
-- (void)dealloc {
-//    [self cancelRequest];
-}
-#pragma mark - < cell懒加载 >
-- (UIImageView *)coverView {
-    if (!_coverView) {
-        _coverView = [[UIImageView alloc] init];
-        _coverView.layer.masksToBounds = YES;
-        _coverView.layer.cornerRadius = 4;
-        _coverView.contentMode = UIViewContentModeScaleAspectFill;
-        _coverView.clipsToBounds = YES;
-    }
-    return _coverView;
-}
-- (UILabel *)albumNameLb {
-    if (!_albumNameLb) {
-        _albumNameLb = [[UILabel alloc] init];
-        _albumNameLb.textColor = [UIColor blackColor];
-        _albumNameLb.font = [UIFont systemFontOfSize:13];
-    }
-    return _albumNameLb;
-}
-- (UILabel *)photoNumberLb {
-    if (!_photoNumberLb) {
-        _photoNumberLb = [[UILabel alloc] init];
-        _photoNumberLb.textColor = [UIColor lightGrayColor];
-        _photoNumberLb.font = [UIFont systemFontOfSize:13];
-    }
-    return _photoNumberLb;
-}
-- (UIButton *)selectNumberBtn {
-    if (!_selectNumberBtn) {
-        _selectNumberBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        _selectNumberBtn.userInteractionEnabled = NO;
-        [_selectNumberBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        _selectNumberBtn.titleLabel.font = [UIFont systemFontOfSize:14];
-//        [_selectNumberBtn setBackgroundColor:self.manager.themeColor];
-        _selectNumberBtn.layer.cornerRadius = 12.f / 2;
-        _selectNumberBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
-    }
-    return _selectNumberBtn;
-}
-@end
-
+     
 @interface HXAlbumListSingleViewCell ()
 @property (strong, nonatomic) UIImageView *coverView1;
-@property (strong, nonatomic) UIImageView *coverView2;
-@property (strong, nonatomic) UIImageView *coverView3;
 @property (strong, nonatomic) UILabel *albumNameLb;
 @property (strong, nonatomic) UILabel *photoNumberLb;
 @property (assign, nonatomic) PHImageRequestID requestId1;
@@ -735,8 +420,6 @@ UITableViewDelegate
     return self;
 }
 - (void)setupUI {
-    [self.contentView addSubview:self.coverView3];
-    [self.contentView addSubview:self.coverView2];
     [self.contentView addSubview:self.coverView1];
     [self.contentView addSubview:self.albumNameLb];
     [self.contentView addSubview:self.photoNumberLb];
@@ -747,20 +430,12 @@ UITableViewDelegate
         [[PHImageManager defaultManager] cancelImageRequest:self.requestId1];
         self.requestId1 = -1;
     }
-    if (self.requestId2) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestId2];
-        self.requestId2 = -1;
-    }
-    if (self.requestId3) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestId3];
-        self.requestId3 = -1;
-    }
 }
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
     [self changeColor];
     self.albumNameLb.text = self.model.albumName;
-    if (!model.result && model.collection) {
+    if (!model.assetResult && model.localIdentifier) {
         HXWeakSelf
         [model getResultWithCompletion:^(HXAlbumModel *albumModel) {
             if (albumModel == weakSelf.model) {
@@ -770,60 +445,18 @@ UITableViewDelegate
     }else {
         [self setAlbumImage];
     }
-    if (!model.result || !model.count) {
+    if (!model.assetResult || !model.count) {
         self.coverView1.image = model.tempImage ?: [UIImage hx_imageNamed:@"hx_yundian_tupian"];
-        self.coverView2.hidden = YES;
-        self.coverView3.hidden = YES;
     }
 }
 - (void)setAlbumImage {
-    NSInteger photoCount = self.model.result.count;
-    if (!self.model.asset) {
-        self.model.asset = self.model.result.lastObject;
-    }
+    NSInteger photoCount = self.model.count;
     HXWeakSelf
-    self.requestId1 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset size:CGSizeMake(150, 150) completion:^(UIImage *image, PHAsset *asset) {
-        if (weakSelf.model.asset == asset) {
+    self.requestId1 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject size:CGSizeMake(150, 150) completion:^(UIImage *image, PHAsset *asset) {
+        if (weakSelf.model.assetResult.lastObject == asset) {
             weakSelf.coverView1.image = image;
         }
     }];
-    if (photoCount == 1) {
-        self.coverView2.hidden = YES;
-        self.coverView3.hidden = YES;
-    }else if (photoCount == 2) {
-        if (!self.model.asset2) {
-            self.model.asset2 = self.model.result[1];
-        }
-        self.requestId2 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset2 size:CGSizeMake(40, 40) completion:^(UIImage *image, PHAsset *asset) {
-            if (weakSelf.model.asset2 == asset) {
-                weakSelf.coverView2.image = image;
-            }
-        }];
-        self.coverView2.hidden = NO;
-        self.coverView3.hidden = YES;
-    }else if (photoCount >= 3){
-        if (!self.model.asset2) {
-            self.model.asset2 = self.model.result[1];
-        }
-        if (!self.model.asset3) {
-            self.model.asset3 = self.model.result[2];
-        }
-        self.coverView2.hidden = NO;
-        self.coverView3.hidden = NO;
-        
-        self.requestId2 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset2 size:CGSizeMake(40, 40) completion:^(UIImage *image, PHAsset *asset) {
-            if (weakSelf.model.asset2 == asset) {
-                weakSelf.coverView2.image = image;
-            }
-        }];
-        
-        
-        self.requestId3 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.asset3 size:CGSizeMake(20, 20) completion:^(UIImage *image, PHAsset *asset) {
-            if (weakSelf.model.asset3 == asset) {
-                weakSelf.coverView3.image = image;
-            }
-        }]; 
-    }
     
     self.photoNumberLb.text = [@(photoCount + self.model.cameraCount).stringValue hx_countStrBecomeComma];
     if (self.getResultCompleteBlock) {
@@ -836,12 +469,6 @@ UITableViewDelegate
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.coverView1.frame = CGRectMake(10, 5, self.hx_h - 10, self.hx_h - 10);
-    if (self.model.count == 2) {
-        self.coverView2.frame = CGRectMake(12.5, 3.5, self.hx_h - 15, self.hx_h - 15);
-    }else {
-        self.coverView2.frame = CGRectMake(12.5, 3.5, self.hx_h - 15, self.hx_h - 15);
-        self.coverView3.frame = CGRectMake(15, 2, self.hx_h - 20, self.hx_h - 20);
-    }
     CGFloat albumNameLbX = CGRectGetMaxX(self.coverView1.frame) + 12;
     CGFloat albumNameLbY = self.hx_h / 2  - 16;
     self.albumNameLb.frame = CGRectMake(albumNameLbX, albumNameLbY, self.hx_w - albumNameLbX - 40, 14);
@@ -869,26 +496,6 @@ UITableViewDelegate
         _coverView1.layer.borderWidth = 0.5f;
     }
     return _coverView1;
-}
-- (UIImageView *)coverView2 {
-    if (!_coverView2) {
-        _coverView2 = [[UIImageView alloc] init];
-        _coverView2.contentMode = UIViewContentModeScaleAspectFill;
-        _coverView2.clipsToBounds = YES;
-        _coverView2.layer.borderColor = [UIColor whiteColor].CGColor;
-        _coverView2.layer.borderWidth = 0.5f;
-    }
-    return _coverView2;
-}
-- (UIImageView *)coverView3 {
-    if (!_coverView3) {
-        _coverView3 = [[UIImageView alloc] init];
-        _coverView3.contentMode = UIViewContentModeScaleAspectFill;
-        _coverView3.clipsToBounds = YES;
-        _coverView3.layer.borderColor = [UIColor whiteColor].CGColor;
-        _coverView3.layer.borderWidth = 0.5f;
-    }
-    return _coverView3;
 }
 - (UILabel *)albumNameLb {
     if (!_albumNameLb) {
