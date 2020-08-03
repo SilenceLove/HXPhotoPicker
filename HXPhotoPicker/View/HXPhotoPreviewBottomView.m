@@ -287,8 +287,9 @@
         [_doneBtn setTitleColor:selectedTitleColor forState:UIControlStateNormal];
         [_doneBtn setTitleColor:[selectedTitleColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
     }
+    UIColor *doneBtnDarkBgColor = self.manager.configuration.bottomDoneBtnDarkBgColor ?: [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1];
     UIColor *doneBgColor = self.manager.configuration.bottomDoneBtnBgColor ?: themeColor;
-    _doneBtn.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1] : doneBgColor;
+    _doneBtn.backgroundColor = [HXPhotoCommon photoCommon].isDark ? doneBtnDarkBgColor : doneBgColor;
     [_editBtn setTitleColor:themeColor forState:UIControlStateNormal];
     [_editBtn setTitleColor:[themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
 }

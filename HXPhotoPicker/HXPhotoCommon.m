@@ -82,20 +82,12 @@ static id instance;
     PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.cameraRollResult];
     if (collectionChanges) {
         if ([collectionChanges hasIncrementalChanges]) {
-            PHFetchResult *result = collectionChanges.fetchResultAfterChanges;
-            self.cameraRollResult = result;
-            if (collectionChanges.insertedObjects.count > 0) {
-                // 添加照片了
-            }
-            if (collectionChanges.removedObjects.count > 0) {
-                // 删除照片了
-
-            }
-            if (collectionChanges.changedObjects.count > 0) {
-                // 改变照片了
-            }
-            if ([collectionChanges hasMoves]) {
-                // 移动照片了
+            if (collectionChanges.insertedObjects.count > 0 ||
+                collectionChanges.removedObjects.count > 0 ||
+                collectionChanges.changedObjects.count > 0 ||
+                [collectionChanges hasMoves]) {
+                PHFetchResult *result = collectionChanges.fetchResultAfterChanges;
+                self.cameraRollResult = result;
             }
         }
     }

@@ -54,6 +54,7 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 @property (copy, nonatomic) NSString * _Nullable cameraRollLocalIdentifier;
 @property (copy, nonatomic) PHFetchResult * _Nullable cameraRollResult;
 @property (assign, nonatomic) NSInteger selectType;
+@property (assign, nonatomic) BOOL creationDateSort;
 
 - (void)getURLFileLengthWithURL:(NSURL *)url
                         success:(HXPhotoCommonGetUrlFileLengthSuccess)success

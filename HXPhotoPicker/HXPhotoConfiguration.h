@@ -7,53 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "HXPhotoTypes.h"
 #import "HXPhotoEditConfiguration.h"
-
-
-/// 当使用了自定义相机类型时会过滤掉内部按 HXPhotoManagerSelectedType 来设置的逻辑，
-/// 将会使用自定义类型的逻辑进行设置
-typedef NS_ENUM(NSUInteger, HXPhotoCustomCameraType) {
-    HXPhotoCustomCameraTypeUnused = 0,      //!< 不使用自定义相机类型，按默认逻辑设置
-    HXPhotoCustomCameraTypePhoto = 1,       //!< 拍照
-    HXPhotoCustomCameraTypeVideo = 2,       //!< 录制
-    HXPhotoCustomCameraTypePhotoAndVideo    //!< 拍照和录制一起
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoConfigurationCameraType) {
-    HXPhotoConfigurationCameraTypePhoto = 0,        //!< 拍照
-    HXPhotoConfigurationCameraTypeVideo = 1,        //!< 录制
-    HXPhotoConfigurationCameraTypePhotoAndVideo     //!< 拍照和录制一起
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoAlbumShowMode) {
-    HXPhotoAlbumShowModeDefault = 0,    //!< 默认的
-    HXPhotoAlbumShowModePopup           //!< 弹窗
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
-    HXPhotoLanguageTypeSys = 0, //!< 跟随系统语言
-    HXPhotoLanguageTypeSc,      //!< 中文简体
-    HXPhotoLanguageTypeTc,      //!< 中文繁体
-    HXPhotoLanguageTypeJa,      //!< 日文
-    HXPhotoLanguageTypeKo,      //!< 韩文
-    HXPhotoLanguageTypeEn       //!< 英文
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoStyle) {
-    HXPhotoStyleDefault = 0,    //!< 默认
-    HXPhotoStyleDark            //!< 暗黑
-};
-
-typedef NS_ENUM(NSUInteger, HXVideoAutoPlayType) {
-    HXVideoAutoPlayTypeNormal = 0, //!< 不自动播放
-    HXVideoAutoPlayTypeWiFi,       //!< wifi网络下自动播放
-    HXVideoAutoPlayTypeAll         //!< 蜂窝移动和wifi网络下自动播放
-};
-
-typedef NS_ENUM(NSUInteger, HXConfigurationType) {
-    HXConfigurationTypeWXChat,  //!< 微信聊天
-    HXConfigurationTypeWXMoment //!< 微信朋友圈
-};
 
 @class
 HXPhotoBottomView,
@@ -67,6 +22,10 @@ HXPhotoPreviewViewController;
 /// 配置类型
 /// 一键配置UI和选择逻辑
 @property (assign, nonatomic) HXConfigurationType type;
+
+/// 照片列表取消按钮的位置
+/// 只在 albumShowMode = HXPhotoAlbumShowModePopup 时有效
+@property (assign, nonatomic) HXPhotoListCancelButtonLocationType photoListCancelLocation;
 
 /// 照片编辑配置
 @property (strong, nonatomic) HXPhotoEditConfiguration *photoEditConfigur;
@@ -404,24 +363,21 @@ HXPhotoPreviewViewController;
 /// 预览界面选择按钮的背景颜色
 @property (strong, nonatomic) UIColor *previewSelectedBtnBgColor;
 
-/**
- sectionHeader悬浮时的标题颜色 ios9以上才有效果
- */
-@property (strong, nonatomic) UIColor *sectionHeaderSuspensionTitleColor;
+/// sectionHeader悬浮时的标题颜色
+/// 3.0.3之后的版本已移除此功能
+@property (strong, nonatomic) UIColor *sectionHeaderSuspensionTitleColor DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
-/**
- sectionHeader悬浮时的背景色 ios9以上才有效果
- */
-@property (strong, nonatomic) UIColor *sectionHeaderSuspensionBgColor;
+/// sectionHeader悬浮时的背景色
+/// 3.0.3之后的版本已移除此功能
+@property (strong, nonatomic) UIColor *sectionHeaderSuspensionBgColor DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
-/**
- 导航栏标题颜色
- */
+/// 导航栏标题颜色
 @property (strong, nonatomic) UIColor *navigationTitleColor;
 
-/**
- 导航栏是否半透明，默认YES
- */
+/// 照片列表导航栏标题箭头颜色
+@property (strong, nonatomic) UIColor *navigationTitleArrowColor;
+
+/// 导航栏是否半透明
 @property (assign, nonatomic) BOOL navBarTranslucent;
 
 /// 导航栏背景颜色
@@ -493,6 +449,12 @@ HXPhotoPreviewViewController;
 
 /// 底部完成按钮背景颜色
 @property (strong, nonatomic) UIColor *bottomDoneBtnBgColor;
+
+/// 底部完成按钮暗黑模式下的背景颜色
+@property (strong, nonatomic) UIColor *bottomDoneBtnDarkBgColor;
+
+/// 底部完成按钮禁用状态下的背景颜色
+@property (strong, nonatomic) UIColor *bottomDoneBtnEnabledBgColor;
 
 /// 底部完成按钮文字颜色
 @property (strong, nonatomic) UIColor *bottomDoneBtnTitleColor;

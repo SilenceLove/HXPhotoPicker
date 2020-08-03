@@ -84,6 +84,7 @@ PHPhotoLibraryChangeObserver
 @property (assign, nonatomic) BOOL isNewEditDismiss;
 
 @property (assign, nonatomic) BOOL firstOn;
+@property (assign, nonatomic) BOOL assetDidChanged;
 @end
 
 @implementation HXPhotoViewController
@@ -162,6 +163,7 @@ PHPhotoLibraryChangeObserver
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.assetDidChanged = NO;
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     self.firstOn = YES;
     self.cellCanSetModel = YES;
@@ -222,12 +224,16 @@ PHPhotoLibraryChangeObserver
 #pragma mark - < private >
 - (void)setupUI {
     self.currentSectionIndex = 0;
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(didCancelClick)];
     [self.view addSubview:self.collectionView];
     if (!self.manager.configuration.singleSelected) {
         [self.view addSubview:self.bottomView];
     }
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
+        if (self.manager.configuration.photoListCancelLocation == HXPhotoListCancelButtonLocationTypeLeft) {
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(didCancelClick)];
+        }else if (self.manager.configuration.photoListCancelLocation == HXPhotoListCancelButtonLocationTypeRight) {
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(didCancelClick)];
+        }
         if (self.manager.configuration.photoListTitleView) {
             self.navigationItem.titleView = self.manager.configuration.photoListTitleView(self.albumModel.albumName);
             HXWeakSelf
@@ -235,11 +241,12 @@ PHPhotoLibraryChangeObserver
                 [weakSelf albumTitleViewDidAction:selected];
             };
         }else {
-            [self.albumTitleView layoutSubviews];
             self.navigationItem.titleView = self.albumTitleView;
         }
         [self.view addSubview:self.albumBgView];
         [self.view addSubview:self.albumView];
+    }else {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(didCancelClick)];
     }
     [self changeColor];
 }
@@ -402,7 +409,6 @@ PHPhotoLibraryChangeObserver
         self.manager.configuration.updatePhotoListTitle(self.albumModel.albumName);
     }else {
         self.albumTitleView.model = self.albumModel;
-        [self.albumTitleView setupAlpha:YES];
     }
     [self getPhotoList];
 }
@@ -470,14 +476,15 @@ PHPhotoLibraryChangeObserver
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         HXWeakSelf
         [self.manager getPhotoListWithAlbumModel:self.albumModel complete:^(NSMutableArray *allList, NSMutableArray *previewList, HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel) {
-            if (weakSelf.albumModel != albumModel || !weakSelf) {
+            if ((weakSelf.albumModel != albumModel && !weakSelf.assetDidChanged) || !weakSelf) {
                 return;
             }
-            if (weakSelf.manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
-                if (weakSelf.allArray.count) {
-                    return;
-                }
-            }
+            weakSelf.assetDidChanged = NO;
+//            if (weakSelf.manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
+//                if (weakSelf.allArray.count) {
+//                    return;
+//                }
+//            }
             if (weakSelf.collectionViewReloadCompletion) {
                 return ;
             }
@@ -1537,17 +1544,8 @@ PHPhotoLibraryChangeObserver
     PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.albumModel.assetResult];
     if (collectionChanges) {
         if ([collectionChanges hasIncrementalChanges]) {
-            // 照片添加不做处理
-//            if (collectionChanges.insertedObjects.count > 0) {
-//                // 添加照片了
-//            }
-            if (collectionChanges.removedObjects.count > 0 ||
-                collectionChanges.changedObjects.count > 0 ||
-                [collectionChanges hasMoves]) {
+            if (collectionChanges.removedObjects.count > 0) {
                 // 删除照片了
-                // 改变照片了
-                // 移动照片了
-//                PHFetchResult *result = collectionChanges.fetchResultAfterChanges;
                 if (collectionChanges.removedObjects.count > 0) {
                     NSArray *selectedArray = self.manager.selectedArray.copy;
                     for (HXPhotoModel *model in selectedArray) {
@@ -1558,8 +1556,11 @@ PHPhotoLibraryChangeObserver
                     }
                 }
                 self.albumModel.assetResult = nil;
+                self.assetDidChanged = YES;
+                self.collectionViewReloadCompletion = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    self.bottomView.manager = self.manager;
+                    [self.navigationController popToViewController:self animated:YES];
+                    self.bottomView.selectCount = [self.manager selectedCount];
                     [self.view hx_showLoadingHUDText:nil];
                     [self startGetAllPhotoModel];
                 });
@@ -2915,8 +2916,10 @@ PHPhotoLibraryChangeObserver
         }
     }
     UIColor *themeColor = self.manager.configuration.bottomDoneBtnBgColor ?: self.manager.configuration.themeColor;
-    UIColor *doneBtnBgColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1] : themeColor;
-    self.doneBtn.backgroundColor = self.doneBtn.enabled ? doneBtnBgColor : [doneBtnBgColor colorWithAlphaComponent:0.5];
+    UIColor *doneBtnDarkBgColor = self.manager.configuration.bottomDoneBtnDarkBgColor ?: [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1];
+    UIColor *doneBtnBgColor = [HXPhotoCommon photoCommon].isDark ? doneBtnDarkBgColor : themeColor;
+    UIColor *doneBtnEnabledBgColor = self.manager.configuration.bottomDoneBtnEnabledBgColor ?: [doneBtnBgColor colorWithAlphaComponent:0.5];
+    self.doneBtn.backgroundColor = self.doneBtn.enabled ? doneBtnBgColor : doneBtnEnabledBgColor;
     
     if (!self.manager.configuration.selectTogether) {
         if (self.manager.selectedPhotoArray.count) {
@@ -3073,7 +3076,7 @@ PHPhotoLibraryChangeObserver
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
         _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
         [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.3] forState:UIControlStateDisabled];
         _doneBtn.layer.cornerRadius = 3;
         _doneBtn.enabled = NO;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];

@@ -146,6 +146,13 @@
     _photoStyle = photoStyle;
     [HXPhotoCommon photoCommon].photoStyle = photoStyle;
 }
+- (void)setCreationDateSort:(BOOL)creationDateSort {
+    if ([HXPhotoCommon photoCommon].creationDateSort != creationDateSort) {
+        [HXPhotoCommon photoCommon].cameraRollResult = nil;
+    }
+    _creationDateSort = creationDateSort;
+    [HXPhotoCommon photoCommon].creationDateSort = creationDateSort;
+}
 - (void)setLanguageType:(HXPhotoLanguageType)languageType {
     if ([HXPhotoCommon photoCommon].languageType != languageType) {
         [HXPhotoCommon photoCommon].languageBundle = nil;
@@ -238,35 +245,42 @@
 //    self.openCamera = NO;
     self.saveSystemAblum = YES;
     self.albumShowMode = HXPhotoAlbumShowModePopup;
+    self.photoListCancelLocation = HXPhotoListCancelButtonLocationTypeLeft;
     
-    // 颜色设置
-    self.statusBarStyle = UIStatusBarStyleLightContent;
-    self.themeColor = [UIColor whiteColor];
-    self.photoEditConfigur.themeColor = [UIColor hx_colorWithHexStr:@"#07C160"];
-    self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
     
     // 原图按钮设置
     self.changeOriginalTinColor = NO;
     self.originalNormalImageName = @"hx_original_normal_wx";
     self.originalSelectedImageName = @"hx_original_selected_wx";
-    
-    self.cameraFocusBoxColor = [UIColor hx_colorWithHexStr:@"#07C160"];
-    
+
+    // 颜色设置
+    UIColor *wxColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.statusBarStyle = UIStatusBarStyleLightContent;
+    self.themeColor = [UIColor whiteColor];
+    self.photoEditConfigur.themeColor = wxColor;
+    self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
+    self.navigationTitleArrowColor = [UIColor hx_colorWithHexStr:@"#B2B2B2"];
+    self.cameraFocusBoxColor = wxColor;
     self.authorizationTipColor = [UIColor whiteColor];
     self.navigationTitleSynchColor = YES;
-    self.cellSelectedBgColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.cellSelectedBgColor = wxColor;
     self.cellSelectedTitleColor = [UIColor whiteColor];
-    self.previewSelectedBtnBgColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.cellDarkSelectBgColor = wxColor;
+    self.cellDarkSelectTitleColor = [UIColor whiteColor];
+    self.previewSelectedBtnBgColor = wxColor;
     self.selectedTitleColor = [UIColor whiteColor];
-    self.bottomDoneBtnBgColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.previewDarkSelectBgColor = wxColor;
+    self.previewDarkSelectTitleColor = [UIColor whiteColor];
+    self.bottomDoneBtnBgColor = wxColor;
+    self.bottomDoneBtnDarkBgColor = wxColor;
+    self.bottomDoneBtnEnabledBgColor = [[UIColor hx_colorWithHexStr:@"#666666"] colorWithAlphaComponent:0.3];
     self.bottomDoneBtnTitleColor = [UIColor whiteColor];
-    
     self.bottomViewBgColor = [UIColor hx_colorWithHexStr:@"#141414"];
     
     self.popupTableViewCellBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
     self.popupTableViewCellLineColor = [[UIColor hx_colorWithHexStr:@"#434344"] colorWithAlphaComponent:0.6];
     self.popupTableViewCellSelectColor = [UIColor clearColor];
-    self.popupTableViewCellSelectIconColor = [UIColor hx_colorWithHexStr:@"#07C160"];
+    self.popupTableViewCellSelectIconColor = wxColor;
     self.popupTableViewCellHighlightedColor = [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1];
     self.popupTableViewBgColor = [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1];
     self.popupTableViewCellPhotoCountColor = [UIColor whiteColor];

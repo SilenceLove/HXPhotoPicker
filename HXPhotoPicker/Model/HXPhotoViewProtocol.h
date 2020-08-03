@@ -91,154 +91,87 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @protocol HXPhotoViewDelegate <NSObject>
 @optional
 
-/**
- 照片/视频发生改变、HXPohotView初始化、manager赋值时调用 - 选择、移动顺序、删除、刷新视图
- 调用 refreshView 会触发此代理
- 
- @param photoView self
- @param allList 所有类型的模型数组
- @param photos 照片类型的模型数组
- @param videos 视频类型的模型数组
- @param isOriginal 是否原图
- */
+/// 照片/视频发生改变、HXPohotView初始化、manager赋值时调用 - 选择、移动顺序、删除、刷新视图
+/// 调用 refreshView 会触发此代理
+/// @param allList 所有类型的模型数组
+/// @param photos 照片类型的模型数组
+/// @param videos 视频类型的模型数组
+/// @param isOriginal 是否选择了原图
 - (void)photoView:(HXPhotoView *)photoView
    changeComplete:(NSArray<HXPhotoModel *> *)allList
            photos:(NSArray<HXPhotoModel *> *)photos
            videos:(NSArray<HXPhotoModel *> *)videos
          original:(BOOL)isOriginal;
 
+/// 照片/视频发生改变、HXPohotView初始化、manager赋值时调用 - 选择、移动顺序、删除、刷新视图
+/// 调用 refreshView 会触发此代理
 - (void)photoViewChangeComplete:(HXPhotoView *)photoView
                    allAssetList:(NSArray<PHAsset *> *)allAssetList
                     photoAssets:(NSArray<PHAsset *> *)photoAssets
                     videoAssets:(NSArray<PHAsset *> *)videoAssets
                        original:(BOOL)isOriginal;
 
-/**
- 相册相片列表点击了完成按钮/删除/移动、HXPohotView初始化且有数据、manager赋值且有数据时
- 调用 refreshView 不会触发此代理
-
- @param photoView self
- @param allList 所有类型的模型数组
- @param photos 照片类型的模型数组
- @param videos 视频类型的模型数组
- @param isOriginal 是否原图
- */
+/// 相册相片列表点击了完成按钮/删除/移动、HXPohotView初始化且有数据、manager赋值且有数据时
+/// 调用 refreshView 不会触发此代理
 - (void)photoListViewControllerDidDone:(HXPhotoView *)photoView
                                allList:(NSArray<HXPhotoModel *> *)allList
                                 photos:(NSArray<HXPhotoModel *> *)photos
                                 videos:(NSArray<HXPhotoModel *> *)videos
                               original:(BOOL)isOriginal;
 
-/**
- 点击了添加cell的事件
-
- @param photoView self
- */
+/// 点击了添加按钮的事件
 - (void)photoViewDidAddCellClick:(HXPhotoView *)photoView;
 
-/**
- 当view高度改变时调用
-
- @param photoView self
- @param frame 位置大小
- */
+/// 当view高度改变时调用
+/// @param frame 位置大小
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame;
 
-/**
- 点击取消时调用
-
- @param photoView self
- */
+/// 取消选择图片时调用
 - (void)photoViewDidCancel:(HXPhotoView *)photoView;
 
-/**
- 删除网络图片时调用
-
- @param photoView self
- @param networkPhotoUrl 被删除的图片地址
- */
+/// 删除网络图片时调用
+/// @param networkPhotoUrl 被删除的图片地址
 - (void)photoView:(HXPhotoView *)photoView deleteNetworkPhoto:(NSString *)networkPhotoUrl;
 
-/**
- 当前删除的模型
-
- @param photoView self
- @param model 模型
- @param index 下标
- */
+/// 当前删除的模型
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index;
 
-/**
- 长按手势结束时是否删除当前拖动的cell
- 
- @param photoView self
- @return 是否删除
- */
+/// 长按手势结束时是否删除当前拖动的cell
 - (BOOL)photoViewShouldDeleteCurrentMoveItem:(HXPhotoView *)photoView
                            gestureRecognizer:(UILongPressGestureRecognizer *)longPgr
                                    indexPath:(NSIndexPath *)indexPath;
 
-/**
- 长按手势发生改变时调用
-
- @param photoView self
- @param longPgr 长按手势识别器
- */
+/// 长按手势发生改变时调用
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerChange:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 
-/**
- 长按手势开始时调用
-
- @param photoView self
- @param longPgr 长按手势识别器
- */
+/// 长按手势开始时调用
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 
-/**
- 长按手势结束时调用
-
- @param photoView self
- @param longPgr 长按手势识别器
- */
+/// 长按手势结束时调用
 - (void)photoView:(HXPhotoView *)photoView gestureRecognizerEnded:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath;
 
-/**
- collectionView是否可以选择item（不包括添加按钮）
-
- @param photoView self
- @param indexPath 选择Cell的indexPath
- @return yes 可以选 no 不可以,点击无反应
- */
-- (BOOL)photoView:(HXPhotoView *)photoView collectionViewShouldSelectItemAtIndexPath:(NSIndexPath *)indexPath model:(HXPhotoModel *)model;
+/// collectionView是否可以选择当前这个item（不包括添加按钮）
+- (BOOL)photoView:(HXPhotoView *)photoView collectionViewShouldSelectItemAtIndexPath:(NSIndexPath *)indexPath
+            model:(HXPhotoModel *)model;
 
 /// 当前选择的model数组，不是已经选择的model数组
 /// 例: 已经选择了 照片1、视频1，再跳转相册选择了照片2、视频2，那么一共就是 照片1、视频1、照片2、视频2.那这个代理返回的数据就是 照片2、视频2
 /// 只有在相册列表点了确定按钮才会触发
-/// @param allList 所有类型
-/// @param photos 照片类型
-/// @param videos 视频类型
-/// @param isOriginal 是否原图
 - (void)photoViewCurrentSelected:(NSArray<HXPhotoModel *> *)allList
                           photos:(NSArray<HXPhotoModel *> *)photos
                           videos:(NSArray<HXPhotoModel *> *)videos
                         original:(BOOL)isOriginal;
 
 /// 取消预览大图的回调
-/// @param photoView self
 - (void)photoViewPreviewDismiss:(HXPhotoView *)photoView;
 
 /// 实现这个代理返回的高度就是HXPhotoView的高度，不会进行自动计算高度.
 /// 每次需要更新高度的时候触发，请确保高度正确
-/// @param photoView self
 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView;
 
 /// 自定义每个item的大小，实现此代码必须将 HXPhotoViewCustomItemSize 此宏的值修改为 1
 /// 并且必须实现 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView 此代理返回HXPhotoView的高度，如果不实现则HXPhotoView的高度为0
-/// @param collectionView collectionView
-/// @param collectionViewLayout layout
-/// @param indexPath indexPath
 /// @param isAddItem 是否是添加按钮的item
-/// @param photoView self
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -255,10 +188,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
 minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
                 photoView:(HXPhotoView *)photoView;
 
-///
-/// @param photoView self
-/// @param model 模型
-- (void)photoViewCameraTakePictureCompletion:(HXPhotoView *)photoView model:(HXPhotoModel *)model;
+/// 相机拍照完成
+- (void)photoViewCameraTakePictureCompletion:(HXPhotoView *)photoView
+                                       model:(HXPhotoModel *)model;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class HXAlbumModel, HXPhotoManager;
+@class HXAlbumModel, HXPhotoManager, HXPhotoConfiguration;
 @interface HXAlbumlistView : UIView
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) HXPhotoManager *manager;
@@ -22,7 +22,7 @@
 
 @interface HXAlbumlistViewCell : UITableViewCell
 @property (strong, nonatomic) HXAlbumModel *model;
-@property (strong, nonatomic) HXPhotoManager *manager;
+@property (strong, nonatomic) HXPhotoConfiguration *configuration;
 - (void)setAlbumImageWithCompletion:(void (^)(NSInteger count, HXAlbumlistViewCell *myCell))completion;
 - (void)cancelRequest ;
 @end
@@ -34,7 +34,7 @@
 @property (copy, nonatomic) void (^didTitleViewBlock)(BOOL selected);
 - (instancetype)initWithManager:(HXPhotoManager *)manager; 
 - (void)deSelect;
-- (void)setupAlpha:(BOOL)anima;
+//- (void)setupAlpha:(BOOL)anima;
 @end
 
 @interface HXAlbumTitleButton : UIButton

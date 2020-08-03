@@ -834,22 +834,22 @@
     HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
 #if HasSDWebImage
-    [[SDWebImageManager sharedManager] loadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
-        if (data) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (success) {
-                    success(data, 0, weakSelf, nil);
-                }
-            });
-        }else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (failed) {
-                    failed(nil, weakSelf);
-                }
-            });
-        }
-    }];
-    return 0;
+        [[SDWebImageManager sharedManager] loadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+            if (data) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (success) {
+                        success(data, 0, weakSelf, nil);
+                    }
+                });
+            }else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (failed) {
+                        failed(nil, weakSelf);
+                    }
+                });
+            }
+        }];
+        return 0;
 #elif HasYYKitOrWebImage
         [[YYWebImageManager sharedManager] requestImageWithURL:self.networkPhotoUrl options:0 progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
             if (image) {
@@ -1347,8 +1347,14 @@
         return 0;
     }
     if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
-        if (failed) {
-            failed(nil, self);
+        if (self.imageURL) {
+            if (success) {
+                success(self.imageURL, self, nil);
+            }
+        }else {
+            if (failed) {
+                failed(nil, self);
+            }
         }
 //        if (self.networkPhotoUrl) {
 //            if (success) {

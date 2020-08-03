@@ -276,8 +276,8 @@
         self.bottomViewBgColor = nil;
         self.manager.configuration.cellSelectedBgColor = nil;
         self.manager.configuration.selectedTitleColor = nil;
-        self.manager.configuration.sectionHeaderSuspensionBgColor = nil;
-        self.manager.configuration.sectionHeaderSuspensionTitleColor = nil;
+//        self.manager.configuration.sectionHeaderSuspensionBgColor = nil;
+//        self.manager.configuration.sectionHeaderSuspensionTitleColor = nil;
     }else if (self.navBgColor.selectedSegmentIndex == 1) {
         self.manager.configuration.navBarBackgroudColor = [UIColor redColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
@@ -285,8 +285,8 @@
         self.bottomViewBgColor = [UIColor redColor];
         self.manager.configuration.cellSelectedBgColor = [UIColor redColor];
         self.manager.configuration.selectedTitleColor = [UIColor redColor];
-        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor redColor];
-        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
+//        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor redColor];
+//        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
     }else if (self.navBgColor.selectedSegmentIndex == 2) {
         self.manager.configuration.navBarBackgroudColor = [UIColor whiteColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
@@ -295,8 +295,8 @@
         self.manager.configuration.cellSelectedBgColor = self.manager.configuration.themeColor;
         self.manager.configuration.cellSelectedTitleColor = [UIColor whiteColor];
         self.manager.configuration.selectedTitleColor = [UIColor whiteColor];
-        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor whiteColor];
-        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor blackColor];
+//        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor whiteColor];
+//        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor blackColor];
     }else if (self.navBgColor.selectedSegmentIndex == 3) {
         self.manager.configuration.navBarBackgroudColor = [UIColor blackColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
@@ -304,8 +304,8 @@
         self.bottomViewBgColor = [UIColor blackColor];
         self.manager.configuration.cellSelectedBgColor = [UIColor blackColor];
         self.manager.configuration.selectedTitleColor = [UIColor blackColor];
-        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor blackColor];
-        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
+//        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor blackColor];
+//        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
     }else if (self.navBgColor.selectedSegmentIndex == 4) {
         self.manager.configuration.navBarBackgroudColor = [UIColor orangeColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
@@ -313,8 +313,8 @@
         self.bottomViewBgColor = [UIColor orangeColor];
         self.manager.configuration.cellSelectedBgColor = [UIColor orangeColor];
         self.manager.configuration.selectedTitleColor = [UIColor orangeColor];
-        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor orangeColor];
-        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
+//        self.manager.configuration.sectionHeaderSuspensionBgColor = [UIColor orangeColor];
+//        self.manager.configuration.sectionHeaderSuspensionTitleColor = [UIColor whiteColor];
     }else {
         self.manager.configuration.navBarBackgroudColor = nil;
         self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
@@ -322,8 +322,8 @@
         self.bottomViewBgColor = nil;
         self.manager.configuration.cellSelectedBgColor = nil;
         self.manager.configuration.selectedTitleColor = nil;
-        self.manager.configuration.sectionHeaderSuspensionBgColor = nil;
-        self.manager.configuration.sectionHeaderSuspensionTitleColor = nil;
+//        self.manager.configuration.sectionHeaderSuspensionBgColor = nil;
+//        self.manager.configuration.sectionHeaderSuspensionTitleColor = nil;
     }
     
     if (self.navTitleColor.selectedSegmentIndex == 0) {

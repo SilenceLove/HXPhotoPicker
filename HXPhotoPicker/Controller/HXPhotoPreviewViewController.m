@@ -238,6 +238,7 @@ HX_PhotoEditViewControllerDelegate
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationWillChanged:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     
     [self addGesture];
+    
 }
 #pragma mark - < private >
 - (void)setExteriorPreviewStyle:(HXPhotoViewPreViewShowStyle)exteriorPreviewStyle {
@@ -371,7 +372,6 @@ HX_PhotoEditViewControllerDelegate
         themeColor = [UIColor whiteColor];
         navBarBackgroudColor = [UIColor blackColor];
         navigationTitleColor = [UIColor whiteColor];
-//        selectedTitleColor = [UIColor blackColor];
         selectBtnBgColor = self.manager.configuration.previewDarkSelectBgColor;
         selectBtnTitleColor = self.manager.configuration.previewDarkSelectTitleColor;
     }else {

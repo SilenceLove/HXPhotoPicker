@@ -615,7 +615,7 @@
     }];
 }
 - (void)dissmissClick {
-    [self.view hx_handleLoading];
+    [self.view hx_handleLoading:NO];
     self.view.userInteractionEnabled = YES;
     if (self.navigationController.viewControllers.count <= 1) {
         [self dismissViewControllerAnimated:YES completion:nil];
