@@ -33,6 +33,9 @@ HXPhotoPreviewViewController;
 /// 相机界面是否开启定位 默认 YES
 @property (assign, nonatomic) BOOL cameraCanLocation;
 
+/// 在系统相册删除资源时是否同步删除已选的同一资源
+//@property (assign, nonatomic) BOOL followSystemDeleteAssetToDeleteSelectAsset;
+
 /// 是否使用仿微信的照片编辑 默认YES
 @property (assign, nonatomic) BOOL useWxPhotoEdit;
 
@@ -377,6 +380,9 @@ HXPhotoPreviewViewController;
 /// 照片列表导航栏标题箭头颜色
 @property (strong, nonatomic) UIColor *navigationTitleArrowColor;
 
+/// 暗黑模式下照片列表导航栏标题箭头颜色
+@property (strong, nonatomic) UIColor *navigationTitleArrowDarkColor;
+
 /// 导航栏是否半透明
 @property (assign, nonatomic) BOOL navBarTranslucent;
 
@@ -463,7 +469,6 @@ HXPhotoPreviewViewController;
 @property (assign, nonatomic) BOOL bottomViewTranslucent;
 
 /// 主题颜色  默认 tintColor
-/// 改变主题颜色后建议也改下原图按钮的图标
 @property (strong, nonatomic) UIColor *themeColor;
 
 /// 是否可以改变原图按钮的tinColor

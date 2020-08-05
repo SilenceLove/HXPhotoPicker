@@ -583,7 +583,7 @@ HX_PhotoEditViewControllerDelegate
         [self.bottomView deleteModel:model];
     }
 }
-- (void)dismissClick {
+- (void)cancelDismissClick {
     self.manager.selectPhotoing = NO;
     if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidCancel:model:)]) {
         HXPhotoModel *model;
@@ -592,7 +592,21 @@ HX_PhotoEditViewControllerDelegate
         }
         [self.delegate photoPreviewControllerDidCancel:self model:model];
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
+    BOOL selectPhotoCancelDismissAnimated = self.manager.selectPhotoCancelDismissAnimated;
+    [self dismissViewControllerAnimated:selectPhotoCancelDismissAnimated completion:^{
+        if ([self.delegate respondsToSelector:@selector(photoPreviewControllerCancelDismissCompletion:)]) {
+            [self.delegate photoPreviewControllerCancelDismissCompletion:self];
+        }
+    }];
+}
+- (void)dismissClick {
+    self.manager.selectPhotoing = NO;
+    BOOL selectPhotoFinishDismissAnimated = self.manager.selectPhotoFinishDismissAnimated;
+    [self dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
+        if ([self.delegate respondsToSelector:@selector(photoPreviewControllerFinishDismissCompletion:)]) {
+            [self.delegate photoPreviewControllerFinishDismissCompletion:self];
+        }
+    }];
 }
 - (void)deleteClick {
     if (!self.modelArray.count) {
@@ -610,7 +624,7 @@ HX_PhotoEditViewControllerDelegate
     titleModel.titleFont = [UIFont systemFontOfSize:13];
     titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
     titleModel.cellHeight = 60.f;
-    titleModel.canSelected = NO;
+    titleModel.canSelect = NO;
     
     HXPhotoBottomViewModel *deleteModel = [[HXPhotoBottomViewModel alloc] init];
     deleteModel.title = [NSBundle hx_localizedStringForKey:@"删除"];
@@ -1088,7 +1102,12 @@ HX_PhotoEditViewControllerDelegate
             [self.delegate photoPreviewControllerDidCancel:self model:model];
         }
         self.manager.selectPhotoing = NO;
-        [self dismissViewControllerAnimated:YES completion:nil];
+        BOOL selectPhotoFinishDismissAnimated = self.manager.selectPhotoFinishDismissAnimated;
+        [self dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
+            if ([self.delegate respondsToSelector:@selector(photoPreviewControllerFinishDismissCompletion:)]) {
+                [self.delegate photoPreviewControllerFinishDismissCompletion:self];
+            }
+        }];
         return;
     }
     if (self.modelArray.count == 0) {
@@ -1270,7 +1289,7 @@ HX_PhotoEditViewControllerDelegate
         _darkCancelBtn.hidden = YES;
         _darkCancelBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
         _darkCancelBtn.contentVerticalAlignment = UIControlContentVerticalAlignmentTop;
-        [_darkCancelBtn addTarget:self action:@selector(dismissClick) forControlEvents:UIControlEventTouchUpInside];
+        [_darkCancelBtn addTarget:self action:@selector(cancelDismissClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _darkCancelBtn;
 }
@@ -1299,10 +1318,10 @@ HX_PhotoEditViewControllerDelegate
     if (!_navItem) {
         _navItem = [[UINavigationItem alloc] init];
         if (self.previewShowDeleteButton) {
-            _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+            _navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(cancelDismissClick)];
             _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"删除"] style:UIBarButtonItemStylePlain target:self action:@selector(deleteClick)];
         }else {
-            _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(dismissClick)];
+            _navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(cancelDismissClick)];
         }
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDefault) {
             _navItem.titleView = self.customTitleView;

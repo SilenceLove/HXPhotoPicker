@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "WxMomentViewController.h"
 #import "Demo1ViewController.h"
 #import "Demo2ViewController.h"
 #import "Demo3ViewController.h"
@@ -93,7 +94,10 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 - (NSArray *)list
 {
     if (!_list) {
-        _list = @[[[ListItem alloc] initWithTitle:@"Demo1"
+        _list = @[[[ListItem alloc] initWithTitle:@"微信朋友圈"
+                                     subTitle:@"仿微信朋友圈选图片功能"
+                                viewControllClass: [WxMomentViewController class]],
+                  [[ListItem alloc] initWithTitle:@"Demo1"
                                          subTitle:@"只使用照片选择器功能,不带选好后自动布局(可扩展)"
                                 viewControllClass: [Demo1ViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo2(暗黑风格，可跟随系统)"
@@ -162,7 +166,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
         self.view.backgroundColor = [UIColor systemBackgroundColor];
-        label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor blackColor];
+        label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor hx_colorWithHexStr:@"#191918"];
     }
 #endif
     [[UIApplication sharedApplication].keyWindow addSubview:label];

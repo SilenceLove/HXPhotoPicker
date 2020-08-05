@@ -37,6 +37,8 @@
                          videos:(NSArray<HXPhotoModel *> *)videoList
                        original:(BOOL)original;
 
+- (void)albumListViewControllerFinishDismissCompletion:(HXAlbumListViewController *)albumListViewController;
+- (void)albumListViewControllerCancelDismissCompletion:(HXAlbumListViewController *)albumListViewController;
 @end
 
 @interface HXAlbumListViewController : UIViewController

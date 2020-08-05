@@ -34,6 +34,8 @@
  */
 - (void)photoNavigationViewControllerDidCancel:(HXCustomNavigationController *)photoNavigationViewController;
 
+- (void)photoNavigationViewControllerFinishDismissCompletion:(HXCustomNavigationController *)photoNavigationViewController;
+- (void)photoNavigationViewControllerCancelDismissCompletion:(HXCustomNavigationController *)photoNavigationViewController;
 @end
 
 @interface HXCustomNavigationController : UINavigationController
@@ -44,6 +46,8 @@
 
 @property (copy, nonatomic) void (^requestCameraRollCompletion)(void);
 @property (copy, nonatomic) void (^requestAllAlbumCompletion)(void);
+
+//@property (copy, nonatomic) void (^ photoLibraryDidChange)(HXAlbumModel *albumModel);
 
 @property (assign ,nonatomic) BOOL isCamera;
 @property (weak, nonatomic) id<HXCustomNavigationControllerDelegate> hx_delegate;

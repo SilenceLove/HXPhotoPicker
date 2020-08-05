@@ -209,7 +209,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     if (@available(iOS 13.0, *)) {
         self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
             if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-                return UIColor.blackColor;
+                return [UIColor hx_colorWithHexStr:@"#191918"];
             }
             return UIColor.whiteColor;
         }];

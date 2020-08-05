@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) CGFloat cellHeight;
 
 /// 是否可以选择
-@property (assign, nonatomic) BOOL canSelected;
+@property (assign, nonatomic) BOOL canSelect;
 
 /// 自定义属性
 @property (strong, nonatomic) id customData;

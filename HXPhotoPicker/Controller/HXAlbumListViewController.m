@@ -234,7 +234,12 @@ UITableViewDelegate
     }
     self.manager.selectPhotoing = NO;
     
-    [self dismissViewControllerAnimated:YES completion:nil];
+    BOOL selectPhotoCancelDismissAnimated = self.manager.selectPhotoCancelDismissAnimated;
+    [self dismissViewControllerAnimated:selectPhotoCancelDismissAnimated completion:^{
+        if ([self.delegate respondsToSelector:@selector(albumListViewControllerCancelDismissCompletion:)]) {
+            [self.delegate albumListViewControllerCancelDismissCompletion:self];
+        }
+    }];
 }
 #pragma mark - < HXPhotoViewControllerDelegate >
 - (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {

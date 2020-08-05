@@ -39,8 +39,6 @@
     self.videoMinimumSelectDuration = 0.f;
     self.videoMaximumDuration = 60.f;
     
-//    self.creationDateSort = YES;
-    
     //    self.saveSystemAblum = NO;
 //    self.deleteTemporaryPhoto = YES;
     if ([UIScreen mainScreen].bounds.size.width != 320 && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
@@ -258,8 +256,11 @@
     self.statusBarStyle = UIStatusBarStyleLightContent;
     self.themeColor = [UIColor whiteColor];
     self.photoEditConfigur.themeColor = wxColor;
-    self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
+//    self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
+    self.navBarBackgroudColor = nil;
+    self.navBarStyle = UIBarStyleBlack;
     self.navigationTitleArrowColor = [UIColor hx_colorWithHexStr:@"#B2B2B2"];
+    self.navigationTitleArrowDarkColor = [UIColor hx_colorWithHexStr:@"#B2B2B2"];
     self.cameraFocusBoxColor = wxColor;
     self.authorizationTipColor = [UIColor whiteColor];
     self.navigationTitleSynchColor = YES;
@@ -275,7 +276,9 @@
     self.bottomDoneBtnDarkBgColor = wxColor;
     self.bottomDoneBtnEnabledBgColor = [[UIColor hx_colorWithHexStr:@"#666666"] colorWithAlphaComponent:0.3];
     self.bottomDoneBtnTitleColor = [UIColor whiteColor];
-    self.bottomViewBgColor = [UIColor hx_colorWithHexStr:@"#141414"];
+//    self.bottomViewBgColor = [UIColor hx_colorWithHexStr:@"#141414"];
+    self.bottomViewBgColor = nil;
+    self.bottomViewBarStyle = UIBarStyleBlack;
     
     self.popupTableViewCellBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
     self.popupTableViewCellLineColor = [[UIColor hx_colorWithHexStr:@"#434344"] colorWithAlphaComponent:0.6];

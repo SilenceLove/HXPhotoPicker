@@ -11,15 +11,35 @@
 @implementation HXAlbumModel
 
 - (void)fetchAssetResult {
-    if ([self.localIdentifier isEqualToString:[HXPhotoCommon photoCommon].cameraRollLocalIdentifier] &&
-        [HXPhotoCommon photoCommon].cameraRollResult) {
-        self.assetResult = [HXPhotoCommon photoCommon].cameraRollResult;
-        self.count = [HXPhotoCommon photoCommon].cameraRollResult.count;
-        return;
+    if ([self.localIdentifier isEqualToString:[HXPhotoCommon photoCommon].cameraRollLocalIdentifier]) {
+        if ([HXPhotoCommon photoCommon].cameraRollResult) {
+            if ([HXPhotoCommon photoCommon].selectType == self.selectType) {
+                self.assetResult = [HXPhotoCommon photoCommon].cameraRollResult;
+                self.count = [HXPhotoCommon photoCommon].cameraRollResult.count;
+                return;
+            }else if ([HXPhotoCommon photoCommon].selectType == 2) {
+                if (self.selectType == 0) {
+                    self.assetResult = [HXPhotoCommon photoCommon].cameraRollResult;
+                    self.count = [[HXPhotoCommon photoCommon].cameraRollResult countOfAssetsWithMediaType:PHAssetMediaTypeImage];
+                    return;
+                }else if (self.selectType == 1) {
+                    self.assetResult = [HXPhotoCommon photoCommon].cameraRollResult;
+                    self.count = [[HXPhotoCommon photoCommon].cameraRollResult countOfAssetsWithMediaType:PHAssetMediaTypeVideo];
+                    return;
+                }
+            }
+            [HXPhotoCommon photoCommon].cameraRollResult = nil;
+        }
+        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:self.assetCollection options:self.option];
+        self.assetResult = result;
+        self.count = result.count;
+        [HXPhotoCommon photoCommon].cameraRollResult = result;
+        [HXPhotoCommon photoCommon].selectType = self.selectType;
+    }else {
+        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:self.assetCollection options:self.option];
+        self.assetResult = result;
+        self.count = result.count;
     }
-    PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:self.assetCollection options:self.option];
-    self.assetResult = result;
-    self.count = result.count;
 }
 
 - (void)getResultWithCompletion:(void (^)(HXAlbumModel *albumModel))completion {

@@ -50,6 +50,9 @@ HXCustomCameraController;
  */
 - (void)photoViewControllerDidChangeSelect:(HXPhotoModel *)model
                                   selected:(BOOL)selected;
+
+- (void)photoViewControllerFinishDismissCompletion:(HXPhotoViewController *)photoViewController;
+- (void)photoViewControllerCancelDismissCompletion:(HXPhotoViewController *)photoViewController;
 @end
 
 @interface HXPhotoViewController : UIViewController

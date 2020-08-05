@@ -55,18 +55,20 @@
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
+        _manager.configuration.type = HXConfigurationTypeWXChat;
         _manager.configuration.singleSelected = YES;
         _manager.configuration.albumListTableView = ^(UITableView *tableView) {
 //            NSSLog(@"%@",tableView);
         };
         _manager.configuration.singleJumpEdit = YES;
-        _manager.configuration.movableCropBox = YES;
+//        _manager.configuration.movableCropBox = YES;
+        _manager.configuration.photoEditConfigur.onlyCliping = YES;
         _manager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_Custom;
         _manager.configuration.photoEditConfigur.customAspectRatio = CGSizeMake(1, 1);
 //        _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.requestImageAfterFinishingSelection = NO;
 //        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
-        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(16, 9);
+//        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(16, 9);
     }
     return _manager;
 }

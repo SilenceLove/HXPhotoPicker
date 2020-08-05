@@ -38,6 +38,11 @@
                                                     (UIViewController * _Nullable viewController,
                                                      HXPhotoManager * _Nullable manager))cancel;
 
+/// 跳转相册列表
+/// @param delegate HXCustomNavigationControllerDelegate
+- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *_Nullable)manager
+                                          delegate:(id _Nullable )delegate;
+
 /// 跳转预览照片界面
 /// @param manager 照片管理者
 /// @param previewStyle 预览样式

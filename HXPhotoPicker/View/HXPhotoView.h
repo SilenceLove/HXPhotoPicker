@@ -86,6 +86,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
 @property (assign, nonatomic) BOOL previewShowDeleteButton;
 /**  添加按钮的图片  */
 @property (copy, nonatomic) NSString *addImageName;
+/**  暗黑模式下添加按钮的图片  */
+@property (copy, nonatomic) NSString *addDarkImageName;
 /**  删除按钮图片  */
 @property (copy, nonatomic) NSString *deleteImageName;
 /**  预览大图时是否禁用手势返回  默认NO  */

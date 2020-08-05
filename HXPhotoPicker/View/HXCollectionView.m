@@ -36,7 +36,10 @@
     }
     return self;
 }
-
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+    [[UIApplication sharedApplication].keyWindow endEditing:YES];
+}
 - (void)addGesture
 {
     UILongPressGestureRecognizer *longPgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPrgEvent:)];

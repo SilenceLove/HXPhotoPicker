@@ -34,10 +34,12 @@
 @property (strong, nonatomic) UIImagePickerController* imagePickerController;
 @property (strong, nonatomic) HXPhotoSubViewCell *addCell;
 @property (assign, nonatomic) BOOL tempShowAddCell;
+@property (assign, nonatomic) CGFloat lastWidth;
 @end
 
 @implementation HXPhotoView
 @synthesize addImageName = _addImageName;
+@synthesize addDarkImageName = _addDarkImageName;
 @synthesize manager = _manager;
 
 - (UICollectionViewFlowLayout *)flowLayout {
@@ -66,6 +68,7 @@
         _addModel = [[HXPhotoModel alloc] init];
         _addModel.type = HXPhotoModelMediaTypeCamera;
         _addModel.thumbPhoto = [UIImage hx_imageNamed:self.addImageName];
+        _addModel.previewPhoto = [UIImage hx_imageNamed:self.addDarkImageName];
     }
     return _addModel;
 } 
@@ -152,7 +155,12 @@
     }
     self.flowLayout.scrollDirection = scrollDirection;
 }
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    self.collectionView.backgroundColor = backgroundColor;
+    [super setBackgroundColor:backgroundColor];
+}
 - (void)setup {
+    self.lastWidth = 0;
     if (_manager) {
         _manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
     }
@@ -174,6 +182,8 @@
         }
         [self setupDataWithAllList:self.manager.afterSelectedArray.copy photos:self.manager.afterSelectedPhotoArray.copy videos:self.manager.afterSelectedVideoArray.copy original:self.manager.afterOriginal];
     }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshView) name:@"HXPhotoViewNeedReloadNotification" object:nil];
 }
 - (void)jumpPreviewViewControllerWithModel:(HXPhotoModel *)model {
     if (![self.manager.afterSelectedArray containsObject:model]) {
@@ -253,13 +263,26 @@
 }
 - (NSString *)addImageName {
     if (!_addImageName) {
-        _addImageName = @"hx_compose_pic_add";
+        _addImageName = @"hx_list_add_img";
     }
     return _addImageName;
+}
+- (NSString *)addDarkImageName {
+    if (!_addDarkImageName) {
+        _addDarkImageName = @"hx_list_add_dark_img";
+    }
+    return _addDarkImageName;
 }
 - (void)setAddImageName:(NSString *)addImageName {
     _addImageName = addImageName;
     self.addModel.thumbPhoto = [UIImage hx_imageNamed:addImageName];
+    if (self.tempShowAddCell) {
+        [self.collectionView reloadData];
+    }
+}
+- (void)setAddDarkImageName:(NSString *)addDarkImageName {
+    _addDarkImageName = addDarkImageName;
+    self.addModel.previewPhoto = [UIImage hx_imageNamed:addDarkImageName];
     if (self.tempShowAddCell) {
         [self.collectionView reloadData];
     }
@@ -736,6 +759,7 @@
             [self.collectionView reloadData];
         }
         [CATransaction commit];
+        [self setupNewFrame];
     }];
     [self changeSelectedListModelIndex];
     if (model.networkPhotoUrl) {
@@ -784,7 +808,6 @@
         model.previewPhoto = nil;
         model = nil;
     }
-    [self setupNewFrame];
 }
 
 - (void)changeSelectedListModelIndex {
@@ -859,7 +882,7 @@
     if (self.changeCompleteBlock) {
         self.changeCompleteBlock(allList.copy, photos.copy, videos.copy, original);
     }
-    [self setupNewFrame];
+    [self layoutSubviews];
     if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal &&
         self.dataList.count) {
         NSInteger currentItem = self.tempShowAddCell ? self.dataList.count : self.dataList.count - 1;
@@ -978,6 +1001,12 @@
 }
 #pragma mark - < 更新高度 >
 - (void)setupNewFrame {
+    BOOL needUpdateFrame = NO;
+    if (self.lastWidth) {
+        if (self.lastWidth != self.hx_w) {
+            needUpdateFrame = YES;
+        }
+    }
     UIEdgeInsets insets = self.collectionView.contentInset;
     CGFloat itemW = (self.hx_w - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
     if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal &&
@@ -1000,7 +1029,7 @@
     self.flowLayout.minimumLineSpacing = self.spacing;
     self.flowLayout.minimumInteritemSpacing = self.spacing;
     
-    if (numOfLinesNew != self.numOfLinesOld) {
+    if (numOfLinesNew != self.numOfLinesOld || needUpdateFrame) {
         self.numOfLinesOld = numOfLinesNew;
         CGFloat newHeight;
         if ([self.delegate respondsToSelector:@selector(photoViewHeight:)] ||
@@ -1037,6 +1066,7 @@
             self.updateFrameBlock(self.frame);
         }
     }
+    self.lastWidth = self.hx_w;
 }
 
 - (void)layoutSubviews {

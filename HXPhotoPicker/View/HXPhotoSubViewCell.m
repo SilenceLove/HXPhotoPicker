@@ -26,9 +26,23 @@
 @end
 
 @implementation HXPhotoSubViewCell
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+#ifdef __IPHONE_13_0
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            if (self.model.type == HXPhotoModelMediaTypeCamera) {
+                if ([HXPhotoCommon photoCommon].isDark) {
+                    self.imageView.image = self.model.previewPhoto;
+                }else {
+                    self.imageView.image = self.model.thumbPhoto;
+                }
+            }
+        }
+    }
+#endif
+}
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         [self setup];
@@ -101,7 +115,7 @@
             titleModel.titleFont = [UIFont systemFontOfSize:13];
             titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
             titleModel.cellHeight = 60.f;
-            titleModel.canSelected = NO;
+            titleModel.canSelect = NO;
             
             HXPhotoBottomViewModel *deleteModel = [[HXPhotoBottomViewModel alloc] init];
             deleteModel.title = [NSBundle hx_localizedStringForKey:@"删除"];
@@ -189,7 +203,11 @@
     self.imageView.image = nil;
     if (model.type == HXPhotoModelMediaTypeCamera) {
         self.deleteBtn.hidden = YES;
-        self.imageView.image = model.thumbPhoto;
+        if ([HXPhotoCommon photoCommon].isDark) {
+            self.imageView.image = model.previewPhoto;
+        }else {
+            self.imageView.image = model.thumbPhoto;
+        }
     }else {
         if (model.localIdentifier && !model.asset) {
             PHFetchOptions *options = [[PHFetchOptions alloc] init];

@@ -40,8 +40,8 @@
 - (void)initMovieOutput;
 - (void)removeMovieOutput;
 
-- (void)addDataOutput;
-- (void)removeDataOutput;
+//- (void)addDataOutput;
+//- (void)removeDataOutput;
 
 - (BOOL)addAudioInput;
 

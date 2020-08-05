@@ -88,6 +88,9 @@ static id instance;
                 [collectionChanges hasMoves]) {
                 PHFetchResult *result = collectionChanges.fetchResultAfterChanges;
                 self.cameraRollResult = result;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoViewNeedReloadNotification" object:nil];
+                });
             }
         }
     }

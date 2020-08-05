@@ -97,9 +97,36 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+//    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
-
+//- (void)photoLibraryDidChange:(PHChange *)changeInstance {
+//    for (HXAlbumModel *albumModel in self.albums) {
+//        PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:albumModel.assetResult];
+//        if (collectionChanges) {
+//            if ([collectionChanges hasIncrementalChanges]) {
+//                if (collectionChanges.removedObjects.count > 0) {
+//                    PHFetchResult *result = collectionChanges.fetchResultAfterChanges;
+//                    if ([albumModel.localIdentifier isEqualToString:[HXPhotoCommon photoCommon].cameraRollLocalIdentifier]) {
+//                        [HXPhotoCommon photoCommon].cameraRollResult = result;
+//                    }
+//                    albumModel.assetResult = result;
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        if (self.photoLibraryDidChange) {
+//                            self.photoLibraryDidChange(albumModel);
+//                        }
+//                    });
+//                }
+//            }
+//        }
+//    }
+//}
 #pragma mark - < HXAlbumListViewControllerDelegate >
+- (void)albumListViewControllerCancelDismissCompletion:(HXAlbumListViewController *)albumListViewController {
+    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerCancelDismissCompletion:)]) {
+        [self.hx_delegate photoNavigationViewControllerCancelDismissCompletion:self];
+    }
+}
 - (void)albumListViewControllerDidCancel:(HXAlbumListViewController *)albumListViewController {
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidCancel:)]) {
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
@@ -111,6 +138,16 @@
     }
 }
 #pragma mark - < HXPhotoViewControllerDelegate >
+- (void)photoViewControllerFinishDismissCompletion:(HXPhotoViewController *)photoViewController {
+    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerFinishDismissCompletion:)]) {
+        [self.hx_delegate photoNavigationViewControllerFinishDismissCompletion:self];
+    }
+}
+- (void)photoViewControllerCancelDismissCompletion:(HXPhotoViewController *)photoViewController {
+    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerCancelDismissCompletion:)]) {
+        [self.hx_delegate photoNavigationViewControllerCancelDismissCompletion:self];
+    }
+}
 - (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController {
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidCancel:)]) {
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
@@ -158,6 +195,7 @@
     if (_manager) {
         self.manager.selectPhotoing = NO;
     }
+//    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     if (HXShowLog) NSSLog(@"dealloc");
 }
 

@@ -22,7 +22,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.canSelected = YES;
+        self.canSelect = YES;
     }
     return self;
 }
@@ -485,7 +485,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     HXPhotoBottomViewModel *model = self.modelArray[indexPath.row];
-    if (!model.canSelected) {
+    if (!model.canSelect) {
         return;
     }
     if (self.selectCompletion) {
@@ -519,9 +519,9 @@
 - (void)changeColor {
     BOOL isDark = self.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
     self.bgView.backgroundColor = isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:0.5f] : [[UIColor blackColor] colorWithAlphaComponent:0.5f];
-    self.contentView.backgroundColor = isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
-    self.tableView.backgroundColor = isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : [UIColor whiteColor];
-    self.footerCancelView.backgroundColor = isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : [UIColor whiteColor];
+    self.contentView.backgroundColor = isDark ? [UIColor hx_colorWithHexStr:@"#1E1E1E"] : [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1];
+    self.tableView.backgroundColor = isDark ? [UIColor hx_colorWithHexStr:@"#2D2D2D"] : [UIColor whiteColor];
+    self.footerCancelView.backgroundColor = isDark ? [UIColor hx_colorWithHexStr:@"#2D2D2D"] : [UIColor whiteColor];
     [self.cancelBtn setTitleColor:isDark ? [UIColor whiteColor] : [UIColor colorWithRed:32.f/255.f green:32.f/255.f blue:32.f/255.f alpha:1] forState:UIControlStateNormal];
     if (self.cancelBtn.isHighlighted) {
         [self.cancelBtn setBackgroundColor:isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : [UIColor hx_colorWithHexStr:@"#E5E5E5"]];
@@ -667,7 +667,7 @@
 - (void)setSelectBgViewColor {
     BOOL isDark = self.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
     UIColor *selectBgColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : self.model.selectColor;
-    if (!self.model.canSelected) {
+    if (!self.model.canSelect) {
         selectBgColor = [UIColor clearColor];
     }
     self.selectBgView.backgroundColor =selectBgColor ;
@@ -675,10 +675,10 @@
 }
 - (void)changeColor {
     BOOL isDark = self.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
-    self.backgroundColor = isDark ? [UIColor colorWithRed:0.075 green:0.075 blue:0.075 alpha:1] : self.model.backgroundColor;
+    self.backgroundColor = isDark ? [UIColor hx_colorWithHexStr:@"#2D2D2D"] : self.model.backgroundColor;
     self.titleLb.textColor = isDark ? [UIColor whiteColor] : self.model.titleColor;
     [self setSelectBgViewColor];
-    self.lineView.backgroundColor = isDark ? [UIColor colorWithRed:0.125 green:0.125 blue:0.125 alpha:1] : self.model.lineColor;
+    self.lineView.backgroundColor = isDark ? [UIColor hx_colorWithHexStr:@"#1E1E1E"] : self.model.lineColor;
     self.subTitleLb.textColor = isDark ? [[UIColor whiteColor] colorWithAlphaComponent:0.8] : self.model.subTitleColor;
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {

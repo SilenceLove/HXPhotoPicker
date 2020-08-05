@@ -71,13 +71,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [self.view addSubview:photoView];
     self.photoView = photoView;
     
-    HXWeakSelf
-    [self.manager getSelectedModelArrayComplete:^(NSArray<HXPhotoModel *> *modelArray) {
-        if (modelArray.count) {
-            [weakSelf.manager addModelArray:modelArray];
-            [weakSelf.photoView refreshView];
-        }
-    }];
+    [self.manager getLocalModelsInFileWithAddData:YES];
     
     UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:@"保存草稿" style:UIBarButtonItemStylePlain target:self action:@selector(savaClick)];
     UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithTitle:@"删除" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];
@@ -89,17 +83,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
         [self.view hx_showImageHUDText:@"请先选择资源!"];
         return;
     }
-    [self.view hx_showLoadingHUDText:nil];
-    HXWeakSelf
-    [self.manager saveSelectModelArraySuccess:^{
-        [weakSelf.view hx_handleLoading];
-    } failed:^{
-        [weakSelf.view hx_handleLoading];
-        [weakSelf.view hx_showImageHUDText:@"保存草稿失败"];
-    }];
+    if (![self.manager saveLocalModelsToFile]) {
+        [self.view hx_showImageHUDText:@"保存草稿失败"];
+    }
 }
 - (void)didNavBtnClick {
-    BOOL success = [self.manager deleteLocalSelectModelArray];
+    BOOL success = [self.manager deleteLocalModelsInFile];
     if (!success) {
         
     }

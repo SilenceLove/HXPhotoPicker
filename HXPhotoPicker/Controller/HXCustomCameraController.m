@@ -167,14 +167,14 @@ const CGFloat HXZoomRate = 1.0f;
 - (void)removeMovieOutput {
     [self.captureSession removeOutput:self.movieOutput];
 }
-- (void)addDataOutput {
-    if ([self.captureSession canAddOutput:self.captureDataOutput]) {
-        [self.captureSession addOutput:self.captureDataOutput];
-    }
-}
-- (void)removeDataOutput {
-    [self.captureSession removeOutput:self.captureDataOutput];
-}
+//- (void)addDataOutput {
+//    if ([self.captureSession canAddOutput:self.captureDataOutput]) {
+//        [self.captureSession addOutput:self.captureDataOutput];
+//    }
+//}
+//- (void)removeDataOutput {
+//    [self.captureSession removeOutput:self.captureDataOutput];
+//}
 - (BOOL)addAudioInput {
     NSError *error;
     AVCaptureDevice *audioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];

@@ -79,6 +79,10 @@ HXPhotoPreviewViewCell;
 /// @param model 取消时展示的model
 - (void)photoPreviewControllerDidCancel:(HXPhotoPreviewViewController *)previewController
                                   model:(HXPhotoModel *)model;
+
+
+- (void)photoPreviewControllerFinishDismissCompletion:(HXPhotoPreviewViewController *)previewController;
+- (void)photoPreviewControllerCancelDismissCompletion:(HXPhotoPreviewViewController *)previewController;
 @end
 
 /// 单独使用 HXPhotoPreviewViewController 来预览图片

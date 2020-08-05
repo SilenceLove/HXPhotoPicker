@@ -31,6 +31,9 @@ typedef void (^ HXCustomCameraViewControllerDidCancelBlock)(HXCustomCameraViewCo
 /// 取消
 /// @param viewController self
 - (void)customCameraViewControllerDidCancel:(HXCustomCameraViewController *)viewController;
+
+- (void)customCameraViewControllerFinishDismissCompletion:(HXCustomCameraViewController *)viewController;
+- (void)customCameraViewControllerCancelDismissCompletion:(HXCustomCameraViewController *)viewController;
 @end
 
 @interface HXCustomCameraViewController : UIViewController

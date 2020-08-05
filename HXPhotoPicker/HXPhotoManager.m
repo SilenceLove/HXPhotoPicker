@@ -49,6 +49,7 @@
 @property (assign, nonatomic) BOOL supportLivePhoto;
 
 @property (assign, nonatomic) BOOL hasAuthorization;
+
 @end
 
 @implementation HXPhotoManager
@@ -67,11 +68,13 @@
     return [self initWithType:HXPhotoManagerSelectedTypePhoto];
 }
 - (void)setType:(HXPhotoManagerSelectedType)type {
-    if (type != [HXPhotoCommon photoCommon].selectType) {
-        [HXPhotoCommon photoCommon].cameraRollResult = nil;
+    if ([HXPhotoCommon photoCommon].selectType != 2) {
+        if (type != [HXPhotoCommon photoCommon].selectType) {
+            [HXPhotoCommon photoCommon].cameraRollResult = nil;
+        }
+        [HXPhotoCommon photoCommon].selectType = type;
     }
     _type = type;
-    [HXPhotoCommon photoCommon].selectType = type;
 }
 - (NSOperationQueue *)dataOperationQueue {
     if (!_dataOperationQueue) {
@@ -81,6 +84,11 @@
     return _dataOperationQueue;
 }
 - (void)setup {
+    self.selectPhotoFinishDismissAnimated = YES;
+    self.selectPhotoCancelDismissAnimated = YES;
+    self.cameraFinishDismissAnimated = YES;
+    self.cameraCancelDismissAnimated = YES;
+    
     self.selectedList = [NSMutableArray array];
     self.selectedPhotos = [NSMutableArray array];
     self.selectedVideos = [NSMutableArray array];
@@ -379,13 +387,16 @@
         [self.endCameraList addObject:photoModel];
     }
 }
-- (void)addModelArray:(NSArray<HXPhotoModel *> *)modelArray {
-    if (!modelArray.count) return;
-    if (![modelArray.firstObject isKindOfClass:[HXPhotoModel class]]) {
+- (void)addLocalModels {
+    [self addLocalModels:self.localModels];
+}
+- (void)addLocalModels:(NSArray<HXPhotoModel *> *)models {
+    if (!models.count) return;
+    if (![models.firstObject isKindOfClass:[HXPhotoModel class]]) {
         if (HXShowLog) NSSLog(@"请传入装着HXPhotoModel对象的数组");
         return;
     }
-    for (HXPhotoModel *photoModel in modelArray) {
+    for (HXPhotoModel *photoModel in models) {
         if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
             [self.endSelectedPhotos addObject:photoModel];
         }else {
@@ -491,9 +502,6 @@
         [HXPhotoCommon photoCommon].cameraRollResult = nil;
         return nil;
     }
-    if ([HXPhotoCommon photoCommon].cameraRollResult != model.assetResult) {
-        [HXPhotoCommon photoCommon].cameraRollResult = model.assetResult;
-    }
     return model;
 }
 - (void)getCameraRollAlbumCompletion:(void (^)(HXAlbumModel *albumModel))completion {
@@ -509,10 +517,10 @@
         if (![collection isKindOfClass:[PHAssetCollection class]]) return;
         if (collection.estimatedAssetCount <= 0) return;
         if ([self isCameraRollAlbum:collection]) {
+            [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = collection.localIdentifier;
             HXAlbumModel *model = [self albumModelWithCollection:collection fetchAssets:YES];
             model.cameraCount = self.cameraList.count;
             model.index = 0;
-            [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = collection.localIdentifier;
             if (completion) completion(model);
             *stop = YES;
             return;
@@ -838,6 +846,11 @@
     PHFetchResult *result = albumModel.assetResult;
     if (self.configuration.reverseDate) {
         [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (self.type == HXPhotoManagerSelectedTypePhoto && asset.mediaType != PHAssetMediaTypeImage) {
+                return;
+            }else if (self.type == HXPhotoManagerSelectedTypeVideo && asset.mediaType != PHAssetMediaTypeVideo) {
+                return;
+            }
             HXPhotoModel *photoModel = [self photoModelWithAsset:asset];
             if (!firstSelectModel && photoModel.selectIndexStr) {
                 firstSelectModel = photoModel;
@@ -903,6 +916,11 @@
 //        });
 
         [result enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (self.type == HXPhotoManagerSelectedTypePhoto && asset.mediaType != PHAssetMediaTypeImage) {
+                return;
+            }else if (self.type == HXPhotoManagerSelectedTypeVideo && asset.mediaType != PHAssetMediaTypeVideo) {
+                return;
+            }
             HXPhotoModel *photoModel = [self photoModelWithAsset:asset];
             if (!firstSelectModel && photoModel.selectIndexStr) {
                 firstSelectModel = photoModel;
@@ -1200,6 +1218,9 @@
     return NO;
 }
 - (void)beforeSelectedListdeletePhotoModel:(HXPhotoModel *)model {
+    if (![self.selectedList containsObject:model]) {
+        return;
+    }
     model.selected = NO;
     model.selectIndexStr = @"";
     model.selectedIndex = 0;
@@ -1794,60 +1815,14 @@
 } 
 
 #pragma mark - < 保存草稿功能 >
-- (void)saveSelectModelArraySuccess:(void (^)(void))success failed:(void (^)(void))failed {
-    if (!self.afterSelectedArray.count) {
-        if (failed) failed();
-        return;
-    }
-    HXWeakSelf
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        BOOL su = [weakSelf saveSelectModelArray];
-        if (!su) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (failed) {
-                    failed();
-                }
-                if (HXShowLog) NSSLog(@"保存草稿失败啦!");
-            });
-        }else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (success) {
-                    success();
-                }
-            });
-        }
-    });
-}
-
-- (BOOL)deleteLocalSelectModelArray {
-    return [self deleteSelectModelArray];
-}
-
-- (void)getSelectedModelArrayComplete:(void (^)(NSArray<HXPhotoModel *> *modelArray))complete  {
-    HXWeakSelf
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *modelArray = [weakSelf getSelectedModelArray];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (complete) {
-                complete(modelArray);
-            }
-        });
-    });
-}
-
-- (BOOL)saveSelectModelArray {
+- (BOOL)saveLocalModelsToFile {
+    self.localModels = self.afterSelectedArray.copy;
     NSMutableData *data = [[NSMutableData alloc] init];
-    //创建归档辅助类
     NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
-    //编码
     [archiver encodeObject:self.afterSelectedArray forKey:HXEncodeKey];
-    //结束编码
     [archiver finishEncoding];
-    //写入到沙盒
     NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
-    
     if([data writeToFile:toFileName atomically:YES]){
         if (HXShowLog) NSSLog(@"归档成功");
         return YES;
@@ -1855,16 +1830,15 @@
     return NO;
 }
 
-- (NSArray<HXPhotoModel *> *)getSelectedModelArray {
+- (NSArray<HXPhotoModel *> *)getLocalModelsInFile {
+    return [self getLocalModelsInFileWithAddData:NO];
+}
+- (NSArray<HXPhotoModel *> *)getLocalModelsInFileWithAddData:(BOOL)addData {
     NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
-    //解档
     NSData *undata = [[NSData alloc] initWithContentsOfFile:toFileName];
-    //解档辅助类
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:undata];
-    //解码并解档出model
     NSArray *tempArray = [unarchiver decodeObjectForKey:HXEncodeKey];
-    //关闭解档
     [unarchiver finishDecoding];
     NSMutableArray *modelArray = @[].mutableCopy;
     for (HXPhotoModel *model in tempArray) {
@@ -1884,23 +1858,34 @@
         }
         [modelArray addObject:model];
     }
-    return modelArray.copy;
+    if (modelArray.count) {
+        if (addData) {
+            [self addLocalModels:modelArray];
+        }
+        self.localModels = modelArray.copy;
+    }else {
+        self.localModels = nil;
+    }
+    return self.localModels;
 }
-
-- (BOOL)deleteSelectModelArray {
+- (BOOL)deleteLocalModelsInFile {
+    self.localModels = nil;
     NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:toFileName]) {
+        return YES;
+    }
     NSError *error;
     [[NSFileManager defaultManager] removeItemAtPath:toFileName error:&error];
     if (error) {
-        if (HXShowLog) NSSLog(@"删除失败");
+        if (HXShowLog) NSSLog(@"删除失败%@", error);
         return NO;
     }
     return YES;
 }
 
 - (void)dealloc {
-    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
+//    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
     [self.dataOperationQueue cancelAllOperations];

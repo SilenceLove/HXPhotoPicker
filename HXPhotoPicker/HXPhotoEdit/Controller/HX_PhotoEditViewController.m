@@ -386,11 +386,11 @@
     }
 }
 - (void)hiddenTopBottomView {
-    self.backBtn.hx_y = -self.backBtn.hx_h;
+    self.backBtn.hx_y = hxNavigationBarHeight - 20 - _backBtn.hx_h - 15;
     self.clippingToolBar.hx_y = self.view.hx_h;
     self.toolsView.hx_y = self.view.hx_h;
-    self.topMaskView.hx_y = -hxNavigationBarHeight;
-    self.bottomMaskView.hx_y = self.view.hx_h;
+//    self.topMaskView.hx_y = -hxNavigationBarHeight;
+//    self.bottomMaskView.hx_y = self.view.hx_h;
 }
 - (void)showTopBottomView {
     [self changeSubviewFrame];
@@ -478,7 +478,7 @@
         _backBtn.tintColor = [UIColor whiteColor];
         _backBtn.hx_size = _backBtn.currentImage.size;
         _backBtn.hx_x = 20;
-        _backBtn.hx_y = hxNavigationBarHeight - 15 - _backBtn.hx_h;
+//        _backBtn.hx_y = hxNavigationBarHeight - 15 - _backBtn.hx_h;
         [_backBtn addTarget:self action:@selector(didBackClick) forControlEvents:UIControlEventTouchUpInside];
         [_backBtn hx_setEnlargeEdgeWithTop:20 right:20 bottom:20 left:20];
     }

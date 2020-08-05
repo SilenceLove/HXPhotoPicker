@@ -40,6 +40,14 @@
     nav.modalPresentationCapturesStatusBarAppearance = YES;
     [self presentViewController:nav animated:YES completion:nil];
 }
+- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *_Nullable)manager
+                                          delegate:(id _Nullable )delegate {
+    
+    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithManager:manager delegate:delegate];
+    nav.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    nav.modalPresentationCapturesStatusBarAppearance = YES;
+    [self presentViewController:nav animated:YES completion:nil];
+}
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager
                                                delegate:(id)delegate {
@@ -86,7 +94,6 @@
                 vc.cancelBlock = cancel;
                 vc.manager = manager;
                 vc.isOutside = YES;
-                vc.delegate = (id)weakSelf;
                 HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
                 nav.isCamera = YES;
                 nav.supportRotation = manager.configuration.supportRotation;

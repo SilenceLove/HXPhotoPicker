@@ -58,15 +58,50 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 - (instancetype)initWithType:(HXPhotoManagerSelectedType)type;
 + (instancetype)managerWithType:(HXPhotoManagerSelectedType)type;
 
+/// 选择照片界面完成时的dismiss时是否需要动画效果
+/// 默认YES
+@property (assign, nonatomic) BOOL selectPhotoFinishDismissAnimated;
+
+/// 选择照片界面取消时的dismiss时是否需要动画效果
+/// 默认YES
+@property (assign, nonatomic) BOOL selectPhotoCancelDismissAnimated;
+
+/// 相机界面拍照完成时dismiss时是否需要动画效果
+/// 默认YES
+@property (assign, nonatomic) BOOL cameraFinishDismissAnimated;
+
+/// 相机界面取消时dismiss时是否需要动画效果
+/// 默认YES
+@property (assign, nonatomic) BOOL cameraCancelDismissAnimated;
+
 /// 只使用相机功能不加载相册信息
 @property (assign, nonatomic) BOOL onlyCamera;
 
-/**
- 添加模型数组
+/// 保存在本地的模型
+/// 如果为空，请调用 getLocalModelsInFileWithAddData: 方法获取
+@property (copy, nonatomic) NSArray<HXPhotoModel *> *localModels;
 
- @param modelArray ...
- */
-- (void)addModelArray:(NSArray<HXPhotoModel *> *)modelArray;
+#pragma mark - < 保存本地的方法 >
+/// 保存本地的方法都是在主线程调用
+/// 获取保存在本地文件的模型数组
+/// @param addData 是否添加到manager的数据中
+- (NSArray<HXPhotoModel *> *)getLocalModelsInFileWithAddData:(BOOL)addData;
+
+/// 获取保存在本地文件的模型数组
+- (NSArray<HXPhotoModel *> *)getLocalModelsInFile;
+
+/// 将模型数组保存到本地文件
+- (BOOL)saveLocalModelsToFile;
+
+/// 将保存在本地文件的模型数组删除
+- (BOOL)deleteLocalModelsInFile;
+
+/// 将本地获取的模型数组添加到manager的数据中
+/// @param models 在本地获取的模型数组
+- (void)addLocalModels:(NSArray<HXPhotoModel *> *)models;
+
+/// 将本地获取的模型数组添加到manager的数据中
+- (void)addLocalModels;
 
 /**
  添加自定义资源模型
@@ -313,48 +348,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 /**
  清空所有已选数组
  */
-- (void)clearSelectedList; 
-
-#pragma mark - < 保存本地的方法 >
-/**
- 保存模型数组到本地
- 
- @param success 成功
- @param failed 失败
- */
-- (void)saveSelectModelArraySuccess:(void (^)(void))success failed:(void (^)(void))failed;
-/**
- 删除本地保存的模型数组
- 
- @return success or failed
- */
-- (BOOL)deleteLocalSelectModelArray;
-/**
- 获取保存在本地的模型数组
- 
- */
-- (void)getSelectedModelArrayComplete:(void (^)(NSArray<HXPhotoModel *> *modelArray))complete;
-
-/**
- 保存当前选择的模型到b本地
-
- @return 成功 or 失败
- */
-- (BOOL)saveSelectModelArray;
-
-/**
- 获取保存本地的模型数组
-
- @return array
- */
-- (NSArray<HXPhotoModel *> *)getSelectedModelArray;
-
-/**
- 删除保存本地的模型数组
-
- @return 成功 or 失败
- */
-- (BOOL)deleteSelectModelArray;
+- (void)clearSelectedList;
 
 #pragma mark - < 辅助属性 >
 @property (assign, nonatomic) HXPhotoManagerVideoSelectedType videoSelectedType;

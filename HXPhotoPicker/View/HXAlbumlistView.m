@@ -448,7 +448,7 @@
     if ([HXPhotoCommon photoCommon].isDark) {
         themeColor = [UIColor whiteColor];
         navigationTitleColor = [UIColor whiteColor];
-        navigationTitleArrowColor = [UIColor whiteColor];
+        navigationTitleArrowColor = self.manager.configuration.navigationTitleArrowDarkColor;
     }else {
         themeColor = self.manager.configuration.themeColor;
         navigationTitleColor = self.manager.configuration.navigationTitleColor;
@@ -551,7 +551,7 @@
             if ([HXPhotoCommon photoCommon].isDark) {
                 themeColor = [UIColor whiteColor];
                 navigationTitleColor = [UIColor whiteColor];
-                navigationTitleArrowColor = [UIColor whiteColor];
+                navigationTitleArrowColor = weakSelf.manager.configuration.navigationTitleArrowDarkColor;
             }else {
                 themeColor = weakSelf.manager.configuration.themeColor;
                 navigationTitleColor = weakSelf.manager.configuration.navigationTitleColor;

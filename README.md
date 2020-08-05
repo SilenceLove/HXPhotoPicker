@@ -670,6 +670,10 @@ frame.size.height 就是 HXPhotoView 的正确高度
 1、将SDWebImage升级到最新版
 2、将YYWebImage换成SDWebImage
 ```
+#### 11. ios14预览视频时无法播放
+```
+系统相册也播放不了，可能是ios14的bug
+```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
@@ -748,6 +752,6 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 - 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
 
-- [有兴趣可以加下创建的QQ群:531895229(有问题请先看Demo，因为工作很忙所以可能问问题没人回答!!)](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26)
+- [有兴趣可以加下创建的QQ群:531895229（有问题请确定看完了demo和README之后再提问）](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26)
 
 [回到顶部](#readme)

@@ -152,6 +152,7 @@
 		7B752DE82372ADF000580F35 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE72372ADF000580F35 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7B752DEA2372ADF300580F35 /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE92372ADF300580F35 /* PhotosUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7B7783D8247E04230013025F /* Demo15ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7783D7247E04230013025F /* Demo15ViewController.m */; };
+		7B7865A424DA9E4700E107BD /* UITextView+Placeholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7865A324DA9E4700E107BD /* UITextView+Placeholder.m */; };
 		7B7E3E7B1E4AACD1002234EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7A1E4AACD1002234EE /* main.m */; };
 		7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */; };
 		7B7E3E811E4AACD1002234EE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E801E4AACD1002234EE /* ViewController.m */; };
@@ -170,6 +171,14 @@
 		7B8629AA237D0F8D00F8A584 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A9237D0F8C00F8A584 /* EventKit.framework */; };
 		7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AB237D0F9400F8A584 /* Contacts.framework */; };
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
+		7B88A0B124D93C9E00980A05 /* WxMomentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B88A0AF24D93C9E00980A05 /* WxMomentViewController.m */; };
+		7B88A0B224D93C9E00980A05 /* WxMomentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B88A0B024D93C9E00980A05 /* WxMomentViewController.xib */; };
+		7B88A0B524D93CEB00980A05 /* WxMomentHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B88A0B424D93CEB00980A05 /* WxMomentHeaderView.m */; };
+		7B88A0B724D93CF700980A05 /* WxMomentHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B88A0B624D93CF700980A05 /* WxMomentHeaderView.xib */; };
+		7B88A0BB24D94D0F00980A05 /* WxMomentPublishViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B88A0B924D94D0F00980A05 /* WxMomentPublishViewController.m */; };
+		7B88A0BC24D94D0F00980A05 /* WxMomentPublishViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B88A0BA24D94D0F00980A05 /* WxMomentPublishViewController.xib */; };
+		7B88A0C024D96A0C00980A05 /* WxMomentViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B88A0BE24D96A0C00980A05 /* WxMomentViewCell.m */; };
+		7B88A0C124D96A0C00980A05 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B88A0BF24D96A0C00980A05 /* WxMomentViewCell.xib */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */; };
 		7BAECD2F237E483700580756 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAECD16237E483700580756 /* NSLayoutConstraint+MASDebugAdditions.m */; };
@@ -531,6 +540,8 @@
 		7B752DE92372ADF300580F35 /* PhotosUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotosUI.framework; path = System/Library/Frameworks/PhotosUI.framework; sourceTree = SDKROOT; };
 		7B7783D6247E04230013025F /* Demo15ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo15ViewController.h; sourceTree = "<group>"; };
 		7B7783D7247E04230013025F /* Demo15ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo15ViewController.m; sourceTree = "<group>"; };
+		7B7865A224DA9E4700E107BD /* UITextView+Placeholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+Placeholder.h"; sourceTree = "<group>"; };
+		7B7865A324DA9E4700E107BD /* UITextView+Placeholder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextView+Placeholder.m"; sourceTree = "<group>"; };
 		7B7E3E761E4AACD1002234EE /* 照片选择器.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "照片选择器.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B7E3E7A1E4AACD1002234EE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7B7E3E7C1E4AACD1002234EE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -559,6 +570,18 @@
 		7B8629A9237D0F8C00F8A584 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		7B8629AB237D0F9400F8A584 /* Contacts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Contacts.framework; path = System/Library/Frameworks/Contacts.framework; sourceTree = SDKROOT; };
 		7B8629AD237D0FAA00F8A584 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		7B88A0AE24D93C9E00980A05 /* WxMomentViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WxMomentViewController.h; sourceTree = "<group>"; };
+		7B88A0AF24D93C9E00980A05 /* WxMomentViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WxMomentViewController.m; sourceTree = "<group>"; };
+		7B88A0B024D93C9E00980A05 /* WxMomentViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WxMomentViewController.xib; sourceTree = "<group>"; };
+		7B88A0B324D93CEB00980A05 /* WxMomentHeaderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WxMomentHeaderView.h; sourceTree = "<group>"; };
+		7B88A0B424D93CEB00980A05 /* WxMomentHeaderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WxMomentHeaderView.m; sourceTree = "<group>"; };
+		7B88A0B624D93CF700980A05 /* WxMomentHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WxMomentHeaderView.xib; sourceTree = "<group>"; };
+		7B88A0B824D94D0F00980A05 /* WxMomentPublishViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WxMomentPublishViewController.h; sourceTree = "<group>"; };
+		7B88A0B924D94D0F00980A05 /* WxMomentPublishViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WxMomentPublishViewController.m; sourceTree = "<group>"; };
+		7B88A0BA24D94D0F00980A05 /* WxMomentPublishViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WxMomentPublishViewController.xib; sourceTree = "<group>"; };
+		7B88A0BD24D96A0C00980A05 /* WxMomentViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WxMomentViewCell.h; sourceTree = "<group>"; };
+		7B88A0BE24D96A0C00980A05 /* WxMomentViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WxMomentViewCell.m; sourceTree = "<group>"; };
+		7B88A0BF24D96A0C00980A05 /* WxMomentViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WxMomentViewCell.xib; sourceTree = "<group>"; };
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
@@ -1238,6 +1261,8 @@
 				7B0D305C24C8186300092B84 /* HXPhotoBottomConfiguration.m */,
 				7B0D305F24C8186300092B84 /* HXPhotoPreviewBottomConfiguration.h */,
 				7B0D305E24C8186300092B84 /* HXPhotoPreviewBottomConfiguration.m */,
+				7B7865A224DA9E4700E107BD /* UITextView+Placeholder.h */,
+				7B7865A324DA9E4700E107BD /* UITextView+Placeholder.m */,
 				7B7E3E7F1E4AACD1002234EE /* ViewController.h */,
 				7B7E3E801E4AACD1002234EE /* ViewController.m */,
 				7B269E031E5695F200AB813D /* Demo1ViewController.h */,
@@ -1245,6 +1270,18 @@
 				7B269E051E5695F200AB813D /* Demo1ViewController.xib */,
 				7B269E0B1E56961500AB813D /* Demo2ViewController.h */,
 				7B269E0C1E56961500AB813D /* Demo2ViewController.m */,
+				7B88A0AE24D93C9E00980A05 /* WxMomentViewController.h */,
+				7B88A0AF24D93C9E00980A05 /* WxMomentViewController.m */,
+				7B88A0B024D93C9E00980A05 /* WxMomentViewController.xib */,
+				7B88A0B324D93CEB00980A05 /* WxMomentHeaderView.h */,
+				7B88A0B424D93CEB00980A05 /* WxMomentHeaderView.m */,
+				7B88A0B624D93CF700980A05 /* WxMomentHeaderView.xib */,
+				7B88A0BD24D96A0C00980A05 /* WxMomentViewCell.h */,
+				7B88A0BE24D96A0C00980A05 /* WxMomentViewCell.m */,
+				7B88A0BF24D96A0C00980A05 /* WxMomentViewCell.xib */,
+				7B88A0B824D94D0F00980A05 /* WxMomentPublishViewController.h */,
+				7B88A0B924D94D0F00980A05 /* WxMomentPublishViewController.m */,
+				7B88A0BA24D94D0F00980A05 /* WxMomentPublishViewController.xib */,
 				7B269E101E56962700AB813D /* Demo3ViewController.h */,
 				7B269E111E56962700AB813D /* Demo3ViewController.m */,
 				7BBE5A1C1F07994000715546 /* Demo4ViewController.h */,
@@ -1641,6 +1678,7 @@
 			files = (
 				7B005AC524D008C500607111 /* HXPhotoEditTextView.xib in Resources */,
 				7B06B2D624D02DA000FDD794 /* ko.lproj in Resources */,
+				7B88A0B724D93CF700980A05 /* WxMomentHeaderView.xib in Resources */,
 				7BBE5A201F07994000715546 /* Demo4ViewController.xib in Resources */,
 				7B06B2DB24D11A1500FDD794 /* IMG_0168.GIF in Resources */,
 				7B005AC324D008C500607111 /* HXPhotoEditGraffitiColorViewCell.xib in Resources */,
@@ -1653,6 +1691,8 @@
 				7B5DA4CC21030DCF00489749 /* Demo11ViewController.xib in Resources */,
 				7B6BC6B92107408200136D61 /* QQ空间视频_20180301091047.mp4 in Resources */,
 				7B005AC124D008C500607111 /* HXPhotoEditChartletContentViewCell.xib in Resources */,
+				7B88A0C124D96A0C00980A05 /* WxMomentViewCell.xib in Resources */,
+				7B88A0BC24D94D0F00980A05 /* WxMomentPublishViewController.xib in Resources */,
 				7B005ABE24D008C500607111 /* HXPhotoEditStickerTrashView.xib in Resources */,
 				7BFE134B24849FA400170F21 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg in Resources */,
 				7B005ABF24D008C500607111 /* HXCameraBottomView.xib in Resources */,
@@ -1663,6 +1703,7 @@
 				7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */,
 				7B7E3E891E4AACD1002234EE /* LaunchScreen.storyboard in Resources */,
 				7B005AC224D008C500607111 /* HXPhotoEditClippingToolBar.xib in Resources */,
+				7B88A0B224D93C9E00980A05 /* WxMomentViewController.xib in Resources */,
 				7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */,
 				7B005AC624D008C500607111 /* HX_PhotoEditBottomView.xib in Resources */,
 				7BFE13512484B17100170F21 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg in Resources */,
@@ -1707,6 +1748,7 @@
 				7B4D4C6924B858C600B03846 /* HXPhotoEditGridLayer.m in Sources */,
 				7B4E66432487AD5C00077EE1 /* HXAlbumListViewController.m in Sources */,
 				7BB23C4624CEB33A00726A7A /* UIButton+WebCache.m in Sources */,
+				7B88A0BB24D94D0F00980A05 /* WxMomentPublishViewController.m in Sources */,
 				7B4E66332487AD5C00077EE1 /* NSBundle+HXPhotoPicker.m in Sources */,
 				7BB23C1D24CEB33A00726A7A /* SDWebImageDownloader.m in Sources */,
 				7B4D4C4B24B858C600B03846 /* HXPhotoClippingView.m in Sources */,
@@ -1746,6 +1788,7 @@
 				7BB23C4924CEB33A00726A7A /* SDImageCachesManagerOperation.m in Sources */,
 				7B4D4C7024B85A7D00B03846 /* HX_PhotoEditBottomView.m in Sources */,
 				7BB23C3C24CEB33A00726A7A /* SDImageGraphics.m in Sources */,
+				7B88A0B124D93C9E00980A05 /* WxMomentViewController.m in Sources */,
 				7B4E663F2487AD5C00077EE1 /* HXPhotoTools.m in Sources */,
 				7B4D4C4824B858C600B03846 /* HXMECancelBlock.m in Sources */,
 				7B4E66342487AD5C00077EE1 /* UIImageView+HXExtension.m in Sources */,
@@ -1791,6 +1834,7 @@
 				7B4E66512487AD5C00077EE1 /* HXPhotoPreviewVideoViewCell.m in Sources */,
 				7B4E66412487AD5C00077EE1 /* HXCustomCameraViewController.m in Sources */,
 				7BB23C1024CEB33A00726A7A /* SDAnimatedImageView+WebCache.m in Sources */,
+				7B88A0C024D96A0C00980A05 /* WxMomentViewCell.m in Sources */,
 				7B4E662A2487AD5C00077EE1 /* HXPhotoConfiguration.m in Sources */,
 				7B4D4C4624B858C600B03846 /* HX_PhotoEditViewController.m in Sources */,
 				7B269E0E1E56961500AB813D /* Demo2ViewController.m in Sources */,
@@ -1884,7 +1928,9 @@
 				7BB23C2D24CEB33A00726A7A /* SDImageIOCoder.m in Sources */,
 				7BB23C3524CEB33A00726A7A /* SDWebImageDownloaderOperation.m in Sources */,
 				7B4E662C2487AD5C00077EE1 /* HXPhotoInteractiveTransition.m in Sources */,
+				7B7865A424DA9E4700E107BD /* UITextView+Placeholder.m in Sources */,
 				7B28A0AB2466871D00F90F37 /* _YYWebImageSetter.m in Sources */,
+				7B88A0B524D93CEB00980A05 /* WxMomentHeaderView.m in Sources */,
 				7B4E662D2487AD5C00077EE1 /* HXPhotoViewPresentTransition.m in Sources */,
 				7B4E665B2487AD5C00077EE1 /* HXPhotoSubViewCell.m in Sources */,
 				7BAECD36237E483700580756 /* MASConstraint.m in Sources */,
@@ -2036,7 +2082,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.3;
+				MARKETING_VERSION = 3.0.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxxxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2063,7 +2109,7 @@
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.3;
+				MARKETING_VERSION = 3.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxxxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

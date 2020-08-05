@@ -192,14 +192,14 @@
         case HXPhotoCustomCameraTypeUnused: {
             if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
                 [self setupImageOutput];
-                [self.cameraController addDataOutput];
+//                [self.cameraController addDataOutput];
             }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
                 [self setupMovieOutput];
             }else {
                 if (!self.manager.configuration.selectTogether && self.isOutside) {
                     if (self.manager.afterSelectedPhotoArray.count > 0) {
                         [self setupImageOutput];
-                        [self.cameraController addDataOutput];
+//                        [self.cameraController addDataOutput];
                     }else if (self.manager.afterSelectedVideoArray.count > 0) {
                         [self setupMovieOutput];
                     }else {
@@ -212,7 +212,7 @@
         } break;
         case HXPhotoCustomCameraTypePhoto: {
             [self setupImageOutput];
-            [self.cameraController addDataOutput];
+//            [self.cameraController addDataOutput];
         } break;
         case HXPhotoCustomCameraTypeVideo: {
             [self setupMovieOutput];
@@ -421,6 +421,7 @@
                     [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL location:self.location complete:^(HXPhotoModel *model, BOOL success) {
                         [weakSelf.view hx_handleLoading:NO];
                         if (success) {
+                            model.videoURL = weakSelf.videoURL;
                             [weakSelf doneCompleteWithModel:model];
                         }else {
                             [weakSelf.view hx_showImageHUDText:@"保存失败!"];
@@ -444,10 +445,19 @@
     if (self.doneBlock) {
         self.doneBlock(model, self);
     }
+    BOOL cameraFinishDismissAnimated = self.manager.cameraFinishDismissAnimated;
     if (self.manager.configuration.cameraPhotoJumpEdit) {
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        [self.presentingViewController dismissViewControllerAnimated:cameraFinishDismissAnimated completion:^{
+            if ([self.delegate respondsToSelector:@selector(customCameraViewControllerFinishDismissCompletion:)]) {
+                [self.delegate customCameraViewControllerFinishDismissCompletion:self];
+            }
+        }];
     }else {
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [self dismissViewControllerAnimated:cameraFinishDismissAnimated completion:^{
+            if ([self.delegate respondsToSelector:@selector(customCameraViewControllerFinishDismissCompletion:)]) {
+                [self.delegate customCameraViewControllerFinishDismissCompletion:self];
+            }
+        }];
     }
 }
 - (void)resetCameraZoom {
@@ -762,7 +772,12 @@
             if (weakSelf.cancelBlock) {
                 weakSelf.cancelBlock(weakSelf);
             }
-            [weakSelf dismissViewControllerAnimated:YES completion:nil];
+            BOOL cameraCancelDismissAnimated = weakSelf.manager.cameraCancelDismissAnimated;
+            [weakSelf dismissViewControllerAnimated:cameraCancelDismissAnimated completion:^{
+                if ([weakSelf.delegate respondsToSelector:@selector(customCameraViewControllerCancelDismissCompletion:)]) {
+                    [weakSelf.delegate customCameraViewControllerCancelDismissCompletion:weakSelf];
+                }
+            }];
         };
     }
     return _bottomView;
@@ -857,7 +872,12 @@
     HXWeakSelf
     [self hx_presentVideoEditViewControllerWithManager:self.manager videoURL:self.videoURL done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXVideoEditViewController *viewController) {
         [weakSelf doneCompleteWithModel:afterModel];
-        [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        BOOL cameraFinishDismissAnimated = weakSelf.manager.cameraFinishDismissAnimated;
+        [weakSelf.presentingViewController dismissViewControllerAnimated:cameraFinishDismissAnimated completion:^{
+            if ([weakSelf.delegate respondsToSelector:@selector(customCameraViewControllerFinishDismissCompletion:)]) {
+                [weakSelf.delegate customCameraViewControllerFinishDismissCompletion:weakSelf];
+            }
+        }];
     } cancel:^(HXVideoEditViewController *viewController) {
         [weakSelf.playVideoView.playerLayer.player play];
     }];

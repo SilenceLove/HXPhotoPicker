@@ -33,6 +33,7 @@
 #import "HXVideoEditViewController.h"
 #import "HXPhotoEdit.h"
 #import "HX_PhotoEditViewController.h"
+#import "UIColor+HXExtension.h"
 
 @interface HXPhotoViewController ()
 <
@@ -46,8 +47,8 @@ HXPhotoPreviewViewControllerDelegate,
 HXCustomCameraViewControllerDelegate,
 HXPhotoEditViewControllerDelegate,
 HXVideoEditViewControllerDelegate,
-HX_PhotoEditViewControllerDelegate,
-PHPhotoLibraryChangeObserver
+HX_PhotoEditViewControllerDelegate
+//PHPhotoLibraryChangeObserver
 >
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (strong, nonatomic) UICollectionView *collectionView;
@@ -99,7 +100,7 @@ PHPhotoLibraryChangeObserver
             [self unregisterForPreviewingWithContext:self.previewingContext];
         }
     }
-    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
+//    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
@@ -164,7 +165,7 @@ PHPhotoLibraryChangeObserver
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.assetDidChanged = NO;
-    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+//    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     self.firstOn = YES;
     self.cellCanSetModel = YES;
     self.extendedLayoutIncludesOpaqueBars = YES;
@@ -173,6 +174,19 @@ PHPhotoLibraryChangeObserver
         self.showBottomPhotoCount = YES;
         self.manager.configuration.showBottomPhotoDetail = NO;
     }
+//    HXWeakSelf
+//    self.hx_customNavigationController.photoLibraryDidChange = ^(HXAlbumModel *albumModel) {
+//        if (albumModel == weakSelf.albumModel ||
+//            [albumModel.localIdentifier isEqualToString:weakSelf.albumModel.localIdentifier]) {
+//            weakSelf.albumModel.assetResult = nil;
+//            weakSelf.assetDidChanged = YES;
+//            weakSelf.collectionViewReloadCompletion = NO;
+//            [weakSelf.navigationController popToViewController:self animated:YES];
+//            weakSelf.bottomView.selectCount = [weakSelf.manager selectedCount];
+//            [weakSelf.view hx_showLoadingHUDText:nil];
+//            [weakSelf startGetAllPhotoModel];
+//        }
+//    };
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
         [self setupUI];
         [self changeSubviewFrame];
@@ -182,8 +196,8 @@ PHPhotoLibraryChangeObserver
         [self setupUI];
         [self changeSubviewFrame];
         // 获取当前应用对照片的访问授权状态
-        HXWeakSelf
         [self.view hx_showLoadingHUDText:nil delay:0.1f];
+        HXWeakSelf
         [HXPhotoTools requestAuthorization:self handler:^(PHAuthorizationStatus status) {
             if (status == PHAuthorizationStatusAuthorized) {
                 [weakSelf getAlbumList];
@@ -446,7 +460,12 @@ PHPhotoLibraryChangeObserver
         self.cancelBlock(self, self.manager);
     }
     self.manager.selectPhotoing = NO;
-    [self dismissViewControllerAnimated:YES completion:nil];
+    BOOL selectPhotoCancelDismissAnimated = self.manager.selectPhotoCancelDismissAnimated;
+    [self dismissViewControllerAnimated:selectPhotoCancelDismissAnimated completion:^{
+        if ([self.delegate respondsToSelector:@selector(photoViewControllerCancelDismissCompletion:)]) {
+            [self.delegate photoViewControllerCancelDismissCompletion:self];
+        }
+    }];
 }
 - (NSInteger)dateItem:(HXPhotoModel *)model {
     NSInteger dateItem = [self.allArray indexOfObject:model];
@@ -614,41 +633,41 @@ PHPhotoLibraryChangeObserver
     }
     [self collectionViewAddModel:model beforeModel:nil];
     
-    if (self.manager.configuration.singleSelected) {
-        if (model.subType == HXPhotoModelMediaSubTypePhoto) {
-            
-            if (self.manager.configuration.useWxPhotoEdit) {
-                HX_PhotoEditViewController *vc = [[HX_PhotoEditViewController alloc] initWithConfiguration:self.manager.configuration.photoEditConfigur];
-                vc.photoModel = model;
-                vc.delegate = self;
-                vc.onlyCliping = YES;
-                vc.supportRotation = YES;
-                vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
-                vc.modalPresentationCapturesStatusBarAppearance = YES;
-                [self presentViewController:vc animated:YES completion:nil];
-            }else {
-                HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
-                vc.isInside = YES;
-                vc.delegate = self;
-                vc.manager = self.manager;
-                vc.model = model;
-                vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
-                vc.modalPresentationCapturesStatusBarAppearance = YES;
-                [self presentViewController:vc animated:YES completion:nil];
-            }
-        }else {
-            HXPhotoPreviewViewController *previewVC = [[HXPhotoPreviewViewController alloc] init];
-            if (HX_IOS9Earlier) {
-                previewVC.photoViewController = self;
-            }
-            previewVC.delegate = self;
-            previewVC.modelArray = self.previewArray;
-            previewVC.manager = self.manager;
-            previewVC.currentModelIndex = [self.previewArray indexOfObject:model];
-            self.navigationController.delegate = previewVC;
-            [self.navigationController pushViewController:previewVC animated:NO];
-        }
-    }
+//    if (self.manager.configuration.singleSelected) {
+//        if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+//            
+//            if (self.manager.configuration.useWxPhotoEdit) {
+//                HX_PhotoEditViewController *vc = [[HX_PhotoEditViewController alloc] initWithConfiguration:self.manager.configuration.photoEditConfigur];
+//                vc.photoModel = model;
+//                vc.delegate = self;
+//                vc.onlyCliping = YES;
+//                vc.supportRotation = YES;
+//                vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+//                vc.modalPresentationCapturesStatusBarAppearance = YES;
+//                [self presentViewController:vc animated:YES completion:nil];
+//            }else {
+//                HXPhotoEditViewController *vc = [[HXPhotoEditViewController alloc] init];
+//                vc.isInside = YES;
+//                vc.delegate = self;
+//                vc.manager = self.manager;
+//                vc.model = model;
+//                vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+//                vc.modalPresentationCapturesStatusBarAppearance = YES;
+//                [self presentViewController:vc animated:YES completion:nil];
+//            }
+//        }else {
+//            HXPhotoPreviewViewController *previewVC = [[HXPhotoPreviewViewController alloc] init];
+//            if (HX_IOS9Earlier) {
+//                previewVC.photoViewController = self;
+//            }
+//            previewVC.delegate = self;
+//            previewVC.modelArray = self.previewArray;
+//            previewVC.manager = self.manager;
+//            previewVC.currentModelIndex = [self.previewArray indexOfObject:model];
+//            self.navigationController.delegate = previewVC;
+//            [self.navigationController pushViewController:previewVC animated:NO];
+//        }
+//    }
 }
 - (void)collectionViewAddModel:(HXPhotoModel *)model beforeModel:(HXPhotoModel *)beforeModel {
     
@@ -1313,6 +1332,11 @@ PHPhotoLibraryChangeObserver
 #pragma mark - < HXVideoEditViewControllerDelegate >
 - (void)videoEditViewControllerDidDoneClick:(HXVideoEditViewController *)videoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
     [self photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+    if (afterModel.needHideSelectBtn && !self.manager.configuration.singleSelected) {
+        self.isNewEditDismiss = YES;
+        [self.manager beforeSelectedListAddPhotoModel:afterModel];
+        [self photoBottomViewDidDoneBtn];
+    }
 }
 #pragma mark - < HXPhotoBottomViewDelegate >
 - (void)photoBottomViewDidPreviewBtn {
@@ -1412,10 +1436,19 @@ PHPhotoLibraryChangeObserver
     [self.navigationController.viewControllers.lastObject.view hx_handleLoading];
     [self cleanSelectedList];
     self.manager.selectPhotoing = NO;
+    BOOL selectPhotoFinishDismissAnimated = self.manager.selectPhotoFinishDismissAnimated;
     if (!self.isNewEditDismiss) {
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [self dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
+            if ([self.delegate respondsToSelector:@selector(photoViewControllerFinishDismissCompletion:)]) {
+                [self.delegate photoViewControllerFinishDismissCompletion:self];
+            }
+        }];
     }else {
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        [self.presentingViewController dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
+            if ([self.delegate respondsToSelector:@selector(photoViewControllerFinishDismissCompletion:)]) {
+                [self.delegate photoViewControllerFinishDismissCompletion:self];
+            }
+        }];
     }
 }
 - (void)photoBottomViewDidEditBtn {
@@ -1540,34 +1573,16 @@ PHPhotoLibraryChangeObserver
 }
 
 #pragma mark - PHPhotoLibraryChangeObserver
-- (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.albumModel.assetResult];
-    if (collectionChanges) {
-        if ([collectionChanges hasIncrementalChanges]) {
-            if (collectionChanges.removedObjects.count > 0) {
-                // 删除照片了
-                if (collectionChanges.removedObjects.count > 0) {
-                    NSArray *selectedArray = self.manager.selectedArray.copy;
-                    for (HXPhotoModel *model in selectedArray) {
-                        if (model.asset && ([collectionChanges.removedObjects containsObject:model.asset])) {
-                            [self.manager beforeSelectedListdeletePhotoModel:model];
-                            [self.manager afterSelectedListdeletePhotoModel:model];
-                        }
-                    }
-                }
-                self.albumModel.assetResult = nil;
-                self.assetDidChanged = YES;
-                self.collectionViewReloadCompletion = NO;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.navigationController popToViewController:self animated:YES];
-                    self.bottomView.selectCount = [self.manager selectedCount];
-                    [self.view hx_showLoadingHUDText:nil];
-                    [self startGetAllPhotoModel];
-                });
-            }
-        }
-    }
-}
+//- (void)photoLibraryDidChange:(PHChange *)changeInstance {
+//    PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.albumModel.assetResult];
+//    if (collectionChanges) {
+//        if ([collectionChanges hasIncrementalChanges]) {
+//            if (collectionChanges.removedObjects.count > 0) {
+//
+//            }
+//        }
+//    }
+//}
 #pragma mark - < 懒加载 >
 - (UILabel *)authorizationLb {
     if (!_authorizationLb) {
@@ -2025,12 +2040,14 @@ PHPhotoLibraryChangeObserver
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
     self.maskView.hidden = !self.imageView.image;
+    self.localIdentifier = model.asset.localIdentifier;
     if (model.photoEdit) {
         self.imageView.image = model.photoEdit.editPreviewImage;
         self.maskView.hidden = NO;
         if (completion) {
             completion(self);
         }
+        self.requestID = 0;
     }else {
         HXWeakSelf
         if (model.type == HXPhotoModelMediaTypeCamera ||
@@ -2091,8 +2108,8 @@ PHPhotoLibraryChangeObserver
                     completion(self);
                 }
             }
+            self.requestID = 0;
         }else {
-            self.localIdentifier = model.asset.localIdentifier;
             int32_t imageRequestID;
             if (highQuality) {
                 imageRequestID = [self.model highQualityRequestThumbImageWithSize:[HXPhotoCommon photoCommon].requestSize completion:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
@@ -2878,13 +2895,14 @@ PHPhotoLibraryChangeObserver
     
     [self.editBtn setTitleColor:themeColor forState:UIControlStateNormal];
     [self.editBtn setTitleColor:[themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+    
     if ([themeColor isEqual:[UIColor whiteColor]]) {
         [self.doneBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [self.doneBtn setTitleColor:[[UIColor blackColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        [self.doneBtn setTitleColor:[[UIColor blackColor] colorWithAlphaComponent:0.3] forState:UIControlStateDisabled];
     }
     if (selectedTitleColor) {
         [self.doneBtn setTitleColor:selectedTitleColor forState:UIControlStateNormal];
-        [self.doneBtn setTitleColor:[selectedTitleColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+        [self.doneBtn setTitleColor:[selectedTitleColor colorWithAlphaComponent:0.3] forState:UIControlStateDisabled];
     }
     if (self.manager.configuration.showOriginalBytesLoading) {
         self.loadingView.color = themeColor;
@@ -3056,6 +3074,7 @@ PHPhotoLibraryChangeObserver
 - (UIToolbar *)bgView {
     if (!_bgView) {
         _bgView = [[UIToolbar alloc] init];
+//        [_bgView setShadowImage:[UIImage new] forToolbarPosition:UIBarPositionAny];
     }
     return _bgView;
 }
@@ -3076,7 +3095,7 @@ PHPhotoLibraryChangeObserver
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
         _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
         [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.3] forState:UIControlStateDisabled];
+        [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _doneBtn.layer.cornerRadius = 3;
         _doneBtn.enabled = NO;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
