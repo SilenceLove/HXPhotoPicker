@@ -36,6 +36,11 @@
         self.previewContentView.videoView.changePlayBtnState = ^(BOOL isSelected) {
             weakSelf.bottomSliderView.playBtnSelected = isSelected;
         };
+        self.previewContentView.videoView.playBtnDidClick = ^(BOOL isPlay) {
+            if (weakSelf.cellDidPlayVideoBtn) {
+                weakSelf.cellDidPlayVideoBtn(isPlay);
+            }
+        };
         self.previewContentView.downloadNetworkImageComplete = ^{
             if (weakSelf.cellDownloadImageComplete) {
                 weakSelf.cellDownloadImageComplete(weakSelf);

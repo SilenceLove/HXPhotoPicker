@@ -41,6 +41,10 @@
     [super viewWillAppear:animated];
     [self changeStatus];
 }
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self.videoView cancelPlayer];
+}
 - (void)changeStatus {
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
@@ -57,14 +61,18 @@
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _manager.configuration.type = HXConfigurationTypeWXChat;
         _manager.configuration.singleSelected = YES;
+        _manager.configuration.lookGifPhoto = NO;
         _manager.configuration.albumListTableView = ^(UITableView *tableView) {
 //            NSSLog(@"%@",tableView);
         };
+        _manager.configuration.videoMaximumSelectDuration = 15.f;
+        _manager.configuration.selectVideoBeyondTheLimitTimeAutoEdit = YES;
         _manager.configuration.singleJumpEdit = YES;
 //        _manager.configuration.movableCropBox = YES;
         _manager.configuration.photoEditConfigur.onlyCliping = YES;
-        _manager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_Custom;
-        _manager.configuration.photoEditConfigur.customAspectRatio = CGSizeMake(1, 1);
+//        _manager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_Custom;
+//        _manager.configuration.photoEditConfigur.customAspectRatio = CGSizeMake(1, 1);
+        
 //        _manager.configuration.movableCropBoxEditSize = YES;
 //        _manager.configuration.requestImageAfterFinishingSelection = NO;
 //        _manager.configuration.albumShowMode = HXPhotoAlbumShowModePopup;
@@ -164,6 +172,7 @@
                 [weakSelf.view hx_showImageHUDText:@"获取失败"];
             }];
         }else  if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            [weakSelf.videoView cancelPlayer];
             weakSelf.videoView.model = model;
 //            [weakSelf.view hx_showLoadingHUDText:@"获取视频中"];
 //            [model exportVideoWithPresetName:AVAssetExportPresetHighestQuality startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:^(float progress, HXPhotoModel *model) {

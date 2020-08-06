@@ -5,12 +5,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "hx_photo_edit_show_tip@2x.png",
+      "filename" : "hx_photo_asset_video_icon@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "hx_photo_edit_show_tip@3x.png",
+      "filename" : "hx_photo_asset_video_icon@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

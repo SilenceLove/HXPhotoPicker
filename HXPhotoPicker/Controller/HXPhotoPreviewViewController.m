@@ -55,6 +55,7 @@ HX_PhotoEditViewControllerDelegate
 @property (strong, nonatomic) UIButton *darkDeleteBtn;
 @property (assign, nonatomic) BOOL statusBarShouldBeHidden;
 @property (assign, nonatomic) BOOL layoutSubviewsCompletion;
+@property (assign, nonatomic) BOOL singleSelectedJumpEdit;
 @end
 
 @implementation HXPhotoPreviewViewController
@@ -230,6 +231,7 @@ HX_PhotoEditViewControllerDelegate
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view
+    self.singleSelectedJumpEdit = NO;
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.edgesForExtendedLayout = UIRectEdgeAll;
     [self setupUI];
@@ -794,6 +796,20 @@ HX_PhotoEditViewControllerDelegate
                 [weakSelf dismissClick];
             }
         }else {
+            if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+                HXPhotoPreviewVideoViewCell *videoCell = (HXPhotoPreviewVideoViewCell *)myCell;
+                if (weakSelf.bottomView.userInteractionEnabled) {
+                    if (!videoCell.previewContentView.videoView.isPlayer) {
+                        [videoCell.previewContentView.videoView didPlayBtnClickWithSelected:YES];
+                    }
+                }else {
+                    if (videoCell.previewContentView.videoView.isPlayer) {
+                        [videoCell.previewContentView.videoView didPlayBtnClickWithSelected:NO];
+                        videoCell.previewContentView.videoView.playBtnHidden = NO;
+                    }
+                }
+                
+            }
             [weakSelf setSubviewAlphaAnimate:YES];
         }
     }];
@@ -887,25 +903,25 @@ HX_PhotoEditViewControllerDelegate
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             // 为视频时
             self.bottomView.enabled = self.manager.configuration.videoCanEdit;
-            if (self.manager.configuration.singleSelected) {
-                if (!self.manager.configuration.singleJumpEdit) {
-                    self.bottomView.hideEditBtn = !self.manager.configuration.videoCanEdit;
-                }else {
-                    self.bottomView.hideEditBtn = YES;
-                }
-            }else {
+//            if (self.manager.configuration.singleSelected) {
+//                if (!self.manager.configuration.singleJumpEdit) {
+//                    self.bottomView.hideEditBtn = !self.manager.configuration.videoCanEdit;
+//                }else {
+//                    self.bottomView.hideEditBtn = YES;
+//                }
+//            }else {
                 self.bottomView.hideEditBtn = !self.manager.configuration.videoCanEdit;
-            }
+//            }
         }else {
-            if (self.manager.configuration.singleSelected) {
-                if (!self.manager.configuration.singleJumpEdit) {
-                    self.bottomView.hideEditBtn = !self.manager.configuration.photoCanEdit;
-                }else {
-                    self.bottomView.hideEditBtn = YES;
-                }
-            }else {
+//            if (self.manager.configuration.singleSelected) {
+//                if (!self.manager.configuration.singleJumpEdit) {
+//                    self.bottomView.hideEditBtn = !self.manager.configuration.photoCanEdit;
+//                }else {
+//                    self.bottomView.hideEditBtn = YES;
+//                }
+//            }else {
                 self.bottomView.hideEditBtn = !self.manager.configuration.photoCanEdit;
-            }
+//            }
             self.bottomView.enabled = self.manager.configuration.photoCanEdit;
         }
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -1007,9 +1023,14 @@ HX_PhotoEditViewControllerDelegate
             return;
         }
     }
+    if (self.manager.configuration.singleSelected &&
+        self.manager.configuration.singleJumpEdit) {
+        self.singleSelectedJumpEdit = YES;
+    }
     HXPhotoModel *model = [self.modelArray objectAtIndex:self.currentModelIndex];
     if (model.type == HXPhotoModelMediaTypePhotoGif ||
-        model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+        model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
+        model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalGif) {
         if (model.photoEdit) {
             [self jumpEditViewControllerWithModel:model];
         }else {
@@ -1125,16 +1146,25 @@ HX_PhotoEditViewControllerDelegate
     if (self.manager.configuration.singleSelected) {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
-                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
-                return;
-            }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
                 if (self.manager.configuration.selectVideoBeyondTheLimitTimeAutoEdit &&
                     self.manager.configuration.videoCanEdit) {
+                    self.singleSelectedJumpEdit = YES;
                     [self jumpVideoEdit];
                 }else {
-                    [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
+                    [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
                 }
                 return;
+            }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
+                [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
+                return;
+            }
+        }else if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+            if (self.manager.configuration.useWxPhotoEdit) {
+                if (self.manager.configuration.singleJumpEdit) {
+                    self.singleSelectedJumpEdit = YES;
+                    [self jumpEditViewControllerWithModel:model];
+                    return;
+                }
             }
         }
         if ([self.delegate respondsToSelector:@selector(photoPreviewSingleSelectedClick:model:)]) {
@@ -1192,6 +1222,12 @@ HX_PhotoEditViewControllerDelegate
 }
 #pragma mark - < HX_PhotoEditViewControllerDelegate >
 - (void)photoEditingController:(HX_PhotoEditViewController *)photoEditingVC didFinishPhotoEdit:(HXPhotoEdit *)photoEdit photoModel:(nonnull HXPhotoModel *)photoModel {
+    if (self.singleSelectedJumpEdit) {
+        if ([self.delegate respondsToSelector:@selector(photoPreviewSingleSelectedClick:model:)]) {
+            [self.delegate photoPreviewSingleSelectedClick:self model:photoModel];
+        }
+        return;
+    }
     [self.collectionView reloadData];
     if (self.outside) {
         [self.bottomView reloadData];
@@ -1222,6 +1258,9 @@ HX_PhotoEditViewControllerDelegate
         }
     }
 }
+- (void)photoEditingControllerDidCancel:(HX_PhotoEditViewController *)photoEditingVC {
+    self.singleSelectedJumpEdit = NO;
+}
 #pragma mark - < HXPhotoEditViewControllerDelegate >
 - (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
     if (self.outside) {
@@ -1245,6 +1284,21 @@ HX_PhotoEditViewControllerDelegate
             self.bottomView.selectCount = [self.manager selectedCount];
             [self.bottomView insertModel:afterModel];
         }
+    }else {
+        if (afterModel.subType == HXPhotoModelMediaSubTypeVideo) {
+            if (self.manager.configuration.singleSelected) {
+                if ([self.delegate respondsToSelector:@selector(photoPreviewSingleSelectedClick:model:)]) {
+                    [self.delegate photoPreviewSingleSelectedClick:self model:afterModel];
+                }
+                return;
+            }else if (beforeModel.needHideSelectBtn) {
+                [self.manager beforeSelectedListAddPhotoModel:afterModel];
+                if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidDone:)]) {
+                    [self.delegate photoPreviewControllerDidDone:self];
+                }
+                return;
+            }
+        }
     }
     if (self.selectPreview) {
         self.modelArray = [NSMutableArray arrayWithArray:[self.manager selectedArray]];
@@ -1262,7 +1316,16 @@ HX_PhotoEditViewControllerDelegate
 }
 #pragma mark - < HXVideoEditViewControllerDelegate >
 - (void)videoEditViewControllerDidDoneClick:(HXVideoEditViewController *)videoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
+    if (self.singleSelectedJumpEdit) {
+        if ([self.delegate respondsToSelector:@selector(photoPreviewSingleSelectedClick:model:)]) {
+            [self.delegate photoPreviewSingleSelectedClick:self model:afterModel];
+        }
+        return;
+    }
     [self photoEditViewControllerDidClipClick:nil beforeModel:beforeModel afterModel:afterModel];
+}
+- (void)videoEditViewControllerDidCancelClick:(HXVideoEditViewController *)videoEditViewController {
+    self.singleSelectedJumpEdit = NO;
 }
 #pragma mark - < 懒加载 >
 - (UIPageControl *)bottomPageControl {

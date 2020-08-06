@@ -25,20 +25,26 @@ typedef NS_ENUM(NSUInteger, HXPreviewVideoSliderType) {
 @property (assign, nonatomic) BOOL stopCancel;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) AVAsset *avAsset;
-- (void)cancelPlayer;
 
+/// 是否正在播放
+@property (assign, nonatomic) BOOL isPlayer;
 @property (assign, nonatomic) BOOL playBtnDidPlay;
+
+@property (assign, nonatomic) BOOL playBtnHidden;
 
 @property (copy, nonatomic) void (^ gotVideoDuration)(NSTimeInterval duration);
 @property (copy, nonatomic) void (^ gotVideoBufferEmptyValue)(CGFloat value);
 @property (copy, nonatomic) void (^ changePlayBtnState)(BOOL isSelected);
 @property (copy, nonatomic) void (^ changeValue)(CGFloat value ,BOOL animaiton);
 @property (copy, nonatomic) void (^ gotVideoCurrentTime)(NSTimeInterval currentTime);
+@property (copy, nonatomic) void (^ playBtnDidClick)(BOOL isPlay);
 - (void)didPlayBtnClickWithSelected:(BOOL)isSelected;
 - (void)changePlayerTimeWithValue:(CGFloat)value type:(HXPreviewVideoSliderType)type;
 
 - (void)showOtherView;
 - (void)hideOtherView:(BOOL)animatoin;
+
+- (void)cancelPlayer;
 @end
 
 @interface HXPreviewVideoSliderView : UIView

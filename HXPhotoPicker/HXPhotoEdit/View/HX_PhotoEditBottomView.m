@@ -51,7 +51,7 @@
     
     [self.doneBtn hx_radiusWithRadius:3 corner:UIRectCornerAllCorners];
     [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
-    self.doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
+    self.doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];
 }
 - (void)setThemeColor:(UIColor *)themeColor {
     _themeColor = themeColor;

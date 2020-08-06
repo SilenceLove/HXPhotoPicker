@@ -45,6 +45,7 @@
     self.bgView.barStyle = manager.configuration.bottomViewBarStyle;
     self.bgView.translucent = manager.configuration.bottomViewTranslucent;
     self.tipView.translucent = manager.configuration.bottomViewTranslucent;
+    self.tipView.barStyle = manager.configuration.bottomViewBarStyle;
 }
 - (void)setupUI {
     _currentIndex = -1;
@@ -304,6 +305,7 @@
     if (!_tipView) {
         _tipView = [[UIToolbar alloc] init];
         _tipView.hidden = YES;
+        [_tipView setShadowImage:[UIImage new] forToolbarPosition:UIBarPositionAny];
         [_tipView addSubview:self.tipLb];
     }
     return _tipView;
@@ -345,7 +347,7 @@
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
-        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
+        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];
         _doneBtn.layer.cornerRadius = 3;
         [_doneBtn addTarget:self action:@selector(didDoneBtnClick) forControlEvents:UIControlEventTouchUpInside];
     }

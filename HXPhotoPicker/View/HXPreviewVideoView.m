@@ -164,6 +164,7 @@
         }
         self.videoManualPause = NO;
         [self.player pause];
+        self.isPlayer = NO;
         [self.player seekToTime:kCMTimeZero];
         [self.player cancelPendingPrerolls];
         [self.player.currentItem cancelPendingSeeks];
@@ -178,6 +179,7 @@
 - (void)pausePlayerAndShowNaviBar {
     [self.player.currentItem seekToTime:CMTimeMake(0, 1)];
     [self.player play];
+    self.isPlayer = YES;
 }
 - (void)addPlayerObservers {
     self.canRemovePlayerObservers = YES;
@@ -296,6 +298,7 @@
 }
 - (void)videoDidPlay {
     [self.player play];
+    self.isPlayer = YES;
     self.videoManualPause = YES;
     if (self.changePlayBtnState) {
         self.changePlayBtnState(YES);
@@ -319,6 +322,7 @@
         return;
     }
     [self.player pause];
+    self.isPlayer = NO;
 }
 - (void)appDidEnterPlayGround {
     if (!self.player.currentItem) {
@@ -326,12 +330,17 @@
     }
     if (self.videoManualPause && self.playBtnDidPlay) {
         [self.player play];
+        self.isPlayer = YES;
     }
 }
-
+- (void)setPlayBtnHidden:(BOOL)playBtnHidden {
+    _playBtnHidden = playBtnHidden;
+    self.playBtn.hidden = playBtnHidden;
+}
 - (void)didPlayBtnClickWithSelected:(BOOL)isSelected {
     self.videoManualPause = isSelected;
     self.playBtnDidPlay = YES;
+    self.isPlayer = isSelected;
     if (isSelected) {
         [self.player play];
     }else {
@@ -357,6 +366,7 @@
     }];
     if (type == HXPreviewVideoSliderTypeTouchDown) {
         [self.player pause];
+        self.isPlayer = NO;
         if (self.changePlayBtnState) {
             self.changePlayBtnState(NO);
         }
@@ -409,6 +419,9 @@
     [self videoDidPlay];
     self.playBtnDidPlay = YES;
     button.hidden = YES;
+    if (self.playBtnDidClick) {
+        self.playBtnDidClick(YES);
+    }
 }
 - (void)setPlayBtnDidPlay:(BOOL)playBtnDidPlay {
     _playBtnDidPlay = playBtnDidPlay;

@@ -394,10 +394,20 @@ HX_PhotoEditViewControllerDelegate
         }
         if (titleViewSeleted) {
             self.albumView.hx_y = navBarHeight;
+            if (self.manager.configuration.singleSelected) {
+                self.albumView.alpha = 1;
+            }
         }else {
             self.albumView.hx_y = -(navBarHeight + self.albumView.hx_h);
+            if (self.manager.configuration.singleSelected) {
+                self.albumView.alpha = 0;
+            }
         }
-        self.albumBgView.hx_size = CGSizeMake(viewWidth, height);
+        if (self.manager.configuration.singleSelected) {
+            self.albumBgView.frame = CGRectMake(0, navBarHeight, viewWidth, height - navBarHeight);
+        }else {
+            self.albumBgView.hx_size = CGSizeMake(viewWidth, height);
+        }
         if (self.manager.configuration.popupAlbumTableView) {
             self.manager.configuration.popupAlbumTableView(self.albumView.tableView);
         }
@@ -1287,10 +1297,12 @@ HX_PhotoEditViewControllerDelegate
     [self photoBottomViewDidDoneBtn];
 }
 - (void)photoPreviewDidEditClick:(HXPhotoPreviewViewController *)previewController model:(HXPhotoModel *)model beforeModel:(HXPhotoModel *)beforeModel {
-    if (self.manager.configuration.useWxPhotoEdit) {
-        [self.collectionView reloadData];
-        [self.bottomView requestPhotosBytes];
-        return;
+    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        if (self.manager.configuration.useWxPhotoEdit) {
+            [self.collectionView reloadData];
+            [self.bottomView requestPhotosBytes];
+            return;
+        }
     }
     model.currentAlbumIndex = self.albumModel.index;
     
@@ -1437,14 +1449,14 @@ HX_PhotoEditViewControllerDelegate
     [self cleanSelectedList];
     self.manager.selectPhotoing = NO;
     BOOL selectPhotoFinishDismissAnimated = self.manager.selectPhotoFinishDismissAnimated;
-    if (!self.isNewEditDismiss) {
-        [self dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
+    if (self.isNewEditDismiss || [self.presentedViewController isKindOfClass:[HX_PhotoEditViewController class]] || [self.presentedViewController isKindOfClass:[HXVideoEditViewController class]]) {
+        [self.presentingViewController dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
             if ([self.delegate respondsToSelector:@selector(photoViewControllerFinishDismissCompletion:)]) {
                 [self.delegate photoViewControllerFinishDismissCompletion:self];
             }
         }];
     }else {
-        [self.presentingViewController dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
+        [self dismissViewControllerAnimated:selectPhotoFinishDismissAnimated completion:^{
             if ([self.delegate respondsToSelector:@selector(photoViewControllerFinishDismissCompletion:)]) {
                 [self.delegate photoViewControllerFinishDismissCompletion:self];
             }
@@ -1678,11 +1690,21 @@ HX_PhotoEditViewControllerDelegate
             }
         }
         [self.albumView selectCellScrollToCenter];
+        if (self.manager.configuration.singleSelected) {
+            [UIView animateWithDuration:0.1 delay:0.15 options:0 animations:^{
+                self.albumView.alpha = 1;
+            } completion:nil];
+        }
         [UIView animateWithDuration:0.25 animations:^{
             self.albumBgView.alpha = 1;
             self.albumView.hx_y = navBarHeight;
         }];
     }else {
+        if (self.manager.configuration.singleSelected) {
+            [UIView animateWithDuration:0.1 animations:^{
+                self.albumView.alpha = 0;
+            }];
+        }
         [UIView animateWithDuration:0.25 animations:^{
             self.albumBgView.alpha = 0;
             self.albumView.hx_y = -CGRectGetMaxY(self.albumView.frame);
@@ -1944,6 +1966,7 @@ HX_PhotoEditViewControllerDelegate
 @property (strong, nonatomic) CALayer *videoMaskLayer;
 @property (strong, nonatomic) UIView *highlightMaskView;
 @property (strong, nonatomic) UIImageView *editTipIcon;
+@property (strong, nonatomic) UIImageView *videoIcon;
 @end
 
 @implementation HXPhotoViewCell
@@ -2036,6 +2059,7 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)setModelDataWithHighQuality:(BOOL)highQuality completion:(void (^)(HXPhotoViewCell *))completion {
     HXPhotoModel *model = self.model;
+    self.videoIcon.hidden = YES;
     self.editTipIcon.hidden = model.photoEdit ? NO : YES;
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
@@ -2164,6 +2188,7 @@ HX_PhotoEditViewControllerDelegate
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.stateLb.text = model.videoTime;
             self.stateLb.hidden = NO;
+            self.videoIcon.hidden = NO;
             self.bottomMaskLayer.hidden = NO;
         }else {
             if ((model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
@@ -2384,8 +2409,8 @@ HX_PhotoEditViewControllerDelegate
     [super layoutSubviews];
     self.imageView.frame = self.bounds;
     self.maskView.frame = self.bounds;
-    self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
-    self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
+    self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 7, 18);
+    self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 27);
     self.selectBtn.hx_x = self.hx_w - self.selectBtn.hx_w - 5;
     self.selectBtn.hx_y = 5;
     self.selectMaskLayer.frame = self.bounds;
@@ -2395,8 +2420,11 @@ HX_PhotoEditViewControllerDelegate
     self.progressView.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
     self.videoMaskLayer.frame = self.bounds;
     self.highlightMaskView.frame = self.bounds;
-    self.editTipIcon.hx_x = 5;
+    self.editTipIcon.hx_x = 7;
     self.editTipIcon.hx_y = self.hx_h - 4 - self.editTipIcon.hx_h;
+    self.videoIcon.hx_x = 7;
+    self.videoIcon.hx_y = self.hx_h - 4 - self.videoIcon.hx_h;
+    self.stateLb.hx_centerY = self.videoIcon.hx_centerY;
 }
 - (void)dealloc {
     self.delegate = nil;
@@ -2421,9 +2449,16 @@ HX_PhotoEditViewControllerDelegate
 - (UIImageView *)editTipIcon {
     if (!_editTipIcon) {
         _editTipIcon = [[UIImageView alloc] initWithImage:[UIImage hx_imageNamed:@"hx_photo_edit_show_tip"]];
-        _editTipIcon.hx_size = CGSizeMake(15.5, 11);
+        _editTipIcon.hx_size = _editTipIcon.image.size;
     }
     return _editTipIcon;
+}
+- (UIImageView *)videoIcon {
+    if (!_videoIcon) {
+        _videoIcon = [[UIImageView alloc] initWithImage:[UIImage hx_imageNamed:@"hx_photo_asset_video_icon"]];
+        _videoIcon.hx_size = _videoIcon.image.size;
+    }
+    return _videoIcon;
 }
 - (UIImageView *)imageView {
     if (!_imageView) {
@@ -2444,6 +2479,7 @@ HX_PhotoEditViewControllerDelegate
         [_maskView addSubview:self.stateLb];
         [_maskView addSubview:self.selectBtn];
         [_maskView addSubview:self.editTipIcon];
+        [_maskView addSubview:self.videoIcon];
     }
     return _maskView;
 }
@@ -3074,7 +3110,6 @@ HX_PhotoEditViewControllerDelegate
 - (UIToolbar *)bgView {
     if (!_bgView) {
         _bgView = [[UIToolbar alloc] init];
-//        [_bgView setShadowImage:[UIImage new] forToolbarPosition:UIBarPositionAny];
     }
     return _bgView;
 }
@@ -3093,7 +3128,7 @@ HX_PhotoEditViewControllerDelegate
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
-        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
+        _doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];
         [_doneBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_doneBtn setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
         _doneBtn.layer.cornerRadius = 3;
