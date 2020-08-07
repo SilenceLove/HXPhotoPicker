@@ -100,6 +100,7 @@
     
     self.photoView.spacing = 5.f;
     self.photoView.delegate = self;
+    self.photoView.deleteCellShowAlert = YES;
     self.photoView.outerCamera = YES;
     self.photoView.previewShowDeleteButton = YES;
     self.photoView.manager = self.photoManager;
@@ -111,11 +112,18 @@
             [weakSelf.photoManager deleteLocalModelsInFile];
             [weakSelf back];
         }, ^{
-            if ([weakSelf.photoManager saveLocalModelsToFile]) {
-                [weakSelf back];
-            }else {
-                [weakSelf.view hx_showImageHUDText:@"保存失败"];
-            }
+            [weakSelf.view hx_showLoadingHUDText:nil];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                BOOL success = [weakSelf.photoManager saveLocalModelsToFile];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.view hx_handleLoading];
+                    if (success) {
+                        [weakSelf back];
+                    }else {
+                        [weakSelf.view hx_showImageHUDText:@"保存失败"];
+                    }
+                });
+            });
         });
     }else {
         // 清空草稿

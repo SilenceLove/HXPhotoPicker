@@ -45,6 +45,7 @@
 @property (assign, nonatomic) BOOL hideDeleteButton;
 /**  删除网络图片时是否显示Alert  */
 @property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
+@property (assign, nonatomic) BOOL deleteCellShowAlert;
 
 @property (assign, nonatomic) NSInteger index;
 // 重新下载

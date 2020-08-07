@@ -147,7 +147,6 @@
 		7B5DA4CB21030DCF00489749 /* Demo11ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5DA4C921030DCF00489749 /* Demo11ViewController.m */; };
 		7B5DA4CC21030DCF00489749 /* Demo11ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B5DA4CA21030DCF00489749 /* Demo11ViewController.xib */; };
 		7B6BC6B721073F1A00136D61 /* Demo12ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6BC6B621073F1A00136D61 /* Demo12ViewController.m */; };
-		7B6BC6B92107408200136D61 /* QQ空间视频_20180301091047.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */; };
 		7B6C2F331F6A283D0044E3D6 /* Demo8ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */; };
 		7B752DE82372ADF000580F35 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE72372ADF000580F35 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7B752DEA2372ADF300580F35 /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE92372ADF300580F35 /* PhotosUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -179,6 +178,7 @@
 		7B88A0BC24D94D0F00980A05 /* WxMomentPublishViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B88A0BA24D94D0F00980A05 /* WxMomentPublishViewController.xib */; };
 		7B88A0C024D96A0C00980A05 /* WxMomentViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B88A0BE24D96A0C00980A05 /* WxMomentViewCell.m */; };
 		7B88A0C124D96A0C00980A05 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B88A0BF24D96A0C00980A05 /* WxMomentViewCell.xib */; };
+		7B9617DB24DD0F13003A1FD6 /* LocalSampleVideo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7B9617DA24DD0F13003A1FD6 /* LocalSampleVideo.mp4 */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */; };
 		7BAECD2F237E483700580756 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAECD16237E483700580756 /* NSLayoutConstraint+MASDebugAdditions.m */; };
@@ -533,7 +533,6 @@
 		7B5DA4CA21030DCF00489749 /* Demo11ViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Demo11ViewController.xib; sourceTree = "<group>"; };
 		7B6BC6B521073F1A00136D61 /* Demo12ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Demo12ViewController.h; sourceTree = "<group>"; };
 		7B6BC6B621073F1A00136D61 /* Demo12ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Demo12ViewController.m; sourceTree = "<group>"; };
-		7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QQ空间视频_20180301091047.mp4"; sourceTree = SOURCE_ROOT; };
 		7B6C2F311F6A283D0044E3D6 /* Demo8ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo8ViewController.h; sourceTree = "<group>"; };
 		7B6C2F321F6A283D0044E3D6 /* Demo8ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo8ViewController.m; sourceTree = "<group>"; };
 		7B752DE72372ADF000580F35 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
@@ -583,6 +582,8 @@
 		7B88A0BE24D96A0C00980A05 /* WxMomentViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WxMomentViewCell.m; sourceTree = "<group>"; };
 		7B88A0BF24D96A0C00980A05 /* WxMomentViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WxMomentViewCell.xib; sourceTree = "<group>"; };
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
+		7B9617D524DCF810003A1FD6 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		7B9617DA24DD0F13003A1FD6 /* LocalSampleVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = LocalSampleVideo.mp4; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
 		7BADE74F1F5A5C1F007AF1D9 /* Demo7ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo7ViewController.h; sourceTree = "<group>"; };
@@ -1265,11 +1266,6 @@
 				7B7865A324DA9E4700E107BD /* UITextView+Placeholder.m */,
 				7B7E3E7F1E4AACD1002234EE /* ViewController.h */,
 				7B7E3E801E4AACD1002234EE /* ViewController.m */,
-				7B269E031E5695F200AB813D /* Demo1ViewController.h */,
-				7B269E041E5695F200AB813D /* Demo1ViewController.m */,
-				7B269E051E5695F200AB813D /* Demo1ViewController.xib */,
-				7B269E0B1E56961500AB813D /* Demo2ViewController.h */,
-				7B269E0C1E56961500AB813D /* Demo2ViewController.m */,
 				7B88A0AE24D93C9E00980A05 /* WxMomentViewController.h */,
 				7B88A0AF24D93C9E00980A05 /* WxMomentViewController.m */,
 				7B88A0B024D93C9E00980A05 /* WxMomentViewController.xib */,
@@ -1282,6 +1278,11 @@
 				7B88A0B824D94D0F00980A05 /* WxMomentPublishViewController.h */,
 				7B88A0B924D94D0F00980A05 /* WxMomentPublishViewController.m */,
 				7B88A0BA24D94D0F00980A05 /* WxMomentPublishViewController.xib */,
+				7B269E031E5695F200AB813D /* Demo1ViewController.h */,
+				7B269E041E5695F200AB813D /* Demo1ViewController.m */,
+				7B269E051E5695F200AB813D /* Demo1ViewController.xib */,
+				7B269E0B1E56961500AB813D /* Demo2ViewController.h */,
+				7B269E0C1E56961500AB813D /* Demo2ViewController.m */,
 				7B269E101E56962700AB813D /* Demo3ViewController.h */,
 				7B269E111E56962700AB813D /* Demo3ViewController.m */,
 				7BBE5A1C1F07994000715546 /* Demo4ViewController.h */,
@@ -1335,7 +1336,7 @@
 				7BFE13502484B17000170F21 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg */,
 				7BFE134A24849FA400170F21 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg */,
 				7B06B2DA24D11A1500FDD794 /* IMG_0168.GIF */,
-				7B6BC6B82107408200136D61 /* QQ空间视频_20180301091047.mp4 */,
+				7B9617DA24DD0F13003A1FD6 /* LocalSampleVideo.mp4 */,
 				7B7E3E7A1E4AACD1002234EE /* main.m */,
 			);
 			name = "Supporting Files";
@@ -1660,6 +1661,7 @@
 				ja,
 				ko,
 				"zh-Hant",
+				fi,
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
 			productRefGroup = 7B7E3E771E4AACD1002234EE /* Products */;
@@ -1689,7 +1691,6 @@
 				7B005AC024D008C500607111 /* HXPhotoEditChartletListView.xib in Resources */,
 				7B06B2B924D0266A00FDD794 /* images.xcassets in Resources */,
 				7B5DA4CC21030DCF00489749 /* Demo11ViewController.xib in Resources */,
-				7B6BC6B92107408200136D61 /* QQ空间视频_20180301091047.mp4 in Resources */,
 				7B005AC124D008C500607111 /* HXPhotoEditChartletContentViewCell.xib in Resources */,
 				7B88A0C124D96A0C00980A05 /* WxMomentViewCell.xib in Resources */,
 				7B88A0BC24D94D0F00980A05 /* WxMomentPublishViewController.xib in Resources */,
@@ -1703,6 +1704,7 @@
 				7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */,
 				7B7E3E891E4AACD1002234EE /* LaunchScreen.storyboard in Resources */,
 				7B005AC224D008C500607111 /* HXPhotoEditClippingToolBar.xib in Resources */,
+				7B9617DB24DD0F13003A1FD6 /* LocalSampleVideo.mp4 in Resources */,
 				7B88A0B224D93C9E00980A05 /* WxMomentViewController.xib in Resources */,
 				7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */,
 				7B005AC624D008C500607111 /* HX_PhotoEditBottomView.xib in Resources */,
@@ -1949,6 +1951,7 @@
 				7BEA307E20DD533600A559A6 /* zh-Hant */,
 				7BEA307F20DD535C00A559A6 /* ja */,
 				7BEA308020DD536300A559A6 /* ko */,
+				7B9617D524DCF810003A1FD6 /* fi */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";

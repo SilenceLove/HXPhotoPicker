@@ -617,20 +617,22 @@ HX_PhotoEditViewControllerDelegate
     }
     NSString *message;
     if (self.currentModel.subType == HXPhotoModelMediaSubTypePhoto) {
-        message = [NSBundle hx_localizedStringForKey:@"确定删除这张照片吗?"];
+        message = [NSBundle hx_localizedStringForKey:@"要删除这张照片吗?"];
     }else {
-        message = [NSBundle hx_localizedStringForKey:@"确定删除这个视频吗?"];
+        message = [NSBundle hx_localizedStringForKey:@"要删除此视频吗?"];
     }
     HXPhotoBottomViewModel *titleModel = [[HXPhotoBottomViewModel alloc] init];
     titleModel.title = message;
     titleModel.titleFont = [UIFont systemFontOfSize:13];
     titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
+    titleModel.titleDarkColor = [UIColor hx_colorWithHexStr:@"#999999"];
     titleModel.cellHeight = 60.f;
     titleModel.canSelect = NO;
     
     HXPhotoBottomViewModel *deleteModel = [[HXPhotoBottomViewModel alloc] init];
     deleteModel.title = [NSBundle hx_localizedStringForKey:@"删除"];
     deleteModel.titleColor = [UIColor redColor];
+    deleteModel.titleDarkColor = [[UIColor redColor] colorWithAlphaComponent:0.8f];
     HXWeakSelf
     [HXPhotoBottomSelectView showSelectViewWithModels:@[titleModel, deleteModel] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
         HXPhotoModel *tempModel = weakSelf.currentModel;

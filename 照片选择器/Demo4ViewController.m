@@ -141,7 +141,7 @@
 
 - (void)editVideo {
     
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
     HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
     
     HXWeakSelf

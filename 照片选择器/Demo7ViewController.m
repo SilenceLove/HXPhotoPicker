@@ -109,7 +109,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [self.manager addCustomAssetModel:images];
     
     /**  添加本地视频  **/
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"QQ空间视频_20180301091047" withExtension:@"mp4"];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
     HXCustomAssetModel *videoAsset = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
 //    [self.manager addLocalVideo:@[url] selected:YES];
     [self.manager addCustomAssetModel:@[videoAsset]];

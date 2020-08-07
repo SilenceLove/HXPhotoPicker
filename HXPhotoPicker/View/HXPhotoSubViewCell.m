@@ -108,26 +108,43 @@
 }
 
 - (void)didDeleteClick {
-    if (self.model.networkPhotoUrl) {
-        if (self.showDeleteNetworkPhotoAlert) {
-            HXPhotoBottomViewModel *titleModel = [[HXPhotoBottomViewModel alloc] init];
-            titleModel.title = [NSBundle hx_localizedStringForKey:@"是否删除此资源"];;
-            titleModel.titleFont = [UIFont systemFontOfSize:13];
-            titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
-            titleModel.cellHeight = 60.f;
-            titleModel.canSelect = NO;
-            
-            HXPhotoBottomViewModel *deleteModel = [[HXPhotoBottomViewModel alloc] init];
-            deleteModel.title = [NSBundle hx_localizedStringForKey:@"删除"];
-            deleteModel.titleColor = [UIColor redColor];
-            HXWeakSelf
-            [HXPhotoBottomSelectView showSelectViewWithModels:@[titleModel, deleteModel] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
-                if ([weakSelf.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
-                    [weakSelf.delegate cellDidDeleteClcik:weakSelf];
-                }
-            } cancelClick:nil];
-            return;
+    BOOL showAlert = NO;
+    NSString *title;
+    if (self.deleteCellShowAlert) {
+        showAlert = YES;
+        if (self.model.subType == HXPhotoModelMediaSubTypePhoto) {
+            title = [NSBundle hx_localizedStringForKey:@"要删除这张照片吗?"];
+        }else if (self.model.subType == HXPhotoModelMediaSubTypeVideo) {
+            title = [NSBundle hx_localizedStringForKey:@"要删除此视频吗?"];
         }
+    }else {
+        if (self.model.networkPhotoUrl) {
+            if (self.showDeleteNetworkPhotoAlert) {
+                showAlert = YES;
+                title = [NSBundle hx_localizedStringForKey:@"是否删除此资源"];
+            }
+        }
+    }
+    if (showAlert) {
+        HXPhotoBottomViewModel *titleModel = [[HXPhotoBottomViewModel alloc] init];
+        titleModel.title = title;
+        titleModel.titleFont = [UIFont systemFontOfSize:13];
+        titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
+        titleModel.titleDarkColor = [UIColor hx_colorWithHexStr:@"#999999"];
+        titleModel.cellHeight = 60.f;
+        titleModel.canSelect = NO;
+        
+        HXPhotoBottomViewModel *deleteModel = [[HXPhotoBottomViewModel alloc] init];
+        deleteModel.title = [NSBundle hx_localizedStringForKey:@"删除"];
+        deleteModel.titleColor = [UIColor redColor];
+        deleteModel.titleDarkColor = [[UIColor redColor] colorWithAlphaComponent:0.8f];
+        HXWeakSelf
+        [HXPhotoBottomSelectView showSelectViewWithModels:@[titleModel, deleteModel] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
+            if ([weakSelf.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
+                [weakSelf.delegate cellDidDeleteClcik:weakSelf];
+            }
+        } cancelClick:nil];
+        return;
     }
 #if HasYYWebImage
 //    [self.imageView yy_cancelCurrentImageRequest];

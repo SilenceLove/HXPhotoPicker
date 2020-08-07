@@ -21,6 +21,7 @@
 @property (strong, nonatomic) HXPhotoManager *photoManager;
 @property (strong, nonatomic) CAGradientLayer *topMaskLayer;
 @property (strong, nonatomic) UIView *topView;
+@property (assign, nonatomic) BOOL getLocalCompletion;
 @end
 
 @implementation WxMomentViewController
@@ -88,7 +89,10 @@
     [self.view addSubview:self.topView];
     [self.view addSubview:self.customNavBar];
     // 获取保存在本地文件中的模型数组
-    [self.photoManager getLocalModelsInFile];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self.photoManager getLocalModelsInFile];
+        self.getLocalCompletion = YES;
+    });
 #ifdef __IPHONE_11_0
     if (@available(iOS 11.0, *)) {
         self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -105,6 +109,9 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)didNavItemClick {
+    if (!self.getLocalCompletion) {
+        [self.photoManager getLocalModelsInFile];
+    }
     if (self.photoManager.localModels.count) {
         // 有保存草稿的数据，将草稿数据添加后直接跳转
         [self.photoManager addLocalModels];
@@ -114,6 +121,7 @@
     HXPhotoBottomViewModel *model1 = [[HXPhotoBottomViewModel alloc] init];
     model1.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
     model1.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
+    model1.subTitleDarkColor = [UIColor hx_colorWithHexStr:@"#999999"];
     model1.cellHeight = 65.f;
     
     HXPhotoBottomViewModel *model2 = [[HXPhotoBottomViewModel alloc] init];

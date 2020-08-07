@@ -69,7 +69,16 @@
     self.models = [NSMutableArray array];
     UIButton *showBtn = [UIButton buttonWithType:UIButtonTypeSystem];
     [showBtn setTitle:@"显示弹窗" forState:UIControlStateNormal];
-    [showBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    if (@available(iOS 13.0, *)) {
+        [showBtn setTitleColor:[UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+            if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                return UIColor.whiteColor;
+            }
+            return UIColor.blackColor;
+        }] forState:UIControlStateNormal];
+    } else {
+        [showBtn setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
+    }
     [showBtn addTarget:self action:@selector(didShowBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     showBtn.frame = CGRectMake(100, 100, self.view.hx_w - 200, 50);
     [self.view addSubview:showBtn];

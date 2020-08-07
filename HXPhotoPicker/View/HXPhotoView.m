@@ -18,7 +18,7 @@
 #import "HXCustomCameraViewController.h"
 #import "HXPhotoViewController.h"
 #import "HXPhotoBottomSelectView.h"
-
+#import "UIColor+HXExtension.h"
 
 @interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate, UICollectionViewDelegateFlowLayout,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
@@ -322,6 +322,7 @@
     }
     cell.model = self.dataList[indexPath.item];
     cell.showDeleteNetworkPhotoAlert = self.showDeleteNetworkPhotoAlert;
+    cell.deleteCellShowAlert = self.deleteCellShowAlert;
     cell.hideDeleteButton = self.hideDeleteButton;
     return cell;
 }
@@ -465,31 +466,35 @@
 - (void)goPhotoViewController {
     if (self.outerCamera) {
         HXPhotoBottomViewModel *shootingModel = [[HXPhotoBottomViewModel alloc] init];
-        shootingModel.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
+        shootingModel.subTitleDarkColor = [UIColor hx_colorWithHexStr:@"#999999"];
         if (self.manager.type == HXPhotoManagerSelectedTypePhoto) {
             if (self.manager.configuration.photoMaxNum > 0) {
                 self.manager.configuration.maxNum = self.manager.configuration.photoMaxNum;
             }
+            shootingModel.title = [NSBundle hx_localizedStringForKey:@"拍照"];
         }else if (self.manager.type == HXPhotoManagerSelectedTypeVideo) {
             if (self.manager.configuration.videoMaxNum > 0) {
                 self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum;
             }
+            shootingModel.title = [NSBundle hx_localizedStringForKey:@"摄像"];
         }else {
-            shootingModel.cellHeight = 65.f;
+            shootingModel.title = [NSBundle hx_localizedStringForKey:@"拍摄"];
             if (self.manager.configuration.photoMaxNum > 0 &&
                 self.manager.configuration.videoMaxNum > 0) {
                 self.manager.configuration.maxNum = self.manager.configuration.videoMaxNum + self.manager.configuration.photoMaxNum;
             }
             if (!self.manager.configuration.selectTogether) {
                 if (self.manager.afterSelectedPhotoArray.count) {
-                    shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片"];
+                    shootingModel.title = [NSBundle hx_localizedStringForKey:@"拍照"];
                 }else if (self.manager.afterSelectedVideoArray.count) {
-                    shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"视频"];
+                    shootingModel.title = [NSBundle hx_localizedStringForKey:@"摄像"];
                 }else {
                     shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
+                    shootingModel.cellHeight = 65.f;
                 }
             }else {
                 shootingModel.subTitle = [NSBundle hx_localizedStringForKey:@"照片或视频"];
+                shootingModel.cellHeight = 65.f;
             }
         }
         HXPhotoBottomViewModel *selectModel = [[HXPhotoBottomViewModel alloc] init];

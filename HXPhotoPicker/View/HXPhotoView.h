@@ -96,6 +96,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
 @property (assign, nonatomic) BOOL interceptAddCellClick;
 /**  删除网络图片时是否显示Alert 默认NO  */
 @property (assign, nonatomic) BOOL showDeleteNetworkPhotoAlert;
+/**  删除cell时是否显示Alert 默认NO  */
+@property (assign, nonatomic) BOOL deleteCellShowAlert;
 /**  预览大图时的风格样式  */
 @property (assign, nonatomic) HXPhotoViewPreViewShowStyle previewStyle;
 /// 底部选择视图是否自适应暗黑风格

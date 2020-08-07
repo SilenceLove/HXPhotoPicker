@@ -60,10 +60,15 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (!self.showAlertCompletion) {
-        hx_showAlert(self, @"提示", @"关于如何获取照片和视频，在README和Demo8中都写有很详细的说明", @"了解", nil, nil, nil);
-        self.showAlertCompletion = YES;
-    }
+//    if (!self.showAlertCompletion) {
+//        hx_showAlert(self, @"提示", @"关于如何获取照片和视频，在README和Demo8中都写有很详细的说明", @"了解", nil, nil, nil);
+//        self.showAlertCompletion = YES;
+//    }
+    self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    self.navigationController.interactivePopGestureRecognizer.enabled = YES;
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -95,7 +100,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 {
     if (!_list) {
         _list = @[[[ListItem alloc] initWithTitle:@"微信朋友圈"
-                                     subTitle:@"仿微信朋友圈选图片功能"
+                                     subTitle:@"仿微信朋友圈选图片功能(包含草稿功能)"
                                 viewControllClass: [WxMomentViewController class]],
                   [[ListItem alloc] initWithTitle:@"Demo1"
                                          subTitle:@"只使用照片选择器功能,不带选好后自动布局(可扩展)"

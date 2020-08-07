@@ -2,8 +2,8 @@
 Pod::Spec.new do |s|
 
   s.name         = "HXPhotoPicker"
-  s.version      = "3.0.3"
-  s.summary      = "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义裁剪照片/视频、3DTouch预览、浏览网络图片/网络视频 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function"
+  s.version      = "3.0.4"
+  s.summary      = "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义编辑照片/视频、3DTouch预览、浏览网络图片/网络视频 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function"
   s.homepage     = "https://github.com/SilenceLove/HXPhotoPicker"
   s.license      = { :type => "MIT", :file => "LICENSE" }
   s.author       = { "SilenceLove" => "294005139@qq.com" }

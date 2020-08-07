@@ -38,11 +38,23 @@
     }
     return _titleColor;
 }
+- (UIColor *)titleDarkColor {
+    if (!_titleDarkColor) {
+        _titleDarkColor = [UIColor whiteColor];
+    }
+    return _titleDarkColor;
+}
 - (UIColor *)subTitleColor {
     if (!_subTitleColor) {
         _subTitleColor = [UIColor hx_colorWithHexStr:@"#999999"];
     }
     return _subTitleColor;
+}
+- (UIColor *)subTitleDarkColor {
+    if (!_subTitleDarkColor) {
+        _subTitleDarkColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8f];
+    }
+    return _subTitleDarkColor;
 }
 - (UIColor *)lineColor {
     if (!_lineColor) {
@@ -676,10 +688,10 @@
 - (void)changeColor {
     BOOL isDark = self.adaptiveDarkness ? [HXPhotoCommon photoCommon].isDark : NO;
     self.backgroundColor = isDark ? [UIColor hx_colorWithHexStr:@"#2D2D2D"] : self.model.backgroundColor;
-    self.titleLb.textColor = isDark ? [UIColor whiteColor] : self.model.titleColor;
+    self.titleLb.textColor = isDark ? self.model.titleDarkColor : self.model.titleColor;
     [self setSelectBgViewColor];
     self.lineView.backgroundColor = isDark ? [UIColor hx_colorWithHexStr:@"#1E1E1E"] : self.model.lineColor;
-    self.subTitleLb.textColor = isDark ? [[UIColor whiteColor] colorWithAlphaComponent:0.8] : self.model.subTitleColor;
+    self.subTitleLb.textColor = isDark ? self.model.subTitleDarkColor : self.model.subTitleColor;
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];

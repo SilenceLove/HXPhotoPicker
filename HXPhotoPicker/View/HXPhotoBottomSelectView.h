@@ -21,6 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 标题字体颜色
 @property (strong, nonatomic) UIColor *titleColor;
 
+/// 暗黑模式下标题字体颜色
+@property (strong, nonatomic) UIColor *titleDarkColor;
+
 /// 子标题内容
 @property (copy, nonatomic) NSString *subTitle;
 
@@ -29,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 子标题颜色
 @property (strong, nonatomic) UIColor *subTitleColor;
+
+/// 暗黑模式下子标题颜色
+@property (strong, nonatomic) UIColor *subTitleDarkColor;
 
 /// 背景颜色
 @property (strong, nonatomic) UIColor *backgroundColor;
