@@ -265,12 +265,18 @@
                 [self.endCameraVideos addObject:photoModel];
                 [self.endCameraList addObject:photoModel];
             }
-        }else if (model.type == HXCustomAssetModelTypeLivePhoto) {
+        }else if (model.type == HXCustomAssetModelTypeLocalLivePhoto ||
+                  model.type == HXCustomAssetModelTypeNetWorkLivePhoto) {
             if (self.type == HXPhotoManagerSelectedTypeVideo) {
                 continue;
             }
-            HXPhotoModel *photoModel = [HXPhotoModel photoModelWithLivePhotoImage:model.localImage videoURL:model.localVideoURL];
-            photoModel.imageURL = model.localImagePath;
+            HXPhotoModel *photoModel;
+            if (model.type == HXCustomAssetModelTypeLocalLivePhoto) {
+                photoModel = [HXPhotoModel photoModelWithLivePhotoImage:model.localImage videoURL:model.localVideoURL];
+                photoModel.imageURL = model.localImagePath;
+            }else if (model.type == HXCustomAssetModelTypeNetWorkLivePhoto){
+                photoModel = [HXPhotoModel photoModelWithLivePhotoNetWorkImage:model.networkImageURL netWorkVideoURL:model.networkVideoURL];
+            }
             photoModel.selected = canAddPhoto ? model.selected : NO;
             if (model.selected && canAddPhoto) {
                 [self.endCameraPhotos addObject:photoModel];
@@ -740,11 +746,20 @@
     if (completion) {
         completion(albums);
     };
-} 
+}
 - (HXPhotoModel *)photoModelWithAsset:(PHAsset *)asset {
     HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
     photoModel.asset = asset;
-    if ([[asset valueForKey:@"isCloudPlaceholder"] boolValue]) {
+    BOOL isICloud = NO;
+//    NSSLog(@"%@", [asset valueForKey:@"sourceType"]);
+//    if (@available(iOS 13, *)) {
+    
+//    }else {
+    // ios13之后可能不准，但是无关紧要。
+    // 因为在获取的时候已经做了iCloud判断了。这里只是在展示的时候方便辨别
+        isICloud = [[asset valueForKey:@"isCloudPlaceholder"] boolValue];
+//    }
+    if (isICloud) {
         if (_iCloudAssetArray.count) {
             if (![_iCloudAssetArray containsObject:asset]) {
                 photoModel.isICloud = YES;
@@ -781,32 +796,32 @@
     }
     if (asset.mediaType == PHAssetMediaTypeImage) {
         photoModel.subType = HXPhotoModelMediaSubTypePhoto;
-        if (@available(iOS 11, *)) {
-            if (asset.playbackStyle == PHAssetPlaybackStyleImageAnimated &&
-                self.configuration.lookGifPhoto) {
-                    photoModel.type = HXPhotoModelMediaTypePhotoGif;
-            }else if (asset.playbackStyle == PHAssetPlaybackStyleLivePhoto &&
-                      self.configuration.lookLivePhoto &&
-                      self.supportLivePhoto) {
-                    photoModel.type =  HXPhotoModelMediaTypeLivePhoto;
-            }else {
-                photoModel.type = HXPhotoModelMediaTypePhoto;
-            }
-        } else {
+//        if (@available(iOS 11, *)) {  // playbackStyle 似乎不稳定
+//            if (asset.playbackStyle == PHAssetPlaybackStyleImageAnimated &&
+//                self.configuration.lookGifPhoto) {
+//                    photoModel.type = HXPhotoModelMediaTypePhotoGif;
+//            }else if (asset.playbackStyle == PHAssetPlaybackStyleLivePhoto &&
+//                      self.configuration.lookLivePhoto &&
+//                      self.supportLivePhoto) {
+//                    photoModel.type =  HXPhotoModelMediaTypeLivePhoto;
+//            }else {
+//                photoModel.type = HXPhotoModelMediaTypePhoto;
+//            }
+//        } else {
             // Fallback on earlier versions
             if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"] &&
                 self.configuration.lookGifPhoto) {
                 
                 photoModel.type = HXPhotoModelMediaTypePhotoGif;
                 
-            }else if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive &&
+            }else if (self.supportLivePhoto &&
                       self.configuration.lookLivePhoto &&
-                      self.supportLivePhoto ){
+                      asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive ){
                 photoModel.type =  HXPhotoModelMediaTypeLivePhoto;
             }else {
                 photoModel.type = HXPhotoModelMediaTypePhoto;
             }
-        }
+//        }
     }else if (asset.mediaType == PHAssetMediaTypeVideo) {
         photoModel.subType = HXPhotoModelMediaSubTypeVideo;
         photoModel.type = HXPhotoModelMediaTypeVideo;
@@ -859,62 +874,6 @@
             [allArray addObject:photoModel];
         }];
     }else {
-        // 只快了0.02秒
-//        NSInteger count = result.count;
-//        double date_s = CFAbsoluteTimeGetCurrent();
-//        dispatch_group_t group = dispatch_group_create();
-//        NSInteger total = 10;
-//        NSInteger eachCount = count / total;
-//        NSInteger remainder = count % total;
-//        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-//        for (int i = 0; i < total; i++) {
-//            dispatch_group_async(group, dispatch_get_global_queue(0,0), ^{
-////                double date_s_1 = CFAbsoluteTimeGetCurrent();
-//                NSInteger loc = count / total * i;
-//                NSInteger eachSubCount;
-//                if (i == total - 1) {
-//                    eachSubCount = eachCount + remainder;
-//                }else {
-//                    eachSubCount = eachCount;
-//                }
-//                NSArray *resultHalf = [result objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(loc, eachSubCount)]];
-//                NSMutableArray *assetArray = [NSMutableArray array];
-//                for (PHAsset *asset in resultHalf) {
-//                    HXPhotoModel *photoModel = [self photoModelWithAsset:asset];
-//                    if (!firstSelectModel && photoModel.selectIndexStr) {
-//                        firstSelectModel = photoModel;
-//                    }
-//                    photoModel.currentAlbumIndex = albumModel.index;
-//                    [assetArray addObject:photoModel];
-//                }
-//                [dict setValue:assetArray forKey:@(i).stringValue];
-////                double date_e_1 = CFAbsoluteTimeGetCurrent();
-////                NSSLog(@"index-> %d :  Time: %f", i, date_e_1 - date_s_1);
-//            });
-//        }
-//        dispatch_group_notify(group, dispatch_get_global_queue(0,0), ^{
-//            NSMutableArray *photoModels = [NSMutableArray array];
-//            NSArray *keys = [dict.allKeys sortedArrayUsingComparator:^NSComparisonResult(NSString * obj1, NSString * obj2) {
-//                if (obj1.integerValue > obj2.integerValue) {
-//                    return NSOrderedDescending;
-//                }else if (obj1.integerValue < obj2.integerValue) {
-//                    return NSOrderedAscending;
-//                }else {
-//                    return NSOrderedSame;
-//                }
-//            }];
-//            for (NSString *key in keys) {
-//                NSMutableArray *assets = dict[key];
-//                [photoModels addObjectsFromArray:assets];
-//            }
-//            NSMutableArray *previewArray = [self setPhotoList:photoModels albumModel:albumModel];
-//            if (complete) {
-//                complete(photoModels, previewArray ?: photoModels, firstSelectModel, albumModel);
-//            }
-//            double date_e = CFAbsoluteTimeGetCurrent();
-//            NSSLog(@"Enumeration Time: %f", date_e - date_s);
-//        });
-
         [result enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
             if (self.type == HXPhotoManagerSelectedTypePhoto && asset.mediaType != PHAssetMediaTypeImage) {
                 return;
@@ -1821,8 +1780,11 @@
     NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
     [archiver encodeObject:self.afterSelectedArray forKey:HXEncodeKey];
     [archiver finishEncoding];
-    NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
+    NSString *toFileName = [HXPhotoPickerLocalModelsPath stringByAppendingPathComponent:HXDiskCacheFileNameForKey(self.configuration.localFileName, NO)];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:HXPhotoPickerLocalModelsPath]) {
+        [fileManager createDirectoryAtPath:HXPhotoPickerLocalModelsPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
     if([data writeToFile:toFileName atomically:YES]){
         if (HXShowLog) NSSLog(@"归档成功");
         return YES;
@@ -1834,8 +1796,7 @@
     return [self getLocalModelsInFileWithAddData:NO];
 }
 - (NSArray<HXPhotoModel *> *)getLocalModelsInFileWithAddData:(BOOL)addData {
-    NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
+    NSString *toFileName = [HXPhotoPickerLocalModelsPath stringByAppendingPathComponent:HXDiskCacheFileNameForKey(self.configuration.localFileName, NO)];
     NSData *undata = [[NSData alloc] initWithContentsOfFile:toFileName];
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:undata];
     NSArray *tempArray = [unarchiver decodeObjectForKey:HXEncodeKey];
@@ -1870,8 +1831,7 @@
 }
 - (BOOL)deleteLocalModelsInFile {
     self.localModels = nil;
-    NSArray *array =  NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *toFileName = [array.firstObject stringByAppendingPathComponent:self.configuration.localFileName];
+    NSString *toFileName = [HXPhotoPickerLocalModelsPath stringByAppendingPathComponent:HXDiskCacheFileNameForKey(self.configuration.localFileName, NO)];
     if (![[NSFileManager defaultManager] fileExistsAtPath:toFileName]) {
         return YES;
     }

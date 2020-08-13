@@ -19,9 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ HXPhotoCommonGetUrlFileLengthSuccess)(NSUInteger length);
-typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
-
 @interface HXPhotoCommon : NSObject
 @property (strong, nonatomic, nullable) NSBundle *languageBundle;
 @property (strong, nonatomic, nullable) NSBundle *photoPickerBundle;
@@ -56,14 +53,12 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 @property (assign, nonatomic) NSInteger selectType;
 @property (assign, nonatomic) BOOL creationDateSort;
 
-- (void)getURLFileLengthWithURL:(NSURL *)url
-                        success:(HXPhotoCommonGetUrlFileLengthSuccess)success
-                        failure:(HXPhotoCommonGetUrlFileLengthFailure)failure;
+@property (copy, nonatomic) NSString *UUIDString;
 
 - (NSURLSessionDownloadTask * _Nullable)downloadVideoWithURL:(NSURL *)videoURL
-                                          progress:(void (^ _Nullable)(float progress, long long downloadLength, long long totleLength, NSURL * _Nullable videoURL))progress
-                                   downloadSuccess:(void (^ _Nullable)(NSURL * _Nullable filePath, NSURL * _Nullable videoURL))success
-                                   downloadFailure:(void (^ _Nullable)(NSError * _Nullable error, NSURL * _Nullable videoURL))failure;
+                                                    progress:(void (^ _Nullable)(float progress, long long downloadLength, long long totleLength, NSURL * _Nullable videoURL))progress
+                                             downloadSuccess:(void (^ _Nullable)(NSURL * _Nullable filePath, NSURL * _Nullable videoURL))success
+                                             downloadFailure:(void (^ _Nullable)(NSError * _Nullable error, NSURL * _Nullable videoURL))failure;
 
 + (instancetype)photoCommon;
 + (void)deallocPhotoCommon;

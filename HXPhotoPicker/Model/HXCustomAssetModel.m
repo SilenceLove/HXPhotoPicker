@@ -115,10 +115,48 @@
 - (instancetype)initLivePhotoAssetWithLocalImagePath:(NSURL *)imagePath localVideoURL:(NSURL *)videoURL selected:(BOOL)selected {
     self = [super init];
     if (self) {
-        self.type = HXCustomAssetModelTypeLivePhoto;
+        self.type = HXCustomAssetModelTypeLocalLivePhoto;
         self.localVideoURL = videoURL;
         self.localImagePath = imagePath;
         self.localImage = [UIImage imageWithContentsOfFile:imagePath.path];
+        self.selected = selected;
+    }
+    return self;
+}
+
++ (instancetype _Nullable)livePhotoAssetWithImage:(UIImage * _Nonnull)image
+                                    localVideoURL:(NSURL * _Nonnull)videoURL
+                                         selected:(BOOL)selected {
+    return [[self alloc] initLivePhotoAssetWithImage:image localVideoURL:videoURL selected:selected];
+}
+
+- (instancetype _Nullable)initLivePhotoAssetWithImage:(UIImage * _Nonnull)image
+                                    localVideoURL:(NSURL * _Nonnull)videoURL
+                                         selected:(BOOL)selected {
+    self = [super init];
+    if (self) {
+        self.type = HXCustomAssetModelTypeLocalLivePhoto;
+        self.localVideoURL = videoURL;
+        self.localImage = image;
+        self.selected = selected;
+    }
+    return self;
+}
+
++ (instancetype _Nullable)livePhotoAssetWithNetworkImageURL:(NSURL * _Nonnull)imageURL
+                                            networkVideoURL:(NSURL * _Nonnull)videoURL
+                                                   selected:(BOOL)selected {
+    return [[self alloc] initLivePhotoAssetWithNetworkImageURL:imageURL networkVideoURL:videoURL selected:selected];
+}
+
+- (instancetype _Nullable)initLivePhotoAssetWithNetworkImageURL:(NSURL * _Nonnull)imageURL
+                                            networkVideoURL:(NSURL * _Nonnull)videoURL
+                                                   selected:(BOOL)selected {
+    self = [super init];
+    if (self) {
+        self.type = HXCustomAssetModelTypeNetWorkLivePhoto;
+        self.networkImageURL = imageURL;
+        self.networkVideoURL = videoURL;
         self.selected = selected;
     }
     return self;

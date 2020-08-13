@@ -150,10 +150,10 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)changeStatusBarStyle {
     if ([HXPhotoCommon photoCommon].isDark) {
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
         return;
     }
-    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle];
+    [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle animated:YES];
 }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
@@ -1318,6 +1318,7 @@ HX_PhotoEditViewControllerDelegate
 #pragma mark - < HX_PhotoEditViewControllerDelegate >
 - (void)photoEditingController:(HX_PhotoEditViewController *)photoEditingVC didFinishPhotoEdit:(HXPhotoEdit *)photoEdit photoModel:(HXPhotoModel *)photoModel {
     if (self.manager.configuration.singleSelected) {
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
         self.isNewEditDismiss = YES;
         [self.manager beforeSelectedListAddPhotoModel:photoModel];
         [self photoBottomViewDidDoneBtn];
@@ -2196,7 +2197,8 @@ HX_PhotoEditViewControllerDelegate
                 self.stateLb.text = @"GIF";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;
-            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto && !model.photoEdit) {
+            }else if ((model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
+                       model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) && !model.photoEdit) {
                 self.stateLb.text = @"Live";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;

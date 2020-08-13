@@ -100,7 +100,7 @@
     return [HXPhotoEditTransition transitionWithType:HXPhotoEditTransitionTypePresent model:self.photoModel];
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed{
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
     return [HXPhotoEditTransition transitionWithType:HXPhotoEditTransitionTypeDismiss model:self.photoModel];
 }
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
@@ -259,6 +259,9 @@
     self.imageHeight = self.photoModel.imageSize.height;
     if (self.photoModel.photoEdit) {
         self.imageRequestComplete = YES;
+        if (!self.transitionCompletion) {
+            self.editingView.hidden = YES;
+        }
         self.photoEdit = self.photoModel.photoEdit;
         self.editingView.image = self.editImage;
         [self setupPhotoData];
@@ -285,10 +288,29 @@
 }
 - (void)requestImaegURL {
     HXWeakSelf
+    if (self.photoModel.type == HXPhotoModelMediaTypeLivePhoto) {
+        [self.photoModel requestPreviewImageWithSize:self.photoModel.endImageSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
+            weakSelf.requestId = iCloudRequestId;
+        } progressHandler:nil success:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            weakSelf.editImage = weakSelf.photoModel.thumbPhoto;
+            [weakSelf.view hx_handleLoading];
+            [weakSelf loadImageCompletion];
+        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+            [weakSelf.view hx_handleLoading];
+            [weakSelf loadImageCompletion];
+        }];
+        return;
+    }else if (self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
+              self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) {
+        self.editImage = self.photoModel.thumbPhoto;
+        [self.view hx_handleLoading];
+        [self loadImageCompletion];
+        return;
+    }
     self.requestId = [self.photoModel requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
         weakSelf.requestId = iCloudRequestId;
     } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
-        NSData *imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
+        NSData * imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
         UIImage *image = [UIImage imageWithData:imageData];
         if (image.imageOrientation != UIImageOrientationUp) {
             image = [image hx_normalizedImage];
@@ -369,6 +391,7 @@
     self.transitionCompletion = YES;
     self.editingView.hidden = NO;
     if (self.photoModel.photoEdit) {
+        self.editingView.hidden = NO;
         if (self.onlyCliping) {
             [self.editingView setClipping:YES animated:YES];
             [UIView animateWithDuration:0.2 animations:^{

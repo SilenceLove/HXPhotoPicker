@@ -7,68 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Photos/Photos.h>
+#import "HXPhotoTypes.h"
 
 @class HXPhotoManager;
-@class HXPhotoModel, HXPhotoEdit;
-
-typedef void (^ HXModelStartRequestICloud)(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model);
-typedef void (^ HXModelProgressHandler)(double progress, HXPhotoModel * _Nullable model);
-typedef void (^ HXModelImageSuccessBlock)(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info);
-typedef void (^ HXModelImageDataSuccessBlock)(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info);
-typedef void (^ HXModelImageURLSuccessBlock)(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info);
-typedef void (^ HXModelLivePhotoSuccessBlock)(PHLivePhoto * _Nullable livePhoto, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info);
-typedef void (^ HXModelAVAssetSuccessBlock)(AVAsset * _Nullable avAsset, AVAudioMix * _Nullable audioMix, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info);
-typedef void (^ HXModelAVPlayerItemSuccessBlock)(AVPlayerItem * _Nullable playerItem, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info);
-typedef void (^ HXModelAVExportSessionSuccessBlock)(AVAssetExportSession * _Nullable assetExportSession, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info);
-typedef void (^ HXModelFailedBlock)(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model);
-typedef void (^ HXModelExportVideoSuccessBlock)(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model);
-typedef void (^ HXModelExportVideoProgressHandler)(float progress, HXPhotoModel * _Nullable model);
-
-typedef NS_ENUM(NSUInteger, HXPhotoModelMediaType) {
-    HXPhotoModelMediaTypePhoto          = 0,    //!< 照片
-    HXPhotoModelMediaTypeLivePhoto      = 1,    //!< LivePhoto
-    HXPhotoModelMediaTypePhotoGif       = 2,    //!< gif图
-    HXPhotoModelMediaTypeVideo          = 3,    //!< 视频
-    HXPhotoModelMediaTypeAudio          = 4,    //!< 预留
-    HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的临时照片、本地/网络图片
-    HXPhotoModelMediaTypeCameraVideo    = 6,    //!< 通过相机录制的视频、本地视频
-    HXPhotoModelMediaTypeCamera         = 7     //!< 跳转相机
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoModelMediaSubType) {
-    HXPhotoModelMediaSubTypePhoto = 0,  //!< 照片
-    HXPhotoModelMediaSubTypeVideo       //!< 视频
-};
-
-typedef void (^ HXModelURLHandler)(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType,  BOOL isNetwork, HXPhotoModel * _Nullable model);
-
-typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraPhotoType) {
-    HXPhotoModelMediaTypeCameraPhotoTypeLocal = 1,          //!< 本地图片
-    HXPhotoModelMediaTypeCameraPhotoTypeLocalGif,           //!< 本地gif图片
-    HXPhotoModelMediaTypeCameraPhotoTypeNetWork,            //!< 网络图片
-    HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif,         //!< 网络gif图片
-    HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto      //!< 本地LivePhoto
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoModelMediaTypeCameraVideoType) {
-    HXPhotoModelMediaTypeCameraVideoTypeLocal = 1,  //!< 本地视频
-    HXPhotoModelMediaTypeCameraVideoTypeNetWork     //!< 网络视频
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoModelVideoState) {
-    HXPhotoModelVideoStateNormal = 0,   //!< 正常状态
-    HXPhotoModelVideoStateUndersize,    //!< 视频时长小于最小选择秒数
-    HXPhotoModelVideoStateOversize      //!< 视频时长超出限制
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
-    HXPhotoModelFormatUnknown = 0,  //!< 未知格式
-    HXPhotoModelFormatPNG,          //!< PNG格式
-    HXPhotoModelFormatJPG,          //!< JPG格式
-    HXPhotoModelFormatGIF,          //!< GIF格式
-    HXPhotoModelFormatHEIC          //!< HEIC格式
-};
+@class HXPhotoEdit;
 
 @interface HXPhotoModel : NSObject<NSCoding>
 /// 创建日期
@@ -112,6 +54,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 /// 本地视频URL / 网络视频地址
 @property (strong, nonatomic) NSURL * _Nullable videoURL;
 
+/// livephoto - 网络视频地址
+@property (strong, nonatomic) NSURL * _Nullable livePhotoVideoURL;
+
 /// 网络图片的地址
 @property (copy, nonatomic) NSURL * _Nullable networkPhotoUrl;
 
@@ -120,6 +65,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 
 /// 网络图片的大小
 //@property (assign, nonatomic) NSUInteger networkImageSize;
+
 /// 临时的列表小图 - 本地图片才用这个上传
 /// 获取图片请使用 request相关方法
 @property (strong, nonatomic) UIImage * _Nullable thumbPhoto;
@@ -258,6 +204,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 + (instancetype _Nullable)photoModelWithLivePhotoImage:(UIImage * _Nullable)image
                                               videoURL:(NSURL * _Nullable)videoURL;
 
+/// 通过网络图片和视频生成本地LivePhoto
+/// @param imageURL 网络图片地址
+/// @param videoURL 网络视频地址
++ (instancetype _Nullable)photoModelWithLivePhotoNetWorkImage:(NSURL * _Nullable)imageURL
+                                              netWorkVideoURL:(NSURL * _Nullable)videoURL;
 /// 判断两个HXPhotoModel是否是同一个
 /// @param photoModel 模型
 - (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
@@ -301,7 +252,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
                                       failed:(HXModelFailedBlock _Nullable)failed;
 
 /// 请求获取本地LivePhoto
-- (PHLivePhotoRequestID)requestLocalLivePhotoWithCompletion:(HXModelLivePhotoSuccessBlock _Nullable)completion;
+- (void)requestLocalLivePhotoWithReqeustID:(void (^ _Nullable)(PHLivePhotoRequestID requestID))requestID
+                                    header:(void (^ _Nullable)(AVAssetWriter * _Nullable writer, AVAssetReader * _Nullable videoReader, AVAssetReader * _Nullable audioReader))header
+                                completion:(HXModelLivePhotoSuccessBlock _Nullable)completion;
 
 /// 请求获取ImageData
 /// @param startRequestICloud 准备开始下载iCloud上的视频
@@ -359,6 +312,10 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
                                                     progressHandler:(HXModelProgressHandler _Nullable)progressHandler
                                                             success:(HXModelImageURLSuccessBlock _Nullable)success
                                                              failed:(HXModelFailedBlock _Nullable)failed;
+
+/// 获取Livephoto里的图片和视频地址
+- (void)requestLivePhotoAssetsWithSuccess:(HXModelLivePhotoAssetsSuccessBlock _Nullable)success
+                                   failed:(HXModelFailedBlock _Nullable)failed;
 
 /// 获取本地图片的URL，内部会将image写入临时目录然后生成文件路径
 /// 不是本地图片的会走失败回调

@@ -87,6 +87,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self.cancelBtn setTitle:[NSBundle hx_localizedStringForKey:@"取消"] forState:UIControlStateNormal];
+    self.cancelBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:15];
     [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
     self.doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];
     self.textBtn.layer.cornerRadius = 1.f;

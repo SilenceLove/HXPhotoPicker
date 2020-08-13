@@ -125,7 +125,7 @@
     self.reverseDate.on = self.manager.configuration.reverseDate;
     self.showDateSectionHeader.on = self.manager.configuration.showDateSectionHeader;
     self.cameraCellShowPreview.on = self.manager.configuration.cameraCellShowPreview;
-    self.sectionHeaderShowPhotoClocation.on = self.manager.configuration.sectionHeaderShowPhotoLocation;
+//    self.sectionHeaderShowPhotoClocation.on = self.manager.configuration.sectionHeaderShowPhotoLocation;
     self.hideOriginalBtn.on = self.manager.configuration.hideOriginalBtn;
     self.themeColor.backgroundColor = self.manager.configuration.themeColor;
     self.navigationTitleSynchColor.on = self.manager.configuration.navigationTitleSynchColor;
@@ -174,7 +174,7 @@
     self.manager.configuration.reverseDate = self.reverseDate.on;
     self.manager.configuration.showDateSectionHeader = self.showDateSectionHeader.on;
     self.manager.configuration.cameraCellShowPreview = self.cameraCellShowPreview.on;
-    self.manager.configuration.sectionHeaderShowPhotoLocation = self.sectionHeaderShowPhotoClocation.on;
+//    self.manager.configuration.sectionHeaderShowPhotoLocation = self.sectionHeaderShowPhotoClocation.on;
     self.manager.configuration.hideOriginalBtn = self.hideOriginalBtn.on;
     self.manager.configuration.themeColor = self.themeColor.backgroundColor;
     self.manager.configuration.sectionHeaderTranslucent = self.sectionHeaderTransluc.on;

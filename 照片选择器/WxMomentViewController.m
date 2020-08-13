@@ -44,6 +44,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 - (void)viewWillDisappear:(BOOL)animated {
@@ -59,7 +60,7 @@
         }
     }
 #endif
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
 }
 
 - (HXPhotoManager *)photoManager {
@@ -115,6 +116,7 @@
     if (self.photoManager.localModels.count) {
         // 有保存草稿的数据，将草稿数据添加后直接跳转
         [self.photoManager addLocalModels];
+        [self setupManagerConfig];
         [self presentMomentPublish];
         return;
     }
@@ -128,13 +130,7 @@
     model2.title = [NSBundle hx_localizedStringForKey:@"从手机相册选择"];
     HXWeakSelf
     [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
-        // 因为公用的同一个manager所以这些需要在跳转前设置一下
-        weakSelf.photoManager.type = HXPhotoManagerSelectedTypePhotoAndVideo;
-        weakSelf.photoManager.configuration.singleJumpEdit = NO;
-        weakSelf.photoManager.configuration.singleSelected = NO;
-        weakSelf.photoManager.configuration.lookGifPhoto = YES;
-        weakSelf.photoManager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_None;
-        weakSelf.photoManager.configuration.photoEditConfigur.onlyCliping = NO;
+        [weakSelf setupManagerConfig];
         // 去掉dismiss的动画方便选择完成后present
         weakSelf.photoManager.selectPhotoFinishDismissAnimated = NO;
         weakSelf.photoManager.cameraFinishDismissAnimated = NO;
@@ -144,6 +140,16 @@
             [weakSelf hx_presentSelectPhotoControllerWithManager:weakSelf.photoManager delegate:weakSelf];
         }
     } cancelClick:nil];
+}
+- (void)setupManagerConfig {
+    // 因为公用的同一个manager所以这些需要在跳转前设置一下
+    self.photoManager.type = HXPhotoManagerSelectedTypePhotoAndVideo;
+    self.photoManager.configuration.singleJumpEdit = NO;
+    self.photoManager.configuration.singleSelected = NO;
+    self.photoManager.configuration.lookGifPhoto = YES;
+    self.photoManager.configuration.lookLivePhoto = YES;
+    self.photoManager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_None;
+    self.photoManager.configuration.photoEditConfigur.onlyCliping = NO;
 }
 - (void)presentMomentPublish {
     // 恢复dismiss的动画

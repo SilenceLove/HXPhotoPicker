@@ -123,9 +123,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
             if (model.photoEdit) {
                 // 如果有编辑数据，则说明这张图篇被编辑过了
                 // 需要这样才能获取到编辑之后的图片
-                model.photoEdit.editPreviewImage;
+//                model.photoEdit.editPreviewImage;
                 // 编辑之后的图片数据
-                model.photoEdit.editPreviewData;
+//                model.photoEdit.editPreviewData;
                 return;
             }
             // 再判断具体类型
@@ -149,6 +149,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
                     
                 }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
                     // 本地livePhoto
+                    
+                }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) {
+                    // 网络livePhoto
                     
                 }
                 // 上传图片的话可以不用判断具体类型，按下面操作取出图片
@@ -189,7 +192,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                     }];
                 }else if (model.type == HXPhotoModelMediaTypePhotoGif) {
                     // 动图，如果 requestImageAfterFinishingSelection = YES 的话，直接取 model.imageURL。因为在选择完成的时候已经获取了不用再去获取
-                    model.imageURL;
+//                    model.imageURL;
                     // 上传动图时，不要直接拿image上传哦。可以获取url或者data上传
                     // 获取url
                     [model requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
@@ -247,7 +250,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                     } failed:nil];
                 }
                 // 也可以不用上面的判断和方法获取，自己根据 model.asset 这个PHAsset对象来获取想要的东西
-                PHAsset *asset = model.asset;
+//                PHAsset *asset = model.asset;
                 // 自由发挥
             }
             
@@ -256,7 +259,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
             if (model.type == HXPhotoModelMediaTypeVideo) {
                 // 为手机相册里的视频
                 // requestImageAfterFinishingSelection = YES 时，直接去 model.videoURL，在选择完成时已经获取了
-                model.videoURL;
+//                model.videoURL;
                 // 获取视频时可以获取 AVAsset，也可以获取 AVAssetExportSession，获取之后再导出视频
                 // 获取 AVAsset
                 [model requestAVAssetStartRequestICloud:nil progressHandler:nil success:^(AVAsset * _Nullable avAsset, AVAudioMix * _Nullable audioMix, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
@@ -279,7 +282,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
                 } failed:nil];
                 
                 // 也可以不用上面的方法获取，自己根据 model.asset 这个PHAsset对象来获取想要的东西
-                PHAsset *asset = model.asset;
+//                PHAsset *asset = model.asset;
                 // 自由发挥
             }else {
                 // 本地视频或者网络视频

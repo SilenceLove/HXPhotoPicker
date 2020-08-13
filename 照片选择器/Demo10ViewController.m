@@ -65,13 +65,15 @@ static const CGFloat kPhotoViewMargin = 12.0;
         }];
     }
 #endif
+//    HXCustomAssetModel *assetModel = [HXCustomAssetModel livePhotoAssetWithNetworkImageURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/5ed15ef7-3411-4f5e-839b-10664d796919.jpg"] networkVideoURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/fufeiduanpian.mp4"] selected:YES];
+//    [self.manager addCustomAssetModel:@[assetModel]];
+    
+    [self.manager getLocalModelsInFileWithAddData:YES];
     HXPhotoView *photoView = [HXPhotoView photoManager:self.manager];
     photoView.frame = CGRectMake(kPhotoViewMargin, hxNavigationBarHeight + kPhotoViewMargin, self.view.hx_w - kPhotoViewMargin * 2, 0);
 //    photoView.showAddCell = YES;  
     [self.view addSubview:photoView];
     self.photoView = photoView;
-    
-    [self.manager getLocalModelsInFileWithAddData:YES];
     
     UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:@"保存草稿" style:UIBarButtonItemStylePlain target:self action:@selector(savaClick)];
     UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithTitle:@"删除" style:UIBarButtonItemStylePlain target:self action:@selector(didNavBtnClick)];

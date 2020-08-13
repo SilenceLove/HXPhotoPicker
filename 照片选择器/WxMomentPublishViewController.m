@@ -54,6 +54,18 @@
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
             return;
         }
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDarkContent animated:YES];
+        return;
+    }
+#endif
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+#ifdef __IPHONE_13_0
+    if (@available(iOS 13.0, *)) {
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDarkContent animated:YES];
+        return;
     }
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
@@ -138,43 +150,93 @@
 - (void)didPublishClick:(UIButton *)button {
     // 发布的时候也清空草稿
     [self.photoManager deleteLocalModelsInFile];
-    self.assetURLDict = [NSMutableDictionary dictionary];
+//    self.assetURLDict = [NSMutableDictionary dictionary];
     [self.view hx_showLoadingHUDText:nil];
     HXWeakSelf
     __block NSInteger count = 0;
+    // 获取的都是原图
     for (HXPhotoModel *photoModel in self.photoManager.afterSelectedArray) {
-        [photoModel fetchAssetURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
-            count++;
-            [weakSelf.view hx_handleLoading];
-            if (mediaType == HXPhotoModelMediaSubTypePhoto) {
-                // 图片
-                if (isNetwork) {
-                    // URL是网络图片地址
-                    
+        if (photoModel.type == HXPhotoModelMediaTypeLivePhoto ||
+            photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
+            photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) {
+                [photoModel requestLivePhotoAssetsWithSuccess:^(NSURL * _Nullable imageURL, NSURL * _Nullable videoURL, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+                    if (isNetwork) {
+                        // URL是网络地址
+                        
+                    }else {
+                        
+                    }
+                    count++;
+                    // 可以直接通过manager取地址，不过如果中间获取失败了可能为nil
+                    // 为nil的情况需要单独处理
+//                    [weakSelf.assetURLDict setObject:@{@"imageURL": imageURL, @"videoURL": videoURL} forKey:model.selectIndexStr];
+                    if (count == weakSelf.photoManager.afterSelectedCount) {
+                        [weakSelf.view hx_handleLoading];
+                        [weakSelf fetchAssetURLCompletion];
+                    }
+                } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                    count++;
+                    if (count == weakSelf.photoManager.afterSelectedCount) {
+                        [weakSelf.view hx_handleLoading];
+                        [weakSelf fetchAssetURLCompletion];
+                    }
+                }];
+        }else {
+            [photoModel fetchAssetURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+                count++;
+                if (mediaType == HXPhotoModelMediaSubTypePhoto) {
+                    // 图片
+                    if (isNetwork) {
+                        // URL是网络图片地址
+                        
+                    }
+                }else if (mediaType == HXPhotoModelMediaSubTypeVideo) {
+                    // 视频
+                    if (isNetwork) {
+                        // URL是网络视频地址
+                        
+                    }
                 }
-            }else if (mediaType == HXPhotoModelMediaSubTypeVideo) {
-                // 视频
-                if (isNetwork) {
-                    // URL是网络视频地址
-                    
+                // 可以直接通过manager取地址，不过如果中间获取失败了可能为nil
+                // 为nil的情况需要单独处理
+//                [weakSelf.assetURLDict setObject:URL forKey:model.selectIndexStr];
+                if (count == weakSelf.photoManager.afterSelectedCount) {
+                    [weakSelf.view hx_handleLoading];
+                    [weakSelf fetchAssetURLCompletion];
                 }
-            }
-            [weakSelf.assetURLDict setObject:URL forKey:model.selectIndexStr];
-            if (count == weakSelf.photoManager.afterSelectedCount) {
-                [weakSelf fetchAssetURLCompletion];
-            }
-        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
-            // 获取失败
-            count++;
-            [weakSelf.view hx_handleLoading];
-            
-            if (count == weakSelf.photoManager.afterSelectedCount) {
-                [weakSelf fetchAssetURLCompletion];
-            }
-        }];
+            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                // 获取失败
+                count++;
+                if (count == weakSelf.photoManager.afterSelectedCount) {
+                    [weakSelf.view hx_handleLoading];
+                    [weakSelf fetchAssetURLCompletion];
+                }
+            }];
+        }
     }
 }
 - (void)fetchAssetURLCompletion {
+    // 可以直接通过manager取地址，不过如果中间获取失败了可能为nil，为nil的情况需要单独处理
+    // 因为这里没有添加自定义资源，所以不做过多的类型判断
+    for (HXPhotoModel *photoModel in self.photoManager.afterSelectedArray) {
+        if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+            if (photoModel.type == HXPhotoModelMediaTypeLivePhoto) {
+                // livephoto被编辑后需要单独处理
+                if (photoModel.photoEdit) {
+                    NSSLog(@"\nLivePhoto被编辑后变成了静态图，图片地址%@", photoModel.imageURL);
+                }else {
+                    NSSLog(@"\n\nLivePhoto-图片地址：%@\nLivePhoto-视频地址：%@", photoModel.imageURL, photoModel.videoURL);
+                }
+            }else if (photoModel.type == HXPhotoModelMediaTypePhotoGif){
+                NSSLog(@"\nGIF图片地址：%@", photoModel.imageURL);
+            }else {
+                NSSLog(@"\n图片地址：%@", photoModel.imageURL);
+            }
+        }else if (photoModel.subType == HXPhotoModelMediaSubTypeVideo) {
+            NSSLog(@"\n视频地址：%@", photoModel.videoURL);
+        }
+    }
+    /*
     // 因为获取得到的顺序是错乱的，需要先排序一下
     NSArray *keys = [self.assetURLDict.allKeys sortedArrayUsingComparator:^NSComparisonResult(NSString * obj1, NSString * obj2) {
         if (obj1.integerValue > obj2.integerValue) {
@@ -187,10 +249,17 @@
     }];
     // 排序完后的顺序就是当前选择的顺序
     for (NSString *key in keys) {
-        NSURL *URL = self.assetURLDict[key];
         // 如果有传入网络图片/视频这个URL就可能是网络/视频，注意在获取的时候区分
-        NSSLog(@"%@", URL);
+        id obj = self.assetURLDict[key];
+        if ([obj isKindOfClass:[NSURL class]]) {
+            NSSLog(@"%@", obj);
+        }else if ([obj isKindOfClass:[NSDictionary class]]) {
+            NSURL *imageURL = obj[@"imageURL"];
+            NSURL *videoURL = obj[@"videoURL"];
+            NSSLog(@"LivePhoto：\nimageURL - %@\nvideoURL - %@", imageURL, videoURL);
+        }
     }
+     */
     HXWeakSelf
     NSString *tipString;
     HXPhotoModel *photoModel = self.photoManager.afterSelectedArray.firstObject;
@@ -215,14 +284,15 @@
 }
 
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame {
-    if (self.didAppear) {
-        [UIView animateWithDuration:0.25 animations:^{
-            self.photoViewHeightConstraint.constant = frame.size.height;
-            [self.view layoutIfNeeded];
-        }];
-    }else {
+    // 不要动画效果
+//    if (self.didAppear) {
+//        [UIView animateWithDuration:0.25 animations:^{
+//            self.photoViewHeightConstraint.constant = frame.size.height;
+//            [self.view layoutIfNeeded];
+//        }];
+//    }else {
         self.photoViewHeightConstraint.constant = frame.size.height;
-    }
+//    }
 }
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index {
     // 删除的时候需要将草稿删除

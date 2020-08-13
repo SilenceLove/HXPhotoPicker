@@ -12,7 +12,7 @@
 #import "HXPhotoManager.h"
 #import <sys/utsname.h>
 #import <MobileCoreServices/MobileCoreServices.h>
-
+#import <AVFoundation/AVFoundation.h>
 
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
@@ -33,6 +33,10 @@
 #import "YYKit.h"
 #endif
 
+NSString *const hx_kFigAppleMakerNote_AssetIdentifier = @"17";
+NSString *const hx_kKeySpaceQuickTimeMetadata = @"mdta";
+NSString *const hx_kKeyStillImageTime = @"com.apple.quicktime.still-image-time";
+NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identifier";
 @implementation HXPhotoTools
 
 + (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model
@@ -207,7 +211,6 @@
     if (!viewController) {
         return;
     }
-    
 #ifdef __IPHONE_14_0
     if (@available(iOS 14, *)) {
         if (status == PHAuthorizationStatusLimited) {
@@ -225,7 +228,6 @@
 
 + (PHAuthorizationStatus)authorizationStatus {
     PHAuthorizationStatus status;
-    
 #ifdef __IPHONE_14_0
     if (@available(iOS 14, *)) {
         status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelAddOnly];
@@ -456,7 +458,7 @@
             }
         });
     }];
-} 
+}
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo {
     [self savePhotoToCustomAlbumWithName:albumName photo:photo location:nil complete:nil];
 }
@@ -558,11 +560,92 @@
     return NO;
 }
 
++ (BOOL)fileExistsAtImageURL:(NSURL *)ImageURL {
+    if (!ImageURL) {
+        return NO;
+    }
+    NSString * downloadPath = HXPhotoPickerDownloadPhotosPath;
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+    NSString *fullPathToFile = [self getImageURLFilePath:ImageURL];
+    if (![fileManager fileExistsAtPath:downloadPath]) {
+        [fileManager createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }else {
+        if ([fileManager fileExistsAtPath:fullPathToFile]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (BOOL)fileExistsAtLivePhotoVideoURL:(NSURL *)videoURL {
+    if (!videoURL) {
+        return NO;
+    }
+    NSString * downloadPath = HXPhotoPickerLivePhotoVideosPath;
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+    NSString *fullPathToFile = [[self getLivePhotoVideoURLFilePath:videoURL] stringByAppendingString:@".mov"];
+    if (![fileManager fileExistsAtPath:downloadPath]) {
+        [fileManager createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }else {
+        if ([fileManager fileExistsAtPath:fullPathToFile]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (BOOL)fileExistsAtLivePhotoImageURL:(NSURL *)ImageURL {
+    if (!ImageURL) {
+        return NO;
+    }
+    NSString * downloadPath = HXPhotoPickerLivePhotoImagesPath;
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+    NSString *fullPathToFile = [[self getLivePhotoImageURLFilePath:ImageURL] stringByAppendingString:@".jpg"];
+    if (![fileManager fileExistsAtPath:downloadPath]) {
+        [fileManager createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }else {
+        if ([fileManager fileExistsAtPath:fullPathToFile]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (NSString *)getLivePhotoVideoURLFilePath:(NSURL *)videoURL {
+    if (!videoURL) {
+        return nil;
+    }
+    NSString *fileName = HXDiskCacheFileNameForKey(videoURL.lastPathComponent, NO);
+//    NSString * fileName = [videoURL.lastPathComponent stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+//    fileName = [fileName stringByReplacingOccurrencesOfString:@"." withString:@"_"];
+    NSString *fullPathToFile = [HXPhotoPickerLivePhotoVideosPath stringByAppendingPathComponent:fileName];
+    return fullPathToFile;
+}
++ (NSString *)getLivePhotoImageURLFilePath:(NSURL *)imageURL {
+    if (!imageURL) {
+        return nil;
+    }
+    NSString *fileName = HXDiskCacheFileNameForKey(imageURL.lastPathComponent, NO);
+//    NSString * fileName = [imageURL.lastPathComponent stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+//    fileName = [fileName stringByReplacingOccurrencesOfString:@"." withString:@"_"];
+    NSString *fullPathToFile = [HXPhotoPickerLivePhotoImagesPath stringByAppendingPathComponent:fileName];
+    return fullPathToFile;
+}
++ (NSString *)getImageURLFilePath:(NSURL *)imageURL {
+    if (!imageURL) {
+        return nil;
+    }
+    NSString *fileName = HXDiskCacheFileNameForKey(imageURL.absoluteString, YES);
+//    NSString * fileName = [imageURL.lastPathComponent stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    NSString *fullPathToFile = [HXPhotoPickerDownloadPhotosPath stringByAppendingPathComponent:fileName];
+    return fullPathToFile;
+}
 + (NSString *)getVideoURLFilePath:(NSURL *)videoURL {
     if (!videoURL) {
         return nil;
     }
-    NSString * fileName = [videoURL.absoluteString stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    NSString *fileName = HXDiskCacheFileNameForKey(videoURL.absoluteString, YES);
+//    NSString * fileName = [videoURL.lastPathComponent stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     NSString *fullPathToFile = [HXPhotoPickerDownloadVideosPath stringByAppendingPathComponent:fileName];
     return fullPathToFile;
 }
@@ -603,5 +686,291 @@
 #else
     NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到");
 #endif
+}
+
++ (AVAssetWriterInputMetadataAdaptor *)metadataSetAdapter {
+    NSString *identifier = [hx_kKeySpaceQuickTimeMetadata stringByAppendingFormat:@"/%@",hx_kKeyStillImageTime];
+    const NSDictionary *spec = @{(__bridge_transfer  NSString*)kCMMetadataFormatDescriptionMetadataSpecificationKey_Identifier :
+                                     identifier,
+                                 (__bridge_transfer  NSString*)kCMMetadataFormatDescriptionMetadataSpecificationKey_DataType :
+                                     @"com.apple.metadata.datatype.int8"
+                                 };
+    CMFormatDescriptionRef desc;
+    CMMetadataFormatDescriptionCreateWithMetadataSpecifications(kCFAllocatorDefault, kCMMetadataFormatType_Boxed, (__bridge CFArrayRef)@[spec], &desc);
+    AVAssetWriterInput *input = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeMetadata outputSettings:nil sourceFormatHint:desc];
+    CFRelease(desc);
+    return [AVAssetWriterInputMetadataAdaptor assetWriterInputMetadataAdaptorWithAssetWriterInput:input];
+}
++ (void)writeToFileWithOriginJPGPath:(NSURL *)originJPGPath
+                TargetWriteFilePath:(NSURL *)finalJPGPath
+                         completion:(void (^ _Nullable)(BOOL success))completion {
+    NSString * assetIdentifier = [HXPhotoCommon photoCommon].UUIDString;
+    CGImageDestinationRef dest = CGImageDestinationCreateWithURL((CFURLRef)finalJPGPath, kUTTypeJPEG, 1, nil);
+    if (!dest) {
+        if (completion) {
+            completion(NO);
+        }
+        return;
+    }
+    CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((CFDataRef)[NSData dataWithContentsOfFile:originJPGPath.path], nil);
+     if (!imageSourceRef) {
+         if (completion) {
+             completion(NO);
+         }
+         return;
+     }
+    NSMutableDictionary *metaData = [(__bridge_transfer  NSDictionary*)CGImageSourceCopyPropertiesAtIndex(imageSourceRef, 0, nil) mutableCopy];
+    if (!metaData) {
+        if (completion) {
+            completion(NO);
+        }
+        return;
+    }
+    NSMutableDictionary *makerNote = [NSMutableDictionary dictionary];
+    [makerNote setValue:assetIdentifier forKey:hx_kFigAppleMakerNote_AssetIdentifier];
+    [metaData setValue:makerNote forKey:(__bridge_transfer  NSString*)kCGImagePropertyMakerAppleDictionary];
+    CGImageDestinationAddImageFromSource(dest, imageSourceRef, 0, (CFDictionaryRef)metaData);
+    CGImageDestinationFinalize(dest);
+    CFRelease(imageSourceRef);
+    if (dest) {
+        CFRelease(dest);
+    }
+     if (completion) {
+         completion(YES);
+     }
+}
++ (void)writeToFileWithOriginMovPath:(NSURL *)originMovPath
+                 TargetWriteFilePath:(NSURL *)finalMovPath
+                              header:(void (^ _Nullable)(AVAssetWriter *, AVAssetReader *, AVAssetReader *))header
+                          completion:(void (^ _Nullable)(BOOL))completion{
+    NSString * assetIdentifier = [HXPhotoCommon photoCommon].UUIDString;
+    AVURLAsset* asset = [AVURLAsset assetWithURL:originMovPath];
+    AVAssetTrack *videoTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+    if (!videoTrack) {
+        if (completion) {
+            completion(NO);
+        }
+        return;
+    }
+    
+    AVAssetReaderOutput *videoOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:videoTrack outputSettings:@{(__bridge_transfer  NSString*)kCVPixelBufferPixelFormatTypeKey : [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA]}];
+    NSError *error;
+    AVAssetReader *reader = [AVAssetReader assetReaderWithAsset:asset error:&error];
+    if([reader canAddOutput:videoOutput]) {
+        [reader addOutput:videoOutput];
+    } else {
+        NSLog(@"Add video output error\n");
+    }
+    NSString *videoCodeec;
+    if (@available(iOS 11.0, *)) {
+        videoCodeec = AVVideoCodecTypeH264;
+    } else {
+        videoCodeec = AVVideoCodecH264;
+    }
+    NSDictionary * outputSetting = @{AVVideoCodecKey: videoCodeec,
+                                     AVVideoWidthKey: [NSNumber numberWithFloat:videoTrack.naturalSize.width],
+                                     AVVideoHeightKey: [NSNumber numberWithFloat:videoTrack.naturalSize.height]
+                                     };
+    
+                              
+    NSError *error_two;
+    
+    AVAssetWriter *writer = [AVAssetWriter assetWriterWithURL:finalMovPath fileType:AVFileTypeQuickTimeMovie error:&error_two];
+    if(error_two) {
+        NSLog(@"CreateWriterError:%@\n",error_two);
+    }
+    writer.metadata = @[ [self metaDataSet:assetIdentifier]];
+                              
+    AVAssetWriterInput *videoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSetting];
+    videoInput.expectsMediaDataInRealTime = YES;
+    videoInput.transform = videoTrack.preferredTransform;
+    
+    if ([writer canAddInput:videoInput]) {
+        [writer addInput:videoInput];
+    }
+    AVAssetWriterInput *audioInput;
+    AVAssetReaderTrackOutput *audioOutput;
+    AVAssetReader *audioReader;
+    AVAsset *aAudioAsset = [AVAsset assetWithURL:originMovPath];
+    if (aAudioAsset.tracks.count > 1) {
+        NSLog(@"Has Audio");
+        // setup audio writer
+        audioInput = [[AVAssetWriterInput alloc] initWithMediaType:AVMediaTypeAudio outputSettings:nil];
+        audioInput.expectsMediaDataInRealTime = NO;
+        if ([writer canAddInput:audioInput]) {
+            [writer addInput:audioInput];
+        }
+        // setup audio reader
+        AVAssetTrack *audioTrack = [aAudioAsset tracksWithMediaType:AVMediaTypeAudio].firstObject;
+        audioOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack:audioTrack outputSettings:nil];
+
+        NSError *audioReaderError = nil;
+        audioReader = [AVAssetReader assetReaderWithAsset:aAudioAsset error:&audioReaderError];
+        if (audioReaderError) {
+            NSLog(@"Unable to read Asset, error: %@",audioReaderError);
+        }
+        
+        if ([audioReader canAddOutput:audioOutput]) {
+            [audioReader addOutput:audioOutput];
+        } else {
+            NSLog(@"cant add audio reader");
+        }
+    }
+                              
+    AVAssetWriterInputMetadataAdaptor *adapter = [self metadataSetAdapter];
+    [writer addInput:adapter.assetWriterInput];
+    [writer startWriting];
+    [reader startReading];
+    [writer startSessionAtSourceTime:kCMTimeZero];
+    
+    if (header) {
+        header(writer, reader, audioReader);
+    }
+    
+    CMTimeRange dummyTimeRange = CMTimeRangeMake(CMTimeMake(0, 1000), CMTimeMake(200, 3000));
+    //Meta data reset:
+    AVMutableMetadataItem *item = [AVMutableMetadataItem metadataItem];
+    item.key = hx_kKeyStillImageTime;
+    item.keySpace = hx_kKeySpaceQuickTimeMetadata;
+    item.value = [NSNumber numberWithInt:0];
+    item.dataType = @"com.apple.metadata.datatype.int8";
+    [adapter appendTimedMetadataGroup:[[AVTimedMetadataGroup alloc] initWithItems:[NSArray arrayWithObject:item] timeRange:dummyTimeRange]];
+    
+    dispatch_queue_t createMovQueue = dispatch_queue_create("createMovQueue", DISPATCH_QUEUE_SERIAL);
+                              
+    [videoInput requestMediaDataWhenReadyOnQueue:createMovQueue usingBlock:^{
+      while ([videoInput isReadyForMoreMediaData]) {
+          if (reader.status == AVAssetReaderStatusReading) {
+              CMSampleBufferRef videoBuffer = [videoOutput copyNextSampleBuffer];
+              if (videoBuffer) {
+                  if (![videoInput appendSampleBuffer:videoBuffer]) {
+                      [reader cancelReading];
+                  }
+                  CFRelease(videoBuffer);
+                  videoBuffer = nil;
+              }else {
+                  [videoInput markAsFinished];
+                  if (reader.status == AVAssetReaderStatusCompleted && audioInput) {
+                      [audioReader startReading];
+                      [writer startSessionAtSourceTime:kCMTimeZero];
+                      [audioInput requestMediaDataWhenReadyOnQueue:createMovQueue usingBlock:^{
+                          while ([audioInput isReadyForMoreMediaData]) {
+                            CMSampleBufferRef audioBuffer = [audioOutput copyNextSampleBuffer];
+                            if (audioBuffer) {
+                                if (![audioInput appendSampleBuffer:audioBuffer]) {
+                                    [audioReader cancelReading];
+                                }
+                                CFRelease(audioBuffer);
+                                audioBuffer = nil;
+                            }else {
+                                [audioInput markAsFinished];
+
+                                [writer finishWritingWithCompletionHandler:^{
+                                }];
+                                break;
+                            }
+                          }
+                      }];
+                  }else {
+                      [writer finishWritingWithCompletionHandler:^{
+                      }];
+                  }
+                  break;
+              }
+          }else {
+              [writer finishWritingWithCompletionHandler:^{
+              }];
+          }
+      }
+    }];
+    while (writer.status == AVAssetWriterStatusWriting) {
+        @autoreleasepool {
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+        }
+    }
+    if (writer.status == AVAssetWriterStatusCancelled ||
+        writer.status == AVAssetWriterStatusFailed) {
+        [[NSFileManager defaultManager] removeItemAtURL:finalMovPath error:nil];
+    }
+                              
+    if (writer.error) {
+        if (completion) {
+            completion(NO);
+        }
+        NSLog(@"cannot write: %@", writer.error);
+    } else {
+        if (completion) {
+            completion(YES);
+        }
+    }
+}
+
++ (AVMetadataItem *)metaDataSet:(NSString *)assetIdentifier {
+    AVMutableMetadataItem *item = [AVMutableMetadataItem metadataItem];
+    item.key = hx_kKeyContentIdentifier;
+    item.keySpace = hx_kKeySpaceQuickTimeMetadata;
+    item.value = assetIdentifier;
+    item.dataType = @"com.apple.metadata.datatype.UTF-8";
+    return item;
+}
+    
++ (long long)fileSizeAtPath:(NSString*)filePath {
+    NSFileManager* manager = [NSFileManager defaultManager];
+    if ([manager fileExistsAtPath:filePath]){
+        return [[manager attributesOfItemAtPath:filePath error:nil] fileSize];
+    }
+    return 0;
+}
++ (long long)folderSizeAtPath:(NSString *)folderPath {
+    NSFileManager* manager = [NSFileManager defaultManager];
+    if (![manager fileExistsAtPath:folderPath]) return 0;
+    NSEnumerator *childFilesEnumerator = [[manager subpathsAtPath:folderPath] objectEnumerator];
+    NSString* fileName;
+    long long folderSize = 0;
+    while ((fileName = [childFilesEnumerator nextObject]) != nil) {
+        NSString* fileAbsolutePath = [folderPath stringByAppendingPathComponent:fileName];
+        folderSize += [self fileSizeAtPath:fileAbsolutePath];
+    }
+    return folderSize;
+}
+/// 获取所有缓存的大小
++ (long long)getAllLocalFileSize {
+    return [self folderSizeAtPath:HXPhotoPickerAssetCachesPath] + [self getAllLocalModelsFileSize];
+}
+
+/// 获取缓存在本地所有的HXPhotoModel的大小
++ (long long)getAllLocalModelsFileSize{
+    return [self folderSizeAtPath:HXPhotoPickerLocalModelsPath];
+}
+
+/// 获取生成LivePhoto缓存在本地的图片视频大小
++ (long long)getLivePhotoAssetFileSize {
+    return [self folderSizeAtPath:HXPhotoPickerCachesLivePhotoPath];
+}
+
+/// 获取下载网络视频缓存的大小
++ (long long)getNetWorkVideoFileSize {
+    return [self folderSizeAtPath:HXPhotoPickerCachesDownloadPath];
+}
+
+/// 删除HXPhotoPicker所有文件
++ (void)deleteAllLocalFile {
+    [[NSFileManager defaultManager] removeItemAtPath:HXPhotoPickerAssetCachesPath error:nil];
+    [self deleteAllLocalModelsFile];
+}
+
+/// 删除本地HXPhotoModel缓存文件
++ (void)deleteAllLocalModelsFile {
+    [[NSFileManager defaultManager] removeItemAtPath:HXPhotoPickerLocalModelsPath error:nil];
+}
+
+/// 删除生成LivePhoto相关的缓存文件
++ (void)deleteLivePhotoCachesFile {
+    [[NSFileManager defaultManager] removeItemAtPath:HXPhotoPickerCachesLivePhotoPath error:nil];
+}
+
+/// 删除下载的网络视频缓存文件
++ (void)deleteNetWorkVideoFile {
+    [[NSFileManager defaultManager] removeItemAtPath:HXPhotoPickerCachesDownloadPath error:nil];
 }
 @end

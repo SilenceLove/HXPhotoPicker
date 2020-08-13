@@ -9,6 +9,7 @@
 #import "HXPhotoPreviewBottomView.h"
 #import "HXPhotoManager.h"
 #import "UIImageView+HXExtension.h"
+#import "HXPhotoEdit.h"
 @interface HXPhotoPreviewBottomView ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout>
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
@@ -401,32 +402,36 @@
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     self.editTipView.hidden = !(model.photoEdit);
-    HXWeakSelf
-    if (model.thumbPhoto) {
-        self.imageView.image = model.thumbPhoto;
-        if (model.networkPhotoUrl) {
-            [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
-                    
-                }
-            } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
-                if (weakSelf.model == model) {
-                    if (error != nil) {
-                    }else {
-                        if (image) {
-                            weakSelf.imageView.image = image;
+    if (model.photoEdit) {
+        self.imageView.image = model.photoEdit.editPosterImage;
+    }else {
+        HXWeakSelf
+        if (model.thumbPhoto) {
+            self.imageView.image = model.thumbPhoto;
+            if (model.networkPhotoUrl) {
+                [self.imageView hx_setImageWithModel:model progress:^(CGFloat progress, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        
+                    }
+                } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                    if (weakSelf.model == model) {
+                        if (error != nil) {
+                        }else {
+                            if (image) {
+                                weakSelf.imageView.image = image;
+                            }
                         }
                     }
+                }];
+            }
+        }else {
+            self.requestID = [self.model requestThumbImageCompletion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                if (weakSelf.model == model) {
+                    weakSelf.imageView.image = image;
                 }
             }];
         }
-    }else {
-        self.requestID = [self.model requestThumbImageCompletion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-            if (weakSelf.model == model) {
-                weakSelf.imageView.image = image;
-            }
-        }]; 
-    } 
+    }
     self.layer.borderWidth = self.selected ? 5 : 0;
     self.layer.borderColor = self.selected ? [([HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : self.selectColor) colorWithAlphaComponent:0.5].CGColor : nil;
 }

@@ -54,6 +54,7 @@
         weakSelf.photoManager.configuration.singleJumpEdit = YES;
         weakSelf.photoManager.configuration.singleSelected = YES;
         weakSelf.photoManager.configuration.lookGifPhoto = NO;
+        weakSelf.photoManager.configuration.lookLivePhoto = NO;
         weakSelf.photoManager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_1x1;
         weakSelf.photoManager.configuration.photoEditConfigur.onlyCliping = YES;
         if (index ==1) {

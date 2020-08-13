@@ -17,9 +17,6 @@ static id instance;
 #if HasAFNetworking
 @property (strong, nonatomic) AFURLSessionManager *sessionManager;
 #endif
-@property (strong, nonatomic) NSURLConnection *urlFileLengthConnection;
-@property (copy, nonatomic) HXPhotoCommonGetUrlFileLengthSuccess fileLengthSuccessBlock;
-@property (copy, nonatomic) HXPhotoCommonGetUrlFileLengthFailure fileLengthFailureBlock;
 @property (assign, nonatomic) BOOL hasAuthorization;
 @end
 
@@ -141,6 +138,12 @@ static id instance;
     }
     return _languageBundle;
 }
+- (NSString *)UUIDString {
+    if (!_UUIDString) {
+        _UUIDString = [[NSUUID UUID] UUIDString];
+    }
+    return _UUIDString;
+}
 - (BOOL)isDark {
     if (self.photoStyle == HXPhotoStyleDark) {
         return YES;
@@ -182,30 +185,6 @@ static id instance;
 }
 - (void)setCameraImage:(UIImage *)cameraImage {
     _cameraImage = [cameraImage hx_scaleImagetoScale:0.4];
-}
-- (void)getURLFileLengthWithURL:(NSURL *)url success:(HXPhotoCommonGetUrlFileLengthSuccess)success failure:(HXPhotoCommonGetUrlFileLengthFailure)failure {
-    if (self.urlFileLengthConnection) {
-        [self.urlFileLengthConnection cancel];
-    }
-    NSMutableURLRequest *mURLRequest = [NSMutableURLRequest requestWithURL:url];
-    [mURLRequest setHTTPMethod:@"HEAD"];
-    mURLRequest.timeoutInterval = 5.0;
-    self.urlFileLengthConnection = [NSURLConnection connectionWithRequest:mURLRequest delegate:self];
-    [self.urlFileLengthConnection start];
-}
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    NSDictionary *dict = [(NSHTTPURLResponse *)response allHeaderFields];
-    NSNumber *length = [dict objectForKey:@"Content-Length"];
-    [connection cancel];
-    if (self.fileLengthSuccessBlock) {
-        self.fileLengthSuccessBlock(length.unsignedIntegerValue);
-    }
-}
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    [connection cancel];
-    if (self.fileLengthFailureBlock) {
-        self.fileLengthFailureBlock();
-    }
 }
 /** 初始化并监听网络变化 */
 - (void)listenNetWorkStatus {
@@ -255,6 +234,7 @@ static id instance;
                     success(filePath, videoURL);
                 }
             }else {
+                [[NSFileManager defaultManager] removeItemAtURL:videoFileURL error:nil];
                 if (failure) {
                     failure(error, videoURL);
                 }

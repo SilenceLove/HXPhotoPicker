@@ -9,6 +9,8 @@
 #ifndef HXPhotoDefine_h
 #define HXPhotoDefine_h
 
+#import <CommonCrypto/CommonDigest.h>
+
 // 日志输出
 #ifdef DEBUG
 #define NSSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
@@ -16,11 +18,10 @@
 #define NSSLog(...)
 #endif
 
-
 /**
  版本号 x.x.x
  */
-#define HXVersion @"3.0.4"
+#define HXVersion @"3.0.5"
 
 /// 如果想要HXPhotoView的item大小自定义设置，请修改为 1
 /// 并且实现HXPhotoView的代理
@@ -39,9 +40,27 @@
 
 #define HXCameraImageKey @"HXCameraImageURLKey"
 
-#define HXPhotoPickerDownloadPath [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]
+#define HXPhotoPickerLibraryCaches [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]
 
-#define HXPhotoPickerDownloadVideosPath [HXPhotoPickerDownloadPath stringByAppendingPathComponent:@"HXPhotoPickerDownload/Videos"]
+#define HXPhotoPickerDocuments [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]
+
+#define HXPhotoPickerLocalModelsPath [HXPhotoPickerDocuments stringByAppendingPathComponent:[NSString stringWithFormat:@"%@/localModels", HXPhotoHeaderSearchPath]]
+
+#define HXPhotoHeaderSearchPath @"com.silence.hxphotopicker"
+
+#define HXPhotoPickerAssetCachesPath [HXPhotoPickerLibraryCaches stringByAppendingPathComponent:HXPhotoHeaderSearchPath]
+
+#define HXPhotoPickerCachesDownloadPath [HXPhotoPickerAssetCachesPath stringByAppendingPathComponent:@"download"]
+
+#define HXPhotoPickerDownloadVideosPath [HXPhotoPickerCachesDownloadPath stringByAppendingPathComponent:@"videos"]
+
+#define HXPhotoPickerDownloadPhotosPath [HXPhotoPickerCachesDownloadPath stringByAppendingPathComponent:@"photos"]
+
+#define HXPhotoPickerCachesLivePhotoPath [HXPhotoPickerAssetCachesPath stringByAppendingPathComponent:@"LivePhoto"]
+
+#define HXPhotoPickerLivePhotoVideosPath [HXPhotoPickerCachesLivePhotoPath stringByAppendingPathComponent:@"videos"]
+
+#define HXPhotoPickerLivePhotoImagesPath [HXPhotoPickerCachesLivePhotoPath stringByAppendingPathComponent:@"images"]
 
 #define HXShowLog YES
 
@@ -98,13 +117,44 @@
 // 强引用
 #define HXStrongSelf __strong typeof(self) strongSelf = weakSelf;
 
-CG_INLINE UIAlertController * hx_showAlert(UIViewController *vc,
-                                          NSString *title,
-                                          NSString *message,
-                                          NSString *buttonTitle1,
-                                          NSString *buttonTitle2,
-                                          dispatch_block_t buttonTitle1Handler,
-                                          dispatch_block_t buttonTitle2Handler) {
+
+
+#pragma mark - Hash
+
+#define HX_MAX_FILE_EXTENSION_LENGTH (NAME_MAX - CC_MD5_DIGEST_LENGTH * 2 - 1)
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+static inline NSString * _Nonnull HXDiskCacheFileNameForKey(NSString * _Nullable key, BOOL addExt) {
+    const char *str = key.UTF8String;
+    if (str == NULL) {
+        str = "";
+    }
+    unsigned char r[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(str, (CC_LONG)strlen(str), r);
+    NSURL *keyURL = [NSURL URLWithString:key];
+    NSString *ext = keyURL ? keyURL.pathExtension : key.pathExtension;
+    // File system has file name length limit, we need to check if ext is too long, we don't add it to the filename
+    if (ext.length > HX_MAX_FILE_EXTENSION_LENGTH) {
+        ext = nil;
+    }
+    NSString *filename = [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+                          r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10],
+                          r[11], r[12], r[13], r[14], r[15]];
+    if (addExt) {
+        filename = [filename stringByAppendingFormat:@"%@", ext.length == 0 ? @"" : [NSString stringWithFormat:@".%@", ext]];
+    }
+    return filename;
+}
+#pragma clang diagnostic pop
+
+CG_INLINE UIAlertController * _Nullable hx_showAlert(UIViewController * _Nullable vc,
+                                          NSString * _Nullable title,
+                                          NSString * _Nullable message,
+                                          NSString * _Nullable buttonTitle1,
+                                          NSString * _Nullable buttonTitle2,
+                                          dispatch_block_t _Nullable buttonTitle1Handler,
+                                          dispatch_block_t _Nullable buttonTitle2Handler) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
                                                                              message:message
                                                                       preferredStyle:UIAlertControllerStyleAlert];

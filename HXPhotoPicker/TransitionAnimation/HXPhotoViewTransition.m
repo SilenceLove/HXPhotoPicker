@@ -10,6 +10,7 @@
 #import "HXPhotoViewController.h"
 #import "HXPhotoPreviewViewController.h"
 #import "HXPhotoPreviewBottomView.h"
+#import "HXPhotoEdit.h"
 @interface HXPhotoViewTransition ()
 @property (assign, nonatomic) HXPhotoViewTransitionType type;
 @end
@@ -51,7 +52,13 @@
 //    if (height > HX_ScreenHeight) {
 //        height = HX_ScreenHeight;
 //    }
-    [self pushAnim:transitionContext image:model.thumbPhoto model:model fromVC:fromVC toVC:toVC];
+    UIImage *image;
+    if (model.photoEdit) {
+        image = model.photoEdit.editPreviewImage;
+    }else {
+        image = model.thumbPhoto;
+    }
+    [self pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
 //    [model requestPreviewImageWithSize:CGSizeMake(width * 0.8, height * 0.8) startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
 //        [weakSelf pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
 //    } failed:^(NSDictionary *info, HXPhotoModel *model) {

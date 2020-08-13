@@ -209,7 +209,6 @@
         self.photoEdit = nil;
         NSSLog(@"%ld张图片",photoList.count);
     }else if (videoList.count > 0) {
-        __weak typeof(self) weakSelf = self;
         
     }
 }

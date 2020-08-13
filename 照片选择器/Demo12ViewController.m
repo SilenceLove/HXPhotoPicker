@@ -101,7 +101,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.photoView = photoView;
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
 //    NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"0AA996F1-6566-4CA3-845F-5698DD9726A0" withExtension:@"jpg"];
-//    NSURL *url1 = [[NSBundle mainBundle] URLForResource:@"IMG_5833" withExtension:@"MP4"];
+    
     NSURL *gifURL = [[NSBundle mainBundle] URLForResource:@"IMG_0168" withExtension:@"GIF"];
     
     HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
@@ -118,13 +118,55 @@ static const CGFloat kPhotoViewMargin = 12.0;
     
     HXCustomAssetModel *assetModel8 = [HXCustomAssetModel assetWithNetworkVideoURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/2280ec38-5873-4b3f-8784-a361645c8854.mp4"] videoCoverURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/5ed15ef7-3411-4f5e-839b-10664d796919.jpg"] videoDuration:61 selected:YES];
     
-//    HXCustomAssetModel *assetModel9 = [HXCustomAssetModel livePhotoAssetWithLocalImagePath:imageURL localVideoURL:url1 selected:YES];
     
     
     [self.manager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6, assetModel7, assetModel8]];
     [self.photoView refreshView];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"外部预览" style:UIBarButtonItemStylePlain target:self action:@selector(previewClick)];
+    UIBarButtonItem *barItem1 = [[UIBarButtonItem alloc] initWithTitle:@"外部预览" style:UIBarButtonItemStylePlain target:self action:@selector(previewClick)];
+    
+    UIBarButtonItem *barItem2 = [[UIBarButtonItem alloc] initWithTitle:@"添加LivePhoto" style:UIBarButtonItemStylePlain target:self action:@selector(addLivePhotoClick)];
+    
+    self.navigationItem.rightBarButtonItems = @[barItem1, barItem2];
+}
+- (void)addLivePhotoClick {
+    HXPhotoBottomViewModel *model1 = [[HXPhotoBottomViewModel alloc] init];
+    model1.title = @"通过本地图片、视频生成-1";
+    
+    HXPhotoBottomViewModel *model2 = [[HXPhotoBottomViewModel alloc] init];
+    model2.title = @"通过本地图片、视频生成-2";
+    
+    HXPhotoBottomViewModel *model3 = [[HXPhotoBottomViewModel alloc] init];
+    model3.title = @"通过网络图片、视频生成-1";
+    
+    HXPhotoBottomViewModel *model4 = [[HXPhotoBottomViewModel alloc] init];
+    model4.title = @"通过网络图片、视频生成-2";
+    
+    HXPhotoBottomViewModel *model5 = [[HXPhotoBottomViewModel alloc] init];
+    model5.title = @"清空LivePhoto本地缓存";
+    HXWeakSelf
+    [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2, model3, model4, model5] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
+        HXCustomAssetModel *assetModel9;
+        if (index == 0) {
+            NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"d87" withExtension:@"jpeg"];
+            NSURL *videoURL = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
+            assetModel9 = [HXCustomAssetModel livePhotoAssetWithLocalImagePath:imageURL localVideoURL:videoURL selected:YES];
+        }else if (index == 1) {
+            NSURL *vurl = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
+            assetModel9 = [HXCustomAssetModel livePhotoAssetWithImage:[UIImage imageNamed:@"1"] localVideoURL:vurl selected:YES];
+        }else if (index == 2){
+            assetModel9 = [HXCustomAssetModel livePhotoAssetWithNetworkImageURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/5ed15ef7-3411-4f5e-839b-10664d796919.jpg"] networkVideoURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/fufeiduanpian.mp4"] selected:YES];
+            
+        }else if (index == 3){
+            assetModel9 = [HXCustomAssetModel livePhotoAssetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/wokeyidengdainishenhoufengm.png"] networkVideoURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/wokeyidengdaonishenhou.MP4"] selected:YES];
+            
+        }else if (index == 4) {
+            [HXPhotoTools deleteLivePhotoCachesFile];
+            return;
+        }
+        [weakSelf.manager addCustomAssetModel:@[assetModel9]];
+        [weakSelf.photoView refreshView];
+    } cancelClick:nil];
 }
 - (void)previewClick {
     HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];

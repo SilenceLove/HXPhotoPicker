@@ -64,7 +64,7 @@
   // 使用YYWebImage加载网络图片
   pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
   ```
-- 搜索不到库或最新版请执行```pod repo update```
+- 搜索不到库或最新版请执行```pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 使用前导入头文件 "HXPhotoPicker.h"
 
@@ -342,41 +342,21 @@ photoView.backgroundColor = [UIColor whiteColor];
 ### <a id="如何保存草稿"></a> 如何保存草稿
 ```objc
 通过 HXPhotoManager 对象进行存储
-/**
-保存模型数组到本地
+/// 获取保存在本地文件的模型数组
+- (NSArray<HXPhotoModel *> *)getLocalModelsInFile;
 
-@param success 成功
-@param failed 失败
-*/
-- (void)saveSelectModelArraySuccess:(void (^)(void))success failed:(void (^)(void))failed;
-/**
-删除本地保存的模型数组
+/// 将模型数组保存到本地文件
+- (BOOL)saveLocalModelsToFile;
 
-@return success or failed
-*/
-- (BOOL)deleteLocalSelectModelArray;
-/**
-获取保存在本地的模型数组
+/// 将保存在本地文件的模型数组删除
+- (BOOL)deleteLocalModelsInFile;
 
-*/
-- (void)getSelectedModelArrayComplete:(void (^)(NSArray<HXPhotoModel *> *modelArray))complete;
+/// 将本地获取的模型数组添加到manager的数据中
+/// @param models 在本地获取的模型数组
+- (void)addLocalModels:(NSArray<HXPhotoModel *> *)models;
 
-// 保存草稿
-[self.manager saveSelectModelArraySuccess:^{
-    // 保存草稿成功
-} failed:^{
-    // 保存草稿失败
-}];
-
-// 获取草稿
-[self.manager getSelectedModelArrayComplete:^(NSArray<HXPhotoModel *> *modelArray) {
-    if (modelArray.count) {
-        // 获取到保存的草稿给manager
-        [weakSelf.manager addModelArray:modelArray];
-        // 刷新HXPhotoView
-        [weakSelf.photoView refreshView];
-    }
-}];
+/// 将本地获取的模型数组添加到manager的数据中
+- (void)addLocalModels;
 ```
 ### <a id="如何添加网络/本地图片、视频"></a> 如何添加网络/本地图片、视频
 ```objc
@@ -678,6 +658,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v3.0.5　-　提高稳定性、支持本地图片和视频生成LivePhoto、支持网络图片和视频生成LivePhoto、修复单选编辑之后状态栏隐藏的问题、整理缓存路径
 - v3.0.4　-　优化选择逻辑、暗黑模式。完善微信样式
 - v3.0.3　-　解决pod加载xib报错的问题、支持添加本地gif图片
 - v3.0.2　-　适配ios14、照片列表导航栏支持自定义titleView

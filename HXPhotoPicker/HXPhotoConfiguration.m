@@ -56,9 +56,9 @@
     
     self.doneBtnShowDetail = YES;
     self.videoCanEdit = YES;
-//    self.singleJumpEdit = YES;
     self.photoCanEdit = YES;
     self.localFileName = @"HXPhotoPickerModelArray";
+    self.languageType = HXPhotoLanguageTypeSys;
     
     self.popupTableViewCellHeight = 65.f;
     if (HX_IS_IPhoneX_All) {
@@ -69,9 +69,7 @@
         self.popupTableViewHeight = 350;
     }
     self.popupTableViewHorizontalHeight = 250; 
-//    self.albumShowMode = HXPhotoAlbumShowModePopup;
-    
-    self.languageType = HXPhotoLanguageTypeSys;
+    self.albumShowMode = HXPhotoAlbumShowModeDefault;
     
     self.cellDarkSelectTitleColor = [UIColor whiteColor];
     self.cellDarkSelectBgColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1];
@@ -99,7 +97,6 @@
     self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
     self.videoAutoPlayType = HXVideoAutoPlayTypeWiFi;
     self.previewSelectedBtnBgColor = self.themeColor;
-    
     self.changeOriginalTinColor = YES;
     self.downloadNetworkVideo = YES;
     self.cameraCanLocation = YES;
@@ -236,15 +233,32 @@
 }
 - (void)setType:(HXConfigurationType)type {
     _type = type;
-    
+    if (type == HXConfigurationTypeWXChat) {
+        [self setWxConfiguration];
+        self.videoMaximumSelectDuration = 60.f * 5.f;
+        self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
+        self.photoMaxNum = 0;
+        self.videoMaxNum = 0;
+        self.maxNum = 9;
+        self.selectTogether = YES;
+    }else if (type == HXConfigurationTypeWXMoment) {
+        [self setWxConfiguration];
+        self.videoMaximumDuration = 15;
+        self.videoMaximumSelectDuration = 15;
+        self.selectVideoBeyondTheLimitTimeAutoEdit = YES;
+        self.photoMaxNum = 9;
+        self.videoMaxNum = 1;
+        self.maxNum = 9;
+        self.selectTogether = NO;
+    }
+}
+- (void)setWxConfiguration {
     self.videoCanEdit = YES;
     self.specialModeNeedHideVideoSelectBtn = YES;
     self.cameraPhotoJumpEdit = YES;
-//    self.openCamera = NO;
     self.saveSystemAblum = YES;
     self.albumShowMode = HXPhotoAlbumShowModePopup;
     self.photoListCancelLocation = HXPhotoListCancelButtonLocationTypeLeft;
-    
     
     // 原图按钮设置
     self.changeOriginalTinColor = NO;
@@ -256,7 +270,6 @@
     self.statusBarStyle = UIStatusBarStyleLightContent;
     self.themeColor = [UIColor whiteColor];
     self.photoEditConfigur.themeColor = wxColor;
-//    self.navBarBackgroudColor = [UIColor hx_colorWithHexStr:@"#141414"];
     self.navBarBackgroudColor = nil;
     self.navBarStyle = UIBarStyleBlack;
     self.navigationTitleArrowColor = [UIColor hx_colorWithHexStr:@"#B2B2B2"];
@@ -299,23 +312,6 @@
     self.photoListViewBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
     self.photoListBottomPhotoCountTextColor = [UIColor whiteColor];
     self.previewPhotoViewBgColor = [UIColor blackColor];
-    
-    if (type == HXConfigurationTypeWXChat) {
-        self.videoMaximumSelectDuration = 60.f * 5.f;
-        self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
-        self.photoMaxNum = 0;
-        self.videoMaxNum = 0;
-        self.maxNum = 9;
-        self.selectTogether = YES;
-    }else if (type == HXConfigurationTypeWXMoment) {
-        self.videoMaximumDuration = 15;
-        self.videoMaximumSelectDuration = 15;
-        self.selectVideoBeyondTheLimitTimeAutoEdit = YES;
-        self.photoMaxNum = 9;
-        self.videoMaxNum = 1;
-        self.maxNum = 9;
-        self.selectTogether = NO;
-    }
 }
 - (HXPhotoEditConfiguration *)photoEditConfigur {
     if (!_photoEditConfigur) {

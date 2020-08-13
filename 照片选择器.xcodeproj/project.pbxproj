@@ -179,6 +179,8 @@
 		7B88A0C024D96A0C00980A05 /* WxMomentViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B88A0BE24D96A0C00980A05 /* WxMomentViewCell.m */; };
 		7B88A0C124D96A0C00980A05 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B88A0BF24D96A0C00980A05 /* WxMomentViewCell.xib */; };
 		7B9617DB24DD0F13003A1FD6 /* LocalSampleVideo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7B9617DA24DD0F13003A1FD6 /* LocalSampleVideo.mp4 */; };
+		7B9617DE24DD62C7003A1FD6 /* c81.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7B9617DC24DD62C6003A1FD6 /* c81.mp4 */; };
+		7B9617DF24DD62C7003A1FD6 /* d87.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 7B9617DD24DD62C7003A1FD6 /* d87.jpeg */; };
 		7B9D12761F0CC54E00C81951 /* Demo5ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */; };
 		7BADE7511F5A5C1F007AF1D9 /* Demo7ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BADE7501F5A5C1F007AF1D9 /* Demo7ViewController.m */; };
 		7BAECD2F237E483700580756 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAECD16237E483700580756 /* NSLayoutConstraint+MASDebugAdditions.m */; };
@@ -584,6 +586,8 @@
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
 		7B9617D524DCF810003A1FD6 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		7B9617DA24DD0F13003A1FD6 /* LocalSampleVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = LocalSampleVideo.mp4; sourceTree = "<group>"; };
+		7B9617DC24DD62C6003A1FD6 /* c81.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = c81.mp4; sourceTree = "<group>"; };
+		7B9617DD24DD62C7003A1FD6 /* d87.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = d87.jpeg; sourceTree = "<group>"; };
 		7B9D12741F0CC54E00C81951 /* Demo5ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo5ViewController.h; sourceTree = "<group>"; };
 		7B9D12751F0CC54E00C81951 /* Demo5ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo5ViewController.m; sourceTree = "<group>"; };
 		7BADE74F1F5A5C1F007AF1D9 /* Demo7ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo7ViewController.h; sourceTree = "<group>"; };
@@ -1335,6 +1339,8 @@
 			children = (
 				7BFE13502484B17000170F21 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg */,
 				7BFE134A24849FA400170F21 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg */,
+				7B9617DC24DD62C6003A1FD6 /* c81.mp4 */,
+				7B9617DD24DD62C7003A1FD6 /* d87.jpeg */,
 				7B06B2DA24D11A1500FDD794 /* IMG_0168.GIF */,
 				7B9617DA24DD0F13003A1FD6 /* LocalSampleVideo.mp4 */,
 				7B7E3E7A1E4AACD1002234EE /* main.m */,
@@ -1651,10 +1657,9 @@
 			};
 			buildConfigurationList = 7B7E3E711E4AACD1002234EE /* Build configuration list for PBXProject "照片选择器" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 				"zh-Hans",
@@ -1696,10 +1701,12 @@
 				7B88A0BC24D94D0F00980A05 /* WxMomentPublishViewController.xib in Resources */,
 				7B005ABE24D008C500607111 /* HXPhotoEditStickerTrashView.xib in Resources */,
 				7BFE134B24849FA400170F21 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg in Resources */,
+				7B9617DE24DD62C7003A1FD6 /* c81.mp4 in Resources */,
 				7B005ABF24D008C500607111 /* HXCameraBottomView.xib in Resources */,
 				7B06B2D424D02DA000FDD794 /* ja.lproj in Resources */,
 				7B005ABD24D008C500607111 /* HXPhotoEditGraffitiColorView.xib in Resources */,
 				7B06B2D724D02DA000FDD794 /* zh-Hant.lproj in Resources */,
+				7B9617DF24DD62C7003A1FD6 /* d87.jpeg in Resources */,
 				7B06B2D524D02DA000FDD794 /* en.lproj in Resources */,
 				7B269E071E5695F200AB813D /* Demo1ViewController.xib in Resources */,
 				7B7E3E891E4AACD1002234EE /* LaunchScreen.storyboard in Resources */,
@@ -2077,15 +2084,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 36YN45CVLK;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/照片选择器/DoraemonKit/Framework",
-					"$(PROJECT_DIR)/照片选择器/Framework1.1.9",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.4;
+				MARKETING_VERSION = 3.0.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxxxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2104,15 +2107,11 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 36YN45CVLK;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/照片选择器/DoraemonKit/Framework",
-					"$(PROJECT_DIR)/照片选择器/Framework1.1.9",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "照片选择器/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.4;
+				MARKETING_VERSION = 3.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "Foreverlove.com-hongxxxx";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

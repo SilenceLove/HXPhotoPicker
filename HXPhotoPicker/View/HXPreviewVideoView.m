@@ -79,6 +79,9 @@
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     if (self.player.currentItem != nil && !self.videoLoadFailed) return;
+    
+
+    self.playBtn.hidden = YES;
     self.canRemovePlayerObservers = NO;
     HXWeakSelf
     if (model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
@@ -88,7 +91,6 @@
             [self requestAVAssetComplete:[AVAsset assetWithURL:videoFileURL]];
             return;
         }
-        self.playBtn.hidden = YES;
         [self showLoading];
         if ([HXPhotoCommon photoCommon].downloadNetworkVideo) {
             self.videoDownloadTask = [[HXPhotoCommon photoCommon] downloadVideoWithURL:model.videoURL progress:^(float progress, long long downloadLength, long long totleLength, NSURL * _Nullable videoURL) {

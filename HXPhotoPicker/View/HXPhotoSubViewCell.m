@@ -318,7 +318,9 @@
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;
                 return;
-            }else if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto && !model.photoEdit) {
+            }else if ((model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
+                       model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) &&
+                      !model.photoEdit) {
                 self.stateLb.text = @"Live";
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;

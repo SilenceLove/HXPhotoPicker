@@ -72,10 +72,18 @@
         [self.imageView requestHDImage];
         self.imageView.downloadICloudAssetComplete = self.downloadICloudAssetComplete;
     }else if (self.type == HXPreviewContentViewTypeLivePhoto) {
+        if (self.model.photoEdit) {
+            return;
+        }
         self.livePhotoView.model = self.model;
+        if (self.model.type == HXPhotoModelMediaTypeCameraPhoto &&
+            (self.model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
+             self.model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto)) {
+            self.livePhotoView.hidden = NO;
+        }
         self.livePhotoView.downloadICloudAssetComplete = ^{
-            weakSelf.imageView.hidden = YES;
             weakSelf.livePhotoView.hidden = NO;
+            weakSelf.imageView.hidden = YES;
             if (weakSelf.downloadICloudAssetComplete) {
                 weakSelf.downloadICloudAssetComplete();
             }

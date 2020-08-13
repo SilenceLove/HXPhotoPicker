@@ -106,8 +106,51 @@
 /// 如果文件夹不存在则会创建文件夹
 /// @param videoURL 网络视频地址
 + (BOOL)fileExistsAtVideoURL:(NSURL * _Nullable)videoURL;
++ (BOOL)fileExistsAtImageURL:(NSURL * _Nullable)ImageURL;
++ (BOOL)fileExistsAtLivePhotoImageURL:(NSURL * _Nullable)ImageURL;
++ (BOOL)fileExistsAtLivePhotoVideoURL:(NSURL * _Nullable)videoURL;
 
 /// 将网络视频地址转换成本地文件名
 /// @param videoURL 网络视频地址
 + (NSString * _Nullable)getVideoURLFilePath:(NSURL * _Nullable)videoURL;
++ (NSString * _Nullable)getImageURLFilePath:(NSURL * _Nullable)imageURL;
++ (NSString * _Nullable)getLivePhotoImageURLFilePath:(NSURL * _Nullable)imageURL;
++ (NSString * _Nullable)getLivePhotoVideoURLFilePath:(NSURL * _Nullable)videoURL;
+
++ (void)writeToFileWithOriginJPGPath:(NSURL * _Nonnull)originJPGPath
+                 TargetWriteFilePath:(NSURL * _Nonnull)finalJPGPath
+                          completion:(void (^ _Nullable)(BOOL success))completion;
+
++ (void)writeToFileWithOriginMovPath:(NSURL * _Nonnull)originMovPath
+                 TargetWriteFilePath:(NSURL * _Nonnull)finalMovPath
+                              header:(void (^ _Nullable)(AVAssetWriter * _Nullable writer, AVAssetReader * _Nullable videoReader, AVAssetReader * _Nullable audioReader))header
+                          completion:(void (^ _Nullable)(BOOL success))completion;
+
+
+
+#pragma mark - < 获取本地文件大小 >
+
+/// 获取所有缓存的大小
++ (long long)getAllLocalFileSize;
+
+/// 获取缓存在本地所有的HXPhotoModel的大小
++ (long long)getAllLocalModelsFileSize;
+
+/// 获取生成LivePhoto缓存在本地的图片视频大小
++ (long long)getLivePhotoAssetFileSize;
+
+/// 获取下载网络视频缓存的大小
++ (long long)getNetWorkVideoFileSize;
+
+/// 删除HXPhotoPicker所有文件
++ (void)deleteAllLocalFile;
+
+/// 删除本地HXPhotoModel缓存文件
++ (void)deleteAllLocalModelsFile;
+
+/// 删除生成LivePhoto相关的缓存文件
++ (void)deleteLivePhotoCachesFile;
+
+/// 删除下载的网络视频缓存文件
++ (void)deleteNetWorkVideoFile;
 @end
