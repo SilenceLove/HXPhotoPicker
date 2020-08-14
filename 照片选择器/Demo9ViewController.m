@@ -14,9 +14,6 @@
 @interface Demo9ViewController ()<UITableViewDelegate,UITableViewDataSource, UIViewControllerPreviewingDelegate>
 @property (strong, nonatomic) UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *dataArray;
-@property (nonatomic, strong) NSMutableArray *uploadArray;
-@property (nonatomic, strong) NSMutableArray *waitArray;
-@property (nonatomic, strong) NSMutableArray *completeArray;
 @property (weak, nonatomic) id<UIViewControllerPreviewing> previewingContext;
 @end
 
@@ -115,36 +112,12 @@
     [self.tableView registerClass:[Demo9ViewCell class] forCellReuseIdentifier:@"CellId"];
     [self.view addSubview:self.tableView];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"写入" style:UIBarButtonItemStyleDone target:self action:@selector(didRightBtn)];
-        
     if ([self respondsToSelector:@selector(traitCollection)]) {
         if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
             if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
                 self.previewingContext = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
             }
         }
-    }
-}
-- (void)didRightBtn {
-    self.completeArray = [NSMutableArray array];
-    self.waitArray = [NSMutableArray arrayWithArray:self.dataArray];
-    [self.view hx_showLoadingHUDText:@"写入中"];
-    [self startUpload];
-}
-- (void)startUpload {
-    if (self.waitArray.count == 0) {
-        [self.view hx_handleLoading];
-        NSSLog(@"全部写入完毕");
-        return;
-    }
-    __block Demo9Model *model = self.waitArray.firstObject;
-    [self.waitArray removeObjectAtIndex:0];
-    
-    if (model.endSelectedList.count > 0) {
-        
-    }else {
-        [self.completeArray addObject:model];
-        [self startUpload];
     }
 }
 #pragma mark - < UITableViewDataSource >

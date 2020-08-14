@@ -44,7 +44,9 @@
 
 #define HXPhotoPickerDocuments [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]
 
-#define HXPhotoPickerLocalModelsPath [HXPhotoPickerDocuments stringByAppendingPathComponent:[NSString stringWithFormat:@"%@/localModels", HXPhotoHeaderSearchPath]]
+//#define HXPhotoPickerLocalModelsPath [HXPhotoPickerDocuments stringByAppendingPathComponent:[NSString stringWithFormat:@"%@/localModels", HXPhotoHeaderSearchPath]]
+
+#define HXPhotoPickerLocalModelsPath [HXPhotoPickerLibraryCaches stringByAppendingPathComponent:@"localModels"]
 
 #define HXPhotoHeaderSearchPath @"com.silence.hxphotopicker"
 

@@ -71,6 +71,7 @@ typedef void (^ HXVideoEditViewControllerDidCancelBlock)(HXVideoEditViewControll
 
 @end
 @interface HXVideoEditBottomView : UIView
+@property (strong, nonatomic) UIButton *playBtn;
 @property (assign, nonatomic) CGFloat itemHeight;
 @property (assign, nonatomic) CGFloat itemWidth;
 @property (assign, nonatomic) CGFloat validRectX;

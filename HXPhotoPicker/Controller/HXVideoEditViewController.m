@@ -82,14 +82,15 @@ HXVideoEditBottomViewDelegate
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.itemHeight = 60;
-    self.itemWidth = self.itemHeight / 16 * 9;
+    CGFloat cellHeight = self.itemHeight - 4;
+    self.itemWidth = cellHeight / 16 * 9;
     CGFloat imgWidth = self.model.imageSize.width;
     CGFloat imgHeight = self.model.imageSize.height;
-    imgWidth = self.itemHeight / imgHeight * imgWidth;
+    imgWidth = cellHeight / imgHeight * imgWidth;
     if (imgWidth > self.itemWidth) {
-        CGFloat w = self.itemHeight / imgHeight * self.model.imageSize.width;
-        if (w > self.itemHeight / 9 * 16) {
-            w = self.itemHeight / 9 * 16;
+        CGFloat w = cellHeight / imgHeight * self.model.imageSize.width;
+        if (w > cellHeight / 9 * 16) {
+            w = cellHeight / 9 * 16;
         }
         self.itemWidth = w;
     }
@@ -250,6 +251,7 @@ HXVideoEditBottomViewDelegate
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self.bgImageView removeFromSuperview];
                 [self.player play];
+                self.bottomView.playBtn.selected = YES;
                 [self startTimer];
             });
         }];
@@ -308,8 +310,10 @@ HXVideoEditBottomViewDelegate
     self.timer = nil;
     [self.bottomView removeLineView];
     [self.playerLayer.player pause];
+    self.bottomView.playBtn.selected = NO;
 }
 - (void)playPartVideo:(NSTimer *)timer {
+    self.bottomView.playBtn.selected = YES;
     [self.playerLayer.player seekToTime:[self getStartTime] toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     [self.playerLayer.player play];
 }
@@ -445,6 +449,7 @@ HXVideoEditBottomViewDelegate
     [self.timer invalidate];
     self.timer = nil;
     [self.playerLayer.player pause];
+    self.bottomView.playBtn.selected = NO;
     
     [self.bottomView.indicatorLine.layer removeAllAnimations];
     bottomView.indicatorLine.frame = frame;
@@ -464,6 +469,7 @@ HXVideoEditBottomViewDelegate
     self.indicatorLineTimer = [NSTimer scheduledTimerWithTimeInterval:duration target:self selector:@selector(indicatorLinePlayPartVideo:) userInfo:nil repeats:NO];
     [self.playerLayer.player seekToTime:CMTimeMakeWithSeconds(second, self.playerLayer.player.currentTime.timescale) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     [self.playerLayer.player play];
+    self.bottomView.playBtn.selected = YES;
     [self.bottomView panGestureStarAnimationWithDuration:duration];
 }
 - (void)indicatorLinePlayPartVideo:(NSTimer *)timer {
@@ -545,6 +551,7 @@ HXEditFrameViewDelegate
 - (void)setup {
     self.interval = -1;
     [self addSubview:self.cancelBtn];
+    [self addSubview:self.playBtn];
     [self addSubview:self.doneBtn];
     [self addSubview:self.collectionView];
     [self addSubview:self.editView];
@@ -556,6 +563,25 @@ HXEditFrameViewDelegate
 - (void)didCancelBtnClick {
     if ([self.delegate respondsToSelector:@selector(videoEditBottomViewDidCancelClick:)]) {
         [self.delegate videoEditBottomViewDidCancelClick:self];
+    }
+}
+- (void)didplayBtnClick:(UIButton *)button {
+    CGRect indicatorLineFrame = [[self.indicatorLine.layer presentationLayer] frame];
+    CGFloat offsetX = self.collectionView.contentOffset.x;
+    CGFloat centerX = CGRectGetMaxX(indicatorLineFrame) + CGRectGetWidth(indicatorLineFrame) - hxValidRectX - hxImageWidth;
+    CGFloat currentSecond = (offsetX + centerX) / self.contentWidth * CMTimeGetSeconds(self.avAsset.duration);
+    if (currentSecond < 0) {
+        currentSecond = 0;
+    }
+    if (button.selected) {
+        self.currentIndicatorLineFrame = indicatorLineFrame;
+        if ([self.delegate respondsToSelector:@selector(videoEditBottomViewIndicatorLinePanGestureBegan:frame:second:)]) {
+            [self.delegate videoEditBottomViewIndicatorLinePanGestureBegan:self frame:self.currentIndicatorLineFrame second:currentSecond];
+        }
+    }else {
+        if ([self.delegate respondsToSelector:@selector(videoEditBottomViewIndicatorLinePanGestureEnd:frame: second:)]) {
+            [self.delegate videoEditBottomViewIndicatorLinePanGestureEnd:self frame:self.indicatorLine.frame second:currentSecond];
+        }
     }
 }
 - (void)didDoneBtnClick {
@@ -582,7 +608,7 @@ HXEditFrameViewDelegate
     } completion:nil];
 }
 - (void)startLineAnimationWithDuration:(NSTimeInterval)duration {
-    self.indicatorLine.frame = CGRectMake(self.editView.validRect.origin.x, self.collectionView.hx_y, 2, self.itemHeight);
+    self.indicatorLine.frame = CGRectMake(self.editView.validRect.origin.x, self.collectionView.hx_y + 2, 2, self.itemHeight - 4);
     [self addSubview:self.indicatorLine];
     [UIView animateWithDuration:duration delay:.0 options:UIViewAnimationOptionRepeat|UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionCurveLinear | UIViewAnimationOptionOverrideInheritedDuration | UIViewAnimationOptionOverrideInheritedCurve animations:^{
         self.indicatorLine.hx_x = CGRectGetMaxX(self.editView.validRect) - 1.5;
@@ -602,7 +628,13 @@ HXEditFrameViewDelegate
     }
     switch (panGesture.state) {
         case UIGestureRecognizerStateBegan: {
-            self.currentIndicatorLineFrame = [[self.indicatorLine.layer presentationLayer] frame];
+            CGRect indicatorLineFrame = [[self.indicatorLine.layer presentationLayer] frame];
+            centerX = CGRectGetMaxX(indicatorLineFrame) + CGRectGetWidth(indicatorLineFrame) - hxValidRectX - hxImageWidth;
+            currentSecond = (offsetX + centerX) / self.contentWidth * CMTimeGetSeconds(self.avAsset.duration);
+            if (currentSecond < 0) {
+                currentSecond = 0;
+            }
+            self.currentIndicatorLineFrame = indicatorLineFrame;
             if ([self.delegate respondsToSelector:@selector(videoEditBottomViewIndicatorLinePanGestureBegan:frame:second:)]) {
                 [self.delegate videoEditBottomViewIndicatorLinePanGestureBegan:self frame:self.currentIndicatorLineFrame second:currentSecond];
             }
@@ -727,10 +759,10 @@ HXEditFrameViewDelegate
 }
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.item < self.dataCount - 1) {
-        return CGSizeMake(self.itemWidth, self.itemHeight);
+        return CGSizeMake(self.itemWidth, self.itemHeight - 4);
     }
     CGFloat itemW = self.contentWidth - indexPath.item * self.itemWidth;
-    return CGSizeMake(itemW, self.itemHeight);
+    return CGSizeMake(itemW, self.itemHeight - 4);
 }
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     [self getVideoFrameWithIndexPath:indexPath];
@@ -789,6 +821,11 @@ HXEditFrameViewDelegate
     self.cancelBtn.frame = CGRectMake(20, CGRectGetMaxY(self.collectionView.frame) + 15, 0 + 20, 40);
     self.cancelBtn.hx_w = [self.cancelBtn.titleLabel hx_getTextWidth];
     
+    self.playBtn.hx_size = CGSizeMake(40, 40);
+    
+    self.playBtn.hx_centerX = self.hx_w / 2;
+    self.playBtn.hx_centerY = self.cancelBtn.hx_centerY;
+    
     self.doneBtn.hx_h = 40;
     self.doneBtn.hx_w = [self.doneBtn.titleLabel hx_getTextWidth];
     self.doneBtn.hx_x = self.hx_w - 20 - self.doneBtn.hx_w;
@@ -823,6 +860,16 @@ HXEditFrameViewDelegate
     }
     return _cancelBtn;
 }
+- (UIButton *)playBtn {
+    if (!_playBtn) {
+        _playBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_playBtn setImage:[UIImage hx_imageNamed:@"hx_video_play"] forState:UIControlStateNormal];
+        [_playBtn setImage:[UIImage hx_imageNamed:@"hx_video_ pause"] forState:UIControlStateSelected];
+        _playBtn.tintColor = [UIColor whiteColor];
+        [_playBtn addTarget:self action:@selector(didplayBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _playBtn;
+}
 - (UIButton *)doneBtn {
     if (!_doneBtn) {
         _doneBtn = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -840,7 +887,7 @@ HXEditFrameViewDelegate
         _flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         _flowLayout.minimumInteritemSpacing = 0;
         _flowLayout.minimumLineSpacing = 0;
-        _flowLayout.sectionInset = UIEdgeInsetsMake(0, hxValidRectX + hxImageWidth, 0, hxValidRectX + hxImageWidth);
+        _flowLayout.sectionInset = UIEdgeInsetsMake(2, hxValidRectX + hxImageWidth, 2, hxValidRectX + hxImageWidth);
     }
     return _flowLayout;
 }
@@ -899,7 +946,7 @@ HXEditFrameViewDelegate
 }
 - (UIView *)indicatorLine {
     if (!_indicatorLine) {
-        _indicatorLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.5, self.itemHeight)];
+        _indicatorLine = [[UIView alloc] initWithFrame:CGRectMake(0, 2, 2, self.itemHeight - 4)];
         _indicatorLine.backgroundColor = [UIColor whiteColor];
         _indicatorLine.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.5].CGColor;
         _indicatorLine.layer.shadowOpacity = 0.5f;

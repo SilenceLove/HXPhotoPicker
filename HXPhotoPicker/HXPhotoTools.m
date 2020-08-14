@@ -39,6 +39,16 @@ NSString *const hx_kKeyStillImageTime = @"com.apple.quicktime.still-image-time";
 NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identifier";
 @implementation HXPhotoTools
 
++ (void)saveModelToCustomAlbumWithAlbumName:(NSString * _Nullable)albumName
+                                 photoModel:(HXPhotoModel * _Nullable)photoModel
+                                   location:(CLLocation * _Nullable)location
+                                   complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete {
+    if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+        
+    }else if (photoModel.subType == HXPhotoModelMediaSubTypeVideo) {
+        
+    }
+}
 + (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model
                                                completion:(void (^)(CLPlacemark * _Nullable placemark, HXPhotoDateModel *model, NSError * _Nullable error))completion {
     CLGeocoder *geoCoder = [[CLGeocoder alloc] init]; 
@@ -935,7 +945,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 }
 /// 获取所有缓存的大小
 + (long long)getAllLocalFileSize {
-    return [self folderSizeAtPath:HXPhotoPickerAssetCachesPath] + [self getAllLocalModelsFileSize];
+    return [self folderSizeAtPath:HXPhotoPickerAssetCachesPath];
 }
 
 /// 获取缓存在本地所有的HXPhotoModel的大小
@@ -956,7 +966,6 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 /// 删除HXPhotoPicker所有文件
 + (void)deleteAllLocalFile {
     [[NSFileManager defaultManager] removeItemAtPath:HXPhotoPickerAssetCachesPath error:nil];
-    [self deleteAllLocalModelsFile];
 }
 
 /// 删除本地HXPhotoModel缓存文件

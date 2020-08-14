@@ -50,6 +50,8 @@
     HXWeakSelf
     [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2, model3] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
         // 因为公用的同一个manager所以这些需要在跳转前设置一下
+        weakSelf.photoManager.selectPhotoFinishDismissAnimated = YES;
+        weakSelf.photoManager.cameraFinishDismissAnimated = YES;
         weakSelf.photoManager.type = HXPhotoManagerSelectedTypePhoto;
         weakSelf.photoManager.configuration.singleJumpEdit = YES;
         weakSelf.photoManager.configuration.singleSelected = YES;

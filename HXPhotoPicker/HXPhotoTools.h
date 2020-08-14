@@ -26,6 +26,11 @@
 @class HXPhotoManager;
 @interface HXPhotoTools : NSObject 
 
++ (void)saveModelToCustomAlbumWithAlbumName:(NSString * _Nullable)albumName
+                                 photoModel:(HXPhotoModel * _Nullable)photoModel
+                                   location:(CLLocation * _Nullable)location
+                                   complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
+
 /**
  保存本地视频到系统相册和自定义相册
 
