@@ -485,6 +485,9 @@
     self.arrowIcon.hx_x = CGRectGetMaxX(self.titleLb.frame) + 5;
     self.contentView.hx_w = width;
     self.contentView.hx_centerX = self.hx_w / 2;
+    if (self.superview) {
+        [self setupContentViewFrame];
+    }
 }
 - (BOOL)selected {
     return self.button.selected;
@@ -500,9 +503,30 @@
 //        self.arrowIcon.alpha = 1;
 //    }
 //}
+- (void)setupContentViewFrame {
+    if (self.superview && [self.superview isKindOfClass:NSClassFromString(@"_UITAMICAdaptorView")]) {
+        // 让按钮在屏幕中间
+        CGFloat temp_x = self.superview.hx_x + self.contentView.hx_x;
+        CGFloat windowWidth = [UIApplication sharedApplication].keyWindow.hx_w;
+        CGFloat w_x = (windowWidth - self.contentView.hx_w) / 2;
+        if (temp_x > w_x) {
+            CGFloat difference = temp_x - w_x;
+            if (self.contentView.hx_x - difference >= 0) {
+                self.contentView.hx_x -= difference;
+            }else {
+                self.contentView.hx_x = 0;
+            }
+        }else {
+            CGFloat difference = w_x - temp_x;
+            self.contentView.hx_x += difference;
+        }
+    }
+}
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.button.frame = self.bounds;
+    
+    [self setupContentViewFrame];
 }
 - (UIView *)contentView {
     if (!_contentView) {

@@ -125,7 +125,7 @@ NSString *const kHXImageViewData_filter = @"HXImageViewData_filter";
     if (array.count) {
         image = [UIImage hx_mergeimages:array];
         if (rotate || mirrorHorizontally) {
-            NSInteger angle = labs(rotate * 180 / M_PI - 360);
+            NSInteger angle = fabs(rotate * 180 / M_PI - 360);
             if (angle == 0 || angle == 360) {
                 if (mirrorHorizontally) {
                     image = [image hx_rotationImage:UIImageOrientationUpMirrored];
