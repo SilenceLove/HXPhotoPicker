@@ -1,10 +1,11 @@
 <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tip_2.png">
 
-[![Platform](http://img.shields.io/badge/platform-ios-blue.svg?style=flat
-             )](https://developer.apple.com/iphone/index.action)
-[![Pod Version](http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?style=flat)](http://cocoadocs.org/docsets/HXPhotoPicker/)
-[![Language](http://img.shields.io/badge/language-ObjC-brightgreen.svg?style=flat)](https://developer.apple.com/Objective-C)
-[![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
+<p align="center">
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/badge/platform-iOS%208.0%2B-ff69b5152950834.svg?style=flat"></a>
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?style=flat"></a>
+<a href="https://developer.apple.com/Objective-C"><img src="http://img.shields.io/badge/language-ObjC-orange.svg?style=flat"></a>
+<a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat"></a>
+</p>
 
 | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_4.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_1.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_2.PNG"> |
 | ------ | ------ | ------ |
