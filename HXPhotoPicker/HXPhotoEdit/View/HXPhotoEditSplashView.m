@@ -130,7 +130,7 @@ NSString *const kHXSplashViewData_frameArray = @"HXSplashViewData_frameArray";
             }
         } else if (self.state == HXPhotoEditSplashStateType_Paintbrush) {
             HXPhotoEditSplashImageBlur *blur = [HXPhotoEditSplashImageBlur new];
-            blur.rect = CGRectMake(point.x-self.paintSize.width/2, point.y-self.paintSize.height/2, self.paintSize.width, self.paintSize.height);
+            blur.rect = CGRectMake(point.x - self.paintSize.width / 2, point.y - self.paintSize.height / 2, self.paintSize.width, self.paintSize.height);
             blur.color = self.splashColor ? self.splashColor(blur.rect.origin) : nil;
             HXPhotoEditSplashMaskLayer *layer = [HXPhotoEditSplashMaskLayer layer];
             layer.frame = self.bounds;
@@ -177,9 +177,9 @@ NSString *const kHXSplashViewData_frameArray = @"HXSplashViewData_frameArray";
                 blur.imageName = @"hx_photo_edit_mosaic_brush";
                 blur.color = self.splashColor ? self.splashColor(point) : nil;
                 /** 新增随机位置 */
-                int x = self.paintSize.width + 20 / self.screenScale;
-                float randomX = floorf(arc4random()%x) - x/2;
-                blur.rect = CGRectMake(point.x-self.paintSize.width/2 + randomX, point.y-self.paintSize.height/2, self.paintSize.width, self.paintSize.height);
+                int x = self.paintSize.width / 2;
+                float randomX = floorf(arc4random() % x) - x / 4;
+                blur.rect = CGRectMake(point.x - self.paintSize.width / 2 + randomX, point.y - self.paintSize.height / 2, self.paintSize.width, self.paintSize.height);
                 [layer.lineArray addObject:blur];
                 /** 新增额外对象 密集图片 */
                 [layer setNeedsDisplay];

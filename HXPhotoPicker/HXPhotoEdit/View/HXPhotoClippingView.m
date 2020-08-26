@@ -28,6 +28,7 @@ NSString *const kHXClippingViewData_maximumZoomScale = @"HXClippingViewData_maxi
 NSString *const kHXClippingViewData_clipsToBounds = @"HXClippingViewData_clipsToBounds";
 NSString *const kHXClippingViewData_transform = @"HXClippingViewData_transform";
 NSString *const kHXClippingViewData_angle = @"HXClippingViewData_angle";
+NSString *const kHXClippingViewData_mirror = @"HXClippingViewData_mirror";
 
 NSString *const kHXClippingViewData_first_minimumZoomScale = @"HXClippingViewData_first_minimumZoomScale";
 
@@ -49,6 +50,8 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
 /** 记录剪裁前的数据 */
 @property (nonatomic, assign) CGRect old_frame;
 @property (nonatomic, assign) NSInteger old_angle;
+@property (nonatomic, assign) BOOL old_mirrorHorizontally;
+@property (nonatomic, assign) HXPhotoClippingViewMirrorType old_mirrorType;
 @property (nonatomic, assign) CGFloat old_zoomScale;
 @property (nonatomic, assign) CGSize old_contentSize;
 @property (nonatomic, assign) CGPoint old_contentOffset;
@@ -89,6 +92,7 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     self.alwaysBounceHorizontal = YES;
     self.alwaysBounceVertical = YES;
     self.angle = 0;
+    self.mirrorType = HXPhotoClippingViewMirrorType_None;
     self.offsetSuperCenter = CGPointZero;
     self.useGesture = NO;
     
@@ -164,13 +168,14 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     /** 参数取整，否则可能会出现1像素偏差 */
 //    inRect = HXMediaEditProundRect(inRect);
     
-    return [self.imageView editOtherImagesInRect:inRect rotate:rotate];
+    return [self.imageView editOtherImagesInRect:inRect rotate:rotate mirrorHorizontally:self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal];
 }
 
 - (void)setCropRect:(CGRect)cropRect {
     /** 记录当前数据 */
     self.old_transform = self.transform;
     self.old_angle = self.angle;
+    self.old_mirrorType = self.mirrorType;
     self.old_frame = self.frame;
     self.old_zoomScale = self.zoomScale;
     self.old_contentSize = self.contentSize;
@@ -245,6 +250,7 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     if (!CGRectEqualToRect(self.old_frame, CGRectZero)) {
         self.transform = self.old_transform;
         self.angle = self.old_angle;
+        self.mirrorType = self.old_mirrorType;
         self.frame = self.old_frame;
         self.saveRect = self.frame;
         self.minimumZoomScale = self.old_minimumZoomScale;
@@ -257,6 +263,7 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
 - (void)resetRotateAngle {
     self.transform = CGAffineTransformIdentity;
     self.angle = 0;
+    self.mirrorType = HXPhotoClippingViewMirrorType_None;
 }
 - (void)reset {
     [self resetToRect:CGRectZero];
@@ -265,6 +272,7 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
 - (void)resetToRect:(CGRect)rect {
     if (!_isReseting) {
         _isReseting = YES;
+        self.mirrorType = HXPhotoClippingViewMirrorType_None;
         if (CGRectEqualToRect(rect, CGRectZero)) {
             [UIView animateWithDuration:0.25
                                   delay:0.0
@@ -501,7 +509,9 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     }
     if (!_isRotating) {
         _isRotating = YES;
-        
+        if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+            clockwise = YES;
+        }
         NSInteger newAngle = self.angle;
         newAngle = clockwise ? newAngle + 90 : newAngle - 90;
         if (newAngle <= -360 || newAngle >= 360)
@@ -527,7 +537,87 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
         
     }
 }
-
+/// 镜像翻转
+- (void)mirrorFlip {
+    if (self.dragging || self.decelerating) {
+        return;
+    }
+    if (!self.isMirrorFlip) {
+        self.isMirrorFlip = YES;
+        if ([self.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
+            [self.clippingDelegate clippingViewWillBeginZooming:self];
+        }
+        CGFloat angleInRadians = 0.0f;
+        switch (self.angle) {
+            case 90:    angleInRadians = M_PI_2;            break;
+            case -90:   angleInRadians = -M_PI_2;           break;
+            case 180:   angleInRadians = M_PI;              break;
+            case -180:  angleInRadians = -M_PI;             break;
+            case 270:   angleInRadians = (M_PI + M_PI_2);   break;
+            case -270:  angleInRadians = -(M_PI + M_PI_2);  break;
+            default:                                        break;
+        }
+        CGAffineTransform rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity ,angleInRadians);
+        [UIView animateWithDuration:0.25 animations:^{
+            if (self.mirrorType == HXPhotoClippingViewMirrorType_None) {
+                // 没有镜像翻转
+                if (self.angle == 0) {
+                    // 上
+                    self.transform = CGAffineTransformScale(rotateTransform ,-1.0, 1.0);
+                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                }else if (self.angle == -90 || self.angle == 90) {
+                    // 左
+                    self.transform = CGAffineTransformScale(rotateTransform ,1.0, -1.0);
+                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                    self.angle = 270;
+                }else if (self.angle == -180 || self.angle == 180) {
+                    // 下
+                    self.transform = CGAffineTransformScale(rotateTransform ,-1.0, 1.0);
+                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                }else if (self.angle == -270 || self.angle == 270) {
+                    // 右
+                    self.transform = CGAffineTransformScale(CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2), -1, 1);
+                    self.angle = 90;
+                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                }
+            }else if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal){
+                // 水平翻转了
+                if (self.angle == 0) {
+                    // 上
+                    self.transform = CGAffineTransformScale(rotateTransform ,1.0, 1.0);
+                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
+                }else if (self.angle == -90 || self.angle == 90) {
+                    // 左
+                    CGAffineTransform transfrom = CGAffineTransformRotate(CGAffineTransformIdentity, -(M_PI + M_PI_2));
+                    self.transform = transfrom;
+                    self.angle = -270;
+                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
+                }else if (self.angle == -180 || self.angle == 180) {
+                    // 下
+                    self.transform = CGAffineTransformScale(rotateTransform ,1.0, 1.0);
+                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
+                }else if (self.angle == -270 || self.angle == 270) {
+                    // 右
+                    self.transform = CGAffineTransformScale(CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2) , 1, 1);
+                    self.angle = -90;
+                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
+                }
+            }
+        } completion:^(BOOL finished) {
+            self.isMirrorFlip = NO;
+            if ([self.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
+                [self.clippingDelegate clippingViewDidEndZooming:self];
+            }
+        }];
+    }
+}
+- (CGAffineTransform)getCurrentMirrorFlip {
+    if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal){
+        // 水平翻转了
+        return CGAffineTransformScale(CGAffineTransformIdentity ,-1.0, 1.0);
+    }
+    return CGAffineTransformIdentity;
+}
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     if ([self.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginDragging:)]) {
@@ -633,6 +723,7 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
         case -270:  angleInRadians = -(M_PI + M_PI_2);  break;
         default:                                        break;
     }
+    
      
     /** 不用重置变形，使用center与bounds来计算原来的frame */
     CGPoint center = self.center;
@@ -679,7 +770,7 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     }
     
     /** 调整变形 */
-    CGAffineTransform transform = CGAffineTransformRotate(CGAffineTransformIdentity, angleInRadians);
+    CGAffineTransform transform = CGAffineTransformRotate([self getCurrentMirrorFlip], angleInRadians);
     self.transform = transform;
     
     /** 计算变形后的坐标拉伸到编辑范围 */
@@ -779,8 +870,9 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
                                  , kHXClippingViewData_clipsToBounds:@(self.clipsToBounds)
                                  , kHXClippingViewData_first_minimumZoomScale:@(self.first_minimumZoomScale)
                                  , kHXClippingViewData_transform:[NSValue valueWithCGAffineTransform:self.transform]
-                                 , kHXClippingViewData_angle:@(self.angle),
-                                 kHXStickerViewData_screenScale:@(self.screenScale)
+                                 , kHXClippingViewData_angle:@(self.angle)
+                                 , kHXClippingViewData_mirror : @(self.mirrorType)
+                                 , kHXStickerViewData_screenScale:@(self.screenScale)
         };
         [data setObject:myData forKey:kHXClippingViewData];
     }
@@ -800,6 +892,7 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     if (myData) {
         self.transform = [myData[kHXClippingViewData_transform] CGAffineTransformValue];
         self.angle = [myData[kHXClippingViewData_angle] integerValue];
+        self.mirrorType = [myData[kHXClippingViewData_mirror] integerValue];
         self.saveRect = [myData[kHXClippingViewData_frame] CGRectValue];
         self.frame = self.saveRect;
         self.minimumZoomScale = [myData[kHXClippingViewData_minimumZoomScale] floatValue];

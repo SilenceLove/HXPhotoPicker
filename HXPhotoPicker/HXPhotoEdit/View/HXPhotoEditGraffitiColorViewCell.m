@@ -12,6 +12,7 @@
 
 @interface HXPhotoEditGraffitiColorViewCell ()
 @property (weak, nonatomic) IBOutlet UIView *colorView;
+@property (weak, nonatomic) IBOutlet UIView *colorCenterView;
 
 @end
 
@@ -21,28 +22,26 @@
     [super awakeFromNib];
     // Initialization code
     
-    self.colorView.backgroundColor = [UIColor redColor];
-    self.colorView.layer.borderColor = [UIColor whiteColor].CGColor;
-    self.colorView.layer.borderWidth = 2.5f;
+    self.colorView.backgroundColor = [UIColor whiteColor];
     [self.colorView hx_radiusWithRadius:11.f corner:UIRectCornerAllCorners];
+    [self.colorCenterView hx_radiusWithRadius:16.f / 2.f corner:UIRectCornerAllCorners];
 }
 
 - (void)setModel:(HXPhotoEditGraffitiColorModel *)model {
     _model = model;
     if ([model.color hx_colorIsWhite]) {
-        self.colorView.backgroundColor = [UIColor hx_colorWithHexStr:@"#eeeeee"];
+        self.colorView.backgroundColor = [UIColor hx_colorWithHexStr:@"#dadada"];
     }else {
-        self.colorView.backgroundColor = model.color;
+        self.colorView.backgroundColor = [UIColor whiteColor];
     }
+    self.colorCenterView.backgroundColor = model.color;
     [self setupColor];
 }
 - (void)setupColor {
     if (self.model.selected) {
-        self.colorView.transform = CGAffineTransformMakeScale(1.25, 1.25);
-        self.colorView.layer.borderWidth = 2.5f * 1.25;
+        self.colorView.transform = CGAffineTransformMakeScale(1.2, 1.2);
     }else {
         self.colorView.transform = CGAffineTransformIdentity;
-        self.colorView.layer.borderWidth = 2.5f;
     }
 }
 - (void)setSelected:(BOOL)selected {

@@ -18,9 +18,21 @@
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LsW-Q7-yha">
                         <rect key="frame" x="14" y="14" width="22" height="22"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DIr-Jf-c7Q">
+                                <rect key="frame" x="3" y="3" width="16" height="16"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="16" id="WsQ-cK-Asi"/>
+                                    <constraint firstAttribute="height" constant="16" id="YJl-ek-ZMC"/>
+                                </constraints>
+                            </view>
+                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="DIr-Jf-c7Q" firstAttribute="centerX" secondItem="LsW-Q7-yha" secondAttribute="centerX" id="QOF-kN-AC5"/>
                             <constraint firstAttribute="width" constant="22" id="gE3-oD-Xzl"/>
+                            <constraint firstItem="DIr-Jf-c7Q" firstAttribute="centerY" secondItem="LsW-Q7-yha" secondAttribute="centerY" id="lHN-WW-Sjb"/>
                             <constraint firstAttribute="height" constant="22" id="s1f-w6-17p"/>
                         </constraints>
                     </view>
@@ -31,6 +43,7 @@
                 <constraint firstItem="LsW-Q7-yha" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="zc3-UX-puk"/>
             </constraints>
             <connections>
+                <outlet property="colorCenterView" destination="DIr-Jf-c7Q" id="dCb-2A-ihs"/>
                 <outlet property="colorView" destination="LsW-Q7-yha" id="43q-ib-nBg"/>
             </connections>
             <point key="canvasLocation" x="-128.98550724637681" y="81.696428571428569"/>

@@ -51,7 +51,7 @@ const CGFloat HXControlWidth = 30.f;
     /** 宫格 */
     HXPhotoEditGridLayer *gridLayer = [[HXPhotoEditGridLayer alloc] init];
     gridLayer.frame = self.bounds;
-    gridLayer.lineWidth = 2.f;
+//    gridLayer.lineWidth = 2.f;
     gridLayer.bgColor = [UIColor clearColor];
     gridLayer.gridColor = [UIColor clearColor];
 
@@ -113,8 +113,7 @@ const CGFloat HXControlWidth = 30.f;
             /** 扩大遮罩范围 */
             [self.gridMaskLayer clearMaskWithAnimated:YES];
         }
-    }
-    /** 简单粗暴的禁用拖动事件 */
+    } 
 //    self.userInteractionEnabled = showMaskLayer;
 }
 
@@ -192,6 +191,27 @@ const CGFloat HXControlWidth = 30.f;
     }
 }
 
+- (void)setupAspectRatio:(HXPhotoEditGridViewAspectRatioType)aspectRatio {
+    _aspectRatio = aspectRatio;
+    CGSize size = self.aspectRatioSize;
+    CGRect gridRect = self.gridRect;
+    if (!CGSizeEqualToSize(size, CGSizeZero)) {
+        /** 计算比例后高度 */
+        CGFloat newHeight = gridRect.size.width * (size.height/size.width);
+        /** 超出最大高度计算 */
+        if (newHeight > _controlMaxRect.size.height) {
+            CGFloat newWidth = gridRect.size.width * (_controlMaxRect.size.height/newHeight);
+            CGFloat diffWidth = gridRect.size.width - newWidth;
+            gridRect.size.width = newWidth;
+            gridRect.origin.x = gridRect.origin.x + diffWidth/2;
+            newHeight = _controlMaxRect.size.height;
+        }
+        CGFloat diffHeight = gridRect.size.height - newHeight;
+        gridRect.size.height = newHeight;
+        gridRect.origin.y = gridRect.origin.y + diffHeight/2;
+    }
+    _gridRect = gridRect;
+}
 - (void)setAspectRatio:(HXPhotoEditGridViewAspectRatioType)aspectRatio {
     [self setAspectRatio:aspectRatio animated:NO];
 }

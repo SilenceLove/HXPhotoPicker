@@ -94,7 +94,7 @@ NSString *const kHXImageViewData_filter = @"HXImageViewData_filter";
     self.stickerView.screenScale = screenScale;
     self.splashView.screenScale = screenScale;
 }
-- (UIImage *)editOtherImagesInRect:(CGRect)rect rotate:(CGFloat)rotate {
+- (UIImage *)editOtherImagesInRect:(CGRect)rect rotate:(CGFloat)rotate mirrorHorizontally:(BOOL)mirrorHorizontally {
     UIImage *image = nil;
     NSMutableArray *array = nil;
     for (UIView *subView in self.subviews) {
@@ -116,13 +116,40 @@ NSString *const kHXImageViewData_filter = @"HXImageViewData_filter";
         if (array == nil) {
             array = [NSMutableArray arrayWithCapacity:3];
         }
-        [array addObject:[subView hx_captureImageAtFrame:rect]];
+        UIImage *subImage = [subView hx_captureImageAtFrame:rect];
         subView.layer.contents = (id)nil;
+        if (subImage) {
+            [array addObject:subImage];
+        }
     }
     if (array.count) {
         image = [UIImage hx_mergeimages:array];
-        if (rotate) {
-            image = [image hx_imageRotatedByRadians:rotate scale:self.screenScale * [UIScreen mainScreen].scale];
+        if (rotate || mirrorHorizontally) {
+            NSInteger angle = labs(rotate * 180 / M_PI - 360);
+            if (angle == 0 || angle == 360) {
+                if (mirrorHorizontally) {
+                    image = [image hx_rotationImage:UIImageOrientationUpMirrored];
+                }
+            }else if (angle == 90) {
+                if (!mirrorHorizontally) {
+                    image = [image hx_rotationImage:UIImageOrientationLeft];
+                }else {
+                    image = [image hx_rotationImage:UIImageOrientationRightMirrored];
+                }
+            }else if (angle == 180) {
+                if (!mirrorHorizontally) {
+                    image = [image hx_rotationImage:UIImageOrientationDown];
+                }else {
+                    image = [image hx_rotationImage:UIImageOrientationDownMirrored];
+                }
+            }else if (angle == 270) {
+                if (!mirrorHorizontally) {
+                    image = [image hx_rotationImage:UIImageOrientationRight];
+                }else {
+                    image = [image hx_rotationImage:UIImageOrientationLeftMirrored];
+                }
+            }
+//            image = [image hx_imageRotatedByRadians:rotate scale:self.screenScale * [UIScreen mainScreen].scale mirrorHorizontally:mirrorHorizontally];
         }
     }
     return image;

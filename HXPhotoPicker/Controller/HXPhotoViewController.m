@@ -1383,15 +1383,19 @@ HX_PhotoEditViewControllerDelegate
         self.navigationController.viewControllers.lastObject.view.userInteractionEnabled = NO;
         [self.navigationController.viewControllers.lastObject.view hx_showLoadingHUDText:nil];
         HXWeakSelf
-        if (self.manager.original) {
-            [self.manager.selectedArray hx_requestImageSeparatelyWithOriginal:self.manager.original completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
+        BOOL requestOriginal = self.manager.original;
+        if (self.manager.configuration.hideOriginalBtn) {
+            requestOriginal = self.manager.configuration.requestOriginalImage;
+        }
+        if (requestOriginal) {
+            [self.manager.selectedArray hx_requestImageSeparatelyWithOriginal:requestOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
                 if (!weakSelf) {
                     return;
                 }
                 [weakSelf afterFinishingGetVideoURL];
             }];
         }else {
-            [self.manager.selectedArray hx_requestImageWithOriginal:self.manager.original completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
+            [self.manager.selectedArray hx_requestImageWithOriginal:requestOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
                 if (!weakSelf) {
                     return;
                 }
@@ -1405,10 +1409,14 @@ HX_PhotoEditViewControllerDelegate
 - (void)afterFinishingGetVideoURL {
     NSArray *videoArray = self.manager.selectedVideoArray;
     if (videoArray.count) {
+        BOOL requestOriginal = self.manager.original;
+        if (self.manager.configuration.hideOriginalBtn) {
+            requestOriginal = self.manager.configuration.requestOriginalImage;
+        }
         HXWeakSelf
         __block NSInteger videoCount = videoArray.count;
         __block NSInteger videoIndex = 0;
-        BOOL endOriginal = self.manager.configuration.exportVideoURLForHighestQuality ? self.manager.original : NO;
+        BOOL endOriginal = self.manager.configuration.exportVideoURLForHighestQuality ? requestOriginal : NO;
         for (HXPhotoModel *pm in videoArray) {
             [pm exportVideoWithPresetName:endOriginal ? AVAssetExportPresetHighestQuality : AVAssetExportPresetMediumQuality startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
                 if (!weakSelf) {

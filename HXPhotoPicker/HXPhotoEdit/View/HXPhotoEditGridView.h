@@ -52,6 +52,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditGridViewAspectRatioType) {
 @property (assign, nonatomic) CGSize customRatioSize;
 - (void)setAspectRatio:(HXPhotoEditGridViewAspectRatioType)aspectRatio animated:(BOOL)animated;
 
+- (void)setupAspectRatio:(HXPhotoEditGridViewAspectRatioType)aspectRatio;
+
 @property (nonatomic, weak) id<HXPhotoEditGridViewDelegate> delegate;
 /** 遮罩颜色 */
 @property (nonatomic, assign) CGColorRef maskColor;

@@ -51,7 +51,7 @@
         HXPhotoEditGraffitiColorModel *model = [[HXPhotoEditGraffitiColorModel alloc] init];
         model.color = color;
         [self.colorModels addObject:model];
-        if (self.colorModels.count == 1) {
+        if (self.colorModels.count == self.defaultDarwColorIndex + 1) {
             model.selected = YES;
             self.currentSelectModel = model;
         }

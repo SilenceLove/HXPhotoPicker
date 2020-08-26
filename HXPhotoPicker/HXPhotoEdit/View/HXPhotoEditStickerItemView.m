@@ -13,6 +13,8 @@
 #import "HXPhotoDefine.h"
 #import "UIView+HXExtension.h"
 #import "HXPhotoEditConfiguration.h"
+#import "HXPhotoClippingView.h"
+#import "HXPhotoEditStickerView.h"
 
 #define HXItemView_margin 22
 
@@ -107,18 +109,18 @@
     [self setScale:_scale rotation:self.arg];
 }
 - (void)resetRotation {
-    [self setScale:_scale rotation:self.arg];
+    [self setScale:_scale rotation:self.arg isInitialize:NO isPinch:NO setMirror:YES];
 }
 - (void)setScale:(CGFloat)scale {
     [self setScale:scale rotation:MAXFLOAT];
 }
 - (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation {
-    [self setScale:scale rotation:rotation isInitialize:NO];
+    [self setScale:scale rotation:rotation isInitialize:NO ];
 }
 - (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation isInitialize:(BOOL)isInitialize  {
-    [self setScale:scale rotation:rotation isInitialize:isInitialize isPinch:NO];
+    [self setScale:scale rotation:rotation isInitialize:isInitialize isPinch:NO setMirror:NO];
 }
-- (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation isInitialize:(BOOL)isInitialize isPinch:(BOOL)isPinch {
+- (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation isInitialize:(BOOL)isInitialize isPinch:(BOOL)isPinch setMirror:(BOOL)setMirror {
     if (rotation != MAXFLOAT) {
         self.arg = rotation;
     }
@@ -179,7 +181,46 @@
     
     self.contentView.center = CGPointMake(rct.size.width/2, rct.size.height/2);
     
-    self.transform = CGAffineTransformMakeRotation(self.arg);
+    if (setMirror) {
+        if ([self.superview isKindOfClass:[HXPhotoEditStickerView class]]) {
+            if (self.superMirrorType == HXPhotoClippingViewMirrorType_None) {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+                    self.transform = CGAffineTransformScale(self.transform, -1, 1);
+                }
+            }else {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+//                    self.transform = CGAffineTransformScale(self.transform, 1, 1);
+                }else {
+                    self.transform = CGAffineTransformScale(self.transform, -1, 1);
+                }
+            }
+        }else {
+            if (self.superMirrorType == HXPhotoClippingViewMirrorType_None) {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+                    if (self.superAngle % 180 != 0) {
+                        // 水平
+                        self.transform = CGAffineTransformScale(self.transform, 1, -1);
+                    }else {
+                        // 垂直
+                        self.transform = CGAffineTransformScale(self.transform, -1, 1);
+                    }
+                }
+            }else {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+                    self.transform = CGAffineTransformScale(self.transform, -1, 1);
+                }else {
+                    if (self.superAngle % 180 != 0) {
+                        // 水平
+                        self.transform = CGAffineTransformScale(self.transform, -1, -1);
+                    }else {
+                        // 垂直
+                        self.transform = CGAffineTransformScale(self.transform, 1, 1);
+                    }
+                }
+            }
+        }
+    }
+    self.transform = CGAffineTransformRotate(self.transform, self.arg);
     
     if (self.isSelected) {
         if (self.touching) {
@@ -298,7 +339,7 @@
             self.touchEnded(self);
         }
     }
-    [self setScale:(self.initialScale * sender.scale) rotation:MAXFLOAT isInitialize:NO isPinch:YES];
+    [self setScale:(self.initialScale * sender.scale) rotation:MAXFLOAT isInitialize:NO isPinch:YES setMirror:YES];
     if(sender.state == UIGestureRecognizerStateBegan && sender.state == UIGestureRecognizerStateChanged){
         sender.scale = 1.0;
     }
@@ -310,23 +351,15 @@
     }
     if(sender.state == UIGestureRecognizerStateBegan){
         self.firstTouch = YES;
-        UIView *clippingView = self.superview.superview.superview;
-        // 旋转后，需要处理弧度的变化
-        CGFloat radians = atan2f(clippingView.transform.b, clippingView.transform.a);
-        if ((radians > 0 && radians < M_PI) || (radians < 0 && radians > -M_PI)) {
-            self.currentItemDegrees = -radians;
-        }else {
-            self.currentItemDegrees = radians;
-        }
         self.touching = YES;
         self.isSelected = YES;
-        self.initialArg = self.arg;
         if (self.rotationBegan) {
             self.rotationBegan();
         }
         if (self.touchBegan) {
             self.touchBegan(self);
         }
+        self.initialArg = self.arg;
         sender.rotation = 0.0;
     } else if (sender.state == UIGestureRecognizerStateEnded ||
                sender.state == UIGestureRecognizerStateCancelled) {
@@ -339,9 +372,38 @@
         }
         sender.rotation = 0.0;
     }else if (sender.state == UIGestureRecognizerStateChanged) {
-        self.arg = self.initialArg + sender.rotation;
+
+        if ([self.superview isKindOfClass:[HXPhotoEditStickerView class]]) {
+            if (self.superMirrorType == HXPhotoClippingViewMirrorType_None) {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+                    self.arg = self.initialArg - sender.rotation;
+                }else {
+                    self.arg = self.initialArg + sender.rotation;
+                }
+            }else {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+                    self.arg = self.initialArg - sender.rotation;
+                }else {
+                    self.arg = self.initialArg + sender.rotation;
+                }
+            }
+        }else {
+            if (self.superMirrorType == HXPhotoClippingViewMirrorType_None) {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+                    self.arg = self.initialArg - sender.rotation;
+                }else {
+                    self.arg = self.initialArg + sender.rotation;
+                }
+            }else {
+                if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+                    self.arg = self.initialArg - sender.rotation;
+                }else {
+                    self.arg = self.initialArg + sender.rotation;
+                }
+            }
+        }
         CGFloat arg = self.arg;
-        [self setScale:self.scale rotation:arg - self.currentItemDegrees isInitialize:NO isPinch:NO];
+        [self setScale:self.scale rotation:arg isInitialize:NO isPinch:NO setMirror:YES];
     }
 }
 @end

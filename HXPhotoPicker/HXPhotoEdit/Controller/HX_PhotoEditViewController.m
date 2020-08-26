@@ -26,9 +26,11 @@
 #import "HXPhotoModel.h"
 #import "HXPhotoEditTransition.h"
 #import "HXPhotoTools.h"
+#import "HXPhotoEditGraffitiColorSizeView.h"
 
 #define HXGraffitiColorViewHeight 60.f
 #define HXmosaicViewHeight 60.f
+#define HXClippingToolBar 110.f
 
 @interface HX_PhotoEditViewController ()<UIGestureRecognizerDelegate, HXPhotoEditingViewDelegate>
 @property (strong, nonatomic) UIView *topMaskView;
@@ -42,13 +44,14 @@
 @property (strong, nonatomic) HXPhotoEditingView *editingView;
 @property (weak, nonatomic) UITapGestureRecognizer *tap;
 @property (strong, nonatomic) HXPhotoEditClippingToolBar *clippingToolBar;
-@property (strong, nonatomic) UIButton *rotateBtn;
 @property (nonatomic, strong, nullable) NSDictionary *editData;
 @property (assign, nonatomic) PHContentEditingInputRequestID requestId;
 @property (assign, nonatomic) CGFloat imageWidth;
 @property (assign, nonatomic) CGFloat imageHeight;
 @property (strong, nonatomic) HXPhotoModel *afterModel;
 @property (assign, nonatomic) BOOL orientationDidChange;
+@property (strong, nonatomic) HXPhotoEditGraffitiColorSizeView *graffitiColorSizeView;
+@property (strong, nonatomic) UIView *brushLineWidthPromptView;
 @end
 
 @implementation HX_PhotoEditViewController
@@ -180,17 +183,15 @@
     [self.view addSubview:self.bottomMaskView];
     if (self.onlyCliping) {
         [self.view addSubview:self.clippingToolBar];
-        [self.view addSubview:self.rotateBtn];
         [self.editingView photoEditEnable:NO];
         self.tap.enabled = NO;
         self.clippingToolBar.userInteractionEnabled = YES;
-        self.rotateBtn.userInteractionEnabled = YES;
     }else {
         [self.view addSubview:self.topMaskView];
         [self.topMaskView addSubview:self.backBtn];
         [self.view addSubview:self.toolsView];
         [self.view addSubview:self.clippingToolBar];
-        [self.view addSubview:self.rotateBtn];
+        [self.view addSubview:self.brushLineWidthPromptView];
     }
 }
 - (void)deviceOrientationWillChanged:(NSNotification *)notify {
@@ -212,19 +213,20 @@
         leftMargin = 0;
         self.backBtn.hx_x = 20;
         self.backBtn.hx_y = hxNavigationBarHeight - 20 - _backBtn.hx_h;
-        self.clippingToolBar.frame = CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin);
+        self.clippingToolBar.frame = CGRectMake(0, self.view.hx_h - HXClippingToolBar - hxBottomMargin, self.view.hx_w, HXClippingToolBar + hxBottomMargin);
         self.toolsView.frame = CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin);
-        self.rotateBtn.hx_x = 25.f;
         
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
         self.backBtn.hx_x = 20 + hxBottomMargin;
         self.backBtn.hx_y = 20;
-        self.clippingToolBar.frame = CGRectMake(hxBottomMargin, self.view.hx_h - 50, self.view.hx_w - hxBottomMargin * 2, 50);
+        self.clippingToolBar.frame = CGRectMake(hxBottomMargin, self.view.hx_h - HXClippingToolBar, self.view.hx_w - hxBottomMargin * 2, HXClippingToolBar);
         self.toolsView.frame = CGRectMake(hxBottomMargin, self.view.hx_h - 50, self.view.hx_w - hxBottomMargin * 2, 50);
-        self.rotateBtn.hx_x = 25 + hxBottomMargin;
     }
-    self.rotateBtn.hx_y = self.clippingToolBar.hx_y - 70 + self.rotateBtn.hx_h;
     self.graffitiColorView.frame = CGRectMake(leftMargin, self.toolsView.hx_y - HXGraffitiColorViewHeight, self.view.hx_w - leftMargin * 2, HXGraffitiColorViewHeight);
+    self.graffitiColorSizeView.frame = CGRectMake(self.view.hx_w - 50 - 12, 0, 50, 180);
+    self.graffitiColorSizeView.hx_centerY = self.view.hx_h / 2;
+    [self setBrushinePromptViewSize];
+    
     self.mosaicView.frame = CGRectMake(leftMargin, self.toolsView.hx_y - HXmosaicViewHeight, self.view.hx_w - leftMargin * 2, HXmosaicViewHeight);
     self.topMaskView.frame = CGRectMake(0, 0, HX_ScreenWidth, hxNavigationBarHeight);
     self.topMaskLayer.frame = CGRectMake(0, 0, HX_ScreenWidth, hxNavigationBarHeight + 30.f);
@@ -269,11 +271,21 @@
         if (self.photoModel.asset) {
             [self requestImaegURL];
         }else {
+            UIImage *image;
             if (self.photoModel.thumbPhoto.images.count > 1) {
-                self.editImage = self.photoModel.thumbPhoto.images.firstObject;
+                image = self.photoModel.thumbPhoto.images.firstObject;
             }else {
-                self.editImage = self.photoModel.thumbPhoto;
+                image = self.photoModel.thumbPhoto;
             }
+            CGSize imageSize = image.size;
+            if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+                while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+                    imageSize.width /= 2;
+                    imageSize.height /= 2;
+                }
+                image = [image hx_scaleToFillSize:imageSize];
+            }
+            self.editImage = image;
             [self loadImageCompletion];
         }
     }
@@ -292,7 +304,7 @@
         [self.photoModel requestPreviewImageWithSize:self.photoModel.endImageSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
             weakSelf.requestId = iCloudRequestId;
         } progressHandler:nil success:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
-            weakSelf.editImage = weakSelf.photoModel.thumbPhoto;
+            weakSelf.editImage = image;
             [weakSelf.view hx_handleLoading];
             [weakSelf loadImageCompletion];
         } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
@@ -315,6 +327,14 @@
         if (image.imageOrientation != UIImageOrientationUp) {
             image = [image hx_normalizedImage];
         }
+        CGSize imageSize = image.size;
+        if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+            while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+                imageSize.width /= 2;
+                imageSize.height /= 2;
+            }
+            image = [image hx_scaleToFillSize:imageSize];
+        }
         weakSelf.editImage = image;
         [weakSelf.view hx_handleLoading];
         [weakSelf loadImageCompletion];
@@ -327,14 +347,21 @@
     self.requestId = [self.photoModel requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
         weakSelf.requestId = iCloudRequestId;
     } progressHandler:nil success:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        if (image.images.count > 1) {
+            image = image.images.firstObject;
+        }
         if (image.imageOrientation != UIImageOrientationUp) {
             image = [image hx_normalizedImage];
         }
-        if (image.images.count > 1) {
-            weakSelf.editImage = image.images.firstObject;
-        }else {
-            weakSelf.editImage = image;
+        CGSize imageSize = image.size;
+        if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+            while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+                imageSize.width /= 2;
+                imageSize.height /= 2;
+            }
+            image = [image hx_scaleToFillSize:imageSize];
         }
+        weakSelf.editImage = image;
         [weakSelf.view hx_handleLoading];
         [weakSelf loadImageCompletion];
     } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
@@ -349,8 +376,8 @@
         [self setupPhotoData];
         if (self.onlyCliping) {
             [self.editingView setClipping:YES animated:YES];
+            [self.clippingToolBar setRotateAlpha:1.f];
             [UIView animateWithDuration:0.2 animations:^{
-                self.rotateBtn.alpha = 1;
                 self.clippingToolBar.alpha = 1;
             }];
         }
@@ -394,8 +421,8 @@
         self.editingView.hidden = NO;
         if (self.onlyCliping) {
             [self.editingView setClipping:YES animated:YES];
+            [self.clippingToolBar setRotateAlpha:1.f];
             [UIView animateWithDuration:0.2 animations:^{
-                self.rotateBtn.alpha = 1;
                 self.clippingToolBar.alpha = 1;
             }];
         }
@@ -429,11 +456,13 @@
     self.backBtn.userInteractionEnabled = YES;
     self.toolsView.userInteractionEnabled = YES;
     self.graffitiColorView.userInteractionEnabled = YES;
+    self.graffitiColorSizeView.userInteractionEnabled = YES;
     self.mosaicView.userInteractionEnabled = YES;
     [UIView animateWithDuration:0.25 animations:^{
         self.backBtn.alpha = 1;
         self.toolsView.alpha = 1;
         self.graffitiColorView.alpha = 1;
+        self.graffitiColorSizeView.alpha = 1;
         self.mosaicView.alpha = 1;
         self.topMaskView.alpha = 1;
         self.bottomMaskView.alpha = 1;
@@ -443,15 +472,18 @@
     self.backBtn.userInteractionEnabled = NO;
     self.toolsView.userInteractionEnabled = NO;
     self.graffitiColorView.userInteractionEnabled = NO;
+    self.graffitiColorSizeView.userInteractionEnabled = NO;
     self.mosaicView.userInteractionEnabled = NO;
     [UIView animateWithDuration:0.25 animations:^{
         self.backBtn.alpha = 0;
         self.toolsView.alpha = 0;
         self.graffitiColorView.alpha = 0;
+        self.graffitiColorSizeView.alpha = 0;
         self.mosaicView.alpha = 0;
         self.topMaskView.alpha = 0;
         self.bottomMaskView.alpha = 0;
     }];
+    [self hiddenBrushLineWidthPromptView];
 }
 - (void)didBgViewClick {
     [UIView cancelPreviousPerformRequestsWithTarget:self];
@@ -462,24 +494,33 @@
     }
 }
 #pragma mark - HXPhotoEditingViewDelegate
+- (void)editingViewViewDidEndZooming:(HXPhotoEditingView *)editingView {
+    CGFloat maxWidth = self.configuration.brushLineMaxWidth;
+    CGFloat minWidth = self.configuration.brushLineMinWidth;
+    CGFloat lineWidth = minWidth + (maxWidth - minWidth) * self.graffitiColorSizeView.scale / editingView.zoomScale;
+    self.editingView.drawLineWidth = lineWidth;
+}
 /** 开始编辑目标 */
 - (void)editingViewWillBeginEditing:(HXPhotoEditingView *)EditingView {
+    BOOL aspectRotioNone = self.configuration.aspectRatio == HXPhotoEditAspectRatioType_None;
     [UIView animateWithDuration:0.25f animations:^{
-        self.rotateBtn.alpha = 0.f;
+        [self.clippingToolBar setRotateAlpha: aspectRotioNone ? 0.5f : 1.f];
     }];
 }
 /** 停止编辑目标 */
 - (void)editingViewDidEndEditing:(HXPhotoEditingView *)EditingView {
-    if (self.rotateBtn.userInteractionEnabled) {
-        [UIView animateWithDuration:0.25f animations:^{
-            self.rotateBtn.alpha = 1.f;
-        }];
-    }
+    [UIView animateWithDuration:0.25f animations:^{
+        [self.clippingToolBar setRotateAlpha:1.f];
+    }];
     self.clippingToolBar.enableReset = self.editingView.canReset;
 }
 /** 进入剪切界面 */
 - (void)editingViewDidAppearClip:(HXPhotoEditingView *)EditingView {
     self.clippingToolBar.enableReset = self.editingView.canReset;
+}
+/// 离开剪切界面
+- (void)editingViewDidDisappearClip:(HXPhotoEditingView *)EditingView {
+    
 }
 - (void)setEditImage:(UIImage *)editImage {
     if (!self.photoEdit) {
@@ -534,9 +575,11 @@
                 if (isSelected) {
                     weakSelf.editingView.clippingView.imageView.type = HXPhotoEditImageViewTypeDraw;
                     [weakSelf.view addSubview:weakSelf.graffitiColorView];
+                    [weakSelf.view addSubview:weakSelf.graffitiColorSizeView];
                 }else {
                     weakSelf.editingView.clippingView.imageView.type = HXPhotoEditImageViewTypeNormal;
                     [weakSelf.graffitiColorView removeFromSuperview];
+                    [weakSelf.graffitiColorSizeView removeFromSuperview];
                 }
             }else if (tag == 1) {
                 // 贴图
@@ -557,11 +600,10 @@
                 [weakSelf.editingView photoEditEnable:!isSelected];
                 weakSelf.tap.enabled = !isSelected;
                 weakSelf.clippingToolBar.userInteractionEnabled = isSelected;
-                weakSelf.rotateBtn.userInteractionEnabled = isSelected;
                 [UIView animateWithDuration:0.25 animations:^{
                     weakSelf.clippingToolBar.alpha = isSelected ? 1 : 0;
-                    weakSelf.rotateBtn.alpha = weakSelf.clippingToolBar.alpha;
                 }];
+                [weakSelf.clippingToolBar setRotateAlpha:1.f];
                 if (isSelected) {
                     [weakSelf.editingView setClipping:YES animated:YES];
                     [weakSelf hideBgViews];
@@ -575,6 +617,7 @@
                 weakSelf.editingView.splashEnable = isSelected;
                 weakSelf.editingView.clippingView.imageView.type = HXPhotoEditImageViewTypeNormal;
                 [weakSelf.graffitiColorView removeFromSuperview];
+                [weakSelf.graffitiColorSizeView removeFromSuperview];
                 if (isSelected) {
                     weakSelf.editingView.clippingView.imageView.type = HXPhotoEditImageViewTypeSplash;
                     [weakSelf.view addSubview:weakSelf.mosaicView];
@@ -600,6 +643,9 @@
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (data) {
                 photoEdit = [[HXPhotoEdit alloc] initWithEditImage:weakSelf.editImage previewImage:image data:data];
+            }
+            if (!photoEdit) {
+                [weakSelf.photoModel.photoEdit clearData];
             }
             dispatch_async(dispatch_get_main_queue(), ^{
                 weakSelf.photoModel.photoEdit = photoEdit;
@@ -646,14 +692,95 @@
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
+- (HXPhotoEditGraffitiColorSizeView *)graffitiColorSizeView {
+    if (!_graffitiColorSizeView) {
+        _graffitiColorSizeView = [HXPhotoEditGraffitiColorSizeView initView];
+        _graffitiColorSizeView.frame = CGRectMake(self.view.hx_w - 50 - 12, 0, 50, 180);
+        _graffitiColorSizeView.hx_centerY = self.view.hx_w / 2;
+        HXWeakSelf
+        _graffitiColorSizeView.changeColorSize = ^(CGFloat scale) {
+            [UIView cancelPreviousPerformRequestsWithTarget:weakSelf];
+            CGFloat maxWidth = weakSelf.configuration.brushLineMaxWidth;
+            CGFloat minWidth = weakSelf.configuration.brushLineMinWidth;
+            CGFloat lineWidth = minWidth + (maxWidth - minWidth) * scale / weakSelf.editingView.zoomScale;
+            weakSelf.editingView.drawLineWidth = lineWidth;
+            [weakSelf setBrushinePromptViewSize];
+            if (weakSelf.brushLineWidthPromptView.hidden || weakSelf.brushLineWidthPromptView.alpha == 0) {
+                weakSelf.brushLineWidthPromptView.hidden = NO;
+                [UIView animateWithDuration:0.25 animations:^{
+                    weakSelf.brushLineWidthPromptView.alpha = 1;
+                } completion:^(BOOL finished) {
+                    if (finished) {
+                        [weakSelf performSelector:@selector(hiddenBrushLineWidthPromptView) withObject:nil afterDelay:2.f inModes:@[NSRunLoopCommonModes]];
+                    }
+                }];
+            }else {
+                [weakSelf performSelector:@selector(hiddenBrushLineWidthPromptView) withObject:nil afterDelay:2.f inModes:@[NSRunLoopCommonModes]];
+            }
+        };
+    }
+    return _graffitiColorSizeView;
+}
+- (void)hiddenBrushLineWidthPromptView {
+    if (!self.brushLineWidthPromptView.hidden || self.brushLineWidthPromptView.alpha == 1) {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.brushLineWidthPromptView.alpha = 0;
+        } completion:^(BOOL finished) {
+            if (finished) {
+                self.brushLineWidthPromptView.hidden = YES;
+            }
+        }];
+    }
+}
+- (UIView *)brushLineWidthPromptView {
+    if (!_brushLineWidthPromptView) {
+        _brushLineWidthPromptView = [[UIView alloc] initWithFrame:CGRectZero];
+        _brushLineWidthPromptView.hidden = YES;
+        _brushLineWidthPromptView.alpha = 0;
+        UIColor *promptBgColor;
+        if (self.configuration.drawColors.count > self.configuration.defaultDarwColorIndex) {
+            promptBgColor = self.configuration.drawColors[self.configuration.defaultDarwColorIndex];
+        }else {
+            promptBgColor = self.configuration.drawColors.firstObject;
+        }
+        _brushLineWidthPromptView.layer.borderWidth = 2.f;
+        if ([promptBgColor hx_colorIsWhite]) {
+            _brushLineWidthPromptView.layer.borderColor = [UIColor hx_colorWithHexStr:@"#dadada"].CGColor;
+        }else {
+            _brushLineWidthPromptView.layer.borderColor = [UIColor whiteColor].CGColor;
+        }
+        _brushLineWidthPromptView.backgroundColor = promptBgColor;
+        _brushLineWidthPromptView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.6f].CGColor;
+        _brushLineWidthPromptView.layer.shadowOffset = CGSizeMake(0, 0);
+        _brushLineWidthPromptView.layer.shadowOpacity = 0.6f;
+    }
+    return _brushLineWidthPromptView;
+}
+- (void)setBrushinePromptViewSize {
+    CGFloat maxWidth = self.configuration.brushLineMaxWidth;
+    CGFloat minWidth = self.configuration.brushLineMinWidth;
+    CGFloat width = self.graffitiColorSizeView.scale * (maxWidth - minWidth) + minWidth + 6 ;
+    self.brushLineWidthPromptView.hx_size = CGSizeMake(width, width);
+    [self.brushLineWidthPromptView hx_radiusWithRadius:width / 2.f corner:UIRectCornerAllCorners];
+    self.brushLineWidthPromptView.layer.shadowRadius = width / 2.f;
+    self.brushLineWidthPromptView.center = CGPointMake(self.view.hx_w / 2, self.view.hx_h / 2);
+}
 - (HXPhotoEditGraffitiColorView *)graffitiColorView {
     if (!_graffitiColorView) {
         _graffitiColorView = [HXPhotoEditGraffitiColorView initView];
         _graffitiColorView.frame = CGRectMake(0, self.toolsView.hx_y - HXGraffitiColorViewHeight, self.view.hx_w, HXGraffitiColorViewHeight);
+        _graffitiColorView.defaultDarwColorIndex = self.configuration.defaultDarwColorIndex;
         _graffitiColorView.drawColors = self.configuration.drawColors;
         HXWeakSelf
         _graffitiColorView.selectColorBlock = ^(UIColor * _Nonnull color) {
+            UIColor *promptBgColor = color;
             weakSelf.editingView.clippingView.imageView.drawView.lineColor = color;
+            if ([promptBgColor hx_colorIsWhite]) {
+                weakSelf.brushLineWidthPromptView.layer.borderColor = [UIColor hx_colorWithHexStr:@"#dadada"].CGColor;
+            }else {
+                weakSelf.brushLineWidthPromptView.layer.borderColor = [UIColor whiteColor].CGColor;
+            }
+            weakSelf.brushLineWidthPromptView.backgroundColor = promptBgColor;
         };
         _graffitiColorView.undoBlock = ^{
             [weakSelf.editingView.clippingView.imageView.drawView undo];
@@ -688,8 +815,16 @@
         _editingView.onlyCliping = self.onlyCliping;
         _editingView.configuration = self.configuration;
         _editingView.clippingDelegate = self;
-        _editingView.clippingView.imageView.drawView.lineColor = self.configuration.drawColors.firstObject;
-        _editingView.clippingView.imageView.drawView.lineWidth = self.configuration.lineWidth;
+        if (self.configuration.drawColors.count > self.configuration.defaultDarwColorIndex) {
+            _editingView.clippingView.imageView.drawView.lineColor = self.configuration.drawColors[self.configuration.defaultDarwColorIndex];
+        }else {
+            _editingView.clippingView.imageView.drawView.lineColor = self.configuration.drawColors.firstObject;
+        }
+
+        CGFloat maxWidth = self.configuration.brushLineMaxWidth;
+        CGFloat minWidth = self.configuration.brushLineMinWidth;
+        CGFloat drawLineWidth = minWidth + (maxWidth - minWidth) * 0.5f;
+        _editingView.drawLineWidth = drawLineWidth;
         if (self.configuration.aspectRatio != HXPhotoEditAspectRatioType_None) {
             _editingView.fixedAspectRatio = YES;
         }
@@ -727,12 +862,41 @@
 - (HXPhotoEditClippingToolBar *)clippingToolBar {
     if (!_clippingToolBar) {
         _clippingToolBar = [HXPhotoEditClippingToolBar initView];
+        if (self.configuration.aspectRatio != HXPhotoEditAspectRatioType_None) {
+            _clippingToolBar.enableRotaio = NO;
+        }else {
+            _clippingToolBar.enableRotaio = YES;
+        }
+        _clippingToolBar.themeColor = self.configuration.themeColor;
         _clippingToolBar.userInteractionEnabled = NO;
         _clippingToolBar.alpha = 0;
-        _clippingToolBar.frame = CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin);
+        _clippingToolBar.frame = CGRectMake(0, self.view.hx_h - HXClippingToolBar - hxBottomMargin, self.view.hx_w, HXClippingToolBar + hxBottomMargin);
         HXWeakSelf
+        _clippingToolBar.didRotateBlock = ^{
+            [weakSelf.editingView rotate];
+            weakSelf.clippingToolBar.enableReset = weakSelf.editingView.canReset;
+        };
+        _clippingToolBar.didMirrorHorizontallyBlock = ^{
+            [weakSelf.editingView mirrorFlip];
+        };
+        _clippingToolBar.selectedRotaioBlock = ^(HXPhotoEditClippingToolBarRotaioModel * _Nonnull model) {
+            if (model.widthRatio) {
+                weakSelf.editingView.clippingView.fixedAspectRatio = YES;
+                weakSelf.editingView.customRatioSize = CGSizeMake(model.widthRatio, model.heightRatio);
+                [weakSelf.editingView resetToRridRectWithAspectRatioIndex:HXPhotoEditAspectRatioType_Custom];
+            }else {
+                weakSelf.editingView.clippingView.fixedAspectRatio = NO;
+                [weakSelf.editingView resetToRridRectWithAspectRatioIndex:0];
+                weakSelf.clippingToolBar.enableReset = weakSelf.editingView.canReset;
+            }
+        };
         _clippingToolBar.didBtnBlock = ^(NSInteger tag) {
+            BOOL aspectRotioNone = weakSelf.configuration.aspectRatio == HXPhotoEditAspectRatioType_None;
             if (tag == 0) {
+                if (aspectRotioNone) {
+                    weakSelf.editingView.clippingView.fixedAspectRatio = NO;
+                    [weakSelf.editingView resetToRridRectWithAspectRatioIndex:0];
+                }
                 // 取消
                 if (weakSelf.onlyCliping) {
                     [weakSelf didBackClick];
@@ -747,34 +911,24 @@
                     return;
                 }
                 [weakSelf.toolsView endCliping];
-                [weakSelf.editingView setClipping:NO animated:YES];
+                [weakSelf.editingView setClipping:NO animated:YES completion:^{
+                    if (aspectRotioNone) {
+                        weakSelf.editingView.clippingView.fixedAspectRatio = NO;
+                        [weakSelf.editingView resetToRridRectWithAspectRatioIndex:0];
+                    }
+                }];
             }else if (tag == 2) {
                 // 还原
+                if (aspectRotioNone) {
+                    weakSelf.editingView.clippingView.fixedAspectRatio = NO;
+                    [weakSelf.editingView resetToRridRectWithAspectRatioIndex:0];
+                }
                 [weakSelf.editingView reset];
                 weakSelf.clippingToolBar.enableReset = weakSelf.editingView.canReset;
             }
         };
     }
     return _clippingToolBar;
-}
-- (UIButton *)rotateBtn {
-    if (!_rotateBtn) {
-        _rotateBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-        [_rotateBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_clip_rotate"] forState:UIControlStateNormal];
-        _rotateBtn.hx_size = _rotateBtn.currentImage.size;
-        _rotateBtn.hx_x = 25.f;
-        _rotateBtn.hx_y = self.clippingToolBar.hx_y - 70 + _rotateBtn.hx_h;
-        _rotateBtn.tintColor = [UIColor whiteColor];
-        [_rotateBtn addTarget:self action:@selector(didRotateBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        _rotateBtn.userInteractionEnabled = NO;
-        _rotateBtn.alpha = 0;
-        [_rotateBtn hx_setEnlargeEdgeWithTop:5 right:20 bottom:20 left:20];
-    }
-    return _rotateBtn;
-}
-- (void)didRotateBtnClick:(UIButton *)button {
-    [self.editingView rotate];
-    self.clippingToolBar.enableReset = self.editingView.canReset;
 }
 - (UIView *)topMaskView {
     if (!_topMaskView) {

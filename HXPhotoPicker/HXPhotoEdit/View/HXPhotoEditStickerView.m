@@ -17,12 +17,19 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "HXPhotoClippingView.h"
 
-NSString *const kHXStickerViewData_movingView = @"HXStickerViewData_movingView";
 
+NSString *const kHXStickerViewData_mirrorType = @"HXStickerViewData_mirrorType";
+
+NSString *const kHXStickerViewData_angel = @"HXStickerViewData_angel";
+
+NSString *const kHXStickerViewData_movingView = @"HXStickerViewData_movingView";
 NSString *const kHXStickerViewData_movingView_content = @"HXStickerViewData_movingView_content";
 NSString *const kHXStickerViewData_movingView_center = @"HXStickerViewData_movingView_center";
 NSString *const kHXStickerViewData_movingView_scale = @"HXStickerViewData_movingView_scale";
 NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_movingView_rotation";
+NSString *const kHXStickerViewData_movingView_mirrorType = @"HXStickerViewData_movingView_mirrorType";
+NSString *const kHXStickerViewData_movingView_superMirrorType = @"HXStickerViewData_movingView_superMirrorType";
+NSString *const kHXStickerViewData_movingView_superAngel = @"HXStickerViewData_movingView_superAngel";
 
 @interface HXPhotoEditStickerView ()
 @property (weak, nonatomic) HXPhotoEditStickerItemView *selectItemView;
@@ -33,6 +40,8 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
 @property (assign, nonatomic) BOOL transhViewDidRemove;
 @property (assign, nonatomic) BOOL touching;
 @property (assign, nonatomic) CGFloat currentItemDegrees;
+@property (assign, nonatomic) CGFloat currentItemArg;
+@property (assign, nonatomic) CGFloat beforeItemArg;
 @end
 
 @implementation HXPhotoEditStickerView
@@ -69,6 +78,16 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
         }
         itemView.isSelected = YES;
         [self bringSubviewToFront:itemView];
+        [itemView resetRotation];
+//        if (self.mirrorType == HXPhotoClippingViewMirrorType_None) {
+//            if (itemView.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+//                itemView.transform = CGAffineTransformScale(itemView.transform, -1, 1);
+//            }
+//        }else {
+//            if (itemView.mirrorType == HXPhotoClippingViewMirrorType_None) {
+//                itemView.transform = CGAffineTransformScale(itemView.transform, -1, 1);
+//            }
+//        }
         self.selectItemView = itemView;
     }else {
         if (self.selectItemView) {
@@ -115,6 +134,7 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
                         itemView.isSelected = YES;
                         weakSelf.selectItemView = itemView;
                         [weakSelf bringSubviewToFront:itemView];
+                        [itemView resetRotation];
                         return;
                     }
                 }
@@ -198,13 +218,7 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
                 weakSelf.selectItemView.isSelected = NO;
                 weakSelf.selectItemView =  itemView;
             }
-            if (weakSelf.addWindowCompletion) {
-                weakSelf.addWindowCompletion = NO;
-                CGRect rect = [[UIApplication sharedApplication].keyWindow convertRect:itemView.frame toView:weakSelf];
-                itemView.frame = rect;
-                [weakSelf addSubview:itemView];
-                [itemView setScale:itemView.scale rotation:itemView.arg + weakSelf.currentItemDegrees];
-            }
+            [weakSelf resetItemView:itemView];
         }
         if (weakSelf.addWindowCompletion) {
             [weakSelf hideTranshView];
@@ -221,13 +235,7 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
             weakSelf.selectItemView.isSelected = NO;
             weakSelf.selectItemView =  itemView;
         }
-        if (weakSelf.addWindowCompletion) {
-            weakSelf.addWindowCompletion = NO;
-            CGRect rect = [[UIApplication sharedApplication].keyWindow convertRect:itemView.frame toView:weakSelf];
-            itemView.frame = rect;
-            [weakSelf addSubview:itemView];
-            [itemView setScale:itemView.scale rotation:itemView.arg + weakSelf.currentItemDegrees];
-        }
+        [weakSelf resetItemView:itemView];
         if (weakSelf.transhView.alpha == 1) {
             [weakSelf hideTranshView];
         }
@@ -252,39 +260,118 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
     }else {
         scale = MIN( MIN(self.hx_w  * self.screenScale - 40, itemView.hx_w) / itemView.hx_w , MIN(self.hx_h * self.screenScale - 40, itemView.hx_h) / itemView.hx_h);
     }
-    UIView *clippingView = self.superview.superview;
+    itemView.superAngle = self.angle;
+    itemView.superMirrorType = self.mirrorType;
     // 旋转后，需要处理弧度的变化
-    CGFloat radians = atan2f(clippingView.transform.b, clippingView.transform.a);
-    if ((radians > 0 && radians < M_PI) || (radians < 0 && radians > -M_PI)) {
+    CGFloat radians = [self currentAngleRadians];
+    if (self.mirrorType == HXPhotoClippingViewMirrorType_None) {
         radians = -radians;
+    }else {
+        if (self.angle % 180 == 0) {
+            radians =  -radians;
+        }
     }
-    itemView.arg = radians;
-    
-    [itemView setScale:scale / self.screenScale];
-
     itemView.isSelected = selected;
     itemView.center = [self convertPoint:[UIApplication sharedApplication].keyWindow.center fromView:(UIView *)[UIApplication sharedApplication].keyWindow];
     itemView.firstTouch = selected;
     [self addSubview:itemView];
+    [itemView setScale:scale / self.screenScale rotation:radians isInitialize:NO isPinch:NO setMirror:YES];
     if (selected) {
         self.selectItemView = itemView;
     }
     return itemView;
 }
-- (void)windowAddItemView:(HXPhotoEditStickerItemView *)itemView {
-    self.addWindowCompletion = YES;
-    UIView *clippingView = self.superview.superview;
-    // 旋转后，需要处理弧度的变化
-    CGFloat radians = atan2f(clippingView.transform.b, clippingView.transform.a);
-    if ((radians > 0 && radians < M_PI) || (radians < 0 && radians > -M_PI)) {
-        self.currentItemDegrees = -radians;
-    }else {
-        self.currentItemDegrees = radians;
+- (void)resetItemView:(HXPhotoEditStickerItemView *)itemView {
+    if (self.addWindowCompletion) {
+        self.addWindowCompletion = NO;
+        CGFloat arg = itemView.arg - self.currentItemArg;
+        CGRect rect = [[UIApplication sharedApplication].keyWindow convertRect:itemView.frame toView:self];
+        itemView.frame = rect;
+        [self addSubview:itemView];
+        if (self.mirrorType == HXPhotoClippingViewMirrorType_None) {
+            [itemView setScale:itemView.scale rotation:itemView.arg - self.currentItemDegrees isInitialize:NO isPinch:NO setMirror:YES];
+        }else {
+            [itemView setScale:itemView.scale rotation:self.beforeItemArg + arg isInitialize:NO isPinch:NO setMirror:YES];
+        }
     }
+}
+- (CGAffineTransform)getMirrorTransform:(CGFloat)radians {
+    CGAffineTransform transfrom = CGAffineTransformMakeScale(-1, 1);
+    if (radians == 0) {
+        return transfrom;
+    }else if (radians == M_PI_2 || radians == -M_PI_2) {
+        return CGAffineTransformRotate(transfrom, M_PI_2);
+    }else if (radians == M_PI || radians == -M_PI) {
+        return CGAffineTransformRotate(transfrom, M_PI);
+    }else if (radians == (M_PI + M_PI_2) || radians == -(M_PI + M_PI_2)) {
+        return CGAffineTransformRotate(transfrom, -M_PI_2);
+    }
+    return transfrom;
+}
+- (CGFloat)currentAngleRadians {
+    CGFloat angleInRadians = 0.0f;
+    switch (self.angle) {
+        case 90:    angleInRadians = M_PI_2;            break;
+        case -90:   angleInRadians = -M_PI_2;           break;
+        case 180:   angleInRadians = M_PI;              break;
+        case -180:  angleInRadians = -M_PI;             break;
+        case 270:   angleInRadians = (M_PI + M_PI_2);   break;
+        case -270:  angleInRadians = -(M_PI + M_PI_2);  break;
+        default:                                        break;
+    }
+    return angleInRadians;
+}
+- (void)windowAddItemView:(HXPhotoEditStickerItemView *)itemView {
+    self.beforeItemArg = itemView.arg;
+    self.addWindowCompletion = YES;
+    // 旋转后，需要处理弧度的变化
+    CGFloat radians = [self currentAngleRadians];
+    self.currentItemDegrees = radians;
+    
     CGRect rect = [self convertRect:itemView.frame toView:[UIApplication sharedApplication].keyWindow];
     itemView.frame = rect;
     [[UIApplication sharedApplication].keyWindow addSubview:itemView];
-    [itemView setScale:itemView.scale rotation:itemView.arg - self.currentItemDegrees];
+    
+    if (self.mirrorType == HXPhotoClippingViewMirrorType_None) {
+        [itemView setScale:itemView.scale rotation:itemView.arg + radians isInitialize:NO isPinch:NO setMirror:YES];
+    }else {
+        if (itemView.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
+            [itemView setScale:itemView.scale rotation:itemView.arg + radians isInitialize:NO isPinch:NO setMirror:YES];
+        }else {
+            if (self.angle % 180 != 0) {
+                [itemView setScale:itemView.scale rotation:itemView.arg + radians isInitialize:NO isPinch:NO setMirror:YES];
+            }else {
+                [itemView setScale:itemView.scale rotation:itemView.arg - radians isInitialize:NO isPinch:NO setMirror:YES];
+            }
+        }
+    }
+    self.currentItemArg = itemView.arg;
+}
+- (void)setMirrorType:(NSInteger)mirrorType {
+    for (HXPhotoEditStickerItemView *subView in self.subviews) {
+        if ([subView isKindOfClass:[HXPhotoEditStickerItemView class]]) {
+            if (mirrorType == 0) {
+                if (_mirrorType != 0) {
+                    if (subView.mirrorType == 0) {
+                        subView.mirrorType = 1;
+                    }else {
+                        subView.mirrorType = 0;
+                    }
+                }
+            }else {
+                if (_mirrorType != 1) {
+                    if (subView.mirrorType == 0) {
+                        subView.mirrorType = 1;
+                    }else {
+                        subView.mirrorType = 0;
+                    }
+                }
+            }
+            subView.superMirrorType = mirrorType;
+            subView.superAngle = self.angle;
+        }
+    }
+    _mirrorType = mirrorType;
 }
 - (HXPhotoEditStickerTrashView *)transhView {
     if (!_transhView) {
@@ -309,6 +396,7 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
     [UIView animateWithDuration:0.25 animations:^{
         self.transhView.hx_y = HX_ScreenHeight;
         self.transhView.alpha = 0;
+        self.selectItemView.alpha = 1;
     } completion:^(BOOL finished) {
         [self.transhView removeFromSuperview];
         self.transhView.inArea = NO;
@@ -365,27 +453,49 @@ NSString *const kHXStickerViewData_movingView_rotation = @"HXStickerViewData_mov
                                      , kHXStickerViewData_movingView_scale:@(view.scale)
                                      , kHXStickerViewData_movingView_rotation:@(view.arg)
                                      , kHXStickerViewData_movingView_center:[NSValue valueWithCGPoint:view.center]
+                                   , kHXStickerViewData_movingView_mirrorType: @(view.mirrorType)
+                                   , kHXStickerViewData_movingView_superMirrorType: @(view.superMirrorType)
+                                   , kHXStickerViewData_movingView_superAngel:@(view.superAngle)
                                      }];
         }
     }
     if (itemDatas.count) {
-        return @{kHXStickerViewData_movingView:[itemDatas copy]
+        return @{kHXStickerViewData_movingView:[itemDatas copy],
+                 kHXStickerViewData_mirrorType : @(self.mirrorType),
+                 kHXStickerViewData_angel : @(self.angle)
         };
+    }else {
+        if (self.angle != 0 || self.mirrorType != HXPhotoClippingViewMirrorType_None) {
+            return @{
+                     kHXStickerViewData_mirrorType : @(self.mirrorType),
+                     kHXStickerViewData_angel : @(self.angle)
+            };
+        }
     }
     return nil;
 }
 
 - (void)setData:(NSDictionary *)data {
+    NSInteger mirrorType = [data[kHXStickerViewData_mirrorType] integerValue];
+    NSInteger angle = [data[kHXStickerViewData_angel] integerValue];
+    self.mirrorType = mirrorType;
+    self.angle = angle;
     NSArray *itemDatas = data[kHXStickerViewData_movingView];
     if (itemDatas.count) {
         for (NSDictionary *itemData in itemDatas) {
             HXPhotoEditStickerItem *item = itemData[kHXStickerViewData_movingView_content];
             CGFloat scale = [itemData[kHXStickerViewData_movingView_scale] floatValue];
+            NSInteger mirrorType= [itemData[kHXStickerViewData_movingView_mirrorType] integerValue];
+            NSInteger superMirrorType= [itemData[kHXStickerViewData_movingView_superMirrorType] integerValue];
+            NSInteger superAngle= [itemData[kHXStickerViewData_movingView_superAngel] integerValue];
             CGFloat rotation = [itemData[kHXStickerViewData_movingView_rotation] floatValue];
             CGPoint center = [itemData[kHXStickerViewData_movingView_center] CGPointValue];
             
             HXPhotoEditStickerItemView *view = [self addStickerItem:item isSelected:NO];
-            [view setScale:scale rotation:rotation isInitialize:YES];
+            view.mirrorType = mirrorType;
+            view.superMirrorType = superMirrorType;
+            view.superAngle = superAngle;
+            [view setScale:scale rotation:rotation isInitialize:YES isPinch:NO setMirror:YES];
             view.center = center;
         }
     }

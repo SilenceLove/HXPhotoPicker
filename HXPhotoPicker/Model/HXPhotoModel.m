@@ -33,6 +33,8 @@
 #import "YYKit.h"
 #endif
 
+#import "HXMECancelBlock.h"
+
 #import "HXPhotoEdit.h"
 
 @implementation HXPhotoModel
@@ -46,7 +48,13 @@
     }
     NSUInteger byte = 0;
     if (self.photoEdit) {
-        _assetByte = self.photoEdit.editPreviewData.length;
+        NSData *imageData = HX_UIImagePNGRepresentation(self.photoEdit.editPreviewImage);
+        if (!imageData) {
+            //返回为png图像。
+            imageData = HX_UIImageJPEGRepresentation(self.photoEdit.editPreviewImage);
+        }
+        byte = imageData.length;
+        _assetByte = byte;
         return _assetByte;
     }
     if (self.asset) {
@@ -69,14 +77,19 @@
             if (self.networkPhotoUrl || self.networkThumbURL) {
                 byte = 0;
             }else {
-                NSData *imageData;
-                if (UIImagePNGRepresentation(self.thumbPhoto)) {
+//                NSData *imageData;
+                NSData *imageData = HX_UIImagePNGRepresentation(self.photoEdit.editPreviewImage);
+                if (!imageData) {
                     //返回为png图像。
-                    imageData = UIImagePNGRepresentation(self.thumbPhoto);
-                }else {
-                    //返回为JPEG图像。
-                    imageData = UIImageJPEGRepresentation(self.thumbPhoto, 0.7);
+                    imageData = HX_UIImageJPEGRepresentation(self.photoEdit.editPreviewImage);
                 }
+//                if (UIImagePNGRepresentation(self.thumbPhoto)) {
+//                    //返回为png图像。
+//                    imageData = UIImagePNGRepresentation(self.thumbPhoto);
+//                }else {
+//                    //返回为JPEG图像。
+//                    imageData = UIImageJPEGRepresentation(self.thumbPhoto, 0.7);
+//                }
                 byte = imageData.length;
             }
         }else if (self.type == HXPhotoModelMediaTypeCameraVideo) {
@@ -959,7 +972,7 @@
                                                success:(HXModelImageDataSuccessBlock)success
                                                 failed:(HXModelFailedBlock)failed {
     if (self.photoEdit) {
-        if (success) success(self.photoEdit.editPreviewData, self.photoEdit.editPreviewImage.imageOrientation, self, nil);
+        if (success) success(HX_UIImageJPEGRepresentation(self.photoEdit.editPreviewImage), self.photoEdit.editPreviewImage.imageOrientation, self, nil);
         return 0;
     }
     HXWeakSelf
@@ -1751,7 +1764,7 @@
         NSData *imageData;
         NSString *suffix;
         if (self.photoEdit) {
-            imageData = self.photoEdit.editPreviewData;
+            imageData = HX_UIImageJPEGRepresentation(self.photoEdit.editPreviewImage);
             suffix = @"jpeg";
         }else {
             if (UIImagePNGRepresentation(image)) {

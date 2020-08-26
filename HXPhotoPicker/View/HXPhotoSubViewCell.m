@@ -232,38 +232,42 @@
         }
         self.deleteBtn.hidden = NO;
         if (model.networkPhotoUrl) {
-            HXWeakSelf
-            self.progressView.hidden = model.downloadComplete;
-            if (model.downloadComplete && !model.downloadError) {
-                if (model.previewPhoto.images.count) {
-                    self.imageView.image = nil;
-                    self.imageView.image = model.previewPhoto.images.firstObject;
-                }else {
-                    self.imageView.image = model.previewPhoto;
-                }
+            if (model.photoEdit) {
+                self.imageView.image = model.photoEdit.editPreviewImage;
             }else {
-                [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
-                    if (weakSelf.model == model) {
-                        weakSelf.progressView.progress = progress;
+                HXWeakSelf
+                self.progressView.hidden = model.downloadComplete;
+                if (model.downloadComplete && !model.downloadError) {
+                    if (model.previewPhoto.images.count) {
+                        self.imageView.image = nil;
+                        self.imageView.image = model.previewPhoto.images.firstObject;
+                    }else {
+                        self.imageView.image = model.previewPhoto;
                     }
-                } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
-                    if (weakSelf.model == model) {
-                        if (error != nil) {
-                            [weakSelf.progressView showError];
-                        }else {
-                            if (image) {
-                                weakSelf.progressView.progress = 1;
-                                weakSelf.progressView.hidden = YES;
-                                if (image.images.count) {
-                                    weakSelf.imageView.image = nil;
-                                    weakSelf.imageView.image = image.images.firstObject;
-                                }else {
-                                    weakSelf.imageView.image = image;
+                }else {
+                    [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
+                        if (weakSelf.model == model) {
+                            weakSelf.progressView.progress = progress;
+                        }
+                    } completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
+                        if (weakSelf.model == model) {
+                            if (error != nil) {
+                                [weakSelf.progressView showError];
+                            }else {
+                                if (image) {
+                                    weakSelf.progressView.progress = 1;
+                                    weakSelf.progressView.hidden = YES;
+                                    if (image.images.count) {
+                                        weakSelf.imageView.image = nil;
+                                        weakSelf.imageView.image = image.images.firstObject;
+                                    }else {
+                                        weakSelf.imageView.image = image;
+                                    }
                                 }
                             }
                         }
-                    }
-                }];
+                    }];
+                }
             }
         }else {
             if (model.photoEdit) {

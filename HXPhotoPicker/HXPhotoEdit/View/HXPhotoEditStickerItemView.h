@@ -42,10 +42,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) void (^ rotationBegan)(void);
 @property (copy, nonatomic) void (^ rotationEnded)(void);
 
+@property (assign, nonatomic) NSInteger mirrorType;
+@property (assign, nonatomic) NSInteger superMirrorType;
+@property (assign, nonatomic) NSInteger superAngle;
+
 - (instancetype)initWithItem:(HXPhotoEditStickerItem *)item screenScale:(CGFloat)screenScale;
 - (void)setScale:(CGFloat)scale;
 - (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation;
 - (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation isInitialize:(BOOL)isInitialize;
+- (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation isInitialize:(BOOL)isInitialize isPinch:(BOOL)isPinch setMirror:(BOOL)setMirror;
 - (void)updateItem:(HXPhotoEditStickerItem *)item;
 - (void)resetRotation;
 - (void)viewDidPan:(UIPanGestureRecognizer *)sender;

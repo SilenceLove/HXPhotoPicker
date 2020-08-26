@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 离开剪切界面
 - (void)editingViewDidDisappearClip:(HXPhotoEditingView *)EditingView;
 
+- (void)editingViewViewDidEndZooming:(HXPhotoEditingView *)editingView;
 @end
 
 @interface HXPhotoEditingView : UIScrollView
@@ -48,9 +49,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// 启用贴图
 @property (nonatomic, readonly) BOOL stickerEnable;
 
+@property (assign, nonatomic) CGFloat drawLineWidth;
+
 /// 开启编辑模式
 @property (nonatomic, assign, getter=isClipping) BOOL clipping;
 - (void)setClipping:(BOOL)clipping animated:(BOOL)animated;
+- (void)setClipping:(BOOL)clipping animated:(BOOL)animated completion:(void (^ _Nullable)(void))completion;
 /// 取消裁剪
 /// @param animated 是否需要动画
 - (void)cancelClipping:(BOOL)animated;
@@ -59,6 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)canReset;
 /// 旋转
 - (void)rotate;
+/// 镜像翻转
+- (void)mirrorFlip;
 /// 默认长宽比例
 @property (nonatomic, assign) NSUInteger defaultAspectRatioIndex;
 /// 固定长宽比例
@@ -70,8 +76,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 长宽比例
 - (NSArray <NSString *>*)aspectRatioDescs;
-- (void)setAspectRatioIndex:(NSUInteger)aspectRatioIndex;
+- (void)setAspectRatioIndex:(NSUInteger)aspectRatioIndex;- (void)setAspectRatioIndex:(NSUInteger)aspectRatioIndex animated:(BOOL)animated;
 - (NSUInteger)aspectRatioIndex;
+
+- (void)resetToRridRectWithAspectRatioIndex:(NSInteger)aspectRatioIndex;
+
 - (void)photoEditEnable:(BOOL)enable;
 
 /// 创建编辑图片

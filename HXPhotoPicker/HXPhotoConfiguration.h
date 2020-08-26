@@ -102,6 +102,11 @@ HXPhotoPreviewViewController;
 /// model.videoURL 为视频地址
 @property (assign, nonatomic) BOOL requestImageAfterFinishingSelection;
 
+/// 当原图按钮隐藏时获取地址时是否请求原图
+/// 为YES时 requestImageAfterFinishingSelection 获取的原图
+/// 为NO时 requestImageAfterFinishingSelection 获取的不是原图
+@property (assign, nonatomic) BOOL requestOriginalImage;
+
 /// 当 requestImageAfterFinishingSelection = YES 并且选中的原图，导出的视频是否为最高质量
 /// 如果视频很大的话，导出高质量会很耗时
 /// 默认为NO

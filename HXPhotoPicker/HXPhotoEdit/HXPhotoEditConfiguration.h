@@ -39,9 +39,19 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditAspectRatio) {
 #pragma mark - < 画笔相关 >
 /// 画笔颜色数组
 @property (copy, nonatomic) NSArray<UIColor *> *drawColors;
-/// 画笔宽度
-/// 默认 5.f
-@property (assign, nonatomic) CGFloat lineWidth;
+
+/// 默认选择的画笔颜色下标
+/// 与 drawColors 对应，默认 2
+@property (assign, nonatomic) NSInteger defaultDarwColorIndex;
+
+/// 画笔默认宽度为最大宽度的50%
+/// 画笔最大宽度
+/// 默认 12.f
+@property (assign, nonatomic) CGFloat brushLineMaxWidth;
+
+/// 画笔最小宽度
+/// 默认 2.f
+@property (assign, nonatomic) CGFloat brushLineMinWidth;
 
 #pragma mark - < 贴图相关 >
 /// 贴图模型数组

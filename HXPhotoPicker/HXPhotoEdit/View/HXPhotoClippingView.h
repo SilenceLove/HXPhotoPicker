@@ -10,6 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, HXPhotoClippingViewMirrorType) {
+    HXPhotoClippingViewMirrorType_None = 0,     // 没有镜像翻转
+    HXPhotoClippingViewMirrorType_Horizontal    // 水平翻转
+};
+
 @protocol HXPhotoClippingViewDelegate;
 @class HXPhotoEditImageView, HXPhotoEditConfiguration;
 @interface HXPhotoClippingView : UIScrollView
@@ -34,6 +39,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL isReseting;
 /** 是否旋转中 */
 @property (nonatomic, readonly) BOOL isRotating;
+/** 是否镜像翻转中 */
+@property (nonatomic, assign) BOOL isMirrorFlip;
+/** 是否水平翻转 */
+@property (assign, nonatomic) HXPhotoClippingViewMirrorType mirrorType;
+/** 旋转系数 */
+@property (assign, nonatomic, readonly) NSInteger angle;
 /** 是否缩放中 */
 //@property (nonatomic, readonly) BOOL isZooming;
 /** 是否可还原 */
@@ -58,6 +69,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)zoomInToRect:(CGRect)toRect;
 /** 旋转 */
 - (void)rotateClockwise:(BOOL)clockwise;
+/// 镜像翻转
+- (void)mirrorFlip;
 /** 还原 */
 - (void)reset;
 /** 还原到某个位置 */

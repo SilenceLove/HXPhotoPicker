@@ -119,6 +119,7 @@ const CGFloat HXZoomRate = 1.0f;
     if (self.defaultFrontCamera) {
         videoDevice = [self cameraWithPosition:AVCaptureDevicePositionFront];
     }
+    
     AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:nil];
     if (videoInput) {
         if ([self.captureSession canAddInput:videoInput]) {
@@ -279,11 +280,14 @@ const CGFloat HXZoomRate = 1.0f;
 }
 - (void)focusAtPoint:(CGPoint)point {
     AVCaptureDevice *device = [self activeCamera];
-    if (device.isFocusPointOfInterestSupported && [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+    if (device.isFocusPointOfInterestSupported && [device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
         NSError *error;
         if ([device lockForConfiguration:&error]) {
+            if (device.smoothAutoFocusSupported) {
+                device.smoothAutoFocusEnabled = YES;
+            }
             device.focusPointOfInterest = point;
-            device.focusMode = AVCaptureFocusModeAutoFocus;
+            device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
             [device unlockForConfiguration];
         }else {
             if ([self.delegate respondsToSelector:@selector(deviceConfigurationFailedWithError:)]) {
@@ -305,9 +309,9 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
         if ([device lockForConfiguration:&error]) {
             device.exposurePointOfInterest = point;
             device.exposureMode = exposureMode;
-            if ([device isExposureModeSupported:AVCaptureExposureModeLocked]) {
-                [device addObserver:self forKeyPath:@"adjustingExposure" options:NSKeyValueObservingOptionNew context:&HXCustomCameraAdjustingExposureContext];
-            }
+//            if ([device isExposureModeSupported:AVCaptureExposureModeLocked]) {
+//                [device addObserver:self forKeyPath:@"adjustingExposure" options:NSKeyValueObservingOptionNew context:&HXCustomCameraAdjustingExposureContext];
+//            }
             [device unlockForConfiguration];
         }else {
             if ([self.delegate respondsToSelector:@selector(deviceConfigurationFailedWithError:)]) {
@@ -318,21 +322,21 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
 }
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if (context == &HXCustomCameraAdjustingExposureContext) {
-        AVCaptureDevice *device = (AVCaptureDevice *)object;
-        if (!device.isAdjustingExposure && [device isExposureModeSupported:AVCaptureExposureModeLocked]) {
-            [object removeObserver:self forKeyPath:@"adjustingExposure" context:&HXCustomCameraAdjustingExposureContext];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSError *error;
-                if ([device lockForConfiguration:&error]) {
-                    device.exposureMode = AVCaptureExposureModeLocked;
-                    [device unlockForConfiguration];
-                }else {
-                    if ([self.delegate respondsToSelector:@selector(deviceConfigurationFailedWithError:)]) {
-                        [self.delegate deviceConfigurationFailedWithError:error];
-                    }
-                }
-            });
-        }
+//        AVCaptureDevice *device = (AVCaptureDevice *)object;
+//        if (!device.isAdjustingExposure && [device isExposureModeSupported:AVCaptureExposureModeLocked]) {
+//            [object removeObserver:self forKeyPath:@"adjustingExposure" context:&HXCustomCameraAdjustingExposureContext];
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                NSError *error;
+//                if ([device lockForConfiguration:&error]) {
+//                    device.exposureMode = AVCaptureExposureModeLocked;
+//                    [device unlockForConfiguration];
+//                }else {
+//                    if ([self.delegate respondsToSelector:@selector(deviceConfigurationFailedWithError:)]) {
+////                        [self.delegate deviceConfigurationFailedWithError:error];
+//                    }
+//                }
+//            });
+//        }
     }else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
@@ -355,6 +359,9 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     
     NSError *error;
     if ([device lockForConfiguration:&error]) {
+        if (device.smoothAutoFocusSupported) {
+            device.smoothAutoFocusEnabled = YES;
+        }
         
         if (canResetFocus) {
             device.focusMode = focusMode;

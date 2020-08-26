@@ -39,7 +39,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditImageViewType) {
 @property (strong, nonatomic) HXPhotoEditConfiguration *configuration;
 /** 数据 */
 @property (nonatomic, strong, nullable) NSDictionary *photoEditData;
-- (UIImage *)editOtherImagesInRect:(CGRect)rect rotate:(CGFloat)rotate;
+- (UIImage *)editOtherImagesInRect:(CGRect)rect rotate:(CGFloat)rotate mirrorHorizontally:(BOOL)mirrorHorizontally;
 - (void)changeSubviewFrame;
 - (void)clearCoverage;
 @end

@@ -23,12 +23,13 @@
 - (UIImage *)hx_fullNormalizedImage;
 - (UIImage *)hx_clipLeftOrRightImage:(CGFloat)scale;
 - (UIImage *)hx_rotationImage:(UIImageOrientation)orient;
++ (UIImage *)hx_rotationImage:(UIImage *)image orient:(UIImageOrientation)orient;
 + (UIImage *)hx_imageWithColor:(UIColor *)color havingSize:(CGSize)size;
 
 
 - (UIImage *)hx_cropInRect:(CGRect)rect;
-- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians;
-- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians scale:(CGFloat)scale;
+- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians mirrorHorizontally:(BOOL)mirrorHorizontally;
+- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians scale:(CGFloat)scale  mirrorHorizontally:(BOOL)mirrorHorizontally;
 - (UIImage *)hx_scaleToFillSize:(CGSize)size;
 - (UIImage *)hx_mergeimages:(NSArray <UIImage *>*)images;
 + (UIImage *)hx_mergeimages:(NSArray <UIImage *>*)images;

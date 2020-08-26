@@ -43,7 +43,6 @@ NSString *const kHXDrawViewData = @"HXDrawViewData";
     }
     return self;
 }
-
 - (CAShapeLayer *)createShapeLayer:(HXDrawBezierPath *)path {
     CAShapeLayer *slayer = [CAShapeLayer layer];
     slayer.path = path.CGPath;

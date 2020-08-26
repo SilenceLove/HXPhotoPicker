@@ -281,6 +281,102 @@
 
     return scaledImage;
 }
++ (UIImage *)hx_rotationImage:(UIImage *)image orient:(UIImageOrientation)orient {
+    CGRect bnds = CGRectZero;
+    UIImage* copy = nil;
+    CGContextRef ctxt = nil;
+    CGImageRef imag = image.CGImage;
+    CGRect rect = CGRectZero;
+    CGAffineTransform tran = CGAffineTransformIdentity;
+    
+    rect.size.width = CGImageGetWidth(imag) * image.scale;
+    rect.size.height = CGImageGetHeight(imag) * image.scale;
+    
+    while (rect.size.width * rect.size.height > 4 * 1000 * 1000) {
+        rect.size.width /= 2;
+        rect.size.height /= 2;
+    }
+    
+    bnds = rect;
+    
+    switch (orient)
+    {
+        case UIImageOrientationUp:
+            return image;
+            
+        case UIImageOrientationUpMirrored:
+            tran = CGAffineTransformMakeTranslation(rect.size.width, 0.0);
+            tran = CGAffineTransformScale(tran, -1.0, 1.0);
+            break;
+            
+        case UIImageOrientationDown:
+            tran = CGAffineTransformMakeTranslation(rect.size.width,
+                                                    rect.size.height);
+            tran = CGAffineTransformRotate(tran, M_PI);
+            break;
+            
+        case UIImageOrientationDownMirrored:
+            tran = CGAffineTransformMakeTranslation(0.0, rect.size.height);
+            tran = CGAffineTransformScale(tran, 1.0, -1.0);
+            break;
+            
+        case UIImageOrientationLeft:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeTranslation(0.0, rect.size.width);
+            tran = CGAffineTransformRotate(tran, 3.0 * M_PI / 2.0);
+            break;
+            
+        case UIImageOrientationLeftMirrored:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeTranslation(rect.size.height,
+                                                    rect.size.width);
+            tran = CGAffineTransformScale(tran, -1.0, 1.0);
+            tran = CGAffineTransformRotate(tran, 3.0 * M_PI / 2.0);
+            break;
+            
+        case UIImageOrientationRight:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeTranslation(rect.size.height, 0.0);
+            tran = CGAffineTransformRotate(tran, M_PI / 2.0);
+            break;
+            
+        case UIImageOrientationRightMirrored:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeScale(-1.0, 1.0);
+            tran = CGAffineTransformRotate(tran, M_PI / 2.0);
+            break;
+            
+        default:
+            return image;
+    }
+    
+    UIGraphicsBeginImageContext(bnds.size);
+    ctxt = UIGraphicsGetCurrentContext();
+    
+    switch (orient)
+    {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            CGContextScaleCTM(ctxt, -1.0, 1.0);
+            CGContextTranslateCTM(ctxt, -rect.size.height, 0.0);
+            break;
+            
+        default:
+            CGContextScaleCTM(ctxt, 1.0, -1.0);
+            CGContextTranslateCTM(ctxt, 0.0, -rect.size.height);
+            break;
+    }
+    
+    CGContextConcatCTM(ctxt, tran);
+    CGContextDrawImage(UIGraphicsGetCurrentContext(), rect, imag);
+    
+    copy = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return copy;
+}
 
 - (UIImage *)hx_rotationImage:(UIImageOrientation)orient {
     CGRect bnds = CGRectZero;
@@ -290,10 +386,10 @@
     CGRect rect = CGRectZero;
     CGAffineTransform tran = CGAffineTransformIdentity;
     
-    rect.size.width = CGImageGetWidth(imag);
-    rect.size.height = CGImageGetHeight(imag);
+    rect.size.width = CGImageGetWidth(imag) * self.scale;
+    rect.size.height = CGImageGetHeight(imag) * self.scale;
     
-    while (rect.size.width * rect.size.height > 4 * 1000 * 1000) {
+    while (rect.size.width * rect.size.height > 3 * 1000 * 1000) {
         rect.size.width /= 2;
         rect.size.height /= 2;
     }
@@ -417,42 +513,27 @@ static CGRect swapWidthAndHeight(CGRect rect) {
 }
 
 /** 将图片旋转弧度radians */
-- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians {
+- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians mirrorHorizontally:(BOOL)mirrorHorizontally {
+    CGFloat width = self.size.width;
+    CGFloat height = self.size.height;
+    
     CGFloat scale = [UIScreen mainScreen].scale; // 取屏幕的比例，可以让贴图显示的更清晰
+    if (scale > 2) {
+        scale = 2;
+    }
     // calculate the size of the rotated view's containing box for our drawing space
     CGAffineTransform t = CGAffineTransformMakeRotation(radians);
-    CGRect clipTransRect = CGRectApplyAffineTransform(CGRectMake(0,0,self.size.width, self.size.height), t);
+    if (mirrorHorizontally) {
+        t = CGAffineTransformScale(t, -1.0, 1.0);
+        NSInteger angle = radians * 180 / M_PI - 360;
+        if (angle % 180 == 0) {
+            radians += M_PI;
+        }
+    }
+    CGRect clipTransRect = CGRectApplyAffineTransform(CGRectMake(0,0, width,  height), t);
     CGSize rotatedSize = clipTransRect.size;
-    rotatedSize.width = ((int)(rotatedSize.width + 0.5) * scale);
-    rotatedSize.height = ((int)(rotatedSize.height + 0.5) * scale);
-    
-    // Create the bitmap context
-    UIGraphicsBeginImageContext(rotatedSize);
-    CGContextRef bitmap = UIGraphicsGetCurrentContext();
-    
-    // Move the origin to the middle of the image so we will rotate and scale around the center.
-    CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
-    
-    // Rotate the image context
-    CGContextRotateCTM(bitmap, radians);
-    
-    // Now, draw the rotated/scaled image into the context
-    CGContextScaleCTM(bitmap, 1.0, -1.0);
-    CGContextDrawImage(bitmap, CGRectMake(-self.size.width * scale / 2, -self.size.height * scale / 2, self.size.width * scale, self.size.height * scale), [self CGImage]);
-    
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return newImage;
-}
-
-- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians scale:(CGFloat)scale {
-    // calculate the size of the rotated view's containing box for our drawing space
-    CGAffineTransform t = CGAffineTransformMakeRotation(radians);
-    CGRect clipTransRect = CGRectApplyAffineTransform(CGRectMake(0,0,self.size.width, self.size.height), t);
-    CGSize rotatedSize = clipTransRect.size;
-    rotatedSize.width = ((int)(rotatedSize.width + 0.5) * scale);
-    rotatedSize.height = ((int)(rotatedSize.height + 0.5) * scale);
+    rotatedSize.width = ((rotatedSize.width) * scale);
+    rotatedSize.height = ((rotatedSize.height) * scale);
     
     // Create the bitmap context
     UIGraphicsBeginImageContext(rotatedSize);
@@ -464,15 +545,59 @@ static CGRect swapWidthAndHeight(CGRect rect) {
     // Rotate the image context
     CGContextRotateCTM(bitmap, radians);
     
+    if (!mirrorHorizontally) {
+        CGContextScaleCTM(bitmap, 1.0, -1.0);
+    }
+    
     // Now, draw the rotated/scaled image into the context
-    CGContextScaleCTM(bitmap, 1.0, -1.0);
+    CGContextDrawImage(bitmap, CGRectMake(-width * scale / 2, -height * scale / 2, width * scale, height * scale), [self CGImage]);
+    
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+- (UIImage *)hx_imageRotatedByRadians:(CGFloat)radians scale:(CGFloat)scale mirrorHorizontally:(BOOL)mirrorHorizontally {
+    if (scale > 2) {
+        scale = 2;
+    }
+    // calculate the size of the rotated view's containing box for our drawing space
+    CGAffineTransform t = CGAffineTransformMakeRotation(radians);
+    if (mirrorHorizontally) {
+        t = CGAffineTransformScale(t, -1.0, 1.0);
+        NSInteger angle = radians * 180 / M_PI - 360;
+        if (angle % 180 == 0) {
+            radians += M_PI;
+        }
+    }
+    CGRect clipTransRect = CGRectApplyAffineTransform(CGRectMake(0,0,self.size.width, self.size.height), t);
+    CGSize rotatedSize = clipTransRect.size;
+    rotatedSize.width = ((rotatedSize.width) * scale);
+    rotatedSize.height = ((rotatedSize.height) * scale);
+    
+    // Create the bitmap context
+    UIGraphicsBeginImageContext(rotatedSize);
+    
+    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    
+    // Move the origin to the middle of the image so we will rotate and scale around the center.
+    CGContextTranslateCTM(bitmap, rotatedSize.width / 2, rotatedSize.height / 2);
+    
+    // Rotate the image context
+    CGContextRotateCTM(bitmap, radians);
+    
+    if (!mirrorHorizontally) {
+        CGContextScaleCTM(bitmap, 1.0, -1.0);
+    }
+    
+    // Now, draw the rotated/scaled image into the context
     CGContextDrawImage(bitmap, CGRectMake(-self.size.width * scale / 2, -self.size.height * scale / 2, self.size.width * scale, self.size.height * scale), [self CGImage]);
     
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    
     return newImage;
 }
+
 - (UIImage *)hx_scaleToFillSize:(CGSize)size {
     if (CGSizeEqualToSize(self.size, size)) {
         return self;
@@ -496,11 +621,20 @@ static CGRect swapWidthAndHeight(CGRect rect) {
 }
 /** 合并图片（图片大小一致） */
 - (UIImage *)hx_mergeimages:(NSArray <UIImage *>*)images {
-    CGFloat scale = [UIScreen mainScreen].scale; // 取屏幕的比例，可以让贴图显示的更清晰
-    UIGraphicsBeginImageContextWithOptions(self.size ,NO, scale);
-    [self drawInRect:CGRectMake(0, 0, self.size.width, self.size.height)];
+    CGSize size = self.size;
+    while (size.width * size.height > 3 * 1000 * 1000) {
+        size.width /= 2;
+        size.height /= 2;
+    }
+    UIGraphicsBeginImageContextWithOptions(size ,NO, 0);
+    [self drawInRect:CGRectMake(0, 0, size.width, size.height)];
     for (UIImage *image in images) {
-        [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
+        size = image.size;
+        while (size.width * size.height > 3 * 1000 * 1000) {
+            size.width /= 2;
+            size.height /= 2;
+        }
+        [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
     }
     UIImage *mergeImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
@@ -508,8 +642,7 @@ static CGRect swapWidthAndHeight(CGRect rect) {
 }
 /** 合并图片(图片大小以第一张为准) */
 + (UIImage *)hx_mergeimages:(NSArray <UIImage *>*)images {
-    CGFloat scale = [UIScreen mainScreen].scale; // 取屏幕的比例，可以让贴图显示的更清晰
-    UIGraphicsBeginImageContextWithOptions(images.firstObject.size ,NO, scale);
+    UIGraphicsBeginImageContextWithOptions(images.firstObject.size ,NO, 0);
     for (UIImage *image in images) {
         [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
     }

@@ -18,11 +18,17 @@
     }
     return self;
 }
-- (CGFloat)lineWidth {
-    if (!_lineWidth) {
-        _lineWidth = 5.f;
+- (CGFloat)brushLineMaxWidth {
+    if (!_brushLineMaxWidth) {
+        _brushLineMaxWidth = 12.f;
     }
-    return _lineWidth;
+    return _brushLineMaxWidth;
+}
+- (CGFloat)brushLineMinWidth {
+    if (!_brushLineMinWidth) {
+        _brushLineMinWidth = 3.f;
+    }
+    return _brushLineMinWidth;
 }
 - (UIColor *)themeColor {
     if (!_themeColor) {
@@ -33,6 +39,7 @@
 - (NSArray<UIColor *> *)drawColors {
     if (!_drawColors) {
         _drawColors = @[[UIColor hx_colorWithHexStr:@"#ffffff"], [UIColor hx_colorWithHexStr:@"#2B2B2B"], [UIColor hx_colorWithHexStr:@"#FA5150"], [UIColor hx_colorWithHexStr:@"#FEC200"], [UIColor hx_colorWithHexStr:@"#07C160"], [UIColor hx_colorWithHexStr:@"#10ADFF"], [UIColor hx_colorWithHexStr:@"#6467EF"]];
+        self.defaultDarwColorIndex = 2;
     }
     return _drawColors;
 }

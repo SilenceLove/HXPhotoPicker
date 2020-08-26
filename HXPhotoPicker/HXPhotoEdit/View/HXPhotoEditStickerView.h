@@ -31,6 +31,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSDictionary *data;
 @property (assign, nonatomic, getter=isHitTestSubView) BOOL hitTestSubView;
 - (HXPhotoEditStickerItemView *)addStickerItem:(HXPhotoEditStickerItem *)item isSelected:(BOOL)selected;
+
+@property (assign, nonatomic) NSInteger angle;
+@property (assign, nonatomic) NSInteger mirrorType;
+
 - (void)removeSelectItem;
 - (void)clearCoverage;
 @end

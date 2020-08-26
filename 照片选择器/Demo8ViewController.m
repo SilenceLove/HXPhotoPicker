@@ -124,8 +124,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
                 // 如果有编辑数据，则说明这张图篇被编辑过了
                 // 需要这样才能获取到编辑之后的图片
 //                model.photoEdit.editPreviewImage;
-                // 编辑之后的图片数据
-//                model.photoEdit.editPreviewData;
                 return;
             }
             // 再判断具体类型
