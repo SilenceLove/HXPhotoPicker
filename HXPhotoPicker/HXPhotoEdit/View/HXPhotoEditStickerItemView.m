@@ -91,9 +91,12 @@
 }
 - (void)updateItem:(HXPhotoEditStickerItem *)item {
     [self.contentView updateItem:item];
-    [self updateFrameWithViewSize:item.itemFrame.size];
+    [self updateFrameWithViewSize:item.itemFrame.size setMirror:YES];
 }
 - (void)updateFrameWithViewSize:(CGSize)viewSize {
+    [self updateFrameWithViewSize:viewSize setMirror:NO];
+}
+- (void)updateFrameWithViewSize:(CGSize)viewSize setMirror:(BOOL)setMirror {
     CGPoint center = self.center;
     CGRect frame = self.frame;
     frame.size = CGSizeMake(viewSize.width + HXItemView_margin / self.screenScale, viewSize.height + HXItemView_margin / self.screenScale);
@@ -106,7 +109,7 @@
     self.contentView.hx_size = viewSize;
     self.contentView.center = CGPointMake(self.hx_w / 2, self.hx_h / 2);
     
-    [self setScale:_scale rotation:self.arg];
+    [self setScale:_scale rotation:self.arg isInitialize:NO isPinch:NO setMirror:setMirror];
 }
 - (void)resetRotation {
     [self setScale:_scale rotation:self.arg isInitialize:NO isPinch:NO setMirror:YES];

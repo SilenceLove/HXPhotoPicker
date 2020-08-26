@@ -8,7 +8,7 @@
 
 | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_4.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_1.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_2.PNG"> |
 | ------ | ------ | ------ |
-| <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_3.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_4.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_5.PNG"> |
+| <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_3_2.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_6.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_7.PNG"> |
 | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_gif_tag_1.gif"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_gif_tag_2.gif"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_gif_tag_3.gif"> |
 
 ## 目录
@@ -38,7 +38,7 @@
 - [x] 自定义转场动画
 - [x] 查看、选择LivePhoto IOS9.1以上才有用
 - [x] 浏览网络图片、网络视频
-- [x] 自定义裁剪图片
+- [x] 仿微信编辑图片功能
 - [x] 自定义裁剪视频时长
 - [x] 传入本地图片、视频
 - [x] 在线下载iCloud上的资源
@@ -94,8 +94,6 @@ for (HXPhotoModel *model in self.selectList) {
             // 如果有编辑数据，则说明这张图篇被编辑过了
             // 需要这样才能获取到编辑之后的图片
             model.photoEdit.editPreviewImage;
-            // 编辑之后的图片数据
-            model.photoEdit.editPreviewData;
             return;
         }
         // 再判断具体类型
@@ -171,47 +169,13 @@ for (HXPhotoModel *model in self.selectList) {
                 // LivePhoto，requestImageAfterFinishingSelection = YES 时没有处理livephoto，需要自己处理
                 // 如果需要上传livephoto的话，需要上传livephoto里的图片和视频
                 // 展示的时候需要根据图片和视频生成livephoto
-                [model requestLivePhotoWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:^(PHLivePhoto * _Nullable livePhoto, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
-                    NSArray *resoures = [PHAssetResource assetResourcesForLivePhoto:livePhoto];
-                    // resoures 里面有两个 PHAssetResource 一个图片，一个视频
-                    PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
-                    // 没有处理iCloud上的情况，需要自己处理
-                    // options.networkAccessAllowed = YES;
-                    // options.progressHandler = ^(double progress) {
-                    //
-                    // };
+                [model requestLivePhotoAssetsWithSuccess:^(NSURL * _Nullable imageURL, NSURL * _Nullable videoURL, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+                    // imageURL - LivePhoto里的照片封面地址
+                    // videoURL - LivePhoto里的视频地址
                     
-                    NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
-                    NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-                    // 导出livePhoto视频的本地地址
-                    NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
-                    for (PHAssetResource *assetResource in resoures) {
-                        if (assetResource.type == PHAssetResourceTypePhoto) {
-                            // LivePhoto的封面
-                            [[PHAssetResourceManager defaultManager] requestDataForAssetResource:assetResource options:options dataReceivedHandler:^(NSData * _Nonnull data) {
-                                UIImage *livePhoto_image = [UIImage imageWithData:data];
-                                // livePhoto_image 需要上传的LIvePhoto封面
-                                NSSLog(@"LivePhoto_image - %@", livePhoto_image);
-                            } completionHandler:^(NSError * _Nullable error) {
-                                if (error) {
-                                    NSSLog(@"LivePhoto_image - 失败%@",error.localizedDescription);
-                                }else {
-                                    NSSLog(@"LivePhoto_image - 成功");
-                                }
-                            }];
-                        }else if (assetResource.type == PHAssetResourceTypePairedVideo) {
-                            // LivePhoto的视频内容
-                            [[PHAssetResourceManager defaultManager] writeDataForAssetResource:assetResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
-                                if (!error) {
-                                    // videoURL 需要上传的LIvePhoto视频地址，已经在本地存在的
-                                    NSSLog(@"LivePhoto_video - %@", videoURL);
-                                }else {
-                                    NSSLog(@"LivePhoto_video - 失败%@",error.localizedDescription);
-                                }
-                            }];
-                        }
-                    }
-                } failed:nil];
+                } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                    // 获取失败
+                }];
             }
             // 也可以不用上面的判断和方法获取，自己根据 model.asset 这个PHAsset对象来获取想要的东西
             PHAsset *asset = model.asset;
@@ -658,6 +622,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v3.0.6　-　修复编辑图片时内存过高的问题、相机添加自动曝光、编辑图片时添加镜像功能、画笔大小支持更改等...
 - v3.0.5　-　提高稳定性、支持本地图片和视频生成LivePhoto、支持网络图片和视频生成LivePhoto、修复单选编辑之后状态栏隐藏的问题、整理缓存路径
 - v3.0.4　-　优化选择逻辑、暗黑模式。完善微信样式
 - v3.0.3　-　解决pod加载xib报错的问题、支持添加本地gif图片

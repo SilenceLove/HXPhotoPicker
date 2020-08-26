@@ -132,7 +132,11 @@
         imgHeight = width / imgWidth * imgHeight;
         w = width;
         h = imgHeight;
-        self.scrollView.maximumZoomScale = 2.5;
+        if (w < h) {
+            self.scrollView.maximumZoomScale = self.frame.size.width * 2.5f / w;
+        } else {
+            self.scrollView.maximumZoomScale = self.frame.size.height * 2.5f / h;
+        }
 
         self.previewContentView.frame = CGRectMake(0, 0, w, h);
         if (h < height) {

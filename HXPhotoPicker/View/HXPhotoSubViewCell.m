@@ -21,6 +21,7 @@
 @property (assign, nonatomic) int32_t requestID;
 @property (strong, nonatomic) UILabel *stateLb;
 @property (strong, nonatomic) CAGradientLayer *bottomMaskLayer;
+@property (strong, nonatomic) UIView *bottomMaskView;
 @property (assign, nonatomic) BOOL addCustomViewCompletion;
 @property (strong, nonatomic) UIView *customView;
 @end
@@ -55,7 +56,6 @@
         _imageView = [[UIImageView alloc] init];
         _imageView.clipsToBounds = YES;
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
-        [_imageView.layer addSublayer:self.bottomMaskLayer];
     }
     return _imageView;
 }
@@ -67,6 +67,13 @@
         _stateLb.font = [UIFont hx_mediumSFUITextOfSize:12];
     }
     return _stateLb;
+}
+- (UIView *)bottomMaskView {
+    if (!_bottomMaskView) {
+        _bottomMaskView = [[UIView alloc] init];
+        [_bottomMaskView.layer addSublayer:self.bottomMaskLayer];
+    }
+    return _bottomMaskView;
 }
 - (CAGradientLayer *)bottomMaskLayer {
     if (!_bottomMaskLayer) {
@@ -101,6 +108,7 @@
 }
 - (void)setup {
     [self.contentView addSubview:self.imageView];
+    [self.contentView addSubview:self.bottomMaskView];
     [self.contentView addSubview:self.stateLb];
     [self.contentView addSubview:self.deleteBtn];
     [self.contentView addSubview:self.progressView];
@@ -305,33 +313,33 @@
     if (model.type == HXPhotoModelMediaTypePhotoGif && !model.photoEdit) {
         self.stateLb.text = @"GIF";
         self.stateLb.hidden = NO;
-        self.bottomMaskLayer.hidden = NO;
+        self.bottomMaskView.hidden = NO;
     }else if (model.type == HXPhotoModelMediaTypeLivePhoto && !model.photoEdit) {
         self.stateLb.text = @"Live";
         self.stateLb.hidden = NO;
-        self.bottomMaskLayer.hidden = NO;
+        self.bottomMaskView.hidden = NO;
     }else {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
             self.stateLb.text = model.videoTime;
             self.stateLb.hidden = NO;
-            self.bottomMaskLayer.hidden = NO;
+            self.bottomMaskView.hidden = NO;
         }else {
             if ((model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
                  model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalGif) && !model.photoEdit) {
                 self.stateLb.text = @"GIF";
                 self.stateLb.hidden = NO;
-                self.bottomMaskLayer.hidden = NO;
+                self.bottomMaskView.hidden = NO;
                 return;
             }else if ((model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
                        model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) &&
                       !model.photoEdit) {
                 self.stateLb.text = @"Live";
                 self.stateLb.hidden = NO;
-                self.bottomMaskLayer.hidden = NO;
+                self.bottomMaskView.hidden = NO;
                 return;
             }
             self.stateLb.hidden = YES;
-            self.bottomMaskLayer.hidden = YES;
+            self.bottomMaskView.hidden = YES;
         }
     }
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:self.index inSection:0];
@@ -350,7 +358,7 @@
         BOOL hiddenState = [self.customProtocol shouldHiddenBottomType:self indexPath:indexPath];
         if (hiddenState) {
             self.stateLb.hidden = hiddenState;
-            self.bottomMaskLayer.hidden = hiddenState;
+            self.bottomMaskView.hidden = hiddenState;
         }
     }
     if ([self.customProtocol respondsToSelector:@selector(customViewFrame:indexPath:)]) {
@@ -372,7 +380,8 @@
     self.imageView.frame = self.bounds;
     
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
-    self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
+    self.bottomMaskView.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
+    self.bottomMaskLayer.frame = self.bottomMaskView.bounds;
 
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;

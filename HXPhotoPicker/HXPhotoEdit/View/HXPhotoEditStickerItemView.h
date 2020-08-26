@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation;
 - (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation isInitialize:(BOOL)isInitialize;
 - (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation isInitialize:(BOOL)isInitialize isPinch:(BOOL)isPinch setMirror:(BOOL)setMirror;
-- (void)updateItem:(HXPhotoEditStickerItem *)item;
+//- (void)updateItem:(HXPhotoEditStickerItem *)item;
 - (void)resetRotation;
 - (void)viewDidPan:(UIPanGestureRecognizer *)sender;
 - (void)viewDidPinch:(UIPinchGestureRecognizer *)sender;

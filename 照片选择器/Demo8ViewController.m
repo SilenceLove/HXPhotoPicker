@@ -205,47 +205,13 @@ static const CGFloat kPhotoViewMargin = 12.0;
                     // LivePhoto，requestImageAfterFinishingSelection = YES 时没有处理livephoto，需要自己处理
                     // 如果需要上传livephoto的话，需要上传livephoto里的图片和视频
                     // 展示的时候需要根据图片和视频生成livephoto
-                    [model requestLivePhotoWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:^(PHLivePhoto * _Nullable livePhoto, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
-                        NSArray *resoures = [PHAssetResource assetResourcesForLivePhoto:livePhoto];
-                        // resoures 里面有两个 PHAssetResource 一个图片，一个视频
-                        PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
-                        // 没有处理iCloud上的情况，需要自己处理
-//                        options.networkAccessAllowed = YES;
-//                        options.progressHandler = ^(double progress) {
-//
-//                        };
+                    [model requestLivePhotoAssetsWithSuccess:^(NSURL * _Nullable imageURL, NSURL * _Nullable videoURL, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+                        // imageURL - LivePhoto里的照片封面地址
+                        // videoURL - LivePhoto里的视频地址
                         
-                        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
-                        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-                        // 导出livePhoto视频的本地地址
-                        NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
-                        for (PHAssetResource *assetResource in resoures) {
-                            if (assetResource.type == PHAssetResourceTypePhoto) {
-                                // LivePhoto的封面
-                                [[PHAssetResourceManager defaultManager] requestDataForAssetResource:assetResource options:options dataReceivedHandler:^(NSData * _Nonnull data) {
-                                    UIImage *livePhoto_image = [UIImage imageWithData:data];
-                                    // livePhoto_image - 需要上传的LivePhoto封面
-                                    NSSLog(@"LivePhoto_image - %@", livePhoto_image);
-                                } completionHandler:^(NSError * _Nullable error) {
-                                    if (error) {
-                                        NSSLog(@"LivePhoto_image - 失败%@",error.localizedDescription);
-                                    }else {
-                                        NSSLog(@"LivePhoto_image - 成功");
-                                    }
-                                }];
-                            }else if (assetResource.type == PHAssetResourceTypePairedVideo) {
-                                // LivePhoto的视频内容
-                                [[PHAssetResourceManager defaultManager] writeDataForAssetResource:assetResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
-                                    if (!error) {
-                                        // videoURL - 需要上传的LivePhoto视频地址，已经在本地存在的
-                                        NSSLog(@"LivePhoto_video - %@", videoURL);
-                                    }else {
-                                        NSSLog(@"LivePhoto_video - 失败%@",error.localizedDescription);
-                                    }
-                                }];
-                            }
-                        }
-                    } failed:nil];
+                    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                        // 获取失败
+                    }];
                 }
                 // 也可以不用上面的判断和方法获取，自己根据 model.asset 这个PHAsset对象来获取想要的东西
 //                PHAsset *asset = model.asset;
