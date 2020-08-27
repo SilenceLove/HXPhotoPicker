@@ -1,10 +1,19 @@
 language: objective-c
 osx_image: xcode11.4
 
+xcode_project: HXPhotoPicker-Demo.xcodeproj
+xcode_scheme: HXPhotoPicker
+
+before_install:
+- env
+- xcodebuild -version
+- xcpretty --version
+
 script:
-    - set -o pipefail
-    - travis_retry xcodebuild -xcodeproj HXPhotoPicker-Demo.xcodeproj -scheme "HXPhotoPicker" -destination "platform=iOS Simulator,name=iPhone 8" -enableCodeCoverage YES | bundle exec xcpretty
-    
+- set -o pipefail
+- xcodebuild clean build -project "$TRAVIS_XCODE_PROJECT"  -scheme "$TRAVIS_XCODE_SCHEME" | xcpretty
+
+
 before_install:
     - pip install codecov
     - pip install coverage
