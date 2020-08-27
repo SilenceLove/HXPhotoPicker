@@ -1,6 +1,6 @@
 //
 //  HXPhotoTypes.h
-//  照片选择器
+//  HXPhotoPicker-Demo
 //
 //  Created by 洪欣 on 2020/8/3.
 //  Copyright © 2020 洪欣. All rights reserved.
@@ -9,9 +9,32 @@
 #ifndef HXPhotoTypes_h
 #define HXPhotoTypes_h
 
+#import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
 
-@class HXPhotoModel;
+@class HXPhotoModel, HXAlbumModel, HXPhotoManager;
+
+typedef void (^ viewControllerDidDoneBlock)(NSArray<HXPhotoModel *> * _Nullable allList, NSArray<HXPhotoModel *> * _Nullable photoList, NSArray<HXPhotoModel *> * _Nullable videoList, BOOL original, UIViewController * _Nullable viewController, HXPhotoManager * _Nullable manager);
+
+typedef void (^ viewControllerDidCancelBlock)(UIViewController * _Nullable viewController, HXPhotoManager * _Nullable manager);
+
+typedef void (^ getAllAlbumListBlock)(NSMutableArray<HXAlbumModel *> * _Nullable albums);
+
+typedef void (^ getSelectAlbumBlock)(HXAlbumModel * _Nullable selectedModel);
+
+typedef void (^ getPhotoListBlock)(NSMutableArray * _Nullable allList , NSMutableArray * _Nullable previewList , HXPhotoModel * _Nullable firstSelectModel, HXAlbumModel * _Nullable albumModel);
+
+typedef NS_ENUM(NSUInteger, HXPhotoManagerSelectedType) {
+    HXPhotoManagerSelectedTypePhoto = 0,        //!< 只显示图片
+    HXPhotoManagerSelectedTypeVideo = 1,        //!< 只显示视频
+    HXPhotoManagerSelectedTypePhotoAndVideo = 2 //!< 图片和视频一起显示
+};
+
+typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
+    HXPhotoManagerVideoSelectedTypeNormal = 0,  //!< 普通状态显示选择按钮
+    HXPhotoManagerVideoSelectedTypeSingle       //!< 单选不显示选择按钮
+};
+
 
 /// 当使用了自定义相机类型时会过滤掉内部按 HXPhotoManagerSelectedType 来设置的逻辑，
 /// 将会使用自定义类型的逻辑进行设置

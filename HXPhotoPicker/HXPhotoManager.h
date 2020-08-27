@@ -1,6 +1,6 @@
 //
 //  HX_PhotoManager.h
-//  照片选择器
+//  HXPhotoPicker-Demo
 //
 //  Created by 洪欣 on 17/2/8.
 //  Copyright © 2017年 洪欣. All rights reserved.
@@ -13,48 +13,18 @@
 #import "HXPhotoTools.h"
 #import "HXPhotoConfiguration.h"
 #import "HXCustomAssetModel.h"
-
-
-typedef void (^ viewControllerDidDoneBlock)(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL original, UIViewController *viewController, HXPhotoManager *manager);
-
-typedef void (^ viewControllerDidCancelBlock)(UIViewController *viewController, HXPhotoManager *manager);
-
-typedef void (^ getAllAlbumListBlock)(NSMutableArray<HXAlbumModel *> *albums);
-
-typedef void (^ getSelectAlbumBlock)(HXAlbumModel *selectedModel);
-
-typedef void (^ getPhotoListBlock)(NSMutableArray *allList , NSMutableArray *previewList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
-
-/**
- *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
- */
-typedef NS_ENUM(NSUInteger, HXPhotoManagerSelectedType) {
-    HXPhotoManagerSelectedTypePhoto = 0,        //!< 只显示图片
-    HXPhotoManagerSelectedTypeVideo = 1,        //!< 只显示视频
-    HXPhotoManagerSelectedTypePhotoAndVideo = 2 //!< 图片和视频一起显示
-};
-
-typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
-    HXPhotoManagerVideoSelectedTypeNormal = 0,  //!< 普通状态显示选择按钮
-    HXPhotoManagerVideoSelectedTypeSingle       //!< 单选不显示选择按钮
-};
+#import "HXPhotoTypes.h"
 
 @interface HXPhotoManager : NSObject
 
-/**
- 当前选择类型
- */
+/// 当前选择类型
 @property (assign, nonatomic) HXPhotoManagerSelectedType type;
 
-/**
- 配置信息
- */
+/// 相关配置
 @property (strong, nonatomic) HXPhotoConfiguration *configuration;
 
-/**
- @param type 选择类型
- @return self
- */
+/// init
+/// @param type 选择类型
 - (instancetype)initWithType:(HXPhotoManagerSelectedType)type;
 + (instancetype)managerWithType:(HXPhotoManagerSelectedType)type;
 
@@ -103,24 +73,17 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 /// 将本地获取的模型数组添加到manager的数据中
 - (void)addLocalModels;
 
-/**
- 添加自定义资源模型
- 如果图片/视频 选中的数量超过最大选择数时,之后选中的会变为未选中
- 如果设置的图片/视频不能同时选择时
- 图片在视频前面的话只会将图片添加到已选数组.
- 视频在图片前面的话只会将视频添加到已选数组.
- 如果 type = HXPhotoManagerSelectedTypePhoto 时 会过滤掉视频
- 如果 type = HXPhotoManagerSelectedTypeVideo 时 会过滤掉图片
- 
- @param assetArray 模型数组
- */
+/// 添加自定义资源模型
+/// 如果图片/视频 选中的数量超过最大选择数时,之后选中的会变为未选中
+/// 如果设置的图片/视频不能同时选择时
+/// 图片在视频前面的话只会将图片添加到已选数组.
+/// 视频在图片前面的话只会将视频添加到已选数组.
+/// 如果 type = HXPhotoManagerSelectedTypePhoto 时 会过滤掉视频
+/// 如果 type = HXPhotoManagerSelectedTypeVideo 时 会过滤掉图片
+/// @param assetArray 模型数组
 - (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
 
-/**
- 获取已选照片数组的照片总大小
- 
- @param completion 获取完成
- */
+/// 获取已选照片数组的照片总大小
 - (void)requestPhotosBytesWithCompletion:(void (^)(NSString *totalBytes, NSUInteger totalDataLengths))completion;
 
 /// 已选照片数据的总大小

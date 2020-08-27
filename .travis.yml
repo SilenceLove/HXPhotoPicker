@@ -1,0 +1,7 @@
+language: objective-c
+osx_image: xcode11.4
+
+script:
+    - set -o pipefail
+    - travis_retry xcodebuild -workspace HXPhotoPicker-Demo.xcworkspace -scheme "HXPhotoPicker" -destination "platform=iOS Simulator,name=iPhone 6"
+

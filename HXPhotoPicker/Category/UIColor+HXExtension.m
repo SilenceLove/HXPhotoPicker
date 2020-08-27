@@ -1,6 +1,6 @@
 //
 //  UIColor+HXExtension.m
-//  照片选择器
+//  HXPhotoPicker-Demo
 //
 //  Created by 洪欣 on 2019/12/3.
 //  Copyright © 2019 洪欣. All rights reserved.

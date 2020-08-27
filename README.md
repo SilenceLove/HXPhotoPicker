@@ -1,10 +1,11 @@
 <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tip_2.png">
 
 <p align="center">
-<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/badge/platform-iOS%208.0%2B-ff69b5152950834.svg?style=flat"></a>
-<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?style=flat"></a>
-<a href="https://developer.apple.com/Objective-C"><img src="http://img.shields.io/badge/language-ObjC-orange.svg?style=flat"></a>
-<a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat"></a>
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://badgen.net/badge/icon/iOS%208.0%2B?color=cyan&icon=apple&label"></a>
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?logo=cocoapods&logoColor=ffffff"></a>
+<a href="https://developer.apple.com/Objective-C"><img src="http://img.shields.io/badge/language-ObjC-red.svg?logo=common-workflow-language"></a>
+<a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://img.shields.io/github/last-commit/SilenceLove/HXPhotoPicker?color=orange&logo=pre-commit&logoColor=ffffff"></a>
 </p>
 
 | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_4.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_1.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_2.PNG"> |

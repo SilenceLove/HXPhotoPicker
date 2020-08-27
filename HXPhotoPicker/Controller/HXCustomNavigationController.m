@@ -1,6 +1,6 @@
 //
 //  HXCustomNavigationController.m
-//  照片选择器
+//  HXPhotoPicker-Demo
 //
 //  Created by 洪欣 on 2017/10/31.
 //  Copyright © 2017年 洪欣. All rights reserved.
@@ -74,6 +74,8 @@
     }];
 }
 - (void)requestModel {
+    self.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    self.modalPresentationCapturesStatusBarAppearance = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         HXWeakSelf
         [self.manager getCameraRollAlbumCompletion:^(HXAlbumModel *albumModel) {

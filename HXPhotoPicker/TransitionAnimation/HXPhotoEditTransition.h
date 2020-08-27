@@ -1,6 +1,6 @@
 //
 //  HXPhotoEditTransition.h
-//  照片选择器
+//  HXPhotoPicker-Demo
 //
 //  Created by 洪欣 on 2019/1/20.
 //  Copyright © 2019年 洪欣. All rights reserved.

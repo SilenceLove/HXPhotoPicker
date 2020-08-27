@@ -1,6 +1,6 @@
 //
 //  HXPreviewContentView.h
-//  照片选择器
+//  HXPhotoPicker-Demo
 //
 //  Created by 洪欣 on 2019/11/19.
 //  Copyright © 2019 洪欣. All rights reserved.
