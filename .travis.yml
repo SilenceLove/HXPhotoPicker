@@ -4,14 +4,18 @@ osx_image: xcode11.4
 xcode_project: HXPhotoPicker-Demo.xcodeproj
 xcode_scheme: HXPhotoPicker
 
+env:
+  global:
+    - FRAMEWORK_NAME=HXPhotoPicker
+    
 before_install:
-- env
-- xcodebuild -version
-- xcpretty --version
+    - env
+    - xcodebuild -version
+    - xcpretty --version
 
 script:
-- set -o pipefail
-- xcodebuild clean -project $xcode_project -scheme $xcode_scheme build | xcpretty
+    - set -o pipefail
+    - xcodebuild clean -project $xcode_project -scheme $FRAMEWORK_NAME build | xcpretty
 
 after_success:
     - sleep 3
