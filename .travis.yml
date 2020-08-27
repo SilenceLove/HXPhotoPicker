@@ -3,5 +3,12 @@ osx_image: xcode11.4
 
 script:
     - set -o pipefail
-    - travis_retry xcodebuild -workspace HXPhotoPicker-Demo.xcworkspace -scheme "HXPhotoPicker" -destination "platform=iOS Simulator,name=iPhone 6"
+    - travis_retry xcodebuild -workspace HXPhotoPicker-Demo.xcodeproj -scheme "HXPhotoPicker" -destination "platform=iOS Simulator,name=iPhone 8" -enableCodeCoverage YES | bundle exec xcpretty
+    
+before_install:
+    - pip install codecov
+    - pip install coverage
 
+after_success:
+    - sleep 5
+    - bash <(curl -s https://codecov.io/bash)

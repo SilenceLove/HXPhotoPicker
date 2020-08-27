@@ -1,6 +1,7 @@
 <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tip_2.png">
 
 <p align="center">
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://travis-ci.org/SilenceLove/HXPhotoPicker.svg?branch=master"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://badgen.net/badge/icon/iOS%208.0%2B?color=cyan&icon=apple&label"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?logo=cocoapods&logoColor=ffffff"></a>
 <a href="https://developer.apple.com/Objective-C"><img src="http://img.shields.io/badge/language-ObjC-red.svg?logo=common-workflow-language"></a>
