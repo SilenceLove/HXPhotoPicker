@@ -11,13 +11,8 @@ before_install:
 
 script:
 - set -o pipefail
-- xcodebuild clean build -project "$TRAVIS_XCODE_PROJECT"  -scheme "$TRAVIS_XCODE_SCHEME" | xcpretty
-
-
-before_install:
-    - pip install codecov
-    - pip install coverage
+- xcodebuild clean -project $xcode_project -scheme $xcode_scheme build | xcpretty
 
 after_success:
-    - sleep 5
+    - sleep 3
     - bash <(curl -s https://codecov.io/bash)
