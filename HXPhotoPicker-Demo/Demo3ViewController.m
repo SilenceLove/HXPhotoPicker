@@ -122,12 +122,15 @@ static const CGFloat kPhotoViewMargin = 12.0;
 }
 
 - (void)lookClick {
-    [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
-    [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
+#if HasSDWebImage
     [[SDWebImageManager sharedManager] cancelAll];
     [[SDWebImageManager sharedManager].imageCache clearWithCacheType:SDImageCacheTypeAll completion:^{
 
     }];
+#elif HasYYKitOrWebImage
+    [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
+    [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
+#endif
 }
 - (void)addNetworkPhoto {
     if (self.manager.afterSelectPhotoCountIsMaximum) {
