@@ -35,20 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)hx_requestImageDataWithCompletion:(void (^)(NSArray<NSData *> * _Nullable imageDataArray))completion;
 
-/**
- 获取AVAsset
-
- @param completion 完成回调，获取失败的不会添加到数组中
- */
-- (void)hx_requestAVAssetWithCompletion:(void (^)(NSArray<AVAsset *> * _Nullable assetArray))completion;
-
-/**
- 获取视频地址
-
- @param presetName AVAssetExportPresetHighestQuality / AVAssetExportPresetMediumQuality
- @param completion 完成回调，获取失败的不会添加到数组中
- */
-- (void)hx_requestVideoURLWithPresetName:(NSString *)presetName completion:(void (^)(NSArray<NSURL *> * _Nullable videoURLArray))completion;
 @end
 
 NS_ASSUME_NONNULL_END

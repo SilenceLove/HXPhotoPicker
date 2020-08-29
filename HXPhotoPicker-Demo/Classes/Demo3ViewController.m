@@ -84,6 +84,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
         }];
     }
 #endif
+
+#if (!HasSDWebImage && !HasYYKitOrWebImage)
+    hx_showAlert(self, @"请将项目里的SDWebImage或YYWebImage导入工程里后再使用网络图片功能", nil, @"确定", nil, nil, nil);
+    return;
+#endif
 //    self.navigationController.navigationBar.translucent = NO;
     self.automaticallyAdjustsScrollViewInsets = YES;
     

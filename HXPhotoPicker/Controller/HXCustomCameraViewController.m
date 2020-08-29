@@ -10,7 +10,6 @@
 #import "HXCustomCameraController.h"
 #import "HXCustomPreviewView.h"
 #import "HXPhotoTools.h"
-#import "HXFullScreenCameraPlayView.h"
 #import "HXPhotoManager.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"

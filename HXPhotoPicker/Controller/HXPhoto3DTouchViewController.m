@@ -357,10 +357,6 @@
 #endif
     });
 }
-
-- (void)dealloc {
-    if (HXShowLog) NSSLog(@"%@",self);
-}
 #if HasSDWebImage
 - (SDAnimatedImageView *)sdImageView {
     if (!_sdImageView) {

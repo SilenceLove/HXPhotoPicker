@@ -735,7 +735,6 @@ NSString *const kHXEditingViewData_clippingView = @"kHXEditingViewData_clippingV
                             returnedImage = [returnedImage hx_rotationImage:UIImageOrientationLeftMirrored];
                         }
                     }
-//                    returnedImage = [returnedImage hx_imageRotatedByRadians:rotate mirrorHorizontally:isHorizontal];
                 }
                 if (otherImage) {
                     UIImage *scaleOtherImage = [otherImage hx_scaleToFillSize:returnedImage.size];

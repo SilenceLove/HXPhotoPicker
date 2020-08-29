@@ -48,11 +48,4 @@
  */
 - (NSString *)hx_dateStringWithFormat:(NSString *)format;
 
-/**
- 是否是同一天
-
- @param date 需要比较的NSDate
- @return yes or no
- */
-- (BOOL)hx_isSameDay:(NSDate*)date;
 @end

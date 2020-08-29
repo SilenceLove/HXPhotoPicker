@@ -394,7 +394,6 @@ UITableViewDelegate
     return _authorizationLb;
 }
 - (void)dealloc {
-    if (HXShowLog) NSSLog(@"dealloc");
     self.manager.selectPhotoing = NO;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CustomCameraViewControllerDidDoneNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];

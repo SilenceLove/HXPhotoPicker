@@ -492,17 +492,6 @@
 - (BOOL)selected {
     return self.button.selected;
 }
-//- (void)setupAlpha:(BOOL)anima {
-//    if (anima) {
-//        [UIView animateWithDuration:0.1 animations:^{
-//            self.titleLb.alpha = 1;
-//            self.arrowIcon.alpha = 1;
-//        }];
-//    }else {
-//        self.titleLb.alpha = 1;
-//        self.arrowIcon.alpha = 1;
-//    }
-//}
 - (void)setupContentViewFrame {
     if (self.superview && [self.superview isKindOfClass:NSClassFromString(@"_UITAMICAdaptorView")]) {
         // 让按钮在屏幕中间

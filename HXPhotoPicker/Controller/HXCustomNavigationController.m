@@ -38,6 +38,8 @@
     if (manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
         HXAlbumListViewController *vc = [[HXAlbumListViewController alloc] initWithManager:manager];
         self = [super initWithRootViewController:vc];
+        self.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        self.modalPresentationCapturesStatusBarAppearance = YES;
         if (self) {
             self.hx_delegate = delegate;
             self.manager = manager;
@@ -52,6 +54,8 @@
         HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
         vc.manager = manager;
         self = [super initWithRootViewController:vc];
+        self.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        self.modalPresentationCapturesStatusBarAppearance = YES;
         if (self) {
             self.hx_delegate = delegate;
             self.manager = manager;
@@ -74,8 +78,6 @@
     }];
 }
 - (void)requestModel {
-    self.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    self.modalPresentationCapturesStatusBarAppearance = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         HXWeakSelf
         [self.manager getCameraRollAlbumCompletion:^(HXAlbumModel *albumModel) {
@@ -198,7 +200,6 @@
         self.manager.selectPhotoing = NO;
     }
 //    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
-    if (HXShowLog) NSSLog(@"dealloc");
 }
 
 @end

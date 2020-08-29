@@ -149,7 +149,6 @@ NSString *const kHXImageViewData_filter = @"HXImageViewData_filter";
                     image = [image hx_rotationImage:UIImageOrientationLeftMirrored];
                 }
             }
-//            image = [image hx_imageRotatedByRadians:rotate scale:self.screenScale * [UIScreen mainScreen].scale mirrorHorizontally:mirrorHorizontally];
         }
     }
     return image;

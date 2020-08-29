@@ -68,6 +68,12 @@
         }];
     }
 #endif
+
+#if (!HasSDWebImage && !HasYYKitOrWebImage)
+    hx_showAlert(self, @"请将项目里的SDWebImage或YYWebImage导入工程里后再查看此demo", nil, @"确定", nil, nil, nil);
+    return;
+#endif
+    
     self.dataArray = [NSMutableArray array];
     for (int i = 0; i < 10; i++) {
         Demo9Model *model = [[Demo9Model alloc] init];

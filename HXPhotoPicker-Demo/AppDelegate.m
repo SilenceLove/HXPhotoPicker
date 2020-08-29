@@ -8,10 +8,9 @@
 
 #import "AppDelegate.h"
 #import "ViewController.h"
-#import "HXPhotoTools.h"
 void uncaughtExceptionHandler(NSException *exception) {
-    NSSLog(@"CRASH: %@", exception);
-    NSSLog(@"Stack Trace: %@", [exception callStackSymbols]);
+    NSLog(@"CRASH: %@", exception);
+    NSLog(@"Stack Trace: %@", [exception callStackSymbols]);
     // Internal error reporting
 }
 @interface AppDelegate ()

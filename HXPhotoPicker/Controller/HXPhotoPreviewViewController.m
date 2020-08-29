@@ -124,7 +124,6 @@ HX_PhotoEditViewControllerDelegate
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
-    if (HXShowLog) NSSLog(@"dealloc");
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
     if ([HXPhotoCommon photoCommon].isDark) {
