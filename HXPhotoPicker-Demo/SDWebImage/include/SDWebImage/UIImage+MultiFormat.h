@@ -1,1 +1,0 @@
-../../Core/UIImage+MultiFormat.h

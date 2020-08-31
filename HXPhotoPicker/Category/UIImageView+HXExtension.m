@@ -51,8 +51,8 @@
         return;
     }
     if (!model.networkThumbURL) model.networkThumbURL = model.networkPhotoUrl;
-    HXWeakSelf
 #if HasSDWebImage
+    HXWeakSelf
     NSString *cacheKey = [[SDWebImageManager sharedManager] cacheKeyForURL:model.networkPhotoUrl];
     [[SDWebImageManager sharedManager].imageCache queryImageForKey:cacheKey options:SDWebImageQueryMemoryData context:nil completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
         if (image) {
@@ -96,6 +96,7 @@
         }
     }];
 #elif HasYYKitOrWebImage
+    HXWeakSelf
     YYWebImageManager *manager = [YYWebImageManager sharedManager];
     [manager.cache getImageForKey:[manager cacheKeyForURL:model.networkPhotoUrl]  withType:YYImageCacheTypeAll withBlock:^(UIImage * _Nullable image, YYImageCacheType type) {
         if (image) {
@@ -144,7 +145,8 @@
 #else
     /// 如果都是pod导入的提示找不到话，先将SD或YY 和 HX 的pod全部移除，再 pod install
     /// 然后再 pod HXPhotoPicker/SDWebImage 或者 HXPhotoPicker/YYWebImage
-    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到");
+    NSSLog(@"请导入YYWebImage/SDWebImage后再使用网络图片功能");
+//    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到");
 #endif
 }
 
@@ -152,8 +154,8 @@
                   progress:(void (^)(CGFloat progress))progressBlock
                  completed:(void (^)(UIImage * image, NSError * error))completedBlock {
 
-    HXWeakSelf
 #if HasSDWebImage
+    HXWeakSelf
     [self sd_setImageWithURL:url placeholderImage:nil options:0 context:nil progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
         CGFloat progress = (CGFloat)receivedSize / expectedSize;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -168,6 +170,7 @@
         }
     }];
 #elif HasYYKitOrWebImage
+    HXWeakSelf
     [self yy_setImageWithURL:url placeholder:nil options:YYWebImageOptionShowNetworkActivity progress:^(NSInteger receivedSize, NSInteger expectedSize) {
         CGFloat progress = (CGFloat)receivedSize / expectedSize;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -186,7 +189,8 @@
 #else
     /// 如果都是pod导入的提示找不到话，先将SD或YY 和 HX 的pod全部移除，再 pod install
     /// 然后再 pod HXPhotoPicker/SDWebImage 或者 HXPhotoPicker/YYWebImage
-    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到");
+    NSSLog(@"请导入YYWebImage/SDWebImage后再使用网络图片功能");
+//    NSAssert(NO, @"请导入YYWebImage/SDWebImage后再使用网络图片功能，HXPhotoPicker为pod导入的那么YY或者SD也必须是pod导入的否则会找不到");
 #endif
 }
 @end

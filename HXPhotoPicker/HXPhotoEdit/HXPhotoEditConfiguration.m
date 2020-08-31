@@ -57,13 +57,22 @@
 }
 - (NSArray<HXPhotoEditChartletTitleModel *> *)chartletModels {
     if (!_chartletModels) {
-        HXPhotoEditChartletTitleModel *netModel = [HXPhotoEditChartletTitleModel modelWithNetworkNURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy_s_highlighted.png"]];
-        NSString *prefix = @"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy%d.png";
-        NSMutableArray *netModels = @[].mutableCopy;
-        for (int i = 1; i <= 40; i++) {
-            [netModels addObject:[HXPhotoEditChartletModel modelWithNetworkNURL:[NSURL URLWithString:[NSString stringWithFormat:prefix ,i]]]];
-        }
-        netModel.models = netModels.copy;
+        HXPhotoEditChartletTitleModel *netModel = [HXPhotoEditChartletTitleModel modelWithImageNamed:@"hx_sticker_cover"];
+        
+        HXPhotoEditChartletModel *subModel1 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_chongya"];
+        HXPhotoEditChartletModel *subModel2 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_jintianfenkeai"];
+        HXPhotoEditChartletModel *subModel3 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_keaibiaoq"];
+        HXPhotoEditChartletModel *subModel4 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_saihong"];
+        HXPhotoEditChartletModel *subModel5 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_xiaochuzhujiao"];
+        HXPhotoEditChartletModel *subModel6 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_yuanqimanman"];
+        HXPhotoEditChartletModel *subModel7 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_yuanqishaonv"];
+        HXPhotoEditChartletModel *subModel8 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_zaizaijia"];
+        HXPhotoEditChartletModel *subModel9 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_haoxinqing"];
+        HXPhotoEditChartletModel *subModel10 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_housailei"];
+        HXPhotoEditChartletModel *subModel11 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_kehaixing"];
+        HXPhotoEditChartletModel *subModel12 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_wow"];
+        HXPhotoEditChartletModel *subModel13 = [HXPhotoEditChartletModel modelWithImageNamed:@"hx_sticker_woxiangfazipai"];
+        netModel.models = @[subModel1, subModel2, subModel3, subModel4, subModel5, subModel6, subModel7, subModel8, subModel9, subModel10, subModel11, subModel12, subModel13];
         _chartletModels = @[netModel];
     }
     return _chartletModels;

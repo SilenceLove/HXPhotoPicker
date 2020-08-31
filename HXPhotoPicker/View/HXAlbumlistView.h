@@ -34,7 +34,6 @@
 @property (copy, nonatomic) void (^didTitleViewBlock)(BOOL selected);
 - (instancetype)initWithManager:(HXPhotoManager *)manager; 
 - (void)deSelect;
-//- (void)setupAlpha:(BOOL)anima;
 @end
 
 @interface HXAlbumTitleButton : UIButton

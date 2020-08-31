@@ -92,15 +92,12 @@
     return YES;
 }
 - (void)rotationView:(UIRotationGestureRecognizer *)rotationGest {
-    
     CGFloat rotation = rotationGest.rotation;
-    NSSLog(@"旋转   %f",rotation);
     self.contentView.transform = CGAffineTransformMakeRotation(rotation);
     
 }
 - (void)pinchView:(UIPinchGestureRecognizer *)pinchGestureRecognizer {
     CGFloat scale = pinchGestureRecognizer.scale;
-    NSLog(@"%f",scale);
     switch (pinchGestureRecognizer.state) {
         case UIGestureRecognizerStateBegan: {
             if (scale > 1) {

@@ -13,7 +13,7 @@
 
 const CGFloat HXZoomRate = 1.0f;
 
-@interface HXCustomCameraController ()<AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface HXCustomCameraController ()<AVCaptureFileOutputRecordingDelegate>
 @property (strong, nonatomic) dispatch_queue_t videoQueue;
 @property (strong, nonatomic) AVCaptureSession *captureSession;
 @property (weak, nonatomic) AVCaptureDeviceInput *activeVideoInput;
@@ -24,7 +24,6 @@ const CGFloat HXZoomRate = 1.0f;
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, assign) UIDeviceOrientation deviceOrientation;
 @property (nonatomic, assign) UIDeviceOrientation imageOrientation;
-@property (strong, nonatomic) AVCaptureVideoDataOutput *captureDataOutput;
 @end
 
 @implementation HXCustomCameraController
@@ -50,7 +49,6 @@ const CGFloat HXZoomRate = 1.0f;
     [self.motionManager stopDeviceMotionUpdates];
 }
 - (void)dealloc {
-    if (HXShowLog) NSSLog(@"dealloc");
 }
 /// 重力感应回调
 - (void)handleDeviceMotion:(CMDeviceMotion *)deviceMotion {
@@ -91,18 +89,6 @@ const CGFloat HXZoomRate = 1.0f;
     self.captureSession = [[AVCaptureSession alloc] init];
 }
 
-- (AVCaptureVideoDataOutput *)captureDataOutput {
-    if (!_captureDataOutput) {
-        _captureDataOutput = [[AVCaptureVideoDataOutput alloc] init];
-        _captureDataOutput.alwaysDiscardsLateVideoFrames = YES;
-        dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
-        [_captureDataOutput setSampleBufferDelegate:self queue:queue];
-        _captureDataOutput.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
-                                [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], kCVPixelBufferPixelFormatTypeKey,
-                                nil];
-    }
-    return _captureDataOutput;
-}
 - (void)setupPreviewLayer:(AVCaptureVideoPreviewLayer *)previewLayer startSessionCompletion:(void (^)(BOOL success))completion {
     if ([self.captureSession canSetSessionPreset:self.sessionPreset]) {
         self.captureSession.sessionPreset = self.sessionPreset;
@@ -168,14 +154,6 @@ const CGFloat HXZoomRate = 1.0f;
 - (void)removeMovieOutput {
     [self.captureSession removeOutput:self.movieOutput];
 }
-//- (void)addDataOutput {
-//    if ([self.captureSession canAddOutput:self.captureDataOutput]) {
-//        [self.captureSession addOutput:self.captureDataOutput];
-//    }
-//}
-//- (void)removeDataOutput {
-//    [self.captureSession removeOutput:self.captureDataOutput];
-//}
 - (BOOL)addAudioInput {
     NSError *error;
     AVCaptureDevice *audioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
@@ -538,14 +516,6 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     }
 }
 
-- (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    if (CMSampleBufferIsValid(sampleBuffer)) {
-        UIImage *image = [[UIImage hx_imageFromSampleBuffer:sampleBuffer] hx_rotationImage:UIImageOrientationRight];
-        if (image) {
-            [HXPhotoCommon photoCommon].cameraImage = image;
-        }
-    }
-}
 #pragma mark - AVCaptureFileOutputRecordingDelegate
 // 开始录制
 - (void)captureOutput:(AVCaptureFileOutput *)output didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray<AVCaptureConnection *> *)connections {

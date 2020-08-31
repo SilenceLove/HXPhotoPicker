@@ -1,15 +1,13 @@
 language: objective-c
-osx_image: xcode11.4
-
-xcode_project: HXPhotoPicker-Demo.xcodeproj
-xcode_scheme: HXPhotoPicker
 
 before_install:
     - gem install xcpretty
+    - gem install cocoapods --pre
     
 script:
     - set -o pipefail
-    - xcodebuild clean -project HXPhotoPicker-Demo.xcodeproj -scheme "HXPhotoPicker" -sdk iphonesimulator build | xcpretty
+    - xcodebuild clean -workspace HXPhotoPicker-Demo.xcworkspace -scheme "HXPhotoPicker" -sdk iphonesimulator build | xcpretty
+    - pod lib lint --verbose --allow-warnings --use-libraries
 
 after_success:
     - sleep 3

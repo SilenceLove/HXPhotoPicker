@@ -32,34 +32,24 @@
     self.photoMaxNum = 9;
     self.videoMaxNum = 1;
     self.showBottomPhotoDetail = YES;
-//    self.reverseDate = YES;
-    
-    
     self.videoMaximumSelectDuration = 3 * 60.f;
     self.videoMinimumSelectDuration = 0.f;
     self.videoMaximumDuration = 60.f;
-    
-    //    self.saveSystemAblum = NO;
-//    self.deleteTemporaryPhoto = YES;
     if ([UIScreen mainScreen].bounds.size.width != 320 && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         self.cameraCellShowPreview = YES;
     }
-    //    self.horizontalHideStatusBar = NO;
     self.customAlbumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     self.horizontalRowCount = 6;
     self.sectionHeaderTranslucent = YES;
     self.supportRotation = YES;
-    
     self.pushTransitionDuration = 0.45f;
     self.popTransitionDuration = 0.35f;
     self.popInteractiveTransitionDuration = 0.35f;
-    
     self.doneBtnShowDetail = YES;
     self.videoCanEdit = YES;
     self.photoCanEdit = YES;
     self.localFileName = @"HXPhotoPickerModelArray";
     self.languageType = HXPhotoLanguageTypeSys;
-    
     self.popupTableViewCellHeight = 65.f;
     if (HX_IS_IPhoneX_All) {
         self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
@@ -102,9 +92,7 @@
     self.cameraCanLocation = YES;
     self.editAssetSaveSystemAblum = NO;
     self.photoEditCustomRatios = @[@{@"原始值" : @"{0, 0}"}, @{@"正方形" : @"{1, 1}"}, @{@"2:3" : @"{2, 3}"}, @{@"3:4" : @"{3, 4}"}, @{@"9:16" : @"{9, 16}"}, @{@"16:9" : @"{16, 9}"}];
-    
     self.useWxPhotoEdit = YES;
-    
     if ([UIScreen mainScreen].bounds.size.width == 320) {
         _clarityScale = 0.8;
     }else if (HX_IS_IPhoneX_All) {
@@ -112,7 +100,6 @@
     }else {
         _clarityScale = 1.5;
     }
-    
     if ([UIScreen mainScreen].bounds.size.width == 320) {
         self.rowCount = 3;
     }else {
@@ -208,9 +195,6 @@
     _videoMaximumDuration = videoMaximumDuration;
 }
 - (CGPoint)movableCropBoxCustomRatio {
-//    if (_movableCropBoxCustomRatio.x == 0 || _movableCropBoxCustomRatio.y == 0) {
-//        return CGPointMake(1, 1);
-//    }
     return _movableCropBoxCustomRatio;
 }
 - (NSInteger)minVideoClippingTime {

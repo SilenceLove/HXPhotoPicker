@@ -1,1 +1,0 @@
-../../Core/SDImageCacheDefine.h

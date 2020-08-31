@@ -1,1 +1,0 @@
-../../Core/SDImageCodersManager.h

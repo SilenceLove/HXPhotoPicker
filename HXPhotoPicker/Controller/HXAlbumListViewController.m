@@ -34,11 +34,12 @@ UITableViewDelegate
 - (void)requestData {
     // 获取当前应用对照片的访问授权状态
     HXWeakSelf
-    [self.view hx_showLoadingHUDText:nil delay:0.1f];
+//    [self.view hx_showLoadingHUDText:nil delay:0.1f];
     [HXPhotoTools requestAuthorization:self handler:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
             [weakSelf getAlbumModelList:YES];
         }else {
+            [weakSelf.hx_customNavigationController.view hx_handleLoading];
 #ifdef __IPHONE_14_0
                 if (@available(iOS 14, *)) {
                     if (status == PHAuthorizationStatusLimited) {
@@ -46,7 +47,7 @@ UITableViewDelegate
                     }
                 }
 #endif
-            [weakSelf.view hx_handleLoading];
+//            [weakSelf.view hx_handleLoading];
             [weakSelf.view addSubview:weakSelf.authorizationLb];
         }
     }];
@@ -394,7 +395,6 @@ UITableViewDelegate
     return _authorizationLb;
 }
 - (void)dealloc {
-    if (HXShowLog) NSSLog(@"dealloc");
     self.manager.selectPhotoing = NO;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CustomCameraViewControllerDidDoneNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];

@@ -224,7 +224,6 @@ static id instance;
             progress(downloadProgress.fractionCompleted, downloadProgress.completedUnitCount, downloadProgress.totalUnitCount, videoURL);
             }
         });
-//        NSLog(@"下载进度：%.0f％", downloadProgress.fractionCompleted * 100);
     } destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
         return videoFileURL;
     } completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
@@ -240,7 +239,6 @@ static id instance;
                 }
             }
         });
-//        NSLog(@"下载完成");
     }];
     [downloadTask resume];
     return downloadTask;
@@ -255,8 +253,6 @@ static id instance;
     instance = nil;
 }
 - (void)dealloc {
-//    NSSLog(@"dealloc");
-    
     [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
 #if HasAFNetworking

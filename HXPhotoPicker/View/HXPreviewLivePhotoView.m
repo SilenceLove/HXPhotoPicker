@@ -98,8 +98,8 @@
             self.imageCurrentLength = 0;
             self.videoCurrentLength = 0;
             self.cacheVideo = [HXPhotoTools fileExistsAtVideoURL:model.livePhotoVideoURL];
-            HXWeakSelf
 #if HasSDWebImage
+            HXWeakSelf
             [[SDWebImageManager sharedManager].imageCache queryImageForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:model.networkPhotoUrl] options:SDWebImageQueryMemoryData context:nil completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
                 if (image) {
                     weakSelf.cacheImage = YES;
@@ -110,6 +110,7 @@
                 [weakSelf getLivePhotoAssetLength];
             }];
 #elif HasYYKitOrWebImage
+            HXWeakSelf
             YYWebImageManager *manager = [YYWebImageManager sharedManager];
             [manager.cache getImageForKey:[manager cacheKeyForURL:model.networkPhotoUrl]  withType:YYImageCacheTypeAll withBlock:^(UIImage * _Nullable image, YYImageCacheType type) {
                 if (image) {

@@ -40,9 +40,6 @@
 - (void)initMovieOutput;
 - (void)removeMovieOutput;
 
-//- (void)addDataOutput;
-//- (void)removeDataOutput;
-
 - (BOOL)addAudioInput;
 
 - (BOOL)switchCameras;

@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7B64194F24F8B0A9003A5723"
+               BlueprintIdentifier = "7B08584A24FA541700E93091"
                BuildableName = "HXPhotoPicker.framework"
                BlueprintName = "HXPhotoPickerFramework"
                ReferencedContainer = "container:HXPhotoPicker-Demo.xcodeproj">
@@ -50,7 +50,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7B64194F24F8B0A9003A5723"
+            BlueprintIdentifier = "7B08584A24FA541700E93091"
             BuildableName = "HXPhotoPicker.framework"
             BlueprintName = "HXPhotoPickerFramework"
             ReferencedContainer = "container:HXPhotoPicker-Demo.xcodeproj">

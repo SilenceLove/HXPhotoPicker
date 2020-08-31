@@ -4,6 +4,7 @@
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://travis-ci.org/SilenceLove/HXPhotoPicker.svg?branch=master"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://badgen.net/badge/icon/iOS%208.0%2B?color=cyan&icon=apple&label"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?logo=cocoapods&logoColor=ffffff"></a>
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat"></a>
 <a href="https://developer.apple.com/Objective-C"><img src="http://img.shields.io/badge/language-ObjC-red.svg?logo=common-workflow-language"></a>
 <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://img.shields.io/github/last-commit/SilenceLove/HXPhotoPicker?color=orange&logo=pre-commit&logoColor=ffffff"></a>
@@ -66,6 +67,10 @@
   
   // 使用YYWebImage加载网络图片
   pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
+  ```
+- Carthage：
+  ```
+  github "SilenceLove/HXPhotoPicker"
   ```
 - 搜索不到库或最新版请执行```pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中

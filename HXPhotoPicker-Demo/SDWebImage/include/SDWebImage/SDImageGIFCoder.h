@@ -1,1 +1,0 @@
-../../Core/SDImageGIFCoder.h

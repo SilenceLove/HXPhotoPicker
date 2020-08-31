@@ -91,13 +91,14 @@ HX_PhotoEditViewControllerDelegate
 @implementation HXPhotoViewController
 #pragma mark - < life cycle >
 - (void)dealloc {
-    if (HXShowLog) NSSLog(@"dealloc");
     if (_collectionView) {
         [self.collectionView.layer removeAllAnimations];
     }
     if (self.manager.configuration.open3DTouchPreview) {
         if (self.previewingContext) {
-            [self unregisterForPreviewingWithContext:self.previewingContext];
+            if (@available(iOS 9.0, *)) {
+                [self unregisterForPreviewingWithContext:self.previewingContext];
+            }
         }
     }
 //    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
@@ -190,7 +191,7 @@ HX_PhotoEditViewControllerDelegate
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
         [self setupUI];
         [self changeSubviewFrame];
-        [self.view hx_showLoadingHUDText:nil];
+//        [self.view hx_showLoadingHUDText:nil];
         [self getPhotoList];
     }else if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) { 
         [self setupUI];
@@ -536,6 +537,7 @@ HX_PhotoEditViewControllerDelegate
 - (void)reloadCollectionViewWithFirstSelectModel:(HXPhotoModel *)firstSelectModel {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.view hx_handleLoading:NO];
+        [self.hx_customNavigationController.view hx_handleLoading];
         if (!self.firstOn) {
             self.cellCanSetModel = NO;
         }
@@ -957,17 +959,9 @@ HX_PhotoEditViewControllerDelegate
         }
     }
 }
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-}
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     if ([cell isKindOfClass:[HXPhotoViewCell class]]) {
         [(HXPhotoViewCell *)cell cancelRequest];
-    }
-}
-- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingSupplementaryView:(UICollectionReusableView *)view forElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath {
-    if ([elementKind isEqualToString:UICollectionElementKindSectionHeader]) {
-        //        NSSLog(@"headerSection消失");
     }
 }
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
@@ -990,26 +984,6 @@ HX_PhotoEditViewControllerDelegate
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
     return self.manager.configuration.showBottomPhotoDetail ? CGSizeMake(self.view.hx_w, 50) : CGSizeZero;
 }
-#pragma mark - < preview Haptic Touch >
-//#ifdef __IPHONE_13_0
-//- (UIContextMenuConfiguration *)collectionView:(UICollectionView *)collectionView contextMenuConfigurationForItemAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)) {
-//    HXPhotoModel *_model;
-//    if (self.manager.configuration.showDateSectionHeader) {
-//        HXPhotoDateModel *dateModel = [self.dateArray objectAtIndex:indexPath.section];
-//        _model = [dateModel.photoModelArray objectAtIndex:indexPath.item];
-//    }else {
-//        _model = [self.allArray objectAtIndex:indexPath.item];
-//    }
-//    HXWeakSelf
-//    UIContextMenuConfiguration *menuConfiguration = [UIContextMenuConfiguration configurationWithIdentifier:_model.localIdentifier ?: _model.cameraIdentifier previewProvider:^UIViewController * _Nullable{
-//        return [weakSelf previewViewControlerWithIndexPath:indexPath];
-//    } actionProvider:nil];
-//    return menuConfiguration;
-//}
-//- (void)collectionView:(UICollectionView *)collectionView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator API_AVAILABLE(ios(13.0)) {
-//    [self pushPreviewControler:animator.previewViewController];
-//}
-//#endif
 - (UIViewController *)previewViewControlerWithIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isICloud) {
@@ -1923,7 +1897,6 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)dealloc {
     [self stopRunning];
-    if (HXShowLog) NSSLog(@"camera - dealloc");
 }
 - (UIButton *)cameraBtn {
     if (!_cameraBtn) {

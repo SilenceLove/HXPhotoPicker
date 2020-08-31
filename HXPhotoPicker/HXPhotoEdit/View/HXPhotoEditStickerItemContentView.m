@@ -8,6 +8,7 @@
 
 #import "HXPhotoEditStickerItemContentView.h"
 #import "HXPhotoEditStickerItem.h"
+#import "HX_PhotoEditViewController.h"
 
 @interface HXPhotoEditStickerItemContentView ()<UIGestureRecognizerDelegate>
 @property (strong, nonatomic) UIImageView *imageView;
@@ -37,7 +38,7 @@
 
 #pragma mark - UIGestureRecognizerDelegate
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    if ([otherGestureRecognizer.delegate isKindOfClass:NSClassFromString(@"HX_PhotoEditViewController")]) {
+    if ([otherGestureRecognizer.delegate isKindOfClass:[HX_PhotoEditViewController class]]) {
         return NO;
     }
     if ([otherGestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] &&
