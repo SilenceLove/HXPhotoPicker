@@ -73,7 +73,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+    
     self.navigationController.interactivePopGestureRecognizer.delegate = (id)self;
     self.title = nil;
     self.view.backgroundColor = [UIColor whiteColor];
