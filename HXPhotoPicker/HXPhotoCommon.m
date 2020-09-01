@@ -98,39 +98,39 @@ static id instance;
         HXPhotoLanguageType type = self.languageType;
         switch (type) {
             case HXPhotoLanguageTypeSc : {
-                language = @"zh-Hans"; // 简体中文
+                language = @"hx_zh-Hans"; // 简体中文
             } break;
             case HXPhotoLanguageTypeTc : {
-                language = @"zh-Hant"; // 繁體中文
+                language = @"hx_zh-Hant"; // 繁體中文
             } break;
             case HXPhotoLanguageTypeJa : {
                 // 日文
-                language = @"ja";
+                language = @"hx_ja";
             } break;
             case HXPhotoLanguageTypeKo : {
                 // 韩文
-                language = @"ko";
+                language = @"hx_ko";
             } break;
             case HXPhotoLanguageTypeEn : {
-                language = @"en";
+                language = @"hx_en";
             } break;
             default : {
                 if ([language hasPrefix:@"en"]) {
                     language = @"en";
                 } else if ([language hasPrefix:@"zh"]) {
                     if ([language rangeOfString:@"Hans"].location != NSNotFound) {
-                        language = @"zh-Hans"; // 简体中文
+                        language = @"hx_zh-Hans"; // 简体中文
                     } else { // zh-Hant\zh-HK\zh-TW
-                        language = @"zh-Hant"; // 繁體中文
+                        language = @"hx_zh-Hant"; // 繁體中文
                     }
                 } else if ([language hasPrefix:@"ja"]){
                     // 日文
-                    language = @"ja";
+                    language = @"hx_ja";
                 }else if ([language hasPrefix:@"ko"]) {
                     // 韩文
-                    language = @"ko";
+                    language = @"hx_ko";
                 }else {
-                    language = @"en";
+                    language = @"hx_en";
                 }
             }break;
         }

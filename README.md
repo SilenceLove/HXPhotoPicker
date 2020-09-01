@@ -68,10 +68,6 @@
   // 使用YYWebImage加载网络图片
   pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
   ```
-- Carthage：
-  ```
-  github "SilenceLove/HXPhotoPicker"
-  ```
 - 搜索不到库或最新版请执行```pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 使用前导入头文件 "HXPhotoPicker.h"
