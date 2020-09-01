@@ -4,6 +4,7 @@
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://travis-ci.org/SilenceLove/HXPhotoPicker.svg?branch=master"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://badgen.net/badge/icon/iOS%208.0%2B?color=cyan&icon=apple&label"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="http://img.shields.io/cocoapods/v/HXPhotoPicker.svg?logo=cocoapods&logoColor=ffffff"></a>
+<a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat"></a>
 <a href="https://developer.apple.com/Objective-C"><img src="http://img.shields.io/badge/language-ObjC-red.svg?logo=common-workflow-language"></a>
 <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
 <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://img.shields.io/github/last-commit/SilenceLove/HXPhotoPicker?color=orange&logo=pre-commit&logoColor=ffffff"></a>
@@ -68,6 +69,10 @@
   pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
   ```
 - 搜索不到库或最新版请执行```pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json```
+- Carthage：
+  ```
+  github "SilenceLove/HXPhotoPicker"
+  ```
 - 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
 - 使用前导入头文件 "HXPhotoPicker.h"
 
@@ -625,6 +630,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v3.0.7　-　本地化文件名重名问题修改、相机/相册跳转未全屏问题修改
 - v3.0.6　-　修复编辑图片时内存过高的问题、相机添加自动曝光、编辑图片时添加镜像功能、画笔大小支持更改等...
 - v3.0.5　-　提高稳定性、支持本地图片和视频生成LivePhoto、支持网络图片和视频生成LivePhoto、修复单选编辑之后状态栏隐藏的问题、整理缓存路径
 - v3.0.4　-　优化选择逻辑、暗黑模式。完善微信样式
