@@ -1866,18 +1866,6 @@ HX_PhotoEditViewControllerDelegate
         self.doneBlock(allList, photoList, videoList, isOriginal, self, self.manager);
     } 
 }
-
-#pragma mark - PHPhotoLibraryChangeObserver
-//- (void)photoLibraryDidChange:(PHChange *)changeInstance {
-//    PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.albumModel.assetResult];
-//    if (collectionChanges) {
-//        if ([collectionChanges hasIncrementalChanges]) {
-//            if (collectionChanges.removedObjects.count > 0) {
-//
-//            }
-//        }
-//    }
-//}
 #pragma mark - < 懒加载 >
 - (UILabel *)authorizationLb {
     if (!_authorizationLb) {
