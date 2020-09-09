@@ -496,6 +496,12 @@ HX_PhotoEditViewControllerDelegate
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.selectBtn];
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
+        CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
+        if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
+            self.selectBtn.hx_w = selectTextWidth + 10;
+        }else {
+            self.selectBtn.hx_w = 24;
+        }
         if (self.manager.configuration.singleSelected) {
             self.selectBtn.hidden = YES;
             if (self.manager.configuration.singleJumpEdit) {
@@ -570,6 +576,12 @@ HX_PhotoEditViewControllerDelegate
         anim.duration = 0.25;
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [button.layer addAnimation:anim forKey:@""];
+    }
+    CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
+    if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
+        self.selectBtn.hx_w = selectTextWidth + 10;
+    }else {
+        self.selectBtn.hx_w = 24;
     }
     UIColor *btnBgColor = self.manager.configuration.previewSelectedBtnBgColor ?: self.manager.configuration.themeColor;
     UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : btnBgColor;
@@ -751,6 +763,8 @@ HX_PhotoEditViewControllerDelegate
         }
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewVideoViewCell" forIndexPath:indexPath];
+    }else {
+        cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewImageViewCell" forIndexPath:indexPath];
     }
     cell.cellViewLongPressGestureRecognizerBlock = ^(UILongPressGestureRecognizer * _Nonnull longPress) {
         [weakSelf respondsToLongPress:longPress];
@@ -935,6 +949,12 @@ HX_PhotoEditViewControllerDelegate
         }
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
+        CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
+        if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
+            self.selectBtn.hx_w = selectTextWidth + 10;
+        }else {
+            self.selectBtn.hx_w = 24;
+        }
         
         UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? self.manager.configuration.previewDarkSelectBgColor : self.manager.configuration.previewSelectedBtnBgColor;
         self.selectBtn.backgroundColor = self.selectBtn.selected ? themeColor : nil;
@@ -1243,6 +1263,12 @@ HX_PhotoEditViewControllerDelegate
                 [self.manager beforeSelectedListAddPhotoModel:photoModel];
                 self.selectBtn.selected = YES;
                 [self.selectBtn setTitle:photoModel.selectIndexStr forState:UIControlStateSelected];
+                CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
+                if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
+                    self.selectBtn.hx_w = selectTextWidth + 10;
+                }else {
+                    self.selectBtn.hx_w = 24;
+                }
                 UIColor *btnBgColor = self.manager.configuration.previewSelectedBtnBgColor ?: self.manager.configuration.themeColor;
                 UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : btnBgColor;
                 self.selectBtn.backgroundColor = themeColor;
@@ -1444,7 +1470,6 @@ HX_PhotoEditViewControllerDelegate
         [_selectBtn setBackgroundImage:[UIImage hx_imageNamed:@"hx_compose_guide_check_box_default_2"] forState:UIControlStateNormal];
         [_selectBtn setBackgroundImage:[[UIImage alloc] init] forState:UIControlStateSelected];
         _selectBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];;
-        _selectBtn.adjustsImageWhenDisabled = YES;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];
         _selectBtn.hx_size = CGSizeMake(24, 24);
         [_selectBtn hx_setEnlargeEdgeWithTop:0 right:0 bottom:20 left:20];

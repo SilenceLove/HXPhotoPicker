@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)changeTime:(NSTimeInterval)time;
 - (void)startRecord;
 - (void)stopRecord;
+
+- (void)videoRecordEnd;
 @end
 
 NS_ASSUME_NONNULL_END

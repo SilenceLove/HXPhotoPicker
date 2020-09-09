@@ -724,9 +724,10 @@
  @param cell 被删的cell
  */
 - (void)cellDidDeleteClcik:(UICollectionViewCell *)cell {
-    if (cell) {
-        [(HXPhotoSubViewCell *)cell imageView].image = nil;
+    if (!cell) {
+        return;
     }
+    [(HXPhotoSubViewCell *)cell imageView].image = nil;
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     HXPhotoModel *model = self.dataList[indexPath.item];
     model.photoEdit = nil;

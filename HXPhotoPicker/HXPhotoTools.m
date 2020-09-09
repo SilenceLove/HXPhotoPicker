@@ -708,6 +708,9 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     }
     CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((CFDataRef)[NSData dataWithContentsOfFile:originJPGPath.path], nil);
      if (!imageSourceRef) {
+         if (dest) {
+             CFRelease(dest);
+         }
          if (completion) {
              completion(NO);
          }
@@ -715,6 +718,12 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
      }
     NSMutableDictionary *metaData = [(__bridge_transfer  NSDictionary*)CGImageSourceCopyPropertiesAtIndex(imageSourceRef, 0, nil) mutableCopy];
     if (!metaData) {
+        if (dest) {
+            CFRelease(dest);
+        }
+        if (imageSourceRef) {
+            CFRelease(imageSourceRef);
+        }
         if (completion) {
             completion(NO);
         }

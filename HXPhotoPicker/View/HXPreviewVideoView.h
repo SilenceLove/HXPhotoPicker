@@ -49,8 +49,8 @@ typedef NS_ENUM(NSUInteger, HXPreviewVideoSliderType) {
 
 @interface HXPreviewVideoSliderView : UIView
 @property (assign, nonatomic) BOOL playBtnSelected;
-@property (assign, nonatomic) NSString *currentTime;
-@property (assign, nonatomic) NSString *totalTime;
+@property (copy, nonatomic) NSString *currentTime;
+@property (copy, nonatomic) NSString *totalTime;
 @property (assign, nonatomic) CGFloat currentValue;
 @property (assign, nonatomic) CGFloat progressValue;
 @property (copy, nonatomic) void (^ didPlayBtnBlock)(BOOL isPlay);

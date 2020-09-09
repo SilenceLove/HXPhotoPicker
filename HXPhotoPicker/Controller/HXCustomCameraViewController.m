@@ -555,8 +555,7 @@
     self.time = (NSInteger)time;
     [self.bottomView changeTime:time];
     if (time + 0.4f >= self.manager.configuration.videoMaximumDuration) {
-        [self stopTimer];
-        [self.cameraController stopRecording];
+        [self.bottomView videoRecordEnd];
     }
 }
 

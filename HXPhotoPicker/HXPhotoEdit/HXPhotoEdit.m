@@ -16,7 +16,7 @@
 /// 编辑预览图片
 @property (nonatomic, strong) UIImage *editPreviewImage;
 /// 编辑图片数据
-//@property (nonatomic, strong) NSData *editPreviewData;
+@property (nonatomic, strong) NSData *editPreviewData;
 /// 编辑原图片
 @property (nonatomic, strong) UIImage *editImage;
 /// 编辑数据
@@ -51,24 +51,28 @@
     CGFloat width = MIN(80.f * 2.f, MIN(editPreviewImage.size.width, editPreviewImage.size.height));
     CGSize size = [UIImage hx_scaleImageSizeBySize:editPreviewImage.size targetSize:CGSizeMake(width, width) isBoth:YES];
     _editPosterImage = [editPreviewImage hx_scaleToFitSize:size];
-//    _editPreviewData = HX_UIImageJPEGRepresentation(editPreviewImage);
 }
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         self.editPosterImage = [aDecoder decodeObjectForKey:@"editPosterImage"];
         self.editPreviewImage = [aDecoder decodeObjectForKey:@"editPreviewImage"];
-//        self.editPreviewData = [aDecoder decodeObjectForKey:@"editPreviewData"];
+        self.editPreviewData = [aDecoder decodeObjectForKey:@"editPreviewData"];
         self.editImage = [aDecoder decodeObjectForKey:@"editImage"];
         self.editData = [aDecoder decodeObjectForKey:@"editData"];
         
     }
     return self;
 }
-
+- (NSData *)editPreviewData {
+    if (!_editPreviewData) {
+        _editPreviewData = HX_UIImageJPEGRepresentation(self.editPreviewImage);
+    }
+    return _editPreviewData;
+}
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:self.editPosterImage forKey:@"editPosterImage"];
     [aCoder encodeObject:self.editPreviewImage forKey:@"editPreviewImage"];
-//    [aCoder encodeObject:self.editPreviewData forKey:@"editPreviewData"];
+    [aCoder encodeObject:self.editPreviewData forKey:@"editPreviewData"];
     [aCoder encodeObject:self.editImage forKey:@"editImage"];
     [aCoder encodeObject:self.editData forKey:@"editData"];
 }

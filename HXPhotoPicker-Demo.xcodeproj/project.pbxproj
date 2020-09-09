@@ -8,23 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		62FC75381C5F62172A3FF354 /* libPods-HXPhotoPicker-Demo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD350B5542739D4914344B4 /* libPods-HXPhotoPicker-Demo.a */; };
-		7B005ABC24D008C500607111 /* HXPhotoEditChartletPreviewView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB124D008C500607111 /* HXPhotoEditChartletPreviewView.xib */; };
-		7B005ABD24D008C500607111 /* HXPhotoEditGraffitiColorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB224D008C500607111 /* HXPhotoEditGraffitiColorView.xib */; };
-		7B005ABE24D008C500607111 /* HXPhotoEditStickerTrashView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB324D008C500607111 /* HXPhotoEditStickerTrashView.xib */; };
-		7B005ABF24D008C500607111 /* HXCameraBottomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB424D008C500607111 /* HXCameraBottomView.xib */; };
-		7B005AC024D008C500607111 /* HXPhotoEditChartletListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB524D008C500607111 /* HXPhotoEditChartletListView.xib */; };
-		7B005AC124D008C500607111 /* HXPhotoEditChartletContentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB624D008C500607111 /* HXPhotoEditChartletContentViewCell.xib */; };
-		7B005AC224D008C500607111 /* HXPhotoEditClippingToolBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB724D008C500607111 /* HXPhotoEditClippingToolBar.xib */; };
-		7B005AC324D008C500607111 /* HXPhotoEditGraffitiColorViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB824D008C500607111 /* HXPhotoEditGraffitiColorViewCell.xib */; };
-		7B005AC424D008C500607111 /* HXPhotoEditMosaicView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005AB924D008C500607111 /* HXPhotoEditMosaicView.xib */; };
-		7B005AC524D008C500607111 /* HXPhotoEditTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005ABA24D008C500607111 /* HXPhotoEditTextView.xib */; };
-		7B005AC624D008C500607111 /* HX_PhotoEditBottomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B005ABB24D008C500607111 /* HX_PhotoEditBottomView.xib */; };
-		7B06B2B924D0266A00FDD794 /* images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2B824D0266A00FDD794 /* images.xcassets */; };
-		7B06B2D324D02DA000FDD794 /* hx_zh-Hans.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2CE24D02DA000FDD794 /* hx_zh-Hans.lproj */; };
-		7B06B2D424D02DA000FDD794 /* hx_ja.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2CF24D02DA000FDD794 /* hx_ja.lproj */; };
-		7B06B2D524D02DA000FDD794 /* hx_en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2D024D02DA000FDD794 /* hx_en.lproj */; };
-		7B06B2D624D02DA000FDD794 /* hx_ko.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2D124D02DA000FDD794 /* hx_ko.lproj */; };
-		7B06B2D724D02DA000FDD794 /* hx_zh-Hant.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7B06B2D224D02DA000FDD794 /* hx_zh-Hant.lproj */; };
 		7B0856B924FA00FD00E93091 /* HXPhotoPicker_DemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0856B824FA00FD00E93091 /* HXPhotoPicker_DemoUITests.m */; };
 		7B08595324FA58DE00E93091 /* WxMomentPublishViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08590D24FA58DE00E93091 /* WxMomentPublishViewController.xib */; };
 		7B08595424FA58DE00E93091 /* YYWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08590E24FA58DE00E93091 /* YYWeakProxy.m */; };
@@ -168,6 +151,26 @@
 		7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AB237D0F9400F8A584 /* Contacts.framework */; };
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
 		7BAF876124C14D5C00ACAF85 /* HXCameraBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */; };
+		7BC3714F2505D25000E2D05C /* images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371332505D24E00E2D05C /* images.xcassets */; };
+		7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */; };
+		7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */; };
+		7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */; };
+		7BC371562505D25000E2D05C /* HXPhotoEditChartletListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371402505D24F00E2D05C /* HXPhotoEditChartletListView.xib */; };
+		7BC371572505D25000E2D05C /* HXCameraBottomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371412505D24F00E2D05C /* HXCameraBottomView.xib */; };
+		7BC371582505D25000E2D05C /* HX_PhotoEditBottomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371422505D24F00E2D05C /* HX_PhotoEditBottomView.xib */; };
+		7BC371592505D25000E2D05C /* HXPhotoEditGraffitiColorViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371432505D24F00E2D05C /* HXPhotoEditGraffitiColorViewCell.xib */; };
+		7BC3715A2505D25000E2D05C /* HXPhotoEditGraffitiColorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371442505D24F00E2D05C /* HXPhotoEditGraffitiColorView.xib */; };
+		7BC3715B2505D25000E2D05C /* HXPhotoEditClippingToolBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371452505D24F00E2D05C /* HXPhotoEditClippingToolBar.xib */; };
+		7BC3715C2505D25000E2D05C /* HXPhotoEditTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371462505D24F00E2D05C /* HXPhotoEditTextView.xib */; };
+		7BC3715D2505D25000E2D05C /* HXPhotoEditChartletPreviewView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371472505D24F00E2D05C /* HXPhotoEditChartletPreviewView.xib */; };
+		7BC3715E2505D25000E2D05C /* HXPhotoEditChartletContentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371482505D24F00E2D05C /* HXPhotoEditChartletContentViewCell.xib */; };
+		7BC371662505D28100E2D05C /* zh-Hant.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371612505D28000E2D05C /* zh-Hant.lproj */; };
+		7BC371672505D28100E2D05C /* ja.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371622505D28000E2D05C /* ja.lproj */; };
+		7BC371682505D28100E2D05C /* ko.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371632505D28100E2D05C /* ko.lproj */; };
+		7BC371692505D28100E2D05C /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371642505D28100E2D05C /* en.lproj */; };
+		7BC3716A2505D28100E2D05C /* zh-Hans.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371652505D28100E2D05C /* zh-Hans.lproj */; };
+		7BC3716C2505D2AD00E2D05C /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3716B2505D2AD00E2D05C /* HXPhotoPicker.bundle */; };
+		7BC3716D2505D2E000E2D05C /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3716B2505D2AD00E2D05C /* HXPhotoPicker.bundle */; };
 		7BD52ECD24FE256900AE3D7C /* HX_PhotoEditViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B4D4BF824B858C600B03846 /* HX_PhotoEditViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7BD52ECE24FE256900AE3D7C /* HXMECancelBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B4D4BFC24B858C600B03846 /* HXMECancelBlock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7BD52ECF24FE256900AE3D7C /* HXPhotoEditChartletModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B4D4C0124B858C600B03846 /* HXPhotoEditChartletModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -345,8 +348,6 @@
 		7BD52F7B24FE258200AE3D7C /* HXPhotoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65AF2487AD5B00077EE1 /* HXPhotoConfiguration.m */; };
 		7BD52F7C24FE258200AE3D7C /* HXPhotoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65DA2487AD5B00077EE1 /* HXPhotoManager.m */; };
 		7BD52F7D24FE258200AE3D7C /* HXPhotoTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65D92487AD5B00077EE1 /* HXPhotoTools.m */; };
-		7BD52F7E24FE258B00AE3D7C /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B08597F24FA5CEC00E93091 /* HXPhotoPicker.bundle */; };
-		7BDDA2F224E7CB5500BEC71F /* HXPhotoEditGraffitiColorSizeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BDDA2F124E7CB5400BEC71F /* HXPhotoEditGraffitiColorSizeView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -361,23 +362,6 @@
 
 /* Begin PBXFileReference section */
 		1AD350B5542739D4914344B4 /* libPods-HXPhotoPicker-Demo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HXPhotoPicker-Demo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7B005AB124D008C500607111 /* HXPhotoEditChartletPreviewView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletPreviewView.xib; sourceTree = "<group>"; };
-		7B005AB224D008C500607111 /* HXPhotoEditGraffitiColorView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorView.xib; sourceTree = "<group>"; };
-		7B005AB324D008C500607111 /* HXPhotoEditStickerTrashView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditStickerTrashView.xib; sourceTree = "<group>"; };
-		7B005AB424D008C500607111 /* HXCameraBottomView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXCameraBottomView.xib; sourceTree = "<group>"; };
-		7B005AB524D008C500607111 /* HXPhotoEditChartletListView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletListView.xib; sourceTree = "<group>"; };
-		7B005AB624D008C500607111 /* HXPhotoEditChartletContentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletContentViewCell.xib; sourceTree = "<group>"; };
-		7B005AB724D008C500607111 /* HXPhotoEditClippingToolBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditClippingToolBar.xib; sourceTree = "<group>"; };
-		7B005AB824D008C500607111 /* HXPhotoEditGraffitiColorViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorViewCell.xib; sourceTree = "<group>"; };
-		7B005AB924D008C500607111 /* HXPhotoEditMosaicView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditMosaicView.xib; sourceTree = "<group>"; };
-		7B005ABA24D008C500607111 /* HXPhotoEditTextView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditTextView.xib; sourceTree = "<group>"; };
-		7B005ABB24D008C500607111 /* HX_PhotoEditBottomView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HX_PhotoEditBottomView.xib; sourceTree = "<group>"; };
-		7B06B2B824D0266A00FDD794 /* images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = images.xcassets; sourceTree = "<group>"; };
-		7B06B2CE24D02DA000FDD794 /* hx_zh-Hans.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "hx_zh-Hans.lproj"; sourceTree = "<group>"; };
-		7B06B2CF24D02DA000FDD794 /* hx_ja.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = hx_ja.lproj; sourceTree = "<group>"; };
-		7B06B2D024D02DA000FDD794 /* hx_en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = hx_en.lproj; sourceTree = "<group>"; };
-		7B06B2D124D02DA000FDD794 /* hx_ko.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = hx_ko.lproj; sourceTree = "<group>"; };
-		7B06B2D224D02DA000FDD794 /* hx_zh-Hant.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "hx_zh-Hant.lproj"; sourceTree = "<group>"; };
 		7B0856B624FA00FD00E93091 /* HXPhotoPicker-DemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "HXPhotoPicker-DemoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B0856B824FA00FD00E93091 /* HXPhotoPicker_DemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoPicker_DemoUITests.m; sourceTree = "<group>"; };
 		7B0856BA24FA00FD00E93091 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -451,7 +435,6 @@
 		7B08595024FA58DE00E93091 /* SettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
 		7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WxMomentViewCell.xib; sourceTree = "<group>"; };
 		7B08595224FA58DE00E93091 /* Demo6SubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo6SubViewController.h; sourceTree = "<group>"; };
-		7B08597F24FA5CEC00E93091 /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
 		7B1B1D1B1F35E84F000E810D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		7B4D4BE624B858C600B03846 /* HXPhotoEditConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditConfiguration.m; sourceTree = "<group>"; };
 		7B4D4BF424B858C600B03846 /* HXPhotoEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoEdit.h; sourceTree = "<group>"; };
@@ -647,9 +630,27 @@
 		7BAF875F24C14D5C00ACAF85 /* HXCameraBottomView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCameraBottomView.h; sourceTree = "<group>"; };
 		7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCameraBottomView.m; sourceTree = "<group>"; };
 		7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewProtocol.h; sourceTree = "<group>"; };
+		7BC371332505D24E00E2D05C /* images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = images.xcassets; sourceTree = "<group>"; };
+		7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorSizeView.xib; sourceTree = "<group>"; };
+		7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditStickerTrashView.xib; sourceTree = "<group>"; };
+		7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditMosaicView.xib; sourceTree = "<group>"; };
+		7BC371402505D24F00E2D05C /* HXPhotoEditChartletListView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletListView.xib; sourceTree = "<group>"; };
+		7BC371412505D24F00E2D05C /* HXCameraBottomView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXCameraBottomView.xib; sourceTree = "<group>"; };
+		7BC371422505D24F00E2D05C /* HX_PhotoEditBottomView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HX_PhotoEditBottomView.xib; sourceTree = "<group>"; };
+		7BC371432505D24F00E2D05C /* HXPhotoEditGraffitiColorViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorViewCell.xib; sourceTree = "<group>"; };
+		7BC371442505D24F00E2D05C /* HXPhotoEditGraffitiColorView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorView.xib; sourceTree = "<group>"; };
+		7BC371452505D24F00E2D05C /* HXPhotoEditClippingToolBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditClippingToolBar.xib; sourceTree = "<group>"; };
+		7BC371462505D24F00E2D05C /* HXPhotoEditTextView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditTextView.xib; sourceTree = "<group>"; };
+		7BC371472505D24F00E2D05C /* HXPhotoEditChartletPreviewView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletPreviewView.xib; sourceTree = "<group>"; };
+		7BC371482505D24F00E2D05C /* HXPhotoEditChartletContentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletContentViewCell.xib; sourceTree = "<group>"; };
+		7BC371612505D28000E2D05C /* zh-Hant.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zh-Hant.lproj"; sourceTree = "<group>"; };
+		7BC371622505D28000E2D05C /* ja.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ja.lproj; sourceTree = "<group>"; };
+		7BC371632505D28100E2D05C /* ko.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ko.lproj; sourceTree = "<group>"; };
+		7BC371642505D28100E2D05C /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
+		7BC371652505D28100E2D05C /* zh-Hans.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zh-Hans.lproj"; sourceTree = "<group>"; };
+		7BC3716B2505D2AD00E2D05C /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
 		7BD52EC024FE250E00AE3D7C /* HXPhotoPicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HXPhotoPicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BD52EC324FE250E00AE3D7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7BDDA2F124E7CB5400BEC71F /* HXPhotoEditGraffitiColorSizeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorSizeView.xib; sourceTree = "<group>"; };
 		7BE8DFD624C68B2800306042 /* HXPhotoViewCellCustomProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewCellCustomProtocol.h; sourceTree = "<group>"; };
 		7BEA307E20DD533600A559A6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		7BEA307F20DD535C00A559A6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -705,24 +706,7 @@
 		7B005AB024D008C500607111 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				7B06B2B824D0266A00FDD794 /* images.xcassets */,
-				7B06B2D024D02DA000FDD794 /* hx_en.lproj */,
-				7B06B2CF24D02DA000FDD794 /* hx_ja.lproj */,
-				7B06B2D124D02DA000FDD794 /* hx_ko.lproj */,
-				7B06B2CE24D02DA000FDD794 /* hx_zh-Hans.lproj */,
-				7B06B2D224D02DA000FDD794 /* hx_zh-Hant.lproj */,
-				7B005ABB24D008C500607111 /* HX_PhotoEditBottomView.xib */,
-				7B005AB424D008C500607111 /* HXCameraBottomView.xib */,
-				7B005AB624D008C500607111 /* HXPhotoEditChartletContentViewCell.xib */,
-				7B005AB524D008C500607111 /* HXPhotoEditChartletListView.xib */,
-				7B005AB124D008C500607111 /* HXPhotoEditChartletPreviewView.xib */,
-				7B005AB724D008C500607111 /* HXPhotoEditClippingToolBar.xib */,
-				7B005AB224D008C500607111 /* HXPhotoEditGraffitiColorView.xib */,
-				7B005AB824D008C500607111 /* HXPhotoEditGraffitiColorViewCell.xib */,
-				7B005AB924D008C500607111 /* HXPhotoEditMosaicView.xib */,
-				7B005AB324D008C500607111 /* HXPhotoEditStickerTrashView.xib */,
-				7B005ABA24D008C500607111 /* HXPhotoEditTextView.xib */,
-				7BDDA2F124E7CB5400BEC71F /* HXPhotoEditGraffitiColorSizeView.xib */,
+				7BC3716B2505D2AD00E2D05C /* HXPhotoPicker.bundle */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -811,7 +795,24 @@
 		7B08594324FA58DE00E93091 /* assets */ = {
 			isa = PBXGroup;
 			children = (
-				7B08597F24FA5CEC00E93091 /* HXPhotoPicker.bundle */,
+				7BC371642505D28100E2D05C /* en.lproj */,
+				7BC371622505D28000E2D05C /* ja.lproj */,
+				7BC371632505D28100E2D05C /* ko.lproj */,
+				7BC371652505D28100E2D05C /* zh-Hans.lproj */,
+				7BC371612505D28000E2D05C /* zh-Hant.lproj */,
+				7BC371422505D24F00E2D05C /* HX_PhotoEditBottomView.xib */,
+				7BC371412505D24F00E2D05C /* HXCameraBottomView.xib */,
+				7BC371482505D24F00E2D05C /* HXPhotoEditChartletContentViewCell.xib */,
+				7BC371402505D24F00E2D05C /* HXPhotoEditChartletListView.xib */,
+				7BC371472505D24F00E2D05C /* HXPhotoEditChartletPreviewView.xib */,
+				7BC371452505D24F00E2D05C /* HXPhotoEditClippingToolBar.xib */,
+				7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */,
+				7BC371442505D24F00E2D05C /* HXPhotoEditGraffitiColorView.xib */,
+				7BC371432505D24F00E2D05C /* HXPhotoEditGraffitiColorViewCell.xib */,
+				7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */,
+				7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */,
+				7BC371462505D24F00E2D05C /* HXPhotoEditTextView.xib */,
+				7BC371332505D24E00E2D05C /* images.xcassets */,
 				7B08594424FA58DE00E93091 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg */,
 				7B08594724FA58DE00E93091 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg */,
 				7B08594824FA58DE00E93091 /* c81.mp4 */,
@@ -1348,6 +1349,16 @@
 				ko,
 				"zh-Hant",
 				fi,
+				hx_ko,
+				hx_KO,
+				"hx_zh-Hant",
+				"hx_ZH-HANT",
+				hx_ja,
+				hx_JA,
+				"hx_zh-Hans",
+				"hx_ZH-HANS",
+				hx_en,
+				hx_EN,
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
 			productRefGroup = 7B7E3E771E4AACD1002234EE /* Products */;
@@ -1373,41 +1384,42 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B005AC524D008C500607111 /* HXPhotoEditTextView.xib in Resources */,
-				7B06B2D624D02DA000FDD794 /* hx_ko.lproj in Resources */,
 				7B08597424FA58DF00E93091 /* IMG_0168.GIF in Resources */,
-				7B005AC324D008C500607111 /* HXPhotoEditGraffitiColorViewCell.xib in Resources */,
-				7B06B2D324D02DA000FDD794 /* hx_zh-Hans.lproj in Resources */,
-				7B005AC424D008C500607111 /* HXPhotoEditMosaicView.xib in Resources */,
 				7B08597224FA58DF00E93091 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg in Resources */,
-				7B005ABC24D008C500607111 /* HXPhotoEditChartletPreviewView.xib in Resources */,
 				7B08596F24FA58DF00E93091 /* SettingViewController.xib in Resources */,
-				7B005AC024D008C500607111 /* HXPhotoEditChartletListView.xib in Resources */,
-				7B06B2B924D0266A00FDD794 /* images.xcassets in Resources */,
+				7BC3715A2505D25000E2D05C /* HXPhotoEditGraffitiColorView.xib in Resources */,
+				7BC3716C2505D2AD00E2D05C /* HXPhotoPicker.bundle in Resources */,
+				7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */,
+				7BC371692505D28100E2D05C /* en.lproj in Resources */,
+				7BC3716A2505D28100E2D05C /* zh-Hans.lproj in Resources */,
 				7B08595324FA58DE00E93091 /* WxMomentPublishViewController.xib in Resources */,
-				7B005AC124D008C500607111 /* HXPhotoEditChartletContentViewCell.xib in Resources */,
 				7B08597C24FA58DF00E93091 /* WxMomentViewCell.xib in Resources */,
-				7B005ABE24D008C500607111 /* HXPhotoEditStickerTrashView.xib in Resources */,
+				7BC371582505D25000E2D05C /* HX_PhotoEditBottomView.xib in Resources */,
+				7BC3715E2505D25000E2D05C /* HXPhotoEditChartletContentViewCell.xib in Resources */,
 				7B08597924FA58DF00E93091 /* Demo11ViewController.xib in Resources */,
+				7BC371662505D28100E2D05C /* zh-Hant.lproj in Resources */,
 				7B64186124F76C67003A5723 /* README.md in Resources */,
-				7B005ABF24D008C500607111 /* HXCameraBottomView.xib in Resources */,
-				7B06B2D424D02DA000FDD794 /* hx_ja.lproj in Resources */,
-				7B005ABD24D008C500607111 /* HXPhotoEditGraffitiColorView.xib in Resources */,
-				7B06B2D724D02DA000FDD794 /* hx_zh-Hant.lproj in Resources */,
+				7BC3715D2505D25000E2D05C /* HXPhotoEditChartletPreviewView.xib in Resources */,
+				7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */,
+				7BC3714F2505D25000E2D05C /* images.xcassets in Resources */,
 				7B08596E24FA58DF00E93091 /* WxMomentViewController.xib in Resources */,
-				7B06B2D524D02DA000FDD794 /* hx_en.lproj in Resources */,
+				7BC3715C2505D25000E2D05C /* HXPhotoEditTextView.xib in Resources */,
 				7B08597024FA58DF00E93091 /* Demo4ViewController.xib in Resources */,
 				7B7E3E891E4AACD1002234EE /* LaunchScreen.storyboard in Resources */,
-				7B005AC224D008C500607111 /* HXPhotoEditClippingToolBar.xib in Resources */,
+				7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */,
 				7B08595824FA58DF00E93091 /* WxMomentHeaderView.xib in Resources */,
-				7BDDA2F224E7CB5500BEC71F /* HXPhotoEditGraffitiColorSizeView.xib in Resources */,
 				7B08597524FA58DF00E93091 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg in Resources */,
 				7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */,
+				7BC371682505D28100E2D05C /* ko.lproj in Resources */,
+				7BC371572505D25000E2D05C /* HXCameraBottomView.xib in Resources */,
 				7B08596C24FA58DF00E93091 /* Demo1ViewController.xib in Resources */,
+				7BC3715B2505D25000E2D05C /* HXPhotoEditClippingToolBar.xib in Resources */,
 				7B08597624FA58DF00E93091 /* c81.mp4 in Resources */,
 				7B08597724FA58DF00E93091 /* d87.jpeg in Resources */,
+				7BC371592505D25000E2D05C /* HXPhotoEditGraffitiColorViewCell.xib in Resources */,
+				7BC371562505D25000E2D05C /* HXPhotoEditChartletListView.xib in Resources */,
 				7B08597324FA58DF00E93091 /* LocalSampleVideo.mp4 in Resources */,
-				7B005AC624D008C500607111 /* HX_PhotoEditBottomView.xib in Resources */,
+				7BC371672505D28100E2D05C /* ja.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1415,7 +1427,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7BD52F7E24FE258B00AE3D7C /* HXPhotoPicker.bundle in Resources */,
+				7BC3716D2505D2E000E2D05C /* HXPhotoPicker.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1866,7 +1878,7 @@
 				INFOPLIST_FILE = "HXPhotoPicker-Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.7;
+				MARKETING_VERSION = 3.0.8;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1890,7 +1902,7 @@
 				INFOPLIST_FILE = "HXPhotoPicker-Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.7;
+				MARKETING_VERSION = 3.0.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1922,6 +1934,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MARKETING_VERSION = 3.0.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPickerFramework;
@@ -1954,6 +1967,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MARKETING_VERSION = 3.0.8;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPickerFramework;
 				PRODUCT_MODULE_NAME = HXPhotoPicker;

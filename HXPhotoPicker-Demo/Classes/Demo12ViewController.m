@@ -168,7 +168,9 @@ static const CGFloat kPhotoViewMargin = 12.0;
             [HXPhotoTools deleteLivePhotoCachesFile];
             return;
         }
-        [weakSelf.manager addCustomAssetModel:@[assetModel9]];
+        if (assetModel9) {
+            [weakSelf.manager addCustomAssetModel:@[assetModel9]];
+        }
         [weakSelf.photoView refreshView];
     } cancelClick:nil];
 }

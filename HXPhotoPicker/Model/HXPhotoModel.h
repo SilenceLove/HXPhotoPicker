@@ -145,7 +145,7 @@
 @property (assign, nonatomic) NSTimeInterval videoCurrentTime;
 
 /// 当前资源的大小 单位：b 字节
-/// 本地图片获取的大小可能不准确
+/// 网络图片/视频为0
 @property (assign, nonatomic) NSUInteger assetByte;
 @property (assign, nonatomic) BOOL requestAssetByte;
 

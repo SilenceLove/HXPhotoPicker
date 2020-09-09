@@ -180,9 +180,9 @@ NSString *const kHXEditingViewData_clippingView = @"kHXEditingViewData_clippingV
     CGFloat right = HXClipZoom_margin;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
-        top = HXClipZoom_margin;
+        top = HXClipZoom_margin + 15;
         left = HXClipZoom_margin + hxTopMargin;
-        bottom = self.editToolbarDefaultHeight + HXClipZoom_margin + 30;
+        bottom = self.editToolbarDefaultHeight + HXClipZoom_margin + 15;
         right = left;
     }
     return UIEdgeInsetsMake(top, left, bottom, right);

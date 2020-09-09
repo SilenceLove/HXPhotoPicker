@@ -268,7 +268,12 @@
         self.editingView.image = self.editImage;
         [self setupPhotoData];
     }else {
-        if (self.photoModel.asset) {
+        if (self.photoModel.asset ||
+            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
+            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
+            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
+            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
+            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) {
             [self requestImaegURL];
         }else {
             UIImage *image;
@@ -504,7 +509,7 @@
 - (void)editingViewWillBeginEditing:(HXPhotoEditingView *)EditingView {
     BOOL aspectRotioNone = self.configuration.aspectRatio == HXPhotoEditAspectRatioType_None;
     [UIView animateWithDuration:0.25f animations:^{
-        [self.clippingToolBar setRotateAlpha: aspectRotioNone ? 0.5f : 1.f];
+        [self.clippingToolBar setRotateAlpha: aspectRotioNone ? 0.5f : 0.f];
     }];
 }
 /** 停止编辑目标 */

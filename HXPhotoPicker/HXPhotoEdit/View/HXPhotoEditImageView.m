@@ -94,7 +94,7 @@ NSString *const kHXImageViewData_filter = @"HXImageViewData_filter";
     self.stickerView.screenScale = screenScale;
     self.splashView.screenScale = screenScale;
 }
-- (UIImage *)editOtherImagesInRect:(CGRect)rect rotate:(CGFloat)rotate mirrorHorizontally:(BOOL)mirrorHorizontally {
+- (UIImage * _Nullable)editOtherImagesInRect:(CGRect)rect rotate:(CGFloat)rotate mirrorHorizontally:(BOOL)mirrorHorizontally {
     UIImage *image = nil;
     NSMutableArray *array = nil;
     for (UIView *subView in self.subviews) {

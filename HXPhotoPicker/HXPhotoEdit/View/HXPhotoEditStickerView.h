@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) CGFloat (^ getMaxScale)(CGSize size);
 
 /** 数据 */
-@property (nonatomic, strong) NSDictionary *data;
+@property (nonatomic, strong, nullable) NSDictionary *data;
 @property (assign, nonatomic, getter=isHitTestSubView) BOOL hitTestSubView;
 - (HXPhotoEditStickerItemView *)addStickerItem:(HXPhotoEditStickerItem *)item isSelected:(BOOL)selected;
 

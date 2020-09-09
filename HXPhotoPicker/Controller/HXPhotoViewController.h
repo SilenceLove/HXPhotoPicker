@@ -86,6 +86,8 @@ HXCustomCameraController;
 @property (strong, nonatomic) UIColor *selectedTitleColor;
 @property (strong, nonatomic) UIColor *darkSelectBgColor;
 @property (strong, nonatomic) UIColor *darkSelectedTitleColor;
+@property (strong, nonatomic, readonly) CALayer *videoMaskLayer;
+@property (strong, nonatomic, readonly) UIButton *selectBtn;
 - (void)resetNetworkImage;
 - (void)cancelRequest;
 - (void)startRequestICloudAsset;

@@ -68,6 +68,23 @@
         _photoManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _photoManager.configuration.type = HXConfigurationTypeWXMoment;
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";
+#if HasSDWebImage
+        // 先导入了SDWebImage
+        _photoManager.configuration.photoEditConfigur.requestChartletModels = ^(void (^ _Nonnull chartletModels)(NSArray<HXPhotoEditChartletTitleModel *> * _Nonnull)) {
+            
+            HXPhotoEditChartletTitleModel *netModel = [HXPhotoEditChartletTitleModel modelWithNetworkNURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy_s_highlighted.png"]];
+            NSString *prefix = @"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy%d.png";
+            NSMutableArray *netModels = @[].mutableCopy;
+            for (int i = 1; i <= 40; i++) {
+                [netModels addObject:[HXPhotoEditChartletModel modelWithNetworkNURL:[NSURL URLWithString:[NSString stringWithFormat:prefix ,i]]]];
+            }
+            netModel.models = netModels.copy;
+            
+            if (chartletModels) {
+                chartletModels(@[netModel]);
+            }
+        };
+#endif
     }
     return _photoManager;
 }
@@ -89,11 +106,6 @@
 #endif
     [self.view addSubview:self.topView];
     [self.view addSubview:self.customNavBar];
-    // 获取保存在本地文件中的模型数组
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.photoManager getLocalModelsInFile];
-        self.getLocalCompletion = YES;
-    });
 #ifdef __IPHONE_11_0
     if (@available(iOS 11.0, *)) {
         self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -104,7 +116,12 @@
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
     self.tableView.tableHeaderView = self.headerView;
-        [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([WxMomentViewCell class]) bundle:nil] forCellReuseIdentifier:@"WxMomentViewCellId"];
+    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([WxMomentViewCell class]) bundle:nil] forCellReuseIdentifier:@"WxMomentViewCellId"];
+    // 获取保存在本地文件中的模型数组
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self.photoManager getLocalModelsInFile];
+        self.getLocalCompletion = YES;
+    });
 }
 - (void)backClick {
     [self.navigationController popViewControllerAnimated:YES];

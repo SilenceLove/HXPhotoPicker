@@ -149,6 +149,10 @@
         self.takePictures();
     }
 }
+- (void)videoRecordEnd {
+    self.longGesture.enabled = NO;
+    self.longGesture.enabled = YES;
+}
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
     self.playView.color = self.manager.configuration.cameraFocusBoxColor;

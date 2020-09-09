@@ -144,6 +144,7 @@
     }
 }
 - (void)back {
+    // 因为manager上个界面也持有了，并不会释放。所以手动清空一下已选的数据
     [self.photoManager clearSelectedList];
     [self dismissViewControllerAnimated:YES completion:nil];
 }

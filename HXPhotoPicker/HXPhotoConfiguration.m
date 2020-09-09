@@ -40,7 +40,6 @@
     }
     self.customAlbumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     self.horizontalRowCount = 6;
-    self.sectionHeaderTranslucent = YES;
     self.supportRotation = YES;
     self.pushTransitionDuration = 0.45f;
     self.popTransitionDuration = 0.35f;
@@ -109,6 +108,7 @@
             self.rowCount = 4;
         }
     }
+    self.allowSlidingSelection = YES;
 }
 - (UIColor *)cameraFocusBoxColor {
     if (!_cameraFocusBoxColor) {

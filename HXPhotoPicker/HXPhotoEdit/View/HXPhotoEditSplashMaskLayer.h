@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HXPhotoEditSplashBlur : NSObject
 
 @property (nonatomic, assign) CGRect rect;
-@property (nonatomic, strong) UIColor *color;
+@property (nonatomic, strong, nullable) UIColor *color;
 
 @end
 

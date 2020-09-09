@@ -272,7 +272,7 @@
     if (self.navBgColor.selectedSegmentIndex == 0) {
         self.manager.configuration.navBarBackgroudColor = nil;
         self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
-        self.manager.configuration.sectionHeaderTranslucent = YES;
+//        self.manager.configuration.sectionHeaderTranslucent = YES;
         self.bottomViewBgColor = nil;
         self.manager.configuration.cellSelectedBgColor = nil;
         self.manager.configuration.selectedTitleColor = nil;
@@ -281,7 +281,7 @@
     }else if (self.navBgColor.selectedSegmentIndex == 1) {
         self.manager.configuration.navBarBackgroudColor = [UIColor redColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
-        self.manager.configuration.sectionHeaderTranslucent = NO;
+//        self.manager.configuration.sectionHeaderTranslucent = NO;
         self.bottomViewBgColor = [UIColor redColor];
         self.manager.configuration.cellSelectedBgColor = [UIColor redColor];
         self.manager.configuration.selectedTitleColor = [UIColor redColor];
@@ -290,7 +290,7 @@
     }else if (self.navBgColor.selectedSegmentIndex == 2) {
         self.manager.configuration.navBarBackgroudColor = [UIColor whiteColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
-        self.manager.configuration.sectionHeaderTranslucent = NO;
+//        self.manager.configuration.sectionHeaderTranslucent = NO;
         self.bottomViewBgColor = [UIColor whiteColor];
         self.manager.configuration.cellSelectedBgColor = self.manager.configuration.themeColor;
         self.manager.configuration.cellSelectedTitleColor = [UIColor whiteColor];
@@ -300,7 +300,7 @@
     }else if (self.navBgColor.selectedSegmentIndex == 3) {
         self.manager.configuration.navBarBackgroudColor = [UIColor blackColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
-        self.manager.configuration.sectionHeaderTranslucent = NO;
+//        self.manager.configuration.sectionHeaderTranslucent = NO;
         self.bottomViewBgColor = [UIColor blackColor];
         self.manager.configuration.cellSelectedBgColor = [UIColor blackColor];
         self.manager.configuration.selectedTitleColor = [UIColor blackColor];
@@ -309,7 +309,7 @@
     }else if (self.navBgColor.selectedSegmentIndex == 4) {
         self.manager.configuration.navBarBackgroudColor = [UIColor orangeColor];
         self.manager.configuration.statusBarStyle = UIStatusBarStyleLightContent;
-        self.manager.configuration.sectionHeaderTranslucent = NO;
+//        self.manager.configuration.sectionHeaderTranslucent = NO;
         self.bottomViewBgColor = [UIColor orangeColor];
         self.manager.configuration.cellSelectedBgColor = [UIColor orangeColor];
         self.manager.configuration.selectedTitleColor = [UIColor orangeColor];
@@ -318,7 +318,7 @@
     }else {
         self.manager.configuration.navBarBackgroudColor = nil;
         self.manager.configuration.statusBarStyle = UIStatusBarStyleDefault;
-        self.manager.configuration.sectionHeaderTranslucent = YES;
+//        self.manager.configuration.sectionHeaderTranslucent = YES;
         self.bottomViewBgColor = nil;
         self.manager.configuration.cellSelectedBgColor = nil;
         self.manager.configuration.selectedTitleColor = nil;

@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) BOOL enabled;
 
 /** 数据 */
-@property (nonatomic, strong) NSDictionary *data;
+@property (nonatomic, strong, nullable) NSDictionary *data;
 
 /// 是否可以撤销
 - (BOOL)canUndo;

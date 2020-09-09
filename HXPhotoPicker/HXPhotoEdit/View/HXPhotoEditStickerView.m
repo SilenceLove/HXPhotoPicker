@@ -79,15 +79,6 @@ NSString *const kHXStickerViewData_movingView_superAngel = @"HXStickerViewData_m
         itemView.isSelected = YES;
         [self bringSubviewToFront:itemView];
         [itemView resetRotation];
-//        if (self.mirrorType == HXPhotoClippingViewMirrorType_None) {
-//            if (itemView.mirrorType == HXPhotoClippingViewMirrorType_Horizontal) {
-//                itemView.transform = CGAffineTransformScale(itemView.transform, -1, 1);
-//            }
-//        }else {
-//            if (itemView.mirrorType == HXPhotoClippingViewMirrorType_None) {
-//                itemView.transform = CGAffineTransformScale(itemView.transform, -1, 1);
-//            }
-//        }
         self.selectItemView = itemView;
     }else {
         if (self.selectItemView) {

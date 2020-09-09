@@ -1104,6 +1104,8 @@ HXEditFrameViewDelegate
             rct.size.width = (point.x - rct.origin.x);
         }
             break;
+        default:
+            break;
     }
     
     switch (panGesture.state) {

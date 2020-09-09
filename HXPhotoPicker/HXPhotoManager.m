@@ -274,7 +274,7 @@
             if (model.type == HXCustomAssetModelTypeLocalLivePhoto) {
                 photoModel = [HXPhotoModel photoModelWithLivePhotoImage:model.localImage videoURL:model.localVideoURL];
                 photoModel.imageURL = model.localImagePath;
-            }else if (model.type == HXCustomAssetModelTypeNetWorkLivePhoto){
+            }else {
                 photoModel = [HXPhotoModel photoModelWithLivePhotoNetWorkImage:model.networkImageURL netWorkVideoURL:model.networkVideoURL];
             }
             photoModel.selected = canAddPhoto ? model.selected : NO;

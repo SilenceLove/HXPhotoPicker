@@ -113,7 +113,10 @@ NSString *const kHXSplashViewData_frameArray = @"HXSplashViewData_frameArray";
                 
                 HXPhotoEditSplashBlur *blur = [HXPhotoEditSplashBlur new];
                 blur.rect = CGRectMake(mosaicPoint.x, mosaicPoint.y, self.squareWidth, self.squareWidth);
-                blur.color = self.splashColor ? self.splashColor(blur.rect.origin) : nil;
+                if (self.splashColor) {
+                    blur.color = self.splashColor(blur.rect.origin);
+                }
+//                blur.color = self.splashColor ? self.splashColor(blur.rect.origin) : nil;
                 
                 HXPhotoEditSplashMaskLayer *layer = [HXPhotoEditSplashMaskLayer layer];
                 layer.frame = self.bounds;
@@ -131,7 +134,10 @@ NSString *const kHXSplashViewData_frameArray = @"HXSplashViewData_frameArray";
         } else if (self.state == HXPhotoEditSplashStateType_Paintbrush) {
             HXPhotoEditSplashImageBlur *blur = [HXPhotoEditSplashImageBlur new];
             blur.rect = CGRectMake(point.x - self.paintSize.width / 2, point.y - self.paintSize.height / 2, self.paintSize.width, self.paintSize.height);
-            blur.color = self.splashColor ? self.splashColor(blur.rect.origin) : nil;
+            if (self.splashColor) {
+                blur.color = self.splashColor(blur.rect.origin);
+            }
+//            blur.color = self.splashColor ? self.splashColor(blur.rect.origin) : nil;
             HXPhotoEditSplashMaskLayer *layer = [HXPhotoEditSplashMaskLayer layer];
             layer.frame = self.bounds;
             [layer.lineArray addObject:blur];
@@ -164,7 +170,10 @@ NSString *const kHXSplashViewData_frameArray = @"HXSplashViewData_frameArray";
                 //2、创建LFSplashBlur
                 HXPhotoEditSplashBlur *blur = [HXPhotoEditSplashBlur new];
                 blur.rect = CGRectMake(mosaicPoint.x, mosaicPoint.y, self.squareWidth, self.squareWidth);
-                blur.color = self.splashColor ? self.splashColor(blur.rect.origin) : nil;
+                if (self.splashColor) {
+                    blur.color = self.splashColor(blur.rect.origin);
+                }
+//                blur.color = self.splashColor ? self.splashColor(blur.rect.origin) : nil;
                 
                 [layer.lineArray addObject:blur];
                 [layer setNeedsDisplay];
@@ -175,7 +184,10 @@ NSString *const kHXSplashViewData_frameArray = @"HXSplashViewData_frameArray";
                 //2、创建LFSplashBlur
                 HXPhotoEditSplashImageBlur *blur = [HXPhotoEditSplashImageBlur new];
                 blur.imageName = @"hx_photo_edit_mosaic_brush";
-                blur.color = self.splashColor ? self.splashColor(point) : nil;
+                if (self.splashColor) {
+                    blur.color = self.splashColor(point);
+                }
+//                blur.color = self.splashColor ? self.splashColor(point) : nil;
                 /** 新增随机位置 */
                 int x = self.paintSize.width / 2;
                 float randomX = floorf(arc4random() % x) - x / 4;

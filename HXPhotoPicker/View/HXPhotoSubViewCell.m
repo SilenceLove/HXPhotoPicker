@@ -135,7 +135,7 @@
     }
     if (showAlert) {
         HXPhotoBottomViewModel *titleModel = [[HXPhotoBottomViewModel alloc] init];
-        titleModel.title = title;
+        titleModel.title = title ?: @"";
         titleModel.titleFont = [UIFont systemFontOfSize:13];
         titleModel.titleColor = [UIColor hx_colorWithHexStr:@"#666666"];
         titleModel.titleDarkColor = [UIColor hx_colorWithHexStr:@"#999999"];

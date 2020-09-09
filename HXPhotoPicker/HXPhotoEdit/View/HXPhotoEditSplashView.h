@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditSplashStateType) {
 @property (nonatomic, assign) CGFloat screenScale;
 
 /** 数据 */
-@property (nonatomic, strong) NSDictionary *data;
+@property (nonatomic, strong, nullable) NSDictionary *data;
 
 @property (nonatomic, copy) void(^splashBegan)(void);
 @property (nonatomic, copy) void(^splashEnded)(void);

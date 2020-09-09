@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 编辑预览图片
 @property (nonatomic, readonly) UIImage *editPreviewImage;
 /// 编辑图片数据
-//@property (nonatomic, readonly) NSData *editPreviewData;
+@property (nonatomic, readonly) NSData *editPreviewData;
 /// 编辑原图片
 @property (nonatomic, readonly) UIImage *editImage;
 /// 编辑数据

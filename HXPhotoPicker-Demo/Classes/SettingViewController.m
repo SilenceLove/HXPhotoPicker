@@ -129,7 +129,7 @@
     self.hideOriginalBtn.on = self.manager.configuration.hideOriginalBtn;
     self.themeColor.backgroundColor = self.manager.configuration.themeColor;
     self.navigationTitleSynchColor.on = self.manager.configuration.navigationTitleSynchColor;
-    self.sectionHeaderTransluc.on = self.manager.configuration.sectionHeaderTranslucent;
+//    self.sectionHeaderTransluc.on = self.manager.configuration.sectionHeaderTranslucent;
     self.supportRotation.on = self.manager.configuration.supportRotation;
     self.doneBtnShowDetail.on = self.manager.configuration.doneBtnShowDetail;
     self.showBottomPhotoDetail.on = self.manager.configuration.showBottomPhotoDetail;
@@ -177,7 +177,7 @@
 //    self.manager.configuration.sectionHeaderShowPhotoLocation = self.sectionHeaderShowPhotoClocation.on;
     self.manager.configuration.hideOriginalBtn = self.hideOriginalBtn.on;
     self.manager.configuration.themeColor = self.themeColor.backgroundColor;
-    self.manager.configuration.sectionHeaderTranslucent = self.sectionHeaderTransluc.on;
+//    self.manager.configuration.sectionHeaderTranslucent = self.sectionHeaderTransluc.on;
     self.manager.configuration.navigationTitleSynchColor = self.navigationTitleSynchColor.on;
     self.manager.configuration.supportRotation = self.supportRotation.on;
     self.manager.configuration.doneBtnShowDetail = self.doneBtnShowDetail.on;

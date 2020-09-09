@@ -98,7 +98,7 @@
         header.didMirrorHorizontallyBlock = self.didMirrorHorizontallyBlock;
         return header;
     }
-    return nil;
+    return [UICollectionReusableView new];
 }
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoEditClippingToolBarRotaioModel *model = self.models[indexPath.item];

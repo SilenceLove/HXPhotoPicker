@@ -177,7 +177,7 @@
         hud.transform = CGAffineTransformIdentity;
     } completion:nil];
     [UIView cancelPreviousPerformRequestsWithTarget:self];
-    [self performSelector:@selector(handleGraceTimer) withObject:nil afterDelay:1.75f inModes:@[NSRunLoopCommonModes]];
+    [self performSelector:@selector(hx_handleGraceTimer) withObject:nil afterDelay:1.75f inModes:@[NSRunLoopCommonModes]];
 } 
 
 - (void)hx_immediatelyShowLoadingHudWithText:(NSString *)text {
@@ -244,27 +244,34 @@
         }
     }
 }
-- (void)hx_handleImageWithDelay:(NSTimeInterval)delay {
-    if (delay) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self handleGraceTimer];
-        });
-    }else {
-        [self handleGraceTimer];
-    }
-}
-- (void)handleGraceTimer {
+- (void)hx_handleImageWithAnimation:(BOOL)animation {
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     for (UIView *view in self.subviews) {
         if ([view isKindOfClass:[HXHUD class]] && [(HXHUD *)view isImage]) {
-            [UIView animateWithDuration:0.25f animations:^{
-                view.alpha = 0;
-                view.transform = CGAffineTransformMakeScale(0.5, 0.5);
-            } completion:^(BOOL finished) {
+            if (animation) {
+                [UIView animateWithDuration:0.25f animations:^{
+                    view.alpha = 0;
+                    view.transform = CGAffineTransformMakeScale(0.5, 0.5);
+                } completion:^(BOOL finished) {
+                    [view removeFromSuperview];
+                }];
+            }else {
                 [view removeFromSuperview];
-            }];
+            }
         }
     }
+}
+- (void)hx_handleImageWithDelay:(NSTimeInterval)delay {
+    if (delay) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self hx_handleGraceTimer];
+        });
+    }else {
+        [self hx_handleGraceTimer];
+    }
+}
+- (void)hx_handleGraceTimer {
+    [self hx_handleImageWithAnimation:YES];
 }
 /**
  圆角

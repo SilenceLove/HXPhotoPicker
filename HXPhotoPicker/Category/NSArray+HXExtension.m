@@ -8,6 +8,7 @@
 
 #import "NSArray+HXExtension.h"
 #import "HXPhotoModel.h"
+#import "HXPhotoEdit.h"
 #import "HXPhotoManager.h"
 
 @implementation NSArray (HXExtension)
@@ -178,6 +179,12 @@
     }];
 }
 - (void)requestImageWithOriginal:(BOOL)original photoModel:(HXPhotoModel *)photoModel successful:(void (^)(UIImage * _Nullable image, NSURL * _Nullable imagePath, HXPhotoModel *photoModel))successful failure:(void (^)(HXPhotoModel *photoModel))failure {
+    if (photoModel.photoEdit) {
+        if (successful) {
+            successful(photoModel.photoEdit.editPreviewImage, nil, photoModel);
+        }
+        return;
+    }
     if (photoModel.type == HXPhotoModelMediaTypeCameraPhoto) {
         if (photoModel.networkPhotoUrl) {
             if ([HXPhotoCommon photoCommon].requestNetworkAfter) {
