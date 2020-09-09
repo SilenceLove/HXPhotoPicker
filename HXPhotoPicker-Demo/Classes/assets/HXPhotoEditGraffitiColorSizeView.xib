@@ -13,7 +13,7 @@
             <rect key="frame" x="0.0" y="0.0" width="50" height="180"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="hx_photo_edit_graffiti_size_backgroud" translatesAutoresizingMaskIntoConstraints="NO" id="svO-Ad-SfJ">
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="svO-Ad-SfJ">
                     <rect key="frame" x="14.5" y="0.0" width="21" height="180"/>
                 </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IhM-dP-QIJ">
@@ -45,7 +45,4 @@
             <point key="canvasLocation" x="-329" y="51"/>
         </view>
     </objects>
-    <resources>
-        <image name="hx_photo_edit_graffiti_size_backgroud" width="21" height="207"/>
-    </resources>
 </document>
