@@ -7,7 +7,6 @@
 //
 
 #import "HXPhotoView.h"
-#import "HXPhotoSubViewCell.h"
 #import "UIView+HXExtension.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
@@ -828,8 +827,6 @@
         i++;
     }
 }
-
-#pragma mark - < HXAlbumListViewControllerDelegate >
 - (void)setupDataWithAllList:(NSArray *)allList photos:(NSArray *)photos videos:(NSArray *)videos original:(BOOL)original {
     
     self.original = original;

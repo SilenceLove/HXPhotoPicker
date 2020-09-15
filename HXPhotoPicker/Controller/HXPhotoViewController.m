@@ -562,8 +562,8 @@ HX_PhotoEditViewControllerDelegate
             maxY = [self panSelectGetMaxYWithPoint:self.panSelectStartPoint];
             startY = [self panSelectGetMinYWithPoint:currentPoint];
         }
-        NSInteger marginW = self.flowLayout.minimumInteritemSpacing + self.flowLayout.itemSize.width;
-        NSInteger marginH = self.flowLayout.minimumInteritemSpacing + self.flowLayout.itemSize.height;
+        NSInteger distanceW = self.flowLayout.minimumInteritemSpacing + self.flowLayout.itemSize.width;
+        NSInteger distanceH = self.flowLayout.minimumInteritemSpacing + self.flowLayout.itemSize.height;
         BOOL canSelectVideo = self.manager.videoSelectedType != HXPhotoManagerVideoSelectedTypeSingle;
         NSIndexPath *sIndexPath = [self.collectionView indexPathForItemAtPoint:self.panSelectStartPoint];
         if (sIndexPath && ![indexPaths containsObject:sIndexPath]) {
@@ -628,15 +628,15 @@ HX_PhotoEditViewControllerDelegate
                     [indexPaths addObject:indexPath];
                 }
                 if (yReverse) {
-                    tempMaxX -= marginW / 2;
+                    tempMaxX -= distanceW / 2;
                 }else {
-                    tempStartX += marginW / 2;
+                    tempStartX += distanceW / 2;
                 }
             }
             if (yReverse) {
-                maxY -= marginH / 2;
+                maxY -= distanceH / 2;
             }else {
-                startY += marginH / 2;
+                startY += distanceH / 2;
             }
         }
         NSIndexPath *eIndexPath = [self.collectionView indexPathForItemAtPoint:currentPoint];
@@ -1088,10 +1088,10 @@ HX_PhotoEditViewControllerDelegate
             cell.selectBgColor = self.manager.configuration.themeColor;
         }
         if (self.cellCanSetModel) {
-            [cell setModel:model clearImage:NO];
+            [cell setModel:model emptyImage:NO];
             [cell setModelDataWithHighQuality:NO completion:nil];
         }else {
-            [cell setModel:model clearImage:YES];
+            [cell setModel:model emptyImage:YES];
         }
         cell.singleSelected = self.manager.configuration.singleSelected;
         return cell;
@@ -2313,9 +2313,9 @@ HX_PhotoEditViewControllerDelegate
         }];
     }
 }
-- (void)setModel:(HXPhotoModel *)model clearImage:(BOOL)clearImage {
+- (void)setModel:(HXPhotoModel *)model emptyImage:(BOOL)emptyImage {
     _model = model;
-    if (clearImage) {
+    if (emptyImage) {
         self.imageView.image = nil;
     }
     self.maskView.hidden = YES;
@@ -2828,180 +2828,6 @@ HX_PhotoEditViewControllerDelegate
         [_selectBtn hx_setEnlargeEdgeWithTop:0 right:0 bottom:15 left:15];
     }
     return _selectBtn;
-}
-@end
-
-@interface HXPhotoViewSectionHeaderView ()
-@property (strong, nonatomic) UILabel *dateLb;
-@property (strong, nonatomic) UILabel *subTitleLb;
-@property (strong, nonatomic) UIToolbar *bgView;
-@end
-
-@implementation HXPhotoViewSectionHeaderView
-- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
-    [super traitCollectionDidChange:previousTraitCollection];
-#ifdef __IPHONE_13_0
-    if (@available(iOS 13.0, *)) {
-        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-            [self setChangeState:self.changeState];
-        }
-    }
-#endif
-}
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self setupUI];
-        [self setChangeState:self.changeState];
-    }
-    return self;
-}
-- (void)setupUI {
-    [self addSubview:self.bgView];
-    [self addSubview:self.dateLb];
-    [self addSubview:self.subTitleLb];
-}
-- (void)setChangeState:(BOOL)changeState {
-    _changeState = changeState;
-    if (self.translucent) {
-        self.bgView.translucent = changeState;
-    }
-    if (self.suspensionBgColor) {
-        self.translucent = NO;
-    }
-    if (changeState) {
-//        if (self.translucent) {
-            self.bgView.alpha = 1;
-//        }
-        if (self.suspensionTitleColor) {
-            self.dateLb.textColor = self.suspensionTitleColor;
-            self.subTitleLb.textColor = self.suspensionTitleColor;
-        }
-        if (self.suspensionBgColor) {
-            self.bgView.barTintColor = self.suspensionBgColor;
-        }else {
-            self.bgView.barTintColor = nil;
-        }
-    }else {
-        if (!self.translucent) {
-            self.bgView.barTintColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
-        }
-//        if (self.translucent) {
-            self.bgView.alpha = 0;
-//        }
-        self.dateLb.textColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : [UIColor blackColor];
-        if ([HXPhotoCommon photoCommon].isDark) {
-            self.subTitleLb.textColor = [UIColor whiteColor];
-        }else {
-            self.subTitleLb.textColor = [UIColor colorWithRed:140.f / 255.f green:140.f / 255.f blue:140.f / 255.f alpha:1];
-        }
-    }
-}
-- (void)setTranslucent:(BOOL)translucent {
-    _translucent = translucent;
-    if (!translucent) {
-        self.bgView.translucent = YES;
-        self.bgView.barTintColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : [UIColor whiteColor];
-    }
-}
-- (void)setModel:(HXPhotoDateModel *)model {
-    _model = model;
-    if (model.location) {
-        if (model.hasLocationTitles) {
-            [self updateDateData];
-        }else {
-            self.dateLb.frame = CGRectMake(8, 0, self.hx_w - 16, 50);
-            self.dateLb.text = model.dateString;
-            self.subTitleLb.hidden = YES;
-            HXWeakSelf
-            [HXPhotoTools getDateLocationDetailInformationWithModel:model completion:^(CLPlacemark * _Nullable placemark, HXPhotoDateModel *model, NSError * _Nullable error) {
-                if (!error) {
-                    if (placemark.locality) {
-                        NSString *province = placemark.administrativeArea;
-                        NSString *city = placemark.locality;
-                        NSString *area = placemark.subLocality;
-                        NSString *street = placemark.thoroughfare;
-                        NSString *subStreet = placemark.subThoroughfare;
-                        if (area) {
-                            model.locationTitle = [NSString stringWithFormat:@"%@ ﹣ %@",city,area];
-                        }else {
-                            model.locationTitle = [NSString stringWithFormat:@"%@",city];
-                        }
-                        if (street) {
-                            if (subStreet) {
-                                model.locationSubTitle = [NSString stringWithFormat:@"%@・%@%@",model.dateString,street,subStreet];
-                            }else {
-                                model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,street];
-                            }
-                        }else if (province) {
-                            model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,province];
-                        }else {
-                            model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,city];
-                        }
-                    }else {
-                        NSString *province = placemark.administrativeArea;
-                        model.locationSubTitle = [NSString stringWithFormat:@"%@・%@",model.dateString,province];
-                        model.locationTitle = province;
-                    }
-                    model.locationError = NO;
-                }else {
-                    model.locationError = YES;
-                }
-                if (weakSelf.model == model) {
-                    weakSelf.model.hasLocationTitles = YES;
-                    [weakSelf updateDateData];
-                }
-            }];
-        }
-    }else {
-        self.dateLb.frame = CGRectMake(8, 0, self.hx_w - 16, 50);
-        self.dateLb.text = model.dateString;
-        self.subTitleLb.hidden = YES;
-    }
-}
-- (void)updateDateData {
-    if (self.model.locationError) {
-        self.dateLb.frame = CGRectMake(8, 0, self.hx_w - 16, 50);
-        self.subTitleLb.hidden = YES;
-        self.dateLb.text = self.model.dateString;
-    }else {
-        if (self.model.locationSubTitle) {
-            self.dateLb.frame = CGRectMake(8, 4, self.hx_w - 16, 30);
-            self.subTitleLb.frame = CGRectMake(8, 28, self.hx_w - 16, 20);
-            self.subTitleLb.hidden = NO;
-            self.subTitleLb.text = self.model.locationSubTitle;
-        }else {
-            self.dateLb.frame = CGRectMake(8, 0, self.hx_w - 16, 50);
-            self.subTitleLb.hidden = YES;
-        }
-        self.dateLb.text = self.model.locationTitle;
-    }
-}
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    self.bgView.frame = self.bounds;
-}
-- (UILabel *)dateLb {
-    if (!_dateLb) {
-        _dateLb = [[UILabel alloc] init];
-        _dateLb.font = [UIFont hx_boldPingFangOfSize:16];
-    }
-    return _dateLb;
-}
-- (UIToolbar *)bgView {
-    if (!_bgView) {
-        _bgView = [[UIToolbar alloc] init];
-        _bgView.translucent = NO;
-        _bgView.clipsToBounds = YES;
-    }
-    return _bgView;
-}
-- (UILabel *)subTitleLb {
-    if (!_subTitleLb) {
-        _subTitleLb = [[UILabel alloc] init];
-        _subTitleLb.font = [UIFont hx_regularPingFangOfSize:12];
-    }
-    return _subTitleLb;
 }
 @end
 

@@ -66,6 +66,9 @@
     }else {
         NSData *imageData = [NSData dataWithContentsOfFile:path];
         UIImage *image = [UIImage imageWithData:imageData];
+        if (!image) {
+            image = [UIImage imageWithContentsOfFile:path];
+        }
         return image;
     }
 }
@@ -180,8 +183,9 @@
 }
 - (void)requestImageWithOriginal:(BOOL)original photoModel:(HXPhotoModel *)photoModel successful:(void (^)(UIImage * _Nullable image, NSURL * _Nullable imagePath, HXPhotoModel *photoModel))successful failure:(void (^)(HXPhotoModel *photoModel))failure {
     if (photoModel.photoEdit) {
+        UIImage *image = photoModel.photoEdit.editPreviewImage;
         if (successful) {
-            successful(photoModel.photoEdit.editPreviewImage, nil, photoModel);
+            successful(image, nil, photoModel);
         }
         return;
     }

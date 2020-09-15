@@ -346,7 +346,9 @@
     if ([self.customProtocol respondsToSelector:@selector(customView:indexPath:)]) {
         if (!self.addCustomViewCompletion) {
             UIView *customView = [self.customProtocol customView:self indexPath:indexPath];
-            [self.contentView addSubview:customView];
+            if (customView) {
+                [self.contentView addSubview:customView];
+            }
             self.customView = customView;
             self.addCustomViewCompletion = YES;
         }

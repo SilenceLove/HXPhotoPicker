@@ -93,7 +93,7 @@ HXCustomCameraController;
 - (void)startRequestICloudAsset;
 - (void)bottomViewPrepareAnimation;
 - (void)bottomViewStartAnimation;
-- (void)setModel:(HXPhotoModel *)model clearImage:(BOOL)clearImage;
+- (void)setModel:(HXPhotoModel *)model emptyImage:(BOOL)emptyImage;
 - (void)setModelDataWithHighQuality:(BOOL)highQuality completion:(void (^)(HXPhotoViewCell *myCell))completion;
 @end
 
@@ -105,14 +105,6 @@ HXCustomCameraController;
 @property (assign, nonatomic) BOOL startSession;
 - (void)starRunning;
 - (void)stopRunning;
-@end
-
-@interface HXPhotoViewSectionHeaderView : HXCustomCollectionReusableView
-@property (strong, nonatomic) HXPhotoDateModel *model;
-@property (assign, nonatomic) BOOL changeState;
-@property (assign, nonatomic) BOOL translucent;
-@property (strong, nonatomic) UIColor *suspensionBgColor;
-@property (strong, nonatomic) UIColor *suspensionTitleColor;
 @end
 
 @interface HXPhotoViewSectionFooterView : UICollectionReusableView

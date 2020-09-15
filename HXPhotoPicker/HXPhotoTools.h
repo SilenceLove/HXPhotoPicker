@@ -26,10 +26,10 @@
 @class HXPhotoManager;
 @interface HXPhotoTools : NSObject 
 
-+ (void)saveModelToCustomAlbumWithAlbumName:(NSString * _Nullable)albumName
-                                 photoModel:(HXPhotoModel * _Nullable)photoModel
-                                   location:(CLLocation * _Nullable)location
-                                   complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
+//+ (void)saveModelToCustomAlbumWithAlbumName:(NSString * _Nullable)albumName
+//                                 photoModel:(HXPhotoModel * _Nullable)photoModel
+//                                   location:(CLLocation * _Nullable)location
+//                                   complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
 
 /**
  保存本地视频到系统相册和自定义相册
@@ -56,11 +56,6 @@
                                  photo:(UIImage * _Nullable)photo
                               location:(CLLocation * _Nullable)location
                               complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
-/**
- 获取定位信息 
- */
-+ (CLGeocoder * _Nullable)getDateLocationDetailInformationWithModel:(HXPhotoDateModel * _Nullable)model
-                                               completion:(void (^ _Nullable)(CLPlacemark * _Nullable placemark, HXPhotoDateModel * _Nullable model, NSError * _Nullable error))completion;
 
 /**
  请求相册权限

@@ -35,6 +35,9 @@
 + (NSString *)hx_localizedStringForKey:(NSString *)key value:(NSString *)value {
     NSBundle *bundle = [HXPhotoCommon photoCommon].languageBundle;
     value = [bundle localizedStringForKey:key value:value table:nil];
+    if (!value) {
+        value = key;
+    }
     return value;
 }
 @end

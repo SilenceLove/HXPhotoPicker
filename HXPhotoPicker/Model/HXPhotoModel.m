@@ -249,6 +249,19 @@
     return _videoDuration;
 }
 
+- (UIImage *)thumbPhoto {
+    if (self.photoEdit) {
+        return self.photoEdit.editPreviewImage;
+    }
+    return _thumbPhoto;
+}
+- (UIImage *)previewPhoto {
+    if (self.photoEdit) {
+        return self.photoEdit.editPreviewImage;
+    }
+    return _previewPhoto;
+}
+
 + (instancetype)photoModelWithPHAsset:(PHAsset *)asset {
     return [[self alloc] initWithPHAsset:asset];
 }
@@ -972,7 +985,7 @@
                                                success:(HXModelImageDataSuccessBlock)success
                                                 failed:(HXModelFailedBlock)failed {
     if (self.photoEdit) {
-        if (success) success(HX_UIImageJPEGRepresentation(self.photoEdit.editPreviewImage), self.photoEdit.editPreviewImage.imageOrientation, self, nil);
+        if (success) success(self.photoEdit.editPreviewData, self.photoEdit.editPreviewImage.imageOrientation, self, nil);
         return 0;
     }
     HXWeakSelf
@@ -1478,7 +1491,7 @@
                                                              failed:(HXModelFailedBlock)failed {
     if (self.photoEdit) {
 //        HXWeakSelf
-        [self fetchCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        [self getCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
             if (success) {
                 success(imageURL, model, nil);
             }
@@ -1610,7 +1623,7 @@
 - (void)requestLivePhotoAssetsWithSuccess:(HXModelLivePhotoAssetsSuccessBlock _Nullable)success
                                    failed:(HXModelFailedBlock _Nullable)failed {
     if (self.photoEdit) {
-        [self fetchCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        [self getCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
             if (success) {
                 success(imageURL, nil, NO, model);
             }
@@ -1718,8 +1731,8 @@
         }
     }
 }
-- (void)fetchCameraImageURLWithSuccess:(HXModelImageURLSuccessBlock _Nullable)success
-                                failed:(HXModelFailedBlock _Nullable)failed {
+- (void)getCameraImageURLWithSuccess:(HXModelImageURLSuccessBlock _Nullable)success
+                              failed:(HXModelFailedBlock _Nullable)failed {
                                     HXWeakSelf
     if (self.photoEdit) {
         [self getImageURLWithImage:self.photoEdit.editPreviewImage success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
@@ -1757,6 +1770,26 @@
         }
     }];
 }
+- (void)getImageWithSuccess:(HXModelImageSuccessBlock _Nullable)success
+                     failed:(HXModelFailedBlock _Nullable)failed {
+    if (self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto) {
+        if (self.thumbPhoto) {
+            if (success) {
+                success(self.thumbPhoto, self, nil);
+            }
+            return;
+        }else if (self.imageURL) {
+            UIImage *image = [UIImage imageWithContentsOfFile:self.imageURL.path];
+            if (image && success) {
+                self.thumbPhoto = image;
+                self.previewPhoto = image;
+                success(image, self, nil);
+                return;
+            }
+        }
+    }
+    [self requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:success failed:failed];
+}
 - (void)getImageURLWithImage:(UIImage *)image
                      success:(HXModelImageURLSuccessBlock _Nullable)success
                       failed:(HXModelFailedBlock _Nullable)failed{
@@ -1764,7 +1797,7 @@
         NSData *imageData;
         NSString *suffix;
         if (self.photoEdit) {
-            imageData = HX_UIImageJPEGRepresentation(self.photoEdit.editPreviewImage);
+            imageData = self.photoEdit.editPreviewData;
             suffix = @"jpeg";
         }else {
             if (UIImagePNGRepresentation(image)) {
@@ -1796,16 +1829,17 @@
         }
     });
 }
-- (void)fetchAssetURLWithSuccess:(HXModelURLHandler)success failed:(HXModelFailedBlock)failed {
-    [self fetchAssetURLWithVideoPresetName:nil success:success failed:failed];
+- (void)getAssetURLWithSuccess:(HXModelURLHandler)success
+                        failed:(HXModelFailedBlock)failed {
+    [self getAssetURLWithVideoPresetName:nil success:success failed:failed];
 }
 
-- (void)fetchAssetURLWithVideoPresetName:(NSString * _Nullable)presetName
-                                 success:(HXModelURLHandler _Nullable)success
-                                  failed:(HXModelFailedBlock _Nullable)failed {
-                                      HXWeakSelf
+- (void)getAssetURLWithVideoPresetName:(NSString * _Nullable)presetName
+                               success:(HXModelURLHandler _Nullable)success
+                                failed:(HXModelFailedBlock _Nullable)failed {
+    HXWeakSelf
     if (self.photoEdit) {
-        [self fetchCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        [self getCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
             if (success) {
                 success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
             }
@@ -1824,7 +1858,7 @@
                         success(self.networkPhotoUrl, HXPhotoModelMediaSubTypePhoto, YES, self);
                     }
             }else {
-                [self fetchCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                [self getCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
                     if (success) {
                         success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
                     }
@@ -1869,93 +1903,4 @@
         }
     }
 }
-@end
-
-@implementation HXPhotoDateModel
-- (NSString *)dateString {
-    if (!_dateString) {
-        NSDateComponents *modelComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
-                                        NSCalendarUnitMonth |
-                                        NSCalendarUnitYear
-                                                                       fromDate:self.date];
-        NSUInteger modelMonth = [modelComponents month];
-        NSUInteger modelYear  = [modelComponents year];
-        NSUInteger modelDay   = [modelComponents day];
-        
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-        NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%lu-%lu-%lu",
-                                                      (unsigned long)modelYear,
-                                                      (unsigned long)modelMonth,
-                                                      (unsigned long)modelDay]];
-        
-        NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay   |
-                                        NSCalendarUnitMonth |
-                                        NSCalendarUnitYear
-                                                                       fromDate:[NSDate date]];
-        NSUInteger month = [components month];
-        NSUInteger year  = [components year];
-        NSUInteger day   = [components day];
-        
-        HXPhotoLanguageType type = [HXPhotoCommon photoCommon].languageType;
-        NSLocale *locale;
-        switch (type) {
-            case HXPhotoLanguageTypeEn:
-                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en"];
-                break;
-            case HXPhotoLanguageTypeSc:
-                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"zh-Hans"];
-                break;
-            case HXPhotoLanguageTypeTc:
-                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"zh-Hant"];
-                break;
-            case HXPhotoLanguageTypeJa:
-                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"ja"];
-                break;
-            case HXPhotoLanguageTypeKo:
-                locale = [[NSLocale alloc] initWithLocaleIdentifier:@"ko"];
-                break;
-            default: {
-                NSString *localization = [NSBundle mainBundle].preferredLocalizations.firstObject;
-                locale = [[NSLocale alloc] initWithLocaleIdentifier:localization];
-            }
-                break;
-        }
-        
-        dateFormatter.locale    = locale;
-        dateFormatter.dateStyle = kCFDateFormatterLongStyle;
-        dateFormatter.timeStyle = NSDateFormatterNoStyle;
-        
-        if (year == modelYear) {
-            NSString *longFormatWithoutYear = [NSDateFormatter dateFormatFromTemplate:@"MMMM d"
-                                                                              options:0
-                                                                               locale:locale];
-            [dateFormatter setDateFormat:longFormatWithoutYear];
-        }
-        NSString *resultString = [dateFormatter stringFromDate:date];
-        
-        if (year == modelYear && month == modelMonth)
-        {
-            if (day == modelDay)
-            {
-                resultString = [NSBundle hx_localizedStringForKey:@"今天"];
-            }
-            else if (day - 1 == modelDay)
-            {
-                resultString = [NSBundle hx_localizedStringForKey:@"昨天"];
-            }else if ([self.date hx_isSameWeek]) {
-                resultString = [self.date hx_getNowWeekday];
-            }
-        }
-        _dateString = resultString;
-    }
-    return _dateString;
-}
-- (NSMutableArray *)locationList {
-    if (!_locationList) {
-        _locationList = [NSMutableArray array];
-    }
-    return _locationList;
-}
-
 @end

@@ -49,17 +49,6 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
         
     }
 }
-+ (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model
-                                               completion:(void (^)(CLPlacemark * _Nullable placemark, HXPhotoDateModel *model, NSError * _Nullable error))completion {
-    CLGeocoder *geoCoder = [[CLGeocoder alloc] init]; 
-    [geoCoder reverseGeocodeLocation:model.location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
-        CLPlacemark *placemark = placemarks.firstObject;
-        if (completion) {
-            completion(placemark,model, error);
-        }
-    }];
-    return geoCoder;
-}
 
 /**
  获取视频的时长

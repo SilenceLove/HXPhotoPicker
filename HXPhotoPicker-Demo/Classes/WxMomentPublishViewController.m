@@ -183,9 +183,12 @@
                     }
                 }];
         }else {
-            [photoModel fetchAssetURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+            [photoModel getAssetURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
                 count++;
                 if (mediaType == HXPhotoModelMediaSubTypePhoto) {
+                    NSData *imageData = [NSData dataWithContentsOfURL:URL];
+                    UIImage *image = [UIImage imageWithData:imageData];
+//                    UIImage *image = [UIImage imageWithContentsOfFile:URL.path];
                     // 图片
                     if (isNetwork) {
                         // URL是网络图片地址

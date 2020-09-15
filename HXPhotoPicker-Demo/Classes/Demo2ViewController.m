@@ -294,12 +294,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width, CGRectGetMaxY(frame) + kPhotoViewMargin);
     
 }
-- (void)photoViewPreviewDismiss:(HXPhotoView *)photoView {
-//    [self changeStatus];
-}
-- (void)photoViewDidCancel:(HXPhotoView *)photoView {
-//    [self changeStatus];
-}
 - (void)photoView:(HXPhotoView *)photoView currentDeleteModel:(HXPhotoModel *)model currentIndex:(NSInteger)index {
     NSSLog(@"%@ --> index - %ld",model,index);
 }
@@ -345,10 +339,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
 
 #pragma mark - < HXPhotoViewCellCustomProtocol >
 //- (UIView *)customView:(HXPhotoSubViewCell *)cell indexPath:(NSIndexPath *)indexPath {
-//    
+//    [cell hx_radiusWithRadius:10 corner:UIRectCornerAllCorners];
+//    [cell.imageView hx_radiusWithRadius:10 corner:UIRectCornerAllCorners];
 //    UIView *view = [[UIView alloc] init];
+//    [view hx_radiusWithRadius:10 corner:UIRectCornerAllCorners];
 //    view.backgroundColor = [UIColor redColor];
-//    
+//
 //    return view;
 //}
 //- (CGRect)customViewFrame:(HXPhotoSubViewCell *)cell indexPath:(NSIndexPath *)indexPath {

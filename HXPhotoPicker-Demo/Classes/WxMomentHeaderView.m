@@ -72,14 +72,14 @@
                     }
                 }];
                 // 上传可以获取imageURL / imageData
-//                [model fetchAssetURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+//                [model getAssetURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
 //
 //                } failed:nil];
             } cancel:nil];
         }else if (index == 2) {
             [weakSelf.hx_viewController hx_presentSelectPhotoControllerWithManager:weakSelf.photoManager didDone:^(NSArray<HXPhotoModel *> * _Nullable allList, NSArray<HXPhotoModel *> * _Nullable photoList, NSArray<HXPhotoModel *> * _Nullable videoList, BOOL isOriginal, UIViewController * _Nullable viewController, HXPhotoManager * _Nullable manager) {
                 HXPhotoModel *photoModel = allList.firstObject;
-                // 因为是编辑过的照片所有直接取
+                // 因为是编辑过的照片所以直接取
                 if (isBg) {
                     weakSelf.backgroudView.image = photoModel.photoEdit.editPreviewImage;
                 }else {

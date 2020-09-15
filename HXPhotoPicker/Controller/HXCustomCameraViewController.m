@@ -336,9 +336,10 @@
 }
 - (void)cancelClick:(UIButton *)button {
     if (button.selected) {
+        self.videoURL = nil;
+        [self setupFlashAndTorchBtn];
         self.bottomView.inTranscribe = NO;
         self.bottomView.inTakePictures = NO;
-//        [self.cameraController startSession];
         [self.imageView removeFromSuperview];
         [self hideBottomToolsView];
         [self.playVideoView stopPlay];
@@ -349,7 +350,6 @@
         self.cancelBtn.hx_w = 50;
         self.bottomView.hidden = NO;
         self.previewView.tapToFocusEnabled = YES;
-        self.previewView.pinchToZoomEnabled = [self.cameraController cameraSupportsZoom];
     }
 }
 - (void)didDoneBtnClick {
@@ -516,6 +516,7 @@
         };
         vc.cancelBlock = ^(HX_PhotoEditViewController * _Nonnull viewController) {
             weakSelf.topView.hidden = NO;
+            [weakSelf.cameraController startSession];
             [weakSelf cancelClick:weakSelf.cancelBtn];
         };
         vc.supportRotation = NO;
@@ -591,6 +592,11 @@
         self.playVideoView.playerLayer.hidden = NO;
         self.playVideoView.videoURL = self.videoURL;
         [self showBottomToolsView];
+        
+        self.previewView.effectiveScale = 1.0f;
+        self.previewView.beginGestureScale = 1.0f;
+        [self.cameraController setZoomValue:1.0f];
+        self.currentZoomFacto = self.cameraController.currentZoomFacto;
     }
     self.cancelBtn.hidden = NO;
 }
@@ -735,6 +741,7 @@
         _bottomView.manager = self.manager;
         HXWeakSelf
         _bottomView.takePictures = ^{
+            weakSelf.imageView.image = nil;
             [weakSelf bottomDidTakePictures];
         };
         _bottomView.startTranscribe = ^{

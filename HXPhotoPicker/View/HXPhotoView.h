@@ -8,13 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
+#import "HXPhotoSubViewCell.h"
 #import "HXCollectionView.h"
 #import "HXPhotoViewCellCustomProtocol.h"
 #import "HXPhotoViewProtocol.h"
 
 typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
     HXPhotoViewPreViewShowStyleDefault, //!< 默认
-    HXPhotoViewPreViewShowStyleDark     //!< 暗黑，此模式下视频会有进度条
+    HXPhotoViewPreViewShowStyleDark     //!< 暗黑，此样式下视频会有进度条
 };
 
 /*
