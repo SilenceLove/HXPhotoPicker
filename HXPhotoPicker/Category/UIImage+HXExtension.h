@@ -11,6 +11,7 @@
 
 @interface UIImage (HXExtension)
 + (UIImage *)hx_imageNamed:(NSString *)imageName;
++ (UIImage *)hx_imageContentsOfFile:(NSString *)imageName;
 + (UIImage *)hx_thumbnailImageForVideo:(NSURL *)videoURL
                              atTime:(NSTimeInterval)time;
 + (UIImage *)hx_animatedGIFWithData:(NSData *)data;

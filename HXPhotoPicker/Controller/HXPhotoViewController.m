@@ -442,9 +442,11 @@ HX_PhotoEditViewControllerDelegate
     }
     if (self.hx_customNavigationController.albums) {
         self.albumView.albumModelArray = self.hx_customNavigationController.albums;
+        self.albumTitleView.canSelect = YES;
     }else {
         self.hx_customNavigationController.requestAllAlbumCompletion = ^{
             weakSelf.albumView.albumModelArray = weakSelf.hx_customNavigationController.albums;
+            weakSelf.albumTitleView.canSelect = YES;
         };
     }
 }
@@ -1939,7 +1941,7 @@ HX_PhotoEditViewControllerDelegate
     return _albumTitleView;
 }
 - (void)albumTitleViewDidAction:(BOOL)selected {
-    if (!self.allArray.count) {
+    if (!self.albumView.albumModelArray.count) {
         return;
     }
     if (selected) {
@@ -2397,14 +2399,16 @@ HX_PhotoEditViewControllerDelegate
             }
             self.requestID = 0;
         }else {
-            int32_t imageRequestID;
+            PHImageRequestID imageRequestID;
             if (highQuality) {
                 imageRequestID = [self.model highQualityRequestThumbImageWithSize:[HXPhotoCommon photoCommon].requestSize completion:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
                     if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
                         return;
                     }
                     if ([weakSelf.localIdentifier isEqualToString:model.asset.localIdentifier]) {
-                        weakSelf.maskView.hidden = NO;
+                        if (weakSelf.maskView.hidden) {
+                            weakSelf.maskView.hidden = NO;
+                        }
                         weakSelf.imageView.image = image;
                     }
                     BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
@@ -2421,7 +2425,9 @@ HX_PhotoEditViewControllerDelegate
                         return;
                     }
                     if ([weakSelf.localIdentifier isEqualToString:model.asset.localIdentifier]) {
-                        weakSelf.maskView.hidden = NO;
+                        if (weakSelf.maskView.hidden) {
+                            weakSelf.maskView.hidden = NO;
+                        }
                         weakSelf.imageView.image = image;
                     }
                     BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
@@ -2639,13 +2645,6 @@ HX_PhotoEditViewControllerDelegate
     self.iCloudMaskLayer.hidden = !self.model.isICloud;
 }
 - (void)cancelRequest {
-#if HasYYWebImage
-//    [self.imageView yy_cancelCurrentImageRequest];
-#elif HasYYKit
-//    [self.imageView cancelCurrentImageRequest];
-#elif HasSDWebImage
-//    [self.imageView sd_cancelCurrentAnimationImagesLoad];
-#endif
     if (self.requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = 0;
@@ -2821,7 +2820,6 @@ HX_PhotoEditViewControllerDelegate
         [_selectBtn setBackgroundImage:bgImage forState:UIControlStateSelected];
         [_selectBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
         _selectBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];
-//        _selectBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
         _selectBtn.hx_size = _selectBtn.currentBackgroundImage.size;
         self.seletBtnNormalWidth = _selectBtn.hx_w;
         [_selectBtn addTarget:self action:@selector(didSelectClick:) forControlEvents:UIControlEventTouchUpInside];

@@ -31,17 +31,17 @@
     self.redView.hidden = YES;
     self.layer.masksToBounds = YES;
     self.layer.cornerRadius = 10.f;
-    self.imageView.image = [UIImage hx_imageNamed:@"hx_photo_edit_trash_close"];
+    self.imageView.image = [UIImage hx_imageContentsOfFile:@"hx_photo_edit_trash_close"];
 }
 - (void)setInArea:(BOOL)inArea {
     _inArea = inArea;
     if (inArea) {
-        self.imageView.image = [UIImage hx_imageNamed:@"hx_photo_edit_trash_open"];
+        self.imageView.image = [UIImage hx_imageContentsOfFile:@"hx_photo_edit_trash_open"];
         self.redView.hidden = NO;
         self.visualView.hidden = YES;
         self.titleLb.text = @"松手即可删除";
     }else {
-        self.imageView.image = [UIImage hx_imageNamed:@"hx_photo_edit_trash_close"];
+        self.imageView.image = [UIImage hx_imageContentsOfFile:@"hx_photo_edit_trash_close"];
         self.redView.hidden = YES;
         self.visualView.hidden = NO;
         self.titleLb.text = @"拖动到此处删除";

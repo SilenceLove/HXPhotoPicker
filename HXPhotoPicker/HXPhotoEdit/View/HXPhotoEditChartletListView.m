@@ -79,7 +79,7 @@
         [self.collectionView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
         [self.titleCollectionView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
     }
-    [self.arrowBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_pull_down"] forState:UIControlStateNormal];
+    [self.arrowBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_pull_down"] forState:UIControlStateNormal];
     self.contentViewBottomConstraint.constant = -(HXclViewHeight + hxBottomMargin);
     self.collectionViewHeightConstraint.constant = HXclViewHeight + hxBottomMargin;
     [self.bgView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hide)]];
@@ -365,7 +365,8 @@
         self.imageView.image = titleModel.image;
     }else if (titleModel.type == HXPhotoEditChartletModelType_ImageNamed) {
         [self.loadingView stopAnimating];
-        self.imageView.image = [UIImage hx_imageNamed:titleModel.imageNamed];
+        UIImage *image = [UIImage hx_imageContentsOfFile:titleModel.imageNamed];
+        self.imageView.image = image;
     }else if (titleModel.type == HXPhotoEditChartletModelType_NetworkURL) {
         HXWeakSelf
         if (!titleModel.loadCompletion) {
@@ -390,7 +391,8 @@
         self.imageView.image = model.image;
     }else if (model.type == HXPhotoEditChartletModelType_ImageNamed) {
         [self.loadingView stopAnimating];
-        self.imageView.image = [UIImage hx_imageNamed:model.imageNamed];
+        UIImage *image = [UIImage hx_imageContentsOfFile:model.imageNamed];
+        self.imageView.image = image;
     }else if (model.type == HXPhotoEditChartletModelType_NetworkURL) {
         if (!model.loadCompletion) {
             [self.loadingView startAnimating];

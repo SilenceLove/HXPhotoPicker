@@ -542,7 +542,7 @@
 - (UIButton *)backBtn {
     if (!_backBtn) {
         _backBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-        [_backBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_back"] forState:UIControlStateNormal];
+        [_backBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_back"] forState:UIControlStateNormal];
         _backBtn.imageView.tintColor = [UIColor whiteColor];
         _backBtn.tintColor = [UIColor whiteColor];
         _backBtn.hx_size = _backBtn.currentImage.size;

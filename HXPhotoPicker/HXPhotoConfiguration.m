@@ -243,6 +243,7 @@
     self.saveSystemAblum = YES;
     self.albumShowMode = HXPhotoAlbumShowModePopup;
     self.photoListCancelLocation = HXPhotoListCancelButtonLocationTypeLeft;
+    self.cameraCellShowPreview = NO;
     
     // 原图按钮设置
     self.changeOriginalTinColor = NO;

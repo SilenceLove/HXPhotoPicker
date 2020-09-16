@@ -16,16 +16,34 @@
     if (!imageName) {
         return nil;
     }
-    UIImage *image = [self imageNamed:imageName];
-    if (image) {
-        return image;
-    }
+    UIImage *image;
     NSBundle *bundle = [NSBundle hx_photoPickerBundle];
     if (bundle) {
-        image = [UIImage imageNamed:imageName inBundle:bundle compatibleWithTraitCollection:nil];
+        NSString *path = [bundle pathForResource:@"images" ofType:nil];
+        path = [path stringByAppendingPathComponent:imageName];
+        image = [UIImage imageNamed:path];
+    }
+    if (!image) {
+        image = [self imageNamed:imageName];
     }
     return image;
-} 
+}
++ (UIImage *)hx_imageContentsOfFile:(NSString *)imageName {
+    if (!imageName) {
+        return nil;
+    }
+    UIImage *image;
+    NSBundle *bundle = [NSBundle hx_photoPickerBundle];
+    if (bundle) {
+        NSString *path = [bundle pathForResource:@"images" ofType:nil];
+        path = [path stringByAppendingPathComponent:imageName];
+        image = [UIImage imageWithContentsOfFile:path];
+    }
+    if (!image) {
+        image = [self imageNamed:imageName];
+    }
+    return image;
+}
 + (UIImage *)hx_thumbnailImageForVideo:(NSURL *)videoURL atTime:(NSTimeInterval)time {
     AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
     if (!asset) {

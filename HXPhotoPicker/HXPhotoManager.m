@@ -704,35 +704,6 @@
             }
         }];
     }];
-//    for (PHFetchResult *fetchResult in allAlbums) {
-//        for (PHAssetCollection *collection in fetchResult) {
-//            // 有可能是PHCollectionList类的的对象，过滤掉
-//            if (![collection isKindOfClass:[PHAssetCollection class]]) continue;
-//            // 过滤空相册
-//            if (collection.estimatedAssetCount <= 0) continue;
-//
-//            if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumAllHidden) continue;
-//            if (collection.assetCollectionSubtype == 215) continue;
-//            if (collection.assetCollectionSubtype == 212) continue;
-//            if (collection.assetCollectionSubtype == 204) continue;
-//            if (collection.assetCollectionSubtype == 1000000201) continue;
-//
-//            @autoreleasepool {
-//                if ([self isCameraRollAlbum:collection]) {
-//                    HXAlbumModel *albumModel = [self albumModelWithCollection:collection fetchAssets:YES];
-//                    albumModel.cameraCount = [self cameraCount];
-//                    albumModel.tempImage = [self firstCameraModel].thumbPhoto;
-//                    [albums insertObject:albumModel atIndex:0];
-//                } else {
-//                    HXAlbumModel *albumModel = [self albumModelWithCollection:collection fetchAssets:YES];
-//                    if (albumModel.count > 0) {
-//                        albumModel.cameraCount = [self cameraCount];
-//                        [albums addObject:albumModel];
-//                    }
-//                }
-//            }
-//        }
-//    }
     if (!albums.count &&
         [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
         HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];

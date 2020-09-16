@@ -34,7 +34,7 @@
     self.flowLayout.minimumInteritemSpacing = 5;
     self.flowLayout.itemSize = CGSizeMake(35.f, 35.f);
     
-    [self.repealBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_repeal"] forState:UIControlStateNormal];
+    [self.repealBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_repeal"] forState:UIControlStateNormal];
     
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;

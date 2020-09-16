@@ -43,15 +43,6 @@
     HXPhotoViewController *fromVC = (HXPhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXPhotoPreviewViewController *toVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [toVC.modelArray objectAtIndex:toVC.currentModelIndex];
-//    HXWeakSelf
-//    CGFloat width = model.endImageSize.width;
-//    CGFloat height = model.endImageSize.height;
-//    if (width > HX_ScreenWidth) {
-//        width = HX_ScreenWidth;
-//    }
-//    if (height > HX_ScreenHeight) {
-//        height = HX_ScreenHeight;
-//    }
     UIImage *image;
     if (model.photoEdit) {
         image = model.photoEdit.editPreviewImage;
@@ -59,10 +50,6 @@
         image = model.thumbPhoto;
     }
     [self pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
-//    [model requestPreviewImageWithSize:CGSizeMake(width * 0.8, height * 0.8) startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-//        [weakSelf pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
-//    } failed:^(NSDictionary *info, HXPhotoModel *model) {
-//    }];
 }
 - (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext image:(UIImage *)image model:(HXPhotoModel *)model fromVC:(HXPhotoViewController *)fromVC toVC:(HXPhotoPreviewViewController *)toVC {
     model.tempImage = image;

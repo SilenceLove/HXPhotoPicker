@@ -226,6 +226,9 @@
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock _Nullable)completion;
 - (PHImageRequestID)requestThumbImageWithSize:(CGSize)size
                                    completion:(HXModelImageSuccessBlock _Nullable)completion;
+- (PHImageRequestID)requestThumbImageWithOptions:(PHImageRequestOptions * _Nullable)options
+                                            size:(CGSize)size
+                                      completion:(HXModelImageSuccessBlock _Nullable)completion;
 
 /// 请求获取缩略图，主要用在列表上展示。此方法只会回调一次
 - (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size

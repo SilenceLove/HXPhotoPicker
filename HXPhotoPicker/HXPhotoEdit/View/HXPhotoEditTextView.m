@@ -91,8 +91,8 @@
     [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
     self.doneBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:16];
     self.textBtn.layer.cornerRadius = 1.f;
-    [self.textBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_text_ normal"] forState:UIControlStateNormal];
-    [self.textBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_text_selected"] forState:UIControlStateSelected];
+    [self.textBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_text_ normal"] forState:UIControlStateNormal];
+    [self.textBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_text_selected"] forState:UIControlStateSelected];
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
         self.topViewHeightConstraint.constant = 50;

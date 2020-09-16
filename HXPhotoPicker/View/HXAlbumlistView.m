@@ -47,6 +47,9 @@
 //    [self refreshCamearCount];
 }
 - (void)selectCellScrollToCenter {
+    if (!self.currentSelectModel) {
+        return;
+    }
     if (self.albumModelArray.count <= self.currentSelectModel.index) {
         return;
     }
@@ -56,13 +59,9 @@
     if (!self.albumModelArray.count) {
         return;;
     }
-    NSInteger i = 0;
-    for (HXAlbumModel *albumMd in self.albumModelArray) {
-        albumMd.cameraCount = [self.manager cameraCount];
-        if (i == 0 && !albumMd.assetResult && !albumMd.localIdentifier) {
-            albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
-        }
-        i++;
+    HXAlbumModel *albumMd = self.albumModelArray.firstObject;
+    if (!albumMd.assetResult && !albumMd.localIdentifier) {
+        albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
     }
     self.cellCanSetModel = NO;
     [self.tableView reloadData];
@@ -424,6 +423,7 @@
 - (instancetype)initWithManager:(HXPhotoManager *)manager {
     self = [super init];
     if (self) {
+        self.canSelect = NO;
         self.manager = manager;
         [self addSubview:self.contentView];
         [self addSubview:self.button];
@@ -584,6 +584,9 @@
     return _button;
 } 
 - (void)didBtnClick:(UIButton *)button {
+    if (!self.canSelect) {
+        return;
+    }
     button.selected = !button.isSelected;
     button.userInteractionEnabled = NO;
     if (button.selected) {

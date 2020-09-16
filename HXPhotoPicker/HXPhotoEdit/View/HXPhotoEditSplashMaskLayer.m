@@ -72,7 +72,7 @@ CGFloat angleBetweenLines(CGPoint line1Start, CGPoint line1End, CGPoint line2Sta
     CGContextSetLineCap(context, kCGLineCapRound);
     CGContextSetLineJoin(context, kCGLineJoinRound);
     
-    for (NSInteger i=0; i<self.lineArray.count; i++) {
+    for (NSInteger i = 0; i < self.lineArray.count; i++) {
         HXPhotoEditSplashBlur *blur = self.lineArray[i];
         CGRect rect = blur.rect;
         

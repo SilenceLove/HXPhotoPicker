@@ -33,8 +33,8 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    [self.confirmBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_clip_confirm"] forState:UIControlStateNormal];
-    [self.cancelBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_clip_cancel"] forState:UIControlStateNormal];
+    [self.confirmBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_clip_confirm"] forState:UIControlStateNormal];
+    [self.cancelBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_clip_cancel"] forState:UIControlStateNormal];
     self.resetBtn.enabled = NO;
     [self.resetBtn setTitle:[NSBundle hx_localizedStringForKey:@"还原"] forState:UIControlStateNormal];
     
@@ -211,7 +211,7 @@
 - (UIButton *)rotateBtn {
     if (!_rotateBtn) {
         _rotateBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-        [_rotateBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_clip_rotate"] forState:UIControlStateNormal];
+        [_rotateBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_clip_rotate"] forState:UIControlStateNormal];
         _rotateBtn.hx_size = _rotateBtn.currentImage.size;
         _rotateBtn.tintColor = [UIColor whiteColor];
         [_rotateBtn addTarget:self action:@selector(didRotateBtnClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -227,7 +227,7 @@
 - (UIButton *)mirrorHorizontallyBtn {
     if (!_mirrorHorizontallyBtn) {
         _mirrorHorizontallyBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-        [_mirrorHorizontallyBtn setImage:[UIImage hx_imageNamed:@"hx_photo_edit_clip_mirror_horizontally"] forState:UIControlStateNormal];
+        [_mirrorHorizontallyBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_clip_mirror_horizontally"] forState:UIControlStateNormal];
         _mirrorHorizontallyBtn.hx_size = _rotateBtn.currentImage.size;
         _mirrorHorizontallyBtn.tintColor = [UIColor whiteColor];
         [_mirrorHorizontallyBtn addTarget:self action:@selector(didMirrorHorizontallyBtnClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -303,7 +303,7 @@
 }
 - (UIImageView *)scaleImageView {
     if (!_scaleImageView) {
-        _scaleImageView = [[UIImageView alloc] initWithImage:[[UIImage hx_imageNamed:@"hx_photo_edit_clip_free"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+        _scaleImageView = [[UIImageView alloc] initWithImage:[[UIImage hx_imageContentsOfFile:@"hx_photo_edit_clip_free"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
     }
     return _scaleImageView;
 }

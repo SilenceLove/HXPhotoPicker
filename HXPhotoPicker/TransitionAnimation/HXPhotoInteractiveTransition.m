@@ -27,20 +27,10 @@
 @property (assign, nonatomic) CGSize scrollViewContentSize;
 @property (assign, nonatomic) CGPoint scrollViewContentOffset;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
-//@property (strong, nonatomic) UIPinchGestureRecognizer *pinchGesture;
-//@property (strong, nonatomic) UIRotationGestureRecognizer *rotationGesture;
-
-//@property (assign, nonatomic) CGFloat initialScale;
-//@property (assign, nonatomic) CGFloat scale;
-//@property (assign, nonatomic) CGFloat initialArg;
-//@property (assign, nonatomic) CGFloat arg;
 @end
 
 @implementation HXPhotoInteractiveTransition
-- (void)addPanGestureForViewController:(UIViewController *)viewController{
-//    self.scale = 1.0f;
-//    self.arg = 0;
-    
+- (void)addPanGestureForViewController:(UIViewController *)viewController {
     self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gestureRecognizeDidUpdate:)];
     self.panGesture.delegate = self;
     self.vc = viewController;
@@ -61,14 +51,6 @@
         };
     }
     [viewController.view addGestureRecognizer:self.panGesture];
-    
-//    self.pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(viewDidPinch:)];
-//    self.pinchGesture.delegate = self;
-//    [viewController.view addGestureRecognizer:self.pinchGesture];
-//
-//    self.rotationGesture = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(viewDidRotation:)];
-//    self.rotationGesture.delegate = self;
-//    [viewController.view addGestureRecognizer:self.rotationGesture];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
@@ -82,53 +64,8 @@
             return YES;
         }
     }
-//    if ((gestureRecognizer == self.panGesture ||
-//         gestureRecognizer == self.pinchGesture ||
-//         gestureRecognizer == self.rotationGesture) &&
-//        (otherGestureRecognizer == self.panGesture ||
-//         otherGestureRecognizer == self.pinchGesture ||
-//         otherGestureRecognizer == self.rotationGesture)) {
-//        return YES;
-//    }
     return NO;
 }
-//- (void)viewDidPinch:(UIPinchGestureRecognizer *)sender {
-//    if(sender.state == UIGestureRecognizerStateBegan){
-//        self.initialScale = self.scale;
-//        sender.scale = 1.0;
-//    }else if (sender.state == UIGestureRecognizerStateChanged) {
-//        [self setScale:self.initialScale * sender.scale rotation:MAXFLOAT];
-//        sender.scale = 1.0;
-//    }else {
-//
-//    }
-//}
-//
-//- (void)viewDidRotation:(UIRotationGestureRecognizer *)sender {
-//    if(sender.state == UIGestureRecognizerStateBegan){
-//        self.initialArg = self.arg;
-//        sender.rotation = 0.0;
-//    } else if (sender.state == UIGestureRecognizerStateEnded ||
-//               sender.state == UIGestureRecognizerStateCancelled) {
-//        sender.rotation = 0.0;
-//    }else if (sender.state == UIGestureRecognizerStateChanged) {
-//        self.arg = self.initialArg + sender.rotation;
-//        CGFloat arg = self.arg;
-//        [self setScale:self.scale rotation:arg];
-//    }
-//}
-//
-//- (void)setScale:(CGFloat)scale rotation:(CGFloat)rotation {
-//    if (rotation != MAXFLOAT) {
-//        self.arg = rotation;
-//    }
-//
-//    self.scale = scale;
-//    CGAffineTransform transform = CGAffineTransformIdentity;
-//    transform = CGAffineTransformMakeScale(self.scale, self.scale);
-//    transform = CGAffineTransformRotate(transform, self.arg);
-//    self.contentView.transform = transform;
-//}
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
     HXPhotoPreviewViewCell *viewCell = [previewVC currentPreviewCell:previewVC.modelArray[previewVC.currentModelIndex]];
@@ -193,7 +130,7 @@
             imageViewScale = 0.4;
         }
         self.contentView.center = CGPointMake(self.transitionImgViewCenter.x + translation.x, self.transitionImgViewCenter.y + translation.y);
-//        self.contentView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
+        self.contentView.transform = CGAffineTransformMakeScale(imageViewScale, imageViewScale);
         
         [self updateInterPercent:1 - scale * scale];
         

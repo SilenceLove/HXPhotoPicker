@@ -752,7 +752,6 @@
         }
     }];
 }
-
 - (PHImageRequestID)requestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
     if (self.photoEdit) {
         if (completion) completion(self.photoEdit.editPosterImage, self, nil);
@@ -770,11 +769,17 @@
         }
         return 0;
     }
-    PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
-    option.resizeMode = PHImageRequestOptionsResizeModeFast;
-    option.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+    PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+    options.resizeMode = PHImageRequestOptionsResizeModeFast;
+    options.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+    return [self requestThumbImageWithOptions:options size:size completion:completion];
+}
+
+- (PHImageRequestID)requestThumbImageWithOptions:(PHImageRequestOptions * _Nullable)options
+                                            size:(CGSize)size
+                                      completion:(HXModelImageSuccessBlock _Nullable)completion {
     HXWeakSelf
-    return [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    return [self requestImageWithOptions:options targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         if (downloadFinined && result) {
             dispatch_async(dispatch_get_main_queue(), ^{

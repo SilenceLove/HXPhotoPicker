@@ -56,7 +56,8 @@
         self.imageSize = self.imageView.image.size;
         [self updateFrame];
     }else if (model.type == HXPhotoEditChartletModelType_ImageNamed) {
-        self.imageView.image = [UIImage hx_imageNamed:model.imageNamed];
+        UIImage *image = [UIImage hx_imageContentsOfFile:model.imageNamed];
+        self.imageView.image = image;
         self.imageSize = self.imageView.image.size;
         [self updateFrame];
     }else if (model.type == HXPhotoEditChartletModelType_NetworkURL) {

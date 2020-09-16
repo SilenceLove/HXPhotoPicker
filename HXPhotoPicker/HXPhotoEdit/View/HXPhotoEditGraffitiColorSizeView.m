@@ -35,7 +35,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.scale = 0.5f;
-    self.imageView.image = [UIImage hx_imageNamed:@"hx_photo_edit_graffiti_size_backgroud"];
+    self.imageView.image = [UIImage hx_imageContentsOfFile:@"hx_photo_edit_graffiti_size_backgroud"];
     [self.indicatorView hx_radiusWithRadius:10.f corner:UIRectCornerAllCorners];
     self.indicatorView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.6f].CGColor;
     self.indicatorView.layer.shadowOpacity = 0.56f;

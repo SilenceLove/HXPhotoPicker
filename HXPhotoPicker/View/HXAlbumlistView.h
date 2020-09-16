@@ -31,6 +31,7 @@
 @property (weak, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXAlbumModel *model;
 @property (assign, nonatomic, readonly) BOOL selected;
+@property (assign, nonatomic) BOOL canSelect;
 @property (copy, nonatomic) void (^didTitleViewBlock)(BOOL selected);
 - (instancetype)initWithManager:(HXPhotoManager *)manager; 
 - (void)deSelect;

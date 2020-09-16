@@ -29,23 +29,23 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    UIImage *graffitiImage = [[UIImage hx_imageNamed:@"hx_photo_edit_tools_graffiti"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *graffitiImage = [[UIImage hx_imageContentsOfFile:@"hx_photo_edit_tools_graffiti"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self.graffitiBtn setImage:graffitiImage forState:UIControlStateNormal];
     [self.graffitiBtn setImage:graffitiImage forState:UIControlStateSelected];
     
-    UIImage *emojiImage = [[UIImage hx_imageNamed:@"hx_photo_edit_tools_emoji"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *emojiImage = [[UIImage hx_imageContentsOfFile:@"hx_photo_edit_tools_emoji"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self.emojiBtn setImage:emojiImage forState:UIControlStateNormal];
     [self.emojiBtn setImage:emojiImage forState:UIControlStateSelected];
     
-    UIImage *textImage = [[UIImage hx_imageNamed:@"hx_photo_edit_tools_text"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *textImage = [[UIImage hx_imageContentsOfFile:@"hx_photo_edit_tools_text"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self.textBtn setImage:textImage forState:UIControlStateNormal];
     [self.textBtn setImage:textImage forState:UIControlStateSelected];
     
-    UIImage *clipImage = [[UIImage hx_imageNamed:@"hx_photo_edit_tools_clip"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *clipImage = [[UIImage hx_imageContentsOfFile:@"hx_photo_edit_tools_clip"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self.clipBtn setImage:clipImage forState:UIControlStateNormal];
     [self.clipBtn setImage:clipImage forState:UIControlStateSelected];
     
-    UIImage *mosaicImage = [[UIImage hx_imageNamed:@"hx_photo_edit_tools_mosaic"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *mosaicImage = [[UIImage hx_imageContentsOfFile:@"hx_photo_edit_tools_mosaic"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [self.mosaicBtn setImage:mosaicImage forState:UIControlStateNormal];
     [self.mosaicBtn setImage:mosaicImage forState:UIControlStateSelected];
     
