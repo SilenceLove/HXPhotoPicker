@@ -151,7 +151,6 @@
 		7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AB237D0F9400F8A584 /* Contacts.framework */; };
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
 		7BAF876124C14D5C00ACAF85 /* HXCameraBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */; };
-		7BC3714F2505D25000E2D05C /* images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7BC371332505D24E00E2D05C /* images.xcassets */; };
 		7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */; };
 		7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */; };
 		7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */; };
@@ -625,7 +624,6 @@
 		7BAF875F24C14D5C00ACAF85 /* HXCameraBottomView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCameraBottomView.h; sourceTree = "<group>"; };
 		7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCameraBottomView.m; sourceTree = "<group>"; };
 		7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewProtocol.h; sourceTree = "<group>"; };
-		7BC371332505D24E00E2D05C /* images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = images.xcassets; sourceTree = "<group>"; };
 		7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorSizeView.xib; sourceTree = "<group>"; };
 		7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditStickerTrashView.xib; sourceTree = "<group>"; };
 		7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditMosaicView.xib; sourceTree = "<group>"; };
@@ -693,12 +691,12 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		7B005AB024D008C500607111 /* Assets */ = {
+		7B005AB024D008C500607111 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				7BC3716B2505D2AD00E2D05C /* HXPhotoPicker.bundle */,
 			);
-			path = Assets;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		7B0856B724FA00FD00E93091 /* HXPhotoPicker-DemoUITests */ = {
@@ -797,7 +795,6 @@
 				7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */,
 				7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */,
 				7BC371462505D24F00E2D05C /* HXPhotoEditTextView.xib */,
-				7BC371332505D24E00E2D05C /* images.xcassets */,
 				7B08594424FA58DE00E93091 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg */,
 				7B08594724FA58DE00E93091 /* 9f2f070828381f30ed5bacf8ab014c086e06f024.jpg */,
 				7B08594824FA58DE00E93091 /* c81.mp4 */,
@@ -910,7 +907,7 @@
 				7B4E65DC2487AD5B00077EE1 /* Controller */,
 				7B4E65BB2487AD5B00077EE1 /* Category */,
 				7B4E65B02487AD5B00077EE1 /* TransitionAnimation */,
-				7B005AB024D008C500607111 /* Assets */,
+				7B005AB024D008C500607111 /* Resources */,
 				7B4E66262487AD5C00077EE1 /* HXPhotoCommon.h */,
 				7B4E65D72487AD5B00077EE1 /* HXPhotoCommon.m */,
 				7B4E65EF2487AD5B00077EE1 /* HXPhotoConfiguration.h */,
@@ -1383,7 +1380,6 @@
 				7B64186124F76C67003A5723 /* README.md in Resources */,
 				7BC3715D2505D25000E2D05C /* HXPhotoEditChartletPreviewView.xib in Resources */,
 				7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */,
-				7BC3714F2505D25000E2D05C /* images.xcassets in Resources */,
 				7B08596E24FA58DF00E93091 /* WxMomentViewController.xib in Resources */,
 				7BC3715C2505D25000E2D05C /* HXPhotoEditTextView.xib in Resources */,
 				7B08597024FA58DF00E93091 /* Demo4ViewController.xib in Resources */,
