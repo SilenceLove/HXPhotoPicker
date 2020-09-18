@@ -68,6 +68,7 @@
         _photoManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _photoManager.configuration.type = HXConfigurationTypeWXMoment;
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";
+        _photoManager.configuration.showOriginalBytes = YES;
 #if HasSDWebImage
         // 先导入了SDWebImage
         _photoManager.configuration.photoEditConfigur.requestChartletModels = ^(void (^ _Nonnull chartletModels)(NSArray<HXPhotoEditChartletTitleModel *> * _Nonnull)) {
