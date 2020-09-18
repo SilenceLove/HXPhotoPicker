@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, nullable) NSBundle *languageBundle;
 @property (strong, nonatomic, nullable) NSBundle *photoPickerBundle;
 
-@property (assign, nonatomic) CGSize requestSize;
+@property (assign, nonatomic) CGFloat requestWidth;
 
 /// 相册风格
 @property (assign, nonatomic) HXPhotoStyle photoStyle;

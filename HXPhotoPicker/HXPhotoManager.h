@@ -175,6 +175,12 @@
 /// 完成之前将拍摄之后的模型添加到已选数组中
 - (void)beforeListAddCameraTakePicturesModel:(HXPhotoModel *)model;
 
+/// 完成之前是否可以选择照片
+- (BOOL)beforeCanSelectPhoto;
+
+/// 完成之前是否可以选择视频
+- (BOOL)beforeCanSelectVideo;
+
 #pragma mark - < 关于选择完成之后的一些方法 >
 
 /// 完成之后选择的总数是否达到最大

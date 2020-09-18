@@ -152,21 +152,16 @@
 /// 编辑的数据
 /// 传入之前的编辑数据可以在原有基础上继续编辑
 @property (strong, nonatomic) HXPhotoEdit * _Nullable photoEdit;
-
-/**  临时图片 */
-@property (strong, nonatomic) UIImage * _Nullable tempImage;
-
-/**  如果当前为视频资源时是禁止选择  */
-@property (assign, nonatomic) BOOL videoUnableSelect;
-/**  是否隐藏选择按钮  */
+/// 是否隐藏选择按钮
 @property (assign, nonatomic) BOOL needHideSelectBtn;
-
-/**  如果当前为视频资源时的视频状态  */
+/// 如果当前为视频资源时的视频状态
 @property (assign, nonatomic) HXPhotoModelVideoState videoState;
 @property (copy, nonatomic) NSString * _Nullable cameraNormalImageNamed;
 @property (copy, nonatomic) NSString * _Nullable cameraPreviewImageNamed;
 
 @property (assign, nonatomic) BOOL loadOriginalImage;
+/// 临时图片
+@property (strong, nonatomic) UIImage * _Nullable tempImage;
 
 #pragma mark - < init >
 /// 通过image初始化
@@ -216,7 +211,9 @@
 #pragma mark - < Request >
 + (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nullable url, NSError * _Nullable error))completion;
 
-+ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset * _Nullable)asset size:(CGSize)size completion:(void (^ _Nullable)(UIImage *_Nullable image, PHAsset * _Nullable asset))completion;
++ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset * _Nullable)asset
+                                           width:(CGFloat)width
+                                      completion:(void (^ _Nullable)(UIImage *_Nullable image, PHAsset * _Nullable asset))completion;
 
 - (PHImageRequestID)requestImageWithOptions:(PHImageRequestOptions * _Nullable)options
                                  targetSize:(CGSize)targetSize
@@ -224,15 +221,15 @@
 
 /// 请求获取缩略图，主要用在列表上展示。此方法会回调多次，如果为视频的话就是视频封面
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock _Nullable)completion;
-- (PHImageRequestID)requestThumbImageWithSize:(CGSize)size
-                                   completion:(HXModelImageSuccessBlock _Nullable)completion;
+- (PHImageRequestID)requestThumbImageWithWidth:(CGFloat)width
+                                    completion:(HXModelImageSuccessBlock _Nullable)completion;
 - (PHImageRequestID)requestThumbImageWithOptions:(PHImageRequestOptions * _Nullable)options
-                                            size:(CGSize)size
+                                           width:(CGFloat)width
                                       completion:(HXModelImageSuccessBlock _Nullable)completion;
 
 /// 请求获取缩略图，主要用在列表上展示。此方法只会回调一次
-- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size
-                                              completion:(HXModelImageSuccessBlock _Nullable )completion;
+- (PHImageRequestID)highQualityRequestThumbImageWithWidth:(CGFloat)width
+                                               completion:(HXModelImageSuccessBlock _Nullable )completion;
 
 /// 请求获取预览大图，此方法只会回调一次，如果为视频的话就是视频封面
 /// @param size 请求图片质量大小，不是尺寸的大小

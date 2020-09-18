@@ -41,7 +41,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 @interface ViewController ()<UITableViewDataSource,UITableViewDelegate>
 
 @property (copy, nonatomic) NSArray *list;
-@property (nonatomic, strong) YYFPSLabel *label;
+//@property (nonatomic, strong) YYFPSLabel *label;
 @property (nonatomic, assign) BOOL showAlertCompletion;
 
 @end
@@ -91,7 +91,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     if (@available(iOS 13.0, *)) {
         [self preferredStatusBarUpdateAnimation];
         self.view.backgroundColor = [UIColor systemBackgroundColor];
-        self.label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor blackColor];
+//        self.label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor blackColor];
         [self changeStatus];
     }
 #endif
@@ -166,16 +166,16 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     tableView.delegate = self;
     tableView.rowHeight = 70;
     [self.view addSubview:tableView];
-    YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, hxTopMargin ? hxTopMargin - 10: 10 , 100, 30)];
-    self.view.backgroundColor = [UIColor whiteColor];
-#ifdef __IPHONE_13_0
-    if (@available(iOS 13.0, *)) {
-        self.view.backgroundColor = [UIColor systemBackgroundColor];
-        label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor hx_colorWithHexStr:@"#191918"];
-    }
-#endif
-    [[UIApplication sharedApplication].keyWindow addSubview:label];
-    self.label = label;
+//    YYFPSLabel *label = [[YYFPSLabel alloc] initWithFrame:CGRectMake(40, hxTopMargin ? hxTopMargin - 10: 10 , 100, 30)];
+//    self.view.backgroundColor = [UIColor whiteColor];
+//#ifdef __IPHONE_13_0
+//    if (@available(iOS 13.0, *)) {
+//        self.view.backgroundColor = [UIColor systemBackgroundColor];
+//        label.textColor = UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor whiteColor] : [UIColor hx_colorWithHexStr:@"#191918"];
+//    }
+//#endif
+//    [[UIApplication sharedApplication].keyWindow addSubview:label];
+//    self.label = label;
 
 //     [UINavigationBar appearance].translucent = NO;
 }

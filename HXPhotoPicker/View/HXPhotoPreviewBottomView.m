@@ -165,7 +165,7 @@
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HXPhotoPreviewBottomViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewBottomViewCellId" forIndexPath:indexPath];
-    cell.selectColor = self.manager.configuration.themeColor;
+    cell.selectColor = self.manager.configuration.previewBottomSelectColor ? : self.manager.configuration.themeColor;
     HXPhotoModel *model = self.modelArray[indexPath.item];
     cell.model = model;
     return cell;
@@ -382,7 +382,7 @@
 
             UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : self.selectColor;
 
-            self.layer.borderColor = self.selected ? [themeColor colorWithAlphaComponent:0.5].CGColor : nil;
+            self.layer.borderColor = self.selected ? [themeColor colorWithAlphaComponent:0.75].CGColor : nil;
             
         }
     }
@@ -433,7 +433,7 @@
         }
     }
     self.layer.borderWidth = self.selected ? 5 : 0;
-    self.layer.borderColor = self.selected ? [([HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : self.selectColor) colorWithAlphaComponent:0.5].CGColor : nil;
+    self.layer.borderColor = self.selected ? [([HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : self.selectColor) colorWithAlphaComponent:0.75].CGColor : nil;
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -470,13 +470,13 @@
         if ([HXPhotoCommon photoCommon].isDark) {
             selectColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
         }
-        self.layer.borderColor = self.selected ? [selectColor colorWithAlphaComponent:0.5].CGColor : nil;
+        self.layer.borderColor = self.selected ? [selectColor colorWithAlphaComponent:0.75].CGColor : nil;
     }
 }
 - (void)setSelected:(BOOL)selected {
     [super setSelected:selected];
     self.layer.borderWidth = selected ? 5 : 0;
-    self.layer.borderColor = selected ? [([HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : self.selectColor) colorWithAlphaComponent:0.5].CGColor : nil;
+    self.layer.borderColor = selected ? [([HXPhotoCommon photoCommon].isDark ? [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1] : self.selectColor) colorWithAlphaComponent:0.75].CGColor : nil;
 }
 - (void)cancelRequest {
     if (self.requestID) {

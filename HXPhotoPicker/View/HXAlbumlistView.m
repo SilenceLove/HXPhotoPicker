@@ -266,7 +266,7 @@
 
     self.countLb.text = @(photoCount + self.model.cameraCount).stringValue;
     HXWeakSelf
-    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject size:CGSizeMake(self.hx_h * 1.4, self.hx_h * 1.4) completion:^(UIImage *image, PHAsset *asset) {
+    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject width:self.hx_h * 1.4 completion:^(UIImage *image, PHAsset *asset) {
         if (asset == weakSelf.model.assetResult.lastObject) {
             weakSelf.coverView.image = image;
         }

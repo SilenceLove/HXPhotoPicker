@@ -35,6 +35,7 @@
     self.videoMaximumSelectDuration = 3 * 60.f;
     self.videoMinimumSelectDuration = 0.f;
     self.videoMaximumDuration = 60.f;
+    self.videoMinimumDuration = 3.f;
     if ([UIScreen mainScreen].bounds.size.width != 320 && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         self.cameraCellShowPreview = YES;
     }
@@ -93,7 +94,7 @@
     self.photoEditCustomRatios = @[@{@"原始值" : @"{0, 0}"}, @{@"正方形" : @"{1, 1}"}, @{@"2:3" : @"{2, 3}"}, @{@"3:4" : @"{3, 4}"}, @{@"9:16" : @"{9, 16}"}, @{@"16:9" : @"{16, 9}"}];
     self.useWxPhotoEdit = YES;
     if ([UIScreen mainScreen].bounds.size.width == 320) {
-        _clarityScale = 0.8;
+        _clarityScale = 1.0;
     }else if (HX_IS_IPhoneX_All) {
         _clarityScale = 1.8;
     }else {
@@ -145,24 +146,22 @@
 - (void)setClarityScale:(CGFloat)clarityScale {
     if (clarityScale <= 0.f) {
         if ([UIScreen mainScreen].bounds.size.width == 320) {
-            _clarityScale = 0.8;
+            _clarityScale = 1.0;
         }else if (HX_IS_IPhoneX_All) {
             _clarityScale = 1.8;
         }else {
-            _clarityScale = 1.5;
+            _clarityScale = 1.4;
         }
     }else {
         _clarityScale = clarityScale;
     }
     CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * self.rowCount - 1 ) / self.rowCount;
-    CGSize size = CGSizeMake(width * clarityScale, width * clarityScale);
-    [HXPhotoCommon photoCommon].requestSize = size;
+    [HXPhotoCommon photoCommon].requestWidth = width * clarityScale;
 }
 - (void)setRowCount:(NSUInteger)rowCount {
     _rowCount = rowCount;
     CGFloat width = ([UIScreen mainScreen].bounds.size.width - 1 * rowCount - 1 ) / rowCount;
-    CGSize size = CGSizeMake(width * self.clarityScale, width * self.clarityScale);
-    [HXPhotoCommon photoCommon].requestSize = size;
+    [HXPhotoCommon photoCommon].requestWidth = width * self.clarityScale;
 }
 - (UIColor *)themeColor {
     if (!_themeColor) {
@@ -189,8 +188,8 @@
     _videoMaximumSelectDuration = videoMaximumSelectDuration;
 }
 - (void)setVideoMaximumDuration:(NSTimeInterval)videoMaximumDuration {
-    if (videoMaximumDuration <= 3) {
-        videoMaximumDuration = 4;
+    if (videoMaximumDuration <= self.videoMinimumDuration) {
+        videoMaximumDuration = self.videoMinimumDuration + 1.f;
     }
     _videoMaximumDuration = videoMaximumDuration;
 }
@@ -255,6 +254,7 @@
     self.statusBarStyle = UIStatusBarStyleLightContent;
     self.themeColor = [UIColor whiteColor];
     self.photoEditConfigur.themeColor = wxColor;
+    self.previewBottomSelectColor = wxColor;
     self.navBarBackgroudColor = nil;
     self.navBarStyle = UIBarStyleBlack;
     self.navigationTitleArrowColor = [UIColor hx_colorWithHexStr:@"#B2B2B2"];

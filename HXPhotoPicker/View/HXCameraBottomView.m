@@ -83,6 +83,16 @@
         return;
     }
     self.inTakePictures = YES;
+    self.backBtn.userInteractionEnabled = NO;
+    [UIView animateWithDuration:0.15 animations:^{
+        self.zoomOutView.transform = CGAffineTransformMakeScale(0.6, 0.6);
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.15 animations:^{
+            self.zoomOutView.transform = CGAffineTransformIdentity;
+        } completion:^(BOOL finished) {
+            self.backBtn.userInteractionEnabled = YES;
+        }];
+    }];
     if (self.takePictures) {
         self.takePictures();
     }
@@ -106,6 +116,7 @@
             if (self.startTranscribe && self.inTranscribe) {
                 self.backBtn.hidden = YES;
                 self.startTranscribe();
+                [self.playView startAnimation];
             }
         }];
     }else if (longGesture.state == UIGestureRecognizerStateChanged) {
@@ -156,6 +167,7 @@
 - (void)setManager:(HXPhotoManager *)manager {
     _manager = manager;
     self.playView.color = self.manager.configuration.cameraFocusBoxColor;
+    self.playView.duration = self.manager.configuration.videoMaximumDuration + 0.4f;
     
     switch (self.manager.configuration.customCameraType) {
         case HXPhotoCustomCameraTypeUnused: {
@@ -200,9 +212,6 @@
     }
 }
 
-- (void)changeTime:(NSTimeInterval)time {
-    self.playView.progress = time / self.manager.configuration.videoMaximumDuration;
-}
 - (void)startRecord {
     
 }
@@ -241,6 +250,7 @@
 - (HXFullScreenCameraPlayView *)playView {
     if (!_playView) {
         _playView = [[HXFullScreenCameraPlayView alloc] initWithFrame:CGRectMake(0, 0, 90, 90) color:self.manager.configuration.cameraFocusBoxColor];
+        _playView.duration = self.manager.configuration.videoMaximumDuration;
     }
     return _playView;
 }

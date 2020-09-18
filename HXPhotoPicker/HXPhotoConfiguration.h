@@ -268,6 +268,9 @@ HXPhotoPreviewViewController;
 
 #pragma mark - < UI相关 >
 
+/// 照片列表上相机cell上的icon图标名
+@property (copy, nonatomic) NSString *photoListTakePhotoIcon;
+
 /// 未授权时界面上提示文字显示的颜色
 @property (strong, nonatomic) UIColor *authorizationTipColor;
 
@@ -476,6 +479,9 @@ HXPhotoPreviewViewController;
 /// 主题颜色  默认 tintColor
 @property (strong, nonatomic) UIColor *themeColor;
 
+/// 预览界面底部已选照片的选中颜色
+@property (strong, nonatomic) UIColor *previewBottomSelectColor;
+
 /// 是否可以改变原图按钮的tinColor
 @property (assign, nonatomic) BOOL changeOriginalTinColor;
 
@@ -573,6 +579,11 @@ HXPhotoPreviewViewController;
  相机视频录制最大秒数  -  默认60s
  */
 @property (assign, nonatomic) NSTimeInterval videoMaximumDuration;
+
+/**
+ 相机视频录制最小秒数  -  默认3s
+ */
+@property (assign, nonatomic) NSTimeInterval videoMinimumDuration;
 
 /**
  *  删除临时的照片/视频 -

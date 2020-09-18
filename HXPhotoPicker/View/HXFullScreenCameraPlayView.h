@@ -11,6 +11,8 @@
 @interface HXFullScreenCameraPlayView : UIView
 @property (assign, nonatomic) CGFloat progress;
 @property (strong, nonatomic) UIColor *color;
+@property (assign, nonatomic) NSTimeInterval duration;
+- (void)startAnimation;
 - (void)clean;
 - (instancetype)initWithFrame:(CGRect)frame color:(UIColor *)color;
 @end

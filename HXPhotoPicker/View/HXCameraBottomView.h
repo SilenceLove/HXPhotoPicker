@@ -22,7 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) HXPhotoManager *manager;
 + (instancetype)initView;
 - (void)hiddenTitle;
-- (void)changeTime:(NSTimeInterval)time;
 - (void)startRecord;
 - (void)stopRecord;
 

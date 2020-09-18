@@ -251,7 +251,7 @@ HXWeakSelf
 #endif
                 model.tempImage = nil;
             }else {
-                self.requestID = [model requestThumbImageWithSize:CGSizeMake(self.hx_w * 0.5, self.hx_h * 0.5) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5f completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                     if (weakSelf.model != model) return;
 #if HasSDWebImage
                     weakSelf.sdImageView.image = image;
@@ -283,14 +283,7 @@ HXWeakSelf
 #endif
                     model.tempImage = nil;
                 }else {
-                    CGSize requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6);
-//                    if (self.hx_h > self.hx_w / 9 * 20 ||
-//                        self.hx_w > self.hx_h / 9 * 20) {
-//                        requestSize = CGSizeMake(self.hx_w * 0.6, self.hx_h * 0.6);
-//                    }else {
-//                        requestSize = CGSizeMake(model.endImageSize.width, model.endImageSize.height);
-//                    }
-                    self.requestID =[model requestThumbImageWithSize:requestSize completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                    self.requestID =[model requestThumbImageWithWidth:self.hx_w * 0.6 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model != model) return;
 #if HasSDWebImage
                         weakSelf.sdImageView.image = image;

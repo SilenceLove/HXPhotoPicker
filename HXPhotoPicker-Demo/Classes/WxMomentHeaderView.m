@@ -64,7 +64,7 @@
                 
                 CGSize size = isBg ? weakSelf.backgroudView.hx_size : weakSelf.headView.hx_size;
                 // 获取一张图片临时展示用
-                [model requestThumbImageWithSize:size completion:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                [model requestThumbImageWithWidth:size.width completion:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
                     if (isBg) {
                         weakSelf.backgroudView.image = image;
                     }else {

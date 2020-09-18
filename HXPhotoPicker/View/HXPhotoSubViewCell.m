@@ -281,27 +281,29 @@
             if (model.photoEdit) {
                 self.imageView.image = model.photoEdit.editPreviewImage;
             }else {
-                if (model.previewPhoto) {
-                    if (model.previewPhoto.images.count) {
-                        self.imageView.image = nil;
-                        self.imageView.image = model.previewPhoto.images.firstObject;
-                    }else {
-                        self.imageView.image = model.previewPhoto;
-                    }
-                }else if (model.thumbPhoto) {
-                    if (model.thumbPhoto.images.count) {
-                        self.imageView.image = nil;
-                        self.imageView.image = model.thumbPhoto.images.firstObject;
-                    }else {
-                        self.imageView.image = model.thumbPhoto;
-                    }
-                }else {
+                if (model.asset) {
                     HXWeakSelf
-                    [self.model requestThumbImageWithSize:CGSizeMake(200, 200) completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                    [self.model requestThumbImageWithWidth:200 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model == model) {
                             weakSelf.imageView.image = image;
                         }
                     }];
+                }else {
+                    if (model.previewPhoto) {
+                        if (model.previewPhoto.images.count) {
+                            self.imageView.image = nil;
+                            self.imageView.image = model.previewPhoto.images.firstObject;
+                        }else {
+                            self.imageView.image = model.previewPhoto;
+                        }
+                    }else if (model.thumbPhoto) {
+                        if (model.thumbPhoto.images.count) {
+                            self.imageView.image = nil;
+                            self.imageView.image = model.thumbPhoto.images.firstObject;
+                        }else {
+                            self.imageView.image = model.thumbPhoto;
+                        }
+                    }
                 }
             }
         }

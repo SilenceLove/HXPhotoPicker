@@ -674,7 +674,11 @@ HX_PhotoEditViewControllerDelegate
                 self.currentPanSelectType = !firstModel.selected;
             }
         }
-
+        
+        BOOL maskLayerHidden = NO;
+        if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle) {
+            maskLayerHidden = self.manager.selectedPhotoCount ? YES : NO;
+        }
         NSMutableArray *reloadSelectArray = [NSMutableArray array];
         for (NSIndexPath *indexPath in indexPaths) {
             HXPhotoModel *model = self.allArray[indexPath.item];
@@ -688,7 +692,9 @@ HX_PhotoEditViewControllerDelegate
                 // 取消选择
                 if (model.selected) {
                     [self.manager beforeSelectedListdeletePhotoModel:model];
-                    [reloadSelectArray addObject:indexPath];
+                    if (![reloadSelectArray containsObject:indexPath]) {
+                        [reloadSelectArray addObject:indexPath];
+                    }
                 }
             }else if (self.currentPanSelectType == 1) {
                 // 选择
@@ -696,7 +702,9 @@ HX_PhotoEditViewControllerDelegate
                     NSString *str = [self.manager maximumOfJudgment:model];
                     if (!str) {
                         [self.manager beforeSelectedListAddPhotoModel:model];
-                        [reloadSelectArray addObject:indexPath];
+                        if (![reloadSelectArray containsObject:indexPath]) {
+                            [reloadSelectArray addObject:indexPath];
+                        }
                     }else {
                         if (self.imagePromptView && [self.imagePromptView.text isEqualToString:str]) {
                             continue;
@@ -706,7 +714,9 @@ HX_PhotoEditViewControllerDelegate
                 }else {
                     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
                     if (![cell.selectBtn.currentTitle isEqualToString:model.selectIndexStr] || !cell.selectBtn.selected) {
-                        [reloadSelectArray addObject:indexPath];
+                        if (![reloadSelectArray containsObject:indexPath]) {
+                            [reloadSelectArray addObject:indexPath];
+                        }
                     }
                 }
             }
@@ -724,12 +734,16 @@ HX_PhotoEditViewControllerDelegate
             if (self.currentPanSelectType == 0) {
                 if (!model.selected) {
                     [self.manager beforeSelectedListAddPhotoModel:model];
-                    [reloadSelectArray addObject:indexPath];
+                    if (![reloadSelectArray containsObject:indexPath]) {
+                        [reloadSelectArray addObject:indexPath];
+                    }
                 }
             }else if (self.currentPanSelectType == 1) {
                 if (model.selected) {
                     [self.manager beforeSelectedListdeletePhotoModel:model];
-                    [reloadSelectArray addObject:indexPath];
+                    if (![reloadSelectArray containsObject:indexPath]) {
+                        [reloadSelectArray addObject:indexPath];
+                    }
                 }
             }
         }
@@ -748,11 +762,8 @@ HX_PhotoEditViewControllerDelegate
                 }
             }
         }
+        [reloadSelectArray addObjectsFromArray:[self getVisibleVideoCellIndexPathsWithCurrentIndexPaths:reloadSelectArray]];
         if (reloadSelectArray.count) {
-            if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle) {
-                BOOL maskLayerHidden = self.manager.selectedPhotoCount ? YES : NO;
-                [reloadSelectArray addObjectsFromArray:[self getVisibleVideoCellIndexPathsWithMaskLayerHidden:maskLayerHidden]];
-            }
             [self.collectionView reloadItemsAtIndexPaths:reloadSelectArray];
             self.bottomView.selectCount = [self.manager selectedCount];
         }
@@ -806,16 +817,25 @@ HX_PhotoEditViewControllerDelegate
     }
     return nil;
 }
-- (NSMutableArray *)getVisibleVideoCellIndexPathsWithMaskLayerHidden:(BOOL)maskLayerHidden {
-    NSMutableArray *array = [NSMutableArray array];
+- (NSMutableArray *)getVisibleVideoCellIndexPathsWithCurrentIndexPaths:(NSMutableArray *)currentIndexPath {
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.collectionView.visibleCells.count];
     for (UICollectionViewCell *tempCell in self.collectionView.visibleCells) {
         if ([tempCell isKindOfClass:[HXPhotoViewCell class]]) {
             HXPhotoViewCell *cell = (HXPhotoViewCell *)tempCell;
-            if (cell.model.subType == HXPhotoModelMediaSubTypeVideo) {
-                if (maskLayerHidden && cell.videoMaskLayer.hidden) {
-                    [array addObject:[self.collectionView indexPathForCell:tempCell]];
-                }else if (!maskLayerHidden && !cell.videoMaskLayer.hidden) {
-                    [array addObject:[self.collectionView indexPathForCell:tempCell]];
+            BOOL canSelect = NO;
+            if (!cell.model.selected) {
+                if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
+                    canSelect = self.manager.beforeCanSelectPhoto;
+                }else if (cell.model.subType == HXPhotoModelMediaSubTypeVideo) {
+                    canSelect = self.manager.beforeCanSelectVideo;
+                }
+            }else {
+                canSelect = YES;
+            }
+            if ((cell.videoMaskLayer.hidden && !canSelect) || (!cell.videoMaskLayer.hidden && canSelect)) {
+                NSIndexPath *indexPath = [self.collectionView indexPathForCell:tempCell];
+                if (![currentIndexPath containsObject:indexPath]) {
+                    [array addObject:indexPath];
                 }
             }
         }
@@ -1064,18 +1084,19 @@ HX_PhotoEditViewControllerDelegate
         }
         return cell;
     }else {
-        if (self.manager.configuration.specialModeNeedHideVideoSelectBtn) {
-            if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle && !self.manager.videoCanSelected && model.subType == HXPhotoModelMediaSubTypeVideo) {
-                model.videoUnableSelect = YES;
-            }else {
-                model.videoUnableSelect = NO;
-            }
-        }
         HXPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoViewCellID" forIndexPath:indexPath];
         cell.delegate = self;
         cell.darkSelectBgColor = self.manager.configuration.cellDarkSelectBgColor;
         cell.darkSelectedTitleColor = self.manager.configuration.cellDarkSelectTitleColor;
-        
+        if (!model.selected) {
+            if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+                cell.canSelect = self.manager.beforeCanSelectPhoto;
+            }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+                cell.canSelect = self.manager.beforeCanSelectVideo;
+            }
+        }else {
+            cell.canSelect = YES;
+        }
         UIColor *cellSelectedTitleColor = self.manager.configuration.cellSelectedTitleColor;
         UIColor *selectedTitleColor = self.manager.configuration.selectedTitleColor;
         UIColor *cellSelectedBgColor = self.manager.configuration.cellSelectedBgColor;
@@ -1177,14 +1198,14 @@ HX_PhotoEditViewControllerDelegate
         }];
     }else {
         HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-        if (cell.model.videoUnableSelect) {
-            [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"视频不能和图片同时选择"]];
-            return;
-        }
         if (cell.model.isICloud) {
             if (!cell.model.iCloudDownloading) {
                 [cell startRequestICloudAsset];
             }
+            return;
+        }
+        if (!cell.canSelect) {
+            [self.view hx_showImageHUDText:[self.manager maximumOfJudgment:cell.model]];
             return;
         }
         if (cell.model.subType == HXPhotoModelMediaSubTypeVideo) {
@@ -1483,26 +1504,17 @@ HX_PhotoEditViewControllerDelegate
                 if (model.dateCellIsVisible) {
                     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:model] inSection:0];
                     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-                    if (cell && ![cell.selectBtn.currentTitle isEqualToString:model.selectIndexStr]) {
+                    if (cell && ![cell.selectBtn.currentTitle isEqualToString:model.selectIndexStr] &&
+                        ![indexPathList containsObject:indexPath]) {
                         [indexPathList addObject:indexPath];
                     }
                 }
             }
         }
     }
-    
-    if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle) {
-        BOOL maskLayerHidden = self.manager.selectedPhotoCount ? YES : NO;
-        [indexPathList addObjectsFromArray:[self getVisibleVideoCellIndexPathsWithMaskLayerHidden:maskLayerHidden]];
-        if (indexPathList.count) {
-            [self.collectionView reloadItemsAtIndexPaths:indexPathList];
-        }
-    }else {
-        if (!selectBtn.selected) {
-            if (indexPathList.count) {
-                [self.collectionView reloadItemsAtIndexPaths:indexPathList];
-            }
-        }
+    [indexPathList addObjectsFromArray:[self getVisibleVideoCellIndexPathsWithCurrentIndexPaths:indexPathList]];
+    if (indexPathList.count) {
+        [self.collectionView reloadItemsAtIndexPaths:indexPathList];
     }
     
     self.bottomView.selectCount = [self.manager selectedCount];
@@ -1538,25 +1550,18 @@ HX_PhotoEditViewControllerDelegate
     if (!model.selected) {
         NSInteger index = 0;
         for (HXPhotoModel *subModel in [self.manager selectedArray]) {
-            subModel.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1];
             if (subModel.currentAlbumIndex == self.albumModel.index && subModel.dateCellIsVisible) {
                 NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:subModel] inSection:0];
-                [indexPathList addObject:indexPath];
+                HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+                if (cell && ![cell.selectBtn.currentTitle isEqualToString:model.selectIndexStr] &&
+                    ![indexPathList containsObject:indexPath]) {
+                    [indexPathList addObject:indexPath];
+                }
             }
             index++;
         }
     }
-    
-    if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle) {
-        for (UICollectionViewCell *tempCell in self.collectionView.visibleCells) {
-            if ([tempCell isKindOfClass:[HXPhotoViewCell class]]) {
-                if ([(HXPhotoViewCell *)tempCell model].subType == HXPhotoModelMediaSubTypeVideo &&
-                    [(HXPhotoViewCell *)tempCell model] != model) {
-                    [indexPathList addObject:[self.collectionView indexPathForCell:tempCell]];
-                }
-            }
-        }
-    }
+    [indexPathList addObjectsFromArray:[self getVisibleVideoCellIndexPathsWithCurrentIndexPaths:indexPathList]];
     if (indexPathList.count) {
         [self.collectionView reloadItemsAtIndexPaths:indexPathList];
     }
@@ -2401,7 +2406,7 @@ HX_PhotoEditViewControllerDelegate
         }else {
             PHImageRequestID imageRequestID;
             if (highQuality) {
-                imageRequestID = [self.model highQualityRequestThumbImageWithSize:[HXPhotoCommon photoCommon].requestSize completion:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                imageRequestID = [self.model highQualityRequestThumbImageWithWidth:[HXPhotoCommon photoCommon].requestWidth completion:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
                     if ([[info objectForKey:PHImageCancelledKey] boolValue]) {
                         return;
                     }
@@ -2498,16 +2503,8 @@ HX_PhotoEditViewControllerDelegate
     
     if (model.isICloud) {
         self.videoMaskLayer.hidden = YES;
-        self.userInteractionEnabled = YES;
     }else {
-        // 当前是否需要隐藏选择按钮
-        if (model.needHideSelectBtn) {
-            // 当前视频是否不可选
-            self.videoMaskLayer.hidden = !model.videoUnableSelect;
-        }else {
-            self.videoMaskLayer.hidden = YES;
-            self.userInteractionEnabled = YES;
-        }
+        self.videoMaskLayer.hidden = self.canSelect;
     }
     
     if (model.iCloudDownloading) {
@@ -2748,10 +2745,10 @@ HX_PhotoEditViewControllerDelegate
         [_maskView.layer addSublayer:self.bottomMaskLayer];
         [_maskView.layer addSublayer:self.selectMaskLayer];
         [_maskView.layer addSublayer:self.iCloudMaskLayer];
-        [_maskView.layer addSublayer:self.videoMaskLayer];
         [_maskView addSubview:self.iCloudIcon];
-        [_maskView addSubview:self.stateLb];
         [_maskView addSubview:self.selectBtn];
+        [_maskView.layer addSublayer:self.videoMaskLayer];
+        [_maskView addSubview:self.stateLb];
         [_maskView addSubview:self.editTipIcon];
         [_maskView addSubview:self.videoIcon];
     }
@@ -2782,7 +2779,7 @@ HX_PhotoEditViewControllerDelegate
 - (CALayer *)videoMaskLayer {
     if (!_videoMaskLayer) {
         _videoMaskLayer = [CALayer layer];
-        _videoMaskLayer.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.7].CGColor;
+        _videoMaskLayer.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8].CGColor;
     }
     return _videoMaskLayer;
 }

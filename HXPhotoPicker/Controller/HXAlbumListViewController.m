@@ -457,7 +457,7 @@ UITableViewDelegate
 - (void)setAlbumImage {
     NSInteger photoCount = self.model.count;
     HXWeakSelf
-    self.requestId1 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject size:CGSizeMake(150, 150) completion:^(UIImage *image, PHAsset *asset) {
+    self.requestId1 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject width:150 completion:^(UIImage *image, PHAsset *asset) {
         if (weakSelf.model.assetResult.lastObject == asset) {
             weakSelf.coverView1.image = image;
         }

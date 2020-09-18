@@ -722,7 +722,6 @@
     HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
     photoModel.asset = asset;
     BOOL isICloud = NO;
-//    NSSLog(@"%@", [asset valueForKey:@"sourceType"]);
 //    if (@available(iOS 13, *)) {
     
 //    }else {
@@ -822,7 +821,6 @@
         }
     }
     
-    NSMutableArray *allArray = [NSMutableArray array];
     
     __block HXPhotoModel *firstSelectModel;
     
@@ -830,6 +828,15 @@
         [albumModel fetchAssetResult];
     }
     PHFetchResult *result = albumModel.assetResult;
+    NSInteger allCount;
+    if (self.type == HXPhotoManagerSelectedTypePhoto) {
+        allCount = [result countOfAssetsWithMediaType:PHAssetMediaTypeImage];
+    }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
+        allCount = [result countOfAssetsWithMediaType:PHAssetMediaTypeVideo];
+    }else {
+        allCount = result.count;
+    }
+    NSMutableArray *allArray = [NSMutableArray arrayWithCapacity:allCount];
     if (self.configuration.reverseDate) {
         [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
             if (self.type == HXPhotoManagerSelectedTypePhoto && asset.mediaType != PHAssetMediaTypeImage) {
@@ -873,13 +880,18 @@
         previewArray = allArray.mutableCopy;
         HXPhotoModel *model = [[HXPhotoModel alloc] init];
         model.type = HXPhotoModelMediaTypeCamera;
-        if (self.configuration.type == HXConfigurationTypeWXChat ||
-            self.configuration.type == HXConfigurationTypeWXMoment) {
-                model.cameraNormalImageNamed = @"hx_takePhoto";
-                model.cameraPreviewImageNamed = @"hx_takePhoto";
+        if (self.configuration.photoListTakePhotoIcon) {
+            model.cameraNormalImageNamed = self.configuration.photoListTakePhotoIcon;
+            model.cameraPreviewImageNamed = self.configuration.photoListTakePhotoIcon;
         }else {
-            model.cameraNormalImageNamed = @"hx_compose_photo_photograph";
-            model.cameraPreviewImageNamed = @"hx_takePhoto";
+            if (self.configuration.type == HXConfigurationTypeWXChat ||
+                self.configuration.type == HXConfigurationTypeWXMoment) {
+                    model.cameraNormalImageNamed = @"hx_takePhoto";
+                    model.cameraPreviewImageNamed = @"hx_takePhoto";
+            }else {
+                model.cameraNormalImageNamed = @"hx_compose_photo_photograph";
+                model.cameraPreviewImageNamed = @"hx_takePhoto";
+            }
         }
         if (!self.configuration.reverseDate) {
             [allArray addObject:model];
@@ -1314,6 +1326,35 @@
         }
     }
 }
+
+/// 完成之前是否可以选择照片
+- (BOOL)beforeCanSelectPhoto {
+    if (!self.configuration.selectTogether) {
+        if (!self.selectedVideoCount && !self.beforeSelectPhotoCountIsMaximum) {
+            return YES;
+        }
+    }else {
+        if (!self.beforeSelectPhotoCountIsMaximum) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// 完成之前是否可以选择视频
+- (BOOL)beforeCanSelectVideo {
+    if (!self.configuration.selectTogether) {
+        if (!self.selectedPhotoCount && !self.beforeSelectVideoCountIsMaximum) {
+            return YES;
+        }
+    }else {
+        if (!self.beforeSelectVideoCountIsMaximum) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 #pragma mark - < 关于选择完成之后的一些方法 >
 - (BOOL)afterSelectCountIsMaximum {
     if (self.endSelectedList.count >= self.configuration.maxNum) {

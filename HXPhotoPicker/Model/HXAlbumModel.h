@@ -9,28 +9,24 @@
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 
-/**
- *  每个相册的模型
- */
-
-@interface HXAlbumModel : NSObject 
-/**  相册名称  */
+@interface HXAlbumModel : NSObject
+/// 相册名称
 @property (copy, nonatomic) NSString *albumName;
-/**  照片数量  */
+/// 照片数量
 @property (assign, nonatomic) NSInteger count;
-
+/// 选择类型
 @property (assign, nonatomic) NSInteger selectType;
+/// 是否按创建时间排序
 @property (assign, nonatomic) BOOL creationDateSort;
-
+/// 唯一标识符
 @property (copy, nonatomic) NSString *localIdentifier;
-@property (strong, nonatomic) PHAssetCollection *assetCollection;
+/// 资源集合
 @property (strong, nonatomic) PHFetchResult *assetResult;
-
-@property (strong, nonatomic) PHFetchOptions *option;
-/**  标记  */
+/// 下标
 @property (assign, nonatomic) NSInteger index;
-/**  选中的个数  */
+/// 选中的个数
 @property (assign, nonatomic) NSInteger selectedCount;
+/// 本地图片数量
 @property (assign, nonatomic) NSUInteger cameraCount;
 @property (strong, nonatomic) UIImage *tempImage;
 

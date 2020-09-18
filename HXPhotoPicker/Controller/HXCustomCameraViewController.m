@@ -357,8 +357,8 @@
     if (!self.videoURL) {
         cameraModel = [HXPhotoModel photoModelWithImage:self.imageView.image];
     }else {
-        if (self.time < 3) {
-            [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制时间少于3秒"]];
+        if (self.time < self.manager.configuration.videoMinimumDuration) {
+            [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"录制时间少于%0.f秒"], self.manager.configuration.videoMinimumDuration]];
             return;
         }
         [self.playVideoView stopPlay];
@@ -493,6 +493,7 @@
     }
 }
 - (void)takePicturesComplete:(UIImage *)image {
+    [self needHideViews];
     self.imageView.image = image;
     [HXPhotoCommon photoCommon].cameraImage = [image hx_normalizedImage];
     [self.view insertSubview:self.imageView belowSubview:self.bottomView];
@@ -554,7 +555,6 @@
     CMTime duration = self.cameraController.recordedDuration;
     NSTimeInterval time = CMTimeGetSeconds(duration);
     self.time = (NSInteger)time;
-    [self.bottomView changeTime:time];
     if (time + 0.4f >= self.manager.configuration.videoMaximumDuration) {
         [self.bottomView videoRecordEnd];
     }
@@ -575,12 +575,12 @@
 }
 - (void)videoFinishRecording:(NSURL *)videoURL {
     [self.bottomView stopRecord];
-    if (self.time < 3) {
+    if (self.time < self.manager.configuration.videoMinimumDuration) {
         self.bottomView.hidden = NO;
         self.cancelBtn.selected = NO;
         self.cancelBtn.hx_w = 50;
         self.changeCameraBtn.hidden = NO;
-        [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"3秒内的视频无效哦~"]];
+        [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"%.0f秒内的视频无效哦~"], self.manager.configuration.videoMinimumDuration]];
     }else {
         [HXPhotoCommon photoCommon].cameraImage = [[UIImage hx_thumbnailImageForVideo:videoURL atTime:0.1f] hx_normalizedImage];
 //        [self.cameraController stopSession];
@@ -615,7 +615,6 @@
     [self.cameraController captureStillImage];
     self.previewView.tapToFocusEnabled = NO;
     self.previewView.pinchToZoomEnabled = NO;
-    [self needHideViews];
 }
 - (void)bottomDidTranscribe {
     if ([self.cameraController isRecording]) {

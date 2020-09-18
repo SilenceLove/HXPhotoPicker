@@ -30,13 +30,18 @@
             }
             [HXPhotoCommon photoCommon].cameraRollResult = nil;
         }
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:self.assetCollection options:self.option];
+        PHAssetCollection *assetCollection = [[PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[self.localIdentifier] options:nil] firstObject];
+        
+        PHFetchOptions *options = [self options];
+        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
         self.assetResult = result;
         self.count = result.count;
         [HXPhotoCommon photoCommon].cameraRollResult = result;
         [HXPhotoCommon photoCommon].selectType = self.selectType;
     }else {
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:self.assetCollection options:self.option];
+        PHFetchOptions *options = [self options];
+        PHAssetCollection *assetCollection = [[PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[self.localIdentifier] options:nil] firstObject];
+        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
         self.assetResult = result;
         self.count = result.count;
     }
@@ -52,24 +57,16 @@
         }
     });
 }
-- (PHAssetCollection *)assetCollection {
-    if (!_assetCollection) {
-        _assetCollection = [[PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[self.localIdentifier] options:nil] firstObject];
+- (PHFetchOptions *)options {
+    PHFetchOptions *options = [[PHFetchOptions alloc] init];
+    if (self.creationDateSort) {
+        options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
     }
-    return _assetCollection;
-}
-- (PHFetchOptions *)option {
-    if (!_option) {
-        _option = [[PHFetchOptions alloc] init];
-        if (self.creationDateSort) {
-            _option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
-        }
-        if (self.selectType == 0) {
-            _option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
-        }else if (self.selectType == 1) {
-            _option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
-        }
+    if (self.selectType == 0) {
+        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+    }else if (self.selectType == 1) {
+        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
     }
-    return _option;
+    return options;
 }
 @end

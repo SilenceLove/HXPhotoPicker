@@ -715,7 +715,29 @@
 #endif
     return nil;
 }
-+ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage * _Nullable, PHAsset * _Nullable))completion {
++ (CGSize)getAssetTargetSizeWithAsset:(PHAsset *)asset width:(CGFloat)width {
+    CGFloat initialWidth = width;
+    CGFloat scale;
+    if (asset.pixelWidth < width) {
+        scale = 0.5f;
+        width = asset.pixelWidth * 0.5f;
+    }else {
+        scale = asset.pixelWidth / width;
+    }
+    CGFloat height = asset.pixelHeight / scale;
+    CGFloat sixteenHeight = width / 9 * 20;
+    if (height > sixteenHeight) {
+        width = sixteenHeight / height * width;
+        height = sixteenHeight;
+    }
+    if (height < initialWidth) {
+        width = initialWidth / height * width;
+        height = initialWidth;
+    }
+    CGSize size = CGSizeMake(width, height);
+    return size;
+}
++ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset *)asset width:(CGFloat)width completion:(void (^)(UIImage * _Nullable, PHAsset * _Nullable))completion {
     if (!asset) {
         if (completion) {
             completion(nil, nil);
@@ -724,7 +746,7 @@
     }
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
     option.resizeMode = PHImageRequestOptionsResizeModeFast;
-    return [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    return [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:[self getAssetTargetSizeWithAsset:asset width:width] contentMode:PHImageContentModeAspectFill options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         if (downloadFinined && result) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -734,25 +756,17 @@
     }];
 }
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock)completion {
-    return [self requestThumbImageWithSize:[HXPhotoCommon photoCommon].requestSize completion:completion];
+    return [self requestThumbImageWithWidth:[HXPhotoCommon photoCommon].requestWidth completion:completion];
 }
-- (PHImageRequestID)highQualityRequestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
+- (PHImageRequestID)highQualityRequestThumbImageWithWidth:(CGFloat)width completion:(HXModelImageSuccessBlock)completion {
     if (self.photoEdit) {
         if (completion) completion(self.photoEdit.editPreviewImage, self, nil);
         return 0;
     }
-    PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
-    HXWeakSelf
-    return [self requestImageWithOptions:option targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
-        if (downloadFinined && result) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(result, weakSelf, info);
-            });
-        }
-    }];
+    PHImageRequestOptions *options = [self imageHighQualityRequestOptions];
+    return [self requestThumbImageWithOptions:options width:width completion:completion];
 }
-- (PHImageRequestID)requestThumbImageWithSize:(CGSize)size completion:(HXModelImageSuccessBlock)completion {
+- (PHImageRequestID)requestThumbImageWithWidth:(CGFloat)width completion:(HXModelImageSuccessBlock)completion {
     if (self.photoEdit) {
         if (completion) completion(self.photoEdit.editPosterImage, self, nil);
         return 0;
@@ -771,15 +785,39 @@
     }
     PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
     options.resizeMode = PHImageRequestOptionsResizeModeFast;
-    options.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
-    return [self requestThumbImageWithOptions:options size:size completion:completion];
+//    options.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+    return [self requestThumbImageWithOptions:options width:width completion:completion];
 }
 
 - (PHImageRequestID)requestThumbImageWithOptions:(PHImageRequestOptions * _Nullable)options
-                                            size:(CGSize)size
+                                           width:(CGFloat)width
                                       completion:(HXModelImageSuccessBlock _Nullable)completion {
+    CGFloat initialWidth = width;
+    CGFloat scale;
+    if (self.asset.pixelWidth < width) {
+        scale = 0.5f;
+        width = self.asset.pixelWidth * scale;
+    }else {
+        if (self.asset.pixelHeight < self.asset.pixelWidth * 2 &&
+            self.asset.pixelHeight > self.asset.pixelWidth * 0.5f) {
+            width *= 0.7f;
+            initialWidth = width;
+        }
+        scale = self.asset.pixelWidth / width;
+    }
+    CGFloat height = self.asset.pixelHeight / scale;
+    CGFloat sixteenHeight = width / 9 * 20;
+    if (height > sixteenHeight) {
+        width = sixteenHeight / height * width;
+        height = sixteenHeight;
+    }
+    if (height < initialWidth && width >= initialWidth) {
+        width = initialWidth / height * width;
+        height = initialWidth;
+    }
+    CGSize size = CGSizeMake(width, height);
     HXWeakSelf
-    return [self requestImageWithOptions:options targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    return [self requestImageWithOptions:options contentMode:PHImageContentModeAspectFill targetSize:size  resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         if (downloadFinined && result) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -1399,13 +1437,17 @@
 }
 
 - (PHImageRequestID)requestImageWithOptions:(PHImageRequestOptions *)options targetSize:(CGSize)targetSize resultHandler:(void (^)(UIImage *__nullable result, NSDictionary *__nullable info))resultHandler {
+    return [self requestImageWithOptions:options contentMode:PHImageContentModeAspectFill targetSize:targetSize resultHandler:resultHandler];
+}
+
+- (PHImageRequestID)requestImageWithOptions:(PHImageRequestOptions *)options contentMode:(PHImageContentMode)contentMode targetSize:(CGSize)targetSize resultHandler:(void (^)(UIImage *__nullable result, NSDictionary *__nullable info))resultHandler {
     if (self.photoEdit) {
         if (resultHandler) {
             resultHandler(self.photoEdit.editPreviewImage, nil);
         }
         return 0;
     }
-    return [[PHImageManager defaultManager] requestImageForAsset:self.asset targetSize:targetSize contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    return [[PHImageManager defaultManager] requestImageForAsset:self.asset targetSize:targetSize contentMode:contentMode options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         if (resultHandler) {
             resultHandler(result, info);
         }

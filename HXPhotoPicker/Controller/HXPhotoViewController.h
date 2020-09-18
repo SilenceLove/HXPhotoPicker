@@ -78,6 +78,7 @@ HXCustomCameraController;
 @property (weak, nonatomic) id<HXPhotoViewCellDelegate> delegate;
 @property (assign, nonatomic) NSInteger section;
 @property (assign, nonatomic) NSInteger item;
+@property (assign, nonatomic) BOOL canSelect;
 @property (strong, nonatomic, readonly) UIImageView *imageView;
 @property (strong, nonatomic) CALayer *selectMaskLayer;
 @property (strong, nonatomic) HXPhotoModel *model;
