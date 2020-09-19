@@ -57,15 +57,6 @@
     }
     self.photoView = photoView;
     [viewController.view addGestureRecognizer:self.panGesture];
-//    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchView:)];
-//    pinchGestureRecognizer.delegate = self;
-//    [viewController.view addGestureRecognizer:pinchGestureRecognizer];
-
-//    UIRotationGestureRecognizer *rotaitonGest = [[UIRotationGestureRecognizer alloc]initWithTarget:self action:@selector(rotationView:)];
-//    rotaitonGest.delegate =self;
-//    [viewController.view addGestureRecognizer:rotaitonGest];
-    
-//    [viewController.view setMultipleTouchEnabled:YES];
 }
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     if ([otherGestureRecognizer.view isKindOfClass:[UICollectionView class]]) {
@@ -90,60 +81,6 @@
     }
     [viewCell.scrollView setContentOffset:viewCell.scrollView.contentOffset animated:NO];
     return YES;
-}
-- (void)rotationView:(UIRotationGestureRecognizer *)rotationGest {
-    CGFloat rotation = rotationGest.rotation;
-    self.contentView.transform = CGAffineTransformMakeRotation(rotation);
-    
-}
-- (void)pinchView:(UIPinchGestureRecognizer *)pinchGestureRecognizer {
-    CGFloat scale = pinchGestureRecognizer.scale;
-    switch (pinchGestureRecognizer.state) {
-        case UIGestureRecognizerStateBegan: {
-            if (scale > 1) {
-                
-                return;
-            }
-            self.isPanGesture = NO;
-            HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc; 
-            if (![previewVC bottomView].userInteractionEnabled) {
-                [[UIApplication sharedApplication] setStatusBarHidden:NO];
-            }
-            [previewVC setStopCancel:YES];
-            self.interation = YES;
-            [self.vc dismissViewControllerAnimated:YES completion:nil];
-        }   break;
-        case UIGestureRecognizerStateChanged:
-            if (self.interation) {
-                
-                self.contentView.transform = CGAffineTransformMakeScale(scale, scale);
-                
-                [self updateInterPercent:1 - scale];
-                
-                [self updateInteractiveTransition:scale];
-            }
-            break;
-        case UIGestureRecognizerStateEnded:
-            if (self.interation) {
-                
-                self.interation = NO;
-                if (scale > 0.7f){
-                    [self cancelInteractiveTransition];
-                    [self interPercentCancel];
-                }else {
-                    [self finishInteractiveTransition];
-                    [self interPercentFinish];
-                }
-            }
-            break;
-        default:
-            if (self.interation) {
-                self.interation = NO;
-                [self cancelInteractiveTransition];
-                [self interPercentCancel];
-            }
-            break;
-    }
 }
 - (void)gestureRecognizeDidUpdate:(UIPanGestureRecognizer *)gestureRecognizer {
     CGFloat scale = 0;

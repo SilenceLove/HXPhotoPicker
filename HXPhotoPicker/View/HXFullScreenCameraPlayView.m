@@ -53,7 +53,7 @@
     self.progressLayer = progressLayer;
     self.currentProgress = 0.f;
 }
-- (void)clean {
+- (void)clear {
     self.progressLayer.hidden = YES;
     [self.progressLayer removeAnimationForKey:@"circle"];
     self.currentProgress = 0;
@@ -70,29 +70,4 @@
     circleAnim.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
     [self.progressLayer addAnimation:circleAnim forKey:@"circle"];
 }
-- (void)setProgress:(CGFloat)progress {
-    _progress = progress; 
-//    self.progressLayer.hidden = NO;
-//    [self.progressLayer removeAnimationForKey:@"circle"];
-//    CABasicAnimation *circleAnim = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
-//    circleAnim.fromValue = @(self.currentProgress);
-//    circleAnim.toValue = @(progress);
-//    circleAnim.duration = 0.2f;
-//    circleAnim.fillMode = kCAFillModeForwards;
-//    circleAnim.removedOnCompletion = NO;
-//    circleAnim.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-//    [self.progressLayer addAnimation:circleAnim forKey:@"circle"];
-//
-////    self.progressLayer.path = [UIBezierPath bezierPathWithArcCenter:self.progressCenter radius:self.progressCenter.x startAngle:-M_PI / 2.f endAngle:-M_PI / 2.f + M_PI * 2.f * progress clockwise:true].CGPath;
-//
-//    self.currentProgress = progress;
-}
-//- (UIBezierPath *)pathForProgress:(CGFloat)progress {
-//    CGPoint center = CGPointMake(self.frame.size.width * 0.5, self.frame.size.height * 0.5);
-//    CGFloat radius = self.frame.size.height * 0.5;
-//    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center radius:radius startAngle:-M_PI / 2 endAngle:-M_PI / 2 + M_PI * 2 * progress clockwise:true];
-//    path.lineWidth = 3;
-//    return path;
-//}
-
 @end

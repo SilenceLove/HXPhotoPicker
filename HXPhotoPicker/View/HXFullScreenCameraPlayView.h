@@ -13,6 +13,6 @@
 @property (strong, nonatomic) UIColor *color;
 @property (assign, nonatomic) NSTimeInterval duration;
 - (void)startAnimation;
-- (void)clean;
+- (void)clear;
 - (instancetype)initWithFrame:(CGRect)frame color:(UIColor *)color;
 @end

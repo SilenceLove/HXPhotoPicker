@@ -104,6 +104,8 @@
 
 #define HX_IOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)
 
+#define HX_IOS11_Earlier  ([UIDevice currentDevice].systemVersion.floatValue < 11.0f)
+
 #define HX_IOS10_Later ([UIDevice currentDevice].systemVersion.floatValue >= 10.0f)
 
 #define HX_IOS91Later ([UIDevice currentDevice].systemVersion.floatValue >= 9.1f)

@@ -14,6 +14,8 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
 
+#import <PhotosUI/PhotosUI.h>
+
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>)
 #import <SDWebImage/UIImageView+WebCache.h>
 #import <SDWebImage/SDWebImageManager.h>
@@ -143,28 +145,27 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 + (void)requestAuthorization:(UIViewController *)viewController
                         handler:(void (^)(PHAuthorizationStatus status))handler {
     PHAuthorizationStatus status = [self authorizationStatus];
-#ifdef __IPHONE_14_0
-    if (@available(iOS 14, *)) {
-        if (status == PHAuthorizationStatusLimited) {
-            if (handler) handler(status);
-            [self showNoAuthorizedAlertWithViewController:viewController status:status];
-            return;
-        }
-    }
-#endif
     if (status == PHAuthorizationStatusAuthorized) {
         if (handler) handler(status);
-    }else if (status == PHAuthorizationStatusDenied ||
-              status == PHAuthorizationStatusRestricted) {
+    }
+#ifdef __IPHONE_14_0
+    else if (@available(iOS 14, *)) {
+        if (status == PHAuthorizationStatusLimited) {
+            if (handler) handler(status);
+        }
+#endif
+    else if (status == PHAuthorizationStatusDenied ||
+             status == PHAuthorizationStatusRestricted) {
         if (handler) handler(status);
         [self showNoAuthorizedAlertWithViewController:viewController status:status];
     }else {
 #ifdef __IPHONE_14_0
         if (@available(iOS 14, *)) {
-            [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelAddOnly handler:^(PHAuthorizationStatus status) {
+            [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (handler) handler(status);
-                    if (status != PHAuthorizationStatusAuthorized) {
+                    if (status != PHAuthorizationStatusAuthorized &&
+                        status != PHAuthorizationStatusLimited) {
                         [self showNoAuthorizedAlertWithViewController:viewController status:status];
                     }else {
                         [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
@@ -188,6 +189,20 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
             }];
         }
     }
+#ifdef __IPHONE_14_0
+    }else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (handler) handler(status);
+                if (status != PHAuthorizationStatusAuthorized) {
+                    [self showNoAuthorizedAlertWithViewController:viewController status:status];
+                }else {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
+                }
+            });
+        }];
+    }
+#endif
 }
 + (void)showNoAuthorizedAlertWithViewController:(UIViewController *)viewController
                                          status:(PHAuthorizationStatus)status {
@@ -213,7 +228,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     PHAuthorizationStatus status;
 #ifdef __IPHONE_14_0
     if (@available(iOS 14, *)) {
-        status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelAddOnly];
+        status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
 #else
     if(NO) {
 #endif
@@ -295,7 +310,9 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     // 判断授权状态
     [self requestAuthorization:nil handler:^(PHAuthorizationStatus status) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (status != PHAuthorizationStatusAuthorized) {
+            if (status == PHAuthorizationStatusNotDetermined ||
+                status == PHAuthorizationStatusRestricted ||
+                status == PHAuthorizationStatusDenied) {
                 if (complete) {
                     complete(nil, NO);
                 }
@@ -334,9 +351,9 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                 }
                 if (HXShowLog) NSSLog(@"保存失败");
                 return;
-            }else { 
-                if (createdAsset.localIdentifier) {
-                    if (complete) {
+            }else {
+                if (complete) {
+                    if (createdAsset.localIdentifier) {
                         HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
                         photoModel.creationDate = [NSDate date];
                         complete(photoModel, YES);
@@ -383,8 +400,15 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     }
     // 判断授权状态
     [self requestAuthorization:nil handler:^(PHAuthorizationStatus status) {
-        if (status != PHAuthorizationStatusAuthorized) return;
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (status == PHAuthorizationStatusNotDetermined ||
+                status == PHAuthorizationStatusRestricted ||
+                status == PHAuthorizationStatusDenied) {
+                if (complete) {
+                    complete(nil, NO);
+                }
+                return;
+            }
             if (!HX_IOS9Later) {
                 UIImage *tempImage = photo;
                 if (tempImage.imageOrientation != UIImageOrientationUp) {
@@ -416,10 +440,12 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                 if (HXShowLog) NSSLog(@"保存失败");
                 return;
             }else {
-                if (complete && createdAsset.localIdentifier) {
-                    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
-                    photoModel.creationDate = [NSDate date];
-                    complete(photoModel, YES);
+                if (complete) {
+                    if (createdAsset.localIdentifier) {
+                        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                        photoModel.creationDate = [NSDate date];
+                        complete(photoModel, YES);
+                    }
                 }
             }
             

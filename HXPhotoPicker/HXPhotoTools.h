@@ -64,7 +64,8 @@
                      handler:(void (^ _Nullable)(PHAuthorizationStatus status))handler;
 
 + (PHAuthorizationStatus)authorizationStatus;
-
++ (void)showNoAuthorizedAlertWithViewController:(UIViewController *)viewController
+                                         status:(PHAuthorizationStatus)status;
 /**
  判断是否是HEIF格式的图片
  */

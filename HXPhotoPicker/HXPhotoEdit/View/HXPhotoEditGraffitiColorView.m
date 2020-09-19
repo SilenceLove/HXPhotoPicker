@@ -32,7 +32,7 @@
     self.flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     self.flowLayout.sectionInset = UIEdgeInsetsMake(0, 15, 0, 0);
     self.flowLayout.minimumInteritemSpacing = 5;
-    self.flowLayout.itemSize = CGSizeMake(35.f, 35.f);
+    self.flowLayout.itemSize = CGSizeMake(37.f, 37.f);
     
     [self.repealBtn setImage:[UIImage hx_imageContentsOfFile:@"hx_photo_edit_repeal"] forState:UIControlStateNormal];
     

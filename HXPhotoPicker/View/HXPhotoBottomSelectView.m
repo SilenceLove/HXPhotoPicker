@@ -174,8 +174,10 @@
         
         [self addSubview:self.bgView];
         [self addSubview:self.contentView];
-        [self.contentView hx_radiusWithRadius:10 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
-        [self.tableView hx_radiusWithRadius:10 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+        if (HX_IOS11_Later) {
+            [self.contentView hx_radiusWithRadius:10 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+            [self.tableView hx_radiusWithRadius:10 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+        }
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     }
     return self;
@@ -344,6 +346,10 @@
 //    if (self.showViewCompletion) {
         [self resetContentViewFrame];
 //    }
+    if (HX_IOS11_Earlier) {
+        [self.contentView hx_radiusWithRadius:10 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+        [self.tableView hx_radiusWithRadius:10 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+    }
 }
 - (void)resetContentViewFrame {
     if (self.contentView.hx_y != self.hx_h - self.contentViewHeight) {

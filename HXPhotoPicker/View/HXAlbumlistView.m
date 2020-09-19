@@ -60,6 +60,7 @@
         return;;
     }
     HXAlbumModel *albumMd = self.albumModelArray.firstObject;
+    albumMd.cameraCount = self.manager.cameraCount;
     if (!albumMd.assetResult && !albumMd.localIdentifier) {
         albumMd.tempImage = [self.manager firstCameraModel].thumbPhoto;
     }
@@ -86,7 +87,7 @@
     if ([cell isKindOfClass:[HXAlbumlistViewCell class]]) {
         HXWeakSelf
         [cell setAlbumImageWithCompletion:^(NSInteger count, HXAlbumlistViewCell *myCell) {
-            if (count <= 0) {
+            if (count <= 0 && cell.model.index > 0) {
                 if ([weakSelf.albumModelArray containsObject:myCell.model]) {
                     [weakSelf.albumModelArray removeObject:myCell.model];
                     [weakSelf.deleteCellArray addObject:[weakSelf.tableView indexPathForCell:myCell]];
@@ -427,12 +428,14 @@
         self.manager = manager;
         [self addSubview:self.contentView];
         [self addSubview:self.button];
-        [self changeColor];
-        if (self.manager.configuration.type == HXConfigurationTypeWXChat ||
-            self.manager.configuration.type == HXConfigurationTypeWXMoment) {
-            self.contentView.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.3];
-            [self.contentView hx_radiusWithRadius:15 corner:UIRectCornerAllCorners];
+        if (HX_IOS11_Later) {
+            if (self.manager.configuration.type == HXConfigurationTypeWXChat ||
+                self.manager.configuration.type == HXConfigurationTypeWXMoment) {
+                self.contentView.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.3];
+                [self.contentView hx_radiusWithRadius:15 corner:UIRectCornerAllCorners];
+            }
         }
+        [self changeColor];
         self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width - 120, 30);
         self.contentView.hx_h = 30;
         self.titleLb.hx_centerY = self.hx_h / 2;
@@ -468,7 +471,7 @@
 }
 - (void)setModel:(HXAlbumModel *)model {
     _model = model;
-    CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 140 - 10 - 5 - self.arrowIcon.hx_w - (30 - self.arrowIcon.hx_h) / 2;
+    CGFloat maxWidth = [self getTextWidth:140];
     self.titleLb.text = model.albumName ?: [NSBundle hx_localizedStringForKey:@"相册"];
     CGFloat textWidth = self.titleLb.hx_getTextWidth;
     if (textWidth > maxWidth) {
@@ -479,21 +482,35 @@
         [self setTitleFrame];
     }];
 }
-- (void)setTitleFrame {
+- (CGFloat)getTextWidth:(CGFloat)margin {
+    CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - margin - 10 - 5 - self.arrowIcon.hx_w - (30 - self.arrowIcon.hx_h) / 2;
+    CGFloat textWidth = self.titleLb.hx_getTextWidth;
+    if (textWidth > maxWidth) {
+        textWidth = maxWidth;
+    }
+    return maxWidth;
+}
+- (void)setSubViewFrame {
     CGFloat width = self.titleLb.hx_w + 5 + self.arrowIcon.hx_w + 10 + (30 - self.arrowIcon.hx_h) / 2;
     self.titleLb.hx_x = 10;
     self.arrowIcon.hx_x = CGRectGetMaxX(self.titleLb.frame) + 5;
     self.contentView.hx_w = width;
     self.contentView.hx_centerX = self.hx_w / 2;
+}
+- (void)setTitleFrame {
+    [self setSubViewFrame];
     if (self.superview) {
-        [self setupContentViewFrame];
+        if ([self.superview isKindOfClass:NSClassFromString(@"_UITAMICAdaptorView")]) {
+            [self setupContentViewFrame];
+        }
     }
 }
 - (BOOL)selected {
     return self.button.selected;
 }
 - (void)setupContentViewFrame {
-    if (self.superview && [self.superview isKindOfClass:NSClassFromString(@"_UITAMICAdaptorView")]) {
+    BOOL canSet = self.superview && [self.superview isKindOfClass:NSClassFromString(@"_UITAMICAdaptorView")];
+    if (canSet) {
         // 让按钮在屏幕中间
         CGFloat temp_x = self.superview.hx_x + self.contentView.hx_x;
         CGFloat windowWidth = [UIApplication sharedApplication].keyWindow.hx_w;
@@ -514,8 +531,14 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.button.frame = self.bounds;
-    
     [self setupContentViewFrame];
+    if (HX_IOS11_Earlier) {
+        if (self.manager.configuration.type == HXConfigurationTypeWXChat ||
+            self.manager.configuration.type == HXConfigurationTypeWXMoment) {
+            self.contentView.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.3];
+            [self.contentView hx_radiusWithRadius:15 corner:UIRectCornerAllCorners];
+        }
+    }
 }
 - (UIView *)contentView {
     if (!_contentView) {
@@ -585,6 +608,9 @@
 } 
 - (void)didBtnClick:(UIButton *)button {
     if (!self.canSelect) {
+        return;
+    }
+    if (!self.model) {
         return;
     }
     button.selected = !button.isSelected;

@@ -34,23 +34,40 @@ UITableViewDelegate
 - (void)requestData {
     // 获取当前应用对照片的访问授权状态
     HXWeakSelf
-//    [self.view hx_showLoadingHUDText:nil delay:0.1f];
-    [HXPhotoTools requestAuthorization:self handler:^(PHAuthorizationStatus status) {
-        if (status == PHAuthorizationStatusAuthorized) {
-            [weakSelf getAlbumModelList:YES];
-        }else {
-            [weakSelf.hx_customNavigationController.view hx_handleLoading];
-#ifdef __IPHONE_14_0
-                if (@available(iOS 14, *)) {
-                    if (status == PHAuthorizationStatusLimited) {
-                        weakSelf.authorizationLb.text = [NSBundle hx_localizedStringForKey:@"无法访问所有照片\n请点击这里前往设置中允许访问所有照片"];
-                    }
-                }
-#endif
-//            [weakSelf.view hx_handleLoading];
-            [weakSelf.view addSubview:weakSelf.authorizationLb];
+    self.hx_customNavigationController.reloadAsset = ^(BOOL initialAuthorization){
+        if (initialAuthorization) {
+            [weakSelf authorizationHandler];
         }
-    }];
+    };
+    [self authorizationHandler];
+}
+
+- (void)authorizationHandler {
+    PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+    if (status == PHAuthorizationStatusAuthorized) {
+        [self getAlbumModelList:YES];
+    }
+#ifdef __IPHONE_14_0
+    else if (@available(iOS 14, *)) {
+        if (status == PHAuthorizationStatusLimited) {
+            [self getAlbumModelList:YES];
+            return;
+        }
+#endif
+    else if (status == PHAuthorizationStatusDenied ||
+             status == PHAuthorizationStatusRestricted){
+        [self.hx_customNavigationController.view hx_handleLoading];
+        [self.view addSubview:self.authorizationLb];
+        [HXPhotoTools showNoAuthorizedAlertWithViewController:self status:status];
+    }
+#ifdef __IPHONE_14_0
+    }else if (status == PHAuthorizationStatusDenied ||
+              status == PHAuthorizationStatusRestricted){
+         [self.hx_customNavigationController.view hx_handleLoading];
+         [self.view addSubview:self.authorizationLb];
+         [HXPhotoTools showNoAuthorizedAlertWithViewController:self status:status];
+     }
+#endif
 }
 - (UIStatusBarStyle)preferredStatusBarStyle {
     if ([HXPhotoCommon photoCommon].isDark) {
@@ -168,8 +185,18 @@ UITableViewDelegate
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (!self.albumModelArray.count && [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
-        [self getAlbumModelList:NO];
+    if (!self.albumModelArray.count) {
+        PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+        if (status == PHAuthorizationStatusAuthorized) {
+            [self getAlbumModelList:NO];
+        }
+#ifdef __IPHONE_14_0
+        else if (@available(iOS 14, *)) {
+            if (status == PHAuthorizationStatusLimited) {
+                [self getAlbumModelList:NO];
+            }
+        }
+#endif
     }
 }
 - (void)setupUI {
@@ -266,6 +293,9 @@ UITableViewDelegate
     }
 }
 - (void)pushPhotoListViewControllerWithAlbumModel:(HXAlbumModel *)albumModel animated:(BOOL) animated {
+    if (self.navigationController.topViewController != self) {
+        [self.navigationController popToViewController:self animated:NO];
+    }
     HXPhotoViewController *vc = [[HXPhotoViewController alloc] init];
     vc.manager = self.manager;
     vc.title = albumModel.albumName;

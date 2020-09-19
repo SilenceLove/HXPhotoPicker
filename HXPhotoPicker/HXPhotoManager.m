@@ -659,22 +659,35 @@
     if (self.firstHasCameraAsset &&
         self.configuration.saveSystemAblum &&
         !smartAlbums.count &&
-        !userAlbums.count &&
-        [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
-        // 防止直接打开相机并没有打开相册,导致相册列表为空,拍的照片没有保存到相册列表
-        if (self.cameraList.count) {
-            HXPhotoModel *photoMd = self.cameraList.firstObject;
-            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-            albumModel.cameraCount = self.cameraList.count;
-            albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
-            albumModel.index = 0;
-            albumModel.tempImage = photoMd.thumbPhoto;
-            [albums addObject:albumModel];
-            if (completion) {
-                completion(albums);
+        !userAlbums.count) {
+        BOOL created = NO;
+        PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+        if (status == PHAuthorizationStatusAuthorized) {
+            created = YES;
+        }
+#ifdef __IPHONE_14_0
+        else if (@available(iOS 14, *)) {
+            if (status == PHAuthorizationStatusLimited) {
+                created = YES;
             }
-            self.firstHasCameraAsset = NO;
-            return;
+        }
+#endif
+        if (created) {
+            // 防止直接打开相机并没有打开相册,导致相册列表为空,拍的照片没有保存到相册列表
+            if (self.cameraList.count) {
+                HXPhotoModel *photoMd = self.cameraList.firstObject;
+                HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+                albumModel.cameraCount = self.cameraList.count;
+                albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
+                albumModel.index = 0;
+                albumModel.tempImage = photoMd.thumbPhoto;
+                [albums addObject:albumModel];
+                if (completion) {
+                    completion(albums);
+                }
+                self.firstHasCameraAsset = NO;
+                return;
+            }
         }
     }
     NSArray *allAlbums = @[smartAlbums,userAlbums];
@@ -704,15 +717,28 @@
             }
         }];
     }];
-    if (!albums.count &&
-        [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
-        HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-        albumModel.cameraCount = [self cameraCount];
-        albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
-        albumModel.index = 0;
-        albumModel.selectType = self.type;
-        albumModel.tempImage = [self firstCameraModel].thumbPhoto;
-        [albums addObject:albumModel];
+    if (!albums.count) {
+        BOOL created = NO;
+        PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+        if (status == PHAuthorizationStatusAuthorized) {
+            created = YES;
+        }
+#ifdef __IPHONE_14_0
+        else if (@available(iOS 14, *)) {
+            if (status == PHAuthorizationStatusLimited) {
+                created = YES;
+            }
+        }
+#endif
+        if (created) {
+            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
+            albumModel.cameraCount = [self cameraCount];
+            albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
+            albumModel.index = 0;
+            albumModel.selectType = self.type;
+            albumModel.tempImage = [self firstCameraModel].thumbPhoto;
+            [albums addObject:albumModel];
+        }
     }
     if (completion) {
         completion(albums);

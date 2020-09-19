@@ -283,7 +283,7 @@
             }else {
                 if (model.asset) {
                     HXWeakSelf
-                    [self.model requestThumbImageWithWidth:200 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                    [self.model requestThumbImageWithWidth:300 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model == model) {
                             weakSelf.imageView.image = image;
                         }

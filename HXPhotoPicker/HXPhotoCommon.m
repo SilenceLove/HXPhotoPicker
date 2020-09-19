@@ -52,10 +52,23 @@ static id instance;
             self.cameraImageURL = imageURL;
         }
         self.cameraRollLocalIdentifier = [[NSUserDefaults standardUserDefaults] objectForKey:@"HXCameraRollLocalIdentifier"];
-
-        if ([HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        
+        PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+        if (status == PHAuthorizationStatusAuthorized) {
             [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
-        }else {
+        }
+#ifdef __IPHONE_14_0
+        else if (@available(iOS 14, *)) {
+            if (status == PHAuthorizationStatusLimited) {
+                [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = nil;
+                [HXPhotoCommon photoCommon].cameraRollResult = nil;
+                [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+            }else {
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestAuthorizationCompletion) name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
+            }
+        }
+#endif
+        else {
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestAuthorizationCompletion) name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
         }
     }
@@ -68,9 +81,22 @@ static id instance;
     }
 }
 - (void)requestAuthorizationCompletion {
-    if (!self.hasAuthorization && [HXPhotoTools authorizationStatus] == PHAuthorizationStatusAuthorized) {
-        self.hasAuthorization = YES;
-        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+    if (!self.hasAuthorization) {
+        PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+        if (status == PHAuthorizationStatusAuthorized) {
+            self.hasAuthorization = YES;
+            [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+        }
+#ifdef __IPHONE_14_0
+        else if (@available(iOS 14, *)) {
+            if (status == PHAuthorizationStatusLimited) {
+                [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = nil;
+                [HXPhotoCommon photoCommon].cameraRollResult = nil;
+                self.hasAuthorization = YES;
+                [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+            }
+        }
+#endif
     }
 }
 

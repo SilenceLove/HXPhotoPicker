@@ -145,14 +145,21 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self addSubview:self.loadingView];
-    [self.contentView hx_radiusWithRadius:5 corner:UIRectCornerAllCorners];
+    if (HX_IOS11_Later) {
+        [self.contentView hx_radiusWithRadius:5 corner:UIRectCornerAllCorners];
+    }
     self.layer.shadowOffset = CGSizeMake(0, 0);
     self.layer.shadowColor = [UIColor blackColor].CGColor;
     self.layer.shadowRadius = 5.f;
     self.layer.shadowOpacity = 0.3f;
     _viewFrame = CGRectZero;
 }
-
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    if (HX_IOS11_Earlier) {
+        [self.contentView hx_radiusWithRadius:5 corner:UIRectCornerAllCorners];
+    }
+}
 - (UIActivityIndicatorView *)loadingView {
     if (!_loadingView) {
         _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];

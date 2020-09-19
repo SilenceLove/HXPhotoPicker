@@ -178,34 +178,54 @@ HX_PhotoEditViewControllerDelegate
         self.showBottomPhotoCount = YES;
         self.manager.configuration.showBottomPhotoDetail = NO;
     }
+    [self setupUI];
+    [self changeSubviewFrame];
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModeDefault) {
-        [self setupUI];
-        [self changeSubviewFrame];
-//        [self.view hx_showLoadingHUDText:nil];
         [self getPhotoList];
-    }else if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) { 
-        [self setupUI];
-        [self changeSubviewFrame];
-        // 获取当前应用对照片的访问授权状态
-        [self.view hx_showLoadingHUDText:nil delay:0.1f];
+    }else if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
+        [self authorizationHandler];
         HXWeakSelf
-        [HXPhotoTools requestAuthorization:self handler:^(PHAuthorizationStatus status) {
-            if (status == PHAuthorizationStatusAuthorized) {
-                [weakSelf getAlbumList];
+        self.hx_customNavigationController.reloadAsset = ^(BOOL initialAuthorization){
+            if (initialAuthorization) {
+                [weakSelf authorizationHandler];
             }else {
-#ifdef __IPHONE_14_0
-                if (@available(iOS 14, *)) {
-                    if (status == PHAuthorizationStatusLimited) {
-                        weakSelf.authorizationLb.text = [NSBundle hx_localizedStringForKey:@"无法访问所有照片\n请点击这里前往设置中允许访问所有照片"];
-                    }
-                }
-#endif
-                [weakSelf.view hx_handleLoading];
-                [weakSelf.view addSubview:weakSelf.authorizationLb];
+                [weakSelf.hx_customNavigationController.view hx_showLoadingHUDText:nil];
+                weakSelf.collectionViewReloadCompletion = NO;
+                weakSelf.albumTitleView.canSelect = YES;
+                [weakSelf getAlbumList];
             }
-        }];
+        };
     }
-
+    [self setupOtherConfiguration];
+}
+- (void)authorizationHandler {
+    PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+    if (status == PHAuthorizationStatusAuthorized) {
+        [self getAlbumList];
+    }
+#ifdef __IPHONE_14_0
+    else if (@available(iOS 14, *)) {
+        if (status == PHAuthorizationStatusLimited) {
+            [self getAlbumList];
+            return;
+        }
+#endif
+    else if (status == PHAuthorizationStatusDenied ||
+             status == PHAuthorizationStatusRestricted) {
+        [self.hx_customNavigationController.view hx_handleLoading:NO];
+        [self.view addSubview:self.authorizationLb];
+        [HXPhotoTools showNoAuthorizedAlertWithViewController:self status:status];
+    }
+#ifdef __IPHONE_14_0
+    }else if (status == PHAuthorizationStatusDenied ||
+              status == PHAuthorizationStatusRestricted) {
+         [self.hx_customNavigationController.view hx_handleLoading:NO];
+         [self.view addSubview:self.authorizationLb];
+         [HXPhotoTools showNoAuthorizedAlertWithViewController:self status:status];
+     }
+#endif
+}
+- (void)setupOtherConfiguration {
     if (self.manager.configuration.open3DTouchPreview) {
 //#ifdef __IPHONE_13_0
 //        if (@available(iOS 13.0, *)) {
@@ -308,8 +328,27 @@ HX_PhotoEditViewControllerDelegate
         self.needChangeViewFrame = YES;
     }
 }
+- (CGFloat)getAlbumHeight {
+    NSInteger count = self.albumView.albumModelArray.count;
+    if (!count) {
+        return 0.f;
+    }
+    CGFloat cellHeight = self.manager.configuration.popupTableViewCellHeight;
+    CGFloat albumHeight = cellHeight * count;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        if (albumHeight > self.manager.configuration.popupTableViewHeight) {
+            albumHeight = self.manager.configuration.popupTableViewHeight;
+        }
+    }else {
+        if (albumHeight > self.manager.configuration.popupTableViewHorizontalHeight) {
+            albumHeight = self.manager.configuration.popupTableViewHorizontalHeight;
+        }
+    }
+    return albumHeight;
+}
 - (void)changeSubviewFrame {
-    CGFloat albumHeight = self.manager.configuration.popupTableViewHeight;
+    CGFloat albumHeight = [self getAlbumHeight];
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
     NSInteger lineCount = self.manager.configuration.rowCount;
@@ -325,7 +364,6 @@ HX_PhotoEditViewControllerDelegate
             navBarHeight = self.navigationController.navigationBar.hx_h + 20;
         }
         lineCount = self.manager.configuration.horizontalRowCount;
-        albumHeight = self.manager.configuration.popupTableViewHorizontalHeight;
     }
     CGFloat bottomMargin = hxBottomMargin;
     CGFloat leftMargin = 0;
@@ -441,14 +479,18 @@ HX_PhotoEditViewControllerDelegate
         };
     }
     if (self.hx_customNavigationController.albums) {
-        self.albumView.albumModelArray = self.hx_customNavigationController.albums;
-        self.albumTitleView.canSelect = YES;
+        [self setAlbumModelArray];
     }else {
         self.hx_customNavigationController.requestAllAlbumCompletion = ^{
-            weakSelf.albumView.albumModelArray = weakSelf.hx_customNavigationController.albums;
-            weakSelf.albumTitleView.canSelect = YES;
+            [weakSelf setAlbumModelArray];
         };
     }
+}
+- (void)setAlbumModelArray {
+    self.albumView.albumModelArray = self.hx_customNavigationController.albums;
+    self.albumView.hx_h = [self getAlbumHeight];
+    self.albumView.hx_y = -(self.collectionView.contentInset.top + self.albumView.hx_h);
+    self.albumTitleView.canSelect = YES;
 }
 - (void)getPhotoList {
     [self startGetAllPhotoModel];
@@ -498,6 +540,9 @@ HX_PhotoEditViewControllerDelegate
     }
 }
 - (void)selectPanGestureRecognizerClick:(UIPanGestureRecognizer *)panGesture {
+    if (self.albumTitleView.selected) {
+        return;
+    }
     if (panGesture.state == UIGestureRecognizerStateBegan) {
         self.panSelectStartPoint = [panGesture locationInView:self.collectionView];
         NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.panSelectStartPoint];
@@ -906,7 +951,6 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)reloadCollectionViewWithFirstSelectModel:(HXPhotoModel *)firstSelectModel {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.view hx_handleLoading:NO];
         [self.hx_customNavigationController.view hx_handleLoading];
         if (!self.firstOn) {
             self.cellCanSetModel = NO;
@@ -930,7 +974,6 @@ HX_PhotoEditViewControllerDelegate
                 [self cellSetModelData:self.collectionVisibleCells.firstObject];
             });
         }
-        self.firstOn = NO;
     });
 }
 - (void)cellSetModelData:(HXPhotoViewCell *)cell {
@@ -1013,7 +1056,19 @@ HX_PhotoEditViewControllerDelegate
     if (!self.manager.configuration.singleSelected) {
         [self.manager beforeListAddCameraTakePicturesModel:model];
     }
-    [self collectionViewAddModel:model beforeModel:nil];
+    if (model.type != HXPhotoModelMediaTypeCameraPhoto &&
+        model.type != HXPhotoModelMediaTypeCameraVideo) {
+        HXAlbumModel *albumModel = self.albumView.albumModelArray.firstObject;
+        if (albumModel.count == 0) {
+            albumModel.assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[model.localIdentifier] options:nil];
+        }
+        albumModel.count++;
+    }
+    if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+        self.photoCount++;
+    }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+        self.videoCount++;
+    }    [self collectionViewAddModel:model beforeModel:nil];
 }
 - (void)collectionViewAddModel:(HXPhotoModel *)model beforeModel:(HXPhotoModel *)beforeModel {
     
@@ -1928,8 +1983,9 @@ HX_PhotoEditViewControllerDelegate
             }else {
                 weakSelf.albumTitleView.model = model;
             }
-            [weakSelf.view hx_showLoadingHUDText:nil];
+            [weakSelf.hx_customNavigationController.view hx_showLoadingHUDText:nil];
             weakSelf.collectionViewReloadCompletion = NO;
+            weakSelf.firstOn = NO;
             [weakSelf startGetAllPhotoModel];
         };
     }

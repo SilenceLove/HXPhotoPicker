@@ -102,7 +102,7 @@
         return;
     }
     if (longGesture.state == UIGestureRecognizerStateBegan) {
-        [self.playView clean];
+        [self.playView clear];
         CGPoint point = [longGesture locationInView:[UIApplication sharedApplication].keyWindow];
         self.firstLongGestureLocation = point;
         self.inTranscribe = YES;
@@ -143,7 +143,7 @@
             self.zoomInView.transform = CGAffineTransformIdentity;
             self.zoomOutView.transform = CGAffineTransformIdentity;
         }];
-        [self.playView clean];
+        [self.playView clear];
         if (self.endTranscribe) {
             self.endTranscribe(self.isAnimation);
         }
@@ -219,7 +219,7 @@
     self.longGesture.enabled = NO;
     self.longGesture.enabled = YES;
     
-    [self.playView clean];
+    [self.playView clear];
     self.playView.transform = CGAffineTransformIdentity;
 }
 - (IBAction)backClick:(UIButton *)sender {

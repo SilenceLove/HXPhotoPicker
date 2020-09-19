@@ -47,6 +47,8 @@
 @property (copy, nonatomic) void (^requestCameraRollCompletion)(void);
 @property (copy, nonatomic) void (^requestAllAlbumCompletion)(void);
 
+@property (copy, nonatomic) void (^ reloadAsset)(BOOL initialAuthorization);
+
 //@property (copy, nonatomic) void (^ photoLibraryDidChange)(HXAlbumModel *albumModel);
 
 @property (assign ,nonatomic) BOOL isCamera;
