@@ -53,6 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) NSInteger selectType;
 @property (assign, nonatomic) BOOL creationDateSort;
 
+@property (copy, nonatomic) void (^photoLibraryDidChange)(void);
+
 @property (copy, nonatomic) NSString *UUIDString;
 
 - (NSURLSessionDownloadTask * _Nullable)downloadVideoWithURL:(NSURL *)videoURL

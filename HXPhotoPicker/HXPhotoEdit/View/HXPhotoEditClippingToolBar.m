@@ -12,6 +12,7 @@
 #import "UIButton+HXExtension.h"
 #import "UIView+HXExtension.h"
 #import "UIFont+HXExtension.h"
+#import "UILabel+HXExtension.h"
 #import "HXPhotoDefine.h"
 
 #define HXScaleViewSize 28.f
@@ -117,15 +118,18 @@
             height = scaleWidth;
             width = scaleWidth / model.heightRatio * model.widthRatio;
         }
-        if (model.widthRatio == 9) {
-            width += 2;
-        }
         model.size = CGSizeMake(width, height);
-//        if (width < scaleWidth) {
-//            width = scaleWidth;
-//        }
         if (height < scaleWidth) {
             height = scaleWidth;
+        }
+        CGFloat textWidth = [UILabel hx_getTextWidthWithText:model.scaleText height:height - 3 font:[UIFont hx_mediumHelveticaNeueOfSize:12]] + 5;
+        if (width < textWidth) {
+            height = textWidth / width * height;
+            width = textWidth;
+            if (height > 45.f) {
+                height = 45.f;
+            }
+            model.size = CGSizeMake(width, height);
         }
         model.scaleSize = CGSizeMake(width, height);
     }
@@ -267,12 +271,11 @@
 - (void)setModel:(HXPhotoEditClippingToolBarRotaioModel *)model {
     _model = model;
     [self setSubviewFrame];
+    self.scaleLb.text = model.scaleText;
     if (!model.widthRatio) {
-        self.scaleLb.text = [NSBundle hx_localizedStringForKey:@"自由"];
         self.scaleView.layer.borderWidth = 0.f;
         self.scaleImageView.hidden = NO;
     }else {
-        self.scaleLb.text = [NSString stringWithFormat:@"%ld:%ld", (NSInteger)model.widthRatio, (NSInteger)model.heightRatio];
         self.scaleView.layer.borderWidth = 1.25f;
         self.scaleImageView.hidden = YES;
     }
@@ -317,13 +320,18 @@
         _scaleLb = [[UILabel alloc] init];
         _scaleLb.textColor = [UIColor whiteColor];
         _scaleLb.textAlignment = NSTextAlignmentCenter;
-//        _scaleLb.numberOfLines = 0;
         _scaleLb.font = [UIFont hx_mediumHelveticaNeueOfSize:12];
-        _scaleLb.adjustsFontSizeToFitWidth = YES;
     }
     return _scaleLb;
 }
 @end
 
 @implementation HXPhotoEditClippingToolBarRotaioModel
+- (NSString *)scaleText {
+    if (!self.widthRatio) {
+        return [NSBundle hx_localizedStringForKey:@"自由"];
+    }else {
+        return [NSString stringWithFormat:@"%ld:%ld", (NSInteger)self.widthRatio, (NSInteger)self.heightRatio];
+    }
+}
 @end

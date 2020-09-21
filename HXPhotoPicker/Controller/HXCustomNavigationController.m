@@ -10,7 +10,6 @@
 #import "HXAlbumListViewController.h"
 #import "HXPhotoViewController.h"
 #import "HXPhotoTools.h"
-#import <PhotosUI/PhotosUI.h>
 
 @interface HXCustomNavigationController ()<HXAlbumListViewControllerDelegate, HXPhotoViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 @property (assign, nonatomic) BOOL didPresentImagePicker;
@@ -74,6 +73,17 @@
 }
 - (void)requestAuthorization {
     self.initialAuthorization = NO;
+    HXWeakSelf
+#ifdef __IPHONE_14_0
+    if (@available(iOS 14, *)) {
+        [HXPhotoCommon photoCommon].photoLibraryDidChange = ^{
+            [weakSelf.timer invalidate];
+            weakSelf.timer = nil;
+            weakSelf.initialAuthorization = NO;
+            [weakSelf imagePickerDidFinish];
+        };
+    }
+#endif
     PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
     if (status == PHAuthorizationStatusAuthorized) {
         [self requestModel];
@@ -82,7 +92,6 @@
 #ifdef __IPHONE_14_0
     else if (@available(iOS 14, *)) {
         if (status == PHAuthorizationStatusLimited) {
-//            [[PHPhotoLibrary sharedPhotoLibrary] presentLimitedLibraryPickerFromViewController:self];
             [self requestModel];
             return;
         }
@@ -91,7 +100,6 @@
     if (status == PHAuthorizationStatusNotDetermined) {
         self.initialAuthorization = YES;
     }
-    HXWeakSelf
     [HXPhotoTools requestAuthorization:nil handler:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
             [weakSelf requestModel];
@@ -128,6 +136,7 @@
             UIImagePickerController *imagePickerController = (UIImagePickerController *)viewControllerToPresent;
             if (imagePickerController.sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
                 imagePickerController.delegate = self;
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
                 HXWeakSelf
                 self.timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
                     if ([weakSelf.presentedViewController isKindOfClass:[UIImagePickerController class]]) {
@@ -141,7 +150,7 @@
                         }
                     }
                 }];
-                [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+                [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
             }
         }
     }
@@ -284,7 +293,11 @@
     if (_manager) {
         self.manager.selectPhotoing = NO;
     }
-//    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
+    if (_timer) {
+        [_timer invalidate];
+        _timer = nil;
+    }
+    if (HXShowLog) NSLog(@"%@ dealloc", self);
 }
 
 @end

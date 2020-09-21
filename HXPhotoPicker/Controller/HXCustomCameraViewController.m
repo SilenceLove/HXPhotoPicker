@@ -13,14 +13,18 @@
 #import "HXPhotoManager.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIImage+HXExtension.h"
-#import <CoreLocation/CoreLocation.h>
 #import "HXPhotoCustomNavigationBar.h"
 #import "UIViewController+HXExtension.h"
 #import "HXCameraBottomView.h"
 #import "HX_PhotoEditViewController.h"
 #import "HXCustomNavigationController.h"
+#import <CoreLocation/CoreLocation.h>
 
-@interface HXCustomCameraViewController ()<HXCustomPreviewViewDelegate,HXCustomCameraControllerDelegate, CLLocationManagerDelegate>
+@interface HXCustomCameraViewController ()
+<HXCustomPreviewViewDelegate ,
+HXCustomCameraControllerDelegate ,
+CLLocationManagerDelegate
+>
 @property (strong, nonatomic) HXCustomCameraController *cameraController;
 @property (strong, nonatomic) HXCustomPreviewView *previewView;
 @property (strong, nonatomic) UIImageView *previewImageView;
@@ -98,8 +102,7 @@
 //        });
 //    }
     self.view.backgroundColor = [UIColor blackColor];
-    
-    if (self.manager.configuration.cameraCanLocation) {
+    if (self.manager.configuration.cameraCanLocation && HX_ALLOW_LOCATION) {
         if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
             [self.locationManager startUpdatingLocation];
         }
@@ -328,7 +331,7 @@
     [self.cameraController stopSession];
 } 
 - (void)dealloc {
-    if (_locationManager) {
+    if (HX_ALLOW_LOCATION && _locationManager) {
         [self.locationManager stopUpdatingLocation];
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -399,8 +402,9 @@
         }else {
             [self.view hx_immediatelyShowLoadingHudWithText:nil];
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                id location = self.location;
                 if (!self.videoURL) {
-                    [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image location:self.location complete:^(HXPhotoModel *model, BOOL success) {
+                    [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image location:location complete:^(HXPhotoModel *model, BOOL success) {
                         if (success) {
                             if (weakSelf.manager.configuration.cameraPhotoJumpEdit) {
                                 [weakSelf hx_presentPhotoEditViewControllerWithManager:weakSelf.manager photoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
@@ -417,7 +421,7 @@
                         }
                     }];
                 }else {
-                    [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL location:self.location complete:^(HXPhotoModel *model, BOOL success) {
+                    [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL location:location complete:^(HXPhotoModel *model, BOOL success) {
                         [weakSelf.view hx_handleLoading:NO];
                         if (success) {
                             model.videoURL = weakSelf.videoURL;

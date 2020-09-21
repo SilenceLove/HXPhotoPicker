@@ -487,6 +487,7 @@ HX_PhotoEditViewControllerDelegate
     }
 }
 - (void)setAlbumModelArray {
+    self.firstDidAlbumTitleView = NO;
     self.albumView.albumModelArray = self.hx_customNavigationController.albums;
     self.albumView.hx_h = [self getAlbumHeight];
     self.albumView.hx_y = -(self.collectionView.contentInset.top + self.albumView.hx_h);
@@ -921,8 +922,8 @@ HX_PhotoEditViewControllerDelegate
 }
 #pragma mark - < public >
 - (void)startGetAllPhotoModel {
+    HXWeakSelf
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        HXWeakSelf
         [self.manager getPhotoListWithAlbumModel:self.albumModel complete:^(NSMutableArray *allList, NSMutableArray *previewList, HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel) {
             if ((weakSelf.albumModel != albumModel &&
                  !weakSelf.assetDidChanged) ||
@@ -944,7 +945,11 @@ HX_PhotoEditViewControllerDelegate
     
     self.allArray = allList.mutableCopy;
     if (self.allArray.count && self.showBottomPhotoCount) {
-        self.manager.configuration.showBottomPhotoDetail = YES;
+        if (!self.photoCount && !self.videoCount) {
+            self.manager.configuration.showBottomPhotoDetail = NO;
+        }else {
+            self.manager.configuration.showBottomPhotoDetail = YES;
+        }
     }
     self.previewArray = previewList.mutableCopy;
     [self reloadCollectionViewWithFirstSelectModel:firstSelectModel];

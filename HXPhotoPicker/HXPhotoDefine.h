@@ -21,7 +21,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"3.0.9"
+#define HXVersion @"3.1.0"
 
 /// 如果想要HXPhotoView的item大小自定义设置，请修改为 1
 /// 并且实现HXPhotoView的代理
@@ -64,9 +64,11 @@
 
 #define HXPhotoPickerLivePhotoImagesPath [HXPhotoPickerCachesLivePhotoPath stringByAppendingPathComponent:@"images"]
 
-#define HXShowLog YES
+#define HXShowLog NO
 
 #define HX_UI_IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+
+#define HX_ALLOW_LOCATION ([[NSBundle mainBundle]objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] || [[NSBundle mainBundle]objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
 
 #define HasAFNetworking (__has_include(<AFNetworking/AFNetworking.h>) || __has_include("AFNetworking.h"))
 

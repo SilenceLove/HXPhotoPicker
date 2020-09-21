@@ -43,6 +43,7 @@ static id instance;
     self = [super init];
     if (self) {
         self.isVCBasedStatusBarAppearance = [[[NSBundle mainBundle]objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"] boolValue];
+        
 #if HasAFNetworking
         self.sessionManager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
         [self listenNetWorkStatus];
@@ -60,8 +61,8 @@ static id instance;
 #ifdef __IPHONE_14_0
         else if (@available(iOS 14, *)) {
             if (status == PHAuthorizationStatusLimited) {
-                [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = nil;
-                [HXPhotoCommon photoCommon].cameraRollResult = nil;
+                self.cameraRollLocalIdentifier = nil;
+                self.cameraRollResult = nil;
                 [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
             }else {
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestAuthorizationCompletion) name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
@@ -90,8 +91,8 @@ static id instance;
 #ifdef __IPHONE_14_0
         else if (@available(iOS 14, *)) {
             if (status == PHAuthorizationStatusLimited) {
-                [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = nil;
-                [HXPhotoCommon photoCommon].cameraRollResult = nil;
+                self.cameraRollLocalIdentifier = nil;
+                self.cameraRollResult = nil;
                 self.hasAuthorization = YES;
                 [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
             }
@@ -102,6 +103,10 @@ static id instance;
 
 #pragma mark - < PHPhotoLibraryChangeObserver >
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
+//    if (!self.cameraRollResult) {
+//        [self photoListReload];
+//        return;
+//    }
     PHFetchResultChangeDetails *collectionChanges = [changeInstance changeDetailsForFetchResult:self.cameraRollResult];
     if (collectionChanges) {
         if ([collectionChanges hasIncrementalChanges]) {
@@ -115,8 +120,27 @@ static id instance;
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoViewNeedReloadNotification" object:nil];
                 });
             }
+        }else {
+            PHFetchResult *result = collectionChanges.fetchResultAfterChanges;
+            self.cameraRollResult = result;
+            [self photoListReload];
         }
     }
+}
+- (void)photoListReload {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#ifdef __IPHONE_14_0
+        if (@available(iOS 14, *)) {
+            PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
+            if (status == PHAuthorizationStatusLimited) {
+                if (self.photoLibraryDidChange) {
+                    self.photoLibraryDidChange();
+                }
+            }
+        }
+#endif
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoViewNeedReloadNotification" object:nil];
+    });
 }
 - (NSBundle *)languageBundle {
     if (!_languageBundle) {

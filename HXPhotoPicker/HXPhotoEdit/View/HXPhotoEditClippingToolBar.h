@@ -49,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) CGFloat widthRatio;
 @property (assign, nonatomic) CGFloat heightRatio;
 
+@property (copy, nonatomic) NSString *scaleText;
+
 @property (assign, nonatomic) BOOL isSelected;
 @end
 NS_ASSUME_NONNULL_END
