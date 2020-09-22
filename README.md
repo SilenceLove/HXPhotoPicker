@@ -57,24 +57,42 @@
 
 ## <a id="安装"></a> 二.  安装 - Installation
 
-- Cocoapods：
-  ```
-  // 不使用网络图片功能 
-  pod 'HXPhotoPicker', '~> 3.0'
+<details>
+   <summary><strong>CocoaPods</strong></summary>
+
+``` ruby
+# 将以下内容添加到您的Podfile中：
+# 不使用网络图片功能
+pod 'HXPhotoPicker', '~> 3.1.0'
   
-  // 使用SDWebImage加载网络图片
-  pod 'HXPhotoPicker/SDWebImage', '~> 3.0'
+# 使用SDWebImage加载网络图片
+pod 'HXPhotoPicker/SDWebImage', '~> 3.1.0'
   
-  // 使用YYWebImage加载网络图片
-  pod 'HXPhotoPicker/YYWebImage', '~> 3.0'
-  ```
-- 搜索不到库或最新版请执行```pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json```
-- Carthage：
-  ```
-  github "SilenceLove/HXPhotoPicker"
-  ```
-- 手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
-- 使用前导入头文件 "HXPhotoPicker.h"
+# 使用YYWebImage加载网络图片
+pod 'HXPhotoPicker/YYWebImage', '~> 3.1.0'
+
+# 搜索不到库或最新版时请执行
+pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
+```
+</details>
+
+<details>
+  <summary><strong>Carthage</strong></summary>
+   
+``` ruby
+# 将以下内容添加到您的Cartfile中：
+github "SilenceLove/HXPhotoPicker"
+```
+</details>
+
+<details>
+  <summary><strong>手动导入</strong></summary>
+   
+``` ruby
+手动导入：将项目中的“HXPhotoPicker”文件夹拖入项目中
+使用前导入头文件 "HXPhotoPicker.h"
+```
+</details>
 
 ## <a id="要求"></a> 三.  要求 - Requirements
 
@@ -85,7 +103,9 @@
 - 相机拍照功能请使用真机调试
 
 ## <a id="例子"></a> 四.  应用示例 - Examples
-### <a id="如何获取照片和视频"> 如何获取照片和视频
+<details id="如何获取照片和视频">
+  <summary><strong>如何获取照片和视频</strong></summary>
+   
 ```objc
 // 如果将_manager.configuration.requestImageAfterFinishingSelection 设为YES，
 // 那么在选择完成的时候就会获取图片和视频地址
@@ -233,6 +253,8 @@ for (HXPhotoModel *model in self.selectList) {
     }
 }
 ```
+</details>
+
 ### <a id="判断两个HXPhotoModel是否为同一资源"> 判断两个HXPhotoModel是否为同一资源
 ```
 HXPhotoModel对象方法
@@ -620,12 +642,11 @@ frame.size.height 就是 HXPhotoView 的正确高度
 ```
 #### 10. ios14预览大图显示空白
 ```objc
-1、将SDWebImage升级到最新版
-2、将YYWebImage换成SDWebImage
-```
-#### 11. ios14预览视频时无法播放
-```
-系统相册也播放不了，可能是ios14的bug
+1、SDWebImage解决方案：升级到最新版
+2、YYWebImage解决方案：
+   https://github.com/ibireme/YYKit/issues/573
+   https://www.jianshu.com/p/9c117dbe22a8
+   或者替换成SDWebImage
 ```
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
