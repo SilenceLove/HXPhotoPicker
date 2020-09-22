@@ -255,14 +255,20 @@ for (HXPhotoModel *model in self.selectList) {
 ```
 </details>
 
-### <a id="判断两个HXPhotoModel是否为同一资源"> 判断两个HXPhotoModel是否为同一资源
+<details id="判断两个HXPhotoModel是否为同一资源">
+  <summary><strong>判断两个HXPhotoModel是否为同一资源</strong></summary>
+   
 ```
 HXPhotoModel对象方法
 /// 判断两个HXPhotoModel是否是同一个
 /// @param photoModel 模型
 - (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
 ```
-### <a id="Demo1"></a> 跳转相册选择照片
+</details>
+
+<details id="Demo1">
+  <summary><strong>跳转相册选择照片</strong></summary>
+   
 ```objc
 // 懒加载 照片管理类
 - (HXPhotoManager *)manager {
@@ -307,7 +313,11 @@ HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWi
 */
 - (void)photoNavigationViewControllerDidCancel:(HXCustomNavigationController *)photoNavigationViewController;
 ```
-### <a id="Demo2"></a> 使用HXPhotoView布局
+</details>
+
+<details id="Demo2">
+  <summary><strong>使用HXPhotoView布局</strong></summary>
+   
 ```objc
 // 懒加载 照片管理类
 - (HXPhotoManager *)manager {
@@ -333,7 +343,11 @@ photoView.backgroundColor = [UIColor whiteColor];
 具体请查看HXPhotoView.h
 ...
 ```
-### <a id="如何保存草稿"></a> 如何保存草稿
+</details>
+
+<details id="如何保存草稿">
+  <summary><strong>使用如何保存草稿</strong></summary>
+   
 ```objc
 通过 HXPhotoManager 对象进行存储
 /// 获取保存在本地文件的模型数组
@@ -352,7 +366,11 @@ photoView.backgroundColor = [UIColor whiteColor];
 /// 将本地获取的模型数组添加到manager的数据中
 - (void)addLocalModels;
 ```
-### <a id="如何添加网络/本地图片、视频"></a> 如何添加网络/本地图片、视频
+</details>
+
+<details id="如何添加网络/本地图片、视频">
+  <summary><strong>如何添加网络/本地图片、视频</strong></summary>
+   
 ```objc
 通过 HXPhotoManager、HXCustomAssetModel 进行添加
 /**
@@ -418,7 +436,11 @@ photoView.backgroundColor = [UIColor whiteColor];
 // 完成后刷新HXPhotoView
 [self.photoView refreshView];  
 ```
-### <a id="相关问题"></a> 相关问题
+</details>
+
+<details id="相关问题">
+  <summary><strong>相关问题</strong></summary>
+   
 #### 1. pod YYWebImage与YYKit冲突
 ```objc
 解决方案：将YYKit拆开分别导入
@@ -648,6 +670,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
    https://www.jianshu.com/p/9c117dbe22a8
    或者替换成SDWebImage
 ```
+</details>
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
