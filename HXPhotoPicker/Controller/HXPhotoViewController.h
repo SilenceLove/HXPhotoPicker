@@ -104,6 +104,7 @@ HXCustomCameraController;
 @property (strong, nonatomic) UIImage *cameraImage;
 @property (assign, nonatomic) BOOL cameraSelected;
 @property (assign, nonatomic) BOOL startSession;
+@property (strong, nonatomic) UIColor *bgColor;
 - (void)starRunning;
 - (void)stopRunning;
 @end

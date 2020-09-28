@@ -179,7 +179,7 @@
 - (BOOL)beforeCanSelectPhoto;
 
 /// 完成之前是否可以选择视频
-- (BOOL)beforeCanSelectVideo;
+- (BOOL)beforeCanSelectVideoWithModel:(HXPhotoModel *)model;
 
 #pragma mark - < 关于选择完成之后的一些方法 >
 

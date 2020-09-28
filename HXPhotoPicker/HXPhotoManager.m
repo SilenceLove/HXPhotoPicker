@@ -792,32 +792,18 @@
     }
     if (asset.mediaType == PHAssetMediaTypeImage) {
         photoModel.subType = HXPhotoModelMediaSubTypePhoto;
-//        if (@available(iOS 11, *)) {  // playbackStyle 似乎不稳定
-//            if (asset.playbackStyle == PHAssetPlaybackStyleImageAnimated &&
-//                self.configuration.lookGifPhoto) {
-//                    photoModel.type = HXPhotoModelMediaTypePhotoGif;
-//            }else if (asset.playbackStyle == PHAssetPlaybackStyleLivePhoto &&
-//                      self.configuration.lookLivePhoto &&
-//                      self.supportLivePhoto) {
-//                    photoModel.type =  HXPhotoModelMediaTypeLivePhoto;
-//            }else {
-//                photoModel.type = HXPhotoModelMediaTypePhoto;
-//            }
-//        } else {
-            // Fallback on earlier versions
-            if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"] &&
-                self.configuration.lookGifPhoto) {
-                
-                photoModel.type = HXPhotoModelMediaTypePhotoGif;
-                
-            }else if (self.supportLivePhoto &&
-                      self.configuration.lookLivePhoto &&
-                      asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive ){
-                photoModel.type =  HXPhotoModelMediaTypeLivePhoto;
-            }else {
-                photoModel.type = HXPhotoModelMediaTypePhoto;
-            }
-//        }
+        if ([[asset valueForKey:@"filename"] hasSuffix:@"GIF"] &&
+            self.configuration.lookGifPhoto) {
+            
+            photoModel.type = HXPhotoModelMediaTypePhotoGif;
+            
+        }else if (self.supportLivePhoto &&
+                  self.configuration.lookLivePhoto &&
+                  asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive ){
+            photoModel.type =  HXPhotoModelMediaTypeLivePhoto;
+        }else {
+            photoModel.type = HXPhotoModelMediaTypePhoto;
+        }
     }else if (asset.mediaType == PHAssetMediaTypeVideo) {
         photoModel.subType = HXPhotoModelMediaSubTypeVideo;
         photoModel.type = HXPhotoModelMediaTypeVideo;
@@ -906,9 +892,13 @@
         previewArray = allArray.mutableCopy;
         HXPhotoModel *model = [[HXPhotoModel alloc] init];
         model.type = HXPhotoModelMediaTypeCamera;
-        if (self.configuration.photoListTakePhotoIcon) {
-            model.cameraNormalImageNamed = self.configuration.photoListTakePhotoIcon;
-            model.cameraPreviewImageNamed = self.configuration.photoListTakePhotoIcon;
+        if (self.configuration.photoListTakePhotoNormalImageNamed) {
+            model.cameraNormalImageNamed = self.configuration.photoListTakePhotoNormalImageNamed;
+            if (self.configuration.photoListTakePhotoSelectImageNamed) {
+                model.cameraPreviewImageNamed = self.configuration.photoListTakePhotoSelectImageNamed;
+            }else {
+                model.cameraPreviewImageNamed = self.configuration.photoListTakePhotoNormalImageNamed;
+            }
         }else {
             if (self.configuration.type == HXConfigurationTypeWXChat ||
                 self.configuration.type == HXConfigurationTypeWXMoment) {
@@ -1368,7 +1358,14 @@
 }
 
 /// 完成之前是否可以选择视频
-- (BOOL)beforeCanSelectVideo {
+- (BOOL)beforeCanSelectVideoWithModel:(HXPhotoModel *)model {
+    if (model.videoDuration < self.configuration.videoMinimumSelectDuration) {
+        return NO;
+    }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
+        if (!self.configuration.videoCanEdit) {
+            return NO;
+        }
+    }
     if (!self.configuration.selectTogether) {
         if (!self.selectedPhotoCount && !self.beforeSelectVideoCountIsMaximum) {
             return YES;
@@ -1883,9 +1880,7 @@
 }
 
 - (void)dealloc {
-//    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HXPhotoRequestAuthorizationCompletion" object:nil];
     [self.dataOperationQueue cancelAllOperations];
     
     self.selectedList = nil;

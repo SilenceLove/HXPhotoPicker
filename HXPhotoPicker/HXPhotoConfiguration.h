@@ -268,8 +268,14 @@ HXPhotoPreviewViewController;
 
 #pragma mark - < UI相关 >
 
-/// 照片列表上相机cell上的icon图标名
-@property (copy, nonatomic) NSString *photoListTakePhotoIcon;
+/// 照片列表上相机cell上的相机未预览时的图标
+@property (copy, nonatomic) NSString *photoListTakePhotoNormalImageNamed;
+
+/// 照片列表上相机cell上的相机还是预览时的图标
+@property (copy, nonatomic) NSString *photoListTakePhotoSelectImageNamed;
+
+/// 照片列表上相机cell的背景颜色
+@property (strong, nonatomic) UIColor *photoListTakePhotoBgColor;
 
 /// 未授权时界面上提示文字显示的颜色
 @property (strong, nonatomic) UIColor *authorizationTipColor;
@@ -627,7 +633,7 @@ HXPhotoPreviewViewController;
 /// 3.0.3 之后的版本已无效
 @property (assign, nonatomic) BOOL filtrationICloudAsset DEPRECATED_MSG_ATTRIBUTE("Invalid attribute");
 
-/// 小图照片清晰度 越大越清晰、越消耗性能
+/// 列表小图照片清晰度 越大越清晰、越消耗性能
 /// 设置太大的话获取图片资源时耗时长且内存消耗大可能会引起界面卡顿
 @property (assign, nonatomic) CGFloat clarityScale;
 

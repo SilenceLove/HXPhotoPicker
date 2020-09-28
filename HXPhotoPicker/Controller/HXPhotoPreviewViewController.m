@@ -528,6 +528,10 @@ HX_PhotoEditViewControllerDelegate
             [self.view addSubview:self.darkCancelBtn];
             if (self.previewShowDeleteButton) {
                 [self.view addSubview:self.darkDeleteBtn];
+                if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+                    self.darkDeleteBtn.alpha = 1;
+                    self.darkDeleteBtn.hidden = NO;
+                }
             }
             if ([self.manager.afterSelectedArray containsObject:model]) {
                 self.bottomPageControl.currentPage = [[self.manager afterSelectedArray] indexOfObject:model];
@@ -882,18 +886,22 @@ HX_PhotoEditViewControllerDelegate
     [myCell cancelRequest];
 }
 - (void)scrollDidScrollHiddenBottomSliderViewWithOffsetX:(CGFloat)offsetx nextModel:(HXPhotoModel *)nextModel {
-    if (self.currentModel.subType == HXPhotoModelMediaSubTypeVideo &&
-        self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
-            HXPhotoPreviewVideoViewCell *cell = (HXPhotoPreviewVideoViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:[self.modelArray indexOfObject:self.currentModel] inSection:0]];
-        if (self.darkCancelBtn.hidden) {
-            return;
-        }
+    if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+        HXPhotoPreviewVideoViewCell *cell = (HXPhotoPreviewVideoViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:[self.modelArray indexOfObject:self.currentModel] inSection:0]];
         float difference = fabs(offsetx - self.currentModel.previewContentOffsetX);
         CGFloat width = [UIScreen mainScreen].bounds.size.width;
         if (difference > width) {
             difference = width;
         }
-        self.darkCancelBtn.alpha = 1 - (difference / width);
+        CGFloat scale = difference / width;
+        if ((self.darkDeleteBtn.hidden || self.darkDeleteBtn.alpha < 1) && nextModel.subType == HXPhotoModelMediaSubTypePhoto) {
+            self.darkDeleteBtn.hidden = NO;
+            self.darkDeleteBtn.alpha = scale;
+        }
+        if (self.darkCancelBtn.hidden) {
+            return;
+        }
+        self.darkCancelBtn.alpha = 1 - scale;
         cell.bottomSliderView.alpha = self.darkCancelBtn.alpha;
     }
 }
@@ -983,16 +991,16 @@ HX_PhotoEditViewControllerDelegate
         }
     }
     self.currentModelIndex = currentIndex;
-    if (currentIndex > 0 && currentIndex < self.modelArray.count) {
+    if (currentIndex >= 0 && currentIndex < self.modelArray.count) {
         HXPhotoModel *nextModel;
         if (self.currentModel.previewContentOffsetX > offsetx) {
             NSInteger index = [self.modelArray indexOfObject:self.currentModel] - 1;
-            if (index > 0 && index < self.modelArray.count) {
+            if (index >= 0 && index < self.modelArray.count) {
                 nextModel = self.modelArray[index];
             }
         }else {
             NSInteger index = [self.modelArray indexOfObject:self.currentModel] + 1;
-            if (index > 0 && index < self.modelArray.count) {
+            if (index >= 0 && index < self.modelArray.count) {
                 nextModel = self.modelArray[index];
             }
         }
@@ -1009,6 +1017,20 @@ HX_PhotoEditViewControllerDelegate
         if (self.currentModel != model) {
             self.darkCancelBtn.alpha = 0;
             self.darkCancelBtn.hidden = YES;
+        }
+        if (self.previewShowDeleteButton &&
+            self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            if (model.subType == HXPhotoModelMediaSubTypePhoto) {
+                self.darkDeleteBtn.hidden = NO;
+                self.darkDeleteBtn.alpha = 1;
+            }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+                if (self.darkDeleteBtn.alpha == 0) {
+                    self.darkDeleteBtn.hidden = YES;
+                }else {
+                    self.darkDeleteBtn.hidden = NO;
+                    self.darkDeleteBtn.alpha = 1;
+                }
+            }
         }
         self.currentModel = model;
         [cell requestHDImage];
@@ -1393,6 +1415,7 @@ HX_PhotoEditViewControllerDelegate
         _darkDeleteBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         _darkDeleteBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         [_darkDeleteBtn addTarget:self action:@selector(deleteClick) forControlEvents:UIControlEventTouchUpInside];
+        [_darkDeleteBtn setTitleShadowColor:[[UIColor blackColor] colorWithAlphaComponent:1.f] forState:UIControlStateNormal];
     }
     return _darkDeleteBtn;
 }

@@ -105,7 +105,6 @@ HX_PhotoEditViewControllerDelegate
             }
         }
     }
-//    [[PHPhotoLibrary sharedPhotoLibrary] unregisterChangeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
@@ -187,8 +186,14 @@ HX_PhotoEditViewControllerDelegate
         HXWeakSelf
         self.hx_customNavigationController.reloadAsset = ^(BOOL initialAuthorization){
             if (initialAuthorization) {
+                if (weakSelf.manager.configuration.navigationBar) {
+                    weakSelf.manager.configuration.navigationBar(weakSelf.navigationController.navigationBar, weakSelf);
+                }
                 [weakSelf authorizationHandler];
             }else {
+                if (weakSelf.albumTitleView.selected) {
+                    [weakSelf.albumTitleView deSelect];
+                }
                 [weakSelf.hx_customNavigationController.view hx_showLoadingHUDText:nil];
                 weakSelf.collectionViewReloadCompletion = NO;
                 weakSelf.albumTitleView.canSelect = YES;
@@ -873,7 +878,7 @@ HX_PhotoEditViewControllerDelegate
                 if (cell.model.subType == HXPhotoModelMediaSubTypePhoto) {
                     canSelect = self.manager.beforeCanSelectPhoto;
                 }else if (cell.model.subType == HXPhotoModelMediaSubTypeVideo) {
-                    canSelect = self.manager.beforeCanSelectVideo;
+                    canSelect = [self.manager beforeCanSelectVideoWithModel:cell.model];
                 }
             }else {
                 canSelect = YES;
@@ -1134,6 +1139,7 @@ HX_PhotoEditViewControllerDelegate
     model.dateCellIsVisible = YES;
     if (model.type == HXPhotoModelMediaTypeCamera) {
         HXPhotoCameraViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoCameraViewCellId" forIndexPath:indexPath];
+        cell.bgColor = self.manager.configuration.photoListTakePhotoBgColor;
         cell.model = model;
         if (!self.cameraCell) {
             cell.cameraImage = [HXPhotoCommon photoCommon].cameraImage;
@@ -1152,7 +1158,7 @@ HX_PhotoEditViewControllerDelegate
             if (model.subType == HXPhotoModelMediaSubTypePhoto) {
                 cell.canSelect = self.manager.beforeCanSelectPhoto;
             }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-                cell.canSelect = self.manager.beforeCanSelectVideo;
+                cell.canSelect = [self.manager beforeCanSelectVideoWithModel:model];
             }
         }else {
             cell.canSelect = YES;
@@ -2135,6 +2141,10 @@ HX_PhotoEditViewControllerDelegate
     if ([HXPhotoCommon photoCommon].isDark) {
         self.cameraBtn.selected = YES;
     }
+}
+- (void)setBgColor:(UIColor *)bgColor {
+    _bgColor = bgColor;
+    self.backgroundColor = bgColor;
 }
 - (void)setCameraImage:(UIImage *)cameraImage {
     _cameraImage = cameraImage;

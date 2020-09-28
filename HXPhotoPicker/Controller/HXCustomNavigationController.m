@@ -11,7 +11,7 @@
 #import "HXPhotoViewController.h"
 #import "HXPhotoTools.h"
 
-@interface HXCustomNavigationController ()<HXAlbumListViewControllerDelegate, HXPhotoViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface HXCustomNavigationController ()<HXAlbumListViewControllerDelegate, HXPhotoViewControllerDelegate>
 @property (assign, nonatomic) BOOL didPresentImagePicker;
 @property (assign, nonatomic) BOOL initialAuthorization;
 @property (strong, nonatomic) NSTimer *timer;
@@ -77,10 +77,13 @@
 #ifdef __IPHONE_14_0
     if (@available(iOS 14, *)) {
         [HXPhotoCommon photoCommon].photoLibraryDidChange = ^{
-            [weakSelf.timer invalidate];
-            weakSelf.timer = nil;
-            weakSelf.initialAuthorization = NO;
-            [weakSelf imagePickerDidFinish];
+            if (!weakSelf.initialAuthorization) {
+                if (weakSelf.timer) {
+                    [weakSelf.timer invalidate];
+                    weakSelf.timer = nil;
+                }
+                [weakSelf imagePickerDidFinish];
+            }
         };
     }
 #endif
@@ -135,22 +138,22 @@
         if ([viewControllerToPresent isKindOfClass:[UIImagePickerController class]]) {
             UIImagePickerController *imagePickerController = (UIImagePickerController *)viewControllerToPresent;
             if (imagePickerController.sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
-                imagePickerController.delegate = self;
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
-                HXWeakSelf
-                self.timer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-                    if ([weakSelf.presentedViewController isKindOfClass:[UIImagePickerController class]]) {
-                        weakSelf.didPresentImagePicker = YES;
-                    }else {
-                        if (weakSelf.didPresentImagePicker) {
-                            [timer invalidate];
-                            weakSelf.timer = nil;
-                            weakSelf.didPresentImagePicker = NO;
-                            [weakSelf imagePickerDidFinish];
+                if (self.initialAuthorization) {
+                    HXWeakSelf
+                    self.timer = [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                        if ([weakSelf.presentedViewController isKindOfClass:[UIImagePickerController class]]) {
+                            weakSelf.didPresentImagePicker = YES;
+                        }else {
+                            if (weakSelf.didPresentImagePicker) {
+                                weakSelf.didPresentImagePicker = NO;
+                                [timer invalidate];
+                                weakSelf.timer = nil;
+                                [weakSelf imagePickerDidFinish];
+                            }
                         }
-                    }
-                }];
-                [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+                    }];
+                    [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+                }
             }
         }
     }
@@ -158,7 +161,6 @@
     [super presentViewController:viewControllerToPresent animated:flag completion:completion];
 }
 - (void)imagePickerDidFinish {
-    self.didPresentImagePicker = NO;
     [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = nil;
     [HXPhotoCommon photoCommon].cameraRollResult = nil;
     self.cameraRollAlbumModel = nil;
@@ -167,23 +169,10 @@
     if (self.reloadAsset) {
         self.reloadAsset(self.initialAuthorization);
     }
-}
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
-    [self.timer invalidate];
-    self.timer = nil;
-    [self imagePickerDidFinish];
-}
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [self.timer invalidate];
-    self.timer = nil;
-    if (self.didPresentImagePicker) {
-        self.didPresentImagePicker = NO;
-        [self requestModel];
-        if (self.reloadAsset) {
-            self.reloadAsset(self.initialAuthorization);
-        }
+    if (self.initialAuthorization) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HXPhotoRequestAuthorizationCompletion" object:nil];
+        self.initialAuthorization = NO;
     }
-    [picker dismissViewControllerAnimated:YES completion:nil];
 }
 - (void)requestModel {
     [self.view hx_showLoadingHUDText:nil];
@@ -196,14 +185,14 @@
                     weakSelf.requestCameraRollCompletion();
                 }
             });
-        }];
-        [self.manager getAllAlbumModelWithCompletion:^(NSMutableArray<HXAlbumModel *> *albums) {
-            weakSelf.albums = albums.mutableCopy;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (weakSelf.requestAllAlbumCompletion) {
-                    weakSelf.requestAllAlbumCompletion();
-                }
-            });
+            [weakSelf.manager getAllAlbumModelWithCompletion:^(NSMutableArray<HXAlbumModel *> *albums) {
+                weakSelf.albums = albums.mutableCopy;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (weakSelf.requestAllAlbumCompletion) {
+                        weakSelf.requestAllAlbumCompletion();
+                    }
+                });
+            }];
         }];
     });
 }

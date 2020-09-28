@@ -62,13 +62,34 @@
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
 }
-
+- (void)photoListAddClick {
+#ifdef __IPHONE_14_0
+    if (@available(iOS 14, *)) {
+        [[PHPhotoLibrary sharedPhotoLibrary] presentLimitedLibraryPickerFromViewController:[UIApplication sharedApplication].keyWindow.rootViewController.navigationController];
+    }
+#endif
+}
 - (HXPhotoManager *)photoManager {
     if (!_photoManager) {
         _photoManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
         _photoManager.configuration.type = HXConfigurationTypeWXMoment;
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";
         _photoManager.configuration.showOriginalBytes = YES;
+        _photoManager.configuration.clarityScale = 2.f;
+        HXWeakSelf
+        // 添加一个可以更改可查看照片的数据
+        _photoManager.configuration.navigationBar = ^(UINavigationBar *navigationBar, UIViewController *viewController) {
+            
+#ifdef __IPHONE_14_0
+            if (@available(iOS 14, *)) {
+                if ([HXPhotoTools authorizationStatus] == PHAuthorizationStatusLimited) {
+                    if ([viewController isKindOfClass:[HXPhotoViewController class]]) {
+                        viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"添加" style:UIBarButtonItemStylePlain target:weakSelf action:@selector(photoListAddClick)];
+                    }
+                }
+            }
+#endif
+        };
 #if HasSDWebImage
         // 先导入了SDWebImage
         _photoManager.configuration.photoEditConfigur.requestChartletModels = ^(void (^ _Nonnull chartletModels)(NSArray<HXPhotoEditChartletTitleModel *> * _Nonnull)) {

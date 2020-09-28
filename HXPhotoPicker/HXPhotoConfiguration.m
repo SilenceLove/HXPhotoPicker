@@ -93,9 +93,7 @@
     self.editAssetSaveSystemAblum = NO;
     self.photoEditCustomRatios = @[@{@"原始值" : @"{0, 0}"}, @{@"正方形" : @"{1, 1}"}, @{@"2:3" : @"{2, 3}"}, @{@"3:4" : @"{3, 4}"}, @{@"9:16" : @"{9, 16}"}, @{@"16:9" : @"{16, 9}"}];
     self.useWxPhotoEdit = YES;
-    if ([UIScreen mainScreen].bounds.size.width == 320) {
-        _clarityScale = 1.0;
-    }else if (HX_IS_IPhoneX_All) {
+    if (HX_IS_IPhoneX_All) {
         _clarityScale = 1.8;
     }else {
         _clarityScale = 1.5;
@@ -145,12 +143,10 @@
 }
 - (void)setClarityScale:(CGFloat)clarityScale {
     if (clarityScale <= 0.f) {
-        if ([UIScreen mainScreen].bounds.size.width == 320) {
-            _clarityScale = 1.0;
-        }else if (HX_IS_IPhoneX_All) {
+        if (HX_IS_IPhoneX_All) {
             _clarityScale = 1.8;
         }else {
-            _clarityScale = 1.4;
+            _clarityScale = 1.5;
         }
     }else {
         _clarityScale = clarityScale;
