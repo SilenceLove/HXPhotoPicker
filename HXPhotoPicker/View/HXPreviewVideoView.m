@@ -160,7 +160,6 @@
         self.playBtn.hidden = NO;
         [self hideLoading];
         [self hideLoadFailedView];
-        [self setVideoCurrentTime:0 animation:NO];
         if (self.changePlayBtnState) {
             self.changePlayBtnState(NO);
         }
@@ -175,6 +174,7 @@
         self.canRemovePlayerObservers = NO;
         [self.player replaceCurrentItemWithPlayerItem:nil];
         self.playerLayer.player = nil;
+        [self setVideoCurrentTime:0 animation:NO];
     }
     self.stopCancel = NO;
 }
@@ -198,11 +198,14 @@
     if (!self.canRemovePlayerObservers) {
         return;
     }
+    if (self.playbackTimeObserver) {
+        [self.player removeTimeObserver:self.playbackTimeObserver];
+        self.playbackTimeObserver = nil;
+    }
     [self.player.currentItem removeObserver:self forKeyPath:@"status"];
     [self.player.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
     [self.player.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
     [self.player.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.player.currentItem];
 }
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
@@ -495,8 +498,6 @@
     self.playBtn.hx_centerY = self.hx_h / 2;
 }
 - (void)dealloc {
-    [self.player removeTimeObserver:self.playbackTimeObserver];
-    self.playbackTimeObserver = nil;
     
     [self.playerLayer removeObserver:self forKeyPath:@"readyForDisplay"];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];

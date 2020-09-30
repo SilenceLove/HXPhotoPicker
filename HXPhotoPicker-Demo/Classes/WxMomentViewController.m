@@ -75,6 +75,7 @@
         _photoManager.configuration.type = HXConfigurationTypeWXMoment;
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";
         _photoManager.configuration.showOriginalBytes = YES;
+        _photoManager.configuration.showOriginalBytesLoading = YES;
         _photoManager.configuration.clarityScale = 2.f;
         HXWeakSelf
         // 添加一个可以更改可查看照片的数据

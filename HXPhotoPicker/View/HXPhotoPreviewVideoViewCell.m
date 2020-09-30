@@ -54,10 +54,6 @@
 }
 - (void)cancelRequest {
     self.previewContentView.stopCancel = self.stopCancel;
-    if (!self.stopCancel) {
-        self.bottomSliderView.alpha = 0;
-        self.bottomSliderView.hidden = YES;
-    }
     [self.previewContentView cancelRequest];
     self.stopCancel = NO;
 }

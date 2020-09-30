@@ -66,7 +66,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoLanguageType) {
 };
 
 typedef NS_ENUM(NSUInteger, HXPhotoStyle) {
-    HXPhotoStyleDefault = 0,    //!< 默认
+    HXPhotoStyleDefault = 0,    //!< 默认，会跟随系统变化
+    HXPhotoStyleInvariant,      //!< 不跟随系统变化
     HXPhotoStyleDark            //!< 暗黑
 };
 

@@ -549,6 +549,10 @@ NSString *const kHXEditingViewData_clippingView = @"kHXEditingViewData_clippingV
 - (void)cancel {
     [self.clippingView cancel];
     _clippingRect = AVMakeRectWithAspectRatioInsideRect(self.clippingView.hx_size, self.bounds);
+    UIEdgeInsets insets = [self refer_clippingInsets];
+    /** 计算clippingView与父界面的中心偏差坐标 */
+    self.clippingView.offsetSuperCenter = self.isClipping ? CGPointMake(insets.right-insets.left, insets.bottom-insets.top) : CGPointZero;
+    
     self.gridView.gridRect = self.clippingView.frame;
     [self.gridView setAspectRatioWithoutDelegate:self.old_aspectRatio];
     self.imagePixel.center = CGPointMake(CGRectGetMidX(self.gridView.gridRect), CGRectGetMidY(self.gridView.gridRect));

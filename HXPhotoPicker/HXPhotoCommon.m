@@ -197,6 +197,8 @@ static id instance;
 - (BOOL)isDark {
     if (self.photoStyle == HXPhotoStyleDark) {
         return YES;
+    }else if (self.photoStyle == HXPhotoStyleInvariant) {
+        return NO;
     }
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {

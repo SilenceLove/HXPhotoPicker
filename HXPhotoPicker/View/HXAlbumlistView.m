@@ -42,9 +42,7 @@
 }
 - (void)setAlbumModelArray:(NSMutableArray *)albumModelArray {
     _albumModelArray = albumModelArray;
-//    [self.tableView reloadData];
     self.currentSelectModel = albumModelArray.firstObject;
-//    [self refreshCamearCount];
 }
 - (void)selectCellScrollToCenter {
     if (!self.currentSelectModel) {
@@ -93,35 +91,25 @@
                     [weakSelf.deleteCellArray addObject:[weakSelf.tableView indexPathForCell:myCell]];
                 }
             }
-            NSInteger cellCount = weakSelf.tableVisibleCells.count;
-            NSInteger index = [weakSelf.tableVisibleCells indexOfObject:myCell];
-            if (index < cellCount - 1) {
-                [weakSelf cellSetModelData:weakSelf.tableVisibleCells[index + 1]];
-            }else {
-                // 可见cell已全部设置
-                weakSelf.cellCanSetModel = YES;
-                weakSelf.tableVisibleCells = nil;
-                if (weakSelf.deleteCellArray.count) {
-                    [weakSelf.tableView deleteRowsAtIndexPaths:weakSelf.deleteCellArray withRowAnimation:UITableViewRowAnimationFade];
-                }
-                [weakSelf.deleteCellArray removeAllObjects];
-                weakSelf.deleteCellArray = nil;
-            }
+            [weakSelf setCellModel:myCell];
         }];
     }else {
-        NSInteger count = self.tableVisibleCells.count;
-        NSInteger index = [self.tableVisibleCells indexOfObject:cell];
-        if (index < count - 1) {
-            [self cellSetModelData:self.tableVisibleCells[index + 1]];
-        }else {
-            self.cellCanSetModel = YES;
-            self.tableVisibleCells = nil;
-            if (self.deleteCellArray.count) {
-                [self.tableView deleteRowsAtIndexPaths:self.deleteCellArray withRowAnimation:UITableViewRowAnimationFade];
-            }
-            [self.deleteCellArray removeAllObjects];
-            self.deleteCellArray = nil;
+        [self setCellModel:cell];
+    }
+}
+- (void)setCellModel:(HXAlbumlistViewCell *)cell {
+    NSInteger count = self.tableVisibleCells.count;
+    NSInteger index = [self.tableVisibleCells indexOfObject:cell];
+    if (index < count - 1) {
+        [self cellSetModelData:self.tableVisibleCells[index + 1]];
+    }else {
+        self.cellCanSetModel = YES;
+        self.tableVisibleCells = nil;
+        if (self.deleteCellArray.count) {
+            [self.tableView deleteRowsAtIndexPaths:self.deleteCellArray withRowAnimation:UITableViewRowAnimationFade];
         }
+        [self.deleteCellArray removeAllObjects];
+        self.deleteCellArray = nil;
     }
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

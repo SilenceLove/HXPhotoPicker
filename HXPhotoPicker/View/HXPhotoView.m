@@ -19,7 +19,7 @@
 #import "HXPhotoBottomSelectView.h"
 #import "UIColor+HXExtension.h"
 
-@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate, UICollectionViewDelegateFlowLayout,HXPhotoSubViewCellDelegate,UIActionSheetDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
+@interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate, UICollectionViewDelegateFlowLayout,HXPhotoSubViewCellDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
 @property (strong, nonatomic) NSMutableArray *videos;
@@ -622,30 +622,12 @@
                 nav.modalPresentationCapturesStatusBarAppearance = YES;
                 [[weakSelf hx_viewController] presentViewController:nav animated:YES completion:nil];
             }else {
-                hx_showAlert([weakSelf hx_viewController], [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], nil, ^{
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                });
+                [HXPhotoTools showUnusableCameraAlert:weakSelf.hx_viewController];
             }
         });
     }];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 0) {
-        [self goCameraViewController];
-    }else if (buttonIndex == 1){
-        [self directGoPhotoViewController];
-    }
-}
-
-/**
- 前往设置开启权限
- */
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 1) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-    }
-}
 - (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model {
     [self cameraDidNextClick:model];
 }

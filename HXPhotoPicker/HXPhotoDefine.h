@@ -10,6 +10,7 @@
 #define HXPhotoDefine_h
 
 #import <CommonCrypto/CommonDigest.h>
+#import "NSBundle+HXPhotoPicker.h"
 
 // 日志输出
 #ifdef DEBUG
@@ -21,7 +22,7 @@
 /**
  版本号 x.x.x
  */
-#define HXVersion @"3.1.0"
+#define HXVersion @"3.1.1"
 
 /// 如果想要HXPhotoView的item大小自定义设置，请修改为 1
 /// 并且实现HXPhotoView的代理
@@ -68,7 +69,9 @@
 
 #define HX_UI_IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 
-#define HX_ALLOW_LOCATION ([[NSBundle mainBundle]objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] || [[NSBundle mainBundle]objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
+#define HX_ALLOW_LOCATION ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
+
+#define HX_PREFERS_STATUS_BAR_HIDDEN [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"] boolValue]
 
 #define HasAFNetworking (__has_include(<AFNetworking/AFNetworking.h>) || __has_include("AFNetworking.h"))
 
@@ -153,7 +156,6 @@ static inline NSString * _Nonnull HXDiskCacheFileNameForKey(NSString * _Nullable
     return filename;
 }
 #pragma clang diagnostic pop
-
 CG_INLINE UIAlertController * _Nullable hx_showAlert(UIViewController * _Nullable vc,
                                           NSString * _Nullable title,
                                           NSString * _Nullable message,

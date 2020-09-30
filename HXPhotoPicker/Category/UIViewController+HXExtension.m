@@ -66,9 +66,7 @@
                 nav.modalPresentationCapturesStatusBarAppearance = YES;
                 [weakSelf presentViewController:nav animated:YES completion:nil];
             }else {
-                hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                });
+                [HXPhotoTools showUnusableCameraAlert:weakSelf];
             }
         });
     }];
@@ -97,9 +95,7 @@
                 nav.modalPresentationCapturesStatusBarAppearance = YES;
                 [weakSelf presentViewController:nav animated:YES completion:nil];
             }else {
-                hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                });
+                [HXPhotoTools showUnusableCameraAlert:weakSelf];
             }
         });
     }];

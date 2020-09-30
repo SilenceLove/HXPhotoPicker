@@ -25,6 +25,7 @@
     * [使用HXPhotoView选照片后自动布局](#Demo2)
     * [保存草稿](#如何保存草稿)
     * [添加网络/本地图片、视频](#如何添加网络/本地图片、视频)
+    * [ios14预览时显示空白](#ios14预览大图显示空白)
     * [相关问题](#相关问题)
     * [更多请下载工程查看](#更多) 
 * [更新记录](#更新历史)
@@ -63,13 +64,13 @@
 ``` ruby
 # 将以下内容添加到您的Podfile中：
 # 不使用网络图片功能
-pod 'HXPhotoPicker', '~> 3.1.0'
+pod 'HXPhotoPicker', '~> 3.1.1'
   
 # 使用SDWebImage加载网络图片
-pod 'HXPhotoPicker/SDWebImage', '~> 3.1.0'
+pod 'HXPhotoPicker/SDWebImage', '~> 3.1.1'
   
 # 使用YYWebImage加载网络图片
-pod 'HXPhotoPicker/YYWebImage', '~> 3.1.0'
+pod 'HXPhotoPicker/YYWebImage', '~> 3.1.1'
 
 # 搜索不到库或最新版时请执行
 pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
@@ -438,6 +439,19 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 </details>
 
+<details id="ios14预览大图显示空白">
+  <summary><strong>ios14预览大图显示空白</strong></summary>
+   
+#### ios14预览大图显示空白
+```objc
+1、SDWebImage解决方案：升级到最新版
+2、YYWebImage解决方案：
+   https://github.com/ibireme/YYKit/issues/573
+   https://www.jianshu.com/p/9c117dbe22a8
+   或者替换成SDWebImage
+```
+</details>
+
 <details id="相关问题">
   <summary><strong>相关问题</strong></summary>
    
@@ -662,18 +676,11 @@ HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
 frame.size.height 就是 HXPhotoView 的正确高度
 代码参考demo11
 ```
-#### 10. ios14预览大图显示空白
-```objc
-1、SDWebImage解决方案：升级到最新版
-2、YYWebImage解决方案：
-   https://github.com/ibireme/YYKit/issues/573
-   https://www.jianshu.com/p/9c117dbe22a8
-   或者替换成SDWebImage
-```
 </details>
 
 ## <a id="更新历史"></a> 五.  更新历史 - Update History
 ```
+- v3.1.1　-　dark模式下界面优化，修复编辑图片在特殊情况下出现未编辑图片显示已编辑状态、完善iOS14适配
 - v3.1.0　-　完善iOS14相册权限，修复ios11以下布局问题
 - v3.0.8　-　修复国际化文件问题、添加滑动手势选择功能
 - v3.0.7　-　本地化文件名重名问题修改、相机/相册跳转未全屏问题修改

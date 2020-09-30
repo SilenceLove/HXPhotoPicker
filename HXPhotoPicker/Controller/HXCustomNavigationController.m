@@ -185,14 +185,14 @@
                     weakSelf.requestCameraRollCompletion();
                 }
             });
-            [weakSelf.manager getAllAlbumModelWithCompletion:^(NSMutableArray<HXAlbumModel *> *albums) {
-                weakSelf.albums = albums.mutableCopy;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (weakSelf.requestAllAlbumCompletion) {
-                        weakSelf.requestAllAlbumCompletion();
-                    }
-                });
-            }];
+        }];
+        [self.manager getAllAlbumModelWithCompletion:^(NSMutableArray<HXAlbumModel *> *albums) {
+            weakSelf.albums = albums.mutableCopy;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (weakSelf.requestAllAlbumCompletion) {
+                    weakSelf.requestAllAlbumCompletion();
+                }
+            });
         }];
     });
 }

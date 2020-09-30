@@ -262,11 +262,12 @@ HX_PhotoEditViewControllerDelegate
     if (!self.manager.configuration.singleSelected) {
         [self.view addSubview:self.bottomView];
     }
+    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(didCancelClick)];
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
         if (self.manager.configuration.photoListCancelLocation == HXPhotoListCancelButtonLocationTypeLeft) {
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(didCancelClick)];
+            self.navigationItem.leftBarButtonItem = cancelItem;
         }else if (self.manager.configuration.photoListCancelLocation == HXPhotoListCancelButtonLocationTypeRight) {
-            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(didCancelClick)];
+            self.navigationItem.rightBarButtonItem = cancelItem;
         }
         if (self.manager.configuration.photoListTitleView) {
             self.navigationItem.titleView = self.manager.configuration.photoListTitleView(self.albumModel.albumName);
@@ -280,7 +281,7 @@ HX_PhotoEditViewControllerDelegate
         [self.view addSubview:self.albumBgView];
         [self.view addSubview:self.albumView];
     }else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStyleDone target:self action:@selector(didCancelClick)];
+        self.navigationItem.rightBarButtonItem = cancelItem;
     }
     [self changeColor];
 }
@@ -341,14 +342,14 @@ HX_PhotoEditViewControllerDelegate
     CGFloat cellHeight = self.manager.configuration.popupTableViewCellHeight;
     CGFloat albumHeight = cellHeight * count;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGFloat albumMaxHeight;
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
-        if (albumHeight > self.manager.configuration.popupTableViewHeight) {
-            albumHeight = self.manager.configuration.popupTableViewHeight;
-        }
+        albumMaxHeight = self.manager.configuration.popupTableViewHeight;
     }else {
-        if (albumHeight > self.manager.configuration.popupTableViewHorizontalHeight) {
-            albumHeight = self.manager.configuration.popupTableViewHorizontalHeight;
-        }
+        albumMaxHeight = self.manager.configuration.popupTableViewHorizontalHeight;
+    }
+    if (albumHeight > albumMaxHeight) {
+        albumHeight = albumMaxHeight;
     }
     return albumHeight;
 }
@@ -800,15 +801,17 @@ HX_PhotoEditViewControllerDelegate
         }
         if (self.currentPanSelectType == 0) {
             for (HXPhotoModel *model in [self.manager selectedArray]) {
-                if (model.currentAlbumIndex == self.albumModel.index) {
-                    if (model.dateCellIsVisible) {
-                        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:model] inSection:0];
-                        HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-                        if (cell && ![cell.selectBtn.currentTitle isEqualToString:model.selectIndexStr]) {
-                            if (![reloadSelectArray containsObject:indexPath]) {
-                                [reloadSelectArray addObject:indexPath];
-                            }
-                        }
+                if (model.currentAlbumIndex != self.albumModel.index) {
+                    continue;
+                }
+                if (!model.dateCellIsVisible) {
+                    continue;
+                }
+                NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:model] inSection:0];
+                HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+                if (cell && ![cell.selectBtn.currentTitle isEqualToString:model.selectIndexStr]) {
+                    if (![reloadSelectArray containsObject:indexPath]) {
+                        [reloadSelectArray addObject:indexPath];
                     }
                 }
             }
@@ -930,8 +933,7 @@ HX_PhotoEditViewControllerDelegate
     HXWeakSelf
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self.manager getPhotoListWithAlbumModel:self.albumModel complete:^(NSMutableArray *allList, NSMutableArray *previewList, HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel) {
-            if ((weakSelf.albumModel != albumModel &&
-                 !weakSelf.assetDidChanged) ||
+            if ((weakSelf.albumModel != albumModel && !weakSelf.assetDidChanged) ||
                 !weakSelf) {
                 return;
             }
@@ -1256,9 +1258,7 @@ HX_PhotoEditViewControllerDelegate
                     nav.modalPresentationCapturesStatusBarAppearance = YES;
                     [weakSelf presentViewController:nav animated:YES completion:nil];
                 }else {
-                    hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
-                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                    }); 
+                    [HXPhotoTools showUnusableCameraAlert:weakSelf];
                 }
             });
         }];
