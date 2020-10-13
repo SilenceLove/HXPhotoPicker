@@ -1,0 +1,13 @@
+language: objective-c
+osx_image: xcode11.5
+
+before_install:
+    - gem install xcpretty
+    
+script:
+    - set -o pipefail
+    - xcodebuild clean -workspace HXPhotoPicker-Demo.xcworkspace -scheme "HXPhotoPicker" -sdk iphonesimulator build | xcpretty
+
+after_success:
+    - sleep 4
+    - bash <(curl -s https://codecov.io/bash)

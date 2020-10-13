@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="HXPhotoEditGraffitiColorView">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="Y7v-8I-t1E">
+                    <rect key="frame" x="0.0" y="0.0" width="260" height="50"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="IIz-TF-u4c">
+                        <size key="itemSize" width="128" height="128"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                </collectionView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EF9-u5-z13">
+                    <rect key="frame" x="265" y="0.0" width="40" height="50"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="40" id="Yno-tK-YOL"/>
+                    </constraints>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <state key="normal">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
+                    <connections>
+                        <action selector="didRepealBtnClick:" destination="iN0-l3-epB" eventType="touchUpInside" id="ewk-gs-1c8"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="Y7v-8I-t1E" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="069-pr-AvX"/>
+                <constraint firstItem="EF9-u5-z13" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="1S7-sd-QTp"/>
+                <constraint firstItem="EF9-u5-z13" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" constant="-15" id="L2Z-Sz-aFv"/>
+                <constraint firstItem="EF9-u5-z13" firstAttribute="leading" secondItem="Y7v-8I-t1E" secondAttribute="trailing" constant="5" id="P8w-js-WgU"/>
+                <constraint firstItem="EF9-u5-z13" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="UAd-SQ-1On"/>
+                <constraint firstItem="Y7v-8I-t1E" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="aDS-y6-oAy"/>
+                <constraint firstItem="Y7v-8I-t1E" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="mxI-HB-2N1"/>
+            </constraints>
+            <nil key="simulatedTopBarMetrics"/>
+            <nil key="simulatedBottomBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="collectionView" destination="Y7v-8I-t1E" id="HOi-ID-fJQ"/>
+                <outlet property="flowLayout" destination="IIz-TF-u4c" id="JFy-Gx-xpA"/>
+                <outlet property="repealBtn" destination="EF9-u5-z13" id="wvI-Tp-dtk"/>
+            </connections>
+            <point key="canvasLocation" x="-329" y="2"/>
+        </view>
+    </objects>
+</document>
