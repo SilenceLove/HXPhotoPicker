@@ -230,13 +230,22 @@ static id instance;
             if ([imageData writeToFile:fullPathToFile atomically:YES]) {
                 NSURL *imageURL = [NSURL fileURLWithPath:fullPathToFile];
                 [[NSUserDefaults standardUserDefaults] setURL:imageURL forKey:HXCameraImageKey];
+                self.cameraImageURL = imageURL;
             }
             self.cameraImage = nil;
         });
     }
 }
 - (void)setCameraImage:(UIImage *)cameraImage {
-    _cameraImage = [cameraImage hx_scaleImagetoScale:0.4];
+    if (!cameraImage) {
+        _cameraImage = nil;
+    }
+    UIImage *image = [cameraImage hx_scaleImagetoScale:0.4];
+    if (image) {
+        _cameraImage = image;
+    }else {
+        _cameraImage = cameraImage;
+    }
 }
 /** 初始化并监听网络变化 */
 - (void)listenNetWorkStatus {

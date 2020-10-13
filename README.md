@@ -263,7 +263,7 @@ for (HXPhotoModel *model in self.selectList) {
 HXPhotoModel对象方法
 /// 判断两个HXPhotoModel是否是同一个
 /// @param photoModel 模型
-- (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
+- (BOOL)isEqualToPhotoModel:(HXPhotoModel * _Nullable)photoModel;
 ```
 </details>
 

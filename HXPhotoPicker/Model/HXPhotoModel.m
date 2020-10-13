@@ -153,7 +153,7 @@
     }
     return HXPhotoModelFormatUnknown;
 }
-- (BOOL)isEqualPhotoModel:(HXPhotoModel *)photoModel {
+- (BOOL)isEqualToPhotoModel:(HXPhotoModel *)photoModel {
     if (!photoModel) {
         return NO;
     }
@@ -198,8 +198,8 @@
 }
 
 
-/// 重写 isEqual 方法 会因为 isEqualPhotoModel 这个在选择照片的时候导致一点点卡顿所以屏蔽
-/// 想要判断两个model是否相容请在需要的时候调用 isEqualPhotoModel 方法来判断
+/// 重写 isEqual 方法 会因为 isEqualToPhotoModel 这个在选择照片的时候导致一点点卡顿所以屏蔽
+/// 想要判断两个model是否相容请在需要的时候调用 isEqualToPhotoModel 方法来判断
 //- (BOOL)isEqual:(id)object {
 //    if (self == object) {
 //        return YES;
@@ -207,7 +207,7 @@
 //    if (![self isKindOfClass:[HXPhotoModel class]]) {
 //        return NO;
 //    }
-//    return [self isEqualPhotoModel:object];
+//    return [self isEqualToPhotoModel:object];
 //}
 
 - (NSDate *)creationDate {

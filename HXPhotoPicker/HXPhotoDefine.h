@@ -107,6 +107,8 @@
 #define hxTopMargin (HX_IS_IPhoneX_All ? 44 : 0)
 #define hxBottomMargin (HX_IS_IPhoneX_All ? 34 : 0)
 
+#define HX_IOS14_Later ([UIDevice currentDevice].systemVersion.floatValue >= 14.0f)
+
 #define HX_IOS11_Later ([UIDevice currentDevice].systemVersion.floatValue >= 11.0f)
 
 #define HX_IOS11_Earlier  ([UIDevice currentDevice].systemVersion.floatValue < 11.0f)

@@ -206,7 +206,7 @@
                                               netWorkVideoURL:(NSURL * _Nullable)videoURL;
 /// 判断两个HXPhotoModel是否是同一个
 /// @param photoModel 模型
-- (BOOL)isEqualPhotoModel:(HXPhotoModel * _Nullable)photoModel;
+- (BOOL)isEqualToPhotoModel:(HXPhotoModel * _Nullable)photoModel;
 
 #pragma mark - < Request >
 + (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nullable url, NSError * _Nullable error))completion;

@@ -336,7 +336,8 @@ HX_PhotoEditViewControllerDelegate
                 self.darkDeleteBtn.frame = CGRectMake(self.view.hx_w - 100 - 15, topMargin, 100, 30);
             }
             self.darkCancelBtn.frame = CGRectMake(15, topMargin, 35, 35);
-            self.bottomPageControl.frame = CGRectMake(0, self.view.hx_h - 30, self.view.hx_w, 10);
+            CGFloat pageControlY = HX_IS_IPhoneX_All ? self.view.hx_h - 40 : self.view.hx_h - 30;
+            self.bottomPageControl.frame = CGRectMake(0, pageControlY, self.view.hx_w, 10);
         }
     }else {
         self.bottomView.frame = CGRectMake(0, bottomViewHeight, self.view.hx_w, 50 + bottomMargin);
@@ -536,7 +537,8 @@ HX_PhotoEditViewControllerDelegate
             if ([self.manager.afterSelectedArray containsObject:model]) {
                 self.bottomPageControl.currentPage = [[self.manager afterSelectedArray] indexOfObject:model];
             }
-            if (self.manager.afterSelectedCount <= 15) {
+            BOOL canAddBottomPageControl =  HX_IOS14_Later ? YES : (self.manager.afterSelectedCount <= 15);
+            if (canAddBottomPageControl) {
                 [self.view addSubview:self.bottomPageControl];
             }
         }
@@ -1380,6 +1382,13 @@ HX_PhotoEditViewControllerDelegate
         _bottomPageControl.currentPageIndicatorTintColor = [UIColor whiteColor];
         _bottomPageControl.pageIndicatorTintColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5f];
         _bottomPageControl.numberOfPages = self.modelArray.count;
+        _bottomPageControl.enabled = NO;
+#ifdef __IPHONE_14_0
+        if (@available(iOS 14, *)) {
+            _bottomPageControl.backgroundStyle = UIPageControlBackgroundStyleProminent;
+            _bottomPageControl.allowsContinuousInteraction = NO;
+        }
+#endif
     }
     return _bottomPageControl;
 }

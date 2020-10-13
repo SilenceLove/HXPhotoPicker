@@ -133,27 +133,28 @@
     }];
 }
 - (void)presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
+    if (!self.initialAuthorization) {
+        [super presentViewController:viewControllerToPresent animated:flag completion:completion];
+        return;
+    }
 #ifdef __IPHONE_14_0
     if (@available(iOS 14, *)) {
         if ([viewControllerToPresent isKindOfClass:[UIImagePickerController class]]) {
             UIImagePickerController *imagePickerController = (UIImagePickerController *)viewControllerToPresent;
             if (imagePickerController.sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
-                if (self.initialAuthorization) {
-                    HXWeakSelf
-                    self.timer = [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:YES block:^(NSTimer * _Nonnull timer) {
-                        if ([weakSelf.presentedViewController isKindOfClass:[UIImagePickerController class]]) {
-                            weakSelf.didPresentImagePicker = YES;
-                        }else {
-                            if (weakSelf.didPresentImagePicker) {
-                                weakSelf.didPresentImagePicker = NO;
-                                [timer invalidate];
-                                weakSelf.timer = nil;
-                                [weakSelf imagePickerDidFinish];
-                            }
+                HXWeakSelf
+                self.timer = [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                    if ([weakSelf.presentedViewController isKindOfClass:[UIImagePickerController class]]) {
+                        weakSelf.didPresentImagePicker = YES;
+                    }else {
+                        if (weakSelf.didPresentImagePicker) {
+                            weakSelf.didPresentImagePicker = NO;
+                            [timer invalidate];
+                            weakSelf.timer = nil;
+                            [weakSelf imagePickerDidFinish];
                         }
-                    }];
-                    [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
-                }
+                    }
+                }];
             }
         }
     }

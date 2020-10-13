@@ -23,6 +23,9 @@ HXPhotoPreviewViewController;
 /// 一键配置UI和选择逻辑
 @property (assign, nonatomic) HXConfigurationType type;
 
+/// 查看LivePhoto是否自动播放，为NO时需要长按才可播放
+@property (assign, nonatomic) BOOL livePhotoAutoPlay;
+
 /// 允许滑动的方式选择资源 - 默认允许
 /// 类似系统相册和QQ滑动选择逻辑
 @property (assign, nonatomic) BOOL allowSlidingSelection;

@@ -1550,7 +1550,8 @@ HX_PhotoEditViewControllerDelegate
             }
             return;
         }
-        if (cell.model.type != HXPhotoModelMediaTypeCameraVideo && cell.model.type != HXPhotoModelMediaTypeCameraPhoto) {
+        if (cell.model.type != HXPhotoModelMediaTypeCameraVideo &&
+            cell.model.type != HXPhotoModelMediaTypeCameraPhoto) {
             cell.model.thumbPhoto = cell.imageView.image;
         }
         [self.manager beforeSelectedListAddPhotoModel:cell.model];

@@ -143,7 +143,9 @@
             weakSelf.downloadICloudAssetComplete();
         }
         weakSelf.livePhotoView.livePhoto = livePhoto;
-        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        if ([HXPhotoCommon photoCommon].livePhotoAutoPlay) {
+            [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        }
     } failed:^(NSDictionary *info, HXPhotoModel *model) {
         if (weakSelf.model != model) return;
         weakSelf.progressView.hidden = YES;
@@ -280,7 +282,9 @@
         }
         [weakSelf.livePhotoView stopPlayback];
         weakSelf.livePhotoView.livePhoto = livePhoto;
-        [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        if ([HXPhotoCommon photoCommon].livePhotoAutoPlay) {
+            [weakSelf.livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        }
     }];
 }
 - (void)cancelLivePhoto {
@@ -323,8 +327,8 @@
         self.progressView.hidden = YES;
         self.progressView.progress = 0;
         if (_livePhotoView.livePhoto) {
-            self.livePhotoView.livePhoto = nil;
             [self stopLivePhoto];
+            self.livePhotoView.livePhoto = nil;
         }
     }
     self.stopCancel = NO;
@@ -345,7 +349,9 @@
 }
 - (void)livePhotoView:(PHLivePhotoView *)livePhotoView didEndPlaybackWithStyle:(PHLivePhotoViewPlaybackStyle)playbackStyle {
     if (livePhotoView == _livePhotoView) {
-        [livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        if ([HXPhotoCommon photoCommon].livePhotoAutoPlay) {
+            [livePhotoView startPlaybackWithStyle:PHLivePhotoViewPlaybackStyleFull];
+        }
     }
 //    [self stopLivePhoto];
 }

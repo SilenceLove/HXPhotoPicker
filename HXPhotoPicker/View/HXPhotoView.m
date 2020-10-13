@@ -532,7 +532,7 @@
         NSMutableArray *tempAll = allList.mutableCopy;
         for (HXPhotoModel *pModel in self.dataList) {
             for (HXPhotoModel *subPModel in tempAll) {
-                if ([pModel isEqualPhotoModel:subPModel]) {
+                if ([pModel isEqualToPhotoModel:subPModel]) {
                     [tempAll removeObject:subPModel];
                     break;
                 }

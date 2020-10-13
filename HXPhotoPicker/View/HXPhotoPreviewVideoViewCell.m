@@ -81,9 +81,11 @@
     [super layoutSubviews];
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
-        self.bottomSliderView.frame = CGRectMake(15, self.hx_h - hxBottomMargin - 60, self.hx_w - 30, 35);
+        CGFloat sliderY = HX_IS_IPHONEX ? self.hx_h - hxBottomMargin - 60 : self.hx_h - hxBottomMargin - 75;
+        self.bottomSliderView.frame = CGRectMake(15, sliderY, self.hx_w - 30, 35);
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
-        self.bottomSliderView.frame = CGRectMake(15, self.hx_h - 60, self.hx_w - 15 - hxBottomMargin, 35);
+        CGFloat sliderY = self.hx_h - 80;
+        self.bottomSliderView.frame = CGRectMake(15, sliderY, self.hx_w - 15 - hxBottomMargin, 35);
     }
 }
 @end

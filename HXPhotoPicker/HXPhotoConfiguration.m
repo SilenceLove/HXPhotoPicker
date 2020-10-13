@@ -108,6 +108,11 @@
         }
     }
     self.allowSlidingSelection = YES;
+    self.livePhotoAutoPlay = YES;
+}
+- (void)setLivePhotoAutoPlay:(BOOL)livePhotoAutoPlay {
+    _livePhotoAutoPlay = livePhotoAutoPlay;
+    [HXPhotoCommon photoCommon].livePhotoAutoPlay = livePhotoAutoPlay;
 }
 - (UIColor *)cameraFocusBoxColor {
     if (!_cameraFocusBoxColor) {

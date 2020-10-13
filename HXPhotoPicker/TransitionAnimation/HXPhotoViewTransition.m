@@ -54,7 +54,7 @@
 - (void)pushAnim:(id<UIViewControllerContextTransitioning>)transitionContext image:(UIImage *)image model:(HXPhotoModel *)model fromVC:(HXPhotoViewController *)fromVC toVC:(HXPhotoPreviewViewController *)toVC {
     model.tempImage = image;
     HXPhotoViewCell *fromCell = [fromVC currentPreviewCell:model];
-    if (!image) {
+    if (!image && fromCell) {
         model.tempImage = fromCell.imageView.image;
         image = fromCell.imageView.image;
     }
