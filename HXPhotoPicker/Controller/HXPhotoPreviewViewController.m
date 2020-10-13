@@ -854,8 +854,8 @@ HX_PhotoEditViewControllerDelegate
         index = indexPath.item;
     }
     
-    HXPhotoModel *model = self.modelArray[index];
-    cell.model = model;
+    HXPhotoModel *photoModel = self.modelArray[index];
+    cell.model = photoModel;
     return cell;
 }
 
