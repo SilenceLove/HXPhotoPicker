@@ -439,7 +439,7 @@ photoView.backgroundColor = [UIColor whiteColor];
 </details>
 
 ## <a id="相关问题"></a> 相关问题 - Issues
-<details id="ios14预览大图显示空白">
+<details open id="ios14预览大图显示空白">
   <summary><strong>ios14预览大图显示空白</strong></summary>
    
 ```objc
@@ -709,17 +709,19 @@ frame.size.height 就是 HXPhotoView 的正确高度
 </details>
 
 ## <a id="最近更新"></a> 最近更新 - Update History
-#### 🗓 最近更新
-```
-- v3.1.1　-　dark模式下界面优化，修复编辑图片在特殊情况下出现未编辑图片显示已编辑状态、完善iOS14适配
-- v3.1.0　-　完善iOS14相册权限，修复ios11以下布局问题
-```
-<details id="历史记录">
-  <summary><strong>历史记录</strong></summary>
+<details open id="最近更新">
+  <summary><strong>最近更新</strong></summary>
    
 ```
 - v3.1.1　-　dark模式下界面优化，修复编辑图片在特殊情况下出现未编辑图片显示已编辑状态、完善iOS14适配
 - v3.1.0　-　完善iOS14相册权限，修复ios11以下布局问题
+```
+</details>
+   
+<details id="历史记录">
+  <summary><strong>历史记录</strong></summary>
+   
+```
 - v3.0.8　-　修复国际化文件问题、添加滑动手势选择功能
 - v3.0.7　-　本地化文件名重名问题修改、相机/相册跳转未全屏问题修改
 - v3.0.6　-　修复编辑图片时内存过高的问题、相机添加自动曝光、编辑图片时添加镜像功能、画笔大小支持更改等...
