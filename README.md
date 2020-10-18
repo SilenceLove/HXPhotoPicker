@@ -25,14 +25,13 @@
     * [使用HXPhotoView选照片后自动布局](#Demo2)
     * [保存草稿](#如何保存草稿)
     * [添加网络/本地图片、视频](#如何添加网络/本地图片、视频)
-    * [ios14预览时显示空白](#ios14预览大图显示空白)
-    * [相关问题](#相关问题)
-    * [更多请下载工程查看](#更多) 
-* [更新记录](#更新历史)
+    * [更多请下载工程查看](#更多)
+* [相关问题](#相关问题)
+* [最近更新](#最近更新)
 * [后续计划](#后续计划)
 * [更多](#更多)
 
-## <a id="特性"></a> 一.  特性 - Features
+## <a id="特性"></a> 特性 - Features
 
 - [x] 查看、选择GIF图片
 - [x] 照片、视频可同时多选/原图
@@ -56,7 +55,7 @@
 - [x] 支持自定义item的大小
 - [x] 支持滑动手势选择
 
-## <a id="安装"></a> 二.  安装 - Installation
+## <a id="安装"></a> 安装 - Installation
 
 <details>
    <summary><strong>CocoaPods</strong></summary>
@@ -95,7 +94,7 @@ github "SilenceLove/HXPhotoPicker"
 ```
 </details>
 
-## <a id="要求"></a> 三.  要求 - Requirements
+## <a id="要求"></a> 要求 - Requirements
 
 - iOS8及以上系统可使用. ARC环境. - iOS 8 or later. Requires ARC
 - 访问相册和相机需要配置四个info.plist文件
@@ -103,7 +102,7 @@ github "SilenceLove/HXPhotoPicker"
 - Privacy - Location When In Use Usage Description 使用相机拍照时会获取位置信息
 - 相机拍照功能请使用真机调试
 
-## <a id="例子"></a> 四.  应用示例 - Examples
+## <a id="例子"></a> 应用示例 - Examples
 <details id="如何获取照片和视频">
   <summary><strong>如何获取照片和视频</strong></summary>
    
@@ -439,10 +438,10 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 </details>
 
+## <a id="相关问题"></a> 相关问题 - Issues
 <details id="ios14预览大图显示空白">
   <summary><strong>ios14预览大图显示空白</strong></summary>
    
-#### ios14预览大图显示空白
 ```objc
 1、SDWebImage解决方案：升级到最新版
 2、YYWebImage解决方案：
@@ -452,14 +451,17 @@ photoView.backgroundColor = [UIColor whiteColor];
 ```
 </details>
 
-<details id="相关问题">
-  <summary><strong>相关问题</strong></summary>
+<details id="pod YYWebImage与YYKit冲突">
+  <summary><strong>pod YYWebImage与YYKit冲突</strong></summary>
    
-#### 1. pod YYWebImage与YYKit冲突
 ```objc
 解决方案：将YYKit拆开分别导入
 ```
-#### 2. 如何更换语言
+</details>
+
+<details id="如何更换语言">
+  <summary><strong>如何更换语言</strong></summary>
+   
 ```objc
 HXPhotoConfiguration.h
 
@@ -477,7 +479,11 @@ HXPhotoLanguageTypeEn       // 英文
 */
 @property (assign, nonatomic) HXPhotoLanguageType languageType;
 ```
-#### 3. 关于图片
+</details>
+
+<details id="关于图片类型">
+  <summary><strong>关于图片类型</strong></summary>
+   
 ```objc
 根据HXPhotoModel的type属性来区分图片类型
 HXPhotoModelMediaTypePhoto          = 0,    //!< 相册里的普通照片
@@ -489,13 +495,21 @@ HXPhotoModelMediaTypeCameraPhoto    = 5,    //!< 通过相机拍的临时照片�
 不为本地图片时thumbPhoto/previewPhoto的值都是临时存的只用于展示
 HXPhotoModel已提供方法获取image或者imageData
 ```
-#### 4. 关于视频的URL
+</details>
+
+<details id="关于视频的URL">
+  <summary><strong>关于视频的URL</strong></summary>
+   
 ```objc
 1.如果选择的HXPhotoModel的PHAsset有值，需要先获取AVAsset，再使用AVAssetExportSession根据AVAsset导出视频地址
 2.如果PHAsset为空的话，则代表此视频是本地视频。可以直接HXPhotoModel里的VideoURL属性
 HXPhotoModel已提供方法获取
 ```
-#### 5. 关于相机拍照
+</details>
+
+<details id="关于相机拍照">
+  <summary><strong>关于视频的URL</strong></summary>
+   
 ```objc
 当拍摄的照片/视频保存到系统相册
 如果系统版本为9.0及以上时，拍照后的照片/视频保存相册后会获取保存后的PHAsset，保存的时候如果有定位信息也会把定位信息保存到相册
@@ -503,7 +517,11 @@ HXPhotoModel里PHAsset有值并且type为 HXPhotoModelMediaTypePhoto / HXPhotoMo
 以下版本的和不保存相册的都只是存在本地的临时图片/视频 
 HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXPhotoModelMediaTypeCameraVideo
 ```
-#### 6. 关于原图
+</details>
+
+<details id="关于原图">
+  <summary><strong>关于原图</strong></summary>
+   
 ```objc
 根据代理或者block回调里的 isOriginal 来判断是否选择了原图 
 方法一：
@@ -569,7 +587,11 @@ HXPhotoModel里PHAsset为空并且type为 HXPhotoModelMediaTypeCameraPhoto / HXP
     // 获取失败
 }];
 ```
-#### 7. 单独使用HXPhotoPreviewViewController预览图片
+</details>
+
+<details id="单独使用HXPhotoPreviewViewController预览图片">
+  <summary><strong>单独使用HXPhotoPreviewViewController预览图片</strong></summary>
+   
 ```objc
 HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
 // selected 为NO 的会过滤掉
@@ -631,7 +653,11 @@ UIViewController+HXExtension.h
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView;
 ```
-#### 8. 单独使用照片、视频编辑功能
+</details>
+
+<details id="单独使用照片、视频编辑功能">
+  <summary><strong>单独使用照片、视频编辑功能</strong></summary>
+   
 ```objc
 // 单独使用照片编辑功能
 HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:[UIImage imageNamed:@"1"]];
@@ -669,7 +695,11 @@ HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
     // 取消
 }];
 ```
-#### 9. HXPhotoView使用约束布局
+</details>
+
+<details id="HXPhotoView使用约束布局">
+  <summary><strong>HXPhotoView使用约束布局</strong></summary>
+   
 ```objc
 使用约束布局HXPhotoView的话需要在 
 - (void)photoView:(HXPhotoView *)photoView updateFrame:(CGRect)frame 这个代理回调里更新约束的高度
@@ -678,7 +708,15 @@ frame.size.height 就是 HXPhotoView 的正确高度
 ```
 </details>
 
-## <a id="更新历史"></a> 五.  更新历史 - Update History
+## <a id="最近更新"></a> 最近更新 - Update History
+#### 🗓 最近更新
+```
+- v3.1.1　-　dark模式下界面优化，修复编辑图片在特殊情况下出现未编辑图片显示已编辑状态、完善iOS14适配
+- v3.1.0　-　完善iOS14相册权限，修复ios11以下布局问题
+```
+<details id="历史记录">
+  <summary><strong>历史记录</strong></summary>
+   
 ```
 - v3.1.1　-　dark模式下界面优化，修复编辑图片在特殊情况下出现未编辑图片显示已编辑状态、完善iOS14适配
 - v3.1.0　-　完善iOS14相册权限，修复ios11以下布局问题
@@ -746,22 +784,23 @@ frame.size.height 就是 HXPhotoView 的正确高度
 - 2017-03-07　　修复通过相机拍照时照片旋转90°的问题
 - 2017-03-06　　第一次提交
 ```
+</details>
 
-## <a id="后续计划"></a> 六.  后续计划 - Plan
+## <a id="后续计划"></a> 后续计划 - Plan
 - [x] 视频添加进度条
 - [x] 支持添加网络视频
 - [x] 视频查看时支持放大缩小
 - [ ] HXPhotoView支持单选模式
 ...
 
-## <a id="更多"></a> 七.  更多 - More
+## <a id="更多"></a> 👨🏻‍💻 - Author
 
-- 如果您发现了bug请尽可能详细地描述系统版本、手机型号和复现步骤等信息 提一个issue.
+- Email: 294005139@qq.com
+- [有兴趣可以加QQ群:531895229](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26)
+<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/AC635A016B904F0577218D2125677C22.png" width="200" height="232">
 
-- 如果您有什么好的建议也可以提issue,大家一起讨论一起学习进步...
-
-- 具体代码请下载项目  如果觉得喜欢的能给一颗小星星么!  ✨✨✨
-
-- [有兴趣可以加下创建的QQ群:531895229（有问题请确定看完了demo和README之后再提问）](//shang.qq.com/wpa/qunwpa?idkey=ebd8d6809c83b4d6b4a18b688621cb73ded0cce092b4d1f734e071a58dd37c26)
+## 👨🏼‍💻 寻求靠谱iOS岗
+- 作者4年多iOS开发经验，想寻求一个不错岗位，有合适的岗位可以加微信详聊🙏，base武汉/深圳。
+<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/240CC0630D104E270662EBBF7F58493D.png" width="200" height="200">
 
 [回到顶部](#readme)
