@@ -100,7 +100,10 @@
             }
             self.isPanGesture = YES;
             if (![(HXPhotoPreviewViewController *)self.vc bottomView].userInteractionEnabled) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
                 [[UIApplication sharedApplication] setStatusBarHidden:NO];
+#pragma clang diagnostic pop
             }
             [(HXPhotoPreviewViewController *)self.vc setStopCancel:YES];
             self.beginX = [gestureRecognizer locationInView:gestureRecognizer.view].x;
@@ -236,7 +239,10 @@
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toVC = [self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     if (!fromVC.bottomView.userInteractionEnabled) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:YES];
+#pragma clang diagnostic pop
         [toVC.navigationController setNavigationBarHidden:YES];
         toVC.navigationController.navigationBar.alpha = 1;
     }

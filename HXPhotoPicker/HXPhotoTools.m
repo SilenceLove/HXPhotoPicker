@@ -213,14 +213,24 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     if (@available(iOS 14, *)) {
         if (status == PHAuthorizationStatusLimited) {
             hx_showAlert(viewController, [NSBundle hx_localizedStringForKey:@"无法访问所有照片"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相册中允许访问所有照片"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], nil, ^{
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                if (@available(iOS 10.0, *)) {
+                    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                }else {
+                    [[UIApplication sharedApplication] openURL:url];
+                }
             });
             return;;
         }
     }
 #endif
     hx_showAlert(viewController, [NSBundle hx_localizedStringForKey:@"无法访问相册"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相册中允许访问相册"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"], nil, ^{
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+        if (@available(iOS 10.0, *)) {
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        }else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
     });
 }
 
@@ -239,7 +249,12 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 }
 + (void)showUnusableCameraAlert:(UIViewController *)vc {
     hx_showAlert(vc, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+        if (@available(iOS 10.0, *)) {
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        }else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
     });
 }
 + (void)exportEditVideoForAVAsset:(AVAsset *)asset
@@ -782,7 +797,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     if([reader canAddOutput:videoOutput]) {
         [reader addOutput:videoOutput];
     } else {
-        NSLog(@"Add video output error\n");
+        NSSLog(@"Add video output error\n");
     }
     NSString *videoCodeec;
     if (@available(iOS 11.0, *)) {
@@ -800,7 +815,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     
     AVAssetWriter *writer = [AVAssetWriter assetWriterWithURL:finalMovPath fileType:AVFileTypeQuickTimeMovie error:&error_two];
     if(error_two) {
-        NSLog(@"CreateWriterError:%@\n",error_two);
+        NSSLog(@"CreateWriterError:%@\n",error_two);
     }
     writer.metadata = @[ [self metaDataSet:assetIdentifier]];
                               
@@ -816,7 +831,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     AVAssetReader *audioReader;
     AVAsset *aAudioAsset = [AVAsset assetWithURL:originMovPath];
     if (aAudioAsset.tracks.count > 1) {
-        NSLog(@"Has Audio");
+        NSSLog(@"Has Audio");
         // setup audio writer
         audioInput = [[AVAssetWriterInput alloc] initWithMediaType:AVMediaTypeAudio outputSettings:nil];
         audioInput.expectsMediaDataInRealTime = NO;
@@ -830,13 +845,13 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
         NSError *audioReaderError = nil;
         audioReader = [AVAssetReader assetReaderWithAsset:aAudioAsset error:&audioReaderError];
         if (audioReaderError) {
-            NSLog(@"Unable to read Asset, error: %@",audioReaderError);
+            NSSLog(@"Unable to read Asset, error: %@",audioReaderError);
         }
         
         if ([audioReader canAddOutput:audioOutput]) {
             [audioReader addOutput:audioOutput];
         } else {
-            NSLog(@"cant add audio reader");
+            NSSLog(@"cant add audio reader");
         }
     }
                               
@@ -920,7 +935,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
         if (completion) {
             completion(NO);
         }
-        NSLog(@"cannot write: %@", writer.error);
+        NSSLog(@"cannot write: %@", writer.error);
     } else {
         if (completion) {
             completion(YES);

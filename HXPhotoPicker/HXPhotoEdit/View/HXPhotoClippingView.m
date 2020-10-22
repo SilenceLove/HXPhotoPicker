@@ -327,9 +327,6 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     CGRect superViewRect = self.superview.bounds;
     CGFloat x = (HXRoundDecade(CGRectGetWidth(superViewRect)) - HXRoundDecade(CGRectGetWidth(self.imageView.frame))) / 2 - HXRoundDecade(self.offsetSuperCenter.x) / 2;
     CGFloat y = (HXRoundDecade(CGRectGetHeight(superViewRect)) - HXRoundDecade(CGRectGetHeight(self.imageView.frame))) / 2 - HXRoundDecade(self.offsetSuperCenter.y) / 2;
-//    NSLog(@"superViewRect - >%f", HXRoundDecade(CGRectGetHeight(superViewRect)));
-//    NSLog(@"imageView - >%f", HXRoundDecade(CGRectGetHeight(self.imageView.frame)));
-//    NSLog(@"offsetSuperCenter - >%f", HXRoundDecade(self.offsetSuperCenter.y));
     CGRect trueFrame = CGRectMake(x ,y , HXRoundDecade(CGRectGetWidth(self.imageView.frame))
                                   , HXRoundDecade(CGRectGetHeight(self.imageView.frame)));
     return [self canResetWithRect:trueFrame];

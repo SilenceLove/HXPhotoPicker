@@ -192,7 +192,7 @@
     if (photoModel.type == HXPhotoModelMediaTypeCameraPhoto) {
         if (photoModel.networkPhotoUrl) {
             if ([HXPhotoCommon photoCommon].requestNetworkAfter) {
-                // 网络图片
+                // 需要下载网络图片就将 [HXPhotoCommon photoCommon].requestNetworkAfter = YES
                 [HXPhotoModel requestImageWithURL:photoModel.networkPhotoUrl progress:nil completion:^(UIImage * _Nullable image, NSURL * _Nullable url, NSError * _Nullable error) {
                     if (image) {
                         photoModel.thumbPhoto = image;

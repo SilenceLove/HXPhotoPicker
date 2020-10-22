@@ -52,6 +52,7 @@
 @property (assign, nonatomic) CGSize imageSize;
 
 /// 本地视频URL / 网络视频地址
+/// 系统相册的资源(PHAsset不为nil的)需要通过exportVideoWithPresetName...方法获取
 @property (strong, nonatomic) NSURL * _Nullable videoURL;
 
 /// livephoto - 网络视频地址

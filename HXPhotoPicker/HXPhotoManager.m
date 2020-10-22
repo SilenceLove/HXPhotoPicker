@@ -582,6 +582,7 @@
     albumModel.albumName = [self transFormAlbumNameWithCollection:collection];
     albumModel.localIdentifier = collection.localIdentifier;
     albumModel.selectType = self.type;
+    albumModel.fetchOptionsPredicate = self.fetchOptionsPredicate;
     albumModel.creationDateSort = self.configuration.creationDateSort;
     if (fetchAssets) {
         [albumModel fetchAssetResult];
@@ -708,6 +709,9 @@
                 albumModel.index = 0;
                 [albums insertObject:albumModel atIndex:0];
             } else {
+                if (self.assetCollectionFilter && self.assetCollectionFilter(collection)) {
+                    return;
+                }
                 HXAlbumModel *albumModel = [self albumModelWithCollection:collection fetchAssets:YES];
                 if (albumModel.count > 0) {
                     albumModel.cameraCount = [self cameraCount];
@@ -736,6 +740,7 @@
             albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
             albumModel.index = 0;
             albumModel.selectType = self.type;
+            albumModel.fetchOptionsPredicate = self.fetchOptionsPredicate;
             albumModel.tempImage = [self firstCameraModel].thumbPhoto;
             [albums addObject:albumModel];
         }
@@ -848,7 +853,7 @@
     }else {
         allCount = result.count;
     }
-    NSMutableArray *allArray = [NSMutableArray arrayWithCapacity:allCount];
+    NSMutableArray *allArray = [NSMutableArray arrayWithCapacity:allCount + self.cameraList.count + 1];
     if (self.configuration.reverseDate) {
         [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
             if (self.type == HXPhotoManagerSelectedTypePhoto && asset.mediaType != PHAssetMediaTypeImage) {
@@ -856,12 +861,18 @@
             }else if (self.type == HXPhotoManagerSelectedTypeVideo && asset.mediaType != PHAssetMediaTypeVideo) {
                 return;
             }
-            HXPhotoModel *photoModel = [self photoModelWithAsset:asset];
-            if (!firstSelectModel && photoModel.selectIndexStr) {
-                firstSelectModel = photoModel;
+            BOOL filter = NO;
+            if (self.assetFilter) {
+                filter = self.assetFilter(albumModel, asset);
             }
-            photoModel.currentAlbumIndex = albumModel.index;
-            [allArray addObject:photoModel];
+            if (!filter) {
+                HXPhotoModel *photoModel = [self photoModelWithAsset:asset];
+                if (!firstSelectModel && photoModel.selectIndexStr) {
+                    firstSelectModel = photoModel;
+                }
+                photoModel.currentAlbumIndex = albumModel.index;
+                [allArray addObject:photoModel];
+            }
         }];
     }else {
         [result enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -870,12 +881,18 @@
             }else if (self.type == HXPhotoManagerSelectedTypeVideo && asset.mediaType != PHAssetMediaTypeVideo) {
                 return;
             }
-            HXPhotoModel *photoModel = [self photoModelWithAsset:asset];
-            if (!firstSelectModel && photoModel.selectIndexStr) {
-                firstSelectModel = photoModel;
+            BOOL filter = NO;
+            if (self.assetFilter) {
+                filter = self.assetFilter(albumModel, asset);
             }
-            photoModel.currentAlbumIndex = albumModel.index;
-            [allArray addObject:photoModel];
+            if (!filter) {
+                HXPhotoModel *photoModel = [self photoModelWithAsset:asset];
+                if (!firstSelectModel && photoModel.selectIndexStr) {
+                    firstSelectModel = photoModel;
+                }
+                photoModel.currentAlbumIndex = albumModel.index;
+                [allArray addObject:photoModel];
+            }
         }];
     }
     

@@ -105,28 +105,28 @@
     }
     [HXPhotoTools requestAuthorization:nil handler:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
-            [weakSelf requestModel];
-            if (weakSelf.reloadAsset) {
-                weakSelf.reloadAsset(weakSelf.initialAuthorization);
+            [self requestModel];
+            if (self.reloadAsset) {
+                self.reloadAsset(self.initialAuthorization);
             }
         }
 #ifdef __IPHONE_14_0
         else if (@available(iOS 14, *)) {
             if (status == PHAuthorizationStatusLimited) {
-                weakSelf.didPresentImagePicker = YES;
+                self.didPresentImagePicker = YES;
             }
 #endif
         else if (status == PHAuthorizationStatusRestricted ||
                  status == PHAuthorizationStatusDenied) {
-            if (weakSelf.reloadAsset) {
-                weakSelf.reloadAsset(weakSelf.initialAuthorization);
+            if (self.reloadAsset) {
+                self.reloadAsset(weakSelf.initialAuthorization);
             }
         }
 #ifdef __IPHONE_14_0
         }else if (status == PHAuthorizationStatusRestricted ||
                   status == PHAuthorizationStatusDenied) {
-             if (weakSelf.reloadAsset) {
-                 weakSelf.reloadAsset(weakSelf.initialAuthorization);
+             if (self.reloadAsset) {
+                 self.reloadAsset(self.initialAuthorization);
              }
          }
 #endif
@@ -287,7 +287,7 @@
         [_timer invalidate];
         _timer = nil;
     }
-    if (HXShowLog) NSLog(@"%@ dealloc", self);
+    if (HXShowLog) NSSLog(@"%@ dealloc", self);
 }
 
 @end

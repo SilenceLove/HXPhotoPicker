@@ -1023,6 +1023,29 @@
         }
     }];
 }
+- (UIImageOrientation)imageOrientationWithCGImageOrientation:(CGImagePropertyOrientation)orientation {
+    UIImageOrientation sureOrientation;
+    if (orientation == kCGImagePropertyOrientationUp) {
+        sureOrientation = UIImageOrientationUp;
+    } else if (orientation == kCGImagePropertyOrientationUpMirrored) {
+        sureOrientation = UIImageOrientationUpMirrored;
+    } else if (orientation == kCGImagePropertyOrientationDown) {
+        sureOrientation = UIImageOrientationDown;
+    } else if (orientation == kCGImagePropertyOrientationDownMirrored) {
+        sureOrientation = UIImageOrientationDownMirrored;
+    } else if (orientation == kCGImagePropertyOrientationLeftMirrored) {
+        sureOrientation = UIImageOrientationLeftMirrored;
+    } else if (orientation == kCGImagePropertyOrientationRight) {
+        sureOrientation = UIImageOrientationRight;
+    } else if (orientation == kCGImagePropertyOrientationRightMirrored) {
+        sureOrientation = UIImageOrientationRightMirrored;
+    } else if (orientation == kCGImagePropertyOrientationLeft) {
+        sureOrientation = UIImageOrientationLeft;
+    } else {
+        sureOrientation = UIImageOrientationUp;
+    }
+    return sureOrientation;
+}
 - (PHImageRequestID)requestImageDataStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
                                        progressHandler:(HXModelProgressHandler)progressHandler
                                                success:(HXModelImageDataSuccessBlock)success
@@ -1085,13 +1108,25 @@
         option.version = PHImageRequestOptionsVersionOriginal;
     }
     self.iCloudDownloading = YES;
-    PHImageRequestID requestID = [[PHImageManager defaultManager] requestImageDataForAsset:self.asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-        [weakSelf requestDataWithResult:imageData info:info size:CGSizeZero resultClass:[NSData class] orientation:orientation audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
-            if (success) {
-                success(result, orientation, weakSelf, info);
-            }
-        } failed:failed];
-    }];
+    PHImageRequestID requestID;
+    if (@available(iOS 13.0, *)) {
+        requestID = [[PHImageManager defaultManager] requestImageDataAndOrientationForAsset:self.asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, CGImagePropertyOrientation orientation, NSDictionary * _Nullable info) {
+            UIImageOrientation sureOrientation = [weakSelf imageOrientationWithCGImageOrientation:orientation];
+            [weakSelf requestDataWithResult:imageData info:info size:CGSizeZero resultClass:[NSData class] orientation:sureOrientation audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+                if (success) {
+                    success(result, orientation, weakSelf, info);
+                }
+            } failed:failed];
+        }];
+    }else {
+        requestID = [[PHImageManager defaultManager] requestImageDataForAsset:self.asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+            [weakSelf requestDataWithResult:imageData info:info size:CGSizeZero resultClass:[NSData class] orientation:orientation audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
+                if (success) {
+                    success(result, orientation, weakSelf, info);
+                }
+            } failed:failed];
+        }];
+    }
     self.iCloudRequestID = requestID;
     return requestID;
 }
@@ -1294,27 +1329,51 @@
                         }
                     });
                 };
-                iCloudRequestId = [[PHImageManager defaultManager] requestImageDataForAsset:self.asset options:iCloudOption resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-                    BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-                    if (downloadFinined && imageData) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-//                            weakSelf.isICloud = NO;
-                            weakSelf.iCloudDownloading = NO;
-                            if (success) {
-                                success(imageData, info, orientation, nil);
-                            }
-                        });
-                    }else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                
+                if (@available(iOS 13.0, *)) {
+                    iCloudRequestId = [[PHImageManager defaultManager] requestImageDataAndOrientationForAsset:self.asset options:iCloudOption resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, CGImagePropertyOrientation orientation, NSDictionary * _Nullable info) {
+                        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                        if (downloadFinined && imageData) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
                                 weakSelf.iCloudDownloading = NO;
-                            }
-                            if (failed) {
-                                failed(info, weakSelf);
-                            }
-                        });
-                    }
-                }];
+                                UIImageOrientation sureOrientation = [weakSelf imageOrientationWithCGImageOrientation:orientation];
+                                if (success) {
+                                    success(imageData, info, sureOrientation, nil);
+                                }
+                            });
+                        }else {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                    weakSelf.iCloudDownloading = NO;
+                                }
+                                if (failed) {
+                                    failed(info, weakSelf);
+                                }
+                            });
+                        }
+                    }];
+                }else {
+                    iCloudRequestId = [[PHImageManager defaultManager] requestImageDataForAsset:self.asset options:iCloudOption resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                        if (downloadFinined && imageData) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                weakSelf.iCloudDownloading = NO;
+                                if (success) {
+                                    success(imageData, info, orientation, nil);
+                                }
+                            });
+                        }else {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if (![[info objectForKey:PHImageCancelledKey] boolValue]) {
+                                    weakSelf.iCloudDownloading = NO;
+                                }
+                                if (failed) {
+                                    failed(info, weakSelf);
+                                }
+                            });
+                        }
+                    }];
+                }
             }else if ([resultClass isEqual:[AVAsset class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
 //                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;

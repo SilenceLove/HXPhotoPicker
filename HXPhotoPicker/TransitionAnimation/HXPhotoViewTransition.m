@@ -137,7 +137,10 @@
     if (transitionContext.interactive && !fromVC.bottomView.userInteractionEnabled) {
         tempBgView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:1];
         [toVC.navigationController setNavigationBarHidden:NO];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
         [containerView insertSubview:tempBgView belowSubview:fromVC.view];
     }else {
         [toVC.view insertSubview:tempBgView belowSubview:toVC.bottomView];
@@ -185,7 +188,10 @@
             if (!fromVC.bottomView.userInteractionEnabled) {
                 fromVC.view.backgroundColor = [UIColor blackColor];
                 [toVC.navigationController setNavigationBarHidden:YES];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
                 [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
             }
         }else{//手势成功，cell的imageView也要显示出来
             //成功了移除tempView，下一次pop的时候又要创建，然后显示cell的imageView

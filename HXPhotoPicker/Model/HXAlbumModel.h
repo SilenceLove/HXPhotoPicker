@@ -30,6 +30,8 @@
 @property (assign, nonatomic) NSUInteger cameraCount;
 @property (strong, nonatomic) UIImage *tempImage;
 
+@property (copy, nonatomic) NSString *fetchOptionsPredicate;
+
 - (void)fetchAssetResult;
 - (void)getResultWithCompletion:(void (^)(HXAlbumModel *albumModel))completion;
 

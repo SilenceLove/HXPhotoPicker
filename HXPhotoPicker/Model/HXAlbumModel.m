@@ -62,10 +62,14 @@
     if (self.creationDateSort) {
         options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
     }
-    if (self.selectType == 0) {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
-    }else if (self.selectType == 1) {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+    if (!self.fetchOptionsPredicate) {
+        if (self.selectType == 0) {
+            options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+        }else if (self.selectType == 1) {
+            options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+        }
+    }else {
+        options.predicate = [NSPredicate predicateWithFormat:self.fetchOptionsPredicate];
     }
     return options;
 }

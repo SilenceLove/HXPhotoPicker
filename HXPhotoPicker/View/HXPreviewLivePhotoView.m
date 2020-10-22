@@ -161,6 +161,8 @@
         [imageURLRequest setHTTPMethod:@"HEAD"];
         NSHTTPURLResponse *imageResp = nil;
         NSError *imageErr = nil;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [NSURLConnection sendSynchronousRequest:imageURLRequest returningResponse:&imageResp error:&imageErr];
         
         if (self.cacheImage) {
@@ -172,6 +174,7 @@
         NSHTTPURLResponse *videoResp = nil;
         NSError *videoErr = nil;
         [NSURLConnection sendSynchronousRequest:videoURLRequest returningResponse:&videoResp error:&videoErr];
+#pragma clang diagnostic pop
         if (!imageErr && !videoErr) {
             self.totalLength = videoResp.expectedContentLength + imageResp.expectedContentLength;
         }

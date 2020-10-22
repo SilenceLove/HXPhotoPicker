@@ -231,7 +231,10 @@
         toCell = cell;
         [containerView addSubview:tempView];
         fromVC.view.backgroundColor =  [[UIColor blackColor] colorWithAlphaComponent:1];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
     }else if ([toVC isKindOfClass:[HXPhotoPreviewViewController class]]) {
         HXPhotoPreviewViewCell *cell = [(HXPhotoPreviewViewController *)toVC currentPreviewCell:self.model];
         if (![(HXPhotoEditViewController *)fromVC isCancel]) {
@@ -262,7 +265,10 @@
             }
         }
         fromVC.view.backgroundColor =  [[UIColor blackColor] colorWithAlphaComponent:0];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
     }else if ([toVC isKindOfClass:[HXCustomCameraViewController class]] &&
               [fromVC isKindOfClass:[HXVideoEditViewController class]]) {
         toFrame = [(HXCustomCameraViewController *)toVC jumpRect];

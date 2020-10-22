@@ -120,7 +120,10 @@ HX_PhotoEditViewControllerDelegate
     if ([UIApplication sharedApplication].statusBarHidden) {
         [self changeStatusBarWithHidden:NO];
         [self.navigationController setNavigationBarHidden:NO animated:NO];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
@@ -163,6 +166,8 @@ HX_PhotoEditViewControllerDelegate
     }
     self.layoutSubviewsCompletion = YES;
 }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
 - (void)changeStatusBarStyle {
     if ([HXPhotoCommon photoCommon].isDark) {
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
@@ -180,6 +185,7 @@ HX_PhotoEditViewControllerDelegate
         }
     }
 }
+#pragma clang diagnostic pop
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
@@ -218,7 +224,10 @@ HX_PhotoEditViewControllerDelegate
     [super viewWillDisappear:animated];
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
         if ([UIApplication sharedApplication].statusBarHidden) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
             [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
         }
         [self changeStatusBarWithHidden:NO];
     }
@@ -271,6 +280,8 @@ HX_PhotoEditViewControllerDelegate
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             [self changeStatusBarWithHidden:YES];
             [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
@@ -278,6 +289,7 @@ HX_PhotoEditViewControllerDelegate
             [self changeStatusBarWithHidden:NO];
             [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
         }
+#pragma clang diagnostic pop
         self.titleLb.hidden = NO;
         self.customTitleView.frame = CGRectMake(0, 0, 150, 44);
         self.titleLb.frame = CGRectMake(0, 9, 150, 14);
@@ -285,6 +297,8 @@ HX_PhotoEditViewControllerDelegate
         self.titleLb.text = model.barTitle;
         self.subTitleLb.text = model.barSubTitle;
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             [self changeStatusBarWithHidden:YES];
             [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
@@ -292,6 +306,7 @@ HX_PhotoEditViewControllerDelegate
             [self changeStatusBarWithHidden:NO];
             [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
         }
+#pragma clang diagnostic pop
         self.customTitleView.frame = CGRectMake(0, 0, 200, 30);
         self.titleLb.hidden = YES;
         self.subTitleLb.frame = CGRectMake(0, 0, 200, 30);
@@ -708,7 +723,10 @@ HX_PhotoEditViewControllerDelegate
     self.bottomView.userInteractionEnabled = !hide;
     UIColor *bgColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : self.manager.configuration.previewPhotoViewBgColor;
     if (animete) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:hide withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
         [UIView animateWithDuration:duration animations:^{
             self.navigationController.navigationBar.alpha = hide ? 0 : 1;
             if (self.outside) {
@@ -723,7 +741,10 @@ HX_PhotoEditViewControllerDelegate
             }
         }];
     }else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:hide];
+#pragma clang diagnostic pop
         self.navigationController.navigationBar.alpha = hide ? 0 : 1;
         if (self.outside) {
             self.navBar.alpha = hide ? 0 : 1;

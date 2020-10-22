@@ -136,7 +136,10 @@ HX_PhotoEditViewControllerDelegate
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self changeStatusBarStyle];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
     if (self.needChangeViewFrame) {
         self.needChangeViewFrame = NO;
     }
@@ -152,6 +155,8 @@ HX_PhotoEditViewControllerDelegate
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
 - (void)changeStatusBarStyle {
     if ([HXPhotoCommon photoCommon].isDark) {
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
@@ -159,6 +164,7 @@ HX_PhotoEditViewControllerDelegate
     }
     [[UIApplication sharedApplication] setStatusBarStyle:self.manager.configuration.statusBarStyle animated:YES];
 }
+#pragma clang diagnostic pop
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     if (self.orientationDidChange) {
@@ -358,6 +364,8 @@ HX_PhotoEditViewControllerDelegate
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
     NSInteger lineCount = self.manager.configuration.rowCount;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
         navBarHeight = hxNavigationBarHeight;
         lineCount = self.manager.configuration.rowCount;
@@ -371,6 +379,7 @@ HX_PhotoEditViewControllerDelegate
         }
         lineCount = self.manager.configuration.horizontalRowCount;
     }
+#pragma clang diagnostic pop
     CGFloat bottomMargin = hxBottomMargin;
     CGFloat leftMargin = 0;
     CGFloat rightMargin = 0;
@@ -1663,7 +1672,10 @@ HX_PhotoEditViewControllerDelegate
 #pragma mark - < HX_PhotoEditViewControllerDelegate >
 - (void)photoEditingController:(HX_PhotoEditViewController *)photoEditingVC didFinishPhotoEdit:(HXPhotoEdit *)photoEdit photoModel:(HXPhotoModel *)photoModel {
     if (self.manager.configuration.singleSelected) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
         self.isNewEditDismiss = YES;
         [self.manager beforeSelectedListAddPhotoModel:photoModel];
         [self photoBottomViewDidDoneBtn];
@@ -1956,7 +1968,12 @@ HX_PhotoEditViewControllerDelegate
     return _authorizationLb;
 }
 - (void)goSetup {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if (@available(iOS 10.0, *)) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    }else {
+        [[UIApplication sharedApplication] openURL:url];
+    }
 }
 - (UIView *)albumBgView {
     if (!_albumBgView) {
@@ -2426,7 +2443,6 @@ HX_PhotoEditViewControllerDelegate
                 self.imageView.image = model.thumbPhoto;
             }
             if (model.networkPhotoUrl) {
-                self.progressView.hidden = model.downloadComplete;
                 CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
                 self.progressView.progress = progress;
                 if (model.downloadComplete && !model.downloadError) {
@@ -2441,6 +2457,7 @@ HX_PhotoEditViewControllerDelegate
                         completion(self);
                     }
                 }else {
+                    self.progressView.hidden = NO;
                     [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
                         if (weakSelf.model == model) {
                             weakSelf.progressView.progress = progress;

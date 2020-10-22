@@ -17,16 +17,16 @@
 
 @interface HXPhotoManager : NSObject
 
+/// init
+/// @param type 选择类型
++ (instancetype)managerWithType:(HXPhotoManagerSelectedType)type;
+- (instancetype)initWithType:(HXPhotoManagerSelectedType)type;
+
 /// 当前选择类型
 @property (assign, nonatomic) HXPhotoManagerSelectedType type;
 
 /// 相关配置
 @property (strong, nonatomic) HXPhotoConfiguration *configuration;
-
-/// init
-/// @param type 选择类型
-- (instancetype)initWithType:(HXPhotoManagerSelectedType)type;
-+ (instancetype)managerWithType:(HXPhotoManagerSelectedType)type;
 
 /// 选择照片界面完成时的dismiss时是否需要动画效果
 /// 默认YES
@@ -44,8 +44,27 @@
 /// 默认YES
 @property (assign, nonatomic) BOOL cameraCancelDismissAnimated;
 
+/// 获取PHAsset集合时的谓词条件
+/// 需要自己根据type判断是否只获取照片或视频
+/// 默认 nil
+/// if (self.selectType == HXPhotoManagerSelectedTypePhoto) {
+///     // fetchOptionsPredicate = @"mediaType == 1";
+///     options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+/// }else if (self.selectType == HXPhotoManagerSelectedTypeVideo) {
+///     // fetchOptionsPredicate = @"mediaType == 2";
+///     options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+/// }
+@property (copy, nonatomic) NSString *fetchOptionsPredicate;
+
+/// 过滤PHAsset   YES 过滤
+/// @param albumModel Asset所在相册模型
+@property (copy, nonatomic) BOOL (^ assetFilter)(HXAlbumModel *albumModel, PHAsset *asset);
+
+/// 过滤相册    YES 过滤
+@property (copy, nonatomic) BOOL (^ assetCollectionFilter)(PHAssetCollection *collection);
+
 /// 只使用相机功能不加载相册信息
-@property (assign, nonatomic) BOOL onlyCamera;
+//@property (assign, nonatomic) BOOL onlyCamera;
 
 /// 保存在本地的模型
 /// 如果为空，请调用 getLocalModelsInFileWithAddData: 方法获取

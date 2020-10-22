@@ -127,7 +127,6 @@
 - (HXCollectionView *)collectionView {
     if (!_collectionView) {
         _collectionView = [[HXCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.flowLayout];
-        _collectionView.tag = 8888;
         if (self.scrollDirection != UICollectionViewScrollDirectionHorizontal) {
             _collectionView.scrollEnabled = NO;
         }
@@ -159,6 +158,7 @@
     [super setBackgroundColor:backgroundColor];
 }
 - (void)setup {
+    self.maximumHeight = HX_ScreenHeight;
     self.lastWidth = 0;
     if (_manager) {
         _manager.configuration.specialModeNeedHideVideoSelectBtn = YES;
@@ -1037,6 +1037,14 @@
             if (newHeight <= 0) {
                 newHeight = 0;
                 self.numOfLinesOld = 0;
+            }
+            if (newHeight > self.maximumHeight) {
+                newHeight = self.maximumHeight;
+                _collectionView.scrollEnabled = YES;
+            }else {
+                if (self.scrollDirection != UICollectionViewScrollDirectionHorizontal) {
+                    _collectionView.scrollEnabled = NO;
+                }
             }
             if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal) {
                 self.hx_h = itemW;

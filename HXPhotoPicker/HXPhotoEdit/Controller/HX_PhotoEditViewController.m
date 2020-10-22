@@ -138,7 +138,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
 }
 - (BOOL)prefersStatusBarHidden {
     return YES;
@@ -327,27 +330,29 @@
     self.requestId = [self.photoModel requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
         weakSelf.requestId = iCloudRequestId;
     } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
-        NSData * imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
-        UIImage *image = [UIImage imageWithData:imageData];
-        if (image.imageOrientation != UIImageOrientationUp) {
-            image = [image hx_normalizedImage];
+        @autoreleasepool {
+            NSData * imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
+            UIImage *image = [UIImage imageWithData:imageData];
+            [weakSelf requestImageCompletion:image];
         }
-        CGSize imageSize = image.size;
-        if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-            while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-                imageSize.width /= 2;
-                imageSize.height /= 2;
-            }
-            image = [image hx_scaleToFillSize:imageSize];
-        }
-        weakSelf.editImage = image;
-        [weakSelf.view hx_handleLoading];
-        [weakSelf loadImageCompletion];
     } failed:^(NSDictionary *info, HXPhotoModel *model) {
-        [weakSelf requenstImage];
+        [weakSelf requestImageData];
     }];
 }
-- (void)requenstImage {
+- (void)requestImageData {
+    HXWeakSelf
+    self.requestId = [self.photoModel requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
+        weakSelf.requestId = iCloudRequestId;
+    } progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        @autoreleasepool {
+            UIImage *image = [UIImage imageWithData:imageData];
+            [weakSelf requestImageCompletion:image];
+        }
+    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+        [weakSelf requestImage];
+    }];
+}
+- (void)requestImage {
     HXWeakSelf
     self.requestId = [self.photoModel requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
         weakSelf.requestId = iCloudRequestId;
@@ -355,24 +360,27 @@
         if (image.images.count > 1) {
             image = image.images.firstObject;
         }
-        if (image.imageOrientation != UIImageOrientationUp) {
-            image = [image hx_normalizedImage];
-        }
-        CGSize imageSize = image.size;
-        if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-            while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-                imageSize.width /= 2;
-                imageSize.height /= 2;
-            }
-            image = [image hx_scaleToFillSize:imageSize];
-        }
-        weakSelf.editImage = image;
-        [weakSelf.view hx_handleLoading];
-        [weakSelf loadImageCompletion];
+        [weakSelf requestImageCompletion:image];
     } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
         [weakSelf.view hx_handleLoading];
         [weakSelf loadImageCompletion];
     }];
+}
+- (void)requestImageCompletion:(UIImage *)image {
+    if (image.imageOrientation != UIImageOrientationUp) {
+        image = [image hx_normalizedImage];
+    }
+    CGSize imageSize = image.size;
+    if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+        while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+            imageSize.width /= 2;
+            imageSize.height /= 2;
+        }
+        image = [image hx_scaleToFillSize:imageSize];
+    }
+    self.editImage = image;
+    [self.view hx_handleLoading];
+    [self loadImageCompletion];
 }
 - (void)loadImageCompletion {
     self.imageRequestComplete = YES;
