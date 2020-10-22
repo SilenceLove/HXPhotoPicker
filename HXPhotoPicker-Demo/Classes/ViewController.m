@@ -74,6 +74,8 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     [super viewWillAppear:animated];
     [self changeStatus];
 }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
 - (void)changeStatus {
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
@@ -85,6 +87,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
+#pragma clang diagnostic pop
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
 #ifdef __IPHONE_13_0

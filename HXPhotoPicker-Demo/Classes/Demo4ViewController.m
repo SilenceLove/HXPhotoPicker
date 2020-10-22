@@ -45,6 +45,8 @@
     [super viewWillDisappear:animated];
     [self.videoView cancelPlayer];
 }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
 - (void)changeStatus {
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
@@ -56,6 +58,7 @@
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
+#pragma clang diagnostic pop
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];

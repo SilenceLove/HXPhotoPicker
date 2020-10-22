@@ -54,6 +54,8 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [super viewWillAppear:animated];
     [self changeStatus];
 }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
 - (void)changeStatus {
 #ifdef __IPHONE_13_0
     if (@available(iOS 13.0, *)) {
@@ -65,6 +67,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
 }
+#pragma clang diagnostic pop
 - (UIButton *)bottomView {
     if (!_bottomView) {
         _bottomView = [UIButton buttonWithType:UIButtonTypeCustom];
