@@ -136,7 +136,8 @@
 /// 据某个相册模型获取照片列表
 /// @param albumModel 相册模型
 /// @param complete 照片列表和首个选中的模型
-- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(getPhotoListBlock)complete;
+- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel
+                          complete:(getPhotoListBlock)complete;
 
 /// 将下载完成的iCloud上的资源模型添加到数组中，确保再次获取iCloud的图片时不会出现云朵标志
 - (void)addICloudModel:(HXPhotoModel *)model;

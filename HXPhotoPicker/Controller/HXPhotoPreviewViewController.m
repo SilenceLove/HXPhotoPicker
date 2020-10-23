@@ -605,8 +605,10 @@ HX_PhotoEditViewControllerDelegate
         self.selectBtn.hx_w = 24;
     }
     UIColor *btnBgColor = self.manager.configuration.previewSelectedBtnBgColor ?: self.manager.configuration.themeColor;
-    UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : btnBgColor;
-    button.backgroundColor = button.selected ? themeColor : nil;
+    if ([HXPhotoCommon photoCommon].isDark) {
+        btnBgColor = self.manager.configuration.previewDarkSelectBgColor;
+    }
+    button.backgroundColor = button.selected ? btnBgColor : nil;
     if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidSelect:model:)]) {
         [self.delegate photoPreviewControllerDidSelect:self model:model];
     }

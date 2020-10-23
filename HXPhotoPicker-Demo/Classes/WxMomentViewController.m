@@ -75,6 +75,16 @@
 - (HXPhotoManager *)photoManager {
     if (!_photoManager) {
         _photoManager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
+//        _photoManager.assetFilter = ^BOOL(HXAlbumModel *albumModel, PHAsset *asset) {
+//            if (!asset.location) {
+//                return YES;
+//            }
+//            // 经纬度
+////            asset.location.coordinate;
+//
+//            return NO;
+//        };
+        
         _photoManager.configuration.type = HXConfigurationTypeWXMoment;
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";
         _photoManager.configuration.showOriginalBytes = YES;

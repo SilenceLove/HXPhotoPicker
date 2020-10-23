@@ -560,10 +560,13 @@ HX_PhotoEditViewControllerDelegate
         return;
     }
     if (panGesture.state == UIGestureRecognizerStateBegan) {
+        // 获取起始点
         self.panSelectStartPoint = [panGesture locationInView:self.collectionView];
         NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.panSelectStartPoint];
+        // 是否可以选择视频
         BOOL canSelectVideo = self.manager.videoSelectedType != HXPhotoManagerVideoSelectedTypeSingle;
         if (indexPath) {
+            // 起始点在cell上
             HXPhotoModel *firstModel = self.allArray[indexPath.item];
             if (firstModel.subType == HXPhotoModelMediaSubTypeVideo) {
                 if (canSelectVideo) {
@@ -573,6 +576,7 @@ HX_PhotoEditViewControllerDelegate
                 self.currentPanSelectType = !firstModel.selected;
             }
         }else {
+            // 起始点不在cell上
             self.currentPanSelectType = -1;
         }
     }else if (panGesture.state == UIGestureRecognizerStateChanged) {
@@ -581,6 +585,7 @@ HX_PhotoEditViewControllerDelegate
         NSInteger lastLine = 0;
         NSIndexPath *firstIndexPath = [self.collectionView indexPathForItemAtPoint:self.panSelectStartPoint];
         if (!firstIndexPath) {
+            // 起始点不在cell上直接不可滑动选择
             return;
         }
         NSIndexPath *lastIndexPath = [self.collectionView indexPathForItemAtPoint:currentPoint];
@@ -607,9 +612,11 @@ HX_PhotoEditViewControllerDelegate
         CGFloat maxX;
         BOOL xReverse = NO;
         if (currentPoint.x > self.panSelectStartPoint.x) {
+            // 向右
             maxX = [self panSelectGetMaxXWithPoint:currentPoint];
             startX = [self panSelectGetMinXWithPoint:self.panSelectStartPoint];
         }else {
+            // 向左
             xReverse = YES;
             maxX = [self panSelectGetMaxXWithPoint:self.panSelectStartPoint];
             startX = [self panSelectGetMinXWithPoint:currentPoint];
@@ -618,9 +625,11 @@ HX_PhotoEditViewControllerDelegate
         CGFloat startY;
         BOOL yReverse = NO;
         if (currentPoint.y > self.panSelectStartPoint.y) {
+            // 向下
             maxY = [self panSelectGetMaxYWithPoint:currentPoint];
             startY = [self panSelectGetMinYWithPoint:self.panSelectStartPoint];
         }else {
+            // 向上
             yReverse = YES;
             maxY = [self panSelectGetMaxYWithPoint:self.panSelectStartPoint];
             startY = [self panSelectGetMinYWithPoint:currentPoint];
@@ -760,6 +769,11 @@ HX_PhotoEditViewControllerDelegate
             }else if (self.currentPanSelectType == 1) {
                 // 选择
                 if (!model.selected) {
+                    if (model.isICloud) {
+                        // 是iCloud上的资源就过滤掉
+                        continue;
+                    }
+                    // 是否可以选择
                     NSString *str = [self.manager maximumOfJudgment:model];
                     if (!str) {
                         [self.manager beforeSelectedListAddPhotoModel:model];
@@ -941,7 +955,8 @@ HX_PhotoEditViewControllerDelegate
 - (void)startGetAllPhotoModel {
     HXWeakSelf
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.manager getPhotoListWithAlbumModel:self.albumModel complete:^(NSMutableArray *allList, NSMutableArray *previewList, HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel) {
+        [self.manager getPhotoListWithAlbumModel:self.albumModel
+                                        complete:^(NSMutableArray * _Nullable allList, NSMutableArray * _Nullable previewList, NSUInteger photoCount, NSUInteger videoCount, HXPhotoModel * _Nullable firstSelectModel, HXAlbumModel * _Nullable albumModel) {
             if ((weakSelf.albumModel != albumModel && !weakSelf.assetDidChanged) ||
                 !weakSelf) {
                 return;
@@ -950,13 +965,16 @@ HX_PhotoEditViewControllerDelegate
             if (weakSelf.collectionViewReloadCompletion) {
                 return ;
             }
+            weakSelf.photoCount = photoCount + weakSelf.manager.cameraPhotoCount;
+            weakSelf.videoCount = videoCount + weakSelf.manager.cameraVideoCount;
+            weakSelf.albumModel.count = weakSelf.photoCount + weakSelf.videoCount;
             [weakSelf setPhotoModelsWithAllList:allList previewList:previewList firstSelectModel:firstSelectModel];
         }];
     });
 }
-- (void)setPhotoModelsWithAllList:(NSMutableArray *)allList previewList:(NSMutableArray *)previewList firstSelectModel:(HXPhotoModel *)firstSelectModel {
-    self.photoCount = [self.albumModel.assetResult countOfAssetsWithMediaType:PHAssetMediaTypeImage] + self.manager.cameraPhotoCount;
-    self.videoCount = [self.albumModel.assetResult countOfAssetsWithMediaType:PHAssetMediaTypeVideo] + self.manager.cameraVideoCount;
+- (void)setPhotoModelsWithAllList:(NSMutableArray *)allList
+                      previewList:(NSMutableArray *)previewList
+                 firstSelectModel:(HXPhotoModel *)firstSelectModel {
     self.collectionViewReloadCompletion = YES;
     
     self.allArray = allList.mutableCopy;
@@ -1089,7 +1107,8 @@ HX_PhotoEditViewControllerDelegate
         self.photoCount++;
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         self.videoCount++;
-    }    [self collectionViewAddModel:model beforeModel:nil];
+    }
+    [self collectionViewAddModel:model beforeModel:nil];
 }
 - (void)collectionViewAddModel:(HXPhotoModel *)model beforeModel:(HXPhotoModel *)beforeModel {
     

@@ -87,7 +87,7 @@
         [dict setValue:[NSError errorWithDomain:@"获取失败" code:99999 userInfo:nil] forKey:model.selectIndexStr];
     }
     __block NSInteger index = 0;
-    __block NSMutableArray *errorArray;
+    NSMutableArray *errorArray = [NSMutableArray array];
     for (HXPhotoModel *model in self) {
         [self requestImageWithOriginal:original photoModel:model successful:^(UIImage * _Nullable image, NSURL * _Nullable imagePath, HXPhotoModel *photoModel) {
             if (image) {
@@ -100,11 +100,9 @@
                     photoModel.previewPhoto = hImage;
                     [dict setObject:hImage forKey:photoModel.selectIndexStr];
                 }else {
-                    if (!errorArray) errorArray = [NSMutableArray array];
                     [errorArray addObject:photoModel];
                 }
             }else {
-                if (!errorArray) errorArray = [NSMutableArray array];
                 [errorArray addObject:photoModel];
             }
             index++;
@@ -114,7 +112,6 @@
                 }
             }
         } failure:^(HXPhotoModel *photoModel) {
-            if (!errorArray) errorArray = [NSMutableArray array];
             [errorArray addObject:photoModel];
             index++;
             if (index == count) {

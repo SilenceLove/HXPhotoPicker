@@ -817,7 +817,8 @@
     }
     return photoModel;
 }
-- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel complete:(getPhotoListBlock)complete {
+- (void)getPhotoListWithAlbumModel:(HXAlbumModel *)albumModel
+                          complete:(getPhotoListBlock)complete {
     
     if (self.selectedList.count) {
         self.selectedAssetList = [NSMutableArray arrayWithCapacity:self.selectedList.count];
@@ -854,6 +855,8 @@
         allCount = result.count;
     }
     NSMutableArray *allArray = [NSMutableArray arrayWithCapacity:allCount + self.cameraList.count + 1];
+    __block NSUInteger photoCount = 0;
+    __block NSUInteger videoCount = 0;
     if (self.configuration.reverseDate) {
         [result enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(PHAsset *asset, NSUInteger idx, BOOL * _Nonnull stop) {
             if (self.type == HXPhotoManagerSelectedTypePhoto && asset.mediaType != PHAssetMediaTypeImage) {
@@ -871,6 +874,11 @@
                     firstSelectModel = photoModel;
                 }
                 photoModel.currentAlbumIndex = albumModel.index;
+                if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                    photoCount++;
+                }else if (photoModel.subType == HXPhotoModelMediaSubTypeVideo) {
+                    videoCount++;
+                }
                 [allArray addObject:photoModel];
             }
         }];
@@ -891,6 +899,11 @@
                     firstSelectModel = photoModel;
                 }
                 photoModel.currentAlbumIndex = albumModel.index;
+                if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+                    photoCount++;
+                }else if (photoModel.subType == HXPhotoModelMediaSubTypeVideo) {
+                    videoCount++;
+                }
                 [allArray addObject:photoModel];
             }
         }];
@@ -962,7 +975,7 @@
         }
     }
     if (complete) {
-        complete(allArray, previewArray ?: allArray, firstSelectModel, albumModel);
+        complete(allArray, previewArray ?: allArray, photoCount, videoCount, firstSelectModel, albumModel);
     }
 }
 - (void)addICloudModel:(HXPhotoModel *)model {
