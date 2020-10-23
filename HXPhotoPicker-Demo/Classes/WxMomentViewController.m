@@ -89,7 +89,7 @@
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";
         _photoManager.configuration.showOriginalBytes = YES;
         _photoManager.configuration.showOriginalBytesLoading = YES;
-        _photoManager.configuration.clarityScale = 2.f;
+//        _photoManager.configuration.clarityScale = 2.f;
         HXWeakSelf
         // 添加一个可以更改可查看照片的数据
         _photoManager.configuration.navigationBar = ^(UINavigationBar *navigationBar, UIViewController *viewController) {
@@ -181,16 +181,15 @@
     
     HXPhotoBottomViewModel *model2 = [[HXPhotoBottomViewModel alloc] init];
     model2.title = [NSBundle hx_localizedStringForKey:@"从手机相册选择"];
-    HXWeakSelf
     [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2] headerView:nil cancelTitle:nil selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
-        [weakSelf setupManagerConfig];
+        [self setupManagerConfig];
         // 去掉dismiss的动画方便选择完成后present
-        weakSelf.photoManager.selectPhotoFinishDismissAnimated = NO;
-        weakSelf.photoManager.cameraFinishDismissAnimated = NO;
+        self.photoManager.selectPhotoFinishDismissAnimated = NO;
+        self.photoManager.cameraFinishDismissAnimated = NO;
         if (index == 0) {
-            [weakSelf hx_presentCustomCameraViewControllerWithManager:weakSelf.photoManager delegate:weakSelf];
+            [self hx_presentCustomCameraViewControllerWithManager:self.photoManager delegate:self];
         }else if (index == 1){
-            [weakSelf hx_presentSelectPhotoControllerWithManager:weakSelf.photoManager delegate:weakSelf];
+            [self hx_presentSelectPhotoControllerWithManager:self.photoManager delegate:self];
         }
     } cancelClick:nil];
 }
@@ -286,5 +285,9 @@
         _topMaskLayer.borderWidth  = 0.0;
     }
     return _topMaskLayer;
+}
+    
+- (void)dealloc {
+    NSSLog(@"dealloc");
 }
 @end

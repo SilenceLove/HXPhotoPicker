@@ -9,7 +9,6 @@
 #import "HXAlbumModel.h"
 #import "HXPhotoTools.h"
 @implementation HXAlbumModel
-
 - (void)fetchAssetResult {
     if ([self.localIdentifier isEqualToString:[HXPhotoCommon photoCommon].cameraRollLocalIdentifier]) {
         if ([HXPhotoCommon photoCommon].cameraRollResult) {

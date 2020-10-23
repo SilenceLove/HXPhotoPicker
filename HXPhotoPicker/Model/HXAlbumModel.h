@@ -13,7 +13,11 @@
 /// 相册名称
 @property (copy, nonatomic) NSString *albumName;
 /// 照片数量
-@property (assign, nonatomic) NSInteger count;
+@property (assign, nonatomic) NSUInteger count;
+/// 在获取照片数据之后的真实数量
+@property (assign, nonatomic) NSUInteger realCount;
+@property (strong, nonatomic) PHAsset *realCoverAsset;
+@property (assign, nonatomic) BOOL needReloadCount;
 /// 选择类型
 @property (assign, nonatomic) NSInteger selectType;
 /// 是否按创建时间排序
@@ -23,9 +27,9 @@
 /// 资源集合
 @property (strong, nonatomic) PHFetchResult *assetResult;
 /// 下标
-@property (assign, nonatomic) NSInteger index;
+@property (assign, nonatomic) NSUInteger index;
 /// 选中的个数
-@property (assign, nonatomic) NSInteger selectedCount;
+@property (assign, nonatomic) NSUInteger selectedCount;
 /// 本地图片数量
 @property (assign, nonatomic) NSUInteger cameraCount;
 @property (strong, nonatomic) UIImage *tempImage;

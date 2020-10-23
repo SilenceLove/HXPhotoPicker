@@ -80,7 +80,14 @@
         [self cellSetModelData:self.tableVisibleCells.firstObject];
     });
 }
-
+- (void)reloadAlbumAssetCountWithAlbumModel:(HXAlbumModel *)model {
+    if (!model || !self.albumModelArray.count) {
+        return;
+    }
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:model.index inSection:0];
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:0];
+    [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+}
 - (void)cellSetModelData:(HXAlbumlistViewCell *)cell {
     if ([cell isKindOfClass:[HXAlbumlistViewCell class]]) {
         HXWeakSelf
@@ -251,12 +258,16 @@
     }
 }
 - (void)getAlbumImageWithCompletion:(void (^)(UIImage *image, PHAsset *asset))completion {
-    NSInteger photoCount = self.model.count;
-
-    self.countLb.text = @(photoCount + self.model.cameraCount).stringValue;
+    NSInteger photoCount = self.model.count + self.model.cameraCount;
+    PHAsset *coverAsset = self.model.assetResult.lastObject;
+    if (self.model.needReloadCount && photoCount != self.model.realCount) {
+        coverAsset = self.model.realCoverAsset;
+        photoCount = self.model.realCount;
+    }
+    self.countLb.text = @(photoCount).stringValue;
     HXWeakSelf
-    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject width:self.hx_h * 1.4 completion:^(UIImage *image, PHAsset *asset) {
-        if (asset == weakSelf.model.assetResult.lastObject) {
+    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:coverAsset width:self.hx_h * 1.4 completion:^(UIImage *image, PHAsset *asset) {
+        if (asset == coverAsset) {
             weakSelf.coverView.image = image;
         }
         if (completion) {

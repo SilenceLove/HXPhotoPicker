@@ -967,7 +967,6 @@ HX_PhotoEditViewControllerDelegate
             }
             weakSelf.photoCount = photoCount + weakSelf.manager.cameraPhotoCount;
             weakSelf.videoCount = videoCount + weakSelf.manager.cameraVideoCount;
-            weakSelf.albumModel.count = weakSelf.photoCount + weakSelf.videoCount;
             [weakSelf setPhotoModelsWithAllList:allList previewList:previewList firstSelectModel:firstSelectModel];
         }];
     });
@@ -1107,6 +1106,9 @@ HX_PhotoEditViewControllerDelegate
         self.photoCount++;
     }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
         self.videoCount++;
+    }
+    if (self.albumModel.realCount != self.photoCount + self.videoCount) {
+        self.albumModel.realCount = self.photoCount + self.videoCount;
     }
     [self collectionViewAddModel:model beforeModel:nil];
 }
@@ -2055,8 +2057,27 @@ HX_PhotoEditViewControllerDelegate
     }
     if (selected) {
         if (!self.firstDidAlbumTitleView) {
+            HXAlbumModel *albumMd = self.albumView.albumModelArray.firstObject;
+            if (albumMd.realCount != self.photoCount + self.videoCount) {
+                albumMd.realCount = self.photoCount + self.videoCount;
+                HXPhotoModel *photoModel = self.previewArray.lastObject;
+                albumMd.realCoverAsset = photoModel.asset;
+                albumMd.needReloadCount = YES;
+            }
             [self.albumView refreshCamearCount];
             self.firstDidAlbumTitleView = YES;
+        }else {
+            BOOL needReload = self.albumModel.realCount != self.photoCount + self.videoCount;
+            if (!needReload && self.albumModel.realCount == 0) {
+                needReload = YES;
+            }
+            if (needReload) {
+                self.albumModel.realCount = self.photoCount + self.videoCount;
+                HXPhotoModel *photoModel = self.previewArray.lastObject;
+                self.albumModel.realCoverAsset = photoModel.asset;
+                self.albumModel.needReloadCount = YES;
+                [self.albumView reloadAlbumAssetCountWithAlbumModel:self.albumModel];
+            }
         }
         self.albumBgView.hidden = NO;
         self.albumBgView.alpha = 0;

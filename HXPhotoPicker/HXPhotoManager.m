@@ -701,7 +701,11 @@
             if (collection.assetCollectionSubtype == 212) return;
             if (collection.assetCollectionSubtype == 204) return;
             if (collection.assetCollectionSubtype == 1000000201) return;
-
+            
+            if (self.assetCollectionFilter &&
+                self.assetCollectionFilter(collection)) {
+                return;
+            }
             if ([self isCameraRollAlbum:collection]) {
                 HXAlbumModel *albumModel = [self albumModelWithCollection:collection fetchAssets:YES];
                 albumModel.cameraCount = [self cameraCount];
@@ -709,9 +713,6 @@
                 albumModel.index = 0;
                 [albums insertObject:albumModel atIndex:0];
             } else {
-                if (self.assetCollectionFilter && self.assetCollectionFilter(collection)) {
-                    return;
-                }
                 HXAlbumModel *albumModel = [self albumModelWithCollection:collection fetchAssets:YES];
                 if (albumModel.count > 0) {
                     albumModel.cameraCount = [self cameraCount];
@@ -745,6 +746,7 @@
             [albums addObject:albumModel];
         }
     }
+    
     if (completion) {
         completion(albums);
     };
