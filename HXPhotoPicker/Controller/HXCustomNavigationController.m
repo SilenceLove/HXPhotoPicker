@@ -218,13 +218,15 @@
     }
 }
 - (void)albumListViewControllerDidCancel:(HXAlbumListViewController *)albumListViewController {
-    [self clearAssetCache];
+    [self clearAssetCacheWithAddOnWindow:!self.manager.selectPhotoCancelDismissAnimated];
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidCancel:)]) {
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
     }
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
-    [self clearAssetCache];
+    if (!self.manager.configuration.requestImageAfterFinishingSelection) {
+        [self clearAssetCacheWithAddOnWindow:!self.manager.selectPhotoFinishDismissAnimated];
+    }
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllList:photos:videos:original:)]) {
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }
@@ -241,13 +243,15 @@
     }
 }
 - (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController {
-    [self clearAssetCache];
+    [self clearAssetCacheWithAddOnWindow:!self.manager.selectPhotoCancelDismissAnimated];
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidCancel:)]) {
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
     }
 }
 - (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
-    [self clearAssetCache];
+    if (!self.manager.configuration.requestImageAfterFinishingSelection) {
+        [self clearAssetCacheWithAddOnWindow:!self.manager.selectPhotoFinishDismissAnimated];
+    }
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllList:photos:videos:original:)]) {
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }
@@ -273,7 +277,6 @@
     return UIStatusBarAnimationFade;
 }
 //支持的方向
-
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     if (self.isCamera) {
         return UIInterfaceOrientationMaskPortrait;
@@ -285,7 +288,7 @@
     }
 }
 
-- (void)clearAssetCache {
+- (void)clearAssetCacheWithAddOnWindow:(BOOL)addOnWindow {
     PHAsset *asset = self.cameraRollAlbumModel.assetResult.firstObject;
     if (asset) {
         PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
@@ -296,26 +299,45 @@
         HXWeakSelf
         if (@available(iOS 13.0, *)) {
             self.requestID = [[PHImageManager defaultManager] requestImageDataAndOrientationForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, CGImagePropertyOrientation orientation, NSDictionary * _Nullable info) {
-                if (imageData && weakSelf) {
-                    [weakSelf addImageViewWithImageData:imageData];
+                if (imageData) {
+                    if (addOnWindow || !weakSelf) {
+                        [HXCustomNavigationController addImageViewOnWindowWithImageData:imageData];
+                    }else {
+                        [weakSelf addImageViewWithImageData:imageData addOnWindow:addOnWindow];
+                    }
                 }
             }];
         }else {
             self.requestID = [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-                if (imageData && weakSelf) {
-                    [weakSelf addImageViewWithImageData:imageData];
+                if (imageData) {
+                    if (addOnWindow || !weakSelf) {
+                        [HXCustomNavigationController addImageViewOnWindowWithImageData:imageData];
+                    }else {
+                        [weakSelf addImageViewWithImageData:imageData addOnWindow:addOnWindow];
+                    }
                 }
             }];
         }
     }
 }
-- (void)addImageViewWithImageData:(NSData *)imageData {
++ (void)addImageViewOnWindowWithImageData:(NSData *)imageData {
     UIImage *image = [UIImage imageWithData:imageData];
-    [self.imageView removeFromSuperview];
     UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-    imageView.frame = self.view.bounds;
     imageView.alpha = 0;
     imageView.userInteractionEnabled = NO;
+    imageView.frame = [UIScreen mainScreen].bounds;
+    [[UIApplication sharedApplication].keyWindow addSubview:imageView];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [imageView removeFromSuperview];
+    });
+}
+- (void)addImageViewWithImageData:(NSData *)imageData addOnWindow:(BOOL)addOnWindow {
+    [self.imageView removeFromSuperview];
+    UIImage *image = [UIImage imageWithData:imageData];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+    imageView.alpha = 0;
+    imageView.userInteractionEnabled = NO;
+    imageView.frame = self.view.bounds;
     [self.view addSubview:imageView];
     self.imageView = imageView;
 }
@@ -326,9 +348,6 @@
     if (_timer) {
         [_timer invalidate];
         _timer = nil;
-    }
-    if (self.requestID) {
-        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
     }
     if (HXShowLog) NSSLog(@"%@ dealloc", self);
 }

@@ -274,10 +274,9 @@
         if (self.photoModel.asset ||
             self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
             self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
-            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
             self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
             self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) {
-            [self requestImaegURL];
+            [self requestImageData];
         }else {
             UIImage *image;
             if (self.photoModel.thumbPhoto.images.count > 1) {
@@ -308,6 +307,20 @@
 }
 - (void)requestImaegURL {
     HXWeakSelf
+    self.requestId = [self.photoModel requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
+        weakSelf.requestId = iCloudRequestId;
+    } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
+        @autoreleasepool {
+            NSData * imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
+            UIImage *image = [UIImage imageWithData:imageData];
+            [weakSelf requestImageCompletion:image];
+        }
+    } failed:^(NSDictionary *info, HXPhotoModel *model) {
+        [weakSelf requestImage];
+    }];
+}
+- (void)requestImageData {
+    HXWeakSelf
     if (self.photoModel.type == HXPhotoModelMediaTypeLivePhoto) {
         [self.photoModel requestPreviewImageWithSize:self.photoModel.endImageSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
             weakSelf.requestId = iCloudRequestId;
@@ -327,20 +340,6 @@
         [self loadImageCompletion];
         return;
     }
-    self.requestId = [self.photoModel requestImageURLStartRequestICloud:^(PHContentEditingInputRequestID iCloudRequestId, HXPhotoModel *model) {
-        weakSelf.requestId = iCloudRequestId;
-    } progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
-        @autoreleasepool {
-            NSData * imageData = [NSData dataWithContentsOfFile:imageURL.relativePath];
-            UIImage *image = [UIImage imageWithData:imageData];
-            [weakSelf requestImageCompletion:image];
-        }
-    } failed:^(NSDictionary *info, HXPhotoModel *model) {
-        [weakSelf requestImageData];
-    }];
-}
-- (void)requestImageData {
-    HXWeakSelf
     self.requestId = [self.photoModel requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
         weakSelf.requestId = iCloudRequestId;
     } progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
@@ -349,7 +348,7 @@
             [weakSelf requestImageCompletion:image];
         }
     } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
-        [weakSelf requestImage];
+        [weakSelf requestImaegURL];
     }];
 }
 - (void)requestImage {

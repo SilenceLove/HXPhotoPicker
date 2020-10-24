@@ -47,7 +47,7 @@
     if (model.photoEdit) {
         image = model.photoEdit.editPreviewImage;
     }else {
-        image = model.thumbPhoto;
+        image = model.thumbPhoto ?: model.previewPhoto;
     }
     [self pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
 }

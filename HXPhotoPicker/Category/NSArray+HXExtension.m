@@ -230,45 +230,32 @@
             return;
         }
     }
-    if ((original && photoModel.type != HXPhotoModelMediaTypeVideo) ||
-        photoModel.type == HXPhotoModelMediaTypePhotoGif) {
-        // 如果选择了原图，就换一种获取方式
-//        [photoModel requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:nil progressHandler:nil success:^(UIImage * _Nullable image, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+//    if ((original && photoModel.type != HXPhotoModelMediaTypeVideo) ||
+//        photoModel.type == HXPhotoModelMediaTypePhotoGif) {
+//        // 如果选择了原图，就换一种获取方式
+//        [photoModel requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
 //            if (successful) {
-//                successful(image, nil, model);
+//                successful(nil, imageURL, model);
 //            }
-//        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+//        } failed:^(NSDictionary *info, HXPhotoModel *model) {
 //            if (failure) {
 //                failure(model);
 //            }
 //        }];
-        [photoModel requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
-            if (successful) {
-                successful(nil, imageURL, model);
+//    }else {
+        [photoModel requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            UIImage *image = [UIImage imageWithData:imageData];
+            if (image.imageOrientation == UIImageOrientationUp) {
+                image = [image hx_normalizedImage];
             }
-        } failed:^(NSDictionary *info, HXPhotoModel *model) {
-            if (failure) {
-                failure(model);
+            // 不是原图那就压缩
+            if (!original) {
+                image = [image hx_scaleImagetoScale:0.6f];
             }
-        }];
-    }else {
-        CGSize size;
-        CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = [UIScreen mainScreen].bounds.size.height;
-        CGFloat imgWidth = photoModel.imageSize.width;
-        CGFloat imgHeight = photoModel.imageSize.height;
-        if (imgHeight > imgWidth / 9 * 20 ||
-            imgWidth > imgHeight / 9 * 20) {
-            // 处理一下长图
-            size = CGSizeMake(width, height);
-        }else {
-            size = CGSizeMake(photoModel.endImageSize.width * 1.5, photoModel.endImageSize.height * 1.5);
-        }
-        [photoModel requestPreviewImageWithSize:size startRequestICloud:nil progressHandler:nil success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
             if (successful) {
                 successful(image, nil, model);
             }
-        } failed:^(NSDictionary *info, HXPhotoModel *model) {
+        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
             if (model.previewPhoto) {
                 if (successful) {
                     successful(model.previewPhoto, nil, model);
@@ -279,7 +266,7 @@
                 }
             }
         }];
-    }
+//    }
 }
 
 - (void)hx_requestImageDataWithCompletion:(void (^)(NSArray<NSData *> * _Nullable imageDataArray))completion {

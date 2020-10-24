@@ -887,7 +887,7 @@
 //    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHLivePhotoRequestOptions *option = [[PHLivePhotoRequestOptions alloc] init];
-//    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     option.networkAccessAllowed = NO;
     PHImageRequestID requestId = 0;
     self.iCloudDownloading = YES;
@@ -1965,15 +1965,35 @@
                 }];
             }
         }else {
-            [self requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
-                if (success) {
-                    success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+            [self requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                UIImage *image = [UIImage imageWithData:imageData];
+                if (image.imageOrientation != UIImageOrientationUp) {
+                    image = [image hx_normalizedImage];
                 }
+                [weakSelf getImageURLWithImage:image success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    weakSelf.imageURL = imageURL;
+                    if (success) {
+                        success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+                    }
+                } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                    if (failed) {
+                        failed(nil, weakSelf);
+                    }
+                }];
             } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
                 if (failed) {
                     failed(nil, weakSelf);
                 }
             }];
+//            [self requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+//                if (success) {
+//                    success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+//                }
+//            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+//                if (failed) {
+//                    failed(nil, weakSelf);
+//                }
+//            }];
         }
     }else if (self.subType == HXPhotoModelMediaSubTypeVideo) {
         if (self.type == HXPhotoModelMediaTypeCameraVideo) {

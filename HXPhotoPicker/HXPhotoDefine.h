@@ -12,17 +12,15 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "NSBundle+HXPhotoPicker.h"
 
+/// 当前版本
+#define HXVersion @"3.1.3"
+
 // 日志输出
 #ifdef DEBUG
 #define NSSLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 #else
 #define NSSLog(...)
 #endif
-
-/**
- 版本号 x.x.x
- */
-#define HXVersion @"3.1.2"
 
 /// 如果想要HXPhotoView的item大小自定义设置，请修改为 1
 /// 并且实现HXPhotoView的代理
@@ -135,7 +133,7 @@
 // 弱引用
 #define HXWeakSelf __weak typeof(self) weakSelf = self;
 // 强引用
-#define HXStrongSelf __strong typeof(self) strongSelf = weakSelf;
+#define HXStrongSelf __strong typeof(weakSelf) strongSelf = weakSelf;
 
 
 

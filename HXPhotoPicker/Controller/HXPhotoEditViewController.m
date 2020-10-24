@@ -214,12 +214,30 @@
         if (!self.isInside) {
             [self.view hx_showLoadingHUDText:nil];
         }
-        [self requestImaegURL];
+        [self requestImageData];
     }else {
         self.imageView.image = self.model.thumbPhoto;
         self.originalImage = self.model.thumbPhoto;
         [self loadImageCompletion];
     }
+}
+- (void)requestImageData {
+    HXWeakSelf
+    self.requestId = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
+        weakSelf.requestId = iCloudRequestId;
+    } progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        weakSelf.bottomView.userInteractionEnabled = YES;
+        UIImage *image = [UIImage imageWithData:imageData];
+        if (image.imageOrientation != UIImageOrientationUp) {
+            image = [image hx_normalizedImage];
+        }
+        weakSelf.originalImage = image;
+        weakSelf.imageView.image = image;
+        [weakSelf.view hx_handleLoading];
+        [weakSelf loadImageCompletion];
+    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+        [weakSelf requestImaegURL];
+    }];
 }
 - (void)requestImaegURL {
     HXWeakSelf

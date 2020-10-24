@@ -63,13 +63,13 @@
 ``` ruby
 # 将以下内容添加到您的Podfile中：
 # 不使用网络图片功能
-pod 'HXPhotoPicker', '~> 3.1.2'
+pod 'HXPhotoPicker', '~> 3.1.3'
   
 # 使用SDWebImage加载网络图片
-pod 'HXPhotoPicker/SDWebImage', '~> 3.1.2'
+pod 'HXPhotoPicker/SDWebImage', '~> 3.1.3'
   
 # 使用YYWebImage加载网络图片
-pod 'HXPhotoPicker/YYWebImage', '~> 3.1.2'
+pod 'HXPhotoPicker/YYWebImage', '~> 3.1.3'
 
 # 搜索不到库或最新版时请执行
 pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
@@ -714,9 +714,10 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
+- v3.1.3　-　修复dark模式下选择按钮颜色错误、退出选择界面时清空缓存、修复iOS14下iCloud上视频可以加载失败问题、提高列表/大图清晰度、修复过滤PHAsset时总数量不对问题
 - v3.1.2　-　适配iPhone12、去除警告、添加可过滤PHAssetCollection、PHAsset功能
 - v3.1.1　-　dark模式下界面优化，修复编辑图片在特殊情况下出现未编辑图片显示已编辑状态、完善iOS14适配
-- v3.1.0　-　完善iOS14相册权限，修复ios11以下布局问题
+- v3.1.0　-　完善iOS14相册权限，修复iOS11以下布局问题
 ```
 </details>
    

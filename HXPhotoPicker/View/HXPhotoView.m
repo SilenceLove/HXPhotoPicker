@@ -737,19 +737,26 @@
         [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
     } completion:^(BOOL finished) {
         BOOL collectionReload = YES;
-        [CATransaction begin];
-        [CATransaction setDisableActions:YES];
         if (self.showAddCell) {
             if (!self.tempShowAddCell) {
                 self.tempShowAddCell = YES;
+                [CATransaction begin];
+                [CATransaction setDisableActions:YES];
                 [self.collectionView reloadData];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [CATransaction commit];
+                });
                 collectionReload = NO;
             }
         }
         if (self.cellCustomProtocol && collectionReload) {
+            [CATransaction begin];
+            [CATransaction setDisableActions:YES];
             [self.collectionView reloadData];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [CATransaction commit];
+            });
         }
-        [CATransaction commit];
         [self setupNewFrame];
     }];
     [self changeSelectedListModelIndex];

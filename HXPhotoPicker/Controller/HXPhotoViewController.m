@@ -771,6 +771,8 @@ HX_PhotoEditViewControllerDelegate
                     // 是否可以选择
                     NSString *str = [self.manager maximumOfJudgment:model];
                     if (!str) {
+                        HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+                        model.thumbPhoto = cell.imageView.image;
                         [self.manager beforeSelectedListAddPhotoModel:model];
                         if (![reloadSelectArray containsObject:indexPath]) {
                             [reloadSelectArray addObject:indexPath];
@@ -1560,7 +1562,8 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)photoViewCell:(HXPhotoViewCell *)cell didSelectBtn:(UIButton *)selectBtn {
     if (selectBtn.selected) {
-        if (cell.model.type != HXPhotoModelMediaTypeCameraVideo && cell.model.type != HXPhotoModelMediaTypeCameraPhoto) {
+        if (cell.model.type != HXPhotoModelMediaTypeCameraVideo &&
+            cell.model.type != HXPhotoModelMediaTypeCameraPhoto) {
             cell.model.thumbPhoto = nil;
             cell.model.previewPhoto = nil;
         }
