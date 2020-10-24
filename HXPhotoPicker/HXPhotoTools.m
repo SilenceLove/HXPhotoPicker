@@ -375,6 +375,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                 if (complete) {
                     if (createdAsset.localIdentifier) {
                         HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                        photoModel.videoURL = videoURL;
                         photoModel.creationDate = [NSDate date];
                         complete(photoModel, YES);
                     }
@@ -415,6 +416,9 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
         }
         return;
     }
+    if (photo.imageOrientation != UIImageOrientationUp) {
+        photo = [photo hx_normalizedImage];
+    }
     if (!albumName) {
         albumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     }
@@ -430,13 +434,9 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                 return;
             }
             if (!HX_IOS9Later) {
-                UIImage *tempImage = photo;
-                if (tempImage.imageOrientation != UIImageOrientationUp) {
-                    tempImage = [tempImage hx_normalizedImage];
-                }
-                UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
+                UIImageWriteToSavedPhotosAlbum(photo, nil, nil, nil);
                 if (complete) {
-                    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:tempImage];
+                    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:photo];
                     photoModel.creationDate = [NSDate date];
                     photoModel.location = location;
                     complete(photoModel, YES);
@@ -463,6 +463,8 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                 if (complete) {
                     if (createdAsset.localIdentifier) {
                         HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                        photoModel.thumbPhoto = photo;
+                        photoModel.location = location;
                         photoModel.creationDate = [NSDate date];
                         complete(photoModel, YES);
                     }

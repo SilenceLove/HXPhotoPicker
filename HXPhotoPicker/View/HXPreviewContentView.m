@@ -75,6 +75,7 @@
         if (self.model.photoEdit) {
             return;
         }
+        [self.imageView requestHDImage];
         self.livePhotoView.model = self.model;
         if (self.model.type == HXPhotoModelMediaTypeCameraPhoto &&
             (self.model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
@@ -89,6 +90,7 @@
             }
         };
     }else if (self.type == HXPreviewContentViewTypeVideo) {
+        [self.imageView requestHDImage];
         self.videoView.model = self.model;
         self.videoView.downloadICloudAssetComplete = ^{
             if (weakSelf.downloadICloudAssetComplete) {

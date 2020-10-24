@@ -87,11 +87,11 @@ CGFloat angleBetweenLines(CGPoint line1Start, CGPoint line1End, CGPoint line2Sta
             UIImage *image = [UIImage hx_imageNamed:((HXPhotoEditSplashImageBlur *)blur).imageName];
             
             if (image) {
-                CGPoint firstPoint = CGPointZero;
-                if (i > 0) {
-                    HXPhotoEditSplashBlur *prevBlur = self.lineArray[i-1];
-                    firstPoint = prevBlur.rect.origin;
-                }
+//                CGPoint firstPoint = CGPointZero;
+//                if (i > 0) {
+//                    HXPhotoEditSplashBlur *prevBlur = self.lineArray[i-1];
+//                    firstPoint = prevBlur.rect.origin;
+//                }
                 /** 创建颜色图片 */
                 CGColorSpaceRef colorRef = CGColorSpaceCreateDeviceRGB();
                 CGContextRef contextRef = CGBitmapContextCreate(nil, image.size.width, image.size.height, 8, image.size.width*4, colorRef, kCGImageAlphaPremultipliedFirst);

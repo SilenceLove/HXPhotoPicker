@@ -14,7 +14,12 @@
 	<string>6.0</string>
 	<key>CFBundleLocalizations</key>
 	<array>
+		<string>zh_TW</string>
+		<string>zh_CN</string>
+		<string>ko</string>
+		<string>ja</string>
 		<string>zh</string>
+		<string>en</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>

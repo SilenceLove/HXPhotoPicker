@@ -50,6 +50,8 @@
 
 @property (assign, nonatomic) BOOL hasAuthorization;
 
+/// 相机拍照临时具有的model(PHAsset不为nil)
+@property (strong, nonatomic) NSMutableArray *tempCameraAssetModels;
 @end
 
 @implementation HXPhotoManager
@@ -775,6 +777,7 @@
         if ([_selectedAssetList containsObject:asset]) {
             HXPhotoModel *selectModel = [self.tempSelectedModelList objectAtIndex:[_selectedAssetList indexOfObject:asset]];
             photoModel.photoEdit = selectModel.photoEdit;
+            photoModel.thumbPhoto = selectModel.thumbPhoto;
             if (selectModel.subType == HXPhotoModelMediaSubTypePhoto) {
                 if (selectModel.type == HXPhotoModelMediaTypeCameraPhoto) {
                     [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:selectModel] withObject:photoModel];
@@ -945,6 +948,25 @@
             [allArray addObject:model];
         }else {
             [allArray insertObject:model atIndex:0];
+        }
+    }
+    if (_tempCameraAssetModels) {
+        NSInteger index = 0;
+        for (HXPhotoModel *model in _tempCameraAssetModels) {
+            if (self.configuration.reverseDate) {
+                [allArray insertObject:model atIndex:cameraIndex + index];
+                if (previewArray) {
+                    [previewArray insertObject:model atIndex:index];
+                }
+            }else {
+                NSInteger count = allArray.count;
+                NSInteger atIndex = (count - cameraIndex) < 0 ? 0 : count - cameraIndex;
+                [allArray insertObject:model atIndex:atIndex];
+                if (previewArray) {
+                    [previewArray addObject:model];
+                }
+            }
+            index++;
         }
     }
     if (self.cameraList.count) {
@@ -1724,6 +1746,12 @@
         [self cancelBeforeSelectedList];
     }
 }
+- (void)addTempCameraAssetModel:(HXPhotoModel *)model {
+    [self.tempCameraAssetModels addObject:model];
+}
+- (void)removeAllTempCameraAssetModel {
+    self.tempCameraAssetModels = nil;
+}
 - (void)cancelBeforeSelectedList {
     [self.selectedList removeAllObjects];
     [self.selectedPhotos removeAllObjects];
@@ -1736,6 +1764,7 @@
     [self.cameraPhotos removeAllObjects];
     [self.cameraList removeAllObjects];
     [self.cameraVideos removeAllObjects];
+    [self removeAllTempCameraAssetModel];
 }
 - (void)sortSelectedListIndex {
     NSInteger i = 0;
@@ -1910,7 +1939,12 @@
     }
     return YES;
 }
-
+- (NSMutableArray *)tempCameraAssetModels {
+    if (!_tempCameraAssetModels) {
+        _tempCameraAssetModels = [NSMutableArray array];
+    }
+    return _tempCameraAssetModels;
+}
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
     [self.dataOperationQueue cancelAllOperations];

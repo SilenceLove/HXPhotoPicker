@@ -744,11 +744,6 @@ HX_PhotoEditViewControllerDelegate
                 self.currentPanSelectType = !firstModel.selected;
             }
         }
-        
-        BOOL maskLayerHidden = NO;
-        if (self.manager.videoSelectedType == HXPhotoManagerVideoSelectedTypeSingle) {
-            maskLayerHidden = self.manager.selectedPhotoCount ? YES : NO;
-        }
         NSMutableArray *reloadSelectArray = [NSMutableArray array];
         for (NSIndexPath *indexPath in indexPaths) {
             HXPhotoModel *model = self.allArray[indexPath.item];
@@ -1093,6 +1088,9 @@ HX_PhotoEditViewControllerDelegate
     model.currentAlbumIndex = self.albumModel.index;
     if (!self.manager.configuration.singleSelected) {
         [self.manager beforeListAddCameraTakePicturesModel:model];
+    }
+    if (model.asset) {
+        [self.manager addTempCameraAssetModel:model];
     }
     if (model.type != HXPhotoModelMediaTypeCameraPhoto &&
         model.type != HXPhotoModelMediaTypeCameraVideo) {

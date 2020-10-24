@@ -105,13 +105,7 @@
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     if (model.photoEdit) {
-#if HasSDWebImage
-        self.sdImageView.image = model.photoEdit.editPreviewImage;
-#elif HasYYKitOrWebImage
-        self.animatedImageView.image = model.photoEdit.editPreviewImage;
-#else
-        self.imageView.image = model.photoEdit.editPreviewImage;
-#endif
+        [self setImageViewWithImage:model.photoEdit.editPreviewImage isAnimation:NO];
         model.tempImage = nil;
         return;
     }
@@ -122,13 +116,7 @@ HXWeakSelf
             CGFloat progress = (CGFloat)model.receivedSize / model.expectedSize;
             self.progressView.progress = progress;
             if (model.downloadComplete && !model.downloadError && model.loadOriginalImage) {
-#if HasSDWebImage
-                self.sdImageView.image = model.previewPhoto;
-#elif HasYYKitOrWebImage
-                self.animatedImageView.image = model.previewPhoto;
-#else
-                self.imageView.image = model.previewPhoto;
-#endif
+                [self setImageViewWithImage:model.previewPhoto isAnimation:NO];
                 if (self.downloadICloudAssetComplete) {
                     self.downloadICloudAssetComplete();
                 }
@@ -229,76 +217,66 @@ HXWeakSelf
                 self.imageView.image = [UIImage hx_animatedGIFWithURL:model.imageURL];
 #endif
             }else {
-#if HasSDWebImage
-                self.sdImageView.image = model.thumbPhoto;
-#elif HasYYKitOrWebImage
-                self.animatedImageView.image = model.thumbPhoto;
-#else
-                self.imageView.image = model.thumbPhoto;
-#endif
+                [self setImageViewWithImage:model.thumbPhoto isAnimation:NO];
             }
             model.tempImage = nil;
         }
     }else {
         if (model.type == HXPhotoModelMediaTypeLivePhoto) {
             if (model.tempImage) {
-#if HasSDWebImage
-                self.sdImageView.image = model.tempImage;
-#elif HasYYKitOrWebImage
-                self.animatedImageView.image = model.tempImage;
-#else
-                self.imageView.image = model.tempImage;
-#endif
+                [self setImageViewWithImage:model.tempImage isAnimation:NO];
                 model.tempImage = nil;
             }else {
                 self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5f completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                     if (weakSelf.model != model) return;
-#if HasSDWebImage
-                    weakSelf.sdImageView.image = image;
-#elif HasYYKitOrWebImage
-                    weakSelf.animatedImageView.image = image;
-#else
-                    weakSelf.imageView.image = image;
-#endif
+                    [weakSelf setImageViewWithImage:image isAnimation:NO];
                 }];
             }
         }else {
             if (model.previewPhoto) {
-#if HasSDWebImage
-                self.sdImageView.image = model.previewPhoto;
-#elif HasYYKitOrWebImage
-                self.animatedImageView.image = model.previewPhoto;
-#else
-                self.imageView.image = model.previewPhoto;
-#endif
+                [self setImageViewWithImage:model.previewPhoto isAnimation:NO];
                 model.tempImage = nil;
             }else {
                 if (model.tempImage) {
-#if HasSDWebImage
-                    self.sdImageView.image = model.tempImage;
-#elif HasYYKitOrWebImage
-                    self.animatedImageView.image = model.tempImage;
-#else
-                    self.imageView.image = model.tempImage;
-#endif
+                    [self setImageViewWithImage:model.tempImage isAnimation:NO];
                     model.tempImage = nil;
                 }else {
-                    self.requestID =[model requestThumbImageWithWidth:self.hx_w * 0.6 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                    self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model != model) return;
-#if HasSDWebImage
-                        weakSelf.sdImageView.image = image;
-#elif HasYYKitOrWebImage
-                        weakSelf.animatedImageView.image = image;
-#else
-                        weakSelf.imageView.image = image;
-#endif
+                        [weakSelf setImageViewWithImage:image isAnimation:NO];
                     }];
                 }
             }
         }
     }
 }
+- (void)setImageViewWithImage:(UIImage *)image isAnimation:(BOOL)isAnimation {
+    CATransition *transition;
+    if (isAnimation) {
+        transition = [CATransition animation];
+        transition.duration = 0.2f;
+        transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        transition.type = kCATransitionFade;
+    }
+        
+#if HasSDWebImage
+    if (isAnimation) [self.sdImageView.layer removeAllAnimations];
+    self.sdImageView.image = image;
+    if (isAnimation) [self.sdImageView.layer addAnimation:transition forKey:nil];
+#elif HasYYKitOrWebImage
+    if (isAnimation) [self.animatedImageView.layer removeAllAnimations];
+    self.animatedImageView.image = image;
+    if (isAnimation) [self.animatedImageView.layer addAnimation:transition forKey:nil];
+#else
+    if (isAnimation) [self.imageView.layer removeAllAnimations];
+    self.imageView.image = image;
+    if (isAnimation) [self.imageView.layer addAnimation:transition forKey:nil];
+#endif
+}
 - (void)requestImageData {
+    if (!self.model.asset) {
+        return;
+    }
     HXWeakSelf
     self.requestID = [self.model requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
         if (weakSelf.model != model) return;
@@ -315,34 +293,22 @@ HXWeakSelf
     } success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
         if (weakSelf.model != model) return;
         @autoreleasepool {
-            UIImage *image = [UIImage imageWithData:imageData];
-            CGSize imageSize = image.size;
-            if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-                while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-                    imageSize.width /= 2;
-                    imageSize.height /= 2;
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                UIImage *image = [UIImage imageWithData:imageData];
+                CGSize imageSize = image.size;
+                if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+                    while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+                        imageSize.width /= 2;
+                        imageSize.height /= 2;
+                    }
+                    image = [image hx_scaleToFillSize:imageSize];
                 }
-                image = [image hx_scaleToFillSize:imageSize];
-            }
-            [weakSelf downloadICloudAssetComplete];
-            weakSelf.progressView.hidden = YES;
-            CATransition *transition = [CATransition animation];
-            transition.duration = 0.2f;
-            transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-            transition.type = kCATransitionFade;
-#if HasSDWebImage
-            [weakSelf.sdImageView.layer removeAllAnimations];
-            weakSelf.sdImageView.image = image;
-            [weakSelf.sdImageView.layer addAnimation:transition forKey:nil];
-#elif HasYYKitOrWebImage
-            [weakSelf.animatedImageView.layer removeAllAnimations];
-            weakSelf.animatedImageView.image = image;
-            [weakSelf.animatedImageView.layer addAnimation:transition forKey:nil];
-#else
-            [weakSelf.imageView.layer removeAllAnimations];
-            weakSelf.imageView.image = image;
-            [weakSelf.imageView.layer addAnimation:transition forKey:nil];
-#endif
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf downloadICloudAssetComplete];
+                    weakSelf.progressView.hidden = YES;
+                    [weakSelf setImageViewWithImage:image isAnimation:YES];
+                });
+            });
         }
     } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
         if (weakSelf.model != model) return;
@@ -351,41 +317,10 @@ HXWeakSelf
 }
 - (void)requestHDImage {
     if (self.model.photoEdit) {
-#if HasSDWebImage
-        self.sdImageView.image = self.model.photoEdit.editPreviewImage;
-#elif HasYYKitOrWebImage
-        self.animatedImageView.image = self.model.photoEdit.editPreviewImage;
-#else
-        self.imageView.image = self.model.photoEdit.editPreviewImage;
-#endif
+        [self setImageViewWithImage:self.model.photoEdit.editPreviewImage isAnimation:NO];
         [self downloadICloudAssetComplete];
         return;
     }
-    CGSize size;
-    CGFloat scale;
-    if (HX_IS_IPhoneX_All) {
-        scale = 2.0f;
-    }else if ([UIScreen mainScreen].bounds.size.width == 320) {
-        scale = 1.2;
-    }else if ([UIScreen mainScreen].bounds.size.width == 375) {
-        scale = 1.5;
-    }else {
-        scale = 1.4;
-    }
-
-    CGFloat photoWidth = self.hx_w;
-    CGFloat aspectRatio = self.model.asset.pixelWidth / (CGFloat)self.model.asset.pixelHeight;
-    CGFloat pixelWidth = photoWidth * scale;
-    // 超宽图片
-    if (aspectRatio > 1.8) {
-        pixelWidth = pixelWidth * aspectRatio;
-    }
-    // 超高图片
-    if (aspectRatio < 0.2) {
-        pixelWidth = pixelWidth * 0.5;
-    }
-    CGFloat pixelHeight = pixelWidth / aspectRatio;
-    size = CGSizeMake(pixelWidth, pixelHeight);
     HXWeakSelf
     if (self.model.type == HXPhotoModelMediaTypeCameraPhoto) {
         if (self.model.networkPhotoUrl) {
@@ -396,45 +331,6 @@ HXWeakSelf
                 [self.progressView showError];
             }
         }
-    }else if (self.model.type == HXPhotoModelMediaTypePhoto) {
-        [self requestImageData];
-//        self.requestID = [self.model requestPreviewImageWithSize:size startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
-//            if (weakSelf.model != model) return;
-//            if (weakSelf.model.isICloud) {
-//                weakSelf.progressView.hidden = NO;
-//            }
-//            weakSelf.requestID = iCloudRequestId;
-//        } progressHandler:^(double progress, HXPhotoModel *model) {
-//            if (weakSelf.model != model) return;
-//            if (weakSelf.model.isICloud) {
-//                weakSelf.progressView.hidden = NO;
-//            }
-//            weakSelf.progressView.progress = progress;
-//        } success:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-//            if (weakSelf.model != model) return;
-//            [weakSelf downloadICloudAssetComplete];
-//            weakSelf.progressView.hidden = YES;
-//            CATransition *transition = [CATransition animation];
-//            transition.duration = 0.2f;
-//            transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-//            transition.type = kCATransitionFade;
-//#if HasSDWebImage
-//            [weakSelf.sdImageView.layer removeAllAnimations];
-//            weakSelf.sdImageView.image = image;
-//            [weakSelf.sdImageView.layer addAnimation:transition forKey:nil];
-//#elif HasYYKitOrWebImage
-//            [weakSelf.animatedImageView.layer removeAllAnimations];
-//            weakSelf.animatedImageView.image = image;
-//            [weakSelf.animatedImageView.layer addAnimation:transition forKey:nil];
-//#else
-//            [weakSelf.imageView.layer removeAllAnimations];
-//            weakSelf.imageView.image = image;
-//            [weakSelf.imageView.layer addAnimation:transition forKey:nil];
-//#endif
-//        } failed:^(NSDictionary *info, HXPhotoModel *model) {
-//            if (weakSelf.model != model) return;
-//            weakSelf.progressView.hidden = YES;
-//        }];
     }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (self.gifImage) {
 #if HasSDWebImage
@@ -465,38 +361,47 @@ HXWeakSelf
                 weakSelf.progressView.progress = progress;
             } success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
                 if (weakSelf.model != model) return;
-                [weakSelf downloadICloudAssetComplete];
-                weakSelf.progressView.hidden = YES;
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    id image;
 #if HasSDWebImage
-                SDAnimatedImage *gifImage = [SDAnimatedImage imageWithData:imageData];
-//                UIImage *gifImage = [UIImage sd_imageWithGIFData:imageData];
-                weakSelf.sdImageView.image = gifImage;
-                weakSelf.gifImage = gifImage;
-                if (gifImage.images.count == 0) {
-                    weakSelf.gifFirstFrame = gifImage;
-                }else {
-                    weakSelf.gifFirstFrame = gifImage.images.firstObject;
-                }
+                    image = [SDAnimatedImage imageWithData:imageData];
 #elif HasYYKitOrWebImage
-                YYImage *gifImage = [YYImage imageWithData:imageData];
-                weakSelf.animatedImageView.image = gifImage;
-                weakSelf.gifImage = gifImage;
+                    image = [YYImage imageWithData:imageData];
 #else
-                UIImage *gifImage = [UIImage hx_animatedGIFWithData:imageData];
-                weakSelf.imageView.image = gifImage;
-                weakSelf.gifImage = gifImage;
-                if (gifImage.images.count == 0) {
-                    weakSelf.gifFirstFrame = gifImage;
-                }else {
-                    weakSelf.gifFirstFrame = gifImage.images.firstObject;
-                }
+                    image = [UIImage hx_animatedGIFWithData:imageData];
 #endif
-                weakSelf.model.tempImage = nil;
+                    dispatch_async(dispatch_get_main_queue(), ^{
+#if HasSDWebImage
+                        weakSelf.sdImageView.image = image;
+                        weakSelf.gifImage = image;
+                        [weakSelf setGifFirstFrame];
+#elif HasYYKitOrWebImage
+                        weakSelf.animatedImageView.image = image;
+                        weakSelf.gifImage = image;
+#else
+                        weakSelf.imageView.image = image;
+                        weakSelf.gifImage = image;
+                        [weakSelf setGifFirstFrame];
+#endif
+                        [weakSelf downloadICloudAssetComplete];
+                        weakSelf.progressView.hidden = YES;
+                        weakSelf.model.tempImage = nil;
+                    });
+                });
             } failed:^(NSDictionary *info, HXPhotoModel *model) {
                 if (weakSelf.model != model) return;
                 weakSelf.progressView.hidden = YES;
             }];
         }
+    }else {
+        [self requestImageData];
+    }
+}
+- (void)setGifFirstFrame {
+    if (self.gifImage.images.count == 0) {
+        self.gifFirstFrame = self.gifImage;
+    }else {
+        self.gifFirstFrame = self.gifImage.images.firstObject;
     }
 }
 - (void)cancelImage {
@@ -505,15 +410,7 @@ HXWeakSelf
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
     }
-    if (self.model.type == HXPhotoModelMediaTypePhoto) {
-#if HasYYWebImage
-//        [self.animatedImageView yy_cancelCurrentImageRequest];
-#elif HasYYKit
-//        [self.animatedImageView cancelCurrentImageRequest];
-#elif HasSDWebImage
-//        [self.imageView sd_cancelCurrentAnimationImagesLoad];
-#endif
-    }else if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
+    if (self.model.type == HXPhotoModelMediaTypePhotoGif) {
         if (!self.stopCancel) {
 #if HasSDWebImage
             self.sdImageView.image = self.gifFirstFrame;

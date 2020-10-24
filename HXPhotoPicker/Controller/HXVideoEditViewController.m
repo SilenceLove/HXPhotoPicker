@@ -1083,12 +1083,11 @@ HXEditFrameViewDelegate
     CGRect rct = self.validRect;
     const CGFloat W = self.hx_w;
     CGFloat minX = hxValidRectX + hxImageWidth;
-    CGFloat maxX = W;
     
     switch (panGesture.view.tag) {
         case 0: {
             //left
-            maxX = self.rightImageView.hx_x - self.minWidth;
+            CGFloat maxX = self.rightImageView.hx_x - self.minWidth;
             point.x = MAX(minX, MIN(point.x, maxX));
             point.y = 0;
             
@@ -1099,7 +1098,7 @@ HXEditFrameViewDelegate
         case 1:  {
             //right
             minX = CGRectGetMaxX(self.leftImageView.frame) + self.minWidth;
-            maxX = W - hxValidRectX - hxImageWidth;
+            CGFloat  maxX = W - hxValidRectX - hxImageWidth;
             
             point.x = MAX(minX, MIN(point.x, maxX));
             point.y = 0;

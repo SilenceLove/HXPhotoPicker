@@ -716,21 +716,19 @@
     return nil;
 }
 + (CGSize)getAssetTargetSizeWithAsset:(PHAsset *)asset width:(CGFloat)width {
+    CGFloat aspectRatio = asset.pixelWidth / (CGFloat)asset.pixelHeight;
     CGFloat initialWidth = width;
-    CGFloat scale;
+    CGFloat height;
     if (asset.pixelWidth < width) {
-        scale = 0.5f;
-        width = asset.pixelWidth * 0.5f;
-    }else {
-        scale = asset.pixelWidth / width;
+        width = width / 2;
     }
-    CGFloat height = asset.pixelHeight / scale;
-    CGFloat sixteenHeight = width / 9 * 20;
-    if (height > sixteenHeight) {
-        width = sixteenHeight / height * width;
-        height = sixteenHeight;
+    height = width / aspectRatio;
+    CGFloat maxHeight = HX_ScreenHeight;
+    if (height > maxHeight) {
+        width = maxHeight / height * width;
+        height = maxHeight;
     }
-    if (height < initialWidth) {
+    if (height < initialWidth && width >= initialWidth) {
         width = initialWidth / height * width;
         height = initialWidth;
     }
@@ -792,24 +790,17 @@
 - (PHImageRequestID)requestThumbImageWithOptions:(PHImageRequestOptions * _Nullable)options
                                            width:(CGFloat)width
                                       completion:(HXModelImageSuccessBlock _Nullable)completion {
+    CGFloat aspectRatio = self.asset.pixelWidth / (CGFloat)self.asset.pixelHeight;
     CGFloat initialWidth = width;
-    CGFloat scale;
+    CGFloat height;
     if (self.asset.pixelWidth < width) {
-        scale = 0.5f;
-        width = self.asset.pixelWidth * scale;
-    }else {
-        if (self.asset.pixelHeight < self.asset.pixelWidth * 2 &&
-            self.asset.pixelHeight > self.asset.pixelWidth * 0.5f) {
-            width *= 0.7f;
-            initialWidth = width;
-        }
-        scale = self.asset.pixelWidth / width;
+        width = width / 2;
     }
-    CGFloat height = self.asset.pixelHeight / scale;
-    CGFloat sixteenHeight = width / 9 * 20;
-    if (height > sixteenHeight) {
-        width = sixteenHeight / height * width;
-        height = sixteenHeight;
+    height = width / aspectRatio;
+    CGFloat maxHeight = HX_ScreenHeight;
+    if (height > maxHeight) {
+        width = maxHeight / height * width;
+        height = maxHeight;
     }
     if (height < initialWidth && width >= initialWidth) {
         width = initialWidth / height * width;
@@ -896,7 +887,7 @@
 //    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
     
     PHLivePhotoRequestOptions *option = [[PHLivePhotoRequestOptions alloc] init];
-    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+//    option.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     option.networkAccessAllowed = NO;
     PHImageRequestID requestId = 0;
     self.iCloudDownloading = YES;
@@ -1100,8 +1091,6 @@
         return 0;
 #endif
     }
-//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
-    
     PHImageRequestOptions *option = [self imageHighQualityRequestOptions];
     option.networkAccessAllowed = NO;
     if (self.type == HXPhotoModelMediaTypePhotoGif) {
@@ -1240,7 +1229,6 @@
     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
     if (downloadFinined && results) {
         dispatch_async(dispatch_get_main_queue(), ^{
-//            self.isICloud = NO;
             self.iCloudDownloading = NO;
             if (success) {
                 success(results, info, orientation, audioMix);
@@ -1266,7 +1254,6 @@
                     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
                     if (downloadFinined && result) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-//                            weakSelf.isICloud = NO;
                             weakSelf.iCloudDownloading = NO;
                             if (success) {
                                 success(result, info, 0, nil);
@@ -1376,7 +1363,8 @@
                 }
             }else if ([resultClass isEqual:[AVAsset class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-//                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+                iCloudOptions.version = PHVideoRequestOptionsVersionOriginal;
+                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1409,7 +1397,8 @@
                 }];
             }else if ([resultClass isEqual:[AVAssetExportSession class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-//                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+                iCloudOptions.version = PHVideoRequestOptionsVersionOriginal;
+                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1442,7 +1431,8 @@
                 }];
             }else if ([resultClass isEqual:[AVPlayerItem class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-//                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+                iCloudOptions.version = PHVideoRequestOptionsVersionOriginal;
+                iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
                     dispatch_async(dispatch_get_main_queue(), ^{

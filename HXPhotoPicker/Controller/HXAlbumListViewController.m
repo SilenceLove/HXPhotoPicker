@@ -124,12 +124,10 @@ UITableViewDelegate
 - (void)changeSubviewFrame {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
-    NSInteger lineCount = 2;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
         navBarHeight = hxNavigationBarHeight;
-        lineCount = 2;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -138,17 +136,14 @@ UITableViewDelegate
         }else {
             navBarHeight = self.navigationController.navigationBar.hx_h + 20;
         }
-        lineCount = 3;
     }
 #pragma clang diagnostic pop
     CGFloat leftMargin = 0;
     CGFloat rightMargin = 0;
-    CGFloat width = self.view.hx_w;
     CGFloat bottomMargin = hxBottomMargin;
     if (HX_IS_IPhoneX_All && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
         leftMargin = 35;
         rightMargin = 35;
-        width = self.view.hx_w - 70;
         bottomMargin = 0;
     }
     

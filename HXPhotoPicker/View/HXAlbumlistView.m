@@ -483,10 +483,10 @@
 }
 - (CGFloat)getTextWidth:(CGFloat)margin {
     CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - margin - 10 - 5 - self.arrowIcon.hx_w - (30 - self.arrowIcon.hx_h) / 2;
-    CGFloat textWidth = self.titleLb.hx_getTextWidth;
-    if (textWidth > maxWidth) {
-        textWidth = maxWidth;
-    }
+//    CGFloat textWidth = self.titleLb.hx_getTextWidth;
+//    if (textWidth > maxWidth) {
+//        textWidth = maxWidth;
+//    }
     return maxWidth;
 }
 - (void)setSubViewFrame {

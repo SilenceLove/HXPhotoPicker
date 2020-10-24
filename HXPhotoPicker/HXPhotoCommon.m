@@ -253,11 +253,10 @@ static id instance;
     AFNetworkReachabilityManager *manager = [AFNetworkReachabilityManager sharedManager];
     self.netStatus = manager.networkReachabilityStatus;
     [manager startMonitoring];
-    HXWeakSelf
     [manager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
-        weakSelf.netStatus = status;
-        if (weakSelf.reachabilityStatusChangeBlock) {
-            weakSelf.reachabilityStatusChangeBlock(status);
+        self.netStatus = status;
+        if (self.reachabilityStatusChangeBlock) {
+            self.reachabilityStatusChangeBlock(status);
         }
     }];
 #endif
@@ -308,6 +307,7 @@ static id instance;
     return nil;
 #endif
 }
+
 + (void)deallocPhotoCommon {
     once = 0;
     once1 = 0;

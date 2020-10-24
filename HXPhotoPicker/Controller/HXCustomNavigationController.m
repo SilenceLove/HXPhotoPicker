@@ -15,6 +15,8 @@
 @property (assign, nonatomic) BOOL didPresentImagePicker;
 @property (assign, nonatomic) BOOL initialAuthorization;
 @property (strong, nonatomic) NSTimer *timer;
+@property (weak, nonatomic) UIImageView *imageView;
+@property (assign, nonatomic) PHImageRequestID requestID;
 @end
 
 @implementation HXCustomNavigationController
@@ -216,11 +218,13 @@
     }
 }
 - (void)albumListViewControllerDidCancel:(HXAlbumListViewController *)albumListViewController {
+    [self clearAssetCache];
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidCancel:)]) {
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
     }
 }
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
+    [self clearAssetCache];
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllList:photos:videos:original:)]) {
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }
@@ -237,11 +241,13 @@
     }
 }
 - (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController {
+    [self clearAssetCache];
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerDidCancel:)]) {
         [self.hx_delegate photoNavigationViewControllerDidCancel:self];
     }
 }
 - (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
+    [self clearAssetCache];
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneAllList:photos:videos:original:)]) {
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }
@@ -279,6 +285,40 @@
     }
 }
 
+- (void)clearAssetCache {
+    PHAsset *asset = self.cameraRollAlbumModel.assetResult.firstObject;
+    if (asset) {
+        PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+        options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
+        options.resizeMode = PHImageRequestOptionsResizeModeFast;
+        options.synchronous = NO;
+        options.networkAccessAllowed = NO;
+        HXWeakSelf
+        if (@available(iOS 13.0, *)) {
+            self.requestID = [[PHImageManager defaultManager] requestImageDataAndOrientationForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, CGImagePropertyOrientation orientation, NSDictionary * _Nullable info) {
+                if (imageData && weakSelf) {
+                    [weakSelf addImageViewWithImageData:imageData];
+                }
+            }];
+        }else {
+            self.requestID = [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                if (imageData && weakSelf) {
+                    [weakSelf addImageViewWithImageData:imageData];
+                }
+            }];
+        }
+    }
+}
+- (void)addImageViewWithImageData:(NSData *)imageData {
+    UIImage *image = [UIImage imageWithData:imageData];
+    [self.imageView removeFromSuperview];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+    imageView.frame = self.view.bounds;
+    imageView.alpha = 0;
+    imageView.userInteractionEnabled = NO;
+    [self.view addSubview:imageView];
+    self.imageView = imageView;
+}
 - (void)dealloc {
     if (_manager) {
         self.manager.selectPhotoing = NO;
@@ -286,6 +326,9 @@
     if (_timer) {
         [_timer invalidate];
         _timer = nil;
+    }
+    if (self.requestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
     }
     if (HXShowLog) NSSLog(@"%@ dealloc", self);
 }

@@ -253,6 +253,9 @@
 
 - (void)selectedListTransformAfter;
 - (void)selectedListTransformBefore;
+
+- (void)addTempCameraAssetModel:(HXPhotoModel *)model;
+- (void)removeAllTempCameraAssetModel;
 /**
  取消选择
  */
