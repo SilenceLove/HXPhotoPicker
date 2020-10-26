@@ -1012,6 +1012,9 @@
     if (itemW <= 0) {
         itemW = 100;
     }
+    if (HX_Is_iPhoneXR) {
+        itemW = (NSInteger)itemW;
+    }
     if (!HXPhotoViewCustomItemSize) {
         self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
     }else {

@@ -630,6 +630,23 @@
     }
     return _barSubTitle;
 }
+
+- (void)isICloudAssetWithCompletion:(void (^)(BOOL isICloud, HXPhotoModel *model))completion {
+    if (!self.asset) {
+        if (completion) {
+            completion(NO, self);
+        }
+    }
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        NSArray *resourceArray = [PHAssetResource assetResourcesForAsset:self.asset];
+        BOOL bIsLocallayAvailable = [[resourceArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(!bIsLocallayAvailable, self);
+            });
+        }
+    });
+}
 - (void)dealloc {
     if (self.iCloudRequestID) {
         if (self.iCloudDownloading) {
@@ -1124,7 +1141,7 @@
                                      progressHandler:(HXModelProgressHandler)progressHandler
                                              success:(HXModelAVAssetSuccessBlock)success
                                               failed:(HXModelFailedBlock)failed {
-    return [self requestAVAssetStartRequestICloud:startRequestICloud deliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic progressHandler:progressHandler success:success failed:failed];
+    return [self requestAVAssetStartRequestICloud:startRequestICloud deliveryMode:PHVideoRequestOptionsDeliveryModeHighQualityFormat progressHandler:progressHandler success:success failed:failed];
 }
 
 - (PHImageRequestID)requestAVAssetStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
@@ -1143,10 +1160,18 @@
     
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
     options.deliveryMode = deliveryMode;
-    options.networkAccessAllowed = NO;
+    options.networkAccessAllowed = YES;
+    HXWeakSelf
+    options.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.iCloudProgress = progress;
+            if (progressHandler) {
+                progressHandler(progress, weakSelf);
+            }
+        });
+    };
     PHImageRequestID requestId = 0;
     self.iCloudDownloading = YES;
-    HXWeakSelf
     requestId = [[PHImageManager defaultManager] requestAVAssetForVideo:self.asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
         [weakSelf requestDataWithResult:asset info:info size:CGSizeZero resultClass:[AVAsset class] orientation:0 audioMix:audioMix startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
             if (success) {
@@ -1154,6 +1179,9 @@
             }
         } failed:failed];
     }];
+     if (startRequestICloud) {
+         startRequestICloud(requestId, self);
+     }
     self.iCloudRequestID = requestId;
     return requestId;
 }
@@ -1169,12 +1197,19 @@
         return 0;
     }
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-    options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
-    options.networkAccessAllowed = NO;
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
+    options.networkAccessAllowed = YES;
+    HXWeakSelf
+    options.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.iCloudProgress = progress;
+            if (progressHandler) {
+                progressHandler(progress, weakSelf);
+            }
+        });
+    };
     PHImageRequestID requestId = 0;
     self.iCloudDownloading = YES;
-    
-    HXWeakSelf
     requestId = [[PHImageManager defaultManager] requestExportSessionForVideo:self.asset options:options exportPreset:AVAssetExportPresetHighestQuality resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
         [weakSelf requestDataWithResult:exportSession info:info size:CGSizeZero resultClass:[AVAssetExportSession class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
             if (success) {
@@ -1182,6 +1217,9 @@
             }
         } failed:failed];
     }];
+    if (startRequestICloud) {
+        startRequestICloud(requestId, self);
+    }
     return requestId;
 }
 
@@ -1197,11 +1235,19 @@
         return 0;
     }
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-    options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
-    options.networkAccessAllowed = NO;
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
+    options.networkAccessAllowed = YES;
+    HXWeakSelf
+    options.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.iCloudProgress = progress;
+            if (progressHandler) {
+                progressHandler(progress, weakSelf);
+            }
+        });
+    };
     PHImageRequestID requestId = 0;
     self.iCloudDownloading = YES;
-    HXWeakSelf
     requestId = [[PHImageManager defaultManager] requestPlayerItemForVideo:self.asset options:options resultHandler:^(AVPlayerItem * _Nullable playerItem, NSDictionary * _Nullable info) {
         [weakSelf requestDataWithResult:playerItem info:info size:CGSizeZero resultClass:[AVPlayerItem class] orientation:0 audioMix:nil startRequestICloud:startRequestICloud progressHandler:progressHandler success:^(id result, NSDictionary *info, UIImageOrientation orientation, AVAudioMix *audioMix) {
             if (success) {
@@ -1209,6 +1255,9 @@
             }
         } failed:failed];
     }];
+    if (startRequestICloud) {
+        startRequestICloud(requestId, self);
+    }
     return requestId;
 }
 

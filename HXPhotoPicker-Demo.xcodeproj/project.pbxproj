@@ -19,7 +19,6 @@
 		7B08595A24FA58DF00E93091 /* Demo9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08591924FA58DE00E93091 /* Demo9Model.m */; };
 		7B08595B24FA58DF00E93091 /* WxMomentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08591A24FA58DE00E93091 /* WxMomentViewController.m */; };
 		7B08595C24FA58DF00E93091 /* Demo8ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08591B24FA58DE00E93091 /* Demo8ViewController.m */; };
-		7B08595D24FA58DF00E93091 /* HXPhotoPreviewBottomConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08591C24FA58DE00E93091 /* HXPhotoPreviewBottomConfiguration.m */; };
 		7B08595E24FA58DF00E93091 /* UITextView+Placeholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08591E24FA58DE00E93091 /* UITextView+Placeholder.m */; };
 		7B08595F24FA58DF00E93091 /* Demo6ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08592024FA58DE00E93091 /* Demo6ViewController.m */; };
 		7B08596024FA58DF00E93091 /* Demo9ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08592124FA58DE00E93091 /* Demo9ViewController.m */; };
@@ -35,7 +34,6 @@
 		7B08596A24FA58DF00E93091 /* WxMomentViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08593824FA58DE00E93091 /* WxMomentViewCell.m */; };
 		7B08596B24FA58DF00E93091 /* Demo3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08593A24FA58DE00E93091 /* Demo3ViewController.m */; };
 		7B08596C24FA58DF00E93091 /* Demo1ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08593B24FA58DE00E93091 /* Demo1ViewController.xib */; };
-		7B08596D24FA58DF00E93091 /* HXPhotoBottomConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08593C24FA58DE00E93091 /* HXPhotoBottomConfiguration.m */; };
 		7B08596E24FA58DF00E93091 /* WxMomentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08593E24FA58DE00E93091 /* WxMomentViewController.xib */; };
 		7B08596F24FA58DF00E93091 /* SettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08593F24FA58DE00E93091 /* SettingViewController.xib */; };
 		7B08597024FA58DF00E93091 /* Demo4ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08594024FA58DE00E93091 /* Demo4ViewController.xib */; };
@@ -373,13 +371,11 @@
 		7B08591924FA58DE00E93091 /* Demo9Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo9Model.m; sourceTree = "<group>"; };
 		7B08591A24FA58DE00E93091 /* WxMomentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WxMomentViewController.m; sourceTree = "<group>"; };
 		7B08591B24FA58DE00E93091 /* Demo8ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo8ViewController.m; sourceTree = "<group>"; };
-		7B08591C24FA58DE00E93091 /* HXPhotoPreviewBottomConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoPreviewBottomConfiguration.m; sourceTree = "<group>"; };
 		7B08591D24FA58DE00E93091 /* Demo9ViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo9ViewCell.h; sourceTree = "<group>"; };
 		7B08591E24FA58DE00E93091 /* UITextView+Placeholder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextView+Placeholder.m"; sourceTree = "<group>"; };
 		7B08591F24FA58DE00E93091 /* Demo2ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo2ViewController.h; sourceTree = "<group>"; };
 		7B08592024FA58DE00E93091 /* Demo6ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo6ViewController.m; sourceTree = "<group>"; };
 		7B08592124FA58DE00E93091 /* Demo9ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo9ViewController.m; sourceTree = "<group>"; };
-		7B08592224FA58DE00E93091 /* HXPhotoBottomConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoBottomConfiguration.h; sourceTree = "<group>"; };
 		7B08592324FA58DE00E93091 /* Demo6SubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo6SubViewController.m; sourceTree = "<group>"; };
 		7B08592424FA58DE00E93091 /* SettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingViewController.h; sourceTree = "<group>"; };
 		7B08592524FA58DE00E93091 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
@@ -395,7 +391,6 @@
 		7B08592F24FA58DE00E93091 /* YYWeakProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYWeakProxy.h; sourceTree = "<group>"; };
 		7B08593024FA58DE00E93091 /* WxMomentPublishViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WxMomentPublishViewController.m; sourceTree = "<group>"; };
 		7B08593124FA58DE00E93091 /* Demo9ViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo9ViewCell.m; sourceTree = "<group>"; };
-		7B08593224FA58DE00E93091 /* HXPhotoPreviewBottomConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoPreviewBottomConfiguration.h; sourceTree = "<group>"; };
 		7B08593324FA58DE00E93091 /* UITextView+Placeholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+Placeholder.h"; sourceTree = "<group>"; };
 		7B08593424FA58DE00E93091 /* Demo8ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo8ViewController.h; sourceTree = "<group>"; };
 		7B08593524FA58DE00E93091 /* Demo9Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo9Model.h; sourceTree = "<group>"; };
@@ -405,7 +400,6 @@
 		7B08593924FA58DE00E93091 /* Demo12ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo12ViewController.h; sourceTree = "<group>"; };
 		7B08593A24FA58DE00E93091 /* Demo3ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Demo3ViewController.m; sourceTree = "<group>"; };
 		7B08593B24FA58DE00E93091 /* Demo1ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Demo1ViewController.xib; sourceTree = "<group>"; };
-		7B08593C24FA58DE00E93091 /* HXPhotoBottomConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HXPhotoBottomConfiguration.m; sourceTree = "<group>"; };
 		7B08593D24FA58DE00E93091 /* Demo9ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo9ViewController.h; sourceTree = "<group>"; };
 		7B08593E24FA58DE00E93091 /* WxMomentViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WxMomentViewController.xib; sourceTree = "<group>"; };
 		7B08593F24FA58DE00E93091 /* SettingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SettingViewController.xib; sourceTree = "<group>"; };
@@ -753,10 +747,6 @@
 				7B08592924FA58DE00E93091 /* Demo14ViewController.m */,
 				7B08592D24FA58DE00E93091 /* Demo15ViewController.h */,
 				7B08591024FA58DE00E93091 /* Demo15ViewController.m */,
-				7B08592224FA58DE00E93091 /* HXPhotoBottomConfiguration.h */,
-				7B08593C24FA58DE00E93091 /* HXPhotoBottomConfiguration.m */,
-				7B08593224FA58DE00E93091 /* HXPhotoPreviewBottomConfiguration.h */,
-				7B08591C24FA58DE00E93091 /* HXPhotoPreviewBottomConfiguration.m */,
 				7B08592424FA58DE00E93091 /* SettingViewController.h */,
 				7B08595024FA58DE00E93091 /* SettingViewController.m */,
 				7B08593F24FA58DE00E93091 /* SettingViewController.xib */,
@@ -1485,7 +1475,6 @@
 				7B4D4C5524B858C600B03846 /* HXPhotoEditStickerItem.m in Sources */,
 				7B4D4C4F24B858C600B03846 /* HXPhotoEditImageView.m in Sources */,
 				7B4E664D2487AD5C00077EE1 /* HXPhotoPreviewBottomView.m in Sources */,
-				7B08596D24FA58DF00E93091 /* HXPhotoBottomConfiguration.m in Sources */,
 				7B4E665A2487AD5C00077EE1 /* HXFullScreenCameraPlayView.m in Sources */,
 				7B08597824FA58DF00E93091 /* Demo5ViewController.m in Sources */,
 				7B4E66532487AD5C00077EE1 /* HXPhotoBottomSelectView.m in Sources */,
@@ -1505,7 +1494,6 @@
 				7B4E66472487AD5C00077EE1 /* HXCustomNavigationController.m in Sources */,
 				7B4E66592487AD5C00077EE1 /* HXPhotoView.m in Sources */,
 				7B08596424FA58DF00E93091 /* Demo14ViewController.m in Sources */,
-				7B08595D24FA58DF00E93091 /* HXPhotoPreviewBottomConfiguration.m in Sources */,
 				7B4D4C6124B858C600B03846 /* HXPhotoEditDrawView.m in Sources */,
 				7B4E664A2487AD5C00077EE1 /* HXPhotoModel.m in Sources */,
 				7B4E66442487AD5C00077EE1 /* HXPhotoPreviewViewController.m in Sources */,

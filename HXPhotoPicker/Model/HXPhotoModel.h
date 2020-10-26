@@ -209,6 +209,9 @@
 /// @param photoModel 模型
 - (BOOL)isEqualToPhotoModel:(HXPhotoModel * _Nullable)photoModel;
 
+/// 获取当前asset是不是iCloud上的资源
+- (void)isICloudAssetWithCompletion:(void (^_Nullable)(BOOL isICloud, HXPhotoModel * _Nullable model))completion;
+
 #pragma mark - < Request >
 + (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nullable url, NSError * _Nullable error))completion;
 

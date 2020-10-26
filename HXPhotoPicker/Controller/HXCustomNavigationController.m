@@ -210,6 +210,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    if ([HXPhotoCommon photoCommon].clearAssetRequestID) {
+        [[PHImageManager defaultManager] cancelImageRequest:[HXPhotoCommon photoCommon].clearAssetRequestID];
+        [HXPhotoCommon photoCommon].clearAssetRequestID = -1;
+    }
 }
 #pragma mark - < HXAlbumListViewControllerDelegate >
 - (void)albumListViewControllerCancelDismissCompletion:(HXAlbumListViewController *)albumListViewController {
@@ -299,6 +303,7 @@
         HXWeakSelf
         if (@available(iOS 13.0, *)) {
             self.requestID = [[PHImageManager defaultManager] requestImageDataAndOrientationForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, CGImagePropertyOrientation orientation, NSDictionary * _Nullable info) {
+                [HXPhotoCommon photoCommon].clearAssetRequestID = -1;
                 if (imageData) {
                     if (addOnWindow || !weakSelf) {
                         [HXCustomNavigationController addImageViewOnWindowWithImageData:imageData];
@@ -307,8 +312,10 @@
                     }
                 }
             }];
+            [HXPhotoCommon photoCommon].clearAssetRequestID = self.requestID;
         }else {
             self.requestID = [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                [HXPhotoCommon photoCommon].clearAssetRequestID = -1;
                 if (imageData) {
                     if (addOnWindow || !weakSelf) {
                         [HXCustomNavigationController addImageViewOnWindowWithImageData:imageData];
@@ -317,6 +324,7 @@
                     }
                 }
             }];
+            [HXPhotoCommon photoCommon].clearAssetRequestID = self.requestID;
         }
     }
 }

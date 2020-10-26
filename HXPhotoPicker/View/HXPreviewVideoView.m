@@ -115,17 +115,20 @@
             return;
         }
     }
-    [self.model requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
+    [UIView cancelPreviousPerformRequestsWithTarget:self];
+    [self performSelector:@selector(showLoading) withObject:nil afterDelay:0.2f];
+    self.requestID = [self.model requestAVAssetStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel *model) {
         if (weakSelf.model != model) return;
-        [weakSelf showLoading];
         weakSelf.requestID = iCloudRequestId;
     } progressHandler:^(double progress, HXPhotoModel *model) {
         if (weakSelf.model != model) return;
     } success:^(AVAsset *avAsset, AVAudioMix *audioMix, HXPhotoModel *model, NSDictionary *info) {
         if (weakSelf.model != model) return;
+        [UIView cancelPreviousPerformRequestsWithTarget:weakSelf];
         [weakSelf requestAVAssetComplete:avAsset];
     } failed:^(NSDictionary *info, HXPhotoModel *model) {
         if (weakSelf.model != model) return;
+        [UIView cancelPreviousPerformRequestsWithTarget:weakSelf];
         weakSelf.videoLoadFailed = YES;
         [weakSelf hideLoading];
         if (![[info objectForKey:PHImageCancelledKey] boolValue]) {

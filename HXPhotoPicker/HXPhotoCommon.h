@@ -62,6 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 设备id
 @property (copy, nonatomic) NSString *UUIDString;
 
+@property (assign, nonatomic) PHImageRequestID clearAssetRequestID;
+
 /// 下载视频
 /// @param videoURL 网络视频地址
 /// @param progress 下载进度
