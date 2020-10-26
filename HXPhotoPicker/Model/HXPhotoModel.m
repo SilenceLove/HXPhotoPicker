@@ -1124,7 +1124,7 @@
                                      progressHandler:(HXModelProgressHandler)progressHandler
                                              success:(HXModelAVAssetSuccessBlock)success
                                               failed:(HXModelFailedBlock)failed {
-    return [self requestAVAssetStartRequestICloud:startRequestICloud deliveryMode:PHVideoRequestOptionsDeliveryModeFastFormat progressHandler:progressHandler success:success failed:failed];
+    return [self requestAVAssetStartRequestICloud:startRequestICloud deliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic progressHandler:progressHandler success:success failed:failed];
 }
 
 - (PHImageRequestID)requestAVAssetStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
@@ -1168,10 +1168,8 @@
         }
         return 0;
     }
-//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
-    
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-    options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
     options.networkAccessAllowed = NO;
     PHImageRequestID requestId = 0;
     self.iCloudDownloading = YES;
@@ -1198,10 +1196,8 @@
         }
         return 0;
     }
-//    [[PHImageManager defaultManager] cancelImageRequest:self.iCloudRequestID];
-    
     PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-    options.deliveryMode = PHVideoRequestOptionsDeliveryModeFastFormat;
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
     options.networkAccessAllowed = NO;
     PHImageRequestID requestId = 0;
     self.iCloudDownloading = YES;
@@ -1239,17 +1235,18 @@
         HXWeakSelf
         if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
             PHImageRequestID iCloudRequestId = 0;
+            PHAssetImageProgressHandler imageProgressHanlder = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.iCloudProgress = progress;
+                    if (progressHandler) {
+                        progressHandler(progress, weakSelf);
+                    }
+                });
+            };
             if ([resultClass isEqual:[UIImage class]]) {
                 PHImageRequestOptions *iCloudOption = [self imageHighQualityRequestOptions];
                 iCloudOption.networkAccessAllowed = YES;
-                iCloudOption.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        weakSelf.iCloudProgress = progress;
-                        if (progressHandler) {
-                            progressHandler(progress, weakSelf);
-                        }
-                    });
-                };
+                iCloudOption.progressHandler = imageProgressHanlder;
                 iCloudRequestId = [weakSelf requestImageWithOptions:iCloudOption targetSize:size resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
                     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
                     if (downloadFinined && result) {
@@ -1274,14 +1271,7 @@
                 PHLivePhotoRequestOptions *iCloudOption = [[PHLivePhotoRequestOptions alloc] init];
                 iCloudOption.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
                 iCloudOption.networkAccessAllowed = YES;
-                iCloudOption.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        weakSelf.iCloudProgress = progress;
-                        if (progressHandler) {
-                            progressHandler(progress, weakSelf);
-                        }
-                    });
-                };
+                iCloudOption.progressHandler = imageProgressHanlder;
                 iCloudRequestId = [[PHImageManager defaultManager] requestLivePhotoForAsset:self.asset targetSize:size contentMode:PHImageContentModeAspectFill options:iCloudOption resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
                     BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
                     if (downloadFinined && livePhoto) {
@@ -1308,14 +1298,7 @@
                 if (self.type == HXPhotoModelMediaTypePhotoGif) {
                     iCloudOption.version = PHImageRequestOptionsVersionOriginal;
                 }
-                iCloudOption.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        weakSelf.iCloudProgress = progress;
-                        if (progressHandler) {
-                            progressHandler(progress, weakSelf);
-                        }
-                    });
-                };
+                iCloudOption.progressHandler = imageProgressHanlder;
                 
                 if (@available(iOS 13.0, *)) {
                     iCloudRequestId = [[PHImageManager defaultManager] requestImageDataAndOrientationForAsset:self.asset options:iCloudOption resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, CGImagePropertyOrientation orientation, NSDictionary * _Nullable info) {
@@ -1363,7 +1346,6 @@
                 }
             }else if ([resultClass isEqual:[AVAsset class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-                iCloudOptions.version = PHVideoRequestOptionsVersionOriginal;
                 iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
@@ -1379,7 +1361,6 @@
                     if (downloadFinined && asset) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             weakSelf.iCloudDownloading = NO;
-//                            weakSelf.isICloud = NO;
                             if (success) {
                                 success(asset, info, 0, audioMix);
                             }
@@ -1397,7 +1378,6 @@
                 }];
             }else if ([resultClass isEqual:[AVAssetExportSession class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-                iCloudOptions.version = PHVideoRequestOptionsVersionOriginal;
                 iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
@@ -1413,7 +1393,6 @@
                     if (downloadFinined && exportSession) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             weakSelf.iCloudDownloading = NO;
-//                            weakSelf.isICloud = NO;
                             if (success) {
                                 success(exportSession, info, 0, nil);
                             }
@@ -1431,7 +1410,6 @@
                 }];
             }else if ([resultClass isEqual:[AVPlayerItem class]]) {
                 PHVideoRequestOptions *iCloudOptions = [[PHVideoRequestOptions alloc] init];
-                iCloudOptions.version = PHVideoRequestOptionsVersionOriginal;
                 iCloudOptions.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
                 iCloudOptions.networkAccessAllowed = YES;
                 iCloudOptions.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
@@ -1447,7 +1425,6 @@
                     if (downloadFinined && playerItem) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             weakSelf.iCloudDownloading = NO;
-//                            weakSelf.isICloud = NO;
                             if (success) {
                                 success(playerItem, info, 0, nil);
                             }
