@@ -464,6 +464,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                     if (createdAsset.localIdentifier) {
                         HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
                         photoModel.thumbPhoto = photo;
+                        photoModel.previewPhoto = photo;
                         photoModel.location = location;
                         photoModel.creationDate = [NSDate date];
                         complete(photoModel, YES);

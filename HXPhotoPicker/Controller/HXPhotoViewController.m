@@ -1584,6 +1584,7 @@ HX_PhotoEditViewControllerDelegate
         if (cell.model.type != HXPhotoModelMediaTypeCameraVideo &&
             cell.model.type != HXPhotoModelMediaTypeCameraPhoto) {
             cell.model.thumbPhoto = cell.imageView.image;
+            cell.model.previewPhoto = cell.imageView.image;
         }
         [self.manager beforeSelectedListAddPhotoModel:cell.model];
         cell.selectMaskLayer.hidden = NO;

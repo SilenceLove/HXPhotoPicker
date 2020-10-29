@@ -778,6 +778,7 @@
             HXPhotoModel *selectModel = [self.tempSelectedModelList objectAtIndex:[_selectedAssetList indexOfObject:asset]];
             photoModel.photoEdit = selectModel.photoEdit;
             photoModel.thumbPhoto = selectModel.thumbPhoto;
+            photoModel.previewPhoto = selectModel.previewPhoto;
             if (selectModel.subType == HXPhotoModelMediaSubTypePhoto) {
                 if (selectModel.type == HXPhotoModelMediaTypeCameraPhoto) {
                     [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:selectModel] withObject:photoModel];
