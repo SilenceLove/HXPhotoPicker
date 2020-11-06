@@ -13,6 +13,7 @@
 #import "HXPhotoBottomSelectView.h"
 #import "HXPhotoEdit.h"
 #import "UIColor+HXExtension.h"
+#import "HXAssetManager.h"
 
 @interface HXPhotoSubViewCell ()
 @property (strong, nonatomic) UIImageView *imageView;
@@ -235,8 +236,7 @@
         }
     }else {
         if (model.localIdentifier && !model.asset) {
-            PHFetchOptions *options = [[PHFetchOptions alloc] init];
-            model.asset = [[PHAsset fetchAssetsWithLocalIdentifiers:@[model.localIdentifier] options:options] firstObject];
+            model.asset = [HXAssetManager fetchAssetWithLocalIdentifier:model.localIdentifier];
         }
         self.deleteBtn.hidden = NO;
         if (model.networkPhotoUrl) {

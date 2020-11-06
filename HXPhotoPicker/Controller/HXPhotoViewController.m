@@ -34,6 +34,7 @@
 #import "HXPhotoEdit.h"
 #import "HX_PhotoEditViewController.h"
 #import "UIColor+HXExtension.h"
+#import "HXAssetManager.h"
 
 @interface HXPhotoViewController ()
 <
@@ -367,7 +368,6 @@ HX_PhotoEditViewControllerDelegate
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
-        navBarHeight = hxNavigationBarHeight;
         lineCount = self.manager.configuration.rowCount;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
@@ -539,9 +539,7 @@ HX_PhotoEditViewControllerDelegate
 - (void)scrollToPoint:(HXPhotoViewCell *)cell rect:(CGRect)rect {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
-    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
-        navBarHeight = hxNavigationBarHeight;
-    }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+    if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
         if ([UIApplication sharedApplication].statusBarHidden) {
             navBarHeight = self.navigationController.navigationBar.hx_h;
         }else {
@@ -986,9 +984,11 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)reloadCollectionViewWithFirstSelectModel:(HXPhotoModel *)firstSelectModel {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.hx_customNavigationController.view hx_handleLoading];
         if (!self.firstOn) {
             self.cellCanSetModel = NO;
+            [self.hx_customNavigationController.view hx_handleLoading];
+        }else {
+            [self.hx_customNavigationController.view hx_handleLoading:NO];
         }
         [self.collectionView reloadData];
         [self collectionViewReloadFinishedWithFirstSelectModel:firstSelectModel];
@@ -1098,7 +1098,7 @@ HX_PhotoEditViewControllerDelegate
         model.type != HXPhotoModelMediaTypeCameraVideo) {
         HXAlbumModel *albumModel = self.albumView.albumModelArray.firstObject;
         if (albumModel.count == 0) {
-            albumModel.assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[model.localIdentifier] options:nil];
+            albumModel.assetResult = [HXAssetManager fetchAssetWithLocalIdentifier:model.localIdentifier];
         }
         albumModel.count++;
     }
@@ -1767,21 +1767,21 @@ HX_PhotoEditViewControllerDelegate
         if (self.manager.configuration.hideOriginalBtn) {
             requestOriginal = self.manager.configuration.requestOriginalImage;
         }
-        if (requestOriginal) {
+//        if (requestOriginal) {
             [self.manager.selectedArray hx_requestImageSeparatelyWithOriginal:requestOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
                 if (!weakSelf) {
                     return;
                 }
                 [weakSelf afterFinishingGetVideoURL];
             }];
-        }else {
-            [self.manager.selectedArray hx_requestImageWithOriginal:requestOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
-                if (!weakSelf) {
-                    return;
-                }
-                [weakSelf afterFinishingGetVideoURL];
-            }];
-        }
+//        }else {
+//            [self.manager.selectedArray hx_requestImageWithOriginal:requestOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
+//                if (!weakSelf) {
+//                    return;
+//                }
+//                [weakSelf afterFinishingGetVideoURL];
+//            }];
+//        }
         return;
     }
     [self dismissVC];
@@ -2019,6 +2019,7 @@ HX_PhotoEditViewControllerDelegate
         _albumView = [[HXAlbumlistView alloc] initWithManager:self.manager];
         HXWeakSelf
         _albumView.didSelectRowBlock = ^(HXAlbumModel *model) {
+            [weakSelf.hx_customNavigationController clearAssetCache];
             if (weakSelf.manager.configuration.photoListChangeTitleViewSelected) {
                 weakSelf.manager.configuration.photoListChangeTitleViewSelected(NO);
                 [weakSelf albumTitleViewDidAction:NO];

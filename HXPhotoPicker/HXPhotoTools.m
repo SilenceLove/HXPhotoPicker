@@ -35,6 +35,8 @@
 #import "YYKit.h"
 #endif
 
+#import "HXAssetManager.h"
+
 NSString *const hx_kFigAppleMakerNote_AssetIdentifier = @"17";
 NSString *const hx_kKeySpaceQuickTimeMetadata = @"mdta";
 NSString *const hx_kKeyStillImageTime = @"com.apple.quicktime.still-image-time";
@@ -374,7 +376,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
             }else {
                 if (complete) {
                     if (createdAsset.localIdentifier) {
-                        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[HXAssetManager fetchAssetWithLocalIdentifier:createdAsset.localIdentifier]];
                         photoModel.videoURL = videoURL;
                         photoModel.creationDate = [NSDate date];
                         complete(photoModel, YES);
@@ -462,7 +464,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
             }else {
                 if (complete) {
                     if (createdAsset.localIdentifier) {
-                        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[HXAssetManager fetchAssetWithLocalIdentifier:createdAsset.localIdentifier]];
                         photoModel.thumbPhoto = photo;
                         photoModel.previewPhoto = photo;
                         photoModel.location = location;

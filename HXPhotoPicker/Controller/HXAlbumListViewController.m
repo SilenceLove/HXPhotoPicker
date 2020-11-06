@@ -9,6 +9,7 @@
 #import "HXAlbumListViewController.h" 
 #import "HXPhotoViewController.h"
 #import "UIViewController+HXExtension.h"
+#import "HXAssetManager.h"
 
 @interface HXAlbumListViewController ()
 <
@@ -367,6 +368,7 @@ UITableViewDelegate
     if (self.navigationController.topViewController != self) {
         return;
     }
+    [self.hx_customNavigationController clearAssetCache];
     HXAlbumModel *model = self.albumModelArray[indexPath.row];
     [self pushPhotoListViewControllerWithAlbumModel:model animated:YES]; 
 }
@@ -493,9 +495,10 @@ UITableViewDelegate
 - (void)setAlbumImage {
     NSInteger photoCount = self.model.count;
     HXWeakSelf
-    self.requestId1 = [HXPhotoModel requestThumbImageWithPHAsset:self.model.assetResult.lastObject width:300 completion:^(UIImage *image, PHAsset *asset) {
-        if (weakSelf.model.assetResult.lastObject == asset) {
-            weakSelf.coverView1.image = image;
+    PHAsset *asset = self.model.assetResult.lastObject;
+    self.requestId1 = [HXAssetManager requestThumbnailImageForAsset:asset targetWidth:300 completion:^(UIImage * _Nonnull result, NSDictionary<NSString *,id> * _Nonnull info) {
+        if (weakSelf.model.assetResult.lastObject == asset && result) {
+            weakSelf.coverView1.image = result;
         }
     }];
     

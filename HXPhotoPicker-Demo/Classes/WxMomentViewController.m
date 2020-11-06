@@ -84,6 +84,10 @@
 //
 //            return NO;
 //        };
+//        _photoManager.assetCollectionFilter = ^BOOL(PHAssetCollection *collection) {
+//            
+//            return YES;
+//        };
         
         _photoManager.configuration.type = HXConfigurationTypeWXMoment;
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";

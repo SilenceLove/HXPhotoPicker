@@ -134,6 +134,7 @@
 		7B4E665F2487AD5C00077EE1 /* HXCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E661E2487AD5B00077EE1 /* HXCircleProgressView.m */; };
 		7B4E66602487AD5C00077EE1 /* HXPhotoPreviewViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E661F2487AD5B00077EE1 /* HXPhotoPreviewViewCell.m */; };
 		7B4E66612487AD5C00077EE1 /* HXPhotoPreviewImageViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E66232487AD5C00077EE1 /* HXPhotoPreviewImageViewCell.m */; };
+		7B5A71CC25538F010064A61B /* HXAssetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5A71CB25538F010064A61B /* HXAssetManager.m */; };
 		7B5B75BF24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5B75BE24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m */; };
 		7B64186124F76C67003A5723 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7B64186024F76C67003A5723 /* README.md */; };
 		7B752DE82372ADF000580F35 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE72372ADF000580F35 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -592,6 +593,8 @@
 		7B4E66242487AD5C00077EE1 /* HXPhotoTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoTools.h; sourceTree = "<group>"; };
 		7B4E66262487AD5C00077EE1 /* HXPhotoCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoCommon.h; sourceTree = "<group>"; };
 		7B4E66292487AD5C00077EE1 /* HXPhotoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoManager.h; sourceTree = "<group>"; };
+		7B5A71CA25538F010064A61B /* HXAssetManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXAssetManager.h; sourceTree = "<group>"; };
+		7B5A71CB25538F010064A61B /* HXAssetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXAssetManager.m; sourceTree = "<group>"; };
 		7B5B75BD24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoEditGraffitiColorSizeView.h; sourceTree = "<group>"; };
 		7B5B75BE24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditGraffitiColorSizeView.m; sourceTree = "<group>"; };
 		7B64186024F76C67003A5723 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -899,6 +902,8 @@
 				7B4E65F82487AD5B00077EE1 /* HXPhotoPicker.h */,
 				7B4E66292487AD5C00077EE1 /* HXPhotoManager.h */,
 				7B4E65DA2487AD5B00077EE1 /* HXPhotoManager.m */,
+				7B5A71CA25538F010064A61B /* HXAssetManager.h */,
+				7B5A71CB25538F010064A61B /* HXAssetManager.m */,
 				7B4E66242487AD5C00077EE1 /* HXPhotoTools.h */,
 				7B4E65D92487AD5B00077EE1 /* HXPhotoTools.m */,
 			);
@@ -1470,6 +1475,7 @@
 				7B4E66302487AD5C00077EE1 /* NSString+HXExtension.m in Sources */,
 				7B4E66522487AD5C00077EE1 /* HXPhotoCustomNavigationBar.m in Sources */,
 				7B08597124FA58DF00E93091 /* Demo2ViewController.m in Sources */,
+				7B5A71CC25538F010064A61B /* HXAssetManager.m in Sources */,
 				7B4E66402487AD5C00077EE1 /* HXPhotoManager.m in Sources */,
 				7B08596224FA58DF00E93091 /* ViewController.m in Sources */,
 				7B4D4C5524B858C600B03846 /* HXPhotoEditStickerItem.m in Sources */,
@@ -1819,7 +1825,7 @@
 				INFOPLIST_FILE = "HXPhotoPicker-Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.1.3;
+				MARKETING_VERSION = 3.1.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-4";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1843,7 +1849,7 @@
 				INFOPLIST_FILE = "HXPhotoPicker-Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.1.3;
+				MARKETING_VERSION = 3.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-4";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

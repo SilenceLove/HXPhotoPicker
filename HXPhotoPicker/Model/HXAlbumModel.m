@@ -8,7 +8,27 @@
 
 #import "HXAlbumModel.h"
 #import "HXPhotoTools.h"
+#import "HXAssetManager.h"
+
+@interface HXAlbumModel ()
+@property (strong, nonatomic) PHFetchOptions *options;
+@property (strong, nonatomic) PHAssetCollection *collection;
+@end
+
 @implementation HXAlbumModel
+
+- (instancetype)initWithCollection:(PHAssetCollection *)collection options:(PHFetchOptions *)options {
+    self = [super init];
+    if (self) {
+        self.collection = collection;
+        self.albumName = [self transFormAlbumNameWithCollection:collection];
+        self.options = options;
+    }
+    return self;
+}
+- (NSString *)localIdentifier {
+    return self.collection.localIdentifier;
+}
 - (void)fetchAssetResult {
     if ([self.localIdentifier isEqualToString:[HXPhotoCommon photoCommon].cameraRollLocalIdentifier]) {
         if ([HXPhotoCommon photoCommon].cameraRollResult) {
@@ -29,18 +49,13 @@
             }
             [HXPhotoCommon photoCommon].cameraRollResult = nil;
         }
-        PHAssetCollection *assetCollection = [[PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[self.localIdentifier] options:nil] firstObject];
-        
-        PHFetchOptions *options = [self options];
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+        PHFetchResult *result = [HXAssetManager fetchAssetsInAssetCollection:self.collection options:self.options];
         self.assetResult = result;
         self.count = result.count;
         [HXPhotoCommon photoCommon].cameraRollResult = result;
         [HXPhotoCommon photoCommon].selectType = self.selectType;
     }else {
-        PHFetchOptions *options = [self options];
-        PHAssetCollection *assetCollection = [[PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[self.localIdentifier] options:nil] firstObject];
-        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+        PHFetchResult *result = [HXAssetManager fetchAssetsInAssetCollection:self.collection options:self.options];
         self.assetResult = result;
         self.count = result.count;
     }
@@ -56,20 +71,67 @@
         }
     });
 }
-- (PHFetchOptions *)options {
-    PHFetchOptions *options = [[PHFetchOptions alloc] init];
-    if (self.creationDateSort) {
-        options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+- (NSString *)transFormAlbumNameWithCollection:(PHAssetCollection *)collection {
+    if (collection.assetCollectionType == PHAssetCollectionTypeAlbum) {
+        return collection.localizedTitle;
     }
-    if (!self.fetchOptionsPredicate) {
-        if (self.selectType == 0) {
-            options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
-        }else if (self.selectType == 1) {
-            options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
-        }
+    NSString *albumName;
+    HXPhotoLanguageType type = [HXPhotoCommon photoCommon].languageType;
+    if (type == HXPhotoLanguageTypeSys) {
+        albumName = collection.localizedTitle;
     }else {
-        options.predicate = [NSPredicate predicateWithFormat:self.fetchOptionsPredicate];
+        if ([collection.localizedTitle isEqualToString:@"最近项目"] ||
+            [collection.localizedTitle isEqualToString:@"最近添加"]) {
+            return [NSBundle hx_localizedStringForKey:HXAlbumRecents];
+        }else if ([collection.localizedTitle isEqualToString:@"Camera Roll"] ||
+                  [collection.localizedTitle isEqualToString:@"相机胶卷"]) {
+            return [NSBundle hx_localizedStringForKey:HXAlbumCameraRoll];
+        }
+        switch (collection.assetCollectionSubtype) {
+            case PHAssetCollectionSubtypeSmartAlbumUserLibrary:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumCameraRoll];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumPanoramas:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumPanoramas];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumVideos:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumVideos];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumFavorites:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumFavorites];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumTimelapses:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumTimelapses];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumRecentlyAdded:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumRecentlyAdded];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumBursts:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumBursts];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumSlomoVideos:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumSlomoVideos];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumSelfPortraits:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumSelfPortraits];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumScreenshots:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumScreenshots];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumDepthEffect:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumDepthEffect];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumLivePhotos:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumLivePhotos];
+                break;
+            case PHAssetCollectionSubtypeSmartAlbumAnimated:
+                albumName = [NSBundle hx_localizedStringForKey:HXAlbumAnimated];
+                break;
+            default:
+                albumName = collection.localizedTitle;
+                break;
+        }
     }
-    return options;
+    return albumName;
 }
 @end

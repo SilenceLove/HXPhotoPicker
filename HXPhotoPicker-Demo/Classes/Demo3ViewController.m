@@ -67,8 +67,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
         _manager.configuration.photoMaxNum = 9; //
         _manager.configuration.videoMaxNum = 5;  //
         _manager.configuration.maxNum = 14;
-        
-//        _manager.networkPhotoUrls = [NSMutableArray arrayWithObjects:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/003d86db-b140-4162-aafa-d38056742181.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0be5118d-f550-403e-8e5c-6d0badb53648.jpg",@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg", nil];
     }
     return _manager;
 }
@@ -116,10 +114,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         [assets addObject:asset];
     }
     [self.manager addCustomAssetModel:assets];
-//    [self.manager addNetworkingImageToAlbum:array selected:YES];
     [self.photoView refreshView];
-    // 可以在懒加载中赋值 ,  也可以这样赋值
-//    self.manager.networkPhotoUrls = ;
     
 //    photoView.manager = self.manager;
     UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:@"添加网络" style:UIBarButtonItemStylePlain target:self action:@selector(addNetworkPhoto)];
@@ -156,7 +151,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     }
     HXCustomAssetModel *asset = [HXCustomAssetModel assetWithLocalVideoURL:[NSURL URLWithString:url] selected:YES];
     [self.manager addCustomAssetModel:@[asset]];
-//    [self.manager addNetworkingImageToAlbum:@[url] selected:YES];
     [self.photoView refreshView];
 }
 

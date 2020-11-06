@@ -105,28 +105,6 @@
 /// 获取已选照片数组的照片总大小
 - (void)requestPhotosBytesWithCompletion:(void (^)(NSString *totalBytes, NSUInteger totalDataLengths))completion;
 
-/// 已选照片数据的总大小
-@property (assign, nonatomic) NSUInteger *selectPhotoTotalDataLengths;
-@property (strong, nonatomic) NSOperationQueue *dataOperationQueue;
-
-/// 使用 addCustomAssetModel: 此方法
-- (void)addLocalVideo:(NSArray<NSURL *> *)urlArray selected:(BOOL)selected DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
-
-/// 使用 addCustomAssetModel: 此方法
-@property (copy, nonatomic) NSArray *localImageList DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
-
-/// 使用 addCustomAssetModel: 此方法
-- (void)addLocalImage:(NSArray *)images selected:(BOOL)selected DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
-
-/// 使用 addCustomAssetModel: 此方法
-- (void)addLocalImageToAlbumWithImages:(NSArray *)images DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
-
-/// 使用 addCustomAssetModel: 此方法
-- (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
-
-/// 使用 addCustomAssetModel: 此方法
-@property (strong, nonatomic) NSArray<NSString *> *networkPhotoUrls DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
-
 /// 获取系统所有相册
 - (void)getAllAlbumModelWithCompletion:(getAllAlbumListBlock)completion;
 
@@ -151,6 +129,10 @@
 /// return nil 则走判断是否达到最大值
 /// return 任意字符串 则会提醒返回的字符串，并且禁止选择
 @property (copy, nonatomic) NSString * (^ shouldSelectModel)(HXPhotoModel *model);
+
+/// 已选照片数据的总大小
+@property (assign, nonatomic) NSUInteger *selectPhotoTotalDataLengths;
+@property (strong, nonatomic) NSOperationQueue *dataOperationQueue;
 
 #pragma mark - < 关于选择完成之前的一些方法>
 /// 完成之前选择的总数量

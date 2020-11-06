@@ -8,6 +8,7 @@
 
 #import "HXPhotoManager.h"
 #import <mach/mach_time.h>
+#import "HXAssetManager.h"
 
 
 @interface HXPhotoManager ()
@@ -49,7 +50,7 @@
 @property (assign, nonatomic) BOOL supportLivePhoto;
 
 @property (assign, nonatomic) BOOL hasAuthorization;
-
+@property (strong, nonatomic) PHFetchOptions *fetchAlbumOptions;
 /// 相机拍照临时具有的model(PHAsset不为nil)
 @property (strong, nonatomic) NSMutableArray *tempCameraAssetModels;
 @end
@@ -76,6 +77,7 @@
         }
         [HXPhotoCommon photoCommon].selectType = type;
     }
+    _fetchAlbumOptions = nil;
     _type = type;
 }
 - (NSOperationQueue *)dataOperationQueue {
@@ -122,24 +124,6 @@
         _configuration = [[HXPhotoConfiguration alloc] init];
     }
     return _configuration;
-}
-- (void)setLocalImageList:(NSArray *)localImageList {
-    _localImageList = localImageList;
-    if (!localImageList.count) return;
-    if (![localImageList.firstObject isKindOfClass:[UIImage class]]) {
-        if (HXShowLog) NSSLog(@"请传入装着UIImage对象的数组");
-        return;
-    }
-    for (UIImage *image in localImageList) {
-        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:image];
-        photoModel.selected = YES;
-        [self.endCameraPhotos addObject:photoModel];
-        [self.endSelectedCameraPhotos addObject:photoModel];
-        [self.endCameraList addObject:photoModel];
-        [self.endSelectedCameraList addObject:photoModel];
-        [self.endSelectedPhotos addObject:photoModel];
-        [self.endSelectedList addObject:photoModel];
-    }
 }
 - (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray {
     if (!assetArray.count) return;
@@ -357,151 +341,28 @@
     }];
     [self.dataOperationQueue addOperation:operation];
 }
-- (void)addNetworkingImageToAlbum:(NSArray<NSString *> *)imageUrls selected:(BOOL)selected {
-    if (!imageUrls.count) return;
-    if (![imageUrls.firstObject isKindOfClass:[NSString class]]) {
-        if (HXShowLog) NSSLog(@"请传入装着NSString对象的数组");
-        return;
-    }
-    self.configuration.deleteTemporaryPhoto = NO;
-    for (NSString *imageUrlStr in imageUrls) {
-        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImageURL:[NSURL URLWithString:imageUrlStr]];
-        photoModel.selected = selected;
-        if (selected) {
-            [self.endCameraPhotos addObject:photoModel];
-            [self.endSelectedCameraPhotos addObject:photoModel];
-            [self.endCameraList addObject:photoModel];
-            [self.endSelectedCameraList addObject:photoModel];
-            [self.endSelectedPhotos addObject:photoModel];
-            [self.endSelectedList addObject:photoModel];
-        }else {
-            [self.endCameraPhotos addObject:photoModel];
-            [self.endCameraList addObject:photoModel];
-        }
-    }
-}
-- (void)setNetworkPhotoUrls:(NSArray<NSString *> *)networkPhotoUrls {
-    _networkPhotoUrls = networkPhotoUrls;
-    if (!networkPhotoUrls.count) return;
-    if (![networkPhotoUrls.firstObject isKindOfClass:[NSString class]]) {
-        if (HXShowLog) NSSLog(@"请传入装着NSString对象的数组");
-        return;
-    }
-    self.configuration.deleteTemporaryPhoto = NO;
-    for (NSString *imageUrlStr in networkPhotoUrls) {
-        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImageURL:[NSURL URLWithString:imageUrlStr]];
-        photoModel.selected = NO;
-        [self.endCameraPhotos addObject:photoModel];
-        [self.endCameraList addObject:photoModel];
-    }
-}
-- (void)addLocalModels {
-    [self addLocalModels:self.localModels];
-}
-- (void)addLocalModels:(NSArray<HXPhotoModel *> *)models {
-    if (!models.count) return;
-    if (![models.firstObject isKindOfClass:[HXPhotoModel class]]) {
-        if (HXShowLog) NSSLog(@"请传入装着HXPhotoModel对象的数组");
-        return;
-    }
-    for (HXPhotoModel *photoModel in models) {
-        if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
-            [self.endSelectedPhotos addObject:photoModel];
-        }else {
-            [self.endSelectedVideos addObject:photoModel];
-        }
-        if (photoModel.type == HXPhotoModelMediaTypeCameraPhoto) {
-            [self.endCameraPhotos addObject:photoModel];
-            [self.endSelectedCameraPhotos addObject:photoModel];
-            [self.endCameraList addObject:photoModel];
-            [self.endSelectedCameraList addObject:photoModel];
-        }else if (photoModel.type == HXPhotoModelMediaTypeCameraVideo) {
-            [self.endCameraVideos addObject:photoModel];
-            [self.endSelectedCameraVideos addObject:photoModel];
-            [self.endCameraList addObject:photoModel];
-            [self.endSelectedCameraList addObject:photoModel];
-        }
-        [self.endSelectedList addObject:photoModel];
-    }
-}
-- (void)addLocalVideo:(NSArray<NSURL *> *)urlArray selected:(BOOL)selected {
-    if (!urlArray.count) return;
-    if (![urlArray.firstObject isKindOfClass:[NSURL class]]) {
-        if (HXShowLog) NSSLog(@"请传入装着NSURL对象的数组");
-        return;
-    }
-    self.configuration.deleteTemporaryPhoto = NO;
-    for (NSURL *url in urlArray) {
-        HXPhotoModel *model = [HXPhotoModel photoModelWithVideoURL:url];
-        model.selected = selected;
-        if (selected) {
-            [self.endCameraVideos addObject:model];
-            [self.endSelectedCameraVideos addObject:model];
-            [self.endCameraList addObject:model];
-            [self.endSelectedCameraList addObject:model];
-            [self.endSelectedVideos addObject:model];
-            [self.endSelectedList addObject:model];
-        }else {
-            [self.endCameraVideos addObject:model];
-            [self.endCameraList addObject:model];
-        }
-    }
-}
-- (void)addLocalImage:(NSArray *)images selected:(BOOL)selected {
-    if (!images.count) return;
-    if (![images.firstObject isKindOfClass:[UIImage class]]) {
-        if (HXShowLog) NSSLog(@"请传入装着UIImage对象的数组");
-        return;
-    }
-    self.configuration.deleteTemporaryPhoto = NO;
-    for (UIImage *image in images) {
-        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:image];
-        photoModel.selected = selected;
-        if (selected) {
-            [self.endCameraPhotos addObject:photoModel];
-            [self.endSelectedCameraPhotos addObject:photoModel];
-            [self.endCameraList addObject:photoModel];
-            [self.endSelectedCameraList addObject:photoModel];
-            [self.endSelectedPhotos addObject:photoModel];
-            [self.endSelectedList addObject:photoModel];
-        }else {
-            [self.endCameraPhotos addObject:photoModel];
-            [self.endCameraList addObject:photoModel];
-        }
-    }
-}
-- (void)addLocalImageToAlbumWithImages:(NSArray *)images {
-    if (!images.count) return;
-    if (![images.firstObject isKindOfClass:[UIImage class]]) {
-        if (HXShowLog) NSSLog(@"请传入装着UIImage对象的数组");
-        return;
-    }
-    self.configuration.deleteTemporaryPhoto = NO;
-    for (UIImage *image in images) {
-        HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:image];
-        [self.endCameraPhotos addObject:photoModel];
-        [self.endCameraList addObject:photoModel];
-    }
-}
 - (PHFetchOptions *)fetchAlbumOptions {
-    PHFetchOptions *option = [[PHFetchOptions alloc] init];
-    if (self.configuration.creationDateSort) {
-        option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+    if (!_fetchAlbumOptions) {
+        PHFetchOptions *options = [[PHFetchOptions alloc] init];
+        if (self.configuration.creationDateSort) {
+            options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        }
+        if (!self.fetchOptionsPredicate) {
+            if (self.type == HXPhotoManagerSelectedTypePhoto) {
+                options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+            }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
+                options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+            }
+        }else {
+            options.predicate = [NSPredicate predicateWithFormat:self.fetchOptionsPredicate];
+        }
+        _fetchAlbumOptions = options;
     }
-    if (self.type == HXPhotoManagerSelectedTypePhoto) {
-        option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
-    }else if (self.type == HXPhotoManagerSelectedTypeVideo) {
-        option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
-    }
-    return option;
-}
-- (PHAssetCollection *)assetCollectionWithIndentifier:(NSString *)localIdentifier {
-    PHAssetCollection *collection = [[PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[localIdentifier] options:nil] firstObject];
-    return collection;
+    return _fetchAlbumOptions;
 }
 - (HXAlbumModel *)getCommonAlbumModel {
     NSString *cameraRollLocalIdentifier = [HXPhotoCommon photoCommon].cameraRollLocalIdentifier;
-    PHAssetCollection *collection = [self assetCollectionWithIndentifier:cameraRollLocalIdentifier];
+    PHAssetCollection *collection = [HXAssetManager fetchAssetCollectionWithIndentifier:cameraRollLocalIdentifier];
     HXAlbumModel *model = [self albumModelWithCollection:collection fetchAssets:YES];
     model.cameraCount = self.cameraList.count;
     model.index = 0;
@@ -520,32 +381,14 @@
             return;
         }
     }
-    PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAny options:nil];
-    [smartAlbums enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (![collection isKindOfClass:[PHAssetCollection class]]) return;
-        if (collection.estimatedAssetCount <= 0) return;
-        if ([self isCameraRollAlbum:collection]) {
-            [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = collection.localIdentifier;
-            HXAlbumModel *model = [self albumModelWithCollection:collection fetchAssets:YES];
-            model.cameraCount = self.cameraList.count;
-            model.index = 0;
-            if (completion) completion(model);
-            *stop = YES;
-            return;
-        }
-    }];
-//    for (PHAssetCollection *collection in smartAlbums) {
-//        if (![collection isKindOfClass:[PHAssetCollection class]]) continue;
-//        if (collection.estimatedAssetCount <= 0) continue;
-//        if ([self isCameraRollAlbum:collection]) {
-//            HXAlbumModel *model = [self albumModelWithCollection:collection fetchAssets:YES];
-//            model.cameraCount = self.cameraList.count;
-//            model.index = 0;
-//            [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = collection.localIdentifier;
-//            if (completion) completion(model);
-//            return;
-//        }
-//    }
+    PHAssetCollection *cameraRollCollection = [HXAssetManager fetchCameraRollAlbumWithOptions:nil];
+    if (cameraRollCollection) {
+        [HXPhotoCommon photoCommon].cameraRollLocalIdentifier = cameraRollCollection.localIdentifier;
+        HXAlbumModel *model = [self albumModelWithCollection:cameraRollCollection fetchAssets:YES];
+        model.cameraCount = self.cameraList.count;
+        model.index = 0;
+        if (completion) completion(model);
+    }
     if (![HXPhotoCommon photoCommon].cameraRollLocalIdentifier) {
         PHFetchOptions *option = [self fetchAlbumOptions];
         HXPhotoModel *photoMd = self.cameraList.firstObject;
@@ -557,172 +400,40 @@
         albumModel.tempImage = photoMd.thumbPhoto;
         albumModel.assetResult = [PHAsset fetchAssetsWithOptions:option];
         albumModel.count = albumModel.assetResult.count;
-//        if (albumModel.count) {
-//            self.cameraRollAlbumModel = albumModel;
-//        }
         if (completion) completion(albumModel);
-    }
-}
-- (BOOL)isCameraRollAlbum:(PHAssetCollection *)metadata {
-    NSString *versionStr = [[UIDevice currentDevice].systemVersion stringByReplacingOccurrencesOfString:@"." withString:@""];
-    if (versionStr.length <= 1) {
-        versionStr = [versionStr stringByAppendingString:@"00"];
-    } else if (versionStr.length <= 2) {
-        versionStr = [versionStr stringByAppendingString:@"0"];
-    }
-    CGFloat version = versionStr.floatValue;
-    
-    if (version >= 800 && version <= 802) {
-        return ((PHAssetCollection *)metadata).assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumRecentlyAdded;
-    } else {
-        return ((PHAssetCollection *)metadata).assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary;
     }
 }
 - (HXAlbumModel *)albumModelWithCollection:(PHAssetCollection *)collection
                                fetchAssets:(BOOL)fetchAssets {
-    HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-    albumModel.albumName = [self transFormAlbumNameWithCollection:collection];
-    albumModel.localIdentifier = collection.localIdentifier;
+    HXAlbumModel *albumModel = [[HXAlbumModel alloc] initWithCollection:collection options:self.fetchAlbumOptions];
     albumModel.selectType = self.type;
-    albumModel.fetchOptionsPredicate = self.fetchOptionsPredicate;
-    albumModel.creationDateSort = self.configuration.creationDateSort;
     if (fetchAssets) {
         [albumModel fetchAssetResult];
     }
     return albumModel;
 }
-- (NSString *)transFormAlbumNameWithCollection:(PHAssetCollection *)collection {
-    if (collection.assetCollectionType == PHAssetCollectionTypeAlbum) {
-        return collection.localizedTitle;
-    }
-    NSString *albumName;
-    HXPhotoLanguageType type = [HXPhotoCommon photoCommon].languageType;
-    if (type == HXPhotoLanguageTypeSys) {
-        albumName = collection.localizedTitle;
-    }else {
-        if ([collection.localizedTitle isEqualToString:@"最近项目"] ||
-            [collection.localizedTitle isEqualToString:@"最近添加"]) {
-            return [NSBundle hx_localizedStringForKey:HXAlbumRecents];
-        }else if ([collection.localizedTitle isEqualToString:@"Camera Roll"] ||
-                  [collection.localizedTitle isEqualToString:@"相机胶卷"]) {
-            return [NSBundle hx_localizedStringForKey:HXAlbumCameraRoll];
-        }
-        switch (collection.assetCollectionSubtype) {
-            case PHAssetCollectionSubtypeSmartAlbumUserLibrary:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumCameraRoll]; 
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumPanoramas:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumPanoramas];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumVideos:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumVideos];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumFavorites:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumFavorites];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumTimelapses:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumTimelapses];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumRecentlyAdded:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumRecentlyAdded];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumBursts:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumBursts];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumSlomoVideos:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumSlomoVideos];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumSelfPortraits:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumSelfPortraits];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumScreenshots:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumScreenshots];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumDepthEffect:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumDepthEffect];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumLivePhotos:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumLivePhotos];
-                break;
-            case PHAssetCollectionSubtypeSmartAlbumAnimated:
-                albumName = [NSBundle hx_localizedStringForKey:HXAlbumAnimated];
-                break;
-            default:
-                albumName = collection.localizedTitle;
-                break;
-        }
-    }
-    return albumName;
-}
+
 - (void)getAllAlbumModelWithCompletion:(getAllAlbumListBlock)completion {
-    PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAny options:nil];
-    PHFetchResult *userAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAny options:nil];
-    
     NSMutableArray *albums = [NSMutableArray array];
-    if (self.firstHasCameraAsset &&
-        self.configuration.saveSystemAblum &&
-        !smartAlbums.count &&
-        !userAlbums.count) {
-        BOOL created = NO;
-        PHAuthorizationStatus status = [HXPhotoTools authorizationStatus];
-        if (status == PHAuthorizationStatusAuthorized) {
-            created = YES;
+    [HXAssetManager enumerateAllAlbumModelsWithWithOptions:self.fetchAlbumOptions usingBlock:^(HXAlbumModel * _Nonnull albumModel) {
+        if (self.assetCollectionFilter &&
+            self.assetCollectionFilter(albumModel.collection)) {
+            return;
         }
-#ifdef __IPHONE_14_0
-        else if (@available(iOS 14, *)) {
-            if (status == PHAuthorizationStatusLimited) {
-                created = YES;
-            }
-        }
-#endif
-        if (created) {
-            // 防止直接打开相机并没有打开相册,导致相册列表为空,拍的照片没有保存到相册列表
-            if (self.cameraList.count) {
-                HXPhotoModel *photoMd = self.cameraList.firstObject;
-                HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-                albumModel.cameraCount = self.cameraList.count;
-                albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
-                albumModel.index = 0;
-                albumModel.tempImage = photoMd.thumbPhoto;
-                [albums addObject:albumModel];
-                if (completion) {
-                    completion(albums);
-                }
-                self.firstHasCameraAsset = NO;
-                return;
-            }
-        }
-    }
-    NSArray *allAlbums = @[smartAlbums,userAlbums];
-    [allAlbums enumerateObjectsUsingBlock:^(PHFetchResult *fetchResult, NSUInteger idx, BOOL * _Nonnull stop) {
-        [fetchResult enumerateObjectsUsingBlock:^(PHAssetCollection *collection, NSUInteger idx, BOOL * _Nonnull stop) {
-            if (![collection isKindOfClass:[PHAssetCollection class]]) return;
-            if (collection.estimatedAssetCount <= 0) return;
-            if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumAllHidden) return;
-            if (collection.assetCollectionSubtype == 215) return;
-            if (collection.assetCollectionSubtype == 212) return;
-            if (collection.assetCollectionSubtype == 204) return;
-            if (collection.assetCollectionSubtype == 1000000201) return;
-            
-            if (self.assetCollectionFilter &&
-                self.assetCollectionFilter(collection)) {
-                return;
-            }
-            if ([self isCameraRollAlbum:collection]) {
-                HXAlbumModel *albumModel = [self albumModelWithCollection:collection fetchAssets:YES];
+        albumModel.selectType = self.type;
+        [albumModel fetchAssetResult];
+        if ([HXAssetManager isCameraRollAlbum:albumModel.collection]) {
+            albumModel.cameraCount = [self cameraCount];
+            albumModel.tempImage = [self firstCameraModel].thumbPhoto;
+            albumModel.index = 0;
+            [albums insertObject:albumModel atIndex:0];
+        } else {
+            if (albumModel.count > 0) {
                 albumModel.cameraCount = [self cameraCount];
-                albumModel.tempImage = [self firstCameraModel].thumbPhoto;
-                albumModel.index = 0;
-                [albums insertObject:albumModel atIndex:0];
-            } else {
-                HXAlbumModel *albumModel = [self albumModelWithCollection:collection fetchAssets:YES];
-                if (albumModel.count > 0) {
-                    albumModel.cameraCount = [self cameraCount];
-                    [albums addObject:albumModel];
-                    albumModel.index = [albums indexOfObject:albumModel];
-                }
+                [albums addObject:albumModel];
+                albumModel.index = [albums indexOfObject:albumModel];
             }
-        }];
+        }
     }];
     if (!albums.count) {
         BOOL created = NO;
@@ -738,14 +449,30 @@
         }
 #endif
         if (created) {
-            HXAlbumModel *albumModel = [[HXAlbumModel alloc] init];
-            albumModel.cameraCount = [self cameraCount];
+            HXPhotoModel *photoMd = self.cameraList.firstObject;
+            HXAlbumModel *albumModel;
+            if ([HXPhotoCommon photoCommon].cameraRollLocalIdentifier) {
+                albumModel = [self getCommonAlbumModel];
+            }else {
+                albumModel = [[HXAlbumModel alloc] init];
+                albumModel.assetResult = [PHAsset fetchAssetsWithOptions:self.fetchAlbumOptions];
+                albumModel.count = albumModel.assetResult.count;
+            }
+            albumModel.cameraCount = self.cameraList.count;
             albumModel.albumName = [NSBundle hx_localizedStringForKey:@"所有照片"];
             albumModel.index = 0;
             albumModel.selectType = self.type;
-            albumModel.fetchOptionsPredicate = self.fetchOptionsPredicate;
-            albumModel.tempImage = [self firstCameraModel].thumbPhoto;
-            [albums addObject:albumModel];
+            albumModel.tempImage = photoMd.thumbPhoto;
+            if (self.firstHasCameraAsset &&
+                self.configuration.saveSystemAblum) {
+                // 防止直接打开相机并没有打开相册,导致相册列表为空,拍的照片没有保存到相册列表
+                if (self.cameraList.count) {
+                    [albums addObject:albumModel];
+                    self.firstHasCameraAsset = NO;
+                }
+            }else {
+                [albums addObject:albumModel];
+            }
         }
     }
     
@@ -756,14 +483,9 @@
 - (HXPhotoModel *)photoModelWithAsset:(PHAsset *)asset {
     HXPhotoModel *photoModel = [[HXPhotoModel alloc] init];
     photoModel.asset = asset;
-    BOOL isICloud = NO;
-//    if (@available(iOS 13, *)) {
-    
-//    }else {
     // ios13之后可能不准，但是无关紧要。
     // 因为在获取的时候已经做了iCloud判断了。这里只是在展示的时候方便辨别
-        isICloud = [[asset valueForKey:@"isCloudPlaceholder"] boolValue];
-//    }
+    BOOL isICloud = [[asset valueForKey:@"isCloudPlaceholder"] boolValue];
     if (isICloud) {
         if (_iCloudAssetArray.count) {
             if (![_iCloudAssetArray containsObject:asset]) {
@@ -844,10 +566,7 @@
             }
         }
     }
-    
-    
     __block HXPhotoModel *firstSelectModel;
-    
     if (!albumModel.assetResult) {
         [albumModel fetchAssetResult];
     }
@@ -1871,6 +1590,35 @@
 } 
 
 #pragma mark - < 保存草稿功能 >
+- (void)addLocalModels {
+    [self addLocalModels:self.localModels];
+}
+- (void)addLocalModels:(NSArray<HXPhotoModel *> *)models {
+    if (!models.count) return;
+    if (![models.firstObject isKindOfClass:[HXPhotoModel class]]) {
+        if (HXShowLog) NSSLog(@"请传入装着HXPhotoModel对象的数组");
+        return;
+    }
+    for (HXPhotoModel *photoModel in models) {
+        if (photoModel.subType == HXPhotoModelMediaSubTypePhoto) {
+            [self.endSelectedPhotos addObject:photoModel];
+        }else {
+            [self.endSelectedVideos addObject:photoModel];
+        }
+        if (photoModel.type == HXPhotoModelMediaTypeCameraPhoto) {
+            [self.endCameraPhotos addObject:photoModel];
+            [self.endSelectedCameraPhotos addObject:photoModel];
+            [self.endCameraList addObject:photoModel];
+            [self.endSelectedCameraList addObject:photoModel];
+        }else if (photoModel.type == HXPhotoModelMediaTypeCameraVideo) {
+            [self.endCameraVideos addObject:photoModel];
+            [self.endSelectedCameraVideos addObject:photoModel];
+            [self.endCameraList addObject:photoModel];
+            [self.endSelectedCameraList addObject:photoModel];
+        }
+        [self.endSelectedList addObject:photoModel];
+    }
+}
 - (BOOL)saveLocalModelsToFile {
     self.localModels = self.afterSelectedArray.copy;
     NSMutableData *data = [[NSMutableData alloc] init];
@@ -1901,7 +1649,7 @@
     NSMutableArray *modelArray = @[].mutableCopy;
     for (HXPhotoModel *model in tempArray) {
         if (model.localIdentifier && !model.asset) {
-            PHAsset *asset = [[PHAsset fetchAssetsWithLocalIdentifiers:@[model.localIdentifier] options:nil] firstObject];
+            PHAsset *asset = [HXAssetManager fetchAssetWithLocalIdentifier:model.localIdentifier];
             if (asset) {
                 model.asset = asset;
                 [modelArray addObject:model];

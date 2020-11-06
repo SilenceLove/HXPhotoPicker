@@ -67,4 +67,6 @@
                        delegate:(id<HXCustomNavigationControllerDelegate>)delegate
                       doneBlock:(viewControllerDidDoneBlock)doneBlock
                     cancelBlock:(viewControllerDidCancelBlock)cancelBlock;
+
+- (void)clearAssetCache;
 @end

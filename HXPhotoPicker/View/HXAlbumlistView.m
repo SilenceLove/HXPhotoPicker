@@ -12,6 +12,7 @@
 #import "UIButton+HXExtension.h"
 #import "UIView+HXExtension.h"
 #import "UIColor+HXExtension.h"
+#import "HXAssetManager.h"
 
 @interface HXAlbumlistView ()<UITableViewDataSource, UITableViewDelegate>
 @property (assign, nonatomic) BOOL cellCanSetModel;
@@ -266,14 +267,14 @@
     }
     self.countLb.text = @(photoCount).stringValue;
     HXWeakSelf
-    self.requestId = [HXPhotoModel requestThumbImageWithPHAsset:coverAsset width:self.hx_h * 1.4 completion:^(UIImage *image, PHAsset *asset) {
-        if (asset == coverAsset) {
-            weakSelf.coverView.image = image;
+    self.requestId = [HXAssetManager requestThumbnailImageForAsset:coverAsset targetWidth:self.hx_h * 1.4 completion:^(UIImage * _Nonnull result, NSDictionary<NSString *,id> * _Nonnull info) {
+        if (weakSelf.model.assetResult.lastObject == coverAsset && result) {
+            weakSelf.coverView.image = result;
         }
-        if (completion) {
-            completion(image, asset);
+        if (completion && result) {
+            completion(result, coverAsset);
         }
-    }]; 
+    }];
 }
 - (void)setConfiguration:(HXPhotoConfiguration *)configuration {
     _configuration = configuration;

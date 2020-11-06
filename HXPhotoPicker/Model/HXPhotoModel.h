@@ -215,21 +215,10 @@
 #pragma mark - < Request >
 + (id _Nullable)requestImageWithURL:(NSURL *_Nullable)url progress:(void (^ _Nullable) (NSInteger receivedSize, NSInteger expectedSize))progress completion:(void (^ _Nullable) (UIImage * _Nullable image, NSURL * _Nullable url, NSError * _Nullable error))completion;
 
-+ (PHImageRequestID)requestThumbImageWithPHAsset:(PHAsset * _Nullable)asset
-                                           width:(CGFloat)width
-                                      completion:(void (^ _Nullable)(UIImage *_Nullable image, PHAsset * _Nullable asset))completion;
-
-- (PHImageRequestID)requestImageWithOptions:(PHImageRequestOptions * _Nullable)options
-                                 targetSize:(CGSize)targetSize
-                              resultHandler:(void (^ _Nullable)(UIImage *__nullable result, NSDictionary *__nullable info))resultHandler;
-
 /// 请求获取缩略图，主要用在列表上展示。此方法会回调多次，如果为视频的话就是视频封面
 - (PHImageRequestID)requestThumbImageCompletion:(HXModelImageSuccessBlock _Nullable)completion;
 - (PHImageRequestID)requestThumbImageWithWidth:(CGFloat)width
                                     completion:(HXModelImageSuccessBlock _Nullable)completion;
-- (PHImageRequestID)requestThumbImageWithOptions:(PHImageRequestOptions * _Nullable)options
-                                           width:(CGFloat)width
-                                      completion:(HXModelImageSuccessBlock _Nullable)completion;
 
 /// 请求获取缩略图，主要用在列表上展示。此方法只会回调一次
 - (PHImageRequestID)highQualityRequestThumbImageWithWidth:(CGFloat)width

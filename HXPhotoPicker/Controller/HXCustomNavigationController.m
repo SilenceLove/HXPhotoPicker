@@ -10,6 +10,7 @@
 #import "HXAlbumListViewController.h"
 #import "HXPhotoViewController.h"
 #import "HXPhotoTools.h"
+#import "HXAssetManager.h"
 
 @interface HXCustomNavigationController ()<HXAlbumListViewControllerDelegate, HXPhotoViewControllerDelegate>
 @property (assign, nonatomic) BOOL didPresentImagePicker;
@@ -291,41 +292,31 @@
         return UIInterfaceOrientationMaskPortrait;
     }
 }
-
+- (void)clearAssetCache {
+    [self clearAssetCacheWithAddOnWindow:NO];
+}
 - (void)clearAssetCacheWithAddOnWindow:(BOOL)addOnWindow {
     PHAsset *asset = self.cameraRollAlbumModel.assetResult.firstObject;
     if (asset) {
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        [HXPhotoCommon photoCommon].clearAssetRequestID = -1;
         PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
         options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
         options.resizeMode = PHImageRequestOptionsResizeModeFast;
         options.synchronous = NO;
         options.networkAccessAllowed = NO;
         HXWeakSelf
-        if (@available(iOS 13.0, *)) {
-            self.requestID = [[PHImageManager defaultManager] requestImageDataAndOrientationForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, CGImagePropertyOrientation orientation, NSDictionary * _Nullable info) {
-                [HXPhotoCommon photoCommon].clearAssetRequestID = -1;
-                if (imageData) {
-                    if (addOnWindow || !weakSelf) {
-                        [HXCustomNavigationController addImageViewOnWindowWithImageData:imageData];
-                    }else {
-                        [weakSelf addImageViewWithImageData:imageData addOnWindow:addOnWindow];
-                    }
+        self.requestID = [HXAssetManager requestImageDataForAsset:asset options:options completion:^(NSData * _Nonnull imageData, UIImageOrientation orientation, NSDictionary<NSString *,id> * _Nonnull info) {
+            [HXPhotoCommon photoCommon].clearAssetRequestID = -1;
+            if (imageData) {
+                if (addOnWindow || !weakSelf) {
+                    [HXCustomNavigationController addImageViewOnWindowWithImageData:imageData];
+                }else {
+                    [weakSelf addImageViewWithImageData:imageData addOnWindow:addOnWindow];
                 }
-            }];
-            [HXPhotoCommon photoCommon].clearAssetRequestID = self.requestID;
-        }else {
-            self.requestID = [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-                [HXPhotoCommon photoCommon].clearAssetRequestID = -1;
-                if (imageData) {
-                    if (addOnWindow || !weakSelf) {
-                        [HXCustomNavigationController addImageViewOnWindowWithImageData:imageData];
-                    }else {
-                        [weakSelf addImageViewWithImageData:imageData addOnWindow:addOnWindow];
-                    }
-                }
-            }];
-            [HXPhotoCommon photoCommon].clearAssetRequestID = self.requestID;
-        }
+            }
+        }];
+        [HXPhotoCommon photoCommon].clearAssetRequestID = self.requestID;
     }
 }
 + (void)addImageViewOnWindowWithImageData:(NSData *)imageData {

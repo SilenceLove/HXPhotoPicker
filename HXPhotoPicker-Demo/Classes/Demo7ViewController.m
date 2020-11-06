@@ -96,7 +96,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
         HXCustomAssetModel *model = [HXCustomAssetModel assetWithLocalImage:image selected:YES];
         [images addObject:model];
     }
-//    [self.manager addLocalImageToAlbumWithImages:images];
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     scrollView.alwaysBounceVertical = YES;
     [self.view addSubview:scrollView];
@@ -108,13 +107,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
     photoView.spacing = 7;
     photoView.lineCount = 3;
     photoView.collectionView.contentInset = UIEdgeInsetsMake(16, 16, 16, 16);
-//    self.manager.localImageList = images;
     [self.manager addCustomAssetModel:images];
     
     /**  添加本地视频  **/
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
     HXCustomAssetModel *videoAsset = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
-//    [self.manager addLocalVideo:@[url] selected:YES];
     [self.manager addCustomAssetModel:@[videoAsset]];
     
     [photoView refreshView];
@@ -140,7 +137,6 @@ static const CGFloat kPhotoViewMargin = 12.0;
     int x = arc4random() % 4;
     HXCustomAssetModel *asset = [HXCustomAssetModel assetWithLocaImageName:@(x).stringValue selected:YES];
     [self.manager addCustomAssetModel:@[asset]];
-//    [self.manager addLocalImage:[NSArray arrayWithObjects:[UIImage imageNamed:@(x).stringValue], nil] selected:YES];
     [self.photoView refreshView];
 }
  

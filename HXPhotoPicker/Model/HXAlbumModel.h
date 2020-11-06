@@ -17,13 +17,10 @@
 /// 在获取照片数据之后的真实数量
 @property (assign, nonatomic) NSUInteger realCount;
 @property (strong, nonatomic) PHAsset *realCoverAsset;
+/// 需要重新加载数量
 @property (assign, nonatomic) BOOL needReloadCount;
 /// 选择类型
 @property (assign, nonatomic) NSInteger selectType;
-/// 是否按创建时间排序
-@property (assign, nonatomic) BOOL creationDateSort;
-/// 唯一标识符
-@property (copy, nonatomic) NSString *localIdentifier;
 /// 资源集合
 @property (strong, nonatomic) PHFetchResult *assetResult;
 /// 下标
@@ -32,10 +29,13 @@
 @property (assign, nonatomic) NSUInteger selectedCount;
 /// 本地图片数量
 @property (assign, nonatomic) NSUInteger cameraCount;
+/// 如果相册里没有资源则用本地图片代替
 @property (strong, nonatomic) UIImage *tempImage;
 
-@property (copy, nonatomic) NSString *fetchOptionsPredicate;
-
+- (instancetype)initWithCollection:(PHAssetCollection *)collection
+                           options:(PHFetchOptions *)options;
+- (NSString *)localIdentifier;
+- (PHAssetCollection *)collection;
 - (void)fetchAssetResult;
 - (void)getResultWithCompletion:(void (^)(HXAlbumModel *albumModel))completion;
 
