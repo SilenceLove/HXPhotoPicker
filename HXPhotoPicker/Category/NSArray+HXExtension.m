@@ -157,7 +157,47 @@
                 photoModel.previewPhoto = hImage;
                 [imageList addObject:hImage];
             }else {
-                [errorPhotoModels addObject:photoModel];
+                //已知在iPhone 8，iOS 10.0.2系统上，通过requestImageDataStartRequestICloud能获取到图片的URL，但通过此URL并不能获取到image。故调用requestPreviewImageWithSize方法获取image，并存到沙盒tmp下
+                [model requestPreviewImageWithSize:PHImageManagerMaximumSize startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
+                } progressHandler:^(double progress, HXPhotoModel * _Nullable model) {
+                } success:^(UIImage * _Nullable imageValue, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                    NSString *photoPathStr = [NSTemporaryDirectory() stringByAppendingString:@"HXPhotoPickerSave/"];
+                    BOOL isDir;
+                    BOOL isDirExit = [[NSFileManager defaultManager] fileExistsAtPath:photoPathStr isDirectory:&isDir];
+                    NSError *error;
+                    if (isDirExit == NO) {
+                        [[NSFileManager defaultManager] createDirectoryAtPath:photoPathStr withIntermediateDirectories:YES attributes:nil error:&error];
+                    }
+                    if (error) {
+                        [errorPhotoModels addObject:photoModel];
+                    }
+                    else {
+                        NSInteger timeStamp = [[NSDate new] timeIntervalSince1970];
+                        NSString *imgPath = [NSString stringWithFormat:@"%@%zd_%zd.jpg",photoPathStr, timeStamp, photoModels.count];
+                        [UIImageJPEGRepresentation(imageValue, 1.0) writeToFile:imgPath atomically:YES];
+                        photoModel.imageURL = [NSURL fileURLWithPath:imgPath];
+                        photoModel.thumbPhoto = imageValue;
+                        photoModel.previewPhoto = imageValue;
+                        [imageList addObject:imageValue];
+                    }
+                    
+                    [photoModels removeObjectAtIndex:0];
+                    if (!photoModels.count) {
+                        [weakSelf requestImageSeparatelyWithOriginal:original imageList:imageList.copy photoModels:photoModels errorPhotoModels:errorPhotoModels.copy completion:completion];
+                    }else {
+                        [weakSelf requestImageSeparatelyWithOriginal:original imageList:imageList photoModels:photoModels errorPhotoModels:errorPhotoModels completion:completion];
+                    }
+                } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                    [errorPhotoModels addObject:photoModel];
+                    [photoModels removeObjectAtIndex:0];
+                    if (!photoModels.count) {
+                        [weakSelf requestImageSeparatelyWithOriginal:original imageList:imageList.copy photoModels:photoModels errorPhotoModels:errorPhotoModels.copy completion:completion];
+                    }else {
+                        [weakSelf requestImageSeparatelyWithOriginal:original imageList:imageList photoModels:photoModels errorPhotoModels:errorPhotoModels completion:completion];
+                    }
+                }];
+                
+                return;
             }
         }else {
             [errorPhotoModels addObject:photoModel];
