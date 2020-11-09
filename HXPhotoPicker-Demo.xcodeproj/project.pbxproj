@@ -50,6 +50,7 @@
 		7B08597B24FA58DF00E93091 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08595024FA58DE00E93091 /* SettingViewController.m */; };
 		7B08597C24FA58DF00E93091 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
+		7B3FAFE02558EFAE0092FCE0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
 		7B4D4C3E24B858C600B03846 /* HXPhotoEditConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D4BE624B858C600B03846 /* HXPhotoEditConfiguration.m */; };
 		7B4D4C4624B858C600B03846 /* HX_PhotoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D4BF924B858C600B03846 /* HX_PhotoEditViewController.m */; };
 		7B4D4C4724B858C600B03846 /* HXPhotoEditChartletModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D4BFE24B858C600B03846 /* HXPhotoEditChartletModel.m */; };
@@ -1311,20 +1312,6 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				hx_ko,
-				"hx_zh-Hant",
-				hx_ja,
-				"hx_zh-Hans",
-				hx_en,
-				"en-IN",
-				"en-AU",
-				"en-GB",
-				"zh-Hans",
-				"zh-Hant",
-				"zh-HK",
-				ja,
-				fr,
-				"fr-CA",
 				Base,
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
@@ -1387,6 +1374,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B3FAFE02558EFAE0092FCE0 /* HXPhotoPicker.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
