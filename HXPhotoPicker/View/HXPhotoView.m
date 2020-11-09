@@ -169,6 +169,7 @@
     self.tag = 9999;
     _showAddCell = YES;
     self.tempShowAddCell = YES;
+    self.previewShowBottomPageControl = YES;
     self.adaptiveDarkness = YES;
     
     self.flowLayout.minimumLineSpacing = self.spacing;
@@ -198,6 +199,7 @@
     vc.modelArray = [NSMutableArray arrayWithArray:self.manager.afterSelectedArray];
     vc.currentModelIndex = [self.manager.afterSelectedArray indexOfObject:model];
     vc.previewShowDeleteButton = self.previewShowDeleteButton;
+    vc.showBottomPageControl = self.previewShowBottomPageControl;
     vc.photoView = self;
     vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
     vc.modalPresentationCapturesStatusBarAppearance = YES;
@@ -383,6 +385,7 @@
         vc.modelArray = [NSMutableArray arrayWithArray:self.dataList];
         vc.currentModelIndex = [self.dataList indexOfObject:model];
         vc.previewShowDeleteButton = self.previewShowDeleteButton;
+        vc.showBottomPageControl = self.previewShowBottomPageControl;
         vc.photoView = self;
         vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
         vc.modalPresentationCapturesStatusBarAppearance = YES;

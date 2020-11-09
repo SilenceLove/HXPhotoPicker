@@ -97,6 +97,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoViewPreViewShowStyle) {
 @property (assign, nonatomic) BOOL deleteCellShowAlert;
 /// 预览大图时的风格样式
 @property (assign, nonatomic) HXPhotoViewPreViewShowStyle previewStyle;
+/// 预览时是否显示底部pageControl，暗黑样式下才有效
+@property (assign, nonatomic) BOOL previewShowBottomPageControl;
 /// 底部选择视图是否自适应暗黑风格
 @property (assign, nonatomic) BOOL adaptiveDarkness;
 /// HXPhotoView最大高度，默认屏幕高度

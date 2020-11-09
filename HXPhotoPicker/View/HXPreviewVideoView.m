@@ -79,7 +79,6 @@
 - (void)setModel:(HXPhotoModel *)model {
     _model = model;
     if (self.player.currentItem != nil && !self.videoLoadFailed) return;
-    
 
     self.playBtn.hidden = YES;
     self.canRemovePlayerObservers = NO;

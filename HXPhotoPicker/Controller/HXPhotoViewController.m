@@ -2265,7 +2265,11 @@ HX_PhotoEditViewControllerDelegate
                         if (weakSelf.cameraSelected) {
                             [UIView animateWithDuration:0.25 animations:^{
                                 weakSelf.tempCameraView.alpha = 0;
-                                weakSelf.effectView.effect = nil;
+                                if (HX_IOS9Later) {
+                                    [weakSelf.effectView setEffect:nil];
+                                }else {
+                                    weakSelf.effectView.alpha = 0;
+                                }
                             } completion:^(BOOL finished) {
                                 [weakSelf.tempCameraView removeFromSuperview];
                                 [weakSelf.effectView removeFromSuperview];

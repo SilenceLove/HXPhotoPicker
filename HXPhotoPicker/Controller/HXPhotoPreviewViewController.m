@@ -24,6 +24,8 @@
 #import "UIImageView+HXExtension.h"
 #import "UIColor+HXExtension.h"
 
+#define HXDARKVIEWWIDTH 30
+
 @interface HXPhotoPreviewViewController ()
 <
 UICollectionViewDataSource,
@@ -51,11 +53,14 @@ HX_PhotoEditViewControllerDelegate
 @property (assign, nonatomic) BOOL isAddInteractiveTransition;
 @property (strong, nonatomic) UIView *dismissTempTopView;
 @property (strong, nonatomic) UIPageControl *bottomPageControl;
+@property (strong, nonatomic) UIView *darkCancelView;
+@property (strong, nonatomic) UIView *darkDeleteView;
 @property (strong, nonatomic) UIButton *darkCancelBtn;
 @property (strong, nonatomic) UIButton *darkDeleteBtn;
 @property (assign, nonatomic) BOOL statusBarShouldBeHidden;
 @property (assign, nonatomic) BOOL layoutSubviewsCompletion;
 @property (assign, nonatomic) BOOL singleSelectedJumpEdit;
+@property (assign, nonatomic) BOOL didAddBottomPageControl;
 @end
 
 @implementation HXPhotoPreviewViewController
@@ -239,6 +244,7 @@ HX_PhotoEditViewControllerDelegate
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view
+    self.didAddBottomPageControl = NO;
     self.singleSelectedJumpEdit = NO;
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.edgesForExtendedLayout = UIRectEdgeAll;
@@ -346,11 +352,11 @@ HX_PhotoEditViewControllerDelegate
             self.navBar.frame = CGRectMake(0, 0, self.view.hx_w, hxNavigationBarHeight);
             self.bottomView.frame = CGRectMake(0, bottomViewHeight, self.view.hx_w, 50 + bottomMargin);
         }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
-            CGFloat topMargin = HX_IS_IPhoneX_All ? 45 : 30;
+            CGFloat topMargin = HX_IS_IPhoneX_All ? ((orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) ? 25 : 45) : 25;
             if (self.previewShowDeleteButton) {
-                self.darkDeleteBtn.frame = CGRectMake(self.view.hx_w - 100 - 15, topMargin, 100, 30);
+                self.darkDeleteView.frame = CGRectMake(self.view.hx_w - HXDARKVIEWWIDTH - 15, topMargin, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
             }
-            self.darkCancelBtn.frame = CGRectMake(15, topMargin, 35, 35);
+            self.darkCancelView.frame = CGRectMake(15, topMargin, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
             CGFloat pageControlY = HX_IS_IPhoneX_All ? self.view.hx_h - 40 : self.view.hx_h - 30;
             self.bottomPageControl.frame = CGRectMake(0, pageControlY, self.view.hx_w, 10);
         }
@@ -543,18 +549,19 @@ HX_PhotoEditViewControllerDelegate
             [self.view addSubview:self.navBar];
         }else if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             
-            self.darkDeleteBtn.alpha = 1;
-            self.darkDeleteBtn.hidden = NO;
-            [self.view addSubview:self.darkCancelBtn];
+            self.darkDeleteView.alpha = 1;
+            self.darkDeleteView.hidden = NO;
+            [self.view addSubview:self.darkCancelView];
             if (self.previewShowDeleteButton) {
-                [self.view addSubview:self.darkDeleteBtn];
+                [self.view addSubview:self.darkDeleteView];
             }
             if ([self.manager.afterSelectedArray containsObject:model]) {
                 self.bottomPageControl.currentPage = [[self.manager afterSelectedArray] indexOfObject:model];
             }
             BOOL canAddBottomPageControl =  HX_IOS14_Later ? YES : (self.manager.afterSelectedCount <= 15);
-            if (canAddBottomPageControl) {
+            if (canAddBottomPageControl && self.showBottomPageControl) {
                 [self.view addSubview:self.bottomPageControl];
+                self.didAddBottomPageControl = YES;
             }
         }
     }
@@ -673,11 +680,19 @@ HX_PhotoEditViewControllerDelegate
         NSInteger tempIndex = weakSelf.currentModelIndex;
         
         [weakSelf.modelArray removeObject:weakSelf.currentModel];
-        [weakSelf.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:weakSelf.currentModelIndex inSection:0]]];
-        dispatch_async(dispatch_get_main_queue(),^{
-            [weakSelf scrollViewDidScroll:weakSelf.collectionView];
-            [weakSelf scrollViewDidEndDecelerating:weakSelf.collectionView];
-        });
+        [weakSelf.collectionView performBatchUpdates:^{
+            [weakSelf.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:weakSelf.currentModelIndex inSection:0]]];
+        } completion:^(BOOL finished) {
+            if (weakSelf.modelArray.count == 1) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [weakSelf scrollViewDidScroll:weakSelf.collectionView];
+                    [weakSelf scrollViewDidEndDecelerating:weakSelf.collectionView];
+                });
+            }else {
+                [weakSelf scrollViewDidScroll:weakSelf.collectionView];
+                [weakSelf scrollViewDidEndDecelerating:weakSelf.collectionView];
+            }
+        }];
         [weakSelf.bottomView deleteModel:weakSelf.currentModel];
         if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             weakSelf.bottomPageControl.numberOfPages = weakSelf.modelArray.count;
@@ -764,8 +779,8 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)setupDarkBtnAlpha:(CGFloat)alpha {
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
-        self.darkDeleteBtn.alpha = alpha;
-        self.darkCancelBtn.alpha = alpha;
+        self.darkDeleteView.alpha = alpha;
+        self.darkCancelView.alpha = alpha;
         self.bottomPageControl.alpha = alpha;
     }
 }
@@ -796,6 +811,7 @@ HX_PhotoEditViewControllerDelegate
             HXPhotoPreviewVideoViewCell *viewCell = (HXPhotoPreviewVideoViewCell *)cell;
             viewCell.bottomSliderView.alpha = 1;
             viewCell.bottomSliderView.hidden = NO;
+            viewCell.didAddBottomPageControl = self.modelArray.count <= 1 ? NO : self.didAddBottomPageControl;
         }
     }else {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewImageViewCell" forIndexPath:indexPath];
@@ -877,27 +893,27 @@ HX_PhotoEditViewControllerDelegate
             if (cell.previewContentView.videoView.playBtnDidPlay) {
                 cell.bottomSliderView.hidden = hidden;
             }
-            self.darkCancelBtn.hidden = hidden;
-            self.darkDeleteBtn.hidden = hidden;
+            self.darkCancelView.hidden = hidden;
+            self.darkDeleteView.hidden = hidden;
         }
         [UIView animateWithDuration:0.25 animations:^{
             if (cell.previewContentView.videoView.playBtnDidPlay) {
                 cell.bottomSliderView.alpha = !hidden;
             }
-            self.darkCancelBtn.alpha = !hidden;
-            self.darkDeleteBtn.alpha = !hidden;
+            self.darkCancelView.alpha = !hidden;
+            self.darkDeleteView.alpha = !hidden;
         } completion:^(BOOL finished) {
             if (cell.previewContentView.videoView.playBtnDidPlay) {
                 cell.bottomSliderView.hidden = hidden;
             }
-            self.darkCancelBtn.hidden = hidden;
-            self.darkDeleteBtn.hidden = hidden;
+            self.darkCancelView.hidden = hidden;
+            self.darkDeleteView.hidden = hidden;
         }];
     }else {
-        self.darkCancelBtn.alpha = !hidden;
-        self.darkCancelBtn.hidden = hidden;
-        self.darkDeleteBtn.alpha = !hidden;
-        self.darkDeleteBtn.hidden = hidden;
+        self.darkCancelView.alpha = !hidden;
+        self.darkCancelView.hidden = hidden;
+        self.darkDeleteView.alpha = !hidden;
+        self.darkDeleteView.hidden = hidden;
         if (cell.previewContentView.videoView.playBtnDidPlay) {
             cell.bottomSliderView.hidden = hidden;
             cell.bottomSliderView.alpha = !hidden;
@@ -946,7 +962,7 @@ HX_PhotoEditViewControllerDelegate
         if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
             self.titleLb.text = model.barTitle;
             self.subTitleLb.text = model.barSubTitle;
-        }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
+        }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
             self.subTitleLb.text = [NSString stringWithFormat:@"%@  %@",model.barTitle,model.barSubTitle];
         }
         self.selectBtn.selected = model.selected;
@@ -1015,14 +1031,14 @@ HX_PhotoEditViewControllerDelegate
         }
         CGFloat scale = difference / width;
         if (self.previewShowDeleteButton) {
-            self.darkDeleteBtn.hidden = NO;
-            if (self.darkDeleteBtn.alpha < 1) {
-                self.darkDeleteBtn.alpha = scale;
+            self.darkDeleteView.hidden = NO;
+            if (self.darkDeleteView.alpha < 1) {
+                self.darkDeleteView.alpha = scale;
             }
         }
-        self.darkCancelBtn.hidden = NO;
-        if (self.darkCancelBtn.alpha < 1) {
-            self.darkCancelBtn.alpha = scale;
+        self.darkCancelView.hidden = NO;
+        if (self.darkCancelView.alpha < 1) {
+            self.darkCancelView.alpha = scale;
         }
         if (nextModel.subType == HXPhotoModelMediaSubTypeVideo) {
             HXPhotoPreviewVideoViewCell *nextCell = (HXPhotoPreviewVideoViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:[self.modelArray indexOfObject:nextModel] inSection:0]];
@@ -1041,16 +1057,16 @@ HX_PhotoEditViewControllerDelegate
         if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark &&
             self.previewShowDeleteButton) {
             if (model.subType == HXPhotoModelMediaSubTypePhoto) {
-                self.darkDeleteBtn.alpha = 1;
+                self.darkDeleteView.alpha = 1;
             }else if (model.subType == HXPhotoModelMediaSubTypeVideo) {
                 if (model != self.currentModel) {
-                    self.darkDeleteBtn.alpha = 1;
+                    self.darkDeleteView.alpha = 1;
                 }
             }
-            if (self.darkDeleteBtn.alpha == 0.005f) {
-                self.darkDeleteBtn.hidden = YES;
+            if (self.darkDeleteView.alpha == 0.005f) {
+                self.darkDeleteView.hidden = YES;
             }else {
-                self.darkDeleteBtn.hidden = NO;
+                self.darkDeleteView.hidden = NO;
             }
         }
         self.currentModel = model;
@@ -1400,12 +1416,16 @@ HX_PhotoEditViewControllerDelegate
 }
 #pragma mark - < 懒加载 >
 - (UIPageControl *)bottomPageControl {
+    if (!self.showBottomPageControl) {
+        return nil;
+    }
     if (!_bottomPageControl) {
         _bottomPageControl = [[UIPageControl alloc] init];
         _bottomPageControl.currentPageIndicatorTintColor = [UIColor whiteColor];
         _bottomPageControl.pageIndicatorTintColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5f];
         _bottomPageControl.numberOfPages = self.modelArray.count;
         _bottomPageControl.enabled = NO;
+        _bottomPageControl.hidesForSinglePage = YES;
 #ifdef __IPHONE_14_0
         if (@available(iOS 14, *)) {
             _bottomPageControl.backgroundStyle = UIPageControlBackgroundStyleProminent;
@@ -1422,26 +1442,49 @@ HX_PhotoEditViewControllerDelegate
     }
     return _dismissTempTopView;
 }
+- (UIVisualEffectView *)creatBlurEffectView {
+    UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+    effectView.frame = CGRectMake(0, 0, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
+    effectView.layer.masksToBounds = YES;
+    effectView.layer.cornerRadius = HXDARKVIEWWIDTH / 2.f;
+    return effectView;
+}
+- (UIView *)darkDeleteView {
+    if (!_darkDeleteView) {
+        _darkDeleteView = [[UIView alloc] init];
+        UIVisualEffectView *effectView = [self creatBlurEffectView];
+        [_darkDeleteView addSubview:effectView];
+        [_darkDeleteView addSubview:self.darkDeleteBtn];
+        _darkDeleteView.alpha = 0;
+        _darkDeleteView.hidden = YES;
+    }
+    return _darkDeleteView;
+}
+- (UIView *)darkCancelView {
+    if (!_darkCancelView) {
+        _darkCancelView = [[UIView alloc] init];
+        UIVisualEffectView *effectView = [self creatBlurEffectView];
+        [_darkCancelView addSubview:effectView];
+        [_darkCancelView addSubview:self.darkCancelBtn];
+    }
+    return _darkCancelView;
+}
 - (UIButton *)darkCancelBtn {
     if (!_darkCancelBtn) {
         _darkCancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_darkCancelBtn setBackgroundImage:[UIImage hx_imageNamed:@"hx_faceu_cancel"] forState:UIControlStateNormal];
-        _darkCancelBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-        _darkCancelBtn.contentVerticalAlignment = UIControlContentVerticalAlignmentTop;
+        [_darkCancelBtn setImage:[UIImage hx_imageNamed:@"hx_preview_dark_close"] forState:UIControlStateNormal];
         [_darkCancelBtn addTarget:self action:@selector(cancelDismissClick) forControlEvents:UIControlEventTouchUpInside];
+        _darkCancelBtn.frame = CGRectMake(0, 0, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
     }
     return _darkCancelBtn;
 }
 - (UIButton *)darkDeleteBtn {
     if (!_darkDeleteBtn) {
         _darkDeleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        _darkDeleteBtn.alpha = 0;
-        _darkDeleteBtn.hidden = YES;
-        [_darkDeleteBtn setTitle:[NSBundle hx_localizedStringForKey:@"删除"] forState:UIControlStateNormal];
-        _darkDeleteBtn.titleLabel.font = [UIFont hx_boldPingFangOfSize:18];
-        _darkDeleteBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+        [_darkDeleteBtn setImage:[UIImage hx_imageNamed:@"hx_preview_dark_delete"] forState:UIControlStateNormal];
         [_darkDeleteBtn addTarget:self action:@selector(deleteClick) forControlEvents:UIControlEventTouchUpInside];
-        [_darkDeleteBtn setTitleShadowColor:[[UIColor blackColor] colorWithAlphaComponent:1.f] forState:UIControlStateNormal];
+        _darkDeleteBtn.frame = CGRectMake(0, 0, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
     }
     return _darkDeleteBtn;
 }

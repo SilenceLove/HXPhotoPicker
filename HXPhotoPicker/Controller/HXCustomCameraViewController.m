@@ -231,7 +231,11 @@ CLLocationManagerDelegate
     if (_previewImageView) {
         [UIView animateWithDuration:0.25 animations:^{
             self.previewImageView.alpha = 0;
-            self.effectView.effect = nil;
+            if (HX_IOS9Later) {
+                [self.effectView setEffect:nil];
+            }else {
+                self.effectView.alpha = 0;
+            }
         } completion:^(BOOL finished) {
             [self.effectView removeFromSuperview];
             [self.previewImageView removeFromSuperview];

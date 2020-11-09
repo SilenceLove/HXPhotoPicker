@@ -53,6 +53,16 @@
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView;
 
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+                                       previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                              showBottomPageControl:(BOOL)showBottomPageControl
+                                       currentIndex:(NSUInteger)currentIndex;
+
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+                                       previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                              showBottomPageControl:(BOOL)showBottomPageControl
+                                       currentIndex:(NSUInteger)currentIndex
+                                          photoView:(HXPhotoView * _Nullable)photoView;
 
 /// 跳转相机界面
 /// @param manager 照片管理者

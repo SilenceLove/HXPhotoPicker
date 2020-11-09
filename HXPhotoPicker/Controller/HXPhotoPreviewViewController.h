@@ -97,14 +97,17 @@ HXPhotoPreviewViewCell;
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) HXPhotoPreviewBottomView *bottomView;
 @property (strong, nonatomic) HXPhotoView *photoView;
-@property (assign, nonatomic) BOOL previewShowDeleteButton;
+/// 停止取消
 @property (assign, nonatomic) BOOL stopCancel;
-/**  预览大图时是否禁用手势返回  */
+/// 预览时显示删除按钮
+@property (assign, nonatomic) BOOL previewShowDeleteButton;
+/// 预览大图时是否禁用手势返回
 @property (assign, nonatomic) BOOL disableaPersentInteractiveTransition;
-/**  使用HXPhotoView预览大图时的风格样式  */
+/// 使用HXPhotoView预览大图时的风格样式
 @property (assign, nonatomic) HXPhotoViewPreViewShowStyle exteriorPreviewStyle;
-
-// 处理ios8 导航栏转场动画崩溃问题
+/// 预览时是否显示底部pageControl
+@property (assign, nonatomic) BOOL showBottomPageControl;
+/// 处理ios8 导航栏转场动画崩溃问题
 @property (strong, nonatomic) UIViewController *photoViewController;
 @property (copy, nonatomic) void (^ currentCellScrollViewDidScroll)(UIScrollView *scrollView);
 

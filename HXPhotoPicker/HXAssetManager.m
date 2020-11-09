@@ -22,7 +22,7 @@
                                usingBlock:(void (^)(PHAssetCollection *collection))enumerationBlock {
     PHFetchResult *smartAlbums = [self fetchSmartAlbumsWithOptions:options];
     PHFetchResult *userAlbums = [self fetchUserAlbumsWithOptions:options];
-    NSMutableArray *allAlbum = [NSMutableArray arrayWithObjects:smartAlbums, userAlbums, nil];
+    NSArray *allAlbum = [NSArray arrayWithObjects:smartAlbums, userAlbums, nil];
     for (PHFetchResult *result in allAlbum) {
         for (PHAssetCollection *collection in result) {
             if (![collection isKindOfClass:[PHAssetCollection class]]) continue;

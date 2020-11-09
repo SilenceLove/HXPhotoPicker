@@ -103,6 +103,21 @@
 
 - (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
                                        previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                              showBottomPageControl:(BOOL)showBottomPageControl
+                                       currentIndex:(NSUInteger)currentIndex {
+    [self hx_presentPreviewPhotoControllerWithManager:manager previewStyle:previewStyle showBottomPageControl:showBottomPageControl currentIndex:currentIndex photoView:nil];
+}
+
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+                                       previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                                       currentIndex:(NSUInteger)currentIndex
+                                          photoView:(HXPhotoView * _Nullable)photoView {
+    [self hx_presentPreviewPhotoControllerWithManager:manager previewStyle:previewStyle showBottomPageControl:YES currentIndex:currentIndex photoView:photoView];
+}
+
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+                                       previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
+                              showBottomPageControl:(BOOL)showBottomPageControl
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView {
     
@@ -121,6 +136,11 @@
         vc.currentModelIndex = 0;
     }else {
         vc.currentModelIndex = currentIndex;
+    }
+    if (photoView) {
+        vc.showBottomPageControl = photoView.previewShowDeleteButton;
+    }else {
+        vc.showBottomPageControl = showBottomPageControl;
     }
     vc.previewShowDeleteButton = photoView.previewShowDeleteButton;
     vc.photoView = photoView;
