@@ -25,7 +25,7 @@
 
 
 - (UIImage *)hx_cropInRect:(CGRect)rect;
-
+- (UIImage *)hx_roundClipingImage;
 - (UIImage *)hx_scaleToFillSize:(CGSize)size;
 - (UIImage *)hx_mergeimages:(NSArray <UIImage *>*)images;
 + (UIImage *)hx_mergeimages:(NSArray <UIImage *>*)images;

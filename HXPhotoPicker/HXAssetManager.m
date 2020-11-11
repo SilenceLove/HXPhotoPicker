@@ -18,8 +18,8 @@
 + (PHFetchResult<PHAssetCollection *> *)fetchUserAlbumsWithOptions:(PHFetchOptions * _Nullable)options {
     return [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAny options:options];
 }
-+ (void)enumerateAllAlbumsWithWithOptions:(PHFetchOptions * _Nullable)options
-                               usingBlock:(void (^)(PHAssetCollection *collection))enumerationBlock {
++ (void)enumerateAllAlbumsWithOptions:(PHFetchOptions * _Nullable)options
+                           usingBlock:(void (^)(PHAssetCollection *collection))enumerationBlock {
     PHFetchResult *smartAlbums = [self fetchSmartAlbumsWithOptions:options];
     PHFetchResult *userAlbums = [self fetchUserAlbumsWithOptions:options];
     NSArray *allAlbum = [NSArray arrayWithObjects:smartAlbums, userAlbums, nil];
@@ -38,9 +38,9 @@
         }
     }
 }
-+ (void)enumerateAllAlbumModelsWithWithOptions:(PHFetchOptions * _Nullable)options
-                                    usingBlock:(void (^)(HXAlbumModel *albumModel))enumerationBlock {
-    [self enumerateAllAlbumsWithWithOptions:nil usingBlock:^(PHAssetCollection *collection) {
++ (void)enumerateAllAlbumModelsWithOptions:(PHFetchOptions * _Nullable)options
+                                usingBlock:(void (^)(HXAlbumModel *albumModel))enumerationBlock {
+    [self enumerateAllAlbumsWithOptions:nil usingBlock:^(PHAssetCollection *collection) {
         HXAlbumModel *albumModel = [[HXAlbumModel alloc] initWithCollection:collection options:options];
         if (enumerationBlock) {
             enumerationBlock(albumModel);

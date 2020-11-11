@@ -59,6 +59,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditGridViewAspectRatioType) {
 @property (nonatomic, assign) CGColorRef maskColor;
 @property (nonatomic, weak, readonly) HXPhotoEditGridLayer *gridLayer;
 
+@property (nonatomic, assign) BOOL isRound;
 /** 长宽比例描述 */
 - (NSArray <NSString *>*)aspectRatioDescs;
 

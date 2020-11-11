@@ -14,6 +14,7 @@
 #import "UIImage+HXExtension.h"
 #import "HXPhotoEditImageView.h"
 #import "HXMECancelBlock.h"
+#import "HXPhotoEditConfiguration.h"
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -171,6 +172,12 @@ NSString *const kHXEditingViewData_clippingView = @"kHXEditingViewData_clippingV
 }
 - (void)setConfiguration:(HXPhotoEditConfiguration *)configuration {
     _configuration = configuration;
+    if (configuration.onlyCliping && configuration.aspectRatio == HXPhotoEditAspectRatioType_1x1) {
+        if (configuration.isRoundCliping) {
+            [self.imagePixel removeFromSuperview];
+        }
+        self.gridView.isRound = configuration.isRoundCliping;
+    }
     self.clippingView.configuration = configuration;
 }
 - (UIEdgeInsets)refer_clippingInsets {
@@ -707,6 +714,7 @@ NSString *const kHXEditingViewData_clippingView = @"kHXEditingViewData_clippingV
     
     NSInteger angle = labs(self.clippingView.angle);
     BOOL isHorizontal = self.clippingView.mirrorType == HXPhotoClippingViewMirrorType_Horizontal;
+    BOOL isRoundCliping = self.configuration.isRoundCliping;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         /** 创建方法 */
         UIImage *(^ClipEditImage)(UIImage *) = ^UIImage * (UIImage *image) {
@@ -714,6 +722,9 @@ NSString *const kHXEditingViewData_clippingView = @"kHXEditingViewData_clippingV
             @autoreleasepool {
                 /** 剪裁图片 */
                 returnedImage = [image hx_cropInRect:clipRect];
+                if (isRoundCliping) {
+                    returnedImage = [returnedImage hx_roundClipingImage];
+                }
                 if (rotate > 0 || isHorizontal) {
                     /** 调整角度 */
                     if (angle == 0 || angle == 360) {

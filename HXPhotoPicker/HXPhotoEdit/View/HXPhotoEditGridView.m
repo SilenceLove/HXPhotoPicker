@@ -84,6 +84,11 @@ const CGFloat HXControlWidth = 30.f;
     _maskColor = maskColor;
     self.gridMaskLayer.maskColor = maskColor;
 }
+- (void)setIsRound:(BOOL)isRound {
+    _isRound = isRound;
+    self.gridLayer.isRound = isRound;
+    self.gridMaskLayer.isRound = isRound;
+}
 - (void)layoutSubviews {
     [super layoutSubviews];
     

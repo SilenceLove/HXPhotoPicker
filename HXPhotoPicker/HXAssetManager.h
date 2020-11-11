@@ -23,12 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (PHAssetCollection *)fetchCameraRollAlbumWithOptions:(PHFetchOptions * _Nullable)options;
 
 /// 获取所有相册
-+ (void)enumerateAllAlbumsWithWithOptions:(PHFetchOptions * _Nullable)options
-                               usingBlock:(void (^)(PHAssetCollection *collection))enumerationBlock;
++ (void)enumerateAllAlbumsWithOptions:(PHFetchOptions * _Nullable)options
+                           usingBlock:(void (^)(PHAssetCollection *collection))enumerationBlock;
 
 /// 获取所有相册模型
-+ (void)enumerateAllAlbumModelsWithWithOptions:(PHFetchOptions * _Nullable)options
-                                    usingBlock:(void (^)(HXAlbumModel *albumModel))enumerationBlock;
++ (void)enumerateAllAlbumModelsWithOptions:(PHFetchOptions * _Nullable)options
+                                usingBlock:(void (^)(HXAlbumModel *albumModel))enumerationBlock;
 
 /// 是否相机胶卷
 + (BOOL)isCameraRollAlbum:(PHAssetCollection *)assetCollection;

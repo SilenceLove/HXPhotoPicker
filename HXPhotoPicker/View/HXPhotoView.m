@@ -1007,16 +1007,13 @@
         }
     }
     UIEdgeInsets insets = self.collectionView.contentInset;
-    CGFloat itemW = (self.hx_w - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
+    CGFloat itemW = (NSInteger)((self.hx_w - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount);
     if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal &&
         itemW > 20) {
         itemW -= 10;
     }
     if (itemW <= 0) {
         itemW = 100;
-    }
-    if (HX_Is_iPhoneXR) {
-        itemW = (NSInteger)itemW;
     }
     if (!HXPhotoViewCustomItemSize) {
         self.flowLayout.itemSize = CGSizeMake(itemW, itemW);

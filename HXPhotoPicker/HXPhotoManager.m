@@ -415,7 +415,7 @@
 
 - (void)getAllAlbumModelWithCompletion:(getAllAlbumListBlock)completion {
     NSMutableArray *albums = [NSMutableArray array];
-    [HXAssetManager enumerateAllAlbumModelsWithWithOptions:self.fetchAlbumOptions usingBlock:^(HXAlbumModel * _Nonnull albumModel) {
+    [HXAssetManager enumerateAllAlbumModelsWithOptions:self.fetchAlbumOptions usingBlock:^(HXAlbumModel * _Nonnull albumModel) {
         if (self.assetCollectionFilter &&
             self.assetCollectionFilter(albumModel.collection)) {
             return;
@@ -501,6 +501,7 @@
             photoModel.photoEdit = selectModel.photoEdit;
             photoModel.thumbPhoto = selectModel.thumbPhoto;
             photoModel.previewPhoto = selectModel.previewPhoto;
+            photoModel.videoURL = selectModel.videoURL;
             if (selectModel.subType == HXPhotoModelMediaSubTypePhoto) {
                 if (selectModel.type == HXPhotoModelMediaTypeCameraPhoto) {
                     [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:selectModel] withObject:photoModel];

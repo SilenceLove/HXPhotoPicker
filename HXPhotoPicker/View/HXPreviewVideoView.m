@@ -487,7 +487,10 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     if (!CGRectEqualToRect(self.playerLayer.frame, self.bounds)) {
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
         self.playerLayer.frame = self.bounds;
+        [CATransaction commit];
     }
     
     self.loadingView.hx_centerX = self.hx_w / 2;

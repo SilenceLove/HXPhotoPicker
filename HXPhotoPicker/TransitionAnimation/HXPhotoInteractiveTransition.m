@@ -27,6 +27,8 @@
 @property (assign, nonatomic) CGSize scrollViewContentSize;
 @property (assign, nonatomic) CGPoint scrollViewContentOffset;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
+
+@property (assign, nonatomic) BOOL beginInterPercentCompletion;
 @end
 
 @implementation HXPhotoInteractiveTransition
@@ -111,6 +113,7 @@
     return scale;
 }
 - (void)panGestureBegan:(UIPanGestureRecognizer *)panGesture {
+    self.beginInterPercentCompletion = NO;
     HXPhotoPreviewViewController *previewVC = (HXPhotoPreviewViewController *)self.vc;
     [previewVC setStopCancel:YES];
     self.beginX = [panGesture locationInView:panGesture.view].x;
@@ -119,7 +122,7 @@
     [self.vc.navigationController popViewControllerAnimated:YES];
 }
 - (void)panGestureChanged:(UIPanGestureRecognizer *)panGesture {
-    if (self.interation) {
+    if (self.interation && self.beginInterPercentCompletion) {
         CGFloat scale = [self panGestureScale:panGesture];
         if (scale < 0.f) {
             scale = 0.f;
@@ -153,6 +156,7 @@
             [self interPercentFinish];
         }
     }
+    self.beginInterPercentCompletion = NO;
 }
 - (void)panGestureOther:(UIPanGestureRecognizer *)panGesture {
     self.vc.view.userInteractionEnabled = YES;
@@ -162,7 +166,7 @@
         [self interPercentCancel];
     }
 }
-- (void)beginInterPercent{
+- (void)beginInterPercent {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
     
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -174,7 +178,9 @@
     HXPhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     HXPhotoViewCell *toCell = [toVC currentPreviewCell:model];
     self.fromCell = fromCell;
-    
+    if (fromCell.previewContentView.frame.origin.x != 0) {
+        NSSLog(@"11111");
+    }
     self.scrollViewZoomScale = [self.fromCell getScrollViewZoomScale];
     self.scrollViewContentSize = [self.fromCell getScrollViewContentSize];
     self.scrollViewContentOffset = [self.fromCell getScrollViewContentOffset];
@@ -184,7 +190,10 @@
     self.contentView = fromCell.previewContentView;
     self.imageInitialFrame = fromCell.previewContentView.frame;
     tempImageViewFrame = [fromCell.previewContentView convertRect:fromCell.previewContentView.bounds toView:containerView];
-    
+    if (tempImageViewFrame.origin.x != 0) {
+        NSSLog(@"11111");
+    }
+    NSSLog(@"%@", NSStringFromCGRect(tempImageViewFrame));
     if (!toCell) {
         [toVC scrollToModel:model];
         toCell = [toVC currentPreviewCell:model];
@@ -211,7 +220,6 @@
     
     [fromCell resetScale:NO];
     [fromCell refreshImageSize];
-    
     self.contentView.frame = tempImageViewFrame;
     self.transitionImgViewCenter = self.contentView.center;
     
@@ -231,25 +239,7 @@
             [toVC.navigationController.navigationBar.layer removeAllAnimations];
             // 找到动画异常的视图，然后移除layer动画 ！！！！！
             // 一层一层的慢慢的找,把每个有动画的全部移除
-            for (UIView *navBarView in toVC.navigationController.navigationBar.subviews) {
-                [navBarView.layer removeAllAnimations];
-                for (UIView *navBarSubView in navBarView.subviews) {
-                    [navBarSubView.layer removeAllAnimations];
-                    for (UIView *backView in navBarSubView.subviews) {
-                        [backView.layer removeAllAnimations];
-                        for (UIView *backSubView in backView.subviews) {
-                            [backSubView.layer removeAllAnimations];
-                            for (UIView *backSSubView in backSubView.subviews) {
-                                [backSSubView.layer removeAllAnimations];
-                                for (CALayer *subLayer in backSSubView.layer.sublayers) {
-                                    // !!!!!!!!
-                                    [subLayer removeAllAnimations];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            [self removeAllAnimationsForView:toVC.navigationController.navigationBar];
             [toVC.navigationController setNavigationBarHidden:NO animated:YES];
         }else {
             [toVC.navigationController setNavigationBarHidden:NO];
@@ -272,6 +262,28 @@
     self.tempCell = toCell;
     if (self.contentView.model.subType == HXPhotoModelMediaSubTypeVideo) {
         [self.contentView.videoView hideOtherView:YES];
+    }
+    self.beginInterPercentCompletion = YES;
+}
+- (void)removeAllAnimationsForView:(UIView *)view {
+    for (UIView *navBarView in view.subviews) {
+        [navBarView.layer removeAllAnimations];
+        for (UIView *navBarSubView in navBarView.subviews) {
+            [navBarSubView.layer removeAllAnimations];
+            for (UIView *backView in navBarSubView.subviews) {
+                [backView.layer removeAllAnimations];
+                for (UIView *backSubView in backView.subviews) {
+                    [backSubView.layer removeAllAnimations];
+                    for (UIView *backSSubView in backSubView.subviews) {
+                        [backSSubView.layer removeAllAnimations];
+                        for (CALayer *subLayer in backSSubView.layer.sublayers) {
+                            // !!!!!!!!
+                            [subLayer removeAllAnimations];
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 - (void)updateInterPercent:(CGFloat)scale{

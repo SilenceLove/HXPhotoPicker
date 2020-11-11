@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** 遮罩颜色 */
 @property (nonatomic, assign) CGColorRef maskColor;
+@property (nonatomic, assign) BOOL isRound;
 /** 遮罩范围 */
 @property (nonatomic, assign, setter=setMaskRect:) CGRect maskRect;
 - (void)setMaskRect:(CGRect)maskRect animated:(BOOL)animated;

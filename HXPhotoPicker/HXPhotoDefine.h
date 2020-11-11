@@ -13,7 +13,7 @@
 #import "NSBundle+HXPhotoPicker.h"
 
 /// 当前版本
-#define HXVersion @"3.1.4"
+#define HXVersion @"3.1.5"
 
 // 日志输出
 #ifdef DEBUG
@@ -134,8 +134,6 @@
 #define HXWeakSelf __weak typeof(self) weakSelf = self;
 // 强引用
 #define HXStrongSelf __strong typeof(weakSelf) strongSelf = weakSelf;
-
-
 
 #pragma mark - Hash
 

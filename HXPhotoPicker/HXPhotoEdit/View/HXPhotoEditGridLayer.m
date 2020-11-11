@@ -60,6 +60,16 @@ NSString *const hxGridLayerAnimtionKey = @"hxGridLayerAnimtionKey";
     }
     return layer;
 }
+- (void)setIsRound:(BOOL)isRound {
+    _isRound = isRound;
+    if (isRound) {
+        [self.topLeftCornerLayer removeFromSuperlayer];
+        [self.topRightCornerLayer removeFromSuperlayer];
+        [self.bottomLeftCornerLayer removeFromSuperlayer];
+        [self.bottomRightCornerLayer removeFromSuperlayer];
+        [self.middleLineLayer removeFromSuperlayer];
+    }
+}
 - (void)setGridRect:(CGRect)gridRect {
     [self setGridRect:gridRect animated:NO];
 }
@@ -75,11 +85,13 @@ NSString *const hxGridLayerAnimtionKey = @"hxGridLayerAnimtionKey";
     
     CGPathRef path = [self drawGrid];
     if (animated) {
-        [self setMiddleLine];
-        [self setAllCorner:UIRectCornerTopLeft];
-        [self setAllCorner:UIRectCornerTopRight];
-        [self setAllCorner:UIRectCornerBottomLeft];
-        [self setAllCorner:UIRectCornerBottomRight];
+        if (!self.isRound) {
+            [self setMiddleLine];
+            [self setAllCorner:UIRectCornerTopLeft];
+            [self setAllCorner:UIRectCornerTopRight];
+            [self setAllCorner:UIRectCornerBottomLeft];
+            [self setAllCorner:UIRectCornerBottomRight];
+        }
         CABasicAnimation *animate = [CABasicAnimation animationWithKeyPath:@"path"];
         animate.duration = 0.25f;
         animate.fromValue = (__bridge id _Nullable)(self.path);
@@ -90,11 +102,13 @@ NSString *const hxGridLayerAnimtionKey = @"hxGridLayerAnimtionKey";
         [self addAnimation:animate forKey:hxGridLayerAnimtionKey];
         
     } else {
-        self.topLeftCornerLayer.path = [self setAllCornerPath:UIRectCornerTopLeft].CGPath;
-        self.topRightCornerLayer.path = [self setAllCornerPath:UIRectCornerTopRight].CGPath;
-        self.bottomLeftCornerLayer.path = [self setAllCornerPath:UIRectCornerBottomLeft].CGPath;
-        self.bottomRightCornerLayer.path = [self setAllCornerPath:UIRectCornerBottomRight].CGPath;
-        self.middleLineLayer.path = [self setMiddleLinePath].CGPath;
+        if (!self.isRound) {
+            self.topLeftCornerLayer.path = [self setAllCornerPath:UIRectCornerTopLeft].CGPath;
+            self.topRightCornerLayer.path = [self setAllCornerPath:UIRectCornerTopRight].CGPath;
+            self.bottomLeftCornerLayer.path = [self setAllCornerPath:UIRectCornerBottomLeft].CGPath;
+            self.bottomRightCornerLayer.path = [self setAllCornerPath:UIRectCornerBottomRight].CGPath;
+            self.middleLineLayer.path = [self setMiddleLinePath].CGPath;
+        }
         self.path = path;
         if (self.callback) {
             self.callback(YES);
@@ -205,7 +219,12 @@ NSString *const hxGridLayerAnimtionKey = @"hxGridLayerAnimtionKey";
     self.lineWidth = 1;
 //    self.borderWidth = 1.5f;
     CGRect rct = self.gridRect;
-    UIBezierPath *path = [UIBezierPath bezierPathWithRect:rct];
+    UIBezierPath *path;
+    if (self.isRound) {
+        path = [UIBezierPath bezierPathWithRoundedRect:rct cornerRadius:rct.size.width / 2.f];
+    }else {
+        path = [UIBezierPath bezierPathWithRect:rct];
+    }
     return path.CGPath;
 }
 - (void)layoutSublayers {

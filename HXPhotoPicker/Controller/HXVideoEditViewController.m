@@ -201,11 +201,7 @@ HXVideoEditBottomViewDelegate
                 }
             } downloadFailure:^(NSError * _Nullable error, NSURL * _Nullable videoURL) {
                 [weakSelf.view hx_handleLoading];
-                hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"获取视频失败!"], nil, [NSBundle hx_localizedStringForKey:@"返回"], [NSBundle hx_localizedStringForKey:@"获取"], ^{
-                    [weakSelf videoEditBottomViewDidCancelClick:nil];
-                }, ^{
-                    [weakSelf getVideo];
-                });
+                [weakSelf showErrorAlert];
             }];
             return;
         }
@@ -225,18 +221,22 @@ HXVideoEditBottomViewDelegate
             }
         } failed:^(NSDictionary *info, HXPhotoModel *model) {
             [weakSelf.view hx_handleLoading];
-            hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"获取视频失败!"], nil, [NSBundle hx_localizedStringForKey:@"返回"], [NSBundle hx_localizedStringForKey:@"获取"], ^{
-                [weakSelf videoEditBottomViewDidCancelClick:nil];
-            }, ^{
-                [weakSelf getVideo];
-            });
+            [weakSelf showErrorAlert];
         }];
     }
+}
+- (void)showErrorAlert {
+    HXWeakSelf
+    hx_showAlert(weakSelf, [NSBundle hx_localizedStringForKey:@"获取视频失败!"], nil, [NSBundle hx_localizedStringForKey:@"返回"], [NSBundle hx_localizedStringForKey:@"获取"], ^{
+        [weakSelf videoEditBottomViewDidCancelClick:nil];
+    }, ^{
+        [weakSelf getVideo];
+    });
 }
 - (void)showCancelAlert {
     if (self.transitionCompletion && !self.requestComplete) {
         HXWeakSelf
-        hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"确定取消吗?"], nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"继续"], ^{
+        hx_showAlert(self, [NSBundle hx_localizedStringForKey:@"是否取消吗?"], nil, [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"继续"], ^{
             [weakSelf videoEditBottomViewDidCancelClick:nil];
         }, nil);
     }

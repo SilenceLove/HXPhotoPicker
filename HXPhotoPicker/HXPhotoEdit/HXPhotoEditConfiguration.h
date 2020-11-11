@@ -77,6 +77,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditAspectRatio) {
 /// 设置自定义比例必须设置 aspectRatio = HXPhotoEditAspectRatioType_Custom，否则无效
 @property (assign, nonatomic) CGSize customAspectRatio;
 
+/// 圆形裁剪框，只要裁剪功能 并且 固定裁剪比例为 HXPhotoEditAspectRatioType_1x1 时有效
+@property (assign, nonatomic) BOOL isRoundCliping;
 @end
 
 NS_ASSUME_NONNULL_END

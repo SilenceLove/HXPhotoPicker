@@ -378,7 +378,6 @@
         image = [image hx_scaleToFillSize:imageSize];
     }
     self.editImage = image;
-    [self.view hx_handleLoading];
     [self loadImageCompletion];
 }
 - (void)loadImageCompletion {
@@ -393,6 +392,7 @@
                 self.clippingToolBar.alpha = 1;
             }];
         }
+        [self.view hx_handleLoading];
     }
 }
 - (CGRect)getImageFrame {

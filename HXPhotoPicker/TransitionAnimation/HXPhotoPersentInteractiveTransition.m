@@ -31,7 +31,7 @@
 @property (assign, nonatomic) CGPoint scrollViewContentOffset;
 @property (assign, nonatomic) CGRect imageInitialFrame;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGesture;
-
+@property (assign, nonatomic) BOOL beginInterPercentCompletion;
 @end
 
 @implementation HXPhotoPersentInteractiveTransition
@@ -108,11 +108,12 @@
             [(HXPhotoPreviewViewController *)self.vc setStopCancel:YES];
             self.beginX = [gestureRecognizer locationInView:gestureRecognizer.view].x;
             self.beginY = [gestureRecognizer locationInView:gestureRecognizer.view].y;
+            self.beginInterPercentCompletion = NO;
             self.interation = YES;
             [self.vc dismissViewControllerAnimated:YES completion:nil];
         } break;
         case UIGestureRecognizerStateChanged:
-            if (self.interation) {
+            if (self.interation && self.beginInterPercentCompletion) {
                 if (scale < 0.f) {
                     scale = 0.f;
                 }
@@ -141,6 +142,7 @@
                     [self finishInteractiveTransition];
                     [self interPercentFinish];
                 }
+                self.beginInterPercentCompletion = NO;
             }
             break;
         default:
@@ -148,6 +150,7 @@
                 self.interation = NO;
                 [self cancelInteractiveTransition];
                 [self interPercentCancel];
+                self.beginInterPercentCompletion = NO;
             }
             break;
     }
@@ -228,6 +231,7 @@
     if (self.contentView.model.subType == HXPhotoModelMediaSubTypeVideo) {
         [self.contentView.videoView hideOtherView:YES];
     }
+    self.beginInterPercentCompletion = YES;
 }
 - (void)updateInterPercent:(CGFloat)scale{
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[self.transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
