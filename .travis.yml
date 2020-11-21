@@ -6,7 +6,7 @@ before_install:
     
 script:
     - set -o pipefail
-    - xcodebuild clean -workspace HXPhotoPicker-Demo.xcworkspace -scheme "HXPhotoPicker" -sdk iphonesimulator build | xcpretty
+    - xcodebuild clean -workspace HXPhotoPickerExample.xcworkspace -scheme "HXPhotoPickerExample" -sdk iphonesimulator build | xcpretty
 
 after_success:
     - sleep 4

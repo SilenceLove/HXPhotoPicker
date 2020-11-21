@@ -1,6 +1,6 @@
 //
 //  HXPhotoPreviewViewCell.m
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 2019/12/5.
 //  Copyright © 2019 洪欣. All rights reserved.
@@ -216,8 +216,6 @@
 - (UIScrollView *)scrollView {
     if (!_scrollView) {
     _scrollView = [[UIScrollView alloc] init];
-    _scrollView.showsHorizontalScrollIndicator = NO;
-    _scrollView.showsVerticalScrollIndicator = NO;
     _scrollView.bouncesZoom = YES;
     _scrollView.minimumZoomScale = 1;
     _scrollView.multipleTouchEnabled = YES;

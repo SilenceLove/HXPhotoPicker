@@ -1,0 +1,22 @@
+"无法访问相册中照片" = "無法訪問相册中照片";
+"当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。" = "當前無照片存取權限，建議前往系統設置，\n允許訪問「照片」中的「所有照片」。";
+"前往系统设置" = "前往系統設置";
+"取消" = "取消";
+"相册" = "相册";
+
+
+
+"HXAlbumCameraRoll" = "所有照片";
+"HXAlbumPanoramas" = "全景照片";
+"HXAlbumVideos" = "視頻";
+"HXAlbumFavorites" = "個人收藏";
+"HXAlbumTimelapses" = "延時攝影";
+"HXAlbumRecents" = "最近項目";
+"HXAlbumRecentlyAdded" = "最近添加";
+"HXAlbumBursts" = "連拍快照";
+"HXAlbumSlomoVideos" = "慢動作";
+"HXAlbumSelfPortraits" = "自拍";
+"HXAlbumScreenshots" = "屏幕快照";
+"HXAlbumDepthEffect" = "人像";
+"HXAlbumLivePhotos" = "實況照片";
+"HXAlbumAnimated" = "動圖";

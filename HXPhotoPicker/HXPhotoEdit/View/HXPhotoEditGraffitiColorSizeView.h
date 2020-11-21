@@ -1,6 +1,6 @@
 //
 //  HXPhotoEditGraffitiColorSizeView.h
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 2020/8/14.
 //  Copyright © 2020 洪欣. All rights reserved.

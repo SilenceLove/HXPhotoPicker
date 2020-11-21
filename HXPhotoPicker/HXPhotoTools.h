@@ -1,6 +1,6 @@
 //
 //  HXPhotoTools.h
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 17/2/8.
 //  Copyright © 2017年 洪欣. All rights reserved.
@@ -142,4 +142,6 @@
 
 /// 删除下载的网络视频缓存文件
 + (void)deleteNetWorkVideoFile;
+
++ (CGFloat)getStatusBarHeight;
 @end

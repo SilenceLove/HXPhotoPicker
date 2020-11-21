@@ -1,6 +1,6 @@
 //
 //  HXPhoto3DTouchViewController.h
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 2017/9/25.
 //  Copyright © 2017年 洪欣. All rights reserved.

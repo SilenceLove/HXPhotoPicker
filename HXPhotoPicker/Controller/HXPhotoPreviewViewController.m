@@ -1,6 +1,6 @@
 //
 //  HXPhotoPreviewViewController.m
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 2017/10/14.
 //  Copyright © 2017年 洪欣. All rights reserved.
@@ -723,7 +723,7 @@ HX_PhotoEditViewControllerDelegate
 }
 - (void)changeStatusBarWithHidden:(BOOL)hidden {
     self.statusBarShouldBeHidden = hidden;
-    [self preferredStatusBarUpdateAnimation];
+//    [self preferredStatusBarUpdateAnimation];
 }
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration {
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {

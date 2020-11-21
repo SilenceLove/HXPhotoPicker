@@ -15,6 +15,7 @@
 #import "HXPhotoEditConfiguration.h"
 #import "NSBundle+HXPhotoPicker.h"
 #import "UIFont+HXExtension.h"
+#import "HXPhotoTools.h"
 
 #define HXEditTextBlankWidth 22
 #define HXEditTextRadius 8.f

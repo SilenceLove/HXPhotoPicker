@@ -1,6 +1,6 @@
 //
 //  HXPhotoViewPresentTransition.h
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 2017/10/28.
 //  Copyright © 2017年 洪欣. All rights reserved.

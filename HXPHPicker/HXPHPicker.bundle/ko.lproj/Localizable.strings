@@ -1,0 +1,22 @@
+"无法访问相册中照片" = "앨범 사진 에 접근 할 수 없습니다.";
+"当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。" = "현재 사진 접근 권한 이 없습니다.시스템 설정 으로 가기 권장，\n사진 속 의 모든 사진 에 접근 할 수 있 도록 합 니 다.";
+"前往系统设置" = "설치";
+"取消" = "취소 하 다";
+"相册" = "앨범";
+
+
+"HXAlbumCameraRoll" = "모든 사진";
+"HXAlbumPanoramas" = "파노라마 사진";
+"HXAlbumVideos" = "동영상";
+"HXAlbumFavorites" = "개인 소장";
+"HXAlbumTimelapses" = "시간 지연 촬영";
+"HXAlbumRecents" = "최근 프로젝트";
+"HXAlbumRecentlyAdded" = "최근에 추가";
+"HXAlbumBursts" = "스냅을 연속으로 찍다";
+"HXAlbumSlomoVideos" = "느린 동작";
+"HXAlbumSelfPortraits" = "셀 카";
+"HXAlbumScreenshots" = "화면 스냅";
+"HXAlbumDepthEffect" = "콜 롬";
+"HXAlbumLivePhotos" = "실황 사진";
+"HXAlbumAnimated" = "발생시키다 투";
+

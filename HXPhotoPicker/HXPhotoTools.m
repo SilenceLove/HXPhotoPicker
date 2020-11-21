@@ -1,6 +1,6 @@
 //
 //  HXPhotoTools.m
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 17/2/8.
 //  Copyright © 2017年 洪欣. All rights reserved.
@@ -1014,5 +1014,18 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 /// 删除下载的网络视频缓存文件
 + (void)deleteNetWorkVideoFile {
     [[NSFileManager defaultManager] removeItemAtPath:HXPhotoPickerCachesDownloadPath error:nil];
+}
+    
+    
++ (CGFloat)getStatusBarHeight {
+    CGFloat statusBarHeight = 0;
+    if (@available(iOS 13.0, *)) {
+        UIStatusBarManager *statusBarManager = [UIApplication sharedApplication].windows.firstObject.windowScene.statusBarManager;
+        statusBarHeight = statusBarManager.statusBarFrame.size.height;
+    }
+    else {
+        statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+    }
+    return statusBarHeight;
 }
 @end

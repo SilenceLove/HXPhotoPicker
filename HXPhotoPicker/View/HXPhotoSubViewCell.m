@@ -1,6 +1,6 @@
 //
 //  HXPhotoSubViewCell.m
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 17/2/17.
 //  Copyright © 2017年 洪欣. All rights reserved.

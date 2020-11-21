@@ -1,6 +1,6 @@
 //
 //  HXAssetManager.m
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 2020/11/5.
 //  Copyright © 2020 洪欣. All rights reserved.

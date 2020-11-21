@@ -1,6 +1,6 @@
 //
 //  HXPhotoInteractiveTransition.m
-//  HXPhotoPicker-Demo
+//  HXPhotoPickerExample
 //
 //  Created by 洪欣 on 2017/10/28.
 //  Copyright © 2017年 洪欣. All rights reserved.
@@ -178,9 +178,6 @@
     HXPhotoPreviewViewCell *fromCell = [fromVC currentPreviewCell:model];
     HXPhotoViewCell *toCell = [toVC currentPreviewCell:model];
     self.fromCell = fromCell;
-    if (fromCell.previewContentView.frame.origin.x != 0) {
-        NSSLog(@"11111");
-    }
     self.scrollViewZoomScale = [self.fromCell getScrollViewZoomScale];
     self.scrollViewContentSize = [self.fromCell getScrollViewContentSize];
     self.scrollViewContentOffset = [self.fromCell getScrollViewContentOffset];
@@ -190,10 +187,6 @@
     self.contentView = fromCell.previewContentView;
     self.imageInitialFrame = fromCell.previewContentView.frame;
     tempImageViewFrame = [fromCell.previewContentView convertRect:fromCell.previewContentView.bounds toView:containerView];
-    if (tempImageViewFrame.origin.x != 0) {
-        NSSLog(@"11111");
-    }
-    NSSLog(@"%@", NSStringFromCGRect(tempImageViewFrame));
     if (!toCell) {
         [toVC scrollToModel:model];
         toCell = [toVC currentPreviewCell:model];
