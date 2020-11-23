@@ -9,7 +9,6 @@
 #import "HXPhotoViewPresentTransition.h"
 #import "HXPhotoView.h"
 #import "HXPhotoSubViewCell.h"
-#import "HXPhotoView.h"
 #import "HXPhotoPreviewViewController.h"
 #import "HXPhotoPreviewBottomView.h"
 #import "HXPhotoEdit.h"
@@ -17,10 +16,11 @@
 @interface HXPhotoViewPresentTransition ()
 @property (strong, nonatomic) HXPhotoView *photoView ;
 @property (assign, nonatomic) HXPhotoViewPresentTransitionType type;
-@property (weak , nonatomic) UIImageView *tempView;
+@property (weak  , nonatomic) UIImageView *tempView;
 @end
 
 @implementation HXPhotoViewPresentTransition
+
 + (instancetype)transitionWithTransitionType:(HXPhotoViewPresentTransitionType)type photoView:(HXPhotoView *)photoView {
     return [[self alloc] initWithTransitionType:type photoView:photoView];
 }
@@ -33,10 +33,11 @@
     }
     return self;
 }
+
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext{
     if (self.type == HXPhotoViewPresentTransitionTypePresent) {
         return 0.45f;
-    }else {
+    } else {
         return 0.25f;
     }
 }
@@ -46,13 +47,14 @@
         case HXPhotoViewPresentTransitionTypePresent:
             [self presentAnimation:transitionContext];
             break;
-            
         case HXPhotoViewPresentTransitionTypeDismiss:
             [self dismissAnimation:transitionContext];
             break;
     }
 }
-- (void)presentAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(UIViewController *)fromVC ToVC:(HXPhotoPreviewViewController *)toVC cell:(HXPhotoSubViewCell *)cell{
+
+- (void)presentAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(UIViewController *)fromVC ToVC:(HXPhotoPreviewViewController *)toVC cell:(HXPhotoSubViewCell *)cell {
+    
     if ((!image || (model.networkPhotoUrl && (model.downloadError || !model.downloadComplete))) &&
         toVC.manager.configuration.customPreviewFromImage) {
         image = toVC.manager.configuration.customPreviewFromImage(toVC.currentModelIndex);
@@ -64,9 +66,8 @@
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
     tempView.frame = [cell.imageView convertRect:cell.imageView.bounds toView:containerView];
-    if (!image) {
-        tempView.image = cell.imageView.image;
-    }
+    if (!image) { tempView.image = cell.imageView.image; }
+    
     if (!cell) {
         if (toVC.manager.configuration.customPreviewFromView) {
             cell = (id)toVC.manager.configuration.customPreviewFromView(toVC.currentModelIndex);
@@ -87,9 +88,7 @@
         toVC.collectionView.hidden = NO;
         toVC.collectionView.alpha = 0;
     }
-    model.endImageSize = CGSizeZero;
-    CGFloat imgWidht = model.endImageSize.width;
-    CGFloat imgHeight = model.endImageSize.height;
+
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
     CGFloat height = [UIScreen mainScreen].bounds.size.height;
     
@@ -101,15 +100,26 @@
     [UIView animateWithDuration:0.2 animations:^{
         toVC.view.backgroundColor = [tempColor colorWithAlphaComponent:1.f];
         [toVC setupDarkBtnAlpha:1.f];
-        if (!cell) {
-            toVC.collectionView.alpha = 1;
-        }
+        if (!cell) { toVC.collectionView.alpha = 1; }
     }];
+    
+    CGSize to = [UIImage hx_scaleImageSizeBySize:model.endImageSize targetSize:containerView.bounds.size isBoth:false];
+    CGRect toFrame = (CGRect){ CGPointMake(width / 2.f - to.width / 2.f, height / 2.f - to.height / 2.f) , to};
+
+    // 添加圆角动画
+    if (cell.layer.cornerRadius > 0) {
+        UIView *maskView = [[UIView alloc] initWithFrame:tempView.bounds];
+        maskView.backgroundColor = [UIColor redColor];
+        maskView.layer.cornerRadius = CGRectGetWidth(tempView.bounds) / 2.f;
+        maskView.layer.masksToBounds = true;
+        tempView.maskView = maskView;
+    }
+    
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.75f initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        if (imgHeight <= height) {
-            tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
-        }else {
-            tempView.frame = CGRectMake(0, 0, imgWidht, imgHeight);
+        tempView.frame = toFrame;
+        if (tempView.maskView) {
+            tempView.maskView.layer.cornerRadius = 0.f;
+            tempView.maskView.frame = (CGRect){ CGPointZero, toFrame.size };
         }
     } completion:^(BOOL finished) {
         cell.hidden = NO;
@@ -132,12 +142,12 @@
     if ([fromVC isKindOfClass:[UINavigationController class]]) {
         UINavigationController *nav = (UINavigationController *)fromVC;
         fromVC = nav.viewControllers.lastObject;
-    }else if ([fromVC isKindOfClass:[UITabBarController class]]) {
+    } else if ([fromVC isKindOfClass:[UITabBarController class]]) {
         UITabBarController *tabBar = (UITabBarController *)fromVC;
         if ([tabBar.selectedViewController isKindOfClass:[UINavigationController class]]) {
             UINavigationController *nav = (UINavigationController *)tabBar.selectedViewController;
             fromVC = nav.viewControllers.lastObject;
-        }else {
+        } else {
             fromVC = tabBar.selectedViewController;
         }
     }
@@ -172,7 +182,7 @@
     if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
         UIImage *image = model.photoEdit ? model.photoEdit.editPosterImage : model.thumbPhoto;
         tempView = [[UIImageView alloc] initWithImage:image];
-    }else {
+    } else {
         tempView = [[UIImageView alloc] initWithImage:fromCell.previewContentView.image];
     }
     UICollectionView *collectionView = (UICollectionView *)self.photoView.collectionView;
@@ -183,7 +193,6 @@
     }
     tempView.clipsToBounds = YES;
     tempView.contentMode = UIViewContentModeScaleAspectFill;
-    
     
     UIView *containerView = [transitionContext containerView];
     tempView.frame = [fromCell.previewContentView convertRect:fromCell.previewContentView.bounds toView:containerView];
@@ -197,13 +206,27 @@
     cell.hidden = YES;
     fromVC.collectionView.hidden = YES;
     
+    // 添加圆角动画
+    if (cell.layer.cornerRadius > 0) {
+        UIView *maskView = [[UIView alloc] initWithFrame:tempView.bounds];
+        maskView.backgroundColor = [UIColor redColor];
+        maskView.layer.cornerRadius = 0.f;
+        maskView.layer.masksToBounds = true;
+        tempView.maskView = maskView;
+    }
+    
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
         fromVC.view.alpha = 0;
         if (cell) {
             tempView.frame = rect;
-        }else {
+        } else {
             tempView.alpha = 0;
             tempView.transform = CGAffineTransformMakeScale(1.3, 1.3);
+        }
+        
+        if (tempView.maskView) {
+            tempView.maskView.layer.cornerRadius = cell.layer.cornerRadius;
+            tempView.maskView.frame = (CGRect){ CGPointZero, rect.size };
         }
     } completion:^(BOOL finished) {
         cell.hidden = NO;
@@ -211,4 +234,5 @@
         [transitionContext completeTransition:YES];
     }];
 }
+
 @end
