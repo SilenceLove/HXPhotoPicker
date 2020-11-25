@@ -146,7 +146,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
                 self.orientationDidChange = false
             }
         }
-        bottomView.frame = CGRect(x: 0, y: view.hx_height - UIDevice.hx_bottomMargin() - 50, width: view.hx_width, height: 50 + UIDevice.hx_bottomMargin())
+        bottomView.frame = CGRect(x: 0, y: view.hx_height - UIDevice.current.hx_bottomMargin - 50, width: view.hx_width, height: 50 + UIDevice.current.hx_bottomMargin)
     }
     
     override func viewDidLoad() {
@@ -278,6 +278,15 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         return UIStatusBarAnimation.fade
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                
+            }
+        }
     }
     
     deinit {

@@ -10,6 +10,10 @@ import UIKit
 
 extension String {
     
+//    var hx_localized: String {
+//        return Bundle.hx_localizedString(for: self)
+//    }
+    
     func hx_localized() -> String {
         return Bundle.hx_localizedString(for: self)
     }

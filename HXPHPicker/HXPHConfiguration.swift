@@ -37,6 +37,9 @@ class HXPHConfiguration: NSObject {
     /// 相册展示类型
     var albumShowMode : HXAlbumShowMode = HXAlbumShowMode.normal
     
+    /// 外观类型
+    var appearanceType: HXPHAppearanceType = HXPHAppearanceType.varied
+    
     /// 选择模式
     var selectMode : HXPHAssetSelectMode = HXPHAssetSelectMode.multiple
     
@@ -83,7 +86,7 @@ class HXPHAlbumListConfiguration: NSObject {
     
     /// 当相册里没有资源时的相册名称
     lazy var emptyAlbumName: String = {
-        return "所有照片"
+        return "所有照片".hx_localized()
     }()
     
     /// 当相册里没有资源时的封面图片名
@@ -194,6 +197,7 @@ class HXPHPreviewViewConfiguration: NSObject {
     lazy var bottomView: HXPHPickerBottomViewConfiguration = {
         let config = HXPHPickerBottomViewConfiguration.init()
         config.previewButtonHidden = true
+        config.editButtonHidden = false
         return config
     }()
 }
@@ -272,6 +276,17 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     
     /// 未选择资源时是否禁用完成按钮
     var disableFinishButtonWhenNotSelected: Bool = false
+    
+    /// 隐藏编辑按钮
+    var editButtonHidden: Bool = true
+    
+    /// 编辑按钮标题颜色
+    lazy var editButtonTitleColor: UIColor = {
+        return UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
+    }()
+    
+    /// 编辑按钮禁用下的标题颜色
+    var editButtonDisableTitleColor: UIColor?
 }
 // MARK: 选择框配置类
 class HXPHSelectBoxConfiguration: NSObject {

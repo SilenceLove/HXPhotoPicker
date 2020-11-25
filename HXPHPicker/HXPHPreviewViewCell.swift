@@ -63,7 +63,7 @@ class HXPHPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         contentView.addSubview(scrollView)
     }
     func setupScrollViewContenSize() {
-        if UIDevice.hx_isPortrait() {
+        if UIDevice.current.hx_isPortrait {
             let aspectRatio = hx_width / photoAsset!.imageSize.width
             let contentWidth = hx_width
             let contentHeight = photoAsset!.imageSize.height * aspectRatio

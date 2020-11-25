@@ -24,6 +24,12 @@ enum HXAlbumShowMode: Int {
     case popup = 1          //!< 弹出展示
 }
 
+enum HXPHAppearanceType: Int {
+    case varied     //!< 会跟随系统变化
+    case normal     //!< 正常样式，不会跟随系统变化
+    case dark       //!< 固定暗黑样式
+}
+
 enum HXPHAssetMediaType: Int {
     case photo = 0      //!< 照片
     case video = 1      //!< 视频

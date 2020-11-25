@@ -174,6 +174,61 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             self.fetchAssetCollectionsCompletion?(self.assetCollectionsArray)
         }
     }
+    /// 获取相册里的资源
+    /// - Parameters:
+    ///   - assetCollection: 相册
+    ///   - completion: 完成回调
+    func fetchPhotoAssets(assetCollection: HXPHAssetCollection?, completion: @escaping ([HXPHAsset], HXPHAsset?) -> Void) {
+        DispatchQueue.global().async {
+            var selectedAssets = [PHAsset]()
+            var selectedPhotoAssets = [HXPHAsset]()
+            for phAsset in self.selectedAssetArray {
+                if phAsset.asset != nil {
+                    selectedAssets.append(phAsset.asset!)
+                    selectedPhotoAssets.append(phAsset)
+                }
+            }
+            var photoAssets = [HXPHAsset]()
+            photoAssets.reserveCapacity(assetCollection?.count ?? 0)
+            var lastAsset: HXPHAsset?
+            assetCollection?.enumerateAssets(usingBlock: { (photoAsset) in
+                if photoAsset.mediaType == HXPHAssetMediaType.photo {
+                    if self.selectType == HXPHSelectType.video {
+                        return
+                    }
+                    if self.config.showAnimatedAsset == true {
+                        if HXPHAssetManager.assetIsAnimated(asset: photoAsset.asset!) {
+                            photoAsset.mediaSubType = HXPHAssetMediaSubType.imageAnimated
+                        }
+                    }
+                    if self.config.showLivePhotoAsset == true {
+                        if HXPHAssetManager.assetIsLivePhoto(asset: photoAsset.asset!) {
+                            photoAsset.mediaSubType = HXPHAssetMediaSubType.livePhoto
+                        }
+                    }
+                }else if photoAsset.mediaType == HXPHAssetMediaType.video {
+                    if self.selectType == HXPHSelectType.photo {
+                        return
+                    }
+                }
+                var asset = photoAsset
+                if selectedAssets.contains(asset.asset!) {
+                    let index = selectedAssets.firstIndex(of: asset.asset!)!
+                    let phAsset: HXPHAsset = selectedPhotoAssets[index]
+                    asset = phAsset
+                    lastAsset = phAsset
+                }
+                if self.config.reverseOrder == true {
+                    photoAssets.insert(asset, at: 0)
+                }else {
+                    photoAssets.append(asset)
+                }
+            })
+            DispatchQueue.main.async {
+                completion(photoAssets, lastAsset)
+            }
+        }
+    }
     func addedPhotoAsset(photoAsset: HXPHAsset) -> Bool {
         let canSelect = canSelectAsset(for: photoAsset)
         if canSelect {
@@ -348,68 +403,18 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         
         super.present(viewControllerToPresent, animated: flag, completion: completion)
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                
+            }
+        }
+    }
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
         print("\(self) deinit")
-    }
-}
-/// 单独写个扩展，处理/获取数据
-extension HXPHPickerController {
-    
-    /// 获取相册里的资源
-    /// - Parameters:
-    ///   - assetCollection: 相册
-    ///   - completion: 完成回调
-    func fetchPhotoAssets(assetCollection: HXPHAssetCollection?, completion: @escaping ([HXPHAsset], HXPHAsset?) -> Void) {
-        DispatchQueue.global().async {
-            var selectedAssets = [PHAsset]()
-            var selectedPhotoAssets = [HXPHAsset]()
-            for phAsset in self.selectedAssetArray {
-                if phAsset.asset != nil {
-                    selectedAssets.append(phAsset.asset!)
-                    selectedPhotoAssets.append(phAsset)
-                }
-            }
-            var photoAssets = [HXPHAsset]()
-            photoAssets.reserveCapacity(assetCollection?.count ?? 0)
-            var lastAsset: HXPHAsset?
-            assetCollection?.enumerateAssets(usingBlock: { (photoAsset) in
-                if photoAsset.mediaType == HXPHAssetMediaType.photo {
-                    if self.selectType == HXPHSelectType.video {
-                        return
-                    }
-                    if self.config.showAnimatedAsset == true {
-                        if HXPHAssetManager.assetIsAnimated(asset: photoAsset.asset!) {
-                            photoAsset.mediaSubType = HXPHAssetMediaSubType.imageAnimated
-                        }
-                    }
-                    if self.config.showLivePhotoAsset == true {
-                        if HXPHAssetManager.assetIsLivePhoto(asset: photoAsset.asset!) {
-                            photoAsset.mediaSubType = HXPHAssetMediaSubType.livePhoto
-                        }
-                    }
-                }else if photoAsset.mediaType == HXPHAssetMediaType.video {
-                    if self.selectType == HXPHSelectType.photo {
-                        return
-                    }
-                }
-                var asset = photoAsset
-                if selectedAssets.contains(asset.asset!) {
-                    let index = selectedAssets.firstIndex(of: asset.asset!)!
-                    let phAsset: HXPHAsset = selectedPhotoAssets[index]
-                    asset = phAsset
-                    lastAsset = phAsset
-                }
-                if self.config.reverseOrder == true {
-                    photoAssets.insert(asset, at: 0)
-                }else {
-                    photoAssets.append(asset)
-                }
-            })
-            DispatchQueue.main.async {
-                completion(photoAssets, lastAsset)
-            }
-        }
     }
 }
 
@@ -482,17 +487,17 @@ class HXPHDeniedAuthorizationView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        closeBtn.frame = CGRect(x: 20, y: UIDevice.hx_statusBarHeight() + 5, width: 40, height: 40)
+        closeBtn.frame = CGRect(x: 20, y: UIDevice.current.hx_statusBarHeight + 5, width: 40, height: 40)
         
         let titleHeight = titleLb.text?.hx_stringHeight(ofFont: titleLb.font, maxWidth: hx_width) ?? 0
         titleLb.frame = CGRect(x: 0, y: 0, width: hx_width, height: titleHeight)
         
         let subTitleHeight = subTitleLb.text?.hx_stringHeight(ofFont: subTitleLb.font, maxWidth: hx_width - 40) ?? 0
-        subTitleLb.frame = CGRect(x: 20, y: hx_height / 2 - subTitleHeight - 30 - UIDevice.hx_topMargin(), width: hx_width - 40, height: subTitleHeight)
+        subTitleLb.frame = CGRect(x: 20, y: hx_height / 2 - subTitleHeight - 30 - UIDevice.current.hx_topMargin, width: hx_width - 40, height: subTitleHeight)
         titleLb.hx_y = subTitleLb.hx_y - 15 - titleHeight
         
         let jumpBtnBottomMargin : CGFloat = UIDevice.isProxy() ? 120 : 50
-        jumpBtn.frame = CGRect(x: 0, y: hx_height - UIDevice.hx_bottomMargin() - 40 - jumpBtnBottomMargin, width: 150, height: 40)
+        jumpBtn.frame = CGRect(x: 0, y: hx_height - UIDevice.current.hx_bottomMargin - 40 - jumpBtnBottomMargin, width: 150, height: 40)
         jumpBtn.hx_centerX = hx_width * 0.5
     }
     required init?(coder: NSCoder) {

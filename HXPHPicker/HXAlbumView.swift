@@ -9,7 +9,7 @@
 import UIKit
 
 protocol HXAlbumViewDelegate: NSObjectProtocol {
-    
+    func albumView(_ albumView: HXAlbumView, didSelectRowAt assetCollection: HXPHAssetCollection)
 }
 
 class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
@@ -50,7 +50,7 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let assetCollection = assetCollectionsArray[indexPath.row]
-        
+        delegate?.albumView(self, didSelectRowAt: assetCollection)
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -64,8 +64,26 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     }
     
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                
+            }
+        }
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+}
+
+class HXAlbumTitleView: UIView {
+    lazy var titleLb: UILabel = {
+        let titleLb = UILabel.init()
+        titleLb.textColor = UIColor.black
+        titleLb.textAlignment = NSTextAlignment.center
+        return titleLb
+    }()
 }

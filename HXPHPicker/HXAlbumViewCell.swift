@@ -94,6 +94,15 @@ class HXAlbumViewCell: UITableViewCell {
         bottomLineView.frame = CGRect(x: coverMargin, y: hx_height - 0.5, width: hx_width - coverMargin * 2, height: 0.5)
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                
+            }
+        }
+    }
+    
     func cancelRequest() {
         if requestID != nil {
             PHImageManager.default().cancelImageRequest(requestID!)

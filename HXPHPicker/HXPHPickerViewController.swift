@@ -226,23 +226,23 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let margin: CGFloat = UIDevice.hx_leftMargin()
+        let margin: CGFloat = UIDevice.current.hx_leftMargin
         collectionView.frame = CGRect(x: margin, y: 0, width: view.hx_width - 2 * margin, height: view.hx_height)
         var collectionTop: CGFloat
         if navigationController?.modalPresentationStyle == UIModalPresentationStyle.fullScreen {
-            collectionTop = UIDevice.hx_navigationBarHeight()
+            collectionTop = UIDevice.current.hx_navigationBarHeight
         }else {
             collectionTop = navigationController!.navigationBar.hx_height
         }
         if isMultipleSelect {
-            bottomView.frame = CGRect(x: 0, y: view.hx_height - 50 - UIDevice.hx_bottomMargin(), width: view.hx_width, height: 50 + UIDevice.hx_bottomMargin())
+            bottomView.frame = CGRect(x: 0, y: view.hx_height - 50 - UIDevice.current.hx_bottomMargin, width: view.hx_width, height: 50 + UIDevice.current.hx_bottomMargin)
             collectionView.contentInset = UIEdgeInsets(top: collectionTop, left: 0, bottom: bottomView.hx_height + 0.5, right: 0)
         }else {
-            collectionView.contentInset = UIEdgeInsets(top: collectionTop, left: 0, bottom: UIDevice.hx_bottomMargin(), right: 0)
+            collectionView.contentInset = UIEdgeInsets(top: collectionTop, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
         }
         let space = config.spacing
         let count : CGFloat
-        if  UIDevice.hx_isPortrait() == true {
+        if  UIDevice.current.hx_isPortrait == true {
             count = CGFloat(config.rowNumber)
         }else {
             count = CGFloat(config.landscapeRowNumber)
@@ -253,6 +253,15 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         if orientationDidChange {
             collectionView.scrollToItem(at: beforeOrientationIndexPath ?? IndexPath(item: 0, section: 0), at: UICollectionView.ScrollPosition.top, animated: false)
             orientationDidChange = false
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                
+            }
         }
     }
     deinit {
@@ -288,6 +297,26 @@ class HXPHPickerBottomView: UIToolbar {
     }()
     
     @objc func didPreviewButtonClick(button: UIButton) {
+        hx_delegate?.bottomViewDidPreviewButtonClick(view: self)
+    }
+    
+    lazy var editBtn: UIButton = {
+        let editBtn = UIButton.init(type: UIButton.ButtonType.custom)
+        editBtn.setTitle("编辑".hx_localized(), for: UIControl.State.normal)
+        editBtn.setTitleColor(config?.editButtonTitleColor, for: UIControl.State.normal)
+        if config?.editButtonDisableTitleColor != nil {
+            editBtn.setTitleColor(config?.editButtonDisableTitleColor, for: UIControl.State.disabled)
+        }else {
+            editBtn.setTitleColor(config?.editButtonTitleColor.withAlphaComponent(0.6), for: UIControl.State.disabled)
+        }
+        editBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        editBtn.isEnabled = false
+        editBtn.addTarget(self, action: #selector(didEditBtnButtonClick(button:)), for: UIControl.Event.touchUpInside)
+        editBtn.isHidden = config!.editButtonHidden
+        return editBtn
+    }()
+    
+    @objc func didEditBtnButtonClick(button: UIButton) {
         hx_delegate?.bottomViewDidPreviewButtonClick(view: self)
     }
     
@@ -358,6 +387,7 @@ class HXPHPickerBottomView: UIToolbar {
         super.init(frame: CGRect.zero)
         self.config = config
         addSubview(previewBtn)
+        addSubview(editBtn)
         addSubview(originalBtn)
         addSubview(finishBtn)
         backgroundColor = config.backgroundColor
@@ -386,16 +416,26 @@ class HXPHPickerBottomView: UIToolbar {
         if finishWidth < 60 {
             finishWidth = 60
         }
-        finishBtn.frame = CGRect(x: hx_width - UIDevice.hx_rightMargin() - finishWidth - 12, y: 0, width: finishWidth, height: 33)
+        finishBtn.frame = CGRect(x: hx_width - UIDevice.current.hx_rightMargin - finishWidth - 12, y: 0, width: finishWidth, height: 33)
         finishBtn.hx_centerY = 25
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         let previewWidth : CGFloat = previewBtn.currentTitle!.hx_localized().hx_stringWidth(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
-        previewBtn.frame = CGRect(x: 12 + UIDevice.hx_leftMargin(), y: 0, width: previewWidth, height: 50)
+        previewBtn.frame = CGRect(x: 12 + UIDevice.current.hx_leftMargin, y: 0, width: previewWidth, height: 50)
+        editBtn.frame = previewBtn.frame
         originalBtn.frame = CGRect(x: 0, y: 0, width: boxControl.frame.maxX, height: 50)
         updateFinishButtonFrame()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                
+            }
+        }
     }
     
     required init?(coder: NSCoder) {

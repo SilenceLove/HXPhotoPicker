@@ -124,12 +124,12 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     func changeSubviewFrame() {
-        let margin: CGFloat = UIDevice.hx_leftMargin()
+        let margin: CGFloat = UIDevice.current.hx_leftMargin
         tableView.frame = CGRect(x: margin, y: 0, width: view.hx_width - 2 * margin, height: view.hx_height)
         if navigationController?.modalPresentationStyle == UIModalPresentationStyle.fullScreen {
-            tableView.contentInset = UIEdgeInsets.init(top: UIDevice.hx_navigationBarHeight(), left: 0, bottom: UIDevice.hx_bottomMargin(), right: 0)
+            tableView.contentInset = UIEdgeInsets.init(top: UIDevice.current.hx_navigationBarHeight, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
         }else {
-            tableView.contentInset = UIEdgeInsets.init(top: navigationController!.navigationBar.hx_height, left: 0, bottom: UIDevice.hx_bottomMargin(), right: 0)
+            tableView.contentInset = UIEdgeInsets.init(top: navigationController!.navigationBar.hx_height, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
         }
         if orientationDidChange {
             if !assetCollectionsArray.isEmpty {
@@ -154,6 +154,15 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return UIStatusBarStyle.default
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                
+            }
+        }
     }
     deinit {
         NotificationCenter.default.removeObserver(self)
