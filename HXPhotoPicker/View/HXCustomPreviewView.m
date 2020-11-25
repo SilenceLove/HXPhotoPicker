@@ -10,7 +10,7 @@
 #import "UIImage+HXExtension.h"
 #define HXCustomCameraViewBOX_BOUNDS CGRectMake(0.0f, 0.0f, 100, 100)
 
-@interface HXCustomPreviewView ()<UIGestureRecognizerDelegate, CAAnimationDelegate>
+@interface HXCustomPreviewView ()<UIGestureRecognizerDelegate>
 @property (strong, nonatomic) UIImageView *focusBox;
 @property (strong, nonatomic) UITapGestureRecognizer *singleTapRecognizer;
 @property (strong, nonatomic) UIPinchGestureRecognizer *pinch;
@@ -131,6 +131,7 @@
 }
 
 - (void)runBoxAnimationOnView:(UIView *)view point:(CGPoint)point {
+    [UIView cancelPreviousPerformRequestsWithTarget:self];
     [view.layer removeAnimationForKey:@"boxAnimation"];
     view.center = point;
     view.hidden = NO;
@@ -152,25 +153,11 @@
     annimaGroup.duration = 1.0f;
     annimaGroup.removedOnCompletion = NO;
     annimaGroup.fillMode = kCAFillModeForwards;
-    annimaGroup.delegate = self;
     [view.layer addAnimation:annimaGroup forKey:@"boxAnimation"];
-    
-//    [UIView animateWithDuration:0.15f
-//                          delay:0.0f
-//                        options:UIViewAnimationOptionCurveEaseInOut
-//                     animations:^{
-//                         view.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1.0);
-//                     }
-//                     completion:^(BOOL complete) {
-//                         [UIView animateWithDuration:0.5 animations:^{
-//                             view.alpha = 0;
-//                         }];
-//                     }];
+    [self performSelector:@selector(animationDidStop) withObject:nil afterDelay:1.0];
 }
-- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
-    if (flag) {
-        self.focusBox.hidden = YES;
-    }
+- (void)animationDidStop {
+    self.focusBox.hidden = YES;
 }
 - (void)setTapToFocusEnabled:(BOOL)enabled {
     _tapToFocusEnabled = enabled;
