@@ -43,7 +43,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         edgesForExtendedLayout = UIRectEdge.all;
         config = hx_pickerController()!.config.albumList
         view.backgroundColor = config!.backgroundColor
-        let backItem = UIBarButtonItem.init(title: "取消".hx_localized(), style: UIBarButtonItem.Style.done, target: self, action: #selector(didCancelItemClick))
+        let backItem = UIBarButtonItem.init(title: "取消".hx_localized, style: UIBarButtonItem.Style.done, target: self, action: #selector(didCancelItemClick))
         navigationItem.rightBarButtonItem = backItem
         view.addSubview(tableView)
         fetchCameraAssetCollection()
@@ -57,7 +57,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         if hx_pickerController()?.cameraAssetCollection != nil {
             self.pushPhotoPickerContoller(assetCollection: hx_pickerController()?.cameraAssetCollection, animated: false)
             self.canFetchAssetCollections = true
-            title = "相册".hx_localized()
+            title = "相册".hx_localized
         }else {
             hx_pickerController()?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
                 var cameraAssetCollection = assetCollection
@@ -66,7 +66,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
                 }
                 self.pushPhotoPickerContoller(assetCollection: cameraAssetCollection, animated: false)
                 self.canFetchAssetCollections = true
-                self.title = "相册".hx_localized()
+                self.title = "相册".hx_localized
             }
         }
     }

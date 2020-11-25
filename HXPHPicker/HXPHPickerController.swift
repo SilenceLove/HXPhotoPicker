@@ -266,48 +266,48 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         if photoAsset.mediaType == HXPHAssetMediaType.photo {
             if !config.photosAndVideosCanBeSelectedTogether {
                 if selectedVideoAssetArray.count > 0 {
-                    text = "照片和视频不能同时选择".hx_localized()
+                    text = "照片和视频不能同时选择".hx_localized
                     canSelect = false
                 }
             }
             if config.maximumSelectPhotoCount > 0 {
                 if selectedPhotoAssetArray.count >= config.maximumSelectPhotoCount {
-                    text = String.init(format: "最多只能选择%d张照片".hx_localized(), arguments: [config.maximumSelectPhotoCount])
+                    text = String.init(format: "最多只能选择%d张照片".hx_localized, arguments: [config.maximumSelectPhotoCount])
                     canSelect = false
                 }
             }else {
                 if selectedAssetArray.count >= config.maximumSelectCount && config.maximumSelectCount > 0 {
-                    text = String.init(format: "已达到最大选择数".hx_localized(), arguments: [config.maximumSelectPhotoCount])
+                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectPhotoCount])
                     canSelect = false
                 }
             }
         }else if photoAsset.mediaType == HXPHAssetMediaType.video {
             if config.videoMaximumSelectDuration > 0 {
                 if round(photoAsset.videoDuration) > Double(config.videoMaximumSelectDuration) {
-                    text = String.init(format: "视频最大时长为%d秒，无法选择".hx_localized(), arguments: [config.videoMaximumSelectDuration])
+                    text = String.init(format: "视频最大时长为%d秒，无法选择".hx_localized, arguments: [config.videoMaximumSelectDuration])
                     canSelect = false
                 }
             }
             if config.videoMinimumSelectDuration > 0 {
                 if photoAsset.videoDuration < Double(config.videoMinimumSelectDuration) {
-                    text = String.init(format: "视频最小时长为%d秒，无法选择".hx_localized(), arguments: [config.videoMinimumSelectDuration])
+                    text = String.init(format: "视频最小时长为%d秒，无法选择".hx_localized, arguments: [config.videoMinimumSelectDuration])
                     canSelect = false
                 }
             }
             if !config.photosAndVideosCanBeSelectedTogether {
                 if selectedPhotoAssetArray.count > 0 {
-                    text = "视频和照片不能同时选择".hx_localized()
+                    text = "视频和照片不能同时选择".hx_localized
                     canSelect = false
                 }
             }
             if config.maximumSelectVideoCount > 0 {
                 if selectedVideoAssetArray.count >= config.maximumSelectVideoCount {
-                    text = String.init(format: "最多只能选择%d个视频".hx_localized(), arguments: [config.maximumSelectPhotoCount])
+                    text = String.init(format: "最多只能选择%d个视频".hx_localized, arguments: [config.maximumSelectPhotoCount])
                     canSelect = false
                 }
             }else {
                 if selectedAssetArray.count >= config.maximumSelectCount && config.maximumSelectCount > 0 {
-                    text = String.init(format: "已达到最大选择数".hx_localized(), arguments: [config.maximumSelectPhotoCount])
+                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectPhotoCount])
                     canSelect = false
                 }
             }
@@ -464,16 +464,16 @@ class HXPHDeniedAuthorizationView: UIView {
         closeBtn.setTitle("X", for: UIControl.State.normal)
         closeBtn.setTitleColor(UIColor.white, for: UIControl.State.normal)
         
-        titleLb.text = "无法访问相册中照片".hx_localized()
+        titleLb.text = "无法访问相册中照片".hx_localized
         titleLb.textColor = config?.titleColor
         titleLb.font = UIFont.hx_semiboldPingFang(size: 20)
         
-        subTitleLb.text = "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".hx_localized()
+        subTitleLb.text = "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".hx_localized
         subTitleLb.textColor = config?.subTitleColor
         subTitleLb.font = UIFont.hx_regularPingFang(size: 17)
         
         jumpBtn.backgroundColor =  config?.jumpButtonBackgroudColor
-        jumpBtn.setTitle("前往系统设置".hx_localized(), for: UIControl.State.normal)
+        jumpBtn.setTitle("前往系统设置".hx_localized, for: UIControl.State.normal)
         jumpBtn.setTitleColor(config?.jumpButtonTitleColor, for: UIControl.State.normal)
         jumpBtn.titleLabel?.font = UIFont.hx_mediumPingFang(size: 16)
     }

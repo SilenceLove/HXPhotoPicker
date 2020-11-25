@@ -70,7 +70,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         config = hx_pickerController()!.config.photoList
         view.backgroundColor = config.backgroundColor
         updateTitle()
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "取消".hx_localized(), style: UIBarButtonItem.Style.done, target: self, action: #selector(didCancelItemClick))
+        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "取消".hx_localized, style: UIBarButtonItem.Style.done, target: self, action: #selector(didCancelItemClick))
     }
     @objc func didCancelItemClick() {
         hx_pickerController()?.cancelCallback()
@@ -282,7 +282,7 @@ class HXPHPickerBottomView: UIToolbar {
     
     lazy var previewBtn: UIButton = {
         let previewBtn = UIButton.init(type: UIButton.ButtonType.custom)
-        previewBtn.setTitle("预览".hx_localized(), for: UIControl.State.normal)
+        previewBtn.setTitle("预览".hx_localized, for: UIControl.State.normal)
         previewBtn.setTitleColor(config?.previewButtonTitleColor, for: UIControl.State.normal)
         if config?.previewButtonDisableTitleColor != nil {
             previewBtn.setTitleColor(config?.previewButtonDisableTitleColor, for: UIControl.State.disabled)
@@ -302,7 +302,7 @@ class HXPHPickerBottomView: UIToolbar {
     
     lazy var editBtn: UIButton = {
         let editBtn = UIButton.init(type: UIButton.ButtonType.custom)
-        editBtn.setTitle("编辑".hx_localized(), for: UIControl.State.normal)
+        editBtn.setTitle("编辑".hx_localized, for: UIControl.State.normal)
         editBtn.setTitleColor(config?.editButtonTitleColor, for: UIControl.State.normal)
         if config?.editButtonDisableTitleColor != nil {
             editBtn.setTitleColor(config?.editButtonDisableTitleColor, for: UIControl.State.disabled)
@@ -350,7 +350,7 @@ class HXPHPickerBottomView: UIToolbar {
     
     lazy var originalTitleLb: UILabel = {
         let originalTitleLb = UILabel.init()
-        originalTitleLb.text = "原图".hx_localized()
+        originalTitleLb.text = "原图".hx_localized
         originalTitleLb.textColor = config?.originalButtonTitleColor
         originalTitleLb.font = UIFont.systemFont(ofSize: 17)
         originalTitleLb.frame = CGRect(x: 0, y: 0, width: originalTitleLb.text!.hx_stringWidth(ofFont: originalTitleLb.font, maxHeight: 50), height: 50)
@@ -367,7 +367,7 @@ class HXPHPickerBottomView: UIToolbar {
     
     lazy var finishBtn: UIButton = {
         let finishBtn = UIButton.init(type: UIButton.ButtonType.custom)
-        finishBtn.setTitle("完成".hx_localized(), for: UIControl.State.normal)
+        finishBtn.setTitle("完成".hx_localized, for: UIControl.State.normal)
         finishBtn.setTitleColor(config?.finishButtonTitleColor, for: UIControl.State.normal)
         finishBtn.setTitleColor(config?.finishButtonDisableTitleColor, for: UIControl.State.disabled)
         finishBtn.setBackgroundImage(UIImage.hx_image(for: config!.finishButtonBackgroudColor, havingSize: CGSize.zero), for: UIControl.State.normal)
@@ -401,18 +401,18 @@ class HXPHPickerBottomView: UIToolbar {
         if selectCount > 0 {
             finishBtn.isEnabled = true
             previewBtn.isEnabled = true
-            finishBtn.setTitle("完成".hx_localized() + " (" + String(format: "%d", arguments: [selectCount]) + ")", for: UIControl.State.normal)
+            finishBtn.setTitle("完成".hx_localized + " (" + String(format: "%d", arguments: [selectCount]) + ")", for: UIControl.State.normal)
         }else {
             finishBtn.isEnabled = !config!.disableFinishButtonWhenNotSelected
             previewBtn.isEnabled = false
-            finishBtn.setTitle("完成".hx_localized(), for: UIControl.State.normal)
+            finishBtn.setTitle("完成".hx_localized, for: UIControl.State.normal)
         }
         updateFinishButtonFrame()
     }
     
     func updateFinishButtonFrame() {
         originalBtn.hx_centerX = hx_width / 2
-        var finishWidth : CGFloat = finishBtn.currentTitle!.hx_localized().hx_stringWidth(ofFont: finishBtn.titleLabel!.font, maxHeight: 50) + 20
+        var finishWidth : CGFloat = finishBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: finishBtn.titleLabel!.font, maxHeight: 50) + 20
         if finishWidth < 60 {
             finishWidth = 60
         }
@@ -422,7 +422,7 @@ class HXPHPickerBottomView: UIToolbar {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        let previewWidth : CGFloat = previewBtn.currentTitle!.hx_localized().hx_stringWidth(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
+        let previewWidth : CGFloat = previewBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
         previewBtn.frame = CGRect(x: 12 + UIDevice.current.hx_leftMargin, y: 0, width: previewWidth, height: 50)
         editBtn.frame = previewBtn.frame
         originalBtn.frame = CGRect(x: 0, y: 0, width: boxControl.frame.maxX, height: 50)

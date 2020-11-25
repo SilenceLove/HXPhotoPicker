@@ -74,50 +74,50 @@ class HXPHTools: NSObject {
         }else {
             if collection.localizedTitle == "最近项目" ||
                 collection.localizedTitle == "最近添加"  {
-                albumName = "HXAlbumRecents".hx_localized()
+                albumName = "HXAlbumRecents".hx_localized
             }else if collection.localizedTitle == "Camera Roll" ||
                         collection.localizedTitle == "相机胶卷" {
-                albumName = "HXAlbumCameraRoll".hx_localized()
+                albumName = "HXAlbumCameraRoll".hx_localized
             }else {
                 switch collection.assetCollectionSubtype {
                 case PHAssetCollectionSubtype.smartAlbumUserLibrary:
-                    albumName = "HXAlbumCameraRoll".hx_localized()
+                    albumName = "HXAlbumCameraRoll".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumVideos:
-                    albumName = "HXAlbumVideos".hx_localized()
+                    albumName = "HXAlbumVideos".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumPanoramas:
-                    albumName = "HXAlbumPanoramas".hx_localized()
+                    albumName = "HXAlbumPanoramas".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumFavorites:
-                    albumName = "HXAlbumFavorites".hx_localized()
+                    albumName = "HXAlbumFavorites".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumTimelapses:
-                    albumName = "HXAlbumTimelapses".hx_localized()
+                    albumName = "HXAlbumTimelapses".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumRecentlyAdded:
-                    albumName = "HXAlbumRecentlyAdded".hx_localized()
+                    albumName = "HXAlbumRecentlyAdded".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumBursts:
-                    albumName = "HXAlbumBursts".hx_localized()
+                    albumName = "HXAlbumBursts".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumSlomoVideos:
-                    albumName = "HXAlbumSlomoVideos".hx_localized()
+                    albumName = "HXAlbumSlomoVideos".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumSelfPortraits:
-                    albumName = "HXAlbumSelfPortraits".hx_localized()
+                    albumName = "HXAlbumSelfPortraits".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumScreenshots:
-                    albumName = "HXAlbumScreenshots".hx_localized()
+                    albumName = "HXAlbumScreenshots".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumDepthEffect:
-                    albumName = "HXAlbumDepthEffect".hx_localized()
+                    albumName = "HXAlbumDepthEffect".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumLivePhotos:
-                    albumName = "HXAlbumLivePhotos".hx_localized()
+                    albumName = "HXAlbumLivePhotos".hx_localized
                     break
                 case PHAssetCollectionSubtype.smartAlbumAnimated:
-                    albumName = "HXAlbumAnimated".hx_localized()
+                    albumName = "HXAlbumAnimated".hx_localized
                     break
                 default:
                     albumName = collection.localizedTitle

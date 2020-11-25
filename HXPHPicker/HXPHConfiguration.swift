@@ -86,7 +86,7 @@ class HXPHAlbumListConfiguration: NSObject {
     
     /// 当相册里没有资源时的相册名称
     lazy var emptyAlbumName: String = {
-        return "所有照片".hx_localized()
+        return "所有照片".hx_localized
     }()
     
     /// 当相册里没有资源时的封面图片名
