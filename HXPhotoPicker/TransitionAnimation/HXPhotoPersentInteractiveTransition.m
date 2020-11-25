@@ -25,7 +25,6 @@
 @property (weak, nonatomic) HXPhotoView *photoView;
 @property (assign, nonatomic) BOOL isPanGesture;
 
-
 @property (assign, nonatomic) CGFloat scrollViewZoomScale;
 @property (assign, nonatomic) CGSize scrollViewContentSize;
 @property (assign, nonatomic) CGPoint scrollViewContentOffset;
@@ -238,7 +237,7 @@
     fromVC.view.alpha = scale;
     self.bgView.alpha = fromVC.view.alpha;
 }
-- (void)interPercentCancel{
+- (void)interPercentCancel {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
     HXPhotoPreviewViewController *fromVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toVC = [self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
@@ -324,9 +323,23 @@
         [fromVC.delegate photoPreviewControllerDidCancel:fromVC model:model];
     }
     fromVC.manager.selectPhotoing = NO;
+    
+    if (self.tempCell && self.tempCell.layer.cornerRadius > 0) {
+        UIView *maskView = [[UIView alloc] initWithFrame:self.contentView.bounds];
+        maskView.backgroundColor = [UIColor redColor];
+        maskView.layer.cornerRadius = 0.f;
+        maskView.layer.masksToBounds = true;
+        self.contentView.maskView = maskView;
+    }
+
     [UIView animateWithDuration:duration delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:option animations:^{
         if (self.tempCell) {
-            self.contentView.frame = [self.tempCell convertRect:self.tempCell.bounds toView: containerView];
+            CGRect toFrame = [self.tempCell convertRect:self.tempCell.bounds toView: containerView];
+            self.contentView.frame = toFrame;
+            if (self.contentView.maskView != nil) {
+                self.contentView.maskView.layer.cornerRadius = self.tempCell.layer.cornerRadius;
+                self.contentView.maskView.frame = (CGRect) { CGPointZero, toFrame.size };
+            }
         }else {
             self.contentView.alpha = 0;
             self.contentView.transform = CGAffineTransformMakeScale(0.3, 0.3);
