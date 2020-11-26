@@ -52,7 +52,7 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
 //        nav.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         present(nav, animated: true, completion: nil)
     }
-    func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray: [HXPHAsset], isOriginal: Bool) {
+    func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray: [HXPHAsset], with isOriginal: Bool) {
         self.selectedAssets = selectedAssetArray
         self.isOriginal = isOriginal
     }

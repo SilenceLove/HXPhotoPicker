@@ -14,8 +14,9 @@ extension UIImage {
         let bundle = HXPHManager.shared.bundle
         var image : UIImage?
         if bundle != nil {
-            let path = bundle?.path(forResource: "images/" + named, ofType: nil)
+            var path = bundle?.path(forResource: "images", ofType: nil)
             if path != nil {
+                path! += "/" + named
                 image = self.init(named: path!)
             }
         }

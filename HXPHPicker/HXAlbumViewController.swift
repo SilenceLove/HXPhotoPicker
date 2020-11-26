@@ -96,7 +96,6 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     
     @objc func didCancelItemClick() {
         hx_pickerController()?.cancelCallback()
-        dismiss(animated: true, completion: nil)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -25,7 +25,7 @@ enum HXAlbumShowMode: Int {
 }
 
 enum HXPHAppearanceType: Int {
-    case varied     //!< 会跟随系统变化
+    case varied     //!< 跟随系统变化
     case normal     //!< 正常样式，不会跟随系统变化
     case dark       //!< 固定暗黑样式
 }

@@ -52,6 +52,30 @@ class HXPHManager: NSObject {
         }
     }
     
+    /// 枚举每个相册资源，
+    /// - Parameters:
+    ///   - options: <#options description#>
+    ///   - showEmptyCollection: <#showEmptyCollection description#>
+    ///   - usingBlock: <#usingBlock description#>
+    /// - Returns: <#description#>
+    func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, usingBlock :@escaping (HXPHAssetCollection?, Bool)->()) {
+        DispatchQueue.global().async {
+            HXPHAssetManager.enumerateAllAlbums(filterInvalid: true, options: nil) { (collection) in
+                let assetCollection = HXPHAssetCollection.init(collection: collection, options: options)
+                if showEmptyCollection == false && assetCollection.count == 0 {
+                    return
+                }
+                let isCameraRoll = HXPHAssetManager.collectionIsCameraRollAlbum(collection: collection)
+                DispatchQueue.main.async {
+                    usingBlock(assetCollection, isCameraRoll);
+                }
+            }
+            DispatchQueue.main.async {
+                usingBlock(nil, false);
+            }
+        }
+    }
+    
     /// 获取相机胶卷资源集合
     func fetchCameraAssetCollection(for type: HXPHSelectType, options: PHFetchOptions, completion :@escaping (HXPHAssetCollection)->()) {
         DispatchQueue.global().async {

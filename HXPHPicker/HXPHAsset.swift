@@ -159,6 +159,39 @@ class HXPHAsset: NSObject {
                 }
             }
         }
+    }
+    
+    /// 请求AVAsset，如果资源在iCloud上会自动下载。如果需要更细节的处理请使用 PHAssetManager
+    /// - Parameters:
+    ///   - iCloudHandler: 下载iCloud上的资源时回调iCloud的请求ID
+    ///   - progressHandler: iCloud下载进度
+    /// - Returns: 请求ID
+    func requestAVAsset(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, AVAsset, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
+        if asset == nil {
+            if failure != nil {
+                failure?(self, nil)
+            }
+            return 0
+        }
+        return HXPHAssetManager.requestAVAsset(for: asset!) { (iCloudRequestID) in
+            if iCloudHandler != nil {
+                iCloudHandler!(self, iCloudRequestID)
+            }
+        } progressHandler: { (progress, error, stop, info) in
+            if progressHandler != nil {
+                progressHandler!(self, progress)
+            }
+        } resultHandler: { (avAsset, audioMix, info, downloadSuccess) in
+            if downloadSuccess {
+                if success != nil {
+                    success!(self, avAsset!, info)
+                }
+            }else {
+                if failure != nil {
+                    failure!(self, info)
+                }
+            }
+        }
 
     }
 }

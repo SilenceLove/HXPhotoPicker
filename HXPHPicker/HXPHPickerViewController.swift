@@ -74,7 +74,6 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     @objc func didCancelItemClick() {
         hx_pickerController()?.cancelCallback()
-        dismiss(animated: true, completion: nil)
     }
     
     func initView() {
@@ -202,9 +201,10 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     func bottomViewDidFinishButtonClick(view: HXPHPickerBottomView) {
         hx_pickerController()?.finishCallback()
-        dismiss(animated: true, completion: nil)
     }
-    func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) { }
+    func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) {
+        hx_pickerController()?.didOriginalButtonCallback()
+    }
     
     // MARK: HXPHPreviewViewControllerDelegate
     func previewViewControllerDidClickOriginal(_ previewViewController: HXPHPreviewViewController, with isOriginal: Bool) {
@@ -310,7 +310,6 @@ class HXPHPickerBottomView: UIToolbar {
             editBtn.setTitleColor(config?.editButtonTitleColor.withAlphaComponent(0.6), for: UIControl.State.disabled)
         }
         editBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
-        editBtn.isEnabled = false
         editBtn.addTarget(self, action: #selector(didEditBtnButtonClick(button:)), for: UIControl.Event.touchUpInside)
         editBtn.isHidden = config!.editButtonHidden
         return editBtn

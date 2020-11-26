@@ -11,7 +11,38 @@ import Photos
 
 
 @objc protocol HXPHPickerControllerDelegate: NSObjectProtocol {
-    @objc optional func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray:[HXPHAsset], isOriginal: Bool)
+    
+    /// 选择完成之后调用
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - selectedAssetArray: 选择的资源对应的 HXPHAsset 数据
+    ///   - isOriginal: 是否选中的原图
+    @objc optional func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray:[HXPHAsset], with isOriginal: Bool)
+    
+    /// 点击了原图按钮
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - isOriginal: 是否选中的原图
+    @objc optional func pickerContollerDidOriginal(_ pickerController: HXPHPickerController, with isOriginal: Bool)
+    
+    /// 是否能够选择cell 不能选择时需要自己手动弹出提示框
+    @objc optional func pickerControllerShouldSelectedAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int) -> Bool
+
+    /// 即将选择 cell 时调用
+    @objc optional func pickerControllerWillSelectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+
+    /// 选择了 cell 之后调用
+    @objc optional func pickerControllerDidSelectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+
+    /// 即将取消了选择 cell
+    @objc optional func pickerControllerWillUnselectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+
+    /// 取消了选择 cell
+    @objc optional func pickerControllerDidUnselectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+    
+    
+    /// 取消时调用
+    /// - Parameter pickerController: 对应的 HXPHPickerController
     @objc optional func pickerContollerDidCancel(_ pickerController: HXPHPickerController)
 }
 
@@ -27,6 +58,9 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     /// 当前被选择的资源对应的 HXPHAsset 对象数组
     var selectedAssetArray: [HXPHAsset] = [] {
         didSet {
+            if config.selectMode == HXPHAssetSelectMode.single {
+                return
+            }
             if !canAddedAsset {
                 canAddedAsset = true
                 return
@@ -147,10 +181,15 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     }
     // MARK: 暴露给子控制器的方法
     func finishCallback() {
-        pickerContollerDelegate?.pickerContollerDidFinish?(self, with: selectedAssetArray, isOriginal: isOriginal)
+        pickerContollerDelegate?.pickerContollerDidFinish?(self, with: selectedAssetArray, with: isOriginal)
+        dismiss(animated: true, completion: nil)
     }
     func cancelCallback() {
         pickerContollerDelegate?.pickerContollerDidCancel?(self)
+        dismiss(animated: true, completion: nil)
+    }
+    func didOriginalButtonCallback() {
+        pickerContollerDelegate?.pickerContollerDidOriginal?(self, with: isOriginal)
     }
     /// 获取相机胶卷资源集合
     func fetchCameraAssetCollection() {
@@ -159,17 +198,30 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             if assetCollection.count == 0 {
                 self.cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config.albumList.emptyAlbumName, coverImage: UIImage.hx_named(named: self.config.albumList.emptyCoverImageName))
             }else {
+                // 获取封面
+                assetCollection.fetchCoverAsset(reverse: self.config.reverseOrder)
                 self.cameraAssetCollection = assetCollection
             }
             self.fetchCameraAssetCollectionCompletion?(self.cameraAssetCollection)
         }
     }
+    
+    /// 获取相册集合
     func fetchAssetCollections() {
         options.sortDescriptors = [NSSortDescriptor.init(key: "creationDate", ascending: config.creationDate)]
-        HXPHManager.shared.fetchAssetCollections(for: options, showEmptyCollection: false) { (assetCollectionsArray) in
-            self.assetCollectionsArray = assetCollectionsArray
-            if !assetCollectionsArray.isEmpty, self.cameraAssetCollection != nil {
-                self.assetCollectionsArray[0] = self.cameraAssetCollection!
+        HXPHManager.shared.fetchAssetCollections(for: options, showEmptyCollection: false) { (assetCollection, isCameraRoll) in
+            if assetCollection != nil {
+                // 获取封面
+                assetCollection!.fetchCoverAsset(reverse: self.config.reverseOrder)
+                if isCameraRoll {
+                    self.assetCollectionsArray.insert(assetCollection!, at: 0);
+                }else {
+                    self.assetCollectionsArray.append(assetCollection!)
+                }
+            }else {
+                if !self.assetCollectionsArray.isEmpty && self.cameraAssetCollection != nil {
+                    self.assetCollectionsArray[0] = self.cameraAssetCollection!
+                }
             }
             self.fetchAssetCollectionsCompletion?(self.assetCollectionsArray)
         }
@@ -232,6 +284,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     func addedPhotoAsset(photoAsset: HXPHAsset) -> Bool {
         let canSelect = canSelectAsset(for: photoAsset)
         if canSelect {
+            pickerContollerDelegate?.pickerControllerWillSelectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count)
             canAddedAsset = false
             photoAsset.selected = true
             photoAsset.selectIndex = selectedAssetArray.count
@@ -241,6 +294,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 selectedVideoAssetArray.append(photoAsset)
             }
             selectedAssetArray.append(photoAsset)
+            pickerContollerDelegate?.pickerControllerDidSelectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count - 1)
         }
         return canSelect
     }
@@ -248,6 +302,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         if selectedAssetArray.isEmpty {
             return false
         }
+        pickerContollerDelegate?.pickerControllerWillUnselectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count)
         photoAsset.selected = false
         if photoAsset.mediaType == HXPHAssetMediaType.photo {
             selectedPhotoAssetArray.remove(at: selectedPhotoAssetArray.firstIndex(of: photoAsset)!)
@@ -258,6 +313,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         for (index, asset) in selectedAssetArray.enumerated() {
             asset.selectIndex = index
         }
+        pickerContollerDelegate?.pickerControllerDidUnselectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count)
         return true
     }
     func canSelectAsset(for photoAsset: HXPHAsset) -> Bool {
@@ -312,7 +368,12 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 }
             }
         }
-        if !canSelect {
+        if pickerContollerDelegate?.pickerControllerShouldSelectedAsset != nil {
+            if canSelect {
+                canSelect = pickerContollerDelegate!.pickerControllerShouldSelectedAsset!(self, asset: photoAsset, atIndex: selectedAssetArray.count)
+            }
+        }
+        if !canSelect && text != nil {
             HXPHProgressHUD.showWarningHUD(addedTo: view, text: text!, afterDelay: 0, animated: true)
             HXPHProgressHUD.hideHUD(forView: view, animated: true, afterDelay: 2)
         }
@@ -346,12 +407,18 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         if assetCollectionsArray.isEmpty {
             if cameraAssetCollection != nil {
                 needReload = resultHasChanges(for: changeInstance, assetCollection: cameraAssetCollection!)
+            }else {
+                needReload = true
             }
         }else {
-            for assetCollection in assetCollectionsArray {
+            let collectionArray = assetCollectionsArray
+            for assetCollection in collectionArray {
                 let hasChanges = resultHasChanges(for: changeInstance, assetCollection: assetCollection)
                 if !needReload {
                     needReload = hasChanges;
+                    if assetCollection.count == 0 {
+                        assetCollectionsArray.remove(at: assetCollectionsArray.firstIndex(of: assetCollection)!)
+                    }
                 }
             }
         }
@@ -370,6 +437,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             if !changeResult!.hasIncrementalChanges {
                 let result = changeResult!.fetchResultAfterChanges
                 assetCollection.changeResult(for: result)
+                assetCollection.fetchCoverAsset(reverse: self.config.reverseOrder)
                 return true
             }
         }
@@ -425,6 +493,7 @@ class HXPHDeniedAuthorizationView: UIView {
     lazy var closeBtn: UIButton = {
         let closeBtn = UIButton.init(type: UIButton.ButtonType.custom)
         closeBtn.addTarget(self, action: #selector(didCloseClick), for: UIControl.Event.touchUpInside)
+        closeBtn.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
         return closeBtn
     }()
     
@@ -461,8 +530,7 @@ class HXPHDeniedAuthorizationView: UIView {
         addSubview(subTitleLb)
         addSubview(jumpBtn)
         backgroundColor = config?.backgroudColor
-        closeBtn.setTitle("X", for: UIControl.State.normal)
-        closeBtn.setTitleColor(UIColor.white, for: UIControl.State.normal)
+        closeBtn.setImage(UIImage.hx_named(named: config?.closeButtonImageName ?? "hx_picker_notAuthorized_close"), for: UIControl.State.normal)
         
         titleLb.text = "无法访问相册中照片".hx_localized
         titleLb.textColor = config?.titleColor
@@ -486,8 +554,7 @@ class HXPHDeniedAuthorizationView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
-        closeBtn.frame = CGRect(x: 20, y: UIDevice.current.hx_statusBarHeight + 5, width: 40, height: 40)
+        closeBtn.frame = CGRect(x: 20, y: UIDevice.current.hx_statusBarHeight + 5, width: 50, height: 50)
         
         let titleHeight = titleLb.text?.hx_stringHeight(ofFont: titleLb.font, maxWidth: hx_width) ?? 0
         titleLb.frame = CGRect(x: 0, y: 0, width: hx_width, height: titleHeight)

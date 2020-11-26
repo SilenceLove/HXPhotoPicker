@@ -38,13 +38,20 @@ class HXPHAssetCollection: NSObject {
         albumName = HXPHTools.transformAlbumName(for: collection!)
         result = PHAsset.fetchAssets(in: collection!, options: options)
         count = result?.count ?? 0
-        coverAsset = result?.firstObject
+//        coverAsset = result?.firstObject
     }
     
     func changeResult(for result: PHFetchResult<PHAsset>) {
         self.result = result
         count = result.count
-        coverAsset = result.firstObject
+    }
+    
+    func fetchCoverAsset(reverse: Bool) {
+        if reverse {
+            coverAsset = result?.firstObject
+        }else {
+            coverAsset = result?.lastObject
+        }
     }
     
     /// 请求获取相册封面图片

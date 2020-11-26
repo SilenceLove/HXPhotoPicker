@@ -324,6 +324,39 @@ class HXPHAssetManager: NSObject {
         }
     }
     
+    class func requestAVAsset(for asset: PHAsset, version: PHVideoRequestOptionsVersion, deliveryMode: PHVideoRequestOptionsDeliveryMode, isNetworkAccessAllowed: Bool, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+        let options = PHVideoRequestOptions.init()
+        options.isNetworkAccessAllowed = isNetworkAccessAllowed
+        options.progressHandler = progressHandler
+        options.version = version
+        options.deliveryMode = deliveryMode
+        return PHImageManager.default().requestAVAsset(forVideo: asset, options: options, resultHandler: resultHandler)
+    }
+    class func requestAVAsset(for asset: PHAsset, iCloudHandler: @escaping (PHImageRequestID) -> Void, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
+        var version = PHVideoRequestOptionsVersion.current
+        var deliveryMode = PHVideoRequestOptionsDeliveryMode.fastFormat
+        return requestAVAsset(for: asset, version: version, deliveryMode: deliveryMode, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (avAsset, audioMix, info) in
+            if self.assetDownloadFinined(for: info) {
+                resultHandler(avAsset, audioMix, info, true)
+            }else {
+                if self.assetIsInCloud(for: info) {
+                    version = PHVideoRequestOptionsVersion.original
+                    deliveryMode = PHVideoRequestOptionsDeliveryMode.highQualityFormat
+                    let iCloudRequestID = self.requestAVAsset(for: asset, version: version, deliveryMode: deliveryMode, isNetworkAccessAllowed: true, progressHandler: progressHandler) { (avAsset, audioMix, info) in
+                        if self.assetDownloadFinined(for: info) {
+                            resultHandler(avAsset, audioMix, info, true)
+                        }else {
+                            resultHandler(avAsset, audioMix, info, false)
+                        }
+                    }
+                    iCloudHandler(iCloudRequestID)
+                }else {
+                    resultHandler(avAsset, audioMix, info, false)
+                }
+            }
+        }
+    }
+    
     
     /// 根据下载获取的信息判断资源是否存在iCloud上
     /// - Parameter info: 下载获取的信息
@@ -368,6 +401,9 @@ class HXPHAssetManager: NSObject {
     /// - Parameter info: 下载获取的信息
     class func assetDownloadIsDegraded(for info: [AnyHashable : Any]?) -> Bool {
         if info == nil {
+            return false
+        }
+        if info![AnyHashable(PHImageResultIsDegradedKey)] == nil {
             return false
         }
         let isDegraded = info![AnyHashable(PHImageResultIsDegradedKey)] as! Int

@@ -91,7 +91,7 @@ class HXPHAlbumListConfiguration: NSObject {
     
     /// 当相册里没有资源时的封面图片名
     lazy var emptyCoverImageName: String = {
-        return ""
+        return "hx_picker_album_empty"
     }()
     
     /// 列表背景颜色
@@ -197,7 +197,7 @@ class HXPHPreviewViewConfiguration: NSObject {
     lazy var bottomView: HXPHPickerBottomViewConfiguration = {
         let config = HXPHPickerBottomViewConfiguration.init()
         config.previewButtonHidden = true
-        config.editButtonHidden = false
+//        config.editButtonHidden = true
         return config
     }()
 }
@@ -343,7 +343,7 @@ class HXPHNotAuthorizedConfiguration: NSObject {
     
     /// 关闭按钮图片名
     lazy var closeButtonImageName: String = {
-        return ""
+        return "hx_picker_notAuthorized_close"
     }()
     
     /// 标题颜色
@@ -358,7 +358,7 @@ class HXPHNotAuthorizedConfiguration: NSObject {
     
     /// 跳转按钮背景颜色
     lazy var jumpButtonBackgroudColor: UIColor = {
-        return UIColor(hx_hexString: "666666")
+        return UIColor(hx_hexString: "333333")
     }()
     
     /// 跳转按钮文字颜色

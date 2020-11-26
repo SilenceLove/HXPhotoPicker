@@ -105,6 +105,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         }
         collectionView.register(HXPHPreviewPhotoViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPreviewPhotoViewCell.self))
         collectionView.register(HXPHPreviewLivePhotoViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPreviewLivePhotoViewCell.self))
+        collectionView.register(HXPHPreviewVideoViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPreviewVideoViewCell.self))
         return collectionView
     }()
     
@@ -118,10 +119,10 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     func bottomViewDidPreviewButtonClick(view: HXPHPickerBottomView) {}
     func bottomViewDidFinishButtonClick(view: HXPHPickerBottomView) {
         hx_pickerController()?.finishCallback()
-        dismiss(animated: true, completion: nil)
     }
     func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) {
         delegate?.previewViewControllerDidClickOriginal(self, with: isOriginal)
+        hx_pickerController()?.didOriginalButtonCallback()
     }
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -191,7 +192,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             }
         }
     }
-    
+    // MARK: HXPHPreviewViewCellDelegate
     func singleTap() {
         if navigationController == nil {
             return
@@ -203,8 +204,16 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             navigationController?.setNeedsStatusBarAppearanceUpdate()
         }
         navigationController!.setNavigationBarHidden(statusBarShouldBeHidden, animated: true)
+        let currentCell = getCell(for: currentPreviewIndex)
         if !statusBarShouldBeHidden {
             self.bottomView.isHidden = false
+            if currentCell?.photoAsset?.mediaType == HXPHAssetMediaType.video {
+                currentCell?.scrollContentView?.videoView.stopPlay()
+            }
+        }else {
+            if currentCell?.photoAsset?.mediaType == HXPHAssetMediaType.video {
+                currentCell?.scrollContentView?.videoView.startPlay()
+            }
         }
         UIView.animate(withDuration: 0.25) {
             self.bottomView.alpha = self.statusBarShouldBeHidden ? 0 : 1
@@ -220,10 +229,14 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photoAsset = previewAssets[indexPath.item]
         let cell :HXPHPreviewViewCell
-        if photoAsset.mediaSubType == HXPHAssetMediaSubType.livePhoto {
-            cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewLivePhotoViewCell.self), for: indexPath) as! HXPHPreviewLivePhotoViewCell
+        if photoAsset.mediaType == HXPHAssetMediaType.photo {
+            if photoAsset.mediaSubType == HXPHAssetMediaSubType.livePhoto {
+                cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewLivePhotoViewCell.self), for: indexPath) as! HXPHPreviewLivePhotoViewCell
+            }else {
+                cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewPhotoViewCell.self), for: indexPath) as! HXPHPreviewPhotoViewCell
+            }
         }else {
-            cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewPhotoViewCell.self), for: indexPath) as! HXPHPreviewPhotoViewCell
+            cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewVideoViewCell.self), for: indexPath) as! HXPHPreviewVideoViewCell
         }
         cell.photoAsset = photoAsset
         cell.delegate = self
@@ -290,6 +303,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     }
     
     deinit {
+        print("\(self) deinit")
         NotificationCenter.default.removeObserver(self)
     }
 }
