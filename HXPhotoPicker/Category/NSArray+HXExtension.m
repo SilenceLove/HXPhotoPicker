@@ -149,6 +149,8 @@
     HXWeakSelf
     [self requestImageWithOriginal:original photoModel:model successful:^(UIImage * _Nullable image, NSURL * _Nullable imagePath, HXPhotoModel *photoModel) {
         if (image) {
+            photoModel.thumbPhoto = image;
+            photoModel.previewPhoto = image;
             [imageList addObject:image];
         }else if (imagePath) {
             UIImage *hImage = [NSArray hx_disposeHEICWithPath:imagePath.relativePath];
