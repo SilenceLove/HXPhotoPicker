@@ -57,6 +57,7 @@
 
 /// 获取当前相册权限类型
 + (PHAuthorizationStatus)authorizationStatus;
++ (BOOL)authorizationStatusIsLimited;
 
 /// 显示未授权的弹窗
 + (void)showNoAuthorizedAlertWithViewController:(UIViewController * _Nullable)viewController

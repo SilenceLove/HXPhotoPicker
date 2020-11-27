@@ -58,6 +58,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7B7E3E751E4AACD1002234EE"
+            BuildableName = "HXPhotoPickerExample.app"
+            BlueprintName = "HXPhotoPickerExample"
+            ReferencedContainer = "container:HXPhotoPickerExample.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -249,6 +249,17 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     }
     return status;
 }
++ (BOOL)authorizationStatusIsLimited {
+    PHAuthorizationStatus status = [self authorizationStatus];
+#ifdef __IPHONE_14_0
+    if (@available(iOS 14, *)) {
+        if (status == PHAuthorizationStatusLimited) {
+            return YES;
+        }
+    }
+#endif
+    return NO;
+}
 + (void)showUnusableCameraAlert:(UIViewController *)vc {
     hx_showAlert(vc, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
         NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
