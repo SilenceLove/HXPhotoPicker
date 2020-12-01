@@ -40,10 +40,10 @@ class HXPHAsset: NSObject {
     }
     
     /// 媒体类型
-    var mediaType: HXPHAssetMediaType = HXPHAssetMediaType.photo
+    var mediaType: HXPHPicker.Asset.MediaType = .photo
     
     /// 媒体子类型
-    var mediaSubType: HXPHAssetMediaSubType = HXPHAssetMediaSubType.image
+    var mediaSubType: HXPHPicker.Asset.MediaSubType = .image
     
     /// 视频时长 格式：00:00
     var videoTime: String?
@@ -64,11 +64,11 @@ class HXPHAsset: NSObject {
     }
     private func setMediaType() {
         if asset?.mediaType.rawValue == 1 {
-            mediaType = HXPHAssetMediaType.photo
-            mediaSubType = HXPHAssetMediaSubType.image
+            mediaType = .photo
+            mediaSubType = .image
         }else if asset?.mediaType.rawValue == 2 {
-            mediaType = HXPHAssetMediaType.video
-            mediaSubType = HXPHAssetMediaSubType.video
+            mediaType = .video
+            mediaSubType = .video
             videoDuration = asset!.duration
             videoTime = HXPHTools.transformVideoDurationToString(duration: asset!.duration)
         }
@@ -82,9 +82,7 @@ class HXPHAsset: NSObject {
             return nil
         }
         return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: 165) { (image, info) in
-            if completion != nil {
-                completion!(image, self, info)
-            }
+            completion?(image, self, info)
         }
     }
     
@@ -95,32 +93,22 @@ class HXPHAsset: NSObject {
     /// - Returns: 请求ID
     func requestImageData(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, Data, UIImage.Orientation, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
         if asset == nil {
-            if failure != nil {
-                failure!(self, nil)
-            }
+            failure?(self, nil)
             return 0
         }
         var version = PHImageRequestOptionsVersion.current
-        if mediaSubType == HXPHAssetMediaSubType.imageAnimated {
-            version = PHImageRequestOptionsVersion.original
+        if mediaSubType == .imageAnimated {
+            version = .original
         }
         return HXPHAssetManager.requestImageData(for: asset!, version: version, iCloudHandler: { (iCloudRequestID) in
-            if iCloudHandler != nil {
-                iCloudHandler!(self, iCloudRequestID)
-            }
+            iCloudHandler?(self, iCloudRequestID)
         }, progressHandler: { (progress, error, stop, info) in
-            if progressHandler != nil {
-                progressHandler!(self, progress)
-            }
+            progressHandler?(self, progress)
         }, resultHandler: { (data, dataUTI, imageOrientation, info, downloadSuccess) in
             if downloadSuccess {
-                if success != nil {
-                    success!(self, data!, imageOrientation, info)
-                }
+                success?(self, data!, imageOrientation, info)
             }else {
-                if failure != nil {
-                    failure!(self, info)
-                }
+                failure?(self, info)
             }
         })
     }
@@ -134,29 +122,19 @@ class HXPHAsset: NSObject {
     @available(iOS 9.1, *)
     func requestLivePhoto(targetSize: CGSize, iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, PHLivePhoto, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
         if asset == nil {
-            if failure != nil {
-                failure?(self, nil)
-            }
+            failure?(self, nil)
             return 0
         }
         
         return HXPHAssetManager.requestLivePhoto(for: asset!, targetSize: targetSize) { (iCloudRequestID) in
-            if iCloudHandler != nil {
-                iCloudHandler!(self, iCloudRequestID)
-            }
+            iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { (progress, error, stop, info) in
-            if progressHandler != nil {
-                progressHandler!(self, progress)
-            }
+            progressHandler?(self, progress)
         } resultHandler: { (livePhoto, info, downloadSuccess) in
             if downloadSuccess {
-                if success != nil {
-                    success!(self, livePhoto!, info)
-                }
+                success?(self, livePhoto!, info)
             }else {
-                if failure != nil {
-                    failure!(self, info)
-                }
+                failure?(self, info)
             }
         }
     }
@@ -168,28 +146,18 @@ class HXPHAsset: NSObject {
     /// - Returns: 请求ID
     func requestAVAsset(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, AVAsset, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
         if asset == nil {
-            if failure != nil {
-                failure?(self, nil)
-            }
+            failure?(self, nil)
             return 0
         }
         return HXPHAssetManager.requestAVAsset(for: asset!) { (iCloudRequestID) in
-            if iCloudHandler != nil {
-                iCloudHandler!(self, iCloudRequestID)
-            }
+            iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { (progress, error, stop, info) in
-            if progressHandler != nil {
-                progressHandler!(self, progress)
-            }
+            progressHandler?(self, progress)
         } resultHandler: { (avAsset, audioMix, info, downloadSuccess) in
             if downloadSuccess {
-                if success != nil {
-                    success!(self, avAsset!, info)
-                }
+                success?(self, avAsset!, info)
             }else {
-                if failure != nil {
-                    failure!(self, info)
-                }
+                failure?(self, info)
             }
         }
 

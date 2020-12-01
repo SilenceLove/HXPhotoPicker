@@ -32,9 +32,9 @@ class HXPHPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         scrollView.delaysContentTouches = false
         scrollView.canCancelContentTouches = true
         scrollView.alwaysBounceVertical = false
-        scrollView.autoresizingMask = UIView.AutoresizingMask.init(arrayLiteral: UIView.AutoresizingMask.flexibleWidth, UIView.AutoresizingMask.flexibleHeight)
+        scrollView.autoresizingMask = UIView.AutoresizingMask.init(arrayLiteral: .flexibleWidth, .flexibleHeight)
         if #available(iOS 11.0, *) {
-            scrollView.contentInsetAdjustmentBehavior = UIScrollView.ContentInsetAdjustmentBehavior.never
+            scrollView.contentInsetAdjustmentBehavior = .never
         }
         let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap(tap:)))
         scrollView.addGestureRecognizer(singleTap)
@@ -191,26 +191,27 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         return videoView
     }()
     
-    var type: HXPHPreviewContentViewType = HXPHPreviewContentViewType.photo
+    var type: HXPHPreviewContentViewType = .photo
     var requestID: PHImageRequestID?
     var requestCompletion: Bool = false
     
     var photoAsset: HXPHAsset? {
         didSet {
-            if type == HXPHPreviewContentViewType.livePhoto {
+            if type == .livePhoto {
                 if #available(iOS 9.1, *) {
                     livePhotoView.livePhoto = nil
                 }
             }
-            if photoAsset?.mediaSubType == HXPHAssetMediaSubType.imageAnimated {
+            if photoAsset?.mediaSubType == .imageAnimated {
                 imageView.setupDisplayLink()
             }else {
                 imageView.displayLink?.invalidate()
                 imageView.gifImage = nil
             }
+            weak var weakSelf = self
             requestID = photoAsset?.requestThumbnailImage(completion: { (image, asset, info) in
-                if asset == self.photoAsset && image != nil {
-                    self.imageView.image = image
+                if asset == weakSelf?.photoAsset && image != nil {
+                    weakSelf?.imageView.image = image
                 }
             })
         }
@@ -220,11 +221,11 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         super.init(frame: CGRect.zero)
         self.type = type
         addSubview(imageView)
-        if type == HXPHPreviewContentViewType.livePhoto {
+        if type == .livePhoto {
             if #available(iOS 9.1, *) {
                 addSubview(livePhotoView)
             }
-        }else if type == HXPHPreviewContentViewType.video {
+        }else if type == .video {
             addSubview(videoView)
         }
     }
@@ -234,14 +235,14 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             return
         }
         cancelRequest()
-        if type == HXPHPreviewContentViewType.photo {
-            if photoAsset?.mediaSubType == HXPHAssetMediaSubType.imageAnimated &&
+        if type == .photo {
+            if photoAsset?.mediaSubType == .imageAnimated &&
                 imageView.gifImage != nil {
                 imageView.startAnimating()
             }else {
                 requestOriginalImage()
             }
-        }else if type == HXPHPreviewContentViewType.livePhoto {
+        }else if type == .livePhoto {
             if #available(iOS 9.1, *) {
                 requestLivePhoto()
             }
@@ -253,37 +254,38 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
     }
     
     func requestOriginalImage() {
+        weak var weakSelf = self
         requestID = photoAsset?.requestImageData(iCloudHandler: { (asset, iCloudRequestID) in
-            if asset == self.photoAsset {
-                self.requestID = iCloudRequestID
+            if asset == weakSelf?.photoAsset {
+                weakSelf?.requestID = iCloudRequestID
             }
         }, progressHandler: { (asset, progress) in
-            if asset == self.photoAsset {
+            if asset == weakSelf?.photoAsset {
                 
             }
         }, success: { (asset, imageData, imageOrientation, info) in
-            if asset.mediaSubType == HXPHAssetMediaSubType.imageAnimated {
-                if asset == self.photoAsset {
+            if asset.mediaSubType == .imageAnimated {
+                if asset == weakSelf?.photoAsset {
                     let image = HXPHGIFImage.init(data: imageData)
-                    self.imageView.gifImage = image
-                    self.requestID = nil
-                    self.requestCompletion = true
+                    weakSelf?.imageView.gifImage = image
+                    weakSelf?.requestID = nil
+                    weakSelf?.requestCompletion = true
                 }
             }else {
                 DispatchQueue.global().async {
                     var image = UIImage.init(data: imageData)
                     image = image?.hx_scaleSuitableSize()
                     DispatchQueue.main.async {
-                        if asset == self.photoAsset {
-                            self.imageView.image = image
-                            self.requestID = nil
-                            self.requestCompletion = true
+                        if asset == weakSelf?.photoAsset {
+                            weakSelf?.imageView.image = image
+                            weakSelf?.requestID = nil
+                            weakSelf?.requestCompletion = true
                         }
                     }
                 }
             }
         }, failure: { (asset, info) in
-            if asset == self.photoAsset {
+            if asset == weakSelf?.photoAsset {
                 
             }
         })
@@ -291,45 +293,51 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
     @available(iOS 9.1, *)
     func requestLivePhoto() {
         let targetSize : CGSize = hx_size
+        weak var weakSelf = self
         requestID = photoAsset?.requestLivePhoto(targetSize: targetSize, iCloudHandler: { (asset, requestID) in
-            if asset == self.photoAsset {
-                self.requestID = requestID
+            if asset == weakSelf?.photoAsset {
+                weakSelf?.requestID = requestID
             }
         }, progressHandler: { (asset, progress) in
-            if asset == self.photoAsset {
+            if asset == weakSelf?.photoAsset {
                 
             }
         }, success: { (asset, livePhoto, info) in
-            if asset == self.photoAsset {
-                self.livePhotoView.livePhoto = livePhoto
-                self.livePhotoView.startPlayback(with: PHLivePhotoViewPlaybackStyle.full)
-                self.requestID = nil
-                self.requestCompletion = true
+            if asset == weakSelf?.photoAsset {
+                weakSelf?.livePhotoView.livePhoto = livePhoto
+                weakSelf?.livePhotoView.startPlayback(with: PHLivePhotoViewPlaybackStyle.full)
+                weakSelf?.requestID = nil
+                weakSelf?.requestCompletion = true
             }
         }, failure: { (asset, info) in
-            if asset == self.photoAsset {
+            if asset == weakSelf?.photoAsset {
                 
             }
         })
     }
     func requestAVAsset() {
+        weak var weakSelf = self
         requestID = photoAsset?.requestAVAsset(iCloudHandler: { (asset, requestID) in
-            if asset == self.photoAsset {
-                self.requestID = requestID
+            if asset == weakSelf?.photoAsset {
+                weakSelf?.requestID = requestID
+                HXPHProgressHUD.showLoadingHUD(addedTo: weakSelf, text: "正在下载...", animated: true)
             }
         }, progressHandler: { (asset, progress) in
-            if asset == self.photoAsset {
-                
+            if asset == weakSelf?.photoAsset {
             }
         }, success: { (asset, avAsset, info) in
-            if asset == self.photoAsset {
-                self.videoView.avAsset = avAsset
-                self.requestID = nil
-                self.requestCompletion = true
+            if asset == weakSelf?.photoAsset {
+                HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
+                weakSelf?.videoView.avAsset = avAsset
+                weakSelf?.requestID = nil
+                weakSelf?.requestCompletion = true
             }
         }, failure: { (asset, info) in
-            if asset == self.photoAsset {
-                
+            if asset == weakSelf?.photoAsset {
+                if !HXPHAssetManager.assetDownloadCancel(for: info) {
+                    HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
+                    HXPHProgressHUD.showWarningHUD(addedTo: weakSelf, text: "下载失败", animated: true, delay: 2)
+                }
             }
         })
     }
@@ -338,20 +346,21 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
         }
-        if photoAsset?.mediaSubType == HXPHAssetMediaSubType.imageAnimated {
+        if photoAsset?.mediaSubType == .imageAnimated {
             imageView.stopAnimating()
         }
-        if type == HXPHPreviewContentViewType.livePhoto {
+        if type == .livePhoto {
             if #available(iOS 9.1, *) {
                 livePhotoView.stopPlayback()
             }
-        }else if type == HXPHPreviewContentViewType.video {
+        }else if type == .video {
             videoView.cancelPlayer()
+            HXPHProgressHUD.hideHUD(forView: self, animated: false)
         }
         requestCompletion = false
     }
     func stopAnimatedImage() {
-        if photoAsset?.mediaSubType == HXPHAssetMediaSubType.imageAnimated {
+        if photoAsset?.mediaSubType == .imageAnimated {
             imageView.displayLink?.invalidate()
             imageView.gifImage = nil
         }
@@ -368,7 +377,9 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             videoView.frame = bounds
         }
     }
-    
+    deinit {
+        cancelRequest()
+    }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -643,7 +654,7 @@ class HXPHVideoView: UIView {
     
     lazy var playButton: UIButton = {
         let playButton = UIButton.init(type: UIButton.ButtonType.custom)
-        playButton.setImage(UIImage.hx_named(named: "hx_picker_cell_video_play"), for: UIControl.State.normal)
+        playButton.setImage("hx_picker_cell_video_play".hx_image, for: UIControl.State.normal)
         playButton.setImage(UIImage.init(), for: UIControl.State.selected)
         playButton.addTarget(self, action: #selector(didPlayButtonClick(button:)), for: UIControl.Event.touchUpInside)
         playButton.hx_size = playButton.currentImage!.size
@@ -713,11 +724,13 @@ class HXPHVideoView: UIView {
             player.replaceCurrentItem(with: nil)
             playerLayer.player = nil
             removePlayerObservers()
-            canRemovePlayerObservers = false
             HXPHProgressHUD.hideHUD(forView: self, animated: true)
         }
     }
     func addedPlayerObservers() {
+        if canRemovePlayerObservers {
+            return
+        }
         player.currentItem?.addObserver(self, forKeyPath: "status", options:[.new, .old], context: nil)
         player.currentItem?.addObserver(self, forKeyPath: "loadedTimeRanges", options:.new, context: nil)
         player.currentItem?.addObserver(self, forKeyPath: "playbackBufferEmpty", options:.new, context: nil)
@@ -735,6 +748,7 @@ class HXPHVideoView: UIView {
         player.currentItem?.removeObserver(self, forKeyPath: "playbackBufferEmpty", context: nil)
         player.currentItem?.removeObserver(self, forKeyPath: "playbackLikelyToKeepUp", context: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
+        canRemovePlayerObservers = false
     }
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if object is AVPlayerItem {

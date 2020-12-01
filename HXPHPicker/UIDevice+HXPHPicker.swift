@@ -12,8 +12,8 @@ extension UIDevice {
     var hx_isPortrait: Bool {
         get {
             let orientation = UIApplication.shared.statusBarOrientation
-            if  orientation == UIInterfaceOrientation.landscapeLeft ||
-                orientation == UIInterfaceOrientation.landscapeRight {
+            if  orientation == .landscapeLeft ||
+                orientation == .landscapeRight {
                 return false
             }
             return true
@@ -79,7 +79,7 @@ extension UIDevice {
     }
     var hx_isPad: Bool {
         get {
-            return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad
+            return UI_USER_INTERFACE_IDIOM() == .pad
         }
     }
     var hx_isAllIPhoneX: Bool {

@@ -24,7 +24,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     lazy var selectBoxControl: HXPHPickerCellSelectBoxControl = {
         let boxControl = HXPHPickerCellSelectBoxControl.init(frame: CGRect(x: 0, y: 0, width: config.selectBox.size.width, height: config.selectBox.size.height))
-        boxControl.backgroundColor = UIColor.clear
+        boxControl.backgroundColor = .clear
         boxControl.config = config.selectBox
         boxControl.addTarget(self, action: #selector(didSelectBoxControlClick), for: UIControl.Event.touchUpInside)
         return boxControl
@@ -60,7 +60,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         let boxWidth = config!.selectBox.size.width
         let boxHeight = config!.selectBox.size.height
         if isSelected {
-            if config.selectBox.type == HXPHPickerCellSelectBoxType.number {
+            if config.selectBox.type == .number {
                 let text = String(format: "%d", arguments: [photoAsset.selectIndex + 1])
                 let font = UIFont.systemFont(ofSize: config!.selectBox.titleFontSize)
                 let textHeight = text.hx_stringHeight(ofFont: font, maxWidth: boxWidth)
@@ -82,7 +82,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     lazy var collectionViewLayout : UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout.init()
-        layout.scrollDirection = UICollectionView.ScrollDirection.horizontal
+        layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
@@ -91,14 +91,13 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     lazy var collectionView : UICollectionView = {
         let collectionView = UICollectionView.init(frame: view.bounds, collectionViewLayout: collectionViewLayout)
-        collectionView.backgroundColor = config.backgroundColor
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.isPagingEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = UIScrollView.ContentInsetAdjustmentBehavior.never
+            collectionView.contentInsetAdjustmentBehavior = .never
         } else {
             // Fallback on earlier versions
             self.automaticallyAdjustsScrollViewInsets = false
@@ -118,11 +117,20 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     // MARK: HXPHPickerBottomViewDelegate
     func bottomViewDidPreviewButtonClick(view: HXPHPickerBottomView) {}
     func bottomViewDidFinishButtonClick(view: HXPHPickerBottomView) {
-        hx_pickerController()?.finishCallback()
+        if hx_pickerController()!.config.selectMode == .multiple {
+            hx_pickerController()?.finishCallback()
+        }else {
+            if previewAssets.isEmpty {
+                HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "没有可选资源".hx_localized, animated: true, delay: 2)
+                return
+            }
+            let photoAsset = previewAssets[currentPreviewIndex]
+            hx_pickerController()?.singleFinishCallback(for: photoAsset)
+        }
     }
     func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) {
         delegate?.previewViewControllerDidClickOriginal(self, with: isOriginal)
-        hx_pickerController()?.didOriginalButtonCallback()
+        hx_pickerController()?.originalButtonCallback()
     }
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -153,19 +161,19 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true;
-        edgesForExtendedLayout = UIRectEdge.all;
+        edgesForExtendedLayout = .all;
         view.clipsToBounds = true
         config = hx_pickerController()!.config.previewView
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
-        view.backgroundColor = config.backgroundColor
         initView()
+        configColor()
     }
     
     func initView() {
         view.addSubview(collectionView)
         view.addSubview(bottomView)
         bottomView.updateFinishButtonTitle()
-        if hx_pickerController()!.config.selectMode == HXPHAssetSelectMode.multiple {
+        if hx_pickerController()!.config.selectMode == .multiple {
             navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: selectBoxControl)
             if currentPreviewIndex == 0 && !previewAssets.isEmpty {
                 let photoAsset = previewAssets.first!
@@ -174,7 +182,10 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             }
         }
     }
-    
+    func configColor() {
+        view.backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
+        collectionView.backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
+    }
     func getCell(for item: Int) -> HXPHPreviewViewCell? {
         if previewAssets.isEmpty {
             return nil
@@ -186,7 +197,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     @objc func deviceOrientationChanged(notify: Notification) {
         orientationDidChange = true
         let cell = getCell(for: currentPreviewIndex)
-        if cell?.photoAsset?.mediaSubType == HXPHAssetMediaSubType.livePhoto {
+        if cell?.photoAsset?.mediaSubType == .livePhoto {
             if #available(iOS 9.1, *) {
                 cell?.scrollContentView?.livePhotoView.stopPlayback()
             }
@@ -199,19 +210,19 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         }
         let isHidden = navigationController!.navigationBar.isHidden
         statusBarShouldBeHidden = !isHidden
-        if self.modalPresentationStyle == UIModalPresentationStyle.fullScreen {
-            UIApplication.shared.setStatusBarHidden(statusBarShouldBeHidden, with: UIStatusBarAnimation.fade)
+        if self.modalPresentationStyle == .fullScreen {
+            UIApplication.shared.setStatusBarHidden(statusBarShouldBeHidden, with: .fade)
             navigationController?.setNeedsStatusBarAppearanceUpdate()
         }
         navigationController!.setNavigationBarHidden(statusBarShouldBeHidden, animated: true)
         let currentCell = getCell(for: currentPreviewIndex)
         if !statusBarShouldBeHidden {
             self.bottomView.isHidden = false
-            if currentCell?.photoAsset?.mediaType == HXPHAssetMediaType.video {
+            if currentCell?.photoAsset?.mediaType == .video {
                 currentCell?.scrollContentView?.videoView.stopPlay()
             }
         }else {
-            if currentCell?.photoAsset?.mediaType == HXPHAssetMediaType.video {
+            if currentCell?.photoAsset?.mediaType == .video {
                 currentCell?.scrollContentView?.videoView.startPlay()
             }
         }
@@ -229,8 +240,8 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photoAsset = previewAssets[indexPath.item]
         let cell :HXPHPreviewViewCell
-        if photoAsset.mediaType == HXPHAssetMediaType.photo {
-            if photoAsset.mediaSubType == HXPHAssetMediaSubType.livePhoto {
+        if photoAsset.mediaType == .photo {
+            if photoAsset.mediaSubType == .livePhoto {
                 cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewLivePhotoViewCell.self), for: indexPath) as! HXPHPreviewLivePhotoViewCell
             }else {
                 cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewPhotoViewCell.self), for: indexPath) as! HXPHPreviewPhotoViewCell
@@ -290,14 +301,14 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     }
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return UIStatusBarAnimation.fade
+        return .fade
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                
+                configColor()
             }
         }
     }

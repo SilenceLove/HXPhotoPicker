@@ -22,9 +22,9 @@ class HXPHTools: NSObject {
         if viewController == nil {
             return
         }
-        if status == PHAuthorizationStatus.denied ||
-            status == PHAuthorizationStatus.restricted {
-            showAlert(viewController: viewController, title: "无法访问相册", message: "请在设置-隐私-相册中允许访问相册", leftActionTitle: "取消", leftHandler: {_ in }, rightActionTitle: "设置") { (alertAction) in
+        if status == .denied ||
+            status == .restricted {
+            showAlert(viewController: viewController, title: "无法访问相册中照片".hx_localized, message: "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".hx_localized, leftActionTitle: "取消".hx_localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".hx_localized) { (alertAction) in
                 openSettingsURL()
             }
         }
@@ -39,7 +39,7 @@ class HXPHTools: NSObject {
     }
     
     class func showAlert(viewController: UIViewController? , title: String? , message: String? , leftActionTitle: String ,  leftHandler: @escaping (UIAlertAction)->(), rightActionTitle: String , rightHandler: @escaping (UIAlertAction)->()) {
-        let alertController = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        let alertController = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
         let leftAction = UIAlertAction.init(title: leftActionTitle, style: UIAlertAction.Style.cancel, handler: leftHandler)
         let rightAction = UIAlertAction.init(title: rightActionTitle, style: UIAlertAction.Style.default, handler: rightHandler)
         alertController.addAction(leftAction)
@@ -64,12 +64,12 @@ class HXPHTools: NSObject {
     }
     
     class func transformAlbumName(for collection: PHAssetCollection) -> String? {
-        if collection.assetCollectionType == PHAssetCollectionType.album {
+        if collection.assetCollectionType == .album {
             return collection.localizedTitle
         }
         var albumName : String?
         let type = HXPHManager.shared.languageType
-        if type == HXPHLanguageType.system {
+        if type == .system {
             albumName = collection.localizedTitle
         }else {
             if collection.localizedTitle == "最近项目" ||
@@ -80,43 +80,43 @@ class HXPHTools: NSObject {
                 albumName = "HXAlbumCameraRoll".hx_localized
             }else {
                 switch collection.assetCollectionSubtype {
-                case PHAssetCollectionSubtype.smartAlbumUserLibrary:
+                case .smartAlbumUserLibrary:
                     albumName = "HXAlbumCameraRoll".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumVideos:
+                case .smartAlbumVideos:
                     albumName = "HXAlbumVideos".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumPanoramas:
+                case .smartAlbumPanoramas:
                     albumName = "HXAlbumPanoramas".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumFavorites:
+                case .smartAlbumFavorites:
                     albumName = "HXAlbumFavorites".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumTimelapses:
+                case .smartAlbumTimelapses:
                     albumName = "HXAlbumTimelapses".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumRecentlyAdded:
+                case .smartAlbumRecentlyAdded:
                     albumName = "HXAlbumRecentlyAdded".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumBursts:
+                case .smartAlbumBursts:
                     albumName = "HXAlbumBursts".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumSlomoVideos:
+                case .smartAlbumSlomoVideos:
                     albumName = "HXAlbumSlomoVideos".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumSelfPortraits:
+                case .smartAlbumSelfPortraits:
                     albumName = "HXAlbumSelfPortraits".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumScreenshots:
+                case .smartAlbumScreenshots:
                     albumName = "HXAlbumScreenshots".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumDepthEffect:
+                case .smartAlbumDepthEffect:
                     albumName = "HXAlbumDepthEffect".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumLivePhotos:
+                case .smartAlbumLivePhotos:
                     albumName = "HXAlbumLivePhotos".hx_localized
                     break
-                case PHAssetCollectionSubtype.smartAlbumAnimated:
+                case .smartAlbumAnimated:
                     albumName = "HXAlbumAnimated".hx_localized
                     break
                 default:
@@ -126,5 +126,25 @@ class HXPHTools: NSObject {
             }
         }
         return albumName
+    }
+    
+    class func transformTargetWidthToSize(targetWidth: CGFloat, asset: PHAsset) -> CGSize {
+        let scale:CGFloat = 0.8
+        let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
+        var width = targetWidth
+        if asset.pixelWidth < Int(targetWidth) {
+            width *= 0.5
+        }
+        var height = width / aspectRatio
+        let maxHeight = UIScreen.main.bounds.size.height
+        if height > maxHeight {
+            width = maxHeight / height * width * scale
+            height = maxHeight * scale
+        }
+        if height < targetWidth && width >= targetWidth {
+            width = targetWidth / height * width * scale
+            height = targetWidth * scale
+        }
+        return CGSize.init(width: width, height: height)
     }
 }

@@ -12,14 +12,13 @@ import Photos
 class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     lazy var tableView : UITableView = {
-        let tableView = UITableView.init(frame: CGRect.init(), style: UITableView.Style.plain)
-        tableView.backgroundColor = config!.backgroundColor
+        let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
         tableView.dataSource = self;
         tableView.delegate = self;
-        tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        tableView.separatorStyle = .none
         tableView.register(HXAlbumViewCell.self, forCellReuseIdentifier: "cellId")
         if #available(iOS 11.0, *) {
-            tableView.contentInsetAdjustmentBehavior = UIScrollView.ContentInsetAdjustmentBehavior.never
+            tableView.contentInsetAdjustmentBehavior = .never
         } else {
             // Fallback on earlier versions
             self.automaticallyAdjustsScrollViewInsets = false
@@ -40,14 +39,18 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     override func viewDidLoad() {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true;
-        edgesForExtendedLayout = UIRectEdge.all;
+        edgesForExtendedLayout = .all;
         config = hx_pickerController()!.config.albumList
-        view.backgroundColor = config!.backgroundColor
-        let backItem = UIBarButtonItem.init(title: "取消".hx_localized, style: UIBarButtonItem.Style.done, target: self, action: #selector(didCancelItemClick))
+        let backItem = UIBarButtonItem.init(title: "取消".hx_localized, style: .done, target: self, action: #selector(didCancelItemClick))
         navigationItem.rightBarButtonItem = backItem
         view.addSubview(tableView)
+        configColor()
         fetchCameraAssetCollection()
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
+    }
+    func configColor() {
+        tableView.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
+        view.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
     }
     @objc func deviceOrientationChanged(notify: Notification) {
         beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
@@ -62,7 +65,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             hx_pickerController()?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
                 var cameraAssetCollection = assetCollection
                 if cameraAssetCollection == nil {
-                    cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName, coverImage: UIImage.hx_named(named: self.config!.emptyCoverImageName))
+                    cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName, coverImage: self.config!.emptyCoverImageName.hx_image)
                 }
                 self.pushPhotoPickerContoller(assetCollection: cameraAssetCollection, animated: false)
                 self.canFetchAssetCollections = true
@@ -82,7 +85,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     func reloadTableView(assetCollectionsArray: [HXPHAssetCollection]) {
         self.assetCollectionsArray = assetCollectionsArray
         if self.assetCollectionsArray.isEmpty {
-            let assetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName, coverImage: UIImage.hx_named(named: self.config!.emptyCoverImageName))
+            let assetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName, coverImage: self.config!.emptyCoverImageName.hx_image)
             self.assetCollectionsArray.append(assetCollection)
         }
         self.tableView.reloadData()
@@ -125,14 +128,14 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     func changeSubviewFrame() {
         let margin: CGFloat = UIDevice.current.hx_leftMargin
         tableView.frame = CGRect(x: margin, y: 0, width: view.hx_width - 2 * margin, height: view.hx_height)
-        if navigationController?.modalPresentationStyle == UIModalPresentationStyle.fullScreen {
+        if navigationController?.modalPresentationStyle == .fullScreen {
             tableView.contentInset = UIEdgeInsets.init(top: UIDevice.current.hx_navigationBarHeight, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
         }else {
             tableView.contentInset = UIEdgeInsets.init(top: navigationController!.navigationBar.hx_height, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
         }
         if orientationDidChange {
             if !assetCollectionsArray.isEmpty {
-                tableView.scrollToRow(at: beforeOrientationIndexPath ?? IndexPath.init(row: 0, section: 0), at: UITableView.ScrollPosition.top, animated: false)
+                tableView.scrollToRow(at: beforeOrientationIndexPath ?? IndexPath.init(row: 0, section: 0), at: .top, animated: false)
             }
             orientationDidChange = false
         }
@@ -152,14 +155,14 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         }
     }
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIStatusBarStyle.default
+        return .default
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                
+                configColor()
             }
         }
     }

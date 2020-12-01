@@ -12,7 +12,7 @@ import Photos
 class HXAlbumViewCell: UITableViewCell {
     lazy var albumCoverView: UIImageView = {
         let albumCoverView = UIImageView.init()
-        albumCoverView.contentMode = UIView.ContentMode.scaleAspectFill
+        albumCoverView.contentMode = .scaleAspectFill
         albumCoverView.clipsToBounds = true
         return albumCoverView
     }()
@@ -35,27 +35,21 @@ class HXAlbumViewCell: UITableViewCell {
     }()
     var config : HXPHAlbumListConfiguration? {
         didSet {
-            albumNameLb.textColor = config?.albumNameColor
             albumNameLb.font = config?.albumNameFont
-            photoCountLb.textColor = config?.photoCountColor
             photoCountLb.font = config?.photoCountFont
-            bottomLineView.backgroundColor = config?.separatorLineColor
-            backgroundColor = config?.cellBackgroudColor
-            if config?.cellSelectedColor != nil {
-                selectedBgView.backgroundColor = config?.cellSelectedColor
-                selectedBackgroundView = selectedBgView
-            }
+            configColor()
         }
     }
     var assetCollection: HXPHAssetCollection? {
         didSet {
             albumNameLb.text = assetCollection?.albumName
             photoCountLb.text = String(assetCollection!.count)
+            weak var weakSelf = self
             requestID = assetCollection?.requestCoverImage(completion: { (image, assetCollection, info) in
-                if assetCollection == self.assetCollection && image != nil {
-                    self.albumCoverView.image = image
+                if assetCollection == weakSelf?.assetCollection && image != nil {
+                    weakSelf?.albumCoverView.image = image
                     if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
-                        self.requestID = nil
+                        weakSelf?.requestID = nil
                     }
                 }
             })
@@ -76,7 +70,23 @@ class HXAlbumViewCell: UITableViewCell {
         contentView.addSubview(photoCountLb)
         contentView.addSubview(bottomLineView)
     }
-    
+    func configColor() {
+        albumNameLb.textColor = HXPHManager.shared.isDark ? config?.albumNameDarkColor : config?.albumNameColor
+        photoCountLb.textColor = HXPHManager.shared.isDark ? config?.photoCountDarkColor : config?.photoCountColor
+        bottomLineView.backgroundColor = HXPHManager.shared.isDark ? config?.separatorLineDarkColor : config?.separatorLineColor
+        backgroundColor = HXPHManager.shared.isDark ? config?.cellbackgroundDarkColor : config?.cellBackgroudColor
+        if HXPHManager.shared.isDark {
+            selectedBgView.backgroundColor = config?.cellDarkSelectedColor
+            selectedBackgroundView = selectedBgView
+        }else {
+            if config?.cellSelectedColor != nil {
+                selectedBgView.backgroundColor = config?.cellSelectedColor
+                selectedBackgroundView = selectedBgView
+            }else {
+                selectedBackgroundView = nil
+            }
+        }
+    }
     override func layoutSubviews() {
         super.layoutSubviews()
         let coverMargin : CGFloat = 5
@@ -98,7 +108,7 @@ class HXAlbumViewCell: UITableViewCell {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                
+                configColor()
             }
         }
     }

@@ -20,12 +20,12 @@ class HXPHPickerViewCell: UICollectionViewCell {
     weak var delegate: HXPHPickerViewCellDelegate?
     var config: HXPHPhotoListCellConfiguration? {
         didSet {
-            backgroundColor = config?.backgroundColor
+            backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
         }
     }
     lazy var imageView: UIImageView = {
         let imageView = UIImageView.init()
-        imageView.contentMode = UIView.ContentMode.scaleAspectFill
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.addSublayer(assetTypeMaskLayer)
         return imageView
@@ -47,8 +47,8 @@ class HXPHPickerViewCell: UICollectionViewCell {
     lazy var assetTypeLb: UILabel = {
         let assetTypeLb = UILabel.init()
         assetTypeLb.font = UIFont.hx_mediumPingFang(size: 14)
-        assetTypeLb.textColor = UIColor.white
-        assetTypeLb.textAlignment = NSTextAlignment.right
+        assetTypeLb.textColor = .white
+        assetTypeLb.textAlignment = .right
         return assetTypeLb
     }()
     var requestID: PHImageRequestID?
@@ -71,11 +71,12 @@ class HXPHPickerViewCell: UICollectionViewCell {
                 assetTypeLb.text = nil
                 assetTypeMaskLayer.isHidden = true
             }
+            weak var weakSelf = self
             requestID = photoAsset?.requestThumbnailImage(completion: { (image, photoAsset, info) in
-                if photoAsset == self.photoAsset && image != nil {
-                    self.imageView.image = image
+                if photoAsset == weakSelf?.photoAsset && image != nil {
+                    weakSelf?.imageView.image = image
                     if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
-                        self.requestID = nil
+                        weakSelf?.requestID = nil
                     }
                 }
             })
@@ -116,8 +117,8 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     lazy var selectControl: HXPHPickerCellSelectBoxControl = {
         let selectControl = HXPHPickerCellSelectBoxControl.init()
-        selectControl.backgroundColor = UIColor.clear
-        selectControl.addTarget(self, action: #selector(didSelectControlClick(control:)), for: UIControl.Event.touchUpInside)
+        selectControl.backgroundColor = .clear
+        selectControl.addTarget(self, action: #selector(didSelectControlClick(control:)), for: .touchUpInside)
         return selectControl
     }()
     
@@ -156,7 +157,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
         let boxHeight = config!.selectBox.size.height
         if isSelected {
             selectMaskLayer.isHidden = false
-            if config!.selectBox.type == HXPHPickerCellSelectBoxType.number {
+            if config!.selectBox.type == .number {
                 let text = String(format: "%d", arguments: [photoAsset!.selectIndex + 1])
                 let font = UIFont.systemFont(ofSize: config!.selectBox.titleFontSize)
                 let textHeight = text.hx_stringHeight(ofFont: font, maxWidth: boxWidth)
@@ -203,7 +204,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                
+                backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
             }
         }
     }
@@ -227,16 +228,16 @@ class HXPHPickerCellSelectBoxControl: UIControl {
         var fillColor : UIColor?
         if isSelected {
             fillRect = rect
-            fillColor = config.selectedBackgroudColor
+            fillColor = HXPHManager.shared.isDark ? config.selectedBackgroudDarkColor : config.selectedBackgroudColor
         }else {
             let borderWidth = config.borderWidth
             let height = hx_height - borderWidth
             fillRect = CGRect(x: borderWidth, y: borderWidth, width: hx_width - borderWidth * 2, height: height - borderWidth)
             let strokePath = UIBezierPath.init(roundedRect: CGRect(x: borderWidth * 0.5, y: borderWidth * 0.5, width: hx_width - borderWidth, height: height), cornerRadius: height / 2)
-            fillColor = config.backgroudColor
+            fillColor = HXPHManager.shared.isDark ? config.darkBackgroudColor : config.backgroudColor
             ctx.addPath(strokePath.cgPath)
             ctx.setLineWidth(borderWidth)
-            ctx.setStrokeColor(config.borderColor.cgColor)
+            ctx.setStrokeColor(HXPHManager.shared.isDark ? config.borderDarkColor.cgColor : config.borderColor.cgColor)
             ctx.strokePath()
         }
         let fillPath = UIBezierPath.init(roundedRect: fillRect, cornerRadius: fillRect.size.height / 2)
@@ -244,7 +245,7 @@ class HXPHPickerCellSelectBoxControl: UIControl {
         ctx.setFillColor(fillColor!.cgColor)
         ctx.fillPath()
         if isSelected {
-            if config.type == HXPHPickerCellSelectBoxType.number {
+            if config.type == .number {
                 ctx.textMatrix = CGAffineTransform.identity
                 ctx.translateBy(x: 0, y: hx_height)
                 ctx.scaleBy(x: 1, y: -1)
@@ -264,19 +265,19 @@ class HXPHPickerCellSelectBoxControl: UIControl {
                 let style = NSMutableParagraphStyle()
                 style.alignment = .center
                 let attrString = NSAttributedString(string: text, attributes: [NSAttributedString.Key.font : font ,
-                    NSAttributedString.Key.foregroundColor: config.titleColor ,
+                                                                               NSAttributedString.Key.foregroundColor: HXPHManager.shared.isDark ? config.titleDarkColor : config.titleColor ,
                     NSAttributedString.Key.paragraphStyle: style])
                 let framesetter = CTFramesetterCreateWithAttributedString(attrString)
                 let frame = CTFramesetterCreateFrame(framesetter, CFRange(location: 0, length: attrString.length), textPath, nil)
                 CTFrameDraw(frame, ctx)
-            }else if config.type == HXPHPickerCellSelectBoxType.tick {
+            }else if config.type == .tick {
                 let tickPath = UIBezierPath.init()
                 tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
                 tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
                 tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
                 ctx.addPath(tickPath.cgPath)
                 ctx.setLineWidth(config.tickWidth)
-                ctx.setStrokeColor(config.tickColor.cgColor)
+                ctx.setStrokeColor(HXPHManager.shared.isDark ? config.tickDarkColor.cgColor : config.tickColor.cgColor)
                 ctx.strokePath()
             }
         }
@@ -291,14 +292,5 @@ class HXPHPickerCellSelectBoxControl: UIControl {
             return self
         }
         return super.hitTest(point, with: event)
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if #available(iOS 13.0, *) {
-            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                
-            }
-        }
     }
 }

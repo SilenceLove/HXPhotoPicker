@@ -17,11 +17,11 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     weak var delegate: HXAlbumViewDelegate?
     
     lazy var tableView : UITableView = {
-        let tableView = UITableView.init(frame: CGRect.init(), style: UITableView.Style.plain)
+        let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
         tableView.backgroundColor = config!.backgroundColor
         tableView.dataSource = self;
         tableView.delegate = self;
-        tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        tableView.separatorStyle = .none
         tableView.register(HXAlbumViewCell.self, forCellReuseIdentifier: "cellId")
         return tableView
     }()
@@ -82,8 +82,8 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
 class HXAlbumTitleView: UIView {
     lazy var titleLb: UILabel = {
         let titleLb = UILabel.init()
-        titleLb.textColor = UIColor.black
-        titleLb.textAlignment = NSTextAlignment.center
+        titleLb.textColor = .black
+        titleLb.textAlignment = .center
         return titleLb
     }()
 }

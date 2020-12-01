@@ -111,22 +111,27 @@ class HXPHProgressHUD: UIView {
         return backgroundView
     }()
     
+    lazy var contentView: UIView = {
+        let contentView = UIView.init()
+        return contentView
+    }()
+    
     lazy var blurEffectView: UIVisualEffectView = {
-        let effect = UIBlurEffect.init(style: UIBlurEffect.Style.dark)
+        let effect = UIBlurEffect.init(style: .dark)
         let blurEffectView = UIVisualEffectView.init(effect: effect)
         return blurEffectView
     }()
     
     lazy var indicatorView : UIActivityIndicatorView = {
-        let indicatorView = UIActivityIndicatorView.init(style: UIActivityIndicatorView.Style.whiteLarge)
+        let indicatorView = UIActivityIndicatorView.init(style: .whiteLarge)
         indicatorView.hidesWhenStopped = true
         return indicatorView
     }()
     
     lazy var textLb: UILabel = {
         let textLb = UILabel.init()
-        textLb.textColor = UIColor.white
-        textLb.textAlignment = NSTextAlignment.center
+        textLb.textColor = .white
+        textLb.textAlignment = .center
         textLb.font = UIFont.hx_mediumPingFang(size: 16)
         textLb.numberOfLines = 0;
         return textLb
@@ -150,12 +155,14 @@ class HXPHProgressHUD: UIView {
     
     func initView() {
         addSubview(backgroundView)
-        backgroundView.addSubview(textLb)
+        contentView.addSubview(textLb)
         if mode == HXPHProgressHUDMode.indicator {
-            backgroundView.addSubview(indicatorView)
+            contentView.addSubview(indicatorView)
         }else if mode == HXPHProgressHUDMode.image {
-            backgroundView.addSubview(imageView)
+            contentView.addSubview(imageView)
         }
+        backgroundView.addSubview(contentView)
+        
     }
     
     private func showHUD(text: String?, animated: Bool, afterDelay: TimeInterval) {
@@ -234,28 +241,28 @@ class HXPHProgressHUD: UIView {
             indicatorView.startAnimating()
             indicatorView.hx_centerX = centenrX
             if text != nil {
-                indicatorView.hx_y = 20
                 textLb.hx_y = indicatorView.frame.maxY + 10
             }else {
-                indicatorView.hx_centerY = 100 / 2
+                textLb.hx_y = indicatorView.frame.maxY
             }
         }else if mode == HXPHProgressHUDMode.image {
             imageView.hx_centerX = centenrX
             if text != nil {
-                imageView.hx_y = 20
                 textLb.hx_y = imageView.frame.maxY + 15
             }else {
-                imageView.hx_centerY = 100 / 2
+                textLb.hx_y = imageView.frame.maxY
             }
         }
-        
         backgroundView.hx_width = width
-        if textLb.frame.maxY + 20 < 120 {
+        contentView.hx_width = width
+        contentView.hx_height = textLb.frame.maxY
+        if contentView.hx_height + 40 < 100 {
             backgroundView.hx_height = 100
         }else {
-            backgroundView.hx_height = textLb.frame.maxY + 20
+            backgroundView.hx_height = contentView.hx_height + 40
         }
-        backgroundView.center = CGPoint(x: hx_width / 2, y: hx_height / 2)
+        contentView.center = CGPoint(x: backgroundView.hx_width * 0.5, y: backgroundView.hx_height * 0.5)
+        backgroundView.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)
         blurEffectView.frame = backgroundView.bounds
     }
     
@@ -278,7 +285,10 @@ class HXPHProgressHUD: UIView {
         progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
         view!.addSubview(progressView)
     }
-    
+    class func showWarningHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
+        self.showWarningHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
+        self.hideHUD(forView: view, animated: animated, afterDelay: delay)
+    }
     class func showWarningHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
         if view == nil {
             return

@@ -12,12 +12,19 @@ import Photos
 
 @objc protocol HXPHPickerControllerDelegate: NSObjectProtocol {
     
-    /// 选择完成之后调用
+    /// 选择完成之后调用，单选模式下不会走此回调
     /// - Parameters:
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - selectedAssetArray: 选择的资源对应的 HXPHAsset 数据
     ///   - isOriginal: 是否选中的原图
     @objc optional func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray:[HXPHAsset], with isOriginal: Bool)
+    
+    /// 单选完成之后调用
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - asset: 对应的 HXPHAsset 数据
+    ///   - isOriginal: 是否选中的原图
+    @objc optional func pickerContollerSingleSelectFinish(_ pickerController: HXPHPickerController, with asset:HXPHAsset, with isOriginal: Bool)
     
     /// 点击了原图按钮
     /// - Parameters:
@@ -58,7 +65,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     /// 当前被选择的资源对应的 HXPHAsset 对象数组
     var selectedAssetArray: [HXPHAsset] = [] {
         didSet {
-            if config.selectMode == HXPHAssetSelectMode.single {
+            if config.selectMode == .single {
                 return
             }
             if !canAddedAsset {
@@ -66,9 +73,9 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 return
             }
             for photoAsset in selectedAssetArray {
-                if photoAsset.mediaType == HXPHAssetMediaType.photo {
+                if photoAsset.mediaType == .photo {
                     selectedPhotoAssetArray.append(photoAsset)
-                }else if photoAsset.mediaType == HXPHAssetMediaType.video {
+                }else if photoAsset.mediaType == .video {
                     selectedVideoAssetArray.append(photoAsset)
                 }
             }
@@ -105,7 +112,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     var fetchCameraAssetCollectionCompletion : ((HXPHAssetCollection?)->())?
     
     // MARK: 私有
-    private var selectType : HXPHSelectType?
+    private var selectType : HXPHPicker.SelectType?
     private var canAddedAsset: Bool = true
     private var selectedPhotoAssetArray: [HXPHAsset] = []
     private var selectedVideoAssetArray: [HXPHAsset] = []
@@ -120,15 +127,17 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     }()
     
     init(config : HXPHConfiguration) {
+        HXPHManager.shared.appearanceStyle = config.appearanceStyle
         _ = HXPHManager.shared.createLanguageBundle(languageType: config.languageType)
         var photoVC : UIViewController? = nil
-        if config.albumShowMode == HXAlbumShowMode.normal {
+        if config.albumShowMode == .normal {
             photoVC = HXAlbumViewController.init()
-        }else if config.albumShowMode == HXAlbumShowMode.popup {
+        }else if config.albumShowMode == .popup {
             photoVC = HXPHPickerViewController.init()
         }
         super.init(rootViewController: photoVC!)
         self.config = config
+        configColor()
         self.navigationBar.isTranslucent = config.navigationBarIsTranslucent
         self.selectType = config.selectType
         self.setOptions()
@@ -141,17 +150,27 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         fatalError("init(coder:) has not been implemented")
     }
     private func setOptions() {
-        if selectType == HXPHSelectType.photo {
+        if selectType == .photo {
             options.predicate = NSPredicate.init(format: "mediaType == %ld", argumentArray: [PHAssetMediaType.image.rawValue])
-        }else if selectType == HXPHSelectType.video {
+        }else if selectType == .video {
             options.predicate = NSPredicate.init(format: "mediaType == %ld", argumentArray: [PHAssetMediaType.video.rawValue])
         }else {
             options.predicate = nil
         }
     }
+    func configColor() {
+        if config.appearanceStyle == .normal {
+            if #available(iOS 13.0, *) {
+                overrideUserInterfaceStyle = .light
+            }
+        }
+        view.backgroundColor = HXPHManager.shared.isDark ? config.navigationViewBackgroudDarkColor : config.navigationViewBackgroudColor
+        navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : HXPHManager.shared.isDark ? config.navigationTitleDarkColor : config.navigationTitleColor]
+        navigationBar.tintColor = HXPHManager.shared.isDark ? config.navigationDarkTintColor : config.navigationTintColor
+        navigationBar.barStyle = HXPHManager.shared.isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
     }
     private func requestAuthorization() {
         let status = HXPHAssetManager.authorizationStatus()
@@ -184,19 +203,25 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         pickerContollerDelegate?.pickerContollerDidFinish?(self, with: selectedAssetArray, with: isOriginal)
         dismiss(animated: true, completion: nil)
     }
+    func singleFinishCallback(for photoAsset: HXPHAsset) {
+        pickerContollerDelegate?.pickerContollerSingleSelectFinish?(self, with: photoAsset, with: isOriginal)
+        dismiss(animated: true, completion: nil)
+    }
     func cancelCallback() {
         pickerContollerDelegate?.pickerContollerDidCancel?(self)
         dismiss(animated: true, completion: nil)
     }
-    func didOriginalButtonCallback() {
+    func originalButtonCallback() {
         pickerContollerDelegate?.pickerContollerDidOriginal?(self, with: isOriginal)
     }
     /// 获取相机胶卷资源集合
     func fetchCameraAssetCollection() {
-        options.sortDescriptors = [NSSortDescriptor.init(key: "creationDate", ascending: config.creationDate)]
-        HXPHManager.shared.fetchCameraAssetCollection(for: selectType ?? HXPHSelectType.any, options: options) { (assetCollection) in
+        if config.creationDate {
+            options.sortDescriptors = [NSSortDescriptor.init(key: "creationDate", ascending: config.creationDate)]
+        }
+        HXPHManager.shared.fetchCameraAssetCollection(for: selectType ?? .any, options: options) { (assetCollection) in
             if assetCollection.count == 0 {
-                self.cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config.albumList.emptyAlbumName, coverImage: UIImage.hx_named(named: self.config.albumList.emptyCoverImageName))
+                self.cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config.albumList.emptyAlbumName, coverImage: self.config.albumList.emptyCoverImageName.hx_image)
             }else {
                 // 获取封面
                 assetCollection.fetchCoverAsset(reverse: self.config.reverseOrder)
@@ -208,22 +233,28 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     
     /// 获取相册集合
     func fetchAssetCollections() {
-        options.sortDescriptors = [NSSortDescriptor.init(key: "creationDate", ascending: config.creationDate)]
-        HXPHManager.shared.fetchAssetCollections(for: options, showEmptyCollection: false) { (assetCollection, isCameraRoll) in
-            if assetCollection != nil {
-                // 获取封面
-                assetCollection!.fetchCoverAsset(reverse: self.config.reverseOrder)
-                if isCameraRoll {
-                    self.assetCollectionsArray.insert(assetCollection!, at: 0);
+        DispatchQueue.global().async {
+            if self.config.creationDate {
+                self.options.sortDescriptors = [NSSortDescriptor.init(key: "creationDate", ascending: self.config.creationDate)]
+            }
+            HXPHManager.shared.fetchAssetCollections(for: self.options, showEmptyCollection: false) { (assetCollection, isCameraRoll) in
+                if assetCollection != nil {
+                    // 获取封面
+                    assetCollection!.fetchCoverAsset(reverse: self.config.reverseOrder)
+                    if isCameraRoll {
+                        self.assetCollectionsArray.insert(assetCollection!, at: 0);
+                    }else {
+                        self.assetCollectionsArray.append(assetCollection!)
+                    }
                 }else {
-                    self.assetCollectionsArray.append(assetCollection!)
-                }
-            }else {
-                if !self.assetCollectionsArray.isEmpty && self.cameraAssetCollection != nil {
-                    self.assetCollectionsArray[0] = self.cameraAssetCollection!
+                    if !self.assetCollectionsArray.isEmpty && self.cameraAssetCollection != nil {
+                        self.assetCollectionsArray[0] = self.cameraAssetCollection!
+                    }
+                    DispatchQueue.main.async {
+                        self.fetchAssetCollectionsCompletion?(self.assetCollectionsArray)
+                    }
                 }
             }
-            self.fetchAssetCollectionsCompletion?(self.assetCollectionsArray)
         }
     }
     /// 获取相册里的资源
@@ -244,22 +275,22 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             photoAssets.reserveCapacity(assetCollection?.count ?? 0)
             var lastAsset: HXPHAsset?
             assetCollection?.enumerateAssets(usingBlock: { (photoAsset) in
-                if photoAsset.mediaType == HXPHAssetMediaType.photo {
-                    if self.selectType == HXPHSelectType.video {
+                if photoAsset.mediaType == .photo {
+                    if self.selectType == .video {
                         return
                     }
-                    if self.config.showAnimatedAsset == true {
+                    if self.config.showImageAnimated == true {
                         if HXPHAssetManager.assetIsAnimated(asset: photoAsset.asset!) {
-                            photoAsset.mediaSubType = HXPHAssetMediaSubType.imageAnimated
+                            photoAsset.mediaSubType = .imageAnimated
                         }
                     }
-                    if self.config.showLivePhotoAsset == true {
+                    if self.config.showLivePhoto == true {
                         if HXPHAssetManager.assetIsLivePhoto(asset: photoAsset.asset!) {
-                            photoAsset.mediaSubType = HXPHAssetMediaSubType.livePhoto
+                            photoAsset.mediaSubType = .livePhoto
                         }
                     }
-                }else if photoAsset.mediaType == HXPHAssetMediaType.video {
-                    if self.selectType == HXPHSelectType.photo {
+                }else if photoAsset.mediaType == .video {
+                    if self.selectType == .photo {
                         return
                     }
                 }
@@ -288,9 +319,9 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             canAddedAsset = false
             photoAsset.selected = true
             photoAsset.selectIndex = selectedAssetArray.count
-            if photoAsset.mediaType == HXPHAssetMediaType.photo {
+            if photoAsset.mediaType == .photo {
                 selectedPhotoAssetArray.append(photoAsset)
-            }else if photoAsset.mediaType == HXPHAssetMediaType.video {
+            }else if photoAsset.mediaType == .video {
                 selectedVideoAssetArray.append(photoAsset)
             }
             selectedAssetArray.append(photoAsset)
@@ -304,9 +335,9 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         }
         pickerContollerDelegate?.pickerControllerWillUnselectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count)
         photoAsset.selected = false
-        if photoAsset.mediaType == HXPHAssetMediaType.photo {
+        if photoAsset.mediaType == .photo {
             selectedPhotoAssetArray.remove(at: selectedPhotoAssetArray.firstIndex(of: photoAsset)!)
-        }else if photoAsset.mediaType == HXPHAssetMediaType.video {
+        }else if photoAsset.mediaType == .video {
             selectedVideoAssetArray.remove(at: selectedVideoAssetArray.firstIndex(of: photoAsset)!)
         }
         selectedAssetArray.remove(at: selectedAssetArray.firstIndex(of: photoAsset)!)
@@ -319,7 +350,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     func canSelectAsset(for photoAsset: HXPHAsset) -> Bool {
         var canSelect = true
         var text: String?
-        if photoAsset.mediaType == HXPHAssetMediaType.photo {
+        if photoAsset.mediaType == .photo {
             if !config.photosAndVideosCanBeSelectedTogether {
                 if selectedVideoAssetArray.count > 0 {
                     text = "照片和视频不能同时选择".hx_localized
@@ -337,7 +368,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                     canSelect = false
                 }
             }
-        }else if photoAsset.mediaType == HXPHAssetMediaType.video {
+        }else if photoAsset.mediaType == .video {
             if config.videoMaximumSelectDuration > 0 {
                 if round(photoAsset.videoDuration) > Double(config.videoMaximumSelectDuration) {
                     text = String.init(format: "视频最大时长为%d秒，无法选择".hx_localized, arguments: [config.videoMaximumSelectDuration])
@@ -374,8 +405,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             }
         }
         if !canSelect && text != nil {
-            HXPHProgressHUD.showWarningHUD(addedTo: view, text: text!, afterDelay: 0, animated: true)
-            HXPHProgressHUD.hideHUD(forView: view, animated: true, afterDelay: 2)
+            HXPHProgressHUD.showWarningHUD(addedTo: view, text: text!, animated: true, delay: 2)
         }
         return canSelect
     }
@@ -471,12 +501,11 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         
         super.present(viewControllerToPresent, animated: flag, completion: completion)
     }
-    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                
+                configColor()
             }
         }
     }
@@ -491,30 +520,30 @@ class HXPHDeniedAuthorizationView: UIView {
     var config: HXPHNotAuthorizedConfiguration?
     
     lazy var closeBtn: UIButton = {
-        let closeBtn = UIButton.init(type: UIButton.ButtonType.custom)
-        closeBtn.addTarget(self, action: #selector(didCloseClick), for: UIControl.Event.touchUpInside)
-        closeBtn.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
+        let closeBtn = UIButton.init(type: .custom)
+        closeBtn.addTarget(self, action: #selector(didCloseClick), for: .touchUpInside)
+        closeBtn.contentVerticalAlignment = .top
         return closeBtn
     }()
     
     lazy var titleLb: UILabel = {
         let titleLb = UILabel.init()
-        titleLb.textAlignment = NSTextAlignment.center
+        titleLb.textAlignment = .center
         titleLb.numberOfLines = 0
         return titleLb
     }()
     
     lazy var subTitleLb: UILabel = {
         let subTitleLb = UILabel.init()
-        subTitleLb.textAlignment = NSTextAlignment.center
+        subTitleLb.textAlignment = .center
         subTitleLb.numberOfLines = 0
         return subTitleLb
     }()
     
     lazy var jumpBtn: UIButton = {
-        let jumpBtn = UIButton.init(type: UIButton.ButtonType.custom)
+        let jumpBtn = UIButton.init(type: .custom)
         jumpBtn.layer.cornerRadius = 5
-        jumpBtn.addTarget(self, action: #selector(jumpSetting), for: UIControl.Event.touchUpInside)
+        jumpBtn.addTarget(self, action: #selector(jumpSetting), for: .touchUpInside)
         return jumpBtn
     }()
     
@@ -529,21 +558,25 @@ class HXPHDeniedAuthorizationView: UIView {
         addSubview(titleLb)
         addSubview(subTitleLb)
         addSubview(jumpBtn)
-        backgroundColor = config?.backgroudColor
-        closeBtn.setImage(UIImage.hx_named(named: config?.closeButtonImageName ?? "hx_picker_notAuthorized_close"), for: UIControl.State.normal)
+        closeBtn.setImage(UIImage.hx_named(named: config?.closeButtonImageName ?? "hx_picker_notAuthorized_close"), for: .normal)
         
         titleLb.text = "无法访问相册中照片".hx_localized
-        titleLb.textColor = config?.titleColor
         titleLb.font = UIFont.hx_semiboldPingFang(size: 20)
         
         subTitleLb.text = "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".hx_localized
-        subTitleLb.textColor = config?.subTitleColor
         subTitleLb.font = UIFont.hx_regularPingFang(size: 17)
         
-        jumpBtn.backgroundColor =  config?.jumpButtonBackgroudColor
-        jumpBtn.setTitle("前往系统设置".hx_localized, for: UIControl.State.normal)
-        jumpBtn.setTitleColor(config?.jumpButtonTitleColor, for: UIControl.State.normal)
+        jumpBtn.setTitle("前往系统设置".hx_localized, for: .normal)
         jumpBtn.titleLabel?.font = UIFont.hx_mediumPingFang(size: 16)
+        
+        configColor()
+    }
+    func configColor() {
+        backgroundColor = HXPHManager.shared.isDark ? config?.darkBackgroudColor : config?.backgroudColor
+        titleLb.textColor = HXPHManager.shared.isDark ? config?.darkTitleColor : config?.titleColor
+        subTitleLb.textColor = HXPHManager.shared.isDark ? config?.darkSubTitleColor : config?.subTitleColor
+        jumpBtn.backgroundColor = HXPHManager.shared.isDark ? config?.jumpButtonDarkBackgroudColor : config?.jumpButtonBackgroudColor
+        jumpBtn.setTitleColor(HXPHManager.shared.isDark ? config?.jumpButtonDarkTitleColor : config?.jumpButtonTitleColor, for: .normal)
     }
     @objc func didCloseClick() {
         self.hx_viewController()?.dismiss(animated: true, completion: nil)
@@ -566,6 +599,15 @@ class HXPHDeniedAuthorizationView: UIView {
         let jumpBtnBottomMargin : CGFloat = UIDevice.isProxy() ? 120 : 50
         jumpBtn.frame = CGRect(x: 0, y: hx_height - UIDevice.current.hx_bottomMargin - 40 - jumpBtnBottomMargin, width: 150, height: 40)
         jumpBtn.hx_centerX = hx_width * 0.5
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                configColor()
+            }
+        }
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

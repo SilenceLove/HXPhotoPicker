@@ -16,23 +16,40 @@ class HXPHManager: NSObject {
     
     var bundle: Bundle?
     var languageBundle: Bundle?
-    var languageType: HXPHLanguageType?
+    var languageType: HXPHPicker.LanguageType?
+    var appearanceStyle: HXPHPicker.AppearanceStyle = .varied
+    var isDark: Bool {
+        get {
+            if appearanceStyle == .normal {
+                return false
+            }
+            if appearanceStyle == .dark {
+                return true
+            }
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return true
+                }
+            }
+            return false
+        }
+    }
     
     private lazy var cameraAlbumLocalIdentifier : String? = {
         var identifier = UserDefaults.standard.string(forKey: "hxcameraAlbumLocalIdentifier")
         return identifier
     }()
     
-    private lazy var cameraAlbumLocalIdentifierType : HXPHSelectType? = {
+    private lazy var cameraAlbumLocalIdentifierType : HXPHPicker.SelectType? = {
         var identifierType = UserDefaults.standard.integer(forKey: "hxcameraAlbumLocalIdentifierType")
-        return HXPHSelectType(rawValue: identifierType)
+        return HXPHPicker.SelectType(rawValue: identifierType)
     }()
     
     /// 获取所有资源集合
     /// - Parameters:
     ///   - showEmptyCollection: 显示空集合
-    ///   - usingBlock: 枚举每一个集合
-    func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, usingBlock :@escaping ([HXPHAssetCollection])->()) {
+    ///   - completion: 完成回调
+    func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, completion :@escaping ([HXPHAssetCollection])->()) {
         DispatchQueue.global().async {
             var assetCollectionsArray = [HXPHAssetCollection]()
             HXPHAssetManager.enumerateAllAlbums(filterInvalid: true, options: nil) { (collection) in
@@ -47,41 +64,33 @@ class HXPHManager: NSObject {
                 }
             }
             DispatchQueue.main.async {
-                usingBlock(assetCollectionsArray);
+                completion(assetCollectionsArray);
             }
         }
     }
     
     /// 枚举每个相册资源，
     /// - Parameters:
-    ///   - options: <#options description#>
-    ///   - showEmptyCollection: <#showEmptyCollection description#>
-    ///   - usingBlock: <#usingBlock description#>
-    /// - Returns: <#description#>
+    ///   - showEmptyCollection: 显示空集合
+    ///   - usingBlock: HXPHAssetCollection 为nil则代表结束，Bool 是否为相机胶卷
     func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, usingBlock :@escaping (HXPHAssetCollection?, Bool)->()) {
-        DispatchQueue.global().async {
-            HXPHAssetManager.enumerateAllAlbums(filterInvalid: true, options: nil) { (collection) in
-                let assetCollection = HXPHAssetCollection.init(collection: collection, options: options)
-                if showEmptyCollection == false && assetCollection.count == 0 {
-                    return
-                }
-                let isCameraRoll = HXPHAssetManager.collectionIsCameraRollAlbum(collection: collection)
-                DispatchQueue.main.async {
-                    usingBlock(assetCollection, isCameraRoll);
-                }
+        HXPHAssetManager.enumerateAllAlbums(filterInvalid: true, options: nil) { (collection) in
+            let assetCollection = HXPHAssetCollection.init(collection: collection, options: options)
+            if showEmptyCollection == false && assetCollection.count == 0 {
+                return
             }
-            DispatchQueue.main.async {
-                usingBlock(nil, false);
-            }
+            let isCameraRoll = HXPHAssetManager.collectionIsCameraRollAlbum(collection: collection)
+            usingBlock(assetCollection, isCameraRoll);
         }
+        usingBlock(nil, false);
     }
     
     /// 获取相机胶卷资源集合
-    func fetchCameraAssetCollection(for type: HXPHSelectType, options: PHFetchOptions, completion :@escaping (HXPHAssetCollection)->()) {
+    func fetchCameraAssetCollection(for type: HXPHPicker.SelectType, options: PHFetchOptions, completion :@escaping (HXPHAssetCollection)->()) {
         DispatchQueue.global().async {
             var useLocalIdentifier = false
             if self.cameraAlbumLocalIdentifier != nil {
-                if  self.cameraAlbumLocalIdentifierType == HXPHSelectType.any ||
+                if  self.cameraAlbumLocalIdentifierType == .any ||
                     type == self.cameraAlbumLocalIdentifierType  {
                     useLocalIdentifier = true
                 }
@@ -124,7 +133,7 @@ class HXPHManager: NSObject {
         }
         return self.bundle
     }
-    func createLanguageBundle(languageType: HXPHLanguageType) -> Bundle? {
+    func createLanguageBundle(languageType: HXPHPicker.LanguageType) -> Bundle? {
         if bundle == nil {
             _ = createBundle()
         }
@@ -134,19 +143,19 @@ class HXPHManager: NSObject {
         if languageBundle == nil {
             var language = Locale.preferredLanguages.first
             switch languageType {
-            case HXPHLanguageType.simplifiedChinese:
+            case .simplifiedChinese:
                 language = "zh-Hans"
                 break
-            case HXPHLanguageType.traditionalChinese:
+            case .traditionalChinese:
                 language = "zh-Hant"
                 break
-            case HXPHLanguageType.japanese:
+            case .japanese:
                 language = "ja"
                 break
-            case HXPHLanguageType.korean:
+            case .korean:
                 language = "ko"
                 break
-            case HXPHLanguageType.english:
+            case .english:
                 language = "en"
                 break
             default:
@@ -179,5 +188,3 @@ class HXPHManager: NSObject {
     override class func copy() -> Any { return self }
     override class func mutableCopy() -> Any { return self }
 }
-
-class HXPHPicker: NSObject { }

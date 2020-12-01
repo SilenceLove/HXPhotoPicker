@@ -38,7 +38,6 @@ class HXPHAssetCollection: NSObject {
         albumName = HXPHTools.transformAlbumName(for: collection!)
         result = PHAsset.fetchAssets(in: collection!, options: options)
         count = result?.count ?? 0
-//        coverAsset = result?.firstObject
     }
     
     func changeResult(for result: PHFetchResult<PHAsset>) {

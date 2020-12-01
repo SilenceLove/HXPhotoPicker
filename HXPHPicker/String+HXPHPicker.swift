@@ -16,6 +16,18 @@ extension String {
         }
     }
     
+    var hx_color: UIColor {
+        get {
+            return UIColor.init(hx_hexString: self)
+        }
+    }
+    
+    var hx_image: UIImage? {
+        get {
+            return UIImage.hx_named(named: self)
+        }
+    }
+    
     func hx_stringWidth(ofFont font: UIFont, maxHeight: CGFloat) -> CGFloat {
         let constraintRect = CGSize(width: CGFloat(MAXFLOAT), height: maxHeight)
         let boundingBox = self.boundingRect(with: constraintRect, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
