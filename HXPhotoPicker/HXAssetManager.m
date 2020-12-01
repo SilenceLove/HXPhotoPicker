@@ -99,6 +99,9 @@
     return resultImage;
 }
 + (CGSize)getAssetTargetSizeWithAsset:(PHAsset *)asset width:(CGFloat)width {
+    if (!asset) {
+        return CGSizeMake(width, width);
+    }
     CGFloat scale = 0.8f;
     CGFloat aspectRatio = asset.pixelWidth / (CGFloat)asset.pixelHeight;
     CGFloat initialWidth = width;

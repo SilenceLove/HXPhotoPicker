@@ -50,7 +50,6 @@
 		7B08597C24FA58DF00E93091 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */; };
 		7B0B2A88255E1AE300ACF619 /* HXPHPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2A7A255E1AE300ACF619 /* HXPHPickerViewController.swift */; };
 		7B0B2A89255E1AE300ACF619 /* HXPHConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2A7B255E1AE300ACF619 /* HXPHConfiguration.swift */; };
-		7B0B2A8A255E1AE300ACF619 /* HXPHTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2A7C255E1AE300ACF619 /* HXPHTypes.swift */; };
 		7B0B2A8B255E1AE300ACF619 /* HXPHPickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2A7D255E1AE300ACF619 /* HXPHPickerController.swift */; };
 		7B0B2A8C255E1AE300ACF619 /* HXPHTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2A7E255E1AE300ACF619 /* HXPHTools.swift */; };
 		7B0B2A8D255E1AE300ACF619 /* HXAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2A7F255E1AE300ACF619 /* HXAlbumViewController.swift */; };
@@ -175,6 +174,7 @@
 		7B8629AA237D0F8D00F8A584 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A9237D0F8C00F8A584 /* EventKit.framework */; };
 		7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AB237D0F9400F8A584 /* Contacts.framework */; };
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
+		7BA47AE3257277E500FB4D99 /* HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */; };
 		7BA6878B25610CF00014C3E3 /* UIImage+HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA6878A25610CF00014C3E3 /* UIImage+HXPHPicker.swift */; };
 		7BA68790256144EA0014C3E3 /* HXPHPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7BA6878F256144EA0014C3E3 /* HXPHPicker.bundle */; };
 		7BA68798256149790014C3E3 /* Bundle+HXPhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA68797256149790014C3E3 /* Bundle+HXPhotoPicker.swift */; };
@@ -441,7 +441,6 @@
 		7B08595224FA58DE00E93091 /* Demo6SubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo6SubViewController.h; sourceTree = "<group>"; };
 		7B0B2A7A255E1AE300ACF619 /* HXPHPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HXPHPickerViewController.swift; sourceTree = "<group>"; };
 		7B0B2A7B255E1AE300ACF619 /* HXPHConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HXPHConfiguration.swift; sourceTree = "<group>"; };
-		7B0B2A7C255E1AE300ACF619 /* HXPHTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HXPHTypes.swift; sourceTree = "<group>"; };
 		7B0B2A7D255E1AE300ACF619 /* HXPHPickerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HXPHPickerController.swift; sourceTree = "<group>"; };
 		7B0B2A7E255E1AE300ACF619 /* HXPHTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HXPHTools.swift; sourceTree = "<group>"; };
 		7B0B2A7F255E1AE300ACF619 /* HXAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HXAlbumViewController.swift; sourceTree = "<group>"; };
@@ -659,6 +658,7 @@
 		7B8629AB237D0F9400F8A584 /* Contacts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Contacts.framework; path = System/Library/Frameworks/Contacts.framework; sourceTree = SDKROOT; };
 		7B8629AD237D0FAA00F8A584 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
+		7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPicker.swift; sourceTree = "<group>"; };
 		7BA6878A25610CF00014C3E3 /* UIImage+HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+HXPHPicker.swift"; sourceTree = "<group>"; };
 		7BA6878F256144EA0014C3E3 /* HXPHPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPHPicker.bundle; sourceTree = "<group>"; };
 		7BA68797256149790014C3E3 /* Bundle+HXPhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+HXPhotoPicker.swift"; sourceTree = "<group>"; };
@@ -832,6 +832,7 @@
 			isa = PBXGroup;
 			children = (
 				7BA6878F256144EA0014C3E3 /* HXPHPicker.bundle */,
+				7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */,
 				7B0B2A7B255E1AE300ACF619 /* HXPHConfiguration.swift */,
 				7B0B2A83255E1AE300ACF619 /* HXPHManager.swift */,
 				7B0B2A84255E1AE300ACF619 /* HXPHAssetManager.swift */,
@@ -846,7 +847,6 @@
 				7B0B2AB3255E5A1800ACF619 /* HXPHPreviewViewController.swift */,
 				7B0B2AB8255E5F6F00ACF619 /* HXPHPreviewViewCell.swift */,
 				7B0B2A7E255E1AE300ACF619 /* HXPHTools.swift */,
-				7B0B2A7C255E1AE300ACF619 /* HXPHTypes.swift */,
 				7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */,
 				7B0B2A86255E1AE300ACF619 /* UIView+HXPHPicker.swift */,
 				7B0B2A87255E1AE300ACF619 /* UIViewController+HXPHPicker.swift */,
@@ -1497,9 +1497,9 @@
 			files = (
 				7B3327F7255EE4F300784BC0 /* String+HXPHPicker.swift in Sources */,
 				7B0B2AAA255E384100ACF619 /* UIFont+HXPHPicker.swift in Sources */,
-				7B0B2A8A255E1AE300ACF619 /* HXPHTypes.swift in Sources */,
 				7B0B2A92255E1AE300ACF619 /* HXPHAssetManager.swift in Sources */,
 				7B0B2A8C255E1AE300ACF619 /* HXPHTools.swift in Sources */,
+				7BA47AE3257277E500FB4D99 /* HXPHPicker.swift in Sources */,
 				7B0B2A94255E1AE300ACF619 /* UIView+HXPHPicker.swift in Sources */,
 				7B0B2A8F255E1AE300ACF619 /* HXPHAssetCollection.swift in Sources */,
 				7B3EDEC5255E185900937B4A /* ViewController.swift in Sources */,
@@ -1946,7 +1946,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 3.1.6;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-5";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-6";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1969,7 +1969,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 3.1.6;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-5";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-6";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
