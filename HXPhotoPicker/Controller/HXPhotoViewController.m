@@ -1062,6 +1062,9 @@ HX_PhotoEditViewControllerDelegate
         if (firstSelectModel) {
             scrollIndexPath = [NSIndexPath indexPathForItem:[self.allArray indexOfObject:firstSelectModel] inSection:0];
             position = UICollectionViewScrollPositionCenteredVertically;
+        }else {
+            scrollIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+            position = UICollectionViewScrollPositionTop;
         }
     }
     if (scrollIndexPath) {

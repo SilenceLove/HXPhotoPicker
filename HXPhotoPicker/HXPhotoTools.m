@@ -1035,7 +1035,11 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
         statusBarHeight = statusBarManager.statusBarFrame.size.height;
     }
     else {
-        statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+        if ([UIApplication sharedApplication].statusBarHidden) {
+            statusBarHeight = HX_IS_IPhoneX_All ? 44: 20;
+        }else {
+            statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+        }
     }
     return statusBarHeight;
 }

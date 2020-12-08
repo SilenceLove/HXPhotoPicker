@@ -215,7 +215,7 @@
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
         leftMargin = 0;
         self.backBtn.hx_x = 20;
-        self.backBtn.hx_y = hxNavigationBarHeight - 20 - _backBtn.hx_h;
+        self.backBtn.hx_y = hxNavigationBarHeight - 20 - self.backBtn.hx_h;
         self.clippingToolBar.frame = CGRectMake(0, self.view.hx_h - HXClippingToolBar - hxBottomMargin, self.view.hx_w, HXClippingToolBar + hxBottomMargin);
         self.toolsView.frame = CGRectMake(0, self.view.hx_h - 50 - hxBottomMargin, self.view.hx_w, 50 + hxBottomMargin);
         
@@ -448,7 +448,7 @@
     }
 }
 - (void)hiddenTopBottomView {
-    self.backBtn.hx_y = hxNavigationBarHeight - 20 - _backBtn.hx_h - 15;
+    self.backBtn.hx_y = hxNavigationBarHeight - 20 - self.backBtn.hx_h - 15;
     self.clippingToolBar.hx_y = self.view.hx_h;
     self.toolsView.hx_y = self.view.hx_h;
 //    self.topMaskView.hx_y = -hxNavigationBarHeight;
