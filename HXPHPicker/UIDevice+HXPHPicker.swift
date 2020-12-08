@@ -32,6 +32,9 @@ extension UIDevice {
                 statusBarHeight = (window?.windowScene?.statusBarManager?.statusBarFrame.size.height)!
             } else {
                 // Fallback on earlier versions
+//                if UIApplication.shared.isStatusBarHidden {
+//                    return hx_isAllIPhoneX ? 44 : 20
+//                }
                 statusBarHeight = UIApplication.shared.statusBarFrame.size.height
             }
             return statusBarHeight

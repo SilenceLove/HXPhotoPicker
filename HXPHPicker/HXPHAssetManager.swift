@@ -230,13 +230,26 @@ class HXPHAssetManager: NSObject {
                 } else {
                     sureOrientation = .up;
                 }
-                DispatchQueue.main.async {
+                
+                if Thread.current.isMainThread {
                     resultHandler(imageData, dataUTI, sureOrientation, info)
+                }else {
+                    DispatchQueue.main.async {
+                        resultHandler(imageData, dataUTI, sureOrientation, info)
+                    }
                 }
             }
         } else {
             // Fallback on earlier versions
-            return PHImageManager.default().requestImageData(for: asset, options: options, resultHandler: resultHandler)
+            return PHImageManager.default().requestImageData(for: asset, options: options) { (imageData, dataUTI, imageOrientation, info) in
+                if Thread.current.isMainThread {
+                    resultHandler(imageData, dataUTI, imageOrientation, info)
+                }else {
+                    DispatchQueue.main.async {
+                        resultHandler(imageData, dataUTI, imageOrientation, info)
+                    }
+                }
+            }
         }
     }
     

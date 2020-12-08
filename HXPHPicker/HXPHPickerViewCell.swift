@@ -78,13 +78,17 @@ class HXPHPickerViewCell: UICollectionViewCell {
                     if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
                         weakSelf?.requestID = nil
                     }
+                    if !(weakSelf?.firstLoadCompletion ?? true) {
+                        weakSelf?.isHidden = false
+                        weakSelf?.firstLoadCompletion = true
+                    }
                 }
             })
         }
     }
     
     var videoCanSelected = true
-    
+    private var firstLoadCompletion: Bool = false
     override init(frame: CGRect) {
         super.init(frame: frame)
         initView()
@@ -93,6 +97,7 @@ class HXPHPickerViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     func initView() {
+        isHidden = true
         contentView.addSubview(imageView)
         contentView.addSubview(assetTypeLb)
     }
@@ -228,13 +233,13 @@ class HXPHPickerCellSelectBoxControl: UIControl {
         var fillColor : UIColor?
         if isSelected {
             fillRect = rect
-            fillColor = HXPHManager.shared.isDark ? config.selectedBackgroudDarkColor : config.selectedBackgroudColor
+            fillColor = HXPHManager.shared.isDark ? config.selectedBackgroudDarkColor : config.selectedBackgroundColor
         }else {
             let borderWidth = config.borderWidth
             let height = hx_height - borderWidth
             fillRect = CGRect(x: borderWidth, y: borderWidth, width: hx_width - borderWidth * 2, height: height - borderWidth)
             let strokePath = UIBezierPath.init(roundedRect: CGRect(x: borderWidth * 0.5, y: borderWidth * 0.5, width: hx_width - borderWidth, height: height), cornerRadius: height / 2)
-            fillColor = HXPHManager.shared.isDark ? config.darkBackgroudColor : config.backgroudColor
+            fillColor = HXPHManager.shared.isDark ? config.darkBackgroundColor : config.backgroundColor
             ctx.addPath(strokePath.cgPath)
             ctx.setLineWidth(borderWidth)
             ctx.setStrokeColor(HXPHManager.shared.isDark ? config.borderDarkColor.cgColor : config.borderColor.cgColor)

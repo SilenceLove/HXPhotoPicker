@@ -164,7 +164,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 overrideUserInterfaceStyle = .light
             }
         }
-        view.backgroundColor = HXPHManager.shared.isDark ? config.navigationViewBackgroudDarkColor : config.navigationViewBackgroudColor
+        view.backgroundColor = HXPHManager.shared.isDark ? config.navigationViewBackgroudDarkColor : config.navigationViewBackgroundColor
         navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : HXPHManager.shared.isDark ? config.navigationTitleDarkColor : config.navigationTitleColor]
         navigationBar.tintColor = HXPHManager.shared.isDark ? config.navigationDarkTintColor : config.navigationTintColor
         navigationBar.barStyle = HXPHManager.shared.isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
@@ -226,6 +226,9 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 // 获取封面
                 assetCollection.fetchCoverAsset(reverse: self.config.reverseOrder)
                 self.cameraAssetCollection = assetCollection
+            }
+            if self.config.albumShowMode == .popup {
+                self.fetchAssetCollections()
             }
             self.fetchCameraAssetCollectionCompletion?(self.cameraAssetCollection)
         }
@@ -501,6 +504,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         
         super.present(viewControllerToPresent, animated: flag, completion: completion)
     }
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
@@ -572,10 +576,10 @@ class HXPHDeniedAuthorizationView: UIView {
         configColor()
     }
     func configColor() {
-        backgroundColor = HXPHManager.shared.isDark ? config?.darkBackgroudColor : config?.backgroudColor
+        backgroundColor = HXPHManager.shared.isDark ? config?.darkBackgroundColor : config?.backgroundColor
         titleLb.textColor = HXPHManager.shared.isDark ? config?.darkTitleColor : config?.titleColor
         subTitleLb.textColor = HXPHManager.shared.isDark ? config?.darkSubTitleColor : config?.subTitleColor
-        jumpBtn.backgroundColor = HXPHManager.shared.isDark ? config?.jumpButtonDarkBackgroudColor : config?.jumpButtonBackgroudColor
+        jumpBtn.backgroundColor = HXPHManager.shared.isDark ? config?.jumpButtonDarkBackgroundColor : config?.jumpButtonBackgroundColor
         jumpBtn.setTitleColor(HXPHManager.shared.isDark ? config?.jumpButtonDarkTitleColor : config?.jumpButtonTitleColor, for: .normal)
     }
     @objc func didCloseClick() {
@@ -587,7 +591,7 @@ class HXPHDeniedAuthorizationView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        closeBtn.frame = CGRect(x: 20, y: UIDevice.current.hx_statusBarHeight + 5, width: 50, height: 50)
+        closeBtn.frame = CGRect(x: 12, y: UIDevice.current.hx_statusBarHeight + 5, width: 50, height: 50)
         
         let titleHeight = titleLb.text?.hx_stringHeight(ofFont: titleLb.font, maxWidth: hx_width) ?? 0
         titleLb.frame = CGRect(x: 0, y: 0, width: hx_width, height: titleHeight)
@@ -597,7 +601,11 @@ class HXPHDeniedAuthorizationView: UIView {
         titleLb.hx_y = subTitleLb.hx_y - 15 - titleHeight
         
         let jumpBtnBottomMargin : CGFloat = UIDevice.isProxy() ? 120 : 50
-        jumpBtn.frame = CGRect(x: 0, y: hx_height - UIDevice.current.hx_bottomMargin - 40 - jumpBtnBottomMargin, width: 150, height: 40)
+        var jumpBtnWidth = (jumpBtn.currentTitle?.hx_stringWidth(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) ?? 0 ) + 10
+        if jumpBtnWidth < 150 {
+            jumpBtnWidth = 150
+        }
+        jumpBtn.frame = CGRect(x: 0, y: hx_height - UIDevice.current.hx_bottomMargin - 40 - jumpBtnBottomMargin, width: jumpBtnWidth, height: 40)
         jumpBtn.hx_centerX = hx_width * 0.5
     }
     

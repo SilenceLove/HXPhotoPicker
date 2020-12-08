@@ -22,6 +22,44 @@ class HXPHAsset: NSObject {
         }
     }
     
+    /// 媒体类型
+    var mediaType: HXPHPicker.Asset.MediaType = .photo
+    
+    /// 媒体子类型
+    var mediaSubType: HXPHPicker.Asset.MediaSubType = .image
+    
+    /// 原图
+    var originalImage: UIImage? {
+        get {
+            let options = PHImageRequestOptions.init()
+            options.isSynchronous = true
+            options.isNetworkAccessAllowed = true
+            options.deliveryMode = .highQualityFormat
+            if mediaSubType == .imageAnimated {
+                options.version = .original
+            }
+            var originalImage: UIImage?
+            _ = HXPHAssetManager.requestImageData(for: asset!, options: options) { (imageData, dataUTI, orientation, info) in
+                if imageData != nil {
+                    originalImage = UIImage.init(data: imageData!)
+                }
+            }
+            return originalImage
+        }
+    }
+    
+    /// 视频时长 格式：00:00
+    var videoTime: String?
+    
+    /// 视频时长 秒
+    var videoDuration: TimeInterval = 0
+    
+    /// 当前资源是否被选中
+    var selected: Bool = false
+    
+    /// 选中时的下标
+    var selectIndex: Int = 0
+    
     /// 当前资源的图片大小
     var imageSize: CGSize {
         get {
@@ -38,24 +76,6 @@ class HXPHAsset: NSObject {
             return size
         }
     }
-    
-    /// 媒体类型
-    var mediaType: HXPHPicker.Asset.MediaType = .photo
-    
-    /// 媒体子类型
-    var mediaSubType: HXPHPicker.Asset.MediaSubType = .image
-    
-    /// 视频时长 格式：00:00
-    var videoTime: String?
-    
-    /// 视频时长 秒
-    var videoDuration: TimeInterval = 0
-    
-    /// 当前资源是否被选中
-    var selected: Bool = false
-    
-    /// 选中时的下标
-    var selectIndex: Int = 0
     
     init(asset: PHAsset) {
         super.init()
@@ -81,7 +101,7 @@ class HXPHAsset: NSObject {
         if asset == nil {
             return nil
         }
-        return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: 165) { (image, info) in
+        return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: 170) { (image, info) in
             completion?(image, self, info)
         }
     }

@@ -74,7 +74,7 @@ class HXAlbumViewCell: UITableViewCell {
         albumNameLb.textColor = HXPHManager.shared.isDark ? config?.albumNameDarkColor : config?.albumNameColor
         photoCountLb.textColor = HXPHManager.shared.isDark ? config?.photoCountDarkColor : config?.photoCountColor
         bottomLineView.backgroundColor = HXPHManager.shared.isDark ? config?.separatorLineDarkColor : config?.separatorLineColor
-        backgroundColor = HXPHManager.shared.isDark ? config?.cellbackgroundDarkColor : config?.cellBackgroudColor
+        backgroundColor = HXPHManager.shared.isDark ? config?.cellbackgroundDarkColor : config?.cellBackgroundColor
         if HXPHManager.shared.isDark {
             selectedBgView.backgroundColor = config?.cellDarkSelectedColor
             selectedBackgroundView = selectedBgView

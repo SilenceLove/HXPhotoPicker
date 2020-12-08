@@ -10,11 +10,12 @@ import UIKit
 
 extension UIViewController {
     
-    func hx_pickerController() -> HXPHPickerController? {
-        if self.navigationController is HXPHPickerController {
-            return self.navigationController as? HXPHPickerController
+    var hx_pickerController: HXPHPickerController? {
+        get {
+            if self.navigationController is HXPHPickerController {
+                return self.navigationController as? HXPHPickerController
+            }
+            return nil
         }
-        return nil
     }
-    
 }

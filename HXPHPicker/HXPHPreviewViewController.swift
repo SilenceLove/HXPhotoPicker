@@ -35,12 +35,12 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         var canUpdate = false
         if isSelected {
             // 选中
-            if hx_pickerController()!.addedPhotoAsset(photoAsset: photoAsset) {
+            if hx_pickerController!.addedPhotoAsset(photoAsset: photoAsset) {
                 canUpdate = true
             }
         }else {
             // 取消选中
-            _ = hx_pickerController()?.removePhotoAsset(photoAsset: photoAsset)
+            _ = hx_pickerController?.removePhotoAsset(photoAsset: photoAsset)
             canUpdate = true
         }
         if canUpdate {
@@ -111,26 +111,26 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     lazy var bottomView : HXPHPickerBottomView = {
         let bottomView = HXPHPickerBottomView.init(config: config.bottomView)
         bottomView.hx_delegate = self
-        bottomView.boxControl.isSelected = hx_pickerController()!.isOriginal
+        bottomView.boxControl.isSelected = hx_pickerController!.isOriginal
         return bottomView
     }()
     // MARK: HXPHPickerBottomViewDelegate
     func bottomViewDidPreviewButtonClick(view: HXPHPickerBottomView) {}
     func bottomViewDidFinishButtonClick(view: HXPHPickerBottomView) {
-        if hx_pickerController()!.config.selectMode == .multiple {
-            hx_pickerController()?.finishCallback()
+        if hx_pickerController!.config.selectMode == .multiple {
+            hx_pickerController?.finishCallback()
         }else {
             if previewAssets.isEmpty {
                 HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "没有可选资源".hx_localized, animated: true, delay: 2)
                 return
             }
             let photoAsset = previewAssets[currentPreviewIndex]
-            hx_pickerController()?.singleFinishCallback(for: photoAsset)
+            hx_pickerController?.singleFinishCallback(for: photoAsset)
         }
     }
     func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) {
         delegate?.previewViewControllerDidClickOriginal(self, with: isOriginal)
-        hx_pickerController()?.originalButtonCallback()
+        hx_pickerController?.originalButtonCallback()
     }
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -163,7 +163,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         extendedLayoutIncludesOpaqueBars = true;
         edgesForExtendedLayout = .all;
         view.clipsToBounds = true
-        config = hx_pickerController()!.config.previewView
+        config = hx_pickerController!.config.previewView
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
         initView()
         configColor()
@@ -173,7 +173,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         view.addSubview(collectionView)
         view.addSubview(bottomView)
         bottomView.updateFinishButtonTitle()
-        if hx_pickerController()!.config.selectMode == .multiple {
+        if hx_pickerController!.config.selectMode == .multiple {
             navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: selectBoxControl)
             if currentPreviewIndex == 0 && !previewAssets.isEmpty {
                 let photoAsset = previewAssets.first!

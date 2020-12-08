@@ -36,13 +36,18 @@ class HXPHManager: NSObject {
     }
     
     private lazy var cameraAlbumLocalIdentifier : String? = {
-        var identifier = UserDefaults.standard.string(forKey: "hxcameraAlbumLocalIdentifier")
+        var identifier = UserDefaults.standard.string(forKey: HXPHPicker.CameraAlbumLocal.identifier.rawValue)
         return identifier
     }()
     
     private lazy var cameraAlbumLocalIdentifierType : HXPHPicker.SelectType? = {
-        var identifierType = UserDefaults.standard.integer(forKey: "hxcameraAlbumLocalIdentifierType")
+        var identifierType = UserDefaults.standard.integer(forKey: HXPHPicker.CameraAlbumLocal.identifierType.rawValue)
         return HXPHPicker.SelectType(rawValue: identifierType)
+    }()
+    
+    private lazy var cameraAlbumLocalLanguage : String? = {
+        var identifierType = UserDefaults.standard.string(forKey: HXPHPicker.CameraAlbumLocal.language.rawValue)
+        return identifierType
     }()
     
     /// 获取所有资源集合
@@ -89,9 +94,11 @@ class HXPHManager: NSObject {
     func fetchCameraAssetCollection(for type: HXPHPicker.SelectType, options: PHFetchOptions, completion :@escaping (HXPHAssetCollection)->()) {
         DispatchQueue.global().async {
             var useLocalIdentifier = false
+            let language = Locale.preferredLanguages.first
             if self.cameraAlbumLocalIdentifier != nil {
-                if  self.cameraAlbumLocalIdentifierType == .any ||
-                    type == self.cameraAlbumLocalIdentifierType  {
+                if  (self.cameraAlbumLocalIdentifierType == .any ||
+                    type == self.cameraAlbumLocalIdentifierType) &&
+                    self.cameraAlbumLocalLanguage == language {
                     useLocalIdentifier = true
                 }
             }
@@ -101,8 +108,9 @@ class HXPHManager: NSObject {
                 collection = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: identifiers, options: nil).firstObject
             }else {
                 collection = HXPHAssetManager.fetchCameraRollAlbum(options: nil)
-                UserDefaults.standard.set(collection?.localIdentifier, forKey: "hxcameraAlbumLocalIdentifier")
-                UserDefaults.standard.set(type.rawValue, forKey: "hxcameraAlbumLocalIdentifierType")
+                UserDefaults.standard.set(collection?.localIdentifier, forKey: HXPHPicker.CameraAlbumLocal.identifier.rawValue)
+                UserDefaults.standard.set(type.rawValue, forKey: HXPHPicker.CameraAlbumLocal.identifierType.rawValue)
+                UserDefaults.standard.set(language, forKey: HXPHPicker.CameraAlbumLocal.language.rawValue)
             }
             let assetCollection = HXPHAssetCollection.init(collection: collection, options: options)
             DispatchQueue.main.async {
@@ -170,6 +178,10 @@ class HXPHManager: NSObject {
                         language = "ja"
                     }else if language!.hasPrefix("ko") {
                         language = "ko"
+                    }else if language!.hasPrefix("th") {
+                        language = "th"
+                    }else if language!.hasPrefix("id") {
+                        language = "id"
                     }else {
                         language = "en"
                     }

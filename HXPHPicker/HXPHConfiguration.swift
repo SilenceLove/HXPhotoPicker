@@ -35,7 +35,7 @@ class HXPHConfiguration: NSObject {
     var languageType : HXPHPicker.LanguageType = .system
     
     /// 相册展示模式
-    var albumShowMode : HXPHPicker.Album.ShowMode = .normal
+    var albumShowMode : HXPHPicker.Album.ShowMode = .popup
     
     /// 外观风格
     var appearanceStyle: HXPHPicker.AppearanceStyle = .varied
@@ -62,7 +62,7 @@ class HXPHConfiguration: NSObject {
     var navigationBarIsTranslucent: Bool = true
     
     /// 导航控制器背景颜色
-    var navigationViewBackgroudColor: UIColor = UIColor.white
+    var navigationViewBackgroundColor: UIColor = UIColor.white
     
     /// 暗黑风格下导航控制器背景颜色
     var navigationViewBackgroudDarkColor: UIColor = "#2E2F30".hx_color
@@ -127,10 +127,10 @@ class HXPHAlbumListConfiguration: NSObject {
     }()
     
     /// cell高度
-    var cellHeight : CGFloat = 100
+    var cellHeight : CGFloat = 60
     
     /// cell背景颜色
-    lazy var cellBackgroudColor: UIColor = {
+    lazy var cellBackgroundColor: UIColor = {
         return UIColor.white
     }()
     
@@ -169,7 +169,7 @@ class HXPHAlbumListConfiguration: NSObject {
     
     /// 暗黑风格下相册名称颜色
     lazy var photoCountDarkColor : UIColor = {
-        return .white
+        return "#dadada".hx_color
     }()
     
     /// 照片数量字体
@@ -187,8 +187,43 @@ class HXPHAlbumListConfiguration: NSObject {
         return "#434344".hx_color.withAlphaComponent(0.6)
     }()
 }
+// MARK: 相册标题视图配置类
+class HXAlbumTitleViewConfiguration: NSObject {
+    
+    /// 背景颜色
+    var backgroundColor: UIColor?
+    
+    /// 暗黑风格下背景颜色
+    var backgroudDarkColor: UIColor?
+    
+    /// 箭头背景颜色
+    lazy var arrowBackgroundColor: UIColor = {
+        return "#333333".hx_color
+    }()
+    
+    /// 箭头颜色
+    lazy var arrowColor: UIColor = {
+        return "#ffffff".hx_color
+    }()
+    
+    /// 暗黑风格下箭头背景颜色
+    lazy var arrowBackgroudDarkColor: UIColor = {
+        return "#ffffff".hx_color
+    }()
+    
+    /// 暗黑风格下箭头颜色
+    lazy var arrowDarkColor: UIColor = {
+        return "#333333".hx_color
+    }()
+}
 // MARK: 照片列表配置类
 class HXPHPhotoListConfiguration: NSObject {
+    
+    /// 相册标题视图配置
+    lazy var titleViewConfig: HXAlbumTitleViewConfiguration = {
+        let titleViewConfig = HXAlbumTitleViewConfiguration.init()
+        return titleViewConfig
+    }()
     
     /// 背景颜色
     lazy var backgroundColor : UIColor = {
@@ -319,17 +354,17 @@ class HXPHPickerBottomViewConfiguration: NSObject {
         let config = HXPHSelectBoxConfiguration.init()
         config.type = .tick
         // 原图按钮选中时的背景颜色
-        config.selectedBackgroudColor = UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
+        config.selectedBackgroundColor = UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
         // 暗黑风格下原图按钮选中时的背景颜色
         config.selectedBackgroudDarkColor = UIColor.white
         // 原图按钮未选中时的边框宽度
         config.borderWidth = 1
         // 原图按钮未选中时的边框颜色
-        config.borderColor = config.selectedBackgroudColor
+        config.borderColor = config.selectedBackgroundColor
         // 暗黑风格下原图按钮未选中时的边框颜色
         config.borderDarkColor = UIColor.white
         // 原图按钮未选中时框框中间的颜色
-        config.backgroudColor = UIColor.white.withAlphaComponent(0.3)
+        config.backgroundColor = UIColor.white.withAlphaComponent(0.3)
         // 原图按钮选中时的勾勾宽度
         config.tickWidth = 1
         return config
@@ -356,22 +391,22 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     }()
     
     /// 完成按钮选中时的背景颜色
-    lazy var finishButtonBackgroudColor: UIColor = {
+    lazy var finishButtonBackgroundColor: UIColor = {
         return UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
     }()
     
     /// 暗黑风格下完成按钮选中时的背景颜色
-    lazy var finishButtonDarkBackgroudColor: UIColor = {
+    lazy var finishButtonDarkBackgroundColor: UIColor = {
         return .white
     }()
     
     /// 完成按钮禁用时的背景颜色
-    lazy var finishButtonDisableBackgroudColor: UIColor = {
+    lazy var finishButtonDisableBackgroundColor: UIColor = {
         return UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1).withAlphaComponent(0.4)
     }()
     
     /// 暗黑风格下完成按钮禁用时的背景颜色
-    lazy var finishButtonDisableDarkBackgroudColor: UIColor = {
+    lazy var finishButtonDisableDarkBackgroundColor: UIColor = {
         return UIColor.white.withAlphaComponent(0.4)
     }()
     
@@ -431,17 +466,17 @@ class HXPHSelectBoxConfiguration: NSObject {
     }()
     
     /// 未选中时框框中间的颜色
-    lazy var backgroudColor: UIColor = {
+    lazy var backgroundColor: UIColor = {
         return UIColor.black.withAlphaComponent(0.4)
     }()
     
     /// 暗黑风格下未选中时框框中间的颜色
-    lazy var darkBackgroudColor : UIColor = {
+    lazy var darkBackgroundColor : UIColor = {
         return UIColor.black.withAlphaComponent(0.2)
     }()
     
     /// 选中之后的背景颜色
-    lazy var selectedBackgroudColor: UIColor = {
+    lazy var selectedBackgroundColor: UIColor = {
         return UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
     }()
     
@@ -469,12 +504,12 @@ class HXPHSelectBoxConfiguration: NSObject {
 class HXPHNotAuthorizedConfiguration: NSObject {
     
     /// 背景颜色
-    lazy var backgroudColor: UIColor = {
+    lazy var backgroundColor: UIColor = {
         return UIColor.white
     }()
     
     /// 暗黑风格下的背景颜色
-    lazy var darkBackgroudColor: UIColor = {
+    lazy var darkBackgroundColor: UIColor = {
         return "#2E2F30".hx_color
     }()
     
@@ -504,12 +539,12 @@ class HXPHNotAuthorizedConfiguration: NSObject {
     }()
     
     /// 跳转按钮背景颜色
-    lazy var jumpButtonBackgroudColor: UIColor = {
+    lazy var jumpButtonBackgroundColor: UIColor = {
         return "#333333".hx_color
     }()
     
     /// 暗黑风格下跳转按钮背景颜色
-    lazy var jumpButtonDarkBackgroudColor: UIColor = {
+    lazy var jumpButtonDarkBackgroundColor: UIColor = {
         return .white
     }()
     

@@ -320,7 +320,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         requestID = photoAsset?.requestAVAsset(iCloudHandler: { (asset, requestID) in
             if asset == weakSelf?.photoAsset {
                 weakSelf?.requestID = requestID
-                HXPHProgressHUD.showLoadingHUD(addedTo: weakSelf, text: "正在下载...", animated: true)
+                HXPHProgressHUD.showLoadingHUD(addedTo: weakSelf, text: "正在下载...".hx_localized, animated: true)
             }
         }, progressHandler: { (asset, progress) in
             if asset == weakSelf?.photoAsset {
@@ -336,7 +336,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             if asset == weakSelf?.photoAsset {
                 if !HXPHAssetManager.assetDownloadCancel(for: info) {
                     HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
-                    HXPHProgressHUD.showWarningHUD(addedTo: weakSelf, text: "下载失败", animated: true, delay: 2)
+                    HXPHProgressHUD.showWarningHUD(addedTo: weakSelf, text: "下载失败".hx_localized, animated: true, delay: 2)
                 }
             }
         })

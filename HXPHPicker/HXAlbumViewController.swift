@@ -40,7 +40,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true;
         edgesForExtendedLayout = .all;
-        config = hx_pickerController()!.config.albumList
+        config = hx_pickerController!.config.albumList
         let backItem = UIBarButtonItem.init(title: "取消".hx_localized, style: .done, target: self, action: #selector(didCancelItemClick))
         navigationItem.rightBarButtonItem = backItem
         view.addSubview(tableView)
@@ -57,12 +57,12 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         orientationDidChange = true
     }
     func fetchCameraAssetCollection() {
-        if hx_pickerController()?.cameraAssetCollection != nil {
-            self.pushPhotoPickerContoller(assetCollection: hx_pickerController()?.cameraAssetCollection, animated: false)
+        if hx_pickerController?.cameraAssetCollection != nil {
+            self.pushPhotoPickerContoller(assetCollection: hx_pickerController?.cameraAssetCollection, animated: false)
             self.canFetchAssetCollections = true
             title = "相册".hx_localized
         }else {
-            hx_pickerController()?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
+            hx_pickerController?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
                 var cameraAssetCollection = assetCollection
                 if cameraAssetCollection == nil {
                     cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName, coverImage: self.config!.emptyCoverImageName.hx_image)
@@ -76,8 +76,8 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     
     func fetchAssetCollections() {
         HXPHProgressHUD.showLoadingHUD(addedTo: view, animated: true)
-        hx_pickerController()?.fetchAssetCollections()
-        hx_pickerController()?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
+        hx_pickerController?.fetchAssetCollections()
+        hx_pickerController?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
             self.reloadTableView(assetCollectionsArray: assetCollectionsArray)
             HXPHProgressHUD.hideHUD(forView: self.view, animated: true)
         }
@@ -98,7 +98,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     @objc func didCancelItemClick() {
-        hx_pickerController()?.cancelCallback()
+        hx_pickerController?.cancelCallback()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

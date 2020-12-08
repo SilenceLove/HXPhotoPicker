@@ -9,6 +9,7 @@
 import UIKit
 
 class HXPHPicker: NSObject {
+    
     enum SelectType: Int {
         case photo = 0      //!< 只显示图片
         case video = 1      //!< 只显示视频
@@ -63,5 +64,10 @@ class HXPHPicker: NSObject {
                 case tick   //!< √
             }
         }
+    }
+    enum CameraAlbumLocal: String {
+        case identifier = "HXCameraAlbumLocalIdentifier"
+        case identifierType = "HXCameraAlbumLocalIdentifierType"
+        case language = "HXCameraAlbumLocalLanguage"
     }
 }

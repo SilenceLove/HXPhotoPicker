@@ -21,8 +21,6 @@
 	<string>是否允许此App后台获取定位信息</string>
 	<key>NSCameraUsageDescription</key>
 	<string>是否允许此App使用你的相机</string>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>zh_CN</string>
 	<key>CFBundleDisplayName</key>
 	<string>照片(Swift)</string>
 	<key>CFBundleExecutable</key>
