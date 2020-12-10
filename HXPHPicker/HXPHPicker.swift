@@ -34,6 +34,8 @@ class HXPHPicker: NSObject {
         case japanese           //!< 日文
         case korean             //!< 韩文
         case english            //!< 英文
+        case thai               //!< 泰语
+        case indonesia          //!< 印尼语
     }
     enum Asset {
         enum MediaType: Int {
@@ -69,5 +71,22 @@ class HXPHPicker: NSObject {
         case identifier = "HXCameraAlbumLocalIdentifier"
         case identifierType = "HXCameraAlbumLocalIdentifierType"
         case language = "HXCameraAlbumLocalLanguage"
+    }
+    enum LivePhotoError {
+        case imageError(Error?)
+        case videoError(Error?)
+        case allError(Error?, Error?)
+    }
+}
+
+enum HXPickerError: LocalizedError {
+    case error(message: String)
+}
+extension HXPickerError {
+    public var errorDescription: String? {
+        switch self {
+            case let .error(message):
+                return message
+        }
     }
 }

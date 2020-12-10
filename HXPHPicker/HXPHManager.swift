@@ -166,6 +166,12 @@ class HXPHManager: NSObject {
             case .english:
                 language = "en"
                 break
+            case .thai:
+                language = "th"
+                break
+            case .indonesia:
+                language = "id"
+                break
             default:
                 if language != nil {
                     if language!.hasPrefix("zh") {

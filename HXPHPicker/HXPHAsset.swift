@@ -42,6 +42,10 @@ class HXPHAsset: NSObject {
             _ = HXPHAssetManager.requestImageData(for: asset!, options: options) { (imageData, dataUTI, orientation, info) in
                 if imageData != nil {
                     originalImage = UIImage.init(data: imageData!)
+                    if self.mediaSubType != .imageAnimated && HXPHAssetManager.assetIsAnimated(asset: self.asset!) {
+                        // 原始图片是动图，但是设置的是不显示动图，所以在这里处理一下
+                        originalImage = originalImage?.images?.first
+                    }
                 }
             }
             return originalImage
@@ -55,7 +59,7 @@ class HXPHAsset: NSObject {
     var videoDuration: TimeInterval = 0
     
     /// 当前资源是否被选中
-    var selected: Bool = false
+    var isSelected: Bool = false
     
     /// 选中时的下标
     var selectIndex: Int = 0
@@ -101,12 +105,12 @@ class HXPHAsset: NSObject {
         if asset == nil {
             return nil
         }
-        return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: 170) { (image, info) in
+        return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: 175) { (image, info) in
             completion?(image, self, info)
         }
     }
     
-    /// 请求imageData，如果资源在iCloud上会自动下载。如果需要更细节的处理请使用 PHAssetManager
+    /// 请求imageData，如果资源在iCloud上会自动下载。如果需要更细节的处理请查看 PHAssetManager
     /// - Parameters:
     ///   - iCloudHandler: 下载iCloud上的资源时回调iCloud的请求ID
     ///   - progressHandler: iCloud下载进度
@@ -133,7 +137,7 @@ class HXPHAsset: NSObject {
         })
     }
     
-    /// 请求LivePhoto，如果资源在iCloud上会自动下载。如果需要更细节的处理请使用 PHAssetManager
+    /// 请求LivePhoto，如果资源在iCloud上会自动下载。如果需要更细节的处理请查看 PHAssetManager
     /// - Parameters:
     ///   - targetSize: 请求的大小
     ///   - iCloudHandler: 下载iCloud上的资源时回调iCloud的请求ID
@@ -159,7 +163,7 @@ class HXPHAsset: NSObject {
         }
     }
     
-    /// 请求AVAsset，如果资源在iCloud上会自动下载。如果需要更细节的处理请使用 PHAssetManager
+    /// 请求AVAsset，如果资源在iCloud上会自动下载。如果需要更细节的处理请查看 PHAssetManager
     /// - Parameters:
     ///   - iCloudHandler: 下载iCloud上的资源时回调iCloud的请求ID
     ///   - progressHandler: iCloud下载进度
@@ -180,6 +184,5 @@ class HXPHAsset: NSObject {
                 failure?(self, info)
             }
         }
-
     }
 }

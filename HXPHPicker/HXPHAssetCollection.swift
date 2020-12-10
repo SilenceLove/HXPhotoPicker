@@ -16,8 +16,8 @@ class HXPHAssetCollection: NSObject {
     var collection : PHAssetCollection?
     var options : PHFetchOptions?
     var coverAsset: PHAsset?
+    var isSelected: Bool = false
     private var coverImage: UIImage?
-    
     init(collection: PHAssetCollection? , options: PHFetchOptions?) {
         super.init()
         self.collection = collection
@@ -43,6 +43,9 @@ class HXPHAssetCollection: NSObject {
     func changeResult(for result: PHFetchResult<PHAsset>) {
         self.result = result
         count = result.count
+        if collection != nil {
+            albumName = HXPHTools.transformAlbumName(for: collection!)
+        }
     }
     
     func fetchCoverAsset(reverse: Bool) {
@@ -51,6 +54,11 @@ class HXPHAssetCollection: NSObject {
         }else {
             coverAsset = result?.lastObject
         }
+    }
+    
+    func changedNameWithImage(albumName: String?, coverImage: UIImage?) {
+        self.albumName = albumName
+        self.coverImage = coverImage
     }
     
     /// 请求获取相册封面图片

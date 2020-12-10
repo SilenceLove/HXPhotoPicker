@@ -13,7 +13,7 @@ protocol HXPHPreviewViewControllerDelegate: NSObjectProtocol {
     func previewViewControllerDidClickSelectBox(_ previewViewController:HXPHPreviewViewController, with isSelected: Bool)
 }
 
-class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, HXPHPreviewViewCellDelegate, HXPHPickerBottomViewDelegate {
+class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, HXPHPreviewViewCellDelegate, HXPHPickerBottomViewDelegate, UINavigationControllerDelegate, UIViewControllerTransitioningDelegate {
     
     weak var delegate: HXPHPreviewViewControllerDelegate?
     var config : HXPHPreviewViewConfiguration!
@@ -21,6 +21,8 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     var orientationDidChange : Bool = false
     var statusBarShouldBeHidden : Bool = false
     var previewAssets : [HXPHAsset] = []
+    var videoLoadSingleCell = false
+    var viewDidAppear: Bool = false
     
     lazy var selectBoxControl: HXPHPickerCellSelectBoxControl = {
         let boxControl = HXPHPickerCellSelectBoxControl.init(frame: CGRect(x: 0, y: 0, width: config.selectBox.size.width, height: config.selectBox.size.height))
@@ -117,14 +119,17 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     // MARK: HXPHPickerBottomViewDelegate
     func bottomViewDidPreviewButtonClick(view: HXPHPickerBottomView) {}
     func bottomViewDidFinishButtonClick(view: HXPHPickerBottomView) {
+        if previewAssets.isEmpty {
+            HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "没有可选资源".hx_localized, animated: true, delay: 2)
+            return
+        }
+        let photoAsset = previewAssets[currentPreviewIndex]
         if hx_pickerController!.config.selectMode == .multiple {
+            if hx_pickerController!.selectedAssetArray.isEmpty {
+                _ = hx_pickerController?.addedPhotoAsset(photoAsset: photoAsset)
+            }
             hx_pickerController?.finishCallback()
         }else {
-            if previewAssets.isEmpty {
-                HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "没有可选资源".hx_localized, animated: true, delay: 2)
-                return
-            }
-            let photoAsset = previewAssets[currentPreviewIndex]
             hx_pickerController?.singleFinishCallback(for: photoAsset)
         }
     }
@@ -134,6 +139,8 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     }
     init() {
         super.init(nibName: nil, bundle: nil)
+        transitioningDelegate = self
+        modalPresentationStyle = .custom
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -166,7 +173,6 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         config = hx_pickerController!.config.previewView
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
         initView()
-        configColor()
     }
     
     func initView() {
@@ -174,11 +180,19 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         view.addSubview(bottomView)
         bottomView.updateFinishButtonTitle()
         if hx_pickerController!.config.selectMode == .multiple {
+            if !hx_pickerController!.config.allowSelectedTogether && hx_pickerController!.config.maximumSelectVideoCount == 1 &&
+                hx_pickerController!.config.selectType == .any{
+                videoLoadSingleCell = true
+            }
             navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: selectBoxControl)
             if currentPreviewIndex == 0 && !previewAssets.isEmpty {
                 let photoAsset = previewAssets.first!
-                updateSelectBox(photoAsset.selected, photoAsset: photoAsset)
-                selectBoxControl.isSelected = photoAsset.selected
+                if photoAsset.mediaType == .video && videoLoadSingleCell {
+                    selectBoxControl.isHidden = true
+                }else {
+                    updateSelectBox(photoAsset.isSelected, photoAsset: photoAsset)
+                    selectBoxControl.isSelected = photoAsset.isSelected
+                }
             }
         }
     }
@@ -193,7 +207,13 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         let cell = self.collectionView.cellForItem(at: IndexPath.init(item: item, section: 0)) as! HXPHPreviewViewCell
         return cell
     }
-    
+    func setCurrentCellImage(image: UIImage?) {
+        if image != nil {
+            let cell = getCell(for: currentPreviewIndex)
+            cell?.cancelRequest()
+            cell?.scrollContentView?.imageView.image = image
+        }
+    }
     @objc func deviceOrientationChanged(notify: Notification) {
         orientationDidChange = true
         let cell = getCell(for: currentPreviewIndex)
@@ -239,7 +259,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photoAsset = previewAssets[indexPath.item]
-        let cell :HXPHPreviewViewCell
+        let cell: HXPHPreviewViewCell
         if photoAsset.mediaType == .photo {
             if photoAsset.mediaSubType == .livePhoto {
                 cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewLivePhotoViewCell.self), for: indexPath) as! HXPHPreviewLivePhotoViewCell
@@ -248,6 +268,8 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             }
         }else {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewVideoViewCell.self), for: indexPath) as! HXPHPreviewVideoViewCell
+            let videoCell = cell as! HXPHPreviewVideoViewCell
+            videoCell.autoPlayVideo = config.autoPlayVideo
         }
         cell.photoAsset = photoAsset
         cell.delegate = self
@@ -274,11 +296,16 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         }
         if !previewAssets.isEmpty {
             let photoAsset = previewAssets[currentIndex]
-            updateSelectBox(photoAsset.selected, photoAsset: photoAsset)
-            if selectBoxControl.isSelected == photoAsset.selected {
-                selectBoxControl.setNeedsDisplay()
+            if photoAsset.mediaType == .video && videoLoadSingleCell {
+                selectBoxControl.isHidden = true
             }else {
-                selectBoxControl.isSelected = photoAsset.selected
+                selectBoxControl.isHidden = false
+                updateSelectBox(photoAsset.isSelected, photoAsset: photoAsset)
+                if selectBoxControl.isSelected == photoAsset.isSelected {
+                    selectBoxControl.setNeedsDisplay()
+                }else {
+                    selectBoxControl.isSelected = photoAsset.isSelected
+                }
             }
         }
         self.currentPreviewIndex = currentIndex
@@ -293,6 +320,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        viewDidAppear = true
         let cell = getCell(for: currentPreviewIndex)
         cell?.requestPreviewAsset()
     }
@@ -307,10 +335,28 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
-            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) && viewDidAppear {
                 configColor()
             }
         }
+    }
+    
+    // MARK: UINavigationControllerDelegate
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if operation == .push {
+            if toVC is HXPHPreviewViewController {
+                return HXPHPickerControllerTransition.init(type: .push)
+            }
+        }else if operation == .pop {
+            if fromVC is HXPHPreviewViewController {
+                let cell = getCell(for: currentPreviewIndex)
+                if cell != nil && cell!.photoAsset!.mediaType == .video {
+                    cell?.scrollContentView?.videoView.hiddenPlayButton()
+                }
+                return HXPHPickerControllerTransition.init(type: .pop)
+            }
+        }
+        return nil
     }
     
     deinit {

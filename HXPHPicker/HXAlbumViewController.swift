@@ -62,14 +62,20 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             self.canFetchAssetCollections = true
             title = "相册".hx_localized
         }else {
+            weak var weakSelf = self
             hx_pickerController?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
                 var cameraAssetCollection = assetCollection
                 if cameraAssetCollection == nil {
-                    cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName, coverImage: self.config!.emptyCoverImageName.hx_image)
+                    cameraAssetCollection = HXPHAssetCollection.init(albumName: weakSelf?.config?.emptyAlbumName, coverImage: weakSelf?.config!.emptyCoverImageName.hx_image)
                 }
-                self.pushPhotoPickerContoller(assetCollection: cameraAssetCollection, animated: false)
-                self.canFetchAssetCollections = true
-                self.title = "相册".hx_localized
+                weakSelf?.canFetchAssetCollections = true
+                weakSelf?.title = "相册".hx_localized
+                if weakSelf?.navigationController?.topViewController is HXPHPickerViewController {
+                    let vc = weakSelf?.navigationController?.topViewController as! HXPHPickerViewController
+                    vc.changedAssetCollection(collection: cameraAssetCollection)
+                    return
+                }
+                weakSelf?.pushPhotoPickerContoller(assetCollection: cameraAssetCollection, animated: false)
             }
         }
     }
@@ -77,9 +83,10 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     func fetchAssetCollections() {
         HXPHProgressHUD.showLoadingHUD(addedTo: view, animated: true)
         hx_pickerController?.fetchAssetCollections()
+        weak var weakSelf = self
         hx_pickerController?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
-            self.reloadTableView(assetCollectionsArray: assetCollectionsArray)
-            HXPHProgressHUD.hideHUD(forView: self.view, animated: true)
+            weakSelf?.reloadTableView(assetCollectionsArray: assetCollectionsArray)
+            HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: true)
         }
     }
     func reloadTableView(assetCollectionsArray: [HXPHAssetCollection]) {

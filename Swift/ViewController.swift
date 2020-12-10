@@ -43,9 +43,7 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let config = HXPHConfiguration.init()
-//        config.selectType = HXPHSelectType.video
-        let nav = HXPHPickerController.init(config: config)
+        let nav = HXPHPickerController.init(config: HXPHTools.getWXConfig())
         nav.pickerContollerDelegate = self
         nav.selectedAssetArray = selectedAssets
         nav.isOriginal = isOriginal

@@ -29,6 +29,10 @@ class HXAlbumViewCell: UITableViewCell {
         bottomLineView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.15)
         return bottomLineView
     }()
+    lazy var tickView: HXAlbumTickView = {
+        let tickView = HXAlbumTickView.init(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        return tickView
+    }()
     lazy var selectedBgView : UIView = {
         let selectedBgView = UIView.init()
         return selectedBgView
@@ -44,6 +48,7 @@ class HXAlbumViewCell: UITableViewCell {
         didSet {
             albumNameLb.text = assetCollection?.albumName
             photoCountLb.text = String(assetCollection!.count)
+            tickView.isHidden = !(assetCollection?.isSelected ?? false)
             weak var weakSelf = self
             requestID = assetCollection?.requestCoverImage(completion: { (image, assetCollection, info) in
                 if assetCollection == weakSelf?.assetCollection && image != nil {
@@ -69,14 +74,16 @@ class HXAlbumViewCell: UITableViewCell {
         contentView.addSubview(albumNameLb)
         contentView.addSubview(photoCountLb)
         contentView.addSubview(bottomLineView)
+        contentView.addSubview(tickView)
     }
     func configColor() {
         albumNameLb.textColor = HXPHManager.shared.isDark ? config?.albumNameDarkColor : config?.albumNameColor
         photoCountLb.textColor = HXPHManager.shared.isDark ? config?.photoCountDarkColor : config?.photoCountColor
         bottomLineView.backgroundColor = HXPHManager.shared.isDark ? config?.separatorLineDarkColor : config?.separatorLineColor
+        tickView.tickLayer.strokeColor = HXPHManager.shared.isDark ? config?.tickDarkColor.cgColor : config?.tickColor.cgColor
         backgroundColor = HXPHManager.shared.isDark ? config?.cellbackgroundDarkColor : config?.cellBackgroundColor
         if HXPHManager.shared.isDark {
-            selectedBgView.backgroundColor = config?.cellDarkSelectedColor
+            selectedBgView.backgroundColor = config?.cellSelectedDarkColor
             selectedBackgroundView = selectedBgView
         }else {
             if config?.cellSelectedColor != nil {
@@ -93,8 +100,11 @@ class HXAlbumViewCell: UITableViewCell {
         let coverWidth = hx_height - (coverMargin * 2)
         albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
         
+        tickView.hx_x = hx_width - 12 - tickView.hx_width
+        tickView.hx_centerY = hx_height * 0.5
+        
         albumNameLb.hx_x = albumCoverView.frame.maxX + 10
-        albumNameLb.hx_size = CGSize(width: hx_width - albumNameLb.hx_x - 20, height: 16)
+        albumNameLb.hx_size = CGSize(width: tickView.hx_x - albumNameLb.hx_x - 20, height: 16)
         albumNameLb.hx_centerY = hx_height / CGFloat(2) - albumNameLb.hx_height / CGFloat(2)
         
         photoCountLb.hx_x = albumCoverView.frame.maxX + 10
@@ -118,5 +128,33 @@ class HXAlbumViewCell: UITableViewCell {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
         }
+    }
+}
+
+class HXAlbumTickView: UIView {
+    lazy var tickLayer: CAShapeLayer = {
+        let tickLayer = CAShapeLayer.init()
+        tickLayer.contentsScale = UIScreen.main.scale
+        let tickPath = UIBezierPath.init()
+        tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
+        tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
+        tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
+        tickLayer.path = tickPath.cgPath
+        tickLayer.lineWidth = 1.5
+        tickLayer.strokeColor = UIColor.black.cgColor
+        tickLayer.fillColor = UIColor.clear.cgColor
+        return tickLayer
+    }()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        layer.addSublayer(tickLayer)
+    }
+    
+    private func scale(_ numerator: CGFloat) -> CGFloat {
+        return numerator / 30 * hx_height
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

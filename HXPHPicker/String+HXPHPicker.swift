@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CommonCrypto
 
 extension String {
     
@@ -27,7 +28,29 @@ extension String {
             return UIImage.hx_named(named: self)
         }
     }
-    
+    static func hx_fileName(suffix: String) -> String {
+        var uuid = UUID().uuidString
+        uuid = uuid.replacingOccurrences(of: "-", with: "").lowercased()
+        var fileName = uuid
+        let nowDate = Date().timeIntervalSince1970
+        
+        fileName.append(String(format: "%d", arguments: [nowDate]))
+        fileName.append(String(format: "%d", arguments: [arc4random()%10000]))
+        return fileName.md5() + "." + suffix
+    }
+    private func md5() -> String {
+        let str = self.cString(using: String.Encoding.utf8)
+        let strLen = CUnsignedInt(self.lengthOfBytes(using: String.Encoding.utf8))
+        let digestLen = Int(CC_MD5_DIGEST_LENGTH)
+        let result = UnsafeMutablePointer<UInt8>.allocate(capacity: 16)
+        CC_MD5(str!, strLen, result)
+        let hash = NSMutableString()
+        for i in 0 ..< digestLen {
+            hash.appendFormat("%02x", result[i])
+        }
+        free(result)
+        return String(format: hash as String)
+    }
     func hx_stringWidth(ofFont font: UIFont, maxHeight: CGFloat) -> CGFloat {
         let constraintRect = CGSize(width: CGFloat(MAXFLOAT), height: maxHeight)
         let boundingBox = self.boundingRect(with: constraintRect, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)

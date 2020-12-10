@@ -86,6 +86,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     func openAlbumView() {
         albumBackgroudView.alpha = 0
         albumBackgroudView.isHidden = false
+        albumView.scrollToMiddle()
         UIView.animate(withDuration: 0.25) {
             self.albumBackgroudView.alpha = 1
             self.configAlbumViewFrame()
@@ -148,7 +149,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     func configData() {
         isMultipleSelect = hx_pickerController!.config.selectMode == .multiple
-        if !hx_pickerController!.config.photosAndVideosCanBeSelectedTogether && hx_pickerController!.config.maximumSelectVideoCount == 1 &&
+        if !hx_pickerController!.config.allowSelectedTogether && hx_pickerController!.config.maximumSelectVideoCount == 1 &&
             hx_pickerController!.config.selectType == .any &&
             isMultipleSelect {
             videoLoadSingleCell = true
@@ -180,7 +181,11 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         }
     }
     func updateTitle() {
-        title = assetCollection?.albumName
+        if hx_pickerController!.config.albumShowMode == .popup {
+            titleView.title = assetCollection?.albumName
+        }else {
+            title = assetCollection?.albumName
+        }
     }
     func fetchData() {
         if hx_pickerController!.config.albumShowMode == .popup {
@@ -188,6 +193,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             navigationItem.titleView = titleView
             if hx_pickerController?.cameraAssetCollection != nil {
                 assetCollection = hx_pickerController?.cameraAssetCollection
+                assetCollection.isSelected = true
                 titleView.title = assetCollection.albumName
                 fetchPhotoAssets()
             }else {
@@ -198,6 +204,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
                         cameraAssetCollection = HXPHAssetCollection.init(albumName: self.hx_pickerController!.config.albumList.emptyAlbumName, coverImage: self.hx_pickerController!.config.albumList.emptyCoverImageName.hx_image)
                     }
                     weakSelf?.assetCollection = cameraAssetCollection
+                    weakSelf?.assetCollection.isSelected = true
                     weakSelf?.titleView.title = weakSelf?.assetCollection.albumName
                     weakSelf?.fetchPhotoAssets()
                 }
@@ -213,25 +220,38 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     func fetchAssetCollections() {
         if !hx_pickerController!.assetCollectionsArray.isEmpty {
             albumView.assetCollectionsArray = hx_pickerController!.assetCollectionsArray
+            albumView.currentSelectedAssetCollection = assetCollection
             configAlbumViewFrame()
-        }else {
-            weak var weakSelf = self
-            hx_pickerController?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
-                weakSelf?.albumView.assetCollectionsArray = assetCollectionsArray
-                weakSelf?.configAlbumViewFrame()
+            if HXPHAssetManager.authorizationStatusIsLimited() {
+                fetchAssetCollectionsClosure()
             }
+        }else {
+            fetchAssetCollectionsClosure()
+        }
+    }
+    private func fetchAssetCollectionsClosure() {
+        weak var weakSelf = self
+        hx_pickerController?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
+            weakSelf?.albumView.assetCollectionsArray = assetCollectionsArray
+            weakSelf?.albumView.currentSelectedAssetCollection = weakSelf?.assetCollection
+            weakSelf?.configAlbumViewFrame()
         }
     }
     func fetchPhotoAssets() {
+        weak var weakSelf = self
         hx_pickerController!.fetchPhotoAssets(assetCollection: assetCollection) { (photoAssets, photoAsset) in
-            self.assets = photoAssets
-            self.collectionView.reloadData()
-            self.scrollToAppropriatePlace(photoAsset: photoAsset)
-            if self.showLoading {
-                HXPHProgressHUD.hideHUD(forView: self.view, animated: true)
-                self.showLoading = false
+            weakSelf?.assets = photoAssets
+            if weakSelf != nil {
+                UIView.transition(with: weakSelf!.collectionView, duration: 0.05, options: .transitionCrossDissolve) {
+                    weakSelf?.collectionView.reloadData()
+                } completion: { (isFinished) in }
+            }
+            weakSelf?.scrollToAppropriatePlace(photoAsset: photoAsset)
+            if weakSelf != nil && weakSelf!.showLoading {
+                HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: true)
+                weakSelf?.showLoading = false
             }else {
-                HXPHProgressHUD.hideHUD(forView: self.navigationController?.view, animated: false)
+                HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: false)
             }
         }
     }
@@ -244,9 +264,56 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             if photoAsset != nil {
                 item = assets.firstIndex(of: photoAsset!) ?? item
             }
-            collectionView.scrollToItem(at: IndexPath(item: item, section: 0), at: .bottom, animated: false)
+            collectionView.scrollToItem(at: IndexPath(item: item, section: 0), at: .centeredVertically, animated: false)
         }
     }
+    func getCell(for item: Int) -> HXPHPickerViewCell? {
+        if assets.isEmpty {
+            return nil
+        }
+        let cell = collectionView.cellForItem(at: IndexPath.init(item: item, section: 0)) as? HXPHPickerViewCell
+        return cell
+    }
+    func getCell(for photoAsset: HXPHAsset) -> HXPHPickerViewCell? {
+        if assets.isEmpty {
+            return nil
+        }
+        let item = assets.firstIndex(of: photoAsset)
+        if item == nil {
+            return nil
+        }
+        return getCell(for: item!)
+    }
+    func reloadCell(for photoAsset: HXPHAsset) {
+        let item = assets.firstIndex(of: photoAsset)
+        if item != nil {
+            collectionView.reloadItems(at: [IndexPath.init(item: item!, section: 0)])
+        }
+    }
+    func changedAssetCollection(collection: HXPHAssetCollection?) {
+        HXPHProgressHUD.showLoadingHUD(addedTo: navigationController?.view, animated: true)
+        if collection == nil {
+            updateTitle()
+            fetchPhotoAssets()
+            reloadAlbumData()
+            return
+        }
+        if hx_pickerController!.config.albumShowMode == .popup {
+            assetCollection.isSelected = false
+            collection?.isSelected = true
+        }
+        assetCollection = collection
+        updateTitle()
+        fetchPhotoAssets()
+        reloadAlbumData()
+    }
+    func reloadAlbumData() {
+        if hx_pickerController!.config.albumShowMode == .popup {
+            albumView.tableView.reloadData()
+        }
+    }
+    
+    // MARK: UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return assets.count
     }
@@ -259,12 +326,17 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         }else {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPickerMultiSelectViewCell.classForCoder()), for: indexPath) as! HXPHPickerMultiSelectViewCell
         }
+        if !photoAsset.isSelected {
+            cell.canSelect = hx_pickerController!.canSelectAsset(for: photoAsset, showHUD: false)
+        }else {
+            cell.canSelect = true
+        }
         cell.delegate = self
         cell.config = config.cell
         cell.photoAsset = photoAsset
         return cell
     }
-    
+    // MARK: UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let myCell: HXPHPickerViewCell = cell as! HXPHPickerViewCell
         
@@ -273,6 +345,9 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: false)
+        if !getCell(for: indexPath.item)!.canSelect {
+            return
+        }
         pushPreviewViewController(previewAssets: assets, currentPreviewIndex: indexPath.item)
     }
     
@@ -281,6 +356,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         vc.previewAssets = previewAssets
         vc.currentPreviewIndex = currentPreviewIndex
         vc.delegate = self
+        navigationController?.delegate = vc
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -291,6 +367,8 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             return
         }
         titleView.title = assetCollection.albumName
+        assetCollection.isSelected = true
+        self.assetCollection.isSelected = false
         self.assetCollection = assetCollection
         HXPHProgressHUD.showLoadingHUD(addedTo: navigationController?.view, animated: true)
         fetchPhotoAssets()
@@ -303,9 +381,9 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             // 取消选中
             _ = hx_pickerController?.removePhotoAsset(photoAsset: cell.photoAsset!)
             cell.updateSelectedState(isSelected: false, animated: true)
-            if config.cell.selectBox.type == .number {
-                updateCellSelectedTitle()
-            }
+//            if config.cell.selectBox.type == .number {
+//                updateCellSelectedTitle()
+//            }
         }else {
             // 选中
             if hx_pickerController!.addedPhotoAsset(photoAsset: cell.photoAsset!) {
@@ -343,17 +421,24 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
                 cell.updateSelectedState(isSelected: true, animated: true)
             }
         }
+        updateCellSelectedTitle()
         bottomView.updateFinishButtonTitle()
     }
     
     func updateCellSelectedTitle() {
         for visibleCell in collectionView.visibleCells {
-            if visibleCell is HXPHPickerMultiSelectViewCell {
-                let cell = visibleCell as! HXPHPickerMultiSelectViewCell
-                if cell.photoAsset!.selected {
-                    if Int(cell.selectControl.text) != (cell.photoAsset!.selectIndex + 1) {
-                        cell.updateSelectedState(isSelected: true, animated: false)
-                        cell.selectControl.setNeedsDisplay()
+            if visibleCell is HXPHPickerViewCell {
+                let cell = visibleCell as! HXPHPickerViewCell
+                if !cell.photoAsset!.isSelected {
+                    cell.canSelect = hx_pickerController!.canSelectAsset(for: cell.photoAsset!, showHUD: false)
+                }
+                if visibleCell is HXPHPickerMultiSelectViewCell {
+                    let cell = visibleCell as! HXPHPickerMultiSelectViewCell
+                    if cell.photoAsset!.isSelected {
+                        if Int(cell.selectControl.text) != (cell.photoAsset!.selectIndex + 1) {
+                            cell.updateSelectedState(isSelected: true, animated: false)
+                            cell.selectControl.setNeedsDisplay()
+                        }
                     }
                 }
             }
@@ -588,9 +673,11 @@ class HXPHPickerBottomView: UIToolbar {
         }
         
         originalTitleLb.textColor = HXPHManager.shared.isDark ? config?.originalButtonTitleDarkColor : config?.originalButtonTitleColor
+        
+        let finishBtnBackgroundColor = HXPHManager.shared.isDark ? config!.finishButtonDarkBackgroundColor : config!.finishButtonBackgroundColor
         finishBtn.setTitleColor(HXPHManager.shared.isDark ? config?.finishButtonTitleDarkColor : config?.finishButtonTitleColor, for: .normal)
         finishBtn.setTitleColor(HXPHManager.shared.isDark ? config?.finishButtonDisableTitleDarkColor : config?.finishButtonDisableTitleColor, for: .disabled)
-        finishBtn.setBackgroundImage(UIImage.hx_image(for: HXPHManager.shared.isDark ? config!.finishButtonDarkBackgroundColor : config!.finishButtonBackgroundColor, havingSize: CGSize.zero), for: .normal)
+        finishBtn.setBackgroundImage(UIImage.hx_image(for: finishBtnBackgroundColor, havingSize: CGSize.zero), for: .normal)
         finishBtn.setBackgroundImage(UIImage.hx_image(for: HXPHManager.shared.isDark ? config!.finishButtonDisableDarkBackgroundColor : config!.finishButtonDisableBackgroundColor, havingSize: CGSize.zero), for: .disabled)
     }
     func updateFinishButtonTitle() {

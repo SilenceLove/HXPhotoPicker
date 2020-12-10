@@ -32,6 +32,7 @@ class HXPHPickerViewCell: UICollectionViewCell {
     }()
     lazy var assetTypeMaskLayer: CAGradientLayer = {
         let layer = CAGradientLayer.init()
+        layer.contentsScale = UIScreen.main.scale
         let blackColor = UIColor.black
         layer.colors = [blackColor.withAlphaComponent(0).cgColor,
                         blackColor.withAlphaComponent(0.15).cgColor,
@@ -51,19 +52,32 @@ class HXPHPickerViewCell: UICollectionViewCell {
         assetTypeLb.textAlignment = .right
         return assetTypeLb
     }()
+    lazy var videoIcon: UIImageView = {
+        let videoIcon = UIImageView.init(image: UIImage.hx_named(named: "hx_picker_cell_video_icon"))
+        videoIcon.hx_size = videoIcon.image?.size ?? CGSize.zero
+        return videoIcon
+    }()
+    
+    lazy var disableMaskLayer: CALayer = {
+        let disableMaskLayer = CALayer.init()
+        disableMaskLayer.backgroundColor = UIColor.white.withAlphaComponent(0.6).cgColor
+        disableMaskLayer.frame = bounds
+        disableMaskLayer.isHidden = true
+        return disableMaskLayer
+    }()
     var requestID: PHImageRequestID?
     var photoAsset: HXPHAsset? {
         didSet {
-            switch photoAsset?.mediaSubType.rawValue {
-            case 1:
+            switch photoAsset?.mediaSubType {
+            case .imageAnimated:
                 assetTypeLb.text = "GIF"
                 assetTypeMaskLayer.isHidden = false
                 break
-            case 2:
+            case .livePhoto:
                 assetTypeLb.text = "Live"
                 assetTypeMaskLayer.isHidden = false
                 break
-            case 4, 5:
+            case .video, .localVideo:
                 assetTypeLb.text = photoAsset?.videoTime
                 assetTypeMaskLayer.isHidden = false
                 break
@@ -71,23 +85,28 @@ class HXPHPickerViewCell: UICollectionViewCell {
                 assetTypeLb.text = nil
                 assetTypeMaskLayer.isHidden = true
             }
+            videoIcon.isHidden = photoAsset?.mediaType != .video
             weak var weakSelf = self
             requestID = photoAsset?.requestThumbnailImage(completion: { (image, photoAsset, info) in
                 if photoAsset == weakSelf?.photoAsset && image != nil {
-                    weakSelf?.imageView.image = image
-                    if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
-                        weakSelf?.requestID = nil
-                    }
                     if !(weakSelf?.firstLoadCompletion ?? true) {
                         weakSelf?.isHidden = false
                         weakSelf?.firstLoadCompletion = true
+                    }
+                    weakSelf?.imageView.image = image
+                    if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
+                        weakSelf?.requestID = nil
                     }
                 }
             })
         }
     }
     
-    var videoCanSelected = true
+    var canSelect = true {
+        didSet {
+            disableMaskLayer.isHidden = canSelect
+        }
+    }
     private var firstLoadCompletion: Bool = false
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -100,6 +119,8 @@ class HXPHPickerViewCell: UICollectionViewCell {
         isHidden = true
         contentView.addSubview(imageView)
         contentView.addSubview(assetTypeLb)
+        contentView.addSubview(videoIcon)
+        contentView.layer.addSublayer(disableMaskLayer)
     }
     
     func cancelRequest() {
@@ -113,8 +134,12 @@ class HXPHPickerViewCell: UICollectionViewCell {
         super.layoutSubviews()
         
         imageView.frame = bounds
+        disableMaskLayer.frame = imageView.bounds
         assetTypeMaskLayer.frame = CGRect(x: 0, y: imageView.hx_height - 25, width: hx_width, height: 25)
         assetTypeLb.frame = CGRect(x: 0, y: hx_height - 19, width: hx_width - 5, height: 18)
+        videoIcon.hx_x = 5
+        videoIcon.hx_y = hx_height - videoIcon.hx_height - 5
+        assetTypeLb.hx_centerY = videoIcon.hx_centerY
     }
 }
 
@@ -129,7 +154,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     lazy var selectMaskLayer: CALayer = {
         let selectMaskLayer = CALayer.init()
-        selectMaskLayer.backgroundColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        selectMaskLayer.backgroundColor = UIColor.black.withAlphaComponent(0.6).cgColor
         selectMaskLayer.frame = bounds
         selectMaskLayer.isHidden = true
         return selectMaskLayer
@@ -137,7 +162,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     override var photoAsset: HXPHAsset? {
         didSet {
-            updateSelectedState(isSelected: photoAsset!.selected, animated: false)
+            updateSelectedState(isSelected: photoAsset!.isSelected, animated: false)
         }
     }
     
@@ -151,9 +176,13 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
         super.init(frame: frame)
         imageView.layer.addSublayer(selectMaskLayer)
         contentView.addSubview(selectControl)
+        contentView.layer.addSublayer(disableMaskLayer)
     }
     
     @objc func didSelectControlClick(control: HXPHPickerCellSelectBoxControl) {
+        if !canSelect {
+            return
+        }
         delegate?.cellDidSelectControlClick(self, isSelected: control.isSelected)
     }
     

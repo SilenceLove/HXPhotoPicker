@@ -29,13 +29,13 @@ class HXPHConfiguration: NSObject {
     var videoMinimumSelectDuration: Int = 0
     
     /// 照片和视频可以一起选择
-    var photosAndVideosCanBeSelectedTogether: Bool = true
+    var allowSelectedTogether: Bool = true
     
     /// 语言类型
     var languageType : HXPHPicker.LanguageType = .system
     
     /// 相册展示模式
-    var albumShowMode : HXPHPicker.Album.ShowMode = .popup
+    var albumShowMode : HXPHPicker.Album.ShowMode = .normal
     
     /// 外观风格
     var appearanceStyle: HXPHPicker.AppearanceStyle = .varied
@@ -77,10 +77,10 @@ class HXPHConfiguration: NSObject {
     /// 暗黑风格下导航栏标题颜色
     var navigationTitleDarkColor: UIColor = UIColor.white
     
-    /// 暗黑风格下导航栏标题颜色
+    /// TintColor
     var navigationTintColor: UIColor?
     
-    /// 暗黑风格下导航栏标题颜色
+    /// 暗黑风格下TintColor
     var navigationDarkTintColor: UIColor = UIColor.white
     
     /// 相册列表配置
@@ -127,7 +127,7 @@ class HXPHAlbumListConfiguration: NSObject {
     }()
     
     /// cell高度
-    var cellHeight : CGFloat = 60
+    var cellHeight : CGFloat = 100
     
     /// cell背景颜色
     lazy var cellBackgroundColor: UIColor = {
@@ -143,7 +143,7 @@ class HXPHAlbumListConfiguration: NSObject {
     var cellSelectedColor : UIColor?
     
     /// 暗黑风格下cell选中时的颜色
-    lazy var cellDarkSelectedColor : UIColor = {
+    lazy var cellSelectedDarkColor : UIColor = {
         return UIColor.init(red: 0.125, green: 0.125, blue: 0.125, alpha: 1)
     }()
     
@@ -185,6 +185,16 @@ class HXPHAlbumListConfiguration: NSObject {
     /// 暗黑风格下分隔线颜色
     lazy var separatorLineDarkColor : UIColor = {
         return "#434344".hx_color.withAlphaComponent(0.6)
+    }()
+    
+    /// 选中勾勾的颜色
+    lazy var tickColor: UIColor = {
+        return "#333333".hx_color
+    }()
+    
+    /// 暗黑风格选中勾勾的颜色
+    lazy var tickDarkColor : UIColor = {
+        return "#ffffff".hx_color
     }()
 }
 // MARK: 相册标题视图配置类
@@ -293,11 +303,15 @@ class HXPHPreviewViewConfiguration: NSObject {
         return config
     }()
     
+    /// 自动播放视频
+    var autoPlayVideo: Bool = false
+    
     /// 底部视图相关配置
     lazy var bottomView: HXPHPickerBottomViewConfiguration = {
         let config = HXPHPickerBottomViewConfiguration.init()
         config.previewButtonHidden = true
-//        config.editButtonHidden = true
+        config.disableFinishButtonWhenNotSelected = false
+        config.editButtonHidden = true
         return config
     }()
 }
@@ -411,7 +425,7 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     }()
     
     /// 未选择资源时是否禁用完成按钮
-    var disableFinishButtonWhenNotSelected: Bool = false
+    var disableFinishButtonWhenNotSelected: Bool = true
     
     /// 隐藏编辑按钮
     var editButtonHidden: Bool = true
@@ -516,6 +530,11 @@ class HXPHNotAuthorizedConfiguration: NSObject {
     /// 关闭按钮图片名
     lazy var closeButtonImageName: String = {
         return "hx_picker_notAuthorized_close"
+    }()
+    
+    /// 暗黑风格下的关闭按钮图片名
+    lazy var closeButtonDarkImageName: String = {
+        return "hx_picker_notAuthorized_close_dark"
     }()
     
     /// 标题颜色

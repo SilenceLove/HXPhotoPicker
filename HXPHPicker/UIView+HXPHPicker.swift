@@ -253,13 +253,18 @@ class HXPHProgressHUD: UIView {
                 textLb.hx_y = imageView.frame.maxY
             }
         }
-        backgroundView.hx_width = width
-        contentView.hx_width = width
+        
         contentView.hx_height = textLb.frame.maxY
+        contentView.hx_width = width
         if contentView.hx_height + 40 < 100 {
             backgroundView.hx_height = 100
         }else {
             backgroundView.hx_height = contentView.hx_height + 40
+        }
+        if width < backgroundView.hx_height {
+            backgroundView.hx_width = backgroundView.hx_height
+        }else {
+            backgroundView.hx_width = width
         }
         contentView.center = CGPoint(x: backgroundView.hx_width * 0.5, y: backgroundView.hx_height * 0.5)
         backgroundView.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)

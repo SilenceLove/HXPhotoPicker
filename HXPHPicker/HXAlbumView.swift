@@ -34,11 +34,27 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         }
     }
     
+    private var currentSelectedRow: Int = 0
+    var currentSelectedAssetCollection: HXPHAssetCollection? {
+        didSet {
+            if currentSelectedAssetCollection != nil {
+                currentSelectedRow = assetCollectionsArray.firstIndex(of: currentSelectedAssetCollection!) ?? 0
+            }
+        }
+    }
+    
     init(config: HXPHAlbumListConfiguration) {
         super.init(frame: CGRect.zero)
         self.config = config
         addSubview(tableView)
         configColor()
+    }
+    func scrollToMiddle() {
+        if assetCollectionsArray.isEmpty {
+            return
+        }
+        let indexPath = IndexPath(row: currentSelectedRow, section: 0)
+        tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.middle, animated: false)
     }
     func configColor() {
         tableView.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
@@ -60,7 +76,9 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let assetCollection = assetCollectionsArray[indexPath.row]
+        currentSelectedAssetCollection = assetCollection
         delegate?.albumView(self, didSelectRowAt: assetCollection)
+        tableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -102,15 +120,18 @@ class HXAlbumTitleView: UIControl {
     
     var title: String? {
         didSet {
+            if title == nil {
+                title = "相册".hx_localized
+            }
             titleLb.text = title
             var titleWidth = self.title?.hx_stringWidth(ofFont: self.titleLb.font, maxHeight: self.hx_height) ?? 0
-            if titleWidth > hx_width - 45 {
+            if titleWidth > hx_width - 40 {
                 titleWidth = hx_width - 45
             }
             UIView.animate(withDuration: 0.25) {
                 self.titleLb.hx_width = titleWidth
                 self.arrowView.hx_x = self.titleLb.frame.maxX + 5
-                self.contentView.hx_width = self.arrowView.frame.maxX + 10
+                self.contentView.hx_width = self.arrowView.frame.maxX + 5
                 self.contentView.hx_centerX = self.hx_width * 0.5
             }
         }
@@ -123,8 +144,11 @@ class HXAlbumTitleView: UIControl {
     }
     
     private lazy var titleLb: UILabel = {
-        let titleLb = UILabel.init(frame: CGRect(x: 10, y: 0, width: 0, height: self.hx_height))
-        titleLb.font = UIFont.hx_semiboldPingFang(size: 18)
+        let text = "相册".hx_localized
+        let font = UIFont.hx_semiboldPingFang(size: 18)
+        let titleLb = UILabel.init(frame: CGRect(x: 10, y: 0, width: text.hx_stringWidth(ofFont: font, maxHeight: self.hx_height), height: self.hx_height))
+        titleLb.text = text
+        titleLb.font = font
         titleLb.textAlignment = .center
         return titleLb
     }()

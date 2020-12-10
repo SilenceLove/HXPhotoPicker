@@ -157,6 +157,12 @@ class HXPHPreviewLivePhotoViewCell: HXPHPreviewViewCell {
 
 class HXPHPreviewVideoViewCell: HXPHPreviewViewCell {
     
+    var autoPlayVideo: Bool = false {
+        didSet {
+            scrollContentView?.videoView.autoPlayVideo = autoPlayVideo
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         scrollContentView = HXPHPreviewContentView.init(type: HXPHPreviewContentViewType.video)
@@ -178,6 +184,8 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
     
     lazy var imageView: HXPHGIFImageView = {
         let imageView = HXPHGIFImageView.init()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     @available(iOS 9.1, *)
@@ -194,6 +202,13 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
     var type: HXPHPreviewContentViewType = .photo
     var requestID: PHImageRequestID?
     var requestCompletion: Bool = false
+    var autoPlayVideo: Bool = false {
+        didSet {
+            if type == .video {
+                videoView.autoPlayVideo = autoPlayVideo
+            }
+        }
+    }
     
     var photoAsset: HXPHAsset? {
         didSet {
@@ -635,22 +650,28 @@ class HXPHVideoView: UIView {
     
     var avAsset: AVAsset? {
         didSet {
+            if playButton.alpha == 0 {
+                UIView.animate(withDuration: 0.25) {
+                    self.playButton.alpha = 1
+                }
+            }
             let playerItem = AVPlayerItem.init(asset: avAsset!)
             player.replaceCurrentItem(with: playerItem)
             playerLayer.player = player
             addedPlayerObservers()
         }
     }
+    override class var layerClass: AnyClass {
+        return AVPlayerLayer.self
+    }
     
     lazy var player: AVPlayer = {
         let player = AVPlayer.init()
         return player
     }()
-    lazy var playerLayer: AVPlayerLayer = {
-        let playerLayer = AVPlayerLayer.init(player: player)
-        playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        return playerLayer
-    }()
+    var playerLayer: AVPlayerLayer {
+        return layer as! AVPlayerLayer
+    }
     
     lazy var playButton: UIButton = {
         let playButton = UIButton.init(type: UIButton.ButtonType.custom)
@@ -658,6 +679,7 @@ class HXPHVideoView: UIView {
         playButton.setImage(UIImage.init(), for: UIControl.State.selected)
         playButton.addTarget(self, action: #selector(didPlayButtonClick(button:)), for: UIControl.Event.touchUpInside)
         playButton.hx_size = playButton.currentImage!.size
+        playButton.alpha = 0
         return playButton
     }()
     @objc func didPlayButtonClick(button: UIButton) {
@@ -671,11 +693,18 @@ class HXPHVideoView: UIView {
     var didEnterBackground: Bool = false
     var enterPlayGroundShouldPlay: Bool = false
     var canRemovePlayerObservers: Bool = false
+    var autoPlayVideo: Bool = false {
+        didSet {
+            if autoPlayVideo {
+                playButton.isSelected = true
+            }
+        }
+    }
     
     init() {
         super.init(frame: CGRect.zero)
         layer.masksToBounds = true
-        layer.addSublayer(playerLayer)
+        playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
         addSubview(playButton)
         
         playerLayer.addObserver(self, forKeyPath: "readyForDisplay", options: [.new, .old], context: nil)
@@ -712,10 +741,18 @@ class HXPHVideoView: UIView {
         playButton.isSelected = false
         isPlaying = false
     }
-    
+    func hiddenPlayButton() {
+        UIView.animate(withDuration: 0.15) {
+            self.playButton.alpha = 0
+        }
+    }
     func cancelPlayer() {
         if player.currentItem != nil {
             stopPlay()
+            if autoPlayVideo {
+                playButton.isSelected = true
+            }
+            playButton.alpha = 0
             player.seek(to: CMTime.zero)
             player.cancelPendingPrerolls()
             player.currentItem?.cancelPendingSeeks()
@@ -785,15 +822,18 @@ class HXPHVideoView: UIView {
             if object as? AVPlayerLayer != playerLayer {
                 return
             }
-            if (self.playerLayer.isReadyForDisplay && !didEnterBackground) {
+            if self.playerLayer.isReadyForDisplay && !didEnterBackground && autoPlayVideo {
                 startPlay()
             }
         }
     }
     
     @objc func playerItemDidPlayToEndTimeNotification(notifi: Notification) {
+        stopPlay()
         player.currentItem?.seek(to: CMTime.init(value: 0, timescale: 1))
-        startPlay()
+        if autoPlayVideo {
+            startPlay()
+        }
     }
     
     override func layoutSubviews() {
