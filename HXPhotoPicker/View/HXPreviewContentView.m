@@ -105,17 +105,11 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    if (!CGRectEqualToRect(self.imageView.frame, self.bounds)) {
         self.imageView.frame = self.bounds;
-    }
     if (self.type == HXPreviewContentViewTypeLivePhoto) {
-        if (!CGRectEqualToRect(self.livePhotoView.frame, self.bounds)) {
-            self.livePhotoView.frame = self.bounds;
-        }
+        self.livePhotoView.frame = self.bounds;
     }else if (self.type == HXPreviewContentViewTypeVideo) {
-        if (!CGRectEqualToRect(self.videoView.frame, self.bounds)) {
-            self.videoView.frame = self.bounds;
-        }
+        self.videoView.frame = self.bounds;
     }
 } 
 
