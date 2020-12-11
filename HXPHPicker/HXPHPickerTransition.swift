@@ -170,11 +170,15 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     self.pushImageView.hx_y = 0
                 }
                 previewVC?.bottomView.alpha = 1
+                if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
+                    pickerVC?.bottomView.alpha = 0
+                }
             } completion: { (isFinished) in
                 if self.requestID != nil {
                     PHImageManager.default().cancelImageRequest(self.requestID!)
                     self.requestID = nil
                 }
+                pickerVC?.bottomView.alpha = 1
                 fromView?.isHidden = false
                 previewVC?.setCurrentCellImage(image: self.pushImageView.image)
                 previewVC?.collectionView.isHidden = false
@@ -185,6 +189,9 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
         }else if type == .pop {
             let rect = toView?.convert(toView?.bounds ?? CGRect.zero, to: containerView) ?? CGRect.zero
             toView?.isHidden = true
+            if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
+                pickerVC?.bottomView.alpha = 0
+            }
             UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.25, delay: 0, options: [.layoutSubviews, .curveEaseOut]) {
                 if rect.isEmpty {
                     fromView?.transform = CGAffineTransform.init(scaleX: 0.1, y: 0.1)
@@ -194,6 +201,9 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                 }
                 contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
                 previewVC?.bottomView.alpha = 0
+                if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
+                    pickerVC?.bottomView.alpha = 1
+                }
             } completion: { (isFinished) in
                 toView?.isHidden = false
                 UIView.animate(withDuration: 0.25, delay: 0, options: [.allowUserInteraction]) {

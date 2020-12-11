@@ -100,7 +100,7 @@ class HXAlbumViewCell: UITableViewCell {
         let coverWidth = hx_height - (coverMargin * 2)
         albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
         
-        tickView.hx_x = hx_width - 12 - tickView.hx_width
+        tickView.hx_x = hx_width - 12 - tickView.hx_width - UIDevice.current.hx_rightMargin
         tickView.hx_centerY = hx_height * 0.5
         
         albumNameLb.hx_x = albumCoverView.frame.maxX + 10

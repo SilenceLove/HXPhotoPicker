@@ -180,9 +180,9 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     }
     
     @objc func didSelectControlClick(control: HXPHPickerCellSelectBoxControl) {
-        if !canSelect {
-            return
-        }
+//        if !canSelect {
+//            return
+//        }
         delegate?.cellDidSelectControlClick(self, isSelected: control.isSelected)
     }
     

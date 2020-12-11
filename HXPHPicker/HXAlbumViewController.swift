@@ -13,6 +13,9 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     
     lazy var tableView : UITableView = {
         let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
+        if HXPHAssetManager.authorizationStatusIsLimited() {
+            tableView.tableHeaderView = promptLb
+        }
         tableView.dataSource = self;
         tableView.delegate = self;
         tableView.separatorStyle = .none
@@ -24,6 +27,15 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             self.automaticallyAdjustsScrollViewInsets = false
         }
         return tableView
+    }()
+    lazy var promptLb: UILabel = {
+        let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
+        promptLb.text = "只能查看允许访问的照片和相关相册".hx_localized
+        promptLb.textAlignment = .center
+        promptLb.font = UIFont.systemFont(ofSize: 14)
+        promptLb.adjustsFontSizeToFitWidth = true
+        promptLb.numberOfLines = 0
+        return promptLb
     }()
     var config: HXPHAlbumListConfiguration?
     var assetCollectionsArray: [HXPHAssetCollection] = []
@@ -133,6 +145,9 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     func changeSubviewFrame() {
+        if HXPHAssetManager.authorizationStatusIsLimited() {
+            promptLb.hx_width = view.hx_width
+        }
         let margin: CGFloat = UIDevice.current.hx_leftMargin
         tableView.frame = CGRect(x: margin, y: 0, width: view.hx_width - 2 * margin, height: view.hx_height)
         if navigationController?.modalPresentationStyle == .fullScreen {
@@ -161,8 +176,8 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             fetchAssetCollections()
         }
     }
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .default
+    override var prefersStatusBarHidden: Bool {
+        return false
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

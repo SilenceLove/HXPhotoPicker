@@ -106,6 +106,16 @@ class HXPHConfiguration: NSObject {
 // MARK: 相册列表配置类
 class HXPHAlbumListConfiguration: NSObject {
     
+    /// 可访问权限下的提示语颜色
+    lazy var limitedStatusPromptColor: UIColor = {
+        return "#999999".hx_color
+    }()
+    
+    /// 暗黑风格可访问权限下的提示语颜色
+    lazy var limitedStatusPromptDarkColor: UIColor = {
+        return "#999999".hx_color
+    }()
+    
     /// 当相册里没有资源时的相册名称
     lazy var emptyAlbumName: String = {
         return "所有照片".hx_localized
@@ -261,7 +271,14 @@ class HXPHPhotoListConfiguration: NSObject {
     
     /// 底部视图相关配置
     lazy var bottomView: HXPHPickerBottomViewConfiguration = {
-        return HXPHPickerBottomViewConfiguration.init()
+        let bottomView = HXPHPickerBottomViewConfiguration.init()
+        bottomView.showPrompt = true
+        return bottomView
+    }()
+    
+    /// 没有资源时展示的相关配置
+    lazy var notAsset : HXPHNotAssetConfiguration = {
+        return HXPHNotAssetConfiguration.init()
     }()
 }
 // MARK: 照片列表Cell配置类
@@ -443,6 +460,39 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     /// 编辑按钮禁用下的标题颜色
     var editButtonDisableTitleColor: UIColor?
     var editButtonDisableTitleDarkColor: UIColor?
+    
+    /// 显示提示视图
+    var showPrompt: Bool = false
+    
+    /// 提示图标颜色
+    lazy var promptIconColor: UIColor = {
+        return UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
+    }()
+    
+    /// 暗黑风格下提示图标颜色
+    lazy var promptIconDarkColor: UIColor = {
+        return .white
+    }()
+    
+    /// 提示语颜色
+    lazy var promptTitleColor: UIColor = {
+        return UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
+    }()
+    
+    /// 暗黑风格下提示语颜色
+    lazy var promptTitleDarkColor: UIColor = {
+        return .white
+    }()
+    
+    /// 提示语颜色
+    lazy var promptArrowColor: UIColor = {
+        return UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
+    }()
+    
+    /// 暗黑风格下提示语颜色
+    lazy var promptArrowDarkColor: UIColor = {
+        return .white
+    }()
 }
 // MARK: 选择框配置类
 class HXPHSelectBoxConfiguration: NSObject {
@@ -543,7 +593,7 @@ class HXPHNotAuthorizedConfiguration: NSObject {
     }()
     
     /// 暗黑风格下的标题颜色
-    lazy var darkTitleColor: UIColor = {
+    lazy var titleDarkColor: UIColor = {
         return .white
     }()
     
@@ -573,7 +623,30 @@ class HXPHNotAuthorizedConfiguration: NSObject {
     }()
     
     /// 暗黑风格下跳转按钮文字颜色
-    lazy var jumpButtonDarkTitleColor: UIColor = {
+    lazy var jumpButtonTitleDarkColor: UIColor = {
         return "#333333".hx_color
+    }()
+}
+
+class HXPHNotAssetConfiguration: NSObject {
+    
+    /// 标题颜色
+    lazy var titleColor: UIColor = {
+        return "#666666".hx_color
+    }()
+    
+    /// 暗黑风格下标题颜色
+    lazy var titleDarkColor: UIColor = {
+        return "#ffffff".hx_color
+    }()
+    
+    /// 子标题颜色
+    lazy var subTitleColor: UIColor = {
+        return "#999999".hx_color
+    }()
+    
+    /// 暗黑风格下子标题颜色
+    lazy var subTitleDarkColor: UIColor = {
+        return "#dadada".hx_color
     }()
 }

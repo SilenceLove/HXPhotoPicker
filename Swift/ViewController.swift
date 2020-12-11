@@ -44,6 +44,7 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let nav = HXPHPickerController.init(config: HXPHTools.getWXConfig())
+//        let nav = HXPHPickerController.init(config: HXPHConfiguration.init())
         nav.pickerContollerDelegate = self
         nav.selectedAssetArray = selectedAssets
         nav.isOriginal = isOriginal

@@ -18,6 +18,9 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     
     lazy var tableView : UITableView = {
         let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
+        if HXPHAssetManager.authorizationStatusIsLimited() {
+            tableView.tableHeaderView = promptLb
+        }
         tableView.dataSource = self;
         tableView.delegate = self;
         tableView.separatorStyle = .none
@@ -26,6 +29,15 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
             tableView.contentInsetAdjustmentBehavior = .never
         }
         return tableView
+    }()
+    lazy var promptLb: UILabel = {
+        let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
+        promptLb.text = "只能查看允许访问的照片和相关相册".hx_localized
+        promptLb.textAlignment = .center
+        promptLb.font = UIFont.systemFont(ofSize: 14)
+        promptLb.adjustsFontSizeToFitWidth = true
+        promptLb.numberOfLines = 0
+        return promptLb
     }()
     var config: HXPHAlbumListConfiguration?
     var assetCollectionsArray: [HXPHAssetCollection] = [] {
@@ -54,11 +66,12 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
             return
         }
         let indexPath = IndexPath(row: currentSelectedRow, section: 0)
-        tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.middle, animated: false)
+        tableView.scrollToRow(at: indexPath, at: .middle, animated: false)
     }
     func configColor() {
         tableView.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
         backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
+        promptLb.textColor = HXPHManager.shared.isDark ? config!.limitedStatusPromptDarkColor : config!.limitedStatusPromptColor
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return assetCollectionsArray.count
@@ -88,6 +101,9 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        if HXPHAssetManager.authorizationStatusIsLimited() {
+            promptLb.hx_width = hx_width
+        }
         tableView.frame = bounds
     }
     

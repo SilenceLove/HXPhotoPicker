@@ -36,6 +36,13 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         return collectionView
     }()
     
+    private lazy var notAssetView: HXPHNotAssetView = {
+        let notAssetView = HXPHNotAssetView.init(frame: CGRect(x: 0, y: 0, width: view.hx_width, height: 0))
+        notAssetView.config = config.notAsset
+        notAssetView.layoutSubviews()
+        return notAssetView
+    }()
+    
     var orientationDidChange : Bool = false
     var beforeOrientationIndexPath: IndexPath?
     var showLoading : Bool = false
@@ -67,7 +74,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     lazy var albumBackgroudView: UIView = {
         let albumBackgroudView = UIView.init()
         albumBackgroudView.isHidden = true
-        albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        albumBackgroudView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
         albumBackgroudView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didAlbumBackgroudViewClick)))
         return albumBackgroudView
     }()
@@ -119,6 +126,9 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     
     func getAlbumViewHeight() -> CGFloat {
         var albumViewHeight = CGFloat(albumView.assetCollectionsArray.count) * (albumView.config?.cellHeight ?? 50)
+        if HXPHAssetManager.authorizationStatusIsLimited() {
+            albumViewHeight += 40
+        }
         if albumViewHeight > view.hx_height * 0.75 {
             albumViewHeight = view.hx_height * 0.75
         }
@@ -240,6 +250,11 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     func fetchPhotoAssets() {
         weak var weakSelf = self
         hx_pickerController!.fetchPhotoAssets(assetCollection: assetCollection) { (photoAssets, photoAsset) in
+            if weakSelf != nil && photoAssets.isEmpty {
+                weakSelf?.view.insertSubview(weakSelf!.notAssetView, at: 1)
+            }else {
+                weakSelf?.notAssetView.removeFromSuperview()
+            }
             weakSelf?.assets = photoAssets
             if weakSelf != nil {
                 UIView.transition(with: weakSelf!.collectionView, duration: 0.05, options: .transitionCrossDissolve) {
@@ -381,48 +396,15 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             // 取消选中
             _ = hx_pickerController?.removePhotoAsset(photoAsset: cell.photoAsset!)
             cell.updateSelectedState(isSelected: false, animated: true)
-//            if config.cell.selectBox.type == .number {
-//                updateCellSelectedTitle()
-//            }
+            updateCellSelectedTitle()
         }else {
             // 选中
             if hx_pickerController!.addedPhotoAsset(photoAsset: cell.photoAsset!) {
-//                if HXPHAssetManager.isICloudAsset(for: cell.photoAsset!.asset) {
-//                    navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-//                    HXPHProgressHUD.showLoadingHUD(addedTo: navigationController?.view, text: "正在下载...", animated: true)
-//                    weak var weakSelf = self
-//                    if cell.photoAsset?.mediaType == .photo {
-//                        _ = cell.photoAsset?.requestImageData(iCloudHandler: nil, progressHandler: { (photoAsset, progress) in
-//                            print(progress)
-//                        }, success: { (photoAsset, data, orientation, info) in
-//                            cell.photoAsset?.asset = HXPHAssetManager.fetchAsset(withLocalIdentifier: photoAsset.asset!.localIdentifier)
-//                            cell.updateSelectedState(isSelected: true, animated: true)
-//                            weakSelf?.bottomView.updateFinishButtonTitle()
-//                            HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
-//                            weakSelf?.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-//                        }, failure: { (photoAsset, info) in
-//                            HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
-//                            weakSelf?.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-//                        })
-//                    }else if cell.photoAsset?.mediaType == .video {
-//                        _ = cell.photoAsset?.requestAVAsset(iCloudHandler: nil, progressHandler: nil, success: { (photoAsset, avAsset, info) in
-//                            cell.photoAsset?.asset = HXPHAssetManager.fetchAsset(withLocalIdentifier: photoAsset.asset!.localIdentifier)
-//                            cell.updateSelectedState(isSelected: true, animated: true)
-//                            weakSelf?.bottomView.updateFinishButtonTitle()
-//                            HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
-//                            weakSelf?.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-//                        }, failure: { (photoAsset, info) in
-//                            HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
-//                            weakSelf?.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-//                        })
-//                    }
-//                    return
-//                }
                 cell.updateSelectedState(isSelected: true, animated: true)
+                updateCellSelectedTitle()
+                bottomView.updateFinishButtonTitle()
             }
         }
-        updateCellSelectedTitle()
-        bottomView.updateFinishButtonTitle()
     }
     
     func updateCellSelectedTitle() {
@@ -487,7 +469,9 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         if isMultipleSelect {
             albumBackgroudView.frame = view.bounds
             configAlbumViewFrame()
-            bottomView.frame = CGRect(x: 0, y: view.hx_height - 50 - UIDevice.current.hx_bottomMargin, width: view.hx_width, height: 50 + UIDevice.current.hx_bottomMargin)
+            let promptHeight: CGFloat = (HXPHAssetManager.authorizationStatusIsLimited() && config.bottomView.showPrompt) ? 70 : 0
+            let bottomHeight: CGFloat = 50 + UIDevice.current.hx_bottomMargin + promptHeight
+            bottomView.frame = CGRect(x: 0, y: view.hx_height - bottomHeight, width: view.hx_width, height: bottomHeight)
             collectionView.contentInset = UIEdgeInsets(top: collectionTop, left: 0, bottom: bottomView.hx_height + 0.5, right: 0)
         }else {
             collectionView.contentInset = UIEdgeInsets(top: collectionTop, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
@@ -510,6 +494,8 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             }
             orientationDidChange = false
         }
+        notAssetView.hx_width = view.hx_width
+        notAssetView.center = CGPoint(x: view.hx_width * 0.5, y: view.hx_height * 0.5)
     }
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         if #available(iOS 13.0, *) {
@@ -517,6 +503,9 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             orientationDidChange = true
         }
         super.viewWillTransition(to: size, with: coordinator)
+    }
+    override var prefersStatusBarHidden: Bool {
+        return false
     }
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -541,6 +530,47 @@ class HXPHPickerBottomView: UIToolbar {
     weak var hx_delegate: HXPHPickerBottomViewDelegate?
     
     var config: HXPHPickerBottomViewConfiguration?
+    
+    lazy var promptView: UIView = {
+        let promptView = UIView.init(frame: CGRect(x: 0, y: 0, width: hx_width, height: 70))
+        promptView.addSubview(promptIcon)
+        promptView.addSubview(promptLb)
+        promptView.addSubview(promptArrow)
+        promptView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didPromptViewClick)))
+        return promptView
+    }()
+    @objc func didPromptViewClick() {
+        HXPHTools.openSettingsURL()
+    }
+    lazy var promptLb: UILabel = {
+        let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
+        promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".hx_localized
+        promptLb.font = UIFont.systemFont(ofSize: 15)
+        promptLb.numberOfLines = 0
+        promptLb.adjustsFontSizeToFitWidth = true
+        return promptLb
+    }()
+    lazy var promptIcon: UIImageView = {
+        let image = UIImage.hx_named(named: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
+        let promptIcon = UIImageView.init(image: image)
+        promptIcon.hx_size = promptIcon.image?.size ?? CGSize.zero
+        return promptIcon
+    }()
+    lazy var promptArrow: UIImageView = {
+        let image = UIImage.hx_named(named: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
+        let promptArrow = UIImageView.init(image: image)
+        promptArrow.hx_size = promptArrow.image?.size ?? CGSize.zero
+        return promptArrow
+    }()
+    
+    lazy var contentView: UIView = {
+        let contentView = UIView.init(frame: CGRect(x: 0, y: 0, width: hx_width, height: 50 + UIDevice.current.hx_bottomMargin))
+        contentView.addSubview(previewBtn)
+        contentView.addSubview(editBtn)
+        contentView.addSubview(originalBtn)
+        contentView.addSubview(finishBtn)
+        return contentView
+    }()
     
     lazy var previewBtn: UIButton = {
         let previewBtn = UIButton.init(type: .custom)
@@ -630,10 +660,10 @@ class HXPHPickerBottomView: UIToolbar {
     init(config: HXPHPickerBottomViewConfiguration) {
         super.init(frame: CGRect.zero)
         self.config = config
-        addSubview(previewBtn)
-        addSubview(editBtn)
-        addSubview(originalBtn)
-        addSubview(finishBtn)
+        addSubview(contentView)
+        if config.showPrompt && HXPHAssetManager.authorizationStatusIsLimited() {
+            addSubview(promptView)
+        }
         configColor()
         isTranslucent = config.isTranslucent
     }
@@ -679,6 +709,11 @@ class HXPHPickerBottomView: UIToolbar {
         finishBtn.setTitleColor(HXPHManager.shared.isDark ? config?.finishButtonDisableTitleDarkColor : config?.finishButtonDisableTitleColor, for: .disabled)
         finishBtn.setBackgroundImage(UIImage.hx_image(for: finishBtnBackgroundColor, havingSize: CGSize.zero), for: .normal)
         finishBtn.setBackgroundImage(UIImage.hx_image(for: HXPHManager.shared.isDark ? config!.finishButtonDisableDarkBackgroundColor : config!.finishButtonDisableBackgroundColor, havingSize: CGSize.zero), for: .disabled)
+        if config!.showPrompt && HXPHAssetManager.authorizationStatusIsLimited() {
+            promptLb.textColor = HXPHManager.shared.isDark ? config?.promptTitleDarkColor : config?.promptTitleColor
+            promptIcon.tintColor = HXPHManager.shared.isDark ? config?.promptIconDarkColor : config?.promptIconColor
+            promptArrow.tintColor = HXPHManager.shared.isDark ? config?.promptArrowDarkColor : config?.promptArrowColor
+        }
     }
     func updateFinishButtonTitle() {
         let selectCount = hx_viewController()?.hx_pickerController?.selectedAssetArray.count ?? 0
@@ -706,11 +741,23 @@ class HXPHPickerBottomView: UIToolbar {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        contentView.hx_width = hx_width
+        contentView.hx_y = hx_height - contentView.hx_height
         let previewWidth : CGFloat = previewBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
         previewBtn.frame = CGRect(x: 12 + UIDevice.current.hx_leftMargin, y: 0, width: previewWidth, height: 50)
         editBtn.frame = previewBtn.frame
         originalBtn.frame = CGRect(x: 0, y: 0, width: boxControl.frame.maxX, height: 50)
         updateFinishButtonFrame()
+        if config!.showPrompt && HXPHAssetManager.authorizationStatusIsLimited() {
+            promptView.hx_width = hx_width
+            promptIcon.hx_x = 12 + UIDevice.current.hx_leftMargin
+            promptIcon.hx_centerY = promptView.hx_height * 0.5
+            promptArrow.hx_x = hx_width - 12 - promptArrow.hx_width - UIDevice.current.hx_rightMargin
+            promptLb.hx_x = promptIcon.frame.maxX + 12
+            promptLb.hx_width = promptArrow.hx_x - promptLb.hx_x - 12
+            promptLb.hx_centerY = promptView.hx_height * 0.5
+            promptArrow.hx_centerY = promptView.hx_height * 0.5
+        }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

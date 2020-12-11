@@ -157,8 +157,8 @@ class HXPHTools: NSObject {
         config.appearanceStyle = .normal
         config.showLivePhoto = true
         config.navigationViewBackgroundColor = "#2E2F30".hx_color
-        config.navigationTitleColor = UIColor.white
-        config.navigationTintColor = UIColor.white
+        config.navigationTitleColor = .white
+        config.navigationTintColor = .white
         config.statusBarStyle = .lightContent
         config.navigationBarStyle = .black
         
@@ -166,8 +166,8 @@ class HXPHTools: NSObject {
         config.albumList.cellHeight = 60
         config.albumList.cellBackgroundColor = "#2E2F30".hx_color
         config.albumList.cellSelectedColor = UIColor.init(red: 0.125, green: 0.125, blue: 0.125, alpha: 1)
-        config.albumList.albumNameColor = UIColor.white
-        config.albumList.photoCountColor = UIColor.white
+        config.albumList.albumNameColor = .white
+        config.albumList.photoCountColor = .white
         config.albumList.separatorLineColor = "#434344".hx_color.withAlphaComponent(0.6)
         config.albumList.tickColor = "#07C160".hx_color
         
@@ -178,43 +178,50 @@ class HXPHTools: NSObject {
         config.photoList.titleViewConfig.arrowColor = "#2E2F30".hx_color
         
         config.photoList.cell.selectBox.selectedBackgroundColor = "#07C160".hx_color
-        config.photoList.cell.selectBox.titleColor = UIColor.white
+        config.photoList.cell.selectBox.titleColor = .white
         
         config.photoList.bottomView.barStyle = .black
-        config.photoList.bottomView.previewButtonTitleColor = UIColor.white
+        config.photoList.bottomView.previewButtonTitleColor = .white
         
-        config.photoList.bottomView.originalButtonTitleColor = UIColor.white
-        config.photoList.bottomView.originalSelectBox.backgroundColor = UIColor.clear
-        config.photoList.bottomView.originalSelectBox.borderColor = UIColor.white
-        config.photoList.bottomView.originalSelectBox.tickColor = UIColor.white
+        config.photoList.bottomView.originalButtonTitleColor = .white
+        config.photoList.bottomView.originalSelectBox.backgroundColor = .clear
+        config.photoList.bottomView.originalSelectBox.borderColor = .white
+        config.photoList.bottomView.originalSelectBox.tickColor = .white
         config.photoList.bottomView.originalSelectBox.selectedBackgroundColor = "#07C160".hx_color
         
-        config.photoList.bottomView.finishButtonTitleColor = UIColor.white
+        config.photoList.bottomView.finishButtonTitleColor = .white
         config.photoList.bottomView.finishButtonBackgroundColor = "#07C160".hx_color
         config.photoList.bottomView.finishButtonDisableBackgroundColor = "#666666".hx_color.withAlphaComponent(0.3)
         
-        config.previewView.backgroundColor = UIColor.black
-        config.previewView.selectBox.tickColor = UIColor.white
+        config.photoList.bottomView.promptTitleColor = UIColor.white.withAlphaComponent(0.6)
+        config.photoList.bottomView.promptIconColor = "#f5a623".hx_color
+        config.photoList.bottomView.promptArrowColor = UIColor.white.withAlphaComponent(0.6)
+        
+        config.photoList.notAsset.titleColor = "#ffffff".hx_color
+        config.photoList.notAsset.subTitleColor = .lightGray
+        
+        config.previewView.backgroundColor = .black
+        config.previewView.selectBox.tickColor = .white
         config.previewView.selectBox.selectedBackgroundColor = "#07C160".hx_color
         
         config.previewView.bottomView.barStyle = .black
-        config.previewView.bottomView.editButtonTitleColor = UIColor.white
+        config.previewView.bottomView.editButtonTitleColor = .white
         
-        config.previewView.bottomView.originalButtonTitleColor = UIColor.white
-        config.previewView.bottomView.originalSelectBox.backgroundColor = UIColor.clear
-        config.previewView.bottomView.originalSelectBox.borderColor = UIColor.white
-        config.previewView.bottomView.originalSelectBox.tickColor = UIColor.white
+        config.previewView.bottomView.originalButtonTitleColor = .white
+        config.previewView.bottomView.originalSelectBox.backgroundColor = .clear
+        config.previewView.bottomView.originalSelectBox.borderColor = .white
+        config.previewView.bottomView.originalSelectBox.tickColor = .white
         config.previewView.bottomView.originalSelectBox.selectedBackgroundColor = "#07C160".hx_color
         
-        config.previewView.bottomView.finishButtonTitleColor = UIColor.white
+        config.previewView.bottomView.finishButtonTitleColor = .white
         config.previewView.bottomView.finishButtonBackgroundColor = "#07C160".hx_color
         config.previewView.bottomView.finishButtonDisableBackgroundColor = "#666666".hx_color.withAlphaComponent(0.3)
         
         config.notAuthorized.closeButtonImageName = "hx_picker_notAuthorized_close_dark"
         config.notAuthorized.backgroundColor = "#2E2F30".hx_color
-        config.notAuthorized.titleColor = UIColor.white
-        config.notAuthorized.subTitleColor = UIColor.white
-        config.notAuthorized.jumpButtonTitleColor = UIColor.white
+        config.notAuthorized.titleColor = .white
+        config.notAuthorized.subTitleColor = .white
+        config.notAuthorized.jumpButtonTitleColor = .white
         config.notAuthorized.jumpButtonBackgroundColor = "#07C160".hx_color
         
         return config

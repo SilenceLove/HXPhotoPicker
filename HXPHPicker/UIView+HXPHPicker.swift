@@ -132,7 +132,7 @@ class HXPHProgressHUD: UIView {
         let textLb = UILabel.init()
         textLb.textColor = .white
         textLb.textAlignment = .center
-        textLb.font = UIFont.hx_mediumPingFang(size: 16)
+        textLb.font = UIFont.systemFont(ofSize: 16)
         textLb.numberOfLines = 0;
         return textLb
     }()
