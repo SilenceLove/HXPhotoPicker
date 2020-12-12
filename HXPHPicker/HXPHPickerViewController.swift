@@ -402,9 +402,9 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             if hx_pickerController!.addedPhotoAsset(photoAsset: cell.photoAsset!) {
                 cell.updateSelectedState(isSelected: true, animated: true)
                 updateCellSelectedTitle()
-                bottomView.updateFinishButtonTitle()
             }
         }
+        bottomView.updateFinishButtonTitle()
     }
     
     func updateCellSelectedTitle() {
