@@ -73,6 +73,10 @@ HX_PhotoEditViewControllerDelegate
             [self changeStatusBarStyle];
             [self setNeedsStatusBarAppearanceUpdate];
             [self.collectionView reloadData];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+                [cell requestHDImage];
+            });
         }
     }
 #endif
@@ -255,6 +259,12 @@ HX_PhotoEditViewControllerDelegate
     
     [self addGesture];
     
+}
+- (void)setCellImage:(UIImage *)image {
+    if (image) {
+        HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+        cell.previewContentView.imageView.image = image;
+    }
 }
 #pragma mark - < private >
 - (void)setExteriorPreviewStyle:(HXPhotoViewPreViewShowStyle)exteriorPreviewStyle {
@@ -816,6 +826,7 @@ HX_PhotoEditViewControllerDelegate
     }else {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewImageViewCell" forIndexPath:indexPath];
     }
+    cell.allowPreviewDirectLoadOriginalImage = self.manager.configuration.allowPreviewDirectLoadOriginalImage;
     cell.cellViewLongPressGestureRecognizerBlock = ^(UILongPressGestureRecognizer * _Nonnull longPress) {
         [weakSelf respondsToLongPress:longPress];
     };

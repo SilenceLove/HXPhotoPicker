@@ -27,6 +27,9 @@
     }
     return self;
 }
+- (void)setAllowPreviewDirectLoadOriginalImage:(BOOL)allowPreviewDirectLoadOriginalImage {
+    self.previewContentView.allowPreviewDirectLoadOriginalImage = allowPreviewDirectLoadOriginalImage;
+}
 - (void)setModel:(HXPhotoModel *)model {
     [super setModel:model];
 }

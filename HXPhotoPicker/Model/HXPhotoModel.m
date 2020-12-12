@@ -1825,4 +1825,38 @@
         }
     }
 }
+
+- (void)getVideoURLWithSuccess:(HXModelURLHandler _Nullable)success
+                        failed:(HXModelFailedBlock _Nullable)failed {
+    if (self.subType == HXPhotoModelMediaSubTypeVideo) {
+        if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+            if (self.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeLocal) {
+                if (success) {
+                    success(self.videoURL, HXPhotoModelMediaSubTypeVideo, NO, self);
+                }
+            }else if (self.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+                if (success) {
+                    success(self.videoURL, HXPhotoModelMediaSubTypeVideo, YES, self);
+                }
+            }
+        }else {
+            [HXAssetManager requestVideoURL:self.asset completion:^(NSURL * _Nullable videoURL) {
+                __strong typeof(self) strongSelf = self;
+                if (videoURL) {
+                    if (success) {
+                        success(videoURL, HXPhotoModelMediaSubTypeVideo, NO, strongSelf);
+                    }
+                }else {
+                    if (failed) {
+                        failed(nil, strongSelf);
+                    }
+                }
+            }];
+        }
+    }else {
+        if (failed) {
+            failed(nil, self);
+        }
+    }
+}
 @end

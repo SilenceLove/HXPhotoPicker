@@ -319,6 +319,10 @@
                                success:(HXModelURLHandler _Nullable)success
                                 failed:(HXModelFailedBlock _Nullable)failed;
 
+/// 获取原视频地址
+- (void)getVideoURLWithSuccess:(HXModelURLHandler _Nullable)success
+                        failed:(HXModelFailedBlock _Nullable)failed;
+
 @property (assign, nonatomic) CGFloat previewContentOffsetX;
 
 @end

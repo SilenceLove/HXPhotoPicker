@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class HXPhotoModel;
 @interface HXPreviewImageView : UIView
+
+/// 预览大图时允许直接加载原图，不先加载小图
+@property (assign, nonatomic) BOOL allowPreviewDirectLoadOriginalImage;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (assign, nonatomic) BOOL stopCancel;
 @property (strong, nonatomic) UIImage * _Nullable gifImage;

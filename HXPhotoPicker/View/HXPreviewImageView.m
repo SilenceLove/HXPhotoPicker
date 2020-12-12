@@ -48,8 +48,9 @@
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @end
 
-@implementation HXPreviewImageView
 
+@implementation HXPreviewImageView
+@synthesize image = _image;
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -63,6 +64,16 @@
         [self addSubview:self.progressView];
     }
     return self;
+}
+- (void)setImage:(UIImage *)image {
+    _image = image;
+#if HasSDWebImage
+    self.sdImageView.image = image;
+#elif HasYYKitOrWebImage
+    self.animatedImageView.image = image;
+#else
+    self.imageView.image = image;
+#endif
 }
 - (UIImage *)image {
     if (self.model.photoEdit) {
@@ -227,10 +238,14 @@ HXWeakSelf
                 [self setImageViewWithImage:model.tempImage isAnimation:NO];
                 model.tempImage = nil;
             }else {
-                self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5f completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-                    if (weakSelf.model != model) return;
-                    [weakSelf setImageViewWithImage:image isAnimation:NO];
-                }];
+                if (self.allowPreviewDirectLoadOriginalImage) {
+                    [self requestImageData];
+                }else {
+                    self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5f completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                        if (weakSelf.model != model) return;
+                        [weakSelf setImageViewWithImage:image isAnimation:NO];
+                    }];
+                }
             }
         }else {
             if (model.previewPhoto) {
@@ -241,10 +256,14 @@ HXWeakSelf
                     [self setImageViewWithImage:model.tempImage isAnimation:NO];
                     model.tempImage = nil;
                 }else {
-                    self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
-                        if (weakSelf.model != model) return;
-                        [weakSelf setImageViewWithImage:image isAnimation:NO];
-                    }];
+                    if (self.allowPreviewDirectLoadOriginalImage) {
+                        [self requestImageData];
+                    }else {
+                        self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                            if (weakSelf.model != model) return;
+                            [weakSelf setImageViewWithImage:image isAnimation:NO];
+                        }];
+                    }
                 }
             }
         }
@@ -295,6 +314,9 @@ HXWeakSelf
         @autoreleasepool {
             dispatch_async(dispatch_get_global_queue(0, 0), ^{
                 UIImage *image = [UIImage imageWithData:imageData];
+                if (orientation != UIImageOrientationUp) {
+                    image = [image hx_normalizedImage];
+                }
                 CGSize imageSize = image.size;
                 if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
                     while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
@@ -394,7 +416,9 @@ HXWeakSelf
             }];
         }
     }else {
-        [self requestImageData];
+        if (!self.allowPreviewDirectLoadOriginalImage) {
+            [self requestImageData];
+        }
     }
 }
 - (void)setGifFirstFrame {
@@ -405,7 +429,9 @@ HXWeakSelf
     }
 }
 - (void)cancelImage {
-    
+    if (self.allowPreviewDirectLoadOriginalImage) {
+        return;
+    }
     if (self.requestID) {
         [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
         self.requestID = -1;
@@ -428,17 +454,11 @@ HXWeakSelf
 - (void)layoutSubviews {
     [super layoutSubviews];
 #if HasSDWebImage
-    if (!CGRectEqualToRect(self.sdImageView.frame, self.bounds)) {
-        self.sdImageView.frame = self.bounds;
-    }
+    self.sdImageView.frame = self.bounds;
 #elif HasYYKitOrWebImage
-    if (!CGRectEqualToRect(self.animatedImageView.frame, self.bounds)) {
-        self.animatedImageView.frame = self.bounds;
-    }
+    self.animatedImageView.frame = self.bounds;
 #else
-    if (!CGRectEqualToRect(self.imageView.frame, self.bounds)) {
-        self.imageView.frame = self.bounds;
-    }
+    self.imageView.frame = self.bounds;
 #endif
     self.progressView.hx_centerX = self.hx_w / 2;
     self.progressView.hx_centerY = self.hx_h / 2;

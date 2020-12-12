@@ -115,4 +115,5 @@ HXPhotoPreviewViewCell;
 - (void)changeStatusBarWithHidden:(BOOL)hidden;
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
 - (void)setupDarkBtnAlpha:(CGFloat)alpha;
+- (void)setCellImage:(UIImage *)image;
 @end 

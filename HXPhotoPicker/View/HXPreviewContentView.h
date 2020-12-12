@@ -20,6 +20,9 @@ typedef NS_ENUM(NSUInteger, HXPreviewContentViewType) {
 };
 @class HXPhotoModel;
 @interface HXPreviewContentView : UIView
+
+/// 预览大图时允许直接加载原图，不先加载小图
+@property (assign, nonatomic) BOOL allowPreviewDirectLoadOriginalImage;
 @property (assign, nonatomic) BOOL stopCancel;
 @property (strong, nonatomic) HXPhotoModel *model;
 @property (strong, nonatomic) UIImage * _Nullable gifImage;

@@ -11,8 +11,12 @@
 #import "HXPhotoPreviewViewController.h"
 #import "HXPhotoPreviewBottomView.h"
 #import "HXPhotoEdit.h"
+#import "HXAssetManager.h"
+
 @interface HXPhotoViewTransition ()
 @property (assign, nonatomic) HXPhotoViewTransitionType type;
+@property (strong, nonatomic) UIImageView *imageView;
+@property (assign, nonatomic) PHImageRequestID requestID;
 @end
 
 @implementation HXPhotoViewTransition
@@ -43,6 +47,16 @@
     HXPhotoViewController *fromVC = (HXPhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXPhotoPreviewViewController *toVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [toVC.modelArray objectAtIndex:toVC.currentModelIndex];
+    PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+    self.requestID = [HXAssetManager requestImageDataForAsset:model.asset options:options completion:^(NSData * _Nonnull imageData, UIImageOrientation orientation, NSDictionary<NSString *,id> * _Nonnull info) {
+        if (imageData) {
+            UIImage *image = [UIImage imageWithData:imageData];
+            if (orientation != UIImageOrientationUp) {
+                image = [image hx_normalizedImage];
+            }
+            self.imageView.image = image;
+        }
+    }];
     UIImage *image;
     if (model.photoEdit) {
         image = model.photoEdit.editPreviewImage;
@@ -64,18 +78,18 @@
     CGFloat imgHeight = model.endImageSize.height;
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
     CGFloat height = [UIScreen mainScreen].bounds.size.height; 
-    UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
+    self.imageView = [[UIImageView alloc] initWithImage:image];
     UIView *tempBgView = [[UIView alloc] initWithFrame:containerView.bounds];
     tempBgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [[UIColor blackColor] colorWithAlphaComponent:0] : [toVC.manager.configuration.previewPhotoViewBgColor colorWithAlphaComponent:0];
-    tempView.clipsToBounds = YES;
-    tempView.contentMode = UIViewContentModeScaleAspectFill;
+    self.imageView.clipsToBounds = YES;
+    self.imageView.contentMode = UIViewContentModeScaleAspectFill;
     if (fromCell) {
-        tempView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView: containerView];
+        self.imageView.frame = [fromCell.imageView convertRect:fromCell.imageView.bounds toView: containerView];
     }else {
-        tempView.hx_size = CGSizeMake(tempView.hx_w * 1.5, tempView.hx_h * 1.5);
-        tempView.center = CGPointMake(width / 2, height / 2); 
+        self.imageView.hx_size = CGSizeMake(self.imageView.hx_w * 1.5, self.imageView.hx_h * 1.5);
+        self.imageView.center = CGPointMake(width / 2, height / 2);
     }
-    [tempBgView addSubview:tempView];
+    [tempBgView addSubview:self.imageView];
     [fromVC.view insertSubview:tempBgView belowSubview:fromVC.bottomView];
     [containerView addSubview:fromVC.view];
     [containerView addSubview:toVC.view];
@@ -93,18 +107,19 @@
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:option animations:^{
         if (imgHeight <= height) {
-            tempView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
+            self.imageView.frame = CGRectMake((width - imgWidht) / 2, (height - imgHeight) / 2, imgWidht, imgHeight);
         }else {
-            tempView.frame = CGRectMake(0, 0, imgWidht, imgHeight);
+            self.imageView.frame = CGRectMake(0, 0, imgWidht, imgHeight);
         }
         toVC.bottomView.alpha = 1;
     } completion:^(BOOL finished) {
         fromCell.hidden = NO;
-        
+        [[PHImageManager defaultManager] cancelImageRequest:self.requestID];
+        [toVC setCellImage:self.imageView.image];
         toVC.view.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : toVC.manager.configuration.previewPhotoViewBgColor;
         toVC.collectionView.hidden = NO;
         [tempBgView removeFromSuperview];
-        [tempView removeFromSuperview];
+        [self.imageView removeFromSuperview];
         toVC.navigationController.navigationBar.userInteractionEnabled = YES;
         [transitionContext completeTransition:YES];
     }];
@@ -217,6 +232,4 @@
         return fromVC.manager.configuration.popTransitionDuration;
     }
 }
-
-
 @end

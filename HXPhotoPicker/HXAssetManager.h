@@ -50,6 +50,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// Asset的原图
 + (UIImage *)originImageForAsset:(PHAsset *)asset;
 
+/// 请求视频地址
++ (void)requestVideoURL:(PHAsset *)asset
+             completion:(void (^ _Nullable)(NSURL * _Nullable videoURL))completion;
+
 /// 请求获取image
 /// @param asset 需要获取的资源
 /// @param targetSize 指定返回的大小

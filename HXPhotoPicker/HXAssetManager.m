@@ -8,6 +8,7 @@
 
 #import "HXAssetManager.h"
 #import "HXAlbumModel.h"
+#import "NSString+HXExtension.h"
 
 @implementation HXAssetManager
 
@@ -97,6 +98,31 @@
         resultImage = [UIImage imageWithData:imageData];
     }];
     return resultImage;
+}
++ (void)requestVideoURL:(PHAsset *)asset completion:(void (^)(NSURL * _Nullable))completion {
+    [self requestAVAssetForAsset:asset networkAccessAllowed:YES progressHandler:nil completion:^(AVAsset * _Nonnull avAsset, AVAudioMix * _Nonnull audioMix, NSDictionary * _Nonnull info) {
+        if ([avAsset isKindOfClass:AVURLAsset.class]) {
+            if (completion) {
+                completion([(AVURLAsset *)avAsset URL]);
+            }
+        }else {
+            PHAssetResource *videoResource = [PHAssetResource assetResourcesForAsset:asset].firstObject;
+            NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
+            NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+            NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
+            PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
+            options.networkAccessAllowed = YES;
+            [[PHAssetResourceManager defaultManager] writeDataForAssetResource:videoResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
+                if (!error) {
+                    if (completion) {
+                        completion(videoURL);
+                    }
+                }else {
+                    completion(nil);
+                }
+            }];
+        }
+    }];
 }
 + (CGSize)getAssetTargetSizeWithAsset:(PHAsset *)asset width:(CGFloat)width {
     if (!asset) {

@@ -174,6 +174,7 @@
 		7B8629AA237D0F8D00F8A584 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A9237D0F8C00F8A584 /* EventKit.framework */; };
 		7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AB237D0F9400F8A584 /* Contacts.framework */; };
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
+		7B8BFB1C2585191D00510339 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */; };
 		7BA141252580CB8C000D0726 /* HXPHPickerTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA141242580CB8C000D0726 /* HXPHPickerTransition.swift */; };
 		7BA47AE3257277E500FB4D99 /* HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */; };
 		7BA6878B25610CF00014C3E3 /* UIImage+HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA6878A25610CF00014C3E3 /* UIImage+HXPHPicker.swift */; };
@@ -658,6 +659,7 @@
 		7B8629A9237D0F8C00F8A584 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		7B8629AB237D0F9400F8A584 /* Contacts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Contacts.framework; path = System/Library/Frameworks/Contacts.framework; sourceTree = SDKROOT; };
 		7B8629AD237D0FAA00F8A584 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; lastKnownFileType = file; path = HXPhotoPicker.podspec; sourceTree = SOURCE_ROOT; };
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
 		7BA141242580CB8C000D0726 /* HXPHPickerTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerTransition.swift; sourceTree = "<group>"; };
 		7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPicker.swift; sourceTree = "<group>"; };
@@ -1178,6 +1180,7 @@
 		7B7E3E781E4AACD1002234EE /* Objective-C */ = {
 			isa = PBXGroup;
 			children = (
+				7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */,
 				7B4E65AE2487AD5B00077EE1 /* HXPhotoPicker */,
 				7B08590B24FA58DE00E93091 /* Classes */,
 				7B7E3E7C1E4AACD1002234EE /* AppDelegate.h */,
@@ -1429,6 +1432,7 @@
 				7B08597424FA58DF00E93091 /* IMG_0168.GIF in Resources */,
 				7B08597224FA58DF00E93091 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg in Resources */,
 				7B08596F24FA58DF00E93091 /* SettingViewController.xib in Resources */,
+				7B8BFB1C2585191D00510339 /* HXPhotoPicker.podspec in Resources */,
 				7BC3715A2505D25000E2D05C /* HXPhotoEditGraffitiColorView.xib in Resources */,
 				7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */,
 				7B08595324FA58DE00E93091 /* WxMomentPublishViewController.xib in Resources */,
@@ -1948,7 +1952,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.1.6;
+				MARKETING_VERSION = 3.1.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-6";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1972,7 +1976,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.1.6;
+				MARKETING_VERSION = 3.1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-6";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
