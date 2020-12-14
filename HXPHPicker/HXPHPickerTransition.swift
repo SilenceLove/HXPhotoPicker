@@ -126,9 +126,11 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             if photoAsset != nil {
                 toView = pickerVC?.getCell(for: photoAsset!)
                 if toView == nil {
-                    pickerVC?.scrollToAppropriatePlace(photoAsset: photoAsset!)
+                    pickerVC?.scrollToCenter(for: photoAsset!)
                     pickerVC?.reloadCell(for: photoAsset!)
                     toView = pickerVC?.getCell(for: photoAsset!)
+                }else {
+                    pickerVC?.scrollToCell(toView as! HXPHPickerViewCell)
                 }
             }
             
@@ -136,6 +138,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             previewVC?.view.backgroundColor = UIColor.clear
         }
         
+        var rect: CGRect = .zero
         if type == .push {
             var imageSize: CGSize = .zero
             var imageCenter: CGPoint = .zero
@@ -155,25 +158,51 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     imageSize = CGSize(width: contentWidth, height: contentHeight)
                 }
             }
-            fromView?.isHidden = true
-            
-            UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.5) {
-                contentView.backgroundColor = backgroundColor?.withAlphaComponent(1)
+            var rectY: CGFloat
+            if imageCenter.equalTo(.zero) {
+                rectY = 0
+            }else {
+                rectY = (toVC.view.hx_height - imageSize.height) * 0.5
             }
-            
-            UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .layoutSubviews) {
-                self.pushImageView.hx_size = imageSize
-                if !imageCenter.equalTo(.zero) {
-                    self.pushImageView.center = imageCenter
-                }else {
-                    self.pushImageView.hx_centerX = toVC.view.hx_width * 0.5
-                    self.pushImageView.hx_y = 0
-                }
+            rect = CGRect(x: (toVC.view.hx_width - imageSize.width) * 0.5, y: rectY, width: imageSize.width, height: imageSize.height)
+            fromView?.isHidden = true
+        }else if type == .pop {
+            rect = toView?.convert(toView?.bounds ?? CGRect.zero, to: containerView) ?? .zero
+            toView?.isHidden = true
+            if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
+                pickerVC?.bottomView.alpha = 0
+            }
+        }
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.1) {
+            if self.type == .push {
                 previewVC?.bottomView.alpha = 1
                 if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
                     pickerVC?.bottomView.alpha = 0
                 }
-            } completion: { (isFinished) in
+                contentView.backgroundColor = backgroundColor?.withAlphaComponent(1)
+            }else if self.type == .pop {
+                previewVC?.bottomView.alpha = 0
+                if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
+                    pickerVC?.bottomView.alpha = 1
+                }
+                contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
+            }
+        }
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
+            if self.type == .push {
+                self.pushImageView.frame = rect
+            }else if self.type == .pop {
+                if rect.isEmpty {
+                    fromView?.transform = CGAffineTransform.init(scaleX: 0.1, y: 0.1)
+                    fromView?.alpha = 0
+                }else {
+                    fromView?.frame = rect
+                }
+            }
+        } completion: { (isFinished) in
+            if self.type == .push {
                 if self.requestID != nil {
                     PHImageManager.default().cancelImageRequest(self.requestID!)
                     self.requestID = nil
@@ -185,26 +214,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                 previewVC?.configColor()
                 contentView.removeFromSuperview()
                 transitionContext.completeTransition(true)
-            }
-        }else if type == .pop {
-            let rect = toView?.convert(toView?.bounds ?? CGRect.zero, to: containerView) ?? CGRect.zero
-            toView?.isHidden = true
-            if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
-                pickerVC?.bottomView.alpha = 0
-            }
-            UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.25, delay: 0, options: [.layoutSubviews, .curveEaseOut]) {
-                if rect.isEmpty {
-                    fromView?.transform = CGAffineTransform.init(scaleX: 0.1, y: 0.1)
-                    fromView?.alpha = 0
-                }else {
-                    fromView?.frame = rect
-                }
-                contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
-                previewVC?.bottomView.alpha = 0
-                if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
-                    pickerVC?.bottomView.alpha = 1
-                }
-            } completion: { (isFinished) in
+            }else if self.type == .pop {
                 toView?.isHidden = false
                 UIView.animate(withDuration: 0.25, delay: 0, options: [.allowUserInteraction]) {
                     fromView?.alpha = 0

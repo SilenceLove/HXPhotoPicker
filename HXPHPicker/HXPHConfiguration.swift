@@ -329,6 +329,7 @@ class HXPHPreviewViewConfiguration: NSObject {
         config.previewButtonHidden = true
         config.disableFinishButtonWhenNotSelected = false
         config.editButtonHidden = true
+        config.showSelectedView = true
         return config
     }()
 }
@@ -491,6 +492,12 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     
     /// 暗黑风格下提示语颜色
     lazy var promptArrowDarkColor: UIColor = {
+        return .white
+    }()
+    
+    var showSelectedView: Bool = false
+    
+    lazy var selectedViewTickColor: UIColor = {
         return .white
     }()
 }

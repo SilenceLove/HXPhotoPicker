@@ -102,10 +102,13 @@ class HXPHAsset: NSObject {
     /// - Parameter completion: 完成回调
     /// - Returns: 请求ID
     func requestThumbnailImage(completion: ((UIImage?, HXPHAsset, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
+        return requestThumbnailImage(targetWidth: 175, completion: completion)
+    }
+    func requestThumbnailImage(targetWidth: CGFloat, completion: ((UIImage?, HXPHAsset, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
         if asset == nil {
             return nil
         }
-        return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: 175) { (image, info) in
+        return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: targetWidth) { (image, info) in
             completion?(image, self, info)
         }
     }

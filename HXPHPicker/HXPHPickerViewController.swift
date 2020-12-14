@@ -270,6 +270,30 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             }
         }
     }
+    func scrollToCenter(for photoAsset: HXPHAsset?) {
+        if assets.isEmpty || photoAsset == nil {
+            return
+        }
+        let item = assets.firstIndex(of: photoAsset!)
+        if item != nil {
+            collectionView.scrollToItem(at: IndexPath(item: item!, section: 0), at: .centeredVertically, animated: false)
+        }
+    }
+    func scrollToCell(_ cell: HXPHPickerViewCell) {
+        if assets.isEmpty {
+            return
+        }
+        let rect = cell.imageView.convert(cell.imageView.bounds, to: view)
+        if rect.minY - collectionView.contentInset.top < 0 {
+            if let indexPath = collectionView.indexPath(for: cell) {
+                collectionView.scrollToItem(at: indexPath, at: .top, animated: false)
+            }
+        }else if rect.maxY > view.hx_height - collectionView.contentInset.bottom {
+            if let indexPath = collectionView.indexPath(for: cell) {
+                collectionView.scrollToItem(at: indexPath, at: .bottom, animated: false)
+            }
+        }
+    }
     func scrollToAppropriatePlace(photoAsset: HXPHAsset?) {
         if assets.isEmpty {
             return
@@ -437,6 +461,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) {
         hx_pickerController?.originalButtonCallback()
     }
+    func bottomViewDidSelectedViewClick(_ bottomView: HXPHPickerBottomView, didSelectedItemAt photoAsset: HXPHAsset) { } 
     
     // MARK: HXPHPreviewViewControllerDelegate
     func previewViewControllerDidClickOriginal(_ previewViewController: HXPHPreviewViewController, with isOriginal: Bool) {
@@ -524,12 +549,21 @@ protocol HXPHPickerBottomViewDelegate: NSObjectProtocol {
     func bottomViewDidPreviewButtonClick(view: HXPHPickerBottomView)
     func bottomViewDidFinishButtonClick(view: HXPHPickerBottomView)
     func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool)
+    func bottomViewDidSelectedViewClick(_ bottomView: HXPHPickerBottomView, didSelectedItemAt photoAsset: HXPHAsset)
 }
 
-class HXPHPickerBottomView: UIToolbar {
+class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
+    
     weak var hx_delegate: HXPHPickerBottomViewDelegate?
     
     var config: HXPHPickerBottomViewConfiguration?
+    
+    lazy var selectedView: HXPHPreviewSelectedView = {
+        let selectedView = HXPHPreviewSelectedView.init(frame: CGRect(x: 0, y: 0, width: hx_width, height: 70))
+        selectedView.delegate = self
+        selectedView.tickColor = config?.selectedViewTickColor
+        return selectedView
+    }()
     
     lazy var promptView: UIView = {
         let promptView = UIView.init(frame: CGRect(x: 0, y: 0, width: hx_width, height: 70))
@@ -664,6 +698,9 @@ class HXPHPickerBottomView: UIToolbar {
         if config.showPrompt && HXPHAssetManager.authorizationStatusIsLimited() {
             addSubview(promptView)
         }
+        if config.showSelectedView {
+            addSubview(selectedView)
+        }
         configColor()
         isTranslucent = config.isTranslucent
     }
@@ -739,6 +776,11 @@ class HXPHPickerBottomView: UIToolbar {
         finishBtn.hx_centerY = 25
     }
     
+    // MARK: HXPHPreviewSelectedViewDelegate
+    func selectedView(_ selectedView: HXPHPreviewSelectedView, didSelectItemAt photoAsset: HXPHAsset) {
+        hx_delegate?.bottomViewDidSelectedViewClick(self, didSelectedItemAt: photoAsset)
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.hx_width = hx_width
@@ -757,6 +799,9 @@ class HXPHPickerBottomView: UIToolbar {
             promptLb.hx_width = promptArrow.hx_x - promptLb.hx_x - 12
             promptLb.hx_centerY = promptView.hx_height * 0.5
             promptArrow.hx_centerY = promptView.hx_height * 0.5
+        }
+        if config!.showSelectedView {
+            selectedView.hx_width = hx_width
         }
     }
     

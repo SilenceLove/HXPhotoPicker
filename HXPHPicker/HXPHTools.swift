@@ -217,6 +217,8 @@ class HXPHTools: NSObject {
         config.previewView.bottomView.finishButtonBackgroundColor = "#07C160".hx_color
         config.previewView.bottomView.finishButtonDisableBackgroundColor = "#666666".hx_color.withAlphaComponent(0.3)
         
+        config.previewView.bottomView.selectedViewTickColor = "#07C160".hx_color
+        
         config.notAuthorized.closeButtonImageName = "hx_picker_notAuthorized_close_dark"
         config.notAuthorized.backgroundColor = "#2E2F30".hx_color
         config.notAuthorized.titleColor = .white
