@@ -53,6 +53,7 @@
 		345E2C203E2D12E7E3546F2E8344A79B /* SDImageLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 418E9D1936DB05384EAF574721405723 /* SDImageLoader.m */; };
 		3801A443834985F278FE479B54319B4F /* AFNetworkReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D656972EC843F56441EDB1B63DD23872 /* AFNetworkReachabilityManager.m */; };
 		38E225F83FB50A828F51F93E59069CF9 /* SDImageIOAnimatedCoderInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 227F1960C957740245CEE789183A38B0 /* SDImageIOAnimatedCoderInternal.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		3955DA5A4973126514C49038C0FE9900 /* Pods-HXPhotoPickerExample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5742B6BAE980582B8893E0BC9AF5ED94 /* Pods-HXPhotoPickerExample-dummy.m */; };
 		3A9FAA5BD20B70FCB5966FD24C6152F4 /* SDImageFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 33B01763AEEE4E72E028421448D79691 /* SDImageFrame.m */; };
 		3B202DB775F482F8C829FEBD7B83C154 /* SDWebImageDownloaderDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 74211975882EE3125446EEA276B47CBE /* SDWebImageDownloaderDecryptor.m */; };
 		3D2FEFBFF5B0E97FB3648C24FB791766 /* UIButton+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = B41A1612F62B6742FE4382E474B631C5 /* UIButton+WebCache.m */; };
@@ -109,7 +110,6 @@
 		757EBD77D300E8FAF251BF89058A0063 /* SDWebImageOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 6537BFFC56F7E8F7BE89C49BF733AFCF /* SDWebImageOperation.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		759335CEF832A5F72222213C7AC7FFEA /* SDAsyncBlockOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = B05699FCB7BABF634770691B55AE5168 /* SDAsyncBlockOperation.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		787AE202E71EF711783ABDEAA6D52204 /* SDImageAPNGCoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E3814F1103F47907F878ED48B197CC /* SDImageAPNGCoder.m */; };
-		78F72C32BF287269D91D2ABA8267DF5A /* Pods-HXPhotoPickerExample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5742B6BAE980582B8893E0BC9AF5ED94 /* Pods-HXPhotoPickerExample-dummy.m */; };
 		7CF2AC7A3B3ED03B30C1E4ED662B0551 /* MASLayoutConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 31C4D1BD07088BD50F491ACEC77FBB0D /* MASLayoutConstraint.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		80B7FBA8291E76D74A651249A0E211FC /* SDMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = DE2D9AAF7FE0EFFABA65D763F2DF541D /* SDMemoryCache.m */; };
 		81F811A56B6724F7E8E2D25364E595E3 /* NSArray+MASShorthandAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 53C603440637E006422B6A09F7FA0EBC /* NSArray+MASShorthandAdditions.h */; settings = {ATTRIBUTES = (Project, ); }; };
@@ -215,21 +215,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		2EBEB7B6FFBEDBFEEB76187D419FD20E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 55AF53E6C77A10ED4985E04D74A8878E;
-			remoteInfo = Masonry;
-		};
-		982DBCE866CCF7676D2910524B381F51 /* PBXContainerItemProxy */ = {
+		24DBCC204D5E216398282C9A4DD33520 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3847153A6E5EEFB86565BA840768F429;
 			remoteInfo = SDWebImage;
 		};
-		B6C3D58D800432AC1FF2BA72A41A2657 /* PBXContainerItemProxy */ = {
+		304B4B8D1782F0B1D0A9F72600A6D1A7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55AF53E6C77A10ED4985E04D74A8878E;
+			remoteInfo = Masonry;
+		};
+		F63764436BF4F8FD268366F592DE863A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
@@ -486,7 +486,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F83098D7261392EF91C21D3A2F787B10 /* Frameworks */ = {
+		D2DB6F8CEC4C86EC57F5268F081AAC7F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -919,6 +919,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		781CFBA6444F2068076CE8BBC21352CE /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BEA8651F99403447F29990C1A94F37D3 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -999,13 +1006,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C2407B9A6B0A9AA66B1B4F3FDF2228AD /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1062,18 +1062,18 @@
 		};
 		D1D724522871333DBFA94E79471AC4FE /* Pods-HXPhotoPickerExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F52B3F70DC9935ADF4A76C908EAD3E2 /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */;
+			buildConfigurationList = ED8A4EE9248F0243D8CED5E965F696E1 /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */;
 			buildPhases = (
-				C2407B9A6B0A9AA66B1B4F3FDF2228AD /* Headers */,
-				40011648948ADBC3C1DE5FC8FD5B2645 /* Sources */,
-				F83098D7261392EF91C21D3A2F787B10 /* Frameworks */,
+				781CFBA6444F2068076CE8BBC21352CE /* Headers */,
+				B12B9A62CBDFBCBDD5D11F158DEA79AA /* Sources */,
+				D2DB6F8CEC4C86EC57F5268F081AAC7F /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				29B374E55CB4F5209B90D691C544F999 /* PBXTargetDependency */,
-				151B15FC7071A8407DAA0680A8307AD0 /* PBXTargetDependency */,
-				DFB9E324F1E27F00CF31BC1CFF9BE64F /* PBXTargetDependency */,
+				AF6C45907CA5CF41EECF166F4BFF14F0 /* PBXTargetDependency */,
+				3112D9829E1808BD89917B1A812E8520 /* PBXTargetDependency */,
+				DEAB32179DB57AEFD9E3EE653B2BBA12 /* PBXTargetDependency */,
 			);
 			name = "Pods-HXPhotoPickerExample";
 			productName = "Pods-HXPhotoPickerExample";
@@ -1131,14 +1131,6 @@
 				894126828AF68F98598CA7B53E737AEF /* UIProgressView+AFNetworking.m in Sources */,
 				304FB2F3CB19F5C44D812D90AA2F1121 /* UIRefreshControl+AFNetworking.m in Sources */,
 				5671A72ECAB90A855ECF6F69B750B4E1 /* UIWebView+AFNetworking.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		40011648948ADBC3C1DE5FC8FD5B2645 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				78F72C32BF287269D91D2ABA8267DF5A /* Pods-HXPhotoPickerExample-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1237,36 +1229,88 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B12B9A62CBDFBCBDD5D11F158DEA79AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3955DA5A4973126514C49038C0FE9900 /* Pods-HXPhotoPickerExample-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		151B15FC7071A8407DAA0680A8307AD0 /* PBXTargetDependency */ = {
+		3112D9829E1808BD89917B1A812E8520 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Masonry;
 			target = 55AF53E6C77A10ED4985E04D74A8878E /* Masonry */;
-			targetProxy = 2EBEB7B6FFBEDBFEEB76187D419FD20E /* PBXContainerItemProxy */;
+			targetProxy = 304B4B8D1782F0B1D0A9F72600A6D1A7 /* PBXContainerItemProxy */;
 		};
-		29B374E55CB4F5209B90D691C544F999 /* PBXTargetDependency */ = {
+		AF6C45907CA5CF41EECF166F4BFF14F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = AFNetworking;
 			target = 0130B3724283586C0E9D2A112D4F2AA1 /* AFNetworking */;
-			targetProxy = B6C3D58D800432AC1FF2BA72A41A2657 /* PBXContainerItemProxy */;
+			targetProxy = F63764436BF4F8FD268366F592DE863A /* PBXContainerItemProxy */;
 		};
-		DFB9E324F1E27F00CF31BC1CFF9BE64F /* PBXTargetDependency */ = {
+		DEAB32179DB57AEFD9E3EE653B2BBA12 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SDWebImage;
 			target = 3847153A6E5EEFB86565BA840768F429 /* SDWebImage */;
-			targetProxy = 982DBCE866CCF7676D2910524B381F51 /* PBXContainerItemProxy */;
+			targetProxy = 24DBCC204D5E216398282C9A4DD33520 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		01ABB8ED0C57A6744C325A1BC2CD11CB /* Debug */ = {
+		12B19388659831B9BA687817F9F09FC8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E8C65A000081A804C15BCA84FA8CD24B /* Pods-HXPhotoPickerExample.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACH_O_TYPE = staticlib;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5ACD43555D06644826A9A35F8F4BEE81 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA5F48E28F6527629331ED946A87D04A /* SDWebImage.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/SDWebImage/SDWebImage-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = SDWebImage;
+				PRODUCT_NAME = SDWebImage;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		602D4E83B837A2671A2037EDB617C254 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA60B5486DD6615C5988A19740CE6C9C /* Masonry.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1285,55 +1329,34 @@
 			};
 			name = Debug;
 		};
-		13DA88666CF53B09B2AFB8BEEB333A26 /* Debug */ = {
+		61EE34D1829967B8BBC6E7858BA5C3A0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E8C65A000081A804C15BCA84FA8CD24B /* Pods-HXPhotoPickerExample.debug.xcconfig */;
+			baseConfigurationReference = BEA01A425AB4602985E07E2B38874079 /* AFNetworking.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MACH_O_TYPE = staticlib;
+				GCC_PREFIX_HEADER = "Target Support Files/AFNetworking/AFNetworking-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = AFNetworking;
+				PRODUCT_NAME = AFNetworking;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		2A6BE2EFB24163F8760F7FDFBD9E8D96 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 01A31513A870508886C637E7445D78F5 /* Pods-HXPhotoPickerExample.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		4BE66A09A74FD25164AAB3C2645B9B93 /* Release */ = {
+		6D42DC62C4F2E194221DF89C48496C98 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1356,6 +1379,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1390,12 +1414,35 @@
 			};
 			name = Release;
 		};
-		4FF00C2A785B420048917CEE6BA6F10A /* Debug */ = {
+		763553A0469F5FF680A6141E54AB5A6E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 78FBCE16EFAA14631A0A8EBDA7B34CA5 /* Masonry.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Masonry;
+				PRODUCT_NAME = Masonry;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7B41A063952E420E38F50847D2B03A3F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CA80D1629374E446428751ABCE8AF9DA /* SDWebImage.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1414,12 +1461,33 @@
 			};
 			name = Debug;
 		};
-		7353D52D6880D22B810A9AFFE8474018 /* Debug */ = {
+		8E246D9BE12FF1AC91213BA6CFA1D123 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BEA01A425AB4602985E07E2B38874079 /* AFNetworking.debug.xcconfig */;
+			baseConfigurationReference = 01A31513A870508886C637E7445D78F5 /* Pods-HXPhotoPickerExample.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACH_O_TYPE = staticlib;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9B5C33DEF372E20F3B8D93104F26F6D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AAF4EDBB614164B0B9F34225878F2699 /* AFNetworking.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -1435,13 +1503,15 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
-			name = Debug;
+			name = Release;
 		};
-		7EF7227D9B20A1D549000096ACCB23D7 /* Debug */ = {
+		E4D0D44B090D4284607EBBC4E71A96C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1464,6 +1534,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1502,98 +1573,14 @@
 			};
 			name = Debug;
 		};
-		BBC96101FAB84DBB4D79AD0C0B4D5576 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 78FBCE16EFAA14631A0A8EBDA7B34CA5 /* Masonry.release.xcconfig */;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = Masonry;
-				PRODUCT_NAME = Masonry;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		C694BEC193CC79076F67F756AE53E86E /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = AAF4EDBB614164B0B9F34225878F2699 /* AFNetworking.release.xcconfig */;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/AFNetworking/AFNetworking-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = AFNetworking;
-				PRODUCT_NAME = AFNetworking;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		D87A66F163EC214EE369973C052B5D94 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA5F48E28F6527629331ED946A87D04A /* SDWebImage.release.xcconfig */;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/SDWebImage/SDWebImage-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = SDWebImage;
-				PRODUCT_NAME = SDWebImage;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		0B9F7EAACDDA564EC328F53A4AB8CF85 /* Build configuration list for PBXNativeTarget "Masonry" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				01ABB8ED0C57A6744C325A1BC2CD11CB /* Debug */,
-				BBC96101FAB84DBB4D79AD0C0B4D5576 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		1F52B3F70DC9935ADF4A76C908EAD3E2 /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				13DA88666CF53B09B2AFB8BEEB333A26 /* Debug */,
-				2A6BE2EFB24163F8760F7FDFBD9E8D96 /* Release */,
+				602D4E83B837A2671A2037EDB617C254 /* Debug */,
+				763553A0469F5FF680A6141E54AB5A6E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1601,8 +1588,8 @@
 		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7EF7227D9B20A1D549000096ACCB23D7 /* Debug */,
-				4BE66A09A74FD25164AAB3C2645B9B93 /* Release */,
+				E4D0D44B090D4284607EBBC4E71A96C1 /* Debug */,
+				6D42DC62C4F2E194221DF89C48496C98 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1610,8 +1597,17 @@
 		B1FA491365904802AD9D5BF4683066A6 /* Build configuration list for PBXNativeTarget "SDWebImage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4FF00C2A785B420048917CEE6BA6F10A /* Debug */,
-				D87A66F163EC214EE369973C052B5D94 /* Release */,
+				7B41A063952E420E38F50847D2B03A3F /* Debug */,
+				5ACD43555D06644826A9A35F8F4BEE81 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ED8A4EE9248F0243D8CED5E965F696E1 /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				12B19388659831B9BA687817F9F09FC8 /* Debug */,
+				8E246D9BE12FF1AC91213BA6CFA1D123 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1619,8 +1615,8 @@
 		EE91476FFEA2C3B3AB024E94672BCFF2 /* Build configuration list for PBXNativeTarget "AFNetworking" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7353D52D6880D22B810A9AFFE8474018 /* Debug */,
-				C694BEC193CC79076F67F756AE53E86E /* Release */,
+				61EE34D1829967B8BBC6E7858BA5C3A0 /* Debug */,
+				9B5C33DEF372E20F3B8D93104F26F6D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
