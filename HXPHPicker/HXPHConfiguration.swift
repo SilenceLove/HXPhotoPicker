@@ -67,8 +67,10 @@ class HXPHConfiguration: NSObject {
     /// 暗黑风格下导航控制器背景颜色
     var navigationViewBackgroudDarkColor: UIColor = "#2E2F30".hx_color
     
+    /// 导航栏样式
     var navigationBarStyle: UIBarStyle = .default
     
+    /// 暗黑风格下导航栏样式
     var navigationBarDarkStyle: UIBarStyle = .black
     
     /// 导航栏标题颜色
@@ -271,9 +273,9 @@ class HXPHPhotoListConfiguration: NSObject {
     
     /// 底部视图相关配置
     lazy var bottomView: HXPHPickerBottomViewConfiguration = {
-        let bottomView = HXPHPickerBottomViewConfiguration.init()
-        bottomView.showPrompt = true
-        return bottomView
+        let config = HXPHPickerBottomViewConfiguration.init()
+        config.showPrompt = true
+        return config
     }()
     
     /// 允许添加相机
