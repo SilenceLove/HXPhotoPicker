@@ -328,3 +328,54 @@ class HXPHPickerCellSelectBoxControl: UIControl {
         return super.hitTest(point, with: event)
     }
 }
+class HXPHPickerCamerViewCell: UICollectionViewCell {
+    
+    override class var layerClass: AnyClass {
+        return AVPlayerLayer.self
+    }
+    
+    var playerLayer: AVPlayerLayer {
+        get {
+            return layer as! AVPlayerLayer
+        }
+    }
+    
+    lazy var imageView: UIImageView = {
+        let imageView = UIImageView.init()
+        return imageView
+    }()
+    
+    var config: HXPHPhotoListCameraCellConfiguration? {
+        didSet {
+            configProperty()
+        }
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        contentView.addSubview(imageView)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    func configProperty() {
+        imageView.image = UIImage.hx_named(named: HXPHManager.shared.isDark ? config?.cameraDarkImageName : config?.cameraImageName)
+        backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
+        imageView.hx_size = imageView.image?.size ?? .zero
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        imageView.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                configProperty()
+            }
+        }
+    }
+}

@@ -106,6 +106,8 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                             self.requestID = nil
                         }
                     }
+                }else if pushImageView.image == nil {
+                    pushImageView.image = photoAsset?.originalImage
                 }
             }
             

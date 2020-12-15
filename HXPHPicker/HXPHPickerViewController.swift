@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import MobileCoreServices
 
-class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, HXPHPickerViewCellDelegate, HXPHPickerBottomViewDelegate, HXPHPreviewViewControllerDelegate, HXAlbumViewDelegate {
+class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, HXPHPickerViewCellDelegate, HXPHPickerBottomViewDelegate, HXPHPreviewViewControllerDelegate, HXAlbumViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var config: HXPHPhotoListConfiguration!
     var assetCollection: HXPHAssetCollection!
@@ -26,6 +27,9 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         collectionView.delegate = self
         collectionView.register(HXPHPickerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerViewCell.classForCoder()))
         collectionView.register(HXPHPickerMultiSelectViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerMultiSelectViewCell.classForCoder()))
+        if config.allowAddCamera {
+            collectionView.register(HXPHPickerCamerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerCamerViewCell.classForCoder()))
+        }
         
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
@@ -35,6 +39,20 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         }
         return collectionView
     }()
+    
+    var cameraCell: HXPHPickerCamerViewCell {
+        get {
+            var indexPath: IndexPath
+            if !hx_pickerController!.config.reverseOrder {
+                indexPath = IndexPath(item: assets.count, section: 0)
+            }else {
+                indexPath = IndexPath(item: 0, section: 0)
+            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPickerCamerViewCell.classForCoder()), for: indexPath) as! HXPHPickerCamerViewCell
+            cell.config = config.cameraCell
+            return cell
+        }
+    }
     
     private lazy var notAssetView: HXPHNotAssetView = {
         let notAssetView = HXPHNotAssetView.init(frame: CGRect(x: 0, y: 0, width: view.hx_width, height: 0))
@@ -48,6 +66,11 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     var showLoading : Bool = false
     var isMultipleSelect : Bool = false
     var videoLoadSingleCell = false
+    var needOffset: Bool {
+        get {
+            return hx_pickerController!.config.reverseOrder && config.allowAddCamera
+        }
+    }
     
     lazy var titleView: HXAlbumTitleView = {
         let titleView = HXAlbumTitleView.init(config: config.titleViewConfig)
@@ -62,6 +85,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             if albumView.assetCollectionsArray.isEmpty {
 //                HXPHProgressHUD.showLoadingHUD(addedTo: view, animated: true)
 //                HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
+                control.isSelected = false
                 return
             }
             openAlbumView()
@@ -106,8 +130,10 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             self.albumBackgroudView.alpha = 0
             self.configAlbumViewFrame()
             self.titleView.arrowView.transform = CGAffineTransform.init(rotationAngle: 2 * .pi)
-        } completion: { (finish) in
-            self.albumBackgroudView.isHidden = true
+        } completion: { (isFinish) in
+            if isFinish {
+                self.albumBackgroudView.isHidden = true
+            }
         }
     }
     
@@ -186,6 +212,8 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         if isMultipleSelect {
             view.addSubview(bottomView)
             bottomView.updateFinishButtonTitle()
+        }
+        if hx_pickerController!.config.albumShowMode == .popup {
             view.addSubview(albumBackgroudView)
             view.addSubview(albumView)
         }
@@ -232,12 +260,8 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             albumView.assetCollectionsArray = hx_pickerController!.assetCollectionsArray
             albumView.currentSelectedAssetCollection = assetCollection
             configAlbumViewFrame()
-            if HXPHAssetManager.authorizationStatusIsLimited() {
-                fetchAssetCollectionsClosure()
-            }
-        }else {
-            fetchAssetCollectionsClosure()
         }
+        fetchAssetCollectionsClosure()
     }
     private func fetchAssetCollectionsClosure() {
         weak var weakSelf = self
@@ -250,12 +274,8 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     func fetchPhotoAssets() {
         weak var weakSelf = self
         hx_pickerController!.fetchPhotoAssets(assetCollection: assetCollection) { (photoAssets, photoAsset) in
-            if weakSelf != nil && photoAssets.isEmpty {
-                weakSelf?.view.insertSubview(weakSelf!.notAssetView, at: 1)
-            }else {
-                weakSelf?.notAssetView.removeFromSuperview()
-            }
             weakSelf?.assets = photoAssets
+            weakSelf?.setupNotAssetView()
             if weakSelf != nil {
                 UIView.transition(with: weakSelf!.collectionView, duration: 0.05, options: .transitionCrossDissolve) {
                     weakSelf?.collectionView.reloadData()
@@ -270,12 +290,22 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             }
         }
     }
+    func setupNotAssetView() {
+        if assets.isEmpty {
+            self.view.insertSubview(self.notAssetView, at: 1)
+        }else {
+            self.notAssetView.removeFromSuperview()
+        }
+    }
     func scrollToCenter(for photoAsset: HXPHAsset?) {
         if assets.isEmpty || photoAsset == nil {
             return
         }
-        let item = assets.firstIndex(of: photoAsset!)
+        var item = assets.firstIndex(of: photoAsset!)
         if item != nil {
+            if needOffset {
+                item! += 1
+            }
             collectionView.scrollToItem(at: IndexPath(item: item!, section: 0), at: .centeredVertically, animated: false)
         }
     }
@@ -298,13 +328,14 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         if assets.isEmpty {
             return
         }
-        if !hx_pickerController!.config.reverseOrder {
-            var item = assets.count - 1
-            if photoAsset != nil {
-                item = assets.firstIndex(of: photoAsset!) ?? item
+        var item = !hx_pickerController!.config.reverseOrder ? assets.count - 1 : 0
+        if photoAsset != nil {
+            item = assets.firstIndex(of: photoAsset!) ?? item
+            if needOffset {
+                item += 1
             }
-            collectionView.scrollToItem(at: IndexPath(item: item, section: 0), at: .centeredVertically, animated: false)
         }
+        collectionView.scrollToItem(at: IndexPath(item: item, section: 0), at: .centeredVertically, animated: false)
     }
     func getCell(for item: Int) -> HXPHPickerViewCell? {
         if assets.isEmpty {
@@ -317,16 +348,40 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         if assets.isEmpty {
             return nil
         }
-        let item = assets.firstIndex(of: photoAsset)
+        var item = assets.firstIndex(of: photoAsset)
         if item == nil {
             return nil
+        }
+        if needOffset {
+            item! += 1
         }
         return getCell(for: item!)
     }
     func reloadCell(for photoAsset: HXPHAsset) {
-        let item = assets.firstIndex(of: photoAsset)
+        var item = assets.firstIndex(of: photoAsset)
         if item != nil {
+            if needOffset {
+                item! += 1
+            }
             collectionView.reloadItems(at: [IndexPath.init(item: item!, section: 0)])
+        }
+    }
+    func getPhotoAsset(for index: Int) -> HXPHAsset {
+        var photoAsset: HXPHAsset
+        if needOffset {
+            photoAsset = assets[index - 1]
+        }else {
+            photoAsset = assets[index]
+        }
+        return photoAsset
+    }
+    func addedPhotoAsset(for photoAsset: HXPHAsset) {
+        if hx_pickerController!.config.reverseOrder {
+            assets.insert(photoAsset, at: 0)
+            collectionView.insertItems(at: [IndexPath(item: needOffset ? 1 : 0, section: 0)])
+        }else {
+            assets.append(photoAsset)
+            collectionView.insertItems(at: [IndexPath(item: needOffset ? assets.count : assets.count - 1, section: 0)])
         }
     }
     func changedAssetCollection(collection: HXPHAssetCollection?) {
@@ -354,21 +409,27 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     
     // MARK: UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return assets.count
+        return config.allowAddCamera ? assets.count + 1 : assets.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if config.allowAddCamera {
+            if !hx_pickerController!.config.reverseOrder {
+                if indexPath.item == assets.count {
+                    return self.cameraCell
+                }
+            }else {
+                if indexPath.item == 0 {
+                    return self.cameraCell
+                }
+            }
+        }
         let cell: HXPHPickerViewCell
-        let photoAsset = assets[indexPath.item]
+        let photoAsset = getPhotoAsset(for: indexPath.item)
         if hx_pickerController?.config.selectMode == .single || (photoAsset.mediaType == .video && videoLoadSingleCell) {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPickerViewCell.classForCoder()), for: indexPath) as! HXPHPickerViewCell
         }else {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPickerMultiSelectViewCell.classForCoder()), for: indexPath) as! HXPHPickerMultiSelectViewCell
-        }
-        if !photoAsset.isSelected {
-            cell.canSelect = hx_pickerController!.canSelectAsset(for: photoAsset, showHUD: false)
-        }else {
-            cell.canSelect = true
         }
         cell.delegate = self
         cell.config = config.cell
@@ -376,20 +437,63 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         return cell
     }
     // MARK: UICollectionViewDelegate
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        let myCell: HXPHPickerViewCell = cell as! HXPHPickerViewCell
-        
-        myCell.cancelRequest()
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if cell is HXPHPickerViewCell {
+            let myCell: HXPHPickerViewCell = cell as! HXPHPickerViewCell
+            let photoAsset = getPhotoAsset(for: indexPath.item)
+            if !photoAsset.isSelected {
+                myCell.canSelect = hx_pickerController!.canSelectAsset(for: photoAsset, showHUD: false)
+            }else {
+                myCell.canSelect = true
+            }
+        }
     }
-    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let myCell: HXPHPickerViewCell? = cell as? HXPHPickerViewCell
+        myCell?.cancelRequest()
+    }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: false)
-        if !getCell(for: indexPath.item)!.canSelect {
+        if navigationController?.topViewController != self {
             return
         }
-        pushPreviewViewController(previewAssets: assets, currentPreviewIndex: indexPath.item)
+        collectionView.deselectItem(at: indexPath, animated: false)
+        let cell = collectionView.cellForItem(at: indexPath)
+        if cell == nil {
+            return
+        }
+        if cell is HXPHPickerCamerViewCell {
+            presentCameraViewController()
+        }else if cell is HXPHPickerViewCell {
+            let myCell = cell as! HXPHPickerViewCell
+            if !myCell.canSelect {
+                return
+            }
+            pushPreviewViewController(previewAssets: assets, currentPreviewIndex: needOffset ? indexPath.item - 1 : indexPath.item)
+        }
     }
-    
+    func presentCameraViewController() {
+        if !UIImagePickerController.isSourceTypeAvailable(.camera) {
+            HXPHProgressHUD.showWarningHUD(addedTo: self.navigationController?.view, text: "相机不可用!".hx_localized, animated: true, delay: 1.5)
+            return
+        }
+        let imagePickerController = UIImagePickerController.init()
+        imagePickerController.sourceType = .camera
+        imagePickerController.delegate = self
+        var mediaTypes: [String]
+        switch hx_pickerController!.config.selectType {
+        case .photo:
+            mediaTypes = [kUTTypeImage as String]
+            break
+        case .video:
+            mediaTypes = [kUTTypeMovie as String]
+            break
+        default:
+            mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
+        }
+        
+        imagePickerController.mediaTypes = mediaTypes
+        present(imagePickerController, animated: true, completion: nil)
+    }
     func pushPreviewViewController(previewAssets: [HXPHAsset], currentPreviewIndex: Int) {
         let vc = HXPHPreviewViewController.init()
         vc.previewAssets = previewAssets
@@ -398,7 +502,32 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         navigationController?.delegate = vc
         navigationController?.pushViewController(vc, animated: true)
     }
-    
+    // MARK: UIImagePickerControllerDelegate
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        HXPHProgressHUD.showLoadingHUD(addedTo: self.navigationController?.view, animated: true)
+        DispatchQueue.global().async {
+            let mediaType = info[.mediaType] as! String
+            var photoAsset: HXPHAsset
+            if mediaType == kUTTypeImage as String {
+                var image: UIImage? = info[.originalImage] as? UIImage
+                image = image?.hx_scaleSuitableSize()
+                photoAsset = HXPHAsset.init(image: image)
+            }else {
+                let videoURL: URL? = info[.mediaURL] as? URL
+                photoAsset = HXPHAsset.init(videoURL: videoURL)
+            }
+            DispatchQueue.main.async {
+                HXPHProgressHUD.hideHUD(forView: self.navigationController?.view, animated: true)
+                if self.hx_pickerController!.addedPhotoAsset(photoAsset: photoAsset) {
+                    self.updateCellSelectedTitle()
+                }
+                self.addedPhotoAsset(for: photoAsset)
+                self.bottomView.updateFinishButtonTitle()
+                self.setupNotAssetView()
+            }
+        }
+        picker.dismiss(animated: true, completion: nil)
+    }
     // MARK: HXAlbumViewDelegate
     func albumView(_ albumView: HXAlbumView, didSelectRowAt assetCollection: HXPHAssetCollection) {
         didAlbumBackgroudViewClick()
@@ -467,6 +596,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     func previewViewControllerDidClickOriginal(_ previewViewController: HXPHPreviewViewController, with isOriginal: Bool) {
         if isMultipleSelect {
             bottomView.boxControl.isSelected = isOriginal
+            bottomView.requestAssetBytes()
         }
     }
     func previewViewControllerDidClickSelectBox(_ previewViewController: HXPHPreviewViewController, with isSelected: Bool) {
@@ -491,9 +621,11 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         }else {
             collectionTop = navigationController!.navigationBar.hx_height
         }
-        if isMultipleSelect {
+        if hx_pickerController != nil && hx_pickerController!.config.albumShowMode == .popup {
             albumBackgroudView.frame = view.bounds
             configAlbumViewFrame()
+        }
+        if isMultipleSelect {
             let promptHeight: CGFloat = (HXPHAssetManager.authorizationStatusIsLimited() && config.bottomView.showPrompt) ? 70 : 0
             let bottomHeight: CGFloat = 50 + UIDevice.current.hx_bottomMargin + promptHeight
             bottomView.frame = CGRect(x: 0, y: view.hx_height - bottomHeight, width: view.hx_width, height: bottomHeight)
@@ -637,6 +769,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         let originalBtn = UIView.init()
         originalBtn.addSubview(originalTitleLb)
         originalBtn.addSubview(boxControl)
+        originalBtn.addSubview(originalLoadingView)
         let tap = UITapGestureRecognizer.init(target: self, action: #selector(didOriginalButtonClick))
         originalBtn.addGestureRecognizer(tap)
         originalBtn.isHidden = config!.originalButtonHidden
@@ -644,14 +777,14 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     }()
     
     @objc func didOriginalButtonClick() {
-        if boxControl.isSelected {
+        boxControl.isSelected = !boxControl.isSelected
+        if !boxControl.isSelected {
             // 取消
-            
+            cancelRequestAssetBytes()
         }else {
             // 选中
-            
+            requestAssetBytes()
         }
-        boxControl.isSelected = !boxControl.isSelected
         hx_viewController()?.hx_pickerController?.isOriginal = boxControl.isSelected
         hx_delegate?.bottomViewDidOriginalButtonClick(view: self, with: boxControl.isSelected)
         boxControl.layer.removeAnimation(forKey: "SelectControlAnimation")
@@ -660,21 +793,67 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         keyAnimation.values = [1.2, 0.8, 1.1, 0.9, 1.0]
         boxControl.layer.add(keyAnimation, forKey: "SelectControlAnimation")
     }
-    
+    func requestAssetBytes() {
+        if !boxControl.isSelected {
+            cancelRequestAssetBytes()
+            return
+        }
+        if let pickerController = hx_viewController()?.hx_pickerController {
+            if pickerController.selectedAssetArray.isEmpty {
+                cancelRequestAssetBytes()
+                return
+            }
+            originalLoadingDelayTimer?.invalidate()
+            let timer = Timer.init(timeInterval: 0.1, target: self, selector: #selector(showOriginalLoading(timer:)), userInfo: nil, repeats: false)
+            RunLoop.main.add(timer, forMode: .common)
+            originalLoadingDelayTimer = timer
+            pickerController.requestSelectedAssetBytes(isPreview: config!.isPreview) { (bytes, bytesString) in
+                self.originalLoadingDelayTimer?.invalidate()
+                self.originalLoadingDelayTimer = nil
+                self.originalLoadingView.stopAnimating()
+                self.showOriginalLoadingView = false
+                self.originalTitleLb.text = "原图".hx_localized + " (" + bytesString + ")"
+                self.updateOriginalButtonFrame()
+            }
+        }
+    }
+    @objc func showOriginalLoading(timer: Timer) {
+        originalTitleLb.text = "原图".hx_localized
+        showOriginalLoadingView = true
+        originalLoadingView.startAnimating()
+        updateOriginalButtonFrame()
+        originalLoadingDelayTimer = nil
+    }
+    func cancelRequestAssetBytes() {
+        originalLoadingDelayTimer?.invalidate()
+        originalLoadingDelayTimer = nil
+        if let pickerController = hx_viewController()?.hx_pickerController {
+            pickerController.cancelRequestAssetBytes(isPreview: config!.isPreview)
+        }
+        showOriginalLoadingView = false
+        originalLoadingView.stopAnimating()
+        originalTitleLb.text = "原图".hx_localized
+        updateOriginalButtonFrame()
+    }
     lazy var originalTitleLb: UILabel = {
         let originalTitleLb = UILabel.init()
         originalTitleLb.text = "原图".hx_localized
         originalTitleLb.font = UIFont.systemFont(ofSize: 17)
-        originalTitleLb.frame = CGRect(x: 0, y: 0, width: originalTitleLb.text!.hx_stringWidth(ofFont: originalTitleLb.font, maxHeight: 50), height: 50)
         return originalTitleLb
     }()
     
     lazy var boxControl: HXPHPickerCellSelectBoxControl = {
-        let boxControl = HXPHPickerCellSelectBoxControl.init(frame: CGRect(x: originalTitleLb.hx_width + 2, y: 0, width: 16, height: 16))
+        let boxControl = HXPHPickerCellSelectBoxControl.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
         boxControl.config = config!.originalSelectBox
-        boxControl.hx_centerY = originalTitleLb.hx_height * 0.5
         boxControl.backgroundColor = UIColor.clear
         return boxControl
+    }()
+    var showOriginalLoadingView: Bool = false
+    var originalLoadingDelayTimer: Timer?
+    lazy var originalLoadingView: UIActivityIndicatorView = {
+        let originalLoadingView = UIActivityIndicatorView.init(style: .white)
+        originalLoadingView.hidesWhenStopped = true
+        return originalLoadingView
     }()
     
     lazy var finishBtn: UIButton = {
@@ -738,7 +917,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
                 editBtn.setTitleColor(config?.editButtonTitleColor.withAlphaComponent(0.6), for: .disabled)
             }
         }
-        
+        originalLoadingView.style = (HXPHManager.shared.isDark ? config?.originalLoadingDarkStyle : config?.originalLoadingStyle) ?? .white
         originalTitleLb.textColor = HXPHManager.shared.isDark ? config?.originalButtonTitleDarkColor : config?.originalButtonTitleColor
         
         let finishBtnBackgroundColor = HXPHManager.shared.isDark ? config!.finishButtonDarkBackgroundColor : config!.finishButtonBackgroundColor
@@ -753,6 +932,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         }
     }
     func updateFinishButtonTitle() {
+        requestAssetBytes()
         let selectCount = hx_viewController()?.hx_pickerController?.selectedAssetArray.count ?? 0
         if selectCount > 0 {
             finishBtn.isEnabled = true
@@ -765,9 +945,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         }
         updateFinishButtonFrame()
     }
-    
     func updateFinishButtonFrame() {
-        originalBtn.hx_centerX = hx_width / 2
         var finishWidth : CGFloat = finishBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: finishBtn.titleLabel!.font, maxHeight: 50) + 20
         if finishWidth < 60 {
             finishWidth = 60
@@ -775,7 +953,18 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         finishBtn.frame = CGRect(x: hx_width - UIDevice.current.hx_rightMargin - finishWidth - 12, y: 0, width: finishWidth, height: 33)
         finishBtn.hx_centerY = 25
     }
-    
+    func updateOriginalButtonFrame() {
+        originalTitleLb.frame = CGRect(x: boxControl.frame.maxX + 5, y: 0, width: originalTitleLb.text!.hx_stringWidth(ofFont: originalTitleLb.font, maxHeight: 50), height: 50)
+        boxControl.hx_centerY = originalTitleLb.hx_height * 0.5
+        originalLoadingView.hx_centerY = originalBtn.hx_height * 0.5
+        originalLoadingView.hx_x = originalTitleLb.frame.maxX + 3
+        if showOriginalLoadingView {
+            originalBtn.frame = CGRect(x: 0, y: 0, width: originalLoadingView.frame.maxX, height: 50)
+        }else {
+            originalBtn.frame = CGRect(x: 0, y: 0, width: originalTitleLb.frame.maxX, height: 50)
+        }
+        originalBtn.hx_centerX = hx_width / 2
+    }
     // MARK: HXPHPreviewSelectedViewDelegate
     func selectedView(_ selectedView: HXPHPreviewSelectedView, didSelectItemAt photoAsset: HXPHAsset) {
         hx_delegate?.bottomViewDidSelectedViewClick(self, didSelectedItemAt: photoAsset)
@@ -788,7 +977,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         let previewWidth : CGFloat = previewBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
         previewBtn.frame = CGRect(x: 12 + UIDevice.current.hx_leftMargin, y: 0, width: previewWidth, height: 50)
         editBtn.frame = previewBtn.frame
-        originalBtn.frame = CGRect(x: 0, y: 0, width: boxControl.frame.maxX, height: 50)
+        updateOriginalButtonFrame()
         updateFinishButtonFrame()
         if config!.showPrompt && HXPHAssetManager.authorizationStatusIsLimited() {
             promptView.hx_width = hx_width
@@ -813,7 +1002,9 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
             }
         }
     }
-    
+    deinit {
+        print("\(self) deinit")
+    }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

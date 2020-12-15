@@ -43,13 +43,14 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let nav = HXPHPickerController.init(config: HXPHTools.getWXConfig())
-//        let nav = HXPHPickerController.init(config: HXPHConfiguration.init())
-        nav.pickerContollerDelegate = self
-        nav.selectedAssetArray = selectedAssets
-        nav.isOriginal = isOriginal
-//        nav.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        present(nav, animated: true, completion: nil)
+        let pickerController = HXPHPickerController.init(config: HXPHTools.getWXConfig())
+//        let pickerController = HXPHPickerController.init(config: HXPHConfiguration.init())
+        pickerController.pickerContollerDelegate = self
+        pickerController.selectedAssetArray = selectedAssets
+//        pickerController.localAssetArray = [HXPHAsset.init(image: UIImage.init(named: "wx_head_icon"))]
+        pickerController.isOriginal = isOriginal
+//        pickerController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        present(pickerController, animated: true, completion: nil)
     }
     func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray: [HXPHAsset], with isOriginal: Bool) {
         self.selectedAssets = selectedAssetArray

@@ -42,7 +42,9 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             // 选中
             if hx_pickerController!.addedPhotoAsset(photoAsset: photoAsset) {
                 canUpdate = true
-                bottomView.selectedView.insertPhotoAsset(photoAsset: photoAsset)
+                if config.bottomView.showSelectedView {
+                    bottomView.selectedView.insertPhotoAsset(photoAsset: photoAsset)
+                }
                 if beforeIsEmpty {
                     bottomNeedAnimated = true
                 }
@@ -53,17 +55,21 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             if !beforeIsEmpty && hx_pickerController!.selectedAssetArray.isEmpty {
                 bottomNeedAnimated = true
             }
-            bottomView.selectedView.removePhotoAsset(photoAsset: photoAsset)
+            if config.bottomView.showSelectedView {
+                bottomView.selectedView.removePhotoAsset(photoAsset: photoAsset)
+            }
             canUpdate = true
         }
         if canUpdate {
-            if bottomNeedAnimated {
-                UIView.animate(withDuration: 0.25) {
-                    self.configBottomViewFrame()
-                    self.bottomView.layoutSubviews()
+            if config.bottomView.showSelectedView {
+                if bottomNeedAnimated {
+                    UIView.animate(withDuration: 0.25) {
+                        self.configBottomViewFrame()
+                        self.bottomView.layoutSubviews()
+                    }
+                }else {
+                    configBottomViewFrame()
                 }
-            }else {
-                configBottomViewFrame()
             }
             updateSelectBox(isSelected, photoAsset: photoAsset)
             selectBoxControl.isSelected = isSelected
@@ -132,8 +138,11 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     lazy var bottomView : HXPHPickerBottomView = {
         let bottomView = HXPHPickerBottomView.init(config: config.bottomView)
         bottomView.hx_delegate = self
-        bottomView.selectedView.reloadData(photoAssets: hx_pickerController!.selectedAssetArray)
+        if config.bottomView.showSelectedView {
+            bottomView.selectedView.reloadData(photoAssets: hx_pickerController!.selectedAssetArray)
+        }
         bottomView.boxControl.isSelected = hx_pickerController!.isOriginal
+        bottomView.requestAssetBytes()
         return bottomView
     }()
     // MARK: HXPHPickerBottomViewDelegate
@@ -187,7 +196,10 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         fatalError("init(coder:) has not been implemented")
     }
     func configBottomViewFrame() {
-        let bottomHeight = hx_pickerController!.selectedAssetArray.isEmpty ? 50 + UIDevice.current.hx_bottomMargin : 50 + UIDevice.current.hx_bottomMargin + 70
+        var bottomHeight = hx_pickerController?.selectedAssetArray.isEmpty ?? true ? 50 + UIDevice.current.hx_bottomMargin : 50 + UIDevice.current.hx_bottomMargin + 70
+        if !config.bottomView.showSelectedView {
+            bottomHeight = 50 + UIDevice.current.hx_bottomMargin
+        }
         bottomView.frame = CGRect(x: 0, y: view.hx_height - bottomHeight, width: view.hx_width, height: bottomHeight)
     }
     override func viewDidLayoutSubviews() {
@@ -209,7 +221,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         }
         configBottomViewFrame()
         if firstLayoutSubviews {
-            if !previewAssets.isEmpty {
+            if !previewAssets.isEmpty && config.bottomView.showSelectedView {
                 DispatchQueue.main.async {
                     self.bottomView.selectedView.scrollTo(photoAsset: self.previewAssets[self.currentPreviewIndex], isAnimated: false)
                 }
@@ -241,7 +253,9 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             if !previewAssets.isEmpty {
                 if currentPreviewIndex == 0  {
                     let photoAsset = previewAssets.first!
-                    bottomView.selectedView.scrollTo(photoAsset: photoAsset)
+                    if config.bottomView.showSelectedView {
+                        bottomView.selectedView.scrollTo(photoAsset: photoAsset)
+                    }
                     if photoAsset.mediaType == .video && videoLoadSingleCell {
                         selectBoxControl.isHidden = true
                     }else {
@@ -278,7 +292,9 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
                 cell?.scrollContentView?.livePhotoView.stopPlayback()
             }
         }
-        bottomView.selectedView.reloadSectionInset()
+        if config.bottomView.showSelectedView {
+            bottomView.selectedView.reloadSectionInset()
+        }
     }
     // MARK: HXPHPreviewViewCellDelegate
     func singleTap() {
@@ -364,7 +380,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
                     selectBoxControl.isSelected = photoAsset.isSelected
                 }
             }
-            if !firstLayoutSubviews {
+            if !firstLayoutSubviews && config.bottomView.showSelectedView {
                 bottomView.selectedView.scrollTo(photoAsset: photoAsset)
             }
         }
@@ -411,7 +427,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             if fromVC is HXPHPreviewViewController {
                 let cell = getCell(for: currentPreviewIndex)
                 if cell != nil && cell!.photoAsset!.mediaType == .video {
-                    cell?.scrollContentView?.videoView.hiddenPlayButton()
+                    cell?.scrollContentView?.hiddenVideoSubView()
                 }
                 return HXPHPickerControllerTransition.init(type: .pop)
             }

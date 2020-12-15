@@ -22,6 +22,7 @@
 "你可以使用相机拍些照片" = "Anda dapat mengambil beberapa gambar dengan kamera";
 "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」" = "Tidak dapat mengakses foto di album\nIzinkan akses ke semua foto di foto";
 "只能查看允许访问的照片和相关相册" = "Hanya dapat melihat foto yang diizinkan dan album terkait";
+"无法使用相机!" = "Tidak bisa menggunakan kamera!";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

@@ -17,6 +17,7 @@ class HXPHAssetCollection: NSObject {
     var options : PHFetchOptions?
     var coverAsset: PHAsset?
     var isSelected: Bool = false
+    var isCameraRoll: Bool = false
     private var coverImage: UIImage?
     init(collection: PHAssetCollection? , options: PHFetchOptions?) {
         super.init()
@@ -50,13 +51,13 @@ class HXPHAssetCollection: NSObject {
     
     func fetchCoverAsset(reverse: Bool) {
         if reverse {
-            coverAsset = result?.firstObject
-        }else {
             coverAsset = result?.lastObject
+        }else {
+            coverAsset = result?.firstObject
         }
     }
     
-    func changedNameWithImage(albumName: String?, coverImage: UIImage?) {
+    func change(albumName: String?, coverImage: UIImage?) {
         self.albumName = albumName
         self.coverImage = coverImage
     }

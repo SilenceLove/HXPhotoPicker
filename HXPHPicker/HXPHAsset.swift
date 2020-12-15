@@ -31,6 +31,9 @@ class HXPHAsset: NSObject {
     /// 原图
     var originalImage: UIImage? {
         get {
+            if asset == nil {
+                return localImage
+            }
             let options = PHImageRequestOptions.init()
             options.isSynchronous = true
             options.isNetworkAccessAllowed = true
@@ -49,6 +52,16 @@ class HXPHAsset: NSObject {
                 }
             }
             return originalImage
+        }
+    }
+    /// 获取视频地址
+    func requestVideoURL(resultHandler: @escaping (URL?) -> Void) {
+        if asset == nil {
+            resultHandler(localVideoURL)
+            return
+        }
+        HXPHAssetManager.requestVideoURL(for: asset!) { (videoURL) in
+            resultHandler(videoURL)
         }
     }
     
@@ -75,16 +88,39 @@ class HXPHAsset: NSObject {
                     size = CGSize(width: asset!.pixelWidth, height: asset!.pixelHeight)
                 }
             }else {
-                size = CGSize(width: 200, height: 200)
+                size = localImage?.size ?? CGSize(width: 200, height: 200)
             }
             return size
         }
     }
     
+    private var localImage: UIImage?
+    private var localVideoURL: URL?
+    
     init(asset: PHAsset) {
         super.init()
         self.asset = asset
         setMediaType()
+    }
+    init(localIdentifier: String) {
+        super.init()
+        asset = HXPHAssetManager.fetchAsset(withLocalIdentifier: localIdentifier)
+        setMediaType()
+    }
+    init(image: UIImage?) {
+        super.init()
+        localImage = image
+        mediaType = .photo
+        mediaSubType = .localPhoto
+    }
+    init(videoURL: URL?) {
+        super.init()
+        localImage = HXPHTools.getVideoThumbnailImage(videoURL: videoURL, atTime: 0.1)
+        videoDuration = HXPHTools.getVideoDuration(videoURL: videoURL)
+        videoTime = HXPHTools.transformVideoDurationToString(duration: videoDuration)
+        localVideoURL = videoURL
+        mediaType = .video
+        mediaSubType = .localVideo
     }
     private func setMediaType() {
         if asset?.mediaType.rawValue == 1 {
@@ -106,6 +142,7 @@ class HXPHAsset: NSObject {
     }
     func requestThumbnailImage(targetWidth: CGFloat, completion: ((UIImage?, HXPHAsset, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
         if asset == nil {
+            completion?(localImage, self, nil)
             return nil
         }
         return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: targetWidth) { (image, info) in
@@ -173,7 +210,11 @@ class HXPHAsset: NSObject {
     /// - Returns: 请求ID
     func requestAVAsset(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, AVAsset, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
         if asset == nil {
-            failure?(self, nil)
+            if localVideoURL != nil {
+                success?(self, AVAsset.init(url: localVideoURL!), nil)
+            }else {
+                failure?(self, nil)
+            }
             return 0
         }
         return HXPHAssetManager.requestAVAsset(for: asset!) { (iCloudRequestID) in
@@ -185,6 +226,57 @@ class HXPHAsset: NSObject {
                 success?(self, avAsset!, info)
             }else {
                 failure?(self, info)
+            }
+        }
+    }
+    
+    func requestAssetBytes(completion: @escaping (Int, String) -> Void) {
+        if self.mediaType == .photo {
+            if let photoAsset = asset {
+                var bytes = 0
+                if mediaSubType == .livePhoto {
+                    let assetResources = PHAssetResource.assetResources(for: photoAsset)
+                    for assetResource in assetResources {
+                        if let byte = assetResource.value(forKey: "fileSize") as? Int {
+                            bytes += byte
+                        }
+                    }
+                }else {
+                    if let assetResource = PHAssetResource.assetResources(for: photoAsset).first {
+                        if let byte = assetResource.value(forKey: "fileSize") as? Int {
+                            bytes += byte
+                        }
+                    }
+                }
+                completion(bytes, HXPHTools.transformBytesToString(bytes: bytes))
+            }else {
+                if let pngData = localImage?.pngData() {
+                    completion(pngData.count, HXPHTools.transformBytesToString(bytes: pngData.count))
+                }else if let jpegData = localImage?.jpegData(compressionQuality: 1) {
+                    completion(jpegData.count, HXPHTools.transformBytesToString(bytes: jpegData.count))
+                }else {
+                    completion(0, "0b")
+                }
+            }
+        }else {
+            if let photoAsset = asset {
+                var fileSize = 0
+                if let assetResource = PHAssetResource.assetResources(for: photoAsset).first {
+                    fileSize = assetResource.value(forKey: "fileSize") as! Int
+                }
+                completion(fileSize, HXPHTools.transformBytesToString(bytes: fileSize))
+            }else {
+                if let videoURL = localVideoURL {
+                    do {
+                        let fileSize = try videoURL.resourceValues(forKeys: [.fileSizeKey])
+                        let bytes = fileSize.fileSize ?? 0
+                        completion(bytes, HXPHTools.transformBytesToString(bytes: bytes))
+                    } catch {
+                        completion(0, "0b")
+                    }
+                }else {
+                    completion(0, "0b")
+                }
             }
         }
     }

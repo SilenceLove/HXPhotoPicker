@@ -276,6 +276,14 @@ class HXPHPhotoListConfiguration: NSObject {
         return bottomView
     }()
     
+    /// 允许添加相机
+    var allowAddCamera: Bool = true
+    
+    /// 相机cell配置
+    lazy var cameraCell: HXPHPhotoListCameraCellConfiguration = {
+        return HXPHPhotoListCameraCellConfiguration.init()
+    }()
+    
     /// 没有资源时展示的相关配置
     lazy var notAsset : HXPHNotAssetConfiguration = {
         return HXPHNotAssetConfiguration.init()
@@ -300,6 +308,24 @@ class HXPHPhotoListCellConfiguration: NSObject {
     lazy var selectBox: HXPHSelectBoxConfiguration = {
         return HXPHSelectBoxConfiguration.init()
     }()
+}
+// MARK: 照片列表相机Cell配置类
+class HXPHPhotoListCameraCellConfiguration: NSObject {
+    
+    /// 允许相机预览
+    var allowPreview: Bool = true
+    
+    /// 背景颜色
+    var backgroundColor : UIColor?
+    
+    /// 暗黑风格下背景颜色
+    var backgroundDarkColor : UIColor?
+    
+    /// 相机图标
+    var cameraImageName: String = "hx_picker_photoList_photograph"
+    
+    /// 暗黑风格下的相机图标
+    var cameraDarkImageName: String = "hx_picker_photoList_photograph_white"
 }
 // MARK: 预览界面配置类
 class HXPHPreviewViewConfiguration: NSObject {
@@ -330,6 +356,7 @@ class HXPHPreviewViewConfiguration: NSObject {
         config.disableFinishButtonWhenNotSelected = false
         config.editButtonHidden = true
         config.showSelectedView = true
+        config.isPreview = true
         return config
     }()
 }
@@ -380,6 +407,12 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     lazy var originalButtonTitleDarkColor: UIColor = {
         return .white
     }()
+    
+    /// 原图加载菊花类型
+    var originalLoadingStyle : UIActivityIndicatorView.Style = .gray
+    
+    /// 暗黑风格下原图加载菊花类型
+    var originalLoadingDarkStyle : UIActivityIndicatorView.Style = .white
     
     /// 原图按钮选择框相关配置
     lazy var originalSelectBox: HXPHSelectBoxConfiguration = {
@@ -495,11 +528,16 @@ class HXPHPickerBottomViewConfiguration: NSObject {
         return .white
     }()
     
+    /// 显示已选资源
     var showSelectedView: Bool = false
     
+    /// 已选资源选中的勾勾颜色
     lazy var selectedViewTickColor: UIColor = {
         return .white
     }()
+    
+    /// 是否是预览界面的底部视图配置，禁止修改
+    var isPreview: Bool = false
 }
 // MARK: 选择框配置类
 class HXPHSelectBoxConfiguration: NSObject {

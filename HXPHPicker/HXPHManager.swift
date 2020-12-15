@@ -113,6 +113,7 @@ class HXPHManager: NSObject {
                 UserDefaults.standard.set(language, forKey: HXPHPicker.CameraAlbumLocal.language.rawValue)
             }
             let assetCollection = HXPHAssetCollection.init(collection: collection, options: options)
+            assetCollection.isCameraRoll = true
             DispatchQueue.main.async {
                 completion(assetCollection)
             }

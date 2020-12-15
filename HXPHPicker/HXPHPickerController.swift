@@ -22,9 +22,9 @@ import Photos
     /// 单选完成之后调用
     /// - Parameters:
     ///   - pickerController: 对应的 HXPHPickerController
-    ///   - asset: 对应的 HXPHAsset 数据
+    ///   - photoAsset: 对应的 HXPHAsset 数据
     ///   - isOriginal: 是否选中的原图
-    @objc optional func pickerContollerSingleSelectFinish(_ pickerController: HXPHPickerController, with asset:HXPHAsset, with isOriginal: Bool)
+    @objc optional func pickerContollerSingleSelectFinish(_ pickerController: HXPHPickerController, with photoAsset:HXPHAsset, with isOriginal: Bool)
     
     /// 点击了原图按钮
     /// - Parameters:
@@ -33,22 +33,22 @@ import Photos
     @objc optional func pickerContollerDidOriginal(_ pickerController: HXPHPickerController, with isOriginal: Bool)
     
     /// 是否能够选择cell 不能选择时需要自己手动弹出提示框
-    @objc optional func pickerControllerShouldSelectedAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int) -> Bool
+    @objc optional func pickerControllerShouldSelectedAsset(_ pickerController: HXPHPickerController, photoAsset: HXPHAsset, atIndex: Int) -> Bool
 
     /// 即将选择 cell 时调用
-    @objc optional func pickerControllerWillSelectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+    @objc optional func pickerControllerWillSelectAsset(_ pickerController: HXPHPickerController, photoAsset: HXPHAsset, atIndex: Int)
 
     /// 选择了 cell 之后调用
-    @objc optional func pickerControllerDidSelectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+    @objc optional func pickerControllerDidSelectAsset(_ pickerController: HXPHPickerController, photoAsset: HXPHAsset, atIndex: Int)
 
     /// 即将取消了选择 cell
-    @objc optional func pickerControllerWillUnselectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+    @objc optional func pickerControllerWillUnselectAsset(_ pickerController: HXPHPickerController, photoAsset: HXPHAsset, atIndex: Int)
 
     /// 取消了选择 cell
-    @objc optional func pickerControllerDidUnselectAsset(_ pickerController: HXPHPickerController, asset: HXPHAsset, atIndex: Int)
+    @objc optional func pickerControllerDidUnselectAsset(_ pickerController: HXPHPickerController, photoAsset: HXPHAsset, atIndex: Int)
     
     
-    /// 取消时调用
+    /// 点击取消时调用
     /// - Parameter pickerController: 对应的 HXPHPickerController
     @objc optional func pickerContollerDidCancel(_ pickerController: HXPHPickerController)
 }
@@ -73,6 +73,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 return
             }
             for photoAsset in selectedAssetArray {
+                photoAsset.isSelected = true
                 if photoAsset.mediaType == .photo {
                     selectedPhotoAssetArray.append(photoAsset)
                 }else if photoAsset.mediaType == .video {
@@ -85,6 +86,10 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             }
         }
     }
+    
+    /// 本地资源数组
+    /// 创建本地资源的HXPHAsset然后赋值即可添加到照片列表
+    var localAssetArray: [HXPHAsset] = []
     
     /// 是否选中了原图
     var isOriginal: Bool = false
@@ -128,6 +133,17 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         assetCollectionsQueue.maxConcurrentOperationCount = 1
         return assetCollectionsQueue
     }()
+    private lazy var requestAssetBytesQueue: OperationQueue = {
+        let requestAssetBytesQueue = OperationQueue.init()
+        requestAssetBytesQueue.maxConcurrentOperationCount = 1
+        return requestAssetBytesQueue
+    }()
+    private lazy var previewRequestAssetBytesQueue: OperationQueue = {
+        let requestAssetBytesQueue = OperationQueue.init()
+        requestAssetBytesQueue.maxConcurrentOperationCount = 1
+        return requestAssetBytesQueue
+    }()
+
     
     init(config : HXPHConfiguration) {
         HXPHManager.shared.appearanceStyle = config.appearanceStyle
@@ -223,6 +239,57 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     func originalButtonCallback() {
         pickerContollerDelegate?.pickerContollerDidOriginal?(self, with: isOriginal)
     }
+    
+    func requestSelectedAssetBytes(isPreview: Bool, completion: @escaping (Int, String) -> Void) {
+        cancelRequestAssetBytes(isPreview: isPreview)
+        weak var weakSelf = self
+        let operation = BlockOperation.init {
+            if weakSelf == nil {
+                return
+            }
+            var totalBytes = 0
+            let totalCount = weakSelf!.selectedAssetArray.count
+            var finishCount = 0
+            for photoAsset in weakSelf!.selectedAssetArray {
+                photoAsset.requestAssetBytes { (bytes, bytesString) in
+                    totalBytes += bytes
+                    finishCount += 1
+                    if finishCount == totalCount {
+                        if isPreview {
+                            if let operation =
+                                weakSelf?.previewRequestAssetBytesQueue.operations.first {
+                                if operation.isCancelled {
+                                    return
+                                }
+                            }
+                        }else {
+                            if let operation =
+                                weakSelf?.requestAssetBytesQueue.operations.first {
+                                if operation.isCancelled {
+                                    return
+                                }
+                            }
+                        }
+                        DispatchQueue.main.async {
+                            completion(totalBytes, HXPHTools.transformBytesToString(bytes: totalBytes))
+                        }
+                    }
+                }
+            }
+        }
+        if isPreview {
+            previewRequestAssetBytesQueue.addOperation(operation)
+        }else {
+            requestAssetBytesQueue.addOperation(operation)
+        }
+    }
+    func cancelRequestAssetBytes(isPreview: Bool) {
+        if isPreview {
+            previewRequestAssetBytesQueue.cancelAllOperations()
+        }else {
+            requestAssetBytesQueue.cancelAllOperations()
+        }
+    }
     /// 获取相机胶卷资源集合
     func fetchCameraAssetCollection() {
         if config.creationDate {
@@ -269,9 +336,13 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                         }
                     }
                     DispatchQueue.main.async {
-                        if self.assetCollectionsQueue.operationCount <= 1 {
-                            self.fetchAssetCollectionsCompletion?(self.assetCollectionsArray)
+                        if let operation =
+                            self.assetCollectionsQueue.operations.first {
+                            if operation.isCancelled {
+                                return
+                            }
                         }
+                        self.fetchAssetCollectionsCompletion?(self.assetCollectionsArray)
                     }
                 }
             }
@@ -285,13 +356,17 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     func fetchPhotoAssets(assetCollection: HXPHAssetCollection?, completion: @escaping ([HXPHAsset], HXPHAsset?) -> Void) {
         DispatchQueue.global().async {
             var selectedAssets = [PHAsset]()
-            var selectedPhotoAssets = [HXPHAsset]()
+            var selectedPhotoAssets:[HXPHAsset] = []
+            var selectedEmptyAssets:[HXPHAsset] = []
             for phAsset in self.selectedAssetArray {
                 if phAsset.asset != nil {
                     selectedAssets.append(phAsset.asset!)
                     selectedPhotoAssets.append(phAsset)
+                }else {
+                    selectedEmptyAssets.append(phAsset)
                 }
             }
+            selectedEmptyAssets.append(contentsOf: self.localAssetArray)
             var photoAssets = [HXPHAsset]()
             photoAssets.reserveCapacity(assetCollection?.count ?? 0)
             var lastAsset: HXPHAsset?
@@ -328,15 +403,28 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                     photoAssets.append(asset)
                 }
             })
+            if self.config.reverseOrder == true {
+                photoAssets.insert(contentsOf: selectedEmptyAssets, at: 0)
+            }else {
+                photoAssets.append(contentsOf: selectedEmptyAssets.reversed())
+            }
+            assetCollection?.count = photoAssets.count
             DispatchQueue.main.async {
                 completion(photoAssets, lastAsset)
             }
         }
     }
     func addedPhotoAsset(photoAsset: HXPHAsset) -> Bool {
+        if singleVideo && photoAsset.mediaType == .video {
+            return false
+        }
+        if config.selectMode == .single {
+            // 单选模式不可添加
+            return false
+        }
         let canSelect = canSelectAsset(for: photoAsset, showHUD: true)
         if canSelect {
-            pickerContollerDelegate?.pickerControllerWillSelectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count)
+            pickerContollerDelegate?.pickerControllerWillSelectAsset?(self, photoAsset: photoAsset, atIndex: selectedAssetArray.count)
             canAddedAsset = false
             photoAsset.isSelected = true
             photoAsset.selectIndex = selectedAssetArray.count
@@ -346,7 +434,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 selectedVideoAssetArray.append(photoAsset)
             }
             selectedAssetArray.append(photoAsset)
-            pickerContollerDelegate?.pickerControllerDidSelectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count - 1)
+            pickerContollerDelegate?.pickerControllerDidSelectAsset?(self, photoAsset: photoAsset, atIndex: selectedAssetArray.count - 1)
         }
         return canSelect
     }
@@ -355,7 +443,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             return false
         }
         canAddedAsset = false
-        pickerContollerDelegate?.pickerControllerWillUnselectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count)
+        pickerContollerDelegate?.pickerControllerWillUnselectAsset?(self, photoAsset: photoAsset, atIndex: selectedAssetArray.count)
         photoAsset.isSelected = false
         if photoAsset.mediaType == .photo {
             selectedPhotoAssetArray.remove(at: selectedPhotoAssetArray.firstIndex(of: photoAsset)!)
@@ -366,7 +454,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         for (index, asset) in selectedAssetArray.enumerated() {
             asset.selectIndex = index
         }
-        pickerContollerDelegate?.pickerControllerDidUnselectAsset?(self, asset: photoAsset, atIndex: selectedAssetArray.count)
+        pickerContollerDelegate?.pickerControllerDidUnselectAsset?(self, photoAsset: photoAsset, atIndex: selectedAssetArray.count)
         return true
     }
     func canSelectAsset(for photoAsset: HXPHAsset, showHUD: Bool) -> Bool {
@@ -423,7 +511,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         }
         if pickerContollerDelegate?.pickerControllerShouldSelectedAsset != nil {
             if canSelect {
-                canSelect = pickerContollerDelegate!.pickerControllerShouldSelectedAsset!(self, asset: photoAsset, atIndex: selectedAssetArray.count)
+                canSelect = pickerContollerDelegate!.pickerControllerShouldSelectedAsset!(self, photoAsset: photoAsset, atIndex: selectedAssetArray.count)
             }
         }
         if !canSelect && text != nil && showHUD {
@@ -450,7 +538,6 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     }
     
     // MARK: PHPhotoLibraryChangeObserver
-    
     func photoLibraryDidChange(_ changeInstance: PHChange) {
         if !HXPHAssetManager.authorizationStatusIsLimited() {
             return
@@ -495,7 +582,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 let result = changeResult!.fetchResultAfterChanges
                 assetCollection.changeResult(for: result)
                 if assetCollection == self.cameraAssetCollection && result.count == 0 {
-                    assetCollection.changedNameWithImage(albumName: self.config.albumList.emptyAlbumName, coverImage: self.config.albumList.emptyCoverImageName.hx_image)
+                    assetCollection.change(albumName: self.config.albumList.emptyAlbumName, coverImage: self.config.albumList.emptyCoverImageName.hx_image)
                     assetCollection.count = 0
                     assetCollection.coverAsset = nil
                 }else {
@@ -527,10 +614,6 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             }
         }
         return nil
-    }
-    override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
-        
-        super.present(viewControllerToPresent, animated: flag, completion: completion)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

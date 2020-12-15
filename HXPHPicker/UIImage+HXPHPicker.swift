@@ -10,18 +10,21 @@ import UIKit
 
 extension UIImage {
     
-    class func hx_named(named: String) -> UIImage? {
+    class func hx_named(named: String?) -> UIImage? {
+        if named == nil {
+            return nil
+        }
         let bundle = HXPHManager.shared.bundle
         var image : UIImage?
         if bundle != nil {
             var path = bundle?.path(forResource: "images", ofType: nil)
             if path != nil {
-                path! += "/" + named
+                path! += "/" + named!
                 image = self.init(named: path!)
             }
         }
         if image == nil {
-            image = self.init(named: named)
+            image = self.init(named: named!)
         }
         return image
     }
@@ -66,6 +69,9 @@ extension UIImage {
         if imageOrientation == .up {
             return self
         }
+        return hx_repaintImage()
+    }
+    func hx_repaintImage() -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
         draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
         let image = UIGraphicsGetImageFromCurrentImageContext()

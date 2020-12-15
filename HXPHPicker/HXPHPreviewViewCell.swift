@@ -223,6 +223,9 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
                 imageView.displayLink?.invalidate()
                 imageView.gifImage = nil
             }
+            if photoAsset?.mediaSubType == .localPhoto {
+                requestCompletion = true
+            }
             weak var weakSelf = self
             requestID = photoAsset?.requestThumbnailImage(completion: { (image, asset, info) in
                 if asset == weakSelf?.photoAsset && image != nil {
@@ -357,6 +360,10 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         })
     }
     func cancelRequest() {
+        if photoAsset?.mediaSubType == .localPhoto {
+            requestCompletion = false
+            return
+        }
         if requestID != nil {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
@@ -373,6 +380,10 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             HXPHProgressHUD.hideHUD(forView: self, animated: false)
         }
         requestCompletion = false
+    }
+    func hiddenVideoSubView() {
+        videoView.hiddenPlayButton()
+        HXPHProgressHUD.hideHUD(forView: self, animated: false)
     }
     func stopAnimatedImage() {
         if photoAsset?.mediaSubType == .imageAnimated {
@@ -742,6 +753,7 @@ class HXPHVideoView: UIView {
         isPlaying = false
     }
     func hiddenPlayButton() {
+        HXPHProgressHUD.hideHUD(forView: self, animated: true)
         UIView.animate(withDuration: 0.15) {
             self.playButton.alpha = 0
         }

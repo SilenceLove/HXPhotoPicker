@@ -50,7 +50,6 @@ class HXPHPicker: NSObject {
             case localPhoto = 3     //!< 本地图片
             case video = 4          //!< 视频
             case localVideo = 5     //!< 本地视频
-            case camera = 99        //!< 相机
         }
     }
     enum Album {

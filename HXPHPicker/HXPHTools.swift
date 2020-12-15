@@ -127,7 +127,41 @@ class HXPHTools: NSObject {
         }
         return albumName
     }
-    
+    class func getVideoThumbnailImage(videoURL: URL?, atTime: TimeInterval) -> UIImage? {
+        if videoURL == nil {
+            return nil
+        }
+        let urlAsset = AVURLAsset.init(url: videoURL!)
+        let assetImageGenerator = AVAssetImageGenerator.init(asset: urlAsset)
+        assetImageGenerator.appliesPreferredTrackTransform = true
+        assetImageGenerator.apertureMode = .encodedPixels
+        let thumbnailImageTime: CFTimeInterval = atTime
+        do {
+            let thumbnailImageRef = try assetImageGenerator.copyCGImage(at: CMTime(value: CMTimeValue(thumbnailImageTime), timescale: 60), actualTime: nil)
+            let image = UIImage.init(cgImage: thumbnailImageRef)
+            return image
+        } catch {
+            return nil
+        }
+    }
+    class func getVideoDuration(videoURL: URL?) -> TimeInterval {
+        if videoURL == nil {
+            return 0
+        }
+        let options = [AVURLAssetPreferPreciseDurationAndTimingKey: false]
+        let urlAsset = AVURLAsset.init(url: videoURL!, options: options)
+        let second = Int(urlAsset.duration.value) / Int(urlAsset.duration.timescale)
+        return TimeInterval(second)
+    }
+    class func transformBytesToString(bytes: Int) -> String {
+        if CGFloat(bytes) >= 0.5 * 1024 * 1024 {
+            return String.init(format: "%0.1fM", arguments: [CGFloat(bytes) / 1024 / 1024])
+        }else if bytes >= 1024 {
+            return String.init(format: "%0.0fK", arguments: [CGFloat(bytes) / 1024])
+        }else {
+            return String.init(format: "%dB", arguments: [bytes])
+        }
+    }
     class func transformTargetWidthToSize(targetWidth: CGFloat, asset: PHAsset) -> CGSize {
         let scale:CGFloat = 0.8
         let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
@@ -152,7 +186,7 @@ class HXPHTools: NSObject {
         let config = HXPHConfiguration.init()
         config.maximumSelectCount = 9
         config.maximumSelectVideoCount = 0
-        config.allowSelectedTogether = false
+        config.allowSelectedTogether = true
         config.albumShowMode = .popup
         config.appearanceStyle = .normal
         config.showLivePhoto = true
@@ -179,6 +213,8 @@ class HXPHTools: NSObject {
         
         config.photoList.cell.selectBox.selectedBackgroundColor = "#07C160".hx_color
         config.photoList.cell.selectBox.titleColor = .white
+        
+        config.photoList.cameraCell.cameraImageName = "hx_picker_photoList_photograph_white"
         
         config.photoList.bottomView.barStyle = .black
         config.photoList.bottomView.previewButtonTitleColor = .white
@@ -212,6 +248,7 @@ class HXPHTools: NSObject {
         config.previewView.bottomView.originalSelectBox.borderColor = .white
         config.previewView.bottomView.originalSelectBox.tickColor = .white
         config.previewView.bottomView.originalSelectBox.selectedBackgroundColor = "#07C160".hx_color
+        config.previewView.bottomView.originalLoadingStyle = .white
         
         config.previewView.bottomView.finishButtonTitleColor = .white
         config.previewView.bottomView.finishButtonBackgroundColor = "#07C160".hx_color
