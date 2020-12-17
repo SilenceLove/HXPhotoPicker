@@ -47,21 +47,21 @@
     HXPhotoViewController *fromVC = (HXPhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXPhotoPreviewViewController *toVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [toVC.modelArray objectAtIndex:toVC.currentModelIndex];
-    PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
-    self.requestID = [HXAssetManager requestImageDataForAsset:model.asset options:options completion:^(NSData * _Nonnull imageData, UIImageOrientation orientation, NSDictionary<NSString *,id> * _Nonnull info) {
-        if (imageData) {
-            UIImage *image = [UIImage imageWithData:imageData];
-            if (orientation != UIImageOrientationUp) {
-                image = [image hx_normalizedImage];
-            }
-            self.imageView.image = image;
-        }
-    }];
     UIImage *image;
     if (model.photoEdit) {
         image = model.photoEdit.editPreviewImage;
     }else {
         image = model.thumbPhoto ?: model.previewPhoto;
+        PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+        self.requestID = [HXAssetManager requestImageDataForAsset:model.asset options:options completion:^(NSData * _Nonnull imageData, UIImageOrientation orientation, NSDictionary<NSString *,id> * _Nonnull info) {
+            if (imageData) {
+                UIImage *image = [UIImage imageWithData:imageData];
+                if (orientation != UIImageOrientationUp) {
+                    image = [image hx_normalizedImage];
+                }
+                self.imageView.image = image;
+            }
+        }];
     }
     [self pushAnim:transitionContext image:image model:model fromVC:fromVC toVC:toVC];
 }
