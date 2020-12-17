@@ -12,7 +12,7 @@ import Photos
 class ViewController: UIViewController , UITableViewDataSource, UITableViewDelegate, HXPHPickerControllerDelegate {
     
     var tableView : UITableView?
-    
+    var localCameraAssetArray: [HXPHAsset] = []
     var selectedAssets: [HXPHAsset] = []
     var isOriginal: Bool = false
     override func viewDidLoad() {
@@ -47,7 +47,10 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
 //        let pickerController = HXPHPickerController.init(config: HXPHConfiguration.init())
         pickerController.pickerContollerDelegate = self
         pickerController.selectedAssetArray = selectedAssets
-//        pickerController.localAssetArray = [HXPHAsset.init(image: UIImage.init(named: "wx_head_icon"))]
+        var localArray:[HXPHAsset] = []
+        localArray.append(HXPHAsset.init(image: UIImage.init(named: "wx_head_icon"), localIdentifier: "wx_head_icon"))
+//        pickerController.localAssetArray = localArray
+        pickerController.localCameraAssetArray = localCameraAssetArray
         pickerController.isOriginal = isOriginal
 //        pickerController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         present(pickerController, animated: true, completion: nil)
@@ -55,6 +58,10 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray: [HXPHAsset], with isOriginal: Bool) {
         self.selectedAssets = selectedAssetArray
         self.isOriginal = isOriginal
+    }
+    
+    func pickerContollerDidDismiss(_ pickerController: HXPHPickerController, with localCameraAssetArray: [HXPHAsset]) {
+        self.localCameraAssetArray = localCameraAssetArray
     }
     
 }

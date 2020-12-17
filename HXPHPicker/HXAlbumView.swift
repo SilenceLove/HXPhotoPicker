@@ -39,7 +39,7 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         promptLb.numberOfLines = 0
         return promptLb
     }()
-    var config: HXPHAlbumListConfiguration?
+    var config: HXPHAlbumListConfiguration
     var assetCollectionsArray: [HXPHAssetCollection] = [] {
         didSet {
             tableView.reloadData()
@@ -56,8 +56,8 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     }
     
     init(config: HXPHAlbumListConfiguration) {
-        super.init(frame: CGRect.zero)
         self.config = config
+        super.init(frame: CGRect.zero)
         addSubview(tableView)
         configColor()
     }
@@ -69,9 +69,14 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         tableView.scrollToRow(at: indexPath, at: .middle, animated: false)
     }
     func configColor() {
-        tableView.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
-        backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
-        promptLb.textColor = HXPHManager.shared.isDark ? config!.limitedStatusPromptDarkColor : config!.limitedStatusPromptColor
+        tableView.backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
+        backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
+        promptLb.textColor = HXPHManager.shared.isDark ? config.limitedStatusPromptDarkColor : config.limitedStatusPromptColor
+    }
+    func updatePrompt() {
+        if HXPHAssetManager.authorizationStatusIsLimited() {
+            tableView.tableHeaderView = promptLb
+        }
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return assetCollectionsArray.count
@@ -84,7 +89,7 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return config!.cellHeight
+        return config.cellHeight
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -124,7 +129,7 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
  
 class HXAlbumTitleView: UIControl {
     
-    var config: HXAlbumTitleViewConfiguration?
+    var config: HXAlbumTitleViewConfiguration
     
     lazy var contentView: UIView = {
         let contentView = UIView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 30))
@@ -176,8 +181,8 @@ class HXAlbumTitleView: UIControl {
     }()
     
     init(config: HXAlbumTitleViewConfiguration) {
-        super.init(frame: CGRect.zero)
         self.config = config
+        super.init(frame: CGRect.zero)
         hx_size = CGSize(width: UIScreen.main.bounds.size.width * 0.5, height: 30)
         contentView.addSubview(titleLb)
         contentView.addSubview(arrowView)
@@ -193,7 +198,7 @@ class HXAlbumTitleView: UIControl {
     }
     
     func configColor() {
-        contentView.backgroundColor = HXPHManager.shared.isDark ? config?.backgroudDarkColor : config?.backgroundColor
+        contentView.backgroundColor = HXPHManager.shared.isDark ? config.backgroudDarkColor : config.backgroundColor
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -211,7 +216,7 @@ class HXAlbumTitleView: UIControl {
 }
 
 class HXAlbumTitleArrowView: UIView {
-    var config: HXAlbumTitleViewConfiguration?
+    var config: HXAlbumTitleViewConfiguration
     lazy var backgroundLayer: CAShapeLayer = {
         let backgroundLayer = CAShapeLayer.init()
         backgroundLayer.contentsScale = UIScreen.main.scale
@@ -222,9 +227,9 @@ class HXAlbumTitleArrowView: UIView {
         arrowLayer.contentsScale = UIScreen.main.scale
         return arrowLayer
     }()
-    init(frame: CGRect, config: HXAlbumTitleViewConfiguration?) {
-        super.init(frame: frame)
+    init(frame: CGRect, config: HXAlbumTitleViewConfiguration) {
         self.config = config
+        super.init(frame: frame)
         drawContent()
         configColor()
     }
@@ -245,8 +250,8 @@ class HXAlbumTitleArrowView: UIView {
     }
     
     func configColor() {
-        backgroundLayer.fillColor = HXPHManager.shared.isDark ? config?.arrowBackgroudDarkColor.cgColor : config?.arrowBackgroundColor.cgColor
-        arrowLayer.strokeColor = HXPHManager.shared.isDark ? config?.arrowDarkColor.cgColor : config?.arrowColor.cgColor
+        backgroundLayer.fillColor = HXPHManager.shared.isDark ? config.arrowBackgroudDarkColor.cgColor : config.arrowBackgroundColor.cgColor
+        arrowLayer.strokeColor = HXPHManager.shared.isDark ? config.arrowDarkColor.cgColor : config.arrowColor.cgColor
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

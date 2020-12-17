@@ -23,7 +23,21 @@ class HXPHAssetManager: NSObject {
         }
         return status;
     }
-    
+    class func requestCameraAccess(completionHandler: @escaping (Bool) -> Void){
+        AVCaptureDevice.requestAccess(for: .video) { (granted) in
+            DispatchQueue.main.async {
+                completionHandler(granted)
+            }
+        }
+    }
+    class func cameraAuthorizationStatus() -> AVAuthorizationStatus {
+        AVCaptureDevice.requestAccess(for: .video) { (granted) in
+            DispatchQueue.main.async {
+                
+            }
+        }
+        return AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
+    }
     class func authorizationStatusIsLimited() -> Bool{
         if #available(iOS 14, *) {
             if authorizationStatus() == .limited {

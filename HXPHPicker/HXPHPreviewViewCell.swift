@@ -196,6 +196,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
     }()
     lazy var videoView: HXPHVideoView = {
         let videoView = HXPHVideoView.init()
+        videoView.alpha = 0
         return videoView
     }()
     
@@ -223,11 +224,12 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
                 imageView.displayLink?.invalidate()
                 imageView.gifImage = nil
             }
-            if photoAsset?.mediaSubType == .localPhoto {
+            if photoAsset?.mediaSubType == .localImage {
                 requestCompletion = true
             }
             weak var weakSelf = self
-            requestID = photoAsset?.requestThumbnailImage(completion: { (image, asset, info) in
+            
+            requestID = photoAsset?.requestThumbnailImage(targetWidth: min(UIScreen.main.bounds.width, UIScreen.main.bounds.height), completion: { (image, asset, info) in
                 if asset == weakSelf?.photoAsset && image != nil {
                     weakSelf?.imageView.image = image
                 }
@@ -323,6 +325,9 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         }, success: { (asset, livePhoto, info) in
             if asset == weakSelf?.photoAsset {
                 weakSelf?.livePhotoView.livePhoto = livePhoto
+                UIView.animate(withDuration: 0.25) {
+                    weakSelf?.livePhotoView.alpha = 1
+                }
                 weakSelf?.livePhotoView.startPlayback(with: PHLivePhotoViewPlaybackStyle.full)
                 weakSelf?.requestID = nil
                 weakSelf?.requestCompletion = true
@@ -347,6 +352,9 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             if asset == weakSelf?.photoAsset {
                 HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
                 weakSelf?.videoView.avAsset = avAsset
+                UIView.animate(withDuration: 0.25) {
+                    weakSelf?.videoView.alpha = 1
+                }
                 weakSelf?.requestID = nil
                 weakSelf?.requestCompletion = true
             }
@@ -360,7 +368,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         })
     }
     func cancelRequest() {
-        if photoAsset?.mediaSubType == .localPhoto {
+        if photoAsset?.mediaSubType == .localImage {
             requestCompletion = false
             return
         }
@@ -374,9 +382,11 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         if type == .livePhoto {
             if #available(iOS 9.1, *) {
                 livePhotoView.stopPlayback()
+                livePhotoView.alpha = 0
             }
         }else if type == .video {
             videoView.cancelPlayer()
+            videoView.alpha = 0
             HXPHProgressHUD.hideHUD(forView: self, animated: false)
         }
         requestCompletion = false
@@ -764,7 +774,6 @@ class HXPHVideoView: UIView {
             if autoPlayVideo {
                 playButton.isSelected = true
             }
-            playButton.alpha = 0
             player.seek(to: CMTime.zero)
             player.cancelPendingPrerolls()
             player.currentItem?.cancelPendingSeeks()

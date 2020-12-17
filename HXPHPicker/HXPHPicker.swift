@@ -44,11 +44,11 @@ class HXPHPicker: NSObject {
         }
 
         enum MediaSubType: Int {
-            case image = 0          //!< 静态图
-            case imageAnimated = 1  //!< 动图
-            case livePhoto = 2      //!< LivePhoto
-            case localPhoto = 3     //!< 本地图片
-            case video = 4          //!< 视频
+            case image = 0          //!< 手机相册里的图片
+            case imageAnimated = 1  //!< 手机相册里的动图
+            case livePhoto = 2      //!< 手机相册里的LivePhoto
+            case localImage = 3     //!< 本地图片
+            case video = 4          //!< 手机相册里的视频
             case localVideo = 5     //!< 本地视频
         }
     }

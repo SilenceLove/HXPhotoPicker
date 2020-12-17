@@ -59,6 +59,7 @@
         weakSelf.photoManager.configuration.lookLivePhoto = NO;
         weakSelf.photoManager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_1x1;
         weakSelf.photoManager.configuration.photoEditConfigur.onlyCliping = YES;
+//        weakSelf.photoManager.configuration.photoEditConfigur.isRoundCliping = YES;
         if (index ==1) {
             [weakSelf.hx_viewController hx_presentCustomCameraViewControllerWithManager:weakSelf.photoManager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
                 

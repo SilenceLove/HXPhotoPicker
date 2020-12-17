@@ -13,7 +13,8 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     
     lazy var tableView : UITableView = {
         let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
-        if HXPHAssetManager.authorizationStatusIsLimited() {
+        if HXPHAssetManager.authorizationStatusIsLimited() &&
+            hx_pickerController!.config.allowLoadPhotoLibrary{
             tableView.tableHeaderView = promptLb
         }
         tableView.dataSource = self;
@@ -63,6 +64,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     func configColor() {
         tableView.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
         view.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
+        promptLb.textColor = HXPHManager.shared.isDark ? config!.limitedStatusPromptDarkColor : config!.limitedStatusPromptColor
     }
     @objc func deviceOrientationChanged(notify: Notification) {
         beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
@@ -108,6 +110,12 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             self.assetCollectionsArray.append(assetCollection)
         }
         self.tableView.reloadData()
+    }
+    func updatePrompt() {
+        if HXPHAssetManager.authorizationStatusIsLimited() &&
+            hx_pickerController!.config.allowLoadPhotoLibrary {
+            tableView.tableHeaderView = promptLb
+        }
     }
     private func pushPhotoPickerContoller(assetCollection: HXPHAssetCollection?, animated: Bool) {
         let photoVC = HXPHPickerViewController.init()

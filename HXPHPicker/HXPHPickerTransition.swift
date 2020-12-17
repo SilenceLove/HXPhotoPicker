@@ -132,7 +132,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     pickerVC?.reloadCell(for: photoAsset!)
                     toView = pickerVC?.getCell(for: photoAsset!)
                 }else {
-                    pickerVC?.scrollToCell(toView as! HXPHPickerViewCell)
+                    pickerVC?.scrollCellToVisibleArea(toView as! HXPHPickerViewCell)
                 }
             }
             
@@ -176,7 +176,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             }
         }
         
-        UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.1) {
+        UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.125) {
             if self.type == .push {
                 previewVC?.bottomView.alpha = 1
                 if HXPHAssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {

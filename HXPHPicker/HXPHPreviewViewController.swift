@@ -134,9 +134,10 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         collectionView.register(HXPHPreviewVideoViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPreviewVideoViewCell.self))
         return collectionView
     }()
-    
+    var allowLoadPhotoLibrary: Bool = true
     lazy var bottomView : HXPHPickerBottomView = {
-        let bottomView = HXPHPickerBottomView.init(config: config.bottomView)
+        let bottomView = HXPHPickerBottomView.init(config: config.bottomView, allowLoadPhotoLibrary: allowLoadPhotoLibrary)
+        bottomView.isPreview = true
         bottomView.hx_delegate = self
         if config.bottomView.showSelectedView {
             bottomView.selectedView.reloadData(photoAssets: hx_pickerController!.selectedAssetArray)
@@ -232,6 +233,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        allowLoadPhotoLibrary = hx_pickerController?.config.allowLoadPhotoLibrary ?? true
         extendedLayoutIncludesOpaqueBars = true;
         edgesForExtendedLayout = .all;
         view.clipsToBounds = true

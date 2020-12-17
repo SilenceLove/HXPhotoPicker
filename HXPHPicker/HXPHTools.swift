@@ -29,6 +29,14 @@ class HXPHTools: NSObject {
             }
         }
     }
+    class func showNotCameraAuthorizedAlert(viewController : UIViewController?) {
+        if viewController == nil {
+            return
+        }
+        showAlert(viewController: viewController, title: "无法使用相机功能".hx_localized, message: "请前往系统设置中，允许访问「相机」。".hx_localized, leftActionTitle: "取消".hx_localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".hx_localized) { (alertAction) in
+            openSettingsURL()
+        }
+    }
     
     class func openSettingsURL() {
         if #available(iOS 10, *) {
@@ -44,6 +52,7 @@ class HXPHTools: NSObject {
         let rightAction = UIAlertAction.init(title: rightActionTitle, style: UIAlertAction.Style.default, handler: rightHandler)
         alertController.addAction(leftAction)
         alertController.addAction(rightAction)
+        viewController?.present(alertController, animated: true, completion: nil)
     }
     
     class func transformVideoDurationToString(duration: TimeInterval) -> String {
@@ -233,8 +242,8 @@ class HXPHTools: NSObject {
         config.photoList.bottomView.promptIconColor = "#f5a623".hx_color
         config.photoList.bottomView.promptArrowColor = UIColor.white.withAlphaComponent(0.6)
         
-        config.photoList.notAsset.titleColor = "#ffffff".hx_color
-        config.photoList.notAsset.subTitleColor = .lightGray
+        config.photoList.emptyView.titleColor = "#ffffff".hx_color
+        config.photoList.emptyView.subTitleColor = .lightGray
         
         config.previewView.backgroundColor = .black
         config.previewView.selectBox.tickColor = .white

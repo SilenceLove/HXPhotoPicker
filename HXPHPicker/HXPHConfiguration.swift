@@ -10,7 +10,7 @@ import UIKit
 
 class HXPHConfiguration: NSObject {
     
-    /// 选择的类型
+    /// 选择的类型，控制获取系统相册资源的类型。不会过滤外部添加的本地资源
     var selectType : HXPHPicker.SelectType = .any
     
     /// 最多可以选择的照片数，如果为0则不限制
@@ -32,31 +32,34 @@ class HXPHConfiguration: NSObject {
     var allowSelectedTogether: Bool = true
     
     /// 语言类型
-    var languageType : HXPHPicker.LanguageType = .system
+    var languageType: HXPHPicker.LanguageType = .system
     
     /// 相册展示模式
-    var albumShowMode : HXPHPicker.Album.ShowMode = .normal
+    var albumShowMode: HXPHPicker.Album.ShowMode = .normal
     
     /// 外观风格
     var appearanceStyle: HXPHPicker.AppearanceStyle = .varied
     
     /// 选择模式
-    var selectMode : HXPHPicker.SelectMode = .multiple
+    var selectMode: HXPHPicker.SelectMode = .multiple
+    
+    /// 允许加载系统照片库
+    var allowLoadPhotoLibrary: Bool = false
     
     /// 获取资源列表时是否按创建时间排序
-    var creationDate : Bool = false
+    var creationDate: Bool = false
     
     /// 获取资源列表后是否按倒序展示
-    var reverseOrder : Bool = false
+    var reverseOrder: Bool = false
     
     /// 展示动图
-    var showImageAnimated : Bool = true
+    var showImageAnimated: Bool = true
     
     /// 展示LivePhoto
-    var showLivePhoto : Bool = true
+    var showLivePhoto: Bool = true
     
     /// 状态栏样式
-    var statusBarStyle : UIStatusBarStyle = .default
+    var statusBarStyle: UIStatusBarStyle = .default
     
     /// 半透明效果
     var navigationBarIsTranslucent: Bool = true
@@ -287,8 +290,8 @@ class HXPHPhotoListConfiguration: NSObject {
     }()
     
     /// 没有资源时展示的相关配置
-    lazy var notAsset : HXPHNotAssetConfiguration = {
-        return HXPHNotAssetConfiguration.init()
+    lazy var emptyView : HXPHEmptyViewConfiguration = {
+        return HXPHEmptyViewConfiguration.init()
     }()
 }
 // MARK: 照片列表Cell配置类
@@ -358,7 +361,6 @@ class HXPHPreviewViewConfiguration: NSObject {
         config.disableFinishButtonWhenNotSelected = false
         config.editButtonHidden = true
         config.showSelectedView = true
-        config.isPreview = true
         return config
     }()
 }
@@ -409,6 +411,8 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     lazy var originalButtonTitleDarkColor: UIColor = {
         return .white
     }()
+    /// 显示原图文件大小
+    var showOriginalFileSize: Bool = true
     
     /// 原图加载菊花类型
     var originalLoadingStyle : UIActivityIndicatorView.Style = .gray
@@ -537,9 +541,6 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     lazy var selectedViewTickColor: UIColor = {
         return .white
     }()
-    
-    /// 是否是预览界面的底部视图配置，禁止修改
-    var isPreview: Bool = false
 }
 // MARK: 选择框配置类
 class HXPHSelectBoxConfiguration: NSObject {
@@ -675,7 +676,7 @@ class HXPHNotAuthorizedConfiguration: NSObject {
     }()
 }
 
-class HXPHNotAssetConfiguration: NSObject {
+class HXPHEmptyViewConfiguration: NSObject {
     
     /// 标题颜色
     lazy var titleColor: UIColor = {

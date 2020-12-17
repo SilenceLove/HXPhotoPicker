@@ -10,14 +10,19 @@ import UIKit
 import Photos
 
 class HXPHAssetCollection: NSObject {
+    
+    /// 相册名称
     var albumName : String?
+    /// 相册里的资源数量
     var count : Int = 0
+    
     var result : PHFetchResult<PHAsset>?
     var collection : PHAssetCollection?
     var options : PHFetchOptions?
     var coverAsset: PHAsset?
     var isSelected: Bool = false
     var isCameraRoll: Bool = false
+    var realCoverImage: UIImage?
     private var coverImage: UIImage?
     init(collection: PHAssetCollection? , options: PHFetchOptions?) {
         super.init()
@@ -49,12 +54,8 @@ class HXPHAssetCollection: NSObject {
         }
     }
     
-    func fetchCoverAsset(reverse: Bool) {
-        if reverse {
-            coverAsset = result?.lastObject
-        }else {
-            coverAsset = result?.firstObject
-        }
+    func fetchCoverAsset() {
+        coverAsset = result?.lastObject
     }
     
     func change(albumName: String?, coverImage: UIImage?) {
@@ -66,16 +67,16 @@ class HXPHAssetCollection: NSObject {
     /// - Parameter completion: 会回调多次
     /// - Returns: 请求ID
     func requestCoverImage(completion: ((UIImage?, HXPHAssetCollection, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
+        if realCoverImage != nil {
+            completion?(realCoverImage, self, nil)
+            return nil
+        }
         if coverAsset == nil {
-            if completion != nil {
-                completion!(coverImage, self, nil)
-            }
+            completion?(coverImage, self, nil)
             return nil
         }
         return HXPHAssetManager.requestThumbnailImage(for: coverAsset!, targetWidth: 160) { (image, info) in
-            if completion != nil {
-                completion!(image, self, info)
-            }
+            completion?(image, self, info)
         }
     }
     

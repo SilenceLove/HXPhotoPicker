@@ -210,7 +210,11 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
             selectMaskLayer.isHidden = true
             updateSelectControlFrame(width: boxWidth, height: boxHeight)
         }
-        selectControl.isSelected = isSelected
+        if selectControl.isSelected == isSelected {
+            selectControl.setNeedsDisplay()
+        }else {
+            selectControl.isSelected = isSelected
+        }
         if animated {
             selectControl.layer.removeAnimation(forKey: "SelectControlAnimation")
             let keyAnimation = CAKeyframeAnimation.init(keyPath: "transform.scale")

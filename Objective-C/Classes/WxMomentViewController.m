@@ -206,6 +206,9 @@
     self.photoManager.configuration.lookLivePhoto = YES;
     self.photoManager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_None;
     self.photoManager.configuration.photoEditConfigur.onlyCliping = NO;
+//    self.photoManager.configuration.photoEditConfigur.aspectRatio = HXPhotoEditAspectRatioType_1x1;
+//    self.photoManager.configuration.photoEditConfigur.onlyCliping = YES;
+//    self.photoManager.configuration.photoEditConfigur.isRoundCliping = YES;
 }
 - (void)presentMomentPublish {
     // 恢复dismiss的动画
