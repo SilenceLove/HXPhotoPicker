@@ -2,8 +2,8 @@
 //  HXPHTools.swift
 //  照片选择器-Swift
 //
-//  Created by 洪欣 on 2019/6/29.
-//  Copyright © 2019年 洪欣. All rights reserved.
+//  Created by Silence on 2019/6/29.
+//  Copyright © 2019年 Silence. All rights reserved.
 //
 
 import UIKit
@@ -193,8 +193,8 @@ class HXPHTools: NSObject {
     
     class func getWXConfig() -> HXPHConfiguration {
         let config = HXPHConfiguration.init()
-        config.maximumSelectCount = 9
-        config.maximumSelectVideoCount = 0
+        config.maximumSelectedCount = 9
+        config.maximumSelectedVideoCount = 0
         config.allowSelectedTogether = true
         config.albumShowMode = .popup
         config.appearanceStyle = .normal

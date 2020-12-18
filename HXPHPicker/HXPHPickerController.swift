@@ -2,8 +2,8 @@
 //  HXPHPickerController.swift
 //  照片选择器-Swift
 //
-//  Created by 洪欣 on 2020/11/9.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/11/9.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -167,7 +167,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         self.config = config
         if config.selectMode == .multiple &&
             !config.allowSelectedTogether &&
-            config.maximumSelectVideoCount == 1 &&
+            config.maximumSelectedVideoCount == 1 &&
             config.selectType == .any {
             singleVideo = true
         }
@@ -565,33 +565,45 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         var canSelect = true
         var text: String?
         if photoAsset.mediaType == .photo {
+            if config.maximumSelectedPhotoFileSize > 0 {
+                if photoAsset.fileSize > config.maximumSelectedPhotoFileSize {
+                    text = "照片大小超过最大限制".hx_localized + HXPHTools.transformBytesToString(bytes: config.maximumSelectedPhotoFileSize)
+                    canSelect = false
+                }
+            }
             if !config.allowSelectedTogether {
                 if selectedVideoAssetArray.count > 0 {
                     text = "照片和视频不能同时选择".hx_localized
                     canSelect = false
                 }
             }
-            if config.maximumSelectPhotoCount > 0 {
-                if selectedPhotoAssetArray.count >= config.maximumSelectPhotoCount {
-                    text = String.init(format: "最多只能选择%d张照片".hx_localized, arguments: [config.maximumSelectPhotoCount])
+            if config.maximumSelectedPhotoCount > 0 {
+                if selectedPhotoAssetArray.count >= config.maximumSelectedPhotoCount {
+                    text = String.init(format: "最多只能选择%d张照片".hx_localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }else {
-                if selectedAssetArray.count >= config.maximumSelectCount && config.maximumSelectCount > 0 {
-                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectPhotoCount])
+                if selectedAssetArray.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
+                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }
         }else if photoAsset.mediaType == .video {
-            if config.videoMaximumSelectDuration > 0 {
-                if round(photoAsset.videoDuration) > Double(config.videoMaximumSelectDuration) {
-                    text = String.init(format: "视频最大时长为%d秒，无法选择".hx_localized, arguments: [config.videoMaximumSelectDuration])
+            if config.maximumSelectedVideoFileSize > 0 {
+                if photoAsset.fileSize > config.maximumSelectedVideoFileSize {
+                    text = "视频大小超过最大限制".hx_localized + HXPHTools.transformBytesToString(bytes: config.maximumSelectedVideoFileSize)
                     canSelect = false
                 }
             }
-            if config.videoMinimumSelectDuration > 0 {
-                if photoAsset.videoDuration < Double(config.videoMinimumSelectDuration) {
-                    text = String.init(format: "视频最小时长为%d秒，无法选择".hx_localized, arguments: [config.videoMinimumSelectDuration])
+            if config.maximumSelectedVideoDuration > 0 {
+                if round(photoAsset.videoDuration) > Double(config.maximumSelectedVideoDuration) {
+                    text = String.init(format: "视频最大时长为%d秒，无法选择".hx_localized, arguments: [config.maximumSelectedVideoDuration])
+                    canSelect = false
+                }
+            }
+            if config.minimumSelectedVideoDuration > 0 {
+                if photoAsset.videoDuration < Double(config.minimumSelectedVideoDuration) {
+                    text = String.init(format: "视频最小时长为%d秒，无法选择".hx_localized, arguments: [config.minimumSelectedVideoDuration])
                     canSelect = false
                 }
             }
@@ -601,14 +613,14 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                     canSelect = false
                 }
             }
-            if config.maximumSelectVideoCount > 0 {
-                if selectedVideoAssetArray.count >= config.maximumSelectVideoCount {
-                    text = String.init(format: "最多只能选择%d个视频".hx_localized, arguments: [config.maximumSelectPhotoCount])
+            if config.maximumSelectedVideoCount > 0 {
+                if selectedVideoAssetArray.count >= config.maximumSelectedVideoCount {
+                    text = String.init(format: "最多只能选择%d个视频".hx_localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }else {
-                if selectedAssetArray.count >= config.maximumSelectCount && config.maximumSelectCount > 0 {
-                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectPhotoCount])
+                if selectedAssetArray.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
+                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }

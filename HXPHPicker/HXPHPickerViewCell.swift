@@ -2,8 +2,8 @@
 //  HXPHPickerViewCell.swift
 //  照片选择器-Swift
 //
-//  Created by 洪欣 on 2019/6/29.
-//  Copyright © 2019年 洪欣. All rights reserved.
+//  Created by Silence on 2019/6/29.
+//  Copyright © 2019年 Silence. All rights reserved.
 //
 
 import UIKit
@@ -28,6 +28,7 @@ class HXPHPickerViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.addSublayer(assetTypeMaskLayer)
+        imageView.layer.addSublayer(selectMaskLayer)
         return imageView
     }()
     lazy var assetTypeMaskLayer: CAGradientLayer = {
@@ -102,6 +103,14 @@ class HXPHPickerViewCell: UICollectionViewCell {
         }
     }
     
+    lazy var selectMaskLayer: CALayer = {
+        let selectMaskLayer = CALayer.init()
+        selectMaskLayer.backgroundColor = UIColor.black.withAlphaComponent(0.6).cgColor
+        selectMaskLayer.frame = bounds
+        selectMaskLayer.isHidden = true
+        return selectMaskLayer
+    }()
+    
     var canSelect = true {
         didSet {
             disableMaskLayer.isHidden = canSelect
@@ -130,10 +139,19 @@ class HXPHPickerViewCell: UICollectionViewCell {
         }
     }
     
+    override var isHighlighted: Bool {
+        didSet {
+            if let selected = photoAsset?.isSelected {
+                if !selected {
+                    selectMaskLayer.isHidden = !isHighlighted
+                }
+            }
+        }
+    }
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         imageView.frame = bounds
+        selectMaskLayer.frame = imageView.bounds
         disableMaskLayer.frame = imageView.bounds
         assetTypeMaskLayer.frame = CGRect(x: 0, y: imageView.hx_height - 25, width: hx_width, height: 25)
         assetTypeLb.frame = CGRect(x: 0, y: hx_height - 19, width: hx_width - 5, height: 18)
@@ -152,14 +170,6 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
         return selectControl
     }()
     
-    lazy var selectMaskLayer: CALayer = {
-        let selectMaskLayer = CALayer.init()
-        selectMaskLayer.backgroundColor = UIColor.black.withAlphaComponent(0.6).cgColor
-        selectMaskLayer.frame = bounds
-        selectMaskLayer.isHidden = true
-        return selectMaskLayer
-    }()
-    
     override var photoAsset: HXPHAsset? {
         didSet {
             updateSelectedState(isSelected: photoAsset!.isSelected, animated: false)
@@ -174,7 +184,6 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        imageView.layer.addSublayer(selectMaskLayer)
         contentView.addSubview(selectControl)
         contentView.layer.addSublayer(disableMaskLayer)
     }
@@ -232,7 +241,6 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        selectMaskLayer.frame = imageView.bounds
         if selectControl.hx_width != hx_width - 5 - selectControl.hx_width {
             updateSelectControlFrame(width: selectControl.hx_width, height: selectControl.hx_height)
         }

@@ -2,67 +2,65 @@
 //  ViewController.swift
 //  HXPhotoPickerSwift
 //
-//  Created by 洪欣 on 2020/11/12.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/11/12.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
 import Photos
 
-class ViewController: UIViewController , UITableViewDataSource, UITableViewDelegate, HXPHPickerControllerDelegate {
+class ViewController: UIViewController , UITableViewDataSource, UITableViewDelegate {
     
     var tableView : UITableView?
-    var localCameraAssetArray: [HXPHAsset] = []
-    var selectedAssets: [HXPHAsset] = []
-    var isOriginal: Bool = false
+    var exampleList:[HXPHExample] = []
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        title = "swift"
+        title = "Example"
+        let baseExample = HXPHExample.init(title: "照片选择器", subTitle: "获取所选资源的内容", viewControllerClass: HXPHPickerBaseViewController.self)
+        exampleList.append(baseExample)
         view.backgroundColor = UIColor.white
-        
         tableView = UITableView.init(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), style: UITableView.Style.plain)
+        tableView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         tableView?.dataSource = self
         tableView?.delegate = self
-        
-        tableView?.register(UITableViewCell.classForCoder(), forCellReuseIdentifier: "cellId")
-        
         view.addSubview(tableView!)
-        
-//        UINavigationBar.appearance().isTranslucent = false
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return exampleList.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId")
-        cell?.textLabel?.text = "\( indexPath.row)"
+        var cell = tableView.dequeueReusableCell(withIdentifier: "cellId")
+        if cell == nil {
+            cell = UITableViewCell.init(style: .subtitle, reuseIdentifier: "CellId")
+            cell?.detailTextLabel?.numberOfLines = 0;
+            cell?.detailTextLabel?.textColor = .gray
+        }
+        cell?.textLabel?.text = exampleList[indexPath.row].title
+        cell?.detailTextLabel?.text = exampleList[indexPath.row].subTitle
         return cell!
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 70
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let pickerController = HXPHPickerController.init(config: HXPHTools.getWXConfig())
-//        let pickerController = HXPHPickerController.init(config: HXPHConfiguration.init())
-        pickerController.pickerContollerDelegate = self
-        pickerController.selectedAssetArray = selectedAssets
-        var localArray:[HXPHAsset] = []
-        localArray.append(HXPHAsset.init(image: UIImage.init(named: "wx_head_icon"), localIdentifier: "wx_head_icon"))
-//        pickerController.localAssetArray = localArray
-        pickerController.localCameraAssetArray = localCameraAssetArray
-        pickerController.isOriginal = isOriginal
-//        pickerController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        present(pickerController, animated: true, completion: nil)
+        let vc = exampleList[indexPath.row].viewControllerClass.init()
+        navigationController?.pushViewController(vc, animated: true)
     }
-    func pickerContollerDidFinish(_ pickerController: HXPHPickerController, with selectedAssetArray: [HXPHAsset], with isOriginal: Bool) {
-        self.selectedAssets = selectedAssetArray
-        self.isOriginal = isOriginal
+}
+
+class HXPHExample: NSObject {
+    var title: String?
+    var subTitle: String?
+    var viewControllerClass: UIViewController.Type
+    init(title: String?, subTitle: String?, viewControllerClass: UIViewController.Type) {
+        self.title = title
+        self.subTitle = subTitle
+        self.viewControllerClass = viewControllerClass
+        super.init()
     }
-    
-    func pickerContollerDidDismiss(_ pickerController: HXPHPickerController, with localCameraAssetArray: [HXPHAsset]) {
-        self.localCameraAssetArray = localCameraAssetArray
-    }
-    
 }
 

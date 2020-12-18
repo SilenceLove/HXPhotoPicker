@@ -2,8 +2,8 @@
 //  HXPHAssetCollection.swift
 //  照片选择器-Swift
 //
-//  Created by 洪欣 on 2019/7/3.
-//  Copyright © 2019年 洪欣. All rights reserved.
+//  Created by Silence on 2019/7/3.
+//  Copyright © 2019年 Silence. All rights reserved.
 //
 
 import UIKit

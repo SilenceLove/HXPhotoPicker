@@ -2,8 +2,8 @@
 //  HXPHPreviewViewController.swift
 //  HXPHPickerExample
 //
-//  Created by 洪欣 on 2020/11/13.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/11/13.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -234,8 +234,8 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         allowLoadPhotoLibrary = hx_pickerController?.config.allowLoadPhotoLibrary ?? true
-        extendedLayoutIncludesOpaqueBars = true;
-        edgesForExtendedLayout = .all;
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = .all
         view.clipsToBounds = true
         config = hx_pickerController!.config.previewView
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
@@ -247,7 +247,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         view.addSubview(bottomView)
         bottomView.updateFinishButtonTitle()
         if hx_pickerController!.config.selectMode == .multiple {
-            if !hx_pickerController!.config.allowSelectedTogether && hx_pickerController!.config.maximumSelectVideoCount == 1 &&
+            if !hx_pickerController!.config.allowSelectedTogether && hx_pickerController!.config.maximumSelectedVideoCount == 1 &&
                 hx_pickerController!.config.selectType == .any{
                 videoLoadSingleCell = true
             }
@@ -577,16 +577,16 @@ class HXPHPreviewSelectedView: UIView, UICollectionViewDataSource, UICollectionV
     }
     func getItemSize(photoAsset: HXPHAsset) -> CGSize {
         let minWidth: CGFloat = 70 - collectionViewLayout.sectionInset.top - collectionViewLayout.sectionInset.bottom
-        let maxWidth: CGFloat = minWidth / 9 * 16
+//        let maxWidth: CGFloat = minWidth / 9 * 16
         let maxHeight: CGFloat = minWidth
-        let aspectRatio = maxHeight / photoAsset.imageSize.height
+//        let aspectRatio = maxHeight / photoAsset.imageSize.height
         let itemHeight = maxHeight
-        var itemWidth = photoAsset.imageSize.width * aspectRatio
-        if itemWidth < minWidth {
-            itemWidth = minWidth
-        }else if itemWidth > maxWidth {
-            itemWidth = maxWidth
-        }
+//        var itemWidth = photoAsset.imageSize.width * aspectRatio
+//        if itemWidth < minWidth {
+           let itemWidth = minWidth
+//        }else if itemWidth > maxWidth {
+//            itemWidth = maxWidth
+//        }
         return CGSize(width: itemWidth, height: itemHeight)
     }
     

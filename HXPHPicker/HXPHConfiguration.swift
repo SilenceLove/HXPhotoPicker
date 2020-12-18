@@ -2,49 +2,34 @@
 //  HXPHConfiguration.swift
 //  照片选择器-Swift
 //
-//  Created by 洪欣 on 2020/11/9.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/11/9.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
 
 class HXPHConfiguration: NSObject {
     
-    /// 选择的类型，控制获取系统相册资源的类型。不会过滤外部添加的本地资源
+    /// 语言类型
+    var languageType: HXPHPicker.LanguageType = .system
+    
+    /// 选择的类型，控制获取系统相册资源的类型
     var selectType : HXPHPicker.SelectType = .any
     
-    /// 最多可以选择的照片数，如果为0则不限制
-    var maximumSelectPhotoCount : Int = 0
-    
-    /// 最多可以选择的视频数，如果为0则不限制
-    var maximumSelectVideoCount : Int = 0
-    
-    /// 最多可以选择的资源数，如果为0则不限制
-    var maximumSelectCount: Int = 9
-    
-    /// 视频最大选择时长，为0则不限制
-    var videoMaximumSelectDuration: Int = 0
-    
-    /// 视频最小选择时长，为0则不限制
-    var videoMinimumSelectDuration: Int = 0
+    /// 选择模式
+    var selectMode: HXPHPicker.SelectMode = .multiple
     
     /// 照片和视频可以一起选择
     var allowSelectedTogether: Bool = true
     
-    /// 语言类型
-    var languageType: HXPHPicker.LanguageType = .system
+    /// 允许加载系统照片库
+    var allowLoadPhotoLibrary: Bool = true
     
     /// 相册展示模式
     var albumShowMode: HXPHPicker.Album.ShowMode = .normal
     
     /// 外观风格
     var appearanceStyle: HXPHPicker.AppearanceStyle = .varied
-    
-    /// 选择模式
-    var selectMode: HXPHPicker.SelectMode = .multiple
-    
-    /// 允许加载系统照片库
-    var allowLoadPhotoLibrary: Bool = false
     
     /// 获取资源列表时是否按创建时间排序
     var creationDate: Bool = false
@@ -57,6 +42,31 @@ class HXPHConfiguration: NSObject {
     
     /// 展示LivePhoto
     var showLivePhoto: Bool = true
+    
+    /// 最多可以选择的照片数，如果为0则不限制
+    var maximumSelectedPhotoCount : Int = 0
+    
+    /// 最多可以选择的视频数，如果为0则不限制
+    var maximumSelectedVideoCount : Int = 0
+    
+    /// 最多可以选择的资源数，如果为0则不限制
+    var maximumSelectedCount: Int = 9
+    
+    /// 视频最大选择时长，为0则不限制
+    var maximumSelectedVideoDuration: Int = 0
+    
+    /// 视频最小选择时长，为0则不限制
+    var minimumSelectedVideoDuration: Int = 0
+    
+    /// 视频选择的最大文件大小，为0则不限制
+    /// 如果限制了大小请将 photoList.cell.show.showDisableMask = false
+    /// 限制并且显示遮罩会导致界面滑动卡顿
+    var maximumSelectedVideoFileSize: Int = 0
+    
+    /// 照片选择的最大文件大小，为0则不限制
+    /// 如果限制了大小请将 photoList.cell.show.showDisableMask = false
+    /// 限制并且显示遮罩会导致界面滑动卡顿 
+    var maximumSelectedPhotoFileSize: Int = 0
     
     /// 状态栏样式
     var statusBarStyle: UIStatusBarStyle = .default
@@ -243,7 +253,6 @@ class HXAlbumTitleViewConfiguration: NSObject {
 }
 // MARK: 照片列表配置类
 class HXPHPhotoListConfiguration: NSObject {
-    
     /// 相册标题视图配置
     lazy var titleViewConfig: HXAlbumTitleViewConfiguration = {
         let titleViewConfig = HXAlbumTitleViewConfiguration.init()
@@ -289,6 +298,11 @@ class HXPHPhotoListConfiguration: NSObject {
         return HXPHPhotoListCameraCellConfiguration.init()
     }()
     
+    /// 相机配置
+    lazy var camera: HXPHCameraConfiguration = {
+        return HXPHCameraConfiguration.init()
+    }()
+    
     /// 没有资源时展示的相关配置
     lazy var emptyView : HXPHEmptyViewConfiguration = {
         return HXPHEmptyViewConfiguration.init()
@@ -296,12 +310,14 @@ class HXPHPhotoListConfiguration: NSObject {
 }
 // MARK: 照片列表Cell配置类
 class HXPHPhotoListCellConfiguration: NSObject {
-    
     /// 背景颜色
     var backgroundColor: UIColor?
     
     /// 暗黑风格下背景颜色
-    var backgroundDarkColor : UIColor?
+    var backgroundDarkColor: UIColor?
+    
+    /// cell在不可选择状态是否显示遮罩
+    var showDisableMask: Bool = true
     
     /// 选择框顶部的间距
     var selectBoxTopMargin: CGFloat = 5
@@ -316,7 +332,6 @@ class HXPHPhotoListCellConfiguration: NSObject {
 }
 // MARK: 照片列表相机Cell配置类
 class HXPHPhotoListCameraCellConfiguration: NSObject {
-    
     /// 允许相机预览
     var allowPreview: Bool = true
     
@@ -331,6 +346,26 @@ class HXPHPhotoListCameraCellConfiguration: NSObject {
     
     /// 暗黑风格下的相机图标
     var cameraDarkImageName: String = "hx_picker_photoList_photograph_white"
+}
+// MARK: 相机配置类
+class HXPHCameraConfiguration: NSObject {
+    /// 拍照完成后是否选择
+    var takePictureCompletionToSelected: Bool = true
+    
+    /// 媒体类型，不设置内部会根据selectType配置
+    var mediaTypes: [String] = []
+    
+    /// 视频最大录制时长
+    var videoMaximumDuration: TimeInterval = 60
+    
+    /// 视频质量
+    var videoQuality: UIImagePickerController.QualityType = .typeMedium
+    
+    /// 默认使用后置相机
+    var cameraDevice: UIImagePickerController.CameraDevice = .rear
+    
+    /// 允许编辑
+    var allowsEditing: Bool = true
 }
 // MARK: 预览界面配置类
 class HXPHPreviewViewConfiguration: NSObject {
@@ -611,7 +646,6 @@ class HXPHSelectBoxConfiguration: NSObject {
     }()
     
 }
-
 // MARK: 未授权界面配置类
 class HXPHNotAuthorizedConfiguration: NSObject {
     
@@ -675,7 +709,7 @@ class HXPHNotAuthorizedConfiguration: NSObject {
         return "#333333".hx_color
     }()
 }
-
+// MARK: 照片列表空资源时展示的视图
 class HXPHEmptyViewConfiguration: NSObject {
     
     /// 标题颜色

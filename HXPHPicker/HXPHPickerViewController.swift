@@ -2,8 +2,8 @@
 //  HXPHPickerViewController.swift
 //  照片选择器-Swift
 //
-//  Created by 洪欣 on 2019/6/29.
-//  Copyright © 2019年 洪欣. All rights reserved.
+//  Created by Silence on 2019/6/29.
+//  Copyright © 2019年 Silence. All rights reserved.
 //
 
 import UIKit
@@ -197,7 +197,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     func configData() {
         isMultipleSelect = hx_pickerController!.config.selectMode == .multiple
-        if !hx_pickerController!.config.allowSelectedTogether && hx_pickerController!.config.maximumSelectVideoCount == 1 &&
+        if !hx_pickerController!.config.allowSelectedTogether && hx_pickerController!.config.maximumSelectedVideoCount == 1 &&
             hx_pickerController!.config.selectType == .any &&
             isMultipleSelect {
             videoLoadSingleCell = true
@@ -218,8 +218,8 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     
     func initView() {
-        extendedLayoutIncludesOpaqueBars = true;
-        edgesForExtendedLayout = .all;
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = .all
         view.addSubview(collectionView)
         if isMultipleSelect {
             view.addSubview(bottomView)
@@ -464,7 +464,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         if cell is HXPHPickerViewCell {
             let myCell: HXPHPickerViewCell = cell as! HXPHPickerViewCell
             let photoAsset = getPhotoAsset(for: indexPath.item)
-            if !photoAsset.isSelected {
+            if !photoAsset.isSelected && config.cell.showDisableMask {
                 myCell.canSelect = hx_pickerController!.canSelectAsset(for: photoAsset, showHUD: false)
             }else {
                 myCell.canSelect = true
@@ -505,21 +505,28 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         }
     }
     func presentCameraViewController() {
-        let imagePickerController = UIImagePickerController.init()
+        let imagePickerController = HXPHImagePickerController.init()
         imagePickerController.sourceType = .camera
         imagePickerController.delegate = self
+        imagePickerController.videoMaximumDuration = config.camera.videoMaximumDuration
+        imagePickerController.videoQuality = config.camera.videoQuality
+        imagePickerController.allowsEditing = config.camera.allowsEditing
+        imagePickerController.cameraDevice = config.camera.cameraDevice
         var mediaTypes: [String]
-        switch hx_pickerController!.config.selectType {
-        case .photo:
-            mediaTypes = [kUTTypeImage as String]
-            break
-        case .video:
-            mediaTypes = [kUTTypeMovie as String]
-            break
-        default:
-            mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
+        if !config.camera.mediaTypes.isEmpty {
+            mediaTypes = config.camera.mediaTypes
+        }else {
+            switch hx_pickerController!.config.selectType {
+            case .photo:
+                mediaTypes = [kUTTypeImage as String]
+                break
+            case .video:
+                mediaTypes = [kUTTypeMovie as String]
+                break
+            default:
+                mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
+            }
         }
-        
         imagePickerController.mediaTypes = mediaTypes
         present(imagePickerController, animated: true, completion: nil)
     }
@@ -538,7 +545,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             let mediaType = info[.mediaType] as! String
             var photoAsset: HXPHAsset
             if mediaType == kUTTypeImage as String {
-                var image: UIImage? = info[.originalImage] as? UIImage
+                var image: UIImage? = (info[.editedImage] ?? info[.originalImage]) as? UIImage
                 image = image?.hx_scaleSuitableSize()
                 photoAsset = HXPHAsset.init(image: image, localIdentifier: String(Date.init().timeIntervalSince1970))
             }else {
@@ -547,8 +554,10 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             }
             DispatchQueue.main.async {
                 HXPHProgressHUD.hideHUD(forView: self.navigationController?.view, animated: true)
-                if self.hx_pickerController!.addedPhotoAsset(photoAsset: photoAsset) {
-                    self.updateCellSelectedTitle()
+                if self.config.camera.takePictureCompletionToSelected {
+                    if self.hx_pickerController!.addedPhotoAsset(photoAsset: photoAsset) {
+                        self.updateCellSelectedTitle()
+                    }
                 }
                 self.hx_pickerController?.updateAlbums(coverImage: photoAsset.originalImage, count: 1)
                 self.hx_pickerController?.addedLocalCameraAsset(photoAsset: photoAsset)
@@ -577,7 +586,6 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     
     // MARK: HXPHPickerViewCellDelegate
-    
     func cellDidSelectControlClick(_ cell: HXPHPickerMultiSelectViewCell, isSelected: Bool) {
         if isSelected {
             // 取消选中
@@ -598,7 +606,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         for visibleCell in collectionView.visibleCells {
             if visibleCell is HXPHPickerViewCell {
                 let cell = visibleCell as! HXPHPickerViewCell
-                if !cell.photoAsset!.isSelected {
+                if !cell.photoAsset!.isSelected && config.cell.showDisableMask {
                     cell.canSelect = hx_pickerController!.canSelectAsset(for: cell.photoAsset!, showHUD: false)
                 }
                 if visibleCell is HXPHPickerMultiSelectViewCell {
@@ -1020,6 +1028,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.hx_width = hx_width
+        contentView.hx_height = 50 + UIDevice.current.hx_bottomMargin
         contentView.hx_y = hx_height - contentView.hx_height
         let previewWidth : CGFloat = previewBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
         previewBtn.frame = CGRect(x: 12 + UIDevice.current.hx_leftMargin, y: 0, width: previewWidth, height: 50)

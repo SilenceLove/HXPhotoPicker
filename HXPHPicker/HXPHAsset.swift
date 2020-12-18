@@ -2,8 +2,8 @@
 //  HXPHAsset.swift
 //  HXPhotoPickerSwift
 //
-//  Created by 洪欣 on 2020/11/12.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/11/12.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -31,27 +31,7 @@ class HXPHAsset: NSObject {
     /// 原图
     var originalImage: UIImage? {
         get {
-            if asset == nil {
-                return localImage
-            }
-            let options = PHImageRequestOptions.init()
-            options.isSynchronous = true
-            options.isNetworkAccessAllowed = true
-            options.deliveryMode = .highQualityFormat
-            if mediaSubType == .imageAnimated {
-                options.version = .original
-            }
-            var originalImage: UIImage?
-            _ = HXPHAssetManager.requestImageData(for: asset!, options: options) { (imageData, dataUTI, orientation, info) in
-                if imageData != nil {
-                    originalImage = UIImage.init(data: imageData!)
-                    if self.mediaSubType != .imageAnimated && HXPHAssetManager.assetIsAnimated(asset: self.asset!) {
-                        // 原始图片是动图，但是设置的是不显示动图，所以在这里处理一下
-                        originalImage = originalImage?.images?.first
-                    }
-                }
-            }
-            return originalImage
+            return getOriginalImage()
         }
     }
     /// 获取视频原始地址
@@ -78,31 +58,7 @@ class HXPHAsset: NSObject {
     /// 图片/视频大小
     var fileSize: Int {
         get {
-            var bytes = 0
-            if let photoAsset = asset {
-                let assetResources = PHAssetResource.assetResources(for: photoAsset)
-                for assetResource in assetResources {
-                    if let byte = assetResource.value(forKey: "fileSize") as? Int {
-                        bytes += byte
-                    }
-                }
-            }else {
-                if self.mediaType == .photo {
-                    if let pngData = localImage?.pngData() {
-                        bytes = pngData.count
-                    }else if let jpegData = localImage?.jpegData(compressionQuality: 1) {
-                        bytes = jpegData.count
-                    }
-                }else {
-                    if let videoURL = localVideoURL {
-                        do {
-                            let fileSize = try videoURL.resourceValues(forKeys: [.fileSizeKey])
-                            bytes = fileSize.fileSize ?? 0
-                        } catch {}
-                    }
-                }
-            }
-            return bytes
+            return getFileSize()
         }
     }
     
@@ -121,17 +77,7 @@ class HXPHAsset: NSObject {
     /// 当前资源的图片大小
     var imageSize: CGSize {
         get {
-            let size : CGSize
-            if asset != nil {
-                if asset!.pixelWidth == 0 || asset!.pixelHeight == 0 {
-                    size = CGSize(width: 200, height: 200)
-                }else {
-                    size = CGSize(width: asset!.pixelWidth, height: asset!.pixelHeight)
-                }
-            }else {
-                size = localImage?.size ?? CGSize(width: 200, height: 200)
-            }
-            return size
+            return getImageSize()
         }
     }
     
@@ -140,6 +86,7 @@ class HXPHAsset: NSObject {
     var localIndex: Int = 0
     private var localImage: UIImage?
     private var localVideoURL: URL?
+    private var pFileSize: Int?
     
     init(asset: PHAsset) {
         super.init()
@@ -173,17 +120,6 @@ class HXPHAsset: NSObject {
         localVideoURL = videoURL
         mediaType = .video
         mediaSubType = .localVideo
-    }
-    private func setMediaType() {
-        if asset?.mediaType.rawValue == 1 {
-            mediaType = .photo
-            mediaSubType = .image
-        }else if asset?.mediaType.rawValue == 2 {
-            mediaType = .video
-            mediaSubType = .video
-            videoDuration = asset!.duration
-            videoTime = HXPHTools.transformVideoDurationToString(duration: asset!.duration)
-        }
     }
     
     /// 请求缩略图
@@ -318,5 +254,84 @@ class HXPHAsset: NSObject {
         }
         photoAsset.localIndex = localIndex
         return photoAsset
+    }
+    
+    private func setMediaType() {
+        if asset?.mediaType.rawValue == 1 {
+            mediaType = .photo
+            mediaSubType = .image
+        }else if asset?.mediaType.rawValue == 2 {
+            mediaType = .video
+            mediaSubType = .video
+            videoDuration = asset!.duration
+            videoTime = HXPHTools.transformVideoDurationToString(duration: asset!.duration)
+        }
+    }
+    private func getFileSize() -> Int {
+        if let fileSize = pFileSize {
+            return fileSize
+        }
+        var fileSize = 0
+        if let photoAsset = asset {
+            let assetResources = PHAssetResource.assetResources(for: photoAsset)
+            for assetResource in assetResources {
+                if let photoFileSize = assetResource.value(forKey: "fileSize") as? Int {
+                    fileSize += photoFileSize
+                }
+            }
+        }else {
+            if self.mediaType == .photo {
+                if let pngData = localImage?.pngData() {
+                    fileSize = pngData.count
+                }else if let jpegData = localImage?.jpegData(compressionQuality: 1) {
+                    fileSize = jpegData.count
+                }
+            }else {
+                if let videoURL = localVideoURL {
+                    do {
+                        let videofileSize = try videoURL.resourceValues(forKeys: [.fileSizeKey])
+                        fileSize = videofileSize.fileSize ?? 0
+                    } catch {}
+                }
+            }
+        }
+        pFileSize = fileSize
+        return fileSize
+    }
+    private func getOriginalImage() -> UIImage? {
+        if asset == nil {
+            return localImage
+        }
+        let options = PHImageRequestOptions.init()
+        options.isSynchronous = true
+        options.isNetworkAccessAllowed = true
+        options.deliveryMode = .highQualityFormat
+        if mediaSubType == .imageAnimated {
+            options.version = .original
+        }
+        var originalImage: UIImage?
+        _ = HXPHAssetManager.requestImageData(for: asset!, options: options) { (imageData, dataUTI, orientation, info) in
+            if imageData != nil {
+                originalImage = UIImage.init(data: imageData!)
+                if self.mediaSubType != .imageAnimated && HXPHAssetManager.assetIsAnimated(asset: self.asset!) {
+                    // 原始图片是动图，但是设置的是不显示动图，所以在这里处理一下
+                    originalImage = originalImage?.images?.first
+                }
+            }
+        }
+        return originalImage
+    }
+    private func getImageSize() -> CGSize {
+        let size : CGSize
+        if asset != nil {
+            if asset!.pixelWidth == 0 || asset!.pixelHeight == 0 {
+                size = CGSize(width: 200, height: 200)
+            }else {
+                size = CGSize(width: asset!.pixelWidth, height: asset!.pixelHeight)
+            }
+        }else {
+            size = localImage?.size ?? CGSize(width: 200, height: 200)
+        }
+        return size
     }
 }

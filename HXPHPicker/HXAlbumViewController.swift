@@ -2,8 +2,8 @@
 //  HXAlbumViewController.swift
 //  照片选择器-Swift
 //
-//  Created by 洪欣 on 2019/6/28.
-//  Copyright © 2019年 洪欣. All rights reserved.
+//  Created by Silence on 2019/6/28.
+//  Copyright © 2019年 Silence. All rights reserved.
 //
 
 import UIKit
@@ -51,8 +51,8 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        extendedLayoutIncludesOpaqueBars = true;
-        edgesForExtendedLayout = .all;
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = .all
         config = hx_pickerController!.config.albumList
         let backItem = UIBarButtonItem.init(title: "取消".hx_localized, style: .done, target: self, action: #selector(didCancelItemClick))
         navigationItem.rightBarButtonItem = backItem

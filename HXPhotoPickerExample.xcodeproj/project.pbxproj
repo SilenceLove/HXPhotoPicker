@@ -66,6 +66,8 @@
 		7B0B2AB4255E5A1800ACF619 /* HXPHPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2AB3255E5A1800ACF619 /* HXPHPreviewViewController.swift */; };
 		7B0B2AB9255E5F6F00ACF619 /* HXPHPreviewViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2AB8255E5F6F00ACF619 /* HXPHPreviewViewCell.swift */; };
 		7B0B2AD1255E82F200ACF619 /* UIDevice+HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */; };
+		7B1C05B6258CAB5E000242A1 /* HXPHPickerBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1C05B5258CAB5E000242A1 /* HXPHPickerBaseViewController.swift */; };
+		7B1C05BB258CABBD000242A1 /* HXPHPickerBaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B1C05BA258CABBD000242A1 /* HXPHPickerBaseViewController.xib */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
 		7B3327F7255EE4F300784BC0 /* String+HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3327F6255EE4F300784BC0 /* String+HXPHPicker.swift */; };
 		7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC0255E185900937B4A /* AppDelegate.swift */; };
@@ -459,6 +461,8 @@
 		7B0B2AB3255E5A1800ACF619 /* HXPHPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPreviewViewController.swift; sourceTree = "<group>"; };
 		7B0B2AB8255E5F6F00ACF619 /* HXPHPreviewViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPreviewViewCell.swift; sourceTree = "<group>"; };
 		7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+HXPHPicker.swift"; sourceTree = "<group>"; };
+		7B1C05B5258CAB5E000242A1 /* HXPHPickerBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerBaseViewController.swift; sourceTree = "<group>"; };
+		7B1C05BA258CABBD000242A1 /* HXPHPickerBaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HXPHPickerBaseViewController.xib; sourceTree = "<group>"; };
 		7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
 		7B3327F6255EE4F300784BC0 /* String+HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+HXPHPicker.swift"; sourceTree = "<group>"; };
 		7B3EDEBE255E185900937B4A /* HXPHPickerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HXPHPickerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -659,7 +663,7 @@
 		7B8629A9237D0F8C00F8A584 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		7B8629AB237D0F9400F8A584 /* Contacts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Contacts.framework; path = System/Library/Frameworks/Contacts.framework; sourceTree = SDKROOT; };
 		7B8629AD237D0FAA00F8A584 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
-		7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; lastKnownFileType = file; path = HXPhotoPicker.podspec; sourceTree = SOURCE_ROOT; };
+		7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = HXPhotoPicker.podspec; sourceTree = SOURCE_ROOT; };
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
 		7BA141242580CB8C000D0726 /* HXPHPickerTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerTransition.swift; sourceTree = "<group>"; };
 		7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPicker.swift; sourceTree = "<group>"; };
@@ -870,6 +874,8 @@
 				7B0B2A79255E1AE300ACF619 /* HXPHPicker */,
 				7B3EDEC0255E185900937B4A /* AppDelegate.swift */,
 				7B3EDEC4255E185900937B4A /* ViewController.swift */,
+				7B1C05B5258CAB5E000242A1 /* HXPHPickerBaseViewController.swift */,
+				7B1C05BA258CABBD000242A1 /* HXPHPickerBaseViewController.xib */,
 				7B3EDEC6255E185900937B4A /* Main.storyboard */,
 				7B3EDEC9255E185B00937B4A /* Assets.xcassets */,
 				7B3EDECB255E185B00937B4A /* LaunchScreen.storyboard */,
@@ -1420,6 +1426,7 @@
 			files = (
 				7B3EDECD255E185B00937B4A /* LaunchScreen.storyboard in Resources */,
 				7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */,
+				7B1C05BB258CABBD000242A1 /* HXPHPickerBaseViewController.xib in Resources */,
 				7B3EDEC8255E185900937B4A /* Main.storyboard in Resources */,
 				7BA68790256144EA0014C3E3 /* HXPHPicker.bundle in Resources */,
 			);
@@ -1503,6 +1510,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B3327F7255EE4F300784BC0 /* String+HXPHPicker.swift in Sources */,
+				7B1C05B6258CAB5E000242A1 /* HXPHPickerBaseViewController.swift in Sources */,
 				7B0B2AAA255E384100ACF619 /* UIFont+HXPHPicker.swift in Sources */,
 				7B0B2A92255E1AE300ACF619 /* HXPHAssetManager.swift in Sources */,
 				7B0B2A8C255E1AE300ACF619 /* HXPHTools.swift in Sources */,

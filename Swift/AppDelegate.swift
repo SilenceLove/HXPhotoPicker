@@ -2,8 +2,8 @@
 //  AppDelegate.swift
 //  HXPhotoPickerSwift
 //
-//  Created by 洪欣 on 2020/11/12.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/11/12.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
