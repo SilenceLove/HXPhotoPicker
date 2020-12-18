@@ -241,7 +241,7 @@ HXWeakSelf
                 if (self.allowPreviewDirectLoadOriginalImage) {
                     [self requestImageData];
                 }else {
-                    self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5f completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                    self.requestID = [model requestThumbImageWithWidth:self.hx_w completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                         if (weakSelf.model != model) return;
                         [weakSelf setImageViewWithImage:image isAnimation:NO];
                     }];
@@ -259,7 +259,7 @@ HXWeakSelf
                     if (self.allowPreviewDirectLoadOriginalImage) {
                         [self requestImageData];
                     }else {
-                        self.requestID = [model requestThumbImageWithWidth:self.hx_w * 0.5 completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
+                        self.requestID = [model requestThumbImageWithWidth:self.hx_w completion:^(UIImage *image, HXPhotoModel *model, NSDictionary *info) {
                             if (weakSelf.model != model) return;
                             [weakSelf setImageViewWithImage:image isAnimation:NO];
                         }];
