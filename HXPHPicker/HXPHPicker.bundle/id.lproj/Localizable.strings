@@ -27,6 +27,8 @@
 "请前往系统设置中，允许访问「相机」。" = "Silakan pergi ke pengaturan sistem untuk mengizinkan akses ke kamera";
 "照片大小超过最大限制" = "Ukuran foto melebihi batas maksimal";
 "视频大小超过最大限制" = "Ukuran video melebihi batas maksimum";
+"视频导出失败" = "Ekspor video gagal";
+"所有照片" = "Semua foto";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

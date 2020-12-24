@@ -424,28 +424,53 @@ class HXPHAssetManager: NSObject {
                     let urlAsset = avAsset as! AVURLAsset
                     resultHandler(urlAsset.url)
                 }else {
-                    let videoResource = PHAssetResource.assetResources(for: asset).first
-                    if videoResource == nil {
-                        resultHandler(nil)
-                        return
-                    }
-                    var tempPath = NSTemporaryDirectory()
-                    tempPath.append(contentsOf: String.hx_fileName(suffix: "mp4"))
-                    let videoURl = URL.init(fileURLWithPath: tempPath)
-                    let options = PHAssetResourceRequestOptions.init()
-                    options.isNetworkAccessAllowed = true
-                    PHAssetResourceManager.default().writeData(for: videoResource!, toFile: videoURl, options: options) { (error) in
-                        if error == nil {
-                            resultHandler(videoURl)
-                        }else {
-                            resultHandler(nil)
-                        }
-                    }
+                    self.requestVideoURL(mp4Format: asset, resultHandler: resultHandler)
+                }
+            }
+        }
+    }
+    class func requestVideoURL(mp4Format asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
+        let videoResource = PHAssetResource.assetResources(for: asset).first
+        if videoResource == nil {
+            resultHandler(nil)
+            return
+        }
+        let videoURL = HXPHTools.getVideoTmpURL()
+        let options = PHAssetResourceRequestOptions.init()
+        options.isNetworkAccessAllowed = true
+        PHAssetResourceManager.default().writeData(for: videoResource!, toFile: videoURL, options: options) { (error) in
+            DispatchQueue.main.async {
+                if error == nil {
+                    resultHandler(videoURL)
+                }else {
+                    resultHandler(nil)
                 }
             }
         }
     }
     // MARK: 获取图片地址
+    class func requestImageURL(for asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
+        requestImageURL(for: asset, suffix: "jpeg", resultHandler: resultHandler)
+    }
+    class func requestImageURL(for asset: PHAsset, suffix: String, resultHandler: @escaping (URL?) -> Void) {
+        let imageResource = PHAssetResource.assetResources(for: asset).first
+        if imageResource == nil {
+            resultHandler(nil)
+            return
+        }
+        let imageURL = HXPHTools.getTmpURL(for: suffix)
+        let options = PHAssetResourceRequestOptions.init()
+        options.isNetworkAccessAllowed = true
+        PHAssetResourceManager.default().writeData(for: imageResource!, toFile: imageURL, options: options) { (error) in
+            DispatchQueue.main.async {
+                if error == nil {
+                    resultHandler(imageURL)
+                }else {
+                    resultHandler(nil)
+                }
+            }
+        }
+    }
     class func requestImageURL(for asset: PHAsset, resultHandler: @escaping (URL?, UIImage?) -> Void) -> PHContentEditingInputRequestID {
         let options = PHContentEditingInputRequestOptions.init()
         options.isNetworkAccessAllowed = true
@@ -455,8 +480,8 @@ class HXPHAssetManager: NSObject {
             }
         }
     }
-    // MARK: 获取LivePhoto里的图片和视频地址
-    class func requestLivePhotoContent(for asset: PHAsset, imageHandler: @escaping (Data?) -> Void, videoHandler: @escaping (URL?) -> Void, completionHandler: @escaping (HXPHPicker.LivePhotoError?) -> Void) {
+    // MARK: 获取LivePhoto里的图片Data和视频地址
+    class func requestLivePhoto(content asset: PHAsset, imageDataHandler: @escaping (Data?) -> Void, videoHandler: @escaping (URL?) -> Void, completionHandler: @escaping (HXPHPicker.LivePhotoError?) -> Void) {
         if #available(iOS 9.1, *) {
             _ = requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize) { (ID) in
             } progressHandler: { (progress, error, stop, info) in
@@ -470,6 +495,14 @@ class HXPHAssetManager: NSObject {
                     completionHandler(.allError(HXPickerError.error(message: "assetResources为nil，获取失败"), HXPickerError.error(message: "assetResources为nil，获取失败")))
                     return
                 }
+                let options = PHAssetResourceRequestOptions.init()
+                options.isNetworkAccessAllowed = true
+                var imageCompletion = false
+                var imageError: Error?
+                var videoCompletion = false
+                var videoError: Error?
+                var imageData: Data?
+                let videoURL = HXPHTools.getVideoTmpURL()
                 let callback = {(imageError: Error?, videoError: Error?) in
                     if imageError != nil && videoError != nil {
                         completionHandler(.allError(imageError, videoError))
@@ -481,36 +514,33 @@ class HXPHAssetManager: NSObject {
                         completionHandler(nil)
                     }
                 }
-                let options = PHAssetResourceRequestOptions.init()
-                options.isNetworkAccessAllowed = true
-                var imageCompletion = false
-                var imageError: Error?
-                var videoCompletion = false
-                var videoError: Error?
-                
                 for assetResource in assetResources {
                     if assetResource.type == .photo {
                         PHAssetResourceManager.default().requestData(for: assetResource, options: options) { (data) in
-                            imageHandler(data)
+                            imageData = data
+                            DispatchQueue.main.async {
+                                imageDataHandler(imageData)
+                            }
                         } completionHandler: { (error) in
-                            imageCompletion = true
                             imageError = error
-                            if videoCompletion {
-                                callback(imageError, videoError)
+                            DispatchQueue.main.async {
+                                if videoCompletion {
+                                    callback(imageError, videoError)
+                                }
+                                imageCompletion = true
                             }
                         }
                     }else if assetResource.type == .pairedVideo {
-                        var tempPath = NSTemporaryDirectory()
-                        tempPath.append(contentsOf: String.hx_fileName(suffix: "mp4"))
-                        let videoURl = URL.init(fileURLWithPath: tempPath)
-                        PHAssetResourceManager.default().writeData(for: assetResource, toFile: videoURl, options: options) { (error) in
-                            videoCompletion = true
-                            if error == nil {
-                                videoHandler(videoURl)
-                            }
-                            videoError = error
-                            if imageCompletion {
-                                callback(imageError, videoError)
+                        PHAssetResourceManager.default().writeData(for: assetResource, toFile: videoURL, options: options) { (error) in
+                            DispatchQueue.main.async {
+                                if error == nil {
+                                    videoHandler(videoURL)
+                                }
+                                videoCompletion = true
+                                videoError = error
+                                if imageCompletion {
+                                    callback(imageError, videoError)
+                                }
                             }
                         }
                     }
@@ -521,7 +551,75 @@ class HXPHAssetManager: NSObject {
             completionHandler(.allError(HXPickerError.error(message: "系统版本低于9.1"), HXPickerError.error(message: "系统版本低于9.1")))
         }
     }
-    
+    // MARK: 获取LivePhoto里的图片地址和视频地址
+    class func requestLivePhoto(contentURL asset: PHAsset, imageURLHandler: @escaping (URL?) -> Void, videoHandler: @escaping (URL?) -> Void, completionHandler: @escaping (HXPHPicker.LivePhotoError?) -> Void) {
+        if #available(iOS 9.1, *) {
+            _ = requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize) { (ID) in
+            } progressHandler: { (progress, error, stop, info) in
+            } resultHandler: { (livePhoto, info, downloadSuccess) in
+                if livePhoto == nil {
+                    completionHandler(.allError(HXPickerError.error(message: "livePhoto为nil，获取失败"), HXPickerError.error(message: "livePhoto为nil，获取失败")))
+                    return
+                }
+                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto!)
+                if assetResources.isEmpty {
+                    completionHandler(.allError(HXPickerError.error(message: "assetResources为nil，获取失败"), HXPickerError.error(message: "assetResources为nil，获取失败")))
+                    return
+                }
+                let options = PHAssetResourceRequestOptions.init()
+                options.isNetworkAccessAllowed = true
+                var imageCompletion = false
+                var imageError: Error?
+                var videoCompletion = false
+                var videoError: Error?
+                let imageURL = HXPHTools.getImageTmpURL()
+                let videoURL = HXPHTools.getVideoTmpURL()
+                let callback = {(imageError: Error?, videoError: Error?) in
+                    if imageError != nil && videoError != nil {
+                        completionHandler(.allError(imageError, videoError))
+                    }else if imageError != nil {
+                        completionHandler(.imageError(imageError))
+                    }else if videoError != nil {
+                        completionHandler(.videoError(videoError))
+                    }else {
+                        completionHandler(nil)
+                    }
+                }
+                for assetResource in assetResources {
+                    if assetResource.type == .photo {
+                        PHAssetResourceManager.default().writeData(for: assetResource, toFile: imageURL, options: options) { (error) in
+                            DispatchQueue.main.async {
+                                if error == nil {
+                                    imageURLHandler(imageURL)
+                                }
+                                imageCompletion = true
+                                imageError = error
+                                if videoCompletion {
+                                    callback(imageError, videoError)
+                                }
+                            }
+                        }
+                    }else if assetResource.type == .pairedVideo {
+                        PHAssetResourceManager.default().writeData(for: assetResource, toFile: videoURL, options: options) { (error) in
+                            DispatchQueue.main.async {
+                                if error == nil {
+                                    videoHandler(videoURL)
+                                }
+                                videoCompletion = true
+                                videoError = error
+                                if imageCompletion {
+                                    callback(imageError, videoError)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            // Fallback on earlier versions
+            completionHandler(.allError(HXPickerError.error(message: "系统版本低于9.1"), HXPickerError.error(message: "系统版本低于9.1")))
+        }
+    }
     /// 资源是否存在iCloud上
     /// - Parameter asset: 对应的 PHAsset
     /// - Returns: 如果在获取到PHAsset之前还未下载的iCloud，之后下载了还是会返回存在

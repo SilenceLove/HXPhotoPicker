@@ -22,20 +22,20 @@ class HXPHPicker: NSObject {
     }
     
     enum AppearanceStyle: Int {
-        case varied     //!< 跟随系统变化
-        case normal     //!< 正常风格，不会跟随系统变化
-        case dark       //!< 暗黑风格
+        case varied = 0     //!< 跟随系统变化
+        case normal = 1     //!< 正常风格，不会跟随系统变化
+        case dark = 2       //!< 暗黑风格
     }
     
     enum LanguageType: Int {
-        case system             //!< 跟随系统语言
-        case simplifiedChinese  //!< 中文简体
-        case traditionalChinese //!< 中文繁体
-        case japanese           //!< 日文
-        case korean             //!< 韩文
-        case english            //!< 英文
-        case thai               //!< 泰语
-        case indonesia          //!< 印尼语
+        case system = 0             //!< 跟随系统语言
+        case simplifiedChinese = 1  //!< 中文简体
+        case traditionalChinese = 2 //!< 中文繁体
+        case japanese = 3           //!< 日文
+        case korean = 4             //!< 韩文
+        case english = 5            //!< 英文
+        case thai = 6               //!< 泰语
+        case indonesia = 7          //!< 印尼语
     }
     enum Asset {
         enum MediaType: Int {
@@ -59,6 +59,14 @@ class HXPHPicker: NSObject {
         }
     }
     enum PhotoList {
+        enum CancelType {
+            case text
+            case image
+        }
+        enum CancelPosition {
+            case left
+            case right
+        }
         enum Cell {
             enum SelectBoxType: Int {
                 case number //!< 数字

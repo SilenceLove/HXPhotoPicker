@@ -218,12 +218,6 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
                     livePhotoView.livePhoto = nil
                 }
             }
-            if photoAsset?.mediaSubType == .imageAnimated {
-                imageView.setupDisplayLink()
-            }else {
-                imageView.displayLink?.invalidate()
-                imageView.gifImage = nil
-            }
             if photoAsset?.mediaSubType == .localImage {
                 requestCompletion = true
             }
@@ -254,7 +248,13 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         if requestCompletion {
             return
         }
-        cancelRequest()
+        if photoAsset?.mediaSubType == .localImage {
+            return
+        }
+        if requestID != nil {
+            PHImageManager.default().cancelImageRequest(requestID!)
+            requestID = nil
+        }
         if type == .photo {
             if photoAsset?.mediaSubType == .imageAnimated &&
                 imageView.gifImage != nil {
@@ -278,6 +278,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         requestID = photoAsset?.requestImageData(iCloudHandler: { (asset, iCloudRequestID) in
             if asset == weakSelf?.photoAsset {
                 weakSelf?.requestID = iCloudRequestID
+                HXPHProgressHUD.showLoadingHUD(addedTo: weakSelf, text: "正在下载...".hx_localized, animated: true)
             }
         }, progressHandler: { (asset, progress) in
             if asset == weakSelf?.photoAsset {
@@ -286,6 +287,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         }, success: { (asset, imageData, imageOrientation, info) in
             if asset.mediaSubType == .imageAnimated {
                 if asset == weakSelf?.photoAsset {
+                    HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
                     let image = HXPHGIFImage.init(data: imageData)
                     weakSelf?.imageView.gifImage = image
                     weakSelf?.requestID = nil
@@ -297,7 +299,8 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
                     image = image?.hx_scaleSuitableSize()
                     DispatchQueue.main.async {
                         if asset == weakSelf?.photoAsset {
-                            weakSelf?.imageView.image = image
+                            HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
+                            weakSelf?.setImage(for: image)
                             weakSelf?.requestID = nil
                             weakSelf?.requestCompletion = true
                         }
@@ -306,9 +309,20 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             }
         }, failure: { (asset, info) in
             if asset == weakSelf?.photoAsset {
-                
+                if !HXPHAssetManager.assetDownloadCancel(for: info) {
+                    HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
+                    HXPHProgressHUD.showWarningHUD(addedTo: weakSelf, text: "下载失败".hx_localized, animated: true, delay: 2)
+                }
             }
         })
+    }
+    func setImage(for image: UIImage?) {
+        let transition = CATransition.init()
+        transition.duration = 0.2
+        transition.timingFunction = CAMediaTimingFunction.init(name: .linear)
+        transition.type = .fade
+        imageView.layer.add(transition, forKey: nil)
+        imageView.image = image
     }
     @available(iOS 9.1, *)
     func requestLivePhoto() {
@@ -317,6 +331,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         requestID = photoAsset?.requestLivePhoto(targetSize: targetSize, iCloudHandler: { (asset, requestID) in
             if asset == weakSelf?.photoAsset {
                 weakSelf?.requestID = requestID
+                HXPHProgressHUD.showLoadingHUD(addedTo: weakSelf, text: "正在下载...".hx_localized, animated: true)
             }
         }, progressHandler: { (asset, progress) in
             if asset == weakSelf?.photoAsset {
@@ -324,6 +339,7 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             }
         }, success: { (asset, livePhoto, info) in
             if asset == weakSelf?.photoAsset {
+                HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
                 weakSelf?.livePhotoView.livePhoto = livePhoto
                 UIView.animate(withDuration: 0.25) {
                     weakSelf?.livePhotoView.alpha = 1
@@ -334,7 +350,10 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             }
         }, failure: { (asset, info) in
             if asset == weakSelf?.photoAsset {
-                
+                if !HXPHAssetManager.assetDownloadCancel(for: info) {
+                    HXPHProgressHUD.hideHUD(forView: weakSelf, animated: true)
+                    HXPHProgressHUD.showWarningHUD(addedTo: weakSelf, text: "下载失败".hx_localized, animated: true, delay: 2)
+                }
             }
         })
     }
@@ -376,9 +395,8 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
         }
-        if photoAsset?.mediaSubType == .imageAnimated {
-            imageView.stopAnimating()
-        }
+        stopAnimatedImage()
+        HXPHProgressHUD.hideHUD(forView: self, animated: false)
         if type == .livePhoto {
             if #available(iOS 9.1, *) {
                 livePhotoView.stopPlayback()
@@ -387,13 +405,19 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
         }else if type == .video {
             videoView.cancelPlayer()
             videoView.alpha = 0
-            HXPHProgressHUD.hideHUD(forView: self, animated: false)
         }
         requestCompletion = false
     }
-    func hiddenVideoSubView() {
-        videoView.hiddenPlayButton()
+    func hiddenOtherSubView() {
+        if photoAsset?.mediaType == .video {
+            videoView.hiddenPlayButton()
+        }
         HXPHProgressHUD.hideHUD(forView: self, animated: false)
+    }
+    func startAnimatedImage() {
+        if photoAsset?.mediaSubType == .imageAnimated {
+            imageView.setupDisplayLink()
+        }
     }
     func stopAnimatedImage() {
         if photoAsset?.mediaSubType == .imageAnimated {

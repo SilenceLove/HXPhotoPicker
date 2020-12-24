@@ -80,7 +80,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             hx_pickerController?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
                 var cameraAssetCollection = assetCollection
                 if cameraAssetCollection == nil {
-                    cameraAssetCollection = HXPHAssetCollection.init(albumName: weakSelf?.config?.emptyAlbumName, coverImage: weakSelf?.config!.emptyCoverImageName.hx_image)
+                    cameraAssetCollection = HXPHAssetCollection.init(albumName: weakSelf?.config?.emptyAlbumName.hx_localized, coverImage: weakSelf?.config!.emptyCoverImageName.hx_image)
                 }
                 weakSelf?.canFetchAssetCollections = true
                 weakSelf?.title = "相册".hx_localized
@@ -106,7 +106,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     func reloadTableView(assetCollectionsArray: [HXPHAssetCollection]) {
         self.assetCollectionsArray = assetCollectionsArray
         if self.assetCollectionsArray.isEmpty {
-            let assetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName, coverImage: self.config!.emptyCoverImageName.hx_image)
+            let assetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName.hx_localized, coverImage: self.config!.emptyCoverImageName.hx_image)
             self.assetCollectionsArray.append(assetCollection)
         }
         self.tableView.reloadData()
@@ -198,6 +198,5 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     deinit {
         NotificationCenter.default.removeObserver(self)
-        print("\(self) deinit")
     }
 }

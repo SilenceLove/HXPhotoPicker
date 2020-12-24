@@ -145,19 +145,25 @@ class HXAlbumTitleView: UIControl {
                 title = "相册".hx_localized
             }
             titleLb.text = title
-            var titleWidth = self.title?.hx_stringWidth(ofFont: self.titleLb.font, maxHeight: self.hx_height) ?? 0
-            if titleWidth > hx_width - 40 {
-                titleWidth = hx_width - 45
-            }
-            UIView.animate(withDuration: 0.25) {
-                self.titleLb.hx_width = titleWidth
-                self.arrowView.hx_x = self.titleLb.frame.maxX + 5
-                self.contentView.hx_width = self.arrowView.frame.maxX + 5
-                self.contentView.hx_centerX = self.hx_width * 0.5
-            }
+            updateTitleFrame()
         }
     }
-    
+    func updateTitleFrame() {
+        var titleWidth = self.title?.hx_stringWidth(ofFont: self.titleLb.font, maxHeight: self.hx_height) ?? 0
+        if titleWidth > hx_width - 40 {
+            titleWidth = hx_width - 45
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.titleLb.hx_width = titleWidth
+            self.arrowView.hx_x = self.titleLb.frame.maxX + 5
+            self.contentView.hx_width = self.arrowView.frame.maxX + 5
+            self.contentView.hx_centerX = self.hx_width * 0.5
+        }
+    }
+    func updateViewFrame() {
+        hx_size = CGSize(width: UIScreen.main.bounds.size.width * 0.5, height: 30)
+        updateTitleFrame()
+    } 
     var titleColor: UIColor? {
         didSet {
             titleLb.textColor = titleColor

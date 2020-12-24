@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class HXPHConfiguration: NSObject {
     
@@ -133,7 +134,7 @@ class HXPHAlbumListConfiguration: NSObject {
     
     /// 当相册里没有资源时的相册名称
     lazy var emptyAlbumName: String = {
-        return "所有照片".hx_localized
+        return "所有照片"
     }()
     
     /// 当相册里没有资源时的封面图片名
@@ -269,6 +270,19 @@ class HXPHPhotoListConfiguration: NSObject {
         return "#2E2F30".hx_color
     }()
     
+    /// 取消按钮的配置只有当 albumShowMode = .popup 时有效
+    /// 取消按钮类型
+    var cancelType: HXPHPicker.PhotoList.CancelType = .text
+    
+    /// 取消按钮位置
+    var cancelPosition: HXPHPicker.PhotoList.CancelPosition = .right
+    
+    /// 取消按钮图片名
+    var cancelImageName: String = "hx_picker_photolist_cancel"
+    
+    /// 暗黑模式下取消按钮图片名
+    var cancelDarkImageName: String = "hx_picker_photolist_cancel"
+    
     /// 每行显示数量
     var rowNumber : Int = 4
     
@@ -286,7 +300,6 @@ class HXPHPhotoListConfiguration: NSObject {
     /// 底部视图相关配置
     lazy var bottomView: HXPHPickerBottomViewConfiguration = {
         let config = HXPHPickerBottomViewConfiguration.init()
-        config.showPrompt = true
         return config
     }()
     
@@ -359,7 +372,10 @@ class HXPHCameraConfiguration: NSObject {
     var videoMaximumDuration: TimeInterval = 60
     
     /// 视频质量
-    var videoQuality: UIImagePickerController.QualityType = .typeMedium
+    var videoQuality: UIImagePickerController.QualityType = .typeHigh
+    
+    /// 视频编辑裁剪导出的质量
+    var videoEditExportQuality: String = AVAssetExportPresetHighestQuality
     
     /// 默认使用后置相机
     var cameraDevice: UIImagePickerController.CameraDevice = .rear
@@ -398,6 +414,19 @@ class HXPHPreviewViewConfiguration: NSObject {
         config.showSelectedView = true
         return config
     }()
+    
+    /// 取消按钮的配置只有当是外部预览时才有效，文字和图片颜色通过 navigationTintColor 设置
+    /// 取消按钮类型
+    var cancelType: HXPHPicker.PhotoList.CancelType = .text
+    
+    /// 取消按钮位置
+    var cancelPosition: HXPHPicker.PhotoList.CancelPosition = .right
+    
+    /// 取消按钮图片名
+    var cancelImageName: String = "hx_picker_photolist_cancel"
+    
+    /// 暗黑模式下取消按钮图片名
+    var cancelDarkImageName: String = "hx_picker_photolist_cancel"
 }
 // MARK: 底部工具栏配置类
 class HXPHPickerBottomViewConfiguration: NSObject {
@@ -536,8 +565,8 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     var editButtonDisableTitleColor: UIColor?
     var editButtonDisableTitleDarkColor: UIColor?
     
-    /// 显示提示视图
-    var showPrompt: Bool = false
+    /// 相册权限为选不部分时显示提示视图
+    var showPrompt: Bool = true
     
     /// 提示图标颜色
     lazy var promptIconColor: UIColor = {

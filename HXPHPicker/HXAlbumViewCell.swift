@@ -77,12 +77,13 @@ class HXAlbumViewCell: UITableViewCell {
         contentView.addSubview(tickView)
     }
     func configColor() {
-        albumNameLb.textColor = HXPHManager.shared.isDark ? config?.albumNameDarkColor : config?.albumNameColor
-        photoCountLb.textColor = HXPHManager.shared.isDark ? config?.photoCountDarkColor : config?.photoCountColor
-        bottomLineView.backgroundColor = HXPHManager.shared.isDark ? config?.separatorLineDarkColor : config?.separatorLineColor
-        tickView.tickLayer.strokeColor = HXPHManager.shared.isDark ? config?.tickDarkColor.cgColor : config?.tickColor.cgColor
-        backgroundColor = HXPHManager.shared.isDark ? config?.cellbackgroundDarkColor : config?.cellBackgroundColor
-        if HXPHManager.shared.isDark {
+        let isDark = HXPHManager.shared.isDark
+        albumNameLb.textColor = isDark ? config?.albumNameDarkColor : config?.albumNameColor
+        photoCountLb.textColor = isDark ? config?.photoCountDarkColor : config?.photoCountColor
+        bottomLineView.backgroundColor = isDark ? config?.separatorLineDarkColor : config?.separatorLineColor
+        tickView.tickLayer.strokeColor = isDark ? config?.tickDarkColor.cgColor : config?.tickColor.cgColor
+        backgroundColor = isDark ? config?.cellbackgroundDarkColor : config?.cellBackgroundColor
+        if isDark {
             selectedBgView.backgroundColor = config?.cellSelectedDarkColor
             selectedBackgroundView = selectedBgView
         }else {

@@ -34,27 +34,23 @@ class HXPHAsset: NSObject {
             return getOriginalImage()
         }
     }
+    /// 获取图片原始地址
+    func requestImageURL(resultHandler: @escaping (URL?) -> Void) {
+        if asset == nil {
+            requestLocalImageURL(resultHandler: resultHandler)
+            return
+        }
+        requestAssetImageURL(resultHandler: resultHandler)
+    }
     /// 获取视频原始地址
     func requestVideoURL(resultHandler: @escaping (URL?) -> Void) {
         if asset == nil {
             resultHandler(localVideoURL)
             return
         }
-        if mediaSubType == .livePhoto {
-            var videoURL: URL?
-            HXPHAssetManager.requestLivePhotoContent(for: asset!) { (imageData) in
-            } videoHandler: { (url) in
-                videoURL = url
-            } completionHandler: { (error) in
-                resultHandler(videoURL)
-            }
-        }else {
-            HXPHAssetManager.requestVideoURL(for: asset!) { (videoURL) in
-                resultHandler(videoURL)
-            }
-        }
+        requestAssetVideoURL(resultHandler: resultHandler)
     }
-    
+
     /// 图片/视频大小
     var fileSize: Int {
         get {
@@ -81,26 +77,33 @@ class HXPHAsset: NSObject {
         }
     }
     
-    /// 本地资源的唯一标识符
-    var localAssetIdentifier: String?
-    var localIndex: Int = 0
-    private var localImage: UIImage?
-    private var localVideoURL: URL?
-    private var pFileSize: Int?
-    
+    /// 根据系统相册里对应的 PHAsset 数据初始化
+    /// - Parameter asset: 系统相册里对应的 PHAsset 数据
     init(asset: PHAsset) {
         super.init()
         self.asset = asset
         setMediaType()
     }
+    
+    /// 根据系统相册里对应的 PHAsset本地唯一标识符 初始化
+    /// - Parameter localIdentifier: 系统相册里对应的 PHAsset本地唯一标识符
     init(localIdentifier: String) {
         super.init()
         asset = HXPHAssetManager.fetchAsset(withLocalIdentifier: localIdentifier)
         setMediaType()
     }
+    
+    /// 根据本地image初始化
+    /// - Parameter image: 对应的 UIImage 数据
     convenience init(image: UIImage?) {
-        self.init(image: image, localIdentifier: nil)
+        self.init(image: image, localIdentifier: String(Date.init().timeIntervalSince1970))
     }
+    
+    /// 根据本地 UIImage 和 自定义的本地唯一标识符 初始化
+    /// 定义了唯一标识符，进入相册时内部会根据标识符自动选中对应的资源。请确保唯一标识符的正确性
+    /// - Parameters:
+    ///   - image: 对应的 UIImage 数据
+    ///   - localIdentifier: 自定义的本地唯一标识符
     init(image: UIImage?, localIdentifier: String?) {
         super.init()
         localAssetIdentifier = localIdentifier
@@ -108,9 +111,18 @@ class HXPHAsset: NSObject {
         mediaType = .photo
         mediaSubType = .localImage
     }
+    
+    /// 根据本地videoURL初始化
+    /// - Parameter videoURL: 对应的 URL 数据
     convenience init(videoURL: URL?) {
-        self.init(videoURL: videoURL, localIdentifier: nil)
+        self.init(videoURL: videoURL, localIdentifier: String(Date.init().timeIntervalSince1970))
     }
+    
+    /// 根据本地 videoURL 和 自定义的本地唯一标识符初始化
+    /// 定义了唯一标识符，进入相册时内部会根据标识符自动选中对应的资源。请确保唯一标识符的正确性
+    /// - Parameters:
+    ///   - videoURL: 对应的 URL 数据
+    ///   - localIdentifier: 自定义的本地唯一标识符
     init(videoURL: URL?, localIdentifier: String?) {
         super.init()
         localAssetIdentifier = localIdentifier
@@ -121,6 +133,13 @@ class HXPHAsset: NSObject {
         mediaType = .video
         mediaSubType = .localVideo
     }
+    
+    /// 本地资源的唯一标识符
+    var localAssetIdentifier: String?
+    var localIndex: Int = 0
+    private var localImage: UIImage?
+    private var localVideoURL: URL?
+    private var pFileSize: Int?
     
     /// 请求缩略图
     /// - Parameter completion: 完成回调
@@ -267,6 +286,9 @@ class HXPHAsset: NSObject {
             videoTime = HXPHTools.transformVideoDurationToString(duration: asset!.duration)
         }
     }
+    private func getLocalImageData() -> Data? {
+        return HXPHTools.getImageData(for: localImage)
+    }
     private func getFileSize() -> Int {
         if let fileSize = pFileSize {
             return fileSize
@@ -281,10 +303,8 @@ class HXPHAsset: NSObject {
             }
         }else {
             if self.mediaType == .photo {
-                if let pngData = localImage?.pngData() {
-                    fileSize = pngData.count
-                }else if let jpegData = localImage?.jpegData(compressionQuality: 1) {
-                    fileSize = jpegData.count
+                if let imageData = getLocalImageData() {
+                    fileSize = imageData.count
                 }
             }else {
                 if let videoURL = localVideoURL {
@@ -333,5 +353,73 @@ class HXPHAsset: NSObject {
             size = localImage?.size ?? CGSize(width: 200, height: 200)
         }
         return size
+    }
+    
+    /// 获取本地图片地址
+    private func requestLocalImageURL(resultHandler: @escaping (URL?) -> Void) {
+        DispatchQueue.global().async {
+            if let imageData = self.getLocalImageData() {
+                let imageURL = HXPHTools.getImageTmpURL()
+                do {
+                    try imageData.write(to: imageURL)
+                    DispatchQueue.main.async {
+                        resultHandler(imageURL)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        resultHandler(nil)
+                    }
+                }
+            }else {
+                DispatchQueue.main.async {
+                    resultHandler(nil)
+                }
+            }
+        }
+    }
+    private func requestAssetImageURL(resultHandler: @escaping (URL?) -> Void) {
+        if asset == nil {
+            return
+        }
+        var suffix: String
+        if mediaSubType == .imageAnimated {
+            suffix = "gif"
+        }else {
+            suffix = "jpeg"
+        }
+        HXPHAssetManager.requestImageURL(for: asset!, suffix: suffix) { (imageURL) in
+            if HXPHAssetManager.assetIsAnimated(asset: self.asset!) && self.mediaSubType != .imageAnimated && imageURL != nil {
+                // 本质上是gif，需要变成静态图
+                let image = UIImage.init(contentsOfFile: imageURL!.path)
+                if let imageData = HXPHTools.getImageData(for: image) {
+                    do {
+                        let tempURL = HXPHTools.getImageTmpURL()
+                        try imageData.write(to: tempURL)
+                        resultHandler(tempURL)
+                    } catch {
+                        resultHandler(nil)
+                    }
+                }else {
+                    resultHandler(nil)
+                }
+            }else {
+                resultHandler(imageURL)
+            }
+        }
+    }
+    private func requestAssetVideoURL(resultHandler: @escaping (URL?) -> Void) {
+        if mediaSubType == .livePhoto {
+            var videoURL: URL?
+            HXPHAssetManager.requestLivePhoto(content: asset!) { (imageData) in
+            } videoHandler: { (url) in
+                videoURL = url
+            } completionHandler: { (error) in
+                resultHandler(videoURL)
+            }
+        }else {
+            HXPHAssetManager.requestVideoURL(mp4Format: asset!) { (videoURL) in
+                resultHandler(videoURL)
+            }
+        }
     }
 }

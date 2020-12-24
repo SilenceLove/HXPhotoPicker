@@ -9,15 +9,11 @@
 import UIKit
 import Photos
 
-protocol HXPHPickerViewCellDelegate: NSObjectProtocol {
-    
-    func cellDidSelectControlClick(_ cell: HXPHPickerMultiSelectViewCell, isSelected: Bool)
-    
+@objc protocol HXPHPickerViewCellDelegate: NSObjectProtocol {
+    @objc optional func cellDidSelectControlClick(_ cell: HXPHPickerMultiSelectViewCell, isSelected: Bool)
 }
 
 class HXPHPickerViewCell: UICollectionViewCell {
-    
-    weak var delegate: HXPHPickerViewCellDelegate?
     var config: HXPHPhotoListCellConfiguration? {
         didSet {
             backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
@@ -87,20 +83,23 @@ class HXPHPickerViewCell: UICollectionViewCell {
                 assetTypeMaskLayer.isHidden = true
             }
             videoIcon.isHidden = photoAsset?.mediaType != .video
-            weak var weakSelf = self
-            requestID = photoAsset?.requestThumbnailImage(completion: { (image, photoAsset, info) in
-                if photoAsset == weakSelf?.photoAsset && image != nil {
-                    if !(weakSelf?.firstLoadCompletion ?? true) {
-                        weakSelf?.isHidden = false
-                        weakSelf?.firstLoadCompletion = true
-                    }
-                    weakSelf?.imageView.image = image
-                    if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
-                        weakSelf?.requestID = nil
-                    }
-                }
-            })
+            requestThumbnailImage()
         }
+    }
+    func requestThumbnailImage() {
+        weak var weakSelf = self
+        requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * 2, completion: { (image, photoAsset, info) in
+            if photoAsset == weakSelf?.photoAsset && image != nil {
+                if !(weakSelf?.firstLoadCompletion ?? true) {
+                    weakSelf?.isHidden = false
+                    weakSelf?.firstLoadCompletion = true
+                }
+                weakSelf?.imageView.image = image
+                if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
+                    weakSelf?.requestID = nil
+                }
+            }
+        })
     }
     
     lazy var selectMaskLayer: CALayer = {
@@ -163,6 +162,8 @@ class HXPHPickerViewCell: UICollectionViewCell {
 
 class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
+    weak var delegate: HXPHPickerViewCellDelegate?
+    
     lazy var selectControl: HXPHPickerCellSelectBoxControl = {
         let selectControl = HXPHPickerCellSelectBoxControl.init()
         selectControl.backgroundColor = .clear
@@ -192,7 +193,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
 //        if !canSelect {
 //            return
 //        }
-        delegate?.cellDidSelectControlClick(self, isSelected: control.isSelected)
+        delegate?.cellDidSelectControlClick?(self, isSelected: control.isSelected)
     }
     
     func updateSelectedState(isSelected: Bool, animated: Bool) {

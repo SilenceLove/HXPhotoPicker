@@ -146,7 +146,7 @@ class HXPHTools: NSObject {
         assetImageGenerator.apertureMode = .encodedPixels
         let thumbnailImageTime: CFTimeInterval = atTime
         do {
-            let thumbnailImageRef = try assetImageGenerator.copyCGImage(at: CMTime(value: CMTimeValue(thumbnailImageTime), timescale: 60), actualTime: nil)
+            let thumbnailImageRef = try assetImageGenerator.copyCGImage(at: CMTime(value: CMTimeValue(thumbnailImageTime), timescale: urlAsset.duration.timescale), actualTime: nil)
             let image = UIImage.init(cgImage: thumbnailImageRef)
             return image
         } catch {
@@ -163,10 +163,10 @@ class HXPHTools: NSObject {
         return TimeInterval(second)
     }
     class func transformBytesToString(bytes: Int) -> String {
-        if CGFloat(bytes) >= 0.5 * 1024 * 1024 {
-            return String.init(format: "%0.1fM", arguments: [CGFloat(bytes) / 1024 / 1024])
-        }else if bytes >= 1024 {
-            return String.init(format: "%0.0fK", arguments: [CGFloat(bytes) / 1024])
+        if CGFloat(bytes) >= 0.5 * 1000 * 1000 {
+            return String.init(format: "%0.1fM", arguments: [CGFloat(bytes) / 1000 / 1000])
+        }else if bytes >= 1000 {
+            return String.init(format: "%0.0fK", arguments: [CGFloat(bytes) / 1000])
         }else {
             return String.init(format: "%dB", arguments: [bytes])
         }
@@ -190,7 +190,70 @@ class HXPHTools: NSObject {
         }
         return CGSize.init(width: width, height: height)
     }
-    
+    class func exportEditVideo(for avAsset: AVAsset, startTime: TimeInterval, endTime: TimeInterval, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
+        let timescale = avAsset.duration.timescale
+        let start = CMTime(value: CMTimeValue(startTime * TimeInterval(timescale)), timescale: timescale)
+        let end = CMTime(value: CMTimeValue(endTime * TimeInterval(timescale)), timescale: timescale)
+        let timeRang = CMTimeRange(start: start, end: end)
+        exportEditVideo(for: avAsset, timeRang: timeRang, presentName: presentName, completion: completion)
+    }
+    class func exportEditVideo(for avAsset: AVAsset, timeRang: CMTimeRange, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
+        if AVAssetExportSession.allExportPresets().contains(presentName) {
+            let videoURL = HXPHTools.getVideoTmpURL()
+            if let exportSession = AVAssetExportSession.init(asset: avAsset, presetName: presentName) {
+                let supportedTypeArray = exportSession.supportedFileTypes
+                exportSession.outputURL = videoURL
+                if supportedTypeArray.contains(AVFileType.mp4) {
+                    exportSession.outputFileType = .mp4
+                }else if supportedTypeArray.isEmpty {
+                    completion(nil, HXPickerError.error(message: "不支持导出该类型视频"))
+                    return
+                }else {
+                    exportSession.outputFileType = supportedTypeArray.first
+                }
+                exportSession.timeRange = timeRang
+                exportSession.exportAsynchronously(completionHandler: {
+                    DispatchQueue.main.async {
+                        switch exportSession.status {
+                        case .completed:
+                            completion(videoURL, nil)
+                            break
+                        case .failed, .cancelled:
+                            completion(nil, exportSession.error)
+                            break
+                        default: break
+                        }
+                    }
+                })
+            }else {
+                completion(nil, HXPickerError.error(message: "不支持导出该类型视频"))
+                return
+            }
+        }else {
+            completion(nil, HXPickerError.error(message: "设备不支持导出：" + presentName))
+            return
+        }
+    }
+    class func getImageData(for image: UIImage?) -> Data? {
+        if let pngData = image?.pngData() {
+            return pngData
+        }else if let jpegData = image?.jpegData(compressionQuality: 1) {
+            return jpegData
+        }
+        return nil
+    }
+    class func getTmpURL(for suffix: String) -> URL {
+        var tmpPath = NSTemporaryDirectory()
+        tmpPath.append(contentsOf: String.hx_fileName(suffix: suffix))
+        let tmpURL = URL.init(fileURLWithPath: tmpPath)
+        return tmpURL
+    }
+    class func getImageTmpURL() -> URL {
+        return getTmpURL(for: "jpeg")
+    }
+    class func getVideoTmpURL() -> URL {
+        return getTmpURL(for: "mp4")
+    }
     class func getWXConfig() -> HXPHConfiguration {
         let config = HXPHConfiguration.init()
         config.maximumSelectedCount = 9
@@ -215,6 +278,8 @@ class HXPHTools: NSObject {
         config.albumList.tickColor = "#07C160".hx_color
         
         config.photoList.backgroundColor = "#2E2F30".hx_color
+        config.photoList.cancelPosition = .left
+        config.photoList.cancelType = .image
         
         config.photoList.titleViewConfig.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
         config.photoList.titleViewConfig.arrowBackgroundColor = "#B2B2B2".hx_color
@@ -245,6 +310,8 @@ class HXPHTools: NSObject {
         config.photoList.emptyView.titleColor = "#ffffff".hx_color
         config.photoList.emptyView.subTitleColor = .lightGray
         
+        config.previewView.cancelType = .image
+        config.previewView.cancelPosition = .left
         config.previewView.backgroundColor = .black
         config.previewView.selectBox.tickColor = .white
         config.previewView.selectBox.selectedBackgroundColor = "#07C160".hx_color

@@ -11,6 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HXPHPickerBaseViewController" customModule="HXPHPickerExample">
             <connections>
+                <outlet property="collectionView" destination="2Kv-7w-a30" id="SUI-ta-4hH"/>
                 <outlet property="view" destination="iN0-l3-epB" id="xfg-wx-vur"/>
             </connections>
         </placeholder>
@@ -23,21 +24,53 @@
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NwQ-gx-TFH">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="700"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="600"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OWE-K4-nDn">
-                                    <rect key="frame" x="184" y="640" width="46" height="30"/>
+                                    <rect key="frame" x="181" y="520" width="52" height="33"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <state key="normal" title="去选择"/>
                                     <connections>
                                         <action selector="selectButtonClick:" destination="-1" eventType="touchUpInside" id="Xkx-I3-D8V"/>
                                     </connections>
                                 </button>
+                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="2Kv-7w-a30">
+                                    <rect key="frame" x="0.0" y="100" width="414" height="400"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="400" id="znL-rg-Ss0"/>
+                                    </constraints>
+                                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="E0r-YU-EA7">
+                                        <size key="itemSize" width="128" height="128"/>
+                                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    </collectionViewFlowLayout>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="BSb-Yp-uek"/>
+                                        <outlet property="delegate" destination="-1" id="G5B-3X-rkM"/>
+                                    </connections>
+                                </collectionView>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mPQ-uN-Ram">
+                                    <rect key="frame" x="61" y="568" width="292" height="33"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <state key="normal" title="获取已选资源的URL，并打印在控制台"/>
+                                    <connections>
+                                        <action selector="didRequestSelectedAssetURL:" destination="-1" eventType="touchUpInside" id="ox6-3L-SrR"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <constraints>
-                                <constraint firstAttribute="bottom" secondItem="OWE-K4-nDn" secondAttribute="bottom" constant="30" id="0Uk-Ij-be2"/>
+                                <constraint firstItem="2Kv-7w-a30" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KYh-c8-vQy"/>
+                                <constraint firstItem="mPQ-uN-Ram" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KwU-l3-Txc"/>
+                                <constraint firstItem="2Kv-7w-a30" firstAttribute="centerY" secondItem="NwQ-gx-TFH" secondAttribute="centerY" id="Nbe-LQ-Syo"/>
                                 <constraint firstItem="OWE-K4-nDn" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="bVI-x8-snf"/>
-                                <constraint firstAttribute="height" constant="700" id="zlO-OJ-smd"/>
+                                <constraint firstItem="mPQ-uN-Ram" firstAttribute="top" secondItem="OWE-K4-nDn" secondAttribute="bottom" constant="15" id="c2o-nX-I6c"/>
+                                <constraint firstItem="2Kv-7w-a30" firstAttribute="leading" secondItem="NwQ-gx-TFH" secondAttribute="leading" id="knd-bA-LEm"/>
+                                <constraint firstItem="OWE-K4-nDn" firstAttribute="top" secondItem="2Kv-7w-a30" secondAttribute="bottom" constant="20" id="sjD-cp-8tO"/>
+                                <constraint firstAttribute="height" constant="600" id="zlO-OJ-smd"/>
+                                <constraint firstAttribute="trailing" secondItem="2Kv-7w-a30" secondAttribute="trailing" id="zog-tI-RbZ"/>
                             </constraints>
                         </view>
                     </subviews>
@@ -58,7 +91,7 @@
                 <constraint firstItem="8cq-En-Ah1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="TbS-af-ltZ"/>
                 <constraint firstItem="8cq-En-Ah1" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="wM3-xu-8DB"/>
             </constraints>
-            <point key="canvasLocation" x="137.68115942028987" y="77.678571428571431"/>
+            <point key="canvasLocation" x="8.6956521739130448" y="-110.49107142857143"/>
         </view>
     </objects>
     <resources>
