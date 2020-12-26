@@ -14,7 +14,7 @@ protocol HXPHPreviewViewControllerDelegate: NSObjectProtocol {
     func previewViewControllerDidClickSelectBox(_ previewViewController:HXPHPreviewViewController, with isSelected: Bool)
 }
 
-class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, HXPHPreviewViewCellDelegate, HXPHPickerBottomViewDelegate, UINavigationControllerDelegate, UIViewControllerTransitioningDelegate {
+class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, HXPHPreviewViewCellDelegate, HXPHPickerBottomViewDelegate, UINavigationControllerDelegate {
     
     weak var delegate: HXPHPreviewViewControllerDelegate?
     var config : HXPHPreviewViewConfiguration!
@@ -193,8 +193,6 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        transitioningDelegate = self
-        modalPresentationStyle = .custom
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -451,7 +449,9 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         return .fade
     }
-    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return hx_pickerController?.config.statusBarStyle ?? .default
+    }
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
@@ -476,7 +476,6 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         }
         return nil
     }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -671,7 +670,7 @@ class HXPHPreviewSelectedViewCell: UICollectionViewCell {
     var photoAsset: HXPHAsset? {
         didSet {
             weak var weakSelf = self
-            requestID = photoAsset?.requestThumbnailImage(targetWidth: 150, completion: { (image, asset, info) in
+            requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * 2, completion: { (image, asset, info) in
                 if weakSelf?.photoAsset == asset {
                     weakSelf?.imageView.image = image
                 }

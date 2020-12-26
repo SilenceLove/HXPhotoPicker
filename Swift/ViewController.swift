@@ -17,7 +17,7 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         title = "Example"
-        let baseExample = HXPHExample.init(title: "照片选择器", subTitle: "获取所选资源的内容", viewControllerClass: HXPHPickerBaseViewController.self)
+        let baseExample = HXPHExample.init(title: "照片选择器", subTitle: "获取所选资源的内容", viewControllerClass: BaseViewController.self)
         exampleList.append(baseExample)
         view.backgroundColor = UIColor.white
         tableView = UITableView.init(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), style: UITableView.Style.plain)

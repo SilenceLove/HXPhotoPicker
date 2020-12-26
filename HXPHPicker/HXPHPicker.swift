@@ -60,12 +60,12 @@ class HXPHPicker: NSObject {
     }
     enum PhotoList {
         enum CancelType {
-            case text
-            case image
+            case text   //!< 文本
+            case image  //!< 图片
         }
         enum CancelPosition {
-            case left
-            case right
+            case left   //!< 左边
+            case right  //!< 右边
         }
         enum Cell {
             enum SelectBoxType: Int {
@@ -134,9 +134,6 @@ class HXPHImagePickerController: UIImagePickerController, UINavigationController
         }
     }
     func getSubviewsOfView(v:UIView) -> [UIView] {
-        if v.subviews.isEmpty {
-            return [v]
-        }
         var allView: [UIView] = [v]
         v.subviews.forEach { (subView) in
             allView.append(contentsOf: getSubviewsOfView(v: subView))

@@ -10,22 +10,31 @@ import UIKit
 import Photos
 
 @objc protocol HXPHPickerViewCellDelegate: NSObjectProtocol {
-    @objc optional func cellDidSelectControlClick(_ cell: HXPHPickerMultiSelectViewCell, isSelected: Bool)
+    @objc optional func cell(didSelectControl cell: HXPHPickerMultiSelectViewCell, isSelected: Bool)
 }
 
 class HXPHPickerViewCell: UICollectionViewCell {
     var config: HXPHPhotoListCellConfiguration? {
         didSet {
-            backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
+            configColor()
         }
+    }
+    func configColor() {
+        backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
     }
     lazy var imageView: UIImageView = {
         let imageView = UIImageView.init()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.addSublayer(assetTypeMaskLayer)
+        imageView.addSubview(assetTypeMaskView)
         imageView.layer.addSublayer(selectMaskLayer)
         return imageView
+    }()
+    lazy var assetTypeMaskView: UIView = {
+        let assetTypeMaskView = UIView.init()
+        assetTypeMaskView.isHidden = true
+        assetTypeMaskView.layer.addSublayer(assetTypeMaskLayer)
+        return assetTypeMaskView
     }()
     lazy var assetTypeMaskLayer: CAGradientLayer = {
         let layer = CAGradientLayer.init()
@@ -39,7 +48,6 @@ class HXPHPickerViewCell: UICollectionViewCell {
         layer.endPoint = CGPoint(x: 0, y: 1)
         layer.locations = [0.15, 0.35, 0.6, 0.9]
         layer.borderWidth = 0.0
-        layer.isHidden = true
         return layer
     }()
     lazy var assetTypeLb: UILabel = {
@@ -52,6 +60,7 @@ class HXPHPickerViewCell: UICollectionViewCell {
     lazy var videoIcon: UIImageView = {
         let videoIcon = UIImageView.init(image: UIImage.hx_named(named: "hx_picker_cell_video_icon"))
         videoIcon.hx_size = videoIcon.image?.size ?? CGSize.zero
+        videoIcon.isHidden = true
         return videoIcon
     }()
     
@@ -68,24 +77,25 @@ class HXPHPickerViewCell: UICollectionViewCell {
             switch photoAsset?.mediaSubType {
             case .imageAnimated:
                 assetTypeLb.text = "GIF"
-                assetTypeMaskLayer.isHidden = false
+                assetTypeMaskView.isHidden = false
                 break
             case .livePhoto:
                 assetTypeLb.text = "Live"
-                assetTypeMaskLayer.isHidden = false
+                assetTypeMaskView.isHidden = false
                 break
             case .video, .localVideo:
                 assetTypeLb.text = photoAsset?.videoTime
-                assetTypeMaskLayer.isHidden = false
+                assetTypeMaskView.isHidden = false
                 break
             default:
                 assetTypeLb.text = nil
-                assetTypeMaskLayer.isHidden = true
+                assetTypeMaskView.isHidden = true
             }
             videoIcon.isHidden = photoAsset?.mediaType != .video
             requestThumbnailImage()
         }
     }
+    /// 获取图片，重写此方法可以修改图片
     func requestThumbnailImage() {
         weak var weakSelf = self
         requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * 2, completion: { (image, photoAsset, info) in
@@ -112,7 +122,8 @@ class HXPHPickerViewCell: UICollectionViewCell {
     
     var canSelect = true {
         didSet {
-            disableMaskLayer.isHidden = canSelect
+            // 禁用遮罩
+            setupDisableMask()
         }
     }
     private var firstLoadCompletion: Bool = false
@@ -131,6 +142,31 @@ class HXPHPickerViewCell: UICollectionViewCell {
         contentView.layer.addSublayer(disableMaskLayer)
     }
     
+    /// 设置禁用遮罩
+    func setupDisableMask() {
+        disableMaskLayer.isHidden = canSelect
+    }
+    /// 设置高亮遮罩
+    func setupHighlightedMask() {
+        if let selected = photoAsset?.isSelected {
+            if !selected {
+                selectMaskLayer.isHidden = !isHighlighted
+            }
+        }
+    }
+    /// 布局，重写此方法修改布局
+    func layoutView() {
+        imageView.frame = bounds
+        selectMaskLayer.frame = imageView.bounds
+        disableMaskLayer.frame = imageView.bounds
+        assetTypeMaskView.frame = CGRect(x: 0, y: imageView.hx_height - 25, width: hx_width, height: 25)
+        assetTypeMaskLayer.frame = assetTypeMaskView.bounds
+        assetTypeLb.frame = CGRect(x: 0, y: hx_height - 19, width: hx_width - 5, height: 18)
+        videoIcon.hx_x = 5
+        videoIcon.hx_y = hx_height - videoIcon.hx_height - 5
+        assetTypeLb.hx_centerY = videoIcon.hx_centerY
+    }
+    
     func cancelRequest() {
         if requestID != nil {
             PHImageManager.default().cancelImageRequest(requestID!)
@@ -140,23 +176,12 @@ class HXPHPickerViewCell: UICollectionViewCell {
     
     override var isHighlighted: Bool {
         didSet {
-            if let selected = photoAsset?.isSelected {
-                if !selected {
-                    selectMaskLayer.isHidden = !isHighlighted
-                }
-            }
+            setupHighlightedMask()
         }
     }
     override func layoutSubviews() {
         super.layoutSubviews()
-        imageView.frame = bounds
-        selectMaskLayer.frame = imageView.bounds
-        disableMaskLayer.frame = imageView.bounds
-        assetTypeMaskLayer.frame = CGRect(x: 0, y: imageView.hx_height - 25, width: hx_width, height: 25)
-        assetTypeLb.frame = CGRect(x: 0, y: hx_height - 19, width: hx_width - 5, height: 18)
-        videoIcon.hx_x = 5
-        videoIcon.hx_y = hx_height - videoIcon.hx_height - 5
-        assetTypeLb.hx_centerY = videoIcon.hx_centerY
+        layoutView()
     }
 }
 
@@ -173,7 +198,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     override var photoAsset: HXPHAsset? {
         didSet {
-            updateSelectedState(isSelected: photoAsset!.isSelected, animated: false)
+            updateSelectedState(isSelected: photoAsset?.isSelected ?? false, animated: false)
         }
     }
     
@@ -189,13 +214,18 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
         contentView.layer.addSublayer(disableMaskLayer)
     }
     
+    /// 选择框点击事件
+    /// - Parameter control: 选择框
     @objc func didSelectControlClick(control: HXPHPickerCellSelectBoxControl) {
-//        if !canSelect {
-//            return
-//        }
-        delegate?.cellDidSelectControlClick?(self, isSelected: control.isSelected)
+        delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
     }
     
+    /// 更新已选状态
+    /// 重写此方法时如果是自定义的选择按钮显示当前选择的下标文字，必须在此方法内更新文字内容，否则将会出现顺序显示错乱
+    /// 当前选择的下标：photoAsset.selectIndex
+    /// - Parameters:
+    ///   - isSelected: 是否已选择
+    ///   - animated: 是否需要动画效果
     func updateSelectedState(isSelected: Bool, animated: Bool) {
         let boxWidth = config!.selectBox.size.width
         let boxHeight = config!.selectBox.size.height
@@ -212,13 +242,13 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
                     textWidth = boxWidth
                 }
                 selectControl.text = text
-                updateSelectControlFrame(width: textWidth, height: boxHeight)
+                updateSelectControlSize(width: textWidth, height: boxHeight)
             }else {
-                updateSelectControlFrame(width: boxWidth, height: boxHeight)
+                updateSelectControlSize(width: boxWidth, height: boxHeight)
             }
         }else {
             selectMaskLayer.isHidden = true
-            updateSelectControlFrame(width: boxWidth, height: boxHeight)
+            updateSelectControlSize(width: boxWidth, height: boxHeight)
         }
         if selectControl.isSelected == isSelected {
             selectControl.setNeedsDisplay()
@@ -234,7 +264,8 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
         }
     }
     
-    func updateSelectControlFrame(width: CGFloat, height: CGFloat) {
+    /// 更新选择框大小
+    func updateSelectControlSize(width: CGFloat, height: CGFloat) {
         let topMargin = config?.selectBoxTopMargin ?? 5
         let rightMargin = config?.selectBoxRightMargin ?? 5
         selectControl.frame = CGRect(x: hx_width - rightMargin - width, y: topMargin, width: width, height: height)
@@ -243,7 +274,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         if selectControl.hx_width != hx_width - 5 - selectControl.hx_width {
-            updateSelectControlFrame(width: selectControl.hx_width, height: selectControl.hx_height)
+            updateSelectControlSize(width: selectControl.hx_width, height: selectControl.hx_height)
         }
     }
     
@@ -344,15 +375,11 @@ class HXPHPickerCellSelectBoxControl: UIControl {
 class HXPHPickerCamerViewCell: UICollectionViewCell {
     
     override class var layerClass: AnyClass {
-        return AVPlayerLayer.self
+        return AVCaptureVideoPreviewLayer.self
     }
     
-    var playerLayer: AVPlayerLayer {
-        get {
-            return layer as! AVPlayerLayer
-        }
-    }
-    
+    var previewLayer: AVCaptureVideoPreviewLayer?
+    var startSeesionCompletion: Bool = false
     lazy var imageView: UIImageView = {
         let imageView = UIImageView.init()
         return imageView
@@ -366,6 +393,8 @@ class HXPHPickerCamerViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        previewLayer = layer as? AVCaptureVideoPreviewLayer
+        previewLayer?.videoGravity = .resizeAspectFill
         contentView.addSubview(imageView)
     }
     
@@ -376,6 +405,44 @@ class HXPHPickerCamerViewCell: UICollectionViewCell {
         imageView.image = UIImage.hx_named(named: HXPHManager.shared.isDark ? config?.cameraDarkImageName : config?.cameraImageName)
         backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
         imageView.hx_size = imageView.image?.size ?? .zero
+        if let allowPreview = config?.allowPreview, allowPreview == true {
+            requestCameraAccess()
+        }
+    }
+    func requestCameraAccess() {
+        if startSeesionCompletion {
+            return
+        }
+        if !UIImagePickerController.isSourceTypeAvailable(.camera) {
+            HXPHProgressHUD.showWarningHUD(addedTo: hx_viewController()?.view, text: "相机不可用!".hx_localized, animated: true, delay: 1.5)
+            return
+        }
+        HXPHAssetManager.requestCameraAccess { (granted) in
+            if granted {
+                self.startSeesion()
+            }else {
+                HXPHTools.showNotCameraAuthorizedAlert(viewController: self.hx_viewController())
+            }
+        }
+    }
+    func startSeesion() {
+        self.startSeesionCompletion = true
+        DispatchQueue.global().async {
+            let session = AVCaptureSession.init()
+            session.beginConfiguration()
+            if session.canSetSessionPreset(AVCaptureSession.Preset.high) {
+                session.sessionPreset = .high
+            }
+            if let videoDevice = AVCaptureDevice.default(for: .video) {
+                do {
+                    let videoInput = try AVCaptureDeviceInput.init(device: videoDevice)
+                    session.addInput(videoInput)
+                    session.commitConfiguration()
+                    session.startRunning()
+                    self.previewLayer?.session = session
+                }catch {}
+            }
+        }
     }
     
     override func layoutSubviews() {

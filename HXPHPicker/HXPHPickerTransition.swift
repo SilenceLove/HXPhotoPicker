@@ -12,7 +12,7 @@ import Photos
 enum HXPHPickerControllerTransitionType: Int {
     case push
     case pop
-    case persent
+    case present
     case dismiss
 }
 
@@ -34,17 +34,23 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        if type == .pop {
+        if type == .pop || type == .present {
             return 0.5
+        }else if type == .dismiss {
+            return 0.65
         }
         return 0.45
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        transition(using: transitionContext)
+        if type == .push || type == .pop {
+            pushTransition(using: transitionContext)
+        }else {
+            presentTransition(using: transitionContext)
+        }
     }
     
-    func transition(using transitionContext: UIViewControllerContextTransitioning) {
+    func pushTransition(using transitionContext: UIViewControllerContextTransitioning) {
         let fromVC = transitionContext.viewController(forKey: .from)!
         let toVC = transitionContext.viewController(forKey: .to)!
         
@@ -86,26 +92,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                 }
                 
                 if photoAsset!.asset != nil {
-                    let options = PHImageRequestOptions.init()
-                    options.resizeMode = .fast
-                    options.isSynchronous = false
-                    requestID = HXPHAssetManager.requestImageData(for: photoAsset!.asset!, options: options) { (imageData, dataUTI, imageOrientation, info) in
-                        if imageData != nil {
-                            var image: UIImage?
-                            if imageOrientation != .up {
-                                image = UIImage.init(data: imageData!)?.hx_normalizedImage()
-                            }else {
-                                image = UIImage.init(data: imageData!)
-                            }
-                            DispatchQueue.main.async {
-                                self.pushImageView.image = image
-                            }
-                        }
-                        if HXPHAssetManager.assetDownloadFinined(for: info) ||
-                            HXPHAssetManager.assetDownloadCancel(for: info){
-                            self.requestID = nil
-                        }
-                    }
+                    requestAssetImage(for: photoAsset!.asset!)
                 }else if pushImageView.image == nil {
                     pushImageView.image = photoAsset?.originalImage
                 }
@@ -142,31 +129,9 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
         
         var rect: CGRect = .zero
         if type == .push {
-            var imageSize: CGSize = .zero
-            var imageCenter: CGPoint = .zero
             if photoAsset != nil {
-                if UIDevice.current.hx_isPortrait {
-                    let aspectRatio = toVC.view.hx_width / photoAsset!.imageSize.width
-                    let contentWidth = toVC.view.hx_width
-                    let contentHeight = photoAsset!.imageSize.height * aspectRatio
-                    imageSize = CGSize(width: contentWidth, height: contentHeight)
-                    if contentHeight < toVC.view.hx_height {
-                        imageCenter = CGPoint(x: toVC.view.hx_width * 0.5, y: toVC.view.hx_height * 0.5)
-                    }
-                }else {
-                    let aspectRatio = toVC.view.hx_height / photoAsset!.imageSize.height
-                    let contentWidth = photoAsset!.imageSize.width * aspectRatio
-                    let contentHeight = toVC.view.hx_height
-                    imageSize = CGSize(width: contentWidth, height: contentHeight)
-                }
+                rect = getPreviewViewFrame(photoAsset: photoAsset!, size: toVC.view.hx_size)
             }
-            var rectY: CGFloat
-            if imageCenter.equalTo(.zero) {
-                rectY = 0
-            }else {
-                rectY = (toVC.view.hx_height - imageSize.height) * 0.5
-            }
-            rect = CGRect(x: (toVC.view.hx_width - imageSize.width) * 0.5, y: rectY, width: imageSize.width, height: imageSize.height)
             fromView?.isHidden = true
         }else if type == .pop {
             rect = toView?.convert(toView?.bounds ?? CGRect.zero, to: containerView) ?? .zero
@@ -227,8 +192,184 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             }
         }
     }
+    func presentTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        let fromVC = transitionContext.viewController(forKey: .from)!
+        let toVC = transitionContext.viewController(forKey: .to)!
+        
+        let containerView = transitionContext.containerView
+        let contentView = UIView.init(frame: fromVC.view.bounds)
+        
+        var pickerController: HXPHPickerController
+        if type == .present {
+            pickerController = toVC as! HXPHPickerController
+        }else {
+            pickerController = fromVC as! HXPHPickerController
+        }
+        let backgroundColor = HXPHManager.shared.isDark ? pickerController.config.previewView.backgroundDarkColor : pickerController.config.previewView.backgroundColor
+        var fromView: UIView
+        var previewView: UIView?
+        var toRect: CGRect = .zero
+        if type == .present {
+            containerView.addSubview(contentView)
+            containerView.addSubview(toVC.view)
+            contentView.backgroundColor = backgroundColor.withAlphaComponent(0)
+            pickerController.previewViewController()?.view.backgroundColor = backgroundColor.withAlphaComponent(0)
+            pickerController.view.backgroundColor = nil
+            pickerController.previewViewController()?.bottomView.alpha = 0
+            pickerController.navigationBar.alpha = 0
+            pickerController.previewViewController()?.collectionView.isHidden = true
+            fromView = pushImageView
+            let currentPreviewIndex = pickerController.previewIndex
+            if let view = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewViewForIndexAt: currentPreviewIndex) {
+                let rect = view.convert(view.bounds, to: contentView)
+                fromView.frame = rect
+                previewView = view
+            }else if let rect = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewFrameForIndexAt: currentPreviewIndex) {
+                fromView.frame = rect
+            }else {
+                fromView.center = CGPoint(x: toVC.view.hx_width * 0.5, y: toVC.view.hx_height * 0.5)
+            }
+            
+            if let image = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewImageForIndexAt: pickerController.previewIndex) {
+                pushImageView.image = image
+            }
+            if !pickerController.selectedAssetArray.isEmpty {
+                let photoAsset = pickerController.selectedAssetArray[pickerController.previewIndex]
+                if photoAsset.asset != nil {
+                    requestAssetImage(for: photoAsset.asset!)
+                }else if pushImageView.image == nil {
+                    pushImageView.image = photoAsset.originalImage
+                }
+                toRect = getPreviewViewFrame(photoAsset: photoAsset, size: toVC.view.hx_size)
+            }
+        }else {
+            pickerController.previewViewController()?.view.insertSubview(contentView, at: 0)
+            pickerController.previewViewController()?.view.backgroundColor = .clear
+            pickerController.previewViewController()?.collectionView.isHidden = true
+            pickerController.view.backgroundColor = .clear
+            contentView.backgroundColor = backgroundColor
+            let currentPreviewIndex = pickerController.previewViewController()?.currentPreviewIndex ?? 0
+            if let view = pickerController.pickerControllerDelegate?.pickerController?(pickerController, dismissPreviewViewForIndexAt: currentPreviewIndex) {
+                toRect = view.convert(view.bounds, to: containerView)
+                previewView = view
+            }else if let rect = pickerController.pickerControllerDelegate?.pickerController?(pickerController, dismissPreviewFrameForIndexAt: currentPreviewIndex) {
+                toRect = rect
+            }
+            if let previewVC = pickerController.previewViewController(), let cell = previewVC.getCell(for: previewVC.currentPreviewIndex), let cellContentView = cell.scrollContentView {
+                cellContentView.hiddenOtherSubView()
+                fromView = cellContentView
+                fromView.frame = cellContentView.convert(cellContentView.bounds, to: containerView)
+            }else {
+                fromView = pushImageView
+            }
+
+        }
+        previewView?.isHidden = true
+        contentView.addSubview(fromView)
+        let duration = (self.type == .dismiss && !toRect.isEmpty) ? transitionDuration(using: transitionContext) - 0.2 : transitionDuration(using: transitionContext)
+        let colorDuration = duration - 0.15
+        let colorDelay = type == .present ? 0.05 : 0
+        UIView.animate(withDuration: colorDuration, delay: colorDelay, options: [.curveLinear]) {
+            if self.type == .present {
+                pickerController.navigationBar.alpha = 1
+                pickerController.previewViewController()?.bottomView.alpha = 1
+                contentView.backgroundColor = backgroundColor.withAlphaComponent(1)
+            }else if self.type == .dismiss {
+                pickerController.navigationBar.alpha = 0
+                pickerController.previewViewController()?.bottomView.alpha = 0
+                contentView.backgroundColor = backgroundColor.withAlphaComponent(0)
+            }
+        } completion: { (isFinished) in
+        }
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
+            if self.type == .present {
+                self.pushImageView.frame = toRect
+            }else if self.type == .dismiss {
+                if toRect.isEmpty {
+                    fromView.transform = CGAffineTransform.init(scaleX: 0.1, y: 0.1)
+                    fromView.alpha = 0
+                }else {
+                    fromView.frame = toRect
+                }
+            }
+        } completion: { (isFinished) in
+            previewView?.isHidden = false
+            if self.type == .present {
+                if self.requestID != nil {
+                    PHImageManager.default().cancelImageRequest(self.requestID!)
+                    self.requestID = nil
+                }
+                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewPresentCompletion: pickerController.previewIndex)
+                pickerController.previewViewController()?.view.backgroundColor = backgroundColor.withAlphaComponent(1)
+                pickerController.previewViewController()?.setCurrentCellImage(image: self.pushImageView.image)
+                pickerController.previewViewController()?.collectionView.isHidden = false
+                pickerController.previewViewController()?.configColor()
+                pickerController.configBackgroundColor()
+                contentView.removeFromSuperview()
+                transitionContext.completeTransition(true)
+            }else {
+                let currentPreviewIndex = pickerController.previewViewController()?.currentPreviewIndex ?? 0
+                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewDismissCompletion: currentPreviewIndex)
+                if toRect.isEmpty {
+                    contentView.removeFromSuperview()
+                    transitionContext.completeTransition(true)
+                }else {
+                    UIView.animate(withDuration: 0.2, delay: 0, options: [.allowUserInteraction]) {
+                        fromView.alpha = 0
+                    } completion: { (isFinished) in
+                        contentView.removeFromSuperview()
+                        transitionContext.completeTransition(true)
+                    }
+                }
+            }
+        }
+    }
     
-    deinit {
-//        print("\(self) deint")
+    func requestAssetImage(for asset: PHAsset) {
+        let options = PHImageRequestOptions.init()
+        options.resizeMode = .fast
+        options.isSynchronous = false
+        requestID = HXPHAssetManager.requestImageData(for: asset, options: options) { (imageData, dataUTI, imageOrientation, info) in
+            if imageData != nil {
+                var image: UIImage?
+                if imageOrientation != .up {
+                    image = UIImage.init(data: imageData!)?.hx_normalizedImage()
+                }else {
+                    image = UIImage.init(data: imageData!)
+                }
+                DispatchQueue.main.async {
+                    self.pushImageView.image = image
+                }
+            }
+            if HXPHAssetManager.assetDownloadFinined(for: info) ||
+                HXPHAssetManager.assetDownloadCancel(for: info){
+                self.requestID = nil
+            }
+        }
+    }
+    func getPreviewViewFrame(photoAsset: HXPHAsset, size: CGSize) -> CGRect {
+        var imageSize: CGSize = .zero
+        var imageCenter: CGPoint = .zero
+        if UIDevice.current.hx_isPortrait {
+            let aspectRatio = size.width / photoAsset.imageSize.width
+            let contentWidth = size.width
+            let contentHeight = photoAsset.imageSize.height * aspectRatio
+            imageSize = CGSize(width: contentWidth, height: contentHeight)
+            if contentHeight < size.height {
+                imageCenter = CGPoint(x: size.width * 0.5, y: size.height * 0.5)
+            }
+        }else {
+            let aspectRatio = size.height / photoAsset.imageSize.height
+            let contentWidth = photoAsset.imageSize.width * aspectRatio
+            let contentHeight = size.height
+            imageSize = CGSize(width: contentWidth, height: contentHeight)
+        }
+        var rectY: CGFloat
+        if imageCenter.equalTo(.zero) {
+            rectY = 0
+        }else {
+            rectY = (size.height - imageSize.height) * 0.5
+        }
+        return CGRect(x: (size.width - imageSize.width) * 0.5, y: rectY, width: imageSize.width, height: imageSize.height)
     }
 }

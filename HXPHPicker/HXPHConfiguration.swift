@@ -152,6 +152,9 @@ class HXPHAlbumListConfiguration: NSObject {
         return "#2E2F30".hx_color
     }()
     
+    /// 自定义cell，继承 HXAlbumViewCell 加以修改
+    var customCellClass: HXAlbumViewCell.Type?
+    
     /// cell高度
     var cellHeight : CGFloat = 100
     
@@ -323,6 +326,13 @@ class HXPHPhotoListConfiguration: NSObject {
 }
 // MARK: 照片列表Cell配置类
 class HXPHPhotoListCellConfiguration: NSObject {
+    
+    /// 自定义不带选择框的cell，继承 HXPHPickerViewCell 加以修改
+    var customSingleCellClass: HXPHPickerViewCell.Type?
+    
+    /// 自定义带选择框的cell，继承 HXPHPickerMultiSelectViewCell 加以修改
+    var customMultipleCellClass: HXPHPickerMultiSelectViewCell.Type?
+    
     /// 背景颜色
     var backgroundColor: UIColor?
     
@@ -365,7 +375,7 @@ class HXPHCameraConfiguration: NSObject {
     /// 拍照完成后是否选择
     var takePictureCompletionToSelected: Bool = true
     
-    /// 媒体类型，不设置内部会根据selectType配置
+    /// 媒体类型[kUTTypeImage, kUTTypeMovie]，不设置内部会根据selectType配置
     var mediaTypes: [String] = []
     
     /// 视频最大录制时长

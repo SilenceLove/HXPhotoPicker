@@ -97,6 +97,7 @@ extension UIView {
 enum HXPHProgressHUDMode : Int {
     case indicator
     case image
+    case success
 }
 
 class HXPHProgressHUD: UIView {
@@ -142,6 +143,11 @@ class HXPHProgressHUD: UIView {
         return imageView
     }()
     
+    lazy var tickView: HXPHProgressImageView = {
+        let tickView = HXPHProgressImageView.init(tickFrame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        return tickView
+    }()
+    
     var text : String?
     var finished : Bool = false
     var showDelayTimer : Timer?
@@ -160,6 +166,8 @@ class HXPHProgressHUD: UIView {
             contentView.addSubview(indicatorView)
         }else if mode == HXPHProgressHUDMode.image {
             contentView.addSubview(imageView)
+        }else if mode == HXPHProgressHUDMode.success {
+            contentView.addSubview(tickView)
         }
         backgroundView.addSubview(contentView)
         
@@ -252,6 +260,9 @@ class HXPHProgressHUD: UIView {
             }else {
                 textLb.hx_y = imageView.frame.maxY
             }
+        }else if mode == HXPHProgressHUDMode.success {
+            tickView.hx_centerX = centenrX
+            textLb.hx_y = tickView.frame.maxY
         }
         
         contentView.hx_height = textLb.frame.maxY
@@ -302,6 +313,18 @@ class HXPHProgressHUD: UIView {
         progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
         view!.addSubview(progressView)
     }
+    class func showSuccessHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
+        self.showSuccessHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
+        self.hideHUD(forView: view, animated: animated, afterDelay: delay)
+    }
+    class func showSuccessHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
+        if view == nil {
+            return
+        }
+        let progressView = HXPHProgressHUD.init(addedTo: view!, mode: HXPHProgressHUDMode.success)
+        progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
+        view!.addSubview(progressView)
+    }
     
     class func hideHUD(forView view:UIView? ,animated: Bool) {
         hideHUD(forView: view, animated: animated, afterDelay: 0)
@@ -326,17 +349,26 @@ class HXPHProgressImageView: UIView {
     
     lazy var circleLayer: CAShapeLayer = {
         let circleLayer = CAShapeLayer.init()
+        circleLayer.contentsScale = UIScreen.main.scale
         return circleLayer
     }()
     
     lazy var lineLayer: CAShapeLayer = {
         let lineLayer = CAShapeLayer.init()
+        lineLayer.contentsScale = UIScreen.main.scale
         return lineLayer
     }()
     
     lazy var pointLayer: CAShapeLayer = {
         let pointLayer = CAShapeLayer.init()
+        pointLayer.contentsScale = UIScreen.main.scale
         return pointLayer
+    }()
+    
+    lazy var tickLayer: CAShapeLayer = {
+        let tickLayer = CAShapeLayer.init()
+        tickLayer.contentsScale = UIScreen.main.scale
+        return tickLayer
     }()
     
     override init(frame: CGRect) {
@@ -346,6 +378,11 @@ class HXPHProgressImageView: UIView {
         layer.addSublayer(pointLayer)
         drawCircle()
         drawExclamationPoint()
+    }
+    init(tickFrame: CGRect) {
+        super.init(frame: tickFrame)
+        layer.addSublayer(tickLayer)
+        drawTickLayer()
     }
     func startAnimation() {
     }
@@ -391,6 +428,22 @@ class HXPHProgressImageView: UIView {
 //        pointAimation.duration = 0.5
 //        pointLayer.add(pointAimation, forKey: "")
     }
+    func drawTickLayer() {
+        let tickPath = UIBezierPath.init()
+        tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
+        tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
+        tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
+        tickLayer.path = tickPath.cgPath
+        tickLayer.lineWidth = 2
+        tickLayer.lineJoin = .round
+        tickLayer.strokeColor = UIColor.white.cgColor
+        tickLayer.fillColor = UIColor.clear.cgColor
+    }
+    
+    private func scale(_ numerator: CGFloat) -> CGFloat {
+        return numerator / 30 * hx_height
+    }
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

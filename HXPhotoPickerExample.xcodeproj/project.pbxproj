@@ -68,8 +68,8 @@
 		7B0B2AD1255E82F200ACF619 /* UIDevice+HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */; };
 		7B151AC3259330D3004962B0 /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */; };
 		7B151AC82593318E004962B0 /* ConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B151AC72593318E004962B0 /* ConfigurationViewController.xib */; };
-		7B1C05B6258CAB5E000242A1 /* HXPHPickerBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1C05B5258CAB5E000242A1 /* HXPHPickerBaseViewController.swift */; };
-		7B1C05BB258CABBD000242A1 /* HXPHPickerBaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B1C05BA258CABBD000242A1 /* HXPHPickerBaseViewController.xib */; };
+		7B1C05B6258CAB5E000242A1 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */; };
+		7B1C05BB258CABBD000242A1 /* BaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B1C05BA258CABBD000242A1 /* BaseViewController.xib */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
 		7B3327F7255EE4F300784BC0 /* String+HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3327F6255EE4F300784BC0 /* String+HXPHPicker.swift */; };
 		7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC0255E185900937B4A /* AppDelegate.swift */; };
@@ -185,6 +185,7 @@
 		7BA68790256144EA0014C3E3 /* HXPHPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7BA6878F256144EA0014C3E3 /* HXPHPicker.bundle */; };
 		7BA68798256149790014C3E3 /* Bundle+HXPhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA68797256149790014C3E3 /* Bundle+HXPhotoPicker.swift */; };
 		7BAF876124C14D5C00ACAF85 /* HXCameraBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */; };
+		7BB3AACB259706CC00E28F0A /* README_Swift.md in Resources */ = {isa = PBXBuildFile; fileRef = 7BB3AACA259706CC00E28F0A /* README_Swift.md */; };
 		7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */; };
 		7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */; };
 		7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */; };
@@ -465,8 +466,8 @@
 		7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+HXPHPicker.swift"; sourceTree = "<group>"; };
 		7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		7B151AC72593318E004962B0 /* ConfigurationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigurationViewController.xib; sourceTree = "<group>"; };
-		7B1C05B5258CAB5E000242A1 /* HXPHPickerBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerBaseViewController.swift; sourceTree = "<group>"; };
-		7B1C05BA258CABBD000242A1 /* HXPHPickerBaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HXPHPickerBaseViewController.xib; sourceTree = "<group>"; };
+		7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		7B1C05BA258CABBD000242A1 /* BaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BaseViewController.xib; sourceTree = "<group>"; };
 		7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
 		7B3327F6255EE4F300784BC0 /* String+HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+HXPHPicker.swift"; sourceTree = "<group>"; };
 		7B3EDEBE255E185900937B4A /* HXPHPickerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HXPHPickerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -676,6 +677,7 @@
 		7BA68797256149790014C3E3 /* Bundle+HXPhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+HXPhotoPicker.swift"; sourceTree = "<group>"; };
 		7BAF875F24C14D5C00ACAF85 /* HXCameraBottomView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCameraBottomView.h; sourceTree = "<group>"; };
 		7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCameraBottomView.m; sourceTree = "<group>"; };
+		7BB3AACA259706CC00E28F0A /* README_Swift.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README_Swift.md; sourceTree = "<group>"; };
 		7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewProtocol.h; sourceTree = "<group>"; };
 		7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorSizeView.xib; sourceTree = "<group>"; };
 		7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditStickerTrashView.xib; sourceTree = "<group>"; };
@@ -880,8 +882,8 @@
 				7B3EDEC4255E185900937B4A /* ViewController.swift */,
 				7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */,
 				7B151AC72593318E004962B0 /* ConfigurationViewController.xib */,
-				7B1C05B5258CAB5E000242A1 /* HXPHPickerBaseViewController.swift */,
-				7B1C05BA258CABBD000242A1 /* HXPHPickerBaseViewController.xib */,
+				7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */,
+				7B1C05BA258CABBD000242A1 /* BaseViewController.xib */,
 				7B3EDEC6255E185900937B4A /* Main.storyboard */,
 				7B3EDEC9255E185B00937B4A /* Assets.xcassets */,
 				7B3EDECB255E185B00937B4A /* LaunchScreen.storyboard */,
@@ -1170,6 +1172,7 @@
 			isa = PBXGroup;
 			children = (
 				7B64186024F76C67003A5723 /* README.md */,
+				7BB3AACA259706CC00E28F0A /* README_Swift.md */,
 				7B7E3E781E4AACD1002234EE /* Objective-C */,
 				7B3EDEBF255E185900937B4A /* Swift */,
 				7BD52EC124FE250E00AE3D7C /* HXPhotoPickerFramework */,
@@ -1433,8 +1436,9 @@
 				7B3EDECD255E185B00937B4A /* LaunchScreen.storyboard in Resources */,
 				7B151AC82593318E004962B0 /* ConfigurationViewController.xib in Resources */,
 				7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */,
-				7B1C05BB258CABBD000242A1 /* HXPHPickerBaseViewController.xib in Resources */,
+				7B1C05BB258CABBD000242A1 /* BaseViewController.xib in Resources */,
 				7B3EDEC8255E185900937B4A /* Main.storyboard in Resources */,
+				7BB3AACB259706CC00E28F0A /* README_Swift.md in Resources */,
 				7BA68790256144EA0014C3E3 /* HXPHPicker.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1517,7 +1521,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B3327F7255EE4F300784BC0 /* String+HXPHPicker.swift in Sources */,
-				7B1C05B6258CAB5E000242A1 /* HXPHPickerBaseViewController.swift in Sources */,
+				7B1C05B6258CAB5E000242A1 /* BaseViewController.swift in Sources */,
 				7B0B2AAA255E384100ACF619 /* UIFont+HXPHPicker.swift in Sources */,
 				7B0B2A92255E1AE300ACF619 /* HXPHAssetManager.swift in Sources */,
 				7B0B2A8C255E1AE300ACF619 /* HXPHTools.swift in Sources */,

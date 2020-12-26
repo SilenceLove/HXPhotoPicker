@@ -72,7 +72,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     func fetchCameraAssetCollection() {
         if hx_pickerController?.cameraAssetCollection != nil {
-            self.pushPhotoPickerContoller(assetCollection: hx_pickerController?.cameraAssetCollection, animated: false)
+            self.pushPhotoPickerController(assetCollection: hx_pickerController?.cameraAssetCollection, animated: false)
             self.canFetchAssetCollections = true
             title = "相册".hx_localized
         }else {
@@ -89,7 +89,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
                     vc.changedAssetCollection(collection: cameraAssetCollection)
                     return
                 }
-                weakSelf?.pushPhotoPickerContoller(assetCollection: cameraAssetCollection, animated: false)
+                weakSelf?.pushPhotoPickerController(assetCollection: cameraAssetCollection, animated: false)
             }
         }
     }
@@ -117,7 +117,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             tableView.tableHeaderView = promptLb
         }
     }
-    private func pushPhotoPickerContoller(assetCollection: HXPHAssetCollection?, animated: Bool) {
+    private func pushPhotoPickerController(assetCollection: HXPHAssetCollection?, animated: Bool) {
         let photoVC = HXPHPickerViewController.init()
         photoVC.assetCollection = assetCollection
         photoVC.showLoading = animated
@@ -144,7 +144,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let assetCollection = assetCollectionsArray[indexPath.row]
-        pushPhotoPickerContoller(assetCollection: assetCollection, animated: true)
+        pushPhotoPickerController(assetCollection: assetCollection, animated: true)
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {

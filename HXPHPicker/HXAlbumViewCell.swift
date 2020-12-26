@@ -49,15 +49,7 @@ class HXAlbumViewCell: UITableViewCell {
             albumNameLb.text = assetCollection?.albumName
             photoCountLb.text = String(assetCollection!.count)
             tickView.isHidden = !(assetCollection?.isSelected ?? false)
-            weak var weakSelf = self
-            requestID = assetCollection?.requestCoverImage(completion: { (image, assetCollection, info) in
-                if assetCollection == weakSelf?.assetCollection && image != nil {
-                    weakSelf?.albumCoverView.image = image
-                    if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
-                        weakSelf?.requestID = nil
-                    }
-                }
-            })
+            requestCoverImage()
         }
     }
     var requestID: PHImageRequestID?
@@ -76,6 +68,20 @@ class HXAlbumViewCell: UITableViewCell {
         contentView.addSubview(bottomLineView)
         contentView.addSubview(tickView)
     }
+    
+    /// 获取相册封面图片，重写此方法修改封面图片
+    func requestCoverImage() {
+        weak var weakSelf = self
+        requestID = assetCollection?.requestCoverImage(completion: { (image, assetCollection, info) in
+            if assetCollection == weakSelf?.assetCollection && image != nil {
+                weakSelf?.albumCoverView.image = image
+                if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
+                    weakSelf?.requestID = nil
+                }
+            }
+        })
+    }
+    // 颜色配置，重写此方法修改颜色配置
     func configColor() {
         let isDark = HXPHManager.shared.isDark
         albumNameLb.textColor = isDark ? config?.albumNameDarkColor : config?.albumNameColor
@@ -95,8 +101,8 @@ class HXAlbumViewCell: UITableViewCell {
             }
         }
     }
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    /// 布局，重写此方法修改布局
+    func layoutView() {
         let coverMargin : CGFloat = 5
         let coverWidth = hx_height - (coverMargin * 2)
         albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
@@ -113,6 +119,11 @@ class HXAlbumViewCell: UITableViewCell {
         photoCountLb.hx_size = CGSize(width: hx_width - photoCountLb.hx_x - 20, height: 14)
         
         bottomLineView.frame = CGRect(x: coverMargin, y: hx_height - 0.5, width: hx_width - coverMargin * 2, height: 0.5)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layoutView()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

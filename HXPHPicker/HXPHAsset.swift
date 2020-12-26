@@ -296,9 +296,18 @@ class HXPHAsset: NSObject {
         var fileSize = 0
         if let photoAsset = asset {
             let assetResources = PHAssetResource.assetResources(for: photoAsset)
+            let assetIsLivePhoto = HXPHAssetManager.assetIsLivePhoto(asset: photoAsset)
             for assetResource in assetResources {
-                if let photoFileSize = assetResource.value(forKey: "fileSize") as? Int {
-                    fileSize += photoFileSize
+                if assetIsLivePhoto && mediaSubType != .livePhoto {
+                    if assetResource.type == .photo {
+                        if let photoFileSize = assetResource.value(forKey: "fileSize") as? Int {
+                            fileSize += photoFileSize
+                        }
+                    }
+                }else {
+                    if let photoFileSize = assetResource.value(forKey: "fileSize") as? Int {
+                        fileSize += photoFileSize
+                    }
                 }
             }
         }else {

@@ -9,9 +9,11 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HXPHPickerBaseViewController" customModule="HXPHPickerExample">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="BaseViewController" customModule="HXPHPickerExample">
             <connections>
                 <outlet property="collectionView" destination="2Kv-7w-a30" id="SUI-ta-4hH"/>
+                <outlet property="collectionViewHeightConstraint" destination="znL-rg-Ss0" id="EBn-QW-BpK"/>
+                <outlet property="collectionViewTopConstraint" destination="g6o-Wc-mhY" id="7Uv-9w-yMX"/>
                 <outlet property="view" destination="iN0-l3-epB" id="xfg-wx-vur"/>
             </connections>
         </placeholder>
@@ -24,7 +26,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NwQ-gx-TFH">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="600"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="620"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OWE-K4-nDn">
                                     <rect key="frame" x="181" y="520" width="52" height="33"/>
@@ -52,9 +54,9 @@
                                     </connections>
                                 </collectionView>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mPQ-uN-Ram">
-                                    <rect key="frame" x="61" y="568" width="292" height="33"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                    <state key="normal" title="获取已选资源的URL，并打印在控制台"/>
+                                    <rect key="frame" x="5" y="568" width="404" height="32"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                    <state key="normal" title="获取已选资源的原始URL，并打印在控制台"/>
                                     <connections>
                                         <action selector="didRequestSelectedAssetURL:" destination="-1" eventType="touchUpInside" id="ox6-3L-SrR"/>
                                     </connections>
@@ -64,12 +66,14 @@
                             <constraints>
                                 <constraint firstItem="2Kv-7w-a30" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KYh-c8-vQy"/>
                                 <constraint firstItem="mPQ-uN-Ram" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KwU-l3-Txc"/>
-                                <constraint firstItem="2Kv-7w-a30" firstAttribute="centerY" secondItem="NwQ-gx-TFH" secondAttribute="centerY" id="Nbe-LQ-Syo"/>
+                                <constraint firstItem="mPQ-uN-Ram" firstAttribute="leading" secondItem="NwQ-gx-TFH" secondAttribute="leading" constant="5" id="YYZ-3a-ufY"/>
                                 <constraint firstItem="OWE-K4-nDn" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="bVI-x8-snf"/>
                                 <constraint firstItem="mPQ-uN-Ram" firstAttribute="top" secondItem="OWE-K4-nDn" secondAttribute="bottom" constant="15" id="c2o-nX-I6c"/>
+                                <constraint firstAttribute="bottom" secondItem="mPQ-uN-Ram" secondAttribute="bottom" constant="20" id="cmf-hq-dhW"/>
+                                <constraint firstItem="2Kv-7w-a30" firstAttribute="top" secondItem="NwQ-gx-TFH" secondAttribute="top" constant="100" id="g6o-Wc-mhY"/>
+                                <constraint firstAttribute="trailing" secondItem="mPQ-uN-Ram" secondAttribute="trailing" constant="5" id="gUh-pT-ISz"/>
                                 <constraint firstItem="2Kv-7w-a30" firstAttribute="leading" secondItem="NwQ-gx-TFH" secondAttribute="leading" id="knd-bA-LEm"/>
                                 <constraint firstItem="OWE-K4-nDn" firstAttribute="top" secondItem="2Kv-7w-a30" secondAttribute="bottom" constant="20" id="sjD-cp-8tO"/>
-                                <constraint firstAttribute="height" constant="600" id="zlO-OJ-smd"/>
                                 <constraint firstAttribute="trailing" secondItem="2Kv-7w-a30" secondAttribute="trailing" id="zog-tI-RbZ"/>
                             </constraints>
                         </view>

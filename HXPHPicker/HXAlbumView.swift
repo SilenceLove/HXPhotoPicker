@@ -24,7 +24,11 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         tableView.dataSource = self;
         tableView.delegate = self;
         tableView.separatorStyle = .none
-        tableView.register(HXAlbumViewCell.self, forCellReuseIdentifier: "cellId")
+        if let customCellClass = config.customCellClass {
+            tableView.register(customCellClass, forCellReuseIdentifier: "AlbumViewCellID")
+        }else {
+            tableView.register(HXAlbumViewCell.self, forCellReuseIdentifier: "AlbumViewCellID")
+        }
         if #available(iOS 11.0, *) {
             tableView.contentInsetAdjustmentBehavior = .never
         }
@@ -82,7 +86,7 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         return assetCollectionsArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId") as! HXAlbumViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "AlbumViewCellID") as! HXAlbumViewCell
         let assetCollection = assetCollectionsArray[indexPath.row]
         cell.assetCollection = assetCollection
         cell.config = config

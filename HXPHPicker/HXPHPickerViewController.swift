@@ -31,8 +31,16 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
         let collectionView = UICollectionView.init(frame: view.bounds, collectionViewLayout: collectionViewLayout)
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(HXPHPickerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerViewCell.classForCoder()))
-        collectionView.register(HXPHPickerMultiSelectViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerMultiSelectViewCell.classForCoder()))
+        if let customSingleCellClass = config.cell.customSingleCellClass {
+            collectionView.register(customSingleCellClass, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerViewCell.classForCoder()))
+        }else {
+            collectionView.register(HXPHPickerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerViewCell.classForCoder()))
+        }
+        if let customMultipleCellClass = config.cell.customMultipleCellClass {
+            collectionView.register(customMultipleCellClass, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerMultiSelectViewCell.classForCoder()))
+        }else {
+            collectionView.register(HXPHPickerMultiSelectViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerMultiSelectViewCell.classForCoder()))
+        }
         if config.allowAddCamera {
             collectionView.register(HXPHPickerCamerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPickerCamerViewCell.classForCoder()))
         }
@@ -304,11 +312,11 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
             weakSelf?.canAddCamera = true
             weakSelf?.assets = photoAssets
             weakSelf?.setupEmptyView()
-            if weakSelf != nil {
-                UIView.transition(with: weakSelf!.collectionView, duration: 0.05, options: .transitionCrossDissolve) {
+//            if weakSelf != nil {
+//                UIView.transition(with: weakSelf!.collectionView, duration: 0.05, options: .transitionCrossDissolve) {
                     weakSelf?.collectionView.reloadData()
-                } completion: { (isFinished) in }
-            }
+//                } completion: { (isFinished) in }
+//            }
             weakSelf?.scrollToAppropriatePlace(photoAsset: photoAsset)
             if weakSelf != nil && weakSelf!.showLoading {
                 HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: true)
@@ -623,7 +631,7 @@ class HXPHPickerViewController: UIViewController, UICollectionViewDataSource, UI
     }
     
     // MARK: HXPHPickerViewCellDelegate
-    func cellDidSelectControlClick(_ cell: HXPHPickerMultiSelectViewCell, isSelected: Bool) {
+    func cell(didSelectControl cell: HXPHPickerMultiSelectViewCell, isSelected: Bool) {
         if isSelected {
             // 取消选中
             _ = hx_pickerController?.removePhotoAsset(photoAsset: cell.photoAsset!)

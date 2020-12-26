@@ -1,5 +1,5 @@
 //
-//  HXPHPickerBaseViewController.swift
+//  BaseViewController.swift
 //  HXPHPickerExample
 //
 //  Created by Silence on 2020/12/18.
@@ -10,9 +10,29 @@
 import UIKit
 import Photos
 
-class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, HXPHPickerBaseViewCellDelegate {
+class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, HXPHPickerBaseViewCellDelegate {
      
+    @IBOutlet weak var collectionViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var collectionViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionView: UICollectionView!
+    
+    var addCell: HXPHPickerBaseAddViewCell {
+        get {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HXPHPickerBaseAddViewCellID", for: IndexPath(item: selectedAssets.count, section: 0)) as! HXPHPickerBaseAddViewCell
+            return cell
+        }
+    }
+    var canSetAddCell: Bool {
+        get {
+            if selectedAssets.count == config.maximumSelectedCount && config.maximumSelectedCount > 0 {
+                return false
+            }
+            return true
+        }
+    }
+    var beforeRowCount: Int = 0
+    
+    
     /// 当前已选资源
     var selectedAssets: [HXPHAsset] = []
     /// 是否选中的原图
@@ -22,7 +42,7 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
     /// 相关配置
     var config: HXPHConfiguration = HXPHTools.getWXConfig()
     init() {
-        super.init(nibName:"HXPHPickerBaseViewController",bundle: nil)
+        super.init(nibName:"BaseViewController",bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -31,7 +51,12 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        config.albumList.customCellClass = HXAlbumViewCustomCell.self
+//        config.photoList.cell.customSingleCellClass = HXPHPickerViewCustomCell.self
+//        config.photoList.cell.customMultipleCellClass = HXPHPickerMultiSelectViewCustomCell.self
+        collectionViewTopConstraint.constant = 20
         collectionView.register(HXPHPickerBaseViewCell.self, forCellWithReuseIdentifier: "HXPHPickerBaseViewCellID")
+        collectionView.register(HXPHPickerBaseAddViewCell.self, forCellWithReuseIdentifier: "HXPHPickerBaseAddViewCellID")
         if #available(iOS 11.0, *) {
             collectionView.dragDelegate = self
             collectionView.dropDelegate = self
@@ -44,15 +69,23 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
         navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "设置", style:    .done, target: self, action: #selector(didSettingButtonClick))
     }
     @objc func longGestureRecognizerClick(longGestureRecognizer: UILongPressGestureRecognizer) {
+        let touchPoint = longGestureRecognizer.location(in: collectionView)
+        let touchIndexPath = collectionView.indexPathForItem(at: touchPoint)
         switch longGestureRecognizer.state {
         case .began:
-            let touchPoint = longGestureRecognizer.location(in: collectionView)
-            if let selectedIndexPath = collectionView.indexPathForItem(at: touchPoint) {
+            if let selectedIndexPath = touchIndexPath {
+                if canSetAddCell && selectedIndexPath.item == selectedAssets.count {
+                    return
+                }
                 collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
             }
             break
         case .changed:
-            let touchPoint = longGestureRecognizer.location(in: collectionView)
+            if let selectedIndexPath = touchIndexPath {
+                if canSetAddCell && selectedIndexPath.item == selectedAssets.count {
+                    return
+                }
+            }
             collectionView.updateInteractiveMovementTargetPosition(touchPoint)
             break
         case .ended:
@@ -71,6 +104,35 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
         flowLayout.minimumInteritemSpacing = 1
         flowLayout.minimumLineSpacing = 1
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
+        configCollectionViewHeight()
+    }
+    func getCollectionViewrowCount() -> Int {
+        let assetCount = canSetAddCell ? selectedAssets.count + 1 : selectedAssets.count
+        var rowCount = Int(assetCount / 3) + 1
+        if assetCount % 3 == 0 {
+            rowCount -= 1
+        }
+        return rowCount
+    }
+    func configCollectionViewHeight() {
+        let rowCount = getCollectionViewrowCount()
+        beforeRowCount = rowCount
+        let itemWidth = Int((view.hx_width - 24 - 2) / 3)
+        var height = CGFloat(rowCount * itemWidth + rowCount)
+        if height > view.hx_height - UIDevice.current.hx_navigationBarHeight - 20 - 150 {
+            height = view.hx_height - UIDevice.current.hx_navigationBarHeight - 20 - 150
+        }
+        collectionViewHeightConstraint.constant = height
+    }
+    func updateCollectionViewHeight() {
+        let rowCount = getCollectionViewrowCount()
+        if beforeRowCount == rowCount {
+            return
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.configCollectionViewHeight()
+            self.view.layoutIfNeeded()
+        }
     }
     @objc func didSettingButtonClick() {
         present(UINavigationController.init(rootViewController: ConfigurationViewController.init(config: config)), animated: true, completion: nil)
@@ -78,8 +140,11 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
     
     /// 跳转选择资源界面
     @IBAction func selectButtonClick(_ sender: UIButton) {
-        let pickerController = HXPHPickerController.init(config: config)
-        pickerController.pickerContollerDelegate = self
+        presentPickerController()
+    }
+    func presentPickerController() {
+        let pickerController = HXPHPickerController.init(picker: config)
+        pickerController.pickerControllerDelegate = self
         pickerController.selectedAssetArray = selectedAssets
         pickerController.localCameraAssetArray = localCameraAssetArray
         pickerController.isOriginal = isOriginal
@@ -89,10 +154,11 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
     @IBAction func didRequestSelectedAssetURL(_ sender: Any) {
         let total = selectedAssets.count
         if total == 0 {
+            HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "请先选择资源", animated: true, delay: 1.5)
             return
         }
         var count = 0
-        HXPHProgressHUD.showLoadingHUD(addedTo: self.navigationController?.view, text: "获取中", animated: true)
+        HXPHProgressHUD.showLoadingHUD(addedTo: self.view, text: "获取中", animated: true)
         weak var weakSelf = self
         for photoAsset in selectedAssets {
             if photoAsset.mediaType == .photo {
@@ -113,7 +179,8 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
                             print("LivePhoto中的内容获取失败\(error!)")
                         }
                         if count == total {
-                            HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
+                            HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
+                            HXPHProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
                         }
                     }
                 }else {
@@ -125,7 +192,8 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
                             print("图片地址获取失败")
                         }
                         if count == total {
-                            HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
+                            HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
+                            HXPHProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
                         }
                     }
 //                    print("图片：\(photoAsset.originalImage!)")
@@ -142,33 +210,55 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
                         print("视频地址：\(videoURL!)")
                     }
                     if count == total {
-                        HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
+                        HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
+                        HXPHProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
                     }
                 }
             }
         }
     }
     // MARK: HXPHPickerControllerDelegate
-    func pickerContoller(_ pickerController: HXPHPickerController, didFinishWith selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
+    func pickerController(_ pickerController: HXPHPickerController, didFinishWith selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
         self.selectedAssets = selectedAssetArray
         self.isOriginal = isOriginal
         collectionView.reloadData()
+        updateCollectionViewHeight()
     }
-    
-    func pickerContoller(_ pickerController: HXPHPickerController, singleFinishWith photoAsset:HXPHAsset, _ isOriginal: Bool) {
+    func pickerController(_ pickerController: HXPHPickerController, singleFinishWith photoAsset:HXPHAsset, _ isOriginal: Bool) {
         selectedAssets = [photoAsset]
         self.isOriginal = isOriginal
         collectionView.reloadData()
+        updateCollectionViewHeight()
     }
-    func pickerContoller(_ pickerController: HXPHPickerController, didDismissWith localCameraAssetArray: [HXPHAsset]) {
+    func pickerController(didCancel pickerController: HXPHPickerController) {
+        
+    }
+    func pickerController(_ pickerController: HXPHPickerController, didDismissWith localCameraAssetArray: [HXPHAsset]) {
+        setNeedsStatusBarAppearanceUpdate()
         self.localCameraAssetArray = localCameraAssetArray
     }
+    func pickerController(_ pickerController: HXPHPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
+        return cell
+    }
+    func pickerController(_ pickerController: HXPHPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as! HXPHPickerBaseViewCell
+        return cell.imageView.image
+    }
+    func pickerController(_ pickerController: HXPHPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
+        return cell
+    }
+    
     // MARK: UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        selectedAssets.count
+        return canSetAddCell ? selectedAssets.count + 1 : selectedAssets.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if canSetAddCell && indexPath.item == selectedAssets.count {
+            return addCell
+        }
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HXPHPickerBaseViewCellID", for: indexPath) as! HXPHPickerBaseViewCell
         cell.delegate = self
         cell.photoAsset = selectedAssets[indexPath.item]
@@ -177,17 +267,29 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
     // MARK: HXPHPickerBaseViewCellDelegate
     func cell(didDeleteButton cell: HXPHPickerBaseViewCell) {
         if let indexPath = collectionView.indexPath(for: cell) {
+            let isFull = selectedAssets.count == config.maximumSelectedCount
             selectedAssets.remove(at: indexPath.item)
-            collectionView.deleteItems(at: [indexPath])
+            if isFull {
+                collectionView.reloadData()
+            }else {
+                collectionView.deleteItems(at: [indexPath])
+            }
+            updateCollectionViewHeight()
         }
     }
     // MARK: UICollectionViewDelegate
     /// 跳转单独预览界面
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let pickerController = HXPHPickerController.init(preview: config)
+        if canSetAddCell && indexPath.item == selectedAssets.count {
+            presentPickerController()
+            return
+        }
+        // 预览时可以重新初始化一个config设置单独的颜色或其他配置
+        // modalPresentationStyle = .custom 会使用框架自带的动画效果
+        let pickerController = HXPHPickerController.init(preview: config, modalPresentationStyle: .custom)
         pickerController.selectedAssetArray = selectedAssets
         pickerController.previewIndex = indexPath.item
-        pickerController.pickerContollerDelegate = self
+        pickerController.pickerControllerDelegate = self
         // 透明导航栏建议修改取消图片
 //        config.previewView.cancelImageName = ""
 //        pickerController.navigationBar.setBackgroundImage(UIImage.hx_image(for: UIColor.clear, havingSize: .zero), for: .default)
@@ -196,6 +298,9 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
     }
     
     func collectionView(_ collectionView: UICollectionView, canEditItemAt indexPath: IndexPath) -> Bool {
+        if canSetAddCell && indexPath.item == selectedAssets.count {
+            return false
+        }
         return true
     }
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
@@ -205,18 +310,30 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
     }
     @available(iOS 11.0, *)
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        let photoAsset = selectedAssets[indexPath.item]
         let itemProvider = NSItemProvider.init()
         let dragItem = UIDragItem.init(itemProvider: itemProvider)
-        dragItem.localObject = photoAsset
+        dragItem.localObject = indexPath
         return [dragItem]
     }
     @available(iOS 11.0, *)
     func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
+        if let sourceIndexPath = session.items.first?.localObject as? IndexPath {
+            if canSetAddCell && sourceIndexPath.item == selectedAssets.count {
+                return false
+            }
+        }
         return true
     }
     @available(iOS 11.0, *)
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        if let sourceIndexPath = session.items.first?.localObject as? IndexPath {
+            if canSetAddCell && sourceIndexPath.item == selectedAssets.count {
+                return UICollectionViewDropProposal.init(operation: .forbidden, intent: .insertAtDestinationIndexPath)
+            }
+        }
+        if destinationIndexPath != nil && canSetAddCell && destinationIndexPath!.item == selectedAssets.count {
+            return UICollectionViewDropProposal.init(operation: .forbidden, intent: .insertAtDestinationIndexPath)
+        }
         var dropProposal: UICollectionViewDropProposal
         if session.localDragSession != nil {
             dropProposal = UICollectionViewDropProposal.init(operation: .move, intent: .insertAtDestinationIndexPath)
@@ -225,6 +342,7 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
         }
         return dropProposal
     }
+    
     @available(iOS 11.0, *)
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         if let destinationIndexPath = coordinator.destinationIndexPath, let sourceIndexPath = coordinator.items.first?.sourceIndexPath {
@@ -242,6 +360,68 @@ class HXPHPickerBaseViewController: UIViewController , HXPHPickerControllerDeleg
             }
         }
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
+}
+class HXAlbumViewCustomCell: HXAlbumViewCell {
+    override func layoutView() {
+        super.layoutView()
+        photoCountLb.hx_x += 100
+    }
+}
+class HXPHPickerViewCustomCell: HXPHPickerViewCell {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isHidden = false
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func requestThumbnailImage() {
+        imageView.image = UIImage.init(named: "hx_picker_add_img")
+    }
+}
+class HXPHPickerMultiSelectViewCustomCell: HXPHPickerMultiSelectViewCell {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isHidden = false
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func requestThumbnailImage() {
+        // 重写图片内容
+        imageView.image = UIImage.init(named: "hx_picker_add_img")
+    }
+    override func didSelectControlClick(control: HXPHPickerCellSelectBoxControl) {
+        // 重写选择框事件，也可以将选择框隐藏。自己新加一个选择框，然后触发代理回调
+        delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
+    }
+    override func updateSelectedState(isSelected: Bool, animated: Bool) {
+        // 重写更新选择的状态，如果是自定义的选择框需要在此设置选择框的选中状态
+        super.updateSelectedState(isSelected: isSelected, animated: animated)
+    }
+    override func updateSelectControlSize(width: CGFloat, height: CGFloat) {
+        // 重写更新选择框大小
+        super.updateSelectControlSize(width: width, height: height)
+    }
+    override func layoutView() {
+        // 重写布局
+        super.layoutView()
+    }
+}
+class HXPHPickerBaseAddViewCell: HXPHPickerViewCell {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isHidden = false
+        imageView.image = UIImage.init(named: "hx_picker_add_img")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 @objc protocol HXPHPickerBaseViewCellDelegate: NSObjectProtocol {
@@ -258,7 +438,7 @@ class HXPHPickerBaseViewCell: HXPHPickerViewCell {
         return deleteButton
     }()
     override func requestThumbnailImage() {
-        // 重新设置 targetWidth
+        // 因为这里的cell不会很多，重新设置 targetWidth，使图片更加清晰
         weak var weakSelf = self
         requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * UIScreen.main.scale, completion: { (image, photoAsset, info) in
             if photoAsset == weakSelf?.photoAsset && image != nil {
@@ -275,6 +455,7 @@ class HXPHPickerBaseViewCell: HXPHPickerViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        // 默认是隐藏的，需要显示出来
         isHidden = false
         contentView.addSubview(deleteButton)
     }

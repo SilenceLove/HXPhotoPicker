@@ -16,22 +16,26 @@ import Photos
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - selectedAssetArray: 选择的资源对应的 HXPHAsset 数据
     ///   - isOriginal: 是否选中的原图
-    @objc optional func pickerContoller(_ pickerController: HXPHPickerController, didFinishWith selectedAssetArray: [HXPHAsset], _ isOriginal: Bool)
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, didFinishWith selectedAssetArray: [HXPHAsset], _ isOriginal: Bool)
     
     /// 单选完成之后调用
     /// - Parameters:
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - photoAsset: 对应的 HXPHAsset 数据
     ///   - isOriginal: 是否选中的原图
-    @objc optional func pickerContoller(_ pickerController: HXPHPickerController, singleFinishWith photoAsset:HXPHAsset, _ isOriginal: Bool)
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, singleFinishWith photoAsset:HXPHAsset, _ isOriginal: Bool)
     
     /// 点击了原图按钮
     /// - Parameters:
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - isOriginal: 是否选中的原图
-    @objc optional func pickerContoller(_ pickerController: HXPHPickerController, didOriginalWith isOriginal: Bool)
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, didOriginalWith isOriginal: Bool)
     
     /// 是否能够选择cell 不能选择时需要自己手动弹出提示框
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - photoAsset: 对应的 HXPHAsset 数据
+    ///   - atIndex: 将要添加的索引
     @objc optional func pickerController(_ pickerController: HXPHPickerController, shouldSelectedAsset photoAsset: HXPHAsset, atIndex: Int) -> Bool
 
     /// 即将选择 cell 时调用
@@ -54,24 +58,50 @@ import Photos
     /// - Parameters:
     ///   - pikcerController: 对应的 HXPHPickerController
     ///   - photoAsset: 对应显示的 HXPHAsset 数据
-    ///   - index: 对应显示的位置下标
+    ///   - index: 对应显示的位置
     @objc optional func pickerController(_ pikcerController: HXPHPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: HXPHAsset, atIndex: Int)
     
     /// 点击取消时调用
     /// - Parameter pickerController: 对应的 HXPHPickerController
-    @objc optional func pickerContoller(didCancel pickerController: HXPHPickerController)
+    @objc optional func pickerController(didCancel pickerController: HXPHPickerController)
     
     /// dismiss后调用
     /// - Parameters:
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - localCameraAssetArray: 相机拍摄存在本地的 HXPHAsset 数据
     ///     可以在下次进入选择时赋值给localCameraAssetArray，列表则会显示
-    @objc optional func pickerContoller(_ pickerController: HXPHPickerController, didDismissWith localCameraAssetArray: [HXPHAsset])
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, didDismissWith localCameraAssetArray: [HXPHAsset])
+    
+    
+    // MARK: 单独预览时的自定义转场动画
+    /// present预览时展示的image
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - index: 预览资源对应的位置
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage?
+    
+    /// present 预览时起始的视图，用于获取位置大小。与 presentPreviewFrameForIndexAt 一样
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, presentPreviewViewForIndexAt index: Int) -> UIView?
+    
+    /// dismiss 结束时对应的视图，用于获取位置大小。与 dismissPreviewFrameForIndexAt 一样
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView?
+    
+    /// present 预览时对应的起始位置大小
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, presentPreviewFrameForIndexAt index: Int) -> CGRect
+    
+    /// dismiss 结束时对应的位置大小
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, dismissPreviewFrameForIndexAt index: Int) -> CGRect
+    
+    /// 外部预览自定义 present 完成
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, previewPresentCompletion atIndex: Int)
+    
+    /// 外部预览自定义 dismiss 完成
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, previewDismissCompletion atIndex: Int)
 }
 
-class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver {
+class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver, UIViewControllerTransitioningDelegate {
     
-    weak var pickerContollerDelegate : HXPHPickerControllerDelegate?
+    weak var pickerControllerDelegate : HXPHPickerControllerDelegate?
     
     /// 相关配置
     var config : HXPHConfiguration
@@ -89,7 +119,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     var localAssetArray: [HXPHAsset] = []
     
     /// 相机拍摄存在本地的资源数组
-    /// 可以通过 pickerContollerDidDismiss 得到上一次相机拍摄的资源，然后赋值即可显示上一次相机拍摄的资源
+    /// 可以通过 pickerControllerDidDismiss 得到上一次相机拍摄的资源，然后赋值即可显示上一次相机拍摄的资源
     var localCameraAssetArray: [HXPHAsset] = []
     
     /// 是否选中了原图
@@ -126,6 +156,51 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         }
     }
     
+    /// 选择资源初始化
+    /// - Parameter config: 相关配置
+    convenience init(picker config: HXPHConfiguration) {
+        self.init(config: config)
+    }
+    /// 选择资源初始化
+    /// - Parameter config: 相关配置
+    init(config: HXPHConfiguration) {
+        HXPHManager.shared.appearanceStyle = config.appearanceStyle
+        _ = HXPHManager.shared.createLanguageBundle(languageType: config.languageType)
+        var photoVC : UIViewController
+        if config.albumShowMode == .normal {
+            photoVC = HXAlbumViewController.init()
+        }else {
+            photoVC = HXPHPickerViewController.init()
+        }
+        self.config = config
+        if config.selectMode == .multiple &&
+            !config.allowSelectedTogether &&
+            config.maximumSelectedVideoCount == 1 &&
+            config.selectType == .any {
+            singleVideo = true
+        }
+        super.init(rootViewController: photoVC)
+    }
+    
+    /// 外部预览资源初始化
+    /// - Parameters:
+    ///   - config: 相关配置
+    ///   - modalPresentationStyle: 设置 custom 样式，框架自带动画效果
+    init(preview config: HXPHConfiguration, modalPresentationStyle: UIModalPresentationStyle) {
+        isPreviewAsset = true
+        HXPHManager.shared.appearanceStyle = config.appearanceStyle
+        _ = HXPHManager.shared.createLanguageBundle(languageType: config.languageType)
+        self.config = config
+        let vc = HXPHPreviewViewController.init()
+        vc.isExternalPreview = true
+        super.init(rootViewController: vc)
+        self.modalPresentationStyle = modalPresentationStyle
+        if modalPresentationStyle == .custom {
+            transitioningDelegate = self
+            modalPresentationCapturesStatusBarAppearance = true
+        }
+    }
+    
     // MARK: 私有
     private var canAddAsset: Bool = true
     private var isFirstAuthorization: Bool = false
@@ -158,43 +233,13 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         return requestAssetBytesQueue
     }()
     private var isPreviewAsset: Bool = false
-    
-    /// 外部预览资源初始化
-    /// - Parameter config: 相关配置
-    init(preview config: HXPHConfiguration) {
-        isPreviewAsset = true
-        HXPHManager.shared.appearanceStyle = config.appearanceStyle
-        _ = HXPHManager.shared.createLanguageBundle(languageType: config.languageType)
-        self.config = config
-        let vc = HXPHPreviewViewController.init()
-        vc.isExternalPreview = true
-        super.init(rootViewController: vc)
-    }
-    
-    /// 选择资源初始化
-    /// - Parameter config: 相关配置
-    convenience init(picker config: HXPHConfiguration) {
-        self.init(config: config)
-    }
-    /// 选择资源初始化
-    /// - Parameter config: 相关配置
-    init(config: HXPHConfiguration) {
-        HXPHManager.shared.appearanceStyle = config.appearanceStyle
-        _ = HXPHManager.shared.createLanguageBundle(languageType: config.languageType)
-        var photoVC : UIViewController
-        if config.albumShowMode == .normal {
-            photoVC = HXAlbumViewController.init()
-        }else {
-            photoVC = HXPHPickerViewController.init()
+    override var modalPresentationStyle: UIModalPresentationStyle {
+        didSet {
+            if isPreviewAsset && modalPresentationStyle == .custom {
+                transitioningDelegate = self
+                modalPresentationCapturesStatusBarAppearance = true
+            }
         }
-        self.config = config
-        if config.selectMode == .multiple &&
-            !config.allowSelectedTogether &&
-            config.maximumSelectedVideoCount == 1 &&
-            config.selectType == .any {
-            singleVideo = true
-        }
-        super.init(rootViewController: photoVC)
     }
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         self.config = HXPHConfiguration.init()
@@ -218,11 +263,16 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 overrideUserInterfaceStyle = .light
             }
         }
+        if modalPresentationStyle != .custom {
+            configBackgroundColor()
+        }
         let isDark = HXPHManager.shared.isDark
-        view.backgroundColor = isDark ? config.navigationViewBackgroudDarkColor : config.navigationViewBackgroundColor
         navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : isDark ? config.navigationTitleDarkColor : config.navigationTitleColor]
         navigationBar.tintColor = isDark ? config.navigationDarkTintColor : config.navigationTintColor
         navigationBar.barStyle = isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
+    }
+    func configBackgroundColor() {
+        view.backgroundColor = HXPHManager.shared.isDark ? config.navigationViewBackgroudDarkColor : config.navigationViewBackgroundColor
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -270,28 +320,28 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     }
     // MARK: 暴露给子控制器的方法
     func finishCallback() {
-        pickerContollerDelegate?.pickerContoller?(self, didFinishWith: selectedAssetArray, isOriginal)
+        pickerControllerDelegate?.pickerController?(self, didFinishWith: selectedAssetArray, isOriginal)
         dismiss(animated: true, completion: nil)
     }
     func singleFinishCallback(for photoAsset: HXPHAsset) {
-        pickerContollerDelegate?.pickerContoller?(self, singleFinishWith: photoAsset, isOriginal)
+        pickerControllerDelegate?.pickerController?(self, singleFinishWith: photoAsset, isOriginal)
         dismiss(animated: true, completion: nil)
     }
     func cancelCallback() {
-        pickerContollerDelegate?.pickerContoller?(didCancel: self)
+        pickerControllerDelegate?.pickerController?(didCancel: self)
         dismiss(animated: true, completion: nil)
     }
     func originalButtonCallback() {
-        pickerContollerDelegate?.pickerContoller?(self, didOriginalWith: isOriginal)
+        pickerControllerDelegate?.pickerController?(self, didOriginalWith: isOriginal)
     }
     func shouldPresentCamera() -> Bool {
-        if let shouldPresent = pickerContollerDelegate?.pickerController?(shouldPresentCamera: self) {
+        if let shouldPresent = pickerControllerDelegate?.pickerController?(shouldPresentCamera: self) {
             return shouldPresent
         }
         return true
     }
     func previewUpdateCurrentlyDisplayedAsset(photoAsset: HXPHAsset, index: Int) {
-        pickerContollerDelegate?.pickerController?(self, previewUpdateCurrentlyDisplayedAsset: photoAsset, atIndex: index)
+        pickerControllerDelegate?.pickerController?(self, previewUpdateCurrentlyDisplayedAsset: photoAsset, atIndex: index)
     }
     
     /// 获取已选资源的总大小
@@ -565,7 +615,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         }
         let canSelect = canSelectAsset(for: photoAsset, showHUD: true)
         if canSelect {
-            pickerContollerDelegate?.pickerController?(self, willSelectAsset: photoAsset, atIndex: selectedAssetArray.count)
+            pickerControllerDelegate?.pickerController?(self, willSelectAsset: photoAsset, atIndex: selectedAssetArray.count)
             canAddAsset = false
             photoAsset.isSelected = true
             photoAsset.selectIndex = selectedAssetArray.count
@@ -575,7 +625,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 selectedVideoAssetArray.append(photoAsset)
             }
             selectedAssetArray.append(photoAsset)
-            pickerContollerDelegate?.pickerController?(self, didSelectAsset: photoAsset, atIndex: selectedAssetArray.count - 1)
+            pickerControllerDelegate?.pickerController?(self, didSelectAsset: photoAsset, atIndex: selectedAssetArray.count - 1)
         }
         return canSelect
     }
@@ -584,7 +634,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             return false
         }
         canAddAsset = false
-        pickerContollerDelegate?.pickerController?(self, willUnselectAsset: photoAsset, atIndex: selectedAssetArray.count)
+        pickerControllerDelegate?.pickerController?(self, willUnselectAsset: photoAsset, atIndex: selectedAssetArray.count)
         photoAsset.isSelected = false
         if photoAsset.mediaType == .photo {
             selectedPhotoAssetArray.remove(at: selectedPhotoAssetArray.firstIndex(of: photoAsset)!)
@@ -595,7 +645,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
         for (index, asset) in selectedAssetArray.enumerated() {
             asset.selectIndex = index
         }
-        pickerContollerDelegate?.pickerController?(self, didUnselectAsset: photoAsset, atIndex: selectedAssetArray.count)
+        pickerControllerDelegate?.pickerController?(self, didUnselectAsset: photoAsset, atIndex: selectedAssetArray.count)
         return true
     }
     func canSelectAsset(for photoAsset: HXPHAsset, showHUD: Bool) -> Bool {
@@ -662,7 +712,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 }
             }
         }
-        if let shouldSelect = pickerContollerDelegate?.pickerController?(self, shouldSelectedAsset: photoAsset, atIndex: selectedAssetArray.count) {
+        if let shouldSelect = pickerControllerDelegate?.pickerController?(self, shouldSelectedAsset: photoAsset, atIndex: selectedAssetArray.count) {
             if canSelect {
                 canSelect = shouldSelect
             }
@@ -712,7 +762,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
             for photoAsset in localCameraAssetArray {
                 cameraAssetArray.append(photoAsset.copyCamera())
             }
-            pickerContollerDelegate?.pickerContoller?(self, didDismissWith: cameraAssetArray)
+            pickerControllerDelegate?.pickerController?(self, didDismissWith: cameraAssetArray)
         }
     }
     override func viewDidLayoutSubviews() {
@@ -791,26 +841,19 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     private func reloadAlbumData() {
         albumViewController()?.tableView.reloadData()
     }
-    private func albumViewController() -> HXAlbumViewController? {
-        for viewController in viewControllers {
-            if viewController is HXAlbumViewController {
-                return viewController as? HXAlbumViewController
-            }
-        }
-        return nil
+    func albumViewController() -> HXAlbumViewController? {
+        return getViewController(for: HXAlbumViewController.self) as? HXAlbumViewController
     }
-    private func pickerViewController() -> HXPHPickerViewController? {
-        for viewController in viewControllers {
-            if viewController is HXPHPickerViewController {
-                return viewController as? HXPHPickerViewController
-            }
-        }
-        return nil
+    func pickerViewController() -> HXPHPickerViewController? {
+        return getViewController(for: HXPHPickerViewController.self) as? HXPHPickerViewController
     }
-    private func previewViewController() -> HXPHPreviewViewController? {
+    func previewViewController() -> HXPHPreviewViewController? {
+        return getViewController(for: HXPHPreviewViewController.self) as? HXPHPreviewViewController
+    }
+    private func getViewController(for viewControllerClass: UIViewController.Type) -> UIViewController? {
         for viewController in viewControllers {
-            if viewController is HXPHPreviewViewController {
-                return viewController as? HXPHPreviewViewController
+            if viewController.isMember(of: viewControllerClass) {
+                return viewController
             }
         }
         return nil
@@ -823,6 +866,13 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
                 configColor()
             }
         }
+    }
+    // MARK: UIViewControllerTransitioningDelegate
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return HXPHPickerControllerTransition.init(type: .present)
+    }
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return HXPHPickerControllerTransition.init(type: .dismiss)
     }
     
     deinit {
