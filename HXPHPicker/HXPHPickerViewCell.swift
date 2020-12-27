@@ -189,8 +189,8 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     weak var delegate: HXPHPickerViewCellDelegate?
     
-    lazy var selectControl: HXPHPickerCellSelectBoxControl = {
-        let selectControl = HXPHPickerCellSelectBoxControl.init()
+    lazy var selectControl: HXPHPickerSelectBoxView = {
+        let selectControl = HXPHPickerSelectBoxView.init()
         selectControl.backgroundColor = .clear
         selectControl.addTarget(self, action: #selector(didSelectControlClick(control:)), for: .touchUpInside)
         return selectControl
@@ -216,7 +216,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     
     /// 选择框点击事件
     /// - Parameter control: 选择框
-    @objc func didSelectControlClick(control: HXPHPickerCellSelectBoxControl) {
+    @objc func didSelectControlClick(control: HXPHPickerSelectBoxView) {
         delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
     }
     
@@ -233,7 +233,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
             selectMaskLayer.isHidden = false
             if config!.selectBox.type == .number {
                 let text = String(format: "%d", arguments: [photoAsset!.selectIndex + 1])
-                let font = UIFont.systemFont(ofSize: config!.selectBox.titleFontSize)
+                let font = UIFont.hx_mediumPingFang(size: config!.selectBox.titleFontSize)
                 let textHeight = text.hx_stringHeight(ofFont: font, maxWidth: boxWidth)
                 var textWidth = text.hx_stringWidth(ofFont: font, maxHeight: textHeight)
                 selectControl.textSize = CGSize(width: textWidth, height: textHeight)
@@ -250,11 +250,7 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
             selectMaskLayer.isHidden = true
             updateSelectControlSize(width: boxWidth, height: boxHeight)
         }
-        if selectControl.isSelected == isSelected {
-            selectControl.setNeedsDisplay()
-        }else {
-            selectControl.isSelected = isSelected
-        }
+        selectControl.isSelected = isSelected
         if animated {
             selectControl.layer.removeAnimation(forKey: "SelectControlAnimation")
             let keyAnimation = CAKeyframeAnimation.init(keyPath: "transform.scale")
@@ -292,73 +288,120 @@ class HXPHPickerMultiSelectViewCell : HXPHPickerViewCell {
     }
 }
 
-class HXPHPickerCellSelectBoxControl: UIControl {
-    var text: String = "0"
+class HXPHPickerSelectBoxView: UIControl {
+    var text: String = "0" {
+        didSet {
+            if config.type == .number {
+                textLayer.string = text
+            }
+        }
+    }
+    override var isSelected: Bool {
+        didSet {
+            updateLayers()
+        }
+    }
     var textSize: CGSize = CGSize.zero
     lazy var config: HXPHSelectBoxConfiguration = {
         return HXPHSelectBoxConfiguration.init()
     }()
+    lazy var backgroundLayer: CAShapeLayer = {
+        let backgroundLayer = CAShapeLayer.init()
+        backgroundLayer.contentsScale = UIScreen.main.scale
+        return backgroundLayer
+    }()
+    lazy var textLayer: CATextLayer = {
+        let textLayer = CATextLayer.init()
+        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.alignmentMode = .center
+        textLayer.isWrapped = true
+        return textLayer
+    }()
+    lazy var tickLayer: CAShapeLayer = {
+        let tickLayer = CAShapeLayer.init()
+        tickLayer.lineJoin = .round
+        tickLayer.contentsScale = UIScreen.main.scale
+        return tickLayer
+    }()
     
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        let ctx = UIGraphicsGetCurrentContext()!
-        var fillRect : CGRect
-        var fillColor : UIColor?
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        layer.addSublayer(backgroundLayer)
+        layer.addSublayer(textLayer)
+        layer.addSublayer(tickLayer)
+    }
+    
+    func backgroundPath() -> CGPath {
+        let strokePath = UIBezierPath.init(roundedRect: CGRect(x: 0, y: 0, width: hx_width, height: hx_height), cornerRadius: hx_height / 2)
+        return strokePath.cgPath
+    }
+    func drawBackgroundLayer() {
+        backgroundLayer.path = backgroundPath()
         if isSelected {
-            fillRect = rect
-            fillColor = HXPHManager.shared.isDark ? config.selectedBackgroudDarkColor : config.selectedBackgroundColor
+            backgroundLayer.fillColor = HXPHManager.shared.isDark ? config.selectedBackgroudDarkColor.cgColor : config.selectedBackgroundColor.cgColor
+            backgroundLayer.lineWidth = 0
         }else {
-            let borderWidth = config.borderWidth
-            let height = hx_height - borderWidth
-            fillRect = CGRect(x: borderWidth, y: borderWidth, width: hx_width - borderWidth * 2, height: height - borderWidth)
-            let strokePath = UIBezierPath.init(roundedRect: CGRect(x: borderWidth * 0.5, y: borderWidth * 0.5, width: hx_width - borderWidth, height: height), cornerRadius: height / 2)
-            fillColor = HXPHManager.shared.isDark ? config.darkBackgroundColor : config.backgroundColor
-            ctx.addPath(strokePath.cgPath)
-            ctx.setLineWidth(borderWidth)
-            ctx.setStrokeColor(HXPHManager.shared.isDark ? config.borderDarkColor.cgColor : config.borderColor.cgColor)
-            ctx.strokePath()
+            backgroundLayer.lineWidth = config.borderWidth
+            backgroundLayer.fillColor = HXPHManager.shared.isDark ? config.darkBackgroundColor.cgColor : config.backgroundColor.cgColor
+            backgroundLayer.strokeColor = HXPHManager.shared.isDark ? config.borderDarkColor.cgColor : config.borderColor.cgColor
         }
-        let fillPath = UIBezierPath.init(roundedRect: fillRect, cornerRadius: fillRect.size.height / 2)
-        ctx.addPath(fillPath.cgPath)
-        ctx.setFillColor(fillColor!.cgColor)
-        ctx.fillPath()
-        if isSelected {
-            if config.type == .number {
-                ctx.textMatrix = CGAffineTransform.identity
-                ctx.translateBy(x: 0, y: hx_height)
-                ctx.scaleBy(x: 1, y: -1)
-                let textPath = CGMutablePath()
-                let font = UIFont.systemFont(ofSize: config.titleFontSize)
-                var textHeight: CGFloat
-                var textWidth: CGFloat
-                if textSize.equalTo(CGSize.zero) {
-                    textHeight = text.hx_stringHeight(ofFont: font, maxWidth: hx_width)
-                    textWidth = text.hx_stringWidth(ofFont: font, maxHeight: textHeight)
-                }else {
-                    textHeight = textSize.height
-                    textWidth = textSize.width
-                }
-                textPath.addRect(CGRect(x: (hx_width - textWidth) * 0.5, y: (hx_height - textHeight) * 0.5, width: textWidth, height: textHeight))
-                ctx.addPath(textPath)
-                let style = NSMutableParagraphStyle()
-                style.alignment = .center
-                let attrString = NSAttributedString(string: text, attributes: [NSAttributedString.Key.font : font ,
-                                                                               NSAttributedString.Key.foregroundColor: HXPHManager.shared.isDark ? config.titleDarkColor : config.titleColor ,
-                    NSAttributedString.Key.paragraphStyle: style])
-                let framesetter = CTFramesetterCreateWithAttributedString(attrString)
-                let frame = CTFramesetterCreateFrame(framesetter, CFRange(location: 0, length: attrString.length), textPath, nil)
-                CTFrameDraw(frame, ctx)
-            }else if config.type == .tick {
-                let tickPath = UIBezierPath.init()
-                tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
-                tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
-                tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
-                ctx.addPath(tickPath.cgPath)
-                ctx.setLineWidth(config.tickWidth)
-                ctx.setStrokeColor(HXPHManager.shared.isDark ? config.tickDarkColor.cgColor : config.tickColor.cgColor)
-                ctx.strokePath()
-            }
+    }
+    func drawTextLayer() {
+        if config.type != .number {
+            textLayer.isHidden = true
+            return
         }
+        if !isSelected {
+            textLayer.string = nil
+        }
+        
+        let font = UIFont.hx_mediumPingFang(size: config.titleFontSize)
+        var textHeight: CGFloat
+        var textWidth: CGFloat
+        if textSize.equalTo(CGSize.zero) {
+            textHeight = text.hx_stringHeight(ofFont: font, maxWidth: hx_width)
+            textWidth = text.hx_stringWidth(ofFont: font, maxHeight: textHeight)
+        }else {
+            textHeight = textSize.height
+            textWidth = textSize.width
+        }
+        textLayer.frame = CGRect(x: (hx_width - textWidth) * 0.5, y: (hx_height - textHeight) * 0.5, width: textWidth, height: textHeight)
+        textLayer.font = CGFont.init(font.fontName as CFString)
+        textLayer.fontSize = config.titleFontSize
+        textLayer.foregroundColor = HXPHManager.shared.isDark ? config.titleDarkColor.cgColor : config.titleColor.cgColor
+    }
+    
+    func tickPath() -> CGPath {
+        let tickPath = UIBezierPath.init()
+        tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
+        tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
+        tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
+        return tickPath.cgPath
+    }
+    func drawTickLayer() {
+        if config.type != .tick {
+            tickLayer.isHidden = true
+            return
+        }
+        tickLayer.isHidden = !isSelected
+        tickLayer.path = tickPath()
+        tickLayer.lineWidth = config.tickWidth
+        tickLayer.strokeColor = HXPHManager.shared.isDark ? config.tickDarkColor.cgColor : config.tickColor.cgColor
+        tickLayer.fillColor = UIColor.clear.cgColor
+    }
+    
+    func updateLayers() {
+        backgroundLayer.frame = bounds
+        if config.type == .tick {
+            tickLayer.frame = bounds
+        }
+        drawBackgroundLayer()
+        drawTextLayer()
+        drawTickLayer()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func scale(_ numerator: CGFloat) -> CGFloat {
@@ -414,7 +457,7 @@ class HXPHPickerCamerViewCell: UICollectionViewCell {
             return
         }
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
-            HXPHProgressHUD.showWarningHUD(addedTo: hx_viewController()?.view, text: "相机不可用!".hx_localized, animated: true, delay: 1.5)
+//            HXPHProgressHUD.showWarningHUD(addedTo: hx_viewController()?.view, text: "相机不可用!".hx_localized, animated: true, delay: 1.5)
             return
         }
         HXPHAssetManager.requestCameraAccess { (granted) in

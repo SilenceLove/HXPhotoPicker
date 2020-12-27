@@ -77,6 +77,12 @@ class HXPHAsset: NSObject {
         }
     }
     
+    /// iCloud下载状态
+    var downloadStatus: HXPHPicker.Asset.DownloadStatus = .unknow
+    
+    /// iCloud下载进度，如果取消了会记录上次进度
+    var downloadProgress: Double = 0
+    
     /// 根据系统相册里对应的 PHAsset 数据初始化
     /// - Parameter asset: 系统相册里对应的 PHAsset 数据
     init(asset: PHAsset) {
@@ -171,14 +177,26 @@ class HXPHAsset: NSObject {
         if mediaSubType == .imageAnimated {
             version = .original
         }
+        downloadStatus = .downloading
         return HXPHAssetManager.requestImageData(for: asset!, version: version, iCloudHandler: { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
         }, progressHandler: { (progress, error, stop, info) in
-            progressHandler?(self, progress)
+            self.downloadProgress = progress
+            DispatchQueue.main.async {
+                progressHandler?(self, progress)
+            }
         }, resultHandler: { (data, dataUTI, imageOrientation, info, downloadSuccess) in
             if downloadSuccess {
+                self.downloadProgress = 1
+                self.downloadStatus = .succeed
                 success?(self, data!, imageOrientation, info)
             }else {
+                if HXPHAssetManager.assetDownloadCancel(for: info) {
+                    self.downloadStatus = .canceled
+                }else {
+                    self.downloadProgress = 0
+                    self.downloadStatus = .failed
+                }
                 failure?(self, info)
             }
         })
@@ -196,15 +214,26 @@ class HXPHAsset: NSObject {
             failure?(self, nil)
             return 0
         }
-        
+        downloadStatus = .downloading
         return HXPHAssetManager.requestLivePhoto(for: asset!, targetSize: targetSize) { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { (progress, error, stop, info) in
-            progressHandler?(self, progress)
+            self.downloadProgress = progress
+            DispatchQueue.main.async {
+                progressHandler?(self, progress)
+            }
         } resultHandler: { (livePhoto, info, downloadSuccess) in
             if downloadSuccess {
+                self.downloadProgress = 1
+                self.downloadStatus = .succeed
                 success?(self, livePhoto!, info)
             }else {
+                if HXPHAssetManager.assetDownloadCancel(for: info) {
+                    self.downloadStatus = .canceled
+                }else {
+                    self.downloadProgress = 0
+                    self.downloadStatus = .failed
+                }
                 failure?(self, info)
             }
         }
@@ -224,14 +253,26 @@ class HXPHAsset: NSObject {
             }
             return 0
         }
+        downloadStatus = .downloading
         return HXPHAssetManager.requestAVAsset(for: asset!) { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { (progress, error, stop, info) in
-            progressHandler?(self, progress)
+            self.downloadProgress = progress
+            DispatchQueue.main.async {
+                progressHandler?(self, progress)
+            }
         } resultHandler: { (avAsset, audioMix, info, downloadSuccess) in
             if downloadSuccess {
+                self.downloadProgress = 1
+                self.downloadStatus = .succeed
                 success?(self, avAsset!, info)
             }else {
+                if HXPHAssetManager.assetDownloadCancel(for: info) {
+                    self.downloadStatus = .canceled
+                }else {
+                    self.downloadProgress = 0
+                    self.downloadStatus = .failed
+                }
                 failure?(self, info)
             }
         }

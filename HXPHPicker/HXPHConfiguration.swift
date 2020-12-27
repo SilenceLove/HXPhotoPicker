@@ -226,7 +226,7 @@ class HXPHAlbumListConfiguration: NSObject {
         return "#ffffff".hx_color
     }()
 }
-// MARK: 相册标题视图配置类
+// MARK: 相册标题视图配置类，弹窗展示相册列表时有效
 class HXAlbumTitleViewConfiguration: NSObject {
     
     /// 背景颜色
@@ -639,7 +639,7 @@ class HXPHSelectBoxConfiguration: NSObject {
     }()
     
     /// 选中状态下勾勾的宽度
-    var tickWidth: CGFloat = 2
+    var tickWidth: CGFloat = 1.5
     
     /// 选中之后的 勾勾 颜色
     lazy var tickColor: UIColor = {

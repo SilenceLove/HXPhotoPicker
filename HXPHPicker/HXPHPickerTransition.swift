@@ -81,7 +81,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
             contentView.addSubview(pushImageView)
             
-            if photoAsset != nil {
+            if photoAsset != nil && pickerVC != nil {
                 let cell = pickerVC!.getCell(for: photoAsset!)
                 if cell != nil {
                     pushImageView.image = cell?.imageView.image
@@ -112,7 +112,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             fromView?.frame = cell?.scrollContentView?.convert(cell?.scrollContentView?.bounds ?? CGRect.zero, to: containerView) ?? CGRect.zero
             contentView.addSubview(fromView!)
             
-            if photoAsset != nil {
+            if photoAsset != nil && pickerVC != nil {
                 toView = pickerVC?.getCell(for: photoAsset!)
                 if toView == nil {
                     pickerVC?.scrollToCenter(for: photoAsset!)
@@ -256,7 +256,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                 toRect = rect
             }
             if let previewVC = pickerController.previewViewController(), let cell = previewVC.getCell(for: previewVC.currentPreviewIndex), let cellContentView = cell.scrollContentView {
-                cellContentView.hiddenOtherSubView()
+                cellContentView.hiddenOtherSubview()
                 fromView = cellContentView
                 fromView.frame = cellContentView.convert(cellContentView.bounds, to: containerView)
             }else {
@@ -299,7 +299,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     PHImageManager.default().cancelImageRequest(self.requestID!)
                     self.requestID = nil
                 }
-                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewPresentCompletion: pickerController.previewIndex)
+                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewPresentComplete: pickerController.previewIndex)
                 pickerController.previewViewController()?.view.backgroundColor = backgroundColor.withAlphaComponent(1)
                 pickerController.previewViewController()?.setCurrentCellImage(image: self.pushImageView.image)
                 pickerController.previewViewController()?.collectionView.isHidden = false
@@ -309,7 +309,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                 transitionContext.completeTransition(true)
             }else {
                 let currentPreviewIndex = pickerController.previewViewController()?.currentPreviewIndex ?? 0
-                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewDismissCompletion: currentPreviewIndex)
+                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewDismissComplete: currentPreviewIndex)
                 if toRect.isEmpty {
                     contentView.removeFromSuperview()
                     transitionContext.completeTransition(true)

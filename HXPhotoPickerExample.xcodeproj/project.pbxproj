@@ -375,6 +375,7 @@
 		7BD52F7B24FE258200AE3D7C /* HXPhotoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65AF2487AD5B00077EE1 /* HXPhotoConfiguration.m */; };
 		7BD52F7C24FE258200AE3D7C /* HXPhotoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65DA2487AD5B00077EE1 /* HXPhotoManager.m */; };
 		7BD52F7D24FE258200AE3D7C /* HXPhotoTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65D92487AD5B00077EE1 /* HXPhotoTools.m */; };
+		7BE660332597564D0025D258 /* HXPHPickerInteractiveTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE660322597564D0025D258 /* HXPHPickerInteractiveTransition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -693,6 +694,7 @@
 		7BC371482505D24F00E2D05C /* HXPhotoEditChartletContentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletContentViewCell.xib; sourceTree = "<group>"; };
 		7BD52EC024FE250E00AE3D7C /* HXPhotoPicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HXPhotoPicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BD52EC324FE250E00AE3D7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7BE660322597564D0025D258 /* HXPHPickerInteractiveTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerInteractiveTransition.swift; sourceTree = "<group>"; };
 		7BE8DFD624C68B2800306042 /* HXPhotoViewCellCustomProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewCellCustomProtocol.h; sourceTree = "<group>"; };
 		E6254BB2C20603515D5A76A4 /* libPods-HXPhotoPickerExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HXPhotoPickerExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -861,6 +863,7 @@
 				7B0B2AB3255E5A1800ACF619 /* HXPHPreviewViewController.swift */,
 				7B0B2AB8255E5F6F00ACF619 /* HXPHPreviewViewCell.swift */,
 				7BA141242580CB8C000D0726 /* HXPHPickerTransition.swift */,
+				7BE660322597564D0025D258 /* HXPHPickerInteractiveTransition.swift */,
 				7B0B2A7E255E1AE300ACF619 /* HXPHTools.swift */,
 				7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */,
 				7B0B2A86255E1AE300ACF619 /* UIView+HXPHPicker.swift */,
@@ -1525,6 +1528,7 @@
 				7B0B2AAA255E384100ACF619 /* UIFont+HXPHPicker.swift in Sources */,
 				7B0B2A92255E1AE300ACF619 /* HXPHAssetManager.swift in Sources */,
 				7B0B2A8C255E1AE300ACF619 /* HXPHTools.swift in Sources */,
+				7BE660332597564D0025D258 /* HXPHPickerInteractiveTransition.swift in Sources */,
 				7BA47AE3257277E500FB4D99 /* HXPHPicker.swift in Sources */,
 				7B0B2A94255E1AE300ACF619 /* UIView+HXPHPicker.swift in Sources */,
 				7B0B2A8F255E1AE300ACF619 /* HXPHAssetCollection.swift in Sources */,

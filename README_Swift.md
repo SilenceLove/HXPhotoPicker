@@ -1,9 +1,9 @@
 
-`HXPhotoPicker` Swift 版本
+`HXPHPicker` Swift 版本
 
 ## <a id="功能"></a> 功能
 
-- [x] UI 外观支持浅色/深色/自动/自定义 (iOS 13.0+)
+- [x] UI 外观支持浅色/深色/自动/自定义
 - [x] 支持多选/混合内容选择
 - [x] 支持的媒体类型:
     - [x] Photo
@@ -13,6 +13,7 @@
 - [x] 支持本地资源
 - [x] 在线下载iCloud上的资源
 - [x] 两种相册展现方式（列表、弹窗）
+- [x] 支持手势返回
 
 ## <a id="要求"></a> 要求
 
@@ -39,7 +40,7 @@
 class ViewController: UIViewController {
 
     func presentPickerController() {
-        // 自带的与微信一致的配置
+        // 设置与微信主题一致的配置
         let config = HXPHTools.getWXConfig()
         let pickerController = HXPHPickerController.init(picker: config)
         pickerController.pickerControllerDelegate = self
@@ -58,7 +59,7 @@ extension ViewController: HXPHPickerControllerDelegate {
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - selectedAssetArray: 选择的资源对应的 HXPHAsset 数据
     ///   - isOriginal: 是否选中的原图
-    func pickerController(_ pickerController: HXPHPickerController, didFinishWith selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
+    func pickerController(_ pickerController: HXPHPickerController, didFinishSelection selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
         self.selectedAssets = selectedAssetArray
         self.isOriginal = isOriginal
     }
@@ -69,7 +70,7 @@ extension ViewController: HXPHPickerControllerDelegate {
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - photoAsset: 对应的 HXPHAsset 数据
     ///   - isOriginal: 是否选中的原图
-    func pickerController(_ pickerController: HXPHPickerController, singleFinishWith photoAsset:HXPHAsset, _ isOriginal: Bool) {
+    func pickerController(_ pickerController: HXPHPickerController, singleFinishSelection photoAsset:HXPHAsset, _ isOriginal: Bool) {
         self.selectedAssets = [photoAsset]
         self.isOriginal = isOriginal
     }
@@ -85,7 +86,7 @@ extension ViewController: HXPHPickerControllerDelegate {
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - localCameraAssetArray: 相机拍摄存在本地的 HXPHAsset 数据
     ///     可以在下次进入选择时赋值给localCameraAssetArray，列表则会显示
-    func pickerController(_ pickerController: HXPHPickerController, didDismissWith localCameraAssetArray: [HXPHAsset]) {
+    func pickerController(_ pickerController: HXPHPickerController, didDismissComplete localCameraAssetArray: [HXPHAsset]) {
         
     }
 }

@@ -95,7 +95,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     func fetchAssetCollections() {
-        HXPHProgressHUD.showLoadingHUD(addedTo: view, animated: true)
+        _ = HXPHProgressHUD.showLoadingHUD(addedTo: view, animated: true)
         hx_pickerController?.fetchAssetCollections()
         weak var weakSelf = self
         hx_pickerController?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
@@ -158,7 +158,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         }
         let margin: CGFloat = UIDevice.current.hx_leftMargin
         tableView.frame = CGRect(x: margin, y: 0, width: view.hx_width - 2 * margin, height: view.hx_height)
-        if navigationController?.modalPresentationStyle == .fullScreen {
+        if navigationController?.modalPresentationStyle == .fullScreen && UIDevice.current.hx_isPortrait {
             tableView.contentInset = UIEdgeInsets.init(top: UIDevice.current.hx_navigationBarHeight, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
         }else {
             tableView.contentInset = UIEdgeInsets.init(top: navigationController!.navigationBar.hx_height, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)

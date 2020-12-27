@@ -148,6 +148,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         pickerController.selectedAssetArray = selectedAssets
         pickerController.localCameraAssetArray = localCameraAssetArray
         pickerController.isOriginal = isOriginal
+//        pickerController.modalPresentationStyle = .fullScreen
         present(pickerController, animated: true, completion: nil)
     }
     /// 获取已选资源的地址
@@ -158,7 +159,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
             return
         }
         var count = 0
-        HXPHProgressHUD.showLoadingHUD(addedTo: self.view, text: "获取中", animated: true)
+        _ = HXPHProgressHUD.showLoadingHUD(addedTo: self.view, text: "获取中", animated: true)
         weak var weakSelf = self
         for photoAsset in selectedAssets {
             if photoAsset.mediaType == .photo {
@@ -218,13 +219,13 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         }
     }
     // MARK: HXPHPickerControllerDelegate
-    func pickerController(_ pickerController: HXPHPickerController, didFinishWith selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
+    func pickerController(_ pickerController: HXPHPickerController, didFinishSelection selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
         self.selectedAssets = selectedAssetArray
         self.isOriginal = isOriginal
         collectionView.reloadData()
         updateCollectionViewHeight()
     }
-    func pickerController(_ pickerController: HXPHPickerController, singleFinishWith photoAsset:HXPHAsset, _ isOriginal: Bool) {
+    func pickerController(_ pickerController: HXPHPickerController, singleFinishSelection photoAsset:HXPHAsset, _ isOriginal: Bool) {
         selectedAssets = [photoAsset]
         self.isOriginal = isOriginal
         collectionView.reloadData()
@@ -233,7 +234,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     func pickerController(didCancel pickerController: HXPHPickerController) {
         
     }
-    func pickerController(_ pickerController: HXPHPickerController, didDismissWith localCameraAssetArray: [HXPHAsset]) {
+    func pickerController(_ pickerController: HXPHPickerController, didDismissComplete localCameraAssetArray: [HXPHAsset]) {
         setNeedsStatusBarAppearanceUpdate()
         self.localCameraAssetArray = localCameraAssetArray
     }
@@ -242,8 +243,8 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         return cell
     }
     func pickerController(_ pickerController: HXPHPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as! HXPHPickerBaseViewCell
-        return cell.imageView.image
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? HXPHPickerBaseViewCell
+        return cell?.imageView.image
     }
     func pickerController(_ pickerController: HXPHPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
@@ -395,7 +396,7 @@ class HXPHPickerMultiSelectViewCustomCell: HXPHPickerMultiSelectViewCell {
         // 重写图片内容
         imageView.image = UIImage.init(named: "hx_picker_add_img")
     }
-    override func didSelectControlClick(control: HXPHPickerCellSelectBoxControl) {
+    override func didSelectControlClick(control: HXPHPickerSelectBoxView) {
         // 重写选择框事件，也可以将选择框隐藏。自己新加一个选择框，然后触发代理回调
         delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
     }

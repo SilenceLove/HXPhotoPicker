@@ -10,8 +10,8 @@ import UIKit
 import Photos
 
 protocol HXPHPreviewViewControllerDelegate: NSObjectProtocol {
-    func previewViewControllerDidClickOriginal(_ previewViewController:HXPHPreviewViewController, with isOriginal: Bool)
-    func previewViewControllerDidClickSelectBox(_ previewViewController:HXPHPreviewViewController, with isSelected: Bool)
+    func previewViewController(_ previewController: HXPHPreviewViewController, didOriginalButton isOriginal: Bool)
+    func previewViewController(_ previewController: HXPHPreviewViewController, didSelectBox photoAsset: HXPHAsset, isSelected: Bool)
 }
 
 class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, HXPHPreviewViewCellDelegate, HXPHPickerBottomViewDelegate, UINavigationControllerDelegate {
@@ -25,8 +25,9 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     var videoLoadSingleCell = false
     var viewDidAppear: Bool = false
     var firstLayoutSubviews: Bool = true
-    lazy var selectBoxControl: HXPHPickerCellSelectBoxControl = {
-        let boxControl = HXPHPickerCellSelectBoxControl.init(frame: CGRect(x: 0, y: 0, width: config.selectBox.size.width, height: config.selectBox.size.height))
+    var interactiveTransition: HXPHPickerInteractiveTransition?
+    lazy var selectBoxControl: HXPHPickerSelectBoxView = {
+        let boxControl = HXPHPickerSelectBoxView.init(frame: CGRect(x: 0, y: 0, width: config.selectBox.size.width, height: config.selectBox.size.height))
         boxControl.backgroundColor = .clear
         boxControl.config = config.selectBox
         boxControl.addTarget(self, action: #selector(didSelectBoxControlClick), for: UIControl.Event.touchUpInside)
@@ -74,7 +75,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             updateSelectBox(isSelected, photoAsset: photoAsset)
             selectBoxControl.isSelected = isSelected
             bottomView.updateFinishButtonTitle()
-            delegate?.previewViewControllerDidClickSelectBox(self, with: isSelected)
+            delegate?.previewViewController(self, didSelectBox: photoAsset, isSelected: isSelected)
             selectBoxControl.layer.removeAnimation(forKey: "SelectControlAnimation")
             let keyAnimation = CAKeyframeAnimation.init(keyPath: "transform.scale")
             keyAnimation.duration = 0.3
@@ -89,7 +90,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         if isSelected {
             if config.selectBox.type == .number {
                 let text = String(format: "%d", arguments: [photoAsset.selectIndex + 1])
-                let font = UIFont.systemFont(ofSize: config!.selectBox.titleFontSize)
+                let font = UIFont.hx_mediumPingFang(size: config!.selectBox.titleFontSize)
                 let textHeight = text.hx_stringHeight(ofFont: font, maxWidth: boxWidth)
                 var textWidth = text.hx_stringWidth(ofFont: font, maxHeight: textHeight)
                 selectBoxControl.textSize = CGSize(width: textWidth, height: textHeight)
@@ -118,6 +119,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     
     lazy var collectionView : UICollectionView = {
         let collectionView = UICollectionView.init(frame: view.bounds, collectionViewLayout: collectionViewLayout)
+        collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.isPagingEnabled = true
@@ -167,7 +169,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         }
     }
     func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) {
-        delegate?.previewViewControllerDidClickOriginal(self, with: isOriginal)
+        delegate?.previewViewController(self, didOriginalButton: isOriginal)
         hx_pickerController?.originalButtonCallback()
     }
     func bottomViewDidSelectedViewClick(_ bottomView: HXPHPickerBottomView, didSelectedItemAt photoAsset: HXPHAsset) {
@@ -250,6 +252,9 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         config = hx_pickerController!.config.previewView
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
         initView()
+        if hx_pickerController?.modalPresentationStyle == .fullScreen {
+            interactiveTransition = HXPHPickerInteractiveTransition.init(panGestureRecognizerFor: self, type: .pop)
+        }
     }
     
     func initView() {
@@ -301,7 +306,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     }
     func configColor() {
         view.backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
-        collectionView.backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
+//        collectionView.backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
     }
     func getCell(for item: Int) -> HXPHPreviewViewCell? {
         if previewAssets.isEmpty {
@@ -414,11 +419,7 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
                 }else {
                     selectBoxControl.isHidden = false
                     updateSelectBox(photoAsset.isSelected, photoAsset: photoAsset)
-                    if selectBoxControl.isSelected == photoAsset.isSelected {
-                        selectBoxControl.setNeedsDisplay()
-                    }else {
-                        selectBoxControl.isSelected = photoAsset.isSelected
-                    }
+                    selectBoxControl.isSelected = photoAsset.isSelected
                 }
             }
             if !firstLayoutSubviews && config.bottomView.showSelectedView && (isMultipleSelect || isExternalPreview) {
@@ -464,18 +465,25 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
     // MARK: UINavigationControllerDelegate
     func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         if operation == .push {
-            if toVC is HXPHPreviewViewController {
+            if toVC is HXPHPreviewViewController && fromVC is HXPHPickerViewController {
                 return HXPHPickerControllerTransition.init(type: .push)
             }
         }else if operation == .pop {
-            if fromVC is HXPHPreviewViewController {
+            if fromVC is HXPHPreviewViewController && toVC is HXPHPickerViewController {
                 let cell = getCell(for: currentPreviewIndex)
-                cell?.scrollContentView?.hiddenOtherSubView()
+                cell?.scrollContentView?.hiddenOtherSubview()
                 return HXPHPickerControllerTransition.init(type: .pop)
             }
         }
         return nil
     }
+    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        if let canInteration = interactiveTransition?.canInteration, canInteration {
+            return interactiveTransition
+        }
+        return nil
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }

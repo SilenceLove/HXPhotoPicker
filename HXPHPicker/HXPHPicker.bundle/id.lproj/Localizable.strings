@@ -16,7 +16,7 @@
 "视频最小时长为%d秒，无法选择" = "Durasi minimum video adalah %d detik dan tidak dapat dipilih";
 "视频和照片不能同时选择" = "Video dan foto tidak dapat dipilih secara bersamaan";
 "最多只能选择%d个视频" = "Anda hanya dapat memilih maksimal %d video";
-"正在下载..." = "mengunduh";
+"正在下载" = "mengunduh";
 "下载失败" = "unduhan gagal";
 "没有照片" = "Tidak ada foto";
 "你可以使用相机拍些照片" = "Anda dapat mengambil beberapa gambar dengan kamera";

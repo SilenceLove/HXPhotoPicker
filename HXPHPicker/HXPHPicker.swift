@@ -51,6 +51,13 @@ class HXPHPicker: NSObject {
             case video = 4          //!< 手机相册里的视频
             case localVideo = 5     //!< 本地视频
         }
+        enum DownloadStatus: Int {
+            case unknow         //!< 未知，不用下载或还未开始下载
+            case succeed        //!< 下载成功
+            case downloading    //!< 下载中
+            case canceled       //!< 取消下载
+            case failed         //!< 下载失败
+        }
     }
     enum Album {
         enum ShowMode: Int {
