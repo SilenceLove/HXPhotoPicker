@@ -298,6 +298,9 @@ class HXPHPickerSelectBoxView: UIControl {
     }
     override var isSelected: Bool {
         didSet {
+            if !isSelected {
+                text = "0"
+            }
             updateLayers()
         }
     }

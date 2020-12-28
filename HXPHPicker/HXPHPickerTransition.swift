@@ -219,10 +219,14 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             pickerController.navigationBar.alpha = 0
             pickerController.previewViewController()?.collectionView.isHidden = true
             fromView = pushImageView
-            let currentPreviewIndex = pickerController.previewIndex
+            let currentPreviewIndex = pickerController.previewViewController()?.currentPreviewIndex ?? 0
             if let view = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewViewForIndexAt: currentPreviewIndex) {
                 let rect = view.convert(view.bounds, to: contentView)
                 fromView.frame = rect
+                if view.layer.cornerRadius > 0 {
+                    pushImageView.layer.cornerRadius = view.layer.cornerRadius
+                    pushImageView.layer.masksToBounds = true
+                }
                 previewView = view
             }else if let rect = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewFrameForIndexAt: currentPreviewIndex) {
                 fromView.frame = rect
@@ -230,11 +234,11 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                 fromView.center = CGPoint(x: toVC.view.hx_width * 0.5, y: toVC.view.hx_height * 0.5)
             }
             
-            if let image = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewImageForIndexAt: pickerController.previewIndex) {
+            if let image = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewImageForIndexAt: currentPreviewIndex) {
                 pushImageView.image = image
             }
             if !pickerController.selectedAssetArray.isEmpty {
-                let photoAsset = pickerController.selectedAssetArray[pickerController.previewIndex]
+                let photoAsset = pickerController.selectedAssetArray[currentPreviewIndex]
                 if photoAsset.asset != nil {
                     requestAssetImage(for: photoAsset.asset!)
                 }else if pushImageView.image == nil {
@@ -249,9 +253,13 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             pickerController.view.backgroundColor = .clear
             contentView.backgroundColor = backgroundColor
             let currentPreviewIndex = pickerController.previewViewController()?.currentPreviewIndex ?? 0
+            var hasCornerRadius = false
             if let view = pickerController.pickerControllerDelegate?.pickerController?(pickerController, dismissPreviewViewForIndexAt: currentPreviewIndex) {
                 toRect = view.convert(view.bounds, to: containerView)
                 previewView = view
+                if view.layer.cornerRadius > 0 {
+                    hasCornerRadius = true
+                }
             }else if let rect = pickerController.pickerControllerDelegate?.pickerController?(pickerController, dismissPreviewFrameForIndexAt: currentPreviewIndex) {
                 toRect = rect
             }
@@ -262,7 +270,9 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             }else {
                 fromView = pushImageView
             }
-
+            if hasCornerRadius {
+                fromView.layer.masksToBounds = true
+            }
         }
         previewView?.isHidden = true
         contentView.addSubview(fromView)
@@ -283,8 +293,14 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
         }
         UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
             if self.type == .present {
+                if self.pushImageView.layer.cornerRadius > 0 {
+                    self.pushImageView.layer.cornerRadius = 0
+                }
                 self.pushImageView.frame = toRect
             }else if self.type == .dismiss {
+                if let previewView = previewView, previewView.layer.cornerRadius > 0 {
+                    fromView.layer.cornerRadius = previewView.layer.cornerRadius
+                }
                 if toRect.isEmpty {
                     fromView.transform = CGAffineTransform.init(scaleX: 0.1, y: 0.1)
                     fromView.alpha = 0
@@ -299,7 +315,8 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     PHImageManager.default().cancelImageRequest(self.requestID!)
                     self.requestID = nil
                 }
-                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewPresentComplete: pickerController.previewIndex)
+                let currentPreviewIndex = pickerController.previewViewController()?.currentPreviewIndex ?? 0
+                pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewPresentComplete: currentPreviewIndex)
                 pickerController.previewViewController()?.view.backgroundColor = backgroundColor.withAlphaComponent(1)
                 pickerController.previewViewController()?.setCurrentCellImage(image: self.pushImageView.image)
                 pickerController.previewViewController()?.collectionView.isHidden = false

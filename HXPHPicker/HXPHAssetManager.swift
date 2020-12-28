@@ -158,6 +158,84 @@ class HXPHAssetManager: NSObject {
     class func fetchAsset(withLocalIdentifier: String) -> PHAsset? {
         return fetchAssets(withLocalIdentifiers: [withLocalIdentifier]).firstObject
     }
+    class func createAssetCollection(for collectionName: String) -> PHAssetCollection? {
+        let collections = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumRegular, options: nil)
+        var assetCollection: PHAssetCollection?
+        collections.enumerateObjects { (collection, index, stop) in
+            if collection.localizedTitle == collectionName {
+                assetCollection = collection
+                stop.pointee = true
+            }
+        }
+        if assetCollection == nil {
+            do {
+                var createCollectionID: String?
+                try PHPhotoLibrary.shared().performChangesAndWait {
+                    createCollectionID = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: collectionName).placeholderForCreatedAssetCollection.localIdentifier
+                }
+                if let createCollectionID = createCollectionID {
+                    assetCollection = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [createCollectionID], options: nil).firstObject
+                }
+            }catch {}
+        }
+        return assetCollection
+    }
+    class func saveSystemAlbum(forAsset asset: Any, mediaType: HXPHPicker.Asset.MediaType, customAlbumName: String?, creationDate: Date?, location: CLLocation?, completion: @escaping (PHAsset?) -> Void) {
+        var albumName: String?
+        if let customAlbumName = customAlbumName {
+            albumName = customAlbumName
+        }else {
+            albumName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String
+        }
+        requestAuthorization { (status) in
+            if status == .denied || status == .notDetermined || status == .restricted {
+                completion(nil)
+                return
+            }
+            do {
+                var placeholder: PHObjectPlaceholder?
+                try PHPhotoLibrary.shared().performChangesAndWait {
+                    var creationRequest: PHAssetCreationRequest? = nil
+                    if asset is URL {
+                        if mediaType == .photo {
+                            creationRequest = PHAssetCreationRequest.creationRequestForAssetFromImage(atFileURL: asset as! URL)
+                        }else if mediaType == .video {
+                            creationRequest = PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: asset as! URL)
+                        }
+                    }else if asset is UIImage {
+                        creationRequest = PHAssetCreationRequest.creationRequestForAsset(from: asset as! UIImage)
+                    }
+                    if let creationDate = creationDate {
+                        creationRequest?.creationDate = creationDate
+                    }else {
+                        creationRequest?.creationDate = Date.init()
+                    }
+                    creationRequest?.location = location
+                    placeholder = creationRequest?.placeholderForCreatedAsset
+                }
+                if let placeholder = placeholder, let phAsset = fetchAsset(withLocalIdentifier: placeholder.localIdentifier) {
+                    completion(phAsset)
+                    if let albumName = albumName, let assetCollection = createAssetCollection(for: albumName) {
+                        do {try PHPhotoLibrary.shared().performChangesAndWait {
+                            PHAssetCollectionChangeRequest.init(for: assetCollection)?.insertAssets([phAsset] as NSFastEnumeration, at: IndexSet.init(integer: 0))
+                        }}catch{}
+                    }
+                }else {
+                    completion(nil)
+                }
+            }catch {
+                completion(nil)
+            }
+        }
+    }
+    
+    class func saveSystemAlbum(forImage image: UIImage, customAlbumName: String?, completion: @escaping (PHAsset?) -> Void) {
+        saveSystemAlbum(forAsset: image, mediaType: .photo, customAlbumName: nil, creationDate: nil, location: nil, completion: completion)
+    }
+    
+    class func saveSystemAlbum(forVideoURL videoURL: URL, customAlbumName: String?, completion: @escaping (PHAsset?) -> Void) {
+        saveSystemAlbum(forAsset: videoURL, mediaType: .video, customAlbumName: nil, creationDate: nil, location: nil, completion: completion)
+    }
     
     /// 判断是否是动图
     /// - Parameter asset: 需要判断的资源

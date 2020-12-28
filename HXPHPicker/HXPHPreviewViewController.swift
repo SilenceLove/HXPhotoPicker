@@ -74,8 +74,8 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             }
             updateSelectBox(isSelected, photoAsset: photoAsset)
             selectBoxControl.isSelected = isSelected
-            bottomView.updateFinishButtonTitle()
             delegate?.previewViewController(self, didSelectBox: photoAsset, isSelected: isSelected)
+            bottomView.updateFinishButtonTitle()
             selectBoxControl.layer.removeAnimation(forKey: "SelectControlAnimation")
             let keyAnimation = CAKeyframeAnimation.init(keyPath: "transform.scale")
             keyAnimation.duration = 0.3
@@ -152,8 +152,15 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         return bottomView
     }()
     // MARK: HXPHPickerBottomViewDelegate
-    func bottomViewDidPreviewButtonClick(view: HXPHPickerBottomView) {}
-    func bottomViewDidFinishButtonClick(view: HXPHPickerBottomView) {
+    func bottomView(didEditButtonClick view: HXPHPickerBottomView) {
+        let photoAsset = previewAssets[currentPreviewIndex]
+        if let shouldEditAsset = hx_pickerController?.shouldEditAsset(photoAsset: photoAsset) {
+            if !shouldEditAsset {
+                return
+            }
+        }
+    }
+    func bottomView(didFinishButtonClick view: HXPHPickerBottomView) {
         if previewAssets.isEmpty {
             HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "没有可选资源".hx_localized, animated: true, delay: 2)
             return
@@ -168,11 +175,11 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             hx_pickerController?.singleFinishCallback(for: photoAsset)
         }
     }
-    func bottomViewDidOriginalButtonClick(view: HXPHPickerBottomView, with isOriginal: Bool) {
+    func bottomView(didOriginalButtonClick view: HXPHPickerBottomView, with isOriginal: Bool) {
         delegate?.previewViewController(self, didOriginalButton: isOriginal)
         hx_pickerController?.originalButtonCallback()
     }
-    func bottomViewDidSelectedViewClick(_ bottomView: HXPHPickerBottomView, didSelectedItemAt photoAsset: HXPHAsset) {
+    func bottomView(_ bottomView: HXPHPickerBottomView, didSelectedItemAt photoAsset: HXPHAsset) {
         if previewAssets.contains(photoAsset) {
             let index = previewAssets.firstIndex(of: photoAsset) ?? 0
             if index == currentPreviewIndex {
@@ -180,12 +187,16 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             }
             getCell(for: currentPreviewIndex)?.cancelRequest()
             collectionView.scrollToItem(at: IndexPath(item: index, section: 0), at: .centeredHorizontally, animated: false)
-            self.requestPreviewTimer?.invalidate()
-            self.requestPreviewTimer = Timer(timeInterval: 0.2, target: self, selector:#selector(delayRequestPreview) , userInfo: nil, repeats: false)
+            setupRequestPreviewTimer()
             RunLoop.main.add(self.requestPreviewTimer!, forMode: RunLoop.Mode.common)
         }else {
             bottomView.selectedView.scrollTo(photoAsset: nil)
         }
+    }
+    func setupRequestPreviewTimer() {
+        self.requestPreviewTimer?.invalidate()
+        self.requestPreviewTimer = Timer(timeInterval: 0.2, target: self, selector:#selector(delayRequestPreview) , userInfo: nil, repeats: false)
+        RunLoop.main.add(self.requestPreviewTimer!, forMode: RunLoop.Mode.common)
     }
     @objc func delayRequestPreview() {
         self.getCell(for: self.currentPreviewIndex)?.requestPreviewAsset()
@@ -203,8 +214,12 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
         var bottomHeight: CGFloat
         if isExternalPreview {
             bottomHeight = (hx_pickerController?.selectedAssetArray.isEmpty ?? true) ? 0 : UIDevice.current.hx_bottomMargin + 70
-            if !config.bottomView.showSelectedView {
-                bottomHeight = 0
+            if !config.bottomView.showSelectedView && config.bottomView.editButtonHidden {
+                if config.bottomView.editButtonHidden {
+                    bottomHeight = 0
+                }else {
+                    bottomHeight = UIDevice.current.hx_bottomMargin + 50
+                }
             }
         }else {
             bottomHeight = hx_pickerController?.selectedAssetArray.isEmpty ?? true ? 50 + UIDevice.current.hx_bottomMargin : 50 + UIDevice.current.hx_bottomMargin + 70
@@ -337,6 +352,29 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             bottomView.selectedView.reloadSectionInset()
         }
     }
+    func deleteCurrentPhotoAsset() {
+        if previewAssets.isEmpty || !isExternalPreview {
+            return
+        }
+        let photoAsset = previewAssets[currentPreviewIndex]
+        if let shouldDelete = hx_pickerController?.previewShouldDeleteAsset(photoAsset: photoAsset, index: currentPreviewIndex), !shouldDelete {
+            return
+        }
+        previewAssets.remove(at: currentPreviewIndex)
+        collectionView.deleteItems(at: [IndexPath.init(item: currentPreviewIndex, section: 0)])
+        bottomView.selectedView.removePhotoAsset(photoAsset: photoAsset)
+        hx_pickerController?.previewDidDeleteAsset(photoAsset: photoAsset, index: currentPreviewIndex)
+        if previewAssets.isEmpty {
+            didCancelItemClick()
+            return
+        }
+        scrollViewDidScroll(collectionView)
+        setupRequestPreviewTimer()
+    }
+    func addedCameraPhotoAsset(_ photoAsset: HXPHAsset) {
+        previewAssets.insert(photoAsset, at: currentPreviewIndex)
+        collectionView.insertItems(at: [IndexPath.init(item: currentPreviewIndex, section: 0)])
+    }
     // MARK: HXPHPreviewViewCellDelegate
     func singleTap() {
         if navigationController == nil {
@@ -425,6 +463,13 @@ class HXPHPreviewViewController: UIViewController, UICollectionViewDataSource, U
             if !firstLayoutSubviews && config.bottomView.showSelectedView && (isMultipleSelect || isExternalPreview) {
                 bottomView.selectedView.scrollTo(photoAsset: photoAsset)
             }
+            if let pickerController = hx_pickerController, !config.bottomView.editButtonHidden {
+                if photoAsset.mediaType == .photo {
+                    bottomView.editBtn.isEnabled = pickerController.config.allowEditPhoto
+                }else if photoAsset.mediaType == .video {
+                    bottomView.editBtn.isEnabled = pickerController.config.allowEditVideo
+                }
+            }
             hx_pickerController?.previewUpdateCurrentlyDisplayedAsset(photoAsset: photoAsset, index: currentIndex)
         }
         self.currentPreviewIndex = currentIndex
@@ -504,6 +549,7 @@ class HXPHPreviewSelectedView: UIView, UICollectionViewDataSource, UICollectionV
         layout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.current.hx_leftMargin, bottom: 5, right: 12 + UIDevice.current.hx_rightMargin)
         return layout
     }()
+
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView.init(frame: bounds, collectionViewLayout: collectionViewLayout)
         collectionView.backgroundColor = UIColor.clear
@@ -514,7 +560,6 @@ class HXPHPreviewSelectedView: UIView, UICollectionViewDataSource, UICollectionV
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        collectionView.register(HXPHPreviewSelectedViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(HXPHPreviewSelectedViewCell.self))
         return collectionView
     }()
     
@@ -527,7 +572,9 @@ class HXPHPreviewSelectedView: UIView, UICollectionViewDataSource, UICollectionV
         addSubview(collectionView)
     }
     func reloadSectionInset() {
-        collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.current.hx_leftMargin, bottom: 5, right: 12 + UIDevice.current.hx_rightMargin)
+        if hx_x == 0 {
+            collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.current.hx_leftMargin, bottom: 5, right: 12 + UIDevice.current.hx_rightMargin)
+        }
     }
     func reloadData(photoAssets: [HXPHAsset]) {
         isHidden = photoAssets.isEmpty
@@ -677,15 +724,19 @@ class HXPHPreviewSelectedViewCell: UICollectionViewCell {
     
     var photoAsset: HXPHAsset? {
         didSet {
-            weak var weakSelf = self
-            requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * 2, completion: { (image, asset, info) in
-                if weakSelf?.photoAsset == asset {
-                    weakSelf?.imageView.image = image
-                }
-            })
-            
+            reqeustAssetImage()
         }
     }
+    /// 获取图片，重写此方法可以修改图片
+    func reqeustAssetImage() {
+        weak var weakSelf = self
+        requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * 2, completion: { (image, asset, info) in
+            if weakSelf?.photoAsset == asset {
+                weakSelf?.imageView.image = image
+            }
+        })
+    }
+    
     override var isSelected: Bool {
         didSet {
             selectedView.isHidden = !isSelected

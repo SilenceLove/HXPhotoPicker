@@ -236,7 +236,7 @@ class HXPHPickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIG
                 self.canInteration = false
                 self.beganInterPercent = false
                 previewViewController.navigationController?.view.isUserInteractionEnabled = true
-                self.transitionContext?.completeTransition(!self.transitionContext!.transitionWasCancelled)
+                self.transitionContext?.completeTransition(false)
                 self.transitionContext = nil
             }
         }
@@ -245,11 +245,19 @@ class HXPHPickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIG
         if let previewViewController = previewViewController, let previewView = previewView {
             panGestureRecognizer.isEnabled = false
             var toRect = toView?.convert(toView?.bounds ?? .zero, to: transitionContext?.containerView) ?? .zero
-            if type == .dismiss, let pickerController = pickerController, toRect.isEmpty {
-                toRect = pickerController.pickerControllerDelegate?.pickerController?(pickerController, dismissPreviewFrameForIndexAt: previewViewController.currentPreviewIndex) ?? .zero
+            if type == .dismiss, let pickerController = pickerController {
+                if toRect.isEmpty {
+                    toRect = pickerController.pickerControllerDelegate?.pickerController?(pickerController, dismissPreviewFrameForIndexAt: previewViewController.currentPreviewIndex) ?? .zero
+                }
+                if let toView = toView, toView.layer.cornerRadius > 0 {
+                    previewView.layer.masksToBounds = true
+                }
             }
             previewView.scrollContentView?.isBacking = true
-            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
+            UIView.animate(withDuration: 0.45, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
+                if let toView = self.toView, toView.layer.cornerRadius > 0 {
+                    previewView.layer.cornerRadius = toView.layer.cornerRadius
+                }
                 if !toRect.isEmpty {
                     previewView.transform = .identity
                     previewView.frame = toRect
@@ -285,12 +293,14 @@ class HXPHPickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIG
                     previewView.removeFromSuperview()
                     if self.type == .dismiss, let pickerController = self.pickerController {
                         pickerController.pickerControllerDelegate?.pickerController?(pickerController, previewDismissComplete: previewViewController.currentPreviewIndex)
+                    }else if self.type == .pop, let toVC = self.transitionContext?.viewController(forKey: .to) as? HXPHPickerViewController {
+                        toVC.collectionView.layer.removeAllAnimations()
                     }
                     self.previewView = nil
                     self.previewViewController = nil
                     self.toView = nil
                     self.panGestureRecognizer.isEnabled = true
-                    self.transitionContext?.completeTransition(!self.transitionContext!.transitionWasCancelled)
+                    self.transitionContext?.completeTransition(true)
                     self.transitionContext = nil
                 }
             }

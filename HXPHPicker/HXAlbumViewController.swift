@@ -38,6 +38,12 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         promptLb.numberOfLines = 0
         return promptLb
     }()
+    lazy var titleLabel: UILabel = {
+        let titleLabel = UILabel.init()
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
+        titleLabel.textAlignment = .center
+        return titleLabel
+    }()
     var config: HXPHAlbumListConfiguration?
     var assetCollectionsArray: [HXPHAssetCollection] = []
     var orientationDidChange : Bool = false
@@ -54,6 +60,8 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
         config = hx_pickerController!.config.albumList
+        title = "返回".hx_localized
+        navigationItem.titleView = titleLabel
         let backItem = UIBarButtonItem.init(title: "取消".hx_localized, style: .done, target: self, action: #selector(didCancelItemClick))
         navigationItem.rightBarButtonItem = backItem
         view.addSubview(tableView)
@@ -62,9 +70,11 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
     }
     func configColor() {
-        tableView.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
-        view.backgroundColor = HXPHManager.shared.isDark ? config!.backgroundDarkColor : config!.backgroundColor
-        promptLb.textColor = HXPHManager.shared.isDark ? config!.limitedStatusPromptDarkColor : config!.limitedStatusPromptColor
+        let isDark = HXPHManager.shared.isDark
+        tableView.backgroundColor = isDark ? config!.backgroundDarkColor : config!.backgroundColor
+        view.backgroundColor = isDark ? config!.backgroundDarkColor : config!.backgroundColor
+        promptLb.textColor = isDark ? config!.limitedStatusPromptDarkColor : config!.limitedStatusPromptColor
+        titleLabel.textColor = isDark ? hx_pickerController?.config.navigationTitleDarkColor : hx_pickerController?.config.navigationTitleColor
     }
     @objc func deviceOrientationChanged(notify: Notification) {
         beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
@@ -74,7 +84,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         if hx_pickerController?.cameraAssetCollection != nil {
             self.pushPhotoPickerController(assetCollection: hx_pickerController?.cameraAssetCollection, animated: false)
             self.canFetchAssetCollections = true
-            title = "相册".hx_localized
+            titleLabel.text = "相册".hx_localized
         }else {
             weak var weakSelf = self
             hx_pickerController?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
@@ -83,7 +93,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
                     cameraAssetCollection = HXPHAssetCollection.init(albumName: weakSelf?.config?.emptyAlbumName.hx_localized, coverImage: weakSelf?.config!.emptyCoverImageName.hx_image)
                 }
                 weakSelf?.canFetchAssetCollections = true
-                weakSelf?.title = "相册".hx_localized
+                weakSelf?.titleLabel.text = "相册".hx_localized
                 if weakSelf?.navigationController?.topViewController is HXPHPickerViewController {
                     let vc = weakSelf?.navigationController?.topViewController as! HXPHPickerViewController
                     vc.changedAssetCollection(collection: cameraAssetCollection)
@@ -156,6 +166,11 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         if HXPHAssetManager.authorizationStatusIsLimited() {
             promptLb.hx_width = view.hx_width
         }
+        var titleWidth = titleLabel.text?.hx_stringWidth(ofFont: titleLabel.font, maxHeight: 30) ?? 0
+        if titleWidth > view.hx_width * 0.6 {
+            titleWidth = view.hx_width * 0.6
+        }
+        titleLabel.hx_size = CGSize(width: titleWidth, height: 30)
         let margin: CGFloat = UIDevice.current.hx_leftMargin
         tableView.frame = CGRect(x: margin, y: 0, width: view.hx_width - 2 * margin, height: view.hx_height)
         if navigationController?.modalPresentationStyle == .fullScreen && UIDevice.current.hx_isPortrait {

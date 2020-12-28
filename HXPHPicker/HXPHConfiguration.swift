@@ -11,6 +11,9 @@ import AVFoundation
 
 class HXPHConfiguration: NSObject {
     
+    /// 如果自带的语言不够，可以添加自定义的语言文字
+    /// HXPHManager.shared.customLanguages 自定义语言数组
+    /// HXPHManager.shared.fixedCustomLanguage 如果有多种自定义语言，可以固定显示某一种
     /// 语言类型
     var languageType: HXPHPicker.LanguageType = .system
     
@@ -60,14 +63,20 @@ class HXPHConfiguration: NSObject {
     var minimumSelectedVideoDuration: Int = 0
     
     /// 视频选择的最大文件大小，为0则不限制
-    /// 如果限制了大小请将 photoList.cell.show.showDisableMask = false
+    /// 如果限制了大小请将 photoList.cell.showDisableMask = false
     /// 限制并且显示遮罩会导致界面滑动卡顿
     var maximumSelectedVideoFileSize: Int = 0
     
     /// 照片选择的最大文件大小，为0则不限制
-    /// 如果限制了大小请将 photoList.cell.show.showDisableMask = false
+    /// 如果限制了大小请将 photoList.cell.showDisableMask = false
     /// 限制并且显示遮罩会导致界面滑动卡顿 
     var maximumSelectedPhotoFileSize: Int = 0
+    
+    /// 允许编辑照片
+    var allowEditPhoto: Bool = true
+    
+    /// 允许编辑视频
+    var allowEditVideo: Bool = true
     
     /// 状态栏样式
     var statusBarStyle: UIStatusBarStyle = .default
@@ -330,7 +339,8 @@ class HXPHPhotoListCellConfiguration: NSObject {
     /// 自定义不带选择框的cell，继承 HXPHPickerViewCell 加以修改
     var customSingleCellClass: HXPHPickerViewCell.Type?
     
-    /// 自定义带选择框的cell，继承 HXPHPickerMultiSelectViewCell 加以修改
+    /// 自定义带选择框的cell
+    /// 继承 HXPHPickerMultiSelectViewCell 加以修改
     var customMultipleCellClass: HXPHPickerMultiSelectViewCell.Type?
     
     /// 背景颜色
@@ -374,6 +384,12 @@ class HXPHPhotoListCameraCellConfiguration: NSObject {
 class HXPHCameraConfiguration: NSObject {
     /// 拍照完成后是否选择
     var takePictureCompletionToSelected: Bool = true
+    
+    /// 拍照完成后保存到系统相册
+    var saveSystemAlbum: Bool = true
+    
+    /// 保存在自定义相册的名字，为空时则取 BundleName
+    var customAlbumName: String?
     
     /// 媒体类型[kUTTypeImage, kUTTypeMovie]，不设置内部会根据selectType配置
     var mediaTypes: [String] = []
@@ -420,7 +436,7 @@ class HXPHPreviewViewConfiguration: NSObject {
         let config = HXPHPickerBottomViewConfiguration.init()
         config.previewButtonHidden = true
         config.disableFinishButtonWhenNotSelected = false
-        config.editButtonHidden = true
+        config.editButtonHidden = false
         config.showSelectedView = true
         return config
     }()
@@ -471,6 +487,8 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     
     /// 预览按钮禁用下的标题颜色
     var previewButtonDisableTitleColor: UIColor?
+    
+    /// 暗黑风格下预览按钮禁用下的标题颜色
     var previewButtonDisableTitleDarkColor: UIColor?
     
     /// 隐藏原图按钮
@@ -575,7 +593,7 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     var editButtonDisableTitleColor: UIColor?
     var editButtonDisableTitleDarkColor: UIColor?
     
-    /// 相册权限为选不部分时显示提示视图
+    /// 相册权限为选部分时显示提示
     var showPrompt: Bool = true
     
     /// 提示图标颜色
@@ -610,6 +628,9 @@ class HXPHPickerBottomViewConfiguration: NSObject {
     
     /// 显示已选资源
     var showSelectedView: Bool = false
+    
+    /// 自定义cell，继承 HXPHPreviewSelectedViewCell 加以修改
+    var customSelectedViewCellClass: HXPHPreviewSelectedViewCell.Type?
     
     /// 已选资源选中的勾勾颜色
     lazy var selectedViewTickColor: UIColor = {

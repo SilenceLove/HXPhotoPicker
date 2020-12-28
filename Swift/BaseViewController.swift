@@ -32,7 +32,6 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     }
     var beforeRowCount: Int = 0
     
-    
     /// 当前已选资源
     var selectedAssets: [HXPHAsset] = []
     /// 是否选中的原图
@@ -41,6 +40,10 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     var localCameraAssetArray: [HXPHAsset] = []
     /// 相关配置
     var config: HXPHConfiguration = HXPHTools.getWXConfig()
+    
+    weak var previewTitleLabel: UILabel?
+    weak var pickerController: HXPHPickerController?
+    
     init() {
         super.init(nibName:"BaseViewController",bundle: nil)
     }
@@ -148,7 +151,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         pickerController.selectedAssetArray = selectedAssets
         pickerController.localCameraAssetArray = localCameraAssetArray
         pickerController.isOriginal = isOriginal
-//        pickerController.modalPresentationStyle = .fullScreen
+        pickerController.modalPresentationStyle = .fullScreen
         present(pickerController, animated: true, completion: nil)
     }
     /// 获取已选资源的地址
@@ -238,6 +241,19 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         setNeedsStatusBarAppearanceUpdate()
         self.localCameraAssetArray = localCameraAssetArray
     }
+    
+    func pickerController(_ pikcerController: HXPHPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: HXPHAsset, atIndex: Int) {
+        previewTitleLabel?.text = String(atIndex + 1) + "/" + String(selectedAssets.count)
+    }
+    func pickerController(_ pickerController: HXPHPickerController, previewDidDeleteAsset photoAsset: HXPHAsset, atIndex: Int) {
+        let isFull = selectedAssets.count == config.maximumSelectedCount
+        selectedAssets.remove(at: atIndex)
+        if isFull {
+            collectionView.reloadData()
+        }else {
+            collectionView.deleteItems(at: [IndexPath.init(item: atIndex, section: 0)])
+        }
+    }
     func pickerController(_ pickerController: HXPHPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
         return cell
@@ -285,17 +301,36 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
             presentPickerController()
             return
         }
+        if selectedAssets.isEmpty {
+            return
+        }
+//        config.previewView.bottomView.showSelectedView = false
         // 预览时可以重新初始化一个config设置单独的颜色或其他配置
         // modalPresentationStyle = .custom 会使用框架自带的动画效果
-        let pickerController = HXPHPickerController.init(preview: config, modalPresentationStyle: .custom)
+        let pickerController = HXPHPickerController.init(preview: config, currentIndex: indexPath.item, modalPresentationStyle: .custom)
         pickerController.selectedAssetArray = selectedAssets
-        pickerController.previewIndex = indexPath.item
         pickerController.pickerControllerDelegate = self
         // 透明导航栏建议修改取消图片
 //        config.previewView.cancelImageName = ""
 //        pickerController.navigationBar.setBackgroundImage(UIImage.hx_image(for: UIColor.clear, havingSize: .zero), for: .default)
 //        pickerController.navigationBar.shadowImage = UIImage.hx_image(for: UIColor.clear, havingSize: .zero)
+        let titleLabel = UILabel.init()
+        titleLabel.hx_size = CGSize(width: 100, height: 30)
+        titleLabel.textColor = .white
+        titleLabel.font = UIFont.hx_semiboldPingFang(size: 17)
+        titleLabel.textAlignment = .center
+        titleLabel.text = String(indexPath.item + 1) + "/" + String(selectedAssets.count)
+        pickerController.previewViewController()?.navigationItem.titleView = titleLabel
+        previewTitleLabel = titleLabel
+        pickerController.previewViewController()?.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "删除", style: .done, target: self, action: #selector(deletePreviewAsset))
         present(pickerController, animated: true, completion: nil)
+        self.pickerController = pickerController
+    }
+    @objc func deletePreviewAsset() {
+        HXPHTools.showAlert(viewController: pickerController, title: "是否删除当前资源", message: nil, leftActionTitle: "确定", leftHandler: { (alertAction) in
+            self.pickerController?.previewViewController()?.deleteCurrentPhotoAsset()
+        }, rightActionTitle: "取消") { (alertAction) in
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, canEditItemAt indexPath: IndexPath) -> Bool {

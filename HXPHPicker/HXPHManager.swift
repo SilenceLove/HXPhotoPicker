@@ -10,9 +10,24 @@ import UIKit
 import Photos
 import PhotosUI
 
+class HXPHCustomLanguage: NSObject {
+    /// 语言
+    /// 会与 Locale.preferredLanguages 进行匹配，匹配成功的才会使用。请确保正确性
+    var language: String = ""
+    /// 语言文件路径
+    var languagePath: String = ""
+}
+
 class HXPHManager: NSObject {
     
     static let shared = HXPHManager()
+    
+    /// 自定义语言
+    var customLanguages: [HXPHCustomLanguage] = []
+    
+    /// 当配置的 languageType 都不匹配时才会判断自定义语言
+    /// 固定的自定义语言，不会受系统语言影响
+    var fixedCustomLanguage: HXPHCustomLanguage?
     
     var bundle: Bundle?
     var languageBundle: Bundle?
@@ -35,6 +50,7 @@ class HXPHManager: NSObject {
         }
     }
     
+    private var isCustomLanguage: Bool = false
     private lazy var cameraAlbumLocalIdentifier : String? = {
         var identifier = UserDefaults.standard.string(forKey: HXPHPicker.CameraAlbumLocal.identifier.rawValue)
         return identifier
@@ -146,11 +162,12 @@ class HXPHManager: NSObject {
         if bundle == nil {
             _ = createBundle()
         }
-        if self.languageType != languageType {
+        if self.languageType != languageType || isCustomLanguage {
             languageBundle = nil
         }
+        isCustomLanguage = false
         if languageBundle == nil {
-            var language = Locale.preferredLanguages.first
+            var language = "en"
             switch languageType {
             case .simplifiedChinese:
                 language = "zh-Hans"
@@ -174,26 +191,39 @@ class HXPHManager: NSObject {
                 language = "id"
                 break
             default:
-                if language != nil {
-                    if language!.hasPrefix("zh") {
-                        if language!.range(of: "Hans") != nil {
+                if let fixedLanguage = fixedCustomLanguage {
+                    isCustomLanguage = true
+                    languageBundle = Bundle.init(path: fixedLanguage.languagePath)
+                    return languageBundle
+                }
+                for customLanguage in customLanguages {
+                    if Locale.preferredLanguages.contains(customLanguage.language) {
+                        isCustomLanguage = true
+                        languageBundle = Bundle.init(path: customLanguage.languagePath)
+                        return languageBundle
+                    }
+                }
+                for preferredLanguage in Locale.preferredLanguages {
+                    if preferredLanguage.hasPrefix("zh") {
+                        if preferredLanguage.range(of: "Hans") != nil {
                             language = "zh-Hans"
                         }else {
                             language = "zh-Hant"
                         }
-                    }else if language!.hasPrefix("ja") {
+                        break
+                    }else if preferredLanguage.hasPrefix("ja") {
                         language = "ja"
-                    }else if language!.hasPrefix("ko") {
+                        break
+                    }else if preferredLanguage.hasPrefix("ko") {
                         language = "ko"
-                    }else if language!.hasPrefix("th") {
+                        break
+                    }else if preferredLanguage.hasPrefix("th") {
                         language = "th"
-                    }else if language!.hasPrefix("id") {
+                        break
+                    }else if preferredLanguage.hasPrefix("id") {
                         language = "id"
-                    }else {
-                        language = "en"
+                        break
                     }
-                }else {
-                    language = "en"
                 }
             }
             let path = bundle?.path(forResource: language, ofType: "lproj")

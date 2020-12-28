@@ -8,6 +8,7 @@
 "原图" = "Gambar asli";
 "预览" = "Pratinjau";
 "编辑" = "edit";
+"返回" = "kembali";
 "没有可选资源" = "Tidak ada sumber daya opsional";
 "照片和视频不能同时选择" = "Foto dan video tidak dapat dipilih secara bersamaan";
 "最多只能选择%d张照片" = "Anda hanya dapat memilih maksimal %d foto";
@@ -28,6 +29,7 @@
 "照片大小超过最大限制" = "Ukuran foto melebihi batas maksimal";
 "视频大小超过最大限制" = "Ukuran video melebihi batas maksimum";
 "视频导出失败" = "Ekspor video gagal";
+"保存失败" = "Gagal menyimpan";
 "所有照片" = "Semua foto";
 
 "HXAlbumCameraRoll" = "Semua foto";

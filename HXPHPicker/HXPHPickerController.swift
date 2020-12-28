@@ -31,7 +31,14 @@ import Photos
     ///   - isOriginal: 是否选中的原图
     @objc optional func pickerController(_ pickerController: HXPHPickerController, didOriginalButton isOriginal: Bool)
     
-    /// 是否能够选择cell 不能选择时需要自己手动弹出提示框
+    /// 将要点击cell，允许的话点击之后会跳转预览界面
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - photoAsset: 对应的 HXPHAsset 数据
+    ///   - atIndex: indexPath.item
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, shouldClickCell photoAsset: HXPHAsset, atIndex: Int) -> Bool
+    
+    /// 将要选择cell 不能选择时需要自己手动弹出提示框
     /// - Parameters:
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - photoAsset: 对应的 HXPHAsset 数据
@@ -54,12 +61,31 @@ import Photos
     /// 可以跳转其他相机界面然后调用 addedCameraPhotoAsset
     @objc optional func pickerController(shouldPresentCamera pickerController: HXPHPickerController) -> Bool
     
+    /// 将要编辑 Asset，不允许的话可以自己跳转其他编辑界面
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - photoAsset: 对应的 HXPHAsset 数据
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, shouldEditAsset photoAsset: HXPHAsset) -> Bool
+    
     /// 预览界面更新当前显示的资源，collectionView滑动了就会调用
     /// - Parameters:
     ///   - pikcerController: 对应的 HXPHPickerController
     ///   - photoAsset: 对应显示的 HXPHAsset 数据
     ///   - index: 对应显示的位置
     @objc optional func pickerController(_ pikcerController: HXPHPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: HXPHAsset, atIndex: Int)
+    
+    /// 预览界面将要删除 Asset
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - photoAsset: 对应被删除的 HXPHAsset 数据
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, previewShouldDeleteAsset photoAsset: HXPHAsset, atIndex: Int) -> Bool
+    
+    /// 预览界面已经删除了 Asset
+    /// - Parameters:
+    ///   - pickerController: 对应的 HXPHPickerController
+    ///   - photoAsset: 对应被删除的 HXPHAsset 数据
+    ///   - atIndex: 资源对应的位置索引
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, previewDidDeleteAsset photoAsset: HXPHAsset, atIndex: Int)
     
     /// 点击取消时调用
     /// - Parameter pickerController: 对应的 HXPHPickerController
@@ -107,7 +133,7 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     var config : HXPHConfiguration
     
     /// 当前被选择的资源对应的 HXPHAsset 对象数组
-    /// 外部预览时的资源数据，可以设置previewIndex指定预览位置
+    /// 外部预览时的资源数据
     var selectedAssetArray: [HXPHAsset] = [] {
         didSet {
             configSelectedArray()
@@ -137,6 +163,9 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     /// - Parameter photoAsset: 对应的 HXPHAsset 数据
     public func addedCameraPhotoAsset(_ photoAsset: HXPHAsset) {
         hx_pickerController?.addedCameraPhotoAsset(photoAsset)
+        if topViewController is HXPHPreviewViewController {
+            previewViewController()?.addedCameraPhotoAsset(photoAsset)
+        }
     }
     
     /// 所有资源集合
@@ -146,15 +175,6 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     /// 相机胶卷资源集合
     private(set) var cameraAssetCollection : HXPHAssetCollection?
     var fetchCameraAssetCollectionCompletion : ((HXPHAssetCollection?)->())?
-    
-    /// 外部预览时的下标
-    var previewIndex: Int = 0 {
-        didSet {
-            if isPreviewAsset {
-                previewViewController()?.currentPreviewIndex = previewIndex
-            }
-        }
-    }
     
     /// 选择资源初始化
     /// - Parameter config: 相关配置
@@ -186,13 +206,14 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     /// - Parameters:
     ///   - config: 相关配置
     ///   - modalPresentationStyle: 设置 custom 样式，框架自带动画效果
-    init(preview config: HXPHConfiguration, modalPresentationStyle: UIModalPresentationStyle) {
+    init(preview config: HXPHConfiguration, currentIndex: Int, modalPresentationStyle: UIModalPresentationStyle) {
         isPreviewAsset = true
         HXPHManager.shared.appearanceStyle = config.appearanceStyle
         _ = HXPHManager.shared.createLanguageBundle(languageType: config.languageType)
         self.config = config
         let vc = HXPHPreviewViewController.init()
         vc.isExternalPreview = true
+        vc.currentPreviewIndex = currentIndex
         super.init(rootViewController: vc)
         self.modalPresentationStyle = modalPresentationStyle
         if modalPresentationStyle == .custom {
@@ -345,6 +366,27 @@ class HXPHPickerController: UINavigationController, PHPhotoLibraryChangeObserver
     }
     func previewUpdateCurrentlyDisplayedAsset(photoAsset: HXPHAsset, index: Int) {
         pickerControllerDelegate?.pickerController?(self, previewUpdateCurrentlyDisplayedAsset: photoAsset, atIndex: index)
+    }
+    func shouldClickCell(photoAsset: HXPHAsset, index: Int) -> Bool {
+        if let shouldClick = pickerControllerDelegate?.pickerController?(self, shouldClickCell: photoAsset, atIndex: index) {
+            return shouldClick
+        }
+        return true
+    }
+    func shouldEditAsset(photoAsset: HXPHAsset) -> Bool {
+        if let shouldEditAsset = pickerControllerDelegate?.pickerController?(self, shouldEditAsset: photoAsset) {
+            return shouldEditAsset
+        }
+        return true
+    }
+    func previewShouldDeleteAsset(photoAsset: HXPHAsset, index: Int) -> Bool {
+        if let previewShouldDeleteAsset = pickerControllerDelegate?.pickerController?(self, previewShouldDeleteAsset: photoAsset, atIndex: index) {
+            return previewShouldDeleteAsset
+        }
+        return true
+    }
+    func previewDidDeleteAsset(photoAsset: HXPHAsset, index: Int) {
+        pickerControllerDelegate?.pickerController?(self, previewDidDeleteAsset: photoAsset, atIndex: index)
     }
     
     /// 获取已选资源的总大小
