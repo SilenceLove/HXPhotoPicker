@@ -9,11 +9,11 @@
 import UIKit
 import Photos
 
-class HXPHAssetManager: NSObject {
+public class HXPHAssetManager: NSObject {
     
     /// 获取当前相册权限状态
     /// - Returns: 权限状态
-    class func authorizationStatus() -> PHAuthorizationStatus {
+    public class func authorizationStatus() -> PHAuthorizationStatus {
         let status : PHAuthorizationStatus;
         if #available(iOS 14, *) {
             status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
@@ -23,14 +23,14 @@ class HXPHAssetManager: NSObject {
         }
         return status;
     }
-    class func requestCameraAccess(completionHandler: @escaping (Bool) -> Void){
+    public class func requestCameraAccess(completionHandler: @escaping (Bool) -> Void){
         AVCaptureDevice.requestAccess(for: .video) { (granted) in
             DispatchQueue.main.async {
                 completionHandler(granted)
             }
         }
     }
-    class func cameraAuthorizationStatus() -> AVAuthorizationStatus {
+    public class func cameraAuthorizationStatus() -> AVAuthorizationStatus {
         AVCaptureDevice.requestAccess(for: .video) { (granted) in
             DispatchQueue.main.async {
                 
@@ -38,7 +38,7 @@ class HXPHAssetManager: NSObject {
         }
         return AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
     }
-    class func authorizationStatusIsLimited() -> Bool{
+    public class func authorizationStatusIsLimited() -> Bool{
         if #available(iOS 14, *) {
             if authorizationStatus() == .limited {
                 return true
@@ -50,7 +50,7 @@ class HXPHAssetManager: NSObject {
     /// 请求获取相册权限
     /// - Parameters:
     ///   - handler: 请求权限完成
-    class func requestAuthorization(with handler : @escaping (PHAuthorizationStatus) -> ()) {
+    public class func requestAuthorization(with handler : @escaping (PHAuthorizationStatus) -> ()) {
         let status = authorizationStatus()
         if status == PHAuthorizationStatus.notDetermined {
             if #available(iOS 14, *) {
@@ -74,14 +74,14 @@ class HXPHAssetManager: NSObject {
     /// 获取系统相册
     /// - Parameter options: 选型
     /// - Returns: 相册列表
-    class func fetchSmartAlbums(options : PHFetchOptions?) -> PHFetchResult<PHAssetCollection> {
+    public class func fetchSmartAlbums(options : PHFetchOptions?) -> PHFetchResult<PHAssetCollection> {
         return PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: options)
     }
     
     /// 获取用户创建的相册
     /// - Parameter options: 选项
     /// - Returns: 相册列表
-    class func fetchUserAlbums(options : PHFetchOptions?) -> PHFetchResult<PHAssetCollection> {
+    public class func fetchUserAlbums(options : PHFetchOptions?) -> PHFetchResult<PHAssetCollection> {
         return PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: options)
     }
     
@@ -91,7 +91,7 @@ class HXPHAssetManager: NSObject {
     ///   - filterInvalid: 过滤无效的相册
     ///   - options: 可选项
     ///   - usingBlock: 枚举每一个相册集合
-    class func enumerateAllAlbums(filterInvalid: Bool, options : PHFetchOptions?, usingBlock :@escaping (PHAssetCollection)->()) {
+    public class func enumerateAllAlbums(filterInvalid: Bool, options : PHFetchOptions?, usingBlock :@escaping (PHAssetCollection)->()) {
         let smartAlbums = fetchSmartAlbums(options: nil)
         let userAlbums = fetchUserAlbums(options: nil)
         let albums = [smartAlbums, userAlbums]
@@ -118,7 +118,7 @@ class HXPHAssetManager: NSObject {
     /// 获取相机胶卷资源集合
     /// - Parameter options: 可选项
     /// - Returns: 相机胶卷集合
-    class func fetchCameraRollAlbum(options: PHFetchOptions?) -> PHAssetCollection? {
+    public class func fetchCameraRollAlbum(options: PHFetchOptions?) -> PHAssetCollection? {
         let smartAlbums = fetchSmartAlbums(options: options)
         var assetCollection : PHAssetCollection?
         smartAlbums.enumerateObjects { (collection, index, stop) in
@@ -136,7 +136,7 @@ class HXPHAssetManager: NSObject {
     
     /// 判断是否是相机胶卷
     /// - Parameter collection: 相机胶卷集合
-    class func collectionIsCameraRollAlbum(collection: PHAssetCollection?) -> Bool {
+    public class func collectionIsCameraRollAlbum(collection: PHAssetCollection?) -> Bool {
         var versionStr = UIDevice.current.systemVersion.replacingOccurrences(of: ".", with: "")
         if versionStr.count <= 1 {
             versionStr.append("00")
@@ -151,14 +151,14 @@ class HXPHAssetManager: NSObject {
         }
     }
     
-    class func fetchAssets(withLocalIdentifiers: [String]) -> PHFetchResult<PHAsset> {
+    public class func fetchAssets(withLocalIdentifiers: [String]) -> PHFetchResult<PHAsset> {
         PHAsset.fetchAssets(withLocalIdentifiers: withLocalIdentifiers, options: nil)
     }
     
-    class func fetchAsset(withLocalIdentifier: String) -> PHAsset? {
+    public class func fetchAsset(withLocalIdentifier: String) -> PHAsset? {
         return fetchAssets(withLocalIdentifiers: [withLocalIdentifier]).firstObject
     }
-    class func createAssetCollection(for collectionName: String) -> PHAssetCollection? {
+    public class func createAssetCollection(for collectionName: String) -> PHAssetCollection? {
         let collections = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumRegular, options: nil)
         var assetCollection: PHAssetCollection?
         collections.enumerateObjects { (collection, index, stop) in
@@ -180,7 +180,7 @@ class HXPHAssetManager: NSObject {
         }
         return assetCollection
     }
-    class func saveSystemAlbum(forAsset asset: Any, mediaType: HXPHPicker.Asset.MediaType, customAlbumName: String?, creationDate: Date?, location: CLLocation?, completion: @escaping (PHAsset?) -> Void) {
+    public class func saveSystemAlbum(forAsset asset: Any, mediaType: HXPHPicker.Asset.MediaType, customAlbumName: String?, creationDate: Date?, location: CLLocation?, completion: @escaping (PHAsset?) -> Void) {
         var albumName: String?
         if let customAlbumName = customAlbumName {
             albumName = customAlbumName
@@ -229,18 +229,18 @@ class HXPHAssetManager: NSObject {
         }
     }
     
-    class func saveSystemAlbum(forImage image: UIImage, customAlbumName: String?, completion: @escaping (PHAsset?) -> Void) {
+    public class func saveSystemAlbum(forImage image: UIImage, customAlbumName: String?, completion: @escaping (PHAsset?) -> Void) {
         saveSystemAlbum(forAsset: image, mediaType: .photo, customAlbumName: nil, creationDate: nil, location: nil, completion: completion)
     }
     
-    class func saveSystemAlbum(forVideoURL videoURL: URL, customAlbumName: String?, completion: @escaping (PHAsset?) -> Void) {
+    public class func saveSystemAlbum(forVideoURL videoURL: URL, customAlbumName: String?, completion: @escaping (PHAsset?) -> Void) {
         saveSystemAlbum(forAsset: videoURL, mediaType: .video, customAlbumName: nil, creationDate: nil, location: nil, completion: completion)
     }
     
     /// 判断是否是动图
     /// - Parameter asset: 需要判断的资源
     /// - Returns: 是否
-    class func assetIsAnimated(asset: PHAsset) -> Bool {
+    public class func assetIsAnimated(asset: PHAsset) -> Bool {
         var isAnimated : Bool = false
         let fileName = asset.value(forKey: "filename") as? String
         if fileName != nil {
@@ -257,7 +257,7 @@ class HXPHAssetManager: NSObject {
     /// 判断否是LivePhoto
     /// - Parameter asset: 需要判断的资源
     /// - Returns: 是否
-    class func assetIsLivePhoto(asset: PHAsset) -> Bool {
+    public class func assetIsLivePhoto(asset: PHAsset) -> Bool {
         var isLivePhoto : Bool = false
         if #available(iOS 9.1, *) {
             isLivePhoto = asset.mediaSubtypes == .photoLive
@@ -277,7 +277,7 @@ class HXPHAssetManager: NSObject {
     ///   - options: 可选项
     ///   - resultHandler: 回调
     /// - Returns: 请求ID
-    class func requestImage(for asset: PHAsset, targetSize: CGSize, options: PHImageRequestOptions, resultHandler: @escaping (UIImage?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+    public class func requestImage(for asset: PHAsset, targetSize: CGSize, options: PHImageRequestOptions, resultHandler: @escaping (UIImage?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
         return PHImageManager.default().requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options, resultHandler: resultHandler)
     }
     
@@ -287,7 +287,7 @@ class HXPHAssetManager: NSObject {
     ///   - targetWidth: 获取的图片大小
     ///   - completion: 完成
     /// - Returns: 请求ID
-    class func requestThumbnailImage(for asset: PHAsset, targetWidth: CGFloat, completion: ((UIImage?, [AnyHashable : Any]?) -> ())?) -> PHImageRequestID {
+    public class func requestThumbnailImage(for asset: PHAsset, targetWidth: CGFloat, completion: ((UIImage?, [AnyHashable : Any]?) -> ())?) -> PHImageRequestID {
         let options = PHImageRequestOptions.init()
         options.resizeMode = .fast
         return requestImage(for: asset, targetSize: HXPHTools.transformTargetWidthToSize(targetWidth: targetWidth, asset: asset), options: options) { (image, info) in
@@ -300,7 +300,7 @@ class HXPHAssetManager: NSObject {
     }
     
     /// 请求imageData，注意处理 HEIC格式
-    class func requestImageData(for asset: PHAsset, options: PHImageRequestOptions, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+    public class func requestImageData(for asset: PHAsset, options: PHImageRequestOptions, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
         if #available(iOS 13, *) {
             return PHImageManager.default().requestImageDataAndOrientation(for: asset, options: options) { (imageData, dataUTI, imageOrientation, info) in
                 var sureOrientation : UIImage.Orientation;
@@ -346,7 +346,7 @@ class HXPHAssetManager: NSObject {
         }
     }
     /// 请求imageData，注意处理 HEIC格式
-    class func requestImageData(for asset: PHAsset, version: PHImageRequestOptionsVersion, isNetworkAccessAllowed: Bool, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+    public class func requestImageData(for asset: PHAsset, version: PHImageRequestOptionsVersion, isNetworkAccessAllowed: Bool, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
         let options = PHImageRequestOptions.init()
         options.version = version
         options.resizeMode = .fast
@@ -361,7 +361,7 @@ class HXPHAssetManager: NSObject {
     ///   - progressHandler: 处理进度
     ///   - resultHandler: 处理结果
     /// - Returns: 请求ID
-    class func requestImageData(for asset: PHAsset, version: PHImageRequestOptionsVersion, iCloudHandler: @escaping (PHImageRequestID) -> Void, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
+    public class func requestImageData(for asset: PHAsset, version: PHImageRequestOptionsVersion, iCloudHandler: @escaping (PHImageRequestID) -> Void, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
         return requestImageData(for: asset, version: version, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (data, dataUTI, imageOrientation, info) in
             if self.assetDownloadFinined(for: info) {
                 DispatchQueue.main.async {
@@ -387,11 +387,11 @@ class HXPHAssetManager: NSObject {
     }
     
     @available(iOS 9.1, *)
-    class func requestLivePhoto(for asset: PHAsset, targetSize: CGSize, options: PHLivePhotoRequestOptions, resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+    public class func requestLivePhoto(for asset: PHAsset, targetSize: CGSize, options: PHLivePhotoRequestOptions, resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
         return PHImageManager.default().requestLivePhoto(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options, resultHandler: resultHandler)
     }
     @available(iOS 9.1, *)
-    class func requestLivePhoto(for asset: PHAsset, targetSize: CGSize, isNetworkAccessAllowed: Bool, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+    public class func requestLivePhoto(for asset: PHAsset, targetSize: CGSize, isNetworkAccessAllowed: Bool, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
         let options = PHLivePhotoRequestOptions.init()
         options.deliveryMode = .highQualityFormat
         options.isNetworkAccessAllowed = isNetworkAccessAllowed
@@ -407,7 +407,7 @@ class HXPHAssetManager: NSObject {
     ///   - resultHandler: 处理结果
     /// - Returns: 请求ID
     @available(iOS 9.1, *)
-    class func requestLivePhoto(for asset: PHAsset, targetSize: CGSize, iCloudHandler: @escaping (PHImageRequestID) -> Void, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
+    public class func requestLivePhoto(for asset: PHAsset, targetSize: CGSize, iCloudHandler: @escaping (PHImageRequestID) -> Void, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
         return requestLivePhoto(for: asset, targetSize: targetSize, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (livePhoto, info) in
             if self.assetDownloadFinined(for: info) {
                 DispatchQueue.main.async {
@@ -443,7 +443,7 @@ class HXPHAssetManager: NSObject {
     ///   - options: 可选项
     ///   - resultHandler: 处理结果
     /// - Returns: 请求ID
-    class func requestAVAsset(for asset: PHAsset, options: PHVideoRequestOptions, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+    public class func requestAVAsset(for asset: PHAsset, options: PHVideoRequestOptions, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
         return PHImageManager.default().requestAVAsset(forVideo: asset, options: options, resultHandler: resultHandler)
     }
     
@@ -453,7 +453,7 @@ class HXPHAssetManager: NSObject {
     ///   - progressHandler: 处理进度
     ///   - resultHandler: 处理结果
     /// - Returns: 请求ID
-    class func requestAVAsset(for asset: PHAsset, version: PHVideoRequestOptionsVersion, deliveryMode: PHVideoRequestOptionsDeliveryMode, isNetworkAccessAllowed: Bool, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
+    public class func requestAVAsset(for asset: PHAsset, version: PHVideoRequestOptionsVersion, deliveryMode: PHVideoRequestOptionsDeliveryMode, isNetworkAccessAllowed: Bool, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?) -> Void) -> PHImageRequestID {
         let options = PHVideoRequestOptions.init()
         options.isNetworkAccessAllowed = isNetworkAccessAllowed
         options.progressHandler = progressHandler
@@ -461,7 +461,7 @@ class HXPHAssetManager: NSObject {
         options.deliveryMode = deliveryMode
         return requestAVAsset(for: asset, options: options, resultHandler: resultHandler)
     }
-    class func requestAVAsset(for asset: PHAsset, iCloudHandler: @escaping (PHImageRequestID) -> Void, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
+    public class func requestAVAsset(for asset: PHAsset, iCloudHandler: @escaping (PHImageRequestID) -> Void, progressHandler: @escaping PHAssetImageProgressHandler, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
         let version = PHVideoRequestOptionsVersion.current
         var deliveryMode = PHVideoRequestOptionsDeliveryMode.fastFormat
         return requestAVAsset(for: asset, version: version, deliveryMode: deliveryMode, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (avAsset, audioMix, info) in
@@ -493,7 +493,7 @@ class HXPHAssetManager: NSObject {
         }
     }
     // MARK: 获取视频地址
-    class func requestVideoURL(for asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
+    public class func requestVideoURL(for asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
         _ = requestAVAsset(for: asset) { (reqeustID) in
         } progressHandler: { (progress, error, stop, info) in
         } resultHandler: { (avAsset, audioMix, info, downloadSuccess) in
@@ -507,7 +507,7 @@ class HXPHAssetManager: NSObject {
             }
         }
     }
-    class func requestVideoURL(mp4Format asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
+    public class func requestVideoURL(mp4Format asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
         let videoResource = PHAssetResource.assetResources(for: asset).first
         if videoResource == nil {
             resultHandler(nil)
@@ -527,10 +527,10 @@ class HXPHAssetManager: NSObject {
         }
     }
     // MARK: 获取图片地址
-    class func requestImageURL(for asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
+    public class func requestImageURL(for asset: PHAsset, resultHandler: @escaping (URL?) -> Void) {
         requestImageURL(for: asset, suffix: "jpeg", resultHandler: resultHandler)
     }
-    class func requestImageURL(for asset: PHAsset, suffix: String, resultHandler: @escaping (URL?) -> Void) {
+    public class func requestImageURL(for asset: PHAsset, suffix: String, resultHandler: @escaping (URL?) -> Void) {
         let imageResource = PHAssetResource.assetResources(for: asset).first
         if imageResource == nil {
             resultHandler(nil)
@@ -549,7 +549,7 @@ class HXPHAssetManager: NSObject {
             }
         }
     }
-    class func requestImageURL(for asset: PHAsset, resultHandler: @escaping (URL?, UIImage?) -> Void) -> PHContentEditingInputRequestID {
+    public class func requestImageURL(for asset: PHAsset, resultHandler: @escaping (URL?, UIImage?) -> Void) -> PHContentEditingInputRequestID {
         let options = PHContentEditingInputRequestOptions.init()
         options.isNetworkAccessAllowed = true
         return asset.requestContentEditingInput(with: options) { (input, info) in
@@ -559,7 +559,7 @@ class HXPHAssetManager: NSObject {
         }
     }
     // MARK: 获取LivePhoto里的图片Data和视频地址
-    class func requestLivePhoto(content asset: PHAsset, imageDataHandler: @escaping (Data?) -> Void, videoHandler: @escaping (URL?) -> Void, completionHandler: @escaping (HXPHPicker.LivePhotoError?) -> Void) {
+    public class func requestLivePhoto(content asset: PHAsset, imageDataHandler: @escaping (Data?) -> Void, videoHandler: @escaping (URL?) -> Void, completionHandler: @escaping (HXPHPicker.LivePhotoError?) -> Void) {
         if #available(iOS 9.1, *) {
             _ = requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize) { (ID) in
             } progressHandler: { (progress, error, stop, info) in
@@ -630,7 +630,7 @@ class HXPHAssetManager: NSObject {
         }
     }
     // MARK: 获取LivePhoto里的图片地址和视频地址
-    class func requestLivePhoto(contentURL asset: PHAsset, imageURLHandler: @escaping (URL?) -> Void, videoHandler: @escaping (URL?) -> Void, completionHandler: @escaping (HXPHPicker.LivePhotoError?) -> Void) {
+    public class func requestLivePhoto(contentURL asset: PHAsset, imageURLHandler: @escaping (URL?) -> Void, videoHandler: @escaping (URL?) -> Void, completionHandler: @escaping (HXPHPicker.LivePhotoError?) -> Void) {
         if #available(iOS 9.1, *) {
             _ = requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize) { (ID) in
             } progressHandler: { (progress, error, stop, info) in
@@ -701,7 +701,7 @@ class HXPHAssetManager: NSObject {
     /// 资源是否存在iCloud上
     /// - Parameter asset: 对应的 PHAsset
     /// - Returns: 如果在获取到PHAsset之前还未下载的iCloud，之后下载了还是会返回存在
-    class func isICloudAsset(for asset: PHAsset?) -> Bool {
+    public class func isICloudAsset(for asset: PHAsset?) -> Bool {
         var isICloud = false
         if asset?.mediaType == PHAssetMediaType.image {
             let options = PHImageRequestOptions.init()
@@ -725,7 +725,7 @@ class HXPHAssetManager: NSObject {
     
     /// 根据下载获取的信息判断资源是否存在iCloud上
     /// - Parameter info: 下载获取的信息
-    class func assetIsInCloud(for info: [AnyHashable : Any]?) -> Bool {
+    public class func assetIsInCloud(for info: [AnyHashable : Any]?) -> Bool {
         if info == nil {
             return false
         }
@@ -738,7 +738,7 @@ class HXPHAssetManager: NSObject {
     
     /// 判断资源是否取消了下载
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadCancel(for info: [AnyHashable : Any]?) -> Bool {
+    public class func assetDownloadCancel(for info: [AnyHashable : Any]?) -> Bool {
         if info == nil {
             return false
         }
@@ -751,7 +751,7 @@ class HXPHAssetManager: NSObject {
     
     /// 判断资源是否下载错误
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadError(for info: [AnyHashable : Any]?) -> Bool {
+    public class func assetDownloadError(for info: [AnyHashable : Any]?) -> Bool {
         if info == nil {
             return false
         }
@@ -764,7 +764,7 @@ class HXPHAssetManager: NSObject {
     
     /// 判断资源下载得到的是否为退化的
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadIsDegraded(for info: [AnyHashable : Any]?) -> Bool {
+    public class func assetDownloadIsDegraded(for info: [AnyHashable : Any]?) -> Bool {
         if info == nil {
             return false
         }
@@ -777,7 +777,7 @@ class HXPHAssetManager: NSObject {
     
     /// 判断资源是否下载完成
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadFinined(for info: [AnyHashable : Any]?) -> Bool {
+    public class func assetDownloadFinined(for info: [AnyHashable : Any]?) -> Bool {
         if info == nil {
             return false
         }

@@ -10,15 +10,15 @@
 import UIKit
 import Photos
 
-class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, HXPHPickerBaseViewCellDelegate {
+class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, BaseViewCellDelegate {
      
     @IBOutlet weak var collectionViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionView: UICollectionView!
     
-    var addCell: HXPHPickerBaseAddViewCell {
+    var addCell: BaseAddViewCell {
         get {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HXPHPickerBaseAddViewCellID", for: IndexPath(item: selectedAssets.count, section: 0)) as! HXPHPickerBaseAddViewCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BaseAddViewCellID", for: IndexPath(item: selectedAssets.count, section: 0)) as! BaseAddViewCell
             return cell
         }
     }
@@ -56,10 +56,10 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         super.viewDidLoad()
 //        config.albumList.customCellClass = HXAlbumViewCustomCell.self
 //        config.photoList.cell.customSingleCellClass = HXPHPickerViewCustomCell.self
-//        config.photoList.cell.customMultipleCellClass = HXPHPickerMultiSelectViewCustomCell.self
+//        config.photoList.cell.customSelectableCellClass = HXPHPickerMultiSelectViewCustomCell.self
         collectionViewTopConstraint.constant = 20
-        collectionView.register(HXPHPickerBaseViewCell.self, forCellWithReuseIdentifier: "HXPHPickerBaseViewCellID")
-        collectionView.register(HXPHPickerBaseAddViewCell.self, forCellWithReuseIdentifier: "HXPHPickerBaseAddViewCellID")
+        collectionView.register(BaseViewCell.self, forCellWithReuseIdentifier: "BaseViewCellID")
+        collectionView.register(BaseAddViewCell.self, forCellWithReuseIdentifier: "BaseAddViewCellID")
         if #available(iOS 11.0, *) {
             collectionView.dragDelegate = self
             collectionView.dropDelegate = self
@@ -151,7 +151,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         pickerController.selectedAssetArray = selectedAssets
         pickerController.localCameraAssetArray = localCameraAssetArray
         pickerController.isOriginal = isOriginal
-        pickerController.modalPresentationStyle = .fullScreen
+//        pickerController.modalPresentationStyle = .fullScreen
         present(pickerController, animated: true, completion: nil)
     }
     /// 获取已选资源的地址
@@ -169,7 +169,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
                 if photoAsset.mediaSubType == .livePhoto {
                     var imageURL: URL?
                     var videoURL: URL?
-                    HXPHAssetManager.requestLivePhoto(contentURL: photoAsset.asset!) { (url) in
+                    HXPHAssetManager.requestLivePhoto(contentURL: photoAsset.phAsset!) { (url) in
                         imageURL = url
                     } videoHandler: { (url) in
                         videoURL = url
@@ -259,7 +259,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         return cell
     }
     func pickerController(_ pickerController: HXPHPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? HXPHPickerBaseViewCell
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? BaseViewCell
         return cell?.imageView.image
     }
     func pickerController(_ pickerController: HXPHPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
@@ -276,13 +276,13 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         if canSetAddCell && indexPath.item == selectedAssets.count {
             return addCell
         }
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HXPHPickerBaseViewCellID", for: indexPath) as! HXPHPickerBaseViewCell
-        cell.delegate = self
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BaseViewCellID", for: indexPath) as! BaseViewCell
+        cell.baseDelegate = self
         cell.photoAsset = selectedAssets[indexPath.item]
         return cell
     }
-    // MARK: HXPHPickerBaseViewCellDelegate
-    func cell(didDeleteButton cell: HXPHPickerBaseViewCell) {
+    // MARK: BaseViewCellDelegate
+    func cell(didDeleteButton cell: BaseViewCell) {
         if let indexPath = collectionView.indexPath(for: cell) {
             let isFull = selectedAssets.count == config.maximumSelectedCount
             selectedAssets.remove(at: indexPath.item)
@@ -328,7 +328,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     }
     @objc func deletePreviewAsset() {
         HXPHTools.showAlert(viewController: pickerController, title: "是否删除当前资源", message: nil, leftActionTitle: "确定", leftHandler: { (alertAction) in
-            self.pickerController?.previewViewController()?.deleteCurrentPhotoAsset()
+            self.pickerController?.deleteCurrentPreviewPhotoAsset()
         }, rightActionTitle: "取消") { (alertAction) in
         }
     }
@@ -408,24 +408,18 @@ class HXAlbumViewCustomCell: HXAlbumViewCell {
     }
 }
 class HXPHPickerViewCustomCell: HXPHPickerViewCell {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override func initView() {
+        super.initView()
         isHidden = false
-    }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     override func requestThumbnailImage() {
         imageView.image = UIImage.init(named: "hx_picker_add_img")
     }
 }
-class HXPHPickerMultiSelectViewCustomCell: HXPHPickerMultiSelectViewCell {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+class HXPHPickerMultiSelectViewCustomCell: HXPHPickerSelectableViewCell {
+    override func initView() {
+        super.initView()
         isHidden = false
-    }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     override func requestThumbnailImage() {
         // 重写图片内容
@@ -448,24 +442,20 @@ class HXPHPickerMultiSelectViewCustomCell: HXPHPickerMultiSelectViewCell {
         super.layoutView()
     }
 }
-class HXPHPickerBaseAddViewCell: HXPHPickerViewCell {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+class BaseAddViewCell: HXPHPickerBaseViewCell {
+    override func initView() {
+        super.initView()
         isHidden = false
         imageView.image = UIImage.init(named: "hx_picker_add_img")
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
 
-@objc protocol HXPHPickerBaseViewCellDelegate: NSObjectProtocol {
-    @objc optional func cell(didDeleteButton cell: HXPHPickerBaseViewCell)
+@objc protocol BaseViewCellDelegate: NSObjectProtocol {
+    @objc optional func cell(didDeleteButton cell: BaseViewCell)
 }
 
-class HXPHPickerBaseViewCell: HXPHPickerViewCell {
-    weak var delegate: HXPHPickerBaseViewCellDelegate?
+class BaseViewCell: HXPHPickerViewCell {
+    weak var baseDelegate: BaseViewCellDelegate?
     lazy var deleteButton: UIButton = {
         let deleteButton = UIButton.init(type: .custom)
         deleteButton.setImage(UIImage.init(named: "hx_compose_delete"), for: .normal)
@@ -486,22 +476,17 @@ class HXPHPickerBaseViewCell: HXPHPickerViewCell {
         })
     }
     @objc func didDeleteButtonClick() {
-        delegate?.cell?(didDeleteButton: self)
+        baseDelegate?.cell?(didDeleteButton: self)
     }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override func initView() {
+        super.initView()
         // 默认是隐藏的，需要显示出来
         isHidden = false
         contentView.addSubview(deleteButton)
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    override func layoutView() {
+        super.layoutView()
         deleteButton.hx_x = hx_width - deleteButton.hx_width
     }
 }

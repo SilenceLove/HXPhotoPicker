@@ -9,35 +9,36 @@
 import UIKit
 import Photos
 
-class HXPHAssetCollection: NSObject {
+open class HXPHAssetCollection: NSObject {
     
     /// 相册名称
-    var albumName : String?
+    public var albumName : String?
     /// 相册里的资源数量
-    var count : Int = 0
+    public var count : Int = 0
     
-    var result : PHFetchResult<PHAsset>?
-    var collection : PHAssetCollection?
-    var options : PHFetchOptions?
+    public var result : PHFetchResult<PHAsset>?
+    public var collection : PHAssetCollection?
+    public var options : PHFetchOptions?
+    public var isSelected: Bool = false
+    public var isCameraRoll: Bool = false
+    
     var coverAsset: PHAsset?
-    var isSelected: Bool = false
-    var isCameraRoll: Bool = false
     var realCoverImage: UIImage?
     private var coverImage: UIImage?
-    init(collection: PHAssetCollection? , options: PHFetchOptions?) {
+    public init(collection: PHAssetCollection? , options: PHFetchOptions?) {
         super.init()
         self.collection = collection
         self.options = options
         fetchResult()
     }
     
-    init(albumName: String?, coverImage: UIImage?) {
+    public init(albumName: String?, coverImage: UIImage?) {
         super.init()
         self.albumName = albumName
         self.coverImage = coverImage
     }
     
-    func fetchResult() {
+    public func fetchResult() {
         if collection == nil {
             return
         }
@@ -46,7 +47,7 @@ class HXPHAssetCollection: NSObject {
         count = result?.count ?? 0
     }
     
-    func changeResult(for result: PHFetchResult<PHAsset>) {
+    public func changeResult(for result: PHFetchResult<PHAsset>) {
         self.result = result
         count = result.count
         if collection != nil {
@@ -54,11 +55,11 @@ class HXPHAssetCollection: NSObject {
         }
     }
     
-    func fetchCoverAsset() {
+    public func fetchCoverAsset() {
         coverAsset = result?.lastObject
     }
     
-    func change(albumName: String?, coverImage: UIImage?) {
+    public func change(albumName: String?, coverImage: UIImage?) {
         self.albumName = albumName
         self.coverImage = coverImage
     }
@@ -66,7 +67,7 @@ class HXPHAssetCollection: NSObject {
     /// 请求获取相册封面图片
     /// - Parameter completion: 会回调多次
     /// - Returns: 请求ID
-    func requestCoverImage(completion: ((UIImage?, HXPHAssetCollection, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
+    public func requestCoverImage(completion: ((UIImage?, HXPHAssetCollection, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
         if realCoverImage != nil {
             completion?(realCoverImage, self, nil)
             return nil
@@ -81,7 +82,7 @@ class HXPHAssetCollection: NSObject {
     }
     
     /// 枚举相册里的资源
-    func enumerateAssets(usingBlock :@escaping (HXPHAsset)->()) {
+    public func enumerateAssets(usingBlock :@escaping (HXPHAsset)->()) {
         if result == nil {
             fetchResult()
         }

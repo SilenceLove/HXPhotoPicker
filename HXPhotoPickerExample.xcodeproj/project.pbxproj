@@ -68,6 +68,31 @@
 		7B0B2AD1255E82F200ACF619 /* UIDevice+HXPHPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */; };
 		7B151AC3259330D3004962B0 /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */; };
 		7B151AC82593318E004962B0 /* ConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B151AC72593318E004962B0 /* ConfigurationViewController.xib */; };
+		7B1A1057259ADC3F005FD62C /* HXPHVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1056259ADC3F005FD62C /* HXPHVideoView.swift */; };
+		7B1A1062259ADC81005FD62C /* HXPHGIFImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1061259ADC81005FD62C /* HXPHGIFImageView.swift */; };
+		7B1A1067259ADCC4005FD62C /* HXPHPickerCamerViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1066259ADCC4005FD62C /* HXPHPickerCamerViewCell.swift */; };
+		7B1A106C259ADD08005FD62C /* HXPHPreviewContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A106B259ADD08005FD62C /* HXPHPreviewContentView.swift */; };
+		7B1A1071259ADD88005FD62C /* HXPHPickerSelectBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1070259ADD88005FD62C /* HXPHPickerSelectBoxView.swift */; };
+		7B1A1076259ADDBB005FD62C /* HXAlbumTitleArrowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1075259ADDBB005FD62C /* HXAlbumTitleArrowView.swift */; };
+		7B1A107E259ADDD6005FD62C /* HXAlbumTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A107D259ADDD6005FD62C /* HXAlbumTitleView.swift */; };
+		7B1A1083259ADE10005FD62C /* HXAlbumTickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1082259ADE10005FD62C /* HXAlbumTickView.swift */; };
+		7B1A108B259ADE60005FD62C /* HXPHEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A108A259ADE60005FD62C /* HXPHEmptyView.swift */; };
+		7B1A1093259ADE78005FD62C /* HXPHDeniedAuthorizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1092259ADE78005FD62C /* HXPHDeniedAuthorizationView.swift */; };
+		7B1A1098259ADECC005FD62C /* HXPHPickerBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1097259ADECC005FD62C /* HXPHPickerBottomView.swift */; };
+		7B1A109D259ADF06005FD62C /* HXPHCameraPickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A109C259ADF06005FD62C /* HXPHCameraPickerController.swift */; };
+		7B1A10A2259AE0C9005FD62C /* HXPHPreviewSelectedViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10A1259AE0C9005FD62C /* HXPHPreviewSelectedViewCell.swift */; };
+		7B1A10A7259AE0E5005FD62C /* HXPHPreviewSelectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10A6259AE0E5005FD62C /* HXPHPreviewSelectedView.swift */; };
+		7B1A10AD259AE76E005FD62C /* HXPHEmptyViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10AC259AE76D005FD62C /* HXPHEmptyViewConfiguration.swift */; };
+		7B1A10B5259AE788005FD62C /* HXPHNotAuthorizedConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10B4259AE788005FD62C /* HXPHNotAuthorizedConfiguration.swift */; };
+		7B1A10BA259AE7A2005FD62C /* HXPHSelectBoxConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10B9259AE7A2005FD62C /* HXPHSelectBoxConfiguration.swift */; };
+		7B1A10BF259AE7C2005FD62C /* HXPHPickerBottomViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10BE259AE7C2005FD62C /* HXPHPickerBottomViewConfiguration.swift */; };
+		7B1A10C4259AE7D8005FD62C /* HXPHPreviewViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10C3259AE7D8005FD62C /* HXPHPreviewViewConfiguration.swift */; };
+		7B1A10C9259AE7F3005FD62C /* HXPHCameraConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10C8259AE7F3005FD62C /* HXPHCameraConfiguration.swift */; };
+		7B1A10CE259AE810005FD62C /* HXPHPhotoListCameraCellConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10CD259AE810005FD62C /* HXPHPhotoListCameraCellConfiguration.swift */; };
+		7B1A10D3259AE828005FD62C /* HXPHPhotoListCellConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10D2259AE828005FD62C /* HXPHPhotoListCellConfiguration.swift */; };
+		7B1A10D8259AE864005FD62C /* HXPHPhotoListConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10D7259AE864005FD62C /* HXPHPhotoListConfiguration.swift */; };
+		7B1A10DD259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10DC259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift */; };
+		7B1A10E2259AE89E005FD62C /* HXPHAlbumListConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10E1259AE89E005FD62C /* HXPHAlbumListConfiguration.swift */; };
 		7B1C05B6258CAB5E000242A1 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */; };
 		7B1C05BB258CABBD000242A1 /* BaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B1C05BA258CABBD000242A1 /* BaseViewController.xib */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
@@ -467,6 +492,31 @@
 		7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+HXPHPicker.swift"; sourceTree = "<group>"; };
 		7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
 		7B151AC72593318E004962B0 /* ConfigurationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigurationViewController.xib; sourceTree = "<group>"; };
+		7B1A1056259ADC3F005FD62C /* HXPHVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHVideoView.swift; sourceTree = "<group>"; };
+		7B1A1061259ADC81005FD62C /* HXPHGIFImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHGIFImageView.swift; sourceTree = "<group>"; };
+		7B1A1066259ADCC4005FD62C /* HXPHPickerCamerViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerCamerViewCell.swift; sourceTree = "<group>"; };
+		7B1A106B259ADD08005FD62C /* HXPHPreviewContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPreviewContentView.swift; sourceTree = "<group>"; };
+		7B1A1070259ADD88005FD62C /* HXPHPickerSelectBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerSelectBoxView.swift; sourceTree = "<group>"; };
+		7B1A1075259ADDBB005FD62C /* HXAlbumTitleArrowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXAlbumTitleArrowView.swift; sourceTree = "<group>"; };
+		7B1A107D259ADDD6005FD62C /* HXAlbumTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXAlbumTitleView.swift; sourceTree = "<group>"; };
+		7B1A1082259ADE10005FD62C /* HXAlbumTickView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXAlbumTickView.swift; sourceTree = "<group>"; };
+		7B1A108A259ADE60005FD62C /* HXPHEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHEmptyView.swift; sourceTree = "<group>"; };
+		7B1A1092259ADE78005FD62C /* HXPHDeniedAuthorizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHDeniedAuthorizationView.swift; sourceTree = "<group>"; };
+		7B1A1097259ADECC005FD62C /* HXPHPickerBottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerBottomView.swift; sourceTree = "<group>"; };
+		7B1A109C259ADF06005FD62C /* HXPHCameraPickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHCameraPickerController.swift; sourceTree = "<group>"; };
+		7B1A10A1259AE0C9005FD62C /* HXPHPreviewSelectedViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPreviewSelectedViewCell.swift; sourceTree = "<group>"; };
+		7B1A10A6259AE0E5005FD62C /* HXPHPreviewSelectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPreviewSelectedView.swift; sourceTree = "<group>"; };
+		7B1A10AC259AE76D005FD62C /* HXPHEmptyViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHEmptyViewConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10B4259AE788005FD62C /* HXPHNotAuthorizedConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHNotAuthorizedConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10B9259AE7A2005FD62C /* HXPHSelectBoxConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHSelectBoxConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10BE259AE7C2005FD62C /* HXPHPickerBottomViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPickerBottomViewConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10C3259AE7D8005FD62C /* HXPHPreviewViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPreviewViewConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10C8259AE7F3005FD62C /* HXPHCameraConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHCameraConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10CD259AE810005FD62C /* HXPHPhotoListCameraCellConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPhotoListCameraCellConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10D2259AE828005FD62C /* HXPHPhotoListCellConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPhotoListCellConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10D7259AE864005FD62C /* HXPHPhotoListConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPhotoListConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10DC259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXAlbumTitleViewConfiguration.swift; sourceTree = "<group>"; };
+		7B1A10E1259AE89E005FD62C /* HXPHAlbumListConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHAlbumListConfiguration.swift; sourceTree = "<group>"; };
 		7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		7B1C05BA258CABBD000242A1 /* BaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BaseViewController.xib; sourceTree = "<group>"; };
 		7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
@@ -847,24 +897,63 @@
 		7B0B2A79255E1AE300ACF619 /* HXPHPicker */ = {
 			isa = PBXGroup;
 			children = (
-				7BA6878F256144EA0014C3E3 /* HXPHPicker.bundle */,
 				7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */,
-				7B0B2A7B255E1AE300ACF619 /* HXPHConfiguration.swift */,
-				7B0B2A83255E1AE300ACF619 /* HXPHManager.swift */,
-				7B0B2A84255E1AE300ACF619 /* HXPHAssetManager.swift */,
-				7B0B2A81255E1AE300ACF619 /* HXPHAssetCollection.swift */,
-				7B0B2A80255E1AE300ACF619 /* HXPHAsset.swift */,
+				7B1A10AB259AE758005FD62C /* Config */,
+				7B1A104F259ADB13005FD62C /* Controller */,
+				7B1A1050259ADB3D005FD62C /* View */,
+				7B1A1051259ADB49005FD62C /* Model */,
+				7B1A1054259ADBC6005FD62C /* Util */,
+				7B1A1052259ADB6C005FD62C /* Extension */,
+				7B1A1053259ADB7B005FD62C /* Transition */,
+				7B1A10E9259B00A7005FD62C /* Resources */,
+			);
+			path = HXPHPicker;
+			sourceTree = SOURCE_ROOT;
+		};
+		7B1A104F259ADB13005FD62C /* Controller */ = {
+			isa = PBXGroup;
+			children = (
 				7B0B2A7D255E1AE300ACF619 /* HXPHPickerController.swift */,
 				7B0B2A7F255E1AE300ACF619 /* HXAlbumViewController.swift */,
-				7B7BE3F12563D34A0008C391 /* HXAlbumView.swift */,
-				7B0B2A82255E1AE300ACF619 /* HXAlbumViewCell.swift */,
 				7B0B2A7A255E1AE300ACF619 /* HXPHPickerViewController.swift */,
-				7B0B2A85255E1AE300ACF619 /* HXPHPickerViewCell.swift */,
 				7B0B2AB3255E5A1800ACF619 /* HXPHPreviewViewController.swift */,
-				7B0B2AB8255E5F6F00ACF619 /* HXPHPreviewViewCell.swift */,
-				7BA141242580CB8C000D0726 /* HXPHPickerTransition.swift */,
-				7BE660322597564D0025D258 /* HXPHPickerInteractiveTransition.swift */,
-				7B0B2A7E255E1AE300ACF619 /* HXPHTools.swift */,
+				7B1A109C259ADF06005FD62C /* HXPHCameraPickerController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		7B1A1050259ADB3D005FD62C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7B7BE3F12563D34A0008C391 /* HXAlbumView.swift */,
+				7B1A107D259ADDD6005FD62C /* HXAlbumTitleView.swift */,
+				7B1A1075259ADDBB005FD62C /* HXAlbumTitleArrowView.swift */,
+				7B1A1082259ADE10005FD62C /* HXAlbumTickView.swift */,
+				7B1A1070259ADD88005FD62C /* HXPHPickerSelectBoxView.swift */,
+				7B1A1097259ADECC005FD62C /* HXPHPickerBottomView.swift */,
+				7B1A106B259ADD08005FD62C /* HXPHPreviewContentView.swift */,
+				7B1A1061259ADC81005FD62C /* HXPHGIFImageView.swift */,
+				7B1A1056259ADC3F005FD62C /* HXPHVideoView.swift */,
+				7B1A10A6259AE0E5005FD62C /* HXPHPreviewSelectedView.swift */,
+				7B1A108A259ADE60005FD62C /* HXPHEmptyView.swift */,
+				7B1A1092259ADE78005FD62C /* HXPHDeniedAuthorizationView.swift */,
+				7B1A1055259ADC03005FD62C /* Cell */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		7B1A1051259ADB49005FD62C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				7B0B2A80255E1AE300ACF619 /* HXPHAsset.swift */,
+				7B0B2A81255E1AE300ACF619 /* HXPHAssetCollection.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		7B1A1052259ADB6C005FD62C /* Extension */ = {
+			isa = PBXGroup;
+			children = (
 				7B0B2AD0255E82F200ACF619 /* UIDevice+HXPHPicker.swift */,
 				7B0B2A86255E1AE300ACF619 /* UIView+HXPHPicker.swift */,
 				7B0B2A87255E1AE300ACF619 /* UIViewController+HXPHPicker.swift */,
@@ -874,8 +963,66 @@
 				7BA6878A25610CF00014C3E3 /* UIImage+HXPHPicker.swift */,
 				7BA68797256149790014C3E3 /* Bundle+HXPhotoPicker.swift */,
 			);
-			path = HXPHPicker;
-			sourceTree = SOURCE_ROOT;
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		7B1A1053259ADB7B005FD62C /* Transition */ = {
+			isa = PBXGroup;
+			children = (
+				7BA141242580CB8C000D0726 /* HXPHPickerTransition.swift */,
+				7BE660322597564D0025D258 /* HXPHPickerInteractiveTransition.swift */,
+			);
+			path = Transition;
+			sourceTree = "<group>";
+		};
+		7B1A1054259ADBC6005FD62C /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				7B0B2A83255E1AE300ACF619 /* HXPHManager.swift */,
+				7B0B2A84255E1AE300ACF619 /* HXPHAssetManager.swift */,
+				7B0B2A7E255E1AE300ACF619 /* HXPHTools.swift */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		7B1A1055259ADC03005FD62C /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				7B0B2A82255E1AE300ACF619 /* HXAlbumViewCell.swift */,
+				7B1A1066259ADCC4005FD62C /* HXPHPickerCamerViewCell.swift */,
+				7B0B2A85255E1AE300ACF619 /* HXPHPickerViewCell.swift */,
+				7B0B2AB8255E5F6F00ACF619 /* HXPHPreviewViewCell.swift */,
+				7B1A10A1259AE0C9005FD62C /* HXPHPreviewSelectedViewCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		7B1A10AB259AE758005FD62C /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				7B0B2A7B255E1AE300ACF619 /* HXPHConfiguration.swift */,
+				7B1A10E1259AE89E005FD62C /* HXPHAlbumListConfiguration.swift */,
+				7B1A10DC259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift */,
+				7B1A10C8259AE7F3005FD62C /* HXPHCameraConfiguration.swift */,
+				7B1A10D7259AE864005FD62C /* HXPHPhotoListConfiguration.swift */,
+				7B1A10D2259AE828005FD62C /* HXPHPhotoListCellConfiguration.swift */,
+				7B1A10CD259AE810005FD62C /* HXPHPhotoListCameraCellConfiguration.swift */,
+				7B1A10C3259AE7D8005FD62C /* HXPHPreviewViewConfiguration.swift */,
+				7B1A10BE259AE7C2005FD62C /* HXPHPickerBottomViewConfiguration.swift */,
+				7B1A10B9259AE7A2005FD62C /* HXPHSelectBoxConfiguration.swift */,
+				7B1A10B4259AE788005FD62C /* HXPHNotAuthorizedConfiguration.swift */,
+				7B1A10AC259AE76D005FD62C /* HXPHEmptyViewConfiguration.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		7B1A10E9259B00A7005FD62C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7BA6878F256144EA0014C3E3 /* HXPHPicker.bundle */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
 		};
 		7B3EDEBF255E185900937B4A /* Swift */ = {
 			isa = PBXGroup;
@@ -1526,31 +1673,56 @@
 				7B3327F7255EE4F300784BC0 /* String+HXPHPicker.swift in Sources */,
 				7B1C05B6258CAB5E000242A1 /* BaseViewController.swift in Sources */,
 				7B0B2AAA255E384100ACF619 /* UIFont+HXPHPicker.swift in Sources */,
+				7B1A1098259ADECC005FD62C /* HXPHPickerBottomView.swift in Sources */,
+				7B1A10D3259AE828005FD62C /* HXPHPhotoListCellConfiguration.swift in Sources */,
+				7B1A107E259ADDD6005FD62C /* HXAlbumTitleView.swift in Sources */,
+				7B1A10E2259AE89E005FD62C /* HXPHAlbumListConfiguration.swift in Sources */,
 				7B0B2A92255E1AE300ACF619 /* HXPHAssetManager.swift in Sources */,
 				7B0B2A8C255E1AE300ACF619 /* HXPHTools.swift in Sources */,
+				7B1A1076259ADDBB005FD62C /* HXAlbumTitleArrowView.swift in Sources */,
 				7BE660332597564D0025D258 /* HXPHPickerInteractiveTransition.swift in Sources */,
 				7BA47AE3257277E500FB4D99 /* HXPHPicker.swift in Sources */,
 				7B0B2A94255E1AE300ACF619 /* UIView+HXPHPicker.swift in Sources */,
 				7B0B2A8F255E1AE300ACF619 /* HXPHAssetCollection.swift in Sources */,
 				7B3EDEC5255E185900937B4A /* ViewController.swift in Sources */,
+				7B1A108B259ADE60005FD62C /* HXPHEmptyView.swift in Sources */,
+				7B1A109D259ADF06005FD62C /* HXPHCameraPickerController.swift in Sources */,
+				7B1A1093259ADE78005FD62C /* HXPHDeniedAuthorizationView.swift in Sources */,
+				7B1A10BA259AE7A2005FD62C /* HXPHSelectBoxConfiguration.swift in Sources */,
 				7B0B2AAF255E3B7B00ACF619 /* UIColor+HXPHPicker.swift in Sources */,
 				7BA68798256149790014C3E3 /* Bundle+HXPhotoPicker.swift in Sources */,
 				7B0B2AB4255E5A1800ACF619 /* HXPHPreviewViewController.swift in Sources */,
 				7B0B2A88255E1AE300ACF619 /* HXPHPickerViewController.swift in Sources */,
+				7B1A106C259ADD08005FD62C /* HXPHPreviewContentView.swift in Sources */,
 				7B0B2A8E255E1AE300ACF619 /* HXPHAsset.swift in Sources */,
+				7B1A10BF259AE7C2005FD62C /* HXPHPickerBottomViewConfiguration.swift in Sources */,
 				7B0B2A89255E1AE300ACF619 /* HXPHConfiguration.swift in Sources */,
 				7BA6878B25610CF00014C3E3 /* UIImage+HXPHPicker.swift in Sources */,
+				7B1A1067259ADCC4005FD62C /* HXPHPickerCamerViewCell.swift in Sources */,
 				7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */,
+				7B1A10AD259AE76E005FD62C /* HXPHEmptyViewConfiguration.swift in Sources */,
+				7B1A10A2259AE0C9005FD62C /* HXPHPreviewSelectedViewCell.swift in Sources */,
+				7B1A10C9259AE7F3005FD62C /* HXPHCameraConfiguration.swift in Sources */,
 				7BA141252580CB8C000D0726 /* HXPHPickerTransition.swift in Sources */,
 				7B0B2AB9255E5F6F00ACF619 /* HXPHPreviewViewCell.swift in Sources */,
 				7B0B2A8D255E1AE300ACF619 /* HXAlbumViewController.swift in Sources */,
 				7B0B2A90255E1AE300ACF619 /* HXAlbumViewCell.swift in Sources */,
+				7B1A10C4259AE7D8005FD62C /* HXPHPreviewViewConfiguration.swift in Sources */,
+				7B1A10DD259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift in Sources */,
 				7B0B2AD1255E82F200ACF619 /* UIDevice+HXPHPicker.swift in Sources */,
+				7B1A10A7259AE0E5005FD62C /* HXPHPreviewSelectedView.swift in Sources */,
+				7B1A10B5259AE788005FD62C /* HXPHNotAuthorizedConfiguration.swift in Sources */,
 				7B0B2A8B255E1AE300ACF619 /* HXPHPickerController.swift in Sources */,
+				7B1A1083259ADE10005FD62C /* HXAlbumTickView.swift in Sources */,
+				7B1A1057259ADC3F005FD62C /* HXPHVideoView.swift in Sources */,
+				7B1A10CE259AE810005FD62C /* HXPHPhotoListCameraCellConfiguration.swift in Sources */,
 				7B7BE3F22563D34A0008C391 /* HXAlbumView.swift in Sources */,
+				7B1A1062259ADC81005FD62C /* HXPHGIFImageView.swift in Sources */,
+				7B1A10D8259AE864005FD62C /* HXPHPhotoListConfiguration.swift in Sources */,
 				7B0B2A93255E1AE300ACF619 /* HXPHPickerViewCell.swift in Sources */,
 				7B151AC3259330D3004962B0 /* ConfigurationViewController.swift in Sources */,
 				7B0B2A95255E1AE300ACF619 /* UIViewController+HXPHPicker.swift in Sources */,
+				7B1A1071259ADD88005FD62C /* HXPHPickerSelectBoxView.swift in Sources */,
 				7B0B2A91255E1AE300ACF619 /* HXPHManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

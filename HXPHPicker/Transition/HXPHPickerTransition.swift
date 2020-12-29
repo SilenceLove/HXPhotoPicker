@@ -81,8 +81,8 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
             contentView.addSubview(pushImageView)
             
-            if photoAsset != nil && pickerVC != nil {
-                let cell = pickerVC!.getCell(for: photoAsset!)
+            if let photoAsset = photoAsset, let pickerVC = pickerVC {
+                let cell = pickerVC.getCell(for: photoAsset)
                 if cell != nil {
                     pushImageView.image = cell?.imageView.image
                     pushImageView.frame = cell?.imageView.convert(cell?.imageView.bounds ?? CGRect.zero, to: containerView) ?? CGRect.zero
@@ -91,10 +91,10 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     pushImageView.center = CGPoint(x: toVC.view.hx_width * 0.5, y: toVC.view.hx_height * 0.5)
                 }
                 
-                if photoAsset!.asset != nil {
-                    requestAssetImage(for: photoAsset!.asset!)
+                if let phAsset = photoAsset.phAsset {
+                    requestAssetImage(for: phAsset)
                 }else if pushImageView.image == nil {
-                    pushImageView.image = photoAsset?.originalImage
+                    pushImageView.image = photoAsset.originalImage
                 }
             }
             
@@ -119,7 +119,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     pickerVC?.reloadCell(for: photoAsset!)
                     toView = pickerVC?.getCell(for: photoAsset!)
                 }else {
-                    pickerVC?.scrollCellToVisibleArea(toView as! HXPHPickerViewCell)
+                    pickerVC?.scrollCellToVisibleArea(toView as! HXPHPickerBaseViewCell)
                 }
             }
             
@@ -239,8 +239,8 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             }
             if !pickerController.selectedAssetArray.isEmpty {
                 let photoAsset = pickerController.selectedAssetArray[currentPreviewIndex]
-                if photoAsset.asset != nil {
-                    requestAssetImage(for: photoAsset.asset!)
+                if let phAsset = photoAsset.phAsset {
+                    requestAssetImage(for: phAsset)
                 }else if pushImageView.image == nil {
                     pushImageView.image = photoAsset.originalImage
                 }

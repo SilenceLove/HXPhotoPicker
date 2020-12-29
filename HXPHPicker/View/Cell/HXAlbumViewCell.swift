@@ -9,42 +9,42 @@
 import UIKit
 import Photos
 
-class HXAlbumViewCell: UITableViewCell {
-    lazy var albumCoverView: UIImageView = {
+open class HXAlbumViewCell: UITableViewCell {
+    public lazy var albumCoverView: UIImageView = {
         let albumCoverView = UIImageView.init()
         albumCoverView.contentMode = .scaleAspectFill
         albumCoverView.clipsToBounds = true
         return albumCoverView
     }()
-    lazy var albumNameLb: UILabel = {
+    public lazy var albumNameLb: UILabel = {
         let albumNameLb = UILabel.init()
         return albumNameLb
     }()
-    lazy var photoCountLb: UILabel = {
+    public lazy var photoCountLb: UILabel = {
         let photoCountLb = UILabel.init()
         return photoCountLb
     }()
-    lazy var bottomLineView: UIView = {
+    public lazy var bottomLineView: UIView = {
         let bottomLineView = UIView.init()
         bottomLineView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.15)
         return bottomLineView
     }()
-    lazy var tickView: HXAlbumTickView = {
+    public lazy var tickView: HXAlbumTickView = {
         let tickView = HXAlbumTickView.init(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         return tickView
     }()
-    lazy var selectedBgView : UIView = {
+    public lazy var selectedBgView : UIView = {
         let selectedBgView = UIView.init()
         return selectedBgView
     }()
-    var config : HXPHAlbumListConfiguration? {
+    public var config : HXPHAlbumListConfiguration? {
         didSet {
             albumNameLb.font = config?.albumNameFont
             photoCountLb.font = config?.photoCountFont
             configColor()
         }
     }
-    var assetCollection: HXPHAssetCollection? {
+    public var assetCollection: HXPHAssetCollection? {
         didSet {
             albumNameLb.text = assetCollection?.albumName
             photoCountLb.text = String(assetCollection!.count)
@@ -58,10 +58,10 @@ class HXAlbumViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         initView()
     }
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    func initView() {
+    open func initView() {
         contentView.addSubview(albumCoverView)
         contentView.addSubview(albumNameLb)
         contentView.addSubview(photoCountLb)
@@ -70,7 +70,7 @@ class HXAlbumViewCell: UITableViewCell {
     }
     
     /// 获取相册封面图片，重写此方法修改封面图片
-    func requestCoverImage() {
+    open func requestCoverImage() {
         weak var weakSelf = self
         requestID = assetCollection?.requestCoverImage(completion: { (image, assetCollection, info) in
             if assetCollection == weakSelf?.assetCollection && image != nil {
@@ -82,7 +82,7 @@ class HXAlbumViewCell: UITableViewCell {
         })
     }
     // 颜色配置，重写此方法修改颜色配置
-    func configColor() {
+    open func configColor() {
         let isDark = HXPHManager.shared.isDark
         albumNameLb.textColor = isDark ? config?.albumNameDarkColor : config?.albumNameColor
         photoCountLb.textColor = isDark ? config?.photoCountDarkColor : config?.photoCountColor
@@ -102,7 +102,7 @@ class HXAlbumViewCell: UITableViewCell {
         }
     }
     /// 布局，重写此方法修改布局
-    func layoutView() {
+    open func layoutView() {
         let coverMargin : CGFloat = 5
         let coverWidth = hx_height - (coverMargin * 2)
         albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
@@ -121,12 +121,12 @@ class HXAlbumViewCell: UITableViewCell {
         bottomLineView.frame = CGRect(x: coverMargin, y: hx_height - 0.5, width: hx_width - coverMargin * 2, height: 0.5)
     }
     
-    override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         layoutView()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
@@ -140,33 +140,5 @@ class HXAlbumViewCell: UITableViewCell {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
         }
-    }
-}
-
-class HXAlbumTickView: UIView {
-    lazy var tickLayer: CAShapeLayer = {
-        let tickLayer = CAShapeLayer.init()
-        tickLayer.contentsScale = UIScreen.main.scale
-        let tickPath = UIBezierPath.init()
-        tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
-        tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
-        tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
-        tickLayer.path = tickPath.cgPath
-        tickLayer.lineWidth = 1.5
-        tickLayer.strokeColor = UIColor.black.cgColor
-        tickLayer.fillColor = UIColor.clear.cgColor
-        return tickLayer
-    }()
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        layer.addSublayer(tickLayer)
-    }
-    
-    private func scale(_ numerator: CGFloat) -> CGFloat {
-        return numerator / 30 * hx_height
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

@@ -20,20 +20,19 @@ class HXPHCustomLanguage: NSObject {
 
 class HXPHManager: NSObject {
     
-    static let shared = HXPHManager()
+    public static let shared = HXPHManager()
     
     /// 自定义语言
-    var customLanguages: [HXPHCustomLanguage] = []
+    public var customLanguages: [HXPHCustomLanguage] = []
     
     /// 当配置的 languageType 都不匹配时才会判断自定义语言
     /// 固定的自定义语言，不会受系统语言影响
-    var fixedCustomLanguage: HXPHCustomLanguage?
+    public var fixedCustomLanguage: HXPHCustomLanguage?
     
-    var bundle: Bundle?
-    var languageBundle: Bundle?
-    var languageType: HXPHPicker.LanguageType?
-    var appearanceStyle: HXPHPicker.AppearanceStyle = .varied
-    var isDark: Bool {
+    public var languageBundle: Bundle?
+    public var languageType: HXPHPicker.LanguageType?
+    public var appearanceStyle: HXPHPicker.AppearanceStyle = .varied
+    public var isDark: Bool {
         get {
             if appearanceStyle == .normal {
                 return false
@@ -49,6 +48,8 @@ class HXPHManager: NSObject {
             return false
         }
     }
+    
+    var bundle: Bundle?
     
     private var isCustomLanguage: Bool = false
     private lazy var cameraAlbumLocalIdentifier : String? = {
@@ -70,7 +71,7 @@ class HXPHManager: NSObject {
     /// - Parameters:
     ///   - showEmptyCollection: 显示空集合
     ///   - completion: 完成回调
-    func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, completion :@escaping ([HXPHAssetCollection])->()) {
+    public func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, completion :@escaping ([HXPHAssetCollection])->()) {
         DispatchQueue.global().async {
             var assetCollectionsArray = [HXPHAssetCollection]()
             HXPHAssetManager.enumerateAllAlbums(filterInvalid: true, options: nil) { (collection) in
@@ -94,7 +95,7 @@ class HXPHManager: NSObject {
     /// - Parameters:
     ///   - showEmptyCollection: 显示空集合
     ///   - usingBlock: HXPHAssetCollection 为nil则代表结束，Bool 是否为相机胶卷
-    func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, usingBlock :@escaping (HXPHAssetCollection?, Bool)->()) {
+    public func fetchAssetCollections(for options: PHFetchOptions, showEmptyCollection: Bool, usingBlock :@escaping (HXPHAssetCollection?, Bool)->()) {
         HXPHAssetManager.enumerateAllAlbums(filterInvalid: true, options: nil) { (collection) in
             let assetCollection = HXPHAssetCollection.init(collection: collection, options: options)
             if showEmptyCollection == false && assetCollection.count == 0 {
@@ -107,7 +108,7 @@ class HXPHManager: NSObject {
     }
     
     /// 获取相机胶卷资源集合
-    func fetchCameraAssetCollection(for type: HXPHPicker.SelectType, options: PHFetchOptions, completion :@escaping (HXPHAssetCollection)->()) {
+    public func fetchCameraAssetCollection(for type: HXPHPicker.SelectType, options: PHFetchOptions, completion :@escaping (HXPHAssetCollection)->()) {
         DispatchQueue.global().async {
             var useLocalIdentifier = false
             let language = Locale.preferredLanguages.first
@@ -158,7 +159,7 @@ class HXPHManager: NSObject {
         }
         return self.bundle
     }
-    func createLanguageBundle(languageType: HXPHPicker.LanguageType) -> Bundle? {
+    public func createLanguageBundle(languageType: HXPHPicker.LanguageType) -> Bundle? {
         if bundle == nil {
             _ = createBundle()
         }

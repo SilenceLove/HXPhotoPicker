@@ -9,16 +9,16 @@
 import UIKit
 import Photos
 
-typealias statusHandler = (PHAuthorizationStatus) -> ()
+public typealias statusHandler = (PHAuthorizationStatus) -> ()
 
-class HXPHTools: NSObject {
+public class HXPHTools: NSObject {
     
     
     /// 显示没有权限的弹窗
     /// - Parameters:
     ///   - viewController: 需要弹窗的viewController
     ///   - status: 权限类型
-    class func showNotAuthorizedAlert(viewController : UIViewController? , status : PHAuthorizationStatus) {
+    public class func showNotAuthorizedAlert(viewController : UIViewController? , status : PHAuthorizationStatus) {
         if viewController == nil {
             return
         }
@@ -29,7 +29,7 @@ class HXPHTools: NSObject {
             }
         }
     }
-    class func showNotCameraAuthorizedAlert(viewController : UIViewController?) {
+    public class func showNotCameraAuthorizedAlert(viewController : UIViewController?) {
         if viewController == nil {
             return
         }
@@ -38,7 +38,7 @@ class HXPHTools: NSObject {
         }
     }
     
-    class func openSettingsURL() {
+    public class func openSettingsURL() {
         if #available(iOS 10, *) {
             UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
         } else {
@@ -46,7 +46,7 @@ class HXPHTools: NSObject {
         }
     }
     
-    class func showAlert(viewController: UIViewController? , title: String? , message: String? , leftActionTitle: String ,  leftHandler: @escaping (UIAlertAction)->(), rightActionTitle: String , rightHandler: @escaping (UIAlertAction)->()) {
+    public class func showAlert(viewController: UIViewController? , title: String? , message: String? , leftActionTitle: String ,  leftHandler: @escaping (UIAlertAction)->(), rightActionTitle: String , rightHandler: @escaping (UIAlertAction)->()) {
         let alertController = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
         let leftAction = UIAlertAction.init(title: leftActionTitle, style: UIAlertAction.Style.cancel, handler: leftHandler)
         let rightAction = UIAlertAction.init(title: rightActionTitle, style: UIAlertAction.Style.default, handler: rightHandler)
@@ -55,7 +55,7 @@ class HXPHTools: NSObject {
         viewController?.present(alertController, animated: true, completion: nil)
     }
     
-    class func transformVideoDurationToString(duration: TimeInterval) -> String {
+    public class func transformVideoDurationToString(duration: TimeInterval) -> String {
         let time = Int(round(Double(duration)))
         if time < 10 {
             return String.init(format: "00:0%d", arguments: [time])
@@ -72,7 +72,7 @@ class HXPHTools: NSObject {
         }
     }
     
-    class func transformAlbumName(for collection: PHAssetCollection) -> String? {
+    public class func transformAlbumName(for collection: PHAssetCollection) -> String? {
         if collection.assetCollectionType == .album {
             return collection.localizedTitle
         }
@@ -136,7 +136,7 @@ class HXPHTools: NSObject {
         }
         return albumName
     }
-    class func getVideoThumbnailImage(videoURL: URL?, atTime: TimeInterval) -> UIImage? {
+    public class func getVideoThumbnailImage(videoURL: URL?, atTime: TimeInterval) -> UIImage? {
         if videoURL == nil {
             return nil
         }
@@ -153,7 +153,7 @@ class HXPHTools: NSObject {
             return nil
         }
     }
-    class func getVideoDuration(videoURL: URL?) -> TimeInterval {
+    public class func getVideoDuration(videoURL: URL?) -> TimeInterval {
         if videoURL == nil {
             return 0
         }
@@ -162,7 +162,7 @@ class HXPHTools: NSObject {
         let second = Int(urlAsset.duration.value) / Int(urlAsset.duration.timescale)
         return TimeInterval(second)
     }
-    class func transformBytesToString(bytes: Int) -> String {
+    public class func transformBytesToString(bytes: Int) -> String {
         if CGFloat(bytes) >= 0.5 * 1000 * 1000 {
             return String.init(format: "%0.1fM", arguments: [CGFloat(bytes) / 1000 / 1000])
         }else if bytes >= 1000 {
@@ -171,7 +171,7 @@ class HXPHTools: NSObject {
             return String.init(format: "%dB", arguments: [bytes])
         }
     }
-    class func transformTargetWidthToSize(targetWidth: CGFloat, asset: PHAsset) -> CGSize {
+    public class func transformTargetWidthToSize(targetWidth: CGFloat, asset: PHAsset) -> CGSize {
         let scale:CGFloat = 0.8
         let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
         var width = targetWidth
@@ -190,14 +190,14 @@ class HXPHTools: NSObject {
         }
         return CGSize.init(width: width, height: height)
     }
-    class func exportEditVideo(for avAsset: AVAsset, startTime: TimeInterval, endTime: TimeInterval, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
+    public class func exportEditVideo(for avAsset: AVAsset, startTime: TimeInterval, endTime: TimeInterval, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
         let timescale = avAsset.duration.timescale
         let start = CMTime(value: CMTimeValue(startTime * TimeInterval(timescale)), timescale: timescale)
         let end = CMTime(value: CMTimeValue(endTime * TimeInterval(timescale)), timescale: timescale)
         let timeRang = CMTimeRange(start: start, end: end)
         exportEditVideo(for: avAsset, timeRang: timeRang, presentName: presentName, completion: completion)
     }
-    class func exportEditVideo(for avAsset: AVAsset, timeRang: CMTimeRange, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
+    public class func exportEditVideo(for avAsset: AVAsset, timeRang: CMTimeRange, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
         if AVAssetExportSession.allExportPresets().contains(presentName) {
             let videoURL = HXPHTools.getVideoTmpURL()
             if let exportSession = AVAssetExportSession.init(asset: avAsset, presetName: presentName) {
@@ -234,7 +234,7 @@ class HXPHTools: NSObject {
             return
         }
     }
-    class func getImageData(for image: UIImage?) -> Data? {
+    public class func getImageData(for image: UIImage?) -> Data? {
         if let pngData = image?.pngData() {
             return pngData
         }else if let jpegData = image?.jpegData(compressionQuality: 1) {
@@ -242,19 +242,19 @@ class HXPHTools: NSObject {
         }
         return nil
     }
-    class func getTmpURL(for suffix: String) -> URL {
+    public class func getTmpURL(for suffix: String) -> URL {
         var tmpPath = NSTemporaryDirectory()
         tmpPath.append(contentsOf: String.hx_fileName(suffix: suffix))
         let tmpURL = URL.init(fileURLWithPath: tmpPath)
         return tmpURL
     }
-    class func getImageTmpURL() -> URL {
+    public class func getImageTmpURL() -> URL {
         return getTmpURL(for: "jpeg")
     }
-    class func getVideoTmpURL() -> URL {
+    public class func getVideoTmpURL() -> URL {
         return getTmpURL(for: "mp4")
     }
-    class func getWXConfig() -> HXPHConfiguration {
+    public class func getWXConfig() -> HXPHConfiguration {
         let config = HXPHConfiguration.init()
         config.maximumSelectedCount = 9
         config.maximumSelectedVideoCount = 0

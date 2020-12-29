@@ -9,7 +9,7 @@
 import UIKit
 import Photos
 
-class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+public class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     lazy var tableView : UITableView = {
         let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
@@ -55,7 +55,7 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
@@ -138,26 +138,26 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
         hx_pickerController?.cancelCallback()
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return assetCollectionsArray.count
     }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellId") as! HXAlbumViewCell
         let assetCollection = assetCollectionsArray[indexPath.row]
         cell.assetCollection = assetCollection
         cell.config = config
         return cell
     }
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return config!.cellHeight
     }
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let assetCollection = assetCollectionsArray[indexPath.row]
         pushPhotoPickerController(assetCollection: assetCollection, animated: true)
     }
     
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let myCell: HXAlbumViewCell = cell as! HXAlbumViewCell
         myCell.cancelRequest()
     }
@@ -185,25 +185,25 @@ class HXAlbumViewController: UIViewController, UITableViewDataSource, UITableVie
             orientationDidChange = false
         }
     }
-    override func viewDidLayoutSubviews() {
+    public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         changeSubviewFrame()
     }
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.popoverPresentationController?.delegate = self as? UIPopoverPresentationControllerDelegate;
     }
-    override func viewDidAppear(_ animated: Bool) {
+    public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if assetCollectionsArray.isEmpty && canFetchAssetCollections {
             fetchAssetCollections()
         }
     }
-    override var prefersStatusBarHidden: Bool {
+    public override var prefersStatusBarHidden: Bool {
         return false
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

@@ -9,42 +9,42 @@
 import UIKit
 import Photos
 
-typealias HXPHAssetICloudHandlerHandler = (HXPHAsset, PHImageRequestID) -> Void
-typealias HXPHAssetProgressHandler = (HXPHAsset, Double) -> Void
-typealias HXPHAssetFailureHandler = (HXPHAsset, [AnyHashable : Any]?) -> Void
+public typealias HXPHAssetICloudHandlerHandler = (HXPHAsset, PHImageRequestID) -> Void
+public typealias HXPHAssetProgressHandler = (HXPHAsset, Double) -> Void
+public typealias HXPHAssetFailureHandler = (HXPHAsset, [AnyHashable : Any]?) -> Void
 
-class HXPHAsset: NSObject {
+open class HXPHAsset: NSObject {
     
     /// 系统相册里的资源
-    var asset: PHAsset? {
+    public var phAsset: PHAsset? {
         didSet {
             setMediaType()
         }
     }
     
     /// 媒体类型
-    var mediaType: HXPHPicker.Asset.MediaType = .photo
+    public var mediaType: HXPHPicker.Asset.MediaType = .photo
     
     /// 媒体子类型
-    var mediaSubType: HXPHPicker.Asset.MediaSubType = .image
+    public var mediaSubType: HXPHPicker.Asset.MediaSubType = .image
     
     /// 原图
-    var originalImage: UIImage? {
+    public var originalImage: UIImage? {
         get {
             return getOriginalImage()
         }
     }
     /// 获取图片原始地址
-    func requestImageURL(resultHandler: @escaping (URL?) -> Void) {
-        if asset == nil {
+    public func requestImageURL(resultHandler: @escaping (URL?) -> Void) {
+        if phAsset == nil {
             requestLocalImageURL(resultHandler: resultHandler)
             return
         }
         requestAssetImageURL(resultHandler: resultHandler)
     }
     /// 获取视频原始地址
-    func requestVideoURL(resultHandler: @escaping (URL?) -> Void) {
-        if asset == nil {
+    public func requestVideoURL(resultHandler: @escaping (URL?) -> Void) {
+        if phAsset == nil {
             resultHandler(localVideoURL)
             return
         }
@@ -52,56 +52,56 @@ class HXPHAsset: NSObject {
     }
 
     /// 图片/视频大小
-    var fileSize: Int {
+    public var fileSize: Int {
         get {
             return getFileSize()
         }
     }
     
     /// 视频时长 格式：00:00
-    var videoTime: String?
+    public var videoTime: String?
     
     /// 视频时长 秒
-    var videoDuration: TimeInterval = 0
+    public var videoDuration: TimeInterval = 0
     
     /// 当前资源是否被选中
-    var isSelected: Bool = false
+    public var isSelected: Bool = false
     
     /// 选中时的下标
-    var selectIndex: Int = 0
+    public var selectIndex: Int = 0
     
     /// 当前资源的图片大小
-    var imageSize: CGSize {
+    public var imageSize: CGSize {
         get {
             return getImageSize()
         }
     }
     
     /// iCloud下载状态
-    var downloadStatus: HXPHPicker.Asset.DownloadStatus = .unknow
+    public var downloadStatus: HXPHPicker.Asset.DownloadStatus = .unknow
     
     /// iCloud下载进度，如果取消了会记录上次进度
-    var downloadProgress: Double = 0
+    public var downloadProgress: Double = 0
     
     /// 根据系统相册里对应的 PHAsset 数据初始化
     /// - Parameter asset: 系统相册里对应的 PHAsset 数据
-    init(asset: PHAsset) {
+    public init(asset: PHAsset) {
         super.init()
-        self.asset = asset
+        self.phAsset = asset
         setMediaType()
     }
     
     /// 根据系统相册里对应的 PHAsset本地唯一标识符 初始化
     /// - Parameter localIdentifier: 系统相册里对应的 PHAsset本地唯一标识符
-    init(localIdentifier: String) {
+    public init(localIdentifier: String) {
         super.init()
-        asset = HXPHAssetManager.fetchAsset(withLocalIdentifier: localIdentifier)
+        phAsset = HXPHAssetManager.fetchAsset(withLocalIdentifier: localIdentifier)
         setMediaType()
     }
     
     /// 根据本地image初始化
     /// - Parameter image: 对应的 UIImage 数据
-    convenience init(image: UIImage?) {
+    public convenience init(image: UIImage?) {
         self.init(image: image, localIdentifier: String(Date.init().timeIntervalSince1970))
     }
     
@@ -110,7 +110,7 @@ class HXPHAsset: NSObject {
     /// - Parameters:
     ///   - image: 对应的 UIImage 数据
     ///   - localIdentifier: 自定义的本地唯一标识符
-    init(image: UIImage?, localIdentifier: String?) {
+    public init(image: UIImage?, localIdentifier: String?) {
         super.init()
         localAssetIdentifier = localIdentifier
         localImage = image
@@ -120,7 +120,7 @@ class HXPHAsset: NSObject {
     
     /// 根据本地videoURL初始化
     /// - Parameter videoURL: 对应的 URL 数据
-    convenience init(videoURL: URL?) {
+    public convenience init(videoURL: URL?) {
         self.init(videoURL: videoURL, localIdentifier: String(Date.init().timeIntervalSince1970))
     }
     
@@ -129,7 +129,7 @@ class HXPHAsset: NSObject {
     /// - Parameters:
     ///   - videoURL: 对应的 URL 数据
     ///   - localIdentifier: 自定义的本地唯一标识符
-    init(videoURL: URL?, localIdentifier: String?) {
+    public init(videoURL: URL?, localIdentifier: String?) {
         super.init()
         localAssetIdentifier = localIdentifier
         localImage = HXPHTools.getVideoThumbnailImage(videoURL: videoURL, atTime: 0.1)
@@ -150,15 +150,15 @@ class HXPHAsset: NSObject {
     /// 请求缩略图
     /// - Parameter completion: 完成回调
     /// - Returns: 请求ID
-    func requestThumbnailImage(completion: ((UIImage?, HXPHAsset, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
+    public func requestThumbnailImage(completion: ((UIImage?, HXPHAsset, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
         return requestThumbnailImage(targetWidth: 180, completion: completion)
     }
-    func requestThumbnailImage(targetWidth: CGFloat, completion: ((UIImage?, HXPHAsset, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
-        if asset == nil {
+    public func requestThumbnailImage(targetWidth: CGFloat, completion: ((UIImage?, HXPHAsset, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
+        if phAsset == nil {
             completion?(localImage, self, nil)
             return nil
         }
-        return HXPHAssetManager.requestThumbnailImage(for: asset!, targetWidth: targetWidth) { (image, info) in
+        return HXPHAssetManager.requestThumbnailImage(for: phAsset!, targetWidth: targetWidth) { (image, info) in
             completion?(image, self, info)
         }
     }
@@ -168,8 +168,8 @@ class HXPHAsset: NSObject {
     ///   - iCloudHandler: 下载iCloud上的资源时回调iCloud的请求ID
     ///   - progressHandler: iCloud下载进度
     /// - Returns: 请求ID
-    func requestImageData(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, Data, UIImage.Orientation, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
-        if asset == nil {
+    public func requestImageData(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, Data, UIImage.Orientation, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
+        if phAsset == nil {
             failure?(self, nil)
             return 0
         }
@@ -178,7 +178,7 @@ class HXPHAsset: NSObject {
             version = .original
         }
         downloadStatus = .downloading
-        return HXPHAssetManager.requestImageData(for: asset!, version: version, iCloudHandler: { (iCloudRequestID) in
+        return HXPHAssetManager.requestImageData(for: phAsset!, version: version, iCloudHandler: { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
         }, progressHandler: { (progress, error, stop, info) in
             self.downloadProgress = progress
@@ -209,13 +209,13 @@ class HXPHAsset: NSObject {
     ///   - progressHandler: iCloud下载进度
     /// - Returns: 请求ID
     @available(iOS 9.1, *)
-    func requestLivePhoto(targetSize: CGSize, iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, PHLivePhoto, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
-        if asset == nil {
+    public func requestLivePhoto(targetSize: CGSize, iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, PHLivePhoto, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
+        if phAsset == nil {
             failure?(self, nil)
             return 0
         }
         downloadStatus = .downloading
-        return HXPHAssetManager.requestLivePhoto(for: asset!, targetSize: targetSize) { (iCloudRequestID) in
+        return HXPHAssetManager.requestLivePhoto(for: phAsset!, targetSize: targetSize) { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { (progress, error, stop, info) in
             self.downloadProgress = progress
@@ -244,8 +244,8 @@ class HXPHAsset: NSObject {
     ///   - iCloudHandler: 下载iCloud上的资源时回调iCloud的请求ID
     ///   - progressHandler: iCloud下载进度
     /// - Returns: 请求ID
-    func requestAVAsset(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, AVAsset, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
-        if asset == nil {
+    public func requestAVAsset(iCloudHandler: HXPHAssetICloudHandlerHandler?, progressHandler: HXPHAssetProgressHandler?, success: ((HXPHAsset, AVAsset, [AnyHashable : Any]?) -> Void)?, failure: HXPHAssetFailureHandler?) -> PHImageRequestID {
+        if phAsset == nil {
             if localVideoURL != nil {
                 success?(self, AVAsset.init(url: localVideoURL!), nil)
             }else {
@@ -254,7 +254,7 @@ class HXPHAsset: NSObject {
             return 0
         }
         downloadStatus = .downloading
-        return HXPHAssetManager.requestAVAsset(for: asset!) { (iCloudRequestID) in
+        return HXPHAssetManager.requestAVAsset(for: phAsset!) { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
         } progressHandler: { (progress, error, stop, info) in
             self.downloadProgress = progress
@@ -278,30 +278,27 @@ class HXPHAsset: NSObject {
         }
     }
     
-    func isEqual(_ photoAsset: HXPHAsset?) -> Bool {
-        if photoAsset == nil {
-            return false
+    public func isEqual(_ photoAsset: HXPHAsset?) -> Bool {
+        if let photoAsset = photoAsset {
+            if self == photoAsset {
+                return true
+            }
+            if let localAssetIdentifier = localAssetIdentifier , let phLocalAssetIdentifier = photoAsset.localAssetIdentifier, localAssetIdentifier == phLocalAssetIdentifier {
+                return true
+            }
+            if let localImage = localImage, let phLocalImage = photoAsset.localImage, localImage == phLocalImage {
+                return true
+            }
+            if let localVideoURL = localVideoURL, let phLocalVideoURL = photoAsset.localVideoURL, localVideoURL == phLocalVideoURL {
+                return true
+            }
+            if let phAsset = phAsset, phAsset == photoAsset.phAsset {
+                return true
+            }
+            if let localIdentifier = phAsset?.localIdentifier, let phLocalIdentifier = photoAsset.phAsset?.localIdentifier, localIdentifier == phLocalIdentifier {
+                return true
+            }
         }
-        if self == photoAsset {
-            return true
-        }
-        if localAssetIdentifier != nil && photoAsset?.localAssetIdentifier != nil &&
-            localAssetIdentifier == photoAsset?.localAssetIdentifier{
-            return true
-        }
-        if localImage != nil && photoAsset?.localImage != nil && localImage == photoAsset?.localImage {
-            return true
-        }
-        if localVideoURL != nil && photoAsset?.localVideoURL != nil && localVideoURL == photoAsset?.localVideoURL {
-            return true
-        }
-        if asset != nil && photoAsset?.asset != nil && asset == photoAsset?.asset {
-            return true
-        }
-        if asset?.localIdentifier != nil && photoAsset?.asset?.localIdentifier != nil && asset?.localIdentifier == photoAsset?.asset?.localIdentifier {
-            return true
-        }
-        
         return false
     }
     
@@ -317,14 +314,14 @@ class HXPHAsset: NSObject {
     }
     
     private func setMediaType() {
-        if asset?.mediaType.rawValue == 1 {
+        if phAsset?.mediaType.rawValue == 1 {
             mediaType = .photo
             mediaSubType = .image
-        }else if asset?.mediaType.rawValue == 2 {
+        }else if phAsset?.mediaType.rawValue == 2 {
             mediaType = .video
             mediaSubType = .video
-            videoDuration = asset!.duration
-            videoTime = HXPHTools.transformVideoDurationToString(duration: asset!.duration)
+            videoDuration = phAsset!.duration
+            videoTime = HXPHTools.transformVideoDurationToString(duration: phAsset!.duration)
         }
     }
     private func getLocalImageData() -> Data? {
@@ -335,7 +332,7 @@ class HXPHAsset: NSObject {
             return fileSize
         }
         var fileSize = 0
-        if let photoAsset = asset {
+        if let photoAsset = phAsset {
             let assetResources = PHAssetResource.assetResources(for: photoAsset)
             let assetIsLivePhoto = HXPHAssetManager.assetIsLivePhoto(asset: photoAsset)
             for assetResource in assetResources {
@@ -369,7 +366,7 @@ class HXPHAsset: NSObject {
         return fileSize
     }
     private func getOriginalImage() -> UIImage? {
-        if asset == nil {
+        if phAsset == nil {
             return localImage
         }
         let options = PHImageRequestOptions.init()
@@ -380,10 +377,10 @@ class HXPHAsset: NSObject {
             options.version = .original
         }
         var originalImage: UIImage?
-        _ = HXPHAssetManager.requestImageData(for: asset!, options: options) { (imageData, dataUTI, orientation, info) in
+        _ = HXPHAssetManager.requestImageData(for: phAsset!, options: options) { (imageData, dataUTI, orientation, info) in
             if imageData != nil {
                 originalImage = UIImage.init(data: imageData!)
-                if self.mediaSubType != .imageAnimated && HXPHAssetManager.assetIsAnimated(asset: self.asset!) {
+                if self.mediaSubType != .imageAnimated && HXPHAssetManager.assetIsAnimated(asset: self.phAsset!) {
                     // 原始图片是动图，但是设置的是不显示动图，所以在这里处理一下
                     originalImage = originalImage?.images?.first
                 }
@@ -393,11 +390,11 @@ class HXPHAsset: NSObject {
     }
     private func getImageSize() -> CGSize {
         let size : CGSize
-        if asset != nil {
-            if asset!.pixelWidth == 0 || asset!.pixelHeight == 0 {
+        if let phAsset = phAsset {
+            if phAsset.pixelWidth == 0 || phAsset.pixelHeight == 0 {
                 size = CGSize(width: 200, height: 200)
             }else {
-                size = CGSize(width: asset!.pixelWidth, height: asset!.pixelHeight)
+                size = CGSize(width: phAsset.pixelWidth, height: phAsset.pixelHeight)
             }
         }else {
             size = localImage?.size ?? CGSize(width: 200, height: 200)
@@ -428,7 +425,7 @@ class HXPHAsset: NSObject {
         }
     }
     private func requestAssetImageURL(resultHandler: @escaping (URL?) -> Void) {
-        if asset == nil {
+        if phAsset == nil {
             return
         }
         var suffix: String
@@ -437,8 +434,8 @@ class HXPHAsset: NSObject {
         }else {
             suffix = "jpeg"
         }
-        HXPHAssetManager.requestImageURL(for: asset!, suffix: suffix) { (imageURL) in
-            if HXPHAssetManager.assetIsAnimated(asset: self.asset!) && self.mediaSubType != .imageAnimated && imageURL != nil {
+        HXPHAssetManager.requestImageURL(for: phAsset!, suffix: suffix) { (imageURL) in
+            if HXPHAssetManager.assetIsAnimated(asset: self.phAsset!) && self.mediaSubType != .imageAnimated && imageURL != nil {
                 // 本质上是gif，需要变成静态图
                 let image = UIImage.init(contentsOfFile: imageURL!.path)
                 if let imageData = HXPHTools.getImageData(for: image) {
@@ -460,14 +457,14 @@ class HXPHAsset: NSObject {
     private func requestAssetVideoURL(resultHandler: @escaping (URL?) -> Void) {
         if mediaSubType == .livePhoto {
             var videoURL: URL?
-            HXPHAssetManager.requestLivePhoto(content: asset!) { (imageData) in
+            HXPHAssetManager.requestLivePhoto(content: phAsset!) { (imageData) in
             } videoHandler: { (url) in
                 videoURL = url
             } completionHandler: { (error) in
                 resultHandler(videoURL)
             }
         }else {
-            HXPHAssetManager.requestVideoURL(mp4Format: asset!) { (videoURL) in
+            HXPHAssetManager.requestVideoURL(mp4Format: phAsset!) { (videoURL) in
                 resultHandler(videoURL)
             }
         }
