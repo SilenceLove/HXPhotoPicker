@@ -3,7 +3,7 @@
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -39,10 +39,10 @@ class HXPHPreviewContentView: UIView, PHLivePhotoViewDelegate {
     var type: HXPHPreviewContentViewType = .photo
     var requestID: PHImageRequestID?
     var requestCompletion: Bool = false
-    var autoPlayVideo: Bool = false {
+    var videoPlayType: HXPHPicker.PreviewView.VideoPlayType = .normal  {
         didSet {
             if type == .video {
-                videoView.autoPlayVideo = autoPlayVideo
+                videoView.videoPlayType = videoPlayType
             }
         }
     }

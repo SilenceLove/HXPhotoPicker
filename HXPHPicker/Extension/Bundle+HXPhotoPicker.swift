@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension Bundle {
+public extension Bundle {
     
     class func hx_localizedString(for key: String) -> String {
         return hx_localizedString(for: key, value: nil)

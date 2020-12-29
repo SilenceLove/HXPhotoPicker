@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIColor {
+public extension UIColor {
     
     convenience init(hx_hexString: String) {
         let hexString = hx_hexString.trimmingCharacters(in: .whitespacesAndNewlines)

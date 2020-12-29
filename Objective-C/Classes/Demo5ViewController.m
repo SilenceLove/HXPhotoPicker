@@ -2,8 +2,8 @@
 //  Demo5ViewController.m
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2017/7/5.
-//  Copyright © 2017年 洪欣. All rights reserved.
+//  Created by Silence on 2017/7/5.
+//  Copyright © 2017年 Silence. All rights reserved.
 //
 
 #import "Demo5ViewController.h"

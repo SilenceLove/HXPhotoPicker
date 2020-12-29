@@ -93,6 +93,11 @@
 		7B1A10D8259AE864005FD62C /* HXPHPhotoListConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10D7259AE864005FD62C /* HXPHPhotoListConfiguration.swift */; };
 		7B1A10DD259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10DC259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift */; };
 		7B1A10E2259AE89E005FD62C /* HXPHAlbumListConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A10E1259AE89E005FD62C /* HXPHAlbumListConfiguration.swift */; };
+		7B1A111C259B2780005FD62C /* HXPHAssetManager+Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A111B259B2780005FD62C /* HXPHAssetManager+Authorization.swift */; };
+		7B1A1121259B2829005FD62C /* HXPHAssetManager+AssetCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1120259B2829005FD62C /* HXPHAssetManager+AssetCollection.swift */; };
+		7B1A1126259B28AA005FD62C /* HXPHAssetManager+Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1125259B28AA005FD62C /* HXPHAssetManager+Asset.swift */; };
+		7B1A112E259B2BB2005FD62C /* HXPHManager+AssetCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A112D259B2BB2005FD62C /* HXPHManager+AssetCollection.swift */; };
+		7B1A1133259B2DC8005FD62C /* HXPHManager+Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1132259B2DC8005FD62C /* HXPHManager+Language.swift */; };
 		7B1C05B6258CAB5E000242A1 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */; };
 		7B1C05BB258CABBD000242A1 /* BaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B1C05BA258CABBD000242A1 /* BaseViewController.xib */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
@@ -517,6 +522,11 @@
 		7B1A10D7259AE864005FD62C /* HXPHPhotoListConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHPhotoListConfiguration.swift; sourceTree = "<group>"; };
 		7B1A10DC259AE87E005FD62C /* HXAlbumTitleViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXAlbumTitleViewConfiguration.swift; sourceTree = "<group>"; };
 		7B1A10E1259AE89E005FD62C /* HXPHAlbumListConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HXPHAlbumListConfiguration.swift; sourceTree = "<group>"; };
+		7B1A111B259B2780005FD62C /* HXPHAssetManager+Authorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HXPHAssetManager+Authorization.swift"; sourceTree = "<group>"; };
+		7B1A1120259B2829005FD62C /* HXPHAssetManager+AssetCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HXPHAssetManager+AssetCollection.swift"; sourceTree = "<group>"; };
+		7B1A1125259B28AA005FD62C /* HXPHAssetManager+Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HXPHAssetManager+Asset.swift"; sourceTree = "<group>"; };
+		7B1A112D259B2BB2005FD62C /* HXPHManager+AssetCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HXPHManager+AssetCollection.swift"; sourceTree = "<group>"; };
+		7B1A1132259B2DC8005FD62C /* HXPHManager+Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HXPHManager+Language.swift"; sourceTree = "<group>"; };
 		7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		7B1C05BA258CABBD000242A1 /* BaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BaseViewController.xib; sourceTree = "<group>"; };
 		7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
@@ -979,7 +989,12 @@
 			isa = PBXGroup;
 			children = (
 				7B0B2A83255E1AE300ACF619 /* HXPHManager.swift */,
+				7B1A112D259B2BB2005FD62C /* HXPHManager+AssetCollection.swift */,
+				7B1A1132259B2DC8005FD62C /* HXPHManager+Language.swift */,
 				7B0B2A84255E1AE300ACF619 /* HXPHAssetManager.swift */,
+				7B1A111B259B2780005FD62C /* HXPHAssetManager+Authorization.swift */,
+				7B1A1120259B2829005FD62C /* HXPHAssetManager+AssetCollection.swift */,
+				7B1A1125259B28AA005FD62C /* HXPHAssetManager+Asset.swift */,
 				7B0B2A7E255E1AE300ACF619 /* HXPHTools.swift */,
 			);
 			path = Util;
@@ -1675,11 +1690,13 @@
 				7B0B2AAA255E384100ACF619 /* UIFont+HXPHPicker.swift in Sources */,
 				7B1A1098259ADECC005FD62C /* HXPHPickerBottomView.swift in Sources */,
 				7B1A10D3259AE828005FD62C /* HXPHPhotoListCellConfiguration.swift in Sources */,
+				7B1A111C259B2780005FD62C /* HXPHAssetManager+Authorization.swift in Sources */,
 				7B1A107E259ADDD6005FD62C /* HXAlbumTitleView.swift in Sources */,
 				7B1A10E2259AE89E005FD62C /* HXPHAlbumListConfiguration.swift in Sources */,
 				7B0B2A92255E1AE300ACF619 /* HXPHAssetManager.swift in Sources */,
 				7B0B2A8C255E1AE300ACF619 /* HXPHTools.swift in Sources */,
 				7B1A1076259ADDBB005FD62C /* HXAlbumTitleArrowView.swift in Sources */,
+				7B1A1126259B28AA005FD62C /* HXPHAssetManager+Asset.swift in Sources */,
 				7BE660332597564D0025D258 /* HXPHPickerInteractiveTransition.swift in Sources */,
 				7BA47AE3257277E500FB4D99 /* HXPHPicker.swift in Sources */,
 				7B0B2A94255E1AE300ACF619 /* UIView+HXPHPicker.swift in Sources */,
@@ -1688,6 +1705,7 @@
 				7B1A108B259ADE60005FD62C /* HXPHEmptyView.swift in Sources */,
 				7B1A109D259ADF06005FD62C /* HXPHCameraPickerController.swift in Sources */,
 				7B1A1093259ADE78005FD62C /* HXPHDeniedAuthorizationView.swift in Sources */,
+				7B1A1121259B2829005FD62C /* HXPHAssetManager+AssetCollection.swift in Sources */,
 				7B1A10BA259AE7A2005FD62C /* HXPHSelectBoxConfiguration.swift in Sources */,
 				7B0B2AAF255E3B7B00ACF619 /* UIColor+HXPHPicker.swift in Sources */,
 				7BA68798256149790014C3E3 /* Bundle+HXPhotoPicker.swift in Sources */,
@@ -1703,6 +1721,7 @@
 				7B1A10AD259AE76E005FD62C /* HXPHEmptyViewConfiguration.swift in Sources */,
 				7B1A10A2259AE0C9005FD62C /* HXPHPreviewSelectedViewCell.swift in Sources */,
 				7B1A10C9259AE7F3005FD62C /* HXPHCameraConfiguration.swift in Sources */,
+				7B1A112E259B2BB2005FD62C /* HXPHManager+AssetCollection.swift in Sources */,
 				7BA141252580CB8C000D0726 /* HXPHPickerTransition.swift in Sources */,
 				7B0B2AB9255E5F6F00ACF619 /* HXPHPreviewViewCell.swift in Sources */,
 				7B0B2A8D255E1AE300ACF619 /* HXAlbumViewController.swift in Sources */,
@@ -1715,6 +1734,7 @@
 				7B0B2A8B255E1AE300ACF619 /* HXPHPickerController.swift in Sources */,
 				7B1A1083259ADE10005FD62C /* HXAlbumTickView.swift in Sources */,
 				7B1A1057259ADC3F005FD62C /* HXPHVideoView.swift in Sources */,
+				7B1A1133259B2DC8005FD62C /* HXPHManager+Language.swift in Sources */,
 				7B1A10CE259AE810005FD62C /* HXPHPhotoListCameraCellConfiguration.swift in Sources */,
 				7B7BE3F22563D34A0008C391 /* HXAlbumView.swift in Sources */,
 				7B1A1062259ADC81005FD62C /* HXPHGIFImageView.swift in Sources */,

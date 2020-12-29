@@ -334,7 +334,7 @@ open class HXPHAsset: NSObject {
         var fileSize = 0
         if let photoAsset = phAsset {
             let assetResources = PHAssetResource.assetResources(for: photoAsset)
-            let assetIsLivePhoto = HXPHAssetManager.assetIsLivePhoto(asset: photoAsset)
+            let assetIsLivePhoto = HXPHAssetManager.isLivePhoto(for: photoAsset)
             for assetResource in assetResources {
                 if assetIsLivePhoto && mediaSubType != .livePhoto {
                     if assetResource.type == .photo {
@@ -380,7 +380,7 @@ open class HXPHAsset: NSObject {
         _ = HXPHAssetManager.requestImageData(for: phAsset!, options: options) { (imageData, dataUTI, orientation, info) in
             if imageData != nil {
                 originalImage = UIImage.init(data: imageData!)
-                if self.mediaSubType != .imageAnimated && HXPHAssetManager.assetIsAnimated(asset: self.phAsset!) {
+                if self.mediaSubType != .imageAnimated && HXPHAssetManager.isImageAnimated(for: self.phAsset!) {
                     // 原始图片是动图，但是设置的是不显示动图，所以在这里处理一下
                     originalImage = originalImage?.images?.first
                 }
@@ -435,7 +435,7 @@ open class HXPHAsset: NSObject {
             suffix = "jpeg"
         }
         HXPHAssetManager.requestImageURL(for: phAsset!, suffix: suffix) { (imageURL) in
-            if HXPHAssetManager.assetIsAnimated(asset: self.phAsset!) && self.mediaSubType != .imageAnimated && imageURL != nil {
+            if HXPHAssetManager.isImageAnimated(for: self.phAsset!) && self.mediaSubType != .imageAnimated && imageURL != nil {
                 // 本质上是gif，需要变成静态图
                 let image = UIImage.init(contentsOfFile: imageURL!.path)
                 if let imageData = HXPHTools.getImageData(for: image) {

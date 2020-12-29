@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIView {
+public extension UIView {
     var hx_x : CGFloat {
         get {
             return frame.origin.x
@@ -94,13 +94,13 @@ extension UIView {
     }
 }
 
-enum HXPHProgressHUDMode : Int {
+public enum HXPHProgressHUDMode : Int {
     case indicator
     case image
     case success
 }
 
-class HXPHProgressHUD: UIView {
+public class HXPHProgressHUD: UIView {
     var mode : HXPHProgressHUDMode!
     
     lazy var backgroundView: UIView = {
@@ -199,7 +199,7 @@ class HXPHProgressHUD: UIView {
             self.backgroundView.alpha = 1
         }
     }
-    private func hideHUD(withAnimated animated: Bool, afterDelay: TimeInterval) {
+    public func hideHUD(withAnimated animated: Bool, afterDelay: TimeInterval) {
         finished = true
         self.showDelayTimer?.invalidate()
         if afterDelay > 0 {
@@ -213,7 +213,7 @@ class HXPHProgressHUD: UIView {
     @objc func handleHideTimer(timer: Timer) {
         hideViews(animated: (timer.userInfo != nil))
     }
-    private func hideViews(animated: Bool) {
+    public func hideViews(animated: Bool) {
         if animated {
             UIView.animate(withDuration: 0.25) {
                 self.backgroundView.alpha = 0
@@ -225,7 +225,7 @@ class HXPHProgressHUD: UIView {
             removeFromSuperview()
         }
     }
-    func updateText(text: String) {
+    public func updateText(text: String) {
         self.text = text
         textLb.text = text
         updateFrame()
@@ -286,18 +286,18 @@ class HXPHProgressHUD: UIView {
         blurEffectView.frame = backgroundView.bounds
     }
     
-    class func showLoadingHUD(addedTo view: UIView?, animated: Bool) -> HXPHProgressHUD? {
+    public class func showLoadingHUD(addedTo view: UIView?, animated: Bool) -> HXPHProgressHUD? {
         return showLoadingHUD(addedTo: view, text: nil, animated: animated)
     }
-    class func showLoadingHUD(addedTo view: UIView?, afterDelay: TimeInterval, animated: Bool) -> HXPHProgressHUD? {
+    public class func showLoadingHUD(addedTo view: UIView?, afterDelay: TimeInterval, animated: Bool) -> HXPHProgressHUD? {
         return showLoadingHUD(addedTo: view, text: nil, afterDelay: afterDelay, animated: animated)
     }
     
-    class func showLoadingHUD(addedTo view: UIView?, text: String?, animated: Bool) -> HXPHProgressHUD? {
+    public class func showLoadingHUD(addedTo view: UIView?, text: String?, animated: Bool) -> HXPHProgressHUD? {
         return showLoadingHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
     }
     
-    class func showLoadingHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) -> HXPHProgressHUD? {
+    public class func showLoadingHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) -> HXPHProgressHUD? {
         if view == nil {
             return nil
         }
@@ -306,11 +306,11 @@ class HXPHProgressHUD: UIView {
         view!.addSubview(progressView)
         return progressView
     }
-    class func showWarningHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
+    public class func showWarningHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
         self.showWarningHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
         self.hideHUD(forView: view, animated: animated, afterDelay: delay)
     }
-    class func showWarningHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
+    public class func showWarningHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
         if view == nil {
             return
         }
@@ -318,11 +318,11 @@ class HXPHProgressHUD: UIView {
         progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
         view!.addSubview(progressView)
     }
-    class func showSuccessHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
+    public class func showSuccessHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
         self.showSuccessHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
         self.hideHUD(forView: view, animated: animated, afterDelay: delay)
     }
-    class func showSuccessHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
+    public class func showSuccessHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
         if view == nil {
             return
         }
@@ -331,11 +331,11 @@ class HXPHProgressHUD: UIView {
         view!.addSubview(progressView)
     }
     
-    class func hideHUD(forView view:UIView? ,animated: Bool) {
+    public class func hideHUD(forView view:UIView? ,animated: Bool) {
         hideHUD(forView: view, animated: animated, afterDelay: 0)
     }
     
-    class func hideHUD(forView view:UIView? ,animated: Bool ,afterDelay: TimeInterval) {
+    public class func hideHUD(forView view:UIView? ,animated: Bool ,afterDelay: TimeInterval) {
         if view == nil {
             return
         }
@@ -345,7 +345,7 @@ class HXPHProgressHUD: UIView {
             }
         }
     }
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         if !frame.equalTo(superview?.bounds ?? frame) {
             frame = superview?.bounds ?? frame

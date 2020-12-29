@@ -3,7 +3,7 @@
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit

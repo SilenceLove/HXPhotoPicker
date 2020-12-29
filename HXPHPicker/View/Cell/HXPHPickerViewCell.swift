@@ -262,7 +262,7 @@ open class HXPHPickerSelectableViewCell : HXPHPickerViewCell {
     
     /// 选择框点击事件
     /// - Parameter control: 选择框
-    @objc func didSelectControlClick(control: HXPHPickerSelectBoxView) {
+    @objc open func didSelectControlClick(control: HXPHPickerSelectBoxView) {
         delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
     }
     open override func updateSelectedState(isSelected: Bool, animated: Bool) {
@@ -306,7 +306,7 @@ open class HXPHPickerSelectableViewCell : HXPHPickerViewCell {
     }
     
     /// 更新选择框大小
-    func updateSelectControlSize(width: CGFloat, height: CGFloat) {
+    open func updateSelectControlSize(width: CGFloat, height: CGFloat) {
         let topMargin = config?.selectBoxTopMargin ?? 5
         let rightMargin = config?.selectBoxRightMargin ?? 5
         selectControl.frame = CGRect(x: hx_width - rightMargin - width, y: topMargin, width: width, height: height)

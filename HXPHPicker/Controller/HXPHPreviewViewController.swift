@@ -369,7 +369,7 @@ extension HXPHPreviewViewController: UICollectionViewDataSource {
         }else {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(HXPHPreviewVideoViewCell.self), for: indexPath) as! HXPHPreviewVideoViewCell
             let videoCell = cell as! HXPHPreviewVideoViewCell
-            videoCell.autoPlayVideo = config.autoPlayVideo
+            videoCell.videoPlayType = config.videoPlayType
         }
         cell.photoAsset = photoAsset
         cell.delegate = self

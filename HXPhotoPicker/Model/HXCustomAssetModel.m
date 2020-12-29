@@ -2,8 +2,8 @@
 //  HXCustomAssetModel.m
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2018/7/25.
-//  Copyright © 2018年 洪欣. All rights reserved.
+//  Created by Silence on 2018/7/25.
+//  Copyright © 2018年 Silence. All rights reserved.
 //
 
 #import "HXCustomAssetModel.h"

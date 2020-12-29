@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIImage {
+public extension UIImage {
     
     class func hx_named(named: String?) -> UIImage? {
         if named == nil {

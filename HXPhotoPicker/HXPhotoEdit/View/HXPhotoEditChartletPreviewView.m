@@ -2,8 +2,8 @@
 //  HXPhotoEditChartletPreviewView.m
 //  photoEditDemo
 //
-//  Created by 洪欣 on 2020/7/1.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/7/1.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 #import "HXPhotoEditChartletPreviewView.h"

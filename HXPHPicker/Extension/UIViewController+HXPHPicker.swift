@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIViewController {
+public extension UIViewController {
     
     var hx_pickerController: HXPHPickerController? {
         get {

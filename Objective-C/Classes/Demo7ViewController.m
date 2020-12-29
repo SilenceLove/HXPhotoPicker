@@ -2,8 +2,8 @@
 //  Demo7ViewController.m
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2017/9/2.
-//  Copyright © 2017年 洪欣. All rights reserved.
+//  Created by Silence on 2017/9/2.
+//  Copyright © 2017年 Silence. All rights reserved.
 //
 
 #import "Demo7ViewController.h" 

@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIDevice {
+public extension UIDevice {
     var hx_isPortrait: Bool {
         get {
             let orientation = UIApplication.shared.statusBarOrientation

@@ -2,8 +2,8 @@
 //  HXPhotoTypes.h
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2020/8/3.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/8/3.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 #ifndef HXPhotoTypes_h

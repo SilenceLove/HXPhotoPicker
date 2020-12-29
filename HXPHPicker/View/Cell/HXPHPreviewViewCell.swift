@@ -173,9 +173,9 @@ class HXPHPreviewLivePhotoViewCell: HXPHPreviewViewCell {
 
 class HXPHPreviewVideoViewCell: HXPHPreviewViewCell {
     
-    var autoPlayVideo: Bool = false {
+    var videoPlayType: HXPHPicker.PreviewView.VideoPlayType = .normal  {
         didSet {
-            scrollContentView?.videoView.autoPlayVideo = autoPlayVideo
+            scrollContentView?.videoView.videoPlayType = videoPlayType
         }
     }
     

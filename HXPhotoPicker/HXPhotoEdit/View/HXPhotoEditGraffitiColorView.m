@@ -2,8 +2,8 @@
 //  HXPhotoEditGraffitiColorView.m
 //  photoEditDemo
 //
-//  Created by 洪欣 on 2020/6/20.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/6/20.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 #import "HXPhotoEditGraffitiColorView.h"

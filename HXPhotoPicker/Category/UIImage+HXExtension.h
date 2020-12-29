@@ -2,8 +2,8 @@
 //  UIImage+HXExtension.h
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 17/2/15.
-//  Copyright © 2017年 洪欣. All rights reserved.
+//  Created by Silence on 17/2/15.
+//  Copyright © 2017年 Silence. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

@@ -2,8 +2,8 @@
 //  NSString+HXExtension.m
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2019/1/10.
-//  Copyright © 2019年 洪欣. All rights reserved.
+//  Created by Silence on 2019/1/10.
+//  Copyright © 2019年 Silence. All rights reserved.
 //
 
 #import "NSString+HXExtension.h"

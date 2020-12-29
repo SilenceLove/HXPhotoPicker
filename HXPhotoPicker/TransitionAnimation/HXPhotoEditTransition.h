@@ -2,8 +2,8 @@
 //  HXPhotoEditTransition.h
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2019/1/20.
-//  Copyright © 2019年 洪欣. All rights reserved.
+//  Created by Silence on 2019/1/20.
+//  Copyright © 2019年 Silence. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

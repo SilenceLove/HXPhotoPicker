@@ -3,7 +3,7 @@
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -131,6 +131,7 @@ public class HXPHPickerBottomViewConfiguration: NSObject {
     public var disableFinishButtonWhenNotSelected: Bool = true
     
     /// 隐藏编辑按钮
+    /// 目前只支持预览界面显示
     public var editButtonHidden: Bool = true
     
     /// 编辑按钮标题颜色

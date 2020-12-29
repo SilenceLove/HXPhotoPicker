@@ -2,8 +2,8 @@
 //  UIColor+HXExtension.m
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2019/12/3.
-//  Copyright © 2019 洪欣. All rights reserved.
+//  Created by Silence on 2019/12/3.
+//  Copyright © 2019 Silence. All rights reserved.
 //
 
 #import "UIColor+HXExtension.h"

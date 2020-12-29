@@ -3,7 +3,7 @@
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -11,14 +11,14 @@ import Photos
 
 open class HXPHPreviewSelectedViewCell: UICollectionViewCell {
     
-    lazy var imageView: UIImageView = {
+    public lazy var imageView: UIImageView = {
         let imageView = UIImageView.init()
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
-    lazy var selectedView: UIView = {
+    public lazy var selectedView: UIView = {
         let selectedView = UIView.init()
         selectedView.isHidden = true
         selectedView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
@@ -26,7 +26,7 @@ open class HXPHPreviewSelectedViewCell: UICollectionViewCell {
         return selectedView
     }()
     
-    lazy var tickView: HXAlbumTickView = {
+    public lazy var tickView: HXAlbumTickView = {
         let tickView = HXAlbumTickView.init(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         return tickView
     }()

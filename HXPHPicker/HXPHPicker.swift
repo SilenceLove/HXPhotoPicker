@@ -81,6 +81,13 @@ public class HXPHPicker: NSObject {
             }
         }
     }
+    public enum PreviewView {
+        public enum VideoPlayType {
+            case normal     //!< 正常状态，不自动播放
+            case auto       //!< 自动播放
+            case once       //!< 自动播放一次
+        }
+    }
     public enum CameraAlbumLocal: String {
         case identifier = "HXCameraAlbumLocalIdentifier"
         case identifierType = "HXCameraAlbumLocalIdentifierType"
@@ -96,8 +103,8 @@ public class HXPHPicker: NSObject {
 public enum HXPickerError: LocalizedError {
     case error(message: String)
 }
-extension HXPickerError {
-    public var errorDescription: String? {
+public extension HXPickerError {
+     var errorDescription: String? {
         switch self {
             case let .error(message):
                 return message

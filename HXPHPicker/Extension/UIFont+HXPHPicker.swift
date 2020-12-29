@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIFont {
+public extension UIFont {
     
     class func hx_regularPingFang(size: CGFloat) -> UIFont {
         let font = UIFont.init(name: "PingFangSC-Regular", size: size)

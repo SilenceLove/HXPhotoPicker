@@ -3,7 +3,7 @@
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -27,15 +27,15 @@ public class HXPHPreviewViewConfiguration: NSObject {
         return config
     }()
     
-    /// 自动播放视频
-    public var autoPlayVideo: Bool = false
+    /// 视频播放类型
+    public var videoPlayType: HXPHPicker.PreviewView.VideoPlayType = .normal
     
     /// 底部视图相关配置
     public lazy var bottomView: HXPHPickerBottomViewConfiguration = {
         let config = HXPHPickerBottomViewConfiguration.init()
         config.previewButtonHidden = true
         config.disableFinishButtonWhenNotSelected = false
-        config.editButtonHidden = false
+        config.editButtonHidden = true
         config.showSelectedView = true
         return config
     }()

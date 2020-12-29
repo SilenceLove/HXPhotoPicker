@@ -2,8 +2,8 @@
 //  HXPhotoEditStickerTrashView.h
 //  photoEditDemo
 //
-//  Created by 洪欣 on 2020/6/27.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Created by Silence on 2020/6/27.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

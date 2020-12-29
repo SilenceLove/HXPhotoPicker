@@ -2,8 +2,8 @@
 //  HXPhotoBottomSelectView.h
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2019/9/30.
-//  Copyright © 2019 洪欣. All rights reserved.
+//  Created by Silence on 2019/9/30.
+//  Copyright © 2019 Silence. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

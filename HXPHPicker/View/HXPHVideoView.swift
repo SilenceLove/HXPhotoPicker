@@ -3,7 +3,7 @@
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
-//  Copyright © 2020 洪欣. All rights reserved.
+//  Copyright © 2020 Silence. All rights reserved.
 //
 
 import UIKit
@@ -56,9 +56,9 @@ class HXPHVideoView: UIView {
     var didEnterBackground: Bool = false
     var enterPlayGroundShouldPlay: Bool = false
     var canRemovePlayerObservers: Bool = false
-    var autoPlayVideo: Bool = false {
+    var videoPlayType: HXPHPicker.PreviewView.VideoPlayType = .normal  {
         didSet {
-            if autoPlayVideo {
+            if videoPlayType == .auto || videoPlayType == .once {
                 playButton.isSelected = true
             }
         }
@@ -118,7 +118,7 @@ class HXPHVideoView: UIView {
     func cancelPlayer() {
         if player.currentItem != nil {
             stopPlay()
-            if autoPlayVideo {
+            if videoPlayType == .auto || videoPlayType == .once {
                 playButton.isSelected = true
             }
             player.seek(to: CMTime.zero)
@@ -190,7 +190,7 @@ class HXPHVideoView: UIView {
             if object as? AVPlayerLayer != playerLayer {
                 return
             }
-            if self.playerLayer.isReadyForDisplay && !didEnterBackground && autoPlayVideo {
+            if self.playerLayer.isReadyForDisplay && !didEnterBackground && (videoPlayType == .auto || videoPlayType == .once) {
                 startPlay()
             }
         }
@@ -199,7 +199,8 @@ class HXPHVideoView: UIView {
     @objc func playerItemDidPlayToEndTimeNotification(notifi: Notification) {
         stopPlay()
         player.currentItem?.seek(to: CMTime.init(value: 0, timescale: 1))
-        if autoPlayVideo {
+        
+        if videoPlayType == .auto {
             startPlay()
         }
     }

@@ -522,12 +522,12 @@ extension HXPHPickerController {
                         return
                     }
                     if self.config.showImageAnimated == true {
-                        if HXPHAssetManager.assetIsAnimated(asset: photoAsset.phAsset!) {
+                        if HXPHAssetManager.isImageAnimated(for: photoAsset.phAsset!) {
                             photoAsset.mediaSubType = .imageAnimated
                         }
                     }
                     if self.config.showLivePhoto == true {
-                        if HXPHAssetManager.assetIsLivePhoto(asset: photoAsset.phAsset!) {
+                        if HXPHAssetManager.isLivePhoto(for: photoAsset.phAsset!) {
                             photoAsset.mediaSubType = .livePhoto
                         }
                     }
