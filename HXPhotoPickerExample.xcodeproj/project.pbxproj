@@ -201,6 +201,7 @@
 		7B7E3E7B1E4AACD1002234EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7A1E4AACD1002234EE /* main.m */; };
 		7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */; };
 		7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B7E3E851E4AACD1002234EE /* Assets.xcassets */; };
+		7B85F313259C62060058BF28 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7B85F312259C62060058BF28 /* Info.plist */; };
 		7B8629A2237D0F6500F8A584 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A1237D0F6500F8A584 /* QuickLook.framework */; };
 		7B8629A4237D0F6C00F8A584 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A3237D0F6C00F8A584 /* AVKit.framework */; };
 		7B8629A6237D0F7400F8A584 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A5237D0F7300F8A584 /* CoreTelephony.framework */; };
@@ -722,6 +723,7 @@
 		7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		7B7E3E851E4AACD1002234EE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B7E3E8A1E4AACD1002234EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B85F312259C62060058BF28 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B8629A1237D0F6500F8A584 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		7B8629A3237D0F6C00F8A584 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		7B8629A5237D0F7300F8A584 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
@@ -908,6 +910,7 @@
 			isa = PBXGroup;
 			children = (
 				7BA47AE2257277E500FB4D99 /* HXPHPicker.swift */,
+				7B85F312259C62060058BF28 /* Info.plist */,
 				7B1A10AB259AE758005FD62C /* Config */,
 				7B1A104F259ADB13005FD62C /* Controller */,
 				7B1A1050259ADB3D005FD62C /* View */,
@@ -1598,6 +1601,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B85F313259C62060058BF28 /* Info.plist in Resources */,
 				7B3EDECD255E185B00937B4A /* LaunchScreen.storyboard in Resources */,
 				7B151AC82593318E004962B0 /* ConfigurationViewController.xib in Resources */,
 				7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */,
