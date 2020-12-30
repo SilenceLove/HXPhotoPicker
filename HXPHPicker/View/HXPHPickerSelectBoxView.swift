@@ -55,7 +55,7 @@ public class HXPHPickerSelectBoxView: UIControl {
     }
     
     func backgroundPath() -> CGPath {
-        let strokePath = UIBezierPath.init(roundedRect: CGRect(x: 0, y: 0, width: hx_width, height: hx_height), cornerRadius: hx_height / 2)
+        let strokePath = UIBezierPath.init(roundedRect: CGRect(x: 0, y: 0, width: width, height: height), cornerRadius: height / 2)
         return strokePath.cgPath
     }
     func drawBackgroundLayer() {
@@ -78,17 +78,17 @@ public class HXPHPickerSelectBoxView: UIControl {
             textLayer.string = nil
         }
         
-        let font = UIFont.hx_mediumPingFang(size: config.titleFontSize)
+        let font = UIFont.mediumPingFang(ofSize: config.titleFontSize)
         var textHeight: CGFloat
         var textWidth: CGFloat
         if textSize.equalTo(CGSize.zero) {
-            textHeight = text.hx_stringHeight(ofFont: font, maxWidth: hx_width)
-            textWidth = text.hx_stringWidth(ofFont: font, maxHeight: textHeight)
+            textHeight = text.height(ofFont: font, maxWidth: width)
+            textWidth = text.width(ofFont: font, maxHeight: textHeight)
         }else {
             textHeight = textSize.height
             textWidth = textSize.width
         }
-        textLayer.frame = CGRect(x: (hx_width - textWidth) * 0.5, y: (hx_height - textHeight) * 0.5, width: textWidth, height: textHeight)
+        textLayer.frame = CGRect(x: (width - textWidth) * 0.5, y: (height - textHeight) * 0.5, width: textWidth, height: textHeight)
         textLayer.font = CGFont.init(font.fontName as CFString)
         textLayer.fontSize = config.titleFontSize
         textLayer.foregroundColor = HXPHManager.shared.isDark ? config.titleDarkColor.cgColor : config.titleColor.cgColor
@@ -96,9 +96,9 @@ public class HXPHPickerSelectBoxView: UIControl {
     
     func tickPath() -> CGPath {
         let tickPath = UIBezierPath.init()
-        tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
-        tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
-        tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
+        tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
+        tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))
+        tickPath.addLine(to: CGPoint(x: width - scale(7), y: scale(9)))
         return tickPath.cgPath
     }
     func drawTickLayer() {
@@ -128,11 +128,11 @@ public class HXPHPickerSelectBoxView: UIControl {
     }
     
     private func scale(_ numerator: CGFloat) -> CGFloat {
-        return numerator / 30 * hx_height
+        return numerator / 30 * height
     }
     
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if CGRect(x: -15, y: -15, width: hx_width + 30, height: hx_height + 30).contains(point) {
+        if CGRect(x: -15, y: -15, width: width + 30, height: height + 30).contains(point) {
             return self
         }
         return super.hitTest(point, with: event)

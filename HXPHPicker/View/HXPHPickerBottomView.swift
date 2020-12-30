@@ -23,7 +23,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     var config: HXPHPickerBottomViewConfiguration
     
     lazy var selectedView: HXPHPreviewSelectedView = {
-        let selectedView = HXPHPreviewSelectedView.init(frame: CGRect(x: 0, y: 0, width: hx_width, height: 70))
+        let selectedView = HXPHPreviewSelectedView.init(frame: CGRect(x: 0, y: 0, width: width, height: 70))
         if let customSelectedViewCellClass = config.customSelectedViewCellClass {
             selectedView.collectionView.register(customSelectedViewCellClass, forCellWithReuseIdentifier: NSStringFromClass(HXPHPreviewSelectedViewCell.self))
         }else {
@@ -35,7 +35,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     }()
     
     lazy var promptView: UIView = {
-        let promptView = UIView.init(frame: CGRect(x: 0, y: 0, width: hx_width, height: 70))
+        let promptView = UIView.init(frame: CGRect(x: 0, y: 0, width: width, height: 70))
         promptView.addSubview(promptIcon)
         promptView.addSubview(promptLb)
         promptView.addSubview(promptArrow)
@@ -47,27 +47,27 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     }
     lazy var promptLb: UILabel = {
         let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
-        promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".hx_localized
+        promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".localized
         promptLb.font = UIFont.systemFont(ofSize: 15)
         promptLb.numberOfLines = 0
         promptLb.adjustsFontSizeToFitWidth = true
         return promptLb
     }()
     lazy var promptIcon: UIImageView = {
-        let image = UIImage.hx_named(named: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage.image(for: "hx_picker_photolist_bottom_prompt")?.withRenderingMode(.alwaysTemplate)
         let promptIcon = UIImageView.init(image: image)
-        promptIcon.hx_size = promptIcon.image?.size ?? CGSize.zero
+        promptIcon.size = promptIcon.image?.size ?? CGSize.zero
         return promptIcon
     }()
     lazy var promptArrow: UIImageView = {
-        let image = UIImage.hx_named(named: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage.image(for: "hx_picker_photolist_bottom_prompt_arrow")?.withRenderingMode(.alwaysTemplate)
         let promptArrow = UIImageView.init(image: image)
-        promptArrow.hx_size = promptArrow.image?.size ?? CGSize.zero
+        promptArrow.size = promptArrow.image?.size ?? CGSize.zero
         return promptArrow
     }()
     
     lazy var contentView: UIView = {
-        let contentView = UIView.init(frame: CGRect(x: 0, y: 0, width: hx_width, height: 50 + UIDevice.current.hx_bottomMargin))
+        let contentView = UIView.init(frame: CGRect(x: 0, y: 0, width: width, height: 50 + UIDevice.current.bottomMargin))
         contentView.addSubview(previewBtn)
         contentView.addSubview(editBtn)
         contentView.addSubview(originalBtn)
@@ -77,14 +77,14 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     
     lazy var previewBtn: UIButton = {
         let previewBtn = UIButton.init(type: .custom)
-        previewBtn.setTitle("预览".hx_localized, for: .normal)
+        previewBtn.setTitle("预览".localized, for: .normal)
         previewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         previewBtn.isEnabled = false
         previewBtn.addTarget(self, action: #selector(didPreviewButtonClick(button:)), for: .touchUpInside)
         previewBtn.isHidden = config.previewButtonHidden
-        previewBtn.hx_height = 50
-        let previewWidth : CGFloat = previewBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
-        previewBtn.hx_width = previewWidth
+        previewBtn.height = 50
+        let previewWidth : CGFloat = previewBtn.currentTitle!.localized.width(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
+        previewBtn.width = previewWidth
         return previewBtn
     }()
     
@@ -94,13 +94,13 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     
     lazy var editBtn: UIButton = {
         let editBtn = UIButton.init(type: .custom)
-        editBtn.setTitle("编辑".hx_localized, for: .normal)
+        editBtn.setTitle("编辑".localized, for: .normal)
         editBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         editBtn.addTarget(self, action: #selector(didEditBtnButtonClick(button:)), for: .touchUpInside)
         editBtn.isHidden = config.editButtonHidden
-        editBtn.hx_height = 50
-        let editWidth : CGFloat = editBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: editBtn.titleLabel!.font, maxHeight: 50)
-        editBtn.hx_width = editWidth
+        editBtn.height = 50
+        let editWidth : CGFloat = editBtn.currentTitle!.localized.width(ofFont: editBtn.titleLabel!.font, maxHeight: 50)
+        editBtn.width = editWidth
         return editBtn
     }()
     
@@ -128,7 +128,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
             // 选中
             requestAssetBytes()
         }
-        hx_viewController()?.hx_pickerController?.isOriginal = boxControl.isSelected
+        viewController()?.pickerController?.isOriginal = boxControl.isSelected
         hx_delegate?.bottomView?(didOriginalButtonClick: self, with: boxControl.isSelected)
         boxControl.layer.removeAnimation(forKey: "SelectControlAnimation")
         let keyAnimation = CAKeyframeAnimation.init(keyPath: "transform.scale")
@@ -147,7 +147,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
             cancelRequestAssetFileSize()
             return
         }
-        if let pickerController = hx_viewController()?.hx_pickerController {
+        if let pickerController = viewController()?.pickerController {
             if pickerController.selectedAssetArray.isEmpty {
                 cancelRequestAssetFileSize()
                 return
@@ -161,13 +161,13 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
                 self.originalLoadingDelayTimer = nil
                 self.originalLoadingView.stopAnimating()
                 self.showOriginalLoadingView = false
-                self.originalTitleLb.text = "原图".hx_localized + " (" + bytesString + ")"
+                self.originalTitleLb.text = "原图".localized + " (" + bytesString + ")"
                 self.updateOriginalButtonFrame()
             }
         }
     }
     @objc func showOriginalLoading(timer: Timer) {
-        originalTitleLb.text = "原图".hx_localized
+        originalTitleLb.text = "原图".localized
         showOriginalLoadingView = true
         originalLoadingView.startAnimating()
         updateOriginalButtonFrame()
@@ -182,17 +182,17 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         }
         originalLoadingDelayTimer?.invalidate()
         originalLoadingDelayTimer = nil
-        if let pickerController = hx_viewController()?.hx_pickerController {
+        if let pickerController = viewController()?.pickerController {
             pickerController.cancelRequestAssetFileSize(isPreview: isPreview)
         }
         showOriginalLoadingView = false
         originalLoadingView.stopAnimating()
-        originalTitleLb.text = "原图".hx_localized
+        originalTitleLb.text = "原图".localized
         updateOriginalButtonFrame()
     }
     lazy var originalTitleLb: UILabel = {
         let originalTitleLb = UILabel.init()
-        originalTitleLb.text = "原图".hx_localized
+        originalTitleLb.text = "原图".localized
         originalTitleLb.font = UIFont.systemFont(ofSize: 17)
         originalTitleLb.lineBreakMode = .byTruncatingHead
         return originalTitleLb
@@ -214,8 +214,8 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     
     lazy var finishBtn: UIButton = {
         let finishBtn = UIButton.init(type: .custom)
-        finishBtn.setTitle("完成".hx_localized, for: .normal)
-        finishBtn.titleLabel?.font = UIFont.hx_mediumPingFang(size: 16)
+        finishBtn.setTitle("完成".localized, for: .normal)
+        finishBtn.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
         finishBtn.layer.cornerRadius = 3
         finishBtn.layer.masksToBounds = true
         finishBtn.isEnabled = false
@@ -305,8 +305,8 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
             let finishBtnBackgroundColor = isDark ? config.finishButtonDarkBackgroundColor : config.finishButtonBackgroundColor
             finishBtn.setTitleColor(isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor, for: .normal)
             finishBtn.setTitleColor(isDark ? config.finishButtonDisableTitleDarkColor : config.finishButtonDisableTitleColor, for: .disabled)
-            finishBtn.setBackgroundImage(UIImage.hx_image(for: finishBtnBackgroundColor, havingSize: CGSize.zero), for: .normal)
-            finishBtn.setBackgroundImage(UIImage.hx_image(for: isDark ? config.finishButtonDisableDarkBackgroundColor : config.finishButtonDisableBackgroundColor, havingSize: CGSize.zero), for: .disabled)
+            finishBtn.setBackgroundImage(UIImage.image(for: finishBtnBackgroundColor, havingSize: CGSize.zero), for: .normal)
+            finishBtn.setBackgroundImage(UIImage.image(for: isDark ? config.finishButtonDisableDarkBackgroundColor : config.finishButtonDisableBackgroundColor, havingSize: CGSize.zero), for: .disabled)
         }
         configPromptColor()
     }
@@ -324,7 +324,7 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         }
         requestAssetBytes()
         var selectCount = 0
-        if let pickerController = hx_viewController()?.hx_pickerController {
+        if let pickerController = viewController()?.pickerController {
             if pickerController.config.selectMode == .multiple {
                 selectCount = pickerController.selectedAssetArray.count
             }
@@ -332,11 +332,11 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         if selectCount > 0 {
             finishBtn.isEnabled = true
             previewBtn.isEnabled = true
-            finishBtn.setTitle("完成".hx_localized + " (" + String(format: "%d", arguments: [selectCount]) + ")", for: .normal)
+            finishBtn.setTitle("完成".localized + " (" + String(format: "%d", arguments: [selectCount]) + ")", for: .normal)
         }else {
             finishBtn.isEnabled = !config.disableFinishButtonWhenNotSelected
             previewBtn.isEnabled = false
-            finishBtn.setTitle("完成".hx_localized, for: .normal)
+            finishBtn.setTitle("完成".localized, for: .normal)
         }
         updateFinishButtonFrame()
     }
@@ -344,12 +344,12 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         if isExternalPreview {
            return
         }
-        var finishWidth : CGFloat = finishBtn.currentTitle!.hx_localized.hx_stringWidth(ofFont: finishBtn.titleLabel!.font, maxHeight: 50) + 20
+        var finishWidth : CGFloat = finishBtn.currentTitle!.localized.width(ofFont: finishBtn.titleLabel!.font, maxHeight: 50) + 20
         if finishWidth < 60 {
             finishWidth = 60
         }
-        finishBtn.frame = CGRect(x: hx_width - UIDevice.current.hx_rightMargin - finishWidth - 12, y: 0, width: finishWidth, height: 33)
-        finishBtn.hx_centerY = 25
+        finishBtn.frame = CGRect(x: width - UIDevice.current.rightMargin - finishWidth - 12, y: 0, width: finishWidth, height: 33)
+        finishBtn.centerY = 25
     }
     func updateOriginalButtonFrame() {
         if isExternalPreview {
@@ -361,12 +361,12 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         }else {
             originalBtn.frame = CGRect(x: 0, y: 0, width: originalTitleLb.frame.maxX, height: 50)
         }
-        originalBtn.hx_centerX = hx_width / 2
-        if originalBtn.frame.maxX > finishBtn.hx_x {
-            originalBtn.hx_x = finishBtn.hx_x - originalBtn.hx_width
-            if originalBtn.hx_x < previewBtn.frame.maxX + 2 {
-                originalBtn.hx_x = previewBtn.frame.maxX + 2
-                originalTitleLb.hx_width = finishBtn.hx_x - previewBtn.frame.maxX - 2 - 5 - boxControl.hx_width
+        originalBtn.centerX = width / 2
+        if originalBtn.frame.maxX > finishBtn.x {
+            originalBtn.x = finishBtn.x - originalBtn.width
+            if originalBtn.x < previewBtn.frame.maxX + 2 {
+                originalBtn.x = previewBtn.frame.maxX + 2
+                originalTitleLb.width = finishBtn.x - previewBtn.frame.maxX - 2 - 5 - boxControl.width
             }
         }
     }
@@ -374,10 +374,10 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
         if isExternalPreview {
            return
         }
-        originalTitleLb.frame = CGRect(x: boxControl.frame.maxX + 5, y: 0, width: originalTitleLb.text!.hx_stringWidth(ofFont: originalTitleLb.font, maxHeight: 50), height: 50)
-        boxControl.hx_centerY = originalTitleLb.hx_height * 0.5
-        originalLoadingView.hx_centerY = originalBtn.hx_height * 0.5
-        originalLoadingView.hx_x = originalTitleLb.frame.maxX + 3
+        originalTitleLb.frame = CGRect(x: boxControl.frame.maxX + 5, y: 0, width: originalTitleLb.text!.width(ofFont: originalTitleLb.font, maxHeight: 50), height: 50)
+        boxControl.centerY = originalTitleLb.height * 0.5
+        originalLoadingView.centerY = originalBtn.height * 0.5
+        originalLoadingView.x = originalTitleLb.frame.maxX + 3
     }
     // MARK: HXPHPreviewSelectedViewDelegate
     func selectedView(_ selectedView: HXPHPreviewSelectedView, didSelectItemAt photoAsset: HXPHAsset) {
@@ -387,39 +387,39 @@ class HXPHPickerBottomView: UIToolbar, HXPHPreviewSelectedViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         if !isExternalPreview {
-            contentView.hx_width = hx_width
-            contentView.hx_height = 50 + UIDevice.current.hx_bottomMargin
-            contentView.hx_y = hx_height - contentView.hx_height
-            previewBtn.hx_x = 12 + UIDevice.current.hx_leftMargin
-            editBtn.hx_x = previewBtn.hx_x
+            contentView.width = width
+            contentView.height = 50 + UIDevice.current.bottomMargin
+            contentView.y = height - contentView.height
+            previewBtn.x = 12 + UIDevice.current.leftMargin
+            editBtn.x = previewBtn.x
             updateFinishButtonFrame()
             updateOriginalButtonFrame()
         }
         if config.showPrompt && HXPHAssetManager.authorizationStatusIsLimited() && allowLoadPhotoLibrary && !isPreview && !isExternalPreview {
-            promptView.hx_width = hx_width
-            promptIcon.hx_x = 12 + UIDevice.current.hx_leftMargin
-            promptIcon.hx_centerY = promptView.hx_height * 0.5
-            promptArrow.hx_x = hx_width - 12 - promptArrow.hx_width - UIDevice.current.hx_rightMargin
-            promptLb.hx_x = promptIcon.frame.maxX + 12
-            promptLb.hx_width = promptArrow.hx_x - promptLb.hx_x - 12
-            promptLb.hx_centerY = promptView.hx_height * 0.5
-            promptArrow.hx_centerY = promptView.hx_height * 0.5
+            promptView.width = width
+            promptIcon.x = 12 + UIDevice.current.leftMargin
+            promptIcon.centerY = promptView.height * 0.5
+            promptArrow.x = width - 12 - promptArrow.width - UIDevice.current.rightMargin
+            promptLb.x = promptIcon.frame.maxX + 12
+            promptLb.width = promptArrow.x - promptLb.x - 12
+            promptLb.centerY = promptView.height * 0.5
+            promptArrow.centerY = promptView.height * 0.5
         }
         if isExternalPreview {
-            editBtn.hx_x = 12 + UIDevice.current.hx_leftMargin
+            editBtn.x = 12 + UIDevice.current.leftMargin
             if config.showSelectedView {
                 if !config.editButtonHidden {
-                    selectedView.hx_x = editBtn.frame.maxX + 12
-                    selectedView.hx_width = hx_width - selectedView.hx_x
-                    selectedView.collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 5, right: 12 + UIDevice.current.hx_rightMargin)
+                    selectedView.x = editBtn.frame.maxX + 12
+                    selectedView.width = width - selectedView.x
+                    selectedView.collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 5, right: 12 + UIDevice.current.rightMargin)
                 }else {
-                    selectedView.hx_width = hx_width
+                    selectedView.width = width
                 }
-                editBtn.hx_centerY = selectedView.hx_centerY
+                editBtn.centerY = selectedView.centerY
             }
         }else {
             if config.showSelectedView && isMultipleSelect {
-                selectedView.hx_width = hx_width
+                selectedView.width = width
             }
         }
     }

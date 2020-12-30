@@ -14,7 +14,7 @@ class HXPHDeniedAuthorizationView: UIView {
     
     lazy var navigationBar: UINavigationBar = {
         let navigationBar = UINavigationBar.init()
-        navigationBar.setBackgroundImage(UIImage.hx_image(for: UIColor.clear, havingSize: CGSize.zero), for: UIBarMetrics.default)
+        navigationBar.setBackgroundImage(UIImage.image(for: UIColor.clear, havingSize: CGSize.zero), for: UIBarMetrics.default)
         navigationBar.shadowImage = UIImage.init()
         let navigationItem = UINavigationItem.init()
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: closeBtn)
@@ -24,7 +24,7 @@ class HXPHDeniedAuthorizationView: UIView {
     
     lazy var closeBtn: UIButton = {
         let closeBtn = UIButton.init(type: .custom)
-        closeBtn.hx_size = CGSize(width: 50, height: 40)
+        closeBtn.size = CGSize(width: 50, height: 40)
         closeBtn.addTarget(self, action: #selector(didCloseClick), for: .touchUpInside)
         closeBtn.contentHorizontalAlignment = .left
         return closeBtn
@@ -63,14 +63,14 @@ class HXPHDeniedAuthorizationView: UIView {
         addSubview(subTitleLb)
         addSubview(jumpBtn)
         
-        titleLb.text = "无法访问相册中照片".hx_localized
-        titleLb.font = UIFont.hx_semiboldPingFang(size: 20)
+        titleLb.text = "无法访问相册中照片".localized
+        titleLb.font = UIFont.semiboldPingFang(ofSize: 20)
         
-        subTitleLb.text = "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".hx_localized
-        subTitleLb.font = UIFont.hx_regularPingFang(size: 17)
+        subTitleLb.text = "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized
+        subTitleLb.font = UIFont.regularPingFang(ofSize: 17)
         
-        jumpBtn.setTitle("前往系统设置".hx_localized, for: .normal)
-        jumpBtn.titleLabel?.font = UIFont.hx_mediumPingFang(size: 16)
+        jumpBtn.setTitle("前往系统设置".localized, for: .normal)
+        jumpBtn.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
         
         configColor()
     }
@@ -78,7 +78,7 @@ class HXPHDeniedAuthorizationView: UIView {
         let closeButtonImageName = config?.closeButtonImageName ?? "hx_picker_notAuthorized_close"
         let closeButtonDarkImageName = config?.closeButtonDarkImageName ?? "hx_picker_notAuthorized_close_dark"
         let isDark = HXPHManager.shared.isDark
-        closeBtn.setImage(UIImage.hx_named(named: isDark ? closeButtonDarkImageName : closeButtonImageName), for: .normal)
+        closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName), for: .normal)
         backgroundColor = isDark ? config?.darkBackgroundColor : config?.backgroundColor
         titleLb.textColor = isDark ? config?.titleDarkColor : config?.titleColor
         subTitleLb.textColor = isDark ? config?.darkSubTitleColor : config?.subTitleColor
@@ -86,7 +86,7 @@ class HXPHDeniedAuthorizationView: UIView {
         jumpBtn.setTitleColor(isDark ? config?.jumpButtonTitleDarkColor : config?.jumpButtonTitleColor, for: .normal)
     }
     @objc func didCloseClick() {
-        self.hx_viewController()?.dismiss(animated: true, completion: nil)
+        self.viewController()?.dismiss(animated: true, completion: nil)
     }
     @objc func jumpSetting() {
         HXPHTools.openSettingsURL()
@@ -95,27 +95,27 @@ class HXPHDeniedAuthorizationView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         var barHeight: CGFloat = 0
-        if hx_viewController()?.navigationController?.modalPresentationStyle == UIModalPresentationStyle.fullScreen {
-            barHeight = (hx_viewController()?.navigationController?.navigationBar.hx_height ?? 44) + UIDevice.current.hx_statusBarHeight
+        if viewController()?.navigationController?.modalPresentationStyle == UIModalPresentationStyle.fullScreen {
+            barHeight = (viewController()?.navigationController?.navigationBar.height ?? 44) + UIDevice.current.statusBarHeight
         }else {
-            barHeight = hx_viewController()?.navigationController?.navigationBar.hx_height ?? 44
+            barHeight = viewController()?.navigationController?.navigationBar.height ?? 44
         }
-        navigationBar.frame = CGRect(x: 0, y: 0, width: hx_width, height: barHeight)
+        navigationBar.frame = CGRect(x: 0, y: 0, width: width, height: barHeight)
         
-        let titleHeight = titleLb.text?.hx_stringHeight(ofFont: titleLb.font, maxWidth: hx_width) ?? 0
-        titleLb.frame = CGRect(x: 0, y: 0, width: hx_width, height: titleHeight)
+        let titleHeight = titleLb.text?.height(ofFont: titleLb.font, maxWidth: width) ?? 0
+        titleLb.frame = CGRect(x: 0, y: 0, width: width, height: titleHeight)
         
-        let subTitleHeight = subTitleLb.text?.hx_stringHeight(ofFont: subTitleLb.font, maxWidth: hx_width - 40) ?? 0
-        subTitleLb.frame = CGRect(x: 20, y: hx_height / 2 - subTitleHeight - 30 - UIDevice.current.hx_topMargin, width: hx_width - 40, height: subTitleHeight)
-        titleLb.hx_y = subTitleLb.hx_y - 15 - titleHeight
+        let subTitleHeight = subTitleLb.text?.height(ofFont: subTitleLb.font, maxWidth: width - 40) ?? 0
+        subTitleLb.frame = CGRect(x: 20, y: height / 2 - subTitleHeight - 30 - UIDevice.current.topMargin, width: width - 40, height: subTitleHeight)
+        titleLb.y = subTitleLb.y - 15 - titleHeight
         
         let jumpBtnBottomMargin : CGFloat = UIDevice.isProxy() ? 120 : 50
-        var jumpBtnWidth = (jumpBtn.currentTitle?.hx_stringWidth(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) ?? 0 ) + 10
+        var jumpBtnWidth = (jumpBtn.currentTitle?.width(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) ?? 0 ) + 10
         if jumpBtnWidth < 150 {
             jumpBtnWidth = 150
         }
-        jumpBtn.frame = CGRect(x: 0, y: hx_height - UIDevice.current.hx_bottomMargin - 40 - jumpBtnBottomMargin, width: jumpBtnWidth, height: 40)
-        jumpBtn.hx_centerX = hx_width * 0.5
+        jumpBtn.frame = CGRect(x: 0, y: height - UIDevice.current.bottomMargin - 40 - jumpBtnBottomMargin, width: jumpBtnWidth, height: 40)
+        jumpBtn.centerX = width * 0.5
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

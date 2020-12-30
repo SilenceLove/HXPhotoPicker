@@ -23,26 +23,26 @@ class HXAlbumTitleView: UIControl {
    var title: String? {
        didSet {
            if title == nil {
-               title = "相册".hx_localized
+               title = "相册".localized
            }
            titleLb.text = title
            updateTitleFrame()
        }
    }
    func updateTitleFrame() {
-       var titleWidth = self.title?.hx_stringWidth(ofFont: self.titleLb.font, maxHeight: self.hx_height) ?? 0
-       if titleWidth > hx_width - 40 {
-           titleWidth = hx_width - 45
+       var titleWidth = title?.width(ofFont: titleLb.font, maxHeight: height) ?? 0
+       if titleWidth > width - 40 {
+           titleWidth = width - 45
        }
        UIView.animate(withDuration: 0.25) {
-           self.titleLb.hx_width = titleWidth
-           self.arrowView.hx_x = self.titleLb.frame.maxX + 5
-           self.contentView.hx_width = self.arrowView.frame.maxX + 5
-           self.contentView.hx_centerX = self.hx_width * 0.5
+           self.titleLb.width = titleWidth
+           self.arrowView.x = self.titleLb.frame.maxX + 5
+           self.contentView.width = self.arrowView.frame.maxX + 5
+           self.contentView.centerX = self.width * 0.5
        }
    }
    func updateViewFrame() {
-       hx_size = CGSize(width: UIScreen.main.bounds.size.width * 0.5, height: 30)
+       size = CGSize(width: UIScreen.main.bounds.size.width * 0.5, height: 30)
        updateTitleFrame()
    }
    var titleColor: UIColor? {
@@ -52,9 +52,9 @@ class HXAlbumTitleView: UIControl {
    }
    
    private lazy var titleLb: UILabel = {
-       let text = "相册".hx_localized
-       let font = UIFont.hx_semiboldPingFang(size: 18)
-       let titleLb = UILabel.init(frame: CGRect(x: 10, y: 0, width: text.hx_stringWidth(ofFont: font, maxHeight: self.hx_height), height: self.hx_height))
+       let text = "相册".localized
+       let font = UIFont.semiboldPingFang(ofSize: 18)
+       let titleLb = UILabel.init(frame: CGRect(x: 10, y: 0, width: text.width(ofFont: font, maxHeight: height), height: height))
        titleLb.text = text
        titleLb.font = font
        titleLb.textAlignment = .center
@@ -70,7 +70,7 @@ class HXAlbumTitleView: UIControl {
    init(config: HXAlbumTitleViewConfiguration) {
        self.config = config
        super.init(frame: CGRect.zero)
-       hx_size = CGSize(width: UIScreen.main.bounds.size.width * 0.5, height: 30)
+       size = CGSize(width: UIScreen.main.bounds.size.width * 0.5, height: 30)
        contentView.addSubview(titleLb)
        contentView.addSubview(arrowView)
        addSubview(contentView)
@@ -79,9 +79,9 @@ class HXAlbumTitleView: UIControl {
    
    override func layoutSubviews() {
        super.layoutSubviews()
-       titleLb.hx_height = hx_height
-       arrowView.hx_centerY = titleLb.hx_centerY
-       contentView.hx_height = hx_height
+       titleLb.height = height
+       arrowView.centerY = titleLb.centerY
+       contentView.height = height
    }
    
    func configColor() {

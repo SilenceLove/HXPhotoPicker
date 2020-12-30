@@ -87,7 +87,7 @@ public class HXPHConfiguration: NSObject {
     public var navigationViewBackgroundColor: UIColor = UIColor.white
     
     /// 暗黑风格下导航控制器背景颜色
-    public var navigationViewBackgroudDarkColor: UIColor = "#2E2F30".hx_color
+    public var navigationViewBackgroudDarkColor: UIColor = "#2E2F30".color
     
     /// 导航栏样式
     public var navigationBarStyle: UIBarStyle = .default

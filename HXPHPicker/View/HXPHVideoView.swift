@@ -38,10 +38,10 @@ class HXPHVideoView: UIView {
     
     lazy var playButton: UIButton = {
         let playButton = UIButton.init(type: UIButton.ButtonType.custom)
-        playButton.setImage("hx_picker_cell_video_play".hx_image, for: UIControl.State.normal)
+        playButton.setImage("hx_picker_cell_video_play".image, for: UIControl.State.normal)
         playButton.setImage(UIImage.init(), for: UIControl.State.selected)
         playButton.addTarget(self, action: #selector(didPlayButtonClick(button:)), for: UIControl.Event.touchUpInside)
-        playButton.hx_size = playButton.currentImage!.size
+        playButton.size = playButton.currentImage!.size
         playButton.alpha = 0
         return playButton
     }()
@@ -208,8 +208,8 @@ class HXPHVideoView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         playerLayer.frame = bounds
-        playButton.hx_centerX = hx_width * 0.5
-        playButton.hx_centerY = hx_height * 0.5
+        playButton.centerX = width * 0.5
+        playButton.centerY = height * 0.5
     }
     required init?(coder: NSCoder) {
         super.init(coder: coder)

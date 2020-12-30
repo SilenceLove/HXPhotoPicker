@@ -20,7 +20,7 @@ class HXPHPreviewSelectedView: UIView, UICollectionViewDataSource, UICollectionV
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 5
         layout.minimumInteritemSpacing = 5
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.current.hx_leftMargin, bottom: 5, right: 12 + UIDevice.current.hx_rightMargin)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.current.leftMargin, bottom: 5, right: 12 + UIDevice.current.rightMargin)
         return layout
     }()
 
@@ -46,8 +46,8 @@ class HXPHPreviewSelectedView: UIView, UICollectionViewDataSource, UICollectionV
         addSubview(collectionView)
     }
     func reloadSectionInset() {
-        if hx_x == 0 {
-            collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.current.hx_leftMargin, bottom: 5, right: 12 + UIDevice.current.hx_rightMargin)
+        if x == 0 {
+            collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.current.leftMargin, bottom: 5, right: 12 + UIDevice.current.rightMargin)
         }
     }
     func reloadData(photoAssets: [HXPHAsset]) {

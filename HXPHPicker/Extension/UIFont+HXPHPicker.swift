@@ -10,17 +10,17 @@ import UIKit
 
 public extension UIFont {
     
-    class func hx_regularPingFang(size: CGFloat) -> UIFont {
+    class func regularPingFang(ofSize size: CGFloat) -> UIFont {
         let font = UIFont.init(name: "PingFangSC-Regular", size: size)
         return font ?? UIFont.systemFont(ofSize: size)
     }
     
-    class func hx_mediumPingFang(size: CGFloat) -> UIFont {
+    class func mediumPingFang(ofSize size: CGFloat) -> UIFont {
         let font = UIFont.init(name: "PingFangSC-Medium", size: size)
         return font ?? UIFont.systemFont(ofSize: size)
     }
     
-    class func hx_semiboldPingFang(size: CGFloat) -> UIFont {
+    class func semiboldPingFang(ofSize size: CGFloat) -> UIFont {
         let font = UIFont.init(name: "PingFangSC-Semibold", size: size)
         return font ?? UIFont.systemFont(ofSize: size)
     }

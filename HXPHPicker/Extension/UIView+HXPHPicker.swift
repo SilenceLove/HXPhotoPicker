@@ -9,7 +9,7 @@
 import UIKit
 
 public extension UIView {
-    var hx_x : CGFloat {
+    var x : CGFloat {
         get {
             return frame.origin.x
         }
@@ -19,7 +19,7 @@ public extension UIView {
             frame = rect
         }
     }
-    var hx_y : CGFloat {
+    var y : CGFloat {
         get {
             return frame.origin.y
         }
@@ -29,9 +29,9 @@ public extension UIView {
             frame = rect
         }
     }
-    var hx_width : CGFloat {
+    var width : CGFloat {
         get {
-            return frame.size.width
+            return frame.width
         }
         set {
             var rect = frame
@@ -39,9 +39,9 @@ public extension UIView {
             frame = rect
         }
     }
-    var hx_height : CGFloat {
+    var height : CGFloat {
         get {
-            return frame.size.height
+            return frame.height
         }
         set {
             var rect = frame
@@ -49,7 +49,7 @@ public extension UIView {
             frame = rect
         }
     }
-    var hx_size : CGSize {
+    var size : CGSize {
         get {
             return frame.size
         }
@@ -59,7 +59,7 @@ public extension UIView {
             frame = rect
         }
     }
-    var hx_centerX : CGFloat {
+    var centerX : CGFloat {
         get {
             return center.x
         }
@@ -69,7 +69,7 @@ public extension UIView {
             center = point
         }
     }
-    var hx_centerY : CGFloat {
+    var centerY : CGFloat {
         get {
             return center.y
         }
@@ -80,7 +80,7 @@ public extension UIView {
         }
     }
     
-    func hx_viewController() -> UIViewController? {
+    func viewController() -> UIViewController? {
         var next = superview
         while (next != nil) {
             let nextResponder = next?.next
@@ -232,57 +232,57 @@ public class HXPHProgressHUD: UIView {
     }
     private func updateFrame() {
         if text != nil {
-            var width = text!.hx_stringWidth(ofFont: textLb.font, maxHeight: 15)
-            if width < 60 {
-                width = 60
+            var textWidth = text!.width(ofFont: textLb.font, maxHeight: 15)
+            if textWidth < 60 {
+                textWidth = 60
             }
-            if width > hx_width - 100 {
-                width = hx_width - 100
+            if textWidth > width - 100 {
+                textWidth = width - 100
             }
-            let height = text!.hx_stringHeight(ofFont: textLb.font, maxWidth: width)
-            textLb.hx_size = CGSize(width: width, height: height)
+            let height = text!.height(ofFont: textLb.font, maxWidth: textWidth)
+            textLb.size = CGSize(width: textWidth, height: height)
         }
-        var width = textLb.hx_width + 60
-        if width < 100 {
-            width = 100
+        var textMaxWidth = textLb.width + 60
+        if textMaxWidth < 100 {
+            textMaxWidth = 100
         }
         
-        let centenrX = width / 2
-        textLb.hx_centerX = centenrX
+        let centenrX = textMaxWidth / 2
+        textLb.centerX = centenrX
         if mode == HXPHProgressHUDMode.indicator {
             indicatorView.startAnimating()
-            indicatorView.hx_centerX = centenrX
+            indicatorView.centerX = centenrX
             if text != nil {
-                textLb.hx_y = indicatorView.frame.maxY + 10
+                textLb.y = indicatorView.frame.maxY + 10
             }else {
-                textLb.hx_y = indicatorView.frame.maxY
+                textLb.y = indicatorView.frame.maxY
             }
         }else if mode == HXPHProgressHUDMode.image {
-            imageView.hx_centerX = centenrX
+            imageView.centerX = centenrX
             if text != nil {
-                textLb.hx_y = imageView.frame.maxY + 15
+                textLb.y = imageView.frame.maxY + 15
             }else {
-                textLb.hx_y = imageView.frame.maxY
+                textLb.y = imageView.frame.maxY
             }
         }else if mode == HXPHProgressHUDMode.success {
-            tickView.hx_centerX = centenrX
-            textLb.hx_y = tickView.frame.maxY
+            tickView.centerX = centenrX
+            textLb.y = tickView.frame.maxY
         }
         
-        contentView.hx_height = textLb.frame.maxY
-        contentView.hx_width = width
-        if contentView.hx_height + 40 < 100 {
-            backgroundView.hx_height = 100
+        contentView.height = textLb.frame.maxY
+        contentView.width = textMaxWidth
+        if contentView.height + 40 < 100 {
+            backgroundView.height = 100
         }else {
-            backgroundView.hx_height = contentView.hx_height + 40
+            backgroundView.height = contentView.height + 40
         }
-        if width < backgroundView.hx_height {
-            backgroundView.hx_width = backgroundView.hx_height
+        if textMaxWidth < backgroundView.height {
+            backgroundView.width = backgroundView.height
         }else {
-            backgroundView.hx_width = width
+            backgroundView.width = textMaxWidth
         }
-        contentView.center = CGPoint(x: backgroundView.hx_width * 0.5, y: backgroundView.hx_height * 0.5)
-        backgroundView.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)
+        contentView.center = CGPoint(x: backgroundView.width * 0.5, y: backgroundView.height * 0.5)
+        backgroundView.center = CGPoint(x: width * 0.5, y: height * 0.5)
         blurEffectView.frame = backgroundView.bounds
     }
     
@@ -400,7 +400,7 @@ class HXPHProgressImageView: UIView {
     }
     func drawCircle() {
         let circlePath = UIBezierPath.init()
-        circlePath.addArc(withCenter: CGPoint(x: hx_width * 0.5, y: hx_height * 0.5), radius: hx_width * 0.5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        circlePath.addArc(withCenter: CGPoint(x: width * 0.5, y: height * 0.5), radius: width * 0.5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
         circleLayer.path = circlePath.cgPath
         circleLayer.lineWidth = 1.5
         circleLayer.strokeColor = UIColor.white.cgColor
@@ -415,8 +415,8 @@ class HXPHProgressImageView: UIView {
     
     func drawExclamationPoint() {
         let linePath = UIBezierPath.init()
-        linePath.move(to: CGPoint(x: hx_width * 0.5, y: 15))
-        linePath.addLine(to: CGPoint(x: hx_width * 0.5, y: hx_height - 22))
+        linePath.move(to: CGPoint(x: width * 0.5, y: 15))
+        linePath.addLine(to: CGPoint(x: width * 0.5, y: height - 22))
         lineLayer.path = linePath.cgPath
         lineLayer.lineWidth = 2
         lineLayer.strokeColor = UIColor.white.cgColor
@@ -429,7 +429,7 @@ class HXPHProgressImageView: UIView {
 //        lineLayer.add(lineAimation, forKey: "")
         
         let pointPath = UIBezierPath.init()
-        pointPath.addArc(withCenter: CGPoint(x: hx_width * 0.5, y: hx_height - 15), radius: 1, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        pointPath.addArc(withCenter: CGPoint(x: width * 0.5, y: height - 15), radius: 1, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
         pointLayer.path = pointPath.cgPath
         pointLayer.lineWidth = 1
         pointLayer.strokeColor = UIColor.white.cgColor
@@ -442,9 +442,9 @@ class HXPHProgressImageView: UIView {
     }
     func drawTickLayer() {
         let tickPath = UIBezierPath.init()
-        tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
-        tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
-        tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
+        tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
+        tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))
+        tickPath.addLine(to: CGPoint(x: width - scale(7), y: scale(9)))
         tickLayer.path = tickPath.cgPath
         tickLayer.lineWidth = 2
         tickLayer.lineJoin = .round
@@ -453,7 +453,7 @@ class HXPHProgressImageView: UIView {
     }
     
     private func scale(_ numerator: CGFloat) -> CGFloat {
-        return numerator / 30 * hx_height
+        return numerator / 30 * height
     }
     
     

@@ -37,12 +37,12 @@ open class HXPHPickerBaseViewCell: UICollectionViewCell {
     open var canSelect = true
     
     /// 请求ID
-    var requestID: PHImageRequestID?
+    public var requestID: PHImageRequestID?
     
     open var photoAsset: HXPHAsset? {
         didSet {
             if let photoAsset = photoAsset {
-                selectedTitle = photoAsset.isSelected ? String(photoAsset.selectIndex + 1) : "0"
+                updateSelectedState(isSelected: photoAsset.isSelected, animated: false)
             }
             requestThumbnailImage()
         }
@@ -66,7 +66,7 @@ open class HXPHPickerBaseViewCell: UICollectionViewCell {
     /// 获取图片，重写此方法可以修改图片
     open func requestThumbnailImage() {
         weak var weakSelf = self
-        requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * 2, completion: { (image, photoAsset, info) in
+        requestID = photoAsset?.requestThumbnailImage(targetWidth: width * 2, completion: { (image, photoAsset, info) in
             if photoAsset == weakSelf?.photoAsset && image != nil {
                 if !(weakSelf?.firstLoadCompletion ?? true) {
                     weakSelf?.isHidden = false
@@ -87,19 +87,23 @@ open class HXPHPickerBaseViewCell: UICollectionViewCell {
     ///   - isSelected: 是否已选择
     ///   - animated: 是否需要动画效果
     open func updateSelectedState(isSelected: Bool, animated: Bool) {
-        
+        if let photoAsset = photoAsset {
+            selectedTitle = isSelected ? String(photoAsset.selectIndex + 1) : "0"
+        }
     }
     /// 布局，重写此方法修改布局
     open func layoutView() {
         imageView.frame = bounds
     }
     
-    func cancelRequest() {
+    /// 取消请求资源图片
+    public func cancelRequest() {
         if requestID != nil {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
         }
     }
+    
     open override func layoutSubviews() {
         super.layoutSubviews()
         layoutView()
@@ -116,12 +120,15 @@ open class HXPHPickerBaseViewCell: UICollectionViewCell {
 }
 
 open class HXPHPickerViewCell: HXPHPickerBaseViewCell {
+    /// 资源类型标签背景
     public lazy var assetTypeMaskView: UIView = {
         let assetTypeMaskView = UIView.init()
         assetTypeMaskView.isHidden = true
         assetTypeMaskView.layer.addSublayer(assetTypeMaskLayer)
         return assetTypeMaskView
     }()
+    
+    /// 资源类型标签背景
     public lazy var assetTypeMaskLayer: CAGradientLayer = {
         let layer = CAGradientLayer.init()
         layer.contentsScale = UIScreen.main.scale
@@ -136,20 +143,25 @@ open class HXPHPickerViewCell: HXPHPickerBaseViewCell {
         layer.borderWidth = 0.0
         return layer
     }()
+    
+    /// 资源类型标签
     public lazy var assetTypeLb: UILabel = {
         let assetTypeLb = UILabel.init()
-        assetTypeLb.font = UIFont.hx_mediumPingFang(size: 14)
+        assetTypeLb.font = UIFont.mediumPingFang(ofSize: 14)
         assetTypeLb.textColor = .white
         assetTypeLb.textAlignment = .right
         return assetTypeLb
     }()
+    
+    /// 视频图标
     public lazy var videoIcon: UIImageView = {
-        let videoIcon = UIImageView.init(image: UIImage.hx_named(named: "hx_picker_cell_video_icon"))
-        videoIcon.hx_size = videoIcon.image?.size ?? CGSize.zero
+        let videoIcon = UIImageView.init(image: UIImage.image(for: "hx_picker_cell_video_icon"))
+        videoIcon.size = videoIcon.image?.size ?? CGSize.zero
         videoIcon.isHidden = true
         return videoIcon
     }()
     
+    /// 禁用遮罩
     public lazy var disableMaskLayer: CALayer = {
         let disableMaskLayer = CALayer.init()
         disableMaskLayer.backgroundColor = UIColor.white.withAlphaComponent(0.6).cgColor
@@ -157,6 +169,8 @@ open class HXPHPickerViewCell: HXPHPickerBaseViewCell {
         disableMaskLayer.isHidden = true
         return disableMaskLayer
     }()
+    
+    /// 资源对象
     open override var photoAsset: HXPHAsset? {
         didSet {
             switch photoAsset?.mediaSubType {
@@ -180,6 +194,7 @@ open class HXPHPickerViewCell: HXPHPickerBaseViewCell {
         }
     }
     
+    /// 选中遮罩
     public lazy var selectMaskLayer: CALayer = {
         let selectMaskLayer = CALayer.init()
         selectMaskLayer.backgroundColor = UIColor.black.withAlphaComponent(0.6).cgColor
@@ -187,12 +202,16 @@ open class HXPHPickerViewCell: HXPHPickerBaseViewCell {
         selectMaskLayer.isHidden = true
         return selectMaskLayer
     }()
+    
+    /// 是否可以选择
     open override var canSelect: Bool {
         didSet {
             // 禁用遮罩
             setupDisableMask()
         }
     }
+    
+    /// 添加视图
     open override func initView() {
         super.initView()
         imageView.addSubview(assetTypeMaskView)
@@ -206,6 +225,26 @@ open class HXPHPickerViewCell: HXPHPickerBaseViewCell {
     open func setupDisableMask() {
         disableMaskLayer.isHidden = canSelect
     }
+    /// 布局
+    open override func layoutView() {
+        super.layoutView()
+        selectMaskLayer.frame = imageView.bounds
+        disableMaskLayer.frame = imageView.bounds
+        assetTypeMaskView.frame = CGRect(x: 0, y: imageView.height - 25, width: width, height: 25)
+        assetTypeMaskLayer.frame = assetTypeMaskView.bounds
+        assetTypeLb.frame = CGRect(x: 0, y: height - 19, width: width - 5, height: 18)
+        videoIcon.x = 5
+        videoIcon.y = height - videoIcon.height - 5
+        assetTypeLb.centerY = videoIcon.centerY
+    }
+    
+    /// 设置高亮时的遮罩
+    open override var isHighlighted: Bool {
+        didSet {
+            setupHighlightedMask()
+        }
+    }
+    
     /// 设置高亮遮罩
     open func setupHighlightedMask() {
         if let selected = photoAsset?.isSelected {
@@ -214,26 +253,11 @@ open class HXPHPickerViewCell: HXPHPickerBaseViewCell {
             }
         }
     }
-    open override func layoutView() {
-        super.layoutView()
-        selectMaskLayer.frame = imageView.bounds
-        disableMaskLayer.frame = imageView.bounds
-        assetTypeMaskView.frame = CGRect(x: 0, y: imageView.hx_height - 25, width: hx_width, height: 25)
-        assetTypeMaskLayer.frame = assetTypeMaskView.bounds
-        assetTypeLb.frame = CGRect(x: 0, y: hx_height - 19, width: hx_width - 5, height: 18)
-        videoIcon.hx_x = 5
-        videoIcon.hx_y = hx_height - videoIcon.hx_height - 5
-        assetTypeLb.hx_centerY = videoIcon.hx_centerY
-    }
-    
-    open override var isHighlighted: Bool {
-        didSet {
-            setupHighlightedMask()
-        }
-    }
 }
 
 open class HXPHPickerSelectableViewCell : HXPHPickerViewCell {
+    
+    /// 选择按钮
     public lazy var selectControl: HXPHPickerSelectBoxView = {
         let selectControl = HXPHPickerSelectBoxView.init()
         selectControl.backgroundColor = .clear
@@ -241,19 +265,15 @@ open class HXPHPickerSelectableViewCell : HXPHPickerViewCell {
         return selectControl
     }()
     
-    open override var photoAsset: HXPHAsset? {
-        didSet {
-            if let photoAsset = photoAsset {
-                updateSelectedState(isSelected: photoAsset.isSelected, animated: false)
-            }
-        }
-    }
+    /// 配置颜色
     open override func configColor() {
         super.configColor()
         if let config = config {
             selectControl.config = config.selectBox
         }
     }
+    
+    /// 添加视图
     open override func initView() {
         super.initView()
         contentView.addSubview(selectControl)
@@ -265,7 +285,10 @@ open class HXPHPickerSelectableViewCell : HXPHPickerViewCell {
     @objc open func didSelectControlClick(control: HXPHPickerSelectBoxView) {
         delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
     }
+    
+    /// 更新选择状态
     open override func updateSelectedState(isSelected: Bool, animated: Bool) {
+        super.updateSelectedState(isSelected: isSelected, animated: animated)
         if let photoAsset = photoAsset, let config = config {
             if Int(selectedTitle) == photoAsset.selectIndex + 1 && selectControl.isSelected == isSelected {
                 return
@@ -277,9 +300,9 @@ open class HXPHPickerSelectableViewCell : HXPHPickerViewCell {
                 selectMaskLayer.isHidden = false
                 if config.selectBox.type == .number {
                     let text = selectedTitle
-                    let font = UIFont.hx_mediumPingFang(size: config.selectBox.titleFontSize)
-                    let textHeight = text.hx_stringHeight(ofFont: font, maxWidth: boxWidth)
-                    var textWidth = text.hx_stringWidth(ofFont: font, maxHeight: textHeight)
+                    let font = UIFont.mediumPingFang(ofSize: config.selectBox.titleFontSize)
+                    let textHeight = text.height(ofFont: font, maxWidth: boxWidth)
+                    var textWidth = text.width(ofFont: font, maxHeight: textHeight)
                     selectControl.textSize = CGSize(width: textWidth, height: textHeight)
                     textWidth += boxHeight * 0.5
                     if textWidth < boxWidth {
@@ -309,13 +332,15 @@ open class HXPHPickerSelectableViewCell : HXPHPickerViewCell {
     open func updateSelectControlSize(width: CGFloat, height: CGFloat) {
         let topMargin = config?.selectBoxTopMargin ?? 5
         let rightMargin = config?.selectBoxRightMargin ?? 5
-        selectControl.frame = CGRect(x: hx_width - rightMargin - width, y: topMargin, width: width, height: height)
+        let rect = CGRect(x: self.width - rightMargin - width, y: topMargin, width: width, height: height)
+        if selectControl.frame.equalTo(rect) {
+            return
+        }
+        selectControl.frame = rect
     }
     
     open override func layoutView() {
         super.layoutView()
-        if selectControl.hx_width != hx_width - 5 - selectControl.hx_width {
-            updateSelectControlSize(width: selectControl.hx_width, height: selectControl.hx_height)
-        }
+        updateSelectControlSize(width: selectControl.width, height: selectControl.height)
     }
 }

@@ -14,7 +14,7 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
     lazy var tableView : UITableView = {
         let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
         if HXPHAssetManager.authorizationStatusIsLimited() &&
-            hx_pickerController!.config.allowLoadPhotoLibrary{
+            pickerController!.config.allowLoadPhotoLibrary{
             tableView.tableHeaderView = promptLb
         }
         tableView.dataSource = self;
@@ -31,7 +31,7 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
     }()
     lazy var promptLb: UILabel = {
         let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
-        promptLb.text = "只能查看允许访问的照片和相关相册".hx_localized
+        promptLb.text = "只能查看允许访问的照片和相关相册".localized
         promptLb.textAlignment = .center
         promptLb.font = UIFont.systemFont(ofSize: 14)
         promptLb.adjustsFontSizeToFitWidth = true
@@ -59,10 +59,10 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
-        config = hx_pickerController!.config.albumList
-        title = "返回".hx_localized
+        config = pickerController!.config.albumList
+        title = "返回".localized
         navigationItem.titleView = titleLabel
-        let backItem = UIBarButtonItem.init(title: "取消".hx_localized, style: .done, target: self, action: #selector(didCancelItemClick))
+        let backItem = UIBarButtonItem.init(title: "取消".localized, style: .done, target: self, action: #selector(didCancelItemClick))
         navigationItem.rightBarButtonItem = backItem
         view.addSubview(tableView)
         configColor()
@@ -74,26 +74,26 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
         tableView.backgroundColor = isDark ? config!.backgroundDarkColor : config!.backgroundColor
         view.backgroundColor = isDark ? config!.backgroundDarkColor : config!.backgroundColor
         promptLb.textColor = isDark ? config!.limitedStatusPromptDarkColor : config!.limitedStatusPromptColor
-        titleLabel.textColor = isDark ? hx_pickerController?.config.navigationTitleDarkColor : hx_pickerController?.config.navigationTitleColor
+        titleLabel.textColor = isDark ? pickerController?.config.navigationTitleDarkColor : pickerController?.config.navigationTitleColor
     }
     @objc func deviceOrientationChanged(notify: Notification) {
         beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
         orientationDidChange = true
     }
     func fetchCameraAssetCollection() {
-        if hx_pickerController?.cameraAssetCollection != nil {
-            self.pushPhotoPickerController(assetCollection: hx_pickerController?.cameraAssetCollection, animated: false)
+        if pickerController?.cameraAssetCollection != nil {
+            self.pushPhotoPickerController(assetCollection: pickerController?.cameraAssetCollection, animated: false)
             self.canFetchAssetCollections = true
-            titleLabel.text = "相册".hx_localized
+            titleLabel.text = "相册".localized
         }else {
             weak var weakSelf = self
-            hx_pickerController?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
+            pickerController?.fetchCameraAssetCollectionCompletion = { (assetCollection) in
                 var cameraAssetCollection = assetCollection
                 if cameraAssetCollection == nil {
-                    cameraAssetCollection = HXPHAssetCollection.init(albumName: weakSelf?.config?.emptyAlbumName.hx_localized, coverImage: weakSelf?.config!.emptyCoverImageName.hx_image)
+                    cameraAssetCollection = HXPHAssetCollection.init(albumName: weakSelf?.config?.emptyAlbumName.localized, coverImage: weakSelf?.config!.emptyCoverImageName.image)
                 }
                 weakSelf?.canFetchAssetCollections = true
-                weakSelf?.titleLabel.text = "相册".hx_localized
+                weakSelf?.titleLabel.text = "相册".localized
                 if weakSelf?.navigationController?.topViewController is HXPHPickerViewController {
                     let vc = weakSelf?.navigationController?.topViewController as! HXPHPickerViewController
                     vc.changedAssetCollection(collection: cameraAssetCollection)
@@ -106,9 +106,9 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
     
     func fetchAssetCollections() {
         _ = HXPHProgressHUD.showLoadingHUD(addedTo: view, animated: true)
-        hx_pickerController?.fetchAssetCollections()
+        pickerController?.fetchAssetCollections()
         weak var weakSelf = self
-        hx_pickerController?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
+        pickerController?.fetchAssetCollectionsCompletion = { (assetCollectionsArray) in
             weakSelf?.reloadTableView(assetCollectionsArray: assetCollectionsArray)
             HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: true)
         }
@@ -116,14 +116,14 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
     func reloadTableView(assetCollectionsArray: [HXPHAssetCollection]) {
         self.assetCollectionsArray = assetCollectionsArray
         if self.assetCollectionsArray.isEmpty {
-            let assetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName.hx_localized, coverImage: self.config!.emptyCoverImageName.hx_image)
+            let assetCollection = HXPHAssetCollection.init(albumName: self.config?.emptyAlbumName.localized, coverImage: self.config!.emptyCoverImageName.image)
             self.assetCollectionsArray.append(assetCollection)
         }
         self.tableView.reloadData()
     }
     func updatePrompt() {
         if HXPHAssetManager.authorizationStatusIsLimited() &&
-            hx_pickerController!.config.allowLoadPhotoLibrary {
+            pickerController!.config.allowLoadPhotoLibrary {
             tableView.tableHeaderView = promptLb
         }
     }
@@ -135,7 +135,7 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     @objc func didCancelItemClick() {
-        hx_pickerController?.cancelCallback()
+        pickerController?.cancelCallback()
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -164,19 +164,19 @@ public class HXAlbumViewController: UIViewController, UITableViewDataSource, UIT
     
     func changeSubviewFrame() {
         if HXPHAssetManager.authorizationStatusIsLimited() {
-            promptLb.hx_width = view.hx_width
+            promptLb.width = view.width
         }
-        var titleWidth = titleLabel.text?.hx_stringWidth(ofFont: titleLabel.font, maxHeight: 30) ?? 0
-        if titleWidth > view.hx_width * 0.6 {
-            titleWidth = view.hx_width * 0.6
+        var titleWidth = titleLabel.text?.width(ofFont: titleLabel.font, maxHeight: 30) ?? 0
+        if titleWidth > view.width * 0.6 {
+            titleWidth = view.width * 0.6
         }
-        titleLabel.hx_size = CGSize(width: titleWidth, height: 30)
-        let margin: CGFloat = UIDevice.current.hx_leftMargin
-        tableView.frame = CGRect(x: margin, y: 0, width: view.hx_width - 2 * margin, height: view.hx_height)
-        if navigationController?.modalPresentationStyle == .fullScreen && UIDevice.current.hx_isPortrait {
-            tableView.contentInset = UIEdgeInsets.init(top: UIDevice.current.hx_navigationBarHeight, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
+        titleLabel.size = CGSize(width: titleWidth, height: 30)
+        let margin: CGFloat = UIDevice.current.leftMargin
+        tableView.frame = CGRect(x: margin, y: 0, width: view.width - 2 * margin, height: view.height)
+        if navigationController?.modalPresentationStyle == .fullScreen && UIDevice.current.isPortrait {
+            tableView.contentInset = UIEdgeInsets.init(top: UIDevice.current.navigationBarHeight, left: 0, bottom: UIDevice.current.bottomMargin, right: 0)
         }else {
-            tableView.contentInset = UIEdgeInsets.init(top: navigationController!.navigationBar.hx_height, left: 0, bottom: UIDevice.current.hx_bottomMargin, right: 0)
+            tableView.contentInset = UIEdgeInsets.init(top: navigationController!.navigationBar.height, left: 0, bottom: UIDevice.current.bottomMargin, right: 0)
         }
         if orientationDidChange {
             if !assetCollectionsArray.isEmpty {

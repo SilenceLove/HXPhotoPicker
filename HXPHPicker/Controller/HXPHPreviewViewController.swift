@@ -70,10 +70,10 @@ public class HXPHPreviewViewController: UIViewController {
         let bottomView = HXPHPickerBottomView.init(config: config.bottomView, allowLoadPhotoLibrary: allowLoadPhotoLibrary, isMultipleSelect: isMultipleSelect, isPreview: true, isExternalPreview: isExternalPreview) 
         bottomView.hx_delegate = self
         if config.bottomView.showSelectedView && (isMultipleSelect || isExternalPreview) {
-            bottomView.selectedView.reloadData(photoAssets: hx_pickerController!.selectedAssetArray)
+            bottomView.selectedView.reloadData(photoAssets: pickerController!.selectedAssetArray)
         }
         if !isExternalPreview {
-            bottomView.boxControl.isSelected = hx_pickerController!.isOriginal
+            bottomView.boxControl.isSelected = pickerController!.isOriginal
             bottomView.requestAssetBytes()
         }
         return bottomView
@@ -89,12 +89,12 @@ public class HXPHPreviewViewController: UIViewController {
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let margin : CGFloat = 20
-        let itemWidth = view.hx_width + margin;
+        let itemWidth = view.width + margin;
         collectionViewLayout.minimumLineSpacing = margin
-        collectionViewLayout.itemSize = view.hx_size
-        let contentWidth = (view.hx_width + itemWidth) * CGFloat(previewAssets.count)
-        collectionView.frame = CGRect(x: -(margin * 0.5), y: 0, width: itemWidth, height: view.hx_height)
-        collectionView.contentSize = CGSize(width: contentWidth, height: view.hx_height)
+        collectionViewLayout.itemSize = view.size
+        let contentWidth = (view.width + itemWidth) * CGFloat(previewAssets.count)
+        collectionView.frame = CGRect(x: -(margin * 0.5), y: 0, width: itemWidth, height: view.height)
+        collectionView.contentSize = CGSize(width: contentWidth, height: view.height)
         collectionView.setContentOffset(CGPoint(x: CGFloat(currentPreviewIndex) * itemWidth, y: 0), animated: false)
         DispatchQueue.main.async {
             if self.orientationDidChange {
@@ -116,15 +116,15 @@ public class HXPHPreviewViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        isMultipleSelect = hx_pickerController?.config.selectMode == .multiple
-        allowLoadPhotoLibrary = hx_pickerController?.config.allowLoadPhotoLibrary ?? true
+        isMultipleSelect = pickerController?.config.selectMode == .multiple
+        allowLoadPhotoLibrary = pickerController?.config.allowLoadPhotoLibrary ?? true
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
         view.clipsToBounds = true
-        config = hx_pickerController!.config.previewView
+        config = pickerController!.config.previewView
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationChanged(notify:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
         initView()
-        if hx_pickerController?.modalPresentationStyle == .fullScreen {
+        if pickerController?.modalPresentationStyle == .fullScreen {
             interactiveTransition = HXPHPickerInteractiveTransition.init(panGestureRecognizerFor: self, type: .pop)
         }
     }
@@ -142,7 +142,7 @@ public class HXPHPreviewViewController: UIViewController {
         return .fade
     }
     public override var preferredStatusBarStyle: UIStatusBarStyle {
-        return hx_pickerController?.config.statusBarStyle ?? .default
+        return pickerController?.config.statusBarStyle ?? .default
     }
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -166,8 +166,8 @@ extension HXPHPreviewViewController {
         view.addSubview(bottomView)
         bottomView.updateFinishButtonTitle()
         if isMultipleSelect || isExternalPreview {
-            if !hx_pickerController!.config.allowSelectedTogether && hx_pickerController!.config.maximumSelectedVideoCount == 1 &&
-                hx_pickerController!.config.selectType == .any{
+            if !pickerController!.config.allowSelectedTogether && pickerController!.config.maximumSelectedVideoCount == 1 &&
+                pickerController!.config.selectType == .any{
                 videoLoadSingleCell = true
             }
             if !isExternalPreview {
@@ -176,9 +176,9 @@ extension HXPHPreviewViewController {
                 var cancelItem: UIBarButtonItem
                 if config.cancelType == .image {
                     let isDark = HXPHManager.shared.isDark
-                    cancelItem = UIBarButtonItem.init(image: UIImage.hx_named(named: isDark ? config.cancelDarkImageName : config.cancelImageName), style: .done, target: self, action: #selector(didCancelItemClick))
+                    cancelItem = UIBarButtonItem.init(image: UIImage.image(for: isDark ? config.cancelDarkImageName : config.cancelImageName), style: .done, target: self, action: #selector(didCancelItemClick))
                 }else {
-                    cancelItem = UIBarButtonItem.init(title: "取消".hx_localized, style: .done, target: self, action: #selector(didCancelItemClick))
+                    cancelItem = UIBarButtonItem.init(title: "取消".localized, style: .done, target: self, action: #selector(didCancelItemClick))
                 }
                 if config.cancelPosition == .left {
                     navigationItem.leftBarButtonItem = cancelItem
@@ -207,21 +207,21 @@ extension HXPHPreviewViewController {
     func configBottomViewFrame() {
         var bottomHeight: CGFloat
         if isExternalPreview {
-            bottomHeight = (hx_pickerController?.selectedAssetArray.isEmpty ?? true) ? 0 : UIDevice.current.hx_bottomMargin + 70
+            bottomHeight = (pickerController?.selectedAssetArray.isEmpty ?? true) ? 0 : UIDevice.current.bottomMargin + 70
             if !config.bottomView.showSelectedView && config.bottomView.editButtonHidden {
                 if config.bottomView.editButtonHidden {
                     bottomHeight = 0
                 }else {
-                    bottomHeight = UIDevice.current.hx_bottomMargin + 50
+                    bottomHeight = UIDevice.current.bottomMargin + 50
                 }
             }
         }else {
-            bottomHeight = hx_pickerController?.selectedAssetArray.isEmpty ?? true ? 50 + UIDevice.current.hx_bottomMargin : 50 + UIDevice.current.hx_bottomMargin + 70
+            bottomHeight = pickerController?.selectedAssetArray.isEmpty ?? true ? 50 + UIDevice.current.bottomMargin : 50 + UIDevice.current.bottomMargin + 70
             if !config.bottomView.showSelectedView || !isMultipleSelect {
-                bottomHeight = 50 + UIDevice.current.hx_bottomMargin
+                bottomHeight = 50 + UIDevice.current.bottomMargin
             }
         }
-        bottomView.frame = CGRect(x: 0, y: view.hx_height - bottomHeight, width: view.hx_width, height: bottomHeight)
+        bottomView.frame = CGRect(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
     }
     func configColor() {
         view.backgroundColor = HXPHManager.shared.isDark ? config.backgroundDarkColor : config.backgroundColor
@@ -248,13 +248,13 @@ extension HXPHPreviewViewController {
             return
         }
         let photoAsset = previewAssets[currentPreviewIndex]
-        if let shouldDelete = hx_pickerController?.previewShouldDeleteAsset(photoAsset: photoAsset, index: currentPreviewIndex), !shouldDelete {
+        if let shouldDelete = pickerController?.previewShouldDeleteAsset(photoAsset: photoAsset, index: currentPreviewIndex), !shouldDelete {
             return
         }
         previewAssets.remove(at: currentPreviewIndex)
         collectionView.deleteItems(at: [IndexPath.init(item: currentPreviewIndex, section: 0)])
         bottomView.selectedView.removePhotoAsset(photoAsset: photoAsset)
-        hx_pickerController?.previewDidDeleteAsset(photoAsset: photoAsset, index: currentPreviewIndex)
+        pickerController?.previewDidDeleteAsset(photoAsset: photoAsset, index: currentPreviewIndex)
         if previewAssets.isEmpty {
             didCancelItemClick()
             return
@@ -271,7 +271,7 @@ extension HXPHPreviewViewController {
 extension HXPHPreviewViewController {
     
     @objc func didCancelItemClick() {
-        hx_pickerController?.cancelCallback()
+        pickerController?.cancelCallback()
         dismiss(animated: true, completion: nil)
     }
     @objc func didSelectBoxControlClick() {
@@ -279,10 +279,10 @@ extension HXPHPreviewViewController {
         let photoAsset = previewAssets[currentPreviewIndex]
         var canUpdate = false
         var bottomNeedAnimated = false
-        let beforeIsEmpty = hx_pickerController!.selectedAssetArray.isEmpty
+        let beforeIsEmpty = pickerController!.selectedAssetArray.isEmpty
         if isSelected {
             // 选中
-            if hx_pickerController!.addedPhotoAsset(photoAsset: photoAsset) {
+            if pickerController!.addedPhotoAsset(photoAsset: photoAsset) {
                 canUpdate = true
                 if config.bottomView.showSelectedView && isMultipleSelect {
                     bottomView.selectedView.insertPhotoAsset(photoAsset: photoAsset)
@@ -293,8 +293,8 @@ extension HXPHPreviewViewController {
             }
         }else {
             // 取消选中
-            _ = hx_pickerController?.removePhotoAsset(photoAsset: photoAsset)
-            if !beforeIsEmpty && hx_pickerController!.selectedAssetArray.isEmpty {
+            _ = pickerController?.removePhotoAsset(photoAsset: photoAsset)
+            if !beforeIsEmpty && pickerController!.selectedAssetArray.isEmpty {
                 bottomNeedAnimated = true
             }
             if config.bottomView.showSelectedView && isMultipleSelect {
@@ -331,21 +331,21 @@ extension HXPHPreviewViewController {
         if isSelected {
             if config.selectBox.type == .number {
                 let text = String(format: "%d", arguments: [photoAsset.selectIndex + 1])
-                let font = UIFont.hx_mediumPingFang(size: config!.selectBox.titleFontSize)
-                let textHeight = text.hx_stringHeight(ofFont: font, maxWidth: boxWidth)
-                var textWidth = text.hx_stringWidth(ofFont: font, maxHeight: textHeight)
+                let font = UIFont.mediumPingFang(ofSize: config!.selectBox.titleFontSize)
+                let textHeight = text.height(ofFont: font, maxWidth: boxWidth)
+                var textWidth = text.width(ofFont: font, maxHeight: textHeight)
                 selectBoxControl.textSize = CGSize(width: textWidth, height: textHeight)
                 textWidth += boxHeight * 0.5
                 if textWidth < boxWidth {
                     textWidth = boxWidth
                 }
                 selectBoxControl.text = text
-                selectBoxControl.hx_size = CGSize(width: textWidth, height: boxHeight)
+                selectBoxControl.size = CGSize(width: textWidth, height: boxHeight)
             }else {
-                selectBoxControl.hx_size = CGSize(width: boxWidth, height: boxHeight)
+                selectBoxControl.size = CGSize(width: boxWidth, height: boxHeight)
             }
         }else {
-            selectBoxControl.hx_size = CGSize(width: boxWidth, height: boxHeight)
+            selectBoxControl.size = CGSize(width: boxWidth, height: boxHeight)
         }
     }
 }
@@ -392,9 +392,9 @@ extension HXPHPreviewViewController: UICollectionViewDelegate {
         if scrollView != collectionView || orientationDidChange {
             return
         }
-        let offsetX = scrollView.contentOffset.x  + (view.hx_width + 20) * 0.5
-        let width = view.hx_width + 20
-        var currentIndex = Int(offsetX / width)
+        let offsetX = scrollView.contentOffset.x  + (view.width + 20) * 0.5
+        let viewWidth = view.width + 20
+        var currentIndex = Int(offsetX / viewWidth)
         if currentIndex > previewAssets.count - 1 {
             currentIndex = previewAssets.count - 1
         }
@@ -415,14 +415,14 @@ extension HXPHPreviewViewController: UICollectionViewDelegate {
             if !firstLayoutSubviews && config.bottomView.showSelectedView && (isMultipleSelect || isExternalPreview) {
                 bottomView.selectedView.scrollTo(photoAsset: photoAsset)
             }
-            if let pickerController = hx_pickerController, !config.bottomView.editButtonHidden {
+            if let pickerController = pickerController, !config.bottomView.editButtonHidden {
                 if photoAsset.mediaType == .photo {
                     bottomView.editBtn.isEnabled = pickerController.config.allowEditPhoto
                 }else if photoAsset.mediaType == .video {
                     bottomView.editBtn.isEnabled = pickerController.config.allowEditVideo
                 }
             }
-            hx_pickerController?.previewUpdateCurrentlyDisplayedAsset(photoAsset: photoAsset, index: currentIndex)
+            pickerController?.previewUpdateCurrentlyDisplayedAsset(photoAsset: photoAsset, index: currentIndex)
         }
         self.currentPreviewIndex = currentIndex
     }
@@ -499,7 +499,7 @@ extension HXPHPreviewViewController: HXPHPickerBottomViewDelegate {
     
     func bottomView(didEditButtonClick view: HXPHPickerBottomView) {
         let photoAsset = previewAssets[currentPreviewIndex]
-        if let shouldEditAsset = hx_pickerController?.shouldEditAsset(photoAsset: photoAsset) {
+        if let shouldEditAsset = pickerController?.shouldEditAsset(photoAsset: photoAsset) {
             if !shouldEditAsset {
                 return
             }
@@ -507,22 +507,22 @@ extension HXPHPreviewViewController: HXPHPickerBottomViewDelegate {
     }
     func bottomView(didFinishButtonClick view: HXPHPickerBottomView) {
         if previewAssets.isEmpty {
-            HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "没有可选资源".hx_localized, animated: true, delay: 2)
+            HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "没有可选资源".localized, animated: true, delay: 2)
             return
         }
         let photoAsset = previewAssets[currentPreviewIndex]
-        if hx_pickerController!.config.selectMode == .multiple {
-            if hx_pickerController!.selectedAssetArray.isEmpty {
-                _ = hx_pickerController?.addedPhotoAsset(photoAsset: photoAsset)
+        if pickerController!.config.selectMode == .multiple {
+            if pickerController!.selectedAssetArray.isEmpty {
+                _ = pickerController?.addedPhotoAsset(photoAsset: photoAsset)
             }
-            hx_pickerController?.finishCallback()
+            pickerController?.finishCallback()
         }else {
-            hx_pickerController?.singleFinishCallback(for: photoAsset)
+            pickerController?.singleFinishCallback(for: photoAsset)
         }
     }
     func bottomView(didOriginalButtonClick view: HXPHPickerBottomView, with isOriginal: Bool) {
         delegate?.previewViewController(self, didOriginalButton: isOriginal)
-        hx_pickerController?.originalButtonCallback()
+        pickerController?.originalButtonCallback()
     }
     func bottomView(_ bottomView: HXPHPickerBottomView, didSelectedItemAt photoAsset: HXPHAsset) {
         if previewAssets.contains(photoAsset) {

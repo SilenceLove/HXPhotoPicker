@@ -24,6 +24,12 @@ let package = Package(
         .target(
             name: "HXPHPicker",
             dependencies: [],
-            path: "HXPHPicker/"),
+            path: "HXPHPicker/",
+            resources: [
+                .copy("Resources")
+            ],
+            swiftSettings: [
+                .define("HXPHPICKER_ENABLE_SPM")
+            ]),
     ]
 )

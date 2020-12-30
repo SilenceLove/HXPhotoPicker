@@ -13,9 +13,9 @@ public class HXAlbumTickView: UIView {
         let tickLayer = CAShapeLayer.init()
         tickLayer.contentsScale = UIScreen.main.scale
         let tickPath = UIBezierPath.init()
-        tickPath.move(to: CGPoint(x: scale(8), y: hx_height * 0.5 + scale(1)))
-        tickPath.addLine(to: CGPoint(x: hx_width * 0.5 - scale(2), y: hx_height - scale(8)))
-        tickPath.addLine(to: CGPoint(x: hx_width - scale(7), y: scale(9)))
+        tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
+        tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))
+        tickPath.addLine(to: CGPoint(x: width - scale(7), y: scale(9)))
         tickLayer.path = tickPath.cgPath
         tickLayer.lineWidth = 1.5
         tickLayer.strokeColor = UIColor.black.cgColor
@@ -28,7 +28,7 @@ public class HXAlbumTickView: UIView {
     }
     
     private func scale(_ numerator: CGFloat) -> CGFloat {
-        return numerator / 30 * hx_height
+        return numerator / 30 * height
     }
     
     required init?(coder: NSCoder) {

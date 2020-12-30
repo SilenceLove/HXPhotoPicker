@@ -19,21 +19,21 @@ public class HXAlbumTitleViewConfiguration: NSObject {
     
     /// 箭头背景颜色
     public lazy var arrowBackgroundColor: UIColor = {
-        return "#333333".hx_color
+        return "#333333".color
     }()
     
     /// 箭头颜色
     public lazy var arrowColor: UIColor = {
-        return "#ffffff".hx_color
+        return "#ffffff".color
     }()
     
     /// 暗黑风格下箭头背景颜色
     public lazy var arrowBackgroudDarkColor: UIColor = {
-        return "#ffffff".hx_color
+        return "#ffffff".color
     }()
     
     /// 暗黑风格下箭头颜色
     public lazy var arrowDarkColor: UIColor = {
-        return "#333333".hx_color
+        return "#333333".color
     }()
 }

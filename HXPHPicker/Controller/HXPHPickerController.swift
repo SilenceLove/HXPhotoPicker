@@ -173,7 +173,7 @@ open class HXPHPickerController: UINavigationController {
     /// 使用其他相机拍摄完之后调用此方法添加
     /// - Parameter photoAsset: 对应的 HXPHAsset 数据
     public func addedCameraPhotoAsset(_ photoAsset: HXPHAsset) {
-        hx_pickerController?.addedCameraPhotoAsset(photoAsset)
+        pickerViewController()?.addedCameraPhotoAsset(photoAsset)
         if topViewController is HXPHPreviewViewController {
             previewViewController()?.addedCameraPhotoAsset(photoAsset)
         }
@@ -366,7 +366,7 @@ extension HXPHPickerController {
     func fetchCameraAssetCollection() {
         if !config.allowLoadPhotoLibrary {
             if cameraAssetCollection == nil {
-                cameraAssetCollection = HXPHAssetCollection.init(albumName: config.albumList.emptyAlbumName.hx_localized, coverImage: config.albumList.emptyCoverImageName.hx_image)
+                cameraAssetCollection = HXPHAssetCollection.init(albumName: config.albumList.emptyAlbumName.localized, coverImage: config.albumList.emptyCoverImageName.image)
             }
             fetchCameraAssetCollectionCompletion?(cameraAssetCollection)
             return
@@ -376,7 +376,7 @@ extension HXPHPickerController {
         }
         HXPHManager.shared.fetchCameraAssetCollection(for: selectType ?? .any, options: options) { (assetCollection) in
             if assetCollection.count == 0 {
-                self.cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config.albumList.emptyAlbumName.hx_localized, coverImage: self.config.albumList.emptyCoverImageName.hx_image)
+                self.cameraAssetCollection = HXPHAssetCollection.init(albumName: self.config.albumList.emptyAlbumName.localized, coverImage: self.config.albumList.emptyCoverImageName.image)
             }else {
                 // 获取封面
                 self.cameraAssetCollection = assetCollection
@@ -726,60 +726,60 @@ extension HXPHPickerController {
         if photoAsset.mediaType == .photo {
             if config.maximumSelectedPhotoFileSize > 0 {
                 if photoAsset.fileSize > config.maximumSelectedPhotoFileSize {
-                    text = "照片大小超过最大限制".hx_localized + HXPHTools.transformBytesToString(bytes: config.maximumSelectedPhotoFileSize)
+                    text = "照片大小超过最大限制".localized + HXPHTools.transformBytesToString(bytes: config.maximumSelectedPhotoFileSize)
                     canSelect = false
                 }
             }
             if !config.allowSelectedTogether {
                 if selectedVideoAssetArray.count > 0 {
-                    text = "照片和视频不能同时选择".hx_localized
+                    text = "照片和视频不能同时选择".localized
                     canSelect = false
                 }
             }
             if config.maximumSelectedPhotoCount > 0 {
                 if selectedPhotoAssetArray.count >= config.maximumSelectedPhotoCount {
-                    text = String.init(format: "最多只能选择%d张照片".hx_localized, arguments: [config.maximumSelectedPhotoCount])
+                    text = String.init(format: "最多只能选择%d张照片".localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }else {
                 if selectedAssetArray.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
-                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectedPhotoCount])
+                    text = String.init(format: "已达到最大选择数".localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }
         }else if photoAsset.mediaType == .video {
             if config.maximumSelectedVideoFileSize > 0 {
                 if photoAsset.fileSize > config.maximumSelectedVideoFileSize {
-                    text = "视频大小超过最大限制".hx_localized + HXPHTools.transformBytesToString(bytes: config.maximumSelectedVideoFileSize)
+                    text = "视频大小超过最大限制".localized + HXPHTools.transformBytesToString(bytes: config.maximumSelectedVideoFileSize)
                     canSelect = false
                 }
             }
             if config.maximumSelectedVideoDuration > 0 {
                 if round(photoAsset.videoDuration) > Double(config.maximumSelectedVideoDuration) {
-                    text = String.init(format: "视频最大时长为%d秒，无法选择".hx_localized, arguments: [config.maximumSelectedVideoDuration])
+                    text = String.init(format: "视频最大时长为%d秒，无法选择".localized, arguments: [config.maximumSelectedVideoDuration])
                     canSelect = false
                 }
             }
             if config.minimumSelectedVideoDuration > 0 {
                 if photoAsset.videoDuration < Double(config.minimumSelectedVideoDuration) {
-                    text = String.init(format: "视频最小时长为%d秒，无法选择".hx_localized, arguments: [config.minimumSelectedVideoDuration])
+                    text = String.init(format: "视频最小时长为%d秒，无法选择".localized, arguments: [config.minimumSelectedVideoDuration])
                     canSelect = false
                 }
             }
             if !config.allowSelectedTogether {
                 if selectedPhotoAssetArray.count > 0 {
-                    text = "视频和照片不能同时选择".hx_localized
+                    text = "视频和照片不能同时选择".localized
                     canSelect = false
                 }
             }
             if config.maximumSelectedVideoCount > 0 {
                 if selectedVideoAssetArray.count >= config.maximumSelectedVideoCount {
-                    text = String.init(format: "最多只能选择%d个视频".hx_localized, arguments: [config.maximumSelectedPhotoCount])
+                    text = String.init(format: "最多只能选择%d个视频".localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }else {
                 if selectedAssetArray.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
-                    text = String.init(format: "已达到最大选择数".hx_localized, arguments: [config.maximumSelectedPhotoCount])
+                    text = String.init(format: "已达到最大选择数".localized, arguments: [config.maximumSelectedPhotoCount])
                     canSelect = false
                 }
             }
@@ -944,7 +944,7 @@ extension HXPHPickerController: PHPhotoLibraryChangeObserver {
                 let result = changeResult!.fetchResultAfterChanges
                 assetCollection.changeResult(for: result)
                 if assetCollection == self.cameraAssetCollection && result.count == 0 {
-                    assetCollection.change(albumName: self.config.albumList.emptyAlbumName.hx_localized, coverImage: self.config.albumList.emptyCoverImageName.hx_image)
+                    assetCollection.change(albumName: self.config.albumList.emptyAlbumName.localized, coverImage: self.config.albumList.emptyCoverImageName.image)
                     assetCollection.count = 0
                     assetCollection.coverAsset = nil
                 }else {

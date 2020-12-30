@@ -42,7 +42,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     var config: HXPHConfiguration = HXPHTools.getWXConfig()
     
     weak var previewTitleLabel: UILabel?
-    weak var pickerController: HXPHPickerController?
+    weak var currentPickerController: HXPHPickerController?
     
     init() {
         super.init(nibName:"BaseViewController",bundle: nil)
@@ -102,7 +102,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let flowLayout: UICollectionViewFlowLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        let itemWidth = Int((view.hx_width - 24 - 2) / 3)
+        let itemWidth = Int((view.width - 24 - 2) / 3)
         flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         flowLayout.minimumInteritemSpacing = 1
         flowLayout.minimumLineSpacing = 1
@@ -120,12 +120,12 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     func configCollectionViewHeight() {
         let rowCount = getCollectionViewrowCount()
         beforeRowCount = rowCount
-        let itemWidth = Int((view.hx_width - 24 - 2) / 3)
-        var height = CGFloat(rowCount * itemWidth + rowCount)
-        if height > view.hx_height - UIDevice.current.hx_navigationBarHeight - 20 - 150 {
-            height = view.hx_height - UIDevice.current.hx_navigationBarHeight - 20 - 150
+        let itemWidth = Int((view.width - 24 - 2) / 3)
+        var heightConstraint = CGFloat(rowCount * itemWidth + rowCount)
+        if heightConstraint > view.height - UIDevice.current.navigationBarHeight - 20 - 150 {
+            heightConstraint = view.height - UIDevice.current.navigationBarHeight - 20 - 150
         }
-        collectionViewHeightConstraint.constant = height
+        collectionViewHeightConstraint.constant = heightConstraint
     }
     func updateCollectionViewHeight() {
         let rowCount = getCollectionViewrowCount()
@@ -253,6 +253,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         }else {
             collectionView.deleteItems(at: [IndexPath.init(item: atIndex, section: 0)])
         }
+        updateCollectionViewHeight()
     }
     func pickerController(_ pickerController: HXPHPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
@@ -312,23 +313,23 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         pickerController.pickerControllerDelegate = self
         // 透明导航栏建议修改取消图片
 //        config.previewView.cancelImageName = ""
-//        pickerController.navigationBar.setBackgroundImage(UIImage.hx_image(for: UIColor.clear, havingSize: .zero), for: .default)
-//        pickerController.navigationBar.shadowImage = UIImage.hx_image(for: UIColor.clear, havingSize: .zero)
+//        pickerController.navigationBar.setBackgroundImage(UIImage.image(for: UIColor.clear, havingSize: .zero), for: .default)
+//        pickerController.navigationBar.shadowImage = UIImage.image(for: UIColor.clear, havingSize: .zero)
         let titleLabel = UILabel.init()
-        titleLabel.hx_size = CGSize(width: 100, height: 30)
+        titleLabel.size = CGSize(width: 100, height: 30)
         titleLabel.textColor = .white
-        titleLabel.font = UIFont.hx_semiboldPingFang(size: 17)
+        titleLabel.font = UIFont.semiboldPingFang(ofSize: 17)
         titleLabel.textAlignment = .center
         titleLabel.text = String(indexPath.item + 1) + "/" + String(selectedAssets.count)
         pickerController.previewViewController()?.navigationItem.titleView = titleLabel
         previewTitleLabel = titleLabel
         pickerController.previewViewController()?.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "删除", style: .done, target: self, action: #selector(deletePreviewAsset))
         present(pickerController, animated: true, completion: nil)
-        self.pickerController = pickerController
+        self.currentPickerController = pickerController
     }
     @objc func deletePreviewAsset() {
-        HXPHTools.showAlert(viewController: pickerController, title: "是否删除当前资源", message: nil, leftActionTitle: "确定", leftHandler: { (alertAction) in
-            self.pickerController?.deleteCurrentPreviewPhotoAsset()
+        HXPHTools.showAlert(viewController: self.currentPickerController, title: "是否删除当前资源", message: nil, leftActionTitle: "确定", leftHandler: { (alertAction) in
+            self.currentPickerController?.deleteCurrentPreviewPhotoAsset()
         }, rightActionTitle: "取消") { (alertAction) in
         }
     }
@@ -404,7 +405,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
 class HXAlbumViewCustomCell: HXAlbumViewCell {
     override func layoutView() {
         super.layoutView()
-        photoCountLb.hx_x += 100
+        photoCountLb.x += 100
     }
 }
 class HXPHPickerViewCustomCell: HXPHPickerViewCell {
@@ -426,20 +427,20 @@ class HXPHPickerMultiSelectViewCustomCell: HXPHPickerSelectableViewCell {
         imageView.image = UIImage.init(named: "hx_picker_add_img")
     }
     override func didSelectControlClick(control: HXPHPickerSelectBoxView) {
-        // 重写选择框事件，也可以将选择框隐藏。自己新加一个选择框，然后触发代理回调
         delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
+        // 重写选择框事件，也可以将选择框隐藏。自己新加一个选择框，然后触发代理回调
     }
     override func updateSelectedState(isSelected: Bool, animated: Bool) {
-        // 重写更新选择的状态，如果是自定义的选择框需要在此设置选择框的选中状态
         super.updateSelectedState(isSelected: isSelected, animated: animated)
+        // 重写更新选择的状态，如果是自定义的选择框需要在此设置选择框的选中状态
     }
     override func updateSelectControlSize(width: CGFloat, height: CGFloat) {
-        // 重写更新选择框大小
         super.updateSelectControlSize(width: width, height: height)
+        // 重写更新选择框大小
     }
     override func layoutView() {
-        // 重写布局
         super.layoutView()
+        // 重写布局
     }
 }
 class BaseAddViewCell: HXPHPickerBaseViewCell {
@@ -459,14 +460,14 @@ class BaseViewCell: HXPHPickerViewCell {
     lazy var deleteButton: UIButton = {
         let deleteButton = UIButton.init(type: .custom)
         deleteButton.setImage(UIImage.init(named: "hx_compose_delete"), for: .normal)
-        deleteButton.hx_size = deleteButton.currentImage?.size ?? .zero
+        deleteButton.size = deleteButton.currentImage?.size ?? .zero
         deleteButton.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
         return deleteButton
     }()
     override func requestThumbnailImage() {
         // 因为这里的cell不会很多，重新设置 targetWidth，使图片更加清晰
         weak var weakSelf = self
-        requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * UIScreen.main.scale, completion: { (image, photoAsset, info) in
+        requestID = photoAsset?.requestThumbnailImage(targetWidth: width * UIScreen.main.scale, completion: { (image, photoAsset, info) in
             if photoAsset == weakSelf?.photoAsset && image != nil {
                 weakSelf?.imageView.image = image
                 if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
@@ -487,6 +488,6 @@ class BaseViewCell: HXPHPickerViewCell {
     
     override func layoutView() {
         super.layoutView()
-        deleteButton.hx_x = hx_width - deleteButton.hx_width
+        deleteButton.x = width - deleteButton.width
     }
 }

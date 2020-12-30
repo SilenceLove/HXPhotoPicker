@@ -18,7 +18,7 @@ public class HXPHNotAuthorizedConfiguration: NSObject {
     
     /// 暗黑风格下的背景颜色
     public lazy var darkBackgroundColor: UIColor = {
-        return "#2E2F30".hx_color
+        return "#2E2F30".color
     }()
     
     /// 关闭按钮图片名
@@ -43,7 +43,7 @@ public class HXPHNotAuthorizedConfiguration: NSObject {
     
     /// 子标题颜色
     public lazy var subTitleColor: UIColor = {
-        return "#444444".hx_color
+        return "#444444".color
     }()
     
     /// 暗黑风格下的子标题颜色
@@ -53,7 +53,7 @@ public class HXPHNotAuthorizedConfiguration: NSObject {
     
     /// 跳转按钮背景颜色
     public lazy var jumpButtonBackgroundColor: UIColor = {
-        return "#333333".hx_color
+        return "#333333".color
     }()
     
     /// 暗黑风格下跳转按钮背景颜色
@@ -63,11 +63,11 @@ public class HXPHNotAuthorizedConfiguration: NSObject {
     
     /// 跳转按钮文字颜色
     public lazy var jumpButtonTitleColor: UIColor = {
-        return "#ffffff".hx_color
+        return "#ffffff".color
     }()
     
     /// 暗黑风格下跳转按钮文字颜色
     public lazy var jumpButtonTitleDarkColor: UIColor = {
-        return "#333333".hx_color
+        return "#333333".color
     }()
 }

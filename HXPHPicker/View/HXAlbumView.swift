@@ -36,7 +36,7 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     }()
     lazy var promptLb: UILabel = {
         let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
-        promptLb.text = "只能查看允许访问的照片和相关相册".hx_localized
+        promptLb.text = "只能查看允许访问的照片和相关相册".localized
         promptLb.textAlignment = .center
         promptLb.font = UIFont.systemFont(ofSize: 14)
         promptLb.adjustsFontSizeToFitWidth = true
@@ -111,7 +111,7 @@ class HXAlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         if HXPHAssetManager.authorizationStatusIsLimited() {
-            promptLb.hx_width = hx_width
+            promptLb.width = width
         }
         tableView.frame = bounds
     }

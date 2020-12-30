@@ -8,9 +8,9 @@
 
 import UIKit
 
-public extension UIViewController {
+extension UIViewController {
     
-    var hx_pickerController: HXPHPickerController? {
+    var pickerController: HXPHPickerController? {
         get {
             if self.navigationController is HXPHPickerController {
                 return self.navigationController as? HXPHPickerController

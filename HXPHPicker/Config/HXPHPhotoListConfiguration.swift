@@ -23,7 +23,7 @@ public class HXPHPhotoListConfiguration: NSObject {
     
     /// 暗黑风格下背景颜色
     public lazy var backgroundDarkColor : UIColor = {
-        return "#2E2F30".hx_color
+        return "#2E2F30".color
     }()
     
     /// 取消按钮的配置只有当 albumShowMode = .popup 时有效

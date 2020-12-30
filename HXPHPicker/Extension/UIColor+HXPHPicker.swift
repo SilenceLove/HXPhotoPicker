@@ -10,8 +10,8 @@ import UIKit
 
 public extension UIColor {
     
-    convenience init(hx_hexString: String) {
-        let hexString = hx_hexString.trimmingCharacters(in: .whitespacesAndNewlines)
+    convenience init(hexString: String) {
+        let hexString = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
         let scanner = Scanner(string: hexString)
         if hexString.hasPrefix("#") {
             scanner.scanLocation = 1

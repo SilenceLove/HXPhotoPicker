@@ -65,31 +65,31 @@ class HXPHPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     }
     func setupScrollViewContenSize() {
         scrollView.zoomScale = 1
-        if UIDevice.current.hx_isPortrait {
-            let aspectRatio = hx_width / photoAsset!.imageSize.width
-            let contentWidth = hx_width
+        if UIDevice.current.isPortrait {
+            let aspectRatio = width / photoAsset!.imageSize.width
+            let contentWidth = width
             let contentHeight = photoAsset!.imageSize.height * aspectRatio
             if contentWidth < contentHeight {
-                scrollView.maximumZoomScale = hx_width * 2.5 / contentWidth
+                scrollView.maximumZoomScale = width * 2.5 / contentWidth
             }else {
-                scrollView.maximumZoomScale = hx_height * 2.5 / contentHeight
+                scrollView.maximumZoomScale = height * 2.5 / contentHeight
             }
             scrollContentView!.frame = CGRect(x: 0, y: 0, width: contentWidth, height: contentHeight)
-            if contentHeight < hx_height {
-                scrollView.contentSize = hx_size
-                scrollContentView!.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)
+            if contentHeight < height {
+                scrollView.contentSize = size
+                scrollContentView!.center = CGPoint(x: width * 0.5, y: height * 0.5)
             }else {
                 scrollView.contentSize = CGSize(width: contentWidth, height: contentHeight)
             }
         }else {
-            let aspectRatio = hx_height / photoAsset!.imageSize.height
+            let aspectRatio = height / photoAsset!.imageSize.height
             let contentWidth = photoAsset!.imageSize.width * aspectRatio
-            let contentHeight = hx_height
-            scrollView.maximumZoomScale = hx_width / contentWidth + 0.5
+            let contentHeight = height
+            scrollView.maximumZoomScale = width / contentWidth + 0.5
             
             scrollContentView!.frame = CGRect(x: 0, y: 0, width: contentWidth, height: contentHeight)
-            scrollContentView!.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)
-            scrollView.contentSize = hx_size
+            scrollContentView!.center = CGPoint(x: width * 0.5, y: height * 0.5)
+            scrollView.contentSize = size
         }
     }
     func requestPreviewAsset() {
@@ -107,17 +107,17 @@ class HXPHPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         }else {
             let touchPoint = tap.location(in: scrollContentView!)
             let maximumZoomScale = scrollView.maximumZoomScale
-            let width = hx_width / maximumZoomScale
-            let height = hx_height / maximumZoomScale
-            scrollView.zoom(to: CGRect(x: touchPoint.x - width / 2, y: touchPoint.y - height / 2, width: width, height: height), animated: true)
+            let zoomWidth = width / maximumZoomScale
+            let zoomHeight = height / maximumZoomScale
+            scrollView.zoom(to: CGRect(x: touchPoint.x - zoomWidth / 2, y: touchPoint.y - zoomHeight / 2, width: zoomWidth, height: zoomHeight), animated: true)
         }
     }
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return scrollContentView!
     }
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        let offsetX = (scrollView.frame.size.width > scrollView.contentSize.width) ? (scrollView.frame.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
-        let offsetY = (scrollView.frame.size.height > scrollView.contentSize.height) ? (scrollView.frame.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
+        let offsetX = (scrollView.width > scrollView.contentSize.width) ? (scrollView.width - scrollView.contentSize.width) * 0.5 : 0.0;
+        let offsetY = (scrollView.height > scrollView.contentSize.height) ? (scrollView.height - scrollView.contentSize.height) * 0.5 : 0.0;
         scrollContentView!.center = CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX, y: scrollView.contentSize.height * 0.5 + offsetY);
     }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

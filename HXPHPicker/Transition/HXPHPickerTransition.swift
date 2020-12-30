@@ -88,7 +88,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                     pushImageView.frame = cell?.imageView.convert(cell?.imageView.bounds ?? CGRect.zero, to: containerView) ?? CGRect.zero
                     fromView = cell
                 }else {
-                    pushImageView.center = CGPoint(x: toVC.view.hx_width * 0.5, y: toVC.view.hx_height * 0.5)
+                    pushImageView.center = CGPoint(x: toVC.view.width * 0.5, y: toVC.view.height * 0.5)
                 }
                 
                 if let phAsset = photoAsset.phAsset {
@@ -130,7 +130,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
         var rect: CGRect = .zero
         if type == .push {
             if photoAsset != nil {
-                rect = getPreviewViewFrame(photoAsset: photoAsset!, size: toVC.view.hx_size)
+                rect = getPreviewViewFrame(photoAsset: photoAsset!, size: toVC.view.size)
             }
             fromView?.isHidden = true
         }else if type == .pop {
@@ -231,7 +231,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             }else if let rect = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewFrameForIndexAt: currentPreviewIndex) {
                 fromView.frame = rect
             }else {
-                fromView.center = CGPoint(x: toVC.view.hx_width * 0.5, y: toVC.view.hx_height * 0.5)
+                fromView.center = CGPoint(x: toVC.view.width * 0.5, y: toVC.view.height * 0.5)
             }
             
             if let image = pickerController.pickerControllerDelegate?.pickerController?(pickerController, presentPreviewImageForIndexAt: currentPreviewIndex) {
@@ -244,7 +244,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
                 }else if pushImageView.image == nil {
                     pushImageView.image = photoAsset.originalImage
                 }
-                toRect = getPreviewViewFrame(photoAsset: photoAsset, size: toVC.view.hx_size)
+                toRect = getPreviewViewFrame(photoAsset: photoAsset, size: toVC.view.size)
             }
         }else {
             pickerController.previewViewController()?.view.insertSubview(contentView, at: 0)
@@ -350,7 +350,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
             if imageData != nil {
                 var image: UIImage?
                 if imageOrientation != .up {
-                    image = UIImage.init(data: imageData!)?.hx_normalizedImage()
+                    image = UIImage.init(data: imageData!)?.normalizedImage()
                 }else {
                     image = UIImage.init(data: imageData!)
                 }
@@ -367,7 +367,7 @@ class HXPHPickerControllerTransition: NSObject, UIViewControllerAnimatedTransiti
     func getPreviewViewFrame(photoAsset: HXPHAsset, size: CGSize) -> CGRect {
         var imageSize: CGSize = .zero
         var imageCenter: CGPoint = .zero
-        if UIDevice.current.hx_isPortrait {
+        if UIDevice.current.isPortrait {
             let aspectRatio = size.width / photoAsset.imageSize.width
             let contentWidth = size.width
             let contentHeight = photoAsset.imageSize.height * aspectRatio

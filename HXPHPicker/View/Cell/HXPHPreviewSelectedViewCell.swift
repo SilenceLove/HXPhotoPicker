@@ -37,7 +37,7 @@ open class HXPHPreviewSelectedViewCell: UICollectionViewCell {
         }
     }
     
-    var requestID: PHImageRequestID?
+    public var requestID: PHImageRequestID?
     
     open var photoAsset: HXPHAsset? {
         didSet {
@@ -47,7 +47,7 @@ open class HXPHPreviewSelectedViewCell: UICollectionViewCell {
     /// 获取图片，重写此方法可以修改图片
     open func reqeustAssetImage() {
         weak var weakSelf = self
-        requestID = photoAsset?.requestThumbnailImage(targetWidth: hx_width * 2, completion: { (image, asset, info) in
+        requestID = photoAsset?.requestThumbnailImage(targetWidth: width * 2, completion: { (image, asset, info) in
             if weakSelf?.photoAsset == asset {
                 weakSelf?.imageView.image = image
             }
@@ -66,7 +66,7 @@ open class HXPHPreviewSelectedViewCell: UICollectionViewCell {
         contentView.addSubview(selectedView)
     }
     
-    func cancelRequest() {
+    public func cancelRequest() {
         if requestID != nil {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
@@ -76,7 +76,7 @@ open class HXPHPreviewSelectedViewCell: UICollectionViewCell {
         super.layoutSubviews()
         imageView.frame = bounds
         selectedView.frame = bounds
-        tickView.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)
+        tickView.center = CGPoint(x: width * 0.5, y: height * 0.5)
     }
     
     required public init?(coder: NSCoder) {

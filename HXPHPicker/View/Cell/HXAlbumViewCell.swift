@@ -10,33 +10,47 @@ import UIKit
 import Photos
 
 open class HXAlbumViewCell: UITableViewCell {
+    
+    /// 封面图片
     public lazy var albumCoverView: UIImageView = {
         let albumCoverView = UIImageView.init()
         albumCoverView.contentMode = .scaleAspectFill
         albumCoverView.clipsToBounds = true
         return albumCoverView
     }()
+    
+    /// 相册名称
     public lazy var albumNameLb: UILabel = {
         let albumNameLb = UILabel.init()
         return albumNameLb
     }()
+    
+    /// 相册里的照片数量
     public lazy var photoCountLb: UILabel = {
         let photoCountLb = UILabel.init()
         return photoCountLb
     }()
+    
+    /// 底部线
     public lazy var bottomLineView: UIView = {
         let bottomLineView = UIView.init()
         bottomLineView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.15)
         return bottomLineView
     }()
+    
+    /// 选中时勾勾的颜色
     public lazy var tickView: HXAlbumTickView = {
         let tickView = HXAlbumTickView.init(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         return tickView
     }()
+    
+    /// 选中时的背景视图
     public lazy var selectedBgView : UIView = {
         let selectedBgView = UIView.init()
         return selectedBgView
     }()
+    
+    /// 配置
     public var config : HXPHAlbumListConfiguration? {
         didSet {
             albumNameLb.font = config?.albumNameFont
@@ -44,6 +58,8 @@ open class HXAlbumViewCell: UITableViewCell {
             configColor()
         }
     }
+    
+    /// 照片集合
     public var assetCollection: HXPHAssetCollection? {
         didSet {
             albumNameLb.text = assetCollection?.albumName
@@ -52,15 +68,10 @@ open class HXAlbumViewCell: UITableViewCell {
             requestCoverImage()
         }
     }
-    var requestID: PHImageRequestID?
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initView()
-    }
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    /// 请求id
+    public var requestID: PHImageRequestID?
+    
     open func initView() {
         contentView.addSubview(albumCoverView)
         contentView.addSubview(albumNameLb)
@@ -104,21 +115,21 @@ open class HXAlbumViewCell: UITableViewCell {
     /// 布局，重写此方法修改布局
     open func layoutView() {
         let coverMargin : CGFloat = 5
-        let coverWidth = hx_height - (coverMargin * 2)
+        let coverWidth = height - (coverMargin * 2)
         albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
         
-        tickView.hx_x = hx_width - 12 - tickView.hx_width - UIDevice.current.hx_rightMargin
-        tickView.hx_centerY = hx_height * 0.5
+        tickView.x = width - 12 - tickView.width - UIDevice.current.rightMargin
+        tickView.centerY = height * 0.5
         
-        albumNameLb.hx_x = albumCoverView.frame.maxX + 10
-        albumNameLb.hx_size = CGSize(width: tickView.hx_x - albumNameLb.hx_x - 20, height: 16)
-        albumNameLb.hx_centerY = hx_height / CGFloat(2) - albumNameLb.hx_height / CGFloat(2)
+        albumNameLb.x = albumCoverView.frame.maxX + 10
+        albumNameLb.size = CGSize(width: tickView.x - albumNameLb.x - 20, height: 16)
+        albumNameLb.centerY = height / CGFloat(2) - albumNameLb.height / CGFloat(2)
         
-        photoCountLb.hx_x = albumCoverView.frame.maxX + 10
-        photoCountLb.hx_y = albumNameLb.frame.maxY + 5
-        photoCountLb.hx_size = CGSize(width: hx_width - photoCountLb.hx_x - 20, height: 14)
+        photoCountLb.x = albumCoverView.frame.maxX + 10
+        photoCountLb.y = albumNameLb.frame.maxY + 5
+        photoCountLb.size = CGSize(width: width - photoCountLb.x - 20, height: 14)
         
-        bottomLineView.frame = CGRect(x: coverMargin, y: hx_height - 0.5, width: hx_width - coverMargin * 2, height: 0.5)
+        bottomLineView.frame = CGRect(x: coverMargin, y: height - 0.5, width: width - coverMargin * 2, height: 0.5)
     }
     
     open override func layoutSubviews() {
@@ -135,10 +146,18 @@ open class HXAlbumViewCell: UITableViewCell {
         }
     }
     
-    func cancelRequest() {
+    public func cancelRequest() {
         if requestID != nil {
             PHImageManager.default().cancelImageRequest(requestID!)
             requestID = nil
         }
+    }
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        initView()
+    }
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

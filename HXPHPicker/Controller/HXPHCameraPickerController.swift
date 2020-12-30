@@ -28,7 +28,7 @@ public class HXPHCameraPickerController: UIImagePickerController {
                 let isNewImageScrollView = imageScrollView == nil
                 imageScrollView = subView as? UIScrollView
                 if let scrollView = imageScrollView {
-                    let size = scrollView.hx_size
+                    let size = scrollView.size
                     let inset = abs(size.width - size.height) * 0.5
                     scrollView.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
                     if isNewImageScrollView {

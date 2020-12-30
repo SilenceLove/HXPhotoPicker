@@ -10,7 +10,7 @@ import UIKit
 
 public extension UIImage {
     
-    class func hx_named(named: String?) -> UIImage? {
+    class func image(for named: String?) -> UIImage? {
         if named == nil {
             return nil
         }
@@ -29,15 +29,15 @@ public extension UIImage {
         return image
     }
     
-    func hx_scaleSuitableSize() -> UIImage? {
+    func scaleSuitableSize() -> UIImage? {
         var imageSize = self.size
         while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
             imageSize.width *= 0.5
             imageSize.height *= 0.5
         }
-        return self.hx_scaleToFillSize(size: imageSize)
+        return self.scaleToFillSize(size: imageSize)
     }
-    func hx_scaleToFillSize(size: CGSize) -> UIImage? {
+    func scaleToFillSize(size: CGSize) -> UIImage? {
         if __CGSizeEqualToSize(self.size, size) {
             return self
         }
@@ -48,7 +48,7 @@ public extension UIImage {
         return image
     }
     
-    class func hx_image(for color: UIColor, havingSize: CGSize) -> UIImage? {
+    class func image(for color: UIColor, havingSize: CGSize) -> UIImage? {
         let rect: CGRect
         if havingSize.equalTo(CGSize.zero) {
             rect = CGRect(x: 0, y: 0, width: 1, height: 1)
@@ -65,13 +65,13 @@ public extension UIImage {
         return image
     }
     
-    func hx_normalizedImage() -> UIImage? {
+    func normalizedImage() -> UIImage? {
         if imageOrientation == .up {
             return self
         }
-        return hx_repaintImage()
+        return repaintImage()
     }
-    func hx_repaintImage() -> UIImage? {
+    func repaintImage() -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
         draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
         let image = UIGraphicsGetImageFromCurrentImageContext()

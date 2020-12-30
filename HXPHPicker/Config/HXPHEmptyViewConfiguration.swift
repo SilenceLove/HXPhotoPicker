@@ -13,21 +13,21 @@ public class HXPHEmptyViewConfiguration: NSObject {
     
     /// 标题颜色
     public lazy var titleColor: UIColor = {
-        return "#666666".hx_color
+        return "#666666".color
     }()
     
     /// 暗黑风格下标题颜色
     public lazy var titleDarkColor: UIColor = {
-        return "#ffffff".hx_color
+        return "#ffffff".color
     }()
     
     /// 子标题颜色
     public lazy var subTitleColor: UIColor = {
-        return "#999999".hx_color
+        return "#999999".color
     }()
     
     /// 暗黑风格下子标题颜色
     public lazy var subTitleDarkColor: UIColor = {
-        return "#dadada".hx_color
+        return "#dadada".color
     }()
 }

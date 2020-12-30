@@ -39,9 +39,9 @@ class HXPHPickerCamerViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     func configProperty() {
-        imageView.image = UIImage.hx_named(named: HXPHManager.shared.isDark ? config?.cameraDarkImageName : config?.cameraImageName)
+        imageView.image = UIImage.image(for: HXPHManager.shared.isDark ? config?.cameraDarkImageName : config?.cameraImageName)
         backgroundColor = HXPHManager.shared.isDark ? config?.backgroundDarkColor : config?.backgroundColor
-        imageView.hx_size = imageView.image?.size ?? .zero
+        imageView.size = imageView.image?.size ?? .zero
         if let allowPreview = config?.allowPreview, allowPreview == true {
             requestCameraAccess()
         }
@@ -51,14 +51,13 @@ class HXPHPickerCamerViewCell: UICollectionViewCell {
             return
         }
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
-//            HXPHProgressHUD.showWarningHUD(addedTo: hx_viewController()?.view, text: "相机不可用!".hx_localized, animated: true, delay: 1.5)
             return
         }
         HXPHAssetManager.requestCameraAccess { (granted) in
             if granted {
                 self.startSeesion()
             }else {
-                HXPHTools.showNotCameraAuthorizedAlert(viewController: self.hx_viewController())
+                HXPHTools.showNotCameraAuthorizedAlert(viewController: self.viewController())
             }
         }
     }
@@ -84,7 +83,7 @@ class HXPHPickerCamerViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        imageView.center = CGPoint(x: hx_width * 0.5, y: hx_height * 0.5)
+        imageView.center = CGPoint(x: width * 0.5, y: height * 0.5)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

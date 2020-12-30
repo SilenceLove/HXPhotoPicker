@@ -935,6 +935,7 @@
 		7B1A1050259ADB3D005FD62C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				7B1A1055259ADC03005FD62C /* Cell */,
 				7B7BE3F12563D34A0008C391 /* HXAlbumView.swift */,
 				7B1A107D259ADDD6005FD62C /* HXAlbumTitleView.swift */,
 				7B1A1075259ADDBB005FD62C /* HXAlbumTitleArrowView.swift */,
@@ -947,7 +948,6 @@
 				7B1A10A6259AE0E5005FD62C /* HXPHPreviewSelectedView.swift */,
 				7B1A108A259ADE60005FD62C /* HXPHEmptyView.swift */,
 				7B1A1092259ADE78005FD62C /* HXPHDeniedAuthorizationView.swift */,
-				7B1A1055259ADC03005FD62C /* Cell */,
 			);
 			path = View;
 			sourceTree = "<group>";

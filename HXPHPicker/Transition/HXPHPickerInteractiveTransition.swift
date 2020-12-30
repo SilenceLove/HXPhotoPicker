@@ -94,7 +94,7 @@ class HXPHPickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIG
             }
             if let previewViewController = previewViewController, let previewView = previewView {
                 let translation = panGR.translation(in: panGR.view)
-                var scale = (translation.y - slidingGap.y) / (previewViewController.view.hx_height)
+                var scale = (translation.y - slidingGap.y) / (previewViewController.view.height)
                 if (scale > 1) {
                     scale = 1
                 }else if scale < 0 {
@@ -138,7 +138,7 @@ class HXPHPickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIG
             }
             if let previewViewController = previewViewController {
                 let translation = panGR.translation(in: panGR.view)
-                let scale = (translation.y - slidingGap.y) / (previewViewController.view.hx_height)
+                let scale = (translation.y - slidingGap.y) / (previewViewController.view.height)
                 if scale < 0.15 {
                     cancel()
                     interPercentDidCancel()
@@ -346,7 +346,7 @@ class HXPHPickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIG
         previewView?.scrollView.clipsToBounds = false
         
         if let previewView = previewView {
-            let anchorPoint = CGPoint(x: beganPoint.x / previewView.hx_width, y: beganPoint.y / previewView.hx_height)
+            let anchorPoint = CGPoint(x: beganPoint.x / previewView.width, y: beganPoint.y / previewView.height)
             previewView.layer.anchorPoint = anchorPoint
             previewView.frame = pickerViewController.view.bounds
             previewCenter = previewView.center
@@ -391,7 +391,7 @@ class HXPHPickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIG
             previewView?.scrollView.clipsToBounds = false
             
             if let previewView = previewView {
-                let anchorPoint = CGPoint(x: beganPoint.x / previewView.hx_width, y: beganPoint.y / previewView.hx_height)
+                let anchorPoint = CGPoint(x: beganPoint.x / previewView.width, y: beganPoint.y / previewView.height)
                 previewView.layer.anchorPoint = anchorPoint
                 previewView.frame = pickerController.view.bounds
                 previewCenter = previewView.center

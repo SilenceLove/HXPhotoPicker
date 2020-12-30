@@ -28,14 +28,14 @@ class HXAlbumTitleArrowView: UIView {
     }
     
     func drawContent() {
-        let circlePath = UIBezierPath.init(arcCenter: CGPoint.init(x: hx_width * 0.5, y: hx_height * 0.5), radius: hx_width * 0.5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        let circlePath = UIBezierPath.init(arcCenter: CGPoint.init(x: width * 0.5, y: height * 0.5), radius: width * 0.5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
         backgroundLayer.path = circlePath.cgPath
         layer.addSublayer(backgroundLayer)
         
         let arrowPath = UIBezierPath.init()
         arrowPath.move(to: CGPoint(x: 5, y: 8))
-        arrowPath.addLine(to: CGPoint(x: hx_width / 2, y: hx_height - 7))
-        arrowPath.addLine(to: CGPoint(x: hx_width - 5, y: 8))
+        arrowPath.addLine(to: CGPoint(x: width / 2, y: height - 7))
+        arrowPath.addLine(to: CGPoint(x: width - 5, y: 8))
         arrowLayer.path = arrowPath.cgPath
         arrowLayer.lineWidth = 1.5
         arrowLayer.fillColor = UIColor.clear.cgColor

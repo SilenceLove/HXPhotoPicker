@@ -37,6 +37,8 @@
 
 ### 快速上手
 ```swift
+import HXPHPicker
+
 class ViewController: UIViewController {
 
     func presentPickerController() {
