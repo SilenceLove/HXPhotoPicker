@@ -1505,6 +1505,8 @@
 			dependencies = (
 			);
 			name = HXPHPickerExample;
+			packageProductDependencies = (
+			);
 			productName = HXPHPickerExample;
 			productReference = 7B3EDEBE255E185900937B4A /* HXPHPickerExample.app */;
 			productType = "com.apple.product-type.application";
@@ -1582,6 +1584,8 @@
 				Base,
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
+			packageReferences = (
+			);
 			productRefGroup = 7B7E3E771E4AACD1002234EE /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

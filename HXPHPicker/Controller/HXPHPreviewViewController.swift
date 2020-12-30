@@ -499,7 +499,7 @@ extension HXPHPreviewViewController: HXPHPickerBottomViewDelegate {
     
     func bottomView(didEditButtonClick view: HXPHPickerBottomView) {
         let photoAsset = previewAssets[currentPreviewIndex]
-        if let shouldEditAsset = pickerController?.shouldEditAsset(photoAsset: photoAsset) {
+        if let shouldEditAsset = pickerController?.shouldEditAsset(photoAsset: photoAsset, atIndex: currentPreviewIndex) {
             if !shouldEditAsset {
                 return
             }

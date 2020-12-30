@@ -10,7 +10,7 @@
 import UIKit
 import Photos
 
-class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, BaseViewCellDelegate {
+class BaseViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, BaseViewCellDelegate {
      
     @IBOutlet weak var collectionViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionViewHeightConstraint: NSLayoutConstraint!
@@ -54,6 +54,7 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
 //        config.albumList.customCellClass = HXAlbumViewCustomCell.self
 //        config.photoList.cell.customSingleCellClass = HXPHPickerViewCustomCell.self
 //        config.photoList.cell.customSelectableCellClass = HXPHPickerMultiSelectViewCustomCell.self
@@ -221,52 +222,6 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
             }
         }
     }
-    // MARK: HXPHPickerControllerDelegate
-    func pickerController(_ pickerController: HXPHPickerController, didFinishSelection selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
-        self.selectedAssets = selectedAssetArray
-        self.isOriginal = isOriginal
-        collectionView.reloadData()
-        updateCollectionViewHeight()
-    }
-    func pickerController(_ pickerController: HXPHPickerController, singleFinishSelection photoAsset:HXPHAsset, _ isOriginal: Bool) {
-        selectedAssets = [photoAsset]
-        self.isOriginal = isOriginal
-        collectionView.reloadData()
-        updateCollectionViewHeight()
-    }
-    func pickerController(didCancel pickerController: HXPHPickerController) {
-        
-    }
-    func pickerController(_ pickerController: HXPHPickerController, didDismissComplete localCameraAssetArray: [HXPHAsset]) {
-        setNeedsStatusBarAppearanceUpdate()
-        self.localCameraAssetArray = localCameraAssetArray
-    }
-    
-    func pickerController(_ pikcerController: HXPHPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: HXPHAsset, atIndex: Int) {
-        previewTitleLabel?.text = String(atIndex + 1) + "/" + String(selectedAssets.count)
-    }
-    func pickerController(_ pickerController: HXPHPickerController, previewDidDeleteAsset photoAsset: HXPHAsset, atIndex: Int) {
-        let isFull = selectedAssets.count == config.maximumSelectedCount
-        selectedAssets.remove(at: atIndex)
-        if isFull {
-            collectionView.reloadData()
-        }else {
-            collectionView.deleteItems(at: [IndexPath.init(item: atIndex, section: 0)])
-        }
-        updateCollectionViewHeight()
-    }
-    func pickerController(_ pickerController: HXPHPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
-        return cell
-    }
-    func pickerController(_ pickerController: HXPHPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? BaseViewCell
-        return cell?.imageView.image
-    }
-    func pickerController(_ pickerController: HXPHPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
-        return cell
-    }
     
     // MARK: UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -402,6 +357,56 @@ class BaseViewController: UIViewController , HXPHPickerControllerDelegate, UICol
         return .default
     }
 }
+
+// MARK: HXPHPickerControllerDelegate
+extension BaseViewController: HXPHPickerControllerDelegate {
+    
+    func pickerController(_ pickerController: HXPHPickerController, didFinishSelection selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
+        self.selectedAssets = selectedAssetArray
+        self.isOriginal = isOriginal
+        collectionView.reloadData()
+        updateCollectionViewHeight()
+    }
+    func pickerController(_ pickerController: HXPHPickerController, singleFinishSelection photoAsset:HXPHAsset, _ isOriginal: Bool) {
+        selectedAssets = [photoAsset]
+        self.isOriginal = isOriginal
+        collectionView.reloadData()
+        updateCollectionViewHeight()
+    }
+    func pickerController(didCancel pickerController: HXPHPickerController) {
+        
+    }
+    func pickerController(_ pickerController: HXPHPickerController, didDismissComplete localCameraAssetArray: [HXPHAsset]) {
+        setNeedsStatusBarAppearanceUpdate()
+        self.localCameraAssetArray = localCameraAssetArray
+    }
+    func pickerController(_ pikcerController: HXPHPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: HXPHAsset, atIndex: Int) {
+        previewTitleLabel?.text = String(atIndex + 1) + "/" + String(selectedAssets.count)
+    }
+    func pickerController(_ pickerController: HXPHPickerController, previewDidDeleteAsset photoAsset: HXPHAsset, atIndex: Int) {
+        let isFull = selectedAssets.count == config.maximumSelectedCount
+        selectedAssets.remove(at: atIndex)
+        if isFull {
+            collectionView.reloadData()
+        }else {
+            collectionView.deleteItems(at: [IndexPath.init(item: atIndex, section: 0)])
+        }
+        updateCollectionViewHeight()
+    }
+    func pickerController(_ pickerController: HXPHPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
+        return cell
+    }
+    func pickerController(_ pickerController: HXPHPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? BaseViewCell
+        return cell?.imageView.image
+    }
+    func pickerController(_ pickerController: HXPHPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
+        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
+        return cell
+    }
+}
+
 class HXAlbumViewCustomCell: HXAlbumViewCell {
     override func layoutView() {
         super.layoutView()
@@ -414,7 +419,7 @@ class HXPHPickerViewCustomCell: HXPHPickerViewCell {
         isHidden = false
     }
     override func requestThumbnailImage() {
-        imageView.image = UIImage.init(named: "hx_picker_add_img")
+        imageView.image = UIImage.image(for: "hx_picker_add_img")
     }
 }
 class HXPHPickerMultiSelectViewCustomCell: HXPHPickerSelectableViewCell {
@@ -424,7 +429,7 @@ class HXPHPickerMultiSelectViewCustomCell: HXPHPickerSelectableViewCell {
     }
     override func requestThumbnailImage() {
         // 重写图片内容
-        imageView.image = UIImage.init(named: "hx_picker_add_img")
+        imageView.image = UIImage.image(for: "hx_picker_add_img")
     }
     override func didSelectControlClick(control: HXPHPickerSelectBoxView) {
         delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
@@ -447,7 +452,7 @@ class BaseAddViewCell: HXPHPickerBaseViewCell {
     override func initView() {
         super.initView()
         isHidden = false
-        imageView.image = UIImage.init(named: "hx_picker_add_img")
+        imageView.image = UIImage.image(for: "hx_picker_add_img")
     }
 }
 
@@ -491,3 +496,5 @@ class BaseViewCell: HXPHPickerViewCell {
         deleteButton.x = width - deleteButton.width
     }
 }
+
+ 

@@ -29,6 +29,8 @@ public class HXPHTools: NSObject {
             }
         }
     }
+    
+    /// 显示没有相机权限弹窗
     public class func showNotCameraAuthorizedAlert(viewController : UIViewController?) {
         if viewController == nil {
             return
@@ -38,6 +40,7 @@ public class HXPHTools: NSObject {
         }
     }
     
+    /// 跳转系统设置界面
     public class func openSettingsURL() {
         if #available(iOS 10, *) {
             UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
@@ -46,6 +49,8 @@ public class HXPHTools: NSObject {
         }
     }
     
+    
+    /// 显示UIAlertController
     public class func showAlert(viewController: UIViewController? , title: String? , message: String? , leftActionTitle: String ,  leftHandler: @escaping (UIAlertAction)->(), rightActionTitle: String , rightHandler: @escaping (UIAlertAction)->()) {
         let alertController = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
         let leftAction = UIAlertAction.init(title: leftActionTitle, style: UIAlertAction.Style.cancel, handler: leftHandler)
@@ -55,6 +60,7 @@ public class HXPHTools: NSObject {
         viewController?.present(alertController, animated: true, completion: nil)
     }
     
+    /// 转换视频时长为 00:00 格式的字符串
     public class func transformVideoDurationToString(duration: TimeInterval) -> String {
         let time = Int(round(Double(duration)))
         if time < 10 {
@@ -72,6 +78,7 @@ public class HXPHTools: NSObject {
         }
     }
     
+    /// 转换相册名称为当前语言
     public class func transformAlbumName(for collection: PHAssetCollection) -> String? {
         if collection.assetCollectionType == .album {
             return collection.localizedTitle
@@ -136,6 +143,8 @@ public class HXPHTools: NSObject {
         }
         return albumName
     }
+    
+    // 根据视频地址获取视频封面
     public class func getVideoThumbnailImage(videoURL: URL?, atTime: TimeInterval) -> UIImage? {
         if videoURL == nil {
             return nil
@@ -153,6 +162,8 @@ public class HXPHTools: NSObject {
             return nil
         }
     }
+    
+    /// 根据视频地址获取视频时长
     public class func getVideoDuration(videoURL: URL?) -> TimeInterval {
         if videoURL == nil {
             return 0
@@ -162,6 +173,8 @@ public class HXPHTools: NSObject {
         let second = Int(urlAsset.duration.value) / Int(urlAsset.duration.timescale)
         return TimeInterval(second)
     }
+    
+    /// 将字节转换成字符串
     public class func transformBytesToString(bytes: Int) -> String {
         if CGFloat(bytes) >= 0.5 * 1000 * 1000 {
             return String.init(format: "%0.1fM", arguments: [CGFloat(bytes) / 1000 / 1000])
@@ -171,6 +184,7 @@ public class HXPHTools: NSObject {
             return String.init(format: "%dB", arguments: [bytes])
         }
     }
+    /// 根据PHAsset资源获取对应的目标大小
     public class func transformTargetWidthToSize(targetWidth: CGFloat, asset: PHAsset) -> CGSize {
         let scale:CGFloat = 0.8
         let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
@@ -190,6 +204,14 @@ public class HXPHTools: NSObject {
         }
         return CGSize.init(width: width, height: height)
     }
+    
+    /// 导出编辑视频
+    /// - Parameters:
+    ///   - avAsset: 视频对应的 AVAsset 数据
+    ///   - startTime: 需要裁剪的开始时间
+    ///   - endTime: 需要裁剪的结束时间
+    ///   - presentName: 导出的质量
+    ///   - completion: 导出完成
     public class func exportEditVideo(for avAsset: AVAsset, startTime: TimeInterval, endTime: TimeInterval, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
         let timescale = avAsset.duration.timescale
         let start = CMTime(value: CMTimeValue(startTime * TimeInterval(timescale)), timescale: timescale)
@@ -197,6 +219,13 @@ public class HXPHTools: NSObject {
         let timeRang = CMTimeRange(start: start, end: end)
         exportEditVideo(for: avAsset, timeRang: timeRang, presentName: presentName, completion: completion)
     }
+    
+    /// 导出编辑视频
+    /// - Parameters:
+    ///   - avAsset: 视频对应的 AVAsset 数据
+    ///   - timeRang: 需要裁剪的时间区域
+    ///   - presentName: 导出的质量
+    ///   - completion: 导出完成
     public class func exportEditVideo(for avAsset: AVAsset, timeRang: CMTimeRange, presentName: String, completion:@escaping (URL?, Error?) -> Void) {
         if AVAssetExportSession.allExportPresets().contains(presentName) {
             let videoURL = HXPHTools.getVideoTmpURL()
@@ -234,6 +263,7 @@ public class HXPHTools: NSObject {
             return
         }
     }
+    /// 将UIImage转换成Data
     public class func getImageData(for image: UIImage?) -> Data? {
         if let pngData = image?.pngData() {
             return pngData
@@ -242,18 +272,22 @@ public class HXPHTools: NSObject {
         }
         return nil
     }
+    /// 获取对应后缀的临时路径
     public class func getTmpURL(for suffix: String) -> URL {
         var tmpPath = NSTemporaryDirectory()
         tmpPath.append(contentsOf: String.fileName(suffix: suffix))
         let tmpURL = URL.init(fileURLWithPath: tmpPath)
         return tmpURL
     }
+    /// 获取图片临时路径
     public class func getImageTmpURL() -> URL {
         return getTmpURL(for: "jpeg")
     }
+    /// 获取视频临时路径
     public class func getVideoTmpURL() -> URL {
         return getTmpURL(for: "mp4")
     }
+    /// 获取和微信主题一致的配置
     public class func getWXConfig() -> HXPHConfiguration {
         let config = HXPHConfiguration.init()
         config.maximumSelectedCount = 9

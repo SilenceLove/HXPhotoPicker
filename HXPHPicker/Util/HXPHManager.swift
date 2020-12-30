@@ -56,6 +56,7 @@ public class HXPHManager: NSObject {
     var bundle: Bundle?
     /// 是否使用了自定义的语言
     var isCustomLanguage: Bool = false
+    
     lazy var cameraAlbumLocalIdentifier : String? = {
         var identifier = UserDefaults.standard.string(forKey: HXPHPicker.CameraAlbumLocal.identifier.rawValue)
         return identifier
@@ -80,6 +81,8 @@ public class HXPHManager: NSObject {
             #if HXPHPICKER_ENABLE_SPM
             if let path = Bundle.module.path(forResource: "HXPHPicker", ofType: "bundle") {
                 self.bundle = Bundle.init(path: path)
+            }else {
+                self.bundle = Bundle.main
             }
             #else
             let bundle = Bundle.init(for: HXPHPicker.self)

@@ -65,7 +65,7 @@ import Photos
     /// - Parameters:
     ///   - pickerController: 对应的 HXPHPickerController
     ///   - photoAsset: 对应的 HXPHAsset 数据
-    @objc optional func pickerController(_ pickerController: HXPHPickerController, shouldEditAsset photoAsset: HXPHAsset) -> Bool
+    @objc optional func pickerController(_ pickerController: HXPHPickerController, shouldEditAsset photoAsset: HXPHAsset, atIndex: Int) -> Bool
     
     /// 预览界面更新当前显示的资源，collectionView滑动了就会调用
     /// - Parameters:
@@ -188,6 +188,15 @@ open class HXPHPickerController: UINavigationController {
     /// - Parameter photoAsset: 对应的 HXPHAsset 数据
     public func previewAddedCameraPhotoAsset(_ photoAsset: HXPHAsset) {
         previewViewController()?.addedCameraPhotoAsset(photoAsset)
+    }
+    
+    /// 获取预览界面当前显示的 image 视图
+    /// - Returns: 对应的 UIImageView
+    public func getCurrentPreviewImageView() -> UIImageView? {
+        if let previewVC = previewViewController(), let cell = previewVC.getCell(for: previewVC.currentPreviewIndex), let imageView = cell.scrollContentView?.imageView {
+            return imageView
+        }
+        return nil
     }
     
     /// 相册列表控制器
@@ -597,8 +606,8 @@ extension HXPHPickerController {
         }
         return true
     }
-    func shouldEditAsset(photoAsset: HXPHAsset) -> Bool {
-        if let shouldEditAsset = pickerControllerDelegate?.pickerController?(self, shouldEditAsset: photoAsset) {
+    func shouldEditAsset(photoAsset: HXPHAsset, atIndex: Int) -> Bool {
+        if let shouldEditAsset = pickerControllerDelegate?.pickerController?(self, shouldEditAsset: photoAsset, atIndex: atIndex) {
             return shouldEditAsset
         }
         return true

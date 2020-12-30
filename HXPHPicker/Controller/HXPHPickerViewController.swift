@@ -431,13 +431,16 @@ extension HXPHPickerViewController {
         return photoAsset
     }
     func addedPhotoAsset(for photoAsset: HXPHAsset) {
+        let indexPath: IndexPath
         if pickerController!.config.reverseOrder {
             assets.insert(photoAsset, at: 0)
-            collectionView.insertItems(at: [IndexPath(item: needOffset ? 1 : 0, section: 0)])
+            indexPath = IndexPath(item: needOffset ? 1 : 0, section: 0)
         }else {
             assets.append(photoAsset)
-            collectionView.insertItems(at: [IndexPath(item: needOffset ? assets.count : assets.count - 1, section: 0)])
+            indexPath = IndexPath(item: needOffset ? assets.count : assets.count - 1, section: 0)
         }
+        collectionView.insertItems(at: [indexPath])
+        collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
     }
     func changedAssetCollection(collection: HXPHAssetCollection?) {
         _ = HXPHProgressHUD.showLoadingHUD(addedTo: navigationController?.view, animated: true)
