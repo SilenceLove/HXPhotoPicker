@@ -78,7 +78,9 @@ public class HXPHManager: NSObject {
     func createBundle() -> Bundle? {
         if self.bundle == nil {
             #if HXPHPICKER_ENABLE_SPM
-            self.bundle = Bundle.module.path(forResource: "HXPHPicker", ofType: "bundle")
+            if let path = Bundle.module.path(forResource: "HXPHPicker", ofType: "bundle") {
+                self.bundle = Bundle.init(path: path)
+            }
             return self.bundle
             #endif
             let bundle = Bundle.init(for: HXPHPicker.self)
