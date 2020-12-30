@@ -81,8 +81,7 @@ public class HXPHManager: NSObject {
             if let path = Bundle.module.path(forResource: "HXPHPicker", ofType: "bundle") {
                 self.bundle = Bundle.init(path: path)
             }
-            return self.bundle
-            #endif
+            #else
             let bundle = Bundle.init(for: HXPHPicker.self)
             var path = bundle.path(forResource: "HXPHPicker", ofType: "bundle")
             if path == nil {
@@ -95,6 +94,7 @@ public class HXPHManager: NSObject {
                 }
             }
             self.bundle = (path != nil) ? Bundle.init(path: path!) : Bundle.main
+            #endif
         }
         return self.bundle
     }
