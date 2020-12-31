@@ -9,6 +9,7 @@
 
 import UIKit
 import Photos
+import HXPHPicker
 
 class BaseViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, BaseViewCellDelegate {
      
@@ -407,7 +408,7 @@ extension BaseViewController: HXPHPickerControllerDelegate {
     }
 }
 
-class HXAlbumViewCustomCell: HXAlbumViewCell {
+class HXAlbumViewCustomCell: HXPHAlbumViewCell {
     override func layoutView() {
         super.layoutView()
         photoCountLb.x += 100

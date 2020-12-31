@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import HXPHPicker
 
 protocol ConfigurationViewControllerDelegate: NSObjectProtocol {
     func ConfigurationViewControllerDidSave(_ config: HXPHConfiguration)

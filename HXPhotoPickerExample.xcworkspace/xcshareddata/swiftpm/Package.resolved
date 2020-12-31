@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "HXPHPicker",
+        "repositoryURL": "https://github.com/SilenceLove/HXPHPicker",
+        "state": {
+          "branch": null,
+          "revision": "c4ef7a1fa969afd5d4bd7595cf9f9141bad64f9c",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
