@@ -496,7 +496,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                 [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
             } error:&error];
             
-            if (error) {
+            if (error != nil) {
                 if (HXShowLog) NSSLog(@"保存自定义相册失败");
             } else {
                 if (HXShowLog) NSSLog(@"保存自定义相册成功");
@@ -524,7 +524,6 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
         NSError * error1 = nil;
         __block NSString * createCollectionID = nil;
         [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
-            NSString * title = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
             createCollectionID = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:title].placeholderForCreatedAssetCollection.localIdentifier;
         } error:&error1];
         
