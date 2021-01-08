@@ -834,9 +834,9 @@
         }
     }
     if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-        if (model.videoDuration < self.configuration.videoMinimumSelectDuration) { 
+        if (round(model.videoDuration) < self.configuration.videoMinimumSelectDuration) { 
             return [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.configuration.videoMinimumSelectDuration];
-        }else if (model.videoDuration >= self.configuration.videoMaximumSelectDuration + 1) {
+        }else if (round(model.videoDuration) >= self.configuration.videoMaximumSelectDuration + 1) {
             if (self.configuration.selectVideoBeyondTheLimitTimeAutoEdit &&
                 self.configuration.videoCanEdit) {
                 if (model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
