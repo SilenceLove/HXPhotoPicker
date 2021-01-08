@@ -1275,9 +1275,9 @@ HX_PhotoEditViewControllerDelegate
                             weakSelf.manager.configuration.shouldUseCamera(weakSelf, cameraType, weakSelf.manager);
                         }
                         weakSelf.manager.configuration.useCameraComplete = ^(HXPhotoModel *model) {
-                            if (model.videoDuration < weakSelf.manager.configuration.videoMinimumSelectDuration) {
+                            if (round(model.videoDuration) < weakSelf.manager.configuration.videoMinimumSelectDuration) {
                                 [weakSelf.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], weakSelf.manager.configuration.videoMinimumSelectDuration]];
-                            }else if (model.videoDuration >= weakSelf.manager.configuration.videoMaximumSelectDuration + 1) {
+                            }else if (round(model.videoDuration) >= weakSelf.manager.configuration.videoMaximumSelectDuration + 1) {
                                 [weakSelf.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], weakSelf.manager.configuration.videoMaximumSelectDuration]];
                             }
                             [weakSelf customCameraViewController:nil didDone:model];

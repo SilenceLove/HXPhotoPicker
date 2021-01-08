@@ -1237,7 +1237,7 @@ HX_PhotoEditViewControllerDelegate
     }
     if (self.manager.configuration.singleSelected) {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-            if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
+            if (round(model.videoDuration) >= self.manager.configuration.videoMaximumSelectDuration + 1) {
                 if (self.manager.configuration.selectVideoBeyondTheLimitTimeAutoEdit &&
                     self.manager.configuration.videoCanEdit) {
                     self.singleSelectedJumpEdit = YES;
@@ -1246,7 +1246,7 @@ HX_PhotoEditViewControllerDelegate
                     [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
                 }
                 return;
-            }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
+            }else if (round(model.videoDuration) < self.manager.configuration.videoMinimumSelectDuration) {
                 [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
                 return;
             }

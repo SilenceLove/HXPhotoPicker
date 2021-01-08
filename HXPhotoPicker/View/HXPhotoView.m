@@ -665,11 +665,11 @@
             return;
         }
         // 当选中视频个数没有达到最大个数时就添加到选中数组中 
-        if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
+        if (round(model.videoDuration) < self.manager.configuration.videoMinimumSelectDuration) {
             
             [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
             return;
-        }else if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
+        }else if (round(model.videoDuration) >= self.manager.configuration.videoMaximumSelectDuration + 1) {
             [[self hx_viewController].view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
             return;
         }else if ([self.manager afterSelectVideoCountIsMaximum]) {

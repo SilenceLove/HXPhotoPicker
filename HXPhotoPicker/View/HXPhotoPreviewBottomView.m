@@ -87,13 +87,13 @@
         }
     }
     if (model.subType == HXPhotoModelMediaSubTypeVideo && !tipText) {
-        if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
+        if (round(model.videoDuration) >= self.manager.configuration.videoMaximumSelectDuration + 1) {
             if (self.manager.configuration.videoCanEdit) {
                 tipText = [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"只能选择%ld秒内的视频，需进行编辑"], self.manager.configuration.videoMaximumSelectDuration];
             }else {
                 tipText = [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration];
             }
-        }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
+        }else if (round(model.videoDuration) < self.manager.configuration.videoMinimumSelectDuration) {
             tipText = [NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration];
         }
     }
