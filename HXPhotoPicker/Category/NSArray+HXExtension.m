@@ -272,19 +272,19 @@
             return;
         }
     }
-//    if ((original && photoModel.type != HXPhotoModelMediaTypeVideo) ||
-//        photoModel.type == HXPhotoModelMediaTypePhotoGif) {
-//        // 如果选择了原图，就换一种获取方式
-//        [photoModel requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
-//            if (successful) {
-//                successful(nil, imageURL, model);
-//            }
-//        } failed:^(NSDictionary *info, HXPhotoModel *model) {
-//            if (failure) {
-//                failure(model);
-//            }
-//        }];
-//    }else {
+    if ((original && photoModel.type != HXPhotoModelMediaTypeVideo) ||
+        photoModel.type == HXPhotoModelMediaTypePhotoGif) {
+        // 如果选择了原图，就换一种获取方式，并获取图片的URL
+        [photoModel requestImageURLStartRequestICloud:nil progressHandler:nil success:^(NSURL *imageURL, HXPhotoModel *model, NSDictionary *info) {
+            if (successful) {
+                successful(nil, imageURL, model);
+            }
+        } failed:^(NSDictionary *info, HXPhotoModel *model) {
+            if (failure) {
+                failure(model);
+            }
+        }];
+    }else {
         [photoModel requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
             UIImage *image = [UIImage imageWithData:imageData];
             if (image.imageOrientation == UIImageOrientationUp) {
@@ -308,7 +308,7 @@
                 }
             }
         }];
-//    }
+    }
 }
 
 - (void)hx_requestImageDataWithCompletion:(void (^)(NSArray<NSData *> * _Nullable imageDataArray))completion {
