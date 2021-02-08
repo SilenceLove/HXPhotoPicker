@@ -167,6 +167,9 @@
     HXPhotoPreviewBottomViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DatePreviewBottomViewCellId" forIndexPath:indexPath];
     cell.selectColor = self.manager.configuration.previewBottomSelectColor ? : self.manager.configuration.themeColor;
     HXPhotoModel *model = self.modelArray[indexPath.item];
+    if ([HXPhotoTools isRTLLanguage]) {
+        model = self.modelArray[self.modelArray.count - 1 - indexPath.item];
+    }
     cell.model = model;
     return cell;
 }
