@@ -268,33 +268,40 @@
             self.editingView.hidden = YES;
         }
         self.photoEdit = self.photoModel.photoEdit;
-        self.editingView.image = self.editImage;
-        [self setupPhotoData];
-    }else {
-        if (self.photoModel.asset ||
-            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
-            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
-            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
-            self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) {
-            [self requestImageData];
+        if (self.editImage) {
+            self.editingView.image = self.editImage;
+            [self setupPhotoData];
         }else {
-            UIImage *image;
-            if (self.photoModel.thumbPhoto.images.count > 1) {
-                image = self.photoModel.thumbPhoto.images.firstObject;
-            }else {
-                image = self.photoModel.thumbPhoto;
-            }
-            CGSize imageSize = image.size;
-            if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-                while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
-                    imageSize.width /= 2;
-                    imageSize.height /= 2;
-                }
-                image = [image hx_scaleToFillSize:imageSize];
-            }
-            self.editImage = image;
-            [self loadImageCompletion];
+            [self setAsetImage];
         }
+    }else {
+        [self setAsetImage];
+    }
+}
+- (void)setAsetImage {
+    if (self.photoModel.asset ||
+        self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
+        self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
+        self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeLocalLivePhoto ||
+        self.photoModel.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto) {
+        [self requestImageData];
+    }else {
+        UIImage *image;
+        if (self.photoModel.thumbPhoto.images.count > 1) {
+            image = self.photoModel.thumbPhoto.images.firstObject;
+        }else {
+            image = self.photoModel.thumbPhoto;
+        }
+        CGSize imageSize = image.size;
+        if (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+            while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+                imageSize.width /= 2;
+                imageSize.height /= 2;
+            }
+            image = [image hx_scaleToFillSize:imageSize];
+        }
+        self.editImage = image;
+        [self loadImageCompletion];
     }
 }
 - (void)setupPhotoData {
@@ -340,7 +347,7 @@
         [self loadImageCompletion];
         return;
     }
-    self.requestId = [self.photoModel requestImageDataStartRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
+    self.requestId = [self.photoModel requestImageDataWithLoadOriginalImage:YES startRequestICloud:^(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model) {
         weakSelf.requestId = iCloudRequestId;
     } progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
         @autoreleasepool {
@@ -430,6 +437,10 @@
     self.transitionCompletion = YES;
     self.editingView.hidden = NO;
     if (self.photoModel.photoEdit) {
+        if (!self.editingView.image) {
+            self.editingView.image = self.editImage;
+            [self setupPhotoData];
+        }
         self.editingView.hidden = NO;
         if (self.onlyCliping) {
             [self.editingView setClipping:YES animated:YES];
@@ -535,14 +546,15 @@
     
 }
 - (void)setEditImage:(UIImage *)editImage {
-    if (!self.photoEdit) {
+//    if (!self.photoEdit) {
         _editImage = HX_UIImageDecodedCopy(editImage);
-    }
+//    }
 }
 - (void)setPhotoEdit:(HXPhotoEdit *)photoEdit {
     _photoEdit = photoEdit;
     if (photoEdit) {
-        _editImage = photoEdit.editImage;
+        NSData *imageData = [NSData dataWithContentsOfFile:photoEdit.imagePath];
+        _editImage = [UIImage imageWithData:imageData];
         self.editData = photoEdit.editData;
     }
 }
@@ -654,7 +666,12 @@
     void (^finishImage)(UIImage *) = ^(UIImage *image){
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (data) {
-                photoEdit = [[HXPhotoEdit alloc] initWithEditImage:weakSelf.editImage previewImage:image data:data];
+                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".jpg"];
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                NSData *imageData = HX_UIImageJPEGRepresentation(weakSelf.editImage);
+                if ([imageData writeToFile:fullPathToFile atomically:YES]) {
+                    photoEdit = [[HXPhotoEdit alloc] initWithEditImagePath:fullPathToFile previewImage:image data:data];
+                }
             }
             if (!photoEdit) {
                 [weakSelf.photoModel.photoEdit clearData];

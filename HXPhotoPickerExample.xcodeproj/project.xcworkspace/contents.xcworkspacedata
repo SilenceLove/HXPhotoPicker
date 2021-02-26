@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/Foreverlove/Documents/HXPhotoPicker/HXPhotoPicker-Demo.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>

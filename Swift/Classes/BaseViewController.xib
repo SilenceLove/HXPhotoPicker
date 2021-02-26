@@ -14,6 +14,8 @@
                 <outlet property="collectionView" destination="2Kv-7w-a30" id="SUI-ta-4hH"/>
                 <outlet property="collectionViewHeightConstraint" destination="znL-rg-Ss0" id="EBn-QW-BpK"/>
                 <outlet property="collectionViewTopConstraint" destination="g6o-Wc-mhY" id="7Uv-9w-yMX"/>
+                <outlet property="pickerStyleControl" destination="iMO-BX-q69" id="POf-lj-gCk"/>
+                <outlet property="previewStyleControl" destination="Aul-E4-bnE" id="QlU-MC-thY"/>
                 <outlet property="view" destination="iN0-l3-epB" id="xfg-wx-vur"/>
             </connections>
         </placeholder>
@@ -26,7 +28,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NwQ-gx-TFH">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="620"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="717"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OWE-K4-nDn">
                                     <rect key="frame" x="181" y="520" width="52" height="33"/>
@@ -61,18 +63,52 @@
                                         <action selector="didRequestSelectedAssetURL:" destination="-1" eventType="touchUpInside" id="ox6-3L-SrR"/>
                                     </connections>
                                 </button>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="pickerStyle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jxh-Aa-vem">
+                                    <rect key="frame" x="48" y="627.5" width="67.5" height="16"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Aul-E4-bnE">
+                                    <rect key="frame" x="126.5" y="666" width="161" height="32"/>
+                                    <segments>
+                                        <segment title="custom"/>
+                                        <segment title="automatic"/>
+                                    </segments>
+                                </segmentedControl>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="previewStyle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gL4-ak-vqs">
+                                    <rect key="frame" x="38.5" y="673.5" width="78" height="16"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="iMO-BX-q69">
+                                    <rect key="frame" x="125.5" y="620" width="163" height="32"/>
+                                    <segments>
+                                        <segment title="fullScreen"/>
+                                        <segment title="automatic"/>
+                                    </segments>
+                                </segmentedControl>
                             </subviews>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <constraints>
+                                <constraint firstItem="gL4-ak-vqs" firstAttribute="centerY" secondItem="Aul-E4-bnE" secondAttribute="centerY" id="EVG-kg-bIt"/>
+                                <constraint firstItem="Jxh-Aa-vem" firstAttribute="centerY" secondItem="iMO-BX-q69" secondAttribute="centerY" id="INL-5j-WUy"/>
+                                <constraint firstItem="Aul-E4-bnE" firstAttribute="top" secondItem="iMO-BX-q69" secondAttribute="bottom" constant="15" id="J0x-sY-crh"/>
                                 <constraint firstItem="2Kv-7w-a30" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KYh-c8-vQy"/>
                                 <constraint firstItem="mPQ-uN-Ram" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="KwU-l3-Txc"/>
+                                <constraint firstItem="iMO-BX-q69" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="Q1s-Sq-WrJ"/>
+                                <constraint firstAttribute="bottom" secondItem="Aul-E4-bnE" secondAttribute="bottom" constant="20" id="UjA-kj-hPZ"/>
+                                <constraint firstItem="iMO-BX-q69" firstAttribute="leading" secondItem="Jxh-Aa-vem" secondAttribute="trailing" constant="10" id="Xfl-1C-JrK"/>
                                 <constraint firstItem="mPQ-uN-Ram" firstAttribute="leading" secondItem="NwQ-gx-TFH" secondAttribute="leading" constant="5" id="YYZ-3a-ufY"/>
                                 <constraint firstItem="OWE-K4-nDn" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="bVI-x8-snf"/>
                                 <constraint firstItem="mPQ-uN-Ram" firstAttribute="top" secondItem="OWE-K4-nDn" secondAttribute="bottom" constant="15" id="c2o-nX-I6c"/>
-                                <constraint firstAttribute="bottom" secondItem="mPQ-uN-Ram" secondAttribute="bottom" constant="20" id="cmf-hq-dhW"/>
                                 <constraint firstItem="2Kv-7w-a30" firstAttribute="top" secondItem="NwQ-gx-TFH" secondAttribute="top" constant="100" id="g6o-Wc-mhY"/>
                                 <constraint firstAttribute="trailing" secondItem="mPQ-uN-Ram" secondAttribute="trailing" constant="5" id="gUh-pT-ISz"/>
+                                <constraint firstItem="iMO-BX-q69" firstAttribute="top" secondItem="mPQ-uN-Ram" secondAttribute="bottom" constant="20" id="h5d-AM-fHZ"/>
                                 <constraint firstItem="2Kv-7w-a30" firstAttribute="leading" secondItem="NwQ-gx-TFH" secondAttribute="leading" id="knd-bA-LEm"/>
+                                <constraint firstItem="Aul-E4-bnE" firstAttribute="leading" secondItem="gL4-ak-vqs" secondAttribute="trailing" constant="10" id="mea-h5-sKo"/>
+                                <constraint firstItem="Aul-E4-bnE" firstAttribute="centerX" secondItem="NwQ-gx-TFH" secondAttribute="centerX" id="pv0-CV-wr5"/>
                                 <constraint firstItem="OWE-K4-nDn" firstAttribute="top" secondItem="2Kv-7w-a30" secondAttribute="bottom" constant="20" id="sjD-cp-8tO"/>
                                 <constraint firstAttribute="trailing" secondItem="2Kv-7w-a30" secondAttribute="trailing" id="zog-tI-RbZ"/>
                             </constraints>

@@ -552,11 +552,15 @@
     if (self.selectedList.count) {
         self.selectedAssetList = [NSMutableArray arrayWithCapacity:self.selectedList.count];
         self.tempSelectedModelList = [NSMutableArray arrayWithCapacity:self.selectedList.count];
+        NSInteger index = 0;
         for (HXPhotoModel *model in _selectedList) {
+            model.selectedIndex = index;
+            model.selectIndexStr = @(index + 1).stringValue;
             if (model.asset) {
                 [self.selectedAssetList addObject:model.asset];
                 [self.tempSelectedModelList addObject:model];
             }
+            index++;
         }
     }
     if (self.iCloudUploadArray.count) {

@@ -48,10 +48,7 @@
 		7B08597A24FA58DF00E93091 /* Demo10ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08594E24FA58DE00E93091 /* Demo10ViewController.m */; };
 		7B08597B24FA58DF00E93091 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08595024FA58DE00E93091 /* SettingViewController.m */; };
 		7B08597C24FA58DF00E93091 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */; };
-		7B151AC3259330D3004962B0 /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */; };
-		7B151AC82593318E004962B0 /* ConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B151AC72593318E004962B0 /* ConfigurationViewController.xib */; };
-		7B1C05B6258CAB5E000242A1 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */; };
-		7B1C05BB258CABBD000242A1 /* BaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B1C05BA258CABBD000242A1 /* BaseViewController.xib */; };
+		7B22FDC225E50B6500772E8E /* HXPHPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 7B22FDC125E50B6500772E8E /* HXPHPicker */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
 		7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC0255E185900937B4A /* AppDelegate.swift */; };
 		7B3EDEC5255E185900937B4A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC4255E185900937B4A /* ViewController.swift */; };
@@ -59,7 +56,6 @@
 		7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC9255E185B00937B4A /* Assets.xcassets */; };
 		7B3EDECD255E185B00937B4A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B3EDECB255E185B00937B4A /* LaunchScreen.storyboard */; };
 		7B3FAFE02558EFAE0092FCE0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
-		7B49EDCF259DDA0100A3D91A /* HXPHPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 7B49EDCE259DDA0100A3D91A /* HXPHPicker */; };
 		7B4D4C3E24B858C600B03846 /* HXPhotoEditConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D4BE624B858C600B03846 /* HXPhotoEditConfiguration.m */; };
 		7B4D4C4624B858C600B03846 /* HX_PhotoEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D4BF924B858C600B03846 /* HX_PhotoEditViewController.m */; };
 		7B4D4C4724B858C600B03846 /* HXPhotoEditChartletModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D4BFE24B858C600B03846 /* HXPhotoEditChartletModel.m */; };
@@ -161,6 +157,16 @@
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
 		7B8BFB1C2585191D00510339 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */; };
 		7BAF876124C14D5C00ACAF85 /* HXCameraBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */; };
+		7BC230EF25B1888C00434BBB /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230E325B1888C00434BBB /* BaseViewController.swift */; };
+		7BC230F025B1888C00434BBB /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230E525B1888C00434BBB /* UIDevice+Extension.swift */; };
+		7BC230F125B1888C00434BBB /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230E625B1888C00434BBB /* UIFont+Extension.swift */; };
+		7BC230F225B1888C00434BBB /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230E725B1888C00434BBB /* UIView+Extension.swift */; };
+		7BC230F325B1888C00434BBB /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230E825B1888C00434BBB /* UIImage+Extension.swift */; };
+		7BC230F425B1888C00434BBB /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230E925B1888C00434BBB /* String+Extension.swift */; };
+		7BC230F525B1888C00434BBB /* ConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC230EA25B1888C00434BBB /* ConfigurationViewController.xib */; };
+		7BC230F625B1888C00434BBB /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230EB25B1888C00434BBB /* ConfigurationViewController.swift */; };
+		7BC230F725B1888C00434BBB /* BaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC230EC25B1888C00434BBB /* BaseViewController.xib */; };
+		7BC230F825B1888C00434BBB /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC230EE25B1888C00434BBB /* ProgressHUD.swift */; };
 		7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */; };
 		7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */; };
 		7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */; };
@@ -352,6 +358,19 @@
 		7BD52F7D24FE258200AE3D7C /* HXPhotoTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65D92487AD5B00077EE1 /* HXPhotoTools.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		7BC2310925B189A100434BBB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		16A9631049F51EB2C9886F18 /* Pods-HXPhotoPickerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPhotoPickerExample.debug.xcconfig"; path = "Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample.debug.xcconfig"; sourceTree = "<group>"; };
 		3582D2EABCA69E96E4C95300 /* Pods-HXPhotoPickerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPhotoPickerExample.release.xcconfig"; path = "Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample.release.xcconfig"; sourceTree = "<group>"; };
@@ -421,10 +440,6 @@
 		7B08595024FA58DE00E93091 /* SettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
 		7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WxMomentViewCell.xib; sourceTree = "<group>"; };
 		7B08595224FA58DE00E93091 /* Demo6SubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo6SubViewController.h; sourceTree = "<group>"; };
-		7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B151AC72593318E004962B0 /* ConfigurationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigurationViewController.xib; sourceTree = "<group>"; };
-		7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
-		7B1C05BA258CABBD000242A1 /* BaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BaseViewController.xib; sourceTree = "<group>"; };
 		7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
 		7B3EDEBE255E185900937B4A /* HXPHPickerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HXPHPickerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B3EDEC0255E185900937B4A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -628,6 +643,16 @@
 		7BAF875F24C14D5C00ACAF85 /* HXCameraBottomView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCameraBottomView.h; sourceTree = "<group>"; };
 		7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCameraBottomView.m; sourceTree = "<group>"; };
 		7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewProtocol.h; sourceTree = "<group>"; };
+		7BC230E325B1888C00434BBB /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		7BC230E525B1888C00434BBB /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
+		7BC230E625B1888C00434BBB /* UIFont+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
+		7BC230E725B1888C00434BBB /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
+		7BC230E825B1888C00434BBB /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		7BC230E925B1888C00434BBB /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		7BC230EA25B1888C00434BBB /* ConfigurationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConfigurationViewController.xib; sourceTree = "<group>"; };
+		7BC230EB25B1888C00434BBB /* ConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BC230EC25B1888C00434BBB /* BaseViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BaseViewController.xib; sourceTree = "<group>"; };
+		7BC230EE25B1888C00434BBB /* ProgressHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
 		7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorSizeView.xib; sourceTree = "<group>"; };
 		7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditStickerTrashView.xib; sourceTree = "<group>"; };
 		7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditMosaicView.xib; sourceTree = "<group>"; };
@@ -651,7 +676,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B49EDCF259DDA0100A3D91A /* HXPHPicker in Frameworks */,
+				7B22FDC225E50B6500772E8E /* HXPHPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -795,12 +820,9 @@
 		7B3EDEBF255E185900937B4A /* Swift */ = {
 			isa = PBXGroup;
 			children = (
+				7BC230E225B1888C00434BBB /* Classes */,
 				7B3EDEC0255E185900937B4A /* AppDelegate.swift */,
 				7B3EDEC4255E185900937B4A /* ViewController.swift */,
-				7B151AC2259330D3004962B0 /* ConfigurationViewController.swift */,
-				7B151AC72593318E004962B0 /* ConfigurationViewController.xib */,
-				7B1C05B5258CAB5E000242A1 /* BaseViewController.swift */,
-				7B1C05BA258CABBD000242A1 /* BaseViewController.xib */,
 				7B3EDEC6255E185900937B4A /* Main.storyboard */,
 				7B3EDEC9255E185B00937B4A /* Assets.xcassets */,
 				7B3EDECB255E185B00937B4A /* LaunchScreen.storyboard */,
@@ -1131,6 +1153,39 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		7BC230E225B1888C00434BBB /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				7BC230E325B1888C00434BBB /* BaseViewController.swift */,
+				7BC230EC25B1888C00434BBB /* BaseViewController.xib */,
+				7BC230EB25B1888C00434BBB /* ConfigurationViewController.swift */,
+				7BC230EA25B1888C00434BBB /* ConfigurationViewController.xib */,
+				7BC230E425B1888C00434BBB /* Extension */,
+				7BC230ED25B1888C00434BBB /* View */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		7BC230E425B1888C00434BBB /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				7BC230E525B1888C00434BBB /* UIDevice+Extension.swift */,
+				7BC230E625B1888C00434BBB /* UIFont+Extension.swift */,
+				7BC230E725B1888C00434BBB /* UIView+Extension.swift */,
+				7BC230E825B1888C00434BBB /* UIImage+Extension.swift */,
+				7BC230E925B1888C00434BBB /* String+Extension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		7BC230ED25B1888C00434BBB /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7BC230EE25B1888C00434BBB /* ProgressHUD.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		7BD52EC124FE250E00AE3D7C /* HXPhotoPickerFramework */ = {
 			isa = PBXGroup;
 			children = (
@@ -1250,6 +1305,7 @@
 				7B3EDEBA255E185900937B4A /* Sources */,
 				7B3EDEBB255E185900937B4A /* Frameworks */,
 				7B3EDEBC255E185900937B4A /* Resources */,
+				7BC2310925B189A100434BBB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1257,7 +1313,7 @@
 			);
 			name = HXPHPickerExample;
 			packageProductDependencies = (
-				7B49EDCE259DDA0100A3D91A /* HXPHPicker */,
+				7B22FDC125E50B6500772E8E /* HXPHPicker */,
 			);
 			productName = HXPHPickerExample;
 			productReference = 7B3EDEBE255E185900937B4A /* HXPHPickerExample.app */;
@@ -1337,7 +1393,7 @@
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
 			packageReferences = (
-				7B49EDCD259DDA0100A3D91A /* XCRemoteSwiftPackageReference "HXPHPicker" */,
+				7B22FDC025E50B6500772E8E /* XCRemoteSwiftPackageReference "HXPHPicker" */,
 			);
 			productRefGroup = 7B7E3E771E4AACD1002234EE /* Products */;
 			projectDirPath = "";
@@ -1356,10 +1412,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B3EDECD255E185B00937B4A /* LaunchScreen.storyboard in Resources */,
-				7B151AC82593318E004962B0 /* ConfigurationViewController.xib in Resources */,
+				7BC230F725B1888C00434BBB /* BaseViewController.xib in Resources */,
 				7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */,
-				7B1C05BB258CABBD000242A1 /* BaseViewController.xib in Resources */,
 				7B3EDEC8255E185900937B4A /* Main.storyboard in Resources */,
+				7BC230F525B1888C00434BBB /* ConfigurationViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1440,10 +1496,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B1C05B6258CAB5E000242A1 /* BaseViewController.swift in Sources */,
+				7BC230F425B1888C00434BBB /* String+Extension.swift in Sources */,
+				7BC230F225B1888C00434BBB /* UIView+Extension.swift in Sources */,
+				7BC230F325B1888C00434BBB /* UIImage+Extension.swift in Sources */,
 				7B3EDEC5255E185900937B4A /* ViewController.swift in Sources */,
+				7BC230F025B1888C00434BBB /* UIDevice+Extension.swift in Sources */,
+				7BC230F625B1888C00434BBB /* ConfigurationViewController.swift in Sources */,
 				7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */,
-				7B151AC3259330D3004962B0 /* ConfigurationViewController.swift in Sources */,
+				7BC230F125B1888C00434BBB /* UIFont+Extension.swift in Sources */,
+				7BC230F825B1888C00434BBB /* ProgressHUD.swift in Sources */,
+				7BC230EF25B1888C00434BBB /* BaseViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1695,6 +1757,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 36YN45CVLK;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1728,6 +1794,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 36YN45CVLK;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = Swift/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -1878,9 +1948,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.8;
+				MARKETING_VERSION = 3.1.9;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-6";
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1905,8 +1975,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.8;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.silence.HXPhotoPicker-6";
+				MARKETING_VERSION = 3.1.9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2033,20 +2103,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		7B49EDCD259DDA0100A3D91A /* XCRemoteSwiftPackageReference "HXPHPicker" */ = {
+		7B22FDC025E50B6500772E8E /* XCRemoteSwiftPackageReference "HXPHPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SilenceLove/HXPHPicker";
 			requirement = {
 				kind = revision;
-				revision = c4ef7a1fa969afd5d4bd7595cf9f9141bad64f9c;
+				revision = 65ceb611d38654a88cfbd030e288070e49cdd080;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7B49EDCE259DDA0100A3D91A /* HXPHPicker */ = {
+		7B22FDC125E50B6500772E8E /* HXPHPicker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7B49EDCD259DDA0100A3D91A /* XCRemoteSwiftPackageReference "HXPHPicker" */;
+			package = 7B22FDC025E50B6500772E8E /* XCRemoteSwiftPackageReference "HXPHPicker" */;
 			productName = HXPHPicker;
 		};
 /* End XCSwiftPackageProductDependency section */

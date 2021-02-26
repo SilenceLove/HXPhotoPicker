@@ -16,6 +16,8 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
     @IBOutlet weak var collectionViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var pickerStyleControl: UISegmentedControl!
+    @IBOutlet weak var previewStyleControl: UISegmentedControl!
     
     var addCell: BaseAddViewCell {
         get {
@@ -34,16 +36,16 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
     var beforeRowCount: Int = 0
     
     /// 当前已选资源
-    var selectedAssets: [HXPHAsset] = []
+    var selectedAssets: [PhotoAsset] = []
     /// 是否选中的原图
     var isOriginal: Bool = false
     /// 相机拍摄的本地资源
-    var localCameraAssetArray: [HXPHAsset] = []
+    var localCameraAssetArray: [PhotoAsset] = []
     /// 相关配置
-    var config: HXPHConfiguration = HXPHTools.getWXConfig()
+    var config: PickerConfiguration = PhotoTools.getWXPickerConfig()
     
     weak var previewTitleLabel: UILabel?
-    weak var currentPickerController: HXPHPickerController?
+    weak var currentPickerController: PhotoPickerController?
     
     init() {
         super.init(nibName:"BaseViewController",bundle: nil)
@@ -56,7 +58,7 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        config.albumList.customCellClass = HXAlbumViewCustomCell.self
+//        config.albumList.customCellClass = AlbumViewCustomCell.self
 //        config.photoList.cell.customSingleCellClass = HXPHPickerViewCustomCell.self
 //        config.photoList.cell.customSelectableCellClass = HXPHPickerMultiSelectViewCustomCell.self
         collectionViewTopConstraint.constant = 20
@@ -124,8 +126,8 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
         beforeRowCount = rowCount
         let itemWidth = Int((view.width - 24 - 2) / 3)
         var heightConstraint = CGFloat(rowCount * itemWidth + rowCount)
-        if heightConstraint > view.height - UIDevice.current.navigationBarHeight - 20 - 150 {
-            heightConstraint = view.height - UIDevice.current.navigationBarHeight - 20 - 150
+        if heightConstraint > view.height - UIDevice.navigationBarHeight - 20 - 150 {
+            heightConstraint = view.height - UIDevice.navigationBarHeight - 20 - 150
         }
         collectionViewHeightConstraint.constant = heightConstraint
     }
@@ -148,30 +150,31 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
         presentPickerController()
     }
     func presentPickerController() {
-        let pickerController = HXPHPickerController.init(picker: config)
+        let pickerController = PhotoPickerController.init(picker: config)
         pickerController.pickerControllerDelegate = self
         pickerController.selectedAssetArray = selectedAssets
         pickerController.localCameraAssetArray = localCameraAssetArray
         pickerController.isOriginal = isOriginal
-//        pickerController.modalPresentationStyle = .fullScreen
+        if pickerStyleControl.selectedSegmentIndex == 0 {
+            pickerController.modalPresentationStyle = .fullScreen
+        }
         present(pickerController, animated: true, completion: nil)
     }
     /// 获取已选资源的地址
     @IBAction func didRequestSelectedAssetURL(_ sender: Any) {
         let total = selectedAssets.count
         if total == 0 {
-            HXPHProgressHUD.showWarningHUD(addedTo: self.view, text: "请先选择资源", animated: true, delay: 1.5)
+            ProgressHUD.showWarningHUD(addedTo: self.view, text: "请先选择资源", animated: true, delay: 1.5)
             return
         }
-        var count = 0
-        _ = HXPHProgressHUD.showLoadingHUD(addedTo: self.view, text: "获取中", animated: true)
         weak var weakSelf = self
+        var count = 0
         for photoAsset in selectedAssets {
             if photoAsset.mediaType == .photo {
                 if photoAsset.mediaSubType == .livePhoto {
                     var imageURL: URL?
                     var videoURL: URL?
-                    HXPHAssetManager.requestLivePhoto(contentURL: photoAsset.phAsset!) { (url) in
+                    AssetManager.requestLivePhoto(contentURL: photoAsset.phAsset!) { (url) in
                         imageURL = url
                     } videoHandler: { (url) in
                         videoURL = url
@@ -185,8 +188,8 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
                             print("LivePhoto中的内容获取失败\(error!)")
                         }
                         if count == total {
-                            HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
-                            HXPHProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
+                            ProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
+                            ProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
                         }
                     }
                 }else {
@@ -198,13 +201,13 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
                             print("图片地址获取失败")
                         }
                         if count == total {
-                            HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
-                            HXPHProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
+                            ProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
+                            ProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
                         }
                     }
 //                    print("图片：\(photoAsset.originalImage!)")
 //                    if count == total {
-//                        HXPHProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
+//                        ProgressHUD.hideHUD(forView: weakSelf?.navigationController?.view, animated: true)
 //                    }
                 }
             }else {
@@ -216,8 +219,8 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
                         print("视频地址：\(videoURL!)")
                     }
                     if count == total {
-                        HXPHProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
-                        HXPHProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
+                        ProgressHUD.hideHUD(forView: weakSelf?.view, animated: false)
+                        ProgressHUD.showSuccessHUD(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
                     }
                 }
             }
@@ -261,16 +264,25 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
         if selectedAssets.isEmpty {
             return
         }
-//        config.previewView.bottomView.showSelectedView = false
-        // 预览时可以重新初始化一个config设置单独的颜色或其他配置
         // modalPresentationStyle = .custom 会使用框架自带的动画效果
-        let pickerController = HXPHPickerController.init(preview: config, currentIndex: indexPath.item, modalPresentationStyle: .custom)
+        // 预览时可以重新初始化一个config设置单独的颜色或其他配置
+        let previewConfig = PhotoTools.getWXPickerConfig()
+//        previewConfig.prefersStatusBarHidden = true
+//        previewConfig.previewView.bottomView.showSelectedView = false
+        var style: UIModalPresentationStyle = .custom
+        if previewStyleControl.selectedSegmentIndex == 1 {
+            if #available(iOS 13.0, *) {
+                style = .automatic
+            }
+        }
+        let pickerController = PhotoPickerController.init(preview: previewConfig, currentIndex: indexPath.item, modalPresentationStyle: style)
         pickerController.selectedAssetArray = selectedAssets
         pickerController.pickerControllerDelegate = self
-        // 透明导航栏建议修改取消图片
+        // 透明导航栏建议修改取消图片,换张带阴影的图片
 //        config.previewView.cancelImageName = ""
 //        pickerController.navigationBar.setBackgroundImage(UIImage.image(for: UIColor.clear, havingSize: .zero), for: .default)
 //        pickerController.navigationBar.shadowImage = UIImage.image(for: UIColor.clear, havingSize: .zero)
+        
         let titleLabel = UILabel.init()
         titleLabel.size = CGSize(width: 100, height: 30)
         titleLabel.textColor = .white
@@ -284,7 +296,7 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
         self.currentPickerController = pickerController
     }
     @objc func deletePreviewAsset() {
-        HXPHTools.showAlert(viewController: self.currentPickerController, title: "是否删除当前资源", message: nil, leftActionTitle: "确定", leftHandler: { (alertAction) in
+        PhotoTools.showAlert(viewController: self.currentPickerController, title: "是否删除当前资源", message: nil, leftActionTitle: "确定", leftHandler: { (alertAction) in
             self.currentPickerController?.deleteCurrentPreviewPhotoAsset()
         }, rightActionTitle: "取消") { (alertAction) in
         }
@@ -359,32 +371,38 @@ class BaseViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
 }
 
-// MARK: HXPHPickerControllerDelegate
-extension BaseViewController: HXPHPickerControllerDelegate {
+// MARK: PhotoPickerControllerDelegate
+extension BaseViewController: PhotoPickerControllerDelegate {
     
-    func pickerController(_ pickerController: HXPHPickerController, didFinishSelection selectedAssetArray: [HXPHAsset], _ isOriginal: Bool) {
+    func pickerController(_ pickerController: PhotoPickerController, didFinishSelection selectedAssetArray: [PhotoAsset], _ isOriginal: Bool) {
         self.selectedAssets = selectedAssetArray
         self.isOriginal = isOriginal
         collectionView.reloadData()
         updateCollectionViewHeight()
     }
-    func pickerController(_ pickerController: HXPHPickerController, singleFinishSelection photoAsset:HXPHAsset, _ isOriginal: Bool) {
+    func pickerController(_ pickerController: PhotoPickerController, singleFinishSelection photoAsset:PhotoAsset, _ isOriginal: Bool) {
         selectedAssets = [photoAsset]
         self.isOriginal = isOriginal
         collectionView.reloadData()
         updateCollectionViewHeight()
     }
-    func pickerController(didCancel pickerController: HXPHPickerController) {
+    func pickerController(_ pickerController: PhotoPickerController, didEditAsset photoAsset: PhotoAsset, atIndex: Int) {
+        if pickerController.isPreviewAsset {
+            selectedAssets[atIndex] = photoAsset
+            collectionView.reloadItems(at: [IndexPath.init(item: atIndex, section: 0)])
+        }
+    }
+    func pickerController(didCancel pickerController: PhotoPickerController) {
         
     }
-    func pickerController(_ pickerController: HXPHPickerController, didDismissComplete localCameraAssetArray: [HXPHAsset]) {
+    func pickerController(_ pickerController: PhotoPickerController, didDismissComplete localCameraAssetArray: [PhotoAsset]) {
         setNeedsStatusBarAppearanceUpdate()
         self.localCameraAssetArray = localCameraAssetArray
     }
-    func pickerController(_ pikcerController: HXPHPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: HXPHAsset, atIndex: Int) {
+    func pickerController(_ pikcerController: PhotoPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: PhotoAsset, atIndex: Int) {
         previewTitleLabel?.text = String(atIndex + 1) + "/" + String(selectedAssets.count)
     }
-    func pickerController(_ pickerController: HXPHPickerController, previewDidDeleteAsset photoAsset: HXPHAsset, atIndex: Int) {
+    func pickerController(_ pickerController: PhotoPickerController, previewDidDeleteAsset photoAsset: PhotoAsset, atIndex: Int) {
         let isFull = selectedAssets.count == config.maximumSelectedCount
         selectedAssets.remove(at: atIndex)
         if isFull {
@@ -394,27 +412,28 @@ extension BaseViewController: HXPHPickerControllerDelegate {
         }
         updateCollectionViewHeight()
     }
-    func pickerController(_ pickerController: HXPHPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
+    func pickerController(_ pickerController: PhotoPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
         return cell
     }
-    func pickerController(_ pickerController: HXPHPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
+    func pickerController(_ pickerController: PhotoPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? BaseViewCell
         return cell?.imageView.image
     }
-    func pickerController(_ pickerController: HXPHPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
+    func pickerController(_ pickerController: PhotoPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
         return cell
     }
 }
 
-class HXAlbumViewCustomCell: HXPHAlbumViewCell {
+class AlbumViewCustomCell: AlbumViewCell {
     override func layoutView() {
         super.layoutView()
+        // 测试修改 x
         photoCountLb.x += 100
     }
 }
-class HXPHPickerViewCustomCell: HXPHPickerViewCell {
+class HXPHPickerViewCustomCell: PhotoPickerViewCell {
     override func initView() {
         super.initView()
         isHidden = false
@@ -423,7 +442,7 @@ class HXPHPickerViewCustomCell: HXPHPickerViewCell {
         imageView.image = UIImage.image(for: "hx_picker_add_img")
     }
 }
-class HXPHPickerMultiSelectViewCustomCell: HXPHPickerSelectableViewCell {
+class HXPHPickerMultiSelectViewCustomCell: PhotoPickerSelectableViewCell {
     override func initView() {
         super.initView()
         isHidden = false
@@ -432,8 +451,8 @@ class HXPHPickerMultiSelectViewCustomCell: HXPHPickerSelectableViewCell {
         // 重写图片内容
         imageView.image = UIImage.image(for: "hx_picker_add_img")
     }
-    override func didSelectControlClick(control: HXPHPickerSelectBoxView) {
-        delegate?.cell?(didSelectControl: self, isSelected: control.isSelected)
+    override func didSelectControlClick(control: PhotoPickerSelectBoxView) {
+        delegate?.cell?(self, didSelectControl: control.isSelected)
         // 重写选择框事件，也可以将选择框隐藏。自己新加一个选择框，然后触发代理回调
     }
     override func updateSelectedState(isSelected: Bool, animated: Bool) {
@@ -449,7 +468,7 @@ class HXPHPickerMultiSelectViewCustomCell: HXPHPickerSelectableViewCell {
         // 重写布局
     }
 }
-class BaseAddViewCell: HXPHPickerBaseViewCell {
+class BaseAddViewCell: PhotoPickerBaseViewCell {
     override func initView() {
         super.initView()
         isHidden = false
@@ -461,7 +480,7 @@ class BaseAddViewCell: HXPHPickerBaseViewCell {
     @objc optional func cell(didDeleteButton cell: BaseViewCell)
 }
 
-class BaseViewCell: HXPHPickerViewCell {
+class BaseViewCell: PhotoPickerViewCell {
     weak var baseDelegate: BaseViewCellDelegate?
     lazy var deleteButton: UIButton = {
         let deleteButton = UIButton.init(type: .custom)
@@ -473,10 +492,10 @@ class BaseViewCell: HXPHPickerViewCell {
     override func requestThumbnailImage() {
         // 因为这里的cell不会很多，重新设置 targetWidth，使图片更加清晰
         weak var weakSelf = self
-        requestID = photoAsset?.requestThumbnailImage(targetWidth: width * UIScreen.main.scale, completion: { (image, photoAsset, info) in
+        requestID = photoAsset.requestThumbnailImage(targetWidth: width * UIScreen.main.scale, completion: { (image, photoAsset, info) in
             if photoAsset == weakSelf?.photoAsset && image != nil {
                 weakSelf?.imageView.image = image
-                if !HXPHAssetManager.assetDownloadIsDegraded(for: info) {
+                if !AssetManager.assetIsDegraded(for: info) {
                     weakSelf?.requestID = nil
                 }
             }

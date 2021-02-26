@@ -10,7 +10,7 @@ import UIKit
 import HXPHPicker
 
 protocol ConfigurationViewControllerDelegate: NSObjectProtocol {
-    func ConfigurationViewControllerDidSave(_ config: HXPHConfiguration)
+    func ConfigurationViewControllerDidSave(_ config: PickerConfiguration)
 }
 
 class ConfigurationViewController: UIViewController, UIScrollViewDelegate {
@@ -36,10 +36,12 @@ class ConfigurationViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var videoMaxDurationField: UITextField!
     @IBOutlet weak var photoMaxFileSizeField: UITextField!
     @IBOutlet weak var videoMaxFileSizeField: UITextField!
+    @IBOutlet weak var saveAlbumSwitch: UISwitch!
+    @IBOutlet weak var customAlbumNameField: UITextField!
     
-    var config: HXPHConfiguration
+    var config: PickerConfiguration
     
-    init(config: HXPHConfiguration) {
+    init(config: PickerConfiguration) {
         self.config = config
         super.init(nibName:"ConfigurationViewController",bundle: nil)
     }
@@ -64,12 +66,14 @@ class ConfigurationViewController: UIViewController, UIScrollViewDelegate {
         videoMaxDurationField.text = String(config.maximumSelectedVideoDuration)
         photoMaxFileSizeField.text = String(config.maximumSelectedPhotoFileSize)
         videoMaxFileSizeField.text = String(config.maximumSelectedVideoFileSize)
+        saveAlbumSwitch.isOn = config.photoList.saveSystemAlbum
+        customAlbumNameField.text = config.photoList.customAlbumName
         
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "取消", style: .done, target: self, action: #selector(didCancelButtonClick))
         navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "保存", style: .done, target: self, action: #selector(didSaveButtonClick))
         if let nav = navigationController {
             if nav.modalPresentationStyle == .fullScreen {
-                topMarginConstraint.constant = UIDevice.current.navigationBarHeight + 5
+                topMarginConstraint.constant = UIDevice.navigationBarHeight + 5
             }else {
                 topMarginConstraint.constant = nav.navigationBar.height + 5
             }
@@ -79,11 +83,11 @@ class ConfigurationViewController: UIViewController, UIScrollViewDelegate {
         dismiss(animated: true, completion: nil)
     }
     @objc func didSaveButtonClick() {
-        config.languageType = HXPHPicker.LanguageType.init(rawValue: languageControl.selectedSegmentIndex)!
-        config.selectType = HXPHPicker.SelectType.init(rawValue: selectTypeControl.selectedSegmentIndex)!
-        config.selectMode = HXPHPicker.SelectMode.init(rawValue: selectModeControl.selectedSegmentIndex)!
-        config.albumShowMode = HXPHPicker.Album.ShowMode.init(rawValue: albumShowModeControl.selectedSegmentIndex)!
-        config.appearanceStyle = HXPHPicker.AppearanceStyle.init(rawValue: appearanceStyleControl.selectedSegmentIndex)!
+        config.languageType = LanguageType.init(rawValue: languageControl.selectedSegmentIndex)!
+        config.selectType = SelectType.init(rawValue: selectTypeControl.selectedSegmentIndex)!
+        config.selectMode = SelectMode.init(rawValue: selectModeControl.selectedSegmentIndex)!
+        config.albumShowMode = AlbumShowMode.init(rawValue: albumShowModeControl.selectedSegmentIndex)!
+        config.appearanceStyle = AppearanceStyle.init(rawValue: appearanceStyleControl.selectedSegmentIndex)!
         config.allowSelectedTogether = allowTogetherSelectedSwitch.isOn
         config.allowLoadPhotoLibrary = allowLoadPhotoLibrarySwitch.isOn
         config.creationDate = createdDateSwitch.isOn
@@ -99,6 +103,8 @@ class ConfigurationViewController: UIViewController, UIScrollViewDelegate {
         config.maximumSelectedVideoDuration = Int(videoMaxDurationField.text ?? "0") ?? 0
         config.maximumSelectedPhotoFileSize = Int(photoMaxFileSizeField.text ?? "0") ?? 0
         config.maximumSelectedVideoFileSize = Int(videoMaxFileSizeField.text ?? "0") ?? 0
+        config.photoList.saveSystemAlbum = saveAlbumSwitch.isOn
+        config.photoList.customAlbumName = customAlbumNameField.text
         
         delegate?.ConfigurationViewControllerDidSave(config)
         dismiss(animated: true, completion: nil)
@@ -111,7 +117,7 @@ class ConfigurationViewController: UIViewController, UIScrollViewDelegate {
         view.endEditing(true)
     }
     required init?(coder aDecoder: NSCoder) {
-        self.config = HXPHConfiguration.init()
+        self.config = PickerConfiguration.init()
         super.init(coder: aDecoder)
     }
 }

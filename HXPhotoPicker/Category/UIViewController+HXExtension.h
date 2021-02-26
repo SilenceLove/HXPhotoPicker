@@ -40,7 +40,7 @@
 
 /// 跳转相册列表
 /// @param delegate HXCustomNavigationControllerDelegate
-- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager *_Nullable)manager
+- (void)hx_presentSelectPhotoControllerWithManager:(HXPhotoManager * _Nullable)manager
                                           delegate:(id _Nullable )delegate;
 
 /// 跳转预览照片界面
@@ -48,17 +48,17 @@
 /// @param previewStyle 预览样式
 /// @param currentIndex 当前预览的下标
 /// @param photoView 照片展示视图 - 没有就不传
-- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *_Nullable)manager
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager * _Nullable)manager
                                        previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView;
 
-- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager * _Nullable)manager
                                        previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
                               showBottomPageControl:(BOOL)showBottomPageControl
                                        currentIndex:(NSUInteger)currentIndex;
 
-- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager *)manager
+- (void)hx_presentPreviewPhotoControllerWithManager:(HXPhotoManager * _Nullable)manager
                                        previewStyle:(HXPhotoViewPreViewShowStyle)previewStyle
                               showBottomPageControl:(BOOL)showBottomPageControl
                                        currentIndex:(NSUInteger)currentIndex
@@ -67,14 +67,14 @@
 /// 跳转相机界面
 /// @param manager 照片管理者
 /// @param delegate 代理
-- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *_Nullable)manager
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager * _Nullable)manager
                                                delegate:(id _Nullable )delegate;
 
 /// 跳转相机界面
 /// @param manager 照片管理者
 /// @param done 完成回调
 /// @param cancel 取消回调
-- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *_Nullable)manager
+- (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager * _Nullable)manager
                                                    done:(HXCustomCameraViewControllerDidDoneBlock _Nullable )done
                                                  cancel:(HXCustomCameraViewControllerDidCancelBlock _Nullable )cancel;
 

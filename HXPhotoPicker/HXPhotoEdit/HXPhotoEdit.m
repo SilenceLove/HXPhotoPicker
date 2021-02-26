@@ -17,22 +17,23 @@
 @property (nonatomic, strong) UIImage *editPreviewImage;
 /// 编辑图片数据
 @property (nonatomic, strong) NSData *editPreviewData;
-/// 编辑原图片
-@property (nonatomic, strong) UIImage *editImage;
+/// 编辑原图片临时地址
+@property (nonatomic, copy) NSString *imagePath;
 /// 编辑数据
 @property (nonatomic, copy) NSDictionary *editData;
 @end
 
 @implementation HXPhotoEdit
 
-- (instancetype)initWithEditImage:(UIImage *)image previewImage:(UIImage *)previewImage data:(NSDictionary *)data {
+- (instancetype)initWithEditImagePath:(NSString *)imagePath previewImage:(UIImage *)previewImage data:(NSDictionary *)data {
     self = [super init];
     if (self) {
         if (!previewImage) {
-            previewImage = image;
+            NSData *data = [NSData dataWithContentsOfFile:imagePath];
+            previewImage = [UIImage imageWithData:data];
         }
         [self setEditingImage:previewImage];
-        _editImage = image;
+        _imagePath = imagePath;
         _editData = data;
     }
     return self;
@@ -42,7 +43,7 @@
 - (void)clearData {
     self.editPreviewImage = nil;
     self.editPosterImage = nil;
-    self.editImage = nil;
+    self.imagePath = nil;
     self.editData = nil;
 }
 - (void)setEditingImage:(UIImage *)editPreviewImage {
@@ -57,7 +58,7 @@
         self.editPosterImage = [aDecoder decodeObjectForKey:@"editPosterImage"];
         self.editPreviewImage = [aDecoder decodeObjectForKey:@"editPreviewImage"];
         self.editPreviewData = [aDecoder decodeObjectForKey:@"editPreviewData"];
-        self.editImage = [aDecoder decodeObjectForKey:@"editImage"];
+        self.imagePath = [aDecoder decodeObjectForKey:@"imagePath"];
         self.editData = [aDecoder decodeObjectForKey:@"editData"];
         
     }
@@ -73,7 +74,7 @@
     [aCoder encodeObject:self.editPosterImage forKey:@"editPosterImage"];
     [aCoder encodeObject:self.editPreviewImage forKey:@"editPreviewImage"];
     [aCoder encodeObject:self.editPreviewData forKey:@"editPreviewData"];
-    [aCoder encodeObject:self.editImage forKey:@"editImage"];
+    [aCoder encodeObject:self.imagePath forKey:@"imagePath"];
     [aCoder encodeObject:self.editData forKey:@"editData"];
 }
 @end

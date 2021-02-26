@@ -1063,7 +1063,7 @@ HXEditFrameViewDelegate
     left.size.width += hxImageWidth * 4;
     CGRect right = self.rightImageView.frame;
     right.origin.x -= hxImageWidth * 2;
-    right.size.width = hxImageWidth * 4;
+    right.size.width += hxImageWidth * 4;
     
     if (CGRectContainsPoint(left, point)) {
         return self.leftImageView;

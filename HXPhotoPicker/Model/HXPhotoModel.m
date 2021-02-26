@@ -951,11 +951,12 @@
         }
     }];
 }
-- (PHImageRequestID)requestImageDataStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
-                                       progressHandler:(HXModelProgressHandler)progressHandler
-                                               success:(HXModelImageDataSuccessBlock)success
-                                                failed:(HXModelFailedBlock)failed {
-    if (self.photoEdit) {
+- (PHImageRequestID)requestImageDataWithLoadOriginalImage:(BOOL)originalImage
+                                       startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                          progressHandler:(HXModelProgressHandler)progressHandler
+                                                  success:(HXModelImageDataSuccessBlock)success
+                                                   failed:(HXModelFailedBlock)failed {
+    if (self.photoEdit && !originalImage) {
         if (success) success(self.photoEdit.editPreviewData, self.photoEdit.editPreviewImage.imageOrientation, self, nil);
         return 0;
     }
@@ -1020,6 +1021,12 @@
     }];
     self.iCloudRequestID = requestID;
     return requestID;
+}
+- (PHImageRequestID)requestImageDataStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud
+                                       progressHandler:(HXModelProgressHandler)progressHandler
+                                               success:(HXModelImageDataSuccessBlock)success
+                                                failed:(HXModelFailedBlock)failed {
+    return [self requestImageDataWithLoadOriginalImage:NO startRequestICloud:startRequestICloud progressHandler:progressHandler success:success failed:failed];
 }
 
 - (PHImageRequestID)requestAVAssetStartRequestICloud:(HXModelStartRequestICloud)startRequestICloud

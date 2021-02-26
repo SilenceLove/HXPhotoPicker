@@ -17,12 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) UIImage *editPreviewImage;
 /// 编辑图片数据
 @property (nonatomic, readonly) NSData *editPreviewData;
-/// 编辑原图片
-@property (nonatomic, readonly) UIImage *editImage;
+/// 编辑原图片本地临时地址
+@property (nonatomic, readonly) NSString *imagePath;
 /// 编辑数据
 @property (nonatomic, readonly) NSDictionary *editData;
 
-- (instancetype)initWithEditImage:(UIImage *)image previewImage:(UIImage *)previewImage data:(NSDictionary *)data;
+- (instancetype)initWithEditImagePath:(NSString *)imagePath previewImage:(UIImage *)previewImage data:(NSDictionary *)data;
 
 - (void)clearData;
 @end
