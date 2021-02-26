@@ -91,6 +91,8 @@
 + (BOOL)platform;
 + (BOOL)isIphone6;
 
+/// 判断RTL语言
++ (BOOL)isRTLLanguage;
 
 /// 判断网络地址是否在本地存在
 /// 如果文件夹不存在则会创建文件夹
