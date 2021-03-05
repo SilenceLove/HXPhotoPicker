@@ -47,10 +47,10 @@
     HXPhotoViewController *fromVC = (HXPhotoViewController *)[transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     HXPhotoPreviewViewController *toVC = (HXPhotoPreviewViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     HXPhotoModel *model = [toVC.modelArray objectAtIndex:toVC.currentModelIndex];
-    UIImage *image;
+    UIImage *image = model.thumbPhoto ?: model.previewPhoto;;
     if (model.photoEdit) {
         image = model.photoEdit.editPreviewImage;
-    }else {
+    }else if (model.asset){
         image = model.thumbPhoto ?: model.previewPhoto;
         PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
         self.requestID = [HXAssetManager requestImageDataForAsset:model.asset options:options completion:^(NSData * _Nonnull imageData, UIImageOrientation orientation, NSDictionary<NSString *,id> * _Nonnull info) {

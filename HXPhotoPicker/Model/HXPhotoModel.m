@@ -1365,18 +1365,25 @@
             [session exportAsynchronouslyWithCompletionHandler:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if ([session status] == AVAssetExportSessionStatusCompleted) {
-                        if (HXShowLog) NSSLog(@"视频导出完成");
                         [timer invalidate];
                         self.videoURL = videoURL;
                         if (success) {
                             success(videoURL, self);
                         }
                     }else if ([session status] == AVAssetExportSessionStatusFailed){
-                        if (HXShowLog) NSSLog(@"视频导出失败");
                         [timer invalidate];
-                        if (failed) {
-                            failed(nil, self);
-                        }
+                        [self getVideoURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+                            self.videoURL = videoURL;
+                            if (success) {
+                                success(videoURL, self);
+                            }
+                            if (HXShowLog) NSSLog(@"视频导出完成");
+                        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                            if (failed) {
+                                failed(nil, self);
+                            }
+                            if (HXShowLog) NSSLog(@"视频导出失败");
+                        }];
                     }else if ([session status] == AVAssetExportSessionStatusCancelled) {
                         if (HXShowLog) NSSLog(@"视频导出被取消");
                         [timer invalidate];

@@ -46,6 +46,9 @@
             NSString *path = dict[key];
             UIImage *image = [self hx_disposeHEICWithPath:path];
             if (image) {
+                if (image.imageOrientation != UIImageOrientationUp) {
+                    image = [image hx_normalizedImage];
+                }
                 [dataArray addObject:image];
             }
         }else {
@@ -62,11 +65,17 @@
         NSString *key = (__bridge NSString *)kCGImageDestinationLossyCompressionQuality;
         NSData *jpgData = [context JPEGRepresentationOfImage:ciImage colorSpace:ciImage.colorSpace options:@{key : @1}];
         UIImage *image = [UIImage imageWithData:jpgData];
+        if (image.imageOrientation != UIImageOrientationUp) {
+            image = [image hx_normalizedImage];
+        }
         return image;
     }else {
         NSData *imageData = [NSData dataWithContentsOfFile:path];
         UIImage *image = [UIImage imageWithData:imageData];
         if (!image) {
+            if (image.imageOrientation != UIImageOrientationUp) {
+                image = [image hx_normalizedImage];
+            }
             image = [UIImage imageWithContentsOfFile:path];
         }
         return image;
@@ -287,7 +296,7 @@
 //    }else {
         [photoModel requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
             UIImage *image = [UIImage imageWithData:imageData];
-            if (image.imageOrientation == UIImageOrientationUp) {
+            if (image.imageOrientation != UIImageOrientationUp) {
                 image = [image hx_normalizedImage];
             }
             // 不是原图那就压缩

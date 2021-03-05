@@ -144,6 +144,9 @@ HX_PhotoEditViewControllerDelegate
     if (self.needChangeViewFrame) {
         self.needChangeViewFrame = NO;
     }
+    if (self.manager.viewWillAppear) {
+        self.manager.viewWillAppear(self);
+    }
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -152,9 +155,21 @@ HX_PhotoEditViewControllerDelegate
             [self.cameraCell starRunning];
         }
     }
+    if (self.manager.viewDidAppear) {
+        self.manager.viewDidAppear(self);
+    }
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    if (self.manager.viewWillDisappear) {
+        self.manager.viewWillDisappear(self);
+    }
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    if (self.manager.viewDidDisappear) {
+        self.manager.viewDidDisappear(self);
+    }
 }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"

@@ -586,7 +586,20 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     } 
     return have;
 }
++ (BOOL)isIphone12Mini {
+    struct utsname systemInfo;
+    uname(&systemInfo);
     
+    NSString *platform = [NSString stringWithCString:systemInfo.machine encoding:NSASCIIStringEncoding];
+    if([platform isEqualToString:@"iPhone13,1"]) {
+        return YES;
+    }else if ([platform isEqualToString:@"x86_64"] || [platform isEqualToString:@"i386"]) {
+        if (([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)) {
+            return YES;
+        }
+    }
+    return NO;
+}
 + (BOOL)isRTLLanguage
 {
     return [NSLocale characterDirectionForLanguage:[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode]] == NSLocaleLanguageDirectionRightToLeft;
@@ -1037,8 +1050,12 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     if (@available(iOS 13.0, *)) {
         UIStatusBarManager *statusBarManager = [UIApplication sharedApplication].windows.firstObject.windowScene.statusBarManager;
         statusBarHeight = statusBarManager.statusBarFrame.size.height;
-        if ([UIApplication sharedApplication].statusBarHidden) {
-            statusBarHeight = HX_IS_IPhoneX_All ? 44: 20;
+        if ([HXPhotoTools isIphone12Mini]) {
+            statusBarHeight = 50;
+        }else {
+            if ([UIApplication sharedApplication].statusBarHidden) {
+                statusBarHeight = HX_IS_IPhoneX_All ? 44: 20;
+            }
         }
     }
     else {

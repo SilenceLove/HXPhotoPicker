@@ -171,9 +171,21 @@ UITableViewDelegate
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self changeStatusBarStyle];
+    if (self.manager.viewWillAppear) {
+        self.manager.viewWillAppear(self);
+    }
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    if (self.manager.viewWillDisappear) {
+        self.manager.viewWillDisappear(self);
+    }
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    if (self.manager.viewDidDisappear) {
+        self.manager.viewDidDisappear(self);
+    }
 }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
@@ -199,6 +211,9 @@ UITableViewDelegate
             }
         }
 #endif
+    }
+    if (self.manager.viewDidAppear) {
+        self.manager.viewDidAppear(self);
     }
 }
 - (void)setupUI {

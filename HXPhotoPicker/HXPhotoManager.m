@@ -675,7 +675,7 @@
             [allArray insertObject:model atIndex:0];
         }
     }
-    if (_tempCameraAssetModels) {
+    if (_tempCameraAssetModels && !self.configuration.singleSelected) {
         NSInteger index = 0;
         for (HXPhotoModel *model in _tempCameraAssetModels) {
             if (self.configuration.reverseDate) {
@@ -1353,6 +1353,9 @@
     self.firstHasCameraAsset = YES;
 }
 - (void)afterSelectedListdeletePhotoModel:(HXPhotoModel *)model {
+    if ([self.tempCameraAssetModels containsObject:model]) {
+        [self.tempCameraAssetModels removeObject:model];
+    }
     if (![self.endSelectedList containsObject:model]) {
         return;
     }

@@ -193,6 +193,9 @@ HX_PhotoEditViewControllerDelegate
             [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
         }
     }
+    if (self.manager.viewWillAppear) {
+        self.manager.viewWillAppear(self);
+    }
 }
 #pragma clang diagnostic pop
 - (void)viewDidAppear:(BOOL)animated {
@@ -232,6 +235,9 @@ HX_PhotoEditViewControllerDelegate
         }
         self.isAddInteractiveTransition = YES;
     }
+    if (self.manager.viewDidAppear) {
+        self.manager.viewDidAppear(self);
+    }
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -248,6 +254,15 @@ HX_PhotoEditViewControllerDelegate
     cell.stopCancel = self.stopCancel;
     [cell cancelRequest];
     self.stopCancel = NO;
+    if (self.manager.viewWillDisappear) {
+        self.manager.viewWillDisappear(self);
+    }
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    if (self.manager.viewDidDisappear) {
+        self.manager.viewDidDisappear(self);
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];

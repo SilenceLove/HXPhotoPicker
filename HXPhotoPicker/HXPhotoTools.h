@@ -90,6 +90,7 @@
 
 + (BOOL)platform;
 + (BOOL)isIphone6;
++ (BOOL)isIphone12Mini;
 
 /// 判断RTL语言
 + (BOOL)isRTLLanguage;

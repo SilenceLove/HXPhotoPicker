@@ -88,13 +88,15 @@
 //            
 //            return YES;
 //        };
-        
         _photoManager.configuration.type = HXConfigurationTypeWXMoment;
         _photoManager.configuration.localFileName = @"hx_WxMomentPhotoModels";
         _photoManager.configuration.showOriginalBytes = YES;
         _photoManager.configuration.showOriginalBytesLoading = YES;
 //        _photoManager.configuration.clarityScale = 2.f;
         HXWeakSelf
+        _photoManager.viewWillAppear = ^(UIViewController *viewController) {
+            NSSLog(@"%@：viewWillAppear", viewController.class);
+        };
         // 添加一个可以更改可查看照片的数据
         _photoManager.configuration.navigationBar = ^(UINavigationBar *navigationBar, UIViewController *viewController) {
             

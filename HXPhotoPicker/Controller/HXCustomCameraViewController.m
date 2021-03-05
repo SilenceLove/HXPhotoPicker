@@ -324,6 +324,9 @@ CLLocationManagerDelegate
         [previewLayerConnection setVideoOrientation:(AVCaptureVideoOrientation)[[UIApplication sharedApplication] statusBarOrientation]];
     
     [self preferredStatusBarUpdateAnimation];
+    if (self.manager.viewWillAppear) {
+        self.manager.viewWillAppear(self);
+    }
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -333,16 +336,25 @@ CLLocationManagerDelegate
 #pragma clang diagnostic pop
     [self.cameraController stopMontionUpdate];
     [self preferredStatusBarUpdateAnimation];
+    if (self.manager.viewWillDisappear) {
+        self.manager.viewWillDisappear(self);
+    }
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self.navigationController setNavigationBarHidden:YES];
     [self.cameraController startMontionUpdate];
+    if (self.manager.viewDidAppear) {
+        self.manager.viewDidAppear(self);
+    }
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [self stopTimer];
     [self.cameraController stopSession];
+    if (self.manager.viewDidDisappear) {
+        self.manager.viewDidDisappear(self);
+    }
 } 
 - (void)dealloc {
     if (HX_ALLOW_LOCATION && _locationManager) {

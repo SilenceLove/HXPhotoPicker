@@ -101,11 +101,11 @@
 }
 + (void)requestVideoURL:(PHAsset *)asset completion:(void (^)(NSURL * _Nullable))completion {
     [self requestAVAssetForAsset:asset networkAccessAllowed:YES progressHandler:nil completion:^(AVAsset * _Nonnull avAsset, AVAudioMix * _Nonnull audioMix, NSDictionary * _Nonnull info) {
-        if ([avAsset isKindOfClass:AVURLAsset.class]) {
-            if (completion) {
-                completion([(AVURLAsset *)avAsset URL]);
-            }
-        }else {
+//        if ([avAsset isKindOfClass:AVURLAsset.class]) {
+//            if (completion) {
+//                completion([(AVURLAsset *)avAsset URL]);
+//            }
+//        }else {
             PHAssetResource *videoResource = [PHAssetResource assetResourcesForAsset:asset].firstObject;
             NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
             NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
@@ -121,7 +121,7 @@
                     completion(nil);
                 }
             }];
-        }
+//        }
     }];
 }
 + (CGSize)getAssetTargetSizeWithAsset:(PHAsset *)asset width:(CGFloat)width {
