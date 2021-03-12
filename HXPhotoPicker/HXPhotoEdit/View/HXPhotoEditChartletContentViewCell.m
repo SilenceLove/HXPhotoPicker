@@ -29,7 +29,7 @@
     }
     CGFloat width;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown || HX_UI_IS_IPAD) {
         width = (HX_ScreenWidth - 5 * 20) / 4;
         self.flowLayout.sectionInset = UIEdgeInsetsMake(75, 20, 20, 20);
     }else {

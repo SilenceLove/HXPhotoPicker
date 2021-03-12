@@ -499,7 +499,7 @@
         if (thread.isMainThread) {
             orientation = [[UIApplication sharedApplication] statusBarOrientation];
         }
-        if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
+        if ((orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) && !HX_UI_IS_IPAD) {
             w = height / self.imageSize.height * imgWidth;
             h = height;
         }else {

@@ -55,13 +55,6 @@
     }
     return _dataList;
 }
-- (HXPhotoSubViewCell *)addCell {
-    if (!_addCell) {
-        _addCell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"addCell" forIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-        _addCell.model = self.addModel;
-    }
-    return _addCell;
-}
 - (HXPhotoModel *)addModel {
     if (!_addModel) {
         _addModel = [[HXPhotoModel alloc] init];

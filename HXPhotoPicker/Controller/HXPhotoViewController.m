@@ -365,7 +365,7 @@ HX_PhotoEditViewControllerDelegate
     CGFloat albumHeight = cellHeight * count;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat albumMaxHeight;
-    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown || HX_UI_IS_IPAD) {
         albumMaxHeight = self.manager.configuration.popupTableViewHeight;
     }else {
         albumMaxHeight = self.manager.configuration.popupTableViewHorizontalHeight;
@@ -382,7 +382,7 @@ HX_PhotoEditViewControllerDelegate
     NSInteger lineCount = self.manager.configuration.rowCount;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
-    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown || HX_UI_IS_IPAD) {
         lineCount = self.manager.configuration.rowCount;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
@@ -2107,7 +2107,7 @@ HX_PhotoEditViewControllerDelegate
         self.albumBgView.alpha = 0;
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         CGFloat navBarHeight = hxNavigationBarHeight;
-        if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown || HX_UI_IS_IPAD) {
             navBarHeight = hxNavigationBarHeight;
         }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft){
             if ([UIApplication sharedApplication].statusBarHidden) {
@@ -2830,7 +2830,7 @@ HX_PhotoEditViewControllerDelegate
     self.maskView.frame = self.bounds;
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 7, 18);
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 27);
-//    [self setSelectBtnFrame];
+    [self setSelectBtnFrame];
     self.selectMaskLayer.frame = self.bounds;
     self.iCloudMaskLayer.frame = self.bounds;
     self.iCloudIcon.hx_x = self.hx_w - 3 - self.iCloudIcon.hx_w;
