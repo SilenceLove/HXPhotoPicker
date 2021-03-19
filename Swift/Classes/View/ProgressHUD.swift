@@ -48,13 +48,13 @@ class ProgressHUD: UIView {
         return textLb
     }()
     
-    lazy var imageView: HXPHProgressImageView = {
-        let imageView = HXPHProgressImageView.init(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
+    lazy var imageView: ProgressImageView = {
+        let imageView = ProgressImageView.init(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
         return imageView
     }()
     
-    lazy var tickView: HXPHProgressImageView = {
-        let tickView = HXPHProgressImageView.init(tickFrame: CGRect(x: 0, y: 0, width: 80, height: 80))
+    lazy var tickView: ProgressImageView = {
+        let tickView = ProgressImageView.init(tickFrame: CGRect(x: 0, y: 0, width: 80, height: 80))
         return tickView
     }()
     
@@ -109,7 +109,7 @@ class ProgressHUD: UIView {
             self.backgroundView.alpha = 1
         }
     }
-    func hideHUD(withAnimated animated: Bool, afterDelay: TimeInterval) {
+    func hide(withAnimated animated: Bool, afterDelay: TimeInterval) {
         finished = true
         self.showDelayTimer?.invalidate()
         if afterDelay > 0 {
@@ -196,18 +196,18 @@ class ProgressHUD: UIView {
         blurEffectView.frame = backgroundView.bounds
     }
     
-    class func showLoadingHUD(addedTo view: UIView?, animated: Bool) -> ProgressHUD? {
-        return showLoadingHUD(addedTo: view, text: nil, animated: animated)
+    class func showLoading(addedTo view: UIView?, animated: Bool) -> ProgressHUD? {
+        return showLoading(addedTo: view, text: nil, animated: animated)
     }
-    class func showLoadingHUD(addedTo view: UIView?, afterDelay: TimeInterval, animated: Bool) -> ProgressHUD? {
-        return showLoadingHUD(addedTo: view, text: nil, afterDelay: afterDelay, animated: animated)
-    }
-    
-    class func showLoadingHUD(addedTo view: UIView?, text: String?, animated: Bool) -> ProgressHUD? {
-        return showLoadingHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
+    class func showLoading(addedTo view: UIView?, afterDelay: TimeInterval, animated: Bool) -> ProgressHUD? {
+        return showLoading(addedTo: view, text: nil, afterDelay: afterDelay, animated: animated)
     }
     
-    class func showLoadingHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) -> ProgressHUD? {
+    class func showLoading(addedTo view: UIView?, text: String?, animated: Bool) -> ProgressHUD? {
+        return showLoading(addedTo: view, text: text, afterDelay: 0, animated: animated)
+    }
+    
+    class func showLoading(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) -> ProgressHUD? {
         if view == nil {
             return nil
         }
@@ -216,11 +216,11 @@ class ProgressHUD: UIView {
         view!.addSubview(progressView)
         return progressView
     }
-    class func showWarningHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
-        self.showWarningHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
-        self.hideHUD(forView: view, animated: animated, afterDelay: delay)
+    class func showWarning(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
+        self.showWarning(addedTo: view, text: text, afterDelay: 0, animated: animated)
+        self.hide(forView: view, animated: animated, afterDelay: delay)
     }
-    class func showWarningHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
+    class func showWarning(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
         if view == nil {
             return
         }
@@ -228,11 +228,11 @@ class ProgressHUD: UIView {
         progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
         view!.addSubview(progressView)
     }
-    class func showSuccessHUD(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
-        self.showSuccessHUD(addedTo: view, text: text, afterDelay: 0, animated: animated)
-        self.hideHUD(forView: view, animated: animated, afterDelay: delay)
+    class func showSuccess(addedTo view: UIView?, text: String?, animated: Bool, delay: TimeInterval) {
+        self.showSuccess(addedTo: view, text: text, afterDelay: 0, animated: animated)
+        self.hide(forView: view, animated: animated, afterDelay: delay)
     }
-    class func showSuccessHUD(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
+    class func showSuccess(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
         if view == nil {
             return
         }
@@ -241,17 +241,17 @@ class ProgressHUD: UIView {
         view!.addSubview(progressView)
     }
     
-    class func hideHUD(forView view:UIView? ,animated: Bool) {
-        hideHUD(forView: view, animated: animated, afterDelay: 0)
+    class func hide(forView view:UIView? ,animated: Bool) {
+        hide(forView: view, animated: animated, afterDelay: 0)
     }
     
-    class func hideHUD(forView view:UIView? ,animated: Bool ,afterDelay: TimeInterval) {
+    class func hide(forView view:UIView? ,animated: Bool ,afterDelay: TimeInterval) {
         if view == nil {
             return
         }
         for subView in view!.subviews {
             if subView is ProgressHUD {
-                (subView as! ProgressHUD).hideHUD(withAnimated: animated, afterDelay: afterDelay)
+                (subView as! ProgressHUD).hide(withAnimated: animated, afterDelay: afterDelay)
             }
         }
     }
@@ -267,7 +267,7 @@ class ProgressHUD: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
-class HXPHProgressImageView: UIView {
+class ProgressImageView: UIView {
     
     lazy var circleLayer: CAShapeLayer = {
         let circleLayer = CAShapeLayer.init()
