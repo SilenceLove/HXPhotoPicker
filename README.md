@@ -65,13 +65,13 @@
 ``` ruby
 # 将以下内容添加到您的Podfile中：
 # 不使用网络图片功能
-pod 'HXPhotoPicker', '~> 3.1.9'
+pod 'HXPhotoPicker', '~> 3.2.0'
   
 # 使用SDWebImage加载网络图片
-pod 'HXPhotoPicker/SDWebImage', '~> 3.1.9'
+pod 'HXPhotoPicker/SDWebImage', '~> 3.2.0'
   
 # 使用YYWebImage加载网络图片
-pod 'HXPhotoPicker/YYWebImage', '~> 3.1.9'
+pod 'HXPhotoPicker/YYWebImage', '~> 3.2.0'
 
 # 搜索不到库或最新版时请执行
 pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
@@ -716,6 +716,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
+- v3.2.0　-　修复特殊情况下获取视频地址崩溃问题
 - v3.1.9　-　优化连续编辑大图出现的内存问题，修复相机拍照后预览崩溃问题
 - v3.1.8　-　修复保存自定义相册无效问题
 - v3.1.7　-　修复相机闪光灯失效问题、视频转场动画效果优化、HXPhotoModel添加获取原视频地址方法、添加属性控制预览界面是否直接加载原图

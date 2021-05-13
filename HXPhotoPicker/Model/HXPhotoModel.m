@@ -1373,9 +1373,9 @@
                     }else if ([session status] == AVAssetExportSessionStatusFailed){
                         [timer invalidate];
                         [self getVideoURLWithSuccess:^(NSURL * _Nullable URL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
-                            self.videoURL = videoURL;
+                            self.videoURL = URL;
                             if (success) {
-                                success(videoURL, self);
+                                success(URL, self);
                             }
                             if (HXShowLog) NSSLog(@"视频导出完成");
                         } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
