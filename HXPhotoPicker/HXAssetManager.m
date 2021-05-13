@@ -113,13 +113,15 @@
             PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
             options.networkAccessAllowed = YES;
             [[PHAssetResourceManager defaultManager] writeDataForAssetResource:videoResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
-                if (!error) {
-                    if (completion) {
-                        completion(videoURL);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (!error) {
+                        if (completion) {
+                            completion(videoURL);
+                        }
+                    }else {
+                        completion(nil);
                     }
-                }else {
-                    completion(nil);
-                }
+                });
             }];
 //        }
     }];
