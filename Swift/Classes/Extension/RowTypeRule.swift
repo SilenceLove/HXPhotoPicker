@@ -14,7 +14,7 @@ protocol HomeRowTypeRule {
 
 protocol ConfigRowTypeRule {
     var title: String { get }
-    var detailTile: String { get }
+    var detailTitle: String { get }
     
     func getFunction<T: UIViewController>(_ controller: T) -> ((IndexPath) -> Void)
 }

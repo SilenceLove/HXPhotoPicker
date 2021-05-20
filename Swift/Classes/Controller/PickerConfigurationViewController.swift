@@ -129,13 +129,14 @@ extension PickerConfigurationViewController {
         present(UINavigationController.init(rootViewController: vc), animated: true, completion: nil)
     }
     func presentEditorConfig(_ indexPath: IndexPath) {
-        let vc: VideoEditorConfigurationViewController
+        let vc: EditorConfigurationViewController
         if #available(iOS 13.0, *) {
-            vc = VideoEditorConfigurationViewController.init(style: .insetGrouped)
+            vc = EditorConfigurationViewController.init(style: .insetGrouped)
         } else {
-            vc = VideoEditorConfigurationViewController.init(style: .grouped)
+            vc = EditorConfigurationViewController.init(style: .grouped)
         }
-        vc.config = config.videoEditor
+        vc.photoConfig = config.photoEditor
+        vc.videoConfig = config.videoEditor
         vc.showOpenEditorButton = false
         present(UINavigationController.init(rootViewController: vc), animated: true, completion: nil)
     }
@@ -418,7 +419,7 @@ extension PickerConfigurationViewController {
             }
         }
         if rowType is ViewControllerOptionsRowType {
-            return presentStyle == .fullScreen ? "全屏" : "非全屏"
+            return presentStyle == .fullScreen ? "true" : "false"
         }
         return ""
     }
@@ -464,7 +465,7 @@ extension PickerConfigurationViewController {
             "是否全屏"
         }
         
-        var detailTile: String {
+        var detailTitle: String {
             "modalPresentationStyle"
         }
         
@@ -480,7 +481,7 @@ extension PickerConfigurationViewController {
             "设置颜色"
         }
         
-        var detailTile: String {
+        var detailTitle: String {
             ".color"
         }
         
@@ -496,8 +497,8 @@ extension PickerConfigurationViewController {
             "编辑配置"
         }
         
-        var detailTile: String {
-            ".videoEditor"
+        var detailTitle: String {
+            ".photoEditor/.videoEditor"
         }
         
         func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
@@ -569,7 +570,7 @@ extension PickerConfigurationViewController {
                 return "视频播放类型"
             }
         }
-        var detailTile: String {
+        var detailTitle: String {
             if self == .photoRowNumber {
                 return ".photoList.rowNumber"
             }
@@ -685,9 +686,9 @@ extension PickerAssetOptions {
         case .photo:
             return "photo"
         case .gifPhoto:
-            return "gifPhoto"
+            return "photo+gifPhoto"
         case .livePhoto:
-            return "livePhoto"
+            return "photo+livePhoto"
         case .video:
             return "video"
         default:

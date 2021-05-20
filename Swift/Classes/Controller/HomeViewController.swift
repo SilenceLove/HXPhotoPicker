@@ -6,12 +6,13 @@
 //
 
 import UIKit
+import HXPHPicker
 
 class HomeViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "PhotoKit"
+        navigationItem.title = "Photo Kit"
         
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
@@ -40,6 +41,14 @@ class HomeViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
+        if let rowType = rowType as? ApplicationRowType  {
+            if rowType == .customCell {
+                let vc = rowType.controller as! PhotoPickerController
+                vc.pickerDelegate = self
+                present(vc, animated: true, completion: nil)
+                return
+            }
+        }
         navigationController?.pushViewController(rowType.controller, animated: true)
     }
 
@@ -95,20 +104,23 @@ extension HomeViewController {
                 }
             case .editor:
                 if #available(iOS 13.0, *) {
-                    return VideoEditorConfigurationViewController(style: .insetGrouped)
+                    return EditorConfigurationViewController(style: .insetGrouped)
                 } else {
-                    return VideoEditorConfigurationViewController(style: .grouped)
+                    return EditorConfigurationViewController(style: .grouped)
                 }
             }
         }
     }
     enum ApplicationRowType: CaseIterable, HomeRowTypeRule {
-        case UICollectionView
+        case avatarPicker
+        case collectionView
         case customCell
         
         var title: String {
             switch self {
-            case .UICollectionView:
+            case .avatarPicker:
+                return "Avatar Picker"
+            case .collectionView:
                 return "Picker+UICollectionView"
             case .customCell:
                 return "Picker+CustomCell"
@@ -117,15 +129,40 @@ extension HomeViewController {
         
         var controller: UIViewController {
             switch self {
-            case .UICollectionView:
+            case .avatarPicker:
+                if #available(iOS 13.0, *) {
+                    return AvatarPickerConfigurationViewController(style: .insetGrouped)
+                } else {
+                    return AvatarPickerConfigurationViewController(style: .grouped)
+                }
+            case .collectionView:
                 return PickerResultViewController()
             case .customCell:
-                return CustomPickerCellViewController()
+                let config: PickerConfiguration = PhotoTools.getWXPickerConfig(isMoment: false)
+                config.photoSelectionTapAction = .quickSelect
+                config.videoSelectionTapAction = .quickSelect
+                config.photoList.cell.customSingleCellClass = CustomPickerViewCell.self
+                config.photoList.cell.customSelectableCellClass = CustomPickerViewCell.self
+                let pickerController = PhotoPickerController.init(config: config)
+                pickerController.autoDismiss = false
+                return pickerController
             }
         }
     }
 }
 
+
+extension HomeViewController: PhotoPickerControllerDelegate {
+    func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
+        pickerController.dismiss(animated: true) {
+            let pickerResultVC = PickerResultViewController.init()
+            pickerResultVC.config = pickerController.config
+            pickerResultVC.selectedAssets = result.photoAssets
+            pickerResultVC.isOriginal = result.isOriginal
+            self.navigationController?.pushViewController(pickerResultVC, animated: true)
+        }
+    }
+}
 extension UITableViewCell {
     
     static var reuseIdentifier: String {

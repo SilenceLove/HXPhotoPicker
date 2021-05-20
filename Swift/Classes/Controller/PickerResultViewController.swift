@@ -174,7 +174,6 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
             ProgressHUD.showWarning(addedTo: self.view, text: "请先选择资源", animated: true, delay: 1.5)
             return
         }
-        weak var weakSelf = self
         var count = 0
         for photoAsset in selectedAssets {
             if photoAsset.mediaType == .photo {
@@ -185,7 +184,7 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
                         imageURL = url
                     } videoHandler: { (url) in
                         videoURL = url
-                    } completionHandler: { (error) in
+                    } completionHandler: { [weak self] (error) in
                         count += 1
                         if error == nil {
                             let image = UIImage.init(contentsOfFile: imageURL!.path)
@@ -195,21 +194,21 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
                             print("LivePhoto中的内容获取失败\(error!)")
                         }
                         if count == total {
-                            ProgressHUD.hide(forView: weakSelf?.view, animated: false)
-                            ProgressHUD.showSuccess(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
+                            ProgressHUD.hide(forView: self?.view, animated: false)
+                            ProgressHUD.showSuccess(addedTo: self?.view, text: "获取完成", animated: true, delay: 1.5)
                         }
                     }
                 }else {
                     count += 1
-                    photoAsset.requestImageURL { (imageURL) in
+                    photoAsset.requestImageURL { [weak self] (imageURL) in
                         if imageURL != nil {
                             print("图片地址：\(imageURL!)")
                         }else {
                             print("图片地址获取失败")
                         }
                         if count == total {
-                            ProgressHUD.hide(forView: weakSelf?.view, animated: false)
-                            ProgressHUD.showSuccess(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
+                            ProgressHUD.hide(forView: self?.view, animated: false)
+                            ProgressHUD.showSuccess(addedTo: self?.view, text: "获取完成", animated: true, delay: 1.5)
                         }
                     }
 //                    print("图片：\(photoAsset.originalImage!)")
@@ -218,7 +217,7 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
 //                    }
                 }
             }else {
-                photoAsset.requestVideoURL { (videoURL) in
+                photoAsset.requestVideoURL { [weak self] (videoURL) in
                     count += 1
                     if videoURL == nil {
                         print("视频地址获取失败")
@@ -226,8 +225,8 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
                         print("视频地址：\(videoURL!)")
                     }
                     if count == total {
-                        ProgressHUD.hide(forView: weakSelf?.view, animated: false)
-                        ProgressHUD.showSuccess(addedTo: weakSelf?.view, text: "获取完成", animated: true, delay: 1.5)
+                        ProgressHUD.hide(forView: self?.view, animated: false)
+                        ProgressHUD.showSuccess(addedTo: self?.view, text: "获取完成", animated: true, delay: 1.5)
                     }
                 }
             }
@@ -280,6 +279,8 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
         // modalPresentationStyle = .custom 会使用框架自带的动画效果
         // 预览时可以重新初始化一个config设置单独的颜色或其他配置
         let previewConfig = PhotoTools.getWXPickerConfig()
+        // 编辑器配置保持一致
+        previewConfig.photoEditor = config.photoEditor
 //        previewConfig.prefersStatusBarHidden = true
 //        previewConfig.previewView.bottomView.showSelectedView = false
         var style: UIModalPresentationStyle = .custom

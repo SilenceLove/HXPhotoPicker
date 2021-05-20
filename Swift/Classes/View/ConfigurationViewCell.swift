@@ -105,14 +105,14 @@ class ConfigurationViewCell: UITableViewCell {
     
     public func setupData(_ rowType: ConfigRowTypeRule, _ content: String) {
         titleLabel.text = rowType.title
-        tagsButton.setTitle(rowType.detailTile, for: .normal)
+        tagsButton.setTitle(rowType.detailTitle, for: .normal)
         contentLabel.text = content
         colorView.isHidden = true
         
     }
     public func setupColorData(_ rowType: ConfigRowTypeRule, _ color: UIColor?) {
         titleLabel.text = rowType.title
-        tagsButton.setTitle(rowType.detailTile, for: .normal)
+        tagsButton.setTitle(rowType.detailTitle, for: .normal)
         colorView.backgroundColor = color
         contentLabel.isHidden = true
     }

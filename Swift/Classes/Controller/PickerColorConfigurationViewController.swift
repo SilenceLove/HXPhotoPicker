@@ -367,7 +367,7 @@ extension PickerColorConfigurationViewController {
             }
         }
         
-        var detailTile: String {
+        var detailTitle: String {
             
             return "." + self.rawValue
         }
@@ -432,7 +432,7 @@ extension PickerColorConfigurationViewController {
             }
         }
         
-        var detailTile: String {
+        var detailTitle: String {
             
             return ".albumList" + self.rawValue
         }
@@ -491,7 +491,7 @@ extension PickerColorConfigurationViewController {
             }
         }
         
-        var detailTile: String {
+        var detailTitle: String {
             switch self {
             case .titleViewBackgroundColor:
                 return ".photoList.titleViewConfig.backgroundColor"
@@ -560,7 +560,7 @@ extension PickerColorConfigurationViewController {
             }
         }
         
-        var detailTile: String {
+        var detailTitle: String {
             switch self {
             case .selectTitleColor:
                 return ".previewView.selectBox.titleColor"
