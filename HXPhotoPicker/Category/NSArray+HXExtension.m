@@ -301,7 +301,7 @@
             }
             // 不是原图那就压缩
             if (!original) {
-                image = [image hx_scaleImagetoScale:0.6f];
+                image = [image hx_scaleImagetoScale:0.5f];
             }
             if (successful) {
                 successful(image, nil, model);

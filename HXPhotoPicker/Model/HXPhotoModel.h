@@ -252,10 +252,10 @@
                                                 failed:(HXModelFailedBlock _Nullable)failed;
 
 - (PHImageRequestID)requestImageDataWithLoadOriginalImage:(BOOL)originalImage
-                                       startRequestICloud:(HXModelStartRequestICloud)startRequestICloud
-                                          progressHandler:(HXModelProgressHandler)progressHandler
-                                                  success:(HXModelImageDataSuccessBlock)success
-                                                   failed:(HXModelFailedBlock)failed;
+                                       startRequestICloud:(HXModelStartRequestICloud _Nullable)startRequestICloud
+                                          progressHandler:(HXModelProgressHandler _Nullable)progressHandler
+                                                  success:(HXModelImageDataSuccessBlock _Nullable)success
+                                                   failed:(HXModelFailedBlock _Nullable)failed;
 
 /// 请求获取AVAsset
 - (PHImageRequestID)requestAVAssetStartRequestICloud:(HXModelStartRequestICloud _Nullable)startRequestICloud

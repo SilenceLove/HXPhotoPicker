@@ -1722,7 +1722,7 @@
                 suffix = @"png";
             }else {
                 //返回为JPEG图像。
-                imageData = UIImageJPEGRepresentation(image, 0.8);
+                imageData = UIImageJPEGRepresentation(image, 1);
                 suffix = @"jpeg";
             }
         }
