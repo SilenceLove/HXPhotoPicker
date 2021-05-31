@@ -1,0 +1,24 @@
+{
+  "name": "LaUtils",
+  "version": "1.2.4",
+  "summary": "工具类",
+  "homepage": "https://git.lingo-ace.com/iOS/LaUtils",
+  "license": "MIT",
+  "authors": {
+    "Gao": "gshzyfx@163.com"
+  },
+  "source": {
+    "git": "https://git.lingo-ace.com/iOS/LaUtils.git",
+    "tag": "1.2.4"
+  },
+  "source_files": "LaUtils/LaUtils/CocoapodFiles/**/*",
+  "platforms": {
+    "ios": "9.0"
+  },
+  "frameworks": "CoreTelephony",
+  "dependencies": {
+    "Reachability": [
+
+    ]
+  }
+}

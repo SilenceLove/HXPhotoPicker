@@ -7,21 +7,181 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EACFEF61485455E3DAE8BF5D0568A8DD /* Pods-HXPhotoPickerExample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5742B6BAE980582B8893E0BC9AF5ED94 /* Pods-HXPhotoPickerExample-dummy.m */; };
+		0378691C6ED62842700C8339C92FCFBE /* LaLanguageUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA826A38ACDB47FC623BA983237CFB2 /* LaLanguageUtil.m */; };
+		11566CEE0F4BAB98259AA9C58991D315 /* NSArray+Ref.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AAF593FB5CBC5F936448E156E51E136 /* NSArray+Ref.m */; };
+		11E078CD138DBE162DEEE3011AACB20C /* Pods-HXPhotoPickerExample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5742B6BAE980582B8893E0BC9AF5ED94 /* Pods-HXPhotoPickerExample-dummy.m */; };
+		12C6CAB9568BCCAAEB5CDBCD72C8371F /* NSMutableArray+StrongRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 79310ADF0DCC48D49604A3735D3A488E /* NSMutableArray+StrongRef.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		1634BCE390568949D3DBAB97F9725BAF /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = F5504119D24077641D25F96040CE5736 /* Reachability.m */; };
+		1B981B45F0D113FA45D3687B9E5C2516 /* LaSwitchMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A39A6FEE346BE08DDEC20109A2E723D /* LaSwitchMethod.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		1DDE0665F29F0282A618A66BF490272F /* LaFontMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = D34DA7ECEB4234FF19343F09A75541F7 /* LaFontMacro.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		2439C96E927BE0AC7572DA1A71A28D88 /* LaSwitchMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = FC59C239D6D0A47BB3058955CF0BAA46 /* LaSwitchMethod.m */; };
+		28DBF77F373E7063519FEA113923064F /* LaEncodeUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B1AB9DFB5CC9D4DFF7F8221C3B5E490 /* LaEncodeUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		29E8D05A5F7B4D769A92E6BFBDF2EB90 /* NSMutableArray+WeakRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 932C7B62103826DC2FB0C81369525BF4 /* NSMutableArray+WeakRef.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		2A3F50612FF396EBD7B2A6BE45709668 /* NSMutableDictionary+WeakRef.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EFCA68A11EE91DCB2C33B0541FB5F78 /* NSMutableDictionary+WeakRef.m */; };
+		2DA9AB920EA83575AB56F6D3C860910D /* LaFileUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B0387DC0D65D416031346700E59D4DD /* LaFileUtil.m */; };
+		3222F1F7A56CB7B88CD0E6957E3C10FC /* NSDictionary+Ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 11AA1ABA9C84F3228F677CE47D9EEF65 /* NSDictionary+Ref.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		398A2E84F78EB763BF98EE0BB63D5C7B /* LaWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4655D03630EF492C8C4204D3D56392CD /* LaWeakProxy.m */; };
+		3BB1C65D52EF2D532DCAA5B9D61C88E0 /* LaNavMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 449868329CC0FF8400919E6D3F133C6A /* LaNavMacro.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		3C5EDE111BF70A3D358E87DFC8C49D7B /* NSBundle+Language.h in Headers */ = {isa = PBXBuildFile; fileRef = 7884E7A2C06B5A594CE4988234824DC3 /* NSBundle+Language.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		3D5BCA8D003F74E9E2B6C7C4E3B5BF0B /* LaFolderUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 4028748C93A5278F06C5AB6C086E2BED /* LaFolderUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		3EF74805766D71E8D3599357599AC330 /* LaUserDefaultsUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 945ED5E0C5B0E92A2BBEEBFE0D7D6135 /* LaUserDefaultsUtil.m */; };
+		471ECCD8FF8D5BC7DBCC25213F9F3BBD /* LaTimeZoneUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 19A35425F369470877E1C6E0E884A612 /* LaTimeZoneUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		498EB838942C003ED991D168AC365BE7 /* LaWeakRefUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = A872E5E070E5C588341C171869611FBC /* LaWeakRefUtil.m */; };
+		4CDED5D5AEDBB8B0A54B9E291116A3D7 /* LaNSStringMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = E45BE5C420DF47C44B88DEF37780182F /* LaNSStringMacro.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		4E17657311B1AEC3D640723E98167B60 /* NSArray+Description.m in Sources */ = {isa = PBXBuildFile; fileRef = 59569A9DDEBC112B5BAE63517236762A /* NSArray+Description.m */; };
+		5057E660430997B0575D7246DE56F1CE /* LaImageUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D18C3AAF3D2F6B70C56543C470E3C9C1 /* LaImageUtil.m */; };
+		553F60DD7EBC86D7DD2C0D2225FA56A6 /* LaNetService.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BABAA0E8FB1BFAEDF0E785F54B2AAE5 /* LaNetService.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		5AFF0A9C7DEBE0F39F9CFE1175CDE305 /* LaUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = FDFCAD41379246594879B2AAB34277D0 /* LaUtils.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		5CD978738085CAC10A3A51D401FA90AE /* LaNetService.m in Sources */ = {isa = PBXBuildFile; fileRef = AB4BCC6F7E680940AB2E3D31F0E4A6E8 /* LaNetService.m */; };
+		6BCE207AA05857810D335DFB757B12F3 /* LaWeakProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = C971F5BBCD89F8E87EE5849CE969D986 /* LaWeakProxy.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		70A161CAEBFCEC979C482C5E80FE4796 /* LaLanguageUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 43095417250B27912BB664EA16D63D5E /* LaLanguageUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		7160865D1A356E6CAD9C2614D59EB499 /* NSArray+Ref.h in Headers */ = {isa = PBXBuildFile; fileRef = B4A1B3AF9DE62ABFAF450C55BE37E600 /* NSArray+Ref.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		73FBA7941E5F096A2B17880CCBCC6B30 /* NSDictionary+Ref.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF406E420E4E5DAEE7F2B3508807B78 /* NSDictionary+Ref.m */; };
+		7E8942F7A60652FA48778F4008F928E8 /* NSMutableDictionary+WeakRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 72FE0A96649DF8DD5740278B3CBD2EB6 /* NSMutableDictionary+WeakRef.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		7FFD5718AB8548B83E1B66B446A80F8C /* NSDictionary+Description.h in Headers */ = {isa = PBXBuildFile; fileRef = 5438818FA077E62499D887E2F339F006 /* NSDictionary+Description.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		8406181C85CCB05FE7556FE26E648179 /* LaCGFloatMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = A6EB871FB544A042454AA60D7873C15C /* LaCGFloatMacro.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		8457BE40AF1DA2AA709D69CF4363A906 /* LaWeakRefUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 33176D8199A03CE7D5A3BB879D86708C /* LaWeakRefUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		8C478522FED6AE186A885EA85DBB54CF /* LaUIViewMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 0697FCCB45768B51D8DB318B8BD8D3B8 /* LaUIViewMacro.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		8CA5C54018BF83944BCF86A790088B7A /* NSMutableArray+WeakRef.m in Sources */ = {isa = PBXBuildFile; fileRef = 633C71681FD9B3C6FFE39315D38296AA /* NSMutableArray+WeakRef.m */; };
+		92214D491AB63E3967F7C5F653BF83F8 /* LaColorUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B5394D9A3AD75C9946465939B207D9B /* LaColorUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		97D9094E41350D992254D284BA441351 /* LaImageUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = DD3E7A5996AB39DA0B4294396626AF30 /* LaImageUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		9AB53ECEE24E26687219A4B7C19BE1D4 /* LaEncodeUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DFCFE8E377F23727401445204F5190D /* LaEncodeUtil.m */; };
+		9B2927268E1579D73E11F7C4CDCDA341 /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = E21DCEFBA8A445D45CE68D5A768D5763 /* Reachability.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		A0B5A73BE03E5F2EEBD061770CBB678C /* LaTimeUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 33FF914EF6A00F1DBAAB3C502698F365 /* LaTimeUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		A476CB95E2D3B6E3BE7D53F8A64DF2AB /* NSMutableArray+StrongRef.m in Sources */ = {isa = PBXBuildFile; fileRef = DCA32E149C9C7827D9E341336077E48B /* NSMutableArray+StrongRef.m */; };
+		AD83322849C44522077A1CA4F3B8D3A6 /* Reachability-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3886192D0A08ADCE997A6DCBA2F32331 /* Reachability-dummy.m */; };
+		B3FCCBC5613F415F0482F0F08975149C /* LaThreadUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 316688651E9005A312DB5F1772889635 /* LaThreadUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		B79A6E1A889B4B99F61E8C54D95FF65D /* LaThreadUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D500B14849C3C714CFAC5BDA16C2CF6 /* LaThreadUtil.m */; };
+		BA045B68093E298B6989D3E2CB06DE7B /* NSMutableDictionary+StrongRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 86897BA90CC322C808148DD67156A23C /* NSMutableDictionary+StrongRef.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		BCF8C39F177F76D663E786559668DF9D /* LaTimeUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9756E7820D7460627A08A740018237 /* LaTimeUtil.m */; };
+		C9731B7F47FE481F4B778520A41DCEB1 /* LaTimeZoneUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 80D64CB208DE1651EDE1DC3FE578D191 /* LaTimeZoneUtil.m */; };
+		D117E6B254E73671144ED01F1A13DE50 /* NSMutableDictionary+StrongRef.m in Sources */ = {isa = PBXBuildFile; fileRef = 897E7F0FCEAA0A9B56117511D60E9D0D /* NSMutableDictionary+StrongRef.m */; };
+		D1F12BB634F7218FC90D9A28A8545E95 /* LaUserDefaultsUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = B9901E986403ECF0CB6892893489A919 /* LaUserDefaultsUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		D3E9554BF7EDECB849D1E7C5799B8907 /* NSBundle+Language.m in Sources */ = {isa = PBXBuildFile; fileRef = A07AE19B3C47CC7F609B1864AF1C470E /* NSBundle+Language.m */; };
+		E61C00376FC7FF343BAE83B4BE9151B2 /* NSDictionary+Description.m in Sources */ = {isa = PBXBuildFile; fileRef = 69FEB5213F5561AC206C2A709C5ED95E /* NSDictionary+Description.m */; };
+		EA1F019E5A179DC16A39D1B31239BE3E /* NSArray+Description.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3A10A21CE23FF9113B3627DF6BFCEE /* NSArray+Description.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		EF816E6C943F968E5F57E3FD61014702 /* LaUtils-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E26001E9E61D5D89C29FBC024EEE1845 /* LaUtils-dummy.m */; };
+		EFDB8E9BFF69B41BE1B035D299C75E4B /* LaCGPointMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 7CD03759BCEE46475CB6A9D7A0EB8FDE /* LaCGPointMacro.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		F2FA17408855524EA6DE1FF4BD35D478 /* LaFolderUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 76195D172E7E1CE2B57D39C047C4A966 /* LaFolderUtil.m */; };
+		F446BB47E75790B2C6F62DD4D43E30DF /* LaFileUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0A916655103BD2156C8CE82A59252E /* LaFileUtil.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		FC8AAC59A7B3D2197F37B902A932F19F /* LaColorUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = CE679CE164EDCD334CE9B37311ADA526 /* LaColorUtil.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		41C8E2E518A1CDDDD1CE678E92D9C82D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAA047C0F5E4106F3904E8497FA17F97;
+			remoteInfo = Reachability;
+		};
+		4679001860DB0B7BD3E2055F060C42F8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAA047C0F5E4106F3904E8497FA17F97;
+			remoteInfo = Reachability;
+		};
+		7C80AD0323E3B35EC38D442085D588B4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 875802151887FE49928CDF6882FF5226;
+			remoteInfo = LaUtils;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		01A31513A870508886C637E7445D78F5 /* Pods-HXPhotoPickerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HXPhotoPickerExample.release.xcconfig"; sourceTree = "<group>"; };
+		0697FCCB45768B51D8DB318B8BD8D3B8 /* LaUIViewMacro.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaUIViewMacro.h; path = LaUtils/LaUtils/CocoapodFiles/macro_def/LaUIViewMacro.h; sourceTree = "<group>"; };
+		0AAF593FB5CBC5F936448E156E51E136 /* NSArray+Ref.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Ref.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSArray+Ref.m"; sourceTree = "<group>"; };
+		11AA1ABA9C84F3228F677CE47D9EEF65 /* NSDictionary+Ref.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+Ref.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSDictionary+Ref.h"; sourceTree = "<group>"; };
+		1308CF2F855C96CB098B1989F385FB0E /* Reachability.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Reachability.debug.xcconfig; sourceTree = "<group>"; };
 		1487CBC234378493AED9BADE98D51AE4 /* Pods-HXPhotoPickerExample-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-HXPhotoPickerExample-acknowledgements.plist"; sourceTree = "<group>"; };
+		19A35425F369470877E1C6E0E884A612 /* LaTimeZoneUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaTimeZoneUtil.h; path = LaUtils/LaUtils/CocoapodFiles/time/LaTimeZoneUtil.h; sourceTree = "<group>"; };
+		2A51A09BFA479D3C91A462F66B76D32F /* libLaUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libLaUtils.a; path = libLaUtils.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B0387DC0D65D416031346700E59D4DD /* LaFileUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaFileUtil.m; path = LaUtils/LaUtils/CocoapodFiles/file/LaFileUtil.m; sourceTree = "<group>"; };
+		316688651E9005A312DB5F1772889635 /* LaThreadUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaThreadUtil.h; path = LaUtils/LaUtils/CocoapodFiles/thread/LaThreadUtil.h; sourceTree = "<group>"; };
+		33176D8199A03CE7D5A3BB879D86708C /* LaWeakRefUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaWeakRefUtil.h; path = LaUtils/LaUtils/CocoapodFiles/weak_ref/LaWeakRefUtil.h; sourceTree = "<group>"; };
+		33FF914EF6A00F1DBAAB3C502698F365 /* LaTimeUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaTimeUtil.h; path = LaUtils/LaUtils/CocoapodFiles/time/LaTimeUtil.h; sourceTree = "<group>"; };
+		3886192D0A08ADCE997A6DCBA2F32331 /* Reachability-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Reachability-dummy.m"; sourceTree = "<group>"; };
+		3EF406E420E4E5DAEE7F2B3508807B78 /* NSDictionary+Ref.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+Ref.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSDictionary+Ref.m"; sourceTree = "<group>"; };
+		400FF55D0451E7A8F33A3D0D3E11C1B9 /* libReachability.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libReachability.a; path = libReachability.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		4028748C93A5278F06C5AB6C086E2BED /* LaFolderUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaFolderUtil.h; path = LaUtils/LaUtils/CocoapodFiles/folder/LaFolderUtil.h; sourceTree = "<group>"; };
+		402F760F552525994712C98BAD96C7E6 /* Reachability-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Reachability-prefix.pch"; sourceTree = "<group>"; };
+		43095417250B27912BB664EA16D63D5E /* LaLanguageUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaLanguageUtil.h; path = LaUtils/LaUtils/CocoapodFiles/language/LaLanguageUtil.h; sourceTree = "<group>"; };
+		449868329CC0FF8400919E6D3F133C6A /* LaNavMacro.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaNavMacro.h; path = LaUtils/LaUtils/CocoapodFiles/macro_def/LaNavMacro.h; sourceTree = "<group>"; };
+		4655D03630EF492C8C4204D3D56392CD /* LaWeakProxy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaWeakProxy.m; path = LaUtils/LaUtils/CocoapodFiles/weak_ref/WeakProxy/LaWeakProxy.m; sourceTree = "<group>"; };
+		4884442B4E727A6B96930CAB74A3270D /* LaUtils-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LaUtils-prefix.pch"; sourceTree = "<group>"; };
+		4BF6BA5B601C642F3E251FA8B95E03DF /* LaUtils.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LaUtils.debug.xcconfig; sourceTree = "<group>"; };
+		4E69E423FBE82CB7D3DB559AD88E97DD /* Reachability.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Reachability.release.xcconfig; sourceTree = "<group>"; };
+		5438818FA077E62499D887E2F339F006 /* NSDictionary+Description.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+Description.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSDictionary+Description.h"; sourceTree = "<group>"; };
 		5742B6BAE980582B8893E0BC9AF5ED94 /* Pods-HXPhotoPickerExample-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-HXPhotoPickerExample-dummy.m"; sourceTree = "<group>"; };
+		59569A9DDEBC112B5BAE63517236762A /* NSArray+Description.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Description.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSArray+Description.m"; sourceTree = "<group>"; };
+		5EFCA68A11EE91DCB2C33B0541FB5F78 /* NSMutableDictionary+WeakRef.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSMutableDictionary+WeakRef.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSMutableDictionary+WeakRef.m"; sourceTree = "<group>"; };
+		633C71681FD9B3C6FFE39315D38296AA /* NSMutableArray+WeakRef.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+WeakRef.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSMutableArray+WeakRef.m"; sourceTree = "<group>"; };
+		69FEB5213F5561AC206C2A709C5ED95E /* NSDictionary+Description.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+Description.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSDictionary+Description.m"; sourceTree = "<group>"; };
+		6DFCFE8E377F23727401445204F5190D /* LaEncodeUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaEncodeUtil.m; path = LaUtils/LaUtils/CocoapodFiles/encode/LaEncodeUtil.m; sourceTree = "<group>"; };
+		72FE0A96649DF8DD5740278B3CBD2EB6 /* NSMutableDictionary+WeakRef.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSMutableDictionary+WeakRef.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSMutableDictionary+WeakRef.h"; sourceTree = "<group>"; };
+		76195D172E7E1CE2B57D39C047C4A966 /* LaFolderUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaFolderUtil.m; path = LaUtils/LaUtils/CocoapodFiles/folder/LaFolderUtil.m; sourceTree = "<group>"; };
 		77DE95D52455539E87518B28C811417B /* Pods-HXPhotoPickerExample-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-HXPhotoPickerExample-acknowledgements.markdown"; sourceTree = "<group>"; };
+		7884E7A2C06B5A594CE4988234824DC3 /* NSBundle+Language.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSBundle+Language.h"; path = "LaUtils/LaUtils/CocoapodFiles/language/NSBundle+Language.h"; sourceTree = "<group>"; };
+		79310ADF0DCC48D49604A3735D3A488E /* NSMutableArray+StrongRef.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+StrongRef.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSMutableArray+StrongRef.h"; sourceTree = "<group>"; };
+		7B1AB9DFB5CC9D4DFF7F8221C3B5E490 /* LaEncodeUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaEncodeUtil.h; path = LaUtils/LaUtils/CocoapodFiles/encode/LaEncodeUtil.h; sourceTree = "<group>"; };
+		7CD03759BCEE46475CB6A9D7A0EB8FDE /* LaCGPointMacro.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaCGPointMacro.h; path = LaUtils/LaUtils/CocoapodFiles/necessary/cgpoint/LaCGPointMacro.h; sourceTree = "<group>"; };
+		7D0A916655103BD2156C8CE82A59252E /* LaFileUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaFileUtil.h; path = LaUtils/LaUtils/CocoapodFiles/file/LaFileUtil.h; sourceTree = "<group>"; };
+		80D64CB208DE1651EDE1DC3FE578D191 /* LaTimeZoneUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaTimeZoneUtil.m; path = LaUtils/LaUtils/CocoapodFiles/time/LaTimeZoneUtil.m; sourceTree = "<group>"; };
+		8270446B91AC00579583C4C5D111E59F /* LaUtils.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LaUtils.release.xcconfig; sourceTree = "<group>"; };
+		86897BA90CC322C808148DD67156A23C /* NSMutableDictionary+StrongRef.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSMutableDictionary+StrongRef.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSMutableDictionary+StrongRef.h"; sourceTree = "<group>"; };
+		897E7F0FCEAA0A9B56117511D60E9D0D /* NSMutableDictionary+StrongRef.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSMutableDictionary+StrongRef.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsdictionary/NSMutableDictionary+StrongRef.m"; sourceTree = "<group>"; };
+		8A39A6FEE346BE08DDEC20109A2E723D /* LaSwitchMethod.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaSwitchMethod.h; path = LaUtils/LaUtils/CocoapodFiles/runtime/LaSwitchMethod.h; sourceTree = "<group>"; };
+		8B5394D9A3AD75C9946465939B207D9B /* LaColorUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaColorUtil.h; path = LaUtils/LaUtils/CocoapodFiles/color/LaColorUtil.h; sourceTree = "<group>"; };
+		8BABAA0E8FB1BFAEDF0E785F54B2AAE5 /* LaNetService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaNetService.h; path = LaUtils/LaUtils/CocoapodFiles/netservice/LaNetService.h; sourceTree = "<group>"; };
+		932C7B62103826DC2FB0C81369525BF4 /* NSMutableArray+WeakRef.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+WeakRef.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSMutableArray+WeakRef.h"; sourceTree = "<group>"; };
+		945ED5E0C5B0E92A2BBEEBFE0D7D6135 /* LaUserDefaultsUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaUserDefaultsUtil.m; path = LaUtils/LaUtils/CocoapodFiles/user_default/LaUserDefaultsUtil.m; sourceTree = "<group>"; };
+		9AA826A38ACDB47FC623BA983237CFB2 /* LaLanguageUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaLanguageUtil.m; path = LaUtils/LaUtils/CocoapodFiles/language/LaLanguageUtil.m; sourceTree = "<group>"; };
+		9D500B14849C3C714CFAC5BDA16C2CF6 /* LaThreadUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaThreadUtil.m; path = LaUtils/LaUtils/CocoapodFiles/thread/LaThreadUtil.m; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		A07AE19B3C47CC7F609B1864AF1C470E /* NSBundle+Language.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSBundle+Language.m"; path = "LaUtils/LaUtils/CocoapodFiles/language/NSBundle+Language.m"; sourceTree = "<group>"; };
+		A6EB871FB544A042454AA60D7873C15C /* LaCGFloatMacro.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaCGFloatMacro.h; path = LaUtils/LaUtils/CocoapodFiles/necessary/cgfloat/LaCGFloatMacro.h; sourceTree = "<group>"; };
+		A872E5E070E5C588341C171869611FBC /* LaWeakRefUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaWeakRefUtil.m; path = LaUtils/LaUtils/CocoapodFiles/weak_ref/LaWeakRefUtil.m; sourceTree = "<group>"; };
+		AB4BCC6F7E680940AB2E3D31F0E4A6E8 /* LaNetService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaNetService.m; path = LaUtils/LaUtils/CocoapodFiles/netservice/LaNetService.m; sourceTree = "<group>"; };
+		B4A1B3AF9DE62ABFAF450C55BE37E600 /* NSArray+Ref.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSArray+Ref.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSArray+Ref.h"; sourceTree = "<group>"; };
+		B9901E986403ECF0CB6892893489A919 /* LaUserDefaultsUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaUserDefaultsUtil.h; path = LaUtils/LaUtils/CocoapodFiles/user_default/LaUserDefaultsUtil.h; sourceTree = "<group>"; };
+		C971F5BBCD89F8E87EE5849CE969D986 /* LaWeakProxy.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaWeakProxy.h; path = LaUtils/LaUtils/CocoapodFiles/weak_ref/WeakProxy/LaWeakProxy.h; sourceTree = "<group>"; };
+		CC9756E7820D7460627A08A740018237 /* LaTimeUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaTimeUtil.m; path = LaUtils/LaUtils/CocoapodFiles/time/LaTimeUtil.m; sourceTree = "<group>"; };
+		CE679CE164EDCD334CE9B37311ADA526 /* LaColorUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaColorUtil.m; path = LaUtils/LaUtils/CocoapodFiles/color/LaColorUtil.m; sourceTree = "<group>"; };
+		CF3A10A21CE23FF9113B3627DF6BFCEE /* NSArray+Description.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSArray+Description.h"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSArray+Description.h"; sourceTree = "<group>"; };
+		D18C3AAF3D2F6B70C56543C470E3C9C1 /* LaImageUtil.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaImageUtil.m; path = LaUtils/LaUtils/CocoapodFiles/image/LaImageUtil.m; sourceTree = "<group>"; };
+		D34DA7ECEB4234FF19343F09A75541F7 /* LaFontMacro.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaFontMacro.h; path = LaUtils/LaUtils/CocoapodFiles/macro_def/LaFontMacro.h; sourceTree = "<group>"; };
+		DCA32E149C9C7827D9E341336077E48B /* NSMutableArray+StrongRef.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+StrongRef.m"; path = "LaUtils/LaUtils/CocoapodFiles/necessary/nsarray/NSMutableArray+StrongRef.m"; sourceTree = "<group>"; };
+		DD3E7A5996AB39DA0B4294396626AF30 /* LaImageUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaImageUtil.h; path = LaUtils/LaUtils/CocoapodFiles/image/LaImageUtil.h; sourceTree = "<group>"; };
+		E21DCEFBA8A445D45CE68D5A768D5763 /* Reachability.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		E26001E9E61D5D89C29FBC024EEE1845 /* LaUtils-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LaUtils-dummy.m"; sourceTree = "<group>"; };
+		E45BE5C420DF47C44B88DEF37780182F /* LaNSStringMacro.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaNSStringMacro.h; path = LaUtils/LaUtils/CocoapodFiles/necessary/nsstring/LaNSStringMacro.h; sourceTree = "<group>"; };
 		E7FACF0656056AFACF2C82D01BD89750 /* libPods-HXPhotoPickerExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-HXPhotoPickerExample.a"; path = "libPods-HXPhotoPickerExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8C65A000081A804C15BCA84FA8CD24B /* Pods-HXPhotoPickerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HXPhotoPickerExample.debug.xcconfig"; sourceTree = "<group>"; };
+		F5504119D24077641D25F96040CE5736 /* Reachability.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		FC59C239D6D0A47BB3058955CF0BAA46 /* LaSwitchMethod.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = LaSwitchMethod.m; path = LaUtils/LaUtils/CocoapodFiles/runtime/LaSwitchMethod.m; sourceTree = "<group>"; };
+		FDFCAD41379246594879B2AAB34277D0 /* LaUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LaUtils.h; path = LaUtils/LaUtils/CocoapodFiles/LaUtils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		F3D69008C42FE774A65F6EE9A29F9484 /* Frameworks */ = {
+		3993EEECD31BC4B98EC5A58B28B7557A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5E2659D6D3ACF05D94F76473EE9D12D3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0A2CFFE2E3A03596EC5E0A5BC02BA99 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -31,12 +191,97 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5B14B628A77C8F7BB4E9F7760D56EB24 /* Products */ = {
+		26FDBEDA7E3057EAC4130F64220B8887 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				9DF1151B3D3114B30A915FAD759F88BD /* LaUtils */,
+				EFD88B0A4FEF75B6B0C75D0A3DA35D8D /* Reachability */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		34687735CEFEFA61606D367BA6845B48 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2A51A09BFA479D3C91A462F66B76D32F /* libLaUtils.a */,
 				E7FACF0656056AFACF2C82D01BD89750 /* libPods-HXPhotoPickerExample.a */,
+				400FF55D0451E7A8F33A3D0D3E11C1B9 /* libReachability.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9DF1151B3D3114B30A915FAD759F88BD /* LaUtils */ = {
+			isa = PBXGroup;
+			children = (
+				A6EB871FB544A042454AA60D7873C15C /* LaCGFloatMacro.h */,
+				7CD03759BCEE46475CB6A9D7A0EB8FDE /* LaCGPointMacro.h */,
+				8B5394D9A3AD75C9946465939B207D9B /* LaColorUtil.h */,
+				CE679CE164EDCD334CE9B37311ADA526 /* LaColorUtil.m */,
+				7B1AB9DFB5CC9D4DFF7F8221C3B5E490 /* LaEncodeUtil.h */,
+				6DFCFE8E377F23727401445204F5190D /* LaEncodeUtil.m */,
+				7D0A916655103BD2156C8CE82A59252E /* LaFileUtil.h */,
+				2B0387DC0D65D416031346700E59D4DD /* LaFileUtil.m */,
+				4028748C93A5278F06C5AB6C086E2BED /* LaFolderUtil.h */,
+				76195D172E7E1CE2B57D39C047C4A966 /* LaFolderUtil.m */,
+				D34DA7ECEB4234FF19343F09A75541F7 /* LaFontMacro.h */,
+				DD3E7A5996AB39DA0B4294396626AF30 /* LaImageUtil.h */,
+				D18C3AAF3D2F6B70C56543C470E3C9C1 /* LaImageUtil.m */,
+				43095417250B27912BB664EA16D63D5E /* LaLanguageUtil.h */,
+				9AA826A38ACDB47FC623BA983237CFB2 /* LaLanguageUtil.m */,
+				449868329CC0FF8400919E6D3F133C6A /* LaNavMacro.h */,
+				8BABAA0E8FB1BFAEDF0E785F54B2AAE5 /* LaNetService.h */,
+				AB4BCC6F7E680940AB2E3D31F0E4A6E8 /* LaNetService.m */,
+				E45BE5C420DF47C44B88DEF37780182F /* LaNSStringMacro.h */,
+				8A39A6FEE346BE08DDEC20109A2E723D /* LaSwitchMethod.h */,
+				FC59C239D6D0A47BB3058955CF0BAA46 /* LaSwitchMethod.m */,
+				316688651E9005A312DB5F1772889635 /* LaThreadUtil.h */,
+				9D500B14849C3C714CFAC5BDA16C2CF6 /* LaThreadUtil.m */,
+				33FF914EF6A00F1DBAAB3C502698F365 /* LaTimeUtil.h */,
+				CC9756E7820D7460627A08A740018237 /* LaTimeUtil.m */,
+				19A35425F369470877E1C6E0E884A612 /* LaTimeZoneUtil.h */,
+				80D64CB208DE1651EDE1DC3FE578D191 /* LaTimeZoneUtil.m */,
+				0697FCCB45768B51D8DB318B8BD8D3B8 /* LaUIViewMacro.h */,
+				B9901E986403ECF0CB6892893489A919 /* LaUserDefaultsUtil.h */,
+				945ED5E0C5B0E92A2BBEEBFE0D7D6135 /* LaUserDefaultsUtil.m */,
+				FDFCAD41379246594879B2AAB34277D0 /* LaUtils.h */,
+				C971F5BBCD89F8E87EE5849CE969D986 /* LaWeakProxy.h */,
+				4655D03630EF492C8C4204D3D56392CD /* LaWeakProxy.m */,
+				33176D8199A03CE7D5A3BB879D86708C /* LaWeakRefUtil.h */,
+				A872E5E070E5C588341C171869611FBC /* LaWeakRefUtil.m */,
+				CF3A10A21CE23FF9113B3627DF6BFCEE /* NSArray+Description.h */,
+				59569A9DDEBC112B5BAE63517236762A /* NSArray+Description.m */,
+				B4A1B3AF9DE62ABFAF450C55BE37E600 /* NSArray+Ref.h */,
+				0AAF593FB5CBC5F936448E156E51E136 /* NSArray+Ref.m */,
+				7884E7A2C06B5A594CE4988234824DC3 /* NSBundle+Language.h */,
+				A07AE19B3C47CC7F609B1864AF1C470E /* NSBundle+Language.m */,
+				5438818FA077E62499D887E2F339F006 /* NSDictionary+Description.h */,
+				69FEB5213F5561AC206C2A709C5ED95E /* NSDictionary+Description.m */,
+				11AA1ABA9C84F3228F677CE47D9EEF65 /* NSDictionary+Ref.h */,
+				3EF406E420E4E5DAEE7F2B3508807B78 /* NSDictionary+Ref.m */,
+				79310ADF0DCC48D49604A3735D3A488E /* NSMutableArray+StrongRef.h */,
+				DCA32E149C9C7827D9E341336077E48B /* NSMutableArray+StrongRef.m */,
+				932C7B62103826DC2FB0C81369525BF4 /* NSMutableArray+WeakRef.h */,
+				633C71681FD9B3C6FFE39315D38296AA /* NSMutableArray+WeakRef.m */,
+				86897BA90CC322C808148DD67156A23C /* NSMutableDictionary+StrongRef.h */,
+				897E7F0FCEAA0A9B56117511D60E9D0D /* NSMutableDictionary+StrongRef.m */,
+				72FE0A96649DF8DD5740278B3CBD2EB6 /* NSMutableDictionary+WeakRef.h */,
+				5EFCA68A11EE91DCB2C33B0541FB5F78 /* NSMutableDictionary+WeakRef.m */,
+				BFF8636A4755129DF6636BF1B498B990 /* Support Files */,
+			);
+			name = LaUtils;
+			path = LaUtils;
+			sourceTree = "<group>";
+		};
+		A8248D46CAA8A983C0ACAB5CB411A6DE /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				3886192D0A08ADCE997A6DCBA2F32331 /* Reachability-dummy.m */,
+				402F760F552525994712C98BAD96C7E6 /* Reachability-prefix.pch */,
+				1308CF2F855C96CB098B1989F385FB0E /* Reachability.debug.xcconfig */,
+				4E69E423FBE82CB7D3DB559AD88E97DD /* Reachability.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Reachability";
 			sourceTree = "<group>";
 		};
 		BB0B8DA68B76354FAF16080A6F447254 /* Pods-HXPhotoPickerExample */ = {
@@ -52,12 +297,25 @@
 			path = "Target Support Files/Pods-HXPhotoPickerExample";
 			sourceTree = "<group>";
 		};
+		BFF8636A4755129DF6636BF1B498B990 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				E26001E9E61D5D89C29FBC024EEE1845 /* LaUtils-dummy.m */,
+				4884442B4E727A6B96930CAB74A3270D /* LaUtils-prefix.pch */,
+				4BF6BA5B601C642F3E251FA8B95E03DF /* LaUtils.debug.xcconfig */,
+				8270446B91AC00579583C4C5D111E59F /* LaUtils.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/LaUtils";
+			sourceTree = "<group>";
+		};
 		CF1408CF629C7361332E53B88F7BD30C = {
 			isa = PBXGroup;
 			children = (
 				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
 				D89477F20FB1DE18A04690586D7808C4 /* Frameworks */,
-				5B14B628A77C8F7BB4E9F7760D56EB24 /* Products */,
+				26FDBEDA7E3057EAC4130F64220B8887 /* Pods */,
+				34687735CEFEFA61606D367BA6845B48 /* Products */,
 				E06EA0D780F64CD5D3804ECAA548AF66 /* Targets Support Files */,
 			);
 			sourceTree = "<group>";
@@ -77,30 +335,123 @@
 			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
+		EFD88B0A4FEF75B6B0C75D0A3DA35D8D /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				E21DCEFBA8A445D45CE68D5A768D5763 /* Reachability.h */,
+				F5504119D24077641D25F96040CE5736 /* Reachability.m */,
+				A8248D46CAA8A983C0ACAB5CB411A6DE /* Support Files */,
+			);
+			name = Reachability;
+			path = Reachability;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		747B3593ABEDA2D544ABD2D0097811D4 /* Headers */ = {
+		07A12D35C944E2D88A37CFEB8DECCC78 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5DFEB2C6043F811F359FDAA972AA28A0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8406181C85CCB05FE7556FE26E648179 /* LaCGFloatMacro.h in Headers */,
+				EFDB8E9BFF69B41BE1B035D299C75E4B /* LaCGPointMacro.h in Headers */,
+				92214D491AB63E3967F7C5F653BF83F8 /* LaColorUtil.h in Headers */,
+				28DBF77F373E7063519FEA113923064F /* LaEncodeUtil.h in Headers */,
+				F446BB47E75790B2C6F62DD4D43E30DF /* LaFileUtil.h in Headers */,
+				3D5BCA8D003F74E9E2B6C7C4E3B5BF0B /* LaFolderUtil.h in Headers */,
+				1DDE0665F29F0282A618A66BF490272F /* LaFontMacro.h in Headers */,
+				97D9094E41350D992254D284BA441351 /* LaImageUtil.h in Headers */,
+				70A161CAEBFCEC979C482C5E80FE4796 /* LaLanguageUtil.h in Headers */,
+				3BB1C65D52EF2D532DCAA5B9D61C88E0 /* LaNavMacro.h in Headers */,
+				553F60DD7EBC86D7DD2C0D2225FA56A6 /* LaNetService.h in Headers */,
+				4CDED5D5AEDBB8B0A54B9E291116A3D7 /* LaNSStringMacro.h in Headers */,
+				1B981B45F0D113FA45D3687B9E5C2516 /* LaSwitchMethod.h in Headers */,
+				B3FCCBC5613F415F0482F0F08975149C /* LaThreadUtil.h in Headers */,
+				A0B5A73BE03E5F2EEBD061770CBB678C /* LaTimeUtil.h in Headers */,
+				471ECCD8FF8D5BC7DBCC25213F9F3BBD /* LaTimeZoneUtil.h in Headers */,
+				8C478522FED6AE186A885EA85DBB54CF /* LaUIViewMacro.h in Headers */,
+				D1F12BB634F7218FC90D9A28A8545E95 /* LaUserDefaultsUtil.h in Headers */,
+				5AFF0A9C7DEBE0F39F9CFE1175CDE305 /* LaUtils.h in Headers */,
+				6BCE207AA05857810D335DFB757B12F3 /* LaWeakProxy.h in Headers */,
+				8457BE40AF1DA2AA709D69CF4363A906 /* LaWeakRefUtil.h in Headers */,
+				EA1F019E5A179DC16A39D1B31239BE3E /* NSArray+Description.h in Headers */,
+				7160865D1A356E6CAD9C2614D59EB499 /* NSArray+Ref.h in Headers */,
+				3C5EDE111BF70A3D358E87DFC8C49D7B /* NSBundle+Language.h in Headers */,
+				7FFD5718AB8548B83E1B66B446A80F8C /* NSDictionary+Description.h in Headers */,
+				3222F1F7A56CB7B88CD0E6957E3C10FC /* NSDictionary+Ref.h in Headers */,
+				12C6CAB9568BCCAAEB5CDBCD72C8371F /* NSMutableArray+StrongRef.h in Headers */,
+				29E8D05A5F7B4D769A92E6BFBDF2EB90 /* NSMutableArray+WeakRef.h in Headers */,
+				BA045B68093E298B6989D3E2CB06DE7B /* NSMutableDictionary+StrongRef.h in Headers */,
+				7E8942F7A60652FA48778F4008F928E8 /* NSMutableDictionary+WeakRef.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EF9752EAC2324FD141A8D311CF9884C5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B2927268E1579D73E11F7C4CDCDA341 /* Reachability.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		D1D724522871333DBFA94E79471AC4FE /* Pods-HXPhotoPickerExample */ = {
+		875802151887FE49928CDF6882FF5226 /* LaUtils */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A88310E6D9CFA1E45B08579A3F2B13C4 /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */;
+			buildConfigurationList = FFDC68A62E74F70FF6C1995E9AA4F555 /* Build configuration list for PBXNativeTarget "LaUtils" */;
 			buildPhases = (
-				747B3593ABEDA2D544ABD2D0097811D4 /* Headers */,
-				5DCE1322F090A7BAB299B2BBCEA83613 /* Sources */,
-				F3D69008C42FE774A65F6EE9A29F9484 /* Frameworks */,
+				5DFEB2C6043F811F359FDAA972AA28A0 /* Headers */,
+				6C2E855BF4CBB62C76A3C1859D39B9FD /* Sources */,
+				3993EEECD31BC4B98EC5A58B28B7557A /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3DBB224934FD6825C1587834F1F968C5 /* PBXTargetDependency */,
+			);
+			name = LaUtils;
+			productName = LaUtils;
+			productReference = 2A51A09BFA479D3C91A462F66B76D32F /* libLaUtils.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		CAA047C0F5E4106F3904E8497FA17F97 /* Reachability */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F0C889AD622C7AB4AAACA3C339C91C22 /* Build configuration list for PBXNativeTarget "Reachability" */;
+			buildPhases = (
+				EF9752EAC2324FD141A8D311CF9884C5 /* Headers */,
+				F888757FC763630070AE7D0A132DB704 /* Sources */,
+				5E2659D6D3ACF05D94F76473EE9D12D3 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Reachability;
+			productName = Reachability;
+			productReference = 400FF55D0451E7A8F33A3D0D3E11C1B9 /* libReachability.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		D1D724522871333DBFA94E79471AC4FE /* Pods-HXPhotoPickerExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3330843EC9DB007D0B5C63643A48164C /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */;
+			buildPhases = (
+				07A12D35C944E2D88A37CFEB8DECCC78 /* Headers */,
+				A4D6C4922195E8C994DD8E88B37ED2D2 /* Sources */,
+				D0A2CFFE2E3A03596EC5E0A5BC02BA99 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6C1C22E323F923A73DF10E8F1F4BAFA1 /* PBXTargetDependency */,
+				8C11B7C1291019DF69BD7AFB9CB8F52F /* PBXTargetDependency */,
 			);
 			name = "Pods-HXPhotoPickerExample";
 			productName = "Pods-HXPhotoPickerExample";
@@ -125,28 +476,161 @@
 				Base,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
-			productRefGroup = 5B14B628A77C8F7BB4E9F7760D56EB24 /* Products */;
+			productRefGroup = 34687735CEFEFA61606D367BA6845B48 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				875802151887FE49928CDF6882FF5226 /* LaUtils */,
 				D1D724522871333DBFA94E79471AC4FE /* Pods-HXPhotoPickerExample */,
+				CAA047C0F5E4106F3904E8497FA17F97 /* Reachability */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		5DCE1322F090A7BAB299B2BBCEA83613 /* Sources */ = {
+		6C2E855BF4CBB62C76A3C1859D39B9FD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EACFEF61485455E3DAE8BF5D0568A8DD /* Pods-HXPhotoPickerExample-dummy.m in Sources */,
+				FC8AAC59A7B3D2197F37B902A932F19F /* LaColorUtil.m in Sources */,
+				9AB53ECEE24E26687219A4B7C19BE1D4 /* LaEncodeUtil.m in Sources */,
+				2DA9AB920EA83575AB56F6D3C860910D /* LaFileUtil.m in Sources */,
+				F2FA17408855524EA6DE1FF4BD35D478 /* LaFolderUtil.m in Sources */,
+				5057E660430997B0575D7246DE56F1CE /* LaImageUtil.m in Sources */,
+				0378691C6ED62842700C8339C92FCFBE /* LaLanguageUtil.m in Sources */,
+				5CD978738085CAC10A3A51D401FA90AE /* LaNetService.m in Sources */,
+				2439C96E927BE0AC7572DA1A71A28D88 /* LaSwitchMethod.m in Sources */,
+				B79A6E1A889B4B99F61E8C54D95FF65D /* LaThreadUtil.m in Sources */,
+				BCF8C39F177F76D663E786559668DF9D /* LaTimeUtil.m in Sources */,
+				C9731B7F47FE481F4B778520A41DCEB1 /* LaTimeZoneUtil.m in Sources */,
+				3EF74805766D71E8D3599357599AC330 /* LaUserDefaultsUtil.m in Sources */,
+				EF816E6C943F968E5F57E3FD61014702 /* LaUtils-dummy.m in Sources */,
+				398A2E84F78EB763BF98EE0BB63D5C7B /* LaWeakProxy.m in Sources */,
+				498EB838942C003ED991D168AC365BE7 /* LaWeakRefUtil.m in Sources */,
+				4E17657311B1AEC3D640723E98167B60 /* NSArray+Description.m in Sources */,
+				11566CEE0F4BAB98259AA9C58991D315 /* NSArray+Ref.m in Sources */,
+				D3E9554BF7EDECB849D1E7C5799B8907 /* NSBundle+Language.m in Sources */,
+				E61C00376FC7FF343BAE83B4BE9151B2 /* NSDictionary+Description.m in Sources */,
+				73FBA7941E5F096A2B17880CCBCC6B30 /* NSDictionary+Ref.m in Sources */,
+				A476CB95E2D3B6E3BE7D53F8A64DF2AB /* NSMutableArray+StrongRef.m in Sources */,
+				8CA5C54018BF83944BCF86A790088B7A /* NSMutableArray+WeakRef.m in Sources */,
+				D117E6B254E73671144ED01F1A13DE50 /* NSMutableDictionary+StrongRef.m in Sources */,
+				2A3F50612FF396EBD7B2A6BE45709668 /* NSMutableDictionary+WeakRef.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4D6C4922195E8C994DD8E88B37ED2D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11E078CD138DBE162DEEE3011AACB20C /* Pods-HXPhotoPickerExample-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F888757FC763630070AE7D0A132DB704 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD83322849C44522077A1CA4F3B8D3A6 /* Reachability-dummy.m in Sources */,
+				1634BCE390568949D3DBAB97F9725BAF /* Reachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		3DBB224934FD6825C1587834F1F968C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Reachability;
+			target = CAA047C0F5E4106F3904E8497FA17F97 /* Reachability */;
+			targetProxy = 4679001860DB0B7BD3E2055F060C42F8 /* PBXContainerItemProxy */;
+		};
+		6C1C22E323F923A73DF10E8F1F4BAFA1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LaUtils;
+			target = 875802151887FE49928CDF6882FF5226 /* LaUtils */;
+			targetProxy = 7C80AD0323E3B35EC38D442085D588B4 /* PBXContainerItemProxy */;
+		};
+		8C11B7C1291019DF69BD7AFB9CB8F52F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Reachability;
+			target = CAA047C0F5E4106F3904E8497FA17F97 /* Reachability */;
+			targetProxy = 41C8E2E518A1CDDDD1CE678E92D9C82D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		6D42DC62C4F2E194221DF89C48496C98 /* Release */ = {
+		698B522D2E5F3EC8FEE44C0DA98469ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 01A31513A870508886C637E7445D78F5 /* Pods-HXPhotoPickerExample.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MACH_O_TYPE = staticlib;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6A9243653A8241E1A54CE2C78C1E92D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8270446B91AC00579583C4C5D111E59F /* LaUtils.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/LaUtils/LaUtils-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = LaUtils;
+				PRODUCT_NAME = LaUtils;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		70279FF9764FE207D2FCC744377BD856 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1308CF2F855C96CB098B1989F385FB0E /* Reachability.debug.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Reachability/Reachability-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Reachability;
+				PRODUCT_NAME = Reachability;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7EE7A78859F657F6BEFC651185B43192 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -196,7 +680,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -208,7 +692,54 @@
 			};
 			name = Release;
 		};
-		E4D0D44B090D4284607EBBC4E71A96C1 /* Debug */ = {
+		B4F8ABB79EE3CAEADF6548703AA3E3A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4BF6BA5B601C642F3E251FA8B95E03DF /* LaUtils.debug.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/LaUtils/LaUtils-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = LaUtils;
+				PRODUCT_NAME = LaUtils;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CF77F662BD76CC55FA917D970AFFFED0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4E69E423FBE82CB7D3DB559AD88E97DD /* Reachability.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Reachability/Reachability-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = Reachability;
+				PRODUCT_NAME = Reachability;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D299434AB35E7FD6F7921C8EF24742FF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -261,7 +792,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -274,16 +805,17 @@
 			};
 			name = Debug;
 		};
-		E69B514E4C9B310D5677572459F3B3DA /* Debug */ = {
+		E97CE1EB34E8F8F9BDA4F85A392960DB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E8C65A000081A804C15BCA84FA8CD24B /* Pods-HXPhotoPickerExample.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
@@ -295,45 +827,41 @@
 			};
 			name = Debug;
 		};
-		FB0BEF4CC44DA95E49A34AF270857F01 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 01A31513A870508886C637E7445D78F5 /* Pods-HXPhotoPickerExample.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+		3330843EC9DB007D0B5C63643A48164C /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E4D0D44B090D4284607EBBC4E71A96C1 /* Debug */,
-				6D42DC62C4F2E194221DF89C48496C98 /* Release */,
+				E97CE1EB34E8F8F9BDA4F85A392960DB /* Debug */,
+				698B522D2E5F3EC8FEE44C0DA98469ED /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A88310E6D9CFA1E45B08579A3F2B13C4 /* Build configuration list for PBXNativeTarget "Pods-HXPhotoPickerExample" */ = {
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E69B514E4C9B310D5677572459F3B3DA /* Debug */,
-				FB0BEF4CC44DA95E49A34AF270857F01 /* Release */,
+				D299434AB35E7FD6F7921C8EF24742FF /* Debug */,
+				7EE7A78859F657F6BEFC651185B43192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F0C889AD622C7AB4AAACA3C339C91C22 /* Build configuration list for PBXNativeTarget "Reachability" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70279FF9764FE207D2FCC744377BD856 /* Debug */,
+				CF77F662BD76CC55FA917D970AFFFED0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFDC68A62E74F70FF6C1995E9AA4F555 /* Build configuration list for PBXNativeTarget "LaUtils" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B4F8ABB79EE3CAEADF6548703AA3E3A8 /* Debug */,
+				6A9243653A8241E1A54CE2C78C1E92D4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1,3 +1,29 @@
-PODFILE CHECKSUM: a36bf61d9f4e376e89919bf08e8596f7dadeab5f
+PODS:
+  - LaUtils (1.2.4):
+    - Reachability
+  - Reachability (3.2)
 
-COCOAPODS: 1.10.0
+DEPENDENCIES:
+  - LaUtils (from `https://git.lingo-ace.com/iOS/LaUtils`, tag `1.2.6`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Reachability
+
+EXTERNAL SOURCES:
+  LaUtils:
+    :git: https://git.lingo-ace.com/iOS/LaUtils
+    :tag: 1.2.6
+
+CHECKOUT OPTIONS:
+  LaUtils:
+    :git: https://git.lingo-ace.com/iOS/LaUtils
+    :tag: 1.2.6
+
+SPEC CHECKSUMS:
+  LaUtils: f5aaf82e4daf466db89e263f29bec7b492b73e5b
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+
+PODFILE CHECKSUM: 5a65d13e6506717a917cc0fa5a0e9455e179a682
+
+COCOAPODS: 1.10.1

@@ -15,7 +15,9 @@ Pod::Spec.new do |s|
   s.framework    = 'UIKit','Photos','PhotosUI'
   s.requires_arc = true
   s.default_subspec = 'Default'
-  
+  s.dependency 'UICKeyChainStore',   '~> 2.1.2'
+  s.dependency 'LaUtils',   '~> 1.2.6'
+
   s.subspec 'Default' do |de|
     de.source_files = "HXPhotoPicker/**/*.{h,m}"
     de.resources    = "HXPhotoPicker/Resources/*.{bundle}"
