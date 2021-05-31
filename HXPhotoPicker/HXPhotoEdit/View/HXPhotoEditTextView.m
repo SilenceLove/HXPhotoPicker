@@ -16,6 +16,7 @@
 #import "NSBundle+HXPhotoPicker.h"
 #import "UIFont+HXExtension.h"
 #import "HXPhotoTools.h"
+#import <LaUtils/LaUtils.h>
 
 #define HXEditTextBlankWidth 22
 #define HXEditTextRadius 8.f
@@ -589,12 +590,12 @@
     }
     if (t1) {
         NSValue *newValue = [NSValue valueWithCGRect:cur];
-        [self.rectArray replaceObjectAtIndex:index withObject:newValue];
+        [self.rectArray s_replaceObjectAtIndex:index withObject:newValue];
         [self processRectIndex:index + 1];
     }
     if (t2) {
         NSValue *newValue = [NSValue valueWithCGRect:last];
-        [self.rectArray replaceObjectAtIndex:index - 1 withObject:newValue];
+        [self.rectArray s_replaceObjectAtIndex:index - 1 withObject:newValue];
         [self processRectIndex:index - 1];
     }
      

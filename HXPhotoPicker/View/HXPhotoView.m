@@ -18,7 +18,7 @@
 #import "HXPhotoViewController.h"
 #import "HXPhotoBottomSelectView.h"
 #import "UIColor+HXExtension.h"
-
+#import <LaUtils/LaUtils.h>
 @interface HXPhotoView ()<HXCollectionViewDataSource,HXCollectionViewDelegate, UICollectionViewDelegateFlowLayout,HXPhotoSubViewCellDelegate,UIAlertViewDelegate,HXAlbumListViewControllerDelegate,HXCustomCameraViewControllerDelegate,HXPhotoPreviewViewControllerDelegate, HXPhotoViewControllerDelegate, HXCustomNavigationControllerDelegate>
 @property (strong, nonatomic) NSMutableArray *dataList;
 @property (strong, nonatomic) NSMutableArray *photos;
@@ -452,7 +452,7 @@
     }
     [self.manager setAfterSelectedPhotoArray:self.photos];
     [self.manager setAfterSelectedVideoArray:self.videos];
-    [self.dataList replaceObjectAtIndex:[self.dataList indexOfObject:beforeModel] withObject:afterModel];
+    [self.dataList s_replaceObjectAtIndex:[self.dataList indexOfObject:beforeModel] withObject:afterModel];
     [self.collectionView reloadData];
     [self dragCellCollectionViewCellEndMoving:self.collectionView];
 }

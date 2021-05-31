@@ -10,7 +10,7 @@
 #import <mach/mach_time.h>
 #import "HXAssetManager.h"
 
-
+#import <LaUtils/LaUtils.h>
 @interface HXPhotoManager ()
 //@property (assign, nonatomic) BOOL hasLivePhoto;
 //------// 当要删除的已选中的图片或者视频的时候需要在对应的end数组里面删除
@@ -504,18 +504,18 @@
             photoModel.videoURL = selectModel.videoURL;
             if (selectModel.subType == HXPhotoModelMediaSubTypePhoto) {
                 if (selectModel.type == HXPhotoModelMediaTypeCameraPhoto) {
-                    [self.selectedCameraPhotos replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:selectModel] withObject:photoModel];
+                    [self.selectedCameraPhotos s_replaceObjectAtIndex:[self.selectedCameraPhotos indexOfObject:selectModel] withObject:photoModel];
                 }else {
-                    [self.selectedPhotos replaceObjectAtIndex:[self.selectedPhotos indexOfObject:selectModel] withObject:photoModel];
+                    [self.selectedPhotos s_replaceObjectAtIndex:[self.selectedPhotos indexOfObject:selectModel] withObject:photoModel];
                 }
             }else if (selectModel.subType == HXPhotoModelMediaSubTypeVideo) {
                 if (selectModel.type == HXPhotoModelMediaTypeCameraVideo) {
-                    [self.selectedCameraVideos replaceObjectAtIndex:[self.selectedCameraVideos indexOfObject:selectModel] withObject:photoModel];
+                    [self.selectedCameraVideos s_replaceObjectAtIndex:[self.selectedCameraVideos indexOfObject:selectModel] withObject:photoModel];
                 }else {
-                    [self.selectedVideos replaceObjectAtIndex:[self.selectedVideos indexOfObject:selectModel] withObject:photoModel];
+                    [self.selectedVideos s_replaceObjectAtIndex:[self.selectedVideos indexOfObject:selectModel] withObject:photoModel];
                 }
             }
-            [self.selectedList replaceObjectAtIndex:[self.selectedList indexOfObject:selectModel] withObject:photoModel];
+            [self.selectedList s_replaceObjectAtIndex:[self.selectedList indexOfObject:selectModel] withObject:photoModel];
             photoModel.selected = YES;
             photoModel.selectedIndex = selectModel.selectedIndex;
             photoModel.selectIndexStr = selectModel.selectIndexStr;
@@ -1224,7 +1224,7 @@
     // 默认视频都是可选的
     [self changeModelVideoState:model];
     
-    [self.endSelectedList replaceObjectAtIndex:[self.endSelectedList indexOfObject:atModel] withObject:model];
+    [self.endSelectedList s_replaceObjectAtIndex:[self.endSelectedList indexOfObject:atModel] withObject:model];
     if (atModel.type == HXPhotoModelMediaTypeCameraPhoto) {
         [self.endSelectedCameraPhotos removeObject:atModel];
         [self.endSelectedCameraList removeObject:atModel];

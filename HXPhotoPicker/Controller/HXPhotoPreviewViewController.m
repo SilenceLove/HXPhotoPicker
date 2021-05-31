@@ -23,7 +23,7 @@
 #import "HXPhotoBottomSelectView.h"
 #import "UIImageView+HXExtension.h"
 #import "UIColor+HXExtension.h"
-
+#import <LaUtils/LaUtils.h>
 #define HXDARKVIEWWIDTH 30
 
 @interface HXPhotoPreviewViewController ()
