@@ -3,33 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21DD13EBAE07BB96CCC6772E /* Pods_HXPHPickerExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4A5D2707D7E9D74D09D7978 /* Pods_HXPHPickerExample.framework */; };
 		438A0ED618CD3AF385950318 /* libPods-HXPhotoPickerExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E6254BB2C20603515D5A76A4 /* libPods-HXPhotoPickerExample.a */; };
-		7B02F2DE2656507500FA94CD /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2C92656507500FA94CD /* UIDevice+Extension.swift */; };
-		7B02F2DF2656507500FA94CD /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2CA2656507500FA94CD /* UIFont+Extension.swift */; };
-		7B02F2E02656507500FA94CD /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2CB2656507500FA94CD /* UIView+Extension.swift */; };
-		7B02F2E12656507500FA94CD /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2CC2656507500FA94CD /* UIImage+Extension.swift */; };
-		7B02F2E22656507500FA94CD /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2CD2656507500FA94CD /* String+Extension.swift */; };
-		7B02F2E32656507500FA94CD /* RowTypeRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2CE2656507500FA94CD /* RowTypeRule.swift */; };
-		7B02F2E42656507500FA94CD /* Core+UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2CF2656507500FA94CD /* Core+UIColor.swift */; };
-		7B02F2E52656507500FA94CD /* EditorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D12656507500FA94CD /* EditorConfigurationViewController.swift */; };
-		7B02F2E62656507500FA94CD /* AvatarPickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D22656507500FA94CD /* AvatarPickerResultViewController.swift */; };
-		7B02F2E72656507500FA94CD /* PickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D32656507500FA94CD /* PickerResultViewController.swift */; };
-		7B02F2E82656507500FA94CD /* AvatarPickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D42656507500FA94CD /* AvatarPickerConfigurationViewController.swift */; };
-		7B02F2E92656507500FA94CD /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D52656507500FA94CD /* HomeViewController.swift */; };
-		7B02F2EA2656507500FA94CD /* CustomPickerCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D62656507500FA94CD /* CustomPickerCellViewController.swift */; };
-		7B02F2EB2656507500FA94CD /* PickerColorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D72656507500FA94CD /* PickerColorConfigurationViewController.swift */; };
-		7B02F2EC2656507500FA94CD /* PickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2D82656507500FA94CD /* PickerConfigurationViewController.swift */; };
-		7B02F2ED2656507500FA94CD /* PickerResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B02F2D92656507500FA94CD /* PickerResultViewController.xib */; };
-		7B02F2EE2656507500FA94CD /* ConfigurationViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2DB2656507500FA94CD /* ConfigurationViewCell.swift */; };
-		7B02F2EF2656507500FA94CD /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2DC2656507500FA94CD /* ProgressHUD.swift */; };
-		7B02F2F02656507500FA94CD /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2DD2656507500FA94CD /* CustomPickerCellView.swift */; };
 		7B02F2F52656509200FA94CD /* picker_example_image.JPG in Resources */ = {isa = PBXBuildFile; fileRef = 7B02F2F32656509100FA94CD /* picker_example_image.JPG */; };
 		7B02F2F62656509200FA94CD /* videoeditormatter.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 7B02F2F42656509200FA94CD /* videoeditormatter.MP4 */; };
-		7B02F3022656545600FA94CD /* HXPHPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 7B02F3012656545600FA94CD /* HXPHPicker */; };
 		7B08595324FA58DE00E93091 /* WxMomentPublishViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08590D24FA58DE00E93091 /* WxMomentPublishViewController.xib */; };
 		7B08595424FA58DE00E93091 /* YYWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08590E24FA58DE00E93091 /* YYWeakProxy.m */; };
 		7B08595524FA58DF00E93091 /* Demo15ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08591024FA58DE00E93091 /* Demo15ViewController.m */; };
@@ -168,6 +149,26 @@
 		7B7E3E7B1E4AACD1002234EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7A1E4AACD1002234EE /* main.m */; };
 		7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */; };
 		7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B7E3E851E4AACD1002234EE /* Assets.xcassets */; };
+		7B817C85266A126500DD7A99 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C70266A126500DD7A99 /* UIDevice+Extension.swift */; };
+		7B817C86266A126500DD7A99 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C71266A126500DD7A99 /* UIFont+Extension.swift */; };
+		7B817C87266A126500DD7A99 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C72266A126500DD7A99 /* UIView+Extension.swift */; };
+		7B817C88266A126500DD7A99 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C73266A126500DD7A99 /* UIImage+Extension.swift */; };
+		7B817C89266A126500DD7A99 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C74266A126500DD7A99 /* String+Extension.swift */; };
+		7B817C8A266A126500DD7A99 /* RowTypeRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C75266A126500DD7A99 /* RowTypeRule.swift */; };
+		7B817C8B266A126500DD7A99 /* Core+UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C76266A126500DD7A99 /* Core+UIColor.swift */; };
+		7B817C8C266A126500DD7A99 /* EditorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C78266A126500DD7A99 /* EditorConfigurationViewController.swift */; };
+		7B817C8D266A126500DD7A99 /* AvatarPickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C79266A126500DD7A99 /* AvatarPickerResultViewController.swift */; };
+		7B817C8E266A126500DD7A99 /* PickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7A266A126500DD7A99 /* PickerResultViewController.swift */; };
+		7B817C8F266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7B266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift */; };
+		7B817C90266A126500DD7A99 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7C266A126500DD7A99 /* HomeViewController.swift */; };
+		7B817C91266A126500DD7A99 /* CustomPickerCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7D266A126500DD7A99 /* CustomPickerCellViewController.swift */; };
+		7B817C92266A126500DD7A99 /* PickerColorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7E266A126500DD7A99 /* PickerColorConfigurationViewController.swift */; };
+		7B817C93266A126500DD7A99 /* PickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7F266A126500DD7A99 /* PickerConfigurationViewController.swift */; };
+		7B817C94266A126500DD7A99 /* PickerResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B817C80266A126500DD7A99 /* PickerResultViewController.xib */; };
+		7B817C95266A126500DD7A99 /* ConfigurationViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C82266A126500DD7A99 /* ConfigurationViewCell.swift */; };
+		7B817C96266A126500DD7A99 /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C83266A126500DD7A99 /* ProgressHUD.swift */; };
+		7B817C97266A126500DD7A99 /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C84266A126500DD7A99 /* CustomPickerCellView.swift */; };
+		7B817C9B266A126D00DD7A99 /* picker_example_gif_image.GIF in Resources */ = {isa = PBXBuildFile; fileRef = 7B817C9A266A126D00DD7A99 /* picker_example_gif_image.GIF */; };
 		7B8629A2237D0F6500F8A584 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A1237D0F6500F8A584 /* QuickLook.framework */; };
 		7B8629A4237D0F6C00F8A584 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A3237D0F6C00F8A584 /* AVKit.framework */; };
 		7B8629A6237D0F7400F8A584 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A5237D0F7300F8A584 /* CoreTelephony.framework */; };
@@ -384,25 +385,6 @@
 /* Begin PBXFileReference section */
 		16A9631049F51EB2C9886F18 /* Pods-HXPhotoPickerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPhotoPickerExample.debug.xcconfig"; path = "Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample.debug.xcconfig"; sourceTree = "<group>"; };
 		3582D2EABCA69E96E4C95300 /* Pods-HXPhotoPickerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPhotoPickerExample.release.xcconfig"; path = "Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample.release.xcconfig"; sourceTree = "<group>"; };
-		7B02F2C92656507500FA94CD /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
-		7B02F2CA2656507500FA94CD /* UIFont+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
-		7B02F2CB2656507500FA94CD /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
-		7B02F2CC2656507500FA94CD /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
-		7B02F2CD2656507500FA94CD /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
-		7B02F2CE2656507500FA94CD /* RowTypeRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowTypeRule.swift; sourceTree = "<group>"; };
-		7B02F2CF2656507500FA94CD /* Core+UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Core+UIColor.swift"; sourceTree = "<group>"; };
-		7B02F2D12656507500FA94CD /* EditorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B02F2D22656507500FA94CD /* AvatarPickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerResultViewController.swift; sourceTree = "<group>"; };
-		7B02F2D32656507500FA94CD /* PickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerResultViewController.swift; sourceTree = "<group>"; };
-		7B02F2D42656507500FA94CD /* AvatarPickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B02F2D52656507500FA94CD /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		7B02F2D62656507500FA94CD /* CustomPickerCellViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellViewController.swift; sourceTree = "<group>"; };
-		7B02F2D72656507500FA94CD /* PickerColorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerColorConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B02F2D82656507500FA94CD /* PickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B02F2D92656507500FA94CD /* PickerResultViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerResultViewController.xib; sourceTree = "<group>"; };
-		7B02F2DB2656507500FA94CD /* ConfigurationViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewCell.swift; sourceTree = "<group>"; };
-		7B02F2DC2656507500FA94CD /* ProgressHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
-		7B02F2DD2656507500FA94CD /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
 		7B02F2F32656509100FA94CD /* picker_example_image.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = picker_example_image.JPG; sourceTree = "<group>"; };
 		7B02F2F42656509200FA94CD /* videoeditormatter.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = videoeditormatter.MP4; sourceTree = "<group>"; };
 		7B08590C24FA58DE00E93091 /* WxMomentPublishViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WxMomentPublishViewController.h; sourceTree = "<group>"; };
@@ -661,6 +643,26 @@
 		7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		7B7E3E851E4AACD1002234EE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B7E3E8A1E4AACD1002234EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B817C70266A126500DD7A99 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
+		7B817C71266A126500DD7A99 /* UIFont+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
+		7B817C72266A126500DD7A99 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
+		7B817C73266A126500DD7A99 /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		7B817C74266A126500DD7A99 /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		7B817C75266A126500DD7A99 /* RowTypeRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowTypeRule.swift; sourceTree = "<group>"; };
+		7B817C76266A126500DD7A99 /* Core+UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Core+UIColor.swift"; sourceTree = "<group>"; };
+		7B817C78266A126500DD7A99 /* EditorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorConfigurationViewController.swift; sourceTree = "<group>"; };
+		7B817C79266A126500DD7A99 /* AvatarPickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerResultViewController.swift; sourceTree = "<group>"; };
+		7B817C7A266A126500DD7A99 /* PickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerResultViewController.swift; sourceTree = "<group>"; };
+		7B817C7B266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerConfigurationViewController.swift; sourceTree = "<group>"; };
+		7B817C7C266A126500DD7A99 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		7B817C7D266A126500DD7A99 /* CustomPickerCellViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellViewController.swift; sourceTree = "<group>"; };
+		7B817C7E266A126500DD7A99 /* PickerColorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerColorConfigurationViewController.swift; sourceTree = "<group>"; };
+		7B817C7F266A126500DD7A99 /* PickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerConfigurationViewController.swift; sourceTree = "<group>"; };
+		7B817C80266A126500DD7A99 /* PickerResultViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerResultViewController.xib; sourceTree = "<group>"; };
+		7B817C82266A126500DD7A99 /* ConfigurationViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewCell.swift; sourceTree = "<group>"; };
+		7B817C83266A126500DD7A99 /* ProgressHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
+		7B817C84266A126500DD7A99 /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
+		7B817C9A266A126D00DD7A99 /* picker_example_gif_image.GIF */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = picker_example_gif_image.GIF; sourceTree = "<group>"; };
 		7B8629A1237D0F6500F8A584 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		7B8629A3237D0F6C00F8A584 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		7B8629A5237D0F7300F8A584 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
@@ -688,7 +690,10 @@
 		7BD52EC024FE250E00AE3D7C /* HXPhotoPicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HXPhotoPicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BD52EC324FE250E00AE3D7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7BE8DFD624C68B2800306042 /* HXPhotoViewCellCustomProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewCellCustomProtocol.h; sourceTree = "<group>"; };
+		C629E186D5E5B5CCE9BB584A /* Pods-HXPHPickerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPHPickerExample.debug.xcconfig"; path = "Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample.debug.xcconfig"; sourceTree = "<group>"; };
+		D634D25CE084AB88B72380DC /* Pods-HXPHPickerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPHPickerExample.release.xcconfig"; path = "Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample.release.xcconfig"; sourceTree = "<group>"; };
 		E6254BB2C20603515D5A76A4 /* libPods-HXPhotoPickerExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HXPhotoPickerExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4A5D2707D7E9D74D09D7978 /* Pods_HXPHPickerExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HXPHPickerExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -696,7 +701,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B02F3022656545600FA94CD /* HXPHPicker in Frameworks */,
+				21DD13EBAE07BB96CCC6772E /* Pods_HXPHPickerExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -732,6 +737,8 @@
 			children = (
 				16A9631049F51EB2C9886F18 /* Pods-HXPhotoPickerExample.debug.xcconfig */,
 				3582D2EABCA69E96E4C95300 /* Pods-HXPhotoPickerExample.release.xcconfig */,
+				C629E186D5E5B5CCE9BB584A /* Pods-HXPHPickerExample.debug.xcconfig */,
+				D634D25CE084AB88B72380DC /* Pods-HXPHPickerExample.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -742,56 +749,6 @@
 				7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		7B02F2C72656507500FA94CD /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				7B02F2C82656507500FA94CD /* Extension */,
-				7B02F2D02656507500FA94CD /* Controller */,
-				7B02F2DA2656507500FA94CD /* View */,
-			);
-			path = Classes;
-			sourceTree = "<group>";
-		};
-		7B02F2C82656507500FA94CD /* Extension */ = {
-			isa = PBXGroup;
-			children = (
-				7B02F2C92656507500FA94CD /* UIDevice+Extension.swift */,
-				7B02F2CA2656507500FA94CD /* UIFont+Extension.swift */,
-				7B02F2CB2656507500FA94CD /* UIView+Extension.swift */,
-				7B02F2CC2656507500FA94CD /* UIImage+Extension.swift */,
-				7B02F2CD2656507500FA94CD /* String+Extension.swift */,
-				7B02F2CE2656507500FA94CD /* RowTypeRule.swift */,
-				7B02F2CF2656507500FA94CD /* Core+UIColor.swift */,
-			);
-			path = Extension;
-			sourceTree = "<group>";
-		};
-		7B02F2D02656507500FA94CD /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-				7B02F2D12656507500FA94CD /* EditorConfigurationViewController.swift */,
-				7B02F2D22656507500FA94CD /* AvatarPickerResultViewController.swift */,
-				7B02F2D32656507500FA94CD /* PickerResultViewController.swift */,
-				7B02F2D42656507500FA94CD /* AvatarPickerConfigurationViewController.swift */,
-				7B02F2D52656507500FA94CD /* HomeViewController.swift */,
-				7B02F2D62656507500FA94CD /* CustomPickerCellViewController.swift */,
-				7B02F2D72656507500FA94CD /* PickerColorConfigurationViewController.swift */,
-				7B02F2D82656507500FA94CD /* PickerConfigurationViewController.swift */,
-				7B02F2D92656507500FA94CD /* PickerResultViewController.xib */,
-			);
-			path = Controller;
-			sourceTree = "<group>";
-		};
-		7B02F2DA2656507500FA94CD /* View */ = {
-			isa = PBXGroup;
-			children = (
-				7B02F2DB2656507500FA94CD /* ConfigurationViewCell.swift */,
-				7B02F2DC2656507500FA94CD /* ProgressHUD.swift */,
-				7B02F2DD2656507500FA94CD /* CustomPickerCellView.swift */,
-			);
-			path = View;
 			sourceTree = "<group>";
 		};
 		7B08590B24FA58DE00E93091 /* Classes */ = {
@@ -890,10 +847,11 @@
 		7B3EDEBF255E185900937B4A /* Swift */ = {
 			isa = PBXGroup;
 			children = (
-				7B02F2C72656507500FA94CD /* Classes */,
+				7B817C6E266A126500DD7A99 /* Classes */,
 				7B3EDEC0255E185900937B4A /* AppDelegate.swift */,
 				7B3EDEC6255E185900937B4A /* Main.storyboard */,
 				7B3EDEC9255E185B00937B4A /* Assets.xcassets */,
+				7B817C9A266A126D00DD7A99 /* picker_example_gif_image.GIF */,
 				7B02F2F32656509100FA94CD /* picker_example_image.JPG */,
 				7B02F2F42656509200FA94CD /* videoeditormatter.MP4 */,
 				7B3EDECB255E185B00937B4A /* LaunchScreen.storyboard */,
@@ -1174,6 +1132,7 @@
 				7B752DE92372ADF300580F35 /* PhotosUI.framework */,
 				7B752DE72372ADF000580F35 /* Photos.framework */,
 				E6254BB2C20603515D5A76A4 /* libPods-HXPhotoPickerExample.a */,
+				F4A5D2707D7E9D74D09D7978 /* Pods_HXPHPickerExample.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1222,6 +1181,56 @@
 				7B7E3E7A1E4AACD1002234EE /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		7B817C6E266A126500DD7A99 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				7B817C6F266A126500DD7A99 /* Extension */,
+				7B817C77266A126500DD7A99 /* Controller */,
+				7B817C81266A126500DD7A99 /* View */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		7B817C6F266A126500DD7A99 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				7B817C70266A126500DD7A99 /* UIDevice+Extension.swift */,
+				7B817C71266A126500DD7A99 /* UIFont+Extension.swift */,
+				7B817C72266A126500DD7A99 /* UIView+Extension.swift */,
+				7B817C73266A126500DD7A99 /* UIImage+Extension.swift */,
+				7B817C74266A126500DD7A99 /* String+Extension.swift */,
+				7B817C75266A126500DD7A99 /* RowTypeRule.swift */,
+				7B817C76266A126500DD7A99 /* Core+UIColor.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		7B817C77266A126500DD7A99 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				7B817C78266A126500DD7A99 /* EditorConfigurationViewController.swift */,
+				7B817C79266A126500DD7A99 /* AvatarPickerResultViewController.swift */,
+				7B817C7A266A126500DD7A99 /* PickerResultViewController.swift */,
+				7B817C7B266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift */,
+				7B817C7C266A126500DD7A99 /* HomeViewController.swift */,
+				7B817C7D266A126500DD7A99 /* CustomPickerCellViewController.swift */,
+				7B817C7E266A126500DD7A99 /* PickerColorConfigurationViewController.swift */,
+				7B817C7F266A126500DD7A99 /* PickerConfigurationViewController.swift */,
+				7B817C80266A126500DD7A99 /* PickerResultViewController.xib */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		7B817C81266A126500DD7A99 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7B817C82266A126500DD7A99 /* ConfigurationViewCell.swift */,
+				7B817C83266A126500DD7A99 /* ProgressHUD.swift */,
+				7B817C84266A126500DD7A99 /* CustomPickerCellView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		7BD52EC124FE250E00AE3D7C /* HXPhotoPickerFramework */ = {
@@ -1340,19 +1349,18 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7B3EDECF255E185B00937B4A /* Build configuration list for PBXNativeTarget "HXPHPickerExample" */;
 			buildPhases = (
+				EB102FF5A30D8D584CC958B5 /* [CP] Check Pods Manifest.lock */,
 				7B3EDEBA255E185900937B4A /* Sources */,
 				7B3EDEBB255E185900937B4A /* Frameworks */,
 				7B3EDEBC255E185900937B4A /* Resources */,
 				7BC2310925B189A100434BBB /* Embed Frameworks */,
+				A924A060CD20916CF2DBD948 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = HXPHPickerExample;
-			packageProductDependencies = (
-				7B02F3012656545600FA94CD /* HXPHPicker */,
-			);
 			productName = HXPHPickerExample;
 			productReference = 7B3EDEBE255E185900937B4A /* HXPHPickerExample.app */;
 			productType = "com.apple.product-type.application";
@@ -1371,8 +1379,6 @@
 			dependencies = (
 			);
 			name = HXPhotoPickerExample;
-			packageProductDependencies = (
-			);
 			productName = "照片选择";
 			productReference = 7B7E3E761E4AACD1002234EE /* HXPhotoPickerExample.app */;
 			productType = "com.apple.product-type.application";
@@ -1432,9 +1438,6 @@
 				Base,
 			);
 			mainGroup = 7B7E3E6D1E4AACD1002234EE;
-			packageReferences = (
-				7B02F3002656545600FA94CD /* XCRemoteSwiftPackageReference "HXPHPicker" */,
-			);
 			productRefGroup = 7B7E3E771E4AACD1002234EE /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1452,9 +1455,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B3EDECD255E185B00937B4A /* LaunchScreen.storyboard in Resources */,
+				7B817C9B266A126D00DD7A99 /* picker_example_gif_image.GIF in Resources */,
+				7B817C94266A126500DD7A99 /* PickerResultViewController.xib in Resources */,
 				7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */,
 				7B3EDEC8255E185900937B4A /* Main.storyboard in Resources */,
-				7B02F2ED2656507500FA94CD /* PickerResultViewController.xib in Resources */,
 				7B02F2F52656509200FA94CD /* picker_example_image.JPG in Resources */,
 				7B02F2F62656509200FA94CD /* videoeditormatter.MP4 in Resources */,
 			);
@@ -1530,6 +1534,48 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		A924A060CD20916CF2DBD948 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/HXPHPicker/HXPHPicker.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HXPHPicker.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EB102FF5A30D8D584CC958B5 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HXPHPickerExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1537,25 +1583,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B02F2DF2656507500FA94CD /* UIFont+Extension.swift in Sources */,
-				7B02F2F02656507500FA94CD /* CustomPickerCellView.swift in Sources */,
-				7B02F2E32656507500FA94CD /* RowTypeRule.swift in Sources */,
-				7B02F2EF2656507500FA94CD /* ProgressHUD.swift in Sources */,
-				7B02F2E72656507500FA94CD /* PickerResultViewController.swift in Sources */,
+				7B817C86266A126500DD7A99 /* UIFont+Extension.swift in Sources */,
+				7B817C97266A126500DD7A99 /* CustomPickerCellView.swift in Sources */,
+				7B817C8A266A126500DD7A99 /* RowTypeRule.swift in Sources */,
+				7B817C96266A126500DD7A99 /* ProgressHUD.swift in Sources */,
+				7B817C8E266A126500DD7A99 /* PickerResultViewController.swift in Sources */,
 				7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */,
-				7B02F2E52656507500FA94CD /* EditorConfigurationViewController.swift in Sources */,
-				7B02F2E12656507500FA94CD /* UIImage+Extension.swift in Sources */,
-				7B02F2E02656507500FA94CD /* UIView+Extension.swift in Sources */,
-				7B02F2EC2656507500FA94CD /* PickerConfigurationViewController.swift in Sources */,
-				7B02F2E22656507500FA94CD /* String+Extension.swift in Sources */,
-				7B02F2E82656507500FA94CD /* AvatarPickerConfigurationViewController.swift in Sources */,
-				7B02F2EA2656507500FA94CD /* CustomPickerCellViewController.swift in Sources */,
-				7B02F2E42656507500FA94CD /* Core+UIColor.swift in Sources */,
-				7B02F2E62656507500FA94CD /* AvatarPickerResultViewController.swift in Sources */,
-				7B02F2E92656507500FA94CD /* HomeViewController.swift in Sources */,
-				7B02F2EE2656507500FA94CD /* ConfigurationViewCell.swift in Sources */,
-				7B02F2EB2656507500FA94CD /* PickerColorConfigurationViewController.swift in Sources */,
-				7B02F2DE2656507500FA94CD /* UIDevice+Extension.swift in Sources */,
+				7B817C8C266A126500DD7A99 /* EditorConfigurationViewController.swift in Sources */,
+				7B817C88266A126500DD7A99 /* UIImage+Extension.swift in Sources */,
+				7B817C87266A126500DD7A99 /* UIView+Extension.swift in Sources */,
+				7B817C93266A126500DD7A99 /* PickerConfigurationViewController.swift in Sources */,
+				7B817C89266A126500DD7A99 /* String+Extension.swift in Sources */,
+				7B817C8F266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift in Sources */,
+				7B817C91266A126500DD7A99 /* CustomPickerCellViewController.swift in Sources */,
+				7B817C8B266A126500DD7A99 /* Core+UIColor.swift in Sources */,
+				7B817C8D266A126500DD7A99 /* AvatarPickerResultViewController.swift in Sources */,
+				7B817C90266A126500DD7A99 /* HomeViewController.swift in Sources */,
+				7B817C95266A126500DD7A99 /* ConfigurationViewCell.swift in Sources */,
+				7B817C92266A126500DD7A99 /* PickerColorConfigurationViewController.swift in Sources */,
+				7B817C85266A126500DD7A99 /* UIDevice+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1798,6 +1844,7 @@
 /* Begin XCBuildConfiguration section */
 		7B3EDED0255E185B00937B4A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C629E186D5E5B5CCE9BB584A /* Pods-HXPHPickerExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1817,11 +1864,8 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Swift/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPHPickerExample;
@@ -1835,6 +1879,7 @@
 		};
 		7B3EDED1255E185B00937B4A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D634D25CE084AB88B72380DC /* Pods-HXPHPickerExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1850,16 +1895,12 @@
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = Swift/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPHPickerExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1994,10 +2035,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 3.2.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker3;
@@ -2021,10 +2059,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 3.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2056,11 +2091,7 @@
 				INFOPLIST_FILE = HXPhotoPickerFramework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MARKETING_VERSION = 3.1.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -2093,11 +2124,7 @@
 				INFOPLIST_FILE = HXPhotoPickerFramework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MARKETING_VERSION = 3.1.5;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPickerFramework;
@@ -2151,25 +2178,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		7B02F3002656545600FA94CD /* XCRemoteSwiftPackageReference "HXPHPicker" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SilenceLove/HXPHPicker";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.8;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		7B02F3012656545600FA94CD /* HXPHPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7B02F3002656545600FA94CD /* XCRemoteSwiftPackageReference "HXPHPicker" */;
-			productName = HXPHPicker;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7B7E3E6E1E4AACD1002234EE /* Project object */;
 }

@@ -1,0 +1,6 @@
+framework module HXPHPicker {
+  umbrella header "HXPHPicker-umbrella.h"
+
+  export *
+  module * { export * }
+}

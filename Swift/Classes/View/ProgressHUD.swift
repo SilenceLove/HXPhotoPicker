@@ -195,18 +195,19 @@ class ProgressHUD: UIView {
         backgroundView.center = CGPoint(x: width * 0.5, y: height * 0.5)
         blurEffectView.frame = backgroundView.bounds
     }
-    
+    @discardableResult
     class func showLoading(addedTo view: UIView?, animated: Bool) -> ProgressHUD? {
         return showLoading(addedTo: view, text: nil, animated: animated)
     }
+    @discardableResult
     class func showLoading(addedTo view: UIView?, afterDelay: TimeInterval, animated: Bool) -> ProgressHUD? {
         return showLoading(addedTo: view, text: nil, afterDelay: afterDelay, animated: animated)
     }
-    
+    @discardableResult
     class func showLoading(addedTo view: UIView?, text: String?, animated: Bool) -> ProgressHUD? {
         return showLoading(addedTo: view, text: text, afterDelay: 0, animated: animated)
     }
-    
+    @discardableResult
     class func showLoading(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) -> ProgressHUD? {
         if view == nil {
             return nil

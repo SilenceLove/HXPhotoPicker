@@ -16,6 +16,7 @@ class EditorConfigurationViewController: UITableViewController {
     let videoURL: URL = URL.init(fileURLWithPath: Bundle.main.path(forResource: "videoeditormatter", ofType: "MP4")!)
     
     var editorType = 0
+    var assetType = 0
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Editor"
@@ -29,14 +30,35 @@ class EditorConfigurationViewController: UITableViewController {
     @objc func backClick() {
         if showOpenEditorButton {
             if editorType == 0 {
-                let image = UIImage.init(contentsOfFile: Bundle.main.path(forResource: "picker_example_image", ofType: ".JPG")!)!
-                let vc = EditorController.init(image: image, config: photoConfig)
-                vc.photoEditorDelegate = self
-                present(vc, animated: true, completion: nil)
+                if assetType == 0 {
+                    let image = UIImage.init(contentsOfFile: Bundle.main.path(forResource: "picker_example_image", ofType: ".JPG")!)!
+                    let vc = EditorController.init(image: image, config: photoConfig)
+                    vc.photoEditorDelegate = self
+                    present(vc, animated: true, completion: nil)
+                }else {
+                    #if canImport(Kingfisher)
+                    let networkURL = URL.init(string: "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif")!
+                    let vc = EditorController.init(networkImageURL: networkURL, config: photoConfig)
+                    vc.photoEditorDelegate = self
+                    present(vc, animated: true, completion: nil)
+                    #else
+                    let image = UIImage.init(contentsOfFile: Bundle.main.path(forResource: "picker_example_image", ofType: ".JPG")!)!
+                    let vc = EditorController.init(image: image, config: photoConfig)
+                    vc.photoEditorDelegate = self
+                    present(vc, animated: true, completion: nil)
+                    #endif
+                }
             }else {
-                let vc = EditorController.init(videoURL: videoURL, config: videoConfig)
-                vc.videoEditorDelegate = self
-                present(vc, animated: true, completion: nil)
+                if assetType == 0 {
+                    let vc = EditorController.init(videoURL: videoURL, config: videoConfig)
+                    vc.videoEditorDelegate = self
+                    present(vc, animated: true, completion: nil)
+                }else {
+                    let networkURL = URL.init(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_video.mp4")!
+                    let vc = EditorController.init(networkVideoURL: networkURL, config: videoConfig)
+                    vc.videoEditorDelegate = self
+                    present(vc, animated: true, completion: nil)
+                }
             }
         }else {
             dismiss(animated: true, completion: nil)
@@ -101,9 +123,24 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.photoEditor = photoConfig
         pickerResultVC.config = pickerConfig
-        let photoAsset = PhotoAsset.init(image: photoEditorViewController.image)
-        photoAsset.photoEdit = result
-        pickerResultVC.selectedAssets = [photoAsset]
+        
+        switch photoEditorViewController.assetType {
+        case .local:
+            var localImageAsset = LocalImageAsset.init(imageURL: result.editedImageURL)
+            localImageAsset.image = result.editedImage
+            let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
+            photoAsset.photoEdit = result
+            pickerResultVC.selectedAssets = [photoAsset]
+        #if canImport(Kingfisher)
+        case .network:
+            let url = photoEditorViewController.networkImageURL!
+            let photoAsset = PhotoAsset.init(networkImageAsset: .init(thumbnailURL: url, originalURL: url))
+            photoAsset.photoEdit = result
+            pickerResultVC.selectedAssets = [photoAsset]
+        #endif
+        default:
+            break
+        }
         self.navigationController?.pushViewController(pickerResultVC, animated: true)
     }
     func photoEditorViewController(didFinishWithUnedited photoEditorViewController: PhotoEditorViewController) {
@@ -111,8 +148,20 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.photoEditor = photoConfig
         pickerResultVC.config = pickerConfig
-        let photoAsset = PhotoAsset.init(image: photoEditorViewController.image)
-        pickerResultVC.selectedAssets = [photoAsset]
+        switch photoEditorViewController.assetType {
+        case .local:
+            let localImageAsset = LocalImageAsset.init(image: photoEditorViewController.image)
+            let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
+            pickerResultVC.selectedAssets = [photoAsset]
+        #if canImport(Kingfisher)
+        case .network:
+            let url = photoEditorViewController.networkImageURL!
+            let photoAsset = PhotoAsset.init(networkImageAsset: .init(thumbnailURL: url, originalURL: url))
+            pickerResultVC.selectedAssets = [photoAsset]
+        #endif
+        default:
+            break
+        }
         self.navigationController?.pushViewController(pickerResultVC, animated: true)
     }
 }
@@ -122,9 +171,19 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.videoEditor = videoConfig
         pickerResultVC.config = pickerConfig
-        let photoAsset = PhotoAsset.init(videoURL: videoURL)
-        photoAsset.videoEdit = result
-        pickerResultVC.selectedAssets = [photoAsset]
+        
+        switch videoEditorViewController.assetType {
+        case .local:
+            let photoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: videoURL))
+            photoAsset.videoEdit = result
+            pickerResultVC.selectedAssets = [photoAsset]
+        case .network:
+            let photoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: videoEditorViewController.networkVideoURL!))
+            photoAsset.videoEdit = result
+            pickerResultVC.selectedAssets = [photoAsset]
+        default:
+            break
+        }
         self.navigationController?.pushViewController(pickerResultVC, animated: true)
     }
     func videoEditorViewController(didFinishWithUnedited videoEditorViewController: VideoEditorViewController) {
@@ -132,8 +191,16 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.videoEditor = videoConfig
         pickerResultVC.config = pickerConfig
-        let photoAsset = PhotoAsset.init(videoURL: videoURL)
-        pickerResultVC.selectedAssets = [photoAsset]
+        switch videoEditorViewController.assetType {
+        case .local:
+            let photoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: videoURL))
+            pickerResultVC.selectedAssets = [photoAsset]
+        case .network:
+            let photoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: videoEditorViewController.networkVideoURL!))
+            pickerResultVC.selectedAssets = [photoAsset]
+        default:
+            break
+        }
         self.navigationController?.pushViewController(pickerResultVC, animated: true)
     }
 }
@@ -143,6 +210,8 @@ extension EditorConfigurationViewController {
             switch rowType {
             case .type:
                 return editorType == 0 ? "photo" : "video"
+            case .assetType:
+                return assetType == 0 ? "本地" : "网络"
             }
         }
         if let rowType = rowType as? photoEditorRow {
@@ -193,6 +262,10 @@ extension EditorConfigurationViewController {
     }
     func editorTypeAction(_ indexPath: IndexPath) {
         editorType = editorType == 0 ? 1 : 0
+        tableView.reloadRows(at: [indexPath], with: .fade)
+    }
+    func assetTypeAction(_ indexPath: IndexPath) {
+        assetType = assetType == 0 ? 1 : 0
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func stateAction(_ indexPath: IndexPath) {
@@ -379,9 +452,15 @@ extension EditorConfigurationViewController {
     }
     enum editorTypeRow: String, CaseIterable, ConfigRowTypeRule {
         case type
+        case assetType
         
         var title: String {
-            return "编辑类型"
+            switch self {
+            case .type:
+                return "编辑类型"
+            case .assetType:
+                return "资源类型"
+            }
         }
         var detailTitle: String {
             return "." + self.rawValue
@@ -393,6 +472,8 @@ extension EditorConfigurationViewController {
             switch self {
             case .type:
                 return controller.editorTypeAction(_:)
+            case .assetType:
+                return controller.assetTypeAction(_:)
             }
         }
     }
