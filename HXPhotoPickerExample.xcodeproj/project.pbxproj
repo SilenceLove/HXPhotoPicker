@@ -52,6 +52,7 @@
 		7B08597B24FA58DF00E93091 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08595024FA58DE00E93091 /* SettingViewController.m */; };
 		7B08597C24FA58DF00E93091 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
+		7B3C2904266F4DAF00F0622F /* PHAsset+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B3C2903266F4DAF00F0622F /* PHAsset+HXExtension.m */; };
 		7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC0255E185900937B4A /* AppDelegate.swift */; };
 		7B3EDEC8255E185900937B4A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC6255E185900937B4A /* Main.storyboard */; };
 		7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B3EDEC9255E185B00937B4A /* Assets.xcassets */; };
@@ -454,6 +455,8 @@
 		7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WxMomentViewCell.xib; sourceTree = "<group>"; };
 		7B08595224FA58DE00E93091 /* Demo6SubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo6SubViewController.h; sourceTree = "<group>"; };
 		7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HXPhotoPicker.bundle; sourceTree = "<group>"; };
+		7B3C2902266F4DAF00F0622F /* PHAsset+HXExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PHAsset+HXExtension.h"; sourceTree = "<group>"; };
+		7B3C2903266F4DAF00F0622F /* PHAsset+HXExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PHAsset+HXExtension.m"; sourceTree = "<group>"; };
 		7B3EDEBE255E185900937B4A /* HXPHPickerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HXPHPickerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B3EDEC0255E185900937B4A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7B3EDEC7255E185900937B4A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -1026,6 +1029,8 @@
 				7B4E65C82487AD5B00077EE1 /* UIView+HXExtension.m */,
 				7B4E65CA2487AD5B00077EE1 /* UIViewController+HXExtension.h */,
 				7B4E65BD2487AD5B00077EE1 /* UIViewController+HXExtension.m */,
+				7B3C2902266F4DAF00F0622F /* PHAsset+HXExtension.h */,
+				7B3C2903266F4DAF00F0622F /* PHAsset+HXExtension.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -1669,6 +1674,7 @@
 				7B4D4C3E24B858C600B03846 /* HXPhotoEditConfiguration.m in Sources */,
 				7B4E66392487AD5C00077EE1 /* UIColor+HXExtension.m in Sources */,
 				7B4D4C6724B858C600B03846 /* HXPhotoEditStickerItemView.m in Sources */,
+				7B3C2904266F4DAF00F0622F /* PHAsset+HXExtension.m in Sources */,
 				7B08595C24FA58DF00E93091 /* Demo8ViewController.m in Sources */,
 				7B4D4C4A24B858C600B03846 /* HXPhotoEditResizeControl.m in Sources */,
 				7B4E662F2487AD5C00077EE1 /* HXPhotoViewTransition.m in Sources */,
@@ -2036,7 +2042,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.2.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2060,7 +2066,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPicker3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2092,7 +2098,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 3.1.5;
+				MARKETING_VERSION = 3.2.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPickerFramework;
@@ -2125,7 +2131,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 3.1.5;
+				MARKETING_VERSION = 3.2.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPhotoPickerFramework;
 				PRODUCT_MODULE_NAME = HXPhotoPicker;

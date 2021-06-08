@@ -37,16 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cancelRequest;
 - (CGSize)getImageSize;
 
-- (CGFloat)getScrollViewZoomScale;
-- (void)setScrollViewZoomScale:(CGFloat)zoomScale;
-- (CGSize)getScrollViewContentSize;
-- (void)setScrollViewContnetSize:(CGSize)contentSize;
-- (CGPoint)getScrollViewContentOffset;
-- (void)setScrollViewContentOffset:(CGPoint)contentOffset;
-@property (copy, nonatomic) void (^ scrollViewDidScroll)(UIScrollView *scrollView);
-
 @property (strong, nonatomic) HXPreviewContentView *previewContentView;
 - (UIImage *)image;
+
+@property (assign, nonatomic) BOOL allowInteration;
 @end
 
 NS_ASSUME_NONNULL_END

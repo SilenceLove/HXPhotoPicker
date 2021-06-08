@@ -79,6 +79,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditAspectRatio) {
 
 /// 圆形裁剪框，只要裁剪功能 并且 固定裁剪比例为 HXPhotoEditAspectRatioType_1x1 时有效
 @property (assign, nonatomic) BOOL isRoundCliping;
+
+@property (assign, nonatomic) CGSize clippingMinSize;
 @end
 
 NS_ASSUME_NONNULL_END

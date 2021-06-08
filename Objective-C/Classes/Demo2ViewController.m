@@ -276,7 +276,11 @@ static const CGFloat kPhotoViewMargin = 12.0;
 //    [self changeStatus];
 //    NSSLog(@"%@",[videos.firstObject videoURL]);
 //    HXPhotoModel *photoModel = allList.firstObject;
-    
+//    [photoModel getAssetURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModelMediaSubType mediaType, BOOL isNetwork, HXPhotoModel * _Nullable model) {
+//        NSSLog(@"%@", imageURL);
+//    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+//
+//    }];
 //    [allList hx_requestImageWithOriginal:isOriginal completion:^(NSArray<UIImage *> * _Nullable imageArray, NSArray<HXPhotoModel *> * _Nullable errorArray) {
 //        // imageArray 获取成功的image数组
 //        // errorArray 获取失败的model数组

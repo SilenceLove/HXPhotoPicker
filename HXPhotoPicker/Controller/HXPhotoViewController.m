@@ -284,6 +284,10 @@ HX_PhotoEditViewControllerDelegate
     if (!self.manager.configuration.singleSelected) {
         [self.view addSubview:self.bottomView];
     }
+    [self setupNav];
+    [self changeColor];
+}
+- (void)setupNav {
     UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:[NSBundle hx_localizedStringForKey:@"取消"] style:UIBarButtonItemStylePlain target:self action:@selector(didCancelClick)];
     if (self.manager.configuration.albumShowMode == HXPhotoAlbumShowModePopup) {
         if (self.manager.configuration.photoListCancelLocation == HXPhotoListCancelButtonLocationTypeLeft) {
@@ -305,7 +309,6 @@ HX_PhotoEditViewControllerDelegate
     }else {
         self.navigationItem.rightBarButtonItem = cancelItem;
     }
-    [self changeColor];
 }
 - (void)changeColor {
     UIColor *backgroundColor;

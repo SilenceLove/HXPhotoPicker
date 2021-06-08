@@ -44,7 +44,7 @@
     self.supportRotation = YES;
     self.pushTransitionDuration = 0.45f;
     self.popTransitionDuration = 0.35f;
-    self.popInteractiveTransitionDuration = 0.35f;
+    self.popInteractiveTransitionDuration = 0.45f;
     self.doneBtnShowDetail = YES;
     self.videoCanEdit = YES;
     self.photoCanEdit = YES;

@@ -844,9 +844,8 @@
 }
 - (HXPhotoEditingView *)editingView {
     if (!_editingView) {
-        _editingView = [[HXPhotoEditingView alloc] initWithFrame:self.view.bounds];
+        _editingView = [[HXPhotoEditingView alloc] initWithFrame:self.view.bounds config:self.configuration];
         _editingView.onlyCliping = self.onlyCliping;
-        _editingView.configuration = self.configuration;
         _editingView.clippingDelegate = self;
         if (self.configuration.drawColors.count > self.configuration.defaultDarwColorIndex) {
             _editingView.clippingView.imageView.drawView.lineColor = self.configuration.drawColors[self.configuration.defaultDarwColorIndex];

@@ -9,7 +9,7 @@
 #import "HXPhotoManager.h"
 #import <mach/mach_time.h>
 #import "HXAssetManager.h"
-
+#import "PHAsset+HXExtension.h"
 
 @interface HXPhotoManager ()
 //@property (assign, nonatomic) BOOL hasLivePhoto;
@@ -303,20 +303,47 @@
             if (model.subType != HXPhotoModelMediaSubTypePhoto) {
                 continue;
             }
-            if (model.assetByte == 0 && model.type != HXPhotoModelMediaTypeCameraPhoto) {
-                [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
-                    model.assetByte = imageData.length;
-                    dataLength += imageData.length;
-                    assetCount ++;
-                    if (assetCount >= weakSelf.selectedPhotos.count) {
-                        weakSelf.selectPhotoTotalDataLengths = &(dataLength);
-                        NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) completion(bytes, dataLength);
-                        });
+            if (model.asset != nil) {
+                [model.asset hx_checkForModificationsWithAssetPathMethodCompletion:^(BOOL hasAdj) {
+                    if (hasAdj) {
+                        [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+                            model.assetByte = imageData.length;
+                            dataLength += model.assetByte;
+                            assetCount ++;
+                            if (assetCount >= weakSelf.selectedPhotos.count) {
+                                weakSelf.selectPhotoTotalDataLengths = &(dataLength);
+                                NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    if (completion) completion(bytes, dataLength);
+                                });
+                            }
+                        } failed:^(NSDictionary *info, HXPhotoModel *model) {
+                            assetCount ++;
+                            if (assetCount >= weakSelf.selectedPhotos.count) {
+                                weakSelf.selectPhotoTotalDataLengths = &(dataLength);
+                                NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    if (completion) completion(bytes, dataLength);
+                                });
+                            }
+                        }];
+                    }else {
+                        [self requestPhotosBytesWithModel:model completion:^(NSUInteger byte) {
+                            dataLength += byte;
+                            assetCount ++;
+                            if (assetCount >= weakSelf.selectedPhotos.count) {
+                                weakSelf.selectPhotoTotalDataLengths = &(dataLength);
+                                NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    if (completion) completion(bytes, dataLength);
+                                });
+                            }
+                        }];
                     }
-                } failed:^(NSDictionary *info, HXPhotoModel *model) {
-                    dataLength += 0;
+                }];
+            }else {
+                [self requestPhotosBytesWithModel:model completion:^(NSUInteger byte) {
+                    dataLength += byte;
                     assetCount ++;
                     if (assetCount >= weakSelf.selectedPhotos.count) {
                         weakSelf.selectPhotoTotalDataLengths = &(dataLength);
@@ -326,20 +353,26 @@
                         });
                     }
                 }];
-            }else {
-                dataLength += model.assetByte;
-                assetCount ++;
-                if (assetCount >= weakSelf.selectedPhotos.count) {
-                    weakSelf.selectPhotoTotalDataLengths = &(dataLength);
-                    NSString *bytes = [HXPhotoTools getBytesFromDataLength:dataLength];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (completion) completion(bytes, dataLength);
-                    });
-                }
             }
         }
     }];
     [self.dataOperationQueue addOperation:operation];
+}
+- (void)requestPhotosBytesWithModel:(HXPhotoModel *)model completion:(void (^)(NSUInteger))completion {
+    if (model.assetByte == 0 && model.type != HXPhotoModelMediaTypeCameraPhoto) {
+        [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {
+            model.assetByte = imageData.length;
+            if (completion) {
+                completion(imageData.length);
+            }
+        } failed:^(NSDictionary *info, HXPhotoModel *model) {
+            if (completion) completion(0);
+        }];
+    }else {
+        if (completion) {
+            completion(model.assetByte);
+        }
+    }
 }
 - (PHFetchOptions *)fetchAlbumOptions {
     if (!_fetchAlbumOptions) {

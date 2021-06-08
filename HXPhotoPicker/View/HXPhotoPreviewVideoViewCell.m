@@ -47,6 +47,11 @@
             }
             [weakSelf refreshImageSize];
         };
+        self.previewContentView.videoView.changeSliderHidden = ^(BOOL isHidden) {
+            [UIView animateWithDuration:0.25 animations:^{
+                weakSelf.bottomSliderView.alpha = isHidden ? 0 : 1;
+            }];
+        };
         [self.scrollView addSubview:self.previewContentView];
         [self.contentView addSubview:self.bottomSliderView];
     }

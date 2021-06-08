@@ -38,6 +38,7 @@ typedef NS_ENUM(NSUInteger, HXPreviewVideoSliderType) {
 @property (copy, nonatomic) void (^ changeValue)(CGFloat value ,BOOL animaiton);
 @property (copy, nonatomic) void (^ gotVideoCurrentTime)(NSTimeInterval currentTime);
 @property (copy, nonatomic) void (^ playBtnDidClick)(BOOL isPlay);
+@property (copy, nonatomic) void (^ changeSliderHidden)(BOOL isHidden);
 - (void)didPlayBtnClickWithSelected:(BOOL)isSelected;
 - (void)changePlayerTimeWithValue:(CGFloat)value type:(HXPreviewVideoSliderType)type;
 

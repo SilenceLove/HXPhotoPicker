@@ -103,8 +103,14 @@
         if (!cell) { toVC.collectionView.alpha = 1; }
     }];
     
-    CGSize to = [UIImage hx_scaleImageSizeBySize:model.endImageSize targetSize:containerView.bounds.size isBoth:false];
-    CGRect toFrame = (CGRect){ CGPointMake(width / 2.f - to.width / 2.f, height / 2.f - to.height / 2.f) , to};
+//    CGSize to = [UIImage hx_scaleImageSizeBySize:model.endImageSize targetSize:containerView.bounds.size isBoth:false];
+    CGSize to = model.endImageSize;
+    CGRect toFrame;
+    if (to.height > height) {
+        toFrame = CGRectMake(0, 0, to.width, to.height);
+    }else {
+        toFrame = (CGRect){ CGPointMake(width / 2.f - to.width / 2.f, height / 2.f - to.height / 2.f) , to};
+    }
 
     // 添加圆角动画
     if (cell.layer.cornerRadius > 0) {

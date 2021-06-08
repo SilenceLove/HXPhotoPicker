@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface HXPhotoEditingView : UIScrollView
-
+- (instancetype)initWithFrame:(CGRect)frame config:(HXPhotoEditConfiguration *)config;
 @property (nonatomic, weak, readonly) HXPhotoClippingView *clippingView;
 @property (nonatomic, weak, readonly) UIView *clipZoomView;
 @property (nonatomic, strong) UIImage *image;

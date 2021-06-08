@@ -36,6 +36,7 @@
 #import "HXMECancelBlock.h"
 #import "HXPhotoEdit.h"
 #import "HXAssetManager.h"
+#import "PHAsset+HXExtension.h"
 
 @implementation HXPhotoModel
 - (void)setSelectIndexStr:(NSString *)selectIndexStr {
@@ -66,7 +67,8 @@
                 }
             }
         }else {
-            id fileSize = [[[PHAssetResource assetResourcesForAsset:self.asset] firstObject] valueForKey:@"fileSize"];
+            PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:self.asset] firstObject];
+            id fileSize = [resource valueForKey:@"fileSize"];
             if (fileSize && ![fileSize isKindOfClass:[NSNull class]]) {
                 byte = [fileSize unsignedIntegerValue];
             }
@@ -1728,9 +1730,8 @@
         }
         NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
         NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-        
-        if ([imageData writeToFile:fullPathToFile atomically:YES]) {
-            NSURL *imageURL = [NSURL fileURLWithPath:fullPathToFile];
+        NSURL *imageURL = [self writeWithImageData:imageData toFile:fullPathToFile];
+        if (imageURL != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     success(imageURL, self, nil);
@@ -1744,6 +1745,13 @@
             });
         }
     });
+}
+- (NSURL *)writeWithImageData:(NSData *)imageData toFile:(NSString *)filePath {
+    if ([imageData writeToFile:filePath atomically:YES]) {
+        return [NSURL fileURLWithPath:filePath];
+    }else {
+        return nil;
+    }
 }
 - (void)getAssetURLWithSuccess:(HXModelURLHandler)success
                         failed:(HXModelFailedBlock)failed {
@@ -1786,6 +1794,26 @@
             }
         }else {
             [self requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                if (model.type == HXPhotoModelMediaTypePhotoGif) {
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".gif"];
+                        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                        NSURL *imageURL = [weakSelf writeWithImageData:imageData toFile:fullPathToFile];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (imageURL != nil) {
+                                weakSelf.imageURL = imageURL;
+                                if (success) {
+                                    success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+                                }
+                            }else {
+                                if (failed) {
+                                    failed(nil, weakSelf);
+                                }
+                            }
+                        });
+                    });
+                    return;
+                }
                 UIImage *image = [UIImage imageWithData:imageData];
                 if (image.imageOrientation != UIImageOrientationUp) {
                     image = [image hx_normalizedImage];

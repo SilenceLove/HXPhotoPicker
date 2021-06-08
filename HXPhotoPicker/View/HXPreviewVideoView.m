@@ -394,6 +394,7 @@
 }
 - (void)showOtherView {
     self.isDismiss = NO;
+    self.changeSliderHidden(NO);
     [UIView animateWithDuration:0.2 animations:^{
         self.loadFailedView.alpha = 1;
         self.loadingView.alpha = 1;
@@ -402,6 +403,7 @@
 }
 - (void)hideOtherView:(BOOL)animatoin {
     self.isDismiss = YES;
+    self.changeSliderHidden(YES);
     if (!animatoin) {
         self.loadingView.hidden = YES;
         self.loadFailedView.hidden = YES;

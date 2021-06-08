@@ -109,9 +109,9 @@ HXPhotoPreviewViewCell;
 @property (assign, nonatomic) BOOL showBottomPageControl;
 /// 处理ios8 导航栏转场动画崩溃问题
 @property (strong, nonatomic) UIViewController *photoViewController;
-@property (copy, nonatomic) void (^ currentCellScrollViewDidScroll)(UIScrollView *scrollView);
 
 - (HXPhotoPreviewViewCell *)currentPreviewCell:(HXPhotoModel *)model;
+- (HXPhotoPreviewViewCell *)currentPreviewCell;
 - (void)changeStatusBarWithHidden:(BOOL)hidden;
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration;
 - (void)setupDarkBtnAlpha:(CGFloat)alpha;
