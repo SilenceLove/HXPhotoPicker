@@ -303,7 +303,7 @@
             if (model.subType != HXPhotoModelMediaSubTypePhoto) {
                 continue;
             }
-            if (model.asset != nil) {
+            if (model.asset != nil && model.photoEdit == nil) {
                 [model.asset hx_checkForModificationsWithAssetPathMethodCompletion:^(BOOL hasAdj) {
                     if (hasAdj) {
                         [model requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData *imageData, UIImageOrientation orientation, HXPhotoModel *model, NSDictionary *info) {

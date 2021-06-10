@@ -9,6 +9,7 @@
 #import "HXAssetManager.h"
 #import "HXAlbumModel.h"
 #import "NSString+HXExtension.h"
+#import "PHAsset+HXExtension.h"
 
 @implementation HXAssetManager
 
@@ -101,29 +102,80 @@
 }
 + (void)requestVideoURL:(PHAsset *)asset completion:(void (^)(NSURL * _Nullable))completion {
     [self requestAVAssetForAsset:asset networkAccessAllowed:YES progressHandler:nil completion:^(AVAsset * _Nonnull avAsset, AVAudioMix * _Nonnull audioMix, NSDictionary * _Nonnull info) {
-//        if ([avAsset isKindOfClass:AVURLAsset.class]) {
-//            if (completion) {
-//                completion([(AVURLAsset *)avAsset URL]);
-//            }
-//        }else {
-            PHAssetResource *videoResource = [PHAssetResource assetResourcesForAsset:asset].firstObject;
+        [asset hx_checkForModificationsWithAssetPathMethodCompletion:^(BOOL isAdjusted) {
             NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
             NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
             NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
-            PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
-            options.networkAccessAllowed = YES;
-            [[PHAssetResourceManager defaultManager] writeDataForAssetResource:videoResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (!error) {
-                        if (completion) {
-                            completion(videoURL);
-                        }
-                    }else {
-                        completion(nil);
+            if (isAdjusted) {
+                if ([avAsset isKindOfClass:AVURLAsset.class]) {
+                    NSFileManager *fileManager = [NSFileManager defaultManager];
+                    NSError *error;
+                    [fileManager copyItemAtURL:[(AVURLAsset *)avAsset URL] toURL:videoURL error:&error];
+                    if (error == nil) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (completion) {
+                                completion(videoURL);
+                            }
+                        });
+                        return;
                     }
-                });
-            }];
-//        }
+                }
+                NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+                NSString *presetName;
+                if ([presets containsObject:AVAssetExportPresetHighestQuality]) {
+                    presetName = AVAssetExportPresetHighestQuality;
+                }else {
+                    presetName = AVAssetExportPresetMediumQuality;
+                }
+                AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:presetName];
+                session.outputURL = videoURL;
+                session.shouldOptimizeForNetworkUse = YES;
+                
+                NSArray *supportedTypeArray = session.supportedFileTypes;
+                if ([supportedTypeArray containsObject:AVFileTypeMPEG4]) {
+                    session.outputFileType = AVFileTypeMPEG4;
+                } else if (supportedTypeArray.count == 0) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (completion) {
+                            completion(nil);
+                        }
+                    });
+                    return;
+                }else {
+                    session.outputFileType = [supportedTypeArray objectAtIndex:0];
+                }
+                
+                [session exportAsynchronouslyWithCompletionHandler:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if ([session status] == AVAssetExportSessionStatusCompleted) {
+                            if (completion) {
+                                completion(videoURL);
+                            }
+                        }else if ([session status] == AVAssetExportSessionStatusFailed ||
+                                  [session status] == AVAssetExportSessionStatusCancelled) {
+                            if (completion) {
+                                completion(nil);
+                            }
+                        }
+                    });
+                }];
+            }else {
+                PHAssetResource *videoResource = [PHAssetResource assetResourcesForAsset:asset].firstObject;
+                PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
+                options.networkAccessAllowed = YES;
+                [[PHAssetResourceManager defaultManager] writeDataForAssetResource:videoResource toFile:videoURL options:options completionHandler:^(NSError * _Nullable error) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (!error) {
+                            if (completion) {
+                                completion(videoURL);
+                            }
+                        }else {
+                            completion(nil);
+                        }
+                    });
+                }];
+            }
+        }];
     }];
 }
 + (CGSize)getAssetTargetSizeWithAsset:(PHAsset *)asset width:(CGFloat)width {

@@ -9,7 +9,7 @@
 <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
 </p>
 
-> [Swift版本(完善中...)](https://github.com/SilenceLove/HXPHPicker)
+> [Swift版本](https://github.com/SilenceLove/HXPHPicker)
 
 | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_4.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_1.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_2.PNG"> |
 | ------ | ------ | ------ |
