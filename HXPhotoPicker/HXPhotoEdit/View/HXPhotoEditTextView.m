@@ -317,8 +317,8 @@
     [self hide];
 }
 - (IBAction)didDoneClick:(id)sender {
-    [self.textView resignFirstResponder];
     if (!self.textView.text.length) {
+        [self.textView resignFirstResponder];
         [self hide];
         return;
     }
@@ -337,6 +337,7 @@
         self.completion(textModel);
     }
     [self hide];
+    [self.textView resignFirstResponder];
 }
 - (CGFloat)getTextMaximumWidthWithView:(UIView *)view {
     CGSize newSize = [self.textView sizeThatFits:CGSizeMake(view.hx_w, view.hx_h)];

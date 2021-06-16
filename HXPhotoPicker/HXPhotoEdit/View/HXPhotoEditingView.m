@@ -109,7 +109,7 @@ NSString *const kHXEditingViewData_clippingView = @"kHXEditingViewData_clippingV
     _editToolbarDefaultHeight = 110.f;
     _defaultMaximumZoomScale = HXMaxZoomScale;
     
-    /** 创建缩放层，避免直接缩放LFClippingView，会改变其transform */
+    /** 创建缩放层，避免直接缩放，会改变其transform */
     UIView *clipZoomView = [[UIView alloc] initWithFrame:self.bounds];
     clipZoomView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     clipZoomView.backgroundColor = [UIColor clearColor];
