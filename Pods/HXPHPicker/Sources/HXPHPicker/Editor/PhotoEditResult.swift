@@ -16,7 +16,8 @@ public struct PhotoEditResult {
         case gif
     }
     
-    /// 编辑后的图片，如果为gif则为封面图片
+    /// 编辑后的缩略图片，如果为gif则为封面图片
+    /// 适合在多图列表展示，预览原图或者大图请使用 editedImageURL
     public let editedImage: UIImage
     
     /// 编辑后的图片本地地址
@@ -30,16 +31,20 @@ public struct PhotoEditResult {
 }
 
 struct PhotoEditData {
-    var cropSize: CGSize = .zero
-    var zoomScale: CGFloat = 0
-    var contentInset: UIEdgeInsets = .zero
-    var offsetScale: CGPoint = .zero
-    var minimumZoomScale: CGFloat = 0
-    var maximumZoomScale: CGFloat = 0
-    var maskRect: CGRect = .zero
-    var angle: CGFloat = 0
-    var transform: CGAffineTransform = .identity
-    var mirrorType: EditorImageResizerView.MirrorType = .none
-    var isPortrait: Bool = true
+    let isPortrait: Bool
+    let cropData: PhotoEditCropData?
+    let brushData: [PhotoEditorBrushData]
 }
 
+struct PhotoEditCropData {
+    let cropSize: CGSize
+    let zoomScale: CGFloat
+    let contentInset: UIEdgeInsets
+    let offsetScale: CGPoint
+    let minimumZoomScale: CGFloat
+    let maximumZoomScale: CGFloat
+    let maskRect: CGRect
+    let angle: CGFloat
+    let transform: CGAffineTransform
+    let mirrorType: EditorImageResizerView.MirrorType
+}

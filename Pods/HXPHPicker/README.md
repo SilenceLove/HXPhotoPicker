@@ -27,7 +27,7 @@
 - [x] 支持手势返回
 - [x] 支持滑动选择
 - [x] 编辑图片（支持动图、网络资源）
-    - [ ] 涂鸦
+    - [x] 涂鸦
     - [ ] 贴纸
     - [ ] 文字
     - [x] 裁剪
@@ -53,7 +53,7 @@
 
 ## <a id="要求"></a> 要求
 
-- iOS 9.0+
+- iOS 10.0+
 - Xcode 12.0+
 - Swift 5.3+
 
@@ -65,7 +65,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.0.9"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.1.1"))
 ]
 ```
 
@@ -126,8 +126,17 @@ extension ViewController: PhotoPickerControllerDelegate {
     ///   - result: 选择的结果
     ///     result.photoAssets  选择的资源数组
     ///     result.isOriginal   是否选中原图
-    func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
-        
+    func pickerController(_ pickerController: PhotoPickerController, 
+                            didFinishSelection result: PickerResult) {
+        result.getImage { (image, photoAsset, index) in
+            if let image = image {
+                print("success", image)
+            }else {
+                print("failed")
+            }
+        } completionHandler: { (images) in
+            print(images)
+        }
     }
     
     /// 点击取消时调用
@@ -142,10 +151,11 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v1.1.1](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#111) | 2021-06-17 | 12.2 | 5.3 | 10.0+ |
+| [v1.1.0](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#110) | 2021-06-08 | 12.2 | 5.3 | 10.0+ |
 | [v1.0.9](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#109) | 2021-06-04 | 12.2 | 5.3 | 10.0+ |
 | [v1.0.8](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#108) | 2021-05-20 | 12.2 | 5.3 | 9.0+ |
 | [v1.0.7](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#107) | 2021-05-17 | 12.2 | 5.3 | 9.0+ |
-| [v1.0.6](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#106) | 2021-03-13 | 12.2 | 5.3 | 9.0+ |
 
 ## 版权协议
 

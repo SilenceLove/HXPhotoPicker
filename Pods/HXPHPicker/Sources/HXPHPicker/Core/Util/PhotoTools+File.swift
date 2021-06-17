@@ -5,9 +5,9 @@
 //  Created by Slience on 2021/6/1.
 //
 
-import Foundation
+import UIKit
 
-public extension PhotoTools {
+extension PhotoTools {
     
     /// 获取文件大小
     /// - Parameter path: 文件路径
@@ -31,7 +31,7 @@ public extension PhotoTools {
     public class func folderSize(atPath path: String) -> Int {
         let fileManager = FileManager.default
         if !fileManager.fileExists(atPath: path) { return 0 }
-        var childFiles = fileManager.subpaths(atPath: path)
+        let childFiles = fileManager.subpaths(atPath: path)
         var folderSize = 0
         childFiles?.forEach({ (fileName) in
             let fileAbsolutePath = path + "/" + fileName
@@ -155,10 +155,12 @@ public extension PhotoTools {
         }
     }
     
+    @discardableResult
     class func removeFile(fileURL: URL) -> Bool {
         removeFile(filePath: fileURL.path)
     }
     
+    @discardableResult
     class func removeFile(filePath: String) -> Bool {
         do {
             if FileManager.default.fileExists(atPath: filePath) {

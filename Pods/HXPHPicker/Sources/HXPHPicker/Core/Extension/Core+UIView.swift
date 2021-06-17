@@ -95,12 +95,19 @@ extension UIView {
     
     /// UIView转UIImage
     /// - Returns: UIImage
-    func convertedtoImage() -> UIImage {
+    func convertedToImage(rect: CGRect = .zero) -> UIImage? {
+        var size = bounds.size
+        var origin = bounds.origin
+        if !size.equalTo(rect.size) && !rect.isEmpty {
+            size = rect.size
+            origin = CGPoint(x: -rect.minX, y: -rect.minY)
+        }
         UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
-        let context = UIGraphicsGetCurrentContext()
-        layer.render(in: context!)
+        drawHierarchy(in: CGRect(origin: origin, size: bounds.size), afterScreenUpdates: true)
+//        let context = UIGraphicsGetCurrentContext()
+//        layer.render(in: context!)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return image!
+        return image
     }
 }

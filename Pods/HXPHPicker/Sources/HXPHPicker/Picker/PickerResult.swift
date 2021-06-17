@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 public struct PickerResult {
     
@@ -14,6 +15,62 @@ public struct PickerResult {
     
     /// 是否选择的原图
     public let isOriginal: Bool
+    
+    /// 获取 image (不是原图)
+    /// - Parameters:
+    ///   - imageHandler: 每一次获取image都会触发
+    ///   - completionHandler: 全部获取完成(失败的不会添加)
+    public func getImage(imageHandler: @escaping (UIImage?, PhotoAsset, Int) -> Void,
+                         completionHandler: @escaping ([UIImage]) -> Void) {
+        let group = DispatchGroup.init()
+        let queue = DispatchQueue.init(label: "hxphpicker.get.image")
+        var images: [UIImage] = []
+        for (index, photoAsset) in photoAssets.enumerated() {
+            queue.async(group: group, execute: DispatchWorkItem.init(block: {
+                let semaphore = DispatchSemaphore.init(value: 0)
+                photoAsset.requestImage { (image, phAsset) in
+                    imageHandler(image, phAsset, index)
+                    if let image = image {
+                        images.append(image)
+                    }
+                    semaphore.signal()
+                }
+                semaphore.wait()
+            }))
+        }
+        group.notify(queue: .main) {
+            completionHandler(images)
+        }
+    }
+    
+    /// 获取视频地址
+    /// - Parameters:
+    ///   - exportPreset: 视频质量，默认中等质量
+    ///   - videoURLHandler: 每一次获取视频地址都会触发
+    ///   - completionHandler: 全部获取完成(失败的不会添加)
+    public func getVideoURL(exportPreset: String = AVAssetExportPresetMediumQuality,
+                            videoURLHandler: @escaping (URL?, PhotoAsset, Int) -> Void,
+                            completionHandler: @escaping ([URL]) -> Void) {
+        let group = DispatchGroup.init()
+        let queue = DispatchQueue.init(label: "hxphpicker.get.videoURL")
+        var videoURLs: [URL] = []
+        for (index, photoAsset) in photoAssets.enumerated() {
+            queue.async(group: group, execute: DispatchWorkItem.init(block: {
+                let semaphore = DispatchSemaphore.init(value: 0)
+                photoAsset.requestVideoURL(exportPreset: exportPreset) { (videoURL) in
+                    videoURLHandler(videoURL, photoAsset, index)
+                    if let videoURL = videoURL {
+                        videoURLs.append(videoURL)
+                    }
+                    semaphore.signal()
+                }
+                semaphore.wait()
+            }))
+        }
+        group.notify(queue: .main) {
+            completionHandler(videoURLs)
+        }
+    }
     
     /// 获取已选资源的地址（原图）
     /// 不包括网络资源，如果网络资源编辑过则会获取
@@ -35,7 +92,7 @@ public struct PickerResult {
         }
     }
     
-    /// 获取已选资源的地址（原图）
+    /// 获取已选资源的地址
     /// 包括网络图片
     /// - Parameters:
     ///   - options: 获取的类型

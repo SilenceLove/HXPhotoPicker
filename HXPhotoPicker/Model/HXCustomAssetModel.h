@@ -14,6 +14,9 @@
 /// 资源类型
 @property (assign, nonatomic) HXCustomAssetModelType type;
 
+/// 图片/视频尺寸
+@property (assign, nonatomic) CGSize imageSize;
+
 /// 网络图片地址 or 网络视频封面
 @property (strong, nonatomic) NSURL * _Nullable networkImageURL;
 

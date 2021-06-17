@@ -14,26 +14,57 @@ protocol PhotoEditorViewDelegate: AnyObject {
     func editorView(didAppear editorView: PhotoEditorView)
     func editorView(willDisappearCrop editorView: PhotoEditorView)
     func editorView(didDisappearCrop editorView: PhotoEditorView)
+    
+    func editorView(drawViewBeganDraw editorView: PhotoEditorView)
+    func editorView(drawViewEndDraw editorView: PhotoEditorView)
 }
 
-class PhotoEditorView: UIScrollView {
+class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     weak var editorDelegate: PhotoEditorViewDelegate?
-    lazy var imageView: EditorImageResizerView = {
-        let imageView = EditorImageResizerView.init(cropConfig: cropConfig)
-        imageView.delegate = self
-        return imageView
+    lazy var imageResizerView: EditorImageResizerView = {
+        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropConfig)
+        imageResizerView.imageView.drawView.lineColor = config.brushColors[config.defaultBrushColorIndex].color
+        imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
+        imageResizerView.delegate = self
+        imageResizerView.imageView.delegate = self
+        return imageResizerView
     }()
     
+    override var zoomScale: CGFloat {
+        didSet {
+            imageResizerView.zoomScale = zoomScale
+        }
+    }
+    
     /// 裁剪配置
-    var cropConfig: PhotoCroppingConfiguration
+    var config: PhotoEditorConfiguration
     
     var state: State = .normal
     var imageScale: CGFloat = 1
     var canZoom = true
     var cropSize: CGSize = .zero
     
-    init(cropConfig: PhotoCroppingConfiguration) {
-        self.cropConfig = cropConfig
+    var drawEnabled: Bool {
+        get {
+            imageResizerView.drawEnabled
+        }
+        set {
+            imageResizerView.drawEnabled = newValue
+        }
+    }
+    
+    var drawColorHex: String = "#ffffff" {
+        didSet {
+            imageResizerView.imageView.drawView.lineColor = drawColorHex.color
+        }
+    }
+    
+    var canUndoDraw: Bool {
+        imageResizerView.imageView.drawView.canUndo
+    }
+    
+    init(config: PhotoEditorConfiguration) {
+        self.config = config
         super.init(frame: .zero)
         delegate = self
         minimumZoomScale = 1.0
@@ -45,7 +76,7 @@ class PhotoEditorView: UIScrollView {
         if #available(iOS 11.0, *) {
             contentInsetAdjustmentBehavior = .never
         }
-        addSubview(imageView)
+        addSubview(imageResizerView)
     }
     
     func updateImageViewFrame() {
@@ -60,32 +91,35 @@ class PhotoEditorView: UIScrollView {
         var imageY: CGFloat = 0
         if imageHeight < height {
             imageY = (height - imageHeight) * 0.5
-            imageView.setViewFrame(CGRect(x: 0, y: -imageY, width: width, height: height))
+            imageResizerView.setViewFrame(CGRect(x: 0, y: -imageY, width: width, height: height))
         }else {
-            imageView.setViewFrame(bounds)
+            imageResizerView.setViewFrame(bounds)
         }
         contentSize = CGSize(width: imageWidth, height: imageHeight)
-        imageView.frame = CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight)
+        imageResizerView.frame = CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight)
     }
     
     func setImage(_ image: UIImage) {
         imageScale = image.width / image.height
         updateImageViewFrame()
-        imageView.setImage(image)
+        imageResizerView.setImage(image)
     }
     func getEditedData() -> PhotoEditData {
-        imageView.getEditedData()
+        imageResizerView.getEditedData()
     }
     func setEditedData(editedData: PhotoEditData) {
         if editedData.isPortrait != UIDevice.isPortrait {
             return
         }
-        cropSize = editedData.cropSize
-        imageView.setEditedData(editedData: editedData)
-        cancelCropping(canShowMask: false, false)
+        if let cropData = editedData.cropData {
+            cropSize = cropData.cropSize
+            imageResizerView.setCropData(cropData: cropData)
+            cancelCropping(canShowMask: false, false)
+        }
+        imageResizerView.setBrushData(brushData: editedData.brushData)
         updateImageViewFrame()
-        if cropConfig.isRoundCrop {
-            imageView.layer.cornerRadius = cropSize.width * 0.5
+        if config.cropConfig.isRoundCrop {
+            imageResizerView.layer.cornerRadius = cropSize.width * 0.5
         }
     }
     
@@ -119,9 +153,10 @@ class PhotoEditorView: UIScrollView {
         state = .cropping
         isScrollEnabled = false
         resetZoomScale(animated)
-        imageView.startCorpping(animated) { [weak self] () in
-            if self != nil {
-                self?.editorDelegate?.editorView(didAppear: self!)
+        imageResizerView.startCorpping(animated) { [weak self] () in
+            if let self = self {
+                self.imageResizerView.zoomScale = self.zoomScale
+                self.editorDelegate?.editorView(didAppear: self)
             }
         }
     }
@@ -131,18 +166,19 @@ class PhotoEditorView: UIScrollView {
         state = .normal
         isScrollEnabled = true
         resetZoomScale(animated)
-        imageView.cancelCropping(canShowMask: canShowMask, animated) { [weak self] () in
-            if self != nil {
-                self?.editorDelegate?.editorView(didDisappearCrop: self!)
+        imageResizerView.cancelCropping(canShowMask: canShowMask, animated) { [weak self] () in
+            if let self = self {
+                self.imageResizerView.zoomScale = self.zoomScale
+                self.editorDelegate?.editorView(didDisappearCrop: self)
             }
         }
     }
     func canReset() -> Bool {
-        return imageView.canReset()
+        return imageResizerView.canReset()
     }
     
     func reset(_ animated: Bool) {
-        imageView.reset(animated)
+        imageResizerView.reset(animated)
     }
     
     func finishCropping(_ animated: Bool, completion: (() -> Void)? = nil) {
@@ -150,25 +186,26 @@ class PhotoEditorView: UIScrollView {
         state = .normal
         isScrollEnabled = true
         resetZoomScale(animated)
-        imageView.finishCropping(animated) { [weak self] () in
-            if self != nil {
-                self?.editorDelegate?.editorView(didDisappearCrop: self!)
-                if self!.cropConfig.isRoundCrop {
-                    self?.imageView.layer.cornerRadius = self!.cropSize.width * 0.5
+        imageResizerView.finishCropping(animated) { [weak self] () in
+            if let self = self {
+                self.imageResizerView.zoomScale = self.zoomScale
+                self.editorDelegate?.editorView(didDisappearCrop: self)
+                if self.config.cropConfig.isRoundCrop {
+                    self.imageResizerView.layer.cornerRadius = self.cropSize.width * 0.5
                 }
             }
             completion?()
         }
-        cropSize = imageView.cropSize
+        cropSize = imageResizerView.cropSize
         updateImageViewFrame()
     } 
     func cropping(completion: @escaping (PhotoEditResult?) -> Void) {
-        let toRect = imageView.getCroppingRect()
-        let inputImage = imageView.imageView.image
-        let viewWidth = imageView.imageView.width
-        let viewHeight = imageView.imageView.height
+        let toRect = imageResizerView.getCroppingRect()
+        let inputImage = imageResizerView.imageView.image
+        let viewWidth = imageResizerView.imageView.width
+        let viewHeight = imageResizerView.imageView.height
         DispatchQueue.global().async {
-            if let imageOptions = self.imageView.cropping(inputImage, toRect: toRect, viewWidth: viewWidth, viewHeight: viewHeight) {
+            if let imageOptions = self.imageResizerView.cropping(inputImage, toRect: toRect, viewWidth: viewWidth, viewHeight: viewHeight) {
                 DispatchQueue.main.async {
                     let editResult = PhotoEditResult.init(editedImage: imageOptions.0, editedImageURL: imageOptions.1, imageType: imageOptions.2, editedData: self.getEditedData())
                     completion(editResult)
@@ -181,19 +218,48 @@ class PhotoEditorView: UIScrollView {
         }
     }
     func changedAspectRatio(of aspectRatio: CGSize) {
-        imageView.changedAspectRatio(of: aspectRatio)
+        imageResizerView.changedAspectRatio(of: aspectRatio)
     }
     func rotate() {
-        imageView.rotate()
+        imageResizerView.rotate()
     }
     func mirrorHorizontally(animated: Bool) {
-        imageView.mirrorHorizontally(animated: animated)
+        imageResizerView.mirrorHorizontally(animated: animated)
     }
     
     func orientationDidChange() {
         cropSize = .zero
         updateImageViewFrame()
-        imageView.updateBaseConfig()
+        imageResizerView.updateBaseConfig()
+    }
+    
+    func undoAllDraw() {
+        imageResizerView.imageView.drawView.emptyCanvas()
+    }
+    
+    func undoDraw() {
+        imageResizerView.imageView.drawView.undo()
+    }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let view = super.hitTest(point, with: event)
+        if state != .cropping && imageResizerView == view {
+            if imageResizerView.drawEnabled {
+                return imageResizerView.imageView.drawView
+            }
+            return self
+        }else if state == .cropping && self == view {
+            return imageResizerView
+        }
+        return view
+    }
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if state == .cropping {
+            return false
+        }else if imageResizerView.drawEnabled && !gestureRecognizer.isKind(of: UIPinchGestureRecognizer.self) {
+            return false
+        }
+        return true
     }
     
     required init?(coder: NSCoder) {
@@ -206,7 +272,7 @@ extension PhotoEditorView: UIScrollViewDelegate {
         if !canZoom {
             return nil
         }
-        return imageView
+        return imageResizerView
     }
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         if !canZoom {
@@ -216,7 +282,18 @@ extension PhotoEditorView: UIScrollViewDelegate {
         let offsetY = (scrollView.height > scrollView.contentSize.height) ? (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
         let centerX = scrollView.contentSize.width * 0.5 + offsetX
         let centerY = scrollView.contentSize.height * 0.5 + offsetY
-        imageView.center = CGPoint(x: centerX, y: centerY);
+        imageResizerView.center = CGPoint(x: centerX, y: centerY);
+    }
+    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+        imageResizerView.zoomScale = scale
+    }
+}
+extension PhotoEditorView: PhotoEditorContentViewDelegate {
+    func contentView(drawViewBeganDraw contentView: PhotoEditorContentView) {
+        editorDelegate?.editorView(drawViewBeganDraw: self)
+    }
+    func contentView(drawViewEndDraw contentView: PhotoEditorContentView) {
+        editorDelegate?.editorView(drawViewEndDraw: self)
     }
 }
 extension PhotoEditorView: EditorImageResizerViewDelegate {
@@ -243,6 +320,4 @@ extension PhotoEditorView: EditorImageResizerViewDelegate {
     func imageResizerView(didEndZooming imageResizerView: EditorImageResizerView) {
         editorDelegate?.editorView(didEndEditing: self)
     }
-    
-    
 }

@@ -42,36 +42,49 @@ public extension AssetManager {
     class func requestImageURL(for asset: PHAsset,
                                toFile fileURL:URL,
                                resultHandler: @escaping ImageURLResultHandler) {
-        var imageResource: PHAssetResource?
-        for resource in PHAssetResource.assetResources(for: asset) {
-            if resource.type == .photo {
-                imageResource = resource
-                break
-            }
-        }
-        if imageResource == nil {
-            resultHandler(nil)
-            return
-        }
-        if !PhotoTools.removeFile(fileURL: fileURL) {
-            resultHandler(nil)
-            return
-        }
-        let imageURL = fileURL
-        let options = PHAssetResourceRequestOptions.init()
-        options.isNetworkAccessAllowed = true
-        PHAssetResourceManager.default().writeData(for: imageResource!, toFile: imageURL, options: options) { (error) in
-            DispatchQueue.main.async {
-                if error == nil {
-                    resultHandler(imageURL)
-                }else {
+        asset.checkAdjustmentStatus { (isAdjusted) in
+            if isAdjusted {
+                self.requestImageData(for: asset, version: .current, iCloudHandler: nil, progressHandler: nil) { (imageData, _, _, _, downloadSuccess) in
+                    if let imageData = imageData,
+                       let imageURL = PhotoTools.write(toFile: fileURL, imageData: imageData) {
+                        resultHandler(imageURL)
+                        return
+                    }
                     resultHandler(nil)
+                }
+            }else {
+                var imageResource: PHAssetResource?
+                for resource in PHAssetResource.assetResources(for: asset) {
+                    if resource.type == .photo {
+                        imageResource = resource
+                        break
+                    }
+                }
+                if imageResource == nil {
+                    resultHandler(nil)
+                    return
+                }
+                if !PhotoTools.removeFile(fileURL: fileURL) {
+                    resultHandler(nil)
+                    return
+                }
+                let imageURL = fileURL
+                let options = PHAssetResourceRequestOptions.init()
+                options.isNetworkAccessAllowed = true
+                PHAssetResourceManager.default().writeData(for: imageResource!, toFile: imageURL, options: options) { (error) in
+                    DispatchQueue.main.async {
+                        if error == nil {
+                            resultHandler(imageURL)
+                        }else {
+                            resultHandler(nil)
+                        }
+                    }
                 }
             }
         }
     }
     
-    /// 请求获取图片地址，不建议使用此方法获取图片地址
+    /// 请求获取图片地址
     /// - Parameters:
     ///   - asset: 对应的 PHAsset 数据
     ///   - resultHandler: 获取结果

@@ -8,7 +8,9 @@
 import UIKit
 import Photos
 
+/// imageData，dataUTI，Orientation，info
 public typealias ImageDataResultHandler = (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void
+/// imageData，dataUTI，Orientation，info，fetchSuccess
 public typealias ImageDataFetchCompletion = (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?, Bool) -> Void
 
 public extension AssetManager {
@@ -23,8 +25,8 @@ public extension AssetManager {
     @discardableResult
     class func requestImageData(for asset: PHAsset,
                                 version: PHImageRequestOptionsVersion,
-                                iCloudHandler: @escaping (PHImageRequestID) -> Void,
-                                progressHandler: @escaping PHAssetImageProgressHandler,
+                                iCloudHandler: ((PHImageRequestID) -> Void)?,
+                                progressHandler: PHAssetImageProgressHandler?,
                                 resultHandler: @escaping ImageDataFetchCompletion) -> PHImageRequestID {
         return requestImageData(for: asset, version: version, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (data, dataUTI, imageOrientation, info) in
             DispatchQueue.main.async {
@@ -37,7 +39,7 @@ public extension AssetManager {
                                 resultHandler(data, dataUTI, imageOrientation, info, self.assetDownloadFinined(for: info))
                             }
                         })
-                        iCloudHandler(iCloudRequestID)
+                        iCloudHandler?(iCloudRequestID)
                     }else {
                         resultHandler(data, dataUTI, imageOrientation, info, false)
                     }
@@ -51,7 +53,7 @@ public extension AssetManager {
     class func requestImageData(for asset: PHAsset,
                                 version: PHImageRequestOptionsVersion,
                                 isNetworkAccessAllowed: Bool,
-                                progressHandler: @escaping PHAssetImageProgressHandler,
+                                progressHandler: PHAssetImageProgressHandler?,
                                 resultHandler: @escaping ImageDataResultHandler) -> PHImageRequestID {
         let options = PHImageRequestOptions.init()
         options.version = version

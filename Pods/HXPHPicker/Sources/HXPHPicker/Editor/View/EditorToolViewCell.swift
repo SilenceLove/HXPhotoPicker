@@ -16,7 +16,16 @@ class EditorToolViewCell: UICollectionViewCell {
     
     var model: EditorToolOptions! {
         didSet {
-            imageView.image = UIImage.image(for: model.imageName)
+            imageView.image = UIImage.image(for: model.imageName)?.withRenderingMode(.alwaysTemplate)
+            imageView.tintColor = .white
+        }
+    }
+    
+    var selectedColor: UIColor?
+    
+    var isSelectedImageView: Bool = false {
+        didSet {
+            imageView.tintColor = isSelectedImageView ? selectedColor : .white
         }
     }
     

@@ -22,8 +22,8 @@ public extension AssetManager {
     @discardableResult
     class func requestAVAsset(for asset: PHAsset,
                               deliveryMode: PHVideoRequestOptionsDeliveryMode = .automatic,
-                              iCloudHandler: @escaping (PHImageRequestID) -> Void,
-                              progressHandler: @escaping PHAssetImageProgressHandler,
+                              iCloudHandler: ((PHImageRequestID) -> Void)?,
+                              progressHandler: PHAssetImageProgressHandler?,
                               resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
         let version = PHVideoRequestOptionsVersion.current
         return requestAVAsset(for: asset, version: version, deliveryMode: deliveryMode, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (avAsset, audioMix, info) in
@@ -49,7 +49,7 @@ public extension AssetManager {
                                 }
                             }
                         }
-                        iCloudHandler(iCloudRequestID)
+                        iCloudHandler?(iCloudRequestID)
                     }else {
                         resultHandler(avAsset, audioMix, info, false)
                     }
@@ -69,7 +69,7 @@ public extension AssetManager {
                               version: PHVideoRequestOptionsVersion,
                               deliveryMode: PHVideoRequestOptionsDeliveryMode,
                               isNetworkAccessAllowed: Bool,
-                              progressHandler: @escaping PHAssetImageProgressHandler,
+                              progressHandler: PHAssetVideoProgressHandler?,
                               resultHandler: @escaping AVAssetResultHandler) -> PHImageRequestID {
         let options = PHVideoRequestOptions.init()
         options.isNetworkAccessAllowed = isNetworkAccessAllowed

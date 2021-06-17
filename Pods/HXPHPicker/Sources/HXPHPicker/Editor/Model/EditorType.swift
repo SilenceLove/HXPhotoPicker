@@ -46,6 +46,8 @@ public extension VideoEditorViewController {
 /// 编辑工具模型
 public extension EditorToolOptions {
     enum `Type` {
+        /// 涂鸦
+        case graffiti
         /// 裁剪
         case cropping
     }

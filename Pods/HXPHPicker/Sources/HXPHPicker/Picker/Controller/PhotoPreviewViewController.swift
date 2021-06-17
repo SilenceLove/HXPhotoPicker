@@ -318,6 +318,10 @@ extension PhotoPreviewViewController {
         if let shouldDelete = pickerController?.previewShouldDeleteAsset(photoAsset: photoAsset, index: currentPreviewIndex), !shouldDelete {
             return
         }
+        #if HXPICKER_ENABLE_EDITOR
+        photoAsset.photoEdit = nil
+        photoAsset.videoEdit = nil
+        #endif
         previewAssets.remove(at: currentPreviewIndex)
         collectionView.deleteItems(at: [IndexPath.init(item: currentPreviewIndex, section: 0)])
         bottomView.selectedView.removePhotoAsset(photoAsset: photoAsset)

@@ -55,9 +55,11 @@
 
 - (void)presentAnim:(id<UIViewControllerContextTransitioning>)transitionContext Image:(UIImage *)image Model:(HXPhotoModel *)model FromVC:(UIViewController *)fromVC ToVC:(HXPhotoPreviewViewController *)toVC cell:(HXPhotoSubViewCell *)cell {
     
+    CGSize imageSize = CGSizeZero;
     if ((!image || (model.networkPhotoUrl && (model.downloadError || !model.downloadComplete))) &&
         toVC.manager.configuration.customPreviewFromImage) {
         image = toVC.manager.configuration.customPreviewFromImage(toVC.currentModelIndex);
+        imageSize = image.size;
     }
     model.tempImage = image;
     UIView *containerView = [transitionContext containerView];
@@ -105,6 +107,11 @@
     
 //    CGSize to = [UIImage hx_scaleImageSizeBySize:model.endImageSize targetSize:containerView.bounds.size isBoth:false];
     CGSize to = model.endImageSize;
+    if (CGSizeEqualToSize(model.imageSize, CGSizeMake(200, 200)) && !CGSizeEqualToSize(imageSize, CGSizeZero)) {
+        model.imageSize = imageSize;
+        model.endImageSize = CGSizeZero;
+        to = model.endImageSize;
+    }
     CGRect toFrame;
     if (to.height > height) {
         toFrame = CGRectMake(0, 0, to.width, to.height);

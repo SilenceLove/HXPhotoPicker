@@ -9,10 +9,6 @@ import UIKit
 #if canImport(Kingfisher)
 import Kingfisher
 
-public enum DonwloadURLType {
-    case thumbnail
-    case original
-}
 #endif
 
 public extension PhotoAsset {

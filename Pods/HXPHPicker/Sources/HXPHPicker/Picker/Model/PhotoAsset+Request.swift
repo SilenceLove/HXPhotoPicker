@@ -26,6 +26,43 @@ public extension PhotoAsset {
         requestAssetImageURL(toFile: fileURL, resultHandler: resultHandler)
     }
     
+    /// 获取图片（系统相册获取的是压缩后的，不是原图）
+    @discardableResult
+    func requestImage(completion: ((UIImage?, PhotoAsset) -> Void)?) -> PHImageRequestID? {
+        #if HXPICKER_ENABLE_EDITOR
+        if let photoEdit = photoEdit {
+            completion?(photoEdit.editedImage, self)
+            return nil
+        }
+        if let videoEdit = videoEdit {
+            completion?(videoEdit.coverImage, self)
+            return nil
+        }
+        #endif
+        if phAsset == nil {
+            requestLocalImage(urlType: .original) { (image, photoAsset) in
+                completion?(image, photoAsset)
+            }
+            return nil
+        }
+        let options = PHImageRequestOptions.init()
+        options.resizeMode = .fast
+        options.deliveryMode = .highQualityFormat
+        options.isNetworkAccessAllowed = true
+        return AssetManager.requestImageData(for: phAsset!, version: isGifAsset ? .original : .current, iCloudHandler: nil, progressHandler: nil) { (imageData, dataUTI, imageOrientation, info, success) in
+            if let imageData = imageData {
+                var image = UIImage.init(data: imageData)
+                if image?.imageOrientation != UIImage.Orientation.up {
+                    image = image?.normalizedImage()
+                }
+                image = image?.scaleImage(toScale: 0.5)
+                completion?(image, self)
+            }else {
+                completion?(nil, self)
+            }
+        }
+    }
+    
     /// 请求获取缩略图
     /// - Parameter completion: 完成回调
     /// - Returns: 请求ID
@@ -43,31 +80,8 @@ public extension PhotoAsset {
         }
         #endif
         if phAsset == nil {
-            if mediaType == .photo {
-                if let image = localImageAsset?.image {
-                    completion?(image, self, nil)
-                    return nil
-                }
-                if isNetworkAsset {
-                    #if canImport(Kingfisher)
-                    getNetworkImage(urlType: .thumbnail) { (image) in
-                        completion?(image, self, nil)
-                    }
-                    #endif
-                    return nil
-                }
-                DispatchQueue.global().async {
-                    if let imageURL = self.localImageAsset?.imageURL, let image = UIImage.init(contentsOfFile: imageURL.path) {
-                        self.localImageAsset?.image = image
-                        DispatchQueue.main.async {
-                            completion?(image, self, nil)
-                        }
-                    }
-                }
-            }else {
-                PhotoTools.getVideoCoverImage(for: self) { (photoAsset, image) in
-                    completion?(image, photoAsset, nil)
-                }
+            requestLocalImage(urlType: .thumbnail) { (image, photoAsset) in
+                completion?(image, photoAsset, nil)
             }
             return nil
         }
@@ -78,93 +92,43 @@ public extension PhotoAsset {
     
     /// 请求imageData，如果资源在iCloud上会自动下载。如果需要更细节的处理请查看 PHAssetManager+Asset
     /// - Parameters:
+    ///   - filterEditor: 过滤编辑后的图片
     ///   - iCloudHandler: 下载iCloud上的资源时回调iCloud的请求ID
     ///   - progressHandler: iCloud下载进度
     /// - Returns: 请求ID
     @discardableResult
-    func requestImageData(iCloudHandler: PhotoAssetICloudHandlerHandler?,
+    func requestImageData(filterEditor: Bool = false,
+                          iCloudHandler: PhotoAssetICloudHandlerHandler?,
                           progressHandler: PhotoAssetProgressHandler?,
                           success: ((PhotoAsset, Data, UIImage.Orientation, [AnyHashable : Any]?) -> Void)?,
                           failure: PhotoAssetFailureHandler?) -> PHImageRequestID {
         #if HXPICKER_ENABLE_EDITOR
-        if let photoEdit = photoEdit {
-            DispatchQueue.global().async {
-                do {
-                    let imageData = try Data.init(contentsOf: photoEdit.editedImageURL)
-                    DispatchQueue.main.async {
-                        success?(self, imageData, photoEdit.editedImage.imageOrientation, nil)
-                    }
-                }catch {
-                    DispatchQueue.main.async {
-                        failure?(self, nil)
-                    }
-                }
+        if let photoEdit = photoEdit, !filterEditor {
+            do {
+                let imageData = try Data.init(contentsOf: photoEdit.editedImageURL)
+                success?(self, imageData, photoEdit.editedImage.imageOrientation, nil)
+            }catch {
+                failure?(self, nil)
             }
             return 0
         }
-        if let videoEdit = videoEdit {
-            DispatchQueue.global().async {
-                let imageData = PhotoTools.getImageData(for: videoEdit.coverImage)
-                DispatchQueue.main.async {
-                    if let imageData = imageData {
-                        success?(self, imageData, videoEdit.coverImage!.imageOrientation, nil)
-                    }else {
-                        failure?(self, nil)
-                    }
-                }
+        if let videoEdit = videoEdit, !filterEditor {
+            let imageData = PhotoTools.getImageData(for: videoEdit.coverImage)
+            if let imageData = imageData {
+                success?(self, imageData, videoEdit.coverImage!.imageOrientation, nil)
+            }else {
+                failure?(self, nil)
             }
             return 0
         }
         #endif
         if phAsset == nil {
-            DispatchQueue.global().async {
-                if let imageData = self.localImageAsset?.imageData {
+            requestlocalImageData { (imageData, photoAsset) in
+                if let imageData = imageData {
                     let image = UIImage.init(data: imageData)
-                    success?(self, imageData, image?.imageOrientation ?? .up, nil)
-                }else if let imageURL = self.localImageAsset?.imageURL {
-                    do {
-                        let imageData = try Data.init(contentsOf: imageURL)
-                        let image = UIImage.init(data: imageData)
-                        DispatchQueue.main.async {
-                            success?(self, imageData, image?.imageOrientation ?? .up, nil)
-                        }
-                    }catch {
-                        DispatchQueue.main.async {
-                            failure?(self, nil)
-                        }
-                    }
-                }else if let localImage = self.localImageAsset?.image {
-                        let imageData = PhotoTools.getImageData(for: localImage)
-                        DispatchQueue.main.async {
-                            if let imageData = imageData {
-                                success?(self, imageData, localImage.imageOrientation, nil)
-                            }else {
-                                failure?(self, nil)
-                            }
-                        }
+                    success?(photoAsset, imageData, image!.imageOrientation, nil)
                 }else {
-                    if self.isNetworkAsset {
-                        #if canImport(Kingfisher)
-                        self.getNetworkImage {  (image) in
-                            if let imageData = image?.kf.gifRepresentation() {
-                                success?(self, imageData, image!.imageOrientation, nil)
-                                return
-                            }
-                            let imageData = PhotoTools.getImageData(for: image)
-                            DispatchQueue.main.async {
-                                if let imageData = imageData {
-                                    success?(self, imageData, image!.imageOrientation, nil)
-                                }else {
-                                    failure?(self, nil)
-                                }
-                            }
-                        }
-                        #endif
-                    }else {
-                        DispatchQueue.main.async {
-                            failure?(self, nil)
-                        }
-                    }
+                    failure?(photoAsset, nil)
                 }
             }
             return 0
@@ -249,54 +213,24 @@ public extension PhotoAsset {
 // MARK: Request Video
 public extension PhotoAsset {
     
-    /// 获取原始视频地址
+    /// 获取原始视频地址，系统相册里的视频需要自行压缩
     /// 网络视频如果在本地有缓存则会返回本地地址，如果没有缓存则为ni
     /// - Parameters:
     ///   - fileURL: 指定视频地址
+    ///   - exportPreset: 导出质量，不传则获取的是原始视频地址
     ///   - resultHandler: 获取结果
     func requestVideoURL(toFile fileURL:URL? = nil,
+                         exportPreset: String? = nil,
                          resultHandler: @escaping (URL?) -> Void) {
-        #if HXPICKER_ENABLE_EDITOR
-        if let videoEdit = videoEdit {
-            if let fileURL = fileURL {
-                if PhotoTools.copyFile(at: videoEdit.editedURL, to: fileURL) {
-                    resultHandler(fileURL)
-                }else {
-                    resultHandler(nil)
-                }
-                return
-            }
-            resultHandler(videoEdit.editedURL)
-            return
-        }
-        #endif
         if phAsset == nil {
-            if mediaType == .photo {
-                resultHandler(nil)
-            }else {
-                var videoURL: URL? = nil
-                if isNetworkAsset {
-                    let key = networkVideoAsset!.videoURL.absoluteString
-                    if PhotoTools.isCached(forVideo: key) {
-                        videoURL = PhotoTools.getVideoCacheURL(for: key)
-                    }
-                }else {
-                    videoURL = localVideoAsset?.videoURL
-                }
-                if let fileURL = fileURL, let videoURL = videoURL {
-                    if PhotoTools.copyFile(at: videoURL, to: fileURL) {
-                        resultHandler(fileURL)
-                    }else {
-                        resultHandler(nil)
-                    }
-                    return
-                }else {
-                    resultHandler(videoURL)
-                }
+            requestLocalVideoURL { (videoURL, photoAsset) in
+                resultHandler(videoURL)
             }
             return
         }
-        requestAssetVideoURL(toFile: fileURL, resultHandler: resultHandler)
+        requestAssetVideoURL(toFile: fileURL,
+                             exportPreset: exportPreset,
+                             resultHandler: resultHandler)
     }
     
     /// 请求AVAsset，如果资源在iCloud上会自动下载。如果需要更细节的处理请查看 PHAssetManager+Asset

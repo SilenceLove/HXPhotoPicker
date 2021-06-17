@@ -47,8 +47,21 @@ public extension AssetManager {
                         completionHandler(nil)
                     }
                 }
+                var hasAdjustmentData = false
                 for assetResource in assetResources {
-                    if assetResource.type == .photo {
+                    if assetResource.type == .adjustmentData {
+                        hasAdjustmentData = true
+                        break
+                    }
+                }
+                for assetResource in assetResources {
+                    var photoType: PHAssetResourceType = .photo
+                    var videoType: PHAssetResourceType = .pairedVideo
+                    if hasAdjustmentData {
+                        photoType = .fullSizePhoto
+                        videoType = .fullSizePairedVideo
+                    }
+                    if assetResource.type == photoType {
                         PHAssetResourceManager.default().requestData(for: assetResource, options: options) { (data) in
                             imageData = data
                             DispatchQueue.main.async {
@@ -63,7 +76,7 @@ public extension AssetManager {
                                 imageCompletion = true
                             }
                         }
-                    }else if assetResource.type == .pairedVideo {
+                    }else if assetResource.type == videoType {
                         PHAssetResourceManager.default().writeData(for: assetResource, toFile: videoURL, options: options) { (error) in
                             DispatchQueue.main.async {
                                 if error == nil {
@@ -113,8 +126,19 @@ public extension AssetManager {
                 let videoURL = fileURL
                 let options = PHAssetResourceRequestOptions.init()
                 options.isNetworkAccessAllowed = true
+                var hasAdjustmentData = false
                 for assetResource in assetResources {
-                    if assetResource.type == .pairedVideo {
+                    if assetResource.type == .adjustmentData {
+                        hasAdjustmentData = true
+                        break
+                    }
+                }
+                for assetResource in assetResources {
+                    var videoType: PHAssetResourceType = .pairedVideo
+                    if hasAdjustmentData {
+                        videoType = .fullSizePairedVideo
+                    }
+                    if assetResource.type == videoType {
                         PHAssetResourceManager.default().writeData(for: assetResource, toFile: videoURL, options: options) { (error) in
                             DispatchQueue.main.async {
                                 if error == nil {
@@ -169,8 +193,21 @@ public extension AssetManager {
                         completionHandler(nil)
                     }
                 }
+                var hasAdjustmentData = false
                 for assetResource in assetResources {
-                    if assetResource.type == .photo {
+                    if assetResource.type == .adjustmentData {
+                        hasAdjustmentData = true
+                        break
+                    }
+                }
+                for assetResource in assetResources {
+                    var photoType: PHAssetResourceType = .photo
+                    var videoType: PHAssetResourceType = .pairedVideo
+                    if hasAdjustmentData {
+                        photoType = .fullSizePhoto
+                        videoType = .fullSizePairedVideo
+                    }
+                    if assetResource.type == photoType {
                         PHAssetResourceManager.default().writeData(for: assetResource, toFile: imageURL, options: options) { (error) in
                             DispatchQueue.main.async {
                                 if error == nil {
@@ -183,7 +220,7 @@ public extension AssetManager {
                                 }
                             }
                         }
-                    }else if assetResource.type == .pairedVideo {
+                    }else if assetResource.type == videoType {
                         PHAssetResourceManager.default().writeData(for: assetResource, toFile: videoURL, options: options) { (error) in
                             DispatchQueue.main.async {
                                 if error == nil {

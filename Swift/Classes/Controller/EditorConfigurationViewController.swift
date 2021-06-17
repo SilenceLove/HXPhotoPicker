@@ -126,8 +126,7 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
         
         switch photoEditorViewController.assetType {
         case .local:
-            var localImageAsset = LocalImageAsset.init(imageURL: result.editedImageURL)
-            localImageAsset.image = result.editedImage
+            let localImageAsset = LocalImageAsset.init(image: photoEditorViewController.image)
             let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
             photoAsset.photoEdit = result
             pickerResultVC.selectedAssets = [photoAsset]

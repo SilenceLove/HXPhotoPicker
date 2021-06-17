@@ -18,20 +18,13 @@ open class PhotoPickerController: UINavigationController {
     
     /// 当前被选择的资源对应的 PhotoAsset 对象数组
     /// 外部预览时的资源数据
-    public var selectedAssetArray: [PhotoAsset] = [] {
-        didSet {
-            configSelectedArray()
-        }
-    }
+    public var selectedAssetArray: [PhotoAsset] = [] { didSet { configSelectedArray() } }
     
     /// 是否选中了原图
     public var isOriginal: Bool = false
     
     /// fetch Assets 时的选项配置
-    public lazy var options : PHFetchOptions = {
-        let options = PHFetchOptions.init()
-        return options
-    }()
+    public lazy var options : PHFetchOptions = .init()
     
     /// 完成/取消时自动 dismiss ,为false需要自己在代理回调里手动 dismiss
     public var autoDismiss: Bool = true
@@ -127,22 +120,14 @@ open class PhotoPickerController: UINavigationController {
         self.viewControllers = [photoVC]
     }
     
-    /// 外部预览资源初始化，默认自带动画效果
-    /// - Parameters:
-    ///   - config: 相关配置
-    ///   - currentIndex: 当前预览的下标
-    public convenience init(preview config: PickerConfiguration,
-                            currentIndex: Int) {
-        self.init(preview: config, currentIndex: currentIndex, modalPresentationStyle: .custom)
-    }
-    
     /// 外部预览资源初始化
     /// - Parameters:
     ///   - config: 相关配置
-    ///   - modalPresentationStyle: 设置 custom 样式，框架自带动画效果
+    ///   - currentIndex: 当前预览的下标
+    ///   - modalPresentationStyle: 默认 custom 样式，框架自带动画效果
     public init(preview config: PickerConfiguration,
                 currentIndex: Int,
-                modalPresentationStyle: UIModalPresentationStyle) {
+                modalPresentationStyle: UIModalPresentationStyle = .custom) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         self.config = config
@@ -204,7 +189,9 @@ open class PhotoPickerController: UINavigationController {
     }
     private var interactiveTransition: PickerInteractiveTransition?
     
+    #if HXPICKER_ENABLE_EDITOR
     private lazy var editedPhotoAssetArray: [PhotoAsset] = []
+    #endif
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -500,14 +487,18 @@ extension PhotoPickerController {
         view.backgroundColor = PhotoManager.isDark ? config.navigationViewBackgroudDarkColor : config.navigationViewBackgroundColor
     }
     func finishCallback() {
+        #if HXPICKER_ENABLE_EDITOR
         removeAllEditedPhotoAsset()
+        #endif
         pickerDelegate?.pickerController(self, didFinishSelection: PickerResult.init(photoAssets: selectedAssetArray, isOriginal: isOriginal))
         if autoDismiss {
             dismiss(animated: true, completion: nil)
         }
     }
     func singleFinishCallback(for photoAsset: PhotoAsset) {
+        #if HXPICKER_ENABLE_EDITOR
         removeAllEditedPhotoAsset()
+        #endif
         pickerDelegate?.pickerController(self, didFinishSelection: PickerResult.init(photoAssets: [photoAsset], isOriginal: isOriginal))
         if autoDismiss {
             dismiss(animated: true, completion: nil)
@@ -583,26 +574,79 @@ extension PhotoPickerController {
         cancelRequestAssetFileSize(isPreview: isPreview)
         let operation = BlockOperation.init {
             var totalFileSize = 0
+            var total: Int = 0
+             
+            func calculationCompletion(_ totalSize: Int) {
+                if isPreview {
+                    if let operation =
+                        self.previewRequestAssetBytesQueue.operations.first {
+                        if operation.isCancelled {
+                            return
+                        }
+                    }
+                }else {
+                    if let operation =
+                        self.requestAssetBytesQueue.operations.first {
+                        if operation.isCancelled {
+                            return
+                        }
+                    }
+                }
+                DispatchQueue.main.async {
+                    completion(totalSize, PhotoTools.transformBytesToString(bytes: totalSize))
+                }
+            }
+            
             for photoAsset in self.selectedAssetArray {
-                totalFileSize += photoAsset.fileSize
-            }
-            if isPreview {
-                if let operation =
-                    self.previewRequestAssetBytesQueue.operations.first {
-                    if operation.isCancelled {
+                if let fileSize = photoAsset.getPFileSize() {
+                    totalFileSize += fileSize
+                    total += 1
+                    if total == self.selectedAssetArray.count {
+                        calculationCompletion(totalFileSize)
+                    }
+                    continue
+                }
+                photoAsset.checkAdjustmentStatus { (isAdjusted, asset) in
+                    if isAdjusted {
+                        if asset.mediaType == .photo {
+                            asset.requestImageData(iCloudHandler: nil, progressHandler: nil) { (sAsset, imageData, imageOrientation, info) in
+                                sAsset.updateFileSize(imageData.count)
+                                totalFileSize += sAsset.fileSize
+                                total += 1
+                                if total == self.selectedAssetArray.count {
+                                    calculationCompletion(totalFileSize)
+                                }
+                            } failure: { (sAsset, info) in
+                                total += 1
+                                if total == self.selectedAssetArray.count {
+                                    calculationCompletion(totalFileSize)
+                                }
+                            }
+                        }else {
+                            asset.requestAVAsset(iCloudHandler: nil, progressHandler: nil) { (sAsset, avAsset, info) in
+                                if let urlAsset = avAsset as? AVURLAsset {
+                                    totalFileSize += urlAsset.url.fileSize
+                                }
+                                total += 1
+                                if total == self.selectedAssetArray.count {
+                                    calculationCompletion(totalFileSize)
+                                }
+                            } failure: { (sAsset, info) in
+                                total += 1
+                                if total == self.selectedAssetArray.count {
+                                    calculationCompletion(totalFileSize)
+                                }
+                            }
+                        }
                         return
+                    }else {
+                        totalFileSize += asset.fileSize
+                    }
+                    total += 1
+                    if total == self.selectedAssetArray.count {
+                        calculationCompletion(totalFileSize)
                     }
                 }
-            }else {
-                if let operation =
-                    self.requestAssetBytesQueue.operations.first {
-                    if operation.isCancelled {
-                        return
-                    }
-                }
-            }
-            DispatchQueue.main.async {
-                completion(totalFileSize, PhotoTools.transformBytesToString(bytes: totalFileSize))
             }
         }
         if isPreview {
@@ -813,6 +857,7 @@ extension PhotoPickerController {
         return false
     }
     
+    #if HXPICKER_ENABLE_EDITOR
     func addedEditedPhotoAsset(_ photoAsset: PhotoAsset) {
         if editedPhotoAssetArray.contains(photoAsset) {
             return
@@ -820,7 +865,6 @@ extension PhotoPickerController {
         editedPhotoAssetArray.append(photoAsset)
     }
     func removeAllEditedPhotoAsset() {
-        #if HXPICKER_ENABLE_EDITOR
         if editedPhotoAssetArray.isEmpty {
             return
         }
@@ -829,8 +873,8 @@ extension PhotoPickerController {
             photoAsset.initialVideoEdit = nil
         }
         editedPhotoAssetArray.removeAll()
-        #endif
     }
+    #endif
 }
 
 // MARK: Private function
@@ -940,7 +984,9 @@ extension PhotoPickerController {
         return nil
     }
     private func didDismiss() {
+        #if HXPICKER_ENABLE_EDITOR
         removeAllEditedPhotoAsset()
+        #endif
         var cameraAssetArray: [PhotoAsset] = []
         for photoAsset in localCameraAssetArray {
             cameraAssetArray.append(photoAsset.copyCamera())

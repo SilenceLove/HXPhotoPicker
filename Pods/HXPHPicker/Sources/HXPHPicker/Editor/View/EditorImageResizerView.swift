@@ -132,47 +132,77 @@ class EditorImageResizerView: UIView {
     var rotating: Bool = false
     var mirroring: Bool = false
     
+    var drawEnabled: Bool {
+        get {
+            imageView.drawView.enabled
+        }
+        set {
+            imageView.drawView.enabled = newValue
+        }
+    }
+    
+    var isDrawing: Bool {
+        imageView.drawView.isDrawing
+    }
+    
+    var zoomScale: CGFloat = 1 {
+        didSet {
+            imageView.zoomScale = zoomScale * scrollView.zoomScale
+        }
+    }
+    
     init(cropConfig: PhotoCroppingConfiguration) {
         self.cropConfig = cropConfig
         super.init(frame: .zero)
         addSubview(containerView)
     }
     func getEditedData() -> PhotoEditData {
-        var editedData = PhotoEditData.init()
-        editedData.cropSize = cropSize
-        editedData.zoomScale = oldZoomScale
-        editedData.contentInset = oldContentInset
-        editedData.minimumZoomScale = oldMinimumZoomScale
-        editedData.maximumZoomScale = oldMaximumZoomScale
-        editedData.maskRect = oldMaskRect
-        editedData.angle = oldAngle
-        editedData.mirrorType = oldMirrorType
-        editedData.transform = oldTransform
-        editedData.isPortrait = UIDevice.isPortrait
+        let brushData = imageView.drawView.getBrushData()
         let rect = maskBgView.convert(controlView.frame, to: imageView)
         
-        editedData.offsetScale = CGPoint(x: rect.minX / baseImageSize.width, y: rect.minY / baseImageSize.height)
+        let offsetScale = CGPoint(x: rect.minX / baseImageSize.width, y: rect.minY / baseImageSize.height)
+        var cropData: PhotoEditCropData? = nil
+        if canReset() {
+            cropData = .init(cropSize: cropSize,
+                             zoomScale: oldZoomScale,
+                             contentInset: oldContentInset,
+                             offsetScale: offsetScale,
+                             minimumZoomScale: oldMinimumZoomScale,
+                             maximumZoomScale: oldMaximumZoomScale,
+                             maskRect: oldMaskRect,
+                             angle: oldAngle,
+                             transform: oldTransform,
+                             mirrorType: oldMirrorType)
+        }
+        let editedData = PhotoEditData.init(isPortrait: UIDevice.isPortrait,
+                                            cropData: cropData,
+                                            brushData: brushData)
         return editedData
     }
-    func setEditedData(editedData: PhotoEditData) {
+    func setCropData(cropData: PhotoEditCropData) {
         hasCropping = true
         // 记录当前数据
-        oldAngle = editedData.angle
-        oldMirrorType = editedData.mirrorType
-        oldTransform = editedData.transform
+        oldAngle = cropData.angle
+        oldMirrorType = cropData.mirrorType
+        oldTransform = cropData.transform
 //        let cropRect = AVMakeRect(aspectRatio: editedData.cropSize, insideRect: getEditableArea())
-        cropSize = editedData.cropSize
-        oldContentInset = editedData.contentInset
-        let rect = AVMakeRect(aspectRatio: editedData.maskRect.size, insideRect: getEditableArea())
-        let widthScale = rect.width / editedData.maskRect.width
-        oldZoomScale = editedData.zoomScale * widthScale
-        oldMinimumZoomScale = editedData.minimumZoomScale * widthScale
-        oldMaximumZoomScale = editedData.maximumZoomScale * widthScale
+        cropSize = cropData.cropSize
+        oldContentInset = cropData.contentInset
+        let rect = AVMakeRect(aspectRatio: cropData.maskRect.size, insideRect: getEditableArea())
+        let widthScale = rect.width / cropData.maskRect.width
+        oldZoomScale = cropData.zoomScale * widthScale
+        oldMinimumZoomScale = cropData.minimumZoomScale * widthScale
+        oldMaximumZoomScale = cropData.maximumZoomScale * widthScale
         let scrollViewContentInset = getScrollViewContentInset(rect, true)
-        let offsetX = baseImageSize.width * editedData.offsetScale.x * oldZoomScale - scrollViewContentInset.left
-        let offsetY = baseImageSize.height * editedData.offsetScale.y * oldZoomScale - scrollViewContentInset.top
+        let offsetX = baseImageSize.width * cropData.offsetScale.x * oldZoomScale - scrollViewContentInset.left
+        let offsetY = baseImageSize.height * cropData.offsetScale.y * oldZoomScale - scrollViewContentInset.top
         oldContentOffset = CGPoint(x: offsetX, y: offsetY)
         oldMaskRect = rect
+    }
+    func setBrushData(brushData: [PhotoEditorBrushData]) {
+        if !brushData.isEmpty {
+            imageView.drawView.setBrushData(brushData, viewSize: imageView.bounds.size)
+        }
     }
     func getEditableArea() -> CGRect {
         let editWidth = containerView.width - contentInsets.left - contentInsets.right
@@ -795,22 +825,47 @@ class EditorImageResizerView: UIView {
         return rect
     }
     func cropping(_ inputImage: UIImage?, toRect cropRect: CGRect, viewWidth: CGFloat, viewHeight: CGFloat) -> (UIImage, URL, PhotoEditResult.ImageType)? {
-        if let option = inputImage?.animateImageFrame() {
-            var images = [UIImage]()
-            var delays = [Double]()
-            for (index, image) in option.0.enumerated() {
-                if let newImage = cropImage(image, toRect: cropRect, viewWidth: viewWidth, viewHeight: viewHeight) {
-                    images.append(newImage)
-                    delays.append(option.1[index])
+        if var inputImage = inputImage {
+            var otherImages: [UIImage] = []
+            if imageView.drawView.count > 0 {
+                DispatchQueue.main.sync {
+                    if let image = self.imageView.drawView.convertedToImage() {
+                        otherImages.append(image)
+                    }
+                    self.imageView.drawView.layer.contents = nil
                 }
             }
-            if let image = images.first, let imageURL = PhotoTools.createAnimatedImageURL(images: images, delays: delays) {
-                return (image, imageURL, .gif)
+            var otherImage: UIImage? = nil
+            if !otherImages.isEmpty {
+                otherImage = UIImage.merge(images: otherImages)?.scaleToFillSize(size: inputImage.size)
             }
-            return nil
-        }
-        if let image = cropImage(inputImage, toRect: cropRect, viewWidth: viewWidth, viewHeight: viewHeight), let imageURL = PhotoTools.write(image: image) {
-            return (image, imageURL, .normal)
+            if let option = inputImage.animateImageFrame() {
+                var images = [UIImage]()
+                var delays = [Double]()
+                for (index, image) in option.0.enumerated() {
+                    var currentImage = image
+                    if let otherImage = otherImage, let newImage = image.merge(images: [otherImage], scale: image.scale) {
+                        currentImage = newImage
+                    }
+                    if let newImage = cropImage(currentImage, toRect: cropRect, viewWidth: viewWidth, viewHeight: viewHeight) {
+                        images.append(newImage)
+                        delays.append(option.1[index])
+                    }
+                }
+                if let image = images.first, let imageURL = PhotoTools.createAnimatedImage(images: images, delays: delays) {
+                    return (image, imageURL, .gif)
+                }
+                return nil
+            }
+            if let otherImage = otherImage, let image = inputImage.merge(images: [otherImage], scale: inputImage.scale) {
+                inputImage = image
+            }
+            if let image = cropImage(inputImage, toRect: cropRect, viewWidth: viewWidth, viewHeight: viewHeight), let imageURL = PhotoTools.write(image: image) {
+                if let thumbnailImage = image.scaleImage(toScale: 0.6) {
+                    return (thumbnailImage, imageURL, .normal)
+                }
+                return (image, imageURL, .normal)
+            }
         }
         return nil
     }
@@ -955,7 +1010,8 @@ extension EditorImageResizerView {
     func updateScrollView() {
         scrollView.alwaysBounceVertical = state == .cropping
         scrollView.alwaysBounceHorizontal = state == .cropping
-        scrollView.isUserInteractionEnabled = state == .cropping
+        scrollView.isScrollEnabled = state == .cropping
+        scrollView.pinchGestureRecognizer?.isEnabled = state == .cropping
     }
     /// 根据裁剪框位置大小获取ScrollView的ContentInset
     func getScrollViewContentInset(_ rect: CGRect, _ isOld: Bool = false) -> UIEdgeInsets {
@@ -1260,6 +1316,7 @@ extension EditorImageResizerView: UIScrollViewDelegate {
         if state != .cropping {
             return
         }
+        zoomScale = scale
         if inControlTimer {
             startControlTimer()
         }else {

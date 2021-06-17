@@ -34,7 +34,7 @@ class EditorToolView: UIView {
     lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout.init()
         flowLayout.scrollDirection = .horizontal
-        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumLineSpacing = 15
         flowLayout.minimumInteritemSpacing = 0
         flowLayout.itemSize = CGSize(width: 30, height: 50)
         return flowLayout
@@ -70,6 +70,8 @@ class EditorToolView: UIView {
     @objc func didFinishButtonClick(button: UIButton) {
         delegate?.toolView(didFinishButtonClick: self)
     }
+    var stretchMask: Bool = false
+    var currentSelectedIndexPath: IndexPath?
     
     init(config: EditorToolViewConfiguration) {
         self.config = config
@@ -84,13 +86,25 @@ class EditorToolView: UIView {
         finishButton.setTitleColor(isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor, for: .normal)
         finishButton.setBackgroundImage(UIImage.image(for: isDark ? config.finishButtonDarkBackgroundColor : config.finishButtonBackgroundColor, havingSize: .zero), for: .normal)
     }
+    func deselected() {
+        if let indexPath = currentSelectedIndexPath {
+            let cell = collectionView.cellForItem(at: indexPath) as? EditorToolViewCell
+            cell?.isSelectedImageView = false
+        }
+    }
+    
+    func selected(indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath) as? EditorToolViewCell
+        cell?.isSelectedImageView = true
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        maskLayer.frame = CGRect(x: 0, y: -10, width: width, height: height + 10)
+        maskLayer.frame = CGRect(x: 0, y: stretchMask ? -70 : -10, width: width, height: stretchMask ? height + 70 : height + 10)
         var finishWidth = (finishButton.currentTitle?.width(ofFont: finishButton.titleLabel!.font, maxHeight: 33) ?? 0) + 20
         if finishWidth < 60 {
             finishWidth = 60
@@ -110,13 +124,25 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditorToolViewCellID", for: indexPath) as! EditorToolViewCell
+        cell.selectedColor = config.toolSelectedColor
         cell.model = config.toolOptions[indexPath.item]
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
-        delegate?.toolView(self, didSelectItemAt: config.toolOptions[indexPath.item])
+        let option = config.toolOptions[indexPath.item]
+        if option.type == .graffiti {
+            if let selectedIndexPath = currentSelectedIndexPath,
+               selectedIndexPath.item == indexPath.item {
+                deselected()
+                currentSelectedIndexPath = nil
+            }else {
+                selected(indexPath: indexPath)
+                currentSelectedIndexPath = indexPath
+            }
+        }
+        delegate?.toolView(self, didSelectItemAt: option)
     }
     
 }

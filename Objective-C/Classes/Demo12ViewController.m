@@ -223,6 +223,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
     // 跳转预览界面时展现动画的image
     photoManager.configuration.customPreviewFromImage = ^UIImage *(NSInteger currentIndex) {
         HXPhotoSubViewCell *viewCell = [weakSelf.photoView collectionViewCellWithIndex:currentIndex];
+        viewCell.model.imageSize = viewCell.imageView.image.size;
         return viewCell.imageView.image;
     };
     // 退出预览界面时终点view
@@ -231,6 +232,7 @@ static const CGFloat kPhotoViewMargin = 12.0;
         return viewCell;
     };
     [photoManager addCustomAssetModel:@[assetModel1, assetModel2, assetModel3, assetModel4, assetModel5, assetModel6, assetModel7, assetModel8]];
+    
     /// 这里需要注意一下
     /// 这里的photoManager 和 self.manager 不是同一个
     /// 虽然展示的是一样的内容但是是两个单独的东西

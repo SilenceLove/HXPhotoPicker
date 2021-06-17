@@ -36,7 +36,6 @@ public extension PhotoEditorViewControllerDelegate {
 
 open class PhotoEditorViewController: BaseViewController {
     
-    /// 代理
     public weak var delegate: PhotoEditorViewControllerDelegate?
     
     /// 配置
@@ -52,7 +51,7 @@ open class PhotoEditorViewController: BaseViewController {
     public private(set) var state: State = .normal
     
     /// 上一次的编辑结果
-    public private(set) var editResult: PhotoEditResult?
+    public let editResult: PhotoEditResult?
     
     /// 编辑image
     /// - Parameters:
@@ -127,17 +126,18 @@ open class PhotoEditorViewController: BaseViewController {
     }
     
     lazy var imageView: PhotoEditorView = {
-        let imageView = PhotoEditorView.init(cropConfig: config.cropConfig)
+        let imageView = PhotoEditorView.init(config: config)
         imageView.editorDelegate = self
         let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap(tap:)))
         imageView.addGestureRecognizer(singleTap)
         return imageView
     }()
+    var topViewIsHidden: Bool = false
     @objc func singleTap(tap: UITapGestureRecognizer) {
-        if state != .normal {
+        if state == .cropping {
             return
         }
-        if topView.isHidden == true {
+        if topViewIsHidden {
             showTopView()
         }else {
             hidenTopView()
@@ -188,6 +188,16 @@ open class PhotoEditorViewController: BaseViewController {
         return layer
     }()
     
+    lazy var brushColorView: PhotoEditorBrushColorView = {
+        let view = PhotoEditorBrushColorView.init(frame: .zero)
+        view.delegate = self
+        view.brushColors = config.brushColors
+        view.currentColorIndex = config.defaultBrushColorIndex
+        view.alpha = 0
+        view.isHidden = true
+        return view
+    }()
+    
     lazy var cropToolView: PhotoEditorCropToolView = {
         var showRatios = true
         if config.cropConfig.fixedRatio || config.cropConfig.isRoundCrop {
@@ -203,6 +213,8 @@ open class PhotoEditorViewController: BaseViewController {
     
     var imageInitializeCompletion = false
     var orientationDidChange: Bool = false
+    var imageViewDidChange: Bool = true
+    var currentToolOption: EditorToolOptions?
     
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -219,6 +231,7 @@ open class PhotoEditorViewController: BaseViewController {
         view.clipsToBounds = true
         view.addSubview(imageView)
         view.addSubview(toolView)
+        view.addSubview(brushColorView)
         view.addSubview(cropConfirmView)
         view.addSubview(cropToolView)
         view.layer.addSublayer(topMaskLayer)
@@ -237,6 +250,8 @@ open class PhotoEditorViewController: BaseViewController {
         }
     }
     open override func deviceOrientationWillChanged(notify: Notification) {
+        imageView.undoAllDraw()
+        brushColorView.canUndo = imageView.canUndoDraw
         imageView.reset(false)
         imageView.finishCropping(false)
         if config.fixedCropState {
@@ -247,6 +262,7 @@ open class PhotoEditorViewController: BaseViewController {
     }
     open override func deviceOrientationDidChanged(notify: Notification) {
         orientationDidChange = true
+        imageViewDidChange = false
     }
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -266,13 +282,22 @@ open class PhotoEditorViewController: BaseViewController {
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
         cropConfirmView.frame = toolView.frame
         cropToolView.frame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
+        brushColorView.frame = cropToolView.frame
         cropToolView.updateContentInset()
-        imageView.frame = view.bounds
+        if !imageView.frame.equalTo(view.bounds) && !imageView.frame.isEmpty && !imageViewDidChange {
+            imageView.frame = view.bounds
+            imageView.reset(false)
+            imageView.finishCropping(false)
+            orientationDidChange = true
+        }else {
+            imageView.frame = view.bounds
+        }
         if !imageInitializeCompletion {
             if !needRequest || image != nil {
                 imageView.setImage(image)
                 if let editedData = editResult?.editedData {
                     imageView.setEditedData(editedData: editedData)
+                    brushColorView.canUndo = imageView.canUndoDraw
                 }
                 if state == .cropping {
                     imageView.startCropping(true)
@@ -287,6 +312,7 @@ open class PhotoEditorViewController: BaseViewController {
                 imageView.startCropping(false)
             }
             orientationDidChange = false
+            imageViewDidChange = true
         }
     }
     open override var prefersStatusBarHidden: Bool {
@@ -363,7 +389,22 @@ extension PhotoEditorViewController {
             #endif
         } else {
             ProgressHUD.showLoading(addedTo: view, animated: true)
-            photoAsset.requestAssetImageURL(filterEditor: true) { [weak self] (imageUrl) in
+            if photoAsset.phAsset != nil && !photoAsset.isGifAsset {
+                photoAsset.requestImageData(filterEditor: true,
+                                            iCloudHandler: nil,
+                                            progressHandler: nil) {
+                    [weak self] (asset, imageData, imageOrientation, info) in
+                    let image = UIImage.init(data: imageData)?.scaleSuitableSize()
+                    ProgressHUD.hide(forView: self?.view, animated: true)
+                    self?.requestAssetCompletion(image: image!)
+                } failure: { [weak self] (asset, info) in
+                    ProgressHUD.hide(forView: self?.view, animated: true)
+                    self?.requestAssetFailure()
+                }
+                return
+            }
+            photoAsset.requestAssetImageURL(filterEditor: true) {
+                [weak self] (imageUrl) in
                 DispatchQueue.global().async {
                     if let imageUrl = imageUrl {
                         #if canImport(Kingfisher)
@@ -389,6 +430,7 @@ extension PhotoEditorViewController {
                         }
                     }
                     DispatchQueue.main.async {
+                        ProgressHUD.hide(forView: self?.view, animated: true)
                         self?.requestAssetFailure()
                     }
                 }
@@ -422,6 +464,7 @@ extension PhotoEditorViewController {
             imageView.setImage(image)
             if let editedData = editResult?.editedData {
                 imageView.setEditedData(editedData: editedData)
+                brushColorView.canUndo = imageView.canUndoDraw
             }
             if state == .cropping {
                 imageView.startCropping(true)
@@ -444,7 +487,10 @@ extension PhotoEditorViewController: EditorToolViewDelegate {
         editResources()
     }
     func editResources() {
-        if imageView.canReset() || imageView.imageView.hasCropping {
+        if imageView.canReset() ||
+            imageView.imageResizerView.hasCropping ||
+            imageView.canUndoDraw {
+            
             ProgressHUD.showLoading(addedTo: view, animated: true)
             imageView.cropping { [weak self] (result) in
                 if let result = result, let self = self {
@@ -461,10 +507,43 @@ extension PhotoEditorViewController: EditorToolViewDelegate {
         }
     }
     func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions) {
-        if model.type == .cropping {
+        if model.type == .graffiti {
+            imageView.drawEnabled = !imageView.drawEnabled
+            toolView.stretchMask = imageView.drawEnabled
+            toolView.layoutSubviews()
+            if imageView.drawEnabled {
+                showBrushColorView()
+                currentToolOption = model
+            }else {
+                hiddenBrushColorView()
+                currentToolOption = nil
+            }
+        }else if model.type == .cropping {
+            imageView.drawEnabled = false
             state = .cropping
             imageView.startCropping(true)
             croppingAction()
+        }
+    }
+    
+    func showBrushColorView() {
+        brushColorView.isHidden = false
+        UIView.animate(withDuration: 0.25) {
+            self.brushColorView.alpha = 1
+        }
+    }
+    
+    func hiddenBrushColorView() {
+        if brushColorView.isHidden {
+            return
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.brushColorView.alpha = 0
+        } completion: { (_) in
+            guard let option = self.currentToolOption, option.type == .graffiti else {
+                return
+            }
+            self.brushColorView.isHidden = true
         }
     }
     
@@ -474,13 +553,18 @@ extension PhotoEditorViewController: EditorToolViewDelegate {
             cropToolView.isHidden = false
             hidenTopView()
         }else {
+            if let option = currentToolOption {
+                if option.type == .graffiti {
+                    imageView.drawEnabled = true
+                }
+            }
             showTopView()
         }
         UIView.animate(withDuration: 0.25) {
             self.cropConfirmView.alpha = self.state == .cropping ? 1 : 0
             self.cropToolView.alpha = self.state == .cropping ? 1 : 0
         } completion: { (isFinished) in
-            if self.state == .normal {
+            if self.state != .cropping {
                 self.cropConfirmView.isHidden = true
                 self.cropToolView.isHidden = true
             }
@@ -488,26 +572,58 @@ extension PhotoEditorViewController: EditorToolViewDelegate {
 
     }
     func showTopView() {
+        topViewIsHidden = false
         toolView.isHidden = false
         topView.isHidden = false
+        var showBrush = false
+        if let option = currentToolOption {
+            if option.type == .graffiti {
+                showBrush = true
+                brushColorView.isHidden = false
+            }
+        }
         UIView.animate(withDuration: 0.25) {
             self.toolView.alpha = 1
             self.topView.alpha = 1
             self.topMaskLayer.isHidden = false
+            if showBrush {
+                self.brushColorView.alpha = 1
+            }
         }
     }
     func hidenTopView() {
+        topViewIsHidden = true
+        var hiddenBrush = false
+        if let option = currentToolOption {
+            if option.type == .graffiti {
+                hiddenBrush = true
+            }
+        }
         UIView.animate(withDuration: 0.25) {
             self.toolView.alpha = 0
             self.topView.alpha = 0
             self.topMaskLayer.isHidden = true
+            if hiddenBrush {
+                self.brushColorView.alpha = 0
+            }
         } completion: { (isFinished) in
-            self.toolView.isHidden = true
-            self.topView.isHidden = true
+            if self.topViewIsHidden {
+                self.toolView.isHidden = true
+                self.topView.isHidden = true
+                self.brushColorView.isHidden = true
+            }
         }
     }
 }
-
+extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
+    func brushColorView(didUndoButton colorView: PhotoEditorBrushColorView) {
+        imageView.undoDraw()
+        brushColorView.canUndo = imageView.canUndoDraw
+    }
+    func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor colorHex: String) {
+        imageView.drawColorHex = colorHex
+    }
+}
 // MARK: EditorCropConfirmViewDelegate
 extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     
@@ -515,7 +631,7 @@ extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     /// - Parameter cropConfirmView: 裁剪视图
     func cropConfirmView(didFinishButtonClick cropConfirmView: EditorCropConfirmView) {
         if config.fixedCropState {
-            imageView.imageView.finishCropping(false, completion: nil, updateCrop: false)
+            imageView.imageResizerView.finishCropping(false, completion: nil, updateCrop: false)
             editResources()
             return
         }
@@ -572,6 +688,15 @@ extension PhotoEditorViewController: PhotoEditorViewDelegate {
     
     func editorView(didDisappearCrop editorView: PhotoEditorView) {
         
+    }
+    
+    func editorView(drawViewBeganDraw editorView: PhotoEditorView) {
+        hidenTopView()
+    }
+    
+    func editorView(drawViewEndDraw editorView: PhotoEditorView) {
+        showTopView()
+        brushColorView.canUndo = editorView.canUndoDraw
     }
 }
 

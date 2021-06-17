@@ -145,7 +145,6 @@ public class PhotoTools {
             generator.appliesPreferredTrackTransform = true
             generator.requestedTimeToleranceAfter = .zero
             generator.requestedTimeToleranceBefore = .zero
-            let seconds = asset.duration.seconds
             let time = CMTime(value: CMTimeValue(atTime), timescale: asset.duration.timescale)
             let array = [NSValue(time: time)]
             generator.generateCGImagesAsynchronously(forTimes: array) { (requestedTime, cgImage, actualTime, result, error) in

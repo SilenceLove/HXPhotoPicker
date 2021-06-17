@@ -112,21 +112,14 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
                     self.requestNetworkCompletion = true
                     if let image = image {
                         self.requestSucceed()
-                        let needUpdate = self.width / self.height != image.width / image.height
-                        self.photoAsset.networkImageAsset?.imageSize = image.size
-                        if needUpdate {
-                            self.delegate?.contentView(updateContentSize: self)
-                        }
+                        self.updateContentSize(image: image)
                         self.delegate?.contentView(networkImagedownloadSuccess: self)
                     }else {
                         self.requestFailed(info: nil)
                     }
                 }else {
                     if let image = image {
-                        let needUpdate = self.width / self.height != image.width / image.height
-                        if needUpdate {
-                            self.delegate?.contentView(updateContentSize: self)
-                        }
+                        self.updateContentSize(image: image)
                     }
                 }
             }
@@ -135,13 +128,16 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
         imageView.setVideoCoverImage(for: photoAsset) { [weak self] (image, photoAsset) in
             if let self = self, let image = image, self.photoAsset == photoAsset {
                 self.imageView.image = image
-                let needUpdate = self.width / self.height != image.width / image.height
-                if needUpdate {
-                    self.delegate?.contentView(updateContentSize: self)
-                }
+                self.updateContentSize(image: image)
             }
         }
         #endif
+    }
+    func updateContentSize(image: UIImage) {
+        let needUpdate = width / height != image.width / image.height
+        if needUpdate {
+            delegate?.contentView(updateContentSize: self)
+        }
     }
     func checkNetworkVideoFileSize(_ url: URL) {
         if let fileSize = photoAsset.networkVideoAsset?.fileSize,
@@ -179,11 +175,17 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
             } completionHandler: { [weak self] (url, error) in
                 self?.networkVideoLoading = false
                 if let url = url {
+                    if let image = self?.photoAsset.networkVideoAsset?.coverImage {
+                        self?.updateContentSize(image: image)
+                    }else if let image = PhotoTools.getVideoThumbnailImage(videoURL: url, atTime: 0.1) {
+                        self?.photoAsset.networkVideoAsset?.coverImage = image
+                        self?.updateContentSize(image: image)
+                    }
                     self?.checkNetworkVideoFileSize(url)
                     self?.requestSucceed()
                     self?.networkVideoRequestCompletion(url)
                 }else {
-                    if let error = error as? NSError, error.code == NSURLErrorCancelled {
+                    if let error = error as NSError?, error.code == NSURLErrorCancelled {
                         self?.requestFailed(info: [PHImageCancelledKey : 1])
                     }else {
                         self?.requestFailed(info: nil)
@@ -287,11 +289,19 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
     func requestOriginalImage() {
         #if HXPICKER_ENABLE_EDITOR
         if let photoEdit = photoAsset.photoEdit {
-            do {
-                let imageData = try Data.init(contentsOf: photoEdit.editedImageURL)
-                imageView.setImageData(imageData)
-            }catch {
-                imageView.setImage(photoEdit.editedImage, animated: true)
+            if photoEdit.imageType == .gif {
+                do {
+                    let imageData = try Data.init(contentsOf: photoEdit.editedImageURL)
+                    imageView.setImageData(imageData)
+                }catch {
+                    imageView.setImage(photoEdit.editedImage, animated: true)
+                }
+            }else {
+                if let image = UIImage.init(contentsOfFile: photoEdit.editedImageURL.path) {
+                    imageView.setImage(image)
+                }else {
+                    imageView.setImage(photoEdit.editedImage, animated: true)
+                }
             }
             requestCompletion = true
             return

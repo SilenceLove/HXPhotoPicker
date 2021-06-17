@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PreviewVideoViewCell: PhotoPreviewViewCell {
+class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete {
     
     lazy var playButton: UIButton = {
         let playButton = UIButton.init(type: UIButton.ButtonType.custom)
@@ -39,6 +39,7 @@ class PreviewVideoViewCell: PhotoPreviewViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         scrollContentView = PhotoPreviewContentView.init(type: .video)
+        scrollContentView.delegate = self
         scrollContentView.videoView.delegate = self
         initView()
         addSubview(playButton)
@@ -51,6 +52,14 @@ class PreviewVideoViewCell: PhotoPreviewViewCell {
         }else {
             super.setupScrollViewContentSize()
         }
+    }
+    
+    func contentView(updateContentSize contentView: PhotoPreviewContentView) {
+        setupScrollViewContentSize()
+    }
+    func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView) {
+    }
+    func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentView) {
     }
     
     override func layoutSubviews() {

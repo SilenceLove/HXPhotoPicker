@@ -181,6 +181,11 @@ public extension PhotoPreviewViewController {
     }
 }
 
+public enum DonwloadURLType {
+    case thumbnail
+    case original
+}
+
 extension PhotoManager {
     enum CameraAlbumLocal: String {
         case identifier = "HXCameraAlbumLocalIdentifier"

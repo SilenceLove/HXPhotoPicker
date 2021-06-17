@@ -29,7 +29,7 @@ open class EditorController: UINavigationController {
     }
     
     /// 当前编辑类型
-    public var editorType: EditorType
+    public let editorType: EditorType
     
     /// 根据UIImage初始化
     /// - Parameters:
@@ -155,7 +155,7 @@ open class EditorController: UINavigationController {
     #endif
     
     /// 编辑器配置
-    var config: EditorConfiguration
+    let config: EditorConfiguration
     
     open override var shouldAutorotate: Bool {
         config.shouldAutorotate

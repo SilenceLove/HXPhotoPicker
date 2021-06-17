@@ -552,10 +552,7 @@ extension VideoEditorViewController {
                 if let url = url {
                     #if HXPICKER_ENABLE_PICKER
                     if let photoAsset = self?.photoAsset {
-                        do {
-                            let fileSize = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-                            photoAsset.networkVideoAsset?.fileSize = fileSize
-                        } catch {}
+                        photoAsset.networkVideoAsset?.fileSize = url.fileSize
                     }
                     #endif
                     self?.loadingView = nil
@@ -563,7 +560,7 @@ extension VideoEditorViewController {
                     self?.avAsset = AVAsset.init(url: url)
                     self?.avassetLoadValuesAsynchronously()
                 }else {
-                    if let error = error as? NSError, error.code == NSURLErrorCancelled {
+                    if let error = error as NSError?, error.code == NSURLErrorCancelled {
                         return
                     }
                     self?.loadingView = nil

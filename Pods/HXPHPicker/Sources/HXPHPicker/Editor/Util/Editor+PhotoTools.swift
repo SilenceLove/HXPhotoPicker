@@ -5,13 +5,13 @@
 //  Created by Slience on 2021/1/9.
 //
 
-import Foundation
+import UIKit
 import ImageIO
 import CoreServices
 
 extension PhotoTools {
-    class func createAnimatedImageURL(images: [UIImage],
-                                      delays: [Double]) -> URL? {
+    class func createAnimatedImage(images: [UIImage],
+                                   delays: [Double]) -> URL? {
         if images.isEmpty || delays.isEmpty {
             return nil
         }

@@ -1,13 +1,14 @@
 //
-//  Picker+PHAsset.swift
+//  Core+PHAsset.swift
 //  HXPHPicker
 //
-//  Created by Slience on 2021/1/7.
+//  Created by Slience on 2021/6/9.
 //
+
 
 import Photos
 
- public extension PHAsset {
+public extension PHAsset {
     
     var isImageAnimated: Bool {
         var isAnimated : Bool = false
@@ -57,5 +58,18 @@ import Photos
             }
         }
         return isICloud
+    }
+    
+    func checkAdjustmentStatus(completion: @escaping (Bool) -> Void) {
+        self.requestContentEditingInput(with: nil) { (input, info) in
+            let avAsset = input?.audiovisualAsset
+            var isAdjusted: Bool = false
+            if let path = avAsset != nil ? avAsset?.description : input?.fullSizeImageURL?.path {
+                if path.contains("/Mutations/") {
+                    isAdjusted = true
+                }
+            }
+            completion(isAdjusted)
+        }
     }
 }

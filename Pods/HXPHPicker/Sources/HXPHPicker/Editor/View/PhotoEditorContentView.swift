@@ -11,10 +11,13 @@ import Kingfisher
 #endif
 
 protocol PhotoEditorContentViewDelegate: AnyObject {
-    
+    func contentView(drawViewBeganDraw contentView: PhotoEditorContentView)
+    func contentView(drawViewEndDraw contentView: PhotoEditorContentView)
 }
 
 class PhotoEditorContentView: UIView {
+    
+    weak var delegate: PhotoEditorContentViewDelegate?
     
     lazy var imageView: UIImageView = {
         var imageView: UIImageView
@@ -28,15 +31,23 @@ class PhotoEditorContentView: UIView {
         return imageView
     }()
     
-    var image: UIImage? {
-        get {
-            imageView.image
+    var image: UIImage? { imageView.image }
+    var zoomScale: CGFloat = 1 {
+        didSet {
+            drawView.scale = zoomScale
         }
     }
+    
+    lazy var drawView: PhotoEditorDrawView = {
+        let drawView = PhotoEditorDrawView.init(frame: .zero)
+        drawView.delegate = self
+        return drawView
+    }()
     
     init() {
         super.init(frame: .zero)
         addSubview(imageView)
+        addSubview(drawView)
     }
     
     
@@ -52,8 +63,18 @@ class PhotoEditorContentView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         imageView.frame = bounds
+        drawView.frame = bounds
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension PhotoEditorContentView: PhotoEditorDrawViewDelegate {
+    func drawView(beganDraw drawView: PhotoEditorDrawView) {
+        delegate?.contentView(drawViewBeganDraw: self)
+    }
+    func drawView(endDraw drawView: PhotoEditorDrawView) {
+        delegate?.contentView(drawViewEndDraw: self)
     }
 }

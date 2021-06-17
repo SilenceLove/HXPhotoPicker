@@ -63,6 +63,16 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
+    func scaleImage(toScale: CGFloat) -> UIImage? {
+        if toScale == 1 {
+            return self
+        }
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: width * toScale, height: height * toScale), false, self.scale)
+        self.draw(in: CGRect(x: 0, y: 0, width: width * toScale, height: height * toScale))
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
     
     class func image(for color: UIColor?, havingSize: CGSize) -> UIImage? {
         if let color = color {
@@ -107,6 +117,9 @@ extension UIImage {
         return newImage
     }
     func cropImage(toRect cropRect: CGRect, viewWidth: CGFloat, viewHeight: CGFloat) -> UIImage? {
+        if cropRect.isEmpty {
+            return self
+        }
         let imageViewScale = max(size.width / viewWidth,
                                  size.height / viewHeight)
 
@@ -259,5 +272,34 @@ extension UIImage {
         }
         #endif
         return nil
+    }
+    func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+        if images.isEmpty {
+            return self
+        }
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: CGRect(origin: .zero, size: size))
+        for image in images {
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+        }
+        let mergeImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return mergeImage
+    }
+    
+    class func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+        if images.isEmpty {
+            return nil
+        }
+        if images.count == 1 {
+            return images.first
+        }
+        UIGraphicsBeginImageContextWithOptions(images.first!.size, false, scale)
+        for image in images {
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+        }
+        let mergeImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return mergeImage
     }
 }

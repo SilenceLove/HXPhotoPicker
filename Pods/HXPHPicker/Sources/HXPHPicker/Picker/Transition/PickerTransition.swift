@@ -148,22 +148,51 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }else if type == .pop {
             rect = toView?.convert(toView?.bounds ?? CGRect.zero, to: containerView) ?? .zero
             toView?.isHidden = true
-            if AssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
-                pickerVC?.bottomView.alpha = 0
+        }
+        var pickerShowParompt = false
+        if AssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
+            pickerShowParompt = true
+        }
+        let pickerController = previewVC?.pickerController
+        let maskHeight = 50 + UIDevice.bottomMargin
+        var previewShowSelectedView = false
+        if previewVC?.config.bottomView.showSelectedView == true &&
+            pickerController?.config.selectMode == .multiple {
+            if pickerController?.selectedAssetArray.isEmpty == false {
+                previewShowSelectedView = true
+                if !pickerShowParompt {
+                    let maskY: CGFloat = type == .push ? 70 : 0
+                    let maskHeight: CGFloat = type == .push ? 50 + UIDevice.bottomMargin : 120 + UIDevice.bottomMargin
+                    let maskView = UIView.init(frame: CGRect(x: 0, y: maskY, width: contentView.width, height: maskHeight))
+                    maskView.backgroundColor = .white
+                    previewVC?.bottomView.mask = maskView
+                }
             }
         }
-        
+        if pickerShowParompt && !previewShowSelectedView {
+            let maskY: CGFloat = type == .push ? 0 : 70
+            let maskHeight: CGFloat = type == .push ? 120 + UIDevice.bottomMargin : 70 + UIDevice.bottomMargin
+            let maskView = UIView.init(frame: CGRect(x: 0, y: maskY, width: contentView.width, height: maskHeight))
+            maskView.backgroundColor = .white
+            pickerVC?.bottomView.mask = maskView
+        }
         UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.125) {
             if self.type == .push {
                 previewVC?.bottomView.alpha = 1
-                if AssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
-                    pickerVC?.bottomView.alpha = 0
+                if previewVC?.bottomView.mask != nil {
+                    previewVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: contentView.width, height: maskHeight + 70)
+                }
+                if pickerVC?.bottomView.mask != nil {
+                    pickerVC?.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: contentView.width, height: maskHeight)
                 }
                 contentView.backgroundColor = backgroundColor?.withAlphaComponent(1)
             }else if self.type == .pop {
                 previewVC?.bottomView.alpha = 0
-                if AssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.showPrompt ?? false {
-                    pickerVC?.bottomView.alpha = 1
+                if previewVC?.bottomView.mask != nil {
+                    previewVC?.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: contentView.width, height: maskHeight + 70)
+                }
+                if pickerVC?.bottomView.mask != nil {
+                    pickerVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: contentView.width, height: maskHeight + 70)
                 }
                 contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
             }
@@ -181,12 +210,13 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
             }
         } completion: { (isFinished) in
+            pickerVC?.bottomView.mask = nil
+            previewVC?.bottomView.mask = nil
             if self.type == .push {
                 if self.requestID != nil {
                     PHImageManager.default().cancelImageRequest(self.requestID!)
                     self.requestID = nil
                 }
-                pickerVC?.bottomView.alpha = 1
                 fromView?.isHidden = false
                 previewVC?.setCurrentCellImage(image: self.pushImageView.image)
                 previewVC?.collectionView.isHidden = false

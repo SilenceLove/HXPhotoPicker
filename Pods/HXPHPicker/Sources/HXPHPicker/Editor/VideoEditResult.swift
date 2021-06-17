@@ -30,12 +30,7 @@ public struct VideoEditResult {
     
     public init(editedURL: URL,
                 cropData: VideoCropData) {
-        do {
-            let videofileSize = try editedURL.resourceValues(forKeys: [.fileSizeKey])
-            editedFileSize = videofileSize.fileSize ?? 0
-        } catch {
-            editedFileSize = 0
-        }
+        editedFileSize = editedURL.fileSize
         
         videoDuration = PhotoTools.getVideoDuration(videoURL: editedURL)
         videoTime = PhotoTools.transformVideoDurationToString(duration: videoDuration)
@@ -67,7 +62,11 @@ public struct VideoCropData {
     /// 2：validWidth ，裁剪框的宽度
     public let cropRectData: (CGFloat, CGFloat, CGFloat)
     
-    public init(startTime: TimeInterval, endTime: TimeInterval, preferredTimescale: Int32, cropingData: (CGFloat, CGFloat, CGFloat), cropRectData: (CGFloat, CGFloat, CGFloat)) {
+    public init(startTime: TimeInterval,
+                endTime: TimeInterval,
+                preferredTimescale: Int32,
+                cropingData: (CGFloat, CGFloat, CGFloat),
+                cropRectData: (CGFloat, CGFloat, CGFloat)) {
         self.startTime = startTime
         self.endTime = endTime
         self.preferredTimescale = preferredTimescale
