@@ -111,7 +111,7 @@
             }
         }else {
             NSURL *url = original ? model.networkPhotoUrl : model.networkThumbURL;
-            [weakSelf yy_setImageWithURL:url placeholder:model.thumbPhoto options:YYWebImageOptionShowNetworkActivity progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+            [weakSelf setImageWithURL:url placeholder:model.thumbPhoto options:YYWebImageOptionShowNetworkActivity progress:^(NSInteger receivedSize, NSInteger expectedSize) {
                 model.receivedSize = receivedSize;
                 model.expectedSize = expectedSize;
                 CGFloat progress = (CGFloat)receivedSize / expectedSize;
@@ -171,7 +171,7 @@
     }];
 #elif HasYYKitOrWebImage
     HXWeakSelf
-    [self yy_setImageWithURL:url placeholder:nil options:YYWebImageOptionShowNetworkActivity progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+    [self setImageWithURL:url placeholder:nil options:YYWebImageOptionShowNetworkActivity progress:^(NSInteger receivedSize, NSInteger expectedSize) {
         CGFloat progress = (CGFloat)receivedSize / expectedSize;
         dispatch_async(dispatch_get_main_queue(), ^{
             if (progressBlock) {
