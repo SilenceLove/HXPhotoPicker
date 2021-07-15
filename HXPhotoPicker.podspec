@@ -2,7 +2,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "HXPhotoPicker"
-  s.version      = "3.2.1"
+  s.version      = "3.2.2"
   s.summary      = "照片/视频选择器 - 支持LivePhoto、GIF图片选择、自定义编辑照片/视频、3DTouch预览、浏览网络图片/网络视频 功能 - Imitation weibo photo/image picker - support for LivePhoto, GIF image selection, 3DTouch preview, browse the web image function"
   s.homepage     = "https://github.com/SilenceLove/HXPhotoPicker"
   s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -46,5 +46,12 @@ Pod::Spec.new do |s|
     yy_af.dependency 'AFNetworking'
     yy_af.resources    = "HXPhotoPicker/Resources/*.{bundle}"
   end
-
+  
+  s.subspec 'CustomItem' do |customItem|
+    customItem.source_files = "HXPhotoPicker/**/*.{h,m}"
+    customItem.dependency 'SDWebImage', '~> 5.0'
+    customItem.dependency 'AFNetworking'
+    customItem.resources    = "HXPhotoPicker/Resources/*.{bundle}"
+    customItem.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => 'HXPhotoViewCustomItemSizeEnable=1'}
+  end
 end
