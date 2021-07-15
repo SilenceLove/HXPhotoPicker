@@ -55,7 +55,7 @@ CGFloat angleBetweenLines(CGPoint line1Start, CGPoint line1End, CGPoint line2Sta
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.contentsScale = [[UIScreen mainScreen] scale];
+//        self.contentsScale = [[UIScreen mainScreen] scale];
         self.backgroundColor = [UIColor clearColor].CGColor;
         _lineArray = [@[] mutableCopy];
     }

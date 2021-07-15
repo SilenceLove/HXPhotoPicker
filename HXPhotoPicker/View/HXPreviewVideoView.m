@@ -138,7 +138,7 @@
 }
 - (void)requestAVAssetComplete:(AVAsset *)avAsset {
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
-    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategorySoloAmbient error: nil];
+    [[AVAudioSession sharedInstance] setCategory: [HXPhotoCommon photoCommon].audioSessionCategory error: nil];
     self.avAsset = avAsset;
     AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:avAsset];
     [self.player replaceCurrentItemWithPlayerItem:playerItem];
