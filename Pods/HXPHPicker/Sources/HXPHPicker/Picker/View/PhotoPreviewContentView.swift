@@ -107,26 +107,26 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
                 self?.requestUpdateProgress(progress: percentage)
             }
         } completionHandler: { [weak self] (image, error, photoAsset) in
-            if let self = self {
-                if self.photoAsset.mediaSubType != .networkVideo {
-                    self.requestNetworkCompletion = true
-                    if let image = image {
-                        self.requestSucceed()
-                        self.updateContentSize(image: image)
-                        self.delegate?.contentView(networkImagedownloadSuccess: self)
-                    }else {
-                        self.requestFailed(info: nil)
-                    }
+            guard let self = self else { return }
+            if self.photoAsset.mediaSubType != .networkVideo {
+                self.requestNetworkCompletion = true
+                if let image = image {
+                    self.requestSucceed()
+                    self.updateContentSize(image: image)
+                    self.delegate?.contentView(networkImagedownloadSuccess: self)
                 }else {
-                    if let image = image {
-                        self.updateContentSize(image: image)
-                    }
+                    self.requestFailed(info: nil)
+                }
+            }else {
+                if let image = image {
+                    self.updateContentSize(image: image)
                 }
             }
         }
         #else
         imageView.setVideoCoverImage(for: photoAsset) { [weak self] (image, photoAsset) in
-            if let self = self, let image = image, self.photoAsset == photoAsset {
+            guard let self = self else { return }
+            if let image = image, self.photoAsset == photoAsset {
                 self.imageView.image = image
                 self.updateContentSize(image: image)
             }
@@ -173,22 +173,25 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
             PhotoManager.shared.downloadTask(with: videoURL) { [weak self] (progress, task) in
                 self?.requestUpdateProgress(progress: progress)
             } completionHandler: { [weak self] (url, error) in
-                self?.networkVideoLoading = false
+                guard let self = self else {
+                    return
+                }
+                self.networkVideoLoading = false
                 if let url = url {
-                    if let image = self?.photoAsset.networkVideoAsset?.coverImage {
-                        self?.updateContentSize(image: image)
+                    if let image = self.photoAsset.networkVideoAsset?.coverImage {
+                        self.updateContentSize(image: image)
                     }else if let image = PhotoTools.getVideoThumbnailImage(videoURL: url, atTime: 0.1) {
-                        self?.photoAsset.networkVideoAsset?.coverImage = image
-                        self?.updateContentSize(image: image)
+                        self.photoAsset.networkVideoAsset?.coverImage = image
+                        self.updateContentSize(image: image)
                     }
-                    self?.checkNetworkVideoFileSize(url)
-                    self?.requestSucceed()
-                    self?.networkVideoRequestCompletion(url)
+                    self.checkNetworkVideoFileSize(url)
+                    self.requestSucceed()
+                    self.networkVideoRequestCompletion(url)
                 }else {
                     if let error = error as NSError?, error.code == NSURLErrorCancelled {
-                        self?.requestFailed(info: [PHImageCancelledKey : 1])
+                        self.requestFailed(info: [PHImageCancelledKey : 1])
                     }else {
-                        self?.requestFailed(info: nil)
+                        self.requestFailed(info: nil)
                     }
                 }
             }
@@ -316,8 +319,9 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
                 self?.requestUpdateProgress(progress: progress)
             }
         }, success: { [weak self] (asset, imageData, imageOrientation, info) in
+            guard let self = self else { return }
             if asset.mediaSubType.isGif {
-                if let self = self, asset == self.photoAsset {
+                if asset == self.photoAsset {
                     self.requestSucceed()
                     self.imageView.setImageData(imageData)
                     self.setAnimatedImageCompletion = true
@@ -329,11 +333,11 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
                     var image = UIImage.init(data: imageData)
                     image = image?.scaleSuitableSize()
                     DispatchQueue.main.async {
-                        if asset == self?.photoAsset {
-                            self?.requestSucceed()
-                            self?.imageView.setImage(image, animated: true)
-                            self?.requestID = nil
-                            self?.requestCompletion = true
+                        if asset == self.photoAsset {
+                            self.requestSucceed()
+                            self.imageView.setImage(image, animated: true)
+                            self.requestID = nil
+                            self.requestCompletion = true
                         }
                     }
                 }

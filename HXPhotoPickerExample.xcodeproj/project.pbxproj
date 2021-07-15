@@ -150,25 +150,6 @@
 		7B7E3E7B1E4AACD1002234EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7A1E4AACD1002234EE /* main.m */; };
 		7B7E3E7E1E4AACD1002234EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */; };
 		7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B7E3E851E4AACD1002234EE /* Assets.xcassets */; };
-		7B817C85266A126500DD7A99 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C70266A126500DD7A99 /* UIDevice+Extension.swift */; };
-		7B817C86266A126500DD7A99 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C71266A126500DD7A99 /* UIFont+Extension.swift */; };
-		7B817C87266A126500DD7A99 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C72266A126500DD7A99 /* UIView+Extension.swift */; };
-		7B817C88266A126500DD7A99 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C73266A126500DD7A99 /* UIImage+Extension.swift */; };
-		7B817C89266A126500DD7A99 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C74266A126500DD7A99 /* String+Extension.swift */; };
-		7B817C8A266A126500DD7A99 /* RowTypeRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C75266A126500DD7A99 /* RowTypeRule.swift */; };
-		7B817C8B266A126500DD7A99 /* Core+UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C76266A126500DD7A99 /* Core+UIColor.swift */; };
-		7B817C8C266A126500DD7A99 /* EditorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C78266A126500DD7A99 /* EditorConfigurationViewController.swift */; };
-		7B817C8D266A126500DD7A99 /* AvatarPickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C79266A126500DD7A99 /* AvatarPickerResultViewController.swift */; };
-		7B817C8E266A126500DD7A99 /* PickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7A266A126500DD7A99 /* PickerResultViewController.swift */; };
-		7B817C8F266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7B266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift */; };
-		7B817C90266A126500DD7A99 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7C266A126500DD7A99 /* HomeViewController.swift */; };
-		7B817C91266A126500DD7A99 /* CustomPickerCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7D266A126500DD7A99 /* CustomPickerCellViewController.swift */; };
-		7B817C92266A126500DD7A99 /* PickerColorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7E266A126500DD7A99 /* PickerColorConfigurationViewController.swift */; };
-		7B817C93266A126500DD7A99 /* PickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C7F266A126500DD7A99 /* PickerConfigurationViewController.swift */; };
-		7B817C94266A126500DD7A99 /* PickerResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B817C80266A126500DD7A99 /* PickerResultViewController.xib */; };
-		7B817C95266A126500DD7A99 /* ConfigurationViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C82266A126500DD7A99 /* ConfigurationViewCell.swift */; };
-		7B817C96266A126500DD7A99 /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C83266A126500DD7A99 /* ProgressHUD.swift */; };
-		7B817C97266A126500DD7A99 /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B817C84266A126500DD7A99 /* CustomPickerCellView.swift */; };
 		7B817C9B266A126D00DD7A99 /* picker_example_gif_image.GIF in Resources */ = {isa = PBXBuildFile; fileRef = 7B817C9A266A126D00DD7A99 /* picker_example_gif_image.GIF */; };
 		7B8629A2237D0F6500F8A584 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A1237D0F6500F8A584 /* QuickLook.framework */; };
 		7B8629A4237D0F6C00F8A584 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A3237D0F6C00F8A584 /* AVKit.framework */; };
@@ -179,6 +160,41 @@
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
 		7B8BFB1C2585191D00510339 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */; };
 		7BAF876124C14D5C00ACAF85 /* HXCameraBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */; };
+		7BB613BF26A01B9700D38EBD /* 野孩子.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613AF26A01B9700D38EBD /* 野孩子.mp3 */; };
+		7BB613C026A01B9700D38EBD /* 嘉宾 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B026A01B9700D38EBD /* 嘉宾 */; };
+		7BB613C126A01B9700D38EBD /* 无赖.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B126A01B9700D38EBD /* 无赖.mp3 */; };
+		7BB613C226A01B9700D38EBD /* 爱你.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B226A01B9700D38EBD /* 爱你.mp3 */; };
+		7BB613C326A01B9700D38EBD /* 少女的祈祷 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B326A01B9700D38EBD /* 少女的祈祷 */; };
+		7BB613C426A01B9700D38EBD /* 时光正好.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B426A01B9700D38EBD /* 时光正好.mp3 */; };
+		7BB613C526A01B9700D38EBD /* 嘉宾.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B526A01B9700D38EBD /* 嘉宾.mp3 */; };
+		7BB613C626A01B9700D38EBD /* 天外来物.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B626A01B9700D38EBD /* 天外来物.mp3 */; };
+		7BB613C726A01B9700D38EBD /* 世间美好与你环环相扣 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B726A01B9700D38EBD /* 世间美好与你环环相扣 */; };
+		7BB613C826A01B9700D38EBD /* 爱你 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B826A01B9700D38EBD /* 爱你 */; };
+		7BB613C926A01B9700D38EBD /* 天外来物 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613B926A01B9700D38EBD /* 天外来物 */; };
+		7BB613CA26A01B9700D38EBD /* 野孩子 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613BA26A01B9700D38EBD /* 野孩子 */; };
+		7BB613CB26A01B9700D38EBD /* 无赖 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613BB26A01B9700D38EBD /* 无赖 */; };
+		7BB613CC26A01B9700D38EBD /* 时光正好 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613BC26A01B9700D38EBD /* 时光正好 */; };
+		7BB613CD26A01B9700D38EBD /* 世间美好与你环环相扣.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613BD26A01B9700D38EBD /* 世间美好与你环环相扣.mp3 */; };
+		7BB613CE26A01B9700D38EBD /* 少女的祈祷.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613BE26A01B9700D38EBD /* 少女的祈祷.mp3 */; };
+		7BB613E626A01BD800D38EBD /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D126A01BD800D38EBD /* UIDevice+Extension.swift */; };
+		7BB613E726A01BD800D38EBD /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D226A01BD800D38EBD /* UIFont+Extension.swift */; };
+		7BB613E826A01BD800D38EBD /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D326A01BD800D38EBD /* UIView+Extension.swift */; };
+		7BB613E926A01BD800D38EBD /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D426A01BD800D38EBD /* UIImage+Extension.swift */; };
+		7BB613EA26A01BD800D38EBD /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D526A01BD800D38EBD /* String+Extension.swift */; };
+		7BB613EB26A01BD800D38EBD /* RowTypeRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D626A01BD800D38EBD /* RowTypeRule.swift */; };
+		7BB613EC26A01BD800D38EBD /* Core+UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D726A01BD800D38EBD /* Core+UIColor.swift */; };
+		7BB613ED26A01BD800D38EBD /* EditorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613D926A01BD800D38EBD /* EditorConfigurationViewController.swift */; };
+		7BB613EE26A01BD800D38EBD /* AvatarPickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613DA26A01BD800D38EBD /* AvatarPickerResultViewController.swift */; };
+		7BB613EF26A01BD800D38EBD /* PickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613DB26A01BD800D38EBD /* PickerResultViewController.swift */; };
+		7BB613F026A01BD800D38EBD /* AvatarPickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613DC26A01BD800D38EBD /* AvatarPickerConfigurationViewController.swift */; };
+		7BB613F126A01BD800D38EBD /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613DD26A01BD800D38EBD /* HomeViewController.swift */; };
+		7BB613F226A01BD800D38EBD /* CustomPickerCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613DE26A01BD800D38EBD /* CustomPickerCellViewController.swift */; };
+		7BB613F326A01BD800D38EBD /* PickerColorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613DF26A01BD800D38EBD /* PickerColorConfigurationViewController.swift */; };
+		7BB613F426A01BD800D38EBD /* PickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613E026A01BD800D38EBD /* PickerConfigurationViewController.swift */; };
+		7BB613F526A01BD800D38EBD /* PickerResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BB613E126A01BD800D38EBD /* PickerResultViewController.xib */; };
+		7BB613F626A01BD800D38EBD /* ConfigurationViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613E326A01BD800D38EBD /* ConfigurationViewCell.swift */; };
+		7BB613F726A01BD800D38EBD /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613E426A01BD800D38EBD /* ProgressHUD.swift */; };
+		7BB613F826A01BD800D38EBD /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB613E526A01BD800D38EBD /* CustomPickerCellView.swift */; };
 		7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */; };
 		7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */; };
 		7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713C2505D24E00E2D05C /* HXPhotoEditMosaicView.xib */; };
@@ -646,25 +662,6 @@
 		7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		7B7E3E851E4AACD1002234EE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B7E3E8A1E4AACD1002234EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7B817C70266A126500DD7A99 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
-		7B817C71266A126500DD7A99 /* UIFont+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
-		7B817C72266A126500DD7A99 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
-		7B817C73266A126500DD7A99 /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
-		7B817C74266A126500DD7A99 /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
-		7B817C75266A126500DD7A99 /* RowTypeRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowTypeRule.swift; sourceTree = "<group>"; };
-		7B817C76266A126500DD7A99 /* Core+UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Core+UIColor.swift"; sourceTree = "<group>"; };
-		7B817C78266A126500DD7A99 /* EditorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B817C79266A126500DD7A99 /* AvatarPickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerResultViewController.swift; sourceTree = "<group>"; };
-		7B817C7A266A126500DD7A99 /* PickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerResultViewController.swift; sourceTree = "<group>"; };
-		7B817C7B266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B817C7C266A126500DD7A99 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		7B817C7D266A126500DD7A99 /* CustomPickerCellViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellViewController.swift; sourceTree = "<group>"; };
-		7B817C7E266A126500DD7A99 /* PickerColorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerColorConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B817C7F266A126500DD7A99 /* PickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B817C80266A126500DD7A99 /* PickerResultViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerResultViewController.xib; sourceTree = "<group>"; };
-		7B817C82266A126500DD7A99 /* ConfigurationViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewCell.swift; sourceTree = "<group>"; };
-		7B817C83266A126500DD7A99 /* ProgressHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
-		7B817C84266A126500DD7A99 /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
 		7B817C9A266A126D00DD7A99 /* picker_example_gif_image.GIF */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = picker_example_gif_image.GIF; sourceTree = "<group>"; };
 		7B8629A1237D0F6500F8A584 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		7B8629A3237D0F6C00F8A584 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
@@ -677,6 +674,41 @@
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
 		7BAF875F24C14D5C00ACAF85 /* HXCameraBottomView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCameraBottomView.h; sourceTree = "<group>"; };
 		7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCameraBottomView.m; sourceTree = "<group>"; };
+		7BB613AF26A01B9700D38EBD /* 野孩子.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "野孩子.mp3"; sourceTree = "<group>"; };
+		7BB613B026A01B9700D38EBD /* 嘉宾 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "嘉宾"; sourceTree = "<group>"; };
+		7BB613B126A01B9700D38EBD /* 无赖.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "无赖.mp3"; sourceTree = "<group>"; };
+		7BB613B226A01B9700D38EBD /* 爱你.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "爱你.mp3"; sourceTree = "<group>"; };
+		7BB613B326A01B9700D38EBD /* 少女的祈祷 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "少女的祈祷"; sourceTree = "<group>"; };
+		7BB613B426A01B9700D38EBD /* 时光正好.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "时光正好.mp3"; sourceTree = "<group>"; };
+		7BB613B526A01B9700D38EBD /* 嘉宾.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "嘉宾.mp3"; sourceTree = "<group>"; };
+		7BB613B626A01B9700D38EBD /* 天外来物.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "天外来物.mp3"; sourceTree = "<group>"; };
+		7BB613B726A01B9700D38EBD /* 世间美好与你环环相扣 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "世间美好与你环环相扣"; sourceTree = "<group>"; };
+		7BB613B826A01B9700D38EBD /* 爱你 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "爱你"; sourceTree = "<group>"; };
+		7BB613B926A01B9700D38EBD /* 天外来物 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "天外来物"; sourceTree = "<group>"; };
+		7BB613BA26A01B9700D38EBD /* 野孩子 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "野孩子"; sourceTree = "<group>"; };
+		7BB613BB26A01B9700D38EBD /* 无赖 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "无赖"; sourceTree = "<group>"; };
+		7BB613BC26A01B9700D38EBD /* 时光正好 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "时光正好"; sourceTree = "<group>"; };
+		7BB613BD26A01B9700D38EBD /* 世间美好与你环环相扣.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "世间美好与你环环相扣.mp3"; sourceTree = "<group>"; };
+		7BB613BE26A01B9700D38EBD /* 少女的祈祷.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "少女的祈祷.mp3"; sourceTree = "<group>"; };
+		7BB613D126A01BD800D38EBD /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
+		7BB613D226A01BD800D38EBD /* UIFont+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
+		7BB613D326A01BD800D38EBD /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
+		7BB613D426A01BD800D38EBD /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		7BB613D526A01BD800D38EBD /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		7BB613D626A01BD800D38EBD /* RowTypeRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowTypeRule.swift; sourceTree = "<group>"; };
+		7BB613D726A01BD800D38EBD /* Core+UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Core+UIColor.swift"; sourceTree = "<group>"; };
+		7BB613D926A01BD800D38EBD /* EditorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BB613DA26A01BD800D38EBD /* AvatarPickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerResultViewController.swift; sourceTree = "<group>"; };
+		7BB613DB26A01BD800D38EBD /* PickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerResultViewController.swift; sourceTree = "<group>"; };
+		7BB613DC26A01BD800D38EBD /* AvatarPickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BB613DD26A01BD800D38EBD /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		7BB613DE26A01BD800D38EBD /* CustomPickerCellViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellViewController.swift; sourceTree = "<group>"; };
+		7BB613DF26A01BD800D38EBD /* PickerColorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerColorConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BB613E026A01BD800D38EBD /* PickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BB613E126A01BD800D38EBD /* PickerResultViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerResultViewController.xib; sourceTree = "<group>"; };
+		7BB613E326A01BD800D38EBD /* ConfigurationViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewCell.swift; sourceTree = "<group>"; };
+		7BB613E426A01BD800D38EBD /* ProgressHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
+		7BB613E526A01BD800D38EBD /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
 		7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewProtocol.h; sourceTree = "<group>"; };
 		7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditGraffitiColorSizeView.xib; sourceTree = "<group>"; };
 		7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditStickerTrashView.xib; sourceTree = "<group>"; };
@@ -850,10 +882,11 @@
 		7B3EDEBF255E185900937B4A /* Swift */ = {
 			isa = PBXGroup;
 			children = (
-				7B817C6E266A126500DD7A99 /* Classes */,
+				7BB613CF26A01BD800D38EBD /* Classes */,
 				7B3EDEC0255E185900937B4A /* AppDelegate.swift */,
 				7B3EDEC6255E185900937B4A /* Main.storyboard */,
 				7B3EDEC9255E185B00937B4A /* Assets.xcassets */,
+				7BB613AE26A01B9700D38EBD /* Music */,
 				7B817C9A266A126D00DD7A99 /* picker_example_gif_image.GIF */,
 				7B02F2F32656509100FA94CD /* picker_example_image.JPG */,
 				7B02F2F42656509200FA94CD /* videoeditormatter.MP4 */,
@@ -1188,52 +1221,75 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		7B817C6E266A126500DD7A99 /* Classes */ = {
+		7BB613AE26A01B9700D38EBD /* Music */ = {
 			isa = PBXGroup;
 			children = (
-				7B817C6F266A126500DD7A99 /* Extension */,
-				7B817C77266A126500DD7A99 /* Controller */,
-				7B817C81266A126500DD7A99 /* View */,
+				7BB613AF26A01B9700D38EBD /* 野孩子.mp3 */,
+				7BB613B026A01B9700D38EBD /* 嘉宾 */,
+				7BB613B126A01B9700D38EBD /* 无赖.mp3 */,
+				7BB613B226A01B9700D38EBD /* 爱你.mp3 */,
+				7BB613B326A01B9700D38EBD /* 少女的祈祷 */,
+				7BB613B426A01B9700D38EBD /* 时光正好.mp3 */,
+				7BB613B526A01B9700D38EBD /* 嘉宾.mp3 */,
+				7BB613B626A01B9700D38EBD /* 天外来物.mp3 */,
+				7BB613B726A01B9700D38EBD /* 世间美好与你环环相扣 */,
+				7BB613B826A01B9700D38EBD /* 爱你 */,
+				7BB613B926A01B9700D38EBD /* 天外来物 */,
+				7BB613BA26A01B9700D38EBD /* 野孩子 */,
+				7BB613BB26A01B9700D38EBD /* 无赖 */,
+				7BB613BC26A01B9700D38EBD /* 时光正好 */,
+				7BB613BD26A01B9700D38EBD /* 世间美好与你环环相扣.mp3 */,
+				7BB613BE26A01B9700D38EBD /* 少女的祈祷.mp3 */,
+			);
+			path = Music;
+			sourceTree = "<group>";
+		};
+		7BB613CF26A01BD800D38EBD /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				7BB613D826A01BD800D38EBD /* Controller */,
+				7BB613D026A01BD800D38EBD /* Extension */,
+				7BB613E226A01BD800D38EBD /* View */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		7B817C6F266A126500DD7A99 /* Extension */ = {
+		7BB613D026A01BD800D38EBD /* Extension */ = {
 			isa = PBXGroup;
 			children = (
-				7B817C70266A126500DD7A99 /* UIDevice+Extension.swift */,
-				7B817C71266A126500DD7A99 /* UIFont+Extension.swift */,
-				7B817C72266A126500DD7A99 /* UIView+Extension.swift */,
-				7B817C73266A126500DD7A99 /* UIImage+Extension.swift */,
-				7B817C74266A126500DD7A99 /* String+Extension.swift */,
-				7B817C75266A126500DD7A99 /* RowTypeRule.swift */,
-				7B817C76266A126500DD7A99 /* Core+UIColor.swift */,
+				7BB613D726A01BD800D38EBD /* Core+UIColor.swift */,
+				7BB613D626A01BD800D38EBD /* RowTypeRule.swift */,
+				7BB613D526A01BD800D38EBD /* String+Extension.swift */,
+				7BB613D126A01BD800D38EBD /* UIDevice+Extension.swift */,
+				7BB613D226A01BD800D38EBD /* UIFont+Extension.swift */,
+				7BB613D426A01BD800D38EBD /* UIImage+Extension.swift */,
+				7BB613D326A01BD800D38EBD /* UIView+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
 		};
-		7B817C77266A126500DD7A99 /* Controller */ = {
+		7BB613D826A01BD800D38EBD /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				7B817C78266A126500DD7A99 /* EditorConfigurationViewController.swift */,
-				7B817C79266A126500DD7A99 /* AvatarPickerResultViewController.swift */,
-				7B817C7A266A126500DD7A99 /* PickerResultViewController.swift */,
-				7B817C7B266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift */,
-				7B817C7C266A126500DD7A99 /* HomeViewController.swift */,
-				7B817C7D266A126500DD7A99 /* CustomPickerCellViewController.swift */,
-				7B817C7E266A126500DD7A99 /* PickerColorConfigurationViewController.swift */,
-				7B817C7F266A126500DD7A99 /* PickerConfigurationViewController.swift */,
-				7B817C80266A126500DD7A99 /* PickerResultViewController.xib */,
+				7BB613DC26A01BD800D38EBD /* AvatarPickerConfigurationViewController.swift */,
+				7BB613DA26A01BD800D38EBD /* AvatarPickerResultViewController.swift */,
+				7BB613DE26A01BD800D38EBD /* CustomPickerCellViewController.swift */,
+				7BB613D926A01BD800D38EBD /* EditorConfigurationViewController.swift */,
+				7BB613DD26A01BD800D38EBD /* HomeViewController.swift */,
+				7BB613DF26A01BD800D38EBD /* PickerColorConfigurationViewController.swift */,
+				7BB613E026A01BD800D38EBD /* PickerConfigurationViewController.swift */,
+				7BB613DB26A01BD800D38EBD /* PickerResultViewController.swift */,
+				7BB613E126A01BD800D38EBD /* PickerResultViewController.xib */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		7B817C81266A126500DD7A99 /* View */ = {
+		7BB613E226A01BD800D38EBD /* View */ = {
 			isa = PBXGroup;
 			children = (
-				7B817C82266A126500DD7A99 /* ConfigurationViewCell.swift */,
-				7B817C83266A126500DD7A99 /* ProgressHUD.swift */,
-				7B817C84266A126500DD7A99 /* CustomPickerCellView.swift */,
+				7BB613E326A01BD800D38EBD /* ConfigurationViewCell.swift */,
+				7BB613E526A01BD800D38EBD /* CustomPickerCellView.swift */,
+				7BB613E426A01BD800D38EBD /* ProgressHUD.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1359,7 +1415,7 @@
 				7B3EDEBB255E185900937B4A /* Frameworks */,
 				7B3EDEBC255E185900937B4A /* Resources */,
 				7BC2310925B189A100434BBB /* Embed Frameworks */,
-				618458B8417175BE6C8AD4D8 /* [CP] Embed Pods Frameworks */,
+				130D04C7C3C6DE18018BCC51 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1459,13 +1515,29 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7BB613CB26A01B9700D38EBD /* 无赖 in Resources */,
+				7BB613C326A01B9700D38EBD /* 少女的祈祷 in Resources */,
+				7BB613C126A01B9700D38EBD /* 无赖.mp3 in Resources */,
+				7BB613F526A01BD800D38EBD /* PickerResultViewController.xib in Resources */,
+				7BB613CC26A01B9700D38EBD /* 时光正好 in Resources */,
 				7B3EDECD255E185B00937B4A /* LaunchScreen.storyboard in Resources */,
+				7BB613C426A01B9700D38EBD /* 时光正好.mp3 in Resources */,
+				7BB613C026A01B9700D38EBD /* 嘉宾 in Resources */,
+				7BB613C526A01B9700D38EBD /* 嘉宾.mp3 in Resources */,
+				7BB613C726A01B9700D38EBD /* 世间美好与你环环相扣 in Resources */,
+				7BB613CE26A01B9700D38EBD /* 少女的祈祷.mp3 in Resources */,
+				7BB613C926A01B9700D38EBD /* 天外来物 in Resources */,
+				7BB613CA26A01B9700D38EBD /* 野孩子 in Resources */,
 				7B817C9B266A126D00DD7A99 /* picker_example_gif_image.GIF in Resources */,
-				7B817C94266A126500DD7A99 /* PickerResultViewController.xib in Resources */,
 				7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */,
+				7BB613BF26A01B9700D38EBD /* 野孩子.mp3 in Resources */,
 				7B3EDEC8255E185900937B4A /* Main.storyboard in Resources */,
+				7BB613C826A01B9700D38EBD /* 爱你 in Resources */,
+				7BB613C626A01B9700D38EBD /* 天外来物.mp3 in Resources */,
 				7B02F2F52656509200FA94CD /* picker_example_image.JPG in Resources */,
 				7B02F2F62656509200FA94CD /* videoeditormatter.MP4 in Resources */,
+				7BB613CD26A01B9700D38EBD /* 世间美好与你环环相扣.mp3 in Resources */,
+				7BB613C226A01B9700D38EBD /* 爱你.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1517,6 +1589,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		130D04C7C3C6DE18018BCC51 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/HXPHPicker/HXPHPicker.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HXPHPicker.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		434547430CF3E6D5B728C923 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1537,26 +1629,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		618458B8417175BE6C8AD4D8 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/HXPHPicker/HXPHPicker.framework",
-				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HXPHPicker.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		EB102FF5A30D8D584CC958B5 /* [CP] Check Pods Manifest.lock */ = {
@@ -1588,25 +1660,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B817C86266A126500DD7A99 /* UIFont+Extension.swift in Sources */,
-				7B817C97266A126500DD7A99 /* CustomPickerCellView.swift in Sources */,
-				7B817C8A266A126500DD7A99 /* RowTypeRule.swift in Sources */,
-				7B817C96266A126500DD7A99 /* ProgressHUD.swift in Sources */,
-				7B817C8E266A126500DD7A99 /* PickerResultViewController.swift in Sources */,
+				7BB613E726A01BD800D38EBD /* UIFont+Extension.swift in Sources */,
+				7BB613F826A01BD800D38EBD /* CustomPickerCellView.swift in Sources */,
+				7BB613EB26A01BD800D38EBD /* RowTypeRule.swift in Sources */,
+				7BB613F726A01BD800D38EBD /* ProgressHUD.swift in Sources */,
+				7BB613EF26A01BD800D38EBD /* PickerResultViewController.swift in Sources */,
 				7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */,
-				7B817C8C266A126500DD7A99 /* EditorConfigurationViewController.swift in Sources */,
-				7B817C88266A126500DD7A99 /* UIImage+Extension.swift in Sources */,
-				7B817C87266A126500DD7A99 /* UIView+Extension.swift in Sources */,
-				7B817C93266A126500DD7A99 /* PickerConfigurationViewController.swift in Sources */,
-				7B817C89266A126500DD7A99 /* String+Extension.swift in Sources */,
-				7B817C8F266A126500DD7A99 /* AvatarPickerConfigurationViewController.swift in Sources */,
-				7B817C91266A126500DD7A99 /* CustomPickerCellViewController.swift in Sources */,
-				7B817C8B266A126500DD7A99 /* Core+UIColor.swift in Sources */,
-				7B817C8D266A126500DD7A99 /* AvatarPickerResultViewController.swift in Sources */,
-				7B817C90266A126500DD7A99 /* HomeViewController.swift in Sources */,
-				7B817C95266A126500DD7A99 /* ConfigurationViewCell.swift in Sources */,
-				7B817C92266A126500DD7A99 /* PickerColorConfigurationViewController.swift in Sources */,
-				7B817C85266A126500DD7A99 /* UIDevice+Extension.swift in Sources */,
+				7BB613ED26A01BD800D38EBD /* EditorConfigurationViewController.swift in Sources */,
+				7BB613E926A01BD800D38EBD /* UIImage+Extension.swift in Sources */,
+				7BB613E826A01BD800D38EBD /* UIView+Extension.swift in Sources */,
+				7BB613F426A01BD800D38EBD /* PickerConfigurationViewController.swift in Sources */,
+				7BB613EA26A01BD800D38EBD /* String+Extension.swift in Sources */,
+				7BB613F026A01BD800D38EBD /* AvatarPickerConfigurationViewController.swift in Sources */,
+				7BB613F226A01BD800D38EBD /* CustomPickerCellViewController.swift in Sources */,
+				7BB613EC26A01BD800D38EBD /* Core+UIColor.swift in Sources */,
+				7BB613EE26A01BD800D38EBD /* AvatarPickerResultViewController.swift in Sources */,
+				7BB613F126A01BD800D38EBD /* HomeViewController.swift in Sources */,
+				7BB613F626A01BD800D38EBD /* ConfigurationViewCell.swift in Sources */,
+				7BB613F326A01BD800D38EBD /* PickerColorConfigurationViewController.swift in Sources */,
+				7BB613E626A01BD800D38EBD /* UIDevice+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

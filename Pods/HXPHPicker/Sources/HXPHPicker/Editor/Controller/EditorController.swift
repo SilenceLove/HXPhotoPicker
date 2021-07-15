@@ -14,18 +14,24 @@ import Kingfisher
 
 open class EditorController: UINavigationController {
     
-    public weak var videoEditorDelegate: VideoEditorViewControllerDelegate? {
+    public weak var photoEditorDelegate: PhotoEditorViewControllerDelegate? {
         didSet {
-            let vc = viewControllers.first as? VideoEditorViewController
-            vc?.delegate = videoEditorDelegate
+            photoEditor?.delegate = photoEditorDelegate
         }
     }
     
-    public weak var photoEditorDelegate: PhotoEditorViewControllerDelegate? {
+    public weak var videoEditorDelegate: VideoEditorViewControllerDelegate? {
         didSet {
-            let vc = viewControllers.first as? PhotoEditorViewController
-            vc?.delegate = photoEditorDelegate
+            videoEditor?.delegate = videoEditorDelegate
         }
+    }
+    
+    public var photoEditor: PhotoEditorViewController? {
+        viewControllers.first as? PhotoEditorViewController
+    }
+    
+    public var videoEditor: VideoEditorViewController? {
+        viewControllers.first as? VideoEditorViewController
     }
     
     /// 当前编辑类型

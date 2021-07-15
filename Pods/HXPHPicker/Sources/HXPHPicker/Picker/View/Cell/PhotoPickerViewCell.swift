@@ -85,7 +85,8 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
                 }else {
                     assetTypeLb.text = nil
                     PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
-                        if let self = self, self.photoAsset == asset {
+                        guard let self = self else { return }
+                        if self.photoAsset == asset {
                             self.assetTypeLb.text = asset.videoTime
                         }
                     }

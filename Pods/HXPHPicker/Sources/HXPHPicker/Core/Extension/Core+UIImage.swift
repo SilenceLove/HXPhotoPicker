@@ -53,12 +53,25 @@ extension UIImage {
         }
         return self.scaleToFillSize(size: imageSize)
     }
-    func scaleToFillSize(size: CGSize) -> UIImage? {
+    func scaleToFillSize(size: CGSize, equalRatio: Bool = false) -> UIImage? {
         if __CGSizeEqualToSize(self.size, size) {
             return self
         }
+        let rect: CGRect
+        if size.width / size.height != width / height && equalRatio {
+            let scale = size.width / width
+            var scaleHeight = scale * height
+            var scaleWidth = size.width
+            if scaleHeight < size.height {
+                scaleWidth = size.height / scaleHeight * size.width
+                scaleHeight = size.height
+            }
+            rect = CGRect(x: -(scaleWidth - size.height) * 0.5, y: -(scaleHeight - size.height) * 0.5, width: scaleWidth, height: scaleHeight)
+        }else {
+            rect = CGRect(origin: .zero, size: size)
+        }
         UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
-        self.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        self.draw(in: rect)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
@@ -74,7 +87,7 @@ extension UIImage {
         return image
     }
     
-    class func image(for color: UIColor?, havingSize: CGSize) -> UIImage? {
+    class func image(for color: UIColor?, havingSize: CGSize, radius: CGFloat = 0) -> UIImage? {
         if let color = color {
             let rect: CGRect
             if havingSize.equalTo(CGSize.zero) {
@@ -82,10 +95,12 @@ extension UIImage {
             }else {
                 rect = CGRect(x: 0, y: 0, width: havingSize.width, height: havingSize.height)
             }
-            UIGraphicsBeginImageContext(rect.size)
+            UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.main.scale)
             let context = UIGraphicsGetCurrentContext()
             context?.setFillColor(color.cgColor)
-            context?.fill(rect)
+            let path = UIBezierPath(roundedRect: rect, cornerRadius: radius).cgPath
+            context?.addPath(path)
+            context?.fillPath()
         
             let image = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()

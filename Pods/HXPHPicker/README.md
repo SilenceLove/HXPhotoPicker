@@ -31,8 +31,10 @@
     - [ ] 贴纸
     - [ ] 文字
     - [x] 裁剪
-    - [ ] 马赛克
+    - [x] 马赛克
+    - [x] 滤镜
 - [x] 编辑视频（支持网络资源）
+    - [x] 配乐
     - [x] 裁剪
 - [x] 相册展现方式
     - [x] 单独列表
@@ -65,7 +67,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.1.1"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.1.3"))
 ]
 ```
 
@@ -151,6 +153,8 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v1.1.3](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#113) | 2021-07-14 | 12.5.1 | 5.3 | 10.0+ |
+| [v1.1.2](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#112) | 2021-06-30 | 12.5.1 | 5.3 | 10.0+ |
 | [v1.1.1](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#111) | 2021-06-17 | 12.2 | 5.3 | 10.0+ |
 | [v1.1.0](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#110) | 2021-06-08 | 12.2 | 5.3 | 10.0+ |
 | [v1.0.9](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#109) | 2021-06-04 | 12.2 | 5.3 | 10.0+ |

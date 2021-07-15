@@ -15,7 +15,7 @@ public class SelectBoxConfiguration {
     public var size: CGSize = CGSize(width: 25, height: 25)
     
     /// 选择框的样式
-    public var style: PhotoPickerSelectBoxView.Style = .number
+    public var style: SelectBoxView.Style = .number
     
     /// 标题的文字大小
     public var titleFontSize: CGFloat = 16

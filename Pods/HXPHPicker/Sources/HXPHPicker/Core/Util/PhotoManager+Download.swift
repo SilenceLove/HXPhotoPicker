@@ -8,6 +8,46 @@
 import UIKit
 
 extension PhotoManager: URLSessionDownloadDelegate {
+    
+    @discardableResult
+    public func downloadTask(with url: URL,
+                      progress: @escaping (Double, URLSessionDownloadTask) -> Void,
+                      completionHandler: @escaping (URL?, Error?) -> Void) -> URLSessionDownloadTask {
+        let key = url.absoluteString
+        downloadProgresss[key] = progress
+        downloadCompletions[key] = completionHandler
+        if let task = downloadTasks[key] {
+            if task.state == .suspended {
+                task.resume()
+                return task
+            }
+        }
+        let task = downloadSession.downloadTask(with: url)
+        downloadTasks[key] = task
+        task.resume()
+        return task
+    }
+    
+    public func suspendTask(_ url: URL) {
+        let key = url.absoluteString
+        let task = downloadTasks[key]
+        if task?.state.rawValue == 1 {
+            return
+        }
+        task?.suspend()
+        downloadCompletions.removeValue(forKey: key)
+        downloadProgresss.removeValue(forKey: key)
+    }
+    
+    public func removeTask(_ url: URL) {
+        let key = url.absoluteString
+        let task = downloadTasks[key]
+        task?.cancel()
+        downloadCompletions.removeValue(forKey: key)
+        downloadProgresss.removeValue(forKey: key)
+        downloadTasks.removeValue(forKey: key)
+    }
+    
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         let responseURL = downloadTask.currentRequest!.url!
         let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)

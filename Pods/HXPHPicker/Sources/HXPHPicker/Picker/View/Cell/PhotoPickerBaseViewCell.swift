@@ -73,7 +73,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     
     /// 获取图片，重写此方法可以修改图片
     open func requestThumbnailImage() {
-        requestThumbnailImage(targetWidth: width * 2)
+        requestThumbnailImage(targetWidth: PhotoManager.shared.targetWidth <= 0 ? width * 2 : PhotoManager.shared.targetWidth)
     }
     
     /// 获取图片，重写此方法可以修改图片

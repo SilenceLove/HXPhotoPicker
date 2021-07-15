@@ -14,13 +14,20 @@ protocol PhotoPreviewVideoViewDelegate: AnyObject {
     func videoView(stopPlay videoView: VideoPlayerView)
     func videoView(showPlayButton videoView: VideoPlayerView)
     func videoView(hidePlayButton videoView: VideoPlayerView)
+    
+    func videoView(resetPlay videoView: VideoPlayerView)
+    func videoView(_ videoView: VideoPlayerView, readyToPlay duration: CGFloat)
+    func videoView(_ videoView: VideoPlayerView, didChangedBuffer duration: CGFloat)
+    func videoView(_ videoView: VideoPlayerView, didChangedPlayerTime duration: CGFloat)
 }
 
 class PhotoPreviewVideoView: VideoPlayerView {
     weak var delegate: PhotoPreviewVideoViewDelegate?
     override var avAsset: AVAsset? {
         didSet {
+            do { try AVAudioSession.sharedInstance().setCategory(.playback) } catch {}
             delegate?.videoView(showPlayButton: self)
+            delegate?.videoView(resetPlay: self)
             let playerItem = AVPlayerItem.init(asset: avAsset!)
             player.replaceCurrentItem(with: playerItem)
             playerLayer.player = player
@@ -33,6 +40,8 @@ class PhotoPreviewVideoView: VideoPlayerView {
     var enterPlayGroundShouldPlay: Bool = false
     var canRemovePlayerObservers: Bool = false
     var videoPlayType: PhotoPreviewViewController.VideoPlayType = .normal
+    
+    var playbackTimeObserver: Any?
     
     override init() {
         super.init()
@@ -115,6 +124,10 @@ class PhotoPreviewVideoView: VideoPlayerView {
         if !canRemovePlayerObservers {
             return
         }
+        if let timeObserver = playbackTimeObserver {
+            player.removeTimeObserver(timeObserver)
+            playbackTimeObserver = nil
+        }
         player.currentItem?.removeObserver(self, forKeyPath: "status", context: nil)
         player.currentItem?.removeObserver(self, forKeyPath: "loadedTimeRanges", context: nil)
         player.currentItem?.removeObserver(self, forKeyPath: "playbackBufferEmpty", context: nil)
@@ -128,20 +141,39 @@ class PhotoPreviewVideoView: VideoPlayerView {
                 return
             }
             if keyPath == "status" {
-                switch player.currentItem!.status {
+                guard let playerItem = player.currentItem else {
+                    return
+                }
+                switch playerItem.status {
                 case AVPlayerItem.Status.readyToPlay:
                     // 可以播放了
+                    ProgressHUD.hide(forView: self, animated: true)
+                    delegate?.videoView(self, readyToPlay: CGFloat(CMTimeGetSeconds(playerItem.duration)))
+                    if playbackTimeObserver == nil {
+                        playbackTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTimeMake(value: 1, timescale: 10), queue: .main) { [weak self] (time) in
+                            guard let self = self else { return }
+                            let currentTime = CMTimeGetSeconds(time)
+                            self.delegate?.videoView(self, didChangedPlayerTime: CGFloat(currentTime))
+                        }
+                    }
                     break
                 case AVPlayerItem.Status.failed:
                     // 初始化失败
-                    
+                    cancelPlayer()
+                    ProgressHUD.showWarning(addedTo: self, text: "视频加载失败!", animated: true, delayHide: 1.5)
                     break
                 default:
-                    // 未知状态
                     break
                 }
             }else if keyPath == "loadedTimeRanges" {
-                
+                let loadedTimeRanges = player.currentItem?.loadedTimeRanges
+                guard let timeRange = loadedTimeRanges?.first?.timeRangeValue else {
+                    return
+                }
+                let startSeconds = CMTimeGetSeconds(timeRange.start)
+                let durationSeconds = CMTimeGetSeconds(timeRange.duration)
+                let bufferSeconds = startSeconds + durationSeconds
+                delegate?.videoView(self, didChangedBuffer: CGFloat(bufferSeconds))
             }else if keyPath == "playbackBufferEmpty" {
                 
             }else if keyPath == "playbackLikelyToKeepUp" {
@@ -170,6 +202,26 @@ class PhotoPreviewVideoView: VideoPlayerView {
         
         if videoPlayType == .auto {
             startPlay()
+        }
+    }
+    
+    func seek(to time: TimeInterval, isPlay: Bool) {
+        guard let playerItem = player.currentItem else {
+            return
+        }
+        if !isPlay {
+            stopPlay()
+        }
+        var seconds = time
+        if time < 0 {
+            seconds = 0
+        }else if time > CMTimeGetSeconds(playerItem.duration) {
+            seconds = CMTimeGetSeconds(playerItem.duration)
+        }
+        player.seek(to: CMTimeMakeWithSeconds(seconds, preferredTimescale: playerItem.duration.timescale), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] isFinished in
+            if isFinished && isPlay {
+                self?.startPlay()
+            }
         }
     }
     

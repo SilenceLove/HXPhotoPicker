@@ -9,7 +9,7 @@
 "预览" = "Pratinjau";
 "编辑" = "edit";
 "返回" = "kembali";
-"还原" = "pengurangan"
+"还原" = "pengurangan";
 "没有可选资源" = "Tidak ada sumber daya opsional";
 "照片和视频不能同时选择" = "Foto dan video tidak dapat dipilih secara bersamaan";
 "最多只能选择%d张照片" = "Anda hanya dapat memilih maksimal %d foto";
@@ -43,6 +43,20 @@
 "视频获取失败!" = "Akuisisi video gagal!";
 "图片下载中" = "Pengunduhan gambar";
 "视频下载中" = "Pengunduhan video";
+"设置失败!" = "Penyiapan gagal!";
+"老电影" = "film lama";
+"怀旧" = "Nostalgia";
+"黑白" = "Hitam dan putih";
+"色调" = "nada";
+"模糊" = "buram";
+"岁月" = "tahun";
+"单色" = "satu warna";
+"褪色" = "luntur";
+"冲印" = "Mencetak";
+"铬黄" = "Kuning Krom";
+"暂无配乐" = "Tidak ada soundtrack";
+"配乐" = "Soundtrack";
+"视频原声" = "Soundtrack video";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

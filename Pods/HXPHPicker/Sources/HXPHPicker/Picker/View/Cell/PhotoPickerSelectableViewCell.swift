@@ -10,8 +10,8 @@ import UIKit
 open class PhotoPickerSelectableViewCell : PhotoPickerViewCell {
     
     /// 选择按钮
-    public lazy var selectControl: PhotoPickerSelectBoxView = {
-        let selectControl = PhotoPickerSelectBoxView.init()
+    public lazy var selectControl: SelectBoxView = {
+        let selectControl = SelectBoxView.init()
         selectControl.backgroundColor = .clear
         selectControl.addTarget(self, action: #selector(didSelectControlClick(control:)), for: .touchUpInside)
         return selectControl
@@ -34,7 +34,7 @@ open class PhotoPickerSelectableViewCell : PhotoPickerViewCell {
     
     /// 选择框点击事件
     /// - Parameter control: 选择框
-    @objc open func didSelectControlClick(control: PhotoPickerSelectBoxView) {
+    @objc open func didSelectControlClick(control: SelectBoxView) {
         selectedAction(self.selectControl.isSelected)
     }
     

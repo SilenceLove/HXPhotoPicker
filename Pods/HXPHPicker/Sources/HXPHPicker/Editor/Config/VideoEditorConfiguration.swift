@@ -18,6 +18,17 @@ open class VideoEditorConfiguration: EditorConfiguration {
     /// 当编辑控制器默认状态是裁剪状态时是否必须裁剪视频
     public var mustBeTailored: Bool = true
     
+    /// 配乐配置
+    public lazy var musicConfig: MusicConfig = .init(infos: [])
+    
+    public struct MusicConfig {
+        /// 配乐信息
+        public let infos: [VideoEditorMusicInfo]
+        public init(infos: [VideoEditorMusicInfo]) {
+            self.infos = infos
+        }
+    }
+    
     /// 裁剪配置
     public lazy var cropping: VideoCroppingConfiguration = .init()
     
@@ -27,17 +38,21 @@ open class VideoEditorConfiguration: EditorConfiguration {
     /// 工具视图配置
     public lazy var toolView: EditorToolViewConfiguration = {
         let config = EditorToolViewConfiguration.init()
-        let cropOption = EditorToolOptions.init(imageName: "hx_editor_video_crop", type: .cropping)
-        let options: [EditorToolOptions] = [cropOption]
-        config.toolOptions = options
+        let musicOption = EditorToolOptions.init(imageName: "hx_editor_tools_music",
+                                                 type: .music)
+        let cropOption = EditorToolOptions.init(imageName: "hx_editor_video_crop",
+                                                type: .cropping) 
+        config.toolOptions = [musicOption, cropOption]
         return config
     }()
+    
     
     func mutableCopy() -> Any {
         let config = VideoEditorConfiguration.init()
         config.exportPresetName = exportPresetName
         config.defaultState = defaultState
         config.mustBeTailored = mustBeTailored
+        config.musicConfig = musicConfig
         config.cropping = cropping
         config.cropView = cropView
         config.toolView = toolView

@@ -43,11 +43,21 @@ public extension VideoEditorViewController {
     }
 }
 
-/// 编辑工具模型
+/// 编辑工具
 public extension EditorToolOptions {
     enum `Type` {
-        /// 涂鸦
+        /// photo - 涂鸦
         case graffiti
+        
+        /// photo - 马赛克
+        case mosaic
+        
+        /// photo - 滤镜
+        case filter
+        
+        /// video - 配乐
+        case music
+        
         /// 裁剪
         case cropping
     }
@@ -102,4 +112,3 @@ extension EditorImageResizerView {
         case horizontal
     }
 }
-

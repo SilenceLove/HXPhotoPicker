@@ -57,6 +57,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         pickerController.view.addGestureRecognizer(panGestureRecognizer)
     }
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if otherGestureRecognizer is UITapGestureRecognizer && otherGestureRecognizer.view is UIScrollView {
+            return false
+        }
         return !(previewViewController?.collectionView.isDragging ?? false)
     }
     

@@ -1,5 +1,5 @@
 //
-//  PhotoPickerSelectBoxView.swift
+//  SelectBoxView.swift
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
@@ -8,7 +8,13 @@
 
 import UIKit
 
-public class PhotoPickerSelectBoxView: UIControl {
+public class SelectBoxView: UIControl {
+    
+    public enum Style: Int {
+        case number //!< 数字
+        case tick   //!< √
+    }
+    
     public var text: String = "0" {
         didSet {
             if config.style == .number {

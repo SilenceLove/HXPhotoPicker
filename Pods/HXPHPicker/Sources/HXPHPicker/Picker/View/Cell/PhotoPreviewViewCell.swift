@@ -17,7 +17,7 @@ protocol PhotoPreviewViewCellDelegate: NSObjectProtocol {
     func photoCell(networkImagedownloadFailed photoCell: PhotoPreviewViewCell)
 }
 
-class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
+open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     
     weak var delegate: PhotoPreviewViewCellDelegate?
     
@@ -59,7 +59,7 @@ class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     func initView() {
@@ -127,15 +127,15 @@ class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
             scrollView.zoom(to: CGRect(x: touchPoint.x - zoomWidth / 2, y: touchPoint.y - zoomHeight / 2, width: zoomWidth, height: zoomHeight), animated: true)
         }
     }
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return scrollContentView
     }
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
         let offsetX = (scrollView.width > scrollView.contentSize.width) ? (scrollView.width - scrollView.contentSize.width) * 0.5 : 0.0;
         let offsetY = (scrollView.height > scrollView.contentSize.height) ? (scrollView.height - scrollView.contentSize.height) * 0.5 : 0.0;
         scrollContentView.center = CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX, y: scrollView.contentSize.height * 0.5 + offsetY);
     }
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if !scrollView.isTracking && scrollView.isDecelerating {
             allowInteration = false
         }
@@ -145,13 +145,13 @@ class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
 //            allowInteration = true
 //        }
 //    }
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         if scrollView.contentOffset.y >= -40 {
             allowInteration = true
         }
     }
     
-    override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         if scrollView.frame.equalTo(bounds) == false {
             scrollView.frame = bounds

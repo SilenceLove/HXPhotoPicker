@@ -17,7 +17,6 @@ class HomeViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-        
     }
     
     // MARK: - Table view data source

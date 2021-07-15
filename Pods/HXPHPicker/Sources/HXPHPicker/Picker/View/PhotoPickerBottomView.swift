@@ -214,8 +214,8 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         return originalTitleLb
     }()
     
-    lazy var boxControl: PhotoPickerSelectBoxView = {
-        let boxControl = PhotoPickerSelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
+    lazy var boxControl: SelectBoxView = {
+        let boxControl = SelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
         boxControl.config = config.originalSelectBox
         boxControl.backgroundColor = UIColor.clear
         return boxControl

@@ -11,6 +11,17 @@ import Photos
 import PhotosUI
 
 extension PhotoManager {
+    struct AssociatedKeys {
+        static var targetWidthKey: String = "targetWidth"
+    }
+    var targetWidth: CGFloat {
+        get {
+            objc_getAssociatedObject(self, &AssociatedKeys.targetWidthKey) as? CGFloat ?? 0
+        }
+        set {
+            objc_setAssociatedObject(self, &AssociatedKeys.targetWidthKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
     
     var cameraAlbumLocalIdentifierSelectOptions : PickerAssetOptions? {
         let identifierType = UserDefaults.standard.integer(forKey: PhotoManager.CameraAlbumLocal.identifierType.rawValue)

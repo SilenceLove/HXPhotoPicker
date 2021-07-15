@@ -9,7 +9,7 @@
 import UIKit
 import Photos
 
-public typealias PhotoAssetICloudHandlerHandler = (PhotoAsset, PHImageRequestID) -> Void
+public typealias PhotoAssetICloudHandler = (PhotoAsset, PHImageRequestID) -> Void
 public typealias PhotoAssetProgressHandler = (PhotoAsset, Double) -> Void
 public typealias PhotoAssetFailureHandler = (PhotoAsset, [AnyHashable : Any]?) -> Void
 
@@ -106,10 +106,9 @@ open class PhotoAsset: Equatable {
         self.localImageAsset = localImageAsset
         mediaType = .photo
         if let imageData = localImageAsset.imageData {
-            mediaSubType = imageData.isGif == true ? .localGifImage : .localImage
+            mediaSubType = imageData.isGif ? .localGifImage : .localImage
         }else if let imageURL = localImageAsset.imageURL {
-            let suffix = imageURL.lastPathComponent
-            mediaSubType = (suffix.hasSuffix("gif") || suffix.hasSuffix("GIF")) ? .localGifImage : .localImage
+            mediaSubType = imageURL.isGif ? .localGifImage : .localImage
         }else {
             mediaSubType = .localImage
         }
@@ -525,18 +524,21 @@ extension PhotoAsset {
             DispatchQueue.global().async {
                 if let imageData = self.localImageAsset?.imageData {
                     resultHandler(imageData, self)
+                    return
                 }else if let imageURL = self.localImageAsset?.imageURL {
                     do {
                         let imageData = try Data.init(contentsOf: imageURL)
                         DispatchQueue.main.async {
                             resultHandler(imageData, self)
                         }
+                        return
                     }catch { }
                 }else if let localImage = self.localImageAsset?.image {
-                        let imageData = PhotoTools.getImageData(for: localImage)
-                        DispatchQueue.main.async {
-                            resultHandler(imageData, self)
-                        }
+                    let imageData = PhotoTools.getImageData(for: localImage)
+                    DispatchQueue.main.async {
+                        resultHandler(imageData, self)
+                    }
+                    return
                 }else {
                     if self.isNetworkAsset {
                         #if canImport(Kingfisher)

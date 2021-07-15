@@ -28,6 +28,14 @@ public class PhotoListCellConfiguration {
     /// 暗黑风格下背景颜色
     public var backgroundDarkColor: UIColor?
     
+    /// 缩略图的清晰度，越大越清楚，越小越模糊
+    /// 为0时，默认为 cell.width * 2
+    public var targetWidth: CGFloat = 0 {
+        didSet {
+            PhotoManager.shared.targetWidth = targetWidth
+        }
+    }
+    
     /// cell在不可选择状态下是否显示禁用遮罩
     /// 如果限制了照片/视频的文件大小，则无效
     public var showDisableMask: Bool = true

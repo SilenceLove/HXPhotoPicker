@@ -121,6 +121,52 @@ extension PickerConfigurationViewController: PhotoPickerControllerDelegate {
     func pickerController(didCancel pickerController: PhotoPickerController) {
         pickerController.dismiss(animated: true, completion: nil)
     }
+    
+    func pickerController(_ pickerController: PhotoPickerController, videoEditor videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+        var musics: [VideoEditorMusicInfo] = []
+        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
+        let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
+        let music1 = VideoEditorMusicInfo.init(audioPath: audioUrl1.path,
+                                               lrcPath: lyricUrl1.path)
+        musics.append(music1)
+        let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
+        let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
+        let music2 = VideoEditorMusicInfo.init(audioPath: audioUrl2.path,
+                                               lrcPath: lyricUrl2.path)
+        musics.append(music2)
+        let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
+        let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
+        let music3 = VideoEditorMusicInfo.init(audioPath: audioUrl3.path,
+                                               lrcPath: lyricUrl3.path)
+        musics.append(music3)
+        let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
+        let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
+        let music4 = VideoEditorMusicInfo.init(audioPath: audioUrl4.path,
+                                               lrcPath: lyricUrl4.path)
+        musics.append(music4)
+        let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
+        let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
+        let music5 = VideoEditorMusicInfo.init(audioPath: audioUrl5.path,
+                                               lrcPath: lyricUrl5.path)
+        musics.append(music5)
+        let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
+        let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
+        let music6 = VideoEditorMusicInfo.init(audioPath: audioUrl6.path,
+                                               lrcPath: lyricUrl6.path)
+        musics.append(music6)
+        let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
+        let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
+        let music7 = VideoEditorMusicInfo.init(audioPath: audioUrl7.path,
+                                               lrcPath: lyricUrl7.path)
+        musics.append(music7)
+        let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
+        let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
+        let music8 = VideoEditorMusicInfo.init(audioPath: audioUrl8.path,
+                                               lrcPath: lyricUrl8.path)
+        musics.append(music8)
+        completionHandler(musics)
+        return false
+    }
 }
 
 extension PickerConfigurationViewController {

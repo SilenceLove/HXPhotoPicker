@@ -22,6 +22,17 @@ public protocol VideoEditorViewControllerDelegate: AnyObject {
     ///   - videoEditorViewController: 对应的 VideoEditorViewController
     func videoEditorViewController(didFinishWithUnedited videoEditorViewController: VideoEditorViewController)
     
+    /// 将要点击工具栏音乐按钮
+    /// - Parameter videoEditorViewController: 对应的 VideoEditorViewController
+    func videoEditorViewController(shouldClickMusicTool videoEditorViewController: VideoEditorViewController) -> Bool
+    
+    /// 加载配乐信息，当musicConfig.infos为空时触发
+    /// 返回 true 内部会显示加载状态，调用 completionHandler 后恢复
+    /// - Parameters:
+    ///   - videoEditorViewController: 对应的 VideoEditorViewController
+    ///   - completionHandler: 传入配乐信息
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
+    
     /// 取消编辑
     /// - Parameter videoEditorViewController: 对应的 VideoEditorViewController
     func videoEditorViewController(didCancel videoEditorViewController: VideoEditorViewController)
@@ -30,6 +41,8 @@ public protocol VideoEditorViewControllerDelegate: AnyObject {
 public extension VideoEditorViewControllerDelegate {
     func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, didFinish result: VideoEditResult) {}
     func videoEditorViewController(didFinishWithUnedited videoEditorViewController: VideoEditorViewController) {}
+    func videoEditorViewController(shouldClickMusicTool videoEditorViewController: VideoEditorViewController) -> Bool { true }
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool { false }
     func videoEditorViewController(didCancel videoEditorViewController: VideoEditorViewController) {}
 }
 
@@ -53,6 +66,13 @@ open class VideoEditorViewController: BaseViewController {
     
     /// 当前编辑的网络视频地址
     public private(set) var networkVideoURL: URL?
+    
+    /// 当前配乐的音频路径
+    public var backgroundMusicPath: String? {
+        didSet {
+            toolView.reloadMusic(isSelected: backgroundMusicPath != nil)
+        }
+    }
     
     /// 上一次的编辑数据
     public private(set) var editResult: VideoEditResult?
@@ -179,6 +199,10 @@ open class VideoEditorViewController: BaseViewController {
         if state != .normal {
             return
         }
+        if isMusicState {
+            isMusicState = false
+            updateMusicView()
+        }
         if topView.isHidden == true {
             showTopView()
         }else {
@@ -215,6 +239,12 @@ open class VideoEditorViewController: BaseViewController {
         playerView.delegate = self
         return playerView
     }()
+    lazy var musicView: VideoEditorMusicView = {
+        let view = VideoEditorMusicView.init(musicInfos: config.musicConfig.infos)
+        view.delegate = self
+        return view
+    }()
+    var isMusicState = false
     lazy var cropView: VideoEditorCropView = {
         let cropView : VideoEditorCropView
         if needRequest {
@@ -253,12 +283,13 @@ open class VideoEditorViewController: BaseViewController {
         layer.contentsScale = UIScreen.main.scale
         let blackColor = UIColor.black
         layer.colors = [blackColor.withAlphaComponent(0).cgColor,
-                        blackColor.withAlphaComponent(0.15).cgColor,
-                        blackColor.withAlphaComponent(0.35).cgColor,
+                        blackColor.withAlphaComponent(0.3).cgColor,
+                        blackColor.withAlphaComponent(0.4).cgColor,
+                        blackColor.withAlphaComponent(0.5).cgColor,
                         blackColor.withAlphaComponent(0.6).cgColor]
         layer.startPoint = CGPoint(x: 0, y: 1)
         layer.endPoint = CGPoint(x: 0, y: 0)
-        layer.locations = [0.15, 0.35, 0.6, 0.9]
+        layer.locations = [0.1, 0.3, 0.5, 0.7, 0.9]
         layer.borderWidth = 0.0
         return layer
     }()
@@ -288,6 +319,7 @@ open class VideoEditorViewController: BaseViewController {
         view.addSubview(cropView)
         view.addSubview(cropConfirmView)
         view.addSubview(toolView)
+        view.addSubview(musicView)
         view.layer.addSublayer(topMaskLayer)
         view.addSubview(topView)
         if needRequest {
@@ -303,10 +335,14 @@ open class VideoEditorViewController: BaseViewController {
         }
         if let editResult = editResult {
             didEdited = true
-            playerView.playStartTime = CMTimeMakeWithSeconds(editResult.cropData.startTime, preferredTimescale: editResult.cropData.preferredTimescale)
-            playerView.playEndTime = CMTimeMakeWithSeconds(editResult.cropData.endTime, preferredTimescale: editResult.cropData.preferredTimescale)
-            rotateBeforeStorageData = editResult.cropData.cropingData
-            rotateBeforeData = editResult.cropData.cropRectData
+            if let cropData = editResult.cropData {
+                playerView.playStartTime = CMTimeMakeWithSeconds(cropData.startTime,
+                                                                 preferredTimescale: cropData.preferredTimescale)
+                playerView.playEndTime = CMTimeMakeWithSeconds(cropData.endTime,
+                                                               preferredTimescale: cropData.preferredTimescale)
+                rotateBeforeStorageData = cropData.cropingData
+                rotateBeforeData = cropData.cropRectData
+            }
         }
     }
     @objc func didBackClick() {
@@ -330,6 +366,8 @@ open class VideoEditorViewController: BaseViewController {
         }
         rotateBeforeData = cropView.getRotateBeforeData()
         playerView.pause()
+        musicView.reset()
+        backgroundMusicPath = nil
         stopPlayTimer()
     }
     open override func deviceOrientationDidChanged(notify: Notification) {
@@ -352,6 +390,7 @@ open class VideoEditorViewController: BaseViewController {
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
         cropConfirmView.frame = toolView.frame
         scrollView.frame = view.bounds
+        setMusicViewFrame()
         if needRequest {
             firstLayoutSubviews = false
             if reqeustAssetCompletion {
@@ -404,6 +443,14 @@ open class VideoEditorViewController: BaseViewController {
             }
         }
     }
+    func setMusicViewFrame() {
+        let musicHeight: CGFloat = 180
+        if !isMusicState {
+            musicView.frame = CGRect(x: 0, y: view.height, width: view.width, height: musicHeight + UIDevice.bottomMargin)
+        }else {
+            musicView.frame = CGRect(x: 0, y: view.height - musicHeight - UIDevice.bottomMargin, width: view.width, height: musicHeight + UIDevice.bottomMargin)
+        }
+    }
     
     func rotateAfterSetStorageData(offsetXScale: CGFloat, validXScale: CGFloat, validWithScale: CGFloat) {
         let insert = cropView.collectionView.contentInset
@@ -454,6 +501,7 @@ open class VideoEditorViewController: BaseViewController {
     }
     func stopAllOperations() {
         stopPlayTimer()
+        PhotoManager.shared.stopPlayMusic()
         if let url = networkVideoURL {
             PhotoManager.shared.suspendTask(url)
             networkVideoURL = nil
@@ -527,6 +575,16 @@ extension VideoEditorViewController {
             }
         }else {
             setPlayerViewFrame()
+        }
+        if let editResult = editResult {
+            playerView.player.volume = editResult.hideVideoSoundTrack ? 0 : 1
+            musicView.originalSoundButton.isSelected = !editResult.hideVideoSoundTrack
+            if let audioURL = editResult.backgroundMusicURL {
+                backgroundMusicPath = audioURL.path
+                musicView.backgroundButton.isSelected = true
+                PhotoManager.shared.playMusic(filePath: audioURL.path) {
+                }
+            }
         }
     }
 }
@@ -677,37 +735,125 @@ extension VideoEditorViewController: VideoEditorCropViewDelegate {
 // MARK: EditorToolViewDelegate
 extension VideoEditorViewController: EditorToolViewDelegate {
     
-    /// 裁剪视频
+    /// 导出视频
     /// - Parameter toolView: 底部工具视频
     func toolView(didFinishButtonClick toolView: EditorToolView) {
         if let startTime = playerView.playStartTime, let endTime = playerView.playEndTime {
             ProgressHUD.showLoading(addedTo: view, text: "视频导出中".localized, animated: true)
             PhotoTools.exportEditVideo(for: avAsset, timeRang: CMTimeRange(start: startTime, end: endTime), presentName: config.exportPresetName) { [weak self] (videoURL, error) in
+                guard let self = self else {
+                    return
+                }
                 if let videoURL = videoURL {
-                    self?.editFinishCallBack(videoURL)
-                    self?.backAction()
+                    if self.backgroundMusicPath != nil || self.playerView.player.volume == 0 {
+                        self.addBackgroundMusic(forVideo: videoURL)
+                        return
+                    }
+                    self.editFinishCallBack(videoURL)
+                    self.backAction()
                 }else {
-                    ProgressHUD.hide(forView: self?.view, animated: true)
-                    ProgressHUD.showWarning(addedTo: self?.view, text: "导出失败".localized, animated: true, delayHide: 1.5)
+                    self.showErrorHUD()
                 }
             }
         }else {
+            if backgroundMusicPath != nil || playerView.player.volume == 0 {
+                ProgressHUD.showLoading(addedTo: view, text: "视频导出中".localized, animated: true)
+                let videoURL = PhotoTools.getVideoTmpURL()
+                AssetManager.exportVideoURL(forVideo: avAsset, toFile: videoURL, exportPreset: config.exportPresetName) { [weak self] (url, error) in
+                    if let url = url {
+                        self?.addBackgroundMusic(forVideo: url)
+                    }else {
+                        self?.showErrorHUD()
+                    }
+                }
+                return
+            }
             delegate?.videoEditorViewController(didFinishWithUnedited: self)
             backAction()
         }
+    }
+    func addBackgroundMusic(forVideo videoURL: URL) {
+        var audioURL: URL?
+        if let musicPath = backgroundMusicPath {
+            audioURL = URL(fileURLWithPath: musicPath)
+        }
+        PhotoTools.videoAddBackgroundMusic(forVideo: videoURL,
+                                           audioURL: audioURL,
+                                           hasOriginalSound: playerView.player.volume == 0 ? false : true,
+                                           presentName: config.exportPresetName) {
+            [weak self] (url) in
+            if let url = url {
+                self?.editFinishCallBack(url)
+                self?.backAction()
+            }else {
+                self?.showErrorHUD()
+            }
+        }
+    }
+    func showErrorHUD() {
+        ProgressHUD.hide(forView: view, animated: true)
+        ProgressHUD.showWarning(addedTo: view, text: "导出失败".localized, animated: true, delayHide: 1.5)
     }
     func editFinishCallBack(_ videoURL: URL) {
         if let currentCropOffset = currentCropOffset {
             rotateBeforeStorageData = cropView.getRotateBeforeData(offsetX: currentCropOffset.x, validX: currentValidRect.minX, validWidth: currentValidRect.width)
         }
         rotateBeforeData = cropView.getRotateBeforeData()
-        let cropData = VideoCropData.init(startTime: playerView.playStartTime!.seconds, endTime: playerView.playEndTime!.seconds, preferredTimescale: avAsset.duration.timescale, cropingData: rotateBeforeStorageData!, cropRectData: rotateBeforeData!)
-        let editResult = VideoEditResult.init(editedURL: videoURL, cropData: cropData)
+        var cropData: VideoCropData?
+        if let startTime = playerView.playStartTime,
+           let endTime = playerView.playEndTime,
+           let rotateBeforeStorageData = rotateBeforeStorageData,
+           let rotateBeforeData = rotateBeforeData {
+            cropData = VideoCropData.init(startTime: startTime.seconds,
+                                          endTime: endTime.seconds,
+                                          preferredTimescale: avAsset.duration.timescale,
+                                          cropingData: rotateBeforeStorageData,
+                                          cropRectData: rotateBeforeData)
+        }
+        var backgroundMusicURL: URL?
+        if let audioPath = backgroundMusicPath {
+            backgroundMusicURL = URL(fileURLWithPath: audioPath)
+        }
+        let editResult = VideoEditResult.init(editedURL: videoURL,
+                                              cropData: cropData,
+                                              backgroundMusicURL: backgroundMusicURL,
+                                              hideVideoSoundTrack: playerView.player.volume == 0 ? true : false)
         delegate?.videoEditorViewController(self, didFinish: editResult)
     }
     func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions) {
-        if model.type == .cropping {
+        if model.type == .music {
+            if let shouldClick = delegate?.videoEditorViewController(shouldClickMusicTool: self),
+               !shouldClick {
+                return
+            }
+            if musicView.musics.isEmpty {
+                if let showLoading = delegate?.videoEditorViewController(self, loadMusic: { [weak self] (infos) in
+                    self?.musicView.reloadData(infos: infos)
+                }) {
+                    if showLoading {
+                        musicView.showLoading()
+                    }
+                }else {
+                    ProgressHUD.showWarning(addedTo: view, text: "暂无配乐".localized, animated: true, delayHide: 1.5)
+                    return
+                }
+            }
+            isMusicState = !isMusicState
+            musicView.reloadContentOffset()
+            updateMusicView()
+            hidenTopView()
+        }else if model.type == .cropping {
             croppingAction()
+        }
+    }
+    
+    func updateMusicView() {
+        UIView.animate(withDuration: 0.25) {
+            self.toolView.alpha = self.isMusicState ? 0 : 1
+            self.setMusicViewFrame()
+        } completion: { (_) in
+            self.toolView.alpha = self.isMusicState ? 0 : 1
+            self.setMusicViewFrame()
         }
     }
     
@@ -804,6 +950,22 @@ extension VideoEditorViewController: EditorCropConfirmViewDelegate {
         } completion: { (isFinished) in
             self.cropView.isHidden = true
             self.cropConfirmView.isHidden = true
+        }
+    }
+}
+
+extension VideoEditorViewController: VideoEditorMusicViewDelegate {
+    func musicView(_ musicView: VideoEditorMusicView, didSelectMusic audioPath: String?) {
+        backgroundMusicPath = audioPath
+    }
+    func musicView(deselectMusic musicView: VideoEditorMusicView) {
+        backgroundMusicPath = nil
+    }
+    func musicView(_ musicView: VideoEditorMusicView, didOriginalSoundButtonClick isSelected: Bool) {
+        if isSelected {
+            playerView.player.volume = 1
+        }else {
+            playerView.player.volume = 0
         }
     }
 }

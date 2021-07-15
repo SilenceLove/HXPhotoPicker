@@ -111,6 +111,24 @@ public class PhotoTools {
         return TimeInterval(round(urlAsset.duration.seconds))
     }
     
+    /// 根据视频时长(00:00:00)获取秒
+    class func getVideoTime(forVideo duration: String) -> TimeInterval {
+        var m = 0
+        var s = 0
+        var ms = 0
+        let components = duration.components(separatedBy: CharacterSet.init(charactersIn: ":."))
+        if components.count >= 2 {
+            m = Int(components[0]) ?? 0
+            s = Int(components[1]) ?? 0
+            if components.count == 3 {
+                ms = Int(components[2]) ?? 0
+            }
+        }else {
+            s = Int(INT_MAX)
+        }
+        return TimeInterval(CGFloat(m * 60) + CGFloat(s) + CGFloat(ms) * 0.001)
+    }
+    
     /// 根据视频地址获取视频封面
     public class func getVideoThumbnailImage(videoURL: URL?,
                                              atTime: TimeInterval) -> UIImage? {

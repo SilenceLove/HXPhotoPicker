@@ -15,6 +15,9 @@ public class EditorToolViewConfiguration {
     /// 工具栏选项按钮选中颜色
     public lazy var toolSelectedColor: UIColor = .systemTintColor
     
+    /// 配乐选中时的颜色
+    public lazy var musicSelectedColor: UIColor = .systemTintColor
+    
     /// 完成按钮标题颜色
     public lazy var finishButtonTitleColor: UIColor = {
         return .white

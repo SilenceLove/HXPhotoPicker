@@ -21,12 +21,13 @@ class EditorToolView: UIView {
         layer.contentsScale = UIScreen.main.scale
         let blackColor = UIColor.black
         layer.colors = [blackColor.withAlphaComponent(0).cgColor,
-                        blackColor.withAlphaComponent(0.15).cgColor,
-                        blackColor.withAlphaComponent(0.35).cgColor,
+                        blackColor.withAlphaComponent(0.3).cgColor,
+                        blackColor.withAlphaComponent(0.4).cgColor,
+                        blackColor.withAlphaComponent(0.5).cgColor,
                         blackColor.withAlphaComponent(0.6).cgColor]
         layer.startPoint = CGPoint(x: 0, y: 0)
         layer.endPoint = CGPoint(x: 0, y: 1)
-        layer.locations = [0.15, 0.35, 0.6, 0.9]
+        layer.locations = [0.1, 0.3, 0.5, 0.7, 0.9]
         layer.borderWidth = 0.0
         return layer
     }()
@@ -72,6 +73,7 @@ class EditorToolView: UIView {
     }
     var stretchMask: Bool = false
     var currentSelectedIndexPath: IndexPath?
+    var musicCellShowBox: Bool = false
     
     init(config: EditorToolViewConfiguration) {
         self.config = config
@@ -94,8 +96,19 @@ class EditorToolView: UIView {
     }
     
     func selected(indexPath: IndexPath) {
+        deselected()
         let cell = collectionView.cellForItem(at: indexPath) as? EditorToolViewCell
         cell?.isSelectedImageView = true
+    }
+    
+    func reloadMusic(isSelected: Bool) {
+        musicCellShowBox = isSelected
+        for (index, option) in config.toolOptions.enumerated() {
+            if option.type == .music {
+                collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
+                return
+            }
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -124,15 +137,22 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditorToolViewCellID", for: indexPath) as! EditorToolViewCell
+        let model = config.toolOptions[indexPath.item]
+        cell.boxColor = config.musicSelectedColor
+        if model.type == .music {
+            cell.showBox = musicCellShowBox
+        }else {
+            cell.showBox = false
+        }
         cell.selectedColor = config.toolSelectedColor
-        cell.model = config.toolOptions[indexPath.item]
+        cell.model = model
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let option = config.toolOptions[indexPath.item]
-        if option.type == .graffiti {
+        if option.type == .graffiti || option.type == .mosaic {
             if let selectedIndexPath = currentSelectedIndexPath,
                selectedIndexPath.item == indexPath.item {
                 deselected()

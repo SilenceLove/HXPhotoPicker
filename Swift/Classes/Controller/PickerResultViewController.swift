@@ -52,7 +52,6 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     
     weak var previewTitleLabel: UILabel?
     weak var currentPickerController: PhotoPickerController?
-    
     init() {
         super.init(nibName:"PickerResultViewController",bundle: nil)
     }
@@ -63,7 +62,6 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         collectionViewTopConstraint.constant = 20
         collectionView.register(ResultViewCell.self, forCellWithReuseIdentifier: "ResultViewCellID")
         collectionView.register(ResultAddViewCell.self, forCellWithReuseIdentifier: "ResultAddViewCellID")
@@ -110,6 +108,7 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
             localAssetArray.append(networkVideoAsset1)
         }
     }
+    
     @objc func longGestureRecognizerClick(longGestureRecognizer: UILongPressGestureRecognizer) {
         let touchPoint = longGestureRecognizer.location(in: collectionView)
         let touchIndexPath = collectionView.indexPathForItem(at: touchPoint)
@@ -343,8 +342,13 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
         let previewConfig = PhotoTools.getWXPickerConfig()
         // 编辑器配置保持一致
         previewConfig.photoEditor = config.photoEditor
-//        previewConfig.prefersStatusBarHidden = true
-//        previewConfig.previewView.bottomView.showSelectedView = false
+        
+        previewConfig.prefersStatusBarHidden = true
+        previewConfig.previewView.showBottomView = false
+        previewConfig.previewView.singleClickCellAutoPlayVideo = false
+        previewConfig.previewView.customVideoCellClass = PreviewVideoControlViewCell.self
+        previewConfig.previewView.bottomView.showSelectedView = false
+        
         var style: UIModalPresentationStyle = .custom
         if previewStyleControl.selectedSegmentIndex == 1 {
             if #available(iOS 13.0, *) {
@@ -354,10 +358,11 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
         let pickerController = PhotoPickerController.init(preview: previewConfig, currentIndex: indexPath.item, modalPresentationStyle: style)
         pickerController.selectedAssetArray = selectedAssets
         pickerController.pickerDelegate = self
-        // 透明导航栏建议修改取消图片,换张带阴影的图片
-//        config.previewView.cancelImageName = ""
-//        pickerController.navigationBar.setBackgroundImage(UIImage.image(for: UIColor.clear, havingSize: .zero), for: .default)
-//        pickerController.navigationBar.shadowImage = UIImage.image(for: UIColor.clear, havingSize: .zero)
+        
+        config.previewView.cancelImageName = ""
+        pickerController.navigationBar.shadowImage = UIImage.image(for: UIColor.clear, havingSize: .zero)
+        pickerController.navigationBar.barTintColor = .clear
+        pickerController.navigationBar.backgroundColor = .clear
         
         let titleLabel = UILabel.init()
         titleLabel.size = CGSize(width: 100, height: 30)
@@ -486,8 +491,19 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
         setNeedsStatusBarAppearanceUpdate()
         self.localCameraAssetArray = localCameraAssetArray
     }
-    func pickerController(_ pikcerController: PhotoPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: PhotoAsset, atIndex: Int) {
+    func pickerController(_ pickerController: PhotoPickerController, viewControllersWillAppear viewController: UIViewController) {
+        if pickerController.isPreviewAsset {
+            let navHeight = viewController.navigationController?.navigationBar.height ?? 0
+            viewController.navigationController?.navigationBar.setBackgroundImage(UIImage.gradualShadowImage(CGSize(width: view.width, height: UIDevice.isAllIPhoneX ? navHeight + 54 : navHeight + 30)), for: .default)
+        }
+    }
+    func pickerController(_ pickerController: PhotoPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: PhotoAsset, atIndex: Int) {
         previewTitleLabel?.text = String(atIndex + 1) + "/" + String(selectedAssets.count)
+    }
+    func pickerController(_ pickerController: PhotoPickerController, previewSingleClick photoAsset: PhotoAsset, atIndex: Int) {
+        if pickerController.isPreviewAsset && photoAsset.mediaType == .photo {
+            pickerController.dismiss(animated: true, completion: nil)
+        }
     }
     func pickerController(_ pickerController: PhotoPickerController, previewDidDeleteAsset photoAsset: PhotoAsset, atIndex: Int) {
         let isFull = selectedAssets.count == config.maximumSelectedCount
@@ -519,6 +535,52 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
                 cell.requestThumbnailImage()
             }
         }
+    }
+    
+    func pickerController(_ pickerController: PhotoPickerController, videoEditor videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+        var musics: [VideoEditorMusicInfo] = []
+        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
+        let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
+        let music1 = VideoEditorMusicInfo.init(audioPath: audioUrl1.path,
+                                               lrcPath: lyricUrl1.path)
+        musics.append(music1)
+        let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
+        let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
+        let music2 = VideoEditorMusicInfo.init(audioPath: audioUrl2.path,
+                                               lrcPath: lyricUrl2.path)
+        musics.append(music2)
+        let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
+        let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
+        let music3 = VideoEditorMusicInfo.init(audioPath: audioUrl3.path,
+                                               lrcPath: lyricUrl3.path)
+        musics.append(music3)
+        let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
+        let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
+        let music4 = VideoEditorMusicInfo.init(audioPath: audioUrl4.path,
+                                               lrcPath: lyricUrl4.path)
+        musics.append(music4)
+        let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
+        let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
+        let music5 = VideoEditorMusicInfo.init(audioPath: audioUrl5.path,
+                                               lrcPath: lyricUrl5.path)
+        musics.append(music5)
+        let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
+        let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
+        let music6 = VideoEditorMusicInfo.init(audioPath: audioUrl6.path,
+                                               lrcPath: lyricUrl6.path)
+        musics.append(music6)
+        let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
+        let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
+        let music7 = VideoEditorMusicInfo.init(audioPath: audioUrl7.path,
+                                               lrcPath: lyricUrl7.path)
+        musics.append(music7)
+        let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
+        let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
+        let music8 = VideoEditorMusicInfo.init(audioPath: audioUrl8.path,
+                                               lrcPath: lyricUrl8.path)
+        musics.append(music8)
+        completionHandler(musics)
+        return false
     }
 }
 

@@ -812,6 +812,20 @@ extension PhotoPickerViewController: PhotoEditorViewControllerDelegate {
 }
 // MARK: VideoEditorViewControllerDelegate
 extension PhotoPickerViewController: VideoEditorViewControllerDelegate {
+    public func videoEditorViewController(shouldClickMusicTool videoEditorViewController: VideoEditorViewController) -> Bool {
+        if let pickerController = pickerController,
+           let shouldClick = pickerController.pickerDelegate?.pickerController(pickerController, videoEditorShouldClickMusicTool: videoEditorViewController) {
+            return shouldClick
+        }
+        return true
+    }
+    public func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+        if let pickerController = pickerController,
+           let showLoading = pickerController.pickerDelegate?.pickerController(pickerController, videoEditor: videoEditorViewController, loadMusic: completionHandler) {
+            return showLoading
+        }
+        return false
+    }
     public func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, didFinish result: VideoEditResult) {
         let photoAsset = videoEditorViewController.photoAsset!
         photoAsset.videoEdit = result

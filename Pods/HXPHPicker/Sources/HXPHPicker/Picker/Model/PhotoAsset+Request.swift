@@ -98,7 +98,7 @@ public extension PhotoAsset {
     /// - Returns: 请求ID
     @discardableResult
     func requestImageData(filterEditor: Bool = false,
-                          iCloudHandler: PhotoAssetICloudHandlerHandler?,
+                          iCloudHandler: PhotoAssetICloudHandler?,
                           progressHandler: PhotoAssetProgressHandler?,
                           success: ((PhotoAsset, Data, UIImage.Orientation, [AnyHashable : Any]?) -> Void)?,
                           failure: PhotoAssetFailureHandler?) -> PHImageRequestID {
@@ -175,7 +175,7 @@ public extension PhotoAsset {
     @available(iOS 9.1, *)
     @discardableResult
     func requestLivePhoto(targetSize: CGSize,
-                          iCloudHandler: PhotoAssetICloudHandlerHandler?,
+                          iCloudHandler: PhotoAssetICloudHandler?,
                           progressHandler: PhotoAssetProgressHandler?,
                           success: ((PhotoAsset, PHLivePhoto, [AnyHashable : Any]?) -> Void)?,
                           failure: PhotoAssetFailureHandler?) -> PHImageRequestID {
@@ -242,7 +242,7 @@ public extension PhotoAsset {
     @discardableResult
     func requestAVAsset(filterEditor: Bool = false,
                         deliveryMode: PHVideoRequestOptionsDeliveryMode = .automatic,
-                        iCloudHandler: PhotoAssetICloudHandlerHandler?,
+                        iCloudHandler: PhotoAssetICloudHandler?,
                         progressHandler: PhotoAssetProgressHandler?,
                         success: ((PhotoAsset, AVAsset, [AnyHashable : Any]?) -> Void)?,
                         failure: PhotoAssetFailureHandler?) -> PHImageRequestID {

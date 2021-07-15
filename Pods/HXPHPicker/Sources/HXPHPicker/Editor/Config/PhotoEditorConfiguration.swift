@@ -19,10 +19,15 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     /// 工具视图配置
     public lazy var toolView: EditorToolViewConfiguration = {
         let config = EditorToolViewConfiguration.init()
-        let graffitiOption = EditorToolOptions.init(imageName: "hx_editor_tools_graffiti", type: .graffiti)
-        let cropOption = EditorToolOptions.init(imageName: "hx_editor_photo_crop", type: .cropping)
-        let options: [EditorToolOptions] = [graffitiOption, cropOption]
-        config.toolOptions = options
+        let graffiti = EditorToolOptions(imageName: "hx_editor_tools_graffiti",
+                                               type: .graffiti)
+        let crop = EditorToolOptions(imageName: "hx_editor_photo_crop",
+                                           type: .cropping)
+        let mosaic = EditorToolOptions(imageName: "hx_editor_tools_mosaic",
+                                             type: .mosaic)
+        let filter = EditorToolOptions(imageName: "hx_editor_tools_filter",
+                                             type: .filter)
+        config.toolOptions = [graffiti, crop, mosaic, filter]
         return config
     }()
     
@@ -40,5 +45,33 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     
     /// 裁剪确认视图配置
     public lazy var cropConfimView: CropConfirmViewConfiguration = .init()
-     
+    
+    /// 滤镜配置
+    public lazy var filterConfig: FilterConfig = .init(infos: PhotoTools.defaultFilters())
+    
+    public struct FilterConfig {
+        /// 滤镜信息
+        public let infos: [PhotoEditorFilterInfo]
+        /// 滤镜选中颜色
+        public let selectedColor: UIColor
+        public init(infos: [PhotoEditorFilterInfo],
+                    selectedColor: UIColor = .systemTintColor) {
+            self.infos = infos
+            self.selectedColor = selectedColor
+        }
+    }
+    
+    /// 马赛克配置
+    public lazy var mosaicConfig: MosaicConfig = .init(mosaicWidth: 20,
+                                                       mosaiclineWidth: 25,
+                                                       smearWidth: 30)
+    
+    public struct MosaicConfig {
+        /// 生成马赛克的大小
+        public let mosaicWidth: CGFloat
+        /// 涂鸦时马赛克的线宽
+        public let mosaiclineWidth: CGFloat
+        /// 涂抹的宽度
+        public let smearWidth: CGFloat
+    }
 }

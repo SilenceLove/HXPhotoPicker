@@ -22,7 +22,8 @@ protocol PhotoEditorViewDelegate: AnyObject {
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     weak var editorDelegate: PhotoEditorViewDelegate?
     lazy var imageResizerView: EditorImageResizerView = {
-        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropConfig)
+        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropConfig,
+                                                           mosaicConfig: config.mosaicConfig)
         imageResizerView.imageView.drawView.lineColor = config.brushColors[config.defaultBrushColorIndex].color
         imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
         imageResizerView.delegate = self
@@ -31,9 +32,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     }()
     
     override var zoomScale: CGFloat {
-        didSet {
-            imageResizerView.zoomScale = zoomScale
-        }
+        didSet { imageResizerView.zoomScale = zoomScale }
     }
     
     /// 裁剪配置
@@ -44,24 +43,25 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     var canZoom = true
     var cropSize: CGSize = .zero
     
+    var image: UIImage? { imageResizerView.imageView.image }
+    
     var drawEnabled: Bool {
-        get {
-            imageResizerView.drawEnabled
-        }
-        set {
-            imageResizerView.drawEnabled = newValue
-        }
+        get { imageResizerView.drawEnabled }
+        set { imageResizerView.drawEnabled = newValue }
     }
-    
+    var mosaicEnabled: Bool {
+        get { imageResizerView.mosaicEnabled }
+        set { imageResizerView.mosaicEnabled = newValue }
+    }
     var drawColorHex: String = "#ffffff" {
-        didSet {
-            imageResizerView.imageView.drawView.lineColor = drawColorHex.color
-        }
+        didSet { imageResizerView.imageView.drawView.lineColor = drawColorHex.color }
     }
-    
-    var canUndoDraw: Bool {
-        imageResizerView.imageView.drawView.canUndo
+    var mosaicType: PhotoEditorMosaicView.MosaicType = .mosaic {
+        didSet { imageResizerView.imageView.mosaicView.type = mosaicType }
     }
+    var canUndoDraw: Bool { imageResizerView.imageView.drawView.canUndo }
+    var canUndoMosaic: Bool { imageResizerView.imageView.mosaicView.canUndo }
+    var hasFilter: Bool { imageResizerView.filter != nil }
     
     init(config: PhotoEditorConfiguration) {
         self.config = config
@@ -104,10 +104,18 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         updateImageViewFrame()
         imageResizerView.setImage(image)
     }
+    func updateImage(_ image: UIImage) {
+        imageResizerView.updateImage(image)
+    }
+    func setMosaicOriginalImage(_ image: UIImage?) {
+        imageResizerView.setMosaicOriginalImage(image)
+    }
     func getEditedData() -> PhotoEditData {
         imageResizerView.getEditedData()
     }
     func setEditedData(editedData: PhotoEditData) {
+        imageResizerView.filter = editedData.filter
+        imageResizerView.filterValue = editedData.filterValue
         if editedData.isPortrait != UIDevice.isPortrait {
             return
         }
@@ -117,6 +125,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
             cancelCropping(canShowMask: false, false)
         }
         imageResizerView.setBrushData(brushData: editedData.brushData)
+        imageResizerView.setMosaicData(mosaicData: editedData.mosaicData)
         updateImageViewFrame()
         if config.cropConfig.isRoundCrop {
             imageResizerView.layer.cornerRadius = cropSize.width * 0.5
@@ -154,10 +163,9 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         isScrollEnabled = false
         resetZoomScale(animated)
         imageResizerView.startCorpping(animated) { [weak self] () in
-            if let self = self {
-                self.imageResizerView.zoomScale = self.zoomScale
-                self.editorDelegate?.editorView(didAppear: self)
-            }
+            guard let self = self else { return }
+            self.imageResizerView.zoomScale = self.zoomScale
+            self.editorDelegate?.editorView(didAppear: self)
         }
     }
     
@@ -167,10 +175,9 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         isScrollEnabled = true
         resetZoomScale(animated)
         imageResizerView.cancelCropping(canShowMask: canShowMask, animated) { [weak self] () in
-            if let self = self {
-                self.imageResizerView.zoomScale = self.zoomScale
-                self.editorDelegate?.editorView(didDisappearCrop: self)
-            }
+            guard let self = self else { return }
+            self.imageResizerView.zoomScale = self.zoomScale
+            self.editorDelegate?.editorView(didDisappearCrop: self)
         }
     }
     func canReset() -> Bool {
@@ -187,12 +194,11 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         isScrollEnabled = true
         resetZoomScale(animated)
         imageResizerView.finishCropping(animated) { [weak self] () in
-            if let self = self {
-                self.imageResizerView.zoomScale = self.zoomScale
-                self.editorDelegate?.editorView(didDisappearCrop: self)
-                if self.config.cropConfig.isRoundCrop {
-                    self.imageResizerView.layer.cornerRadius = self.cropSize.width * 0.5
-                }
+            guard let self = self else { return }
+            self.imageResizerView.zoomScale = self.zoomScale
+            self.editorDelegate?.editorView(didDisappearCrop: self)
+            if self.config.cropConfig.isRoundCrop {
+                self.imageResizerView.layer.cornerRadius = self.cropSize.width * 0.5
             }
             completion?()
         }
@@ -205,9 +211,15 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         let viewWidth = imageResizerView.imageView.width
         let viewHeight = imageResizerView.imageView.height
         DispatchQueue.global().async {
-            if let imageOptions = self.imageResizerView.cropping(inputImage, toRect: toRect, viewWidth: viewWidth, viewHeight: viewHeight) {
+            if let imageOptions = self.imageResizerView.cropping(inputImage,
+                                                                 toRect: toRect,
+                                                                 viewWidth: viewWidth,
+                                                                 viewHeight: viewHeight) {
                 DispatchQueue.main.async {
-                    let editResult = PhotoEditResult.init(editedImage: imageOptions.0, editedImageURL: imageOptions.1, imageType: imageOptions.2, editedData: self.getEditedData())
+                    let editResult = PhotoEditResult.init(editedImage: imageOptions.0,
+                                                          editedImageURL: imageOptions.1,
+                                                          imageType: imageOptions.2,
+                                                          editedData: self.getEditedData())
                     completion(editResult)
                 }
             }else {
@@ -236,9 +248,14 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     func undoAllDraw() {
         imageResizerView.imageView.drawView.emptyCanvas()
     }
-    
     func undoDraw() {
         imageResizerView.imageView.drawView.undo()
+    }
+    func undoMosaic() {
+        imageResizerView.imageView.mosaicView.undo()
+    }
+    func undoAllMosaic() {
+        imageResizerView.imageView.mosaicView.undoAll()
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -246,6 +263,9 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         if state != .cropping && imageResizerView == view {
             if imageResizerView.drawEnabled {
                 return imageResizerView.imageView.drawView
+            }
+            if imageResizerView.mosaicEnabled {
+                return imageResizerView.imageView.mosaicView
             }
             return self
         }else if state == .cropping && self == view {
@@ -256,7 +276,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if state == .cropping {
             return false
-        }else if imageResizerView.drawEnabled && !gestureRecognizer.isKind(of: UIPinchGestureRecognizer.self) {
+        }else if (imageResizerView.drawEnabled || imageResizerView.mosaicEnabled) && !gestureRecognizer.isKind(of: UIPinchGestureRecognizer.self) {
             return false
         }
         return true

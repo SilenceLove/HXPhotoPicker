@@ -11,6 +11,9 @@ import UIKit
 // MARK: 预览界面配置类
 public class PreviewViewConfiguration {
     
+    /// 自定义视频Cell
+    public var customVideoCellClass: PreviewVideoViewCell.Type?
+    
     /// 背景颜色
     public lazy var backgroundColor : UIColor = {
         return .white
@@ -29,6 +32,12 @@ public class PreviewViewConfiguration {
     
     /// 视频播放类型
     public var videoPlayType: PhotoPreviewViewController.VideoPlayType = .normal
+    
+    /// 单击cell隐藏/显示导航栏时是否播放/暂停视频
+    public var singleClickCellAutoPlayVideo: Bool = true
+    
+    /// 显示底部视图
+    public var showBottomView: Bool = true
     
     /// 底部视图相关配置
     public lazy var bottomView: PickerBottomViewConfiguration = {

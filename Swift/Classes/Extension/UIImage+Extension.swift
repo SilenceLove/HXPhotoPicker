@@ -65,4 +65,25 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
+    
+    class func gradualShadowImage(_ havingSize: CGSize) -> UIImage? {
+        let layer = CAGradientLayer.init()
+        layer.contentsScale = UIScreen.main.scale
+        let blackColor = UIColor.black
+        layer.colors = [blackColor.withAlphaComponent(0).cgColor,
+                        blackColor.withAlphaComponent(0.3).cgColor,
+                        blackColor.withAlphaComponent(0.4).cgColor,
+                        blackColor.withAlphaComponent(0.5).cgColor,
+                        blackColor.withAlphaComponent(0.6).cgColor]
+        layer.startPoint = CGPoint(x: 0, y: 1)
+        layer.endPoint = CGPoint(x: 0, y: 0)
+        layer.locations = [0.1, 0.3, 0.5, 0.7, 0.9]
+        layer.borderWidth = 0.0
+        layer.frame = CGRect(origin: .zero, size: havingSize)
+        UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen.main.scale)
+        layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
 }
