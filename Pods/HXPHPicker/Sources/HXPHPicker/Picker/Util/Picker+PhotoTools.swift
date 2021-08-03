@@ -16,12 +16,10 @@ extension PhotoTools {
     ///   - status: 权限类型
     public class func showNotAuthorizedAlert(viewController : UIViewController? ,
                                              status : PHAuthorizationStatus) {
-        if viewController == nil {
-            return
-        }
+        guard let vc = viewController else { return }
         if status == .denied ||
             status == .restricted {
-            showAlert(viewController: viewController, title: "无法访问相册中照片".localized, message: "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized, leftActionTitle: "取消".localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".localized) { (alertAction) in
+            showAlert(viewController: vc, title: "无法访问相册中照片".localized, message: "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized, leftActionTitle: "取消".localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".localized) { (alertAction) in
                 openSettingsURL()
             }
         }
@@ -29,10 +27,8 @@ extension PhotoTools {
     
     /// 显示没有相机权限弹窗
     public class func showNotCameraAuthorizedAlert(viewController : UIViewController?) {
-        if viewController == nil {
-            return
-        }
-        showAlert(viewController: viewController, title: "无法使用相机功能".localized, message: "请前往系统设置中，允许访问「相机」。".localized, leftActionTitle: "取消".localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".localized) { (alertAction) in
+        guard let vc = viewController else { return }
+        showAlert(viewController: vc, title: "无法使用相机功能".localized, message: "请前往系统设置中，允许访问「相机」。".localized, leftActionTitle: "取消".localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".localized) { (alertAction) in
             openSettingsURL()
         }
     }
@@ -102,7 +98,6 @@ extension PhotoTools {
         }
         return albumName
     }
-    
     public class func getVideoCoverImage(for photoAsset: PhotoAsset, completionHandler: @escaping (PhotoAsset, UIImage) -> Void) {
         if photoAsset.mediaType == .video {
             var url: URL?
@@ -190,6 +185,7 @@ extension PhotoTools {
             return String.init(format: "%dB", arguments: [bytes])
         }
     }
+    
     /// 获取和微信主题一致的配置
     public class func getWXPickerConfig(isMoment: Bool = false) -> PickerConfiguration {
         let config = PickerConfiguration.init()
@@ -227,9 +223,9 @@ extension PhotoTools {
         config.photoList.cancelPosition = .left
         config.photoList.cancelType = .image
         
-        config.photoList.titleViewConfig.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
-        config.photoList.titleViewConfig.arrowBackgroundColor = "#B2B2B2".color
-        config.photoList.titleViewConfig.arrowColor = "#2E2F30".color
+        config.photoList.titleView.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
+        config.photoList.titleView.arrowBackgroundColor = "#B2B2B2".color
+        config.photoList.titleView.arrowColor = "#2E2F30".color
         
         config.photoList.cell.targetWidth = 250
         config.photoList.cell.selectBox.selectedBackgroundColor = "#07C160".color
@@ -289,15 +285,17 @@ extension PhotoTools {
         config.videoEditor.toolView.finishButtonDarkBackgroundColor = "#07C160".color
         config.videoEditor.toolView.toolSelectedColor = "#07C160".color
         config.videoEditor.toolView.musicSelectedColor = "#07C160".color
+        config.videoEditor.music.tintColor = "#07C160".color
         
         config.photoEditor.toolView.toolSelectedColor = "#07C160".color
         config.photoEditor.toolView.finishButtonBackgroundColor = "#07C160".color
         config.photoEditor.toolView.finishButtonDarkBackgroundColor = "#07C160".color
         config.photoEditor.cropConfimView.finishButtonBackgroundColor = "#07C160".color
         config.photoEditor.cropConfimView.finishButtonDarkBackgroundColor = "#07C160".color
-        config.photoEditor.cropConfig.aspectRatioSelectedColor = "#07C160".color
-        config.photoEditor.filterConfig = .init(infos: defaultFilters(),
+        config.photoEditor.cropping.aspectRatioSelectedColor = "#07C160".color
+        config.photoEditor.filter = .init(infos: defaultFilters(),
                                                 selectedColor: "#07C160".color)
+        config.photoEditor.text.tintColor =  "#07C160".color
         #endif
         
         config.notAuthorized.closeButtonImageName = "hx_picker_notAuthorized_close_dark"

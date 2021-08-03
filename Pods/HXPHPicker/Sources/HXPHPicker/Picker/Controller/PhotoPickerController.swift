@@ -79,15 +79,15 @@ open class PhotoPickerController: UINavigationController {
     
     /// 相册列表控制器
     public func albumViewController() -> AlbumViewController? {
-        return getViewController(for: AlbumViewController.self) as? AlbumViewController
+        getViewController(for: AlbumViewController.self) as? AlbumViewController
     }
     /// 照片选择控制器
     public func pickerViewController() -> PhotoPickerViewController? {
-        return getViewController(for: PhotoPickerViewController.self) as? PhotoPickerViewController
+        getViewController(for: PhotoPickerViewController.self) as? PhotoPickerViewController
     }
     /// 照片预览控制器
     public func previewViewController() -> PhotoPreviewViewController? {
-        return getViewController(for: PhotoPreviewViewController.self) as? PhotoPreviewViewController
+        getViewController(for: PhotoPreviewViewController.self) as? PhotoPreviewViewController
     }
     
     /// 当前处于的外部预览
@@ -95,12 +95,14 @@ open class PhotoPickerController: UINavigationController {
     
     /// 选择资源初始化
     /// - Parameter config: 相关配置
-    public convenience init(picker config: PickerConfiguration) {
-        self.init(config: config)
+    public convenience init(picker config: PickerConfiguration,
+                            delegate: PhotoPickerControllerDelegate? = nil) {
+        self.init(config: config, delegate: delegate)
     }
     /// 选择资源初始化
     /// - Parameter config: 相关配置
-    public init(config: PickerConfiguration) {
+    public init(config: PickerConfiguration,
+                delegate: PhotoPickerControllerDelegate? = nil) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         self.config = config
@@ -111,6 +113,7 @@ open class PhotoPickerController: UINavigationController {
             singleVideo = true
         }
         super.init(nibName: nil, bundle: nil)
+        pickerDelegate = delegate
         var photoVC : UIViewController
         if config.albumShowMode == .normal {
             photoVC = AlbumViewController.init()
@@ -127,12 +130,14 @@ open class PhotoPickerController: UINavigationController {
     ///   - modalPresentationStyle: 默认 custom 样式，框架自带动画效果
     public init(preview config: PickerConfiguration,
                 currentIndex: Int,
-                modalPresentationStyle: UIModalPresentationStyle = .custom) {
+                modalPresentationStyle: UIModalPresentationStyle = .custom,
+                delegate: PhotoPickerControllerDelegate? = nil) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         self.config = config
         isPreviewAsset = true
         super.init(nibName: nil, bundle: nil)
+        pickerDelegate = delegate
         let vc = PhotoPreviewViewController.init()
         vc.isExternalPreview = true
         vc.currentPreviewIndex = currentIndex
@@ -199,6 +204,9 @@ open class PhotoPickerController: UINavigationController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        PhotoManager.shared.targetWidth = config.photoList.cell.targetWidth
+        PhotoManager.shared.indicatorType = config.indicatorType
+        PhotoManager.shared.loadNetworkVideoMode = config.previewView.loadNetworkVideoMode
         configColor()
         navigationBar.isTranslucent = config.navigationBarIsTranslucent
         selectOptions = config.selectOptions
@@ -227,7 +235,10 @@ open class PhotoPickerController: UINavigationController {
     }
     
     public override var preferredStatusBarStyle: UIStatusBarStyle {
-        config.statusBarStyle
+        if PhotoManager.isDark {
+            return .lightContent
+        }
+        return config.statusBarStyle
     }
     public override var prefersStatusBarHidden: Bool {
         if config.prefersStatusBarHidden {
@@ -609,17 +620,20 @@ extension PhotoPickerController {
                 photoAsset.checkAdjustmentStatus { (isAdjusted, asset) in
                     if isAdjusted {
                         if asset.mediaType == .photo {
-                            asset.requestImageData(iCloudHandler: nil, progressHandler: nil) { (sAsset, imageData, imageOrientation, info) in
-                                sAsset.updateFileSize(imageData.count)
-                                totalFileSize += sAsset.fileSize
-                                total += 1
-                                if total == self.selectedAssetArray.count {
-                                    calculationCompletion(totalFileSize)
-                                }
-                            } failure: { (sAsset, info) in
-                                total += 1
-                                if total == self.selectedAssetArray.count {
-                                    calculationCompletion(totalFileSize)
+                            asset.requestImageData(iCloudHandler: nil, progressHandler: nil) { sAsset, result in
+                                switch result {
+                                case .success(let dataResult):
+                                    sAsset.updateFileSize(dataResult.imageData.count)
+                                    totalFileSize += sAsset.fileSize
+                                    total += 1
+                                    if total == self.selectedAssetArray.count {
+                                        calculationCompletion(totalFileSize)
+                                    }
+                                case .failure(_):
+                                    total += 1
+                                    if total == self.selectedAssetArray.count {
+                                        calculationCompletion(totalFileSize)
+                                    }
                                 }
                             }
                         }else {
@@ -631,7 +645,7 @@ extension PhotoPickerController {
                                 if total == self.selectedAssetArray.count {
                                     calculationCompletion(totalFileSize)
                                 }
-                            } failure: { (sAsset, info) in
+                            } failure: { (sAsset, info, error) in
                                 total += 1
                                 if total == self.selectedAssetArray.count {
                                     calculationCompletion(totalFileSize)

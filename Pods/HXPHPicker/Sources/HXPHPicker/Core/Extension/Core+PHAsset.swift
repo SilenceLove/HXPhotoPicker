@@ -45,9 +45,14 @@ public extension PHAsset {
             options.isSynchronous = true
             options.deliveryMode = .fastFormat
             options.resizeMode = .fast
-            AssetManager.requestImageData(for: self, options: options) { (imageData, dataUTI, orientation, info) in
-                if imageData == nil && AssetManager.assetIsInCloud(for: info) {
-                    isICloud = true
+            AssetManager.requestImageData(for: self, options: options) { (result) in
+                switch result {
+                case .failure(let error):
+                    if AssetManager.assetIsInCloud(for: error.info) {
+                        isICloud = true
+                    }
+                default:
+                    break
                 }
             }
         }else if mediaType == PHAssetMediaType.video {

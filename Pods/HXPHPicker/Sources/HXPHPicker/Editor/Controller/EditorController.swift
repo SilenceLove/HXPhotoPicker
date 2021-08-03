@@ -15,15 +15,11 @@ import Kingfisher
 open class EditorController: UINavigationController {
     
     public weak var photoEditorDelegate: PhotoEditorViewControllerDelegate? {
-        didSet {
-            photoEditor?.delegate = photoEditorDelegate
-        }
+        didSet { photoEditor?.delegate = photoEditorDelegate }
     }
     
     public weak var videoEditorDelegate: VideoEditorViewControllerDelegate? {
-        didSet {
-            videoEditor?.delegate = videoEditorDelegate
-        }
+        didSet { videoEditor?.delegate = videoEditorDelegate }
     }
     
     public var photoEditor: PhotoEditorViewController? {
@@ -44,11 +40,13 @@ open class EditorController: UINavigationController {
     ///   - config: 编辑配置
     public init(image: UIImage,
                 editResult: PhotoEditResult? = nil,
-                config: PhotoEditorConfiguration) {
+                config: PhotoEditorConfiguration,
+                delegate: PhotoEditorViewControllerDelegate? = nil) {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
         let photoEditorVC = PhotoEditorViewController.init(image: image, editResult: editResult, config: config)
+        photoEditorVC.delegate = delegate
         self.viewControllers = [photoEditorVC]
     }
     
@@ -59,11 +57,11 @@ open class EditorController: UINavigationController {
     ///   - config: 编辑配置
     public init(imageData: Data,
                 editResult: PhotoEditResult? = nil,
-                config: PhotoEditorConfiguration) {
+                config: PhotoEditorConfiguration,
+                delegate: PhotoEditorViewControllerDelegate? = nil) {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
-        
         let image: UIImage
         #if canImport(Kingfisher)
         image = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))!
@@ -71,6 +69,7 @@ open class EditorController: UINavigationController {
         image = UIImage.init(data: imageData)!
         #endif
         let photoEditorVC = PhotoEditorViewController.init(image: image, editResult: editResult, config: config)
+        photoEditorVC.delegate = delegate
         self.viewControllers = [photoEditorVC]
     }
     
@@ -78,11 +77,13 @@ open class EditorController: UINavigationController {
     /// 编辑网络图片
     public init(networkImageURL: URL,
                 editResult: PhotoEditResult? = nil,
-                config: PhotoEditorConfiguration) {
+                config: PhotoEditorConfiguration,
+                delegate: PhotoEditorViewControllerDelegate? = nil) {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
         let photoEditorVC = PhotoEditorViewController.init(networkImageURL: networkImageURL, editResult: editResult, config: config)
+        photoEditorVC.delegate = delegate
         self.viewControllers = [photoEditorVC]
     }
     #endif
@@ -94,8 +95,12 @@ open class EditorController: UINavigationController {
     ///   - config: 编辑配置
     public convenience init(videoURL: URL,
                             editResult: VideoEditResult? = nil,
-                            config: VideoEditorConfiguration) {
-        self.init(avAsset: AVAsset.init(url: videoURL), editResult: editResult, config: config)
+                            config: VideoEditorConfiguration,
+                            delegate: VideoEditorViewControllerDelegate? = nil) {
+        self.init(avAsset: AVAsset.init(url: videoURL),
+                  editResult: editResult,
+                  config: config,
+                  delegate: delegate)
     }
     
     /// 编辑 AVAsset
@@ -105,11 +110,13 @@ open class EditorController: UINavigationController {
     ///   - config: 编辑配置
     public init(avAsset: AVAsset,
                 editResult: VideoEditResult? = nil,
-                config: VideoEditorConfiguration) {
+                config: VideoEditorConfiguration,
+                delegate: VideoEditorViewControllerDelegate? = nil) {
         editorType = .video
         self.config = config
         super.init(nibName: nil, bundle: nil)
         let videoEditorVC = VideoEditorViewController.init(avAsset: avAsset, editResult: editResult, config: config)
+        videoEditorVC.delegate = delegate
         self.viewControllers = [videoEditorVC]
     }
     
@@ -120,11 +127,13 @@ open class EditorController: UINavigationController {
     ///   - config: 编辑配置
     public init(networkVideoURL: URL,
                 editResult: VideoEditResult? = nil,
-                config: VideoEditorConfiguration) {
+                config: VideoEditorConfiguration,
+                delegate: VideoEditorViewControllerDelegate? = nil) {
         editorType = .video
         self.config = config
         super.init(nibName: nil, bundle: nil)
         let videoEditorVC = VideoEditorViewController.init(networkVideoURL: networkVideoURL, editResult: editResult, config: config)
+        videoEditorVC.delegate = delegate
         self.viewControllers = [videoEditorVC]
     }
     
@@ -136,11 +145,14 @@ open class EditorController: UINavigationController {
     ///   - config: 编辑配置
     public init(photoAsset: PhotoAsset,
                 editResult: VideoEditResult? = nil,
-                config: VideoEditorConfiguration) {
+                config: VideoEditorConfiguration,
+                delegate: VideoEditorViewControllerDelegate? = nil) {
         editorType = .video
         self.config = config
         super.init(nibName: nil, bundle: nil)
-        let videoEditorVC = VideoEditorViewController.init(photoAsset: photoAsset, editResult: editResult, config: config)
+        let videoEditorVC = VideoEditorViewController.init(photoAsset: photoAsset,
+                                                           editResult: editResult, config: config)
+        videoEditorVC.delegate = delegate
         self.viewControllers = [videoEditorVC]
     }
     
@@ -151,11 +163,15 @@ open class EditorController: UINavigationController {
     ///   - config: 编辑配置
     public init(photoAsset: PhotoAsset,
                 editResult: PhotoEditResult? = nil,
-                config: PhotoEditorConfiguration) {
+                config: PhotoEditorConfiguration,
+                delegate: PhotoEditorViewControllerDelegate? = nil) {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
-        let photoEditorVC = PhotoEditorViewController.init(photoAsset: photoAsset, editResult: editResult, config: config)
+        let photoEditorVC = PhotoEditorViewController.init(photoAsset: photoAsset,
+                                                           editResult: editResult,
+                                                           config: config)
+        photoEditorVC.delegate = delegate
         self.viewControllers = [photoEditorVC]
     }
     #endif

@@ -12,6 +12,12 @@ protocol EditorToolViewDelegate: NSObjectProtocol {
     func toolView(didFinishButtonClick toolView: EditorToolView)
 }
 
+class EditorToolScrollView: UICollectionView {
+    override func touchesShouldCancel(in view: UIView) -> Bool {
+        true
+    }
+}
+
 class EditorToolView: UIView {
     weak var delegate: EditorToolViewDelegate?
     var config: EditorToolViewConfiguration
@@ -41,8 +47,9 @@ class EditorToolView: UIView {
         return flowLayout
     }()
     
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 50), collectionViewLayout: flowLayout)
+    lazy var collectionView: EditorToolScrollView = {
+        let collectionView = EditorToolScrollView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 50), collectionViewLayout: flowLayout)
+        collectionView.delaysContentTouches = false
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -130,7 +137,7 @@ class EditorToolView: UIView {
     }
 }
 
-extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate {
+extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate, EditorToolViewCellDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         config.toolOptions.count
     }
@@ -138,6 +145,7 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditorToolViewCellID", for: indexPath) as! EditorToolViewCell
         let model = config.toolOptions[indexPath.item]
+        cell.delegate = self
         cell.boxColor = config.musicSelectedColor
         if model.type == .music {
             cell.showBox = musicCellShowBox
@@ -146,11 +154,27 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate {
         }
         cell.selectedColor = config.toolSelectedColor
         cell.model = model
+        if model.type == .graffiti || model.type == .mosaic {
+            if let selectedIndexPath = currentSelectedIndexPath,
+               selectedIndexPath.item == indexPath.item {
+                cell.isSelectedImageView = true
+            }else {
+                cell.isSelectedImageView = false
+            }
+        }else {
+            cell.isSelectedImageView = false
+        }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: true)
+        collectionView.deselectItem(at: indexPath, animated: false)
+    }
+    
+    func toolViewCell(didClick cell: EditorToolViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else {
+            return
+        }
         let option = config.toolOptions[indexPath.item]
         if option.type == .graffiti || option.type == .mosaic {
             if let selectedIndexPath = currentSelectedIndexPath,
@@ -164,5 +188,4 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate {
         }
         delegate?.toolView(self, didSelectItemAt: option)
     }
-    
 }

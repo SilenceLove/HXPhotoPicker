@@ -12,8 +12,6 @@ import Photos
 import Kingfisher
 #endif
 
-public typealias statusHandler = (PHAuthorizationStatus) -> ()
-
 public class PhotoTools {
     
     /// 跳转系统设置界面
@@ -90,12 +88,30 @@ public class PhotoTools {
         }else if time < 60 {
             return String.init(format: "00:%d", arguments: [time])
         }else {
-            let min = Int(time / 60)
+            var min = Int(time / 60)
             let sec = time - (min * 60)
-            if sec < 10 {
-                return String.init(format: "%d:0%d", arguments: [min,sec])
+            if min < 60 {
+                if sec < 10 {
+                    return String.init(format: "%d:0%d", arguments: [min,sec])
+                }else {
+                    return String.init(format: "%d:%d", arguments: [min,sec])
+                }
             }else {
-                return String.init(format: "%d:%d", arguments: [min,sec])
+                let hour = Int(min / 60)
+                min -= hour * 60
+                if min < 10 {
+                    if sec < 10 {
+                        return String.init(format: "%d:0%d:0%d", arguments: [hour,min,sec])
+                    }else {
+                        return String.init(format: "%d:0%d:%d", arguments: [hour,min,sec])
+                    }
+                }else {
+                    if sec < 10 {
+                        return String.init(format: "%d:%d:0%d", arguments: [hour,min,sec])
+                    }else {
+                        return String.init(format: "%d:%d:%d", arguments: [hour,min,sec])
+                    }
+                }
             }
         }
     }
@@ -216,7 +232,7 @@ public class PhotoTools {
                 if supportedTypeArray.contains(AVFileType.mp4) {
                     exportSession.outputFileType = .mp4
                 }else if supportedTypeArray.isEmpty {
-                    completion(nil, PhotoError.error(message: "不支持导出该类型视频"))
+                    completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
                     return
                 }else {
                     exportSession.outputFileType = supportedTypeArray.first
@@ -237,11 +253,11 @@ public class PhotoTools {
                     }
                 })
             }else {
-                completion(nil, PhotoError.error(message: "不支持导出该类型视频"))
+                completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
                 return
             }
         }else {
-            completion(nil, PhotoError.error(message: "设备不支持导出：" + presentName))
+            completion(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + presentName))
             return
         }
     }

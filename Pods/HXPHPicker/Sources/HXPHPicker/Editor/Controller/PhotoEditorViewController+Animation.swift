@@ -8,6 +8,16 @@
 import UIKit
 
 extension PhotoEditorViewController {
+    func showChartletView() {
+        UIView.animate(withDuration: 0.25) {
+            self.setChartletViewFrame()
+        }
+    }
+    func hiddenChartletView() {
+        UIView.animate(withDuration: 0.25) {
+            self.setChartletViewFrame()
+        }
+    }
     
     func showFilterView() {
         UIView.animate(withDuration: 0.25) {
@@ -96,6 +106,8 @@ extension PhotoEditorViewController {
             }else if option.type == .mosaic {
                 mosaicToolView.isHidden = false
             }
+        }else {
+            imageView.stickerEnabled = true
         }
         UIView.animate(withDuration: 0.25) {
             self.toolView.alpha = 1

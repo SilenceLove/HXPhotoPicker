@@ -8,30 +8,32 @@
 import UIKit
 
 public struct VideoEditorMusicInfo {
-    /// 音频文件路径
-    public let audioPath: String
-    /// 歌词lrc路径
-    public let lrcPath: String
-    public init(audioPath: String,
-                lrcPath: String) {
-        self.audioPath = audioPath
-        self.lrcPath = lrcPath
+    /// 音频文件本地/网络地址(MP3格式)
+    public let audioURL: URL
+    /// 歌词lrc内容(包含歌名和歌手名的话会显示)
+    public let lrc: String
+    public init(audioURL: URL,
+                lrc: String) {
+        self.audioURL = audioURL
+        self.lrc = lrc
     }
 }
 
 class VideoEditorMusic: Equatable {
-    let audioPath: String
-    let lrcPath: String
-    init(audioPath: String,
-                lrcPath: String) {
-        self.audioPath = audioPath
-        self.lrcPath = lrcPath
+    let audioURL: URL
+    let lrc: String
+    init(audioURL: URL,
+         lrc: String) {
+        self.audioURL = audioURL
+        self.lrc = lrc
     }
     
     var isLoading: Bool = false
+    var isSelected: Bool = false
     
     var metaData: [String: String] = [:]
     var lyrics: [VideoEditorLyric] = []
+    var lyricIsEmpty = false
     var songName: String? { metaData["ti"] }
     var singer: String? { metaData["ar"] }
     var time: TimeInterval? {
@@ -44,12 +46,6 @@ class VideoEditorMusic: Equatable {
     }
     
     func parseLrc() {
-        let lrc: String
-        do {
-            lrc = try String(contentsOfFile: lrcPath)
-        } catch {
-            return
-        }
         let lines = lrc.replacingOccurrences(of: "\r", with: "").components(separatedBy: "\n")
         let tags = ["ti", "ar", "al", "by", "offset", "t_time"]
         let pattern1 = "(\\[\\d{0,2}:\\d{0,2}([.|:]\\d{0,3})?\\])"
@@ -125,6 +121,10 @@ class VideoEditorMusic: Equatable {
             }
         }
         lyrics = sorted
+        if lyrics.isEmpty {
+            lyricIsEmpty = true
+            lyrics.append(.init(lyric: "此歌曲暂无歌词，请您欣赏".localized))
+        }
     }
     
     func lyric(at range: NSRange) -> [VideoEditorLyric] {

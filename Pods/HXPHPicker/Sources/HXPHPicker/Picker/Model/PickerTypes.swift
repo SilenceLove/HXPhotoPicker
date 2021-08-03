@@ -51,7 +51,7 @@ public enum SelectionTapAction: Equatable {
     case quickSelect
     
     /// 打开编辑器
-    /// - 点击资源时会进入编辑界面
+    /// - 点击资源时如果可以编辑的话，就会进入编辑界面
     case openEditor
 }
 
@@ -149,6 +149,14 @@ public extension PhotoAsset {
         case downloading    //!< 下载中
         case canceled       //!< 取消下载
         case failed         //!< 下载失败
+    }
+    
+    /// 网络视频加载方式
+    enum LoadNetworkVideoMode {
+        /// 先下载
+        case download
+        /// 直接播放
+        case play
     }
 }
 

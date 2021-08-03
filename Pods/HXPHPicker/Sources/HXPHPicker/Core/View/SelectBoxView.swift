@@ -138,7 +138,7 @@ public class SelectBoxView: UIControl {
     }
     
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if CGRect(x: -15, y: -15, width: width + 30, height: height + 30).contains(point) {
+        if isUserInteractionEnabled && CGRect(x: -15, y: -15, width: width + 30, height: height + 30).contains(point) {
             return self
         }
         return super.hitTest(point, with: event)

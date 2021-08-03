@@ -64,7 +64,7 @@ public class PreviewVideoControlViewCell: PreviewVideoViewCell, PreviewVideoSlid
             maskLayer.isHidden = false
         }
     }
-    public override func hiddenToolView() {
+    public override func hideToolView() {
         if sliderView.alpha == 1 {
             UIView.animate(withDuration: 0.15) {
                 self.sliderView.alpha = 0
@@ -74,6 +74,16 @@ public class PreviewVideoControlViewCell: PreviewVideoViewCell, PreviewVideoSlid
                 }
             }
         }
+        if !maskLayer.isHidden {
+            maskLayer.isHidden = true
+        }
+    }
+    public override func showMask() {
+        if maskLayer.isHidden {
+            maskLayer.isHidden = false
+        }
+    }
+    public override func hideMask() {
         if !maskLayer.isHidden {
             maskLayer.isHidden = true
         }

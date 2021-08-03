@@ -236,12 +236,15 @@ extension PhotoPickerViewController {
         if item >= assets.count && !needOffset {
             return
         }
+        guard let pickerController = pickerController else {
+            return
+        }
         var showHUD = false
-        if let pickerController = pickerController {
-            let photoAsset = getPhotoAsset(for: item)
-            if photoAsset.isSelected != isSelected {
-                if isSelected {
-                    if pickerController.canSelectAsset(for: photoAsset, showHUD: false) {
+        let photoAsset = getPhotoAsset(for: item)
+        if photoAsset.isSelected != isSelected {
+            if isSelected {
+                func addAsset(showTip: Bool) {
+                    if pickerController.canSelectAsset(for: photoAsset, showHUD: showTip) {
                         pickerController.addedPhotoAsset(photoAsset: photoAsset)
                         if let cell = getCell(for: item) {
                             cell.updateSelectedState(isSelected: isSelected, animated: false)
@@ -249,18 +252,30 @@ extension PhotoPickerViewController {
                     }else {
                         showHUD = true
                     }
-                }else {
-                    pickerController.removePhotoAsset(photoAsset: photoAsset)
-                    if let cell = getCell(for: item) {
-                        cell.updateSelectedState(isSelected: isSelected, animated: false)
+                }
+                let inICloud = photoAsset.checkICloundStatus(allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto, completion: { isSuccess in
+                    if isSuccess {
+                        addAsset(showTip: true)
                     }
+                })
+                if inICloud {
+                    swipeSelectPanGR?.isEnabled = false
+                    clearSwipeSelectData()
+                    swipeSelectPanGR?.isEnabled = true
+                }else {
+                    addAsset(showTip: false)
+                }
+            }else {
+                pickerController.removePhotoAsset(photoAsset: photoAsset)
+                if let cell = getCell(for: item) {
+                    cell.updateSelectedState(isSelected: isSelected, animated: false)
                 }
             }
-            bottomView.updateFinishButtonTitle()
         }
-        if pickerController!.selectArrayIsFull() && showHUD {
+        bottomView.updateFinishButtonTitle()
+        if pickerController.selectArrayIsFull() && showHUD {
             swipeSelectPanGR?.isEnabled = false
-            ProgressHUD.showWarning(addedTo: navigationController?.view, text: String.init(format: "已达到最大选择数".localized, arguments: [pickerController!.config.maximumSelectedPhotoCount]), animated: true, delayHide: 1.5)
+            ProgressHUD.showWarning(addedTo: navigationController?.view, text: String.init(format: "已达到最大选择数".localized, arguments: [pickerController.config.maximumSelectedPhotoCount]), animated: true, delayHide: 1.5)
             clearSwipeSelectData()
             swipeSelectPanGR?.isEnabled = true
         }

@@ -50,6 +50,9 @@ class VideoEditorMusicAnimationView: UIView {
         }
     }
     func startAnimation() {
+        if isAnimatoning {
+            return
+        }
         isAnimatoning = true
         for shapeLayer in animationLayers {
             shapeLayer.removeAllAnimations()

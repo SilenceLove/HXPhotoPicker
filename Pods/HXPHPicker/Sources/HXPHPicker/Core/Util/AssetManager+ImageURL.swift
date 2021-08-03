@@ -8,10 +8,9 @@
 import UIKit
 import Photos
 
-public typealias ImageURLResultHandler = (URL?) -> Void
-
 // MARK: 获取图片地址
 public extension AssetManager {
+    typealias ImageURLResultHandler = (Result<URL, AssetError>) -> Void
     
     /// 请求获取图片地址
     /// - Parameters:
@@ -44,13 +43,17 @@ public extension AssetManager {
                                resultHandler: @escaping ImageURLResultHandler) {
         asset.checkAdjustmentStatus { (isAdjusted) in
             if isAdjusted {
-                self.requestImageData(for: asset, version: .current, iCloudHandler: nil, progressHandler: nil) { (imageData, _, _, _, downloadSuccess) in
-                    if let imageData = imageData,
-                       let imageURL = PhotoTools.write(toFile: fileURL, imageData: imageData) {
-                        resultHandler(imageURL)
-                        return
+                self.requestImageData(for: asset, version: .current, iCloudHandler: nil, progressHandler: nil) { (result) in
+                    switch result {
+                    case .success(let dataResult):
+                        if let imageURL = PhotoTools.write(toFile: fileURL, imageData: dataResult.imageData) {
+                            resultHandler(.success(imageURL))
+                        }else {
+                            resultHandler(.failure(.fileWriteFailed))
+                        }
+                    case .failure(let error):
+                        resultHandler(.failure(error.error))
                     }
-                    resultHandler(nil)
                 }
             }else {
                 var imageResource: PHAssetResource?
@@ -61,11 +64,11 @@ public extension AssetManager {
                     }
                 }
                 if imageResource == nil {
-                    resultHandler(nil)
+                    resultHandler(.failure(.assetResourceIsEmpty))
                     return
                 }
                 if !PhotoTools.removeFile(fileURL: fileURL) {
-                    resultHandler(nil)
+                    resultHandler(.failure(.removeFileFailed))
                     return
                 }
                 let imageURL = fileURL
@@ -74,9 +77,9 @@ public extension AssetManager {
                 PHAssetResourceManager.default().writeData(for: imageResource!, toFile: imageURL, options: options) { (error) in
                     DispatchQueue.main.async {
                         if error == nil {
-                            resultHandler(imageURL)
+                            resultHandler(.success(imageURL))
                         }else {
-                            resultHandler(nil)
+                            resultHandler(.failure(.assetResourceWriteDataFailed(error!)))
                         }
                     }
                 }

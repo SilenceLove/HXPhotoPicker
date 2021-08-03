@@ -13,11 +13,18 @@ import Kingfisher
 protocol PhotoEditorContentViewDelegate: AnyObject {
     func contentView(drawViewBeganDraw contentView: PhotoEditorContentView)
     func contentView(drawViewEndDraw contentView: PhotoEditorContentView)
+    func contentView(_ contentView: PhotoEditorContentView, updateStickerText item: EditorStickerItem)
 }
 
 class PhotoEditorContentView: UIView {
     
     weak var delegate: PhotoEditorContentViewDelegate?
+    
+    var itemViewMoveToCenter: ((CGRect) -> Bool)?
+    
+    var stickerMinScale: ((CGSize) -> CGFloat)?
+    
+    var stickerMaxScale: ((CGSize) -> CGFloat)?
     
     lazy var imageView: UIImageView = {
         var imageView: UIImageView
@@ -35,6 +42,7 @@ class PhotoEditorContentView: UIView {
         didSet {
             drawView.scale = zoomScale
             mosaicView.scale = zoomScale
+            stickerView.scale = zoomScale
         }
     }
     lazy var drawView: PhotoEditorDrawView = {
@@ -47,6 +55,11 @@ class PhotoEditorContentView: UIView {
         view.delegate = self
         return view
     }()
+    lazy var stickerView: EditorStickerView = {
+        let view = EditorStickerView(frame: .zero)
+        view.delegate = self
+        return view
+    }()
     
     let mosaicConfig: PhotoEditorConfiguration.MosaicConfig
     
@@ -56,6 +69,7 @@ class PhotoEditorContentView: UIView {
         addSubview(imageView)
         addSubview(mosaicView)
         addSubview(drawView)
+        addSubview(stickerView)
     }
     func setMosaicOriginalImage(_ image: UIImage?) {
         mosaicView.originalImage = image
@@ -74,6 +88,7 @@ class PhotoEditorContentView: UIView {
         imageView.frame = bounds
         drawView.frame = bounds
         mosaicView.frame = bounds
+        stickerView.frame = bounds
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -86,6 +101,38 @@ extension PhotoEditorContentView: PhotoEditorDrawViewDelegate {
     }
     func drawView(endDraw drawView: PhotoEditorDrawView) {
         delegate?.contentView(drawViewEndDraw: self)
+    }
+}
+extension PhotoEditorContentView: EditorStickerViewDelegate {
+    func stickerView(_ stickerView: EditorStickerView, updateStickerText item: EditorStickerItem) {
+        delegate?.contentView(self, updateStickerText: item)
+    }
+    
+    func stickerView(touchBegan stickerView: EditorStickerView) {
+        delegate?.contentView(drawViewBeganDraw: self)
+    }
+    func stickerView(touchEnded stickerView: EditorStickerView) {
+        delegate?.contentView(drawViewEndDraw: self)
+    }
+    func stickerView(_ stickerView: EditorStickerView, moveToCenter rect: CGRect) -> Bool {
+        if let moveToCenter = itemViewMoveToCenter?(rect) {
+            return moveToCenter
+        }
+        return false
+    }
+    
+    func stickerView(_ stickerView: EditorStickerView, minScale itemSize: CGSize) -> CGFloat {
+        if let minScale = stickerMinScale?(itemSize) {
+            return minScale
+        }
+        return 0.2
+    }
+    
+    func stickerView(_ stickerView: EditorStickerView, maxScale itemSize: CGSize) -> CGFloat {
+        if let maxScale = stickerMaxScale?(itemSize) {
+            return maxScale
+        }
+        return 5
     }
 }
 extension PhotoEditorContentView: PhotoEditorMosaicViewDelegate {

@@ -156,16 +156,18 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         let pickerController = previewVC?.pickerController
         let maskHeight = 50 + UIDevice.bottomMargin
         var previewShowSelectedView = false
-        if previewVC?.config.bottomView.showSelectedView == true &&
-            pickerController?.config.selectMode == .multiple {
-            if pickerController?.selectedAssetArray.isEmpty == false {
+        if let previewVC = previewVC,
+           previewVC.config.bottomView.showSelectedView,
+           let pickerController = pickerController,
+           pickerController.config.selectMode == .multiple {
+            if pickerController.selectedAssetArray.isEmpty == false {
                 previewShowSelectedView = true
                 if !pickerShowParompt {
                     let maskY: CGFloat = type == .push ? 70 : 0
                     let maskHeight: CGFloat = type == .push ? 50 + UIDevice.bottomMargin : 120 + UIDevice.bottomMargin
                     let maskView = UIView.init(frame: CGRect(x: 0, y: maskY, width: contentView.width, height: maskHeight))
                     maskView.backgroundColor = .white
-                    previewVC?.bottomView.mask = maskView
+                    previewVC.bottomView.mask = maskView
                 }
             }
         }
@@ -176,29 +178,42 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             maskView.backgroundColor = .white
             pickerVC?.bottomView.mask = maskView
         }
-        UIView.animate(withDuration: transitionDuration(using: transitionContext) - 0.125) {
+        let duration = transitionDuration(using: transitionContext)
+        UIView.animate(withDuration: duration - 0.15) {
             if self.type == .push {
-                previewVC?.bottomView.alpha = 1
+                contentView.backgroundColor = backgroundColor?.withAlphaComponent(1)
+            }else if self.type == .pop {
+                contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
+            }
+        }
+        if type == .push {
+            UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveEaseIn]) {
                 if previewVC?.bottomView.mask != nil {
                     previewVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: contentView.width, height: maskHeight + 70)
                 }
                 if pickerVC?.bottomView.mask != nil {
                     pickerVC?.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: contentView.width, height: maskHeight)
                 }
-                contentView.backgroundColor = backgroundColor?.withAlphaComponent(1)
-            }else if self.type == .pop {
-                previewVC?.bottomView.alpha = 0
+            } completion: { _ in }
+            let alphaDuration = previewVC?.bottomView.mask == nil ? duration - 0.15 : 0.15
+            UIView.animate(withDuration: alphaDuration) {
+                previewVC?.bottomView.alpha = 1
+            }
+        }else if type == .pop {
+            UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveLinear]) {
                 if previewVC?.bottomView.mask != nil {
                     previewVC?.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: contentView.width, height: maskHeight + 70)
                 }
                 if pickerVC?.bottomView.mask != nil {
                     pickerVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: contentView.width, height: maskHeight + 70)
                 }
-                contentView.backgroundColor = backgroundColor?.withAlphaComponent(0)
-            }
+            } completion: { _ in }
+            UIView.animate(withDuration: duration - 0.15, delay: 0.125, options: []) {
+                previewVC?.bottomView.alpha = 0
+            } completion: { _ in }
         }
         
-        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
             if self.type == .push {
                 self.pushImageView.frame = rect
             }else if self.type == .pop {
@@ -400,17 +415,24 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         let options = PHImageRequestOptions.init()
         options.resizeMode = .fast
         options.isSynchronous = false
-        requestID = AssetManager.requestImageData(for: asset, options: options) { (imageData, dataUTI, imageOrientation, info) in
-            if imageData != nil {
-                var image: UIImage?
-                if imageOrientation != .up {
-                    image = UIImage.init(data: imageData!)?.normalizedImage()
-                }else {
-                    image = UIImage.init(data: imageData!)
+        requestID = AssetManager.requestImageData(for: asset, options: options) { (result) in
+            var info: [AnyHashable : Any]? = nil
+            switch result {
+            case .success(let dataResult):
+                info = dataResult.info
+                DispatchQueue.global().async {
+                    var image: UIImage?
+                    if dataResult.imageOrientation != .up {
+                        image = UIImage.init(data: dataResult.imageData)?.normalizedImage()
+                    }else {
+                        image = UIImage.init(data: dataResult.imageData)
+                    }
+                    DispatchQueue.main.async {
+                        self.pushImageView.image = image
+                    }
                 }
-                DispatchQueue.main.async {
-                    self.pushImageView.image = image
-                }
+            case .failure(let error):
+                info = error.info
             }
             if AssetManager.assetDownloadFinined(for: info) ||
                 AssetManager.assetCancelDownload(for: info){

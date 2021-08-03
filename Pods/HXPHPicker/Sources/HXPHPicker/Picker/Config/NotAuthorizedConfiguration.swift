@@ -12,64 +12,40 @@ import UIKit
 public class NotAuthorizedConfiguration {
     
     /// 背景颜色
-    public lazy var backgroundColor: UIColor = {
-        return UIColor.white
-    }()
+    public lazy var backgroundColor: UIColor = .white
     
     /// 暗黑风格下的背景颜色
-    public lazy var darkBackgroundColor: UIColor = {
-        return "#2E2F30".color
-    }()
+    public lazy var darkBackgroundColor: UIColor = "#2E2F30".color
     
     /// 关闭按钮图片名
-    public lazy var closeButtonImageName: String = {
-        return "hx_picker_notAuthorized_close"
-    }()
+    public lazy var closeButtonImageName: String = "hx_picker_notAuthorized_close"
     
     /// 暗黑风格下的关闭按钮图片名
-    public lazy var closeButtonDarkImageName: String = {
-        return "hx_picker_notAuthorized_close_dark"
-    }()
+    public lazy var closeButtonDarkImageName: String = "hx_picker_notAuthorized_close_dark"
     
     /// 标题颜色
-    public lazy var titleColor: UIColor = {
-        return UIColor.black
-    }()
+    public lazy var titleColor: UIColor = .black
     
     /// 暗黑风格下的标题颜色
-    public lazy var titleDarkColor: UIColor = {
-        return .white
-    }()
+    public lazy var titleDarkColor: UIColor = .white
     
     /// 子标题颜色
-    public lazy var subTitleColor: UIColor = {
-        return "#444444".color
-    }()
+    public lazy var subTitleColor: UIColor = "#444444".color
     
     /// 暗黑风格下的子标题颜色
-    public lazy var darkSubTitleColor: UIColor = {
-        return .white
-    }()
+    public lazy var darkSubTitleColor: UIColor = .white
     
     /// 跳转按钮背景颜色
-    public lazy var jumpButtonBackgroundColor: UIColor = {
-        return "#333333".color
-    }()
+    public lazy var jumpButtonBackgroundColor: UIColor = "#333333".color
     
     /// 暗黑风格下跳转按钮背景颜色
-    public lazy var jumpButtonDarkBackgroundColor: UIColor = {
-        return .white
-    }()
+    public lazy var jumpButtonDarkBackgroundColor: UIColor = .white
     
     /// 跳转按钮文字颜色
-    public lazy var jumpButtonTitleColor: UIColor = {
-        return "#ffffff".color
-    }()
+    public lazy var jumpButtonTitleColor: UIColor = "#ffffff".color
     
     /// 暗黑风格下跳转按钮文字颜色
-    public lazy var jumpButtonTitleDarkColor: UIColor = {
-        return "#333333".color
-    }()
+    public lazy var jumpButtonTitleDarkColor: UIColor = "#333333".color
     
     public init() { }
 }

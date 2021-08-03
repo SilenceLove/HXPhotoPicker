@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreImage
 
 /// 需要添加滤镜的原始图片、上一次添加滤镜的图片，value，event
 public typealias PhotoEditorFilterHandler = (UIImage, UIImage?, Float, PhotoEditorFilterInfo.Event) -> UIImage?
@@ -25,7 +24,7 @@ public struct PhotoEditorFilterInfo {
     /// 设置 -1 则代表不显示滑块
     public let defaultValue: Float
     
-    /// 滤镜处理器，传入未添加滤镜的图片,返回添加滤镜之后的图片
+    /// 滤镜处理器，内部会传入未添加滤镜的图片，返回添加滤镜之后的图片
     public let filterHandler: PhotoEditorFilterHandler
     
     public init(filterName: String,
@@ -37,7 +36,7 @@ public struct PhotoEditorFilterInfo {
     }
 }
 
-class PhotoEditorFilter: Equatable {
+class PhotoEditorFilter: Equatable, Codable {
     
     let filterName: String
     let defaultValue: Float

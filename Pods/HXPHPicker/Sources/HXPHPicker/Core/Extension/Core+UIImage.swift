@@ -86,7 +86,6 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
-    
     class func image(for color: UIColor?, havingSize: CGSize, radius: CGFloat = 0) -> UIImage? {
         if let color = color {
             let rect: CGRect
@@ -295,7 +294,7 @@ extension UIImage {
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
         draw(in: CGRect(origin: .zero, size: size))
         for image in images {
-            image.draw(in: CGRect(origin: .zero, size: image.size))
+            image.draw(in: CGRect(origin: .zero, size: size))
         }
         let mergeImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()

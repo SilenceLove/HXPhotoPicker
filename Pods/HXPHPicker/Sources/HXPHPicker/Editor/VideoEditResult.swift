@@ -25,19 +25,23 @@ public struct VideoEditResult {
     /// 视频时长 秒
     public let videoDuration: TimeInterval
     
+    /// 原视频音量
+    public let videoSoundVolume: Float
+    
     /// 背景音乐地址
     public let backgroundMusicURL: URL?
     
-    /// 隐藏视频原声
-    public let hideVideoSoundTrack: Bool
+    /// 背景音乐音量
+    public let backgroundMusicVolume: Float
     
     /// 裁剪数据
     public let cropData: VideoCropData?
     
     public init(editedURL: URL,
                 cropData: VideoCropData?,
+                videoSoundVolume: Float,
                 backgroundMusicURL: URL?,
-                hideVideoSoundTrack: Bool) {
+                backgroundMusicVolume: Float) {
         editedFileSize = editedURL.fileSize
         
         videoDuration = PhotoTools.getVideoDuration(videoURL: editedURL)
@@ -45,12 +49,13 @@ public struct VideoEditResult {
         coverImage = PhotoTools.getVideoThumbnailImage(videoURL: editedURL, atTime: 0.1)
         self.editedURL = editedURL
         self.cropData = cropData
+        self.videoSoundVolume = videoSoundVolume
         self.backgroundMusicURL = backgroundMusicURL
-        self.hideVideoSoundTrack = hideVideoSoundTrack
+        self.backgroundMusicVolume = backgroundMusicVolume
     }
 }
 
-public struct VideoCropData {
+public struct VideoCropData: Codable {
     
     /// 编辑的开始时间
     public let startTime: TimeInterval
@@ -64,23 +69,83 @@ public struct VideoCropData {
     /// 0：offsetX ，CollectionView的offset.x
     /// 1：validX ，裁剪框的x
     /// 2：validWidth ，裁剪框的宽度
-    public let cropingData: (CGFloat, CGFloat, CGFloat)
+    public let cropingData: CropData
     
     /// 裁剪框的位置大小比例
     /// 0：offsetX ，CollectionView的offset.x
     /// 1：validX ，裁剪框的x
     /// 2：validWidth ，裁剪框的宽度
-    public let cropRectData: (CGFloat, CGFloat, CGFloat)
+    public let cropRectData: CropData
     
     public init(startTime: TimeInterval,
                 endTime: TimeInterval,
                 preferredTimescale: Int32,
-                cropingData: (CGFloat, CGFloat, CGFloat),
-                cropRectData: (CGFloat, CGFloat, CGFloat)) {
+                cropingData: CropData,
+                cropRectData: CropData) {
         self.startTime = startTime
         self.endTime = endTime
         self.preferredTimescale = preferredTimescale
         self.cropingData = cropingData
         self.cropRectData = cropRectData
+    }
+    
+    public struct CropData: Codable {
+        let offsetX: CGFloat
+        let validX: CGFloat
+        let validWidth: CGFloat
+    }
+}
+
+extension VideoEditResult: Codable {
+    
+    enum CodingKeys: String, CodingKey {
+        case editedURL
+        case coverImage
+        case editedFileSize
+        case videoTime
+        case videoDuration
+        case videoSoundVolume
+        case backgroundMusicURL
+        case backgroundMusicVolume
+        case cropData
+    }
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        editedURL = try container.decode(URL.self, forKey: .editedURL)
+        if let coverImageData = try container.decodeIfPresent(Data.self, forKey: .coverImage) {
+            coverImage = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(coverImageData) as? UIImage
+        }else {
+            coverImage = nil
+        }
+        editedFileSize = try container.decode(Int.self, forKey: .editedFileSize)
+        videoTime = try container.decode(String.self, forKey: .videoTime)
+        videoDuration = try container.decode(TimeInterval.self, forKey: .videoDuration)
+        videoSoundVolume = try container.decode(Float.self, forKey: .videoSoundVolume)
+        backgroundMusicURL = try container.decodeIfPresent(URL.self, forKey: .backgroundMusicURL)
+        backgroundMusicVolume = try container.decode(Float.self, forKey: .backgroundMusicVolume)
+        cropData = try container.decode(VideoCropData.self, forKey: .cropData)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(editedURL, forKey: .editedURL)
+        try container.encode(editedFileSize, forKey: .editedFileSize)
+        try container.encode(videoTime, forKey: .videoTime)
+        try container.encode(videoDuration, forKey: .videoDuration)
+        try container.encode(videoSoundVolume, forKey: .videoSoundVolume)
+        try container.encode(backgroundMusicURL, forKey: .backgroundMusicURL)
+        try container.encode(backgroundMusicVolume, forKey: .backgroundMusicVolume)
+        try container.encode(cropData, forKey: .cropData)
+        
+        if let image = coverImage {
+            if #available(iOS 11.0, *) {
+                let imageData = try NSKeyedArchiver.archivedData(withRootObject: image, requiringSecureCoding: false)
+                try container.encode(imageData, forKey: .coverImage)
+            } else {
+                // Fallback on earlier versions
+                let imageData = NSKeyedArchiver.archivedData(withRootObject: image)
+                try container.encode(imageData, forKey: .coverImage)
+            }
+        }
     }
 }

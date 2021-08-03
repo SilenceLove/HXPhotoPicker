@@ -11,20 +11,13 @@ import UIKit
 // MARK: 照片列表配置类
 public class PhotoListConfiguration {
     /// 相册标题视图配置
-    public lazy var titleViewConfig: AlbumTitleViewConfiguration = {
-        let titleViewConfig = AlbumTitleViewConfiguration.init()
-        return titleViewConfig
-    }()
+    public lazy var titleView: AlbumTitleViewConfiguration = .init()
     
     /// 背景颜色
-    public lazy var backgroundColor : UIColor = {
-        return UIColor.white
-    }()
+    public lazy var backgroundColor : UIColor = .white
     
     /// 暗黑风格下背景颜色
-    public lazy var backgroundDarkColor : UIColor = {
-        return "#2E2F30".color
-    }()
+    public lazy var backgroundDarkColor : UIColor = "#2E2F30".color
     
     /// 取消按钮的配置只有当 albumShowMode = .popup 时有效
     /// 取消按钮类型
@@ -64,28 +57,19 @@ public class PhotoListConfiguration {
     public var autoSwipeBottomAreaHeight: CGFloat = 100
     
     /// cell相关配置
-    public lazy var cell: PhotoListCellConfiguration = {
-        return PhotoListCellConfiguration.init()
-    }()
+    public lazy var cell: PhotoListCellConfiguration = .init()
     
     /// 底部视图相关配置
-    public lazy var bottomView: PickerBottomViewConfiguration = {
-        let config = PickerBottomViewConfiguration.init()
-        return config
-    }()
+    public lazy var bottomView: PickerBottomViewConfiguration = .init()
     
     /// 允许添加相机
     public var allowAddCamera: Bool = true
     
     /// 相机cell配置
-    public lazy var cameraCell: PhotoListCameraCellConfiguration = {
-        return PhotoListCameraCellConfiguration.init()
-    }()
+    public lazy var cameraCell: PhotoListCameraCellConfiguration = .init()
     
     /// 相机配置
-    public lazy var camera: CameraConfiguration = {
-        return CameraConfiguration.init()
-    }()
+    public lazy var camera: CameraConfiguration = .init()
     
     /// 拍照完成后是否选择
     public var takePictureCompletionToSelected: Bool = true
@@ -97,9 +81,7 @@ public class PhotoListConfiguration {
     public var customAlbumName: String?
     
     /// 没有资源时展示的相关配置
-    public lazy var emptyView : EmptyViewConfiguration = {
-        return EmptyViewConfiguration.init()
-    }()
+    public lazy var emptyView : EmptyViewConfiguration = .init()
     
     public init() { }
 }

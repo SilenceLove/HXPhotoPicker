@@ -11,22 +11,19 @@ import CommonCrypto
 
 extension String {
     
-    var localized: String {
-        get {
-            Bundle.localizedString(for: self)
-        }
-    }
+    var localized: String { Bundle.localizedString(for: self) }
     
-    var color: UIColor {
-        get {
-            UIColor.init(hexString: self)
-        }
-    }
+    var color: UIColor { UIColor.init(hexString: self) }
     
-    var image: UIImage? {
-        get {
-            UIImage.image(for: self)
+    var image: UIImage? { UIImage.image(for: self) }
+    
+    var lrc: String? {
+        var lrcString : String?
+        if let bundle = PhotoManager.shared.bundle,
+           let path = bundle.path(forResource: "musics", ofType: nil) {
+            lrcString = try? String(contentsOfFile: path + "/" + self)
         }
+        return lrcString
     }
     
     static func fileName(suffix: String) -> String {
@@ -37,7 +34,7 @@ extension String {
         
         fileName.append(String(format: "%d", arguments: [nowDate]))
         fileName.append(String(format: "%d", arguments: [arc4random()%10000]))
-        return fileName.md5() + "." + suffix
+        return suffix.isEmpty ? fileName.md5() : fileName.md5() + "." + suffix
     }
     func md5() -> String {
         let str = self.cString(using: String.Encoding.utf8)
@@ -51,6 +48,12 @@ extension String {
         }
         free(result)
         return String(format: hash as String)
+    }
+    
+    func size(ofAttributes attributes: [NSAttributedString.Key: Any], maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
+        let constraintRect = CGSize(width: maxWidth, height: maxHeight)
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes:attributes, context: nil)
+        return boundingBox.size
     }
     
     /// 字符串宽度
@@ -68,9 +71,7 @@ extension String {
     ///   - maxHeight: 最大高度
     /// - Returns: 字符串宽度
     func width(ofFont font: UIFont, maxHeight: CGFloat) -> CGFloat {
-        let constraintRect = CGSize(width: CGFloat(MAXFLOAT), height: maxHeight)
-        let boundingBox = self.boundingRect(with: constraintRect, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        return boundingBox.size.width
+        return size(ofAttributes: [NSAttributedString.Key.font: font], maxWidth: CGFloat(MAXFLOAT), maxHeight: maxHeight).width
     }
     
     /// 字符串高度
@@ -88,9 +89,7 @@ extension String {
     ///   - maxWidth: 最大宽度
     /// - Returns: 高度
     func height(ofFont font: UIFont, maxWidth: CGFloat) -> CGFloat {
-        let constraintRect = CGSize(width: maxWidth, height: CGFloat(MAXFLOAT))
-        let boundingBox = self.boundingRect(with: constraintRect, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        return boundingBox.size.height
+        return size(ofAttributes: [NSAttributedString.Key.font: font], maxWidth: maxWidth, maxHeight: CGFloat(MAXFLOAT)).height
     }
     
     subscript(_ indexs: ClosedRange<Int>) -> String {

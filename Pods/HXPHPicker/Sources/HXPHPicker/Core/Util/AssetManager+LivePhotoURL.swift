@@ -20,12 +20,12 @@ public extension AssetManager {
             } progressHandler: { (progress, error, stop, info) in
             } resultHandler: { (livePhoto, info, downloadSuccess) in
                 if livePhoto == nil {
-                    completionHandler(.allError(PhotoError.error(message: "livePhoto为nil，获取失败"), PhotoError.error(message: "livePhoto为nil，获取失败")))
+                    completionHandler(.allError(PhotoError.error(type: .imageEmpty, message: "livePhoto为nil，获取失败"), PhotoError.error(type: .videoEmpty, message: "livePhoto为nil，获取失败")))
                     return
                 }
                 let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto!)
                 if assetResources.isEmpty {
-                    completionHandler(.allError(PhotoError.error(message: "assetResources为nil，获取失败"), PhotoError.error(message: "assetResources为nil，获取失败")))
+                    completionHandler(.allError(PhotoError.error(type: .imageEmpty, message: "assetResources为nil，获取失败"), PhotoError.error(type: .videoEmpty, message: "assetResources为nil，获取失败")))
                     return
                 }
                 let options = PHAssetResourceRequestOptions.init()
@@ -94,7 +94,7 @@ public extension AssetManager {
             }
         } else {
             // Fallback on earlier versions
-            completionHandler(.allError(PhotoError.error(message: "系统版本低于9.1"), PhotoError.error(message: "系统版本低于9.1")))
+            completionHandler(.allError(PhotoError.error(type: .imageEmpty, message: "系统版本低于9.1"), PhotoError.error(type: .videoEmpty, message: "系统版本低于9.1")))
         }
     }
     
@@ -111,16 +111,16 @@ public extension AssetManager {
             } progressHandler: { (progress, error, stop, info) in
             } resultHandler: { (livePhoto, info, downloadSuccess) in
                 if livePhoto == nil {
-                    completionHandler(nil, .allError(PhotoError.error(message: "livePhoto为nil，获取失败"), PhotoError.error(message: "livePhoto为nil，获取失败")))
+                    completionHandler(nil, .allError(PhotoError.error(type: .imageEmpty, message: "livePhoto为nil，获取失败"), PhotoError.error(type: .videoEmpty, message: "livePhoto为nil，获取失败")))
                     return
                 }
                 let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto!)
                 if assetResources.isEmpty {
-                    completionHandler(nil, .allError(PhotoError.error(message: "assetResources为nil，获取失败"), PhotoError.error(message: "assetResources为nil，获取失败")))
+                    completionHandler(nil, .allError(PhotoError.error(type: .imageEmpty, message: "assetResources为nil，获取失败"), PhotoError.error(type: .videoEmpty, message: "assetResources为nil，获取失败")))
                     return
                 }
                 if !PhotoTools.removeFile(fileURL: fileURL) {
-                    completionHandler(nil, .allError(PhotoError.error(message: "指定的地址已存在"), PhotoError.error(message: "指定的地址已存在")))
+                    completionHandler(nil, .allError(PhotoError.error(type: .imageEmpty, message: "指定的地址已存在"), PhotoError.error(type: .videoEmpty, message: "指定的地址已存在")))
                     return
                 }
                 let videoURL = fileURL
@@ -153,7 +153,7 @@ public extension AssetManager {
             }
         } else {
             // Fallback on earlier versions
-            completionHandler(nil, .allError(PhotoError.error(message: "系统版本低于9.1"), PhotoError.error(message: "系统版本低于9.1")))
+            completionHandler(nil, .allError(PhotoError.error(type: .imageEmpty, message: "系统版本低于9.1"), PhotoError.error(type: .videoEmpty, message: "系统版本低于9.1")))
         }
     }
     // MARK: 获取LivePhoto里的图片地址和视频地址
@@ -166,12 +166,12 @@ public extension AssetManager {
             } progressHandler: { (progress, error, stop, info) in
             } resultHandler: { (livePhoto, info, downloadSuccess) in
                 if livePhoto == nil {
-                    completionHandler(.allError(PhotoError.error(message: "livePhoto为nil，获取失败"), PhotoError.error(message: "livePhoto为nil，获取失败")))
+                    completionHandler(.allError(PhotoError.error(type: .imageEmpty, message: "livePhoto为nil，获取失败"), PhotoError.error(type: .videoEmpty, message: "livePhoto为nil，获取失败")))
                     return
                 }
                 let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto!)
                 if assetResources.isEmpty {
-                    completionHandler(.allError(PhotoError.error(message: "assetResources为nil，获取失败"), PhotoError.error(message: "assetResources为nil，获取失败")))
+                    completionHandler(.allError(PhotoError.error(type: .imageEmpty, message: "assetResources为nil，获取失败"), PhotoError.error(type: .videoEmpty, message: "assetResources为nil，获取失败")))
                     return
                 }
                 let options = PHAssetResourceRequestOptions.init()
@@ -238,7 +238,7 @@ public extension AssetManager {
             }
         } else {
             // Fallback on earlier versions
-            completionHandler(.allError(PhotoError.error(message: "系统版本低于9.1"), PhotoError.error(message: "系统版本低于9.1")))
+            completionHandler(.allError(PhotoError.error(type: .imageEmpty, message: "系统版本低于9.1"), PhotoError.error(type: .videoEmpty, message: "系统版本低于9.1")))
         }
     }
 }

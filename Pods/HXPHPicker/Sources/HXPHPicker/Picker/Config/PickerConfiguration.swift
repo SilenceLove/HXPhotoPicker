@@ -24,6 +24,12 @@ open class PickerConfiguration: BaseConfiguration {
     /// 允许加载系统照片库
     public var allowLoadPhotoLibrary: Bool = true
     
+    /// 选择照片时，先判断是否在iCloud上。如果在iCloud上会先同步iCloud上的资源
+    /// 如果在断网或者系统iCloud出错的情况下:
+    /// true: 选择失败
+    /// fasle: 获取原始图片会失败
+    public var allowSyncICloudWhenSelectPhoto : Bool = true
+    
     /// 相册展示模式
     public var albumShowMode: AlbumShowMode = .normal
     
@@ -72,7 +78,7 @@ open class PickerConfiguration: BaseConfiguration {
     /// 视频编辑配置
     public lazy var videoEditor: VideoEditorConfiguration = .init()
     
-    /// 图片编辑配置
+    /// 照片编辑配置
     public lazy var photoEditor: PhotoEditorConfiguration = .init()
     #endif
     
@@ -107,22 +113,14 @@ open class PickerConfiguration: BaseConfiguration {
     public var navigationDarkTintColor: UIColor = UIColor.white
     
     /// 相册列表配置
-    public lazy var albumList : AlbumListConfiguration = {
-        return AlbumListConfiguration.init()
-    }()
+    public lazy var albumList : AlbumListConfiguration = .init()
     
     /// 照片列表配置
-    public lazy var photoList: PhotoListConfiguration = {
-        return PhotoListConfiguration.init()
-    }()
+    public lazy var photoList: PhotoListConfiguration = .init()
     
     /// 预览界面配置
-    public lazy var previewView: PreviewViewConfiguration = {
-        return PreviewViewConfiguration.init()
-    }()
+    public lazy var previewView: PreviewViewConfiguration = .init()
     
     /// 未授权提示界面相关配置
-    public lazy var notAuthorized : NotAuthorizedConfiguration = {
-        return NotAuthorizedConfiguration.init()
-    }()
+    public lazy var notAuthorized : NotAuthorizedConfiguration = .init()
 }

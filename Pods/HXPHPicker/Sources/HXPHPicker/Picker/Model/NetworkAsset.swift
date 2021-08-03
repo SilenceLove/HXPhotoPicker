@@ -9,7 +9,7 @@ import UIKit
 #if canImport(Kingfisher)
 import Kingfisher
 
-public struct NetworkImageAsset {
+public struct NetworkImageAsset: Codable {
     
     /// 占位图
     public var placeholder: String?
@@ -94,4 +94,48 @@ public struct NetworkVideoAsset {
         self.coverImage = coverImage
     }
     #endif
+}
+
+extension NetworkVideoAsset: Codable {
+    enum CodingKeys: CodingKey {
+        case videoURL
+        case duration
+        case coverImage
+        case fileSize
+        #if canImport(Kingfisher)
+        case coverImageURL
+        #endif
+    }
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        videoURL = try container.decode(URL.self, forKey: .videoURL)
+        duration = try container.decode(TimeInterval.self, forKey: .duration)
+        if let imageData = try container.decodeIfPresent(Data.self, forKey: .coverImage) {
+            coverImage = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(imageData) as? UIImage
+        }else {
+            coverImage = nil
+        }
+        fileSize = try container.decode(Int.self, forKey: .fileSize)
+        #if canImport(Kingfisher)
+        coverImageURL = try container.decodeIfPresent(URL.self, forKey: .coverImageURL)
+        #endif
+    }
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(videoURL, forKey: .videoURL)
+        try container.encode(duration, forKey: .duration)
+        if let image = coverImage {
+            if #available(iOS 11.0, *) {
+                let imageData = try NSKeyedArchiver.archivedData(withRootObject: image, requiringSecureCoding: false)
+                try container.encode(imageData, forKey: .coverImage)
+            } else {
+                let imageData = NSKeyedArchiver.archivedData(withRootObject: image)
+                try container.encode(imageData, forKey: .coverImage)
+            }
+        }
+        try container.encode(fileSize, forKey: .fileSize)
+        #if canImport(Kingfisher)
+        try container.encode(coverImageURL, forKey: .coverImageURL)
+        #endif
+    }
 }

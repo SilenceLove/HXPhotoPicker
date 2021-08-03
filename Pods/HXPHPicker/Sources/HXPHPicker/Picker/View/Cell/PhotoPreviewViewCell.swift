@@ -13,6 +13,7 @@ import ImageIO
 
 protocol PhotoPreviewViewCellDelegate: NSObjectProtocol {
     func cell(singleTap cell: PhotoPreviewViewCell)
+    func cell(longPress cell: PhotoPreviewViewCell)
     func photoCell(networkImagedownloadSuccess photoCell: PhotoPreviewViewCell)
     func photoCell(networkImagedownloadFailed photoCell: PhotoPreviewViewCell)
 }
@@ -46,6 +47,8 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         singleTap.require(toFail: doubleTap)
         scrollView.addGestureRecognizer(doubleTap)
         scrollView.addSubview(scrollContentView)
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressClick(longPress:)))
+        scrollView.addGestureRecognizer(longPress)
         return scrollView
     }()
     
@@ -125,6 +128,11 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
             let zoomWidth = width / maximumZoomScale
             let zoomHeight = height / maximumZoomScale
             scrollView.zoom(to: CGRect(x: touchPoint.x - zoomWidth / 2, y: touchPoint.y - zoomHeight / 2, width: zoomWidth, height: zoomHeight), animated: true)
+        }
+    }
+    @objc func longPressClick(longPress: UILongPressGestureRecognizer) {
+        if longPress.state == .began {
+            delegate?.cell(longPress: self)
         }
     }
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {

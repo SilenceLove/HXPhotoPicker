@@ -10,15 +10,33 @@ import HXPHPicker
 
 class HomeViewController: UITableViewController {
     
+    var reachability: Reachability?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Photo Kit"
-        
+        reachability = try? .init()
+        reachability?.whenReachable = { reachability in
+            if reachability.connection != .unavailable {
+                print("网络连接：可用")
+                if reachability.connection == .wifi {
+                    print("连接类型：WiFi")
+                } else {
+                    print("连接类型：移动网络")
+                }
+            } else {
+                print("网络连接：不可用")
+            }
+        }
+        do{
+            try reachability?.startNotifier()
+        }catch {
+            print("could not start reachability notifier")
+        }
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
     }
-    
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -115,6 +133,7 @@ extension HomeViewController {
         case preselectAsset
         case collectionView
         case customCell
+        case weChatMoment
         
         var title: String {
             switch self {
@@ -126,6 +145,8 @@ extension HomeViewController {
                 return "Picker+UICollectionView"
             case .customCell:
                 return "Picker+CustomCell"
+            case .weChatMoment:
+                return "WeChat-Moment"
             }
         }
         
@@ -145,14 +166,20 @@ extension HomeViewController {
             case .collectionView:
                 return PickerResultViewController()
             case .customCell:
-                let config: PickerConfiguration = PhotoTools.getWXPickerConfig(isMoment: false)
+                let config: PickerConfiguration = PhotoTools.getWXPickerConfig(
+                    isMoment: false
+                )
                 config.photoSelectionTapAction = .quickSelect
                 config.videoSelectionTapAction = .quickSelect
                 config.photoList.cell.customSingleCellClass = CustomPickerViewCell.self
                 config.photoList.cell.customSelectableCellClass = CustomPickerViewCell.self
-                let pickerController = PhotoPickerController.init(config: config)
+                let pickerController = PhotoPickerController(
+                    config: config
+                )
                 pickerController.autoDismiss = false
                 return pickerController
+            case .weChatMoment:
+                return WeChatMometViewController()
             }
         }
     }

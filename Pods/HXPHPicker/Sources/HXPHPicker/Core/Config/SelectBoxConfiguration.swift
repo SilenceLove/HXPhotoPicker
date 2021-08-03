@@ -35,7 +35,7 @@ public class SelectBoxConfiguration {
     
     /// 选中之后的 勾勾 颜色
     public lazy var tickColor: UIColor = {
-        return UIColor.white
+        return .white
     }()
     
     /// 暗黑风格下选中之后的 勾勾 颜色
@@ -45,12 +45,12 @@ public class SelectBoxConfiguration {
     
     /// 未选中时框框中间的颜色
     public lazy var backgroundColor: UIColor = {
-        return UIColor.black.withAlphaComponent(0.4)
+        return .black.withAlphaComponent(0.4)
     }()
     
     /// 暗黑风格下未选中时框框中间的颜色
     public lazy var darkBackgroundColor : UIColor = {
-        return UIColor.black.withAlphaComponent(0.2)
+        return .black.withAlphaComponent(0.2)
     }()
     
     /// 选中之后的背景颜色

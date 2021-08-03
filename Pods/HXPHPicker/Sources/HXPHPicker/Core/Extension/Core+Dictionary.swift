@@ -24,9 +24,12 @@ extension Dictionary {
         }
         return false
     }
+    var error: Error? {
+        self[AnyHashable(PHImageErrorKey) as! Key] as? Error
+    }
     /// 判断资源是否下载错误
     var isError: Bool {
-        return self[AnyHashable(PHImageErrorKey) as! Key] != nil
+        self[AnyHashable(PHImageErrorKey) as! Key] != nil
     }
     
     /// 判断资源下载得到的是否为退化的
@@ -39,6 +42,6 @@ extension Dictionary {
     
     /// 判断资源是否下载完成
     var downloadFinined: Bool {
-        return !isCancel && !isError && !isDegraded
+        !isCancel && !isError && !isDegraded
     }
 }

@@ -126,43 +126,51 @@ extension PickerConfigurationViewController: PhotoPickerControllerDelegate {
         var musics: [VideoEditorMusicInfo] = []
         let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
         let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
-        let music1 = VideoEditorMusicInfo.init(audioPath: audioUrl1.path,
-                                               lrcPath: lyricUrl1.path)
+        let lrc1 = try! String(contentsOfFile: lyricUrl1.path)
+        let music1 = VideoEditorMusicInfo.init(audioURL: audioUrl1,
+                                               lrc: lrc1)
         musics.append(music1)
         let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
         let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
-        let music2 = VideoEditorMusicInfo.init(audioPath: audioUrl2.path,
-                                               lrcPath: lyricUrl2.path)
+        let lrc2 = try! String(contentsOfFile: lyricUrl2.path)
+        let music2 = VideoEditorMusicInfo.init(audioURL: audioUrl2,
+                                               lrc: lrc2)
         musics.append(music2)
         let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
         let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
-        let music3 = VideoEditorMusicInfo.init(audioPath: audioUrl3.path,
-                                               lrcPath: lyricUrl3.path)
+        let lrc3 = try! String(contentsOfFile: lyricUrl3.path)
+        let music3 = VideoEditorMusicInfo.init(audioURL: audioUrl3,
+                                               lrc: lrc3)
         musics.append(music3)
         let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
         let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
-        let music4 = VideoEditorMusicInfo.init(audioPath: audioUrl4.path,
-                                               lrcPath: lyricUrl4.path)
+        let lrc4 = try! String(contentsOfFile: lyricUrl4.path)
+        let music4 = VideoEditorMusicInfo.init(audioURL: audioUrl4,
+                                               lrc: lrc4)
         musics.append(music4)
         let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
         let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
-        let music5 = VideoEditorMusicInfo.init(audioPath: audioUrl5.path,
-                                               lrcPath: lyricUrl5.path)
+        let lrc5 = try! String(contentsOfFile: lyricUrl5.path)
+        let music5 = VideoEditorMusicInfo.init(audioURL: audioUrl5,
+                                               lrc: lrc5)
         musics.append(music5)
         let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
         let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
-        let music6 = VideoEditorMusicInfo.init(audioPath: audioUrl6.path,
-                                               lrcPath: lyricUrl6.path)
+        let lrc6 = try! String(contentsOfFile: lyricUrl6.path)
+        let music6 = VideoEditorMusicInfo.init(audioURL: audioUrl6,
+                                               lrc: lrc6)
         musics.append(music6)
         let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
         let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
-        let music7 = VideoEditorMusicInfo.init(audioPath: audioUrl7.path,
-                                               lrcPath: lyricUrl7.path)
+        let lrc7 = try! String(contentsOfFile: lyricUrl7.path)
+        let music7 = VideoEditorMusicInfo.init(audioURL: audioUrl7,
+                                               lrc: lrc7)
         musics.append(music7)
         let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
         let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
-        let music8 = VideoEditorMusicInfo.init(audioPath: audioUrl8.path,
-                                               lrcPath: lyricUrl8.path)
+        let lrc8 = try! String(contentsOfFile: lyricUrl8.path)
+        let music8 = VideoEditorMusicInfo.init(audioURL: audioUrl8,
+                                               lrc: lrc8)
         musics.append(music8)
         completionHandler(musics)
         return false

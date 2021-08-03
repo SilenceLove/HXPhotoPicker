@@ -13,8 +13,9 @@ extension PhotoEditorViewController {
             imageView.imageResizerView.hasCropping ||
             imageView.canUndoDraw ||
             imageView.canUndoMosaic ||
-            imageView.hasFilter {
-            
+            imageView.hasFilter ||
+            imageView.hasSticker {
+            imageView.deselectedSticker()
             ProgressHUD.showLoading(addedTo: view, animated: true)
             imageView.cropping { [weak self] (result) in
                 guard let self = self else { return }

@@ -81,31 +81,39 @@ extension PhotoEditorViewController {
                 photoAsset.requestImageData(filterEditor: true,
                                             iCloudHandler: nil,
                                             progressHandler: nil) {
-                    [weak self] (asset, imageData, imageOrientation, info) in
+                    [weak self] asset, result in
                     guard let self = self else { return }
-                    let image = UIImage.init(data: imageData)?.scaleSuitableSize()
-                    DispatchQueue.global().async {
-                        self.filterHDImageHandler(image: image!)
-                        DispatchQueue.main.async {
-                            ProgressHUD.hide(forView: self.view, animated: true)
-                            self.requestAssetCompletion(image: image!)
+                    switch result {
+                    case .success(let dataResult):
+                        let image = UIImage.init(data: dataResult.imageData)?.scaleSuitableSize()
+                        DispatchQueue.global().async {
+                            self.filterHDImageHandler(image: image!)
+                            DispatchQueue.main.async {
+                                ProgressHUD.hide(forView: self.view, animated: true)
+                                self.requestAssetCompletion(image: image!)
+                            }
+                        }
+                    case .failure(let error):
+                        ProgressHUD.hide(forView: self.view, animated: true)
+                        if let inICloud = error.info?.inICloud {
+                            self.requestAssetFailure(isICloud: inICloud)
+                        }else {
+                            self.requestAssetFailure(isICloud: false)
                         }
                     }
-                } failure: { [weak self] (asset, info) in
-                    ProgressHUD.hide(forView: self?.view, animated: true)
-                    self?.requestAssetFailure()
                 }
                 return
             }
-            photoAsset.requestAssetImageURL(filterEditor: true) {
-                [weak self] (imageUrl) in
+            photoAsset.requestAssetImageURL(filterEditor: true) { [weak self] result in
                 guard let self = self else { return }
-                DispatchQueue.global().async {
-                    if let imageUrl = imageUrl {
+                switch result {
+                case .success(let response):
+                    DispatchQueue.global().async {
+                        let imageURL = response.url
                         #if canImport(Kingfisher)
                         if self.photoAsset.isGifAsset == true {
                             do {
-                                let imageData = try Data.init(contentsOf: imageUrl)
+                                let imageData = try Data.init(contentsOf: imageURL)
                                 if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))  {
                                     self.filterHDImageHandler(image: gifImage)
                                     DispatchQueue.main.async {
@@ -117,7 +125,7 @@ extension PhotoEditorViewController {
                             }catch {}
                         }
                         #endif
-                        if let image = UIImage.init(contentsOfFile: imageUrl.path)?.scaleSuitableSize() {
+                        if let image = UIImage.init(contentsOfFile: imageURL.path)?.scaleSuitableSize() {
                             self.filterHDImageHandler(image: image)
                             DispatchQueue.main.async {
                                 ProgressHUD.hide(forView: self.view, animated: true)
@@ -126,10 +134,10 @@ extension PhotoEditorViewController {
                             return
                         }
                     }
-                    DispatchQueue.main.async {
-                        ProgressHUD.hide(forView: self.view, animated: true)
-                        self.requestAssetFailure()
-                    }
+                case .failure(_):
+                    ProgressHUD.hide(forView: self.view, animated: true)
+                    self.requestAssetFailure(isICloud: false)
+                    break
                 }
             }
         }
@@ -156,7 +164,7 @@ extension PhotoEditorViewController {
                     }
                 }
             }else {
-                self.requestAssetFailure()
+                self.requestAssetFailure(isICloud: false)
             }
         }
     }
@@ -179,9 +187,10 @@ extension PhotoEditorViewController {
         setFilterImage()
         setImage(image)
     }
-    func requestAssetFailure() {
+    func requestAssetFailure(isICloud: Bool) {
         ProgressHUD.hide(forView: view, animated: true)
-        PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: "图片获取失败!".localized, actionTitle: "确定".localized) { (alertAction) in
+        let text = isICloud ? "iCloud同步失败" : "图片获取失败!"
+        PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: text.localized, actionTitle: "确定".localized) { (alertAction) in
             self.didBackClick()
         }
     }
@@ -195,35 +204,52 @@ extension PhotoEditorViewController {
                 return
             }
         }
-        var value: Float = 0
-        var minSize: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        DispatchQueue.main.sync {
-            value = filterView.sliderView.value
-            if !view.size.equalTo(.zero) {
-                minSize = min(view.width, view.height) * 2
+        var hasMosaic = false
+        var hasFilter = false
+        for option in config.toolView.toolOptions {
+            if option.type == .filter {
+                hasFilter = true
+            }else if option.type == .mosaic {
+                hasMosaic = true
             }
         }
-        if image.width > minSize {
-            let thumbnailScale = minSize / image.width
-            thumbnailImage = image.scaleImage(toScale: thumbnailScale)
+        var value: Float = 0
+        if hasFilter {
+            var minSize: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+            DispatchQueue.main.sync {
+                value = filterView.sliderView.value
+                if !view.size.equalTo(.zero) {
+                    minSize = min(view.width, view.height) * 2
+                }
+            }
+            if image.width > minSize {
+                let thumbnailScale = minSize / image.width
+                thumbnailImage = image.scaleImage(toScale: thumbnailScale)
+            }
+            if thumbnailImage == nil {
+                thumbnailImage = image
+            }
         }
-        if thumbnailImage == nil {
-            thumbnailImage = image
-        }
-        if let filter = editResult?.editedData.filter {
+        if let filter = editResult?.editedData.filter, hasFilter {
             var newImage: UIImage?
-            if !config.filterConfig.infos.isEmpty {
-                let info = config.filterConfig.infos[filter.sourceIndex]
+            if !config.filter.infos.isEmpty {
+                let info = config.filter.infos[filter.sourceIndex]
                 newImage = info.filterHandler(thumbnailImage, image, value, .touchUpInside)
             }
             if let newImage = newImage {
                 filterHDImage = newImage
-                mosaicImage = newImage.mosaicImage(level: config.mosaicConfig.mosaicWidth)
+                if hasMosaic {
+                    mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)
+                }
             }
         }else {
-            mosaicImage = thumbnailImage.mosaicImage(level: config.mosaicConfig.mosaicWidth)
+            if hasMosaic {
+                mosaicImage = thumbnailImage.mosaicImage(level: config.mosaic.mosaicWidth)
+            }
         }
-        filterImage = image.scaleToFillSize(size: CGSize(width: 80, height: 80), equalRatio: true)
+        if hasFilter {
+            filterImage = image.scaleToFillSize(size: CGSize(width: 80, height: 80), equalRatio: true)
+        }
     }
     func setFilterImage() {
         if let image = filterHDImage {

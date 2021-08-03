@@ -57,6 +57,14 @@
 "暂无配乐" = "Tidak ada soundtrack";
 "配乐" = "Soundtrack";
 "视频原声" = "Soundtrack video";
+"正在同步iCloud" = "Sinkronisasi iCloud";
+"iCloud同步失败" = "Sinkronisasi iCloud gagal";
+"拖动到此处删除" = "Seret ke sini untuk menghapus";
+"松手即可删除" = "Lepaskan untuk menghapus";
+"搜索" = "Cari";
+"背景音乐" = "Musik";
+"搜索歌名" = "Cari judul lagu";
+"此歌曲暂无歌词，请您欣赏" = "Tidak ada lirik untuk lagu ini, selamat menikmati";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

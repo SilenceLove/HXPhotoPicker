@@ -19,14 +19,20 @@ open class VideoEditorConfiguration: EditorConfiguration {
     public var mustBeTailored: Bool = true
     
     /// 配乐配置
-    public lazy var musicConfig: MusicConfig = .init(infos: [])
+    public lazy var music: MusicConfig = .init()
     
-    public struct MusicConfig {
+    public class MusicConfig {
+        /// 显示搜索
+        public var showSearch: Bool = true
+        /// 完成按钮背景颜色、搜索框光标颜色
+        public var tintColor: UIColor = .systemTintColor
+        /// 搜索框的 placeholder
+        public var placeholder: String = ""
         /// 配乐信息
-        public let infos: [VideoEditorMusicInfo]
-        public init(infos: [VideoEditorMusicInfo]) {
-            self.infos = infos
-        }
+        /// 也可通过代理回调设置
+        /// func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
+        public var infos: [VideoEditorMusicInfo] = []
+        public init() { }
     }
     
     /// 裁剪配置
@@ -52,7 +58,7 @@ open class VideoEditorConfiguration: EditorConfiguration {
         config.exportPresetName = exportPresetName
         config.defaultState = defaultState
         config.mustBeTailored = mustBeTailored
-        config.musicConfig = musicConfig
+        config.music = music
         config.cropping = cropping
         config.cropView = cropView
         config.toolView = toolView

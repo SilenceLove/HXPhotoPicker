@@ -31,7 +31,26 @@ public protocol VideoEditorViewControllerDelegate: AnyObject {
     /// - Parameters:
     ///   - videoEditorViewController: 对应的 VideoEditorViewController
     ///   - completionHandler: 传入配乐信息
-    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController,
+                                   loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
+    
+    /// 搜索配乐信息
+    /// - Parameters:
+    ///   - videoEditorViewController: 对应的 VideoEditorViewController
+    ///   - text: 搜索的文字内容
+    ///   - completion: 传入配乐信息，是否需要加载更多
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController,
+                                   didSearch text: String?,
+                                   completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void)
+    
+    /// 加载更多配乐信息
+    /// - Parameters:
+    ///   - videoEditorViewController: 对应的 VideoEditorViewController
+    ///   - text: 搜索的文字内容
+    ///   - completion: 传入配乐信息，是否还有更多数据
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController,
+                                   loadMore text: String?,
+                                   completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void)
     
     /// 取消编辑
     /// - Parameter videoEditorViewController: 对应的 VideoEditorViewController
@@ -42,7 +61,25 @@ public extension VideoEditorViewControllerDelegate {
     func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, didFinish result: VideoEditResult) {}
     func videoEditorViewController(didFinishWithUnedited videoEditorViewController: VideoEditorViewController) {}
     func videoEditorViewController(shouldClickMusicTool videoEditorViewController: VideoEditorViewController) -> Bool { true }
-    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool { false }
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+        var infos: [VideoEditorMusicInfo] = []
+        if let audioURL = URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3"),
+           let lrc = "天外来物".lrc {
+            let info = VideoEditorMusicInfo(audioURL: audioURL, lrc: lrc)
+            infos.append(info)
+        }
+        return false
+    }
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController,
+                                   didSearch text: String?,
+                                   completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        completionHandler([], false)
+    }
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController,
+                                   loadMore text: String?,
+                                   completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        completionHandler([], false)
+    }
     func videoEditorViewController(didCancel videoEditorViewController: VideoEditorViewController) {}
 }
 
@@ -59,7 +96,7 @@ open class VideoEditorViewController: BaseViewController {
     public private(set) var state: State
     
     /// 资源类型
-    public let assetType: EditorController.AssetType
+    public let sourceType: EditorController.SourceType
     
     /// 在视频未获取成功之前展示的视频封面
     public var coverImage: UIImage?
@@ -69,10 +106,24 @@ open class VideoEditorViewController: BaseViewController {
     
     /// 当前配乐的音频路径
     public var backgroundMusicPath: String? {
-        didSet {
-            toolView.reloadMusic(isSelected: backgroundMusicPath != nil)
-        }
+        didSet { toolView.reloadMusic(isSelected: backgroundMusicPath != nil) }
     }
+    
+    /// 配乐音量
+    public var backgroundMusicVolume: Float = 1 {
+        didSet { PhotoManager.shared.changeAudioPlayerVolume(backgroundMusicVolume) }
+    }
+    
+    /// 播放视频
+    public func playVideo() { startPlayTimer() }
+    
+    /// 视频原声音量
+    public var videoVolume: Float = 1 {
+        didSet { playerView.player.volume = videoVolume }
+    }
+    
+    /// 界面消失之后取消下载网络视频
+    public var viewDidDisappearCancelDownload = true
     
     /// 上一次的编辑数据
     public private(set) var editResult: VideoEditResult?
@@ -106,7 +157,7 @@ open class VideoEditorViewController: BaseViewController {
         }
         needRequest = true
         requestType = 3
-        self.assetType = .local
+        self.sourceType = .local
         self.editResult = editResult
         self.state = config.defaultState
         self.config = config
@@ -132,7 +183,7 @@ open class VideoEditorViewController: BaseViewController {
         }
         requestType = 2
         needRequest = true
-        self.assetType = .network
+        self.sourceType = .network
         self.editResult = editResult
         self.state = config.defaultState
         self.config = config
@@ -162,7 +213,7 @@ open class VideoEditorViewController: BaseViewController {
         }
         requestType = 1
         needRequest = true
-        self.assetType = .picker
+        sourceType = .picker
         self.editResult = editResult
         self.state = config.defaultState
         self.config = config
@@ -197,6 +248,10 @@ open class VideoEditorViewController: BaseViewController {
     }()
     @objc func singleTap(tap: UITapGestureRecognizer) {
         if state != .normal {
+            return
+        }
+        if isSearchMusic {
+            hideSearchMusicView()
             return
         }
         if isMusicState {
@@ -240,11 +295,17 @@ open class VideoEditorViewController: BaseViewController {
         return playerView
     }()
     lazy var musicView: VideoEditorMusicView = {
-        let view = VideoEditorMusicView.init(musicInfos: config.musicConfig.infos)
+        let view = VideoEditorMusicView.init(config: config.music)
+        view.delegate = self
+        return view
+    }()
+    lazy var searchMusicView: VideoEditorSearchMusicView = {
+        let view = VideoEditorSearchMusicView(config: config.music)
         view.delegate = self
         return view
     }()
     var isMusicState = false
+    var isSearchMusic = false
     lazy var cropView: VideoEditorCropView = {
         let cropView : VideoEditorCropView
         if needRequest {
@@ -320,6 +381,7 @@ open class VideoEditorViewController: BaseViewController {
         view.addSubview(cropConfirmView)
         view.addSubview(toolView)
         view.addSubview(musicView)
+        view.addSubview(searchMusicView)
         view.layer.addSublayer(topMaskLayer)
         view.addSubview(topView)
         if needRequest {
@@ -336,12 +398,11 @@ open class VideoEditorViewController: BaseViewController {
         if let editResult = editResult {
             didEdited = true
             if let cropData = editResult.cropData {
-                playerView.playStartTime = CMTimeMakeWithSeconds(cropData.startTime,
-                                                                 preferredTimescale: cropData.preferredTimescale)
+                playerView.playStartTime = CMTimeMakeWithSeconds(cropData.startTime, preferredTimescale: cropData.preferredTimescale)
                 playerView.playEndTime = CMTimeMakeWithSeconds(cropData.endTime,
                                                                preferredTimescale: cropData.preferredTimescale)
-                rotateBeforeStorageData = cropData.cropingData
-                rotateBeforeData = cropData.cropRectData
+                rotateBeforeStorageData = (cropData.cropingData.offsetX, cropData.cropingData.validX, cropData.cropingData.validWidth)
+                rotateBeforeData = (cropData.cropRectData.offsetX, cropData.cropRectData.validX, cropData.cropRectData.validWidth)
             }
         }
     }
@@ -367,6 +428,7 @@ open class VideoEditorViewController: BaseViewController {
         rotateBeforeData = cropView.getRotateBeforeData()
         playerView.pause()
         musicView.reset()
+        searchMusicView.deselect()
         backgroundMusicPath = nil
         stopPlayTimer()
     }
@@ -391,6 +453,10 @@ open class VideoEditorViewController: BaseViewController {
         cropConfirmView.frame = toolView.frame
         scrollView.frame = view.bounds
         setMusicViewFrame()
+        setSearchMusicViewFrame()
+        if orientationDidChange {
+            searchMusicView.reloadData()
+        }
         if needRequest {
             firstLayoutSubviews = false
             if reqeustAssetCompletion {
@@ -444,11 +510,22 @@ open class VideoEditorViewController: BaseViewController {
         }
     }
     func setMusicViewFrame() {
-        let musicHeight: CGFloat = 180
+        let musicHeight: CGFloat = 190
         if !isMusicState {
             musicView.frame = CGRect(x: 0, y: view.height, width: view.width, height: musicHeight + UIDevice.bottomMargin)
         }else {
             musicView.frame = CGRect(x: 0, y: view.height - musicHeight - UIDevice.bottomMargin, width: view.width, height: musicHeight + UIDevice.bottomMargin)
+        }
+    }
+    func setSearchMusicViewFrame() {
+        var viewHeight: CGFloat = view.height * 0.75 + UIDevice.bottomMargin
+        if !UIDevice.isPad && !UIDevice.isPortrait {
+            viewHeight = view.height * 0.85 + UIDevice.bottomMargin
+        }
+        if !isSearchMusic {
+            searchMusicView.frame = CGRect(x: 0, y: view.height, width: view.width, height: viewHeight)
+        }else {
+            searchMusicView.frame = CGRect(x: 0, y: view.height - viewHeight, width: view.width, height: viewHeight)
         }
     }
     
@@ -499,13 +576,14 @@ open class VideoEditorViewController: BaseViewController {
         super.viewDidDisappear(animated)
         stopAllOperations()
     }
-    func stopAllOperations() {
+    public func stopAllOperations() {
         stopPlayTimer()
         PhotoManager.shared.stopPlayMusic()
-        if let url = networkVideoURL {
+        if let url = networkVideoURL, viewDidDisappearCancelDownload {
             PhotoManager.shared.suspendTask(url)
             networkVideoURL = nil
         }
+        viewDidDisappearCancelDownload = true
     }
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -531,30 +609,35 @@ extension VideoEditorViewController {
             downloadNetworkVideo()
             return
         }
-        let loadingView = ProgressHUD.showLoading(addedTo: view, text: "视频加载中".localized, animated: true)
+        let loadingView = ProgressHUD.showLoading(addedTo: view, text: nil, animated: true)
         view.bringSubviewToFront(topView)
         assetRequestID = photoAsset.requestAVAsset(filterEditor: true, deliveryMode: .highQualityFormat) { [weak self] (photoAsset, requestID) in
             self?.assetRequestID = requestID
+            loadingView?.updateText(text: "正在同步iCloud".localized + "...")
         } progressHandler: { (photoAsset, progress) in
             if progress > 0 {
-                loadingView?.updateText(text: "视频加载中".localized + "(" + String(Int(progress * 100)) + "%)")
+                loadingView?.updateText(text: "正在同步iCloud".localized + "(" + String(Int(progress * 100)) + "%)")
             }
         } success: { [weak self] (photoAsset, avAsset, info) in
             ProgressHUD.hide(forView: self?.view, animated: false)
             self?.avAsset = avAsset
             self?.reqeustAssetCompletion = true
             self?.assetRequestComplete()
-        } failure: { [weak self] (photoAsset, info) in
-            if info?.isCancel != true {
+        } failure: { [weak self] (photoAsset, info, error) in
+            if let info = info, !info.isCancel {
                 ProgressHUD.hide(forView: self?.view, animated: false)
-                self?.assetRequestFailure()
+                if info.inICloud {
+                    self?.assetRequestFailure(message: "iCloud同步失败".localized)
+                }else {
+                    self?.assetRequestFailure()
+                }
             }
         }
     }
     #endif
     
-    func assetRequestFailure() {
-        PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: "视频获取失败!".localized, actionTitle: "确定".localized) { (alertAction) in
+    func assetRequestFailure(message: String = "视频获取失败!".localized) {
+        PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: message, actionTitle: "确定".localized) { (alertAction) in
             self.backAction()
         }
     }
@@ -577,13 +660,14 @@ extension VideoEditorViewController {
             setPlayerViewFrame()
         }
         if let editResult = editResult {
-            playerView.player.volume = editResult.hideVideoSoundTrack ? 0 : 1
-            musicView.originalSoundButton.isSelected = !editResult.hideVideoSoundTrack
+            playerView.player.volume = editResult.videoSoundVolume
+            musicView.originalSoundButton.isSelected = editResult.videoSoundVolume > 0
             if let audioURL = editResult.backgroundMusicURL {
                 backgroundMusicPath = audioURL.path
                 musicView.backgroundButton.isSelected = true
                 PhotoManager.shared.playMusic(filePath: audioURL.path) {
                 }
+                backgroundMusicVolume = editResult.backgroundMusicVolume
             }
         }
     }
@@ -602,11 +686,12 @@ extension VideoEditorViewController {
             }
             loadingView = ProgressHUD.showLoading(addedTo: view, text: "视频下载中".localized, animated: true)
             view.bringSubviewToFront(topView)
-            PhotoManager.shared.downloadTask(with: videoURL) { [weak self] (progress, task) in
+            PhotoManager.shared.downloadTask(with: videoURL) {
+                [weak self] (progress, task) in
                 if progress > 0 {
                     self?.loadingView?.updateText(text: "视频下载中".localized + "(" + String(Int(progress * 100)) + "%)")
                 }
-            } completionHandler: { [weak self] (url, error) in
+            } completionHandler: { [weak self] (url, error, _) in
                 if let url = url {
                     #if HXPICKER_ENABLE_PICKER
                     if let photoAsset = self?.photoAsset {
@@ -779,9 +864,9 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         }
         PhotoTools.videoAddBackgroundMusic(forVideo: videoURL,
                                            audioURL: audioURL,
-                                           hasOriginalSound: playerView.player.volume == 0 ? false : true,
-                                           presentName: config.exportPresetName) {
-            [weak self] (url) in
+                                           audioVolume: backgroundMusicVolume,
+                                           originalAudioVolume: playerView.player.volume,
+                                           presentName: config.exportPresetName) { [weak self] (url) in
             if let url = url {
                 self?.editFinishCallBack(url)
                 self?.backAction()
@@ -807,8 +892,8 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             cropData = VideoCropData.init(startTime: startTime.seconds,
                                           endTime: endTime.seconds,
                                           preferredTimescale: avAsset.duration.timescale,
-                                          cropingData: rotateBeforeStorageData,
-                                          cropRectData: rotateBeforeData)
+                                          cropingData: .init(offsetX: rotateBeforeStorageData.0, validX: rotateBeforeStorageData.1, validWidth: rotateBeforeStorageData.2),
+                                          cropRectData: .init(offsetX: rotateBeforeData.0, validX: rotateBeforeData.1, validWidth: rotateBeforeData.2))
         }
         var backgroundMusicURL: URL?
         if let audioPath = backgroundMusicPath {
@@ -816,8 +901,9 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         }
         let editResult = VideoEditResult.init(editedURL: videoURL,
                                               cropData: cropData,
+                                              videoSoundVolume: playerView.player.volume,
                                               backgroundMusicURL: backgroundMusicURL,
-                                              hideVideoSoundTrack: playerView.player.volume == 0 ? true : false)
+                                              backgroundMusicVolume: backgroundMusicVolume)
         delegate?.videoEditorViewController(self, didFinish: editResult)
     }
     func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions) {
@@ -953,7 +1039,7 @@ extension VideoEditorViewController: EditorCropConfirmViewDelegate {
         }
     }
 }
-
+// MARK: VideoEditorMusicViewDelegate
 extension VideoEditorViewController: VideoEditorMusicViewDelegate {
     func musicView(_ musicView: VideoEditorMusicView, didSelectMusic audioPath: String?) {
         backgroundMusicPath = audioPath
@@ -961,11 +1047,54 @@ extension VideoEditorViewController: VideoEditorMusicViewDelegate {
     func musicView(deselectMusic musicView: VideoEditorMusicView) {
         backgroundMusicPath = nil
     }
+    func musicView(didSearchButton musicView: VideoEditorMusicView) {
+        searchMusicView.searchView.becomeFirstResponder()
+        isSearchMusic = true
+        UIView.animate(withDuration: 0.25) {
+            self.setSearchMusicViewFrame()
+        }
+    }
     func musicView(_ musicView: VideoEditorMusicView, didOriginalSoundButtonClick isSelected: Bool) {
         if isSelected {
             playerView.player.volume = 1
         }else {
             playerView.player.volume = 0
+        }
+    }
+}
+// MARK: VideoEditorSearchMusicViewDelegate
+extension VideoEditorViewController: VideoEditorSearchMusicViewDelegate {
+    func searchMusicView(didCancelClick searchMusicView: VideoEditorSearchMusicView) {
+        hideSearchMusicView()
+    }
+    func searchMusicView(didFinishClick searchMusicView: VideoEditorSearchMusicView) {
+        hideSearchMusicView(deselect: false)
+    }
+    func searchMusicView(_ searchMusicView: VideoEditorSearchMusicView, didSelectItem audioPath: String?) {
+        musicView.reset()
+        musicView.backgroundButton.isSelected = true
+        backgroundMusicPath = audioPath
+    }
+    func searchMusicView(_ searchMusicView: VideoEditorSearchMusicView, didSearch text: String?, completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        delegate?.videoEditorViewController(self, didSearch: text, completionHandler: completion)
+    }
+    func searchMusicView(_ searchMusicView: VideoEditorSearchMusicView, loadMore text: String?, completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        delegate?.videoEditorViewController(self, loadMore: text, completionHandler: completion)
+    }
+    func searchMusicView(deselectItem searchMusicView: VideoEditorSearchMusicView) {
+        backgroundMusicPath = nil
+        musicView.backgroundButton.isSelected = false
+    }
+    func hideSearchMusicView(deselect: Bool = true) {
+        searchMusicView.endEditing(true)
+        isSearchMusic = false
+        UIView.animate(withDuration: 0.25) {
+            self.setSearchMusicViewFrame()
+        } completion: { _ in
+            if deselect {
+                self.searchMusicView.deselect()
+            }
+            self.searchMusicView.clearData()
         }
     }
 }

@@ -85,12 +85,19 @@ public extension AssetManager {
     class func exportVideoURL(forVideo asset: PHAsset,
                               toFile fileURL:URL,
                               exportPreset: String,
-                              completionHandler: @escaping (URL?, Error?) -> Void) {
-        requestAVAsset(for: asset, iCloudHandler: nil, progressHandler: nil) { (avAsset, avAudioMix, info, success) in
-            if let avAsset = avAsset {
-                self.exportVideoURL(forVideo: avAsset, toFile: fileURL, exportPreset: exportPreset, completionHandler: completionHandler)
-            }else {
-                completionHandler(nil, info?[PHImageErrorKey] as? Error)
+                              completionHandler: @escaping (Result<URL, AssetManager.AVAssetError>) -> Void) {
+        requestAVAsset(for: asset, iCloudHandler: nil, progressHandler: nil) { (result) in
+            switch result {
+            case .success(let avResult):
+                self.exportVideoURL(forVideo: avResult.avAsset, toFile: fileURL, exportPreset: exportPreset) { videoURL, error in
+                    if let videoURL = videoURL {
+                        completionHandler(.success(videoURL))
+                    }else {
+                        completionHandler(.failure(.init(info: avResult.info, error: .exportFailed(error))))
+                    }
+                }
+            case .failure(let error):
+                completionHandler(.failure(error))
             }
         }
     }

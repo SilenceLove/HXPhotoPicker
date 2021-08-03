@@ -10,7 +10,7 @@ import AVKit
 extension PhotoManager: AVAudioPlayerDelegate {
     
     @discardableResult
-    func playMusic(filePath path: String, finished: @escaping () -> Void) -> Bool {
+    public func playMusic(filePath path: String, finished: @escaping () -> Void) -> Bool {
         audioPlayFinish = finished
         let url = URL(fileURLWithPath: path)
         if let currentURL = audioPlayer?.url,
@@ -32,10 +32,14 @@ extension PhotoManager: AVAudioPlayerDelegate {
         }
     }
     
-    func stopPlayMusic() {
+    public func stopPlayMusic() {
         audioPlayer?.stop()
         audioPlayer = nil
         audioPlayFinish = nil
+    }
+    
+    public func changeAudioPlayerVolume(_ volume: Float) {
+        audioPlayer?.volume = volume
     }
     
     

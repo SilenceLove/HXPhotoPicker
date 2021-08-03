@@ -31,9 +31,7 @@ public class PhotoListCellConfiguration {
     /// 缩略图的清晰度，越大越清楚，越小越模糊
     /// 为0时，默认为 cell.width * 2
     public var targetWidth: CGFloat = 0 {
-        didSet {
-            PhotoManager.shared.targetWidth = targetWidth
-        }
+        didSet { PhotoManager.shared.targetWidth = targetWidth }
     }
     
     /// cell在不可选择状态下是否显示禁用遮罩
@@ -47,9 +45,7 @@ public class PhotoListCellConfiguration {
     public var selectBoxRightMargin: CGFloat = 5
     
     /// 选择框相关配置
-    public lazy var selectBox: SelectBoxConfiguration = {
-        return SelectBoxConfiguration.init()
-    }()
+    public lazy var selectBox: SelectBoxConfiguration = .init()
     
-    public init() { }
+    public init() { PhotoManager.shared.targetWidth = targetWidth }
 }

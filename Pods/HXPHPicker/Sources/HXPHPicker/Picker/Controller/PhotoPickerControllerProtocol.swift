@@ -80,6 +80,29 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
                           atIndex: Int) -> Bool
     
     #if HXPICKER_ENABLE_EDITOR
+    
+    /// 照片编辑器加载贴图标题资源
+    /// - Parameters:
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - photoEditorViewController: 对应的 PhotoEditorViewController
+    ///   - loadTitleChartlet: 传入标题数组
+    func pickerController(_ pickerController: PhotoPickerController,
+                          loadTitleChartlet photoEditorViewController: PhotoEditorViewController,
+                          response: @escaping EditorTitleChartletResponse)
+    
+    /// 照片编辑器加载贴图资源
+    /// - Parameters:
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - photoEditorViewController: 对应的 PhotoEditorViewController
+    ///   - titleChartlet: 对应配置的 title
+    ///   - titleIndex: 对应配置的 title 的位置索引
+    ///   - response: 传入 title索引 和 贴图数据
+    func pickerController(_ pickerController: PhotoPickerController,
+                          loadChartletList photoEditorViewController: PhotoEditorViewController,
+                          titleChartlet: EditorChartlet,
+                          titleIndex: Int,
+                          response: @escaping EditorChartletListResponse)
+    
     /// 视频编辑器，将要点击工具栏音乐按钮
     /// - Parameters:
     ///   - pickerController: 对应的 PhotoPickerController
@@ -96,6 +119,26 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
     func pickerController(_ pickerController: PhotoPickerController,
                           videoEditor videoEditorViewController: VideoEditorViewController,
                           loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
+    
+    /// 视频编辑器搜索配乐信息
+    /// - Parameters:
+    ///   - videoEditorViewController: 对应的 VideoEditorViewController
+    ///   - text: 搜索的文字内容
+    ///   - completion: 传入配乐信息，是否需要加载更多
+    func pickerController(_ pickerController: PhotoPickerController,
+                          videoEditor videoEditorViewController: VideoEditorViewController,
+                          didSearch text: String?,
+                          completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void)
+    
+    /// 视频编辑器加载更多配乐信息
+    /// - Parameters:
+    ///   - videoEditorViewController: 对应的 VideoEditorViewController
+    ///   - text: 搜索的文字内容
+    ///   - completion: 传入配乐信息，是否还有更多数据
+    func pickerController(_ pickerController: PhotoPickerController,
+                          videoEditor videoEditorViewController: VideoEditorViewController,
+                          loadMore text: String?,
+                          completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void)
     #endif
     
     /// Asset 编辑完后调用
@@ -123,6 +166,15 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
     ///   - atIndex: 对应显示的位置
     func pickerController(_ pickerController: PhotoPickerController,
                           previewSingleClick photoAsset: PhotoAsset,
+                          atIndex: Int)
+    
+    /// 预览界面长按操作
+    /// - Parameters:
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - photoAsset: 对应显示的 PhotoAsset 数据
+    ///   - atIndex: 对应显示的位置
+    func pickerController(_ pickerController: PhotoPickerController,
+                          previewLongPressClick photoAsset: PhotoAsset,
                           atIndex: Int)
     
     /// 预览界面将要删除 Asset
@@ -239,11 +291,51 @@ public extension PhotoPickerControllerDelegate {
     
     #if HXPICKER_ENABLE_EDITOR
     func pickerController(_ pickerController: PhotoPickerController,
+                          loadTitleChartlet photoEditorViewController: PhotoEditorViewController,
+                          response: @escaping EditorTitleChartletResponse) {
+        #if canImport(Kingfisher)
+        let titles = PhotoTools.defaultTitleChartlet()
+        response(titles)
+        #endif
+    }
+    func pickerController(_ pickerController: PhotoPickerController,
+                          loadChartletList photoEditorViewController: PhotoEditorViewController,
+                          titleChartlet: EditorChartlet,
+                          titleIndex: Int,
+                          response: @escaping EditorChartletListResponse) {
+        /// 默认加载这些贴图
+        #if canImport(Kingfisher)
+        let chartletList = PhotoTools.defaultNetworkChartlet()
+        response(titleIndex, chartletList)
+        #endif
+    }
+    func pickerController(_ pickerController: PhotoPickerController,
                           videoEditorShouldClickMusicTool videoEditorViewController: VideoEditorViewController) -> Bool { true }
     
     func pickerController(_ pickerController: PhotoPickerController,
                           videoEditor videoEditorViewController: VideoEditorViewController,
-                          loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool { false }
+                          loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+        var infos: [VideoEditorMusicInfo] = []
+        if let audioURL = URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3"),
+           let lrc = "天外来物".lrc {
+            let info = VideoEditorMusicInfo(audioURL: audioURL, lrc: lrc)
+            infos.append(info)
+        }
+        completionHandler(infos)
+        return false
+    }
+    func pickerController(_ pickerController: PhotoPickerController,
+                          videoEditor videoEditorViewController: VideoEditorViewController,
+                          didSearch text: String?,
+                          completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        completionHandler([], false)
+    }
+    func pickerController(_ pickerController: PhotoPickerController,
+                          videoEditor videoEditorViewController: VideoEditorViewController,
+                          loadMore text: String?,
+                          completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        completionHandler([], false)
+    }
     #endif
     
     func pickerController(_ pickerController: PhotoPickerController, didEditAsset photoAsset: PhotoAsset, atIndex: Int) { }
@@ -252,6 +344,10 @@ public extension PhotoPickerControllerDelegate {
     
     func pickerController(_ pickerController: PhotoPickerController,
                           previewSingleClick photoAsset: PhotoAsset,
+                          atIndex: Int) { }
+    
+    func pickerController(_ pickerController: PhotoPickerController,
+                          previewLongPressClick photoAsset: PhotoAsset,
                           atIndex: Int) { }
     
     func pickerController(_ pickerController: PhotoPickerController, previewShouldDeleteAsset photoAsset: PhotoAsset, atIndex: Int) -> Bool { true }

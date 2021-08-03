@@ -20,6 +20,18 @@ protocol EditorImageResizerViewDelegate: AnyObject {
     func imageResizerView(didEndZooming imageResizerView: EditorImageResizerView)
 }
 
+class PhotoEditorContainerView: UIView {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        true
+    }
+}
+
+class PhotoEditorScrollView: UIScrollView {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        true
+    }
+}
+
 class EditorImageResizerView: UIView {
     
     enum ImageOrientation {
@@ -32,11 +44,12 @@ class EditorImageResizerView: UIView {
     deinit {
 //        print("deinit", self)
     }
+    var exportScale: CGFloat = UIScreen.main.scale
     /// 裁剪配置
     var cropConfig: PhotoCroppingConfiguration
     weak var delegate: EditorImageResizerViewDelegate?
-    lazy var containerView: UIView = {
-        let containerView = UIView.init()
+    lazy var containerView: PhotoEditorContainerView = {
+        let containerView = PhotoEditorContainerView.init()
         containerView.addSubview(scrollView)
         updateScrollView()
         containerView.addSubview(maskBgView)
@@ -45,8 +58,8 @@ class EditorImageResizerView: UIView {
         return containerView
     }()
     
-    lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView.init(frame: .zero)
+    lazy var scrollView: PhotoEditorScrollView = {
+        let scrollView = PhotoEditorScrollView.init(frame: .zero)
         scrollView.delegate = self
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = 20.0
@@ -64,6 +77,41 @@ class EditorImageResizerView: UIView {
     let mosaicConfig: PhotoEditorConfiguration.MosaicConfig
     lazy var imageView: PhotoEditorContentView = {
         let imageView = PhotoEditorContentView.init(mosaicConfig: mosaicConfig)
+        imageView.itemViewMoveToCenter = { [weak self] rect -> Bool in
+            guard let self = self, let view = self.viewController()?.view else { return false }
+            var newRect = self.convert(self.bounds, to: view)
+            if newRect.width > view.width {
+                newRect.origin.x = 0
+                newRect.size.width = view.width
+            }
+            if newRect.height > view.height {
+                newRect.origin.y = 0
+                newRect.size.height = view.height
+            }
+            let marginWidth = rect.width - 20
+            let marginHeight = rect.height - 20
+            if CGRect(x: newRect.minX - marginWidth, y: newRect.minY - marginHeight, width: newRect.width + marginWidth * 2, height: newRect.height + marginHeight * 2).contains(rect) {
+                return false
+            }
+            return true
+        }
+        imageView.stickerMinScale = { [weak self] itemSize -> CGFloat in
+            min(35 / itemSize.width, 35 / itemSize.height)
+        }
+        imageView.stickerMaxScale = { [weak self] itemSize -> CGFloat in
+            guard let self = self, let view = self.viewController()?.view else { return 0 }
+            var newRect = self.convert(self.bounds, to: view)
+            if newRect.width > view.width {
+                newRect.origin.x = 0
+                newRect.size.width = view.width
+            }
+            if newRect.height > view.height {
+                newRect.origin.y = 0
+                newRect.size.height = view.height
+            }
+            let maxScale = min(itemSize.width, itemSize.height)
+            return max((newRect.width + 35) / maxScale, (newRect.height + 35) / maxScale)
+        }
         return imageView
     }()
     
@@ -93,7 +141,11 @@ class EditorImageResizerView: UIView {
     /// 当前状态
     var state: PhotoEditorView.State = .normal
     /// 当前镜像类型
-    var mirrorType: MirrorType = .none
+    var mirrorType: MirrorType = .none {
+        didSet {
+            imageView.stickerView.mirrorType = mirrorType
+        }
+    }
     /// imageview原始宽高
     var baseImageSize: CGSize = .zero
     /// 图片宽高比例
@@ -128,7 +180,11 @@ class EditorImageResizerView: UIView {
     var currentAspectRatio: CGSize = .zero
     /// 是否固定比例
     var isFixedRatio: Bool = false
-    var currentAngle: CGFloat = 0
+    var currentAngle: CGFloat = 0 {
+        didSet {
+            imageView.stickerView.angle = currentAngle
+        }
+    }
     
     var rotating: Bool = false
     var mirroring: Bool = false
@@ -136,6 +192,10 @@ class EditorImageResizerView: UIView {
     var drawEnabled: Bool {
         get { imageView.drawView.enabled }
         set { imageView.drawView.enabled = newValue }
+    }
+    var stickerEnabled: Bool {
+        get { imageView.stickerView.enabled }
+        set { imageView.stickerView.enabled = newValue }
     }
     var mosaicEnabled: Bool {
         get { imageView.mosaicView.enabled }
@@ -177,12 +237,14 @@ class EditorImageResizerView: UIView {
                              mirrorType: oldMirrorType)
         }
         let mosaicData = imageView.mosaicView.getMosaicData()
+        let stickerData = imageView.stickerView.stickerData()
         let editedData = PhotoEditData.init(isPortrait: UIDevice.isPortrait,
                                             cropData: cropData,
                                             brushData: brushData,
                                             filter: filter,
                                             filterValue: filterValue,
-                                            mosaicData: mosaicData)
+                                            mosaicData: mosaicData,
+                                            stickerData: stickerData)
         return editedData
     }
     func setCropData(cropData: PhotoEditCropData) {
@@ -203,6 +265,14 @@ class EditorImageResizerView: UIView {
         let offsetY = baseImageSize.height * cropData.offsetScale.y * oldZoomScale - scrollViewContentInset.top
         oldContentOffset = CGPoint(x: offsetX, y: offsetY)
         oldMaskRect = rect
+        
+        imageView.stickerView.angle = oldAngle
+        imageView.stickerView.mirrorType = oldMirrorType
+    }
+    func setStickerData(stickerData: EditorStickerData?) {
+        if let stickerData = stickerData {
+            imageView.stickerView.setStickerData(stickerData: stickerData, viewSize: imageView.bounds.size)
+        }
     }
     func setBrushData(brushData: [PhotoEditorBrushData]) {
         if !brushData.isEmpty {
@@ -865,19 +935,35 @@ class EditorImageResizerView: UIView {
                     self.imageView.drawView.layer.contents = nil
                 }
             }
+            DispatchQueue.main.sync {
+                if self.imageView.stickerView.count > 0 {
+                    if let image = self.imageView.stickerView.layer.convertedToImage() {
+                        otherImages.append(image)
+                    }
+                    self.imageView.stickerView.layer.contents = nil
+                }
+            }
             var otherImage: UIImage? = nil
             if !otherImages.isEmpty {
                 otherImage = UIImage.merge(images: otherImages)?.scaleToFillSize(size: inputImage.size)
+            }
+            var crop_Rect = cropRect
+            if exportScale != inputImage.scale && otherImage != nil {
+                let scale = exportScale / inputImage.scale
+                crop_Rect.origin.x *= scale
+                crop_Rect.origin.y *= scale
+                crop_Rect.size.width *= scale
+                crop_Rect.size.height *= scale
             }
             if let option = inputImage.animateImageFrame() {
                 var images = [UIImage]()
                 var delays = [Double]()
                 for (index, image) in option.0.enumerated() {
                     var currentImage = image
-                    if let otherImage = otherImage, let newImage = image.merge(images: [otherImage], scale: image.scale) {
+                    if let otherImage = otherImage, let newImage = image.merge(images: [otherImage], scale: exportScale) {
                         currentImage = newImage
                     }
-                    if let newImage = cropImage(currentImage, toRect: cropRect, viewWidth: viewWidth, viewHeight: viewHeight) {
+                    if let newImage = cropImage(currentImage, toRect: crop_Rect, viewWidth: viewWidth, viewHeight: viewHeight) {
                         images.append(newImage)
                         delays.append(option.1[index])
                     }
@@ -887,10 +973,11 @@ class EditorImageResizerView: UIView {
                 }
                 return nil
             }
-            if let otherImage = otherImage, let image = inputImage.merge(images: [otherImage], scale: inputImage.scale) {
+            if let otherImage = otherImage, let image = inputImage.merge(images: [otherImage], scale: exportScale) {
                 inputImage = image
             }
-            if let image = cropImage(inputImage, toRect: cropRect, viewWidth: viewWidth, viewHeight: viewHeight), let imageURL = PhotoTools.write(image: image) {
+            if let image = cropImage(inputImage, toRect: crop_Rect, viewWidth: viewWidth, viewHeight: viewHeight),
+               let imageURL = PhotoTools.write(image: image) {
                 if let thumbnailImage = image.scaleImage(toScale: 0.6) {
                     return (thumbnailImage, imageURL, .normal)
                 }

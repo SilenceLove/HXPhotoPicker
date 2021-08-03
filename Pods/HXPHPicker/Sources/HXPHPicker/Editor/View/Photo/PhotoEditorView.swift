@@ -17,13 +17,15 @@ protocol PhotoEditorViewDelegate: AnyObject {
     
     func editorView(drawViewBeganDraw editorView: PhotoEditorView)
     func editorView(drawViewEndDraw editorView: PhotoEditorView)
+    func editorView(_ editorView: PhotoEditorView, updateStickerText item: EditorStickerItem)
 }
 
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     weak var editorDelegate: PhotoEditorViewDelegate?
     lazy var imageResizerView: EditorImageResizerView = {
-        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropConfig,
-                                                           mosaicConfig: config.mosaicConfig)
+        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropping,
+                                                           mosaicConfig: config.mosaic)
+        imageResizerView.exportScale = config.scale
         imageResizerView.imageView.drawView.lineColor = config.brushColors[config.defaultBrushColorIndex].color
         imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
         imageResizerView.delegate = self
@@ -35,7 +37,6 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         didSet { imageResizerView.zoomScale = zoomScale }
     }
     
-    /// 裁剪配置
     var config: PhotoEditorConfiguration
     
     var state: State = .normal
@@ -45,9 +46,20 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     
     var image: UIImage? { imageResizerView.imageView.image }
     
+    var isEnabled: Bool = false {
+        didSet {
+            imageResizerView.isUserInteractionEnabled = isEnabled
+            isScrollEnabled = isEnabled
+        }
+    }
+    
     var drawEnabled: Bool {
         get { imageResizerView.drawEnabled }
         set { imageResizerView.drawEnabled = newValue }
+    }
+    var stickerEnabled: Bool {
+        get { imageResizerView.stickerEnabled }
+        set { imageResizerView.stickerEnabled = newValue }
     }
     var mosaicEnabled: Bool {
         get { imageResizerView.mosaicEnabled }
@@ -61,6 +73,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     }
     var canUndoDraw: Bool { imageResizerView.imageView.drawView.canUndo }
     var canUndoMosaic: Bool { imageResizerView.imageView.mosaicView.canUndo }
+    var hasSticker: Bool { imageResizerView.imageView.stickerView.count > 0 }
     var hasFilter: Bool { imageResizerView.filter != nil }
     
     init(config: PhotoEditorConfiguration) {
@@ -126,8 +139,9 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         }
         imageResizerView.setBrushData(brushData: editedData.brushData)
         imageResizerView.setMosaicData(mosaicData: editedData.mosaicData)
+        imageResizerView.setStickerData(stickerData: editedData.stickerData)
         updateImageViewFrame()
-        if config.cropConfig.isRoundCrop {
+        if config.cropping.isRoundCrop {
             imageResizerView.layer.cornerRadius = cropSize.width * 0.5
         }
     }
@@ -197,7 +211,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
             guard let self = self else { return }
             self.imageResizerView.zoomScale = self.zoomScale
             self.editorDelegate?.editorView(didDisappearCrop: self)
-            if self.config.cropConfig.isRoundCrop {
+            if self.config.cropping.isRoundCrop {
                 self.imageResizerView.layer.cornerRadius = self.cropSize.width * 0.5
             }
             completion?()
@@ -238,6 +252,15 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     func mirrorHorizontally(animated: Bool) {
         imageResizerView.mirrorHorizontally(animated: animated)
     }
+    func addSticker(item: EditorStickerItem, isSelected: Bool) {
+        imageResizerView.imageView.stickerView.add(sticker: item, isSelected: isSelected)
+    }
+    func updateSticker(item: EditorStickerItem) {
+        imageResizerView.imageView.stickerView.update(item: item)
+    }
+    func deselectedSticker() {
+        imageResizerView.imageView.stickerView.deselectedSticker()
+    }
     
     func orientationDidChange() {
         cropSize = .zero
@@ -256,6 +279,9 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     }
     func undoAllMosaic() {
         imageResizerView.imageView.mosaicView.undoAll()
+    }
+    func undoAllSticker() {
+        imageResizerView.imageView.stickerView.removeAllSticker()
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -309,6 +335,9 @@ extension PhotoEditorView: UIScrollViewDelegate {
     }
 }
 extension PhotoEditorView: PhotoEditorContentViewDelegate {
+    func contentView(_ contentView: PhotoEditorContentView, updateStickerText item: EditorStickerItem) {
+        editorDelegate?.editorView(self, updateStickerText: item)
+    }
     func contentView(drawViewBeganDraw contentView: PhotoEditorContentView) {
         editorDelegate?.editorView(drawViewBeganDraw: self)
     }

@@ -124,18 +124,31 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 backgroundView.alpha = alpha
                 let toVC = transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
                 if !previewViewController.statusBarShouldBeHidden {
-                    previewViewController.bottomView.alpha = alpha
+                    let hasPreviewMask = previewViewController.bottomView.mask != nil
+                    if hasPreviewMask {
+                        var bottomViewAlpha = 1 - scale * 1.5
+                        if bottomViewAlpha < 0 {
+                            bottomViewAlpha = 0
+                        }
+                        previewViewController.bottomView.alpha = bottomViewAlpha
+                    }else {
+                        previewViewController.bottomView.alpha = alpha
+                    }
                     if type == .pop {
-                        if previewViewController.bottomView.mask != nil {
-                            let maskY = 70 * (1 - alpha)
+                        var maskScale = 1 - scale * 2.85
+                        if maskScale < 0 {
+                            maskScale = 0
+                        }
+                        if hasPreviewMask {
+                            let maskY = 70 * (1 - maskScale)
                             let maskWidth = previewViewController.bottomView.width
                             let maskHeight = previewViewController.bottomView.height - maskY
                             previewViewController.bottomView.mask?.frame = CGRect(x: 0, y: maskY, width: maskWidth, height: maskHeight)
                         }
                         if toVC?.bottomView.mask != nil {
-                            let maskY = 70 * alpha
+                            let maskY = 70 * maskScale
                             let maskWidth = previewViewController.bottomView.width
-                            let maskHeight = 50 + UIDevice.bottomMargin + 70 * (1 - alpha)
+                            let maskHeight = 50 + UIDevice.bottomMargin + 70 * (1 - maskScale)
                             toVC?.bottomView.mask?.frame = CGRect(x: 0, y: maskY, width: maskWidth, height: maskHeight)
                             
                         }

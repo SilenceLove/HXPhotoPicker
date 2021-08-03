@@ -20,7 +20,7 @@ class EditorConfigurationViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Editor"
-//        videoConfig.musicConfig.infos = musics
+//        videoConfig.music = .init(infos: musics)
         
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
@@ -125,7 +125,7 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
         pickerConfig.photoEditor = photoConfig
         pickerResultVC.config = pickerConfig
         
-        switch photoEditorViewController.assetType {
+        switch photoEditorViewController.sourceType {
         case .local:
             let localImageAsset = LocalImageAsset.init(image: photoEditorViewController.image)
             let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
@@ -148,7 +148,7 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.photoEditor = photoConfig
         pickerResultVC.config = pickerConfig
-        switch photoEditorViewController.assetType {
+        switch photoEditorViewController.sourceType {
         case .local:
             let localImageAsset = LocalImageAsset.init(image: photoEditorViewController.image)
             let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
@@ -166,61 +166,84 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
     }
 }
 extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
+    func getMusicInfos() -> [VideoEditorMusicInfo] {
+        var musics: [VideoEditorMusicInfo] = []
+//        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
+        let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
+        let lrc1 = try! String(contentsOfFile: lyricUrl1.path)
+        let music1 = VideoEditorMusicInfo.init(audioURL: URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3")!,
+                                               lrc: lrc1)
+        musics.append(music1)
+        let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
+        let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
+        let lrc2 = try! String(contentsOfFile: lyricUrl2.path)
+        let music2 = VideoEditorMusicInfo.init(audioURL: audioUrl2,
+                                               lrc: lrc2)
+        musics.append(music2)
+        let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
+        let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
+        let lrc3 = try! String(contentsOfFile: lyricUrl3.path)
+        let music3 = VideoEditorMusicInfo.init(audioURL: audioUrl3,
+                                               lrc: lrc3)
+        musics.append(music3)
+        let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
+        let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
+        let lrc4 = try! String(contentsOfFile: lyricUrl4.path)
+        let music4 = VideoEditorMusicInfo.init(audioURL: audioUrl4,
+                                               lrc: lrc4)
+        musics.append(music4)
+        let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
+        let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
+        let lrc5 = try! String(contentsOfFile: lyricUrl5.path)
+        let music5 = VideoEditorMusicInfo.init(audioURL: audioUrl5,
+                                               lrc: lrc5)
+        musics.append(music5)
+        let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
+        let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
+        let lrc6 = try! String(contentsOfFile: lyricUrl6.path)
+        let music6 = VideoEditorMusicInfo.init(audioURL: audioUrl6,
+                                               lrc: lrc6)
+        musics.append(music6)
+        let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
+        let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
+        let lrc7 = try! String(contentsOfFile: lyricUrl7.path)
+        let music7 = VideoEditorMusicInfo.init(audioURL: audioUrl7,
+                                               lrc: lrc7)
+        musics.append(music7)
+        let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
+        let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
+        let lrc8 = try! String(contentsOfFile: lyricUrl8.path)
+        let music8 = VideoEditorMusicInfo.init(audioURL: audioUrl8,
+                                               lrc: lrc8)
+        musics.append(music8)
+        return musics
+    }
     func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
         // 模仿延迟加加载数据
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            var musics: [VideoEditorMusicInfo] = []
-            let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
-            let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
-            let music1 = VideoEditorMusicInfo.init(audioPath: audioUrl1.path,
-                                                   lrcPath: lyricUrl1.path)
-            musics.append(music1)
-            let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
-            let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
-            let music2 = VideoEditorMusicInfo.init(audioPath: audioUrl2.path,
-                                                   lrcPath: lyricUrl2.path)
-            musics.append(music2)
-            let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
-            let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
-            let music3 = VideoEditorMusicInfo.init(audioPath: audioUrl3.path,
-                                                   lrcPath: lyricUrl3.path)
-            musics.append(music3)
-            let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
-            let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
-            let music4 = VideoEditorMusicInfo.init(audioPath: audioUrl4.path,
-                                                   lrcPath: lyricUrl4.path)
-            musics.append(music4)
-            let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
-            let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
-            let music5 = VideoEditorMusicInfo.init(audioPath: audioUrl5.path,
-                                                   lrcPath: lyricUrl5.path)
-            musics.append(music5)
-            let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
-            let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
-            let music6 = VideoEditorMusicInfo.init(audioPath: audioUrl6.path,
-                                                   lrcPath: lyricUrl6.path)
-            musics.append(music6)
-            let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
-            let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
-            let music7 = VideoEditorMusicInfo.init(audioPath: audioUrl7.path,
-                                                   lrcPath: lyricUrl7.path)
-            musics.append(music7)
-            let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
-            let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
-            let music8 = VideoEditorMusicInfo.init(audioPath: audioUrl8.path,
-                                                   lrcPath: lyricUrl8.path)
-            musics.append(music8)
-            completionHandler(musics)
+            completionHandler(self.getMusicInfos())
         }
         return true
     }
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, didSearch text: String?, completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        // 模仿延迟加加载数据
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            completionHandler(self.getMusicInfos(), true)
+        }
+    }
+    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMore text: String?, completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            completionHandler(self.getMusicInfos(), false)
+        }
+    }
+    
     func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, didFinish result: VideoEditResult) {
         let pickerResultVC = PickerResultViewController.init()
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.videoEditor = videoConfig
         pickerResultVC.config = pickerConfig
         
-        switch videoEditorViewController.assetType {
+        switch videoEditorViewController.sourceType {
         case .local:
             let photoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: videoURL))
             photoAsset.videoEdit = result
@@ -239,7 +262,7 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.videoEditor = videoConfig
         pickerResultVC.config = pickerConfig
-        switch videoEditorViewController.assetType {
+        switch videoEditorViewController.sourceType {
         case .local:
             let photoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: videoURL))
             pickerResultVC.selectedAssets = [photoAsset]
@@ -269,13 +292,13 @@ extension EditorConfigurationViewController {
             case .fixedCropState:
                 return photoConfig.fixedCropState ? "true" : "false"
             case .isRoundCrop:
-                return photoConfig.cropConfig.isRoundCrop ? "true" : "false"
+                return photoConfig.cropping.isRoundCrop ? "true" : "false"
             case .fixedRatio:
-                return photoConfig.cropConfig.fixedRatio ? "true" : "false"
+                return photoConfig.cropping.fixedRatio ? "true" : "false"
             case .aspectRatioType:
-                return photoConfig.cropConfig.aspectRatioType.title
+                return photoConfig.cropping.aspectRatioType.title
             case .maskType:
-                switch photoConfig.cropConfig.maskType {
+                switch photoConfig.cropping.maskType {
                 case .blackColor:
                     return "blackColor"
                 case .darkBlurEffect:
@@ -341,11 +364,11 @@ extension EditorConfigurationViewController {
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func isRoundCropAction(_ indexPath: IndexPath) {
-        photoConfig.cropConfig.isRoundCrop = !photoConfig.cropConfig.isRoundCrop
+        photoConfig.cropping.isRoundCrop = !photoConfig.cropping.isRoundCrop
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func fixedRatioAction(_ indexPath: IndexPath) {
-        photoConfig.cropConfig.fixedRatio = !photoConfig.cropConfig.fixedRatio
+        photoConfig.cropping.fixedRatio = !photoConfig.cropping.fixedRatio
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func aspectRatioTypeAction(_ indexPath: IndexPath) {
@@ -365,7 +388,7 @@ extension EditorConfigurationViewController {
             let heightTextFiled = alert.textFields?.last
             let heightRatioStr = heightTextFiled?.text ?? "0"
             let heightRatio = Int(heightRatioStr.count == 0 ? "0" : heightRatioStr)!
-            self.photoConfig.cropConfig.aspectRatioType = .custom(CGSize(width: widthRatio, height: heightRatio))
+            self.photoConfig.cropping.aspectRatioType = .custom(CGSize(width: widthRatio, height: heightRatio))
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
@@ -379,11 +402,11 @@ extension EditorConfigurationViewController {
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:
-                    self.photoConfig.cropConfig.maskType = .blackColor
+                    self.photoConfig.cropping.maskType = .blackColor
                 case 1:
-                    self.photoConfig.cropConfig.maskType = .darkBlurEffect
+                    self.photoConfig.cropping.maskType = .darkBlurEffect
                 case 2:
-                    self.photoConfig.cropConfig.maskType = .lightBlurEffect
+                    self.photoConfig.cropping.maskType = .lightBlurEffect
                 default:
                     break
                 }
@@ -554,7 +577,7 @@ extension EditorConfigurationViewController {
                 return "." + rawValue
             default: break
             }
-            return ".cropConfig." + rawValue
+            return ".cropping." + rawValue
         }
         func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
             guard let controller = controller as? EditorConfigurationViewController else {

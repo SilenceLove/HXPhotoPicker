@@ -16,7 +16,7 @@ protocol PhotoEditorMosaicViewDelegate: AnyObject {
 }
 
 class PhotoEditorMosaicView: UIView, UIGestureRecognizerDelegate {
-    enum MosaicType {
+    enum MosaicType: Int, Codable {
         case mosaic
         case smear
     }
@@ -388,4 +388,39 @@ struct PhotoEditorMosaicData {
     let colors: [UIColor]
     let lineWidth: CGFloat
     let angles: [CGFloat]
+}
+extension PhotoEditorMosaicData: Codable {
+    enum CodingKeys: String, CodingKey {
+        case type
+        case points
+        case colors
+        case lineWidth
+        case angles
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decode(PhotoEditorMosaicView.MosaicType.self, forKey: .type)
+        points = try container.decode([CGPoint].self, forKey: .points)
+        let colorDatas = try container.decode(Data.self, forKey: .colors)
+        colors = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(colorDatas) as! [UIColor]
+        lineWidth = try container.decode(CGFloat.self, forKey: .lineWidth)
+        angles = try container.decode([CGFloat].self, forKey: .angles)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
+        try container.encode(points, forKey: .points)
+        if #available(iOS 11.0, *) {
+            let colorDatas = try NSKeyedArchiver.archivedData(withRootObject: colors, requiringSecureCoding: false)
+            try container.encode(colorDatas, forKey: .colors)
+        } else {
+            // Fallback on earlier versions
+            let colorDatas = NSKeyedArchiver.archivedData(withRootObject: colors)
+            try container.encode(colorDatas, forKey: .colors)
+        }
+        try container.encode(lineWidth, forKey: .lineWidth)
+        try container.encode(angles, forKey: .angles)
+    }
 }

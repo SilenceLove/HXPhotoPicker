@@ -14,21 +14,19 @@ public class PreviewViewConfiguration {
     /// 自定义视频Cell
     public var customVideoCellClass: PreviewVideoViewCell.Type?
     
+    /// 网络视频加载方式
+    public var loadNetworkVideoMode: PhotoAsset.LoadNetworkVideoMode = .download {
+        didSet { PhotoManager.shared.loadNetworkVideoMode = loadNetworkVideoMode }
+    }
+    
     /// 背景颜色
-    public lazy var backgroundColor : UIColor = {
-        return .white
-    }()
+    public lazy var backgroundColor : UIColor = .white
     
     /// 暗黑风格下背景颜色
-    public lazy var backgroundDarkColor : UIColor = {
-        return .black
-    }()
+    public lazy var backgroundDarkColor : UIColor = .black
     
     /// 选择框配置
-    public lazy var selectBox: SelectBoxConfiguration = {
-        let config = SelectBoxConfiguration.init()
-        return config
-    }()
+    public lazy var selectBox: SelectBoxConfiguration = .init()
     
     /// 视频播放类型
     public var videoPlayType: PhotoPreviewViewController.VideoPlayType = .normal
@@ -64,5 +62,5 @@ public class PreviewViewConfiguration {
     /// 暗黑模式下取消按钮图片名
     public var cancelDarkImageName: String = "hx_picker_photolist_cancel"
     
-    public init() { }
+    public init() { PhotoManager.shared.loadNetworkVideoMode = loadNetworkVideoMode }
 }

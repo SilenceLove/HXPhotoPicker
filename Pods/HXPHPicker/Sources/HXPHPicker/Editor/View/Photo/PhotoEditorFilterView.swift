@@ -174,6 +174,8 @@ extension PhotoEditorFilterView: UICollectionViewDataSource, UICollectionViewDel
         currentFilter.isSelected = false
         if let currentCell = collectionView.cellForItem(at: IndexPath(item: currentSelectedIndex, section: 0)) as? PhotoEditorFilterViewCell {
             currentCell.updateSelectedView(true)
+        }else {
+            collectionView.reloadItems(at: [IndexPath(item: currentSelectedIndex, section: 0)])
         }
         if let cell = collectionView.cellForItem(at: indexPath) as? PhotoEditorFilterViewCell {
             cell.filter.isSelected = true
@@ -196,7 +198,10 @@ extension PhotoEditorFilterView: PhotoEditorFilterViewCellDelegate {
         if let image = image,
            let index = filters.firstIndex(of: cell.filter) {
             let filterInfo = filterConfig.infos[index - 1]
-            return filterInfo.filterHandler(image, cell.imageView.image, filterInfo.defaultValue, .touchUpInside)
+            return filterInfo.filterHandler(image,
+                                            cell.imageView.image,
+                                            filterInfo.defaultValue,
+                                            .touchUpInside)
         }
         return nil
     }

@@ -8,10 +8,10 @@
 import UIKit
 import Photos
 
-public typealias VideoURLResultHandler = (URL?) -> Void
-
 // MARK: 获取视频地址
 public extension AssetManager {
+    
+    typealias VideoURLResultHandler = (Result<URL, AssetError>) -> Void
     
     /// 请求获取视频地址
     /// - Parameters:
@@ -21,7 +21,7 @@ public extension AssetManager {
                                resultHandler: @escaping VideoURLResultHandler) {
         requestAVAsset(for: asset) { (reqeustID) in
         } progressHandler: { (progress, error, stop, info) in
-        } resultHandler: { (avAsset, audioMix, info, downloadSuccess) in
+        } resultHandler: { (_) in
             self.requestVideoURL(mp4Format: asset, resultHandler: resultHandler)
         }
     }
@@ -46,12 +46,14 @@ public extension AssetManager {
                                resultHandler: @escaping VideoURLResultHandler) {
         asset.checkAdjustmentStatus { (isAdjusted) in
             if isAdjusted {
-                self.requestAVAsset(for: asset, iCloudHandler: nil, progressHandler: nil) { (avAsset, audioMix, info, success) in
-                    if let urlAsset = avAsset as? AVURLAsset,
-                       PhotoTools.copyFile(at: urlAsset.url, to: fileURL) {
-                        resultHandler(fileURL)
-                    }else {
-                        if let avAsset = avAsset {
+                self.requestAVAsset(for: asset, iCloudHandler: nil, progressHandler: nil) { (result) in
+                    switch result {
+                    case .success(let avResult):
+                        let avAsset = avResult.avAsset
+                        if let urlAsset = avAsset as? AVURLAsset,
+                           PhotoTools.copyFile(at: urlAsset.url, to: fileURL) {
+                            resultHandler(.success(fileURL))
+                        }else {
                             var presetName: String
                             let presets = AVAssetExportSession.exportPresets(compatibleWith: avAsset)
                             if presets.contains(AVAssetExportPresetHighestQuality) {
@@ -69,16 +71,16 @@ public extension AssetManager {
                                 DispatchQueue.main.async {
                                     switch exportSession?.status {
                                     case .completed:
-                                        resultHandler(fileURL)
+                                        resultHandler(.success(fileURL))
                                     case .failed, .cancelled:
-                                        resultHandler(nil)
+                                        resultHandler(.failure(.exportFailed(exportSession?.error)))
                                     default: break
                                     }
                                 }
                             })
-                            return
                         }
-                        resultHandler(nil)
+                    case .failure(let error):
+                        resultHandler(.failure(error.error))
                     }
                 }
             }else {
@@ -89,11 +91,11 @@ public extension AssetManager {
                     }
                 }
                 if videoResource == nil {
-                    resultHandler(nil)
+                    resultHandler(.failure(.assetResourceIsEmpty))
                     return
                 }
                 if !PhotoTools.removeFile(fileURL: fileURL) {
-                    resultHandler(nil)
+                    resultHandler(.failure(.removeFileFailed))
                     return
                 }
                 let videoURL = fileURL
@@ -102,9 +104,9 @@ public extension AssetManager {
                 PHAssetResourceManager.default().writeData(for: videoResource!, toFile: videoURL, options: options) { (error) in
                     DispatchQueue.main.async {
                         if error == nil {
-                            resultHandler(videoURL)
+                            resultHandler(.success(videoURL))
                         }else {
-                            resultHandler(nil)
+                            resultHandler(.failure(.assetResourceWriteDataFailed(error!)))
                         }
                     }
                 }

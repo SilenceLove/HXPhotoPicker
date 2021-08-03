@@ -28,8 +28,8 @@
 - [x] 支持滑动选择
 - [x] 编辑图片（支持动图、网络资源）
     - [x] 涂鸦
-    - [ ] 贴纸
-    - [ ] 文字
+    - [x] 贴纸
+    - [x] 文字
     - [x] 裁剪
     - [x] 马赛克
     - [x] 滤镜
@@ -67,7 +67,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.1.3"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.1.6"))
 ]
 ```
 
@@ -88,6 +88,8 @@ github "SilenceLove/HXPHPicker"
 ```
 
 ## 使用方法
+
+> 我们在 [Wiki](https://github.com/SilenceLove/HXPHPicker/wiki) 中提供了更详细的使用说明。
 
 ### 准备工作
 
@@ -153,13 +155,10 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v1.1.6](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#116) | 2021-08-02 | 12.5.1 | 5.3 | 10.0+ |
+| [v1.1.5](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#115) | 2021-07-28 | 12.5.1 | 5.3 | 10.0+ |
+| [v1.1.4](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#114) | 2021-07-16 | 12.5.1 | 5.3 | 10.0+ |
 | [v1.1.3](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#113) | 2021-07-14 | 12.5.1 | 5.3 | 10.0+ |
-| [v1.1.2](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#112) | 2021-06-30 | 12.5.1 | 5.3 | 10.0+ |
-| [v1.1.1](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#111) | 2021-06-17 | 12.2 | 5.3 | 10.0+ |
-| [v1.1.0](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#110) | 2021-06-08 | 12.2 | 5.3 | 10.0+ |
-| [v1.0.9](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#109) | 2021-06-04 | 12.2 | 5.3 | 10.0+ |
-| [v1.0.8](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#108) | 2021-05-20 | 12.2 | 5.3 | 9.0+ |
-| [v1.0.7](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#107) | 2021-05-17 | 12.2 | 5.3 | 9.0+ |
 
 ## 版权协议
 

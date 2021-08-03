@@ -50,6 +50,8 @@ public class PhotoManager: NSObject {
     var bundle: Bundle?
     /// 是否使用了自定义的语言
     var isCustomLanguage: Bool = false
+    /// 加载指示器类型
+    var indicatorType: BaseConfiguration.IndicatorType = .circle
     
     lazy var downloadSession: URLSession = {
         let session = URLSession.init(configuration: .default, delegate: self, delegateQueue: nil)
@@ -62,14 +64,13 @@ public class PhotoManager: NSObject {
     }()
     
     var audioPlayer: AVAudioPlayer?
-    
     var audioPlayFinish: (() -> Void)?
     
     var downloadTasks: [String : URLSessionDownloadTask] = [:]
-    
-    var downloadCompletions: [String : (URL?, Error?) -> Void] = [:]
-    
+    var downloadCompletions: [String : (URL?, Error?, Any?) -> Void] = [:]
     var downloadProgresss: [String : (Double, URLSessionDownloadTask) -> Void] = [:]
+    var downloadFileURLs: [String : URL] = [:]
+    var downloadExts: [String : Any] = [:]
     
     private override init() {
         super.init()

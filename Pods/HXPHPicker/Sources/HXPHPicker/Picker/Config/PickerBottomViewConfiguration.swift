@@ -30,14 +30,10 @@ public class PickerBottomViewConfiguration {
     public var previewButtonHidden: Bool = false
     
     /// 预览按钮标题颜色
-    public lazy var previewButtonTitleColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var previewButtonTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下预览按钮标题颜色
-    public lazy var previewButtonTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public lazy var previewButtonTitleDarkColor: UIColor = .white
     
     /// 预览按钮禁用下的标题颜色
     public var previewButtonDisableTitleColor: UIColor?
@@ -49,14 +45,11 @@ public class PickerBottomViewConfiguration {
     public var originalButtonHidden : Bool = false
     
     /// 原图按钮标题颜色
-    public lazy var originalButtonTitleColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var originalButtonTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下预览按钮标题颜色
-    public lazy var originalButtonTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public lazy var originalButtonTitleDarkColor: UIColor = .white
+    
     /// 显示原图文件大小
     public var showOriginalFileSize: Bool = true
     
@@ -88,44 +81,28 @@ public class PickerBottomViewConfiguration {
     }()
     
     /// 完成按钮标题颜色
-    public lazy var finishButtonTitleColor: UIColor = {
-        return UIColor.white
-    }()
+    public lazy var finishButtonTitleColor: UIColor = .white
     
     /// 暗黑风格下完成按钮标题颜色
-    public lazy var finishButtonTitleDarkColor: UIColor = {
-        return .black
-    }()
+    public lazy var finishButtonTitleDarkColor: UIColor = .black
     
     /// 完成按钮禁用下的标题颜色
-    public lazy var finishButtonDisableTitleColor: UIColor = {
-        return UIColor.white.withAlphaComponent(0.6)
-    }()
+    public lazy var finishButtonDisableTitleColor: UIColor = .white.withAlphaComponent(0.6)
     
     /// 暗黑风格下完成按钮禁用下的标题颜色
-    public lazy var finishButtonDisableTitleDarkColor: UIColor = {
-        return UIColor.black.withAlphaComponent(0.6)
-    }()
+    public lazy var finishButtonDisableTitleDarkColor: UIColor = .black.withAlphaComponent(0.6)
     
     /// 完成按钮选中时的背景颜色
-    public lazy var finishButtonBackgroundColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var finishButtonBackgroundColor: UIColor = .systemTintColor
     
     /// 暗黑风格下完成按钮选中时的背景颜色
-    public lazy var finishButtonDarkBackgroundColor: UIColor = {
-        return .white
-    }()
+    public lazy var finishButtonDarkBackgroundColor: UIColor = .white
     
     /// 完成按钮禁用时的背景颜色
-    public lazy var finishButtonDisableBackgroundColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var finishButtonDisableBackgroundColor: UIColor = .systemTintColor
     
     /// 暗黑风格下完成按钮禁用时的背景颜色
-    public lazy var finishButtonDisableDarkBackgroundColor: UIColor = {
-        return UIColor.white.withAlphaComponent(0.4)
-    }()
+    public lazy var finishButtonDisableDarkBackgroundColor: UIColor = .white.withAlphaComponent(0.4)
     
     /// 未选择资源时是否禁用完成按钮
     public var disableFinishButtonWhenNotSelected: Bool = true
@@ -136,14 +113,10 @@ public class PickerBottomViewConfiguration {
     public var editButtonHidden: Bool = true
     
     /// 编辑按钮标题颜色
-    public lazy var editButtonTitleColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var editButtonTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下编辑按钮标题颜色
-    public lazy var editButtonTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public lazy var editButtonTitleDarkColor: UIColor = .white
     
     /// 编辑按钮禁用下的标题颜色
     public var editButtonDisableTitleColor: UIColor?
@@ -154,34 +127,22 @@ public class PickerBottomViewConfiguration {
     public var showPrompt: Bool = true
     
     /// 提示图标颜色
-    public lazy var promptIconColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var promptIconColor: UIColor = .systemTintColor
     
     /// 暗黑风格下提示图标颜色
-    public lazy var promptIconDarkColor: UIColor = {
-        return .white
-    }()
+    public lazy var promptIconDarkColor: UIColor = .white
     
     /// 提示语颜色
-    public lazy var promptTitleColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var promptTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下提示语颜色
-    public lazy var promptTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public lazy var promptTitleDarkColor: UIColor = .white
     
     /// 提示语颜色
-    public lazy var promptArrowColor: UIColor = {
-        return .systemTintColor
-    }()
+    public lazy var promptArrowColor: UIColor = .systemTintColor
     
     /// 暗黑风格下提示语颜色
-    public lazy var promptArrowDarkColor: UIColor = {
-        return .white
-    }()
+    public lazy var promptArrowDarkColor: UIColor = .white
     
     /// 显示已选资源
     public var showSelectedView: Bool = false
@@ -190,9 +151,7 @@ public class PickerBottomViewConfiguration {
     public var customSelectedViewCellClass: PhotoPreviewSelectedViewCell.Type?
     
     /// 已选资源选中的勾勾颜色
-    public lazy var selectedViewTickColor: UIColor = {
-        return .white
-    }()
+    public lazy var selectedViewTickColor: UIColor = .white
     
     public init() { }
 }

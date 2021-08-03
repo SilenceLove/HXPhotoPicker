@@ -8,12 +8,20 @@
 import UIKit
 import Photos
 
-/// imageData，dataUTI，Orientation，info
-public typealias ImageDataResultHandler = (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void
-/// imageData，dataUTI，Orientation，info，fetchSuccess
-public typealias ImageDataFetchCompletion = (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?, Bool) -> Void
-
 public extension AssetManager {
+    typealias ImageDataResultHandler = (Result<ImageDataResult, ImageDataError>) -> Void
+    
+    struct ImageDataResult {
+        public let imageData: Data
+        public let dataUTI: String
+        public let imageOrientation: UIImage.Orientation
+        public let info: [AnyHashable : Any]?
+    }
+    
+    struct ImageDataError: Error {
+        public let info: [AnyHashable : Any]?
+        public let error: AssetError
+    }
     
     /// 请求imageData，如果资源在iCloud上会自动请求下载iCloud上的资源 注意处理 HEIC格式
     /// - Parameters:
@@ -27,22 +35,31 @@ public extension AssetManager {
                                 version: PHImageRequestOptionsVersion,
                                 iCloudHandler: ((PHImageRequestID) -> Void)?,
                                 progressHandler: PHAssetImageProgressHandler?,
-                                resultHandler: @escaping ImageDataFetchCompletion) -> PHImageRequestID {
-        return requestImageData(for: asset, version: version, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (data, dataUTI, imageOrientation, info) in
+                                resultHandler: @escaping ImageDataResultHandler) -> PHImageRequestID {
+        return requestImageData(for: asset, version: version, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (result) in
             DispatchQueue.main.async {
-                if self.assetDownloadFinined(for: info) {
-                    resultHandler(data, dataUTI, imageOrientation, info, true)
-                }else {
-                    if self.assetIsInCloud(for: info) {
-                        let iCloudRequestID = self.requestImageData(for: asset, version: version, isNetworkAccessAllowed: true, progressHandler: progressHandler, resultHandler: { (data, dataUTI, imageOrientation, info) in
+                switch result {
+                case .failure(let error):
+                    switch error.error {
+                    case .needSyncICloud:
+                        let iCloudRequestID = self.requestImageData(for: asset, version: version, isNetworkAccessAllowed: true, progressHandler: progressHandler, resultHandler: { (result) in
                             DispatchQueue.main.async {
-                                resultHandler(data, dataUTI, imageOrientation, info, self.assetDownloadFinined(for: info))
+                                switch result {
+                                case .success(_):
+                                    resultHandler(result)
+                                case .failure(let error):
+                                    resultHandler(.failure(.init(info: error.info, error: .syncICloudFailed(error.info))))
+                                }
                             }
                         })
                         iCloudHandler?(iCloudRequestID)
-                    }else {
-                        resultHandler(data, dataUTI, imageOrientation, info, false)
+                    default:
+                        resultHandler(.failure(error))
+                        break
                     }
+                default:
+                    resultHandler(result)
+                    break
                 }
             }
         }
@@ -89,23 +106,45 @@ public extension AssetManager {
                 } else {
                     sureOrientation = .up;
                 }
-                
+                func result() {
+                    if let imageData = imageData, self.assetDownloadFinined(for: info) {
+                        resultHandler(.success(.init(imageData: imageData, dataUTI: dataUTI!, imageOrientation: sureOrientation, info: info)))
+                        return
+                    }
+                    
+                    if let inICloud = info?.inICloud, inICloud {
+                        resultHandler(.failure(.init(info: info, error: .needSyncICloud)))
+                    }else {
+                        resultHandler(.failure(.init(info: info, error: .requestFailed(info))))
+                    }
+                }
                 if DispatchQueue.isMain {
-                    resultHandler(imageData, dataUTI, sureOrientation, info)
+                    result()
                 }else {
                     DispatchQueue.main.async {
-                        resultHandler(imageData, dataUTI, sureOrientation, info)
+                        result()
                     }
                 }
             }
         } else {
             // Fallback on earlier versions
             return PHImageManager.default().requestImageData(for: asset, options: options) { (imageData, dataUTI, imageOrientation, info) in
+                func result() {
+                    if let imageData = imageData {
+                        resultHandler(.success(.init(imageData: imageData, dataUTI: dataUTI!, imageOrientation: imageOrientation, info: info)))
+                        return
+                    }
+                    if let inICloud = info?.inICloud, inICloud {
+                        resultHandler(.failure(.init(info: info, error: .needSyncICloud)))
+                    }else {
+                        resultHandler(.failure(.init(info: info, error: .requestFailed(info))))
+                    }
+                }
                 if DispatchQueue.isMain {
-                    resultHandler(imageData, dataUTI, imageOrientation, info)
+                    result()
                 }else {
                     DispatchQueue.main.async {
-                        resultHandler(imageData, dataUTI, imageOrientation, info)
+                        result()
                     }
                 }
             }

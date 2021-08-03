@@ -12,24 +12,16 @@ import UIKit
 public class EmptyViewConfiguration {
     
     /// 标题颜色
-    public lazy var titleColor: UIColor = {
-        return "#666666".color
-    }()
+    public lazy var titleColor: UIColor = "#666666".color
     
     /// 暗黑风格下标题颜色
-    public lazy var titleDarkColor: UIColor = {
-        return "#ffffff".color
-    }()
+    public lazy var titleDarkColor: UIColor = "#ffffff".color
     
     /// 子标题颜色
-    public lazy var subTitleColor: UIColor = {
-        return "#999999".color
-    }()
+    public lazy var subTitleColor: UIColor = "#999999".color
     
     /// 暗黑风格下子标题颜色
-    public lazy var subTitleDarkColor: UIColor = {
-        return "#dadada".color
-    }()
+    public lazy var subTitleDarkColor: UIColor = "#dadada".color
     
     public init() { }
 }

@@ -164,6 +164,36 @@ struct PhotoEditorBrushData {
     let lineWidth: CGFloat
 }
 
+extension PhotoEditorBrushData: Codable {
+    enum CodingKeys: String, CodingKey {
+        case color
+        case points
+        case lineWidth
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let colorData = try container.decode(Data.self, forKey: .color)
+        color = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(colorData) as! UIColor
+        points = try container.decode([CGPoint].self, forKey: .points)
+        lineWidth = try container.decode(CGFloat.self, forKey: .lineWidth)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if #available(iOS 11.0, *) {
+            let colorData = try NSKeyedArchiver.archivedData(withRootObject: color, requiringSecureCoding: false)
+            try container.encode(colorData, forKey: .color)
+        } else {
+            // Fallback on earlier versions
+            let colorData = NSKeyedArchiver.archivedData(withRootObject: color)
+            try container.encode(colorData, forKey: .color)
+        }
+        try container.encode(points, forKey: .points)
+        try container.encode(lineWidth, forKey: .lineWidth)
+    }
+}
+
 class PhotoEditorBrushPath: UIBezierPath {
     var color: UIColor?
     var points: [CGPoint] = []
