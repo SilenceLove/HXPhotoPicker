@@ -126,6 +126,8 @@ const CGFloat HXZoomRate = 1.0f;
 - (AVCaptureMovieFileOutput *)movieOutput {
     if (!_movieOutput) {
         _movieOutput = [[AVCaptureMovieFileOutput alloc] init];
+        CMTime maxDuration = CMTimeMakeWithSeconds(MAX(1, self.videoMaximumDuration), 30);
+        _movieOutput.maxRecordedDuration = maxDuration;
     }
     return _movieOutput;
 }
@@ -296,27 +298,6 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
                 [self.delegate deviceConfigurationFailedWithError:error];
             }
         }
-    }
-}
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
-    if (context == &HXCustomCameraAdjustingExposureContext) {
-//        AVCaptureDevice *device = (AVCaptureDevice *)object;
-//        if (!device.isAdjustingExposure && [device isExposureModeSupported:AVCaptureExposureModeLocked]) {
-//            [object removeObserver:self forKeyPath:@"adjustingExposure" context:&HXCustomCameraAdjustingExposureContext];
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                NSError *error;
-//                if ([device lockForConfiguration:&error]) {
-//                    device.exposureMode = AVCaptureExposureModeLocked;
-//                    [device unlockForConfiguration];
-//                }else {
-//                    if ([self.delegate respondsToSelector:@selector(deviceConfigurationFailedWithError:)]) {
-////                        [self.delegate deviceConfigurationFailedWithError:error];
-//                    }
-//                }
-//            });
-//        }
-    }else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
 - (void)resetFocusAndExposureModes {
@@ -527,6 +508,13 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
 - (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL
       fromConnections:(NSArray *)connections
                 error:(NSError *)error {
+    if ([error.userInfo[AVErrorRecordingSuccessfullyFinishedKey] boolValue]) {
+        if ([self.delegate respondsToSelector:@selector(videoFinishRecording:)]) {
+            [self.delegate videoFinishRecording:[self.outputURL copy]];
+        }
+        self.outputURL = nil;
+        return;
+    }
     if (error) {
         if ([self.delegate respondsToSelector:@selector(mediaCaptureFailedWithError:)]) {
             [self.delegate mediaCaptureFailedWithError:error];
