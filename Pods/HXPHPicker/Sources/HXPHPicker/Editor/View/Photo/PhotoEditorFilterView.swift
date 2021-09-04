@@ -36,7 +36,10 @@ class PhotoEditorFilterView: UIView {
     }()
     
     lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 50), collectionViewLayout: flowLayout)
+        let collectionView = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
+            collectionViewLayout: flowLayout
+        )
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -45,7 +48,10 @@ class PhotoEditorFilterView: UIView {
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        collectionView.register(PhotoEditorFilterViewCell.self, forCellWithReuseIdentifier: "PhotoEditorFilterViewCellID")
+        collectionView.register(
+            PhotoEditorFilterViewCell.self,
+            forCellWithReuseIdentifier: "PhotoEditorFilterViewCellID"
+        )
         return collectionView
     }()
     
@@ -61,8 +67,20 @@ class PhotoEditorFilterView: UIView {
         slider.layer.shadowRadius = 4
         slider.layer.shadowOpacity = 0.5
         slider.layer.shadowOffset = CGSize(width: 0, height: 0)
-        slider.addTarget(self, action: #selector(sliderDidChanged(slider:)), for: .valueChanged)
-        slider.addTarget(self, action: #selector(sliderTouchUpInside(slider:)), for: [.touchUpInside, .touchCancel, .touchUpOutside])
+        slider.addTarget(
+            self,
+            action: #selector(sliderDidChanged(slider:)),
+            for: .valueChanged
+        )
+        slider.addTarget(
+            self,
+            action: #selector(sliderTouchUpInside(slider:)),
+            for: [
+                .touchUpInside,
+                .touchCancel,
+                .touchUpOutside
+            ]
+        )
         return slider
     }()
     
@@ -130,7 +148,14 @@ class PhotoEditorFilterView: UIView {
     }
     func scrollToSelectedCell() {
         if currentSelectedIndex > 0 {
-            collectionView.scrollToItem(at: IndexPath(item: currentSelectedIndex, section: 0), at: .centeredHorizontally, animated: true)
+            collectionView.scrollToItem(
+                at: IndexPath(
+                    item: currentSelectedIndex,
+                    section: 0
+                ),
+                at: .centeredHorizontally,
+                animated: true
+            )
         }
     }
     func currentSelectedCell() -> PhotoEditorFilterViewCell? {
@@ -138,10 +163,25 @@ class PhotoEditorFilterView: UIView {
     }
     override func layoutSubviews() {
         super.layoutSubviews()
-        sliderView.frame = CGRect(x: UIDevice.leftMargin + 20, y: 0, width: width - 40 - UIDevice.leftMargin - UIDevice.rightMargin, height: 20)
-        backgroundView.frame = CGRect(x: 0, y: 30, width: width, height: 120 + UIDevice.bottomMargin)
+        sliderView.frame = CGRect(
+            x: UIDevice.leftMargin + 20,
+            y: 0,
+            width: width - 40 - UIDevice.leftMargin - UIDevice.rightMargin,
+            height: 20
+        )
+        backgroundView.frame = CGRect(
+            x: 0,
+            y: 30,
+            width: width,
+            height: 120 + UIDevice.bottomMargin
+        )
         collectionView.frame = CGRect(x: 0, y: 0, width: width, height: 120)
-        flowLayout.sectionInset = UIEdgeInsets(top: 10, left: 15 + UIDevice.leftMargin, bottom: 0, right: 15 + UIDevice.rightMargin)
+        flowLayout.sectionInset = UIEdgeInsets(
+            top: 10,
+            left: 15 + UIDevice.leftMargin,
+            bottom: 0,
+            right: 15 + UIDevice.rightMargin
+        )
     }
     
     required init?(coder: NSCoder) {
@@ -153,8 +193,14 @@ extension PhotoEditorFilterView: UICollectionViewDataSource, UICollectionViewDel
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         filters.count
     }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoEditorFilterViewCellID", for: indexPath) as! PhotoEditorFilterViewCell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "PhotoEditorFilterViewCellID",
+            for: indexPath
+        ) as! PhotoEditorFilterViewCell
         cell.delegate = self
         cell.imageView.image = image
         cell.selectedColor = filterConfig.selectedColor
@@ -172,7 +218,12 @@ extension PhotoEditorFilterView: UICollectionViewDataSource, UICollectionViewDel
         let currentFilter = filters[currentSelectedIndex]
         currentFilter.sourceIndex = 0
         currentFilter.isSelected = false
-        if let currentCell = collectionView.cellForItem(at: IndexPath(item: currentSelectedIndex, section: 0)) as? PhotoEditorFilterViewCell {
+        if let currentCell = collectionView.cellForItem(
+            at: IndexPath(
+                item: currentSelectedIndex,
+                section: 0
+            )
+        ) as? PhotoEditorFilterViewCell {
             currentCell.updateSelectedView(true)
         }else {
             collectionView.reloadItems(at: [IndexPath(item: currentSelectedIndex, section: 0)])

@@ -25,8 +25,6 @@ extension Data {
     }
     
     var isGif: Bool {
-        get {
-            imageContentType == .gif
-        }
+        imageContentType == .gif
     }
 }

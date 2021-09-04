@@ -8,7 +8,7 @@
 import UIKit
 import Photos
 
-public typealias ImageResultHandler = (UIImage?, [AnyHashable : Any]?) -> Void
+public typealias ImageResultHandler = (UIImage?, [AnyHashable: Any]?) -> Void
 
 public extension AssetManager {
     
@@ -24,7 +24,14 @@ public extension AssetManager {
                                      completion: ImageResultHandler?) -> PHImageRequestID {
         let options = PHImageRequestOptions.init()
         options.resizeMode = .fast
-        return requestImage(for: asset, targetSize: PhotoTools.transformTargetWidthToSize(targetWidth: targetWidth, asset: asset), options: options) { (image, info) in
+        return requestImage(
+            for: asset,
+            targetSize: PhotoTools.transformTargetWidthToSize(
+                targetWidth: targetWidth,
+                asset: asset
+            ),
+            options: options
+        ) { (image, info) in
             if completion != nil {
                 DispatchQueue.main.async {
                     completion!(image, info)
@@ -41,10 +48,18 @@ public extension AssetManager {
     ///   - resultHandler: 回调
     /// - Returns: 请求ID
     @discardableResult
-    class func requestImage(for asset: PHAsset,
-                            targetSize: CGSize,
-                            options: PHImageRequestOptions,
-                            resultHandler: @escaping ImageResultHandler) -> PHImageRequestID {
-        return PHImageManager.default().requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options, resultHandler: resultHandler)
+    class func requestImage(
+        for asset: PHAsset,
+        targetSize: CGSize,
+        options: PHImageRequestOptions,
+        resultHandler: @escaping ImageResultHandler
+    ) -> PHImageRequestID {
+        return PHImageManager.default().requestImage(
+            for: asset,
+            targetSize: targetSize,
+            contentMode: .aspectFill,
+            options: options,
+            resultHandler: resultHandler
+        )
     }
 }

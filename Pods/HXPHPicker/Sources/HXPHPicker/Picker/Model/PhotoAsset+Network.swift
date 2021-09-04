@@ -50,7 +50,15 @@ public extension PhotoAsset {
         #endif
         let isThumbnail = urlType == .thumbnail
         let url = isThumbnail ? networkImageAsset!.thumbnailURL : networkImageAsset!.originalURL
-        let options: KingfisherOptionsInfo = isThumbnail ? .init([.onlyLoadFirstFrame, .cacheOriginalImage]) : .init([.backgroundDecode])
+        let options: KingfisherOptionsInfo = isThumbnail ?
+            .init(
+                [.onlyLoadFirstFrame,
+             .cacheOriginalImage]
+            )
+            :
+            .init(
+                [.backgroundDecode]
+            )
         
         PhotoTools.downloadNetworkImage(with: url, options: options, progressBlock: progressBlock) { (image) in
             if let image = image {

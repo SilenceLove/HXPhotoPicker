@@ -28,25 +28,18 @@ extension PhotoManager {
             switch languageType {
             case .simplifiedChinese:
                 language = "zh-Hans"
-                break
             case .traditionalChinese:
                 language = "zh-Hant"
-                break
             case .japanese:
                 language = "ja"
-                break
             case .korean:
                 language = "ko"
-                break
             case .english:
                 language = "en"
-                break
             case .thai:
                 language = "th"
-                break
             case .indonesia:
                 language = "id"
-                break
             default:
                 if let fixedLanguage = fixedCustomLanguage {
                     isCustomLanguage = true

@@ -14,37 +14,39 @@ extension PhotoTools {
     /// - Parameters:
     ///   - viewController: 需要弹窗的viewController
     ///   - status: 权限类型
-    public class func showNotAuthorizedAlert(viewController : UIViewController? ,
-                                             status : PHAuthorizationStatus) {
+    public class func showNotAuthorizedAlert(
+        viewController: UIViewController?,
+        status: PHAuthorizationStatus
+    ) {
         guard let vc = viewController else { return }
         if status == .denied ||
             status == .restricted {
-            showAlert(viewController: vc, title: "无法访问相册中照片".localized, message: "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized, leftActionTitle: "取消".localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".localized) { (alertAction) in
+            showAlert(
+                viewController: vc,
+                title: "无法访问相册中照片".localized,
+                message: "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized,
+                leftActionTitle: "取消".localized,
+                leftHandler: {_ in },
+                rightActionTitle: "前往系统设置".localized) { (alertAction) in
                 openSettingsURL()
             }
         }
     }
     
-    /// 显示没有相机权限弹窗
-    public class func showNotCameraAuthorizedAlert(viewController : UIViewController?) {
-        guard let vc = viewController else { return }
-        showAlert(viewController: vc, title: "无法使用相机功能".localized, message: "请前往系统设置中，允许访问「相机」。".localized, leftActionTitle: "取消".localized, leftHandler: {_ in }, rightActionTitle: "前往系统设置".localized) { (alertAction) in
-            openSettingsURL()
-        }
-    }
-    
     /// 转换相册名称为当前语言
-    public class func transformAlbumName(for collection: PHAssetCollection) -> String? {
+    public class func transformAlbumName(
+        for collection: PHAssetCollection
+    ) -> String? {
         if collection.assetCollectionType == .album {
             return collection.localizedTitle
         }
-        var albumName : String?
+        var albumName: String?
         let type = PhotoManager.shared.languageType
         if type == .system {
             albumName = collection.localizedTitle
         }else {
             if collection.localizedTitle == "最近项目" ||
-                collection.localizedTitle == "最近添加"  {
+                collection.localizedTitle == "最近添加" {
                 albumName = "HXAlbumRecents".localized
             }else if collection.localizedTitle == "Camera Roll" ||
                         collection.localizedTitle == "相机胶卷" {
@@ -53,52 +55,40 @@ extension PhotoTools {
                 switch collection.assetCollectionSubtype {
                 case .smartAlbumUserLibrary:
                     albumName = "HXAlbumCameraRoll".localized
-                    break
                 case .smartAlbumVideos:
                     albumName = "HXAlbumVideos".localized
-                    break
                 case .smartAlbumPanoramas:
                     albumName = "HXAlbumPanoramas".localized
-                    break
                 case .smartAlbumFavorites:
                     albumName = "HXAlbumFavorites".localized
-                    break
                 case .smartAlbumTimelapses:
                     albumName = "HXAlbumTimelapses".localized
-                    break
                 case .smartAlbumRecentlyAdded:
                     albumName = "HXAlbumRecentlyAdded".localized
-                    break
                 case .smartAlbumBursts:
                     albumName = "HXAlbumBursts".localized
-                    break
                 case .smartAlbumSlomoVideos:
                     albumName = "HXAlbumSlomoVideos".localized
-                    break
                 case .smartAlbumSelfPortraits:
                     albumName = "HXAlbumSelfPortraits".localized
-                    break
                 case .smartAlbumScreenshots:
                     albumName = "HXAlbumScreenshots".localized
-                    break
                 case .smartAlbumDepthEffect:
                     albumName = "HXAlbumDepthEffect".localized
-                    break
                 case .smartAlbumLivePhotos:
                     albumName = "HXAlbumLivePhotos".localized
-                    break
                 case .smartAlbumAnimated:
                     albumName = "HXAlbumAnimated".localized
-                    break
                 default:
                     albumName = collection.localizedTitle
-                    break
                 }
             }
         }
         return albumName
     }
-    public class func getVideoCoverImage(for photoAsset: PhotoAsset, completionHandler: @escaping (PhotoAsset, UIImage) -> Void) {
+    public class func getVideoCoverImage(
+        for photoAsset: PhotoAsset,
+        completionHandler: @escaping (PhotoAsset, UIImage?) -> Void) {
         if photoAsset.mediaType == .video {
             var url: URL?
             if let videoAsset = photoAsset.localVideoAsset,
@@ -122,7 +112,7 @@ extension PhotoTools {
                 }
             }
             if let url = url {
-                getVideoThumbnailImage(url: url, atTime: 0.1) { (videoURL, coverImage) in
+                getVideoThumbnailImage(url: url, atTime: 0.1) { (videoURL, coverImage, result) in
                     if photoAsset.isNetworkAsset {
                         photoAsset.networkVideoAsset?.coverImage = coverImage
                     }else {
@@ -130,11 +120,92 @@ extension PhotoTools {
                     }
                     completionHandler(photoAsset, coverImage)
                 }
+            }else {
+                completionHandler(photoAsset, nil)
             }
         }
     }
     
-    public class func getVideoDuration(for photoAsset: PhotoAsset, completionHandler: @escaping (PhotoAsset, TimeInterval) -> Void) {
+    /// 导出编辑视频
+    /// - Parameters:
+    ///   - avAsset: 视频对应的 AVAsset 数据
+    ///   - outputURL: 指定视频导出的地址，为nil时默认为临时目录
+    ///   - timeRang: 需要裁剪的时间区域
+    ///   - overlayImage: 贴纸
+    ///   - audioURL: 需要添加的音频地址
+    ///   - audioVolume: 需要添加的音频音量
+    ///   - originalAudioVolume: 视频原始音频音量
+    ///   - presentName: 导出的质量
+    ///   - completion: 导出完成
+    @discardableResult
+    public class func exportEditVideo(
+        for avAsset: AVAsset,
+        outputURL: URL? = nil,
+        startTime: TimeInterval,
+        endTime: TimeInterval,
+        exportPreset: ExportPreset = .ratio_960x540,
+        videoQuality: Int = 5,
+        completion:
+            @escaping (URL?, Error?) -> Void) -> AVAssetExportSession? {
+        if AVAssetExportSession.exportPresets(
+            compatibleWith: avAsset).contains(exportPreset.name) {
+            let videoURL = outputURL == nil ? PhotoTools.getVideoTmpURL() : outputURL
+            if let exportSession = AVAssetExportSession(
+                asset: avAsset,
+                presetName: exportPreset.name) {
+                let timescale = avAsset.duration.timescale
+                let start = CMTime(value: CMTimeValue(startTime * TimeInterval(timescale)), timescale: timescale)
+                let end = CMTime(value: CMTimeValue(endTime * TimeInterval(timescale)), timescale: timescale)
+                let timeRang = CMTimeRange(start: start, end: end)
+                
+                let supportedTypeArray = exportSession.supportedFileTypes
+                exportSession.outputURL = videoURL
+                if supportedTypeArray.contains(AVFileType.mp4) {
+                    exportSession.outputFileType = .mp4
+                }else if supportedTypeArray.isEmpty {
+                    completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
+                    return nil
+                }else {
+                    exportSession.outputFileType = supportedTypeArray.first
+                }
+                exportSession.shouldOptimizeForNetworkUse = true
+                if timeRang != .zero {
+                    exportSession.timeRange = timeRang
+                }
+                if videoQuality > 0 {
+                    exportSession.fileLengthLimit = exportSessionFileLengthLimit(
+                        seconds: avAsset.duration.seconds,
+                        exportPreset: exportPreset,
+                        videoQuality: videoQuality
+                    )
+                }
+                exportSession.exportAsynchronously(completionHandler: {
+                    DispatchQueue.main.async {
+                        switch exportSession.status {
+                        case .completed:
+                            completion(videoURL, nil)
+                        case .failed, .cancelled:
+                            completion(nil, exportSession.error)
+                        default: break
+                        }
+                    }
+                })
+                return exportSession
+            }else {
+                completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
+                return nil
+            }
+        }else {
+            completion(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
+            return nil
+        }
+    }
+    
+    public class func getVideoDuration(
+        for photoAsset: PhotoAsset,
+        completionHandler:
+            @escaping (PhotoAsset, TimeInterval) -> Void
+    ) {
         if photoAsset.mediaType == .video {
             var url: URL?
             if let videoAsset = photoAsset.localVideoAsset,
@@ -158,7 +229,7 @@ extension PhotoTools {
                 }
             }
             if let url = url {
-                let avAsset = AVAsset.init(url: url)
+                let avAsset = AVURLAsset(url: url)
                 avAsset.loadValuesAsynchronously(forKeys: ["duration"]) {
                     let duration = avAsset.duration.seconds
                     if photoAsset.isNetworkAsset {
@@ -187,7 +258,9 @@ extension PhotoTools {
     }
     
     /// 获取和微信主题一致的配置
+    // swiftlint:disable function_body_length
     public class func getWXPickerConfig(isMoment: Bool = false) -> PickerConfiguration {
+        // swiftlint:enable function_body_length
         let config = PickerConfiguration.init()
         if isMoment {
             config.maximumSelectedCount = 9
@@ -201,6 +274,7 @@ extension PhotoTools {
             config.maximumSelectedVideoCount = 0
             config.allowSelectedTogether = true
         }
+        let wxColor = "#07C160".color
         config.selectOptions = [.gifPhoto, .video]
         config.albumShowMode = .popup
         config.appearanceStyle = .normal
@@ -217,18 +291,18 @@ extension PhotoTools {
         config.albumList.albumNameColor = .white
         config.albumList.photoCountColor = .white
         config.albumList.separatorLineColor = "#434344".color.withAlphaComponent(0.6)
-        config.albumList.tickColor = "#07C160".color
+        config.albumList.tickColor = wxColor
         
         config.photoList.backgroundColor = "#2E2F30".color
         config.photoList.cancelPosition = .left
         config.photoList.cancelType = .image
         
         config.photoList.titleView.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
-        config.photoList.titleView.arrowBackgroundColor = "#B2B2B2".color
-        config.photoList.titleView.arrowColor = "#2E2F30".color
+        config.photoList.titleView.arrow.backgroundColor = "#B2B2B2".color
+        config.photoList.titleView.arrow.arrowColor = "#2E2F30".color
         
         config.photoList.cell.targetWidth = 250
-        config.photoList.cell.selectBox.selectedBackgroundColor = "#07C160".color
+        config.photoList.cell.selectBox.selectedBackgroundColor = wxColor
         config.photoList.cell.selectBox.titleColor = .white
         
         config.photoList.cameraCell.cameraImageName = "hx_picker_photoList_photograph_white"
@@ -240,11 +314,11 @@ extension PhotoTools {
         config.photoList.bottomView.originalSelectBox.backgroundColor = .clear
         config.photoList.bottomView.originalSelectBox.borderColor = .white
         config.photoList.bottomView.originalSelectBox.tickColor = .white
-        config.photoList.bottomView.originalSelectBox.selectedBackgroundColor = "#07C160".color
+        config.photoList.bottomView.originalSelectBox.selectedBackgroundColor = wxColor
         config.photoList.bottomView.originalLoadingStyle = .white
         
         config.photoList.bottomView.finishButtonTitleColor = .white
-        config.photoList.bottomView.finishButtonBackgroundColor = "#07C160".color
+        config.photoList.bottomView.finishButtonBackgroundColor = wxColor
         config.photoList.bottomView.finishButtonDisableBackgroundColor = "#666666".color.withAlphaComponent(0.3)
         
         config.photoList.bottomView.promptTitleColor = UIColor.white.withAlphaComponent(0.6)
@@ -258,7 +332,7 @@ extension PhotoTools {
         config.previewView.cancelPosition = .left
         config.previewView.backgroundColor = .black
         config.previewView.selectBox.tickColor = .white
-        config.previewView.selectBox.selectedBackgroundColor = "#07C160".color
+        config.previewView.selectBox.selectedBackgroundColor = wxColor
         
         config.previewView.bottomView.barStyle = .black
         
@@ -266,36 +340,44 @@ extension PhotoTools {
         config.previewView.bottomView.originalSelectBox.backgroundColor = .clear
         config.previewView.bottomView.originalSelectBox.borderColor = .white
         config.previewView.bottomView.originalSelectBox.tickColor = .white
-        config.previewView.bottomView.originalSelectBox.selectedBackgroundColor = "#07C160".color
+        config.previewView.bottomView.originalSelectBox.selectedBackgroundColor = wxColor
         config.previewView.bottomView.originalLoadingStyle = .white
         
         config.previewView.bottomView.finishButtonTitleColor = .white
-        config.previewView.bottomView.finishButtonBackgroundColor = "#07C160".color
+        config.previewView.bottomView.finishButtonBackgroundColor = wxColor
         config.previewView.bottomView.finishButtonDisableBackgroundColor = "#666666".color.withAlphaComponent(0.3)
         
-        config.previewView.bottomView.selectedViewTickColor = "#07C160".color
-        
+        config.previewView.bottomView.selectedViewTickColor = wxColor
         
         #if HXPICKER_ENABLE_EDITOR
         config.previewView.bottomView.editButtonTitleColor = .white
-        config.videoEditor.cropping.maximumVideoCroppingTime = 15
-        config.videoEditor.cropView.finishButtonBackgroundColor = "#07C160".color
-        config.videoEditor.cropView.finishButtonDarkBackgroundColor = "#07C160".color
-        config.videoEditor.toolView.finishButtonBackgroundColor = "#07C160".color
-        config.videoEditor.toolView.finishButtonDarkBackgroundColor = "#07C160".color
-        config.videoEditor.toolView.toolSelectedColor = "#07C160".color
-        config.videoEditor.toolView.musicSelectedColor = "#07C160".color
-        config.videoEditor.music.tintColor = "#07C160".color
         
-        config.photoEditor.toolView.toolSelectedColor = "#07C160".color
-        config.photoEditor.toolView.finishButtonBackgroundColor = "#07C160".color
-        config.photoEditor.toolView.finishButtonDarkBackgroundColor = "#07C160".color
-        config.photoEditor.cropConfimView.finishButtonBackgroundColor = "#07C160".color
-        config.photoEditor.cropConfimView.finishButtonDarkBackgroundColor = "#07C160".color
-        config.photoEditor.cropping.aspectRatioSelectedColor = "#07C160".color
-        config.photoEditor.filter = .init(infos: defaultFilters(),
-                                                selectedColor: "#07C160".color)
-        config.photoEditor.text.tintColor =  "#07C160".color
+        config.videoEditor.cropping.maximumVideoCroppingTime = 15
+        config.videoEditor.cropView.finishButtonBackgroundColor = wxColor
+        config.videoEditor.cropView.finishButtonDarkBackgroundColor = wxColor
+        config.videoEditor.toolView.finishButtonBackgroundColor = wxColor
+        config.videoEditor.toolView.finishButtonDarkBackgroundColor = wxColor
+        config.videoEditor.toolView.toolSelectedColor = wxColor
+        config.videoEditor.toolView.musicSelectedColor = wxColor
+        config.videoEditor.music.tintColor = wxColor
+        config.videoEditor.text.tintColor = wxColor
+        
+        config.photoEditor.toolView.toolSelectedColor = wxColor
+        config.photoEditor.toolView.finishButtonBackgroundColor = wxColor
+        config.photoEditor.toolView.finishButtonDarkBackgroundColor = wxColor
+        config.photoEditor.cropConfimView.finishButtonBackgroundColor = wxColor
+        config.photoEditor.cropConfimView.finishButtonDarkBackgroundColor = wxColor
+        config.photoEditor.cropping.aspectRatioSelectedColor = wxColor
+        config.photoEditor.filter = .init(
+            infos: defaultFilters(),
+            selectedColor: wxColor
+        )
+        config.photoEditor.text.tintColor = wxColor
+        #endif
+        
+        #if HXPICKER_ENABLE_CAMERA
+        config.photoList.camera.videoMaximumDuration = 15
+        config.photoList.camera.tintColor = wxColor
         #endif
         
         config.notAuthorized.closeButtonImageName = "hx_picker_notAuthorized_close_dark"
@@ -303,7 +385,7 @@ extension PhotoTools {
         config.notAuthorized.titleColor = .white
         config.notAuthorized.subTitleColor = .white
         config.notAuthorized.jumpButtonTitleColor = .white
-        config.notAuthorized.jumpButtonBackgroundColor = "#07C160".color
+        config.notAuthorized.jumpButtonBackgroundColor = wxColor
         
         return config
     }

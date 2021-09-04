@@ -14,16 +14,21 @@ class PhotoEditorCropToolModel: Equatable {
     var widthRatio: CGFloat = 0
     var heightRatio: CGFloat = 0
     var scaleText: String {
-        get {
-            if widthRatio == 0 {
-                return "自由".localized
-            }
-            return String(format: "%d:%d", Int(widthRatio), Int(heightRatio))
+        if widthRatio == 0 {
+            return "自由".localized
         }
+        return String(
+            format: "%d:%d",
+            Int(widthRatio),
+            Int(heightRatio)
+        )
     }
     var isSelected: Bool = false
     
-    static func == (lhs: PhotoEditorCropToolModel, rhs: PhotoEditorCropToolModel) -> Bool {
-        return lhs === rhs
+    static func == (
+        lhs: PhotoEditorCropToolModel,
+        rhs: PhotoEditorCropToolModel
+    ) -> Bool {
+        lhs === rhs
     }
 }

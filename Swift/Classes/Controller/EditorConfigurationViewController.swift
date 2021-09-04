@@ -25,25 +25,46 @@ class EditorConfigurationViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: showOpenEditorButton ? "打开编辑器" : "确定", style: .done, target: self, action: #selector(backClick))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: showOpenEditorButton ? "打开编辑器" : "确定",
+            style: .done,
+            target: self,
+            action: #selector(backClick)
+        )
     }
     
     @objc func backClick() {
         if showOpenEditorButton {
             if editorType == 0 {
                 if assetType == 0 {
-                    let image = UIImage.init(contentsOfFile: Bundle.main.path(forResource: "picker_example_image", ofType: ".JPG")!)!
+                    let image = UIImage(
+                        contentsOfFile: Bundle.main.path(
+                            forResource: "picker_example_image",
+                            ofType: ".JPG"
+                        )!
+                    )!
                     let vc = EditorController.init(image: image, config: photoConfig)
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
                 }else {
                     #if canImport(Kingfisher)
-                    let networkURL = URL.init(string: "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif")!
-                    let vc = EditorController.init(networkImageURL: networkURL, config: photoConfig)
+                    let networkURL = URL(
+                        string:
+                            "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif"
+                    )!
+                    let vc = EditorController(
+                        networkImageURL: networkURL,
+                        config: photoConfig
+                    )
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
                     #else
-                    let image = UIImage.init(contentsOfFile: Bundle.main.path(forResource: "picker_example_image", ofType: ".JPG")!)!
+                    let image = UIImage(
+                        contentsOfFile: Bundle.main.path(
+                            forResource: "picker_example_image",
+                            ofType: ".JPG"
+                        )!
+                    )!
                     let vc = EditorController.init(image: image, config: photoConfig)
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
@@ -55,7 +76,10 @@ class EditorConfigurationViewController: UITableViewController {
                     vc.videoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
                 }else {
-                    let networkURL = URL.init(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_video.mp4")!
+                    let networkURL = URL(
+                        string:
+                            "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_video.mp4"
+                    )!
                     let vc = EditorController.init(networkVideoURL: networkURL, config: videoConfig)
                     vc.videoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
@@ -69,7 +93,7 @@ class EditorConfigurationViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return showOpenEditorButton ? editorSection.allCases.count : editorSection.allCases.count - 1
+        return showOpenEditorButton ? EditorSection.allCases.count : EditorSection.allCases.count - 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -79,18 +103,21 @@ class EditorConfigurationViewController: UITableViewController {
         }else {
             index = section + 1
         }
-        return editorSection.allCases[index].allRowCase.count
+        return EditorSection.allCases[index].allRowCase.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ConfigurationViewCell.reuseIdentifier, for: indexPath) as! ConfigurationViewCell
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: ConfigurationViewCell.reuseIdentifier,
+            for: indexPath
+        ) as! ConfigurationViewCell
         let index: Int
         if showOpenEditorButton {
             index = indexPath.section
         }else {
             index = indexPath.section + 1
         }
-        let rowType = editorSection.allCases[index].allRowCase[indexPath.row]
+        let rowType = EditorSection.allCases[index].allRowCase[indexPath.row]
         cell.setupData(rowType, getRowContent(rowType))
         return cell
     }
@@ -105,7 +132,7 @@ class EditorConfigurationViewController: UITableViewController {
         }else {
             index = indexPath.section + 1
         }
-        let rowType = editorSection.allCases[index].allRowCase[indexPath.row]
+        let rowType = EditorSection.allCases[index].allRowCase[indexPath.row]
         rowType.getFunction(self)(indexPath)
     }
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -115,11 +142,14 @@ class EditorConfigurationViewController: UITableViewController {
         }else {
             index = section + 1
         }
-        return editorSection.allCases[index].title
+        return EditorSection.allCases[index].title
     }
 }
 extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
-    func photoEditorViewController(_ photoEditorViewController: PhotoEditorViewController, didFinish result: PhotoEditResult) {
+    func photoEditorViewController(
+        _ photoEditorViewController: PhotoEditorViewController,
+        didFinish result: PhotoEditResult
+    ) {
         let pickerResultVC = PickerResultViewController.init()
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.photoEditor = photoConfig
@@ -170,74 +200,96 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         var musics: [VideoEditorMusicInfo] = []
 //        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
         let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
-        let lrc1 = try! String(contentsOfFile: lyricUrl1.path)
-        let music1 = VideoEditorMusicInfo.init(audioURL: URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3")!,
-                                               lrc: lrc1)
+        let lrc1 = try! String(contentsOfFile: lyricUrl1.path) // swiftlint:disable:this force_try
+        let music1 = VideoEditorMusicInfo.init(audioURL: URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3")!, // swiftlint:disable:this line_length
+                                               lrc: lrc1,
+                                               urlType: .network)
         musics.append(music1)
         let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
         let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
-        let lrc2 = try! String(contentsOfFile: lyricUrl2.path)
+        let lrc2 = try! String(contentsOfFile: lyricUrl2.path) // swiftlint:disable:this force_try
         let music2 = VideoEditorMusicInfo.init(audioURL: audioUrl2,
-                                               lrc: lrc2)
+                                               lrc: lrc2,
+                                               urlType: .network)
         musics.append(music2)
         let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
         let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
-        let lrc3 = try! String(contentsOfFile: lyricUrl3.path)
+        let lrc3 = try! String(contentsOfFile: lyricUrl3.path) // swiftlint:disable:this force_try
         let music3 = VideoEditorMusicInfo.init(audioURL: audioUrl3,
-                                               lrc: lrc3)
+                                               lrc: lrc3,
+                                               urlType: .network)
         musics.append(music3)
         let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
         let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
-        let lrc4 = try! String(contentsOfFile: lyricUrl4.path)
+        let lrc4 = try! String(contentsOfFile: lyricUrl4.path) // swiftlint:disable:this force_try
         let music4 = VideoEditorMusicInfo.init(audioURL: audioUrl4,
-                                               lrc: lrc4)
+                                               lrc: lrc4,
+                                               urlType: .network)
         musics.append(music4)
         let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
         let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
-        let lrc5 = try! String(contentsOfFile: lyricUrl5.path)
+        let lrc5 = try! String(contentsOfFile: lyricUrl5.path) // swiftlint:disable:this force_try
         let music5 = VideoEditorMusicInfo.init(audioURL: audioUrl5,
-                                               lrc: lrc5)
+                                               lrc: lrc5,
+                                               urlType: .network)
         musics.append(music5)
         let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
         let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
-        let lrc6 = try! String(contentsOfFile: lyricUrl6.path)
+        let lrc6 = try! String(contentsOfFile: lyricUrl6.path) // swiftlint:disable:this force_try
         let music6 = VideoEditorMusicInfo.init(audioURL: audioUrl6,
-                                               lrc: lrc6)
+                                               lrc: lrc6,
+                                               urlType: .network)
         musics.append(music6)
         let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
         let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
-        let lrc7 = try! String(contentsOfFile: lyricUrl7.path)
+        let lrc7 = try! String(contentsOfFile: lyricUrl7.path) // swiftlint:disable:this force_try
         let music7 = VideoEditorMusicInfo.init(audioURL: audioUrl7,
-                                               lrc: lrc7)
+                                               lrc: lrc7,
+                                               urlType: .network)
         musics.append(music7)
         let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
         let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
-        let lrc8 = try! String(contentsOfFile: lyricUrl8.path)
+        let lrc8 = try! String(contentsOfFile: lyricUrl8.path) // swiftlint:disable:this force_try
         let music8 = VideoEditorMusicInfo.init(audioURL: audioUrl8,
-                                               lrc: lrc8)
+                                               lrc: lrc8,
+                                               urlType: .network)
         musics.append(music8)
         return musics
     }
-    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+    func videoEditorViewController(
+        _ videoEditorViewController: VideoEditorViewController,
+        loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]
+        ) -> Void) -> Bool {
         // 模仿延迟加加载数据
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             completionHandler(self.getMusicInfos())
         }
         return true
     }
-    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, didSearch text: String?, completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+    func videoEditorViewController(
+        _ videoEditorViewController: VideoEditorViewController,
+        didSearch text: String?,
+        completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void
+    ) {
         // 模仿延迟加加载数据
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             completionHandler(self.getMusicInfos(), true)
         }
     }
-    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, loadMore text: String?, completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+    func videoEditorViewController(
+        _ videoEditorViewController: VideoEditorViewController,
+        loadMore text: String?,
+        completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void
+    ) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             completionHandler(self.getMusicInfos(), false)
         }
     }
     
-    func videoEditorViewController(_ videoEditorViewController: VideoEditorViewController, didFinish result: VideoEditResult) {
+    func videoEditorViewController(
+        _ videoEditorViewController: VideoEditorViewController,
+        didFinish result: VideoEditResult
+    ) {
         let pickerResultVC = PickerResultViewController.init()
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.videoEditor = videoConfig
@@ -249,7 +301,11 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
             photoAsset.videoEdit = result
             pickerResultVC.selectedAssets = [photoAsset]
         case .network:
-            let photoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: videoEditorViewController.networkVideoURL!))
+            let photoAsset = PhotoAsset(
+                networkVideoAsset: .init(
+                    videoURL: videoEditorViewController.networkVideoURL!
+                )
+            )
             photoAsset.videoEdit = result
             pickerResultVC.selectedAssets = [photoAsset]
         default:
@@ -264,10 +320,14 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         pickerResultVC.config = pickerConfig
         switch videoEditorViewController.sourceType {
         case .local:
-            let photoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: videoURL))
+            let photoAsset = PhotoAsset(localVideoAsset: .init(videoURL: videoURL))
             pickerResultVC.selectedAssets = [photoAsset]
         case .network:
-            let photoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: videoEditorViewController.networkVideoURL!))
+            let photoAsset = PhotoAsset(
+                networkVideoAsset: .init(
+                    videoURL: videoEditorViewController.networkVideoURL!
+                )
+            )
             pickerResultVC.selectedAssets = [photoAsset]
         default:
             break
@@ -277,7 +337,7 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
 }
 extension EditorConfigurationViewController {
     func getRowContent(_ rowType: ConfigRowTypeRule) -> String {
-        if let rowType = rowType as? editorTypeRow {
+        if let rowType = rowType as? EditorTypeRow {
             switch rowType {
             case .type:
                 return editorType == 0 ? "photo" : "video"
@@ -285,7 +345,7 @@ extension EditorConfigurationViewController {
                 return assetType == 0 ? "本地" : "网络"
             }
         }
-        if let rowType = rowType as? photoEditorRow {
+        if let rowType = rowType as? PhotoEditorRow {
             switch rowType {
             case .state:
                 return photoConfig.state.title
@@ -308,16 +368,22 @@ extension EditorConfigurationViewController {
                 }
             }
         }
-        if let rowType = rowType as? videoEditorRow {
+        if let rowType = rowType as? VideoEditorRow {
             switch rowType {
             case .exportPresetName:
-                switch videoConfig.exportPresetName {
-                case AVAssetExportPresetLowQuality:
+                switch videoConfig.exportPreset {
+                case .lowQuality:
                     return "LowQuality"
-                case AVAssetExportPresetMediumQuality:
+                case .mediumQuality:
                     return "MediumQuality"
-                default:
+                case .highQuality:
                     return "HighestQuality"
+                case .ratio_640x480:
+                    return "640x480"
+                case .ratio_960x540:
+                    return "960x540"
+                case .ratio_1280x720:
+                    return "1280x720"
                 }
             case .defaultState:
                 return videoConfig.defaultState.title
@@ -381,7 +447,11 @@ extension EditorConfigurationViewController {
             textfield.keyboardType = .numberPad
             textfield.placeholder = "输入高度比"
         }
-        alert.addAction(UIAlertAction.init(title: "确定", style: .default, handler: { (action) in
+        alert.addAction(
+            UIAlertAction(
+                title: "确定",
+                style: .default,
+                handler: { (action) in
             let widthTextFiled = alert.textFields?.first
             let widthRatioStr = widthTextFiled?.text ?? "0"
             let widthRatio = Int(widthRatioStr.count == 0 ? "0" : widthRatioStr)!
@@ -424,11 +494,11 @@ extension EditorConfigurationViewController {
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:
-                    self.videoConfig.exportPresetName = AVAssetExportPresetLowQuality
+                    self.videoConfig.exportPreset = .lowQuality
                 case 1:
-                    self.videoConfig.exportPresetName = AVAssetExportPresetMediumQuality
+                    self.videoConfig.exportPreset = .mediumQuality
                 case 2:
-                    self.videoConfig.exportPresetName = AVAssetExportPresetHighestQuality
+                    self.videoConfig.exportPreset = .highQuality
                 default:
                     break
                 }
@@ -469,7 +539,11 @@ extension EditorConfigurationViewController {
             textfield.keyboardType = .numberPad
             textfield.text = String(maximumVideoCroppingTime)
         }
-        alert.addAction(UIAlertAction.init(title: "确定", style: .default, handler: { (action) in
+        alert.addAction(
+            UIAlertAction(
+                title: "确定",
+                style: .default,
+                handler: { (action) in
             let textFiled = alert.textFields?.first
             let time = Int(textFiled?.text ?? "0")!
             self.videoConfig.cropping.maximumVideoCroppingTime = TimeInterval(time)
@@ -485,7 +559,11 @@ extension EditorConfigurationViewController {
             textfield.keyboardType = .numberPad
             textfield.text = String(minimumVideoCroppingTime)
         }
-        alert.addAction(UIAlertAction.init(title: "确定", style: .default, handler: { (action) in
+        alert.addAction(
+            UIAlertAction(
+                title: "确定",
+                style: .default,
+                handler: { (action) in
             let textFiled = alert.textFields?.first
             let time = Int(textFiled?.text ?? "0")!
             self.videoConfig.cropping.minimumVideoCroppingTime = TimeInterval(time)
@@ -496,7 +574,7 @@ extension EditorConfigurationViewController {
     }
 }
 extension EditorConfigurationViewController {
-    enum editorSection: Int, CaseIterable  {
+    enum EditorSection: Int, CaseIterable {
         case editorType
         case photoOptions
         case videoOptions
@@ -513,15 +591,15 @@ extension EditorConfigurationViewController {
         var allRowCase: [ConfigRowTypeRule] {
             switch self {
             case .editorType:
-                return editorTypeRow.allCases
+                return EditorTypeRow.allCases
             case .photoOptions:
-                return photoEditorRow.allCases
+                return PhotoEditorRow.allCases
             case .videoOptions:
-                return videoEditorRow.allCases
+                return VideoEditorRow.allCases
             }
         }
     }
-    enum editorTypeRow: String, CaseIterable, ConfigRowTypeRule {
+    enum EditorTypeRow: String, CaseIterable, ConfigRowTypeRule {
         case type
         case assetType
         
@@ -536,7 +614,10 @@ extension EditorConfigurationViewController {
         var detailTitle: String {
             return "." + self.rawValue
         }
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
             guard let controller = controller as? EditorConfigurationViewController else {
                 return { _ in }
             }
@@ -548,7 +629,7 @@ extension EditorConfigurationViewController {
             }
         }
     }
-    enum photoEditorRow: String, CaseIterable, ConfigRowTypeRule {
+    enum PhotoEditorRow: String, CaseIterable, ConfigRowTypeRule {
         case state
         case fixedCropState
         case isRoundCrop
@@ -579,7 +660,10 @@ extension EditorConfigurationViewController {
             }
             return ".cropping." + rawValue
         }
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
             guard let controller = controller as? EditorConfigurationViewController else {
                 return { _ in }
             }
@@ -599,7 +683,7 @@ extension EditorConfigurationViewController {
             }
         }
     }
-    enum videoEditorRow: String, CaseIterable, ConfigRowTypeRule {
+    enum VideoEditorRow: String, CaseIterable, ConfigRowTypeRule {
         case exportPresetName
         case defaultState
         case mustBeTailored
@@ -629,7 +713,10 @@ extension EditorConfigurationViewController {
             return "." + self.rawValue
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
             guard let controller = controller as? EditorConfigurationViewController else {
                 return { _ in }
             }

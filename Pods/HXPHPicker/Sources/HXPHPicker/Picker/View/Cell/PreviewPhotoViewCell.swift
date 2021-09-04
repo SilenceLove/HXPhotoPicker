@@ -30,4 +30,3 @@ class PreviewPhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete 
         delegate?.photoCell(networkImagedownloadFailed: self)
     }
 }
-

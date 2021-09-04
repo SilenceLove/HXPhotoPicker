@@ -27,21 +27,27 @@ class EditorStickerItemView: UIView {
         view.center = center
         return view
     }()
+    lazy var externalBorder: CALayer = {
+        let externalBorder = CALayer()
+        
+        return externalBorder
+    }()
     var item: EditorStickerItem
     
     var scale: CGFloat
     var touching: Bool = false
-     
     var isSelected: Bool = false {
         willSet {
             if isSelected == newValue {
                 return
             }
-            if item.text != nil {
-                layer.shadowColor = newValue ? UIColor.black.withAlphaComponent(0.8).cgColor : UIColor.clear.cgColor
+//            if item.text != nil {
+//                layer.shadowColor = newValue ? UIColor.black.withAlphaComponent(0.8).cgColor : UIColor.clear.cgColor
+//            }
+            if item.music == nil {
+                externalBorder.cornerRadius = newValue ? 1 / scale : 0
+                externalBorder.borderWidth = newValue ? 1 / scale : 0
             }
-            layer.cornerRadius = newValue ? 1 / scale : 0
-            layer.borderWidth = newValue ? 1 / scale : 0
             isUserInteractionEnabled = newValue
             
             if newValue {
@@ -60,14 +66,23 @@ class EditorStickerItemView: UIView {
     init(item: EditorStickerItem, scale: CGFloat) {
         self.item = item
         self.scale = scale
-        let rect = CGRect(x: 0, y: 0, width: item.frame.width + itemMargin / scale, height: item.frame.height + itemMargin / scale)
+        let rect = CGRect(x: 0, y: 0, width: item.frame.width, height: item.frame.height)
         super.init(frame: rect)
+        let margin = itemMargin / scale
+        externalBorder.frame = CGRect(
+            x: -margin * 0.5,
+            y: -margin * 0.5,
+            width: width + margin,
+            height: height + margin
+        )
+        layer.addSublayer(externalBorder)
         addSubview(contentView)
-        if item.text != nil {
-            layer.shadowColor = UIColor.black.withAlphaComponent(0.8).cgColor
+//        if item.text != nil {
+//            layer.shadowColor = UIColor.black.withAlphaComponent(0.8).cgColor
+//        }
+        if item.music == nil {
+            externalBorder.borderColor = UIColor.white.cgColor
         }
-
-        layer.borderColor = UIColor.white.cgColor
         layer.shadowOpacity = 0.3
         layer.shadowOffset = CGSize(width: 0, height: 0)
         layer.shadowRadius = 1
@@ -80,15 +95,23 @@ class EditorStickerItemView: UIView {
         }
         return view
     }
+    func invalidateTimer() {
+        self.contentView.invalidateTimer()
+    }
     func initGestures() {
         contentView.isUserInteractionEnabled = true
         let tapGR = UITapGestureRecognizer(target: self, action: #selector(contentViewTapClick(tapGR:)))
         contentView.addGestureRecognizer(tapGR)
         let panGR = UIPanGestureRecognizer(target: self, action: #selector(contentViewPanClick(panGR:)))
         contentView.addGestureRecognizer(panGR)
-        let pinchGR = UIPinchGestureRecognizer(target: self, action: #selector(contentViewPinchClick(pinchGR:)))
-        contentView.addGestureRecognizer(pinchGR)
-        let rotationGR = UIRotationGestureRecognizer(target: self, action: #selector(contentViewRotationClick(rotationGR:)))
+        if item.music == nil {
+            let pinchGR = UIPinchGestureRecognizer(target: self, action: #selector(contentViewPinchClick(pinchGR:)))
+            contentView.addGestureRecognizer(pinchGR)
+        }
+        let rotationGR = UIRotationGestureRecognizer(
+            target: self,
+            action: #selector(contentViewRotationClick(rotationGR:))
+        )
         contentView.addGestureRecognizer(rotationGR)
     }
     
@@ -133,7 +156,10 @@ class EditorStickerItemView: UIView {
             if let moveToCenter = delegate?.stickerItemView(self, moveToCenter: rect), !isDelete {
                 let keyWindow = UIApplication.shared.keyWindow
                 if let view = keyWindow, moveToCenter,
-                   let viewCenter = superview?.convert(CGPoint(x: view.width * 0.5, y: view.height * 0.5), from: view){
+                   let viewCenter = superview?.convert(
+                    CGPoint(x: view.width * 0.5, y: view.height * 0.5),
+                    from: view
+                   ) {
                     UIView.animate(withDuration: 0.25) {
                         self.center = viewCenter
                     }
@@ -280,11 +306,20 @@ class EditorStickerItemView: UIView {
             contentView.transform = .init(scaleX: self.pinchScale, y: self.pinchScale)
         }
         var rect = frame
-        rect.origin.x += (rect.width - (contentView.width + margin)) / 2
-        rect.origin.y += (rect.height - (contentView.height + margin)) / 2
-        rect.size.width = contentView.width + margin
-        rect.size.height = contentView.height + margin
+        rect.origin.x += (rect.width - contentView.width) / 2
+        rect.origin.y += (rect.height - contentView.height) / 2
+        rect.size.width = contentView.width
+        rect.size.height = contentView.height
         frame = rect
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        externalBorder.frame = CGRect(
+            x: -margin * 0.5,
+            y: -margin * 0.5,
+            width: width + margin,
+            height: height + margin
+        )
+        CATransaction.commit()
         
         contentView.center = CGPoint(x: rect.width * 0.5, y: rect.height * 0.5)
         if isMirror {
@@ -321,13 +356,13 @@ class EditorStickerItemView: UIView {
             }
         }
         transform = transform.rotated(by: radian)
-        if isSelected {
+        if isSelected && item.music == nil {
             if touching {
-                layer.borderWidth = 1
-                layer.cornerRadius = 1
+                externalBorder.borderWidth = 1
+                externalBorder.cornerRadius = 1
             }else {
-                layer.borderWidth = 1 / scale
-                layer.cornerRadius = 1 / scale
+                externalBorder.borderWidth = 1 / scale
+                externalBorder.cornerRadius = 1 / scale
             }
         }
     }
@@ -339,10 +374,16 @@ class EditorStickerItemView: UIView {
     func update(size: CGSize, isMirror: Bool = false) {
         let center = self.center
         var frame = frame
-        frame.size = CGSize(width: size.width + itemMargin / scale, height: size.height + itemMargin / scale)
+        frame.size = CGSize(width: size.width, height: size.height)
         self.frame = frame
         self.center = center
-        
+        let margin = itemMargin / scale
+        externalBorder.frame = CGRect(
+            x: -margin * 0.5,
+            y: -margin * 0.5,
+            width: width + margin,
+            height: height + margin
+        )
         contentView.transform = .identity
         transform = .identity
         

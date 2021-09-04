@@ -11,8 +11,10 @@ import UIKit
 public class SelectBoxView: UIControl {
     
     public enum Style: Int {
-        case number //!< 数字
-        case tick   //!< √
+        /// 数字
+        case number
+        /// 勾勾
+        case tick
     }
     
     public var text: String = "0" {
@@ -61,18 +63,32 @@ public class SelectBoxView: UIControl {
     }
     
     func backgroundPath() -> CGPath {
-        let strokePath = UIBezierPath.init(roundedRect: CGRect(x: 0, y: 0, width: width, height: height), cornerRadius: height / 2)
+        let strokePath = UIBezierPath(
+            roundedRect: CGRect(
+                x: 0,
+                y: 0,
+                width: width,
+                height: height
+            ),
+            cornerRadius: height / 2
+        )
         return strokePath.cgPath
     }
     func drawBackgroundLayer() {
         backgroundLayer.path = backgroundPath()
         if isSelected {
-            backgroundLayer.fillColor = PhotoManager.isDark ? config.selectedBackgroudDarkColor.cgColor : config.selectedBackgroundColor.cgColor
+            backgroundLayer.fillColor = PhotoManager.isDark ?
+                config.selectedBackgroudDarkColor.cgColor :
+                config.selectedBackgroundColor.cgColor
             backgroundLayer.lineWidth = 0
         }else {
             backgroundLayer.lineWidth = config.borderWidth
-            backgroundLayer.fillColor = PhotoManager.isDark ? config.darkBackgroundColor.cgColor : config.backgroundColor.cgColor
-            backgroundLayer.strokeColor = PhotoManager.isDark ? config.borderDarkColor.cgColor : config.borderColor.cgColor
+            backgroundLayer.fillColor = PhotoManager.isDark ?
+                config.darkBackgroundColor.cgColor :
+                config.backgroundColor.cgColor
+            backgroundLayer.strokeColor = PhotoManager.isDark ?
+                config.borderDarkColor.cgColor :
+                config.borderColor.cgColor
         }
     }
     func drawTextLayer() {
@@ -94,7 +110,12 @@ public class SelectBoxView: UIControl {
             textHeight = textSize.height
             textWidth = textSize.width
         }
-        textLayer.frame = CGRect(x: (width - textWidth) * 0.5, y: (height - textHeight) * 0.5, width: textWidth, height: textHeight)
+        textLayer.frame = CGRect(
+            x: (width - textWidth) * 0.5,
+            y: (height - textHeight) * 0.5,
+            width: textWidth,
+            height: textHeight
+        )
         textLayer.font = CGFont.init(font.fontName as CFString)
         textLayer.fontSize = config.titleFontSize
         textLayer.foregroundColor = PhotoManager.isDark ? config.titleDarkColor.cgColor : config.titleColor.cgColor

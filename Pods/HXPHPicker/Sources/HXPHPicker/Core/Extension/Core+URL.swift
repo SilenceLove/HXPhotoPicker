@@ -9,7 +9,7 @@ import Foundation
 
 extension URL {
     var isGif: Bool {
-        lastPathComponent.hasSuffix("gif") || lastPathComponent.hasSuffix("GIF")
+        absoluteString.hasSuffix("gif") || absoluteString.hasSuffix("GIF")
     }
     var fileSize: Int {
          do {

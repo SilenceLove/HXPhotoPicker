@@ -14,11 +14,9 @@ import Kingfisher
 
 open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     
-    public lazy var imageView: UIImageView = {
-        let imageView = UIImageView.init()
-        imageView.clipsToBounds = true
-        imageView.contentMode = .scaleAspectFill
-        return imageView
+    public lazy var photoView: PhotoThumbnailView = {
+        let photoView = PhotoThumbnailView()
+        return photoView
     }()
     
     public lazy var selectedView: UIView = {
@@ -44,29 +42,14 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     
     open var photoAsset: PhotoAsset! {
         didSet {
+            photoView.photoAsset = photoAsset
             reqeustAssetImage()
         }
     }
+    
     /// 获取图片，重写此方法可以修改图片
     open func reqeustAssetImage() {
-        if photoAsset.isNetworkAsset ||
-            photoAsset.mediaSubType == .localVideo {
-            #if canImport(Kingfisher)
-            imageView.setImage(for: photoAsset, urlType: .thumbnail)
-            #else
-            imageView.setVideoCoverImage(for: photoAsset) { [weak self] (image, photoAsset) in
-                if self?.photoAsset == photoAsset {
-                    self?.imageView.image = image
-                }
-            }
-            #endif
-        }else {
-            requestID = photoAsset.requestThumbnailImage(targetWidth: width * 2, completion: { [weak self] (image, asset, info) in
-                if self?.photoAsset == asset {
-                    self?.imageView.image = image
-                }
-            })
-        }
+        photoView.requestThumbnailImage(targetWidth: width * 2)
     }
     
     open override var isSelected: Bool {
@@ -77,19 +60,16 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(imageView)
+        contentView.addSubview(photoView)
         contentView.addSubview(selectedView)
     }
     
     public func cancelRequest() {
-        if requestID != nil {
-            PHImageManager.default().cancelImageRequest(requestID!)
-            requestID = nil
-        }
+        photoView.cancelRequest()
     }
     open override func layoutSubviews() {
         super.layoutSubviews()
-        imageView.frame = bounds
+        photoView.frame = bounds
         selectedView.frame = bounds
         tickView.center = CGPoint(x: width * 0.5, y: height * 0.5)
     }

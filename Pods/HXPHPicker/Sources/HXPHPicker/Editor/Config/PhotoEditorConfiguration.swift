@@ -22,18 +22,30 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     /// 工具视图配置
     public lazy var toolView: EditorToolViewConfiguration = {
         let config = EditorToolViewConfiguration.init()
-        let graffiti = EditorToolOptions(imageName: "hx_editor_tools_graffiti",
-                                         type: .graffiti)
-        let chartlet = EditorToolOptions(imageName: "hx_editor_photo_tools_emoji",
-                                         type: .chartlet)
-        let text = EditorToolOptions(imageName: "hx_editor_photo_tools_text",
-                                         type: .text)
-        let crop = EditorToolOptions(imageName: "hx_editor_photo_crop",
-                                     type: .cropping)
-        let mosaic = EditorToolOptions(imageName: "hx_editor_tools_mosaic",
-                                       type: .mosaic)
-        let filter = EditorToolOptions(imageName: "hx_editor_tools_filter",
-                                       type: .filter)
+        let graffiti = EditorToolOptions(
+            imageName: "hx_editor_tools_graffiti",
+            type: .graffiti
+        )
+        let chartlet = EditorToolOptions(
+            imageName: "hx_editor_photo_tools_emoji",
+            type: .chartlet
+        )
+        let text = EditorToolOptions(
+            imageName: "hx_editor_photo_tools_text",
+            type: .text
+        )
+        let crop = EditorToolOptions(
+            imageName: "hx_editor_photo_crop",
+            type: .cropping
+        )
+        let mosaic = EditorToolOptions(
+            imageName: "hx_editor_tools_mosaic",
+            type: .mosaic
+        )
+        let filter = EditorToolOptions(
+            imageName: "hx_editor_tools_filter",
+            type: .filter
+        )
         config.toolOptions = [graffiti, chartlet, text, crop, mosaic, filter]
         return config
     }()
@@ -48,48 +60,10 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     public var brushLineWidth: CGFloat = 5
     
     /// 贴图
-    public lazy var chartlet: ChartletConfig = .init()
-    
-    public class ChartletConfig {
-        public enum LoadScene {
-            /// cell显示时
-            case cellDisplay
-            /// 滚动停止时
-            case scrollStop
-        }
-        /// 弹窗高度
-        public var viewHeight: CGFloat = UIScreen.main.bounds.height * 0.5
-        /// 每行显示个数
-        public var rowCount: Int = UIDevice.isPad ? 6 : 5
-        /// 加载时机
-        public var loadScene: LoadScene = .cellDisplay
-        /// 贴图标题
-        public var titles: [EditorChartlet] = []
-    }
+    public lazy var chartlet: EditorChartletConfig = .init()
     
     /// 文本
-    public lazy var text: TextConfig = .init()
-    
-    public class TextConfig {
-        /// 文本颜色数组
-        public lazy var colors: [String] = PhotoTools.defaultColors()
-        /// 确定按钮背景颜色、文本光标颜色
-        public lazy var tintColor: UIColor = .systemTintColor
-        /// 文本字体
-        public lazy var font: UIFont = .boldSystemFont(ofSize: 25)
-        /// 最大字数限制，0为不限制
-        public var maximumLimitTextLength: Int = 0
-        /// 文本视图推出样式
-        public lazy var modalPresentationStyle: UIModalPresentationStyle = {
-            if #available(iOS 13.0, *) {
-                return .automatic
-            } else {
-                return .fullScreen
-            }
-        }()
-        
-        public init() { }
-    }
+    public lazy var text: EditorTextConfig = .init()
     
     /// 裁剪配置
     public lazy var cropping: PhotoCroppingConfiguration = .init()
@@ -105,8 +79,10 @@ open class PhotoEditorConfiguration: EditorConfiguration {
         public let infos: [PhotoEditorFilterInfo]
         /// 滤镜选中颜色
         public let selectedColor: UIColor
-        public init(infos: [PhotoEditorFilterInfo],
-                    selectedColor: UIColor = .systemTintColor) {
+        public init(
+            infos: [PhotoEditorFilterInfo],
+            selectedColor: UIColor = .systemTintColor
+        ) {
             self.infos = infos
             self.selectedColor = selectedColor
         }
@@ -124,5 +100,15 @@ open class PhotoEditorConfiguration: EditorConfiguration {
         public let mosaiclineWidth: CGFloat
         /// 涂抹的宽度
         public let smearWidth: CGFloat
+        
+        public init(
+            mosaicWidth: CGFloat,
+            mosaiclineWidth: CGFloat,
+            smearWidth: CGFloat
+        ) {
+            self.mosaicWidth = mosaicWidth
+            self.mosaiclineWidth = mosaiclineWidth
+            self.smearWidth = smearWidth
+        }
     }
 }

@@ -8,7 +8,7 @@
 import UIKit
 import AVKit
 
-protocol VideoEditorCropViewDelegate: NSObjectProtocol {
+protocol VideoEditorCropViewDelegate: AnyObject {
     func cropView(_ cropView: VideoEditorCropView, didChangedValidRectAt time: CMTime)
     func cropView(_ cropView: VideoEditorCropView, endChangedValidRectAt time: CMTime)
     func cropView(_ cropView: VideoEditorCropView, progressLineDragBeganAt time: CMTime)
@@ -119,7 +119,12 @@ class VideoEditorCropView: UIView {
         imageGenerator?.cancelAllCGImageGeneration()
         videoFrameMap.removeAll()
         
-        collectionView.contentInset = UIEdgeInsets(top: 2, left: validRectX + imageWidth, bottom: 2, right: validRectX + imageWidth)
+        collectionView.contentInset = UIEdgeInsets(
+            top: 2,
+            left: validRectX + imageWidth,
+            bottom: 2,
+            right: validRectX + imageWidth
+        )
         let cellHeight = itemHeight - 4
         itemWidth = cellHeight / 16 * 9
         var imgWidth = videoSize.width
@@ -231,7 +236,12 @@ extension VideoEditorCropView {
     }
     func resetValidRect() {
         let imgWidth = imageWidth * 0.5
-        frameMaskView.validRect = CGRect(x: validRectX + imgWidth, y: 0, width: width - (validRectX + imgWidth) * 2, height: itemHeight)
+        frameMaskView.validRect = CGRect(
+            x: validRectX + imgWidth,
+            y: 0,
+            width: width - (validRectX + imgWidth) * 2,
+            height: itemHeight
+        )
     }
     func videoDuration(real: Bool = false) -> CGFloat {
         if real {
@@ -239,10 +249,26 @@ extension VideoEditorCropView {
         }
         return CGFloat(round(avAsset.duration.seconds))
     }
-    func getRotateBeforeData() -> (offsetXScale: CGFloat, validXScale: CGFloat, validWithScale: CGFloat) {
-        return getRotateBeforeData(offsetX: collectionView.contentOffset.x, validX: frameMaskView.validRect.minX, validWidth: frameMaskView.validRect.width)
+    func getRotateBeforeData() -> (  // swiftlint:disable:this large_tuple
+        offsetXScale: CGFloat,
+        validXScale: CGFloat,
+        validWithScale: CGFloat
+    ) {
+        return getRotateBeforeData(
+            offsetX: collectionView.contentOffset.x,
+            validX: frameMaskView.validRect.minX,
+            validWidth: frameMaskView.validRect.width
+        )
     }
-    func getRotateBeforeData(offsetX: CGFloat, validX: CGFloat, validWidth: CGFloat) -> (offsetXScale: CGFloat, validXScale: CGFloat, validWithScale: CGFloat) {
+    func getRotateBeforeData(
+        offsetX: CGFloat,
+        validX: CGFloat,
+        validWidth: CGFloat
+    ) -> ( // swiftlint:disable:this large_tuple
+        offsetXScale: CGFloat,
+        validXScale: CGFloat,
+        validWithScale: CGFloat
+    ) {
         let insert = collectionView.contentInset
         let offsetXScale = (offsetX + insert.left) / contentWidth
         let validInitialX = validRectX + imageWidth * 0.5
@@ -251,7 +277,11 @@ extension VideoEditorCropView {
         let validWithScale = validWidth / validMaxWidth
         return (offsetXScale, validXScale, validWithScale)
     }
-    func rotateAfterSetData(offsetXScale: CGFloat, validXScale: CGFloat, validWithScale: CGFloat) {
+    func rotateAfterSetData(
+        offsetXScale: CGFloat,
+        validXScale: CGFloat,
+        validWithScale: CGFloat
+    ) {
         let insert = collectionView.contentInset
         let offsetX = -insert.left + contentWidth * offsetXScale
         collectionView.setContentOffset(CGPoint(x: offsetX, y: -insert.top), animated: false)
@@ -268,9 +298,21 @@ extension VideoEditorCropView {
         let startDuration = getStartDuration(real: true)
         let endDuration = getEndDuration()
         let totalDuration = round(endDuration - startDuration)
-        endTimeLb.text = PhotoTools.transformVideoDurationToString(duration: TimeInterval(round(endDuration)))
-        totalTimeLb.text = PhotoTools.transformVideoDurationToString(duration: TimeInterval(totalDuration))
-        startTimeLb.text = PhotoTools.transformVideoDurationToString(duration: TimeInterval(round(endDuration) - totalDuration))
+        endTimeLb.text = PhotoTools.transformVideoDurationToString(
+            duration: TimeInterval(
+                round(endDuration)
+            )
+        )
+        totalTimeLb.text = PhotoTools.transformVideoDurationToString(
+            duration: TimeInterval(
+                totalDuration
+            )
+        )
+        startTimeLb.text = PhotoTools.transformVideoDurationToString(
+            duration: TimeInterval(
+                round(endDuration) - totalDuration
+            )
+        )
     }
     func getMiddleDuration(real: Bool = false) -> CGFloat {
         let validWidth = frameMaskView.validRect.width - imageWidth
@@ -293,7 +335,10 @@ extension VideoEditorCropView {
         return second
     }
     func getStartTime(real: Bool = false) -> CMTime {
-        return CMTimeMakeWithSeconds(Float64(getStartDuration(real: real)), preferredTimescale: avAsset.duration.timescale)
+        CMTimeMakeWithSeconds(
+            Float64(getStartDuration(real: real)),
+            preferredTimescale: avAsset.duration.timescale
+        )
     }
     func getEndDuration(real: Bool = false) -> CGFloat {
         let videoSecond = videoDuration(real: real)
@@ -305,7 +350,10 @@ extension VideoEditorCropView {
         return second
     }
     func getEndTime(real: Bool = false) -> CMTime {
-        return CMTimeMakeWithSeconds(Float64(getEndDuration(real: real)), preferredTimescale: avAsset.duration.timescale)
+        CMTimeMakeWithSeconds(
+            Float64(getEndDuration(real: real)),
+            preferredTimescale: avAsset.duration.timescale
+        )
     }
     func stopScroll() {
         let inset = collectionView.contentInset
@@ -319,23 +367,39 @@ extension VideoEditorCropView {
         collectionView.setContentOffset(offset, animated: false)
     }
 }
-extension VideoEditorCropView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension VideoEditorCropView: UICollectionViewDataSource,
+                               UICollectionViewDelegate,
+                               UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         videoFrameCount
     }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VideoEditorCropViewCellID", for: indexPath) as! VideoEditorCropViewCell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "VideoEditorCropViewCellID",
+            for: indexPath
+        ) as! VideoEditorCropViewCell
         return cell
     }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
         if indexPath.item < videoFrameCount - 1 {
             return CGSize(width: itemWidth, height: itemHeight - 4)
         }
         let itemW = contentWidth - CGFloat(indexPath.item) * itemWidth
         return CGSize(width: itemW, height: itemHeight - 4)
     }
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
         if let cgImage = videoFrameMap[indexPath.item] {
             let myCell = cell as! VideoEditorCropViewCell
             myCell.image = UIImage.init(cgImage: cgImage)
@@ -343,7 +407,9 @@ extension VideoEditorCropView: UICollectionViewDataSource, UICollectionViewDeleg
     }
     func setCurrentCell(image: UIImage, index: Int) {
         DispatchQueue.main.async {
-            let cell = self.collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? VideoEditorCropViewCell
+            let cell = self.collectionView.cellForItem(
+                at: IndexPath(item: index, section: 0)
+            ) as? VideoEditorCropViewCell
             cell?.image = image
         }
     }
@@ -378,7 +444,7 @@ extension VideoEditorCropView: UICollectionViewDataSource, UICollectionViewDeleg
         imageGenerator?.requestedTimeToleranceAfter = .zero
         imageGenerator?.requestedTimeToleranceBefore = .zero
          
-        var times:[NSValue] = []
+        var times: [NSValue] = []
         for index in 0..<videoFrameCount {
             let time = getVideoCurrentTime(for: index)
             times.append(NSValue.init(time: time))
@@ -406,7 +472,7 @@ extension VideoEditorCropView: UICollectionViewDataSource, UICollectionViewDeleg
                         hasError = true
                     }
                 }
-                index = index + 1
+                index += 1
             }
         }
     }

@@ -26,7 +26,12 @@ class PickerConfigurationViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: showOpenPickerButton ? "打开选择器" : "确定", style: .done, target: self, action: #selector(openPickerController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: showOpenPickerButton ? "打开选择器" : "确定",
+            style: .done,
+            target: self,
+            action: #selector(openPickerController)
+        )
     }
     
     @objc func openPickerController() {
@@ -59,7 +64,10 @@ class PickerConfigurationViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ConfigurationViewCell.reuseIdentifier, for: indexPath) as! ConfigurationViewCell
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: ConfigurationViewCell.reuseIdentifier,
+            for: indexPath
+        ) as! ConfigurationViewCell
         var section: Int
         if !showOpenPickerButton {
             section = indexPath.section + 1
@@ -122,53 +130,57 @@ extension PickerConfigurationViewController: PhotoPickerControllerDelegate {
         pickerController.dismiss(animated: true, completion: nil)
     }
     
-    func pickerController(_ pickerController: PhotoPickerController, videoEditor videoEditorViewController: VideoEditorViewController, loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        videoEditor videoEditorViewController: VideoEditorViewController,
+        loadMusic
+            completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
         var musics: [VideoEditorMusicInfo] = []
         let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
         let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
-        let lrc1 = try! String(contentsOfFile: lyricUrl1.path)
+        let lrc1 = try! String(contentsOfFile: lyricUrl1.path) // swiftlint:disable:this force_try
         let music1 = VideoEditorMusicInfo.init(audioURL: audioUrl1,
                                                lrc: lrc1)
         musics.append(music1)
         let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
         let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
-        let lrc2 = try! String(contentsOfFile: lyricUrl2.path)
+        let lrc2 = try! String(contentsOfFile: lyricUrl2.path) // swiftlint:disable:this force_try
         let music2 = VideoEditorMusicInfo.init(audioURL: audioUrl2,
                                                lrc: lrc2)
         musics.append(music2)
         let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
         let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
-        let lrc3 = try! String(contentsOfFile: lyricUrl3.path)
+        let lrc3 = try! String(contentsOfFile: lyricUrl3.path) // swiftlint:disable:this force_try
         let music3 = VideoEditorMusicInfo.init(audioURL: audioUrl3,
                                                lrc: lrc3)
         musics.append(music3)
         let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
         let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
-        let lrc4 = try! String(contentsOfFile: lyricUrl4.path)
+        let lrc4 = try! String(contentsOfFile: lyricUrl4.path) // swiftlint:disable:this force_try
         let music4 = VideoEditorMusicInfo.init(audioURL: audioUrl4,
                                                lrc: lrc4)
         musics.append(music4)
         let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
         let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
-        let lrc5 = try! String(contentsOfFile: lyricUrl5.path)
+        let lrc5 = try! String(contentsOfFile: lyricUrl5.path) // swiftlint:disable:this force_try
         let music5 = VideoEditorMusicInfo.init(audioURL: audioUrl5,
                                                lrc: lrc5)
         musics.append(music5)
         let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
         let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
-        let lrc6 = try! String(contentsOfFile: lyricUrl6.path)
+        let lrc6 = try! String(contentsOfFile: lyricUrl6.path) // swiftlint:disable:this force_try
         let music6 = VideoEditorMusicInfo.init(audioURL: audioUrl6,
                                                lrc: lrc6)
         musics.append(music6)
         let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
         let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
-        let lrc7 = try! String(contentsOfFile: lyricUrl7.path)
+        let lrc7 = try! String(contentsOfFile: lyricUrl7.path) // swiftlint:disable:this force_try
         let music7 = VideoEditorMusicInfo.init(audioURL: audioUrl7,
                                                lrc: lrc7)
         musics.append(music7)
         let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
         let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
-        let lrc8 = try! String(contentsOfFile: lyricUrl8.path)
+        let lrc8 = try! String(contentsOfFile: lyricUrl8.path) // swiftlint:disable:this force_try
         let music8 = VideoEditorMusicInfo.init(audioURL: audioUrl8,
                                                lrc: lrc8)
         musics.append(music8)
@@ -202,7 +214,16 @@ extension PickerConfigurationViewController {
     }
     func languageTypeAction(_ indexPath: IndexPath) {
         let alert = UIAlertController.init(title: "languageType", message: nil, preferredStyle: .alert)
-        let titles = ["system", "simplifiedChinese", "traditionalChinese", "japanese", "korean", "english", "thai", "indonesia"]
+        let titles = [
+            "system",
+            "simplifiedChinese",
+            "traditionalChinese",
+            "japanese",
+            "korean",
+            "english",
+            "thai",
+            "indonesia"
+        ]
         for title in titles {
             alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { (action) in
                 self.config.languageType = LanguageType.init(rawValue: titles.firstIndex(of: action.title!)!)!
@@ -523,7 +544,10 @@ extension PickerConfigurationViewController {
             "modalPresentationStyle"
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
             guard let controller = controller as? PickerConfigurationViewController else { return { _ in } }
             return controller.presentStyleAction(_:)
         }
@@ -539,7 +563,10 @@ extension PickerConfigurationViewController {
             ".color"
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
             guard let controller = controller as? PickerConfigurationViewController else { return { _ in } }
             return controller.presentColorConfig(_:)
         }
@@ -555,7 +582,10 @@ extension PickerConfigurationViewController {
             ".photoEditor/.videoEditor"
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
             guard let controller = controller as? PickerConfigurationViewController else { return { _ in } }
             return controller.presentEditorConfig(_:)
         }
@@ -634,7 +664,10 @@ extension PickerConfigurationViewController {
             return "." + self.rawValue
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
             guard let controller = controller as? PickerConfigurationViewController else { return { _ in } }
             switch self {
             case .languageType:
@@ -718,7 +751,15 @@ extension AppearanceStyle {
 
 extension PickerAssetOptions {
     var title: String {
-        if self == [.photo, .gifPhoto, .livePhoto, .video] || self == [.gifPhoto, .livePhoto, .video]{
+        if self == [
+            .photo,
+            .gifPhoto,
+            .livePhoto,
+            .video] ||
+            self == [
+            .gifPhoto,
+            .livePhoto,
+            .video] {
             return "photo+gif+livePhoto+video"
         }
         if self == [.photo, .gifPhoto, .video] || self == [.gifPhoto, .video] {
@@ -782,7 +823,7 @@ extension SelectionTapAction {
         }
     }
 }
-extension PhotoPreviewViewController.VideoPlayType {
+extension PhotoPreviewViewController.PlayType {
     var title: String {
         switch self {
         case .normal:

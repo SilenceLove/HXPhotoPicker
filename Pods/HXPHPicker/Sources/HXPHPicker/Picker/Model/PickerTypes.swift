@@ -144,11 +144,16 @@ public extension PhotoAsset {
         }
     }
     enum DownloadStatus: Int {
-        case unknow         //!< 未知，不用下载或还未开始下载
-        case succeed        //!< 下载成功
-        case downloading    //!< 下载中
-        case canceled       //!< 取消下载
-        case failed         //!< 下载失败
+        /// 未知，不用下载或还未开始下载
+        case unknow
+        /// 下载成功
+        case succeed
+        /// 下载中
+        case downloading
+        /// 取消下载
+        case canceled
+        /// 下载失败
+        case failed
     }
     
     /// 网络视频加载方式
@@ -161,26 +166,36 @@ public extension PhotoAsset {
 }
 
 public enum AlbumShowMode: Int {
-    case normal = 0         //!< 正常展示
-    case popup = 1          //!< 弹出展示
+    /// 正常展示
+    case normal = 0
+    /// 弹出展示
+    case popup = 1
 }
 
 public extension PhotoPickerViewController {
     enum CancelType {
-        case text   //!< 文本
-        case image  //!< 图片
+        /// 文本
+        case text
+        /// 图片
+        case image
     }
     enum CancelPosition {
-        case left   //!< 左边
-        case right  //!< 右边
+        /// 左边
+        case left
+        /// 右边
+        case right
     }
 }
 
 public extension PhotoPreviewViewController {
-    enum VideoPlayType {
-        case normal     //!< 正常状态，不自动播放
-        case auto       //!< 自动播放
-        case once       //!< 自动播放一次
+    enum PlayType {
+        /// 视频不自动播放
+        /// LivePhoto需要长按播放
+        case normal
+        /// 自动循环播放
+        case auto
+        /// 只有第一次自动播放
+        case once
     }
 }
 

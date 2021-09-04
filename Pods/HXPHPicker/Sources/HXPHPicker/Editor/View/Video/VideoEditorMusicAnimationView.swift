@@ -6,38 +6,46 @@
 //
 
 import UIKit
+import AVFoundation
 
-class VideoEditorMusicAnimationView: UIView {
+class VideoEditorMusicAnimationLayer: CALayer {
     var animationLayers: [CAShapeLayer] = []
     var isAnimatoning: Bool = false
-    init() {
-        super.init(frame: .zero)
+    let scale: CGFloat
+    var animationBeginTime: CFTimeInterval = AVCoreAnimationBeginTimeAtZero
+    init(hexColor: String = "#333333",
+         scale: CGFloat = 1) {
+        self.scale = scale
+        super.init()
         for _ in 0..<12 {
             let shapeLayer = CAShapeLayer()
+            shapeLayer.contentsScale = UIScreen.main.scale
             shapeLayer.fillColor = UIColor.clear.cgColor
-            shapeLayer.strokeColor = "#333333".color.cgColor
-            shapeLayer.lineWidth = 1
-            layer.addSublayer(shapeLayer)
+            shapeLayer.strokeColor = hexColor.color.cgColor
+            shapeLayer.lineWidth = 1 * scale
+            addSublayer(shapeLayer)
             animationLayers.append(shapeLayer)
         }
     }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    func changeColor(hex: String) {
+        for shapeLayer in animationLayers {
+            shapeLayer.strokeColor = hex.color.cgColor
+        }
     }
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    override func layoutSublayers() {
+        super.layoutSublayers()
         for shapeLayer in animationLayers {
             shapeLayer.frame = bounds
         }
-        updatePath()
+        updatePath(true)
     }
-    func updatePath() {
-        let pillarWidth: CGFloat = 1
+    func updatePath(_ skip: Bool = false) {
+        let pillarWidth: CGFloat = 1 * scale
         let pillarHeighs: [CGFloat] = [4, 8, 12, 8, 6, 4, 7, 12, 8, 10, 6, 4]
         for (index, shapeLayer) in animationLayers.enumerated() {
-            let pillarHeigh = pillarHeighs[index]
-            let pillarX: CGFloat = (pillarWidth + 2) * CGFloat(index)
-            let startY: CGFloat = (height - pillarHeigh) * 0.5
+            let pillarHeigh = pillarHeighs[index] * scale
+            let pillarX: CGFloat = (pillarWidth + 2 * scale) * CGFloat(index)
+            let startY: CGFloat = (frame.height - pillarHeigh) * 0.5
             let startPoint = CGPoint(x: pillarX, y: startY)
             let endPoint = CGPoint(x: pillarX, y: startY + pillarHeigh)
             let path = UIBezierPath()
@@ -46,11 +54,11 @@ class VideoEditorMusicAnimationView: UIView {
             shapeLayer.path = path.cgPath
         }
         if isAnimatoning {
-            startAnimation()
+            startAnimation(skip)
         }
     }
-    func startAnimation() {
-        if isAnimatoning {
+    func startAnimation(_ skip: Bool = false) {
+        if isAnimatoning && !skip {
             return
         }
         isAnimatoning = true
@@ -77,6 +85,7 @@ class VideoEditorMusicAnimationView: UIView {
             animation.repeatCount = MAXFLOAT
             animation.isRemovedOnCompletion = false
             animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            animation.beginTime = animationBeginTime
             shapeLayer.add(animation, forKey: nil)
         }
     }
@@ -85,5 +94,38 @@ class VideoEditorMusicAnimationView: UIView {
         for shapeLayer in animationLayers {
             shapeLayer.removeAllAnimations()
         }
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+class VideoEditorMusicAnimationView: UIView {
+    lazy var animationLayer: VideoEditorMusicAnimationLayer = {
+        let animationLayer = VideoEditorMusicAnimationLayer(hexColor: hexColor)
+        return animationLayer
+    }()
+    let hexColor: String
+    init(hexColor: String = "#333333") {
+        self.hexColor = hexColor
+        super.init(frame: .zero)
+        layer.addSublayer(animationLayer)
+    }
+    func changeColor(hex: String) {
+        animationLayer.changeColor(hex: hex)
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        animationLayer.frame = bounds
+    }
+     
+    func startAnimation() {
+        animationLayer.startAnimation()
+    }
+    func stopAnimation() {
+        animationLayer.stopAnimation()
     }
 }

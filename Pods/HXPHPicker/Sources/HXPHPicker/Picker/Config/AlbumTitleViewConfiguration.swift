@@ -1,9 +1,8 @@
 //
 //  AlbumTitleViewConfiguration.swift
-//  HXPHPickerExample
+//  HXPHPicker
 //
-//  Created by Slience on 2020/12/29.
-//  Copyright © 2020 Silence. All rights reserved.
+//  Created by Slience on 2021/8/30.
 //
 
 import UIKit
@@ -17,17 +16,8 @@ public class AlbumTitleViewConfiguration {
     /// 暗黑风格下背景颜色
     public var backgroudDarkColor: UIColor?
     
-    /// 箭头背景颜色
-    public lazy var arrowBackgroundColor: UIColor = "#333333".color
-    
-    /// 箭头颜色
-    public lazy var arrowColor: UIColor = "#ffffff".color
-    
-    /// 暗黑风格下箭头背景颜色
-    public lazy var arrowBackgroudDarkColor: UIColor = "#ffffff".color
-    
-    /// 暗黑风格下箭头颜色
-    public lazy var arrowDarkColor: UIColor = "#333333".color
+    /// 箭头配置
+    public lazy var arrow: ArrowViewConfiguration = .init()
     
     public init() { }
 }

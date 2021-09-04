@@ -29,22 +29,30 @@ extension PhotoAsset {
         completion(false, self)
     }
     
-    func checkICloundStatus(allowSyncPhoto : Bool,
-                            completion: @escaping (Bool) -> Void) -> Bool {
+    func checkICloundStatus(
+        allowSyncPhoto: Bool,
+        completion: @escaping (Bool) -> Void
+    ) -> Bool {
         guard let phAsset = phAsset else {
             return false
         }
         if mediaType == .photo && !allowSyncPhoto {
             return false
         }
-        if downloadStatus != .succeed && phAsset.inICloud  {
+        if downloadStatus != .succeed && phAsset.inICloud {
             let keyWindow = UIApplication.shared.keyWindow
             var loadingView: ProgressHUD?
             if mediaType == .photo {
                 requestImageData { _, _ in
-                    loadingView = ProgressHUD.showLoading(addedTo: keyWindow, text: "正在同步iCloud".localized + "...", animated: true)
+                    loadingView = ProgressHUD.showLoading(
+                        addedTo: keyWindow,
+                        text: "正在同步iCloud".localized + "...",
+                        animated: true
+                    )
                 } progressHandler: { _, progress in
-                    loadingView?.updateText(text: "正在同步iCloud".localized + "(" + String(Int(progress * 100)) + "%)")
+                    loadingView?.updateText(
+                        text: "正在同步iCloud".localized + "(" + String(Int(progress * 100)) + "%)"
+                    )
                 } resultHandler: { _, result in
                     switch result {
                     case .success(_):
@@ -53,14 +61,23 @@ extension PhotoAsset {
                         completion(true)
                     case .failure(_):
                         ProgressHUD.hide(forView: keyWindow, animated: false)
-                        ProgressHUD.showWarning(addedTo: keyWindow, text: "iCloud同步失败".localized, animated: true, delayHide: 1.5)
+                        ProgressHUD.showWarning(
+                            addedTo: keyWindow,
+                            text: "iCloud同步失败".localized,
+                            animated: true,
+                            delayHide: 1.5
+                        )
                         loadingView = nil
                         completion(false)
                     }
                 }
             }else if mediaType == .video {
                 requestAVAsset { _, _ in
-                    loadingView = ProgressHUD.showLoading(addedTo: keyWindow, text: "正在同步iCloud".localized + "...", animated: true)
+                    loadingView = ProgressHUD.showLoading(
+                        addedTo: keyWindow,
+                        text: "正在同步iCloud".localized + "...",
+                        animated: true
+                    )
                 } progressHandler: { _, progress in
                     loadingView?.updateText(text: "正在同步iCloud".localized + "(" + String(Int(progress * 100)) + "%)")
                 } success: { _, _, _ in
@@ -69,7 +86,12 @@ extension PhotoAsset {
                     completion(true)
                 } failure: { _, _, _ in
                     ProgressHUD.hide(forView: keyWindow, animated: false)
-                    ProgressHUD.showWarning(addedTo: keyWindow, text: "iCloud同步失败".localized, animated: true, delayHide: 1.5)
+                    ProgressHUD.showWarning(
+                        addedTo: keyWindow,
+                        text: "iCloud同步失败".localized,
+                        animated: true,
+                        delayHide: 1.5
+                    )
                     loadingView = nil
                     completion(false)
                 }

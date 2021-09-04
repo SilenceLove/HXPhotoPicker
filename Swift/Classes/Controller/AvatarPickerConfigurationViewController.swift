@@ -16,6 +16,7 @@ class AvatarPickerConfigurationViewController: UITableViewController {
         navigationItem.title = "Avatar Picker"
         config.selectMode = .single
         config.selectOptions = .photo
+        config.photoList.finishSelectionAfterTakingPhoto = true
         config.photoSelectionTapAction = .openEditor
         config.photoEditor.fixedCropState = true
         config.photoEditor.cropping.isRoundCrop = true
@@ -25,10 +26,24 @@ class AvatarPickerConfigurationViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "打开选择器", style: .done, target: self, action: #selector(openPickerController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "打开选择器",
+            style: .done,
+            target: self,
+            action: #selector(openPickerController)
+        )
     }
     
     @objc func openPickerController() {
+        let aspectRatioType = config.photoEditor.cropping.aspectRatioType
+        let fixedRatio = config.photoEditor.cropping.fixedRatio
+        let fixedCropState = config.photoEditor.fixedCropState
+        let isRoundCrop = config.photoEditor.cropping.isRoundCrop
+        config.photoList.camera.photoEditor.cropping.aspectRatioType = aspectRatioType
+        config.photoList.camera.photoEditor.cropping.fixedRatio = fixedRatio
+        config.photoList.camera.photoEditor.fixedCropState = fixedCropState
+        config.photoList.camera.photoEditor.cropping.isRoundCrop = isRoundCrop
+        
         let vc = PhotoPickerController.init(config: config)
         vc.pickerDelegate = self
         vc.autoDismiss = false
@@ -46,7 +61,10 @@ class AvatarPickerConfigurationViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ConfigurationViewCell.reuseIdentifier, for: indexPath) as! ConfigurationViewCell
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: ConfigurationViewCell.reuseIdentifier,
+            for: indexPath
+        ) as! ConfigurationViewCell
         let rowType = AvatarPickerSection.allCases[indexPath.section].allRowCase[indexPath.row]
         cell.setupData(rowType, getRowContent(rowType))
         return cell
@@ -209,7 +227,7 @@ extension AvatarPickerConfigurationViewController {
     }
 }
 extension AvatarPickerConfigurationViewController {
-    enum AvatarPickerSection: Int, CaseIterable  {
+    enum AvatarPickerSection: Int, CaseIterable {
         case pickerOptions
         case photoEditOptions
         var title: String {
@@ -250,7 +268,9 @@ extension AvatarPickerConfigurationViewController {
         var detailTitle: String {
             return "." + self.rawValue
         }
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? AvatarPickerConfigurationViewController else {
                 return { _ in }
             }
@@ -292,7 +312,9 @@ extension AvatarPickerConfigurationViewController {
             }
             return ".cropping." + rawValue
         }
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? AvatarPickerConfigurationViewController else {
                 return { _ in }
             }

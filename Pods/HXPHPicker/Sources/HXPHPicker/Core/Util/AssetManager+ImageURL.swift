@@ -16,9 +16,15 @@ public extension AssetManager {
     /// - Parameters:
     ///   - asset: 对应的 PHAsset 数据
     ///   - resultHandler: 获取结果
-    class func requestImageURL(for asset: PHAsset,
-                               resultHandler: @escaping ImageURLResultHandler) {
-        requestImageURL(for: asset, suffix: "jpeg", resultHandler: resultHandler)
+    class func requestImageURL(
+        for asset: PHAsset,
+        resultHandler: @escaping ImageURLResultHandler
+    ) {
+        requestImageURL(
+            for: asset,
+            suffix: "jpeg",
+            resultHandler: resultHandler
+        )
     }
     
     /// 请求获取图片地址
@@ -26,11 +32,17 @@ public extension AssetManager {
     ///   - asset: 对应的 PHAsset 数据
     ///   - suffix: 后缀格式
     ///   - resultHandler: 获取结果
-    class func requestImageURL(for asset: PHAsset,
-                               suffix: String,
-                               resultHandler: @escaping ImageURLResultHandler) {
+    class func requestImageURL(
+        for asset: PHAsset,
+        suffix: String,
+        resultHandler: @escaping ImageURLResultHandler
+    ) {
         let imageURL = PhotoTools.getTmpURL(for: suffix)
-        requestImageURL(for: asset, toFile: imageURL, resultHandler: resultHandler)
+        requestImageURL(
+            for: asset,
+            toFile: imageURL,
+            resultHandler: resultHandler
+        )
     }
     
     /// 请求获取图片地址
@@ -38,15 +50,25 @@ public extension AssetManager {
     ///   - asset: 对应的 PHAsset 数据
     ///   - fileURL: 指定本地地址
     ///   - resultHandler: 获取结果
-    class func requestImageURL(for asset: PHAsset,
-                               toFile fileURL:URL,
-                               resultHandler: @escaping ImageURLResultHandler) {
+    class func requestImageURL(
+        for asset: PHAsset,
+        toFile fileURL: URL,
+        resultHandler: @escaping ImageURLResultHandler
+    ) {
         asset.checkAdjustmentStatus { (isAdjusted) in
             if isAdjusted {
-                self.requestImageData(for: asset, version: .current, iCloudHandler: nil, progressHandler: nil) { (result) in
+                self.requestImageData(
+                    for: asset,
+                    version: .current,
+                    iCloudHandler: nil,
+                    progressHandler: nil
+                ) { (result) in
                     switch result {
                     case .success(let dataResult):
-                        if let imageURL = PhotoTools.write(toFile: fileURL, imageData: dataResult.imageData) {
+                        if let imageURL = PhotoTools.write(
+                            toFile: fileURL,
+                            imageData: dataResult.imageData
+                        ) {
                             resultHandler(.success(imageURL))
                         }else {
                             resultHandler(.failure(.fileWriteFailed))
@@ -57,13 +79,12 @@ public extension AssetManager {
                 }
             }else {
                 var imageResource: PHAssetResource?
-                for resource in PHAssetResource.assetResources(for: asset) {
-                    if resource.type == .photo {
-                        imageResource = resource
-                        break
-                    }
+                for resource in PHAssetResource.assetResources(for: asset) where
+                    resource.type == .photo {
+                    imageResource = resource
+                    break
                 }
-                if imageResource == nil {
+                guard let imageResource = imageResource else {
                     resultHandler(.failure(.assetResourceIsEmpty))
                     return
                 }
@@ -74,7 +95,11 @@ public extension AssetManager {
                 let imageURL = fileURL
                 let options = PHAssetResourceRequestOptions.init()
                 options.isNetworkAccessAllowed = true
-                PHAssetResourceManager.default().writeData(for: imageResource!, toFile: imageURL, options: options) { (error) in
+                PHAssetResourceManager.default().writeData(
+                    for: imageResource,
+                    toFile: imageURL,
+                    options: options
+                ) { (error) in
                     DispatchQueue.main.async {
                         if error == nil {
                             resultHandler(.success(imageURL))
@@ -93,13 +118,20 @@ public extension AssetManager {
     ///   - resultHandler: 获取结果
     /// - Returns: 请求ID
     @discardableResult
-    class func requestImageURL(for asset: PHAsset,
-                               resultHandler: @escaping (URL?, UIImage?) -> Void) -> PHContentEditingInputRequestID {
+    class func requestImageURL(
+        for asset: PHAsset,
+        resultHandler: @escaping (URL?, UIImage?) -> Void
+    ) -> PHContentEditingInputRequestID {
         let options = PHContentEditingInputRequestOptions.init()
         options.isNetworkAccessAllowed = true
-        return asset.requestContentEditingInput(with: options) { (input, info) in
+        return asset.requestContentEditingInput(
+            with: options
+        ) { (input, info) in
             DispatchQueue.main.async {
-                resultHandler(input?.fullSizeImageURL, input?.displaySizeImage)
+                resultHandler(
+                    input?.fullSizeImageURL,
+                    input?.displaySizeImage
+                )
             }
         }
     }

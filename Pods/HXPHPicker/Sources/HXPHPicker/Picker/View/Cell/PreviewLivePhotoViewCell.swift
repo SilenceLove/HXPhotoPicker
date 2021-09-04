@@ -9,6 +9,12 @@ import UIKit
 
 class PreviewLivePhotoViewCell: PhotoPreviewViewCell {
     
+    var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once {
+        didSet {
+            scrollContentView.livePhotoPlayType = livePhotoPlayType
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         scrollContentView = PhotoPreviewContentView.init(type: .livePhoto)

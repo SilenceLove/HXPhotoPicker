@@ -11,7 +11,8 @@ protocol VideoEditorSearchMusicViewDelegate: AnyObject {
     func searchMusicView(didCancelClick searchMusicView: VideoEditorSearchMusicView)
     func searchMusicView(didFinishClick searchMusicView: VideoEditorSearchMusicView)
     func searchMusicView(_ searchMusicView: VideoEditorSearchMusicView,
-                         didSelectItem audioPath: String?)
+                         didSelectItem audioPath: String?,
+                         music: VideoEditorMusic)
     func searchMusicView(_ searchMusicView: VideoEditorSearchMusicView,
                          didSearch text: String?,
                          completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void)
@@ -68,8 +69,22 @@ class VideoEditorSearchMusicView: UIView {
         let button = UIButton(type: .system)
         let title = "完成".localized
         let font = UIFont.systemFont(ofSize: 16)
-        let image = UIImage.image(for: config.tintColor, havingSize: CGSize(width: title.width(ofFont: font, maxHeight: 35), height: 30), radius: 3)
-        let disabledImage = UIImage.image(for: .white.withAlphaComponent(0.2), havingSize: CGSize(width: title.width(ofFont: font, maxHeight: 30), height: 30), radius: 3)
+        let image = UIImage.image(
+            for: config.tintColor,
+            havingSize: CGSize(
+                width: title.width(ofFont: font, maxHeight: 35),
+                height: 30
+            ),
+            radius: 3
+        )
+        let disabledImage = UIImage.image(
+            for: .white.withAlphaComponent(0.2),
+            havingSize: CGSize(
+                width: title.width(ofFont: font, maxHeight: 30),
+                height: 30
+            ),
+            radius: 3
+        )
         button.setTitle(title, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.setTitleColor(.white.withAlphaComponent(0.6), for: .disabled)
@@ -96,13 +111,22 @@ class VideoEditorSearchMusicView: UIView {
         let view = SearchView()
         view.textColor = .white
         view.tintColor = config.tintColor
-        view.attributedPlaceholder = NSAttributedString(string: config.placeholder.isEmpty ? "搜索歌名".localized : config.placeholder, attributes: [.font: UIFont.systemFont(ofSize: 17), .foregroundColor: UIColor.white.withAlphaComponent(0.4)])
+        view.attributedPlaceholder = NSAttributedString(
+            string: config.placeholder.isEmpty ?
+                "搜索歌名".localized :
+                config.placeholder,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.white.withAlphaComponent(0.4)
+            ]
+        )
         view.font = .systemFont(ofSize: 17)
         view.clearButtonMode = .whileEditing
         view.returnKeyType = .search
         let searchIcon = UIImageView()
         searchIcon.image = "hx_editor_video_music_search".image?.withRenderingMode(.alwaysTemplate)
         searchIcon.tintColor = .white.withAlphaComponent(0.4)
+        searchIcon.size = searchIcon.image?.size ?? .zero
         view.leftView = searchIcon
         view.leftViewMode = .always
         view.layer.cornerRadius = 10
@@ -118,7 +142,13 @@ class VideoEditorSearchMusicView: UIView {
         return flowLayout
     }()
     lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 90), collectionViewLayout: flowLayout)
+        let collectionView = UICollectionView(
+            frame: CGRect(
+                x: 0, y: 0,
+                width: 0, height: 90
+            ),
+            collectionViewLayout: flowLayout
+        )
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -159,14 +189,21 @@ class VideoEditorSearchMusicView: UIView {
         addSubview(searchBgView)
         addSubview(searchView)
         addSubview(collectionView)
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appDidEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
     }
     @objc func appDidEnterBackground() {
         deselect()
     }
     func deselect() {
         if currentSelectItem >= 0 {
-            if let cell = collectionView.cellForItem(at: IndexPath(item: currentSelectItem, section: 0)) as? VideoEditorMusicViewCell {
+            if let cell = collectionView.cellForItem(
+                at: IndexPath(item: currentSelectItem, section: 0)
+            ) as? VideoEditorMusicViewCell {
                 cell.stopMusic()
             }else {
                 musics[currentSelectItem].isSelected = false
@@ -212,7 +249,12 @@ class VideoEditorSearchMusicView: UIView {
         titleLb.y = 0
         cancelButton.frame = CGRect(x: 12 + UIDevice.leftMargin, y: 0, width: 0, height: 50)
         cancelButton.width = cancelButton.currentTitle?.width(ofFont: cancelButton.titleLabel!.font, maxHeight: 50) ?? 0
-        finishButton.width = (finishButton.currentTitle?.width(ofFont: finishButton.titleLabel!.font, maxHeight: 50) ?? 0) + 20
+        finishButton.width = (
+            finishButton.currentTitle?.width(
+                ofFont: finishButton.titleLabel!.font,
+                maxHeight: 50
+            ) ?? 0
+        ) + 20
         if finishButton.width < 55 {
             finishButton.width = 55
         }
@@ -220,11 +262,21 @@ class VideoEditorSearchMusicView: UIView {
         finishButton.centerY = topView.height * 0.5
         finishButton.x = width - UIDevice.rightMargin - 12 - finishButton.width
         
-        searchView.frame = CGRect(x: 12 + UIDevice.leftMargin, y: topView.frame.maxY + 12, width: width - 24 - UIDevice.leftMargin - UIDevice.rightMargin, height: 35)
+        searchView.frame = CGRect(
+            x: 12 + UIDevice.leftMargin,
+            y: topView.frame.maxY + 12,
+            width: width - 24 - UIDevice.leftMargin - UIDevice.rightMargin,
+            height: 35
+        )
         searchBgView.frame = searchView.frame
         
         setupCollectionInset()
-        collectionView.frame = CGRect(x: 0, y: searchView.frame.maxY + 12, width: width, height: height - searchView.frame.maxY - 12)
+        collectionView.frame = CGRect(
+            x: 0,
+            y: searchView.frame.maxY + 12,
+            width: width,
+            height: height - searchView.frame.maxY - 12
+        )
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -235,7 +287,12 @@ class VideoEditorSearchMusicView: UIView {
     class SearchView: UITextField {
         override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
             let rect = super.leftViewRect(forBounds: bounds)
-            return CGRect(x: (height - rect.width) * 0.5, y: (height - rect.height) * 0.5, width: rect.width, height: rect.height)
+            return CGRect(
+                x: (height - rect.width) * 0.5,
+                y: (height - rect.height) * 0.5,
+                width: rect.width,
+                height: rect.height
+            )
         }
         override func textRect(forBounds bounds: CGRect) -> CGRect {
             var rect = super.textRect(forBounds: bounds)
@@ -262,22 +319,34 @@ class VideoEditorSearchMusicView: UIView {
         }
     }
 }
-extension VideoEditorSearchMusicView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension VideoEditorSearchMusicView: UICollectionViewDataSource,
+                                      UICollectionViewDelegate,
+                                      UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         musics.count
     }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VideoEditorMusicViewCellID", for: indexPath) as! VideoEditorMusicViewCell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "VideoEditorMusicViewCellID",
+            for: indexPath
+        ) as! VideoEditorMusicViewCell
         cell.music = musics[indexPath.item]
         return cell
     }
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath) {
+        endEditing(true)
         collectionView.deselectItem(at: indexPath, animated: false)
         if currentSelectItem == indexPath.item {
             return
         }
         if currentSelectItem >= 0 {
-            if let lastCell = collectionView.cellForItem(at: IndexPath(item: currentSelectItem, section: 0)) as? VideoEditorMusicViewCell {
+            if let lastCell = collectionView.cellForItem(
+                at: IndexPath(item: currentSelectItem, section: 0)
+            ) as? VideoEditorMusicViewCell {
                 lastCell.stopMusic()
             }else {
                 musics[currentSelectItem].isSelected = false
@@ -287,17 +356,20 @@ extension VideoEditorSearchMusicView: UICollectionViewDataSource, UICollectionVi
             }
         }
         let cell = collectionView.cellForItem(at: indexPath) as! VideoEditorMusicViewCell
-        cell.playMusic { [weak self] path in
+        cell.playMusic { [weak self] path, music  in
             guard let self = self else { return }
             let shake = UIImpactFeedbackGenerator(style: .light)
             shake.prepare()
             shake.impactOccurred()
-            self.delegate?.searchMusicView(self, didSelectItem: path)
+            self.delegate?.searchMusicView(self, didSelectItem: path, music: music)
         }
         currentSelectItem = indexPath.item
         finishButton.isEnabled = true
     }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath) -> CGSize {
         CGSize(width: width - collectionView.contentInset.left - collectionView.contentInset.right, height: 90)
     }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -308,8 +380,10 @@ extension VideoEditorSearchMusicView: UICollectionViewDataSource, UICollectionVi
             if !isLoadMore && !isLoading && !musics.isEmpty {
                 isLoadMore = true
                 startLoading(isMore: true)
-                delegate?.searchMusicView(self, loadMore: searchView.text, completion: {
-                    [weak self] musicInfos, hasMore in
+                delegate?.searchMusicView(
+                    self,
+                    loadMore: searchView.text,
+                    completion: { [weak self] musicInfos, hasMore in
                     guard let self = self else { return }
                     self.stopLoading()
                     let musics = self.getMusics(infos: musicInfos)
@@ -328,6 +402,9 @@ extension VideoEditorSearchMusicView: UICollectionViewDataSource, UICollectionVi
             }
         }
     }
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        endEditing(true)
+    }
     func setupCollectionInset() {
         let top: CGFloat = 10
         let left = UIDevice.leftMargin + 12
@@ -339,12 +416,22 @@ extension VideoEditorSearchMusicView: UICollectionViewDataSource, UICollectionVi
                 loadBgView.frame = CGRect(x: 0, y: -40, width: collectionView.width - left - right, height: 40)
             }else {
                 collectionView.contentInset = UIEdgeInsets(top: top, left: left, bottom: bottom + 40, right: right)
-                loadBgView.frame = CGRect(x: 0, y: collectionView.contentSize.height + top + 10, width: collectionView.width - left - right, height: 40)
+                loadBgView.frame = CGRect(
+                    x: 0,
+                    y: collectionView.contentSize.height + top + 10,
+                    width: collectionView.width - left - right,
+                    height: 40
+                )
             }
         }else {
             collectionView.contentInset = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
             if !hasMore {
-                noMoreView.frame = CGRect(x: 0, y: collectionView.contentSize.height + top + 10, width: collectionView.width - left - right, height: 40)
+                noMoreView.frame = CGRect(
+                    x: 0,
+                    y: collectionView.contentSize.height + top + 10,
+                    width: collectionView.width - left - right,
+                    height: 40
+                )
                 updateMoreLine()
             }
         }
@@ -353,14 +440,18 @@ extension VideoEditorSearchMusicView: UICollectionViewDataSource, UICollectionVi
 extension VideoEditorSearchMusicView: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         endEditing(true)
+        let text = textField.text
         isLoadMore = false
         stopLoading()
         removeNoMore()
         deselect()
         clearData()
+        textField.text = text
         startLoading(isMore: false)
-        delegate?.searchMusicView(self, didSearch: textField.text, completion: {
-            [weak self] musicInfos, hasMore in
+        delegate?.searchMusicView(
+            self,
+            didSearch: text,
+            completion: { [weak self] musicInfos, hasMore in
             guard let self = self else { return }
             self.stopLoading()
             let musics = self.getMusics(infos: musicInfos)
@@ -389,7 +480,12 @@ extension VideoEditorSearchMusicView: UITextFieldDelegate {
             loadBgView.frame = CGRect(x: 0, y: -40, width: collectionView.width - left - right, height: 40)
         }else {
             collectionView.contentInset = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
-            loadBgView.frame = CGRect(x: 0, y: collectionView.contentSize.height + top + 10, width: collectionView.width - left - right, height: 40)
+            loadBgView.frame = CGRect(
+                x: 0,
+                y: collectionView.contentSize.height + top + 10,
+                width: collectionView.width - left - right,
+                height: 40
+            )
         }
         loadingView.startAnimating()
         loadingView.centerX = loadBgView.width * 0.5
@@ -397,7 +493,12 @@ extension VideoEditorSearchMusicView: UITextFieldDelegate {
     }
     func stopLoading() {
         isLoading = false
-        collectionView.contentInset = UIEdgeInsets(top: 10, left: UIDevice.leftMargin + 12, bottom: UIDevice.bottomMargin + 60, right: UIDevice.rightMargin + 12)
+        collectionView.contentInset = UIEdgeInsets(
+            top: 10,
+            left: UIDevice.leftMargin + 12,
+            bottom: UIDevice.bottomMargin + 60,
+            right: UIDevice.rightMargin + 12
+        )
         loadingView.stopAnimating()
         loadBgView.removeFromSuperview()
     }
@@ -407,7 +508,12 @@ extension VideoEditorSearchMusicView: UITextFieldDelegate {
         let bottom = UIDevice.bottomMargin + 60
         let right = UIDevice.rightMargin + 12
         collectionView.contentInset = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
-        noMoreView.frame = CGRect(x: 0, y: collectionView.contentSize.height + top + 10, width: collectionView.width - left - right, height: 40)
+        noMoreView.frame = CGRect(
+            x: 0,
+            y: collectionView.contentSize.height + top + 10,
+            width: collectionView.width - left - right,
+            height: 40
+        )
         updateMoreLine()
         collectionView.addSubview(noMoreView)
     }
@@ -416,7 +522,13 @@ extension VideoEditorSearchMusicView: UITextFieldDelegate {
     }
     func updateMoreLine() {
         let arcCenter = CGPoint(x: noMoreView.width * 0.5, y: 10)
-        let path = UIBezierPath(arcCenter: arcCenter, radius: 1, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: true)
+        let path = UIBezierPath(
+            arcCenter: arcCenter,
+            radius: 1,
+            startAngle: 0,
+            endAngle: CGFloat.pi * 2,
+            clockwise: true
+        )
         path.move(to: CGPoint(x: arcCenter.x - 10, y: arcCenter.y))
         path.addLine(to: CGPoint(x: arcCenter.x - 110, y: arcCenter.y))
         path.move(to: CGPoint(x: arcCenter.x + 10, y: arcCenter.y))

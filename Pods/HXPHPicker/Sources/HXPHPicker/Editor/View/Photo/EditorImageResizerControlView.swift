@@ -94,13 +94,441 @@ class EditorImageResizerControlView: UIView {
     }
     
     func changeControl(enabled: Bool, index: Int) {
-        for (item, control) in controls.enumerated() {
-            if item != index {
-                (control as? UIPanGestureRecognizer)?.isEnabled = enabled
-            }
+        for (item, control) in controls.enumerated() where item != index {
+            (control as? UIPanGestureRecognizer)?.isEnabled = enabled
         }
     }
-    
+    func topControlHandler(_ point: CGPoint) {
+        var rectX = currentFrame.minX
+        var rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        rectH -= point.y
+        rectY += point.y
+        if rectH < 50 {
+            rectH = 50
+            rectY = currentFrame.maxY - 50
+        }
+        if rectY < maxImageresizerFrame.minY {
+            rectY = maxImageresizerFrame.minY
+            rectH = currentFrame.maxY - maxImageresizerFrame.minY
+        }
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            var w = rectH * widthRatio
+            if currentFrame.width > currentFrame.height {
+                if rectH < 50 {
+                    rectH = 50
+                    rectY = currentFrame.maxY - rectH
+                    w = rectH * widthRatio
+                }
+            }else {
+                if w < 50 {
+                    w = 50
+                    rectH = w * heightRatio
+                    rectY = currentFrame.maxY - rectH
+                }
+            }
+            rectX = currentFrame.minX + (rectW - w) * 0.5
+            rectW = w
+            if rectX < maxImageresizerFrame.minX {
+                rectX = maxImageresizerFrame.minX
+            }
+            if rectX + rectW > maxImageresizerFrame.maxX {
+                rectX = maxImageresizerFrame.maxX - rectW
+            }
+            if rectW >= maxImageresizerFrame.width {
+                rectX = maxImageresizerFrame.minX
+                rectW = maxImageresizerFrame.width
+                let h = rectW * heightRatio
+                rectY += (rectH - h) * 0.5
+                rectH = h
+                let minY = currentFrame.maxY - rectH
+                if rectY < minY {
+                    rectY = minY
+                }
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
+    func leftControlHandler(_ point: CGPoint) {
+        var rectX = currentFrame.minX
+        var rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        rectX += point.x
+        rectW -= point.x
+        if rectW < 50 {
+            rectW = 50
+            rectX = currentFrame.maxX - 50
+        }
+        if rectX < maxImageresizerFrame.minX {
+            rectX = maxImageresizerFrame.minX
+            rectW = currentFrame.maxX - maxImageresizerFrame.minX
+        }
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            var h = rectW * heightRatio
+            if currentFrame.width > currentFrame.height {
+                if h < 50 {
+                    h = 50
+                    rectW = h * widthRatio
+                    rectX = currentFrame.maxX - rectW
+                }
+            }else {
+                if rectW < 50 {
+                    rectW = 50
+                    rectX = currentFrame.maxX - rectW
+                    h = rectW * heightRatio
+                }
+            }
+            rectY = currentFrame.minY + (rectH - h) * 0.5
+            rectH = h
+            if rectY < maxImageresizerFrame.minY {
+                rectY = maxImageresizerFrame.minY
+            }
+            if rectY + rectH > maxImageresizerFrame.maxY {
+                rectY = maxImageresizerFrame.maxY - rectH
+            }
+            if rectH >= maxImageresizerFrame.height {
+                rectY = maxImageresizerFrame.minY
+                rectH = maxImageresizerFrame.height
+                let w = rectH * widthRatio
+                rectX += (rectW - w) * 0.5
+                rectW = w
+                let minX = currentFrame.maxX - rectW
+                if rectX < minX {
+                    rectX = minX
+                }
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
+    func rightControlHandler(_ point: CGPoint) {
+        var rectX = currentFrame.minX
+        var rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        rectW += point.x
+        if rectW < 50 {
+            rectW = 50
+        }
+        if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
+            rectW = maxImageresizerFrame.maxX - currentFrame.minX
+        }
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            var h = rectW * heightRatio
+            if currentFrame.width > currentFrame.height {
+                if h < 50 {
+                    h = 50
+                    rectW = h * widthRatio
+                }
+            }else {
+                if rectW < 50 {
+                    rectW = 50
+                    h = rectW * heightRatio
+                }
+            }
+            rectY = currentFrame.minY + (rectH - h) * 0.5
+            rectH = h
+            if rectY < maxImageresizerFrame.minY {
+                rectY = maxImageresizerFrame.minY
+            }
+            if rectY + rectH > maxImageresizerFrame.maxY {
+                rectY = maxImageresizerFrame.maxY - rectH
+            }
+            if rectH >= maxImageresizerFrame.height {
+                rectY = maxImageresizerFrame.minY
+                rectH = maxImageresizerFrame.height
+                let w = rectH * widthRatio
+                rectX += (rectW - w) * 0.5
+                rectW = w
+                let maxX = currentFrame.minX + rectW
+                if rectX + rectW > maxX {
+                    rectX = maxX - rectW
+                }
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
+    func bottomControlHandler(_ point: CGPoint) {
+        var rectX = currentFrame.minX
+        var rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        rectH += point.y
+        if rectH < 50 {
+            rectH = 50
+        }
+        if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
+            rectH = maxImageresizerFrame.maxY - currentFrame.minY
+        }
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            var w = rectH * widthRatio
+            if currentFrame.width > currentFrame.height {
+                if rectH < 50 {
+                    rectH = 50
+                    w = rectH * widthRatio
+                }
+            }else {
+                if w < 50 {
+                    w = 50
+                    rectH = w * heightRatio
+                }
+            }
+            rectX = currentFrame.minX + (rectW - w) * 0.5
+            rectW = w
+            if rectX < maxImageresizerFrame.minX {
+                rectX = maxImageresizerFrame.minX
+            }
+            if rectX + rectW > maxImageresizerFrame.maxX {
+                rectX = maxImageresizerFrame.maxX - rectW
+            }
+            if rectW >= maxImageresizerFrame.width {
+                rectX = maxImageresizerFrame.minX
+                rectW = maxImageresizerFrame.width
+                let h = rectW * heightRatio
+                rectY += (rectH - h) * 0.5
+                rectH = h
+                let maxY = currentFrame.minY + rectH
+                if rectY + rectH > maxY {
+                    rectY = maxY - rectH
+                }
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
+    func leftTopControlHandler(_ point: CGPoint) {
+        var rectX = currentFrame.minX
+        var rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            if aspectRatio.width > aspectRatio.height {
+                rectW -= point.x
+                rectH = rectW * heightRatio
+            }else {
+                rectH -= point.y
+                rectW = rectH * widthRatio
+            }
+            if currentFrame.width > currentFrame.height {
+                if rectH < 50 {
+                    rectH = 50
+                    rectW = rectH * widthRatio
+                }
+            }else {
+                if rectW < 50 {
+                    rectW = 50
+                    rectH = rectW * heightRatio
+                }
+            }
+            if rectW > currentFrame.maxX - maxImageresizerFrame.minX {
+                rectW = currentFrame.maxX - maxImageresizerFrame.minX
+                rectH = rectW * heightRatio
+            }
+            if rectH > currentFrame.maxY - maxImageresizerFrame.minY {
+                rectH = currentFrame.maxY - maxImageresizerFrame.minY
+                rectW = rectH * widthRatio
+            }
+            rectX = currentFrame.maxX - rectW
+            rectY = currentFrame.maxY - rectH
+        }else {
+            rectX += point.x
+            rectY += point.y
+            rectW -= point.x
+            rectH -= point.y
+            if rectW < 50 {
+                rectW = 50
+                rectX = currentFrame.maxX - 50
+            }
+            if rectH < 50 {
+                rectH = 50
+                rectY = currentFrame.maxY - 50
+            }
+            if rectX < maxImageresizerFrame.minX {
+                rectX = maxImageresizerFrame.minX
+                rectW = currentFrame.maxX - maxImageresizerFrame.minX
+            }
+            if rectY < maxImageresizerFrame.minY {
+                rectY = maxImageresizerFrame.minY
+                rectH = currentFrame.maxY - maxImageresizerFrame.minY
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
+    func leftBottomControlHandler(_ point: CGPoint) {
+        var rectX = currentFrame.minX
+        let rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            if aspectRatio.width > aspectRatio.height {
+                rectW -= point.x
+                rectH = rectW * heightRatio
+            }else {
+                rectH += point.y
+                rectW = rectH * widthRatio
+            }
+            if currentFrame.width > currentFrame.height {
+                if rectH < 50 {
+                    rectH = 50
+                    rectW = rectH * widthRatio
+                }
+            }else {
+                if rectW < 50 {
+                    rectW = 50
+                    rectH = rectW * heightRatio
+                }
+            }
+            if rectW > currentFrame.maxX - maxImageresizerFrame.minX {
+                rectW = currentFrame.maxX - maxImageresizerFrame.minX
+                rectH = rectW * heightRatio
+            }
+            if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
+                rectH = maxImageresizerFrame.maxY - currentFrame.minY
+                rectW = rectH * widthRatio
+            }
+            rectX = currentFrame.maxX - rectW
+        }else {
+            rectX += point.x
+            rectW -= point.x
+            rectH += point.y
+            if rectW < 50 {
+                rectW = 50
+                rectX = currentFrame.maxX - 50
+            }
+            if rectH < 50 {
+                rectH = 50
+            }
+            if rectX < maxImageresizerFrame.minX {
+                rectX = maxImageresizerFrame.minX
+                rectW = currentFrame.maxX - maxImageresizerFrame.minX
+            }
+            if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
+                rectH = maxImageresizerFrame.maxY - currentFrame.minY
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
+    func rightTopControlHandler(_ point: CGPoint) {
+        let rectX = currentFrame.minX
+        var rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            if aspectRatio.width > aspectRatio.height {
+                rectW += point.x
+                rectH = rectW * heightRatio
+            }else {
+                rectH -= point.y
+                rectW = rectH * widthRatio
+            }
+            if currentFrame.width > currentFrame.height {
+                if rectH < 50 {
+                    rectH = 50
+                    rectW = rectH * widthRatio
+                }
+            }else {
+                if rectW < 50 {
+                    rectW = 50
+                    rectH = rectW * heightRatio
+                }
+            }
+            if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
+                rectW = maxImageresizerFrame.maxX - currentFrame.minX
+                rectH = rectW * heightRatio
+            }
+            rectY = currentFrame.maxY - rectH
+            if rectY < maxImageresizerFrame.minY {
+                rectY = maxImageresizerFrame.minY
+                rectH = currentFrame.maxY - maxImageresizerFrame.minY
+                rectW = rectH * widthRatio
+            }
+        }else {
+            rectW += point.x
+            rectY += point.y
+            rectH -= point.y
+            if rectW < 50 {
+                rectW = 50
+            }
+            if rectH < 50 {
+                rectH = 50
+                rectY = currentFrame.maxY - 50
+            }
+            if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
+                rectW = maxImageresizerFrame.maxX - currentFrame.minX
+            }
+            if rectY < maxImageresizerFrame.minY {
+                rectY = maxImageresizerFrame.minY
+                rectH = currentFrame.maxY - maxImageresizerFrame.minY
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
+    func rightBottomControlHandler(_ point: CGPoint) {
+        let rectX = currentFrame.minX
+        let rectY = currentFrame.minY
+        var rectW = currentFrame.width
+        var rectH = currentFrame.height
+        let widthRatio = aspectRatio.width / aspectRatio.height
+        let heightRatio = aspectRatio.height / aspectRatio.width
+        if fixedRatio && !aspectRatio.equalTo(.zero) {
+            if aspectRatio.width > aspectRatio.height {
+                rectW += point.x
+                rectH = rectW * heightRatio
+            }else {
+                rectH += point.y
+                rectW = rectH * widthRatio
+            }
+            if currentFrame.width > currentFrame.height {
+                if rectH < 50 {
+                    rectH = 50
+                    rectW = rectH * widthRatio
+                }
+            }else {
+                if rectW < 50 {
+                    rectW = 50
+                    rectH = rectW * heightRatio
+                }
+            }
+            if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
+                rectW = maxImageresizerFrame.maxX - currentFrame.minX
+                rectH = rectW * heightRatio
+            }
+            if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
+                rectH = maxImageresizerFrame.maxY - currentFrame.minY
+                rectW = rectH * widthRatio
+            }
+        }else {
+            rectW += point.x
+            rectH += point.y
+            if rectW < 50 {
+                rectW = 50
+            }
+            if rectH < 50 {
+                rectH = 50
+            }
+            if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
+                rectW = maxImageresizerFrame.maxX - currentFrame.minX
+            }
+            if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
+                rectH = maxImageresizerFrame.maxY - currentFrame.minY
+            }
+        }
+        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
+    }
     /// 代码沉余，待优化
     @objc func panGestureRecognizerHandler(pan: UIPanGestureRecognizer) {
         let view = pan.view
@@ -111,381 +539,23 @@ class EditorImageResizerControlView: UIView {
             delegate?.controlView(beganChanged: self, frame)
             currentFrame = self.frame
         }
-        var rectX = currentFrame.minX
-        var rectY = currentFrame.minY
-        var rectW = currentFrame.width
-        var rectH = currentFrame.height
-        let widthRatio = aspectRatio.width / aspectRatio.height
-        let heightRatio = aspectRatio.height / aspectRatio.width
         if view == topControl {
-            rectH = rectH - point.y
-            rectY = rectY + point.y
-            if rectH < 50 {
-                rectH = 50
-                rectY = currentFrame.maxY - 50
-            }
-            if rectY < maxImageresizerFrame.minY {
-                rectY = maxImageresizerFrame.minY
-                rectH = currentFrame.maxY - maxImageresizerFrame.minY
-            }
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                var w = rectH * widthRatio
-                if currentFrame.width > currentFrame.height {
-                    if rectH < 50 {
-                        rectH = 50
-                        rectY = currentFrame.maxY - rectH
-                        w = rectH * widthRatio
-                    }
-                }else {
-                    if w < 50 {
-                        w = 50
-                        rectH = w * heightRatio
-                        rectY = currentFrame.maxY - rectH
-                    }
-                }
-                rectX = currentFrame.minX + (rectW - w) * 0.5
-                rectW = w
-                if rectX < maxImageresizerFrame.minX {
-                    rectX = maxImageresizerFrame.minX
-                }
-                if rectX + rectW > maxImageresizerFrame.maxX {
-                    rectX = maxImageresizerFrame.maxX - rectW
-                }
-                if rectW >= maxImageresizerFrame.width {
-                    rectX = maxImageresizerFrame.minX
-                    rectW = maxImageresizerFrame.width
-                    let h = rectW * heightRatio
-                    rectY = rectY + (rectH - h) * 0.5
-                    rectH = h
-                    let minY = currentFrame.maxY - rectH
-                    if rectY < minY {
-                        rectY = minY
-                    }
-                }
-            }
+            topControlHandler(point)
         }else if view == leftControl {
-            rectX = rectX + point.x
-            rectW = rectW - point.x
-            if rectW < 50 {
-                rectW = 50
-                rectX = currentFrame.maxX - 50
-            }
-            if rectX < maxImageresizerFrame.minX {
-                rectX = maxImageresizerFrame.minX
-                rectW = currentFrame.maxX - maxImageresizerFrame.minX
-            }
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                var h = rectW * heightRatio
-                if currentFrame.width > currentFrame.height {
-                    if h < 50 {
-                        h = 50
-                        rectW = h * widthRatio
-                        rectX = currentFrame.maxX - rectW
-                    }
-                }else {
-                    if rectW < 50 {
-                        rectW = 50
-                        rectX = currentFrame.maxX - rectW
-                        h = rectW * heightRatio
-                    }
-                }
-                rectY = currentFrame.minY + (rectH - h) * 0.5
-                rectH = h
-                if rectY < maxImageresizerFrame.minY {
-                    rectY = maxImageresizerFrame.minY
-                }
-                if rectY + rectH > maxImageresizerFrame.maxY {
-                    rectY = maxImageresizerFrame.maxY - rectH
-                }
-                if rectH >= maxImageresizerFrame.height {
-                    rectY = maxImageresizerFrame.minY
-                    rectH = maxImageresizerFrame.height
-                    let w = rectH * widthRatio
-                    rectX = rectX + (rectW - w) * 0.5
-                    rectW = w
-                    let minX = currentFrame.maxX - rectW
-                    if rectX < minX {
-                        rectX = minX
-                    }
-                }
-            }
+            leftControlHandler(point)
         }else if view == rightControl {
-            rectW = rectW + point.x
-            if rectW < 50 {
-                rectW = 50
-            }
-            if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
-                rectW = maxImageresizerFrame.maxX - currentFrame.minX
-            }
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                var h = rectW * heightRatio
-                if currentFrame.width > currentFrame.height {
-                    if h < 50 {
-                        h = 50
-                        rectW = h * widthRatio
-                    }
-                }else {
-                    if rectW < 50 {
-                        rectW = 50
-                        h = rectW * heightRatio
-                    }
-                }
-                rectY = currentFrame.minY + (rectH - h) * 0.5
-                rectH = h
-                if rectY < maxImageresizerFrame.minY {
-                    rectY = maxImageresizerFrame.minY
-                }
-                if rectY + rectH > maxImageresizerFrame.maxY {
-                    rectY = maxImageresizerFrame.maxY - rectH
-                }
-                if rectH >= maxImageresizerFrame.height {
-                    rectY = maxImageresizerFrame.minY
-                    rectH = maxImageresizerFrame.height
-                    let w = rectH * widthRatio
-                    rectX = rectX + (rectW - w) * 0.5
-                    rectW = w
-                    let maxX = currentFrame.minX + rectW
-                    if rectX + rectW > maxX {
-                        rectX = maxX - rectW
-                    }
-                }
-            }
+            rightControlHandler(point)
         }else if view == bottomControl {
-            rectH = rectH + point.y
-            if rectH < 50 {
-                rectH = 50
-            }
-            if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
-                rectH = maxImageresizerFrame.maxY - currentFrame.minY
-            }
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                var w = rectH * widthRatio
-                if currentFrame.width > currentFrame.height {
-                    if rectH < 50 {
-                        rectH = 50
-                        w = rectH * widthRatio
-                    }
-                }else {
-                    if w < 50 {
-                        w = 50
-                        rectH = w * heightRatio
-                    }
-                }
-                rectX = currentFrame.minX + (rectW - w) * 0.5
-                rectW = w
-                if rectX < maxImageresizerFrame.minX {
-                    rectX = maxImageresizerFrame.minX
-                }
-                if rectX + rectW > maxImageresizerFrame.maxX {
-                    rectX = maxImageresizerFrame.maxX - rectW
-                }
-                if rectW >= maxImageresizerFrame.width {
-                    rectX = maxImageresizerFrame.minX
-                    rectW = maxImageresizerFrame.width
-                    let h = rectW * heightRatio
-                    rectY = rectY + (rectH - h) * 0.5
-                    rectH = h
-                    let maxY = currentFrame.minY + rectH
-                    if rectY + rectH > maxY {
-                        rectY = maxY - rectH
-                    }
-                }
-            }
+            bottomControlHandler(point)
         }else if view == leftTopControl {
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                if aspectRatio.width > aspectRatio.height {
-                    rectW = rectW - point.x
-                    rectH = rectW * heightRatio
-                }else {
-                    rectH = rectH - point.y
-                    rectW = rectH * widthRatio
-                }
-                if currentFrame.width > currentFrame.height {
-                    if rectH < 50 {
-                        rectH = 50
-                        rectW = rectH * widthRatio
-                    }
-                }else  {
-                    if rectW < 50 {
-                        rectW = 50
-                        rectH = rectW * heightRatio
-                    }
-                }
-                if rectW > currentFrame.maxX - maxImageresizerFrame.minX {
-                    rectW = currentFrame.maxX - maxImageresizerFrame.minX
-                    rectH = rectW * heightRatio
-                }
-                if rectH > currentFrame.maxY - maxImageresizerFrame.minY {
-                    rectH = currentFrame.maxY - maxImageresizerFrame.minY
-                    rectW = rectH * widthRatio
-                }
-                rectX = currentFrame.maxX - rectW
-                rectY = currentFrame.maxY - rectH
-            }else {
-                rectX = rectX + point.x
-                rectY = rectY + point.y
-                rectW = rectW - point.x
-                rectH = rectH - point.y
-                if rectW < 50 {
-                    rectW = 50
-                    rectX = currentFrame.maxX - 50
-                }
-                if rectH < 50 {
-                    rectH = 50
-                    rectY = currentFrame.maxY - 50
-                }
-                if rectX < maxImageresizerFrame.minX {
-                    rectX = maxImageresizerFrame.minX
-                    rectW = currentFrame.maxX - maxImageresizerFrame.minX
-                }
-                if rectY < maxImageresizerFrame.minY {
-                    rectY = maxImageresizerFrame.minY
-                    rectH = currentFrame.maxY - maxImageresizerFrame.minY
-                }
-            }
+            leftTopControlHandler(point)
         }else if view == leftBottomControl {
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                if aspectRatio.width > aspectRatio.height {
-                    rectW = rectW - point.x
-                    rectH = rectW * heightRatio
-                }else {
-                    rectH = rectH + point.y
-                    rectW = rectH * widthRatio
-                }
-                if currentFrame.width > currentFrame.height {
-                    if rectH < 50 {
-                        rectH = 50
-                        rectW = rectH * widthRatio
-                    }
-                }else  {
-                    if rectW < 50 {
-                        rectW = 50
-                        rectH = rectW * heightRatio
-                    }
-                }
-                if rectW > currentFrame.maxX - maxImageresizerFrame.minX {
-                    rectW = currentFrame.maxX - maxImageresizerFrame.minX
-                    rectH = rectW * heightRatio
-                }
-                if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
-                    rectH = maxImageresizerFrame.maxY - currentFrame.minY
-                    rectW = rectH * widthRatio
-                }
-                rectX = currentFrame.maxX - rectW
-            }else {
-                rectX = rectX + point.x
-                rectW = rectW - point.x
-                rectH = rectH + point.y
-                if rectW < 50 {
-                    rectW = 50
-                    rectX = currentFrame.maxX - 50
-                }
-                if rectH < 50 {
-                    rectH = 50
-                }
-                if rectX < maxImageresizerFrame.minX {
-                    rectX = maxImageresizerFrame.minX
-                    rectW = currentFrame.maxX - maxImageresizerFrame.minX
-                }
-                if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
-                    rectH = maxImageresizerFrame.maxY - currentFrame.minY
-                }
-            }
+            leftBottomControlHandler(point)
         }else if view == rightTopControl {
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                if aspectRatio.width > aspectRatio.height {
-                    rectW = rectW + point.x
-                    rectH = rectW * heightRatio
-                }else {
-                    rectH = rectH - point.y
-                    rectW = rectH * widthRatio
-                }
-                if currentFrame.width > currentFrame.height {
-                    if rectH < 50 {
-                        rectH = 50
-                        rectW = rectH * widthRatio
-                    }
-                }else  {
-                    if rectW < 50 {
-                        rectW = 50
-                        rectH = rectW * heightRatio
-                    }
-                }
-                if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
-                    rectW = maxImageresizerFrame.maxX - currentFrame.minX
-                    rectH = rectW * heightRatio
-                }
-                rectY = currentFrame.maxY - rectH
-                if rectY < maxImageresizerFrame.minY {
-                    rectY = maxImageresizerFrame.minY
-                    rectH = currentFrame.maxY - maxImageresizerFrame.minY
-                    rectW = rectH * widthRatio
-                }
-            }else {
-                rectW = rectW + point.x
-                rectY = rectY + point.y
-                rectH = rectH - point.y
-                if rectW < 50 {
-                    rectW = 50
-                }
-                if rectH < 50 {
-                    rectH = 50
-                    rectY = currentFrame.maxY - 50
-                }
-                if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
-                    rectW = maxImageresizerFrame.maxX - currentFrame.minX
-                }
-                if rectY < maxImageresizerFrame.minY {
-                    rectY = maxImageresizerFrame.minY
-                    rectH = currentFrame.maxY - maxImageresizerFrame.minY
-                }
-            }
+            rightTopControlHandler(point)
         }else if view == rightBottomControl {
-            if fixedRatio && !aspectRatio.equalTo(.zero) {
-                if aspectRatio.width > aspectRatio.height {
-                    rectW = rectW + point.x
-                    rectH = rectW * heightRatio
-                }else {
-                    rectH = rectH + point.y
-                    rectW = rectH * widthRatio
-                }
-                if currentFrame.width > currentFrame.height {
-                    if rectH < 50 {
-                        rectH = 50
-                        rectW = rectH * widthRatio
-                    }
-                }else  {
-                    if rectW < 50 {
-                        rectW = 50
-                        rectH = rectW * heightRatio
-                    }
-                }
-                if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
-                    rectW = maxImageresizerFrame.maxX - currentFrame.minX
-                    rectH = rectW * heightRatio
-                }
-                if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
-                    rectH = maxImageresizerFrame.maxY - currentFrame.minY
-                    rectW = rectH * widthRatio
-                }
-            }else {
-                rectW = rectW + point.x
-                rectH = rectH + point.y
-                if rectW < 50 {
-                    rectW = 50
-                }
-                if rectH < 50 {
-                    rectH = 50
-                }
-                if rectW > maxImageresizerFrame.maxX - currentFrame.minX {
-                    rectW = maxImageresizerFrame.maxX - currentFrame.minX
-                }
-                if rectH > maxImageresizerFrame.maxY - currentFrame.minY {
-                    rectH = maxImageresizerFrame.maxY - currentFrame.minY
-                }
-            }
+            rightBottomControlHandler(point)
         }
-        frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
         delegate?.controlView(didChanged: self, frame)
         if pan.state == .cancelled || pan.state == .ended || pan.state == .failed {
             delegate?.controlView(endChanged: self, frame)
@@ -521,13 +591,48 @@ class EditorImageResizerControlView: UIView {
         super.layoutSubviews()
         let lineMarign: CGFloat = 20
         topControl.frame = CGRect(x: lineMarign, y: -lineMarign, width: width - lineMarign * 2, height: lineMarign * 2)
-        leftControl.frame = CGRect(x: -lineMarign, y: lineMarign, width: lineMarign * 2, height: height - lineMarign * 2)
-        rightControl.frame = CGRect(x: width - lineMarign, y: lineMarign, width: lineMarign * 2, height: height - lineMarign * 2)
-        bottomControl.frame = CGRect(x: lineMarign, y: height - lineMarign, width: width - lineMarign * 2, height: lineMarign * 2)
-        leftTopControl.frame = CGRect(x: -lineMarign, y: -lineMarign, width: lineMarign * 2, height: lineMarign * 2)
-        leftBottomControl.frame = CGRect(x: -lineMarign, y: height - lineMarign, width: lineMarign * 2, height: lineMarign * 2)
-        rightTopControl.frame = CGRect(x: width - lineMarign, y: -lineMarign, width: lineMarign * 2, height: lineMarign * 2)
-        rightBottomControl.frame = CGRect(x: width - lineMarign, y: height - lineMarign, width: lineMarign * 2, height: lineMarign * 2)
+        leftControl.frame = CGRect(
+            x: -lineMarign,
+            y: lineMarign,
+            width: lineMarign * 2,
+            height: height - lineMarign * 2
+        )
+        rightControl.frame = CGRect(
+            x: width - lineMarign,
+            y: lineMarign,
+            width: lineMarign * 2,
+            height: height - lineMarign * 2
+        )
+        bottomControl.frame = CGRect(
+            x: lineMarign,
+            y: height - lineMarign,
+            width: width - lineMarign * 2,
+            height: lineMarign * 2
+        )
+        leftTopControl.frame = CGRect(
+            x: -lineMarign,
+            y: -lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
+        leftBottomControl.frame = CGRect(
+            x: -lineMarign,
+            y: height - lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
+        rightTopControl.frame = CGRect(
+            x: width - lineMarign,
+            y: -lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
+        rightBottomControl.frame = CGRect(
+            x: width - lineMarign,
+            y: height - lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
     }
     
     required init?(coder: NSCoder) {

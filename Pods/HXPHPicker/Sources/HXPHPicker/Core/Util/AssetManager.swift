@@ -19,12 +19,14 @@ public class AssetManager {
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
     ///   - completion: PHAsset为空则保存失败
-    public class func saveSystemAlbum(forAsset asset: Any,
-                                      mediaType: PHAssetMediaType,
-                                      customAlbumName: String?,
-                                      creationDate: Date?,
-                                      location: CLLocation?,
-                                      completion: @escaping (PHAsset?) -> Void) {
+    public class func saveSystemAlbum(
+        forAsset asset: Any,
+        mediaType: PHAssetMediaType,
+        customAlbumName: String? = nil,
+        creationDate: Date = Date(),
+        location: CLLocation? = nil,
+        completion: @escaping (PHAsset?) -> Void
+    ) {
         var albumName: String?
         if let customAlbumName = customAlbumName, customAlbumName.count > 0 {
             albumName = customAlbumName
@@ -43,31 +45,43 @@ public class AssetManager {
             var placeholder: PHObjectPlaceholder?
             do {
                 try PHPhotoLibrary.shared().performChangesAndWait {
-                    var creationRequest: PHAssetCreationRequest? = nil
+                    var creationRequest: PHAssetCreationRequest?
                     if asset is URL {
                         if mediaType == .image {
-                            creationRequest = PHAssetCreationRequest.creationRequestForAssetFromImage(atFileURL: asset as! URL)
+                            creationRequest = PHAssetCreationRequest.creationRequestForAssetFromImage(
+                                atFileURL: asset as! URL
+                            )
                         }else if mediaType == .video {
-                            creationRequest = PHAssetCreationRequest.creationRequestForAssetFromVideo(atFileURL: asset as! URL)
+                            creationRequest = PHAssetCreationRequest.creationRequestForAssetFromVideo(
+                                atFileURL: asset as! URL
+                            )
                         }
                     }else if asset is UIImage {
-                        creationRequest = PHAssetCreationRequest.creationRequestForAsset(from: asset as! UIImage)
+                        creationRequest = PHAssetCreationRequest.creationRequestForAsset(
+                            from: asset as! UIImage
+                        )
                     }
-                    if let creationDate = creationDate {
-                        creationRequest?.creationDate = creationDate
-                    }else {
-                        creationRequest?.creationDate = Date.init()
-                    }
+                    creationRequest?.creationDate = creationDate
                     creationRequest?.location = location
                     placeholder = creationRequest?.placeholderForCreatedAsset
                 }
             }catch { }
-            if let placeholder = placeholder, let phAsset = fetchAsset(withLocalIdentifier: placeholder.localIdentifier) {
+            if let placeholder = placeholder,
+               let phAsset = fetchAsset(
+                withLocalIdentifier: placeholder.localIdentifier
+               ) {
                 completion(phAsset)
                 if let albumName = albumName, let assetCollection = createAssetCollection(for: albumName) {
-                    do {try PHPhotoLibrary.shared().performChangesAndWait {
-                        PHAssetCollectionChangeRequest.init(for: assetCollection)?.insertAssets([phAsset] as NSFastEnumeration, at: IndexSet.init(integer: 0))
-                    }}catch{}
+                    do {
+                        try PHPhotoLibrary.shared().performChangesAndWait {
+                            PHAssetCollectionChangeRequest(
+                                for: assetCollection
+                            )?.insertAssets(
+                                [phAsset] as NSFastEnumeration,
+                                at: IndexSet.init(integer: 0)
+                            )
+                        }
+                    }catch {}
                 }
             }else {
                 completion(nil)
@@ -76,17 +90,31 @@ public class AssetManager {
     }
     
     /// 保存图片到系统相册
-    public class func saveSystemAlbum(forImage image: UIImage,
-                                      customAlbumName: String? = nil,
-                                      completion: @escaping (PHAsset?) -> Void) {
-        saveSystemAlbum(forAsset: image, mediaType: .image, customAlbumName: customAlbumName, creationDate: nil, location: nil, completion: completion)
+    public class func saveSystemAlbum(
+        forImage image: UIImage,
+        customAlbumName: String? = nil,
+        completion: @escaping (PHAsset?) -> Void
+    ) {
+        saveSystemAlbum(
+            forAsset: image,
+            mediaType: .image,
+            customAlbumName: customAlbumName,
+            completion: completion
+        )
     }
     
     /// 保存视频到系统相册
-    public class func saveSystemAlbum(forVideoURL videoURL: URL,
-                                      customAlbumName: String? = nil,
-                                      completion: @escaping (PHAsset?) -> Void) {
-        saveSystemAlbum(forAsset: videoURL, mediaType: .video, customAlbumName: customAlbumName, creationDate: nil, location: nil, completion: completion)
+    public class func saveSystemAlbum(
+        forVideoURL videoURL: URL,
+        customAlbumName: String? = nil,
+        completion: @escaping (PHAsset?) -> Void
+    ) {
+        saveSystemAlbum(
+            forAsset: videoURL,
+            mediaType: .video,
+            customAlbumName: customAlbumName,
+            completion: completion
+        )
     }
     
 }

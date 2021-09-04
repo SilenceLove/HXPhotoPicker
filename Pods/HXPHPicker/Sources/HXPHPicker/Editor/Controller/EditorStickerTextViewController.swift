@@ -8,8 +8,14 @@
 import UIKit
 
 protocol EditorStickerTextViewControllerDelegate: AnyObject {
-    func stickerTextViewController(_ controller: EditorStickerTextViewController, didFinish stickerText: EditorStickerText)
-    func stickerTextViewController(_ controller: EditorStickerTextViewController, didFinish stickerItem: EditorStickerItem)
+    func stickerTextViewController(
+        _ controller: EditorStickerTextViewController,
+        didFinish stickerText: EditorStickerText
+    )
+    func stickerTextViewController(
+        _ controller: EditorStickerTextViewController,
+        didFinish stickerItem: EditorStickerItem
+    )
 }
 
 class EditorStickerTextController: UINavigationController {
@@ -20,9 +26,9 @@ class EditorStickerTextController: UINavigationController {
 
 class EditorStickerTextViewController: BaseViewController {
     weak var delegate: EditorStickerTextViewControllerDelegate?
-    let config: PhotoEditorConfiguration.TextConfig
+    let config: EditorTextConfig
     let stickerItem: EditorStickerItem?
-    init(config: PhotoEditorConfiguration.TextConfig,
+    init(config: EditorTextConfig,
          stickerItem: EditorStickerItem? = nil) {
         self.config = config
         self.stickerItem = stickerItem
@@ -62,16 +68,32 @@ class EditorStickerTextViewController: BaseViewController {
             textWidth += 10
         }
         button.size = CGSize(width: textWidth, height: 30)
-        button.setBackgroundImage(UIImage.image(for: config.tintColor, havingSize: button.size, radius: 3), for: .normal)
-        button.addTarget(self, action: #selector(didFinishButtonClick), for: .touchUpInside)
+        button.setBackgroundImage(
+            UIImage.image(
+                for: config.tintColor,
+                havingSize: button.size,
+                radius: 3
+            ),
+            for: .normal
+        )
+        button.addTarget(
+            self,
+            action: #selector(didFinishButtonClick),
+            for: .touchUpInside
+        )
         return button
     }()
     
     @objc func didFinishButtonClick() {
         if let image = textView.textImage(), !textView.text.isEmpty {
-            let stickerText = EditorStickerText(image: image, text: textView.text, textColor: textView.currentSelectedColor, showBackgroud: textView.showBackgroudColor)
+            let stickerText = EditorStickerText(
+                image: image,
+                text: textView.text,
+                textColor: textView.currentSelectedColor,
+                showBackgroud: textView.showBackgroudColor
+            )
             if stickerItem != nil {
-                let stickerItem = EditorStickerItem(image: image, text: stickerText)
+                let stickerItem = EditorStickerItem(image: image, imageData: nil, text: stickerText)
                 delegate?.stickerTextViewController(self, didFinish: stickerItem)
             }else {
                 delegate?.stickerTextViewController(self, didFinish: stickerText)
@@ -88,10 +110,8 @@ class EditorStickerTextViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = .clear
         navigationController?.view.backgroundColor = .clear
-        
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: cancelButton)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: finishButton)
         view.addSubview(bgView)
@@ -100,12 +120,20 @@ class EditorStickerTextViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.navigationBar.shadowImage = UIImage.image(for: UIColor.clear, havingSize: .zero)
-        navigationController?.navigationBar.setBackgroundImage(UIImage.image(for: UIColor.clear, havingSize: .zero), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage.image(
+            for: UIColor.clear,
+            havingSize: .zero
+        )
+        navigationController?.navigationBar.setBackgroundImage(
+            UIImage.image(
+                for: UIColor.clear,
+                havingSize: .zero
+            ),
+            for: .default
+        )
         navigationController?.navigationBar.barTintColor = .clear
         navigationController?.navigationBar.backgroundColor = .clear
     }
-    
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()

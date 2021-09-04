@@ -34,6 +34,7 @@ extension PhotoManager: AVAudioPlayerDelegate {
     
     public func stopPlayMusic() {
         audioPlayer?.stop()
+        audioPlayer?.delegate = nil
         audioPlayer = nil
         audioPlayFinish = nil
     }
@@ -41,7 +42,6 @@ extension PhotoManager: AVAudioPlayerDelegate {
     public func changeAudioPlayerVolume(_ volume: Float) {
         audioPlayer?.volume = volume
     }
-    
     
     public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         if flag {

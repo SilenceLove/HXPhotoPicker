@@ -21,60 +21,40 @@ public class SelectBoxConfiguration {
     public var titleFontSize: CGFloat = 16
     
     /// 选中之后的 标题 颜色
-    public lazy var titleColor: UIColor = {
-        return .white
-    }()
+    public var titleColor: UIColor = .white
     
     /// 暗黑风格下选中之后的 标题 颜色
-    public lazy var titleDarkColor : UIColor = {
-        return .white
-    }()
+    public var titleDarkColor: UIColor = .white
     
     /// 选中状态下勾勾的宽度
     public var tickWidth: CGFloat = 1.5
     
     /// 选中之后的 勾勾 颜色
-    public lazy var tickColor: UIColor = {
-        return .white
-    }()
+    public var tickColor: UIColor = .white
     
     /// 暗黑风格下选中之后的 勾勾 颜色
-    public lazy var tickDarkColor : UIColor = {
-        return .black
-    }()
+    public var tickDarkColor: UIColor = .black
     
     /// 未选中时框框中间的颜色
-    public lazy var backgroundColor: UIColor = {
-        return .black.withAlphaComponent(0.4)
-    }()
+    public var backgroundColor: UIColor = .black.withAlphaComponent(0.4)
     
     /// 暗黑风格下未选中时框框中间的颜色
-    public lazy var darkBackgroundColor : UIColor = {
-        return .black.withAlphaComponent(0.2)
-    }()
+    public var darkBackgroundColor: UIColor = .black.withAlphaComponent(0.2)
     
     /// 选中之后的背景颜色
-    public lazy var selectedBackgroundColor: UIColor = {
-        return .systemTintColor
-    }()
+    public var selectedBackgroundColor: UIColor = .systemTintColor
     
     /// 暗黑风格下选中之后的背景颜色
-    public lazy var selectedBackgroudDarkColor : UIColor = {
-        return .systemTintColor
-    }()
+    public var selectedBackgroudDarkColor: UIColor = .systemTintColor
     
     /// 未选中时的边框宽度
     public var borderWidth: CGFloat = 1.5
     
     /// 未选中时的边框颜色
-    public lazy var borderColor: UIColor = {
-        return .white
-    }()
+    public var borderColor: UIColor = .white
     
     /// 暗黑风格下未选中时的边框颜色
-    public lazy var borderDarkColor : UIColor = {
-        return .white
-    }()
+    public var borderDarkColor: UIColor = .white
     
     public init() { }
 }

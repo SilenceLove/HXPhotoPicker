@@ -39,7 +39,10 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
         pan.delegate = self
         addGestureRecognizer(pan)
     }
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
         if otherGestureRecognizer.isKind(of: UITapGestureRecognizer.self) &&
             otherGestureRecognizer.view is PhotoEditorView {
             return true

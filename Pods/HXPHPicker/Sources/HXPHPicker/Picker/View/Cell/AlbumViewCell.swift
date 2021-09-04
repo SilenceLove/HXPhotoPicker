@@ -45,13 +45,13 @@ open class AlbumViewCell: UITableViewCell {
     }()
     
     /// 选中时的背景视图
-    public lazy var selectedBgView : UIView = {
+    public lazy var selectedBgView: UIView = {
         let selectedBgView = UIView.init()
         return selectedBgView
     }()
     
     /// 配置
-    public var config : AlbumListConfiguration? {
+    public var config: AlbumListConfiguration? {
         didSet {
             albumNameLb.font = config?.albumNameFont
             photoCountLb.font = config?.photoCountFont
@@ -83,14 +83,18 @@ open class AlbumViewCell: UITableViewCell {
     /// 获取相册封面图片，重写此方法修改封面图片
     open func requestCoverImage() {
         requestID = assetCollection?.requestCoverImage(completion: { [weak self] (image, assetCollection, info) in
-            if assetCollection == self?.assetCollection && image != nil {
-                self?.albumCoverView.image = image
+            guard let self = self else { return }
+            if let info = info, info.isCancel { return }
+            if let image = image,
+               assetCollection == self.assetCollection {
+                self.albumCoverView.image = image
                 if !AssetManager.assetIsDegraded(for: info) {
-                    self?.requestID = nil
+                    self.requestID = nil
                 }
             }
         })
     }
+    
     // 颜色配置，重写此方法修改颜色配置
     open func configColor() {
         let isDark = PhotoManager.isDark
@@ -113,7 +117,7 @@ open class AlbumViewCell: UITableViewCell {
     }
     /// 布局，重写此方法修改布局
     open func layoutView() {
-        let coverMargin : CGFloat = 5
+        let coverMargin: CGFloat = 5
         let coverWidth = height - (coverMargin * 2)
         albumCoverView.frame = CGRect(x: coverMargin, y: coverMargin, width: coverWidth, height: coverWidth)
         
@@ -146,10 +150,9 @@ open class AlbumViewCell: UITableViewCell {
     }
     
     public func cancelRequest() {
-        if requestID != nil {
-            PHImageManager.default().cancelImageRequest(requestID!)
-            requestID = nil
-        }
+        guard let requestID = requestID else { return }
+        PHImageManager.default().cancelImageRequest(requestID)
+        self.requestID = nil
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

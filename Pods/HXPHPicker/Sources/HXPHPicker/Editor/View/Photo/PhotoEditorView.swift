@@ -224,16 +224,36 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         let inputImage = imageResizerView.imageView.image
         let viewWidth = imageResizerView.imageView.width
         let viewHeight = imageResizerView.imageView.height
+        var drawLayer: CALayer?
+        if imageResizerView.imageView.drawView.count > 0 {
+            drawLayer = imageResizerView.imageView.drawView.layer
+        }
+        var stickerLayer: CALayer?
+        if imageResizerView.imageView.stickerView.count > 0 {
+            stickerLayer = imageResizerView.imageView.stickerView.layer
+        }
+        var mosaicLayer: CALayer?
+        if imageResizerView.imageView.mosaicView.count > 0 {
+            mosaicLayer = imageResizerView.imageView.mosaicView.layer
+        }
         DispatchQueue.global().async {
-            if let imageOptions = self.imageResizerView.cropping(inputImage,
-                                                                 toRect: toRect,
-                                                                 viewWidth: viewWidth,
-                                                                 viewHeight: viewHeight) {
+            let imageOptions = self.imageResizerView.cropping(
+                inputImage,
+                toRect: toRect,
+                mosaicLayer: mosaicLayer,
+                drawLayer: drawLayer,
+                stickerLayer: stickerLayer,
+                viewWidth: viewWidth,
+                viewHeight: viewHeight
+            )
+            if let imageOptions = imageOptions {
                 DispatchQueue.main.async {
-                    let editResult = PhotoEditResult.init(editedImage: imageOptions.0,
-                                                          editedImageURL: imageOptions.1,
-                                                          imageType: imageOptions.2,
-                                                          editedData: self.getEditedData())
+                    let editResult = PhotoEditResult(
+                        editedImage: imageOptions.0,
+                        editedImageURL: imageOptions.1,
+                        imageType: imageOptions.2,
+                        editedData: self.getEditedData()
+                    )
                     completion(editResult)
                 }
             }else {
@@ -266,6 +286,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         cropSize = .zero
         updateImageViewFrame()
         imageResizerView.updateBaseConfig()
+        cancelCropping(false)
     }
     
     func undoAllDraw() {
@@ -302,7 +323,8 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if state == .cropping {
             return false
-        }else if (imageResizerView.drawEnabled || imageResizerView.mosaicEnabled) && !gestureRecognizer.isKind(of: UIPinchGestureRecognizer.self) {
+        }else if (imageResizerView.drawEnabled || imageResizerView.mosaicEnabled) &&
+                    !gestureRecognizer.isKind(of: UIPinchGestureRecognizer.self) {
             return false
         }
         return true
@@ -324,11 +346,13 @@ extension PhotoEditorView: UIScrollViewDelegate {
         if !canZoom {
             return
         }
-        let offsetX = (scrollView.width > scrollView.contentSize.width) ? (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
-        let offsetY = (scrollView.height > scrollView.contentSize.height) ? (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
+        let offsetX = (scrollView.width > scrollView.contentSize.width) ?
+            (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
+        let offsetY = (scrollView.height > scrollView.contentSize.height) ?
+            (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
         let centerX = scrollView.contentSize.width * 0.5 + offsetX
         let centerY = scrollView.contentSize.height * 0.5 + offsetY
-        imageResizerView.center = CGPoint(x: centerX, y: centerY);
+        imageResizerView.center = CGPoint(x: centerX, y: centerY)
     }
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         imageResizerView.zoomScale = scale

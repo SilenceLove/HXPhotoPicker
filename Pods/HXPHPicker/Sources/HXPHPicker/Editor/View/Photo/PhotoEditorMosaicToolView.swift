@@ -8,8 +8,13 @@
 import UIKit
 
 protocol PhotoEditorMosaicToolViewDelegate: AnyObject {
-    func mosaicToolView(_ mosaicToolView: PhotoEditorMosaicToolView, didChangedMosaicType type: PhotoEditorMosaicView.MosaicType)
-    func mosaicToolView(didUndoClick mosaicToolView: PhotoEditorMosaicToolView)
+    func mosaicToolView(
+        _ mosaicToolView: PhotoEditorMosaicToolView,
+        didChangedMosaicType type: PhotoEditorMosaicView.MosaicType
+    )
+    func mosaicToolView(
+        didUndoClick mosaicToolView: PhotoEditorMosaicToolView
+    )
 }
 class PhotoEditorMosaicToolView: UIView {
     weak var delegate: PhotoEditorMosaicToolViewDelegate?

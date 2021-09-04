@@ -15,7 +15,7 @@ extension UIImage {
     
     func scaleSuitableSize() -> UIImage? {
         var imageSize = self.size
-        while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+        while imageSize.width * imageSize.height > 3 * 1000 * 1000 {
             imageSize.width *= 0.5
             imageSize.height *= 0.5
         }

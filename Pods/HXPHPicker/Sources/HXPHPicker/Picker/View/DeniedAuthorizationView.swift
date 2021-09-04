@@ -14,7 +14,13 @@ class DeniedAuthorizationView: UIView {
     
     lazy var navigationBar: UINavigationBar = {
         let navigationBar = UINavigationBar.init()
-        navigationBar.setBackgroundImage(UIImage.image(for: UIColor.clear, havingSize: CGSize.zero), for: UIBarMetrics.default)
+        navigationBar.setBackgroundImage(
+            UIImage.image(
+                for: UIColor.clear,
+                havingSize: CGSize.zero
+            ),
+            for: UIBarMetrics.default
+        )
         navigationBar.shadowImage = UIImage.init()
         let navigationItem = UINavigationItem.init()
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: closeBtn)
@@ -108,15 +114,25 @@ class DeniedAuthorizationView: UIView {
         titleLb.frame = CGRect(x: 0, y: 0, width: width, height: titleHeight)
         
         let subTitleHeight = subTitleLb.text?.height(ofFont: subTitleLb.font, maxWidth: width - 40) ?? 0
-        subTitleLb.frame = CGRect(x: 20, y: height / 2 - subTitleHeight - 30 - UIDevice.topMargin, width: width - 40, height: subTitleHeight)
+        subTitleLb.frame = CGRect(
+            x: 20,
+            y: height / 2 - subTitleHeight - 30 - UIDevice.topMargin,
+            width: width - 40,
+            height: subTitleHeight
+        )
         titleLb.y = subTitleLb.y - 15 - titleHeight
         
-        let jumpBtnBottomMargin : CGFloat = UIDevice.isProxy() ? 120 : 50
+        let jumpBtnBottomMargin: CGFloat = UIDevice.isProxy() ? 120 : 50
         var jumpBtnWidth = (jumpBtn.currentTitle?.width(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) ?? 0 ) + 10
         if jumpBtnWidth < 150 {
             jumpBtnWidth = 150
         }
-        jumpBtn.frame = CGRect(x: 0, y: height - UIDevice.bottomMargin - 40 - jumpBtnBottomMargin, width: jumpBtnWidth, height: 40)
+        jumpBtn.frame = CGRect(
+            x: 0,
+            y: height - UIDevice.bottomMargin - 40 - jumpBtnBottomMargin,
+            width: jumpBtnWidth,
+            height: 40
+        )
         jumpBtn.centerX = width * 0.5
     }
     

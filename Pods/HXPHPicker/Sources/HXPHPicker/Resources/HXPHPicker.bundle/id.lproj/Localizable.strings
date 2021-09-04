@@ -35,6 +35,7 @@
 "视频导出中" = "Ekspor video";
 "导出失败" = "Ekspor gagal";
 "视频加载中" = "Pemuatan video";
+"视频加载失败!" = "Video gagal dimuat!";
 "视频可编辑最大时长为%d秒，无法编辑" = "Panjang maksimal video yang dapat diedit adalah %d detik dan tidak dapat diedit";
 "相机不可用!" = "Kamera tidak tersedia!";
 "确定" = "menentukan";
@@ -56,7 +57,7 @@
 "铬黄" = "Kuning Krom";
 "暂无配乐" = "Tidak ada soundtrack";
 "配乐" = "Soundtrack";
-"视频原声" = "Soundtrack video";
+"视频原声" = "suara asli";
 "正在同步iCloud" = "Sinkronisasi iCloud";
 "iCloud同步失败" = "Sinkronisasi iCloud gagal";
 "拖动到此处删除" = "Seret ke sini untuk menghapus";
@@ -65,6 +66,19 @@
 "背景音乐" = "Musik";
 "搜索歌名" = "Cari judul lagu";
 "此歌曲暂无歌词，请您欣赏" = "Tidak ada lirik untuk lagu ini, selamat menikmati";
+"选择" = "Terpilih";
+"取消选择" = "batalkan pilihan";
+"歌词" = "Lirik";
+"拍摄失败!" = "Pemotretan gagal!";
+"摄像头切换失败!" = "Pergantian kamera gagal!";
+"相机初始化失败!" = "Inisialisasi kamera gagal!";
+"轻触拍照" = "Ketuk untuk mengambil foto";
+"按住摄像" = "tekan dan tahan untuk mengambil foto";
+"轻触拍照，按住摄像" = "Ketuk untuk mengambil foto, tekan dan tahan untuk mengambil foto";
+"拍摄时长不足%d秒" = "Waktu pemotretan kurang dari %d detik";
+"麦克风添加失败，录制视频会没有声音哦!" = "Gagal menambahkan mikrofon, tidak akan ada suara saat merekam video!";
+"无法使用麦克风" = "Tidak dapat menggunakan mikrofon";
+"请在设置-隐私-相机中允许访问麦克风" = "Harap izinkan akses ke mikrofon di Pengaturan-Privasi-Kamera";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

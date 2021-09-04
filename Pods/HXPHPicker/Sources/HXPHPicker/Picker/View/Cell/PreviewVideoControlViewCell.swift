@@ -10,18 +10,7 @@ import UIKit
 public class PreviewVideoControlViewCell: PreviewVideoViewCell, PreviewVideoSliderViewDelegate {
     
     lazy var maskLayer: CAGradientLayer = {
-        let layer = CAGradientLayer.init()
-        layer.contentsScale = UIScreen.main.scale
-        let blackColor = UIColor.black
-        layer.colors = [blackColor.withAlphaComponent(0).cgColor,
-                        blackColor.withAlphaComponent(0.25).cgColor,
-                        blackColor.withAlphaComponent(0.3).cgColor,
-                        blackColor.withAlphaComponent(0.4).cgColor,
-                        blackColor.withAlphaComponent(0.5).cgColor]
-        layer.startPoint = CGPoint(x: 0, y: 0)
-        layer.endPoint = CGPoint(x: 0, y: 1)
-        layer.locations = [0.15, 0.5, 0.6, 0.7, 0.9]
-        layer.borderWidth = 0.0
+        let layer = PhotoTools.getGradientShadowLayer(false)
         return layer
     }()
     lazy var sliderView: PreviewVideoSliderView = {
@@ -89,7 +78,11 @@ public class PreviewVideoControlViewCell: PreviewVideoViewCell, PreviewVideoSlid
         }
     }
     
-    func videoSliderView(_ videoSliderView: PreviewVideoSliderView, didChangedPlayDuration duration: CGFloat, state: SliderView.Event) {
+    func videoSliderView(
+        _ videoSliderView: PreviewVideoSliderView,
+        didChangedPlayDuration duration: CGFloat,
+        state: SliderView.Event
+    ) {
         seek(to: TimeInterval(duration), isPlay: state == .touchUpInSide)
     }
     func videoSliderView(_ videoSliderView: PreviewVideoSliderView, didPlayButtonClick isSelected: Bool) {
@@ -102,7 +95,12 @@ public class PreviewVideoControlViewCell: PreviewVideoViewCell, PreviewVideoSlid
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        sliderView.frame = CGRect(x: 0, y: height - 50 - UIDevice.bottomMargin, width: width, height: 50 + UIDevice.bottomMargin)
+        sliderView.frame = CGRect(
+            x: 0,
+            y: height - 50 - UIDevice.bottomMargin,
+            width: width,
+            height: 50 + UIDevice.bottomMargin
+        )
         
         maskLayer.frame = CGRect(x: 0, y: sliderView.y - 20, width: width, height: sliderView.height + 20)
     }
@@ -113,8 +111,15 @@ public class PreviewVideoControlViewCell: PreviewVideoViewCell, PreviewVideoSlid
 }
 
 protocol PreviewVideoSliderViewDelegate: AnyObject {
-    func videoSliderView(_ videoSliderView: PreviewVideoSliderView, didChangedPlayDuration duration: CGFloat, state: SliderView.Event)
-    func videoSliderView(_ videoSliderView: PreviewVideoSliderView, didPlayButtonClick isSelected: Bool)
+    func videoSliderView(
+        _ videoSliderView: PreviewVideoSliderView,
+        didChangedPlayDuration duration: CGFloat,
+        state: SliderView.Event
+    )
+    func videoSliderView(
+        _ videoSliderView: PreviewVideoSliderView,
+        didPlayButtonClick isSelected: Bool
+    )
 }
 
 class PreviewVideoSliderView: UIView, SliderViewDelegate {
@@ -280,7 +285,11 @@ class PlayButton: UIControl {
         CATransaction.commit()
     }
     
-    func getAnimation(_ fromValue: Any?,_ toValue: Any?, _ duration: TimeInterval) -> CABasicAnimation {
+    func getAnimation(
+        _ fromValue: Any?,
+        _ toValue: Any?,
+        _ duration: TimeInterval
+    ) -> CABasicAnimation {
         let animation = CABasicAnimation.init(keyPath: "path")
         animation.fromValue = fromValue
         animation.toValue = toValue
@@ -303,7 +312,11 @@ class PlayButton: UIControl {
 }
 
 protocol SliderViewDelegate: AnyObject {
-    func sliderView(_ sliderView:SliderView, didChangedValue value: CGFloat, state: SliderView.Event)
+    func sliderView(
+        _ sliderView: SliderView,
+        didChangedValue value: CGFloat,
+        state: SliderView.Event
+    )
 }
 
 class SliderView: UIView {
@@ -331,7 +344,12 @@ class SliderView: UIView {
         switch pan.state {
         case .began:
             let point = pan.location(in: self)
-            let rect = CGRect(x: thumbView.x - 20, y: thumbView.y - 20, width: thumbView.width + 40, height: thumbView.height + 40)
+            let rect = CGRect(
+                x: thumbView.x - 20,
+                y: thumbView.y - 20,
+                width: thumbView.width + 40,
+                height: thumbView.height + 40
+            )
             if !rect.contains(point) {
                 pan.isEnabled = false
                 pan.isEnabled = true
@@ -402,14 +420,17 @@ class SliderView: UIView {
         addGestureRecognizer(panGR)
     }
     
-    func setValue(_ value: CGFloat, isAnimation:Bool) {
+    func setValue(
+        _ value: CGFloat,
+        isAnimation: Bool
+    ) {
         switch panGR.state {
         case .began, .changed, .ended:
             return
         default:
             break
         }
-        if value < 0  {
+        if value < 0 {
             self.value = 0
         }else if value > 1 {
             self.value = 1
@@ -418,10 +439,18 @@ class SliderView: UIView {
         }
         let currentWidth = self.value * width
         if isAnimation {
-            UIView.animate(withDuration: 0.25, delay: 0, options: [.curveLinear, .allowUserInteraction,.overrideInheritedDuration, .overrideInheritedCurve]) {
+            UIView.animate(
+                withDuration: 0.25,
+                delay: 0,
+                options: [
+                    .curveLinear,
+                    .allowUserInteraction,
+                    .overrideInheritedDuration,
+                    .overrideInheritedCurve
+                ]
+            ) {
                 self.thumbView.centerX = 5 + (self.width - 10) * self.value
                 self.trackView.width = currentWidth
-            } completion: { _ in
             }
         }else {
             thumbView.centerX = 5 + (width - 10) * value

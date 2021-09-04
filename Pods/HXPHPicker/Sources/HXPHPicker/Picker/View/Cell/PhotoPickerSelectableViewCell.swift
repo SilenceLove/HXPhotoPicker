@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class PhotoPickerSelectableViewCell : PhotoPickerViewCell {
+open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     
     /// 选择按钮
     public lazy var selectControl: SelectBoxView = {
@@ -65,7 +65,8 @@ open class PhotoPickerSelectableViewCell : PhotoPickerViewCell {
                     updateSelectControlSize(width: boxWidth, height: boxHeight)
                 }
             }else {
-                if selectControl.isSelected == false && selectControl.size.equalTo(CGSize(width: boxWidth, height: boxHeight)) {
+                if selectControl.isSelected == false &&
+                    selectControl.size.equalTo(CGSize(width: boxWidth, height: boxHeight)) {
                     return
                 }
                 selectMaskLayer.isHidden = true

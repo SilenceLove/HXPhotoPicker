@@ -45,7 +45,6 @@ public class CropConfirmViewConfiguration {
     /// 暗黑风格下取消按钮选的背景颜色
     public var cancelButtonDarkBackgroundColor: UIColor?
     
-    
     /// 还原按钮标题颜色
     public lazy var resetButtonTitleColor: UIColor = {
         return .white

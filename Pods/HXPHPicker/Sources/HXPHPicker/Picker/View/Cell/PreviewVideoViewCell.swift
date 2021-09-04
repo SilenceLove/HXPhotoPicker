@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete {
     
@@ -27,7 +28,7 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
         }
     }
     
-    var videoPlayType: PhotoPreviewViewController.VideoPlayType = .normal  {
+    var videoPlayType: PhotoPreviewViewController.PlayType = .normal {
         didSet {
             if videoPlayType == .auto || videoPlayType == .once {
                 playButton.isSelected = true
@@ -35,6 +36,8 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
             scrollContentView.videoView.videoPlayType = videoPlayType
         }
     }
+    
+    var statusBarShouldBeHidden = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -55,7 +58,20 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
     }
     
     func contentView(updateContentSize contentView: PhotoPreviewContentView) {
-        setupScrollViewContentSize()
+        guard let videoAsset = photoAsset.networkVideoAsset,
+              videoAsset.coverImage == nil,
+              videoAsset.videoSize.equalTo(.zero) else {
+            return
+        }
+        guard let image = PhotoTools.getVideoThumbnailImage(videoURL: videoAsset.videoURL, atTime: 0.1) else {
+            return
+        }
+        let videoScale = image.width / image.height
+        let viewScale = contentView.width / contentView.height
+        if videoScale != viewScale {
+            photoAsset.networkVideoAsset?.videoSize = image.size
+            setupScrollViewContentSize()
+        }
     }
     func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView) {
         
@@ -140,6 +156,8 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
 }
 
 extension PreviewVideoViewCell: PhotoPreviewVideoViewDelegate {
+    func videoView(readyForDisplay videoView: VideoPlayerView) {
+    }
     func videoView(resetPlay videoView: VideoPlayerView) {
         videoDidChangedPlayTime(duration: 0, isAnimation: false)
     }
@@ -172,7 +190,9 @@ extension PreviewVideoViewCell: PhotoPreviewVideoViewDelegate {
                 self.playButton.alpha = 1
             }
         }
-        showToolView()
+        if !statusBarShouldBeHidden {
+            showToolView()
+        }
     }
     
     func videoView(_ videoView: VideoPlayerView, isPlaybackLikelyToKeepUp: Bool) {

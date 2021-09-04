@@ -44,7 +44,8 @@ extension PhotoEditorViewController {
         UIView.animate(withDuration: 0.25) {
             self.brushColorView.alpha = 0
         } completion: { (_) in
-            guard let option = self.currentToolOption, option.type == .graffiti else {
+            guard let option = self.currentToolOption,
+                  option.type == .graffiti else {
                 return
             }
             self.brushColorView.isHidden = true
@@ -64,7 +65,8 @@ extension PhotoEditorViewController {
         UIView.animate(withDuration: 0.25) {
             self.mosaicToolView.alpha = 0
         } completion: { (_) in
-            guard let option = self.currentToolOption, option.type == .mosaic else {
+            guard let option = self.currentToolOption,
+                  option.type == .mosaic else {
                 return
             }
             self.mosaicToolView.isHidden = true

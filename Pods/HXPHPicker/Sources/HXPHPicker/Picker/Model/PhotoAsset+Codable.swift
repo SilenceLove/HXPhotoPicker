@@ -9,21 +9,18 @@ import UIKit
 
 extension PhotoAsset {
     struct Simplify: Codable {
-        public let phLocalIdentifier: String?
-        public let localImageAsset: LocalImageAsset?
-        public let localVideoAsset: LocalVideoAsset?
-        public let networkVideoAsset: NetworkVideoAsset?
+        let phLocalIdentifier: String?
+        let localImageAsset: LocalImageAsset?
+        let localVideoAsset: LocalVideoAsset?
+        let networkVideoAsset: NetworkVideoAsset?
         
         #if canImport(Kingfisher)
-        public let networkImageAsset: NetworkImageAsset?
+        let networkImageAsset: NetworkImageAsset?
         #endif
         
         #if HXPICKER_ENABLE_EDITOR
-        /// 图片编辑数据
-        public let photoEdit: PhotoEditResult?
-        
-        /// 视频编辑数据
-        public let videoEdit: VideoEditResult?
+        let photoEdit: PhotoEditResult?
+        let videoEdit: VideoEditResult?
         #endif
     }
     
@@ -33,33 +30,41 @@ extension PhotoAsset {
         let simplify: Simplify
         #if HXPICKER_ENABLE_EDITOR
             #if canImport(Kingfisher)
-            simplify = Simplify(phLocalIdentifier: phAsset?.localIdentifier,
-                                localImageAsset: localImageAsset,
-                                localVideoAsset: localVideoAsset,
-                                networkVideoAsset: networkVideoAsset,
-                                networkImageAsset: networkImageAsset,
-                                photoEdit: photoEdit,
-                                videoEdit: videoEdit)
+            simplify = Simplify(
+                phLocalIdentifier: phAsset?.localIdentifier,
+                localImageAsset: localImageAsset,
+                localVideoAsset: localVideoAsset,
+                networkVideoAsset: networkVideoAsset,
+                networkImageAsset: networkImageAsset,
+                photoEdit: photoEdit,
+                videoEdit: videoEdit
+            )
             #else
-            simplify = Simplify(phLocalIdentifier: phAsset?.localIdentifier,
-                                localImageAsset: localImageAsset,
-                                localVideoAsset: localVideoAsset,
-                                networkVideoAsset: networkVideoAsset,
-                                photoEdit: photoEdit,
-                                videoEdit: videoEdit)
+            simplify = Simplify(
+                phLocalIdentifier: phAsset?.localIdentifier,
+                localImageAsset: localImageAsset,
+                localVideoAsset: localVideoAsset,
+                networkVideoAsset: networkVideoAsset,
+                photoEdit: photoEdit,
+                videoEdit: videoEdit
+            )
             #endif
         #else
             #if canImport(Kingfisher)
-            simplify = Simplify(phLocalIdentifier: phAsset?.localIdentifier,
-                                localImageAsset: localImageAsset,
-                                localVideoAsset: localVideoAsset,
-                                networkVideoAsset: networkVideoAsset,
-                                networkImageAsset: networkImageAsset)
+            simplify = Simplify(
+                phLocalIdentifier: phAsset?.localIdentifier,
+                localImageAsset: localImageAsset,
+                localVideoAsset: localVideoAsset,
+                networkVideoAsset: networkVideoAsset,
+                networkImageAsset: networkImageAsset
+            )
             #else
-            simplify = Simplify(phLocalIdentifier: phAsset?.localIdentifier,
-                                localImageAsset: localImageAsset,
-                                localVideoAsset: localVideoAsset,
-                                networkVideoAsset: networkVideoAsset)
+            simplify = Simplify(
+                phLocalIdentifier: phAsset?.localIdentifier,
+                localImageAsset: localImageAsset,
+                localVideoAsset: localVideoAsset,
+                networkVideoAsset: networkVideoAsset
+            )
             #endif
         #endif
         let encoder = JSONEncoder()
@@ -71,7 +76,7 @@ extension PhotoAsset {
     /// - Parameter data: 之前编码得到的数据
     /// - Returns: 对应的 PhotoAsset 对象
     public class func decoder(data: Data) -> PhotoAsset? {
-        var photoAsset: PhotoAsset? = nil
+        var photoAsset: PhotoAsset?
         do {
             let decoder = JSONDecoder()
             let simplify = try decoder.decode(Simplify.self, from: data)

@@ -15,7 +15,15 @@ extension UIImageView {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         // 设置位图颜色分布为 RGBA
         let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
-        guard let context = CGContext(data: &pixel, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4, space: colorSpace, bitmapInfo: bitmapInfo) else {
+        guard let context = CGContext(
+                data: &pixel,
+                width: 1,
+                height: 1,
+                bitsPerComponent: 8,
+                bytesPerRow: 4,
+                space: colorSpace,
+                bitmapInfo: bitmapInfo
+        ) else {
             return nil
         }
         // 设置 context 原点偏移为目标位置所有坐标

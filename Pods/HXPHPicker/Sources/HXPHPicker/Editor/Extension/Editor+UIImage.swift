@@ -15,7 +15,7 @@ extension UIImage {
         return filter(name: "CIPixellate", parameters: [kCIInputScaleKey: scale])
     }
     
-    func filter(name: String, parameters: [String:Any]) -> UIImage? {
+    func filter(name: String, parameters: [String: Any]) -> UIImage? {
         guard let image = self.cgImage else {
             return nil
         }

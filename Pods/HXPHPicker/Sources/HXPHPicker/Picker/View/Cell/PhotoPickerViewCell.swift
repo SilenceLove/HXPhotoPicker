@@ -20,17 +20,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     
     /// 资源类型标签背景
     public lazy var assetTypeMaskLayer: CAGradientLayer = {
-        let layer = CAGradientLayer.init()
-        layer.contentsScale = UIScreen.main.scale
-        let blackColor = UIColor.black
-        layer.colors = [blackColor.withAlphaComponent(0).cgColor,
-                        blackColor.withAlphaComponent(0.15).cgColor,
-                        blackColor.withAlphaComponent(0.35).cgColor,
-                        blackColor.withAlphaComponent(0.6).cgColor]
-        layer.startPoint = CGPoint(x: 0, y: 0)
-        layer.endPoint = CGPoint(x: 0, y: 1)
-        layer.locations = [0.15, 0.35, 0.6, 0.9]
-        layer.borderWidth = 0.0
+        let layer = PhotoTools.getGradientShadowLayer(false)
         return layer
     }()
     
@@ -139,8 +129,8 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     /// 添加视图
     open override func initView() {
         super.initView()
-        imageView.addSubview(assetTypeMaskView)
-        imageView.layer.addSublayer(selectMaskLayer)
+        photoView.addSubview(assetTypeMaskView)
+        photoView.layer.addSublayer(selectMaskLayer)
         contentView.addSubview(assetTypeLb)
         contentView.addSubview(assetTypeIcon)
         contentView.addSubview(assetEditMarkIcon)
@@ -159,16 +149,21 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     /// 布局
     open override func layoutView() {
         super.layoutView()
-        selectMaskLayer.frame = imageView.bounds
-        disableMaskLayer.frame = imageView.bounds
-        assetTypeMaskView.frame = CGRect(x: 0, y: imageView.height - 25, width: width, height: 25)
-        assetTypeMaskLayer.frame = CGRect(x: 0, y: -5, width: assetTypeMaskView.width, height: assetTypeMaskView.height + 5)
+        selectMaskLayer.frame = photoView.bounds
+        disableMaskLayer.frame = photoView.bounds
+        assetTypeMaskView.frame = CGRect(x: 0, y: photoView.height - 25, width: width, height: 25)
+        assetTypeMaskLayer.frame = CGRect(
+            x: 0,
+            y: -5,
+            width: assetTypeMaskView.width,
+            height: assetTypeMaskView.height + 5
+        )
         assetTypeLb.frame = CGRect(x: 0, y: height - 19, width: width - 5, height: 18)
-        assetTypeIcon.size = assetTypeIcon.image?.size ?? CGSize.zero
+        assetTypeIcon.size = assetTypeIcon.image?.size ?? .zero
         assetTypeIcon.x = 5
         assetTypeIcon.y = height - assetTypeIcon.height - 5
         assetTypeLb.centerY = assetTypeIcon.centerY
-        assetEditMarkIcon.size = assetEditMarkIcon.image?.size ?? CGSize.zero
+        assetEditMarkIcon.size = assetEditMarkIcon.image?.size ?? .zero
         assetEditMarkIcon.x = 5
         assetEditMarkIcon.y = height - assetEditMarkIcon.height - 5
     }
@@ -182,6 +177,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     
     /// 设置高亮遮罩
     open func setupHighlightedMask() {
+        guard let photoAsset = photoAsset else { return }
         if !photoAsset.isSelected {
             selectMaskLayer.isHidden = !isHighlighted
         }

@@ -13,24 +13,31 @@ protocol PhotoEditorCropToolViewDelegate: AnyObject {
     func cropToolView(didChangedAspectRatio cropToolView: PhotoEditorCropToolView, at model: PhotoEditorCropToolModel)
 }
 
-class PhotoEditorCropToolView: UIView {
+public class PhotoEditorCropToolView: UIView {
     weak var delegate: PhotoEditorCropToolViewDelegate?
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout.init()
-        flowLayout.minimumInteritemSpacing = 20;
+    public lazy var flowLayout: UICollectionViewFlowLayout = {
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.minimumInteritemSpacing = 20
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 10)
         flowLayout.scrollDirection = .horizontal
         return flowLayout
     }()
-    lazy var collectionView: UICollectionView = {
+    public lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView.init(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.register(PhotoEditorCropToolViewCell.classForCoder(), forCellWithReuseIdentifier: "PhotoEditorCropToolViewCellID")
-        collectionView.register(PhotoEditorCropToolHeaderView.classForCoder(), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "PhotoEditorCropToolHeaderViewID")
+        collectionView.register(
+            PhotoEditorCropToolViewCell.classForCoder(),
+            forCellWithReuseIdentifier: "PhotoEditorCropToolViewCellID"
+        )
+        collectionView.register(
+            PhotoEditorCropToolHeaderView.classForCoder(),
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: "PhotoEditorCropToolHeaderViewID"
+        )
         return collectionView
     }()
     
@@ -59,7 +66,12 @@ class PhotoEditorCropToolView: UIView {
         addSubview(collectionView)
     }
     func updateContentInset() {
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: UIDevice.leftMargin, bottom: 0, right: UIDevice.rightMargin)
+        collectionView.contentInset = UIEdgeInsets(
+            top: 0,
+            left: UIDevice.leftMargin,
+            bottom: 0,
+            right: UIDevice.rightMargin
+        )
     }
     func reset(animated: Bool) {
         currentSelectedModel?.isSelected = false
@@ -68,7 +80,7 @@ class PhotoEditorCropToolView: UIView {
         collectionView.reloadData()
         collectionView.setContentOffset(CGPoint(x: -collectionView.contentInset.left, y: 0), animated: animated)
     }
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         collectionView.frame = bounds
     }
@@ -79,25 +91,43 @@ class PhotoEditorCropToolView: UIView {
 }
 
 extension PhotoEditorCropToolView: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         showRatios ? ratioModels.count : 0
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoEditorCropToolViewCellID", for: indexPath) as! PhotoEditorCropToolViewCell
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "PhotoEditorCropToolViewCellID",
+            for: indexPath
+        ) as! PhotoEditorCropToolViewCell
         cell.themeColor = themeColor
         cell.model = ratioModels[indexPath.item]
         return cell
     }
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "PhotoEditorCropToolHeaderViewID", for: indexPath) as! PhotoEditorCropToolHeaderView
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: "PhotoEditorCropToolHeaderViewID",
+            for: indexPath
+        ) as! PhotoEditorCropToolHeaderView
         headerView.delegate = self
         headerView.showRatios = showRatios
         return headerView
     }
 }
 extension PhotoEditorCropToolView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
         let model = ratioModels[indexPath.item]
         if !model.scaleSize.equalTo(.zero) {
             return model.scaleSize
@@ -118,7 +148,10 @@ extension PhotoEditorCropToolView: UICollectionViewDelegate, UICollectionViewDel
             if itemHeight < scaleWidth {
                 itemHeight = scaleWidth
             }
-            let textWidth = model.scaleText.width(ofFont: UIFont.mediumPingFang(ofSize: 12), maxHeight: itemHeight - 3) + 5
+            let textWidth = model.scaleText.width(
+                ofFont: UIFont.mediumPingFang(ofSize: 12),
+                maxHeight: itemHeight - 3
+            ) + 5
             if itemWidth < textWidth {
                 itemHeight = textWidth / itemWidth * itemHeight
                 itemWidth = textWidth
@@ -131,10 +164,14 @@ extension PhotoEditorCropToolView: UICollectionViewDelegate, UICollectionViewDel
         }
         return model.scaleSize
     }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: 100, height: 50)
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        CGSize(width: 100, height: 50)
     }
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         var selectedIndexPath: IndexPath?
         if let model = currentSelectedModel {
             let index = ratioModels.firstIndex(of: model)!

@@ -14,54 +14,12 @@ import Kingfisher
 
 public class PhotoTools {
     
-    /// 跳转系统设置界面
-    public class func openSettingsURL() {
-        if let openURL = URL(string: UIApplication.openSettingsURLString) {
-            if #available(iOS 10, *) {
-                UIApplication.shared.open(openURL, options: [:], completionHandler: nil)
-            } else {
-                UIApplication.shared.openURL(openURL)
-            }
-        }
-    }
-    
-    /// 显示UIAlertController
-    public class func showAlert(viewController: UIViewController? ,
-                                title: String? ,
-                                message: String? ,
-                                leftActionTitle: String? ,
-                                leftHandler: ((UIAlertAction) -> Void)?,
-                                rightActionTitle: String? ,
-                                rightHandler: ((UIAlertAction) -> Void)?) {
-        let alertController = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
-        if let leftActionTitle = leftActionTitle {
-            let leftAction = UIAlertAction.init(title: leftActionTitle, style: UIAlertAction.Style.cancel, handler: leftHandler)
-            alertController.addAction(leftAction)
-        }
-        if let rightActionTitle = rightActionTitle {
-            let rightAction = UIAlertAction.init(title: rightActionTitle, style: UIAlertAction.Style.default, handler: rightHandler)
-            alertController.addAction(rightAction)
-        }
-        viewController?.present(alertController, animated: true, completion: nil)
-    }
-    
-    public class func showConfirm(viewController: UIViewController? ,
-                                  title: String? ,
-                                  message: String?,
-                                  actionTitle: String?,
-                                  actionHandler: ((UIAlertAction) -> Void)?) {
-        let alertController = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
-        if let actionTitle = actionTitle {
-            let action = UIAlertAction.init(title: actionTitle, style: UIAlertAction.Style.cancel, handler: actionHandler)
-            alertController.addAction(action)
-            viewController?.present(alertController, animated: true, completion: nil)
-        }
-    }
-    
     /// 根据PHAsset资源获取对应的目标大小
-    public class func transformTargetWidthToSize(targetWidth: CGFloat,
-                                                 asset: PHAsset) -> CGSize {
-        let scale:CGFloat = 0.8
+    public class func transformTargetWidthToSize(
+        targetWidth: CGFloat,
+        asset: PHAsset
+    ) -> CGSize {
+        let scale: CGFloat = 0.8
         let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
         var width = targetWidth
         if asset.pixelWidth < Int(targetWidth) {
@@ -81,7 +39,9 @@ public class PhotoTools {
     }
     
     /// 转换视频时长为 mm:ss 格式的字符串
-    public class func transformVideoDurationToString(duration: TimeInterval) -> String {
+    public class func transformVideoDurationToString(
+        duration: TimeInterval
+    ) -> String {
         let time = Int(round(Double(duration)))
         if time < 10 {
             return String.init(format: "00:0%d", arguments: [time])
@@ -92,24 +52,24 @@ public class PhotoTools {
             let sec = time - (min * 60)
             if min < 60 {
                 if sec < 10 {
-                    return String.init(format: "%d:0%d", arguments: [min,sec])
+                    return String(format: "%d:0%d", arguments: [min, sec])
                 }else {
-                    return String.init(format: "%d:%d", arguments: [min,sec])
+                    return String(format: "%d:%d", arguments: [min, sec])
                 }
             }else {
                 let hour = Int(min / 60)
                 min -= hour * 60
                 if min < 10 {
                     if sec < 10 {
-                        return String.init(format: "%d:0%d:0%d", arguments: [hour,min,sec])
+                        return String(format: "%d:0%d:0%d", arguments: [hour, min, sec])
                     }else {
-                        return String.init(format: "%d:0%d:%d", arguments: [hour,min,sec])
+                        return String(format: "%d:0%d:%d", arguments: [hour, min, sec])
                     }
                 }else {
                     if sec < 10 {
-                        return String.init(format: "%d:%d:0%d", arguments: [hour,min,sec])
+                        return String(format: "%d:%d:0%d", arguments: [hour, min, sec])
                     }else {
-                        return String.init(format: "%d:%d:%d", arguments: [hour,min,sec])
+                        return String(format: "%d:%d:%d", arguments: [hour, min, sec])
                     }
                 }
             }
@@ -117,12 +77,14 @@ public class PhotoTools {
     }
     
     /// 根据视频地址获取视频时长
-    public class func getVideoDuration(videoURL: URL?) -> TimeInterval {
-        if videoURL == nil {
+    public class func getVideoDuration(
+        videoURL: URL?
+    ) -> TimeInterval {
+        guard let videoURL = videoURL else {
             return 0
         }
         let options = [AVURLAssetPreferPreciseDurationAndTimingKey: false]
-        let urlAsset = AVURLAsset.init(url: videoURL!, options: options)
+        let urlAsset = AVURLAsset.init(url: videoURL, options: options)
 //        let second = TimeInterval(urlAsset.duration.value) / TimeInterval(urlAsset.duration.timescale)
         return TimeInterval(round(urlAsset.duration.seconds))
     }
@@ -132,7 +94,9 @@ public class PhotoTools {
         var m = 0
         var s = 0
         var ms = 0
-        let components = duration.components(separatedBy: CharacterSet.init(charactersIn: ":."))
+        let components = duration.components(
+            separatedBy: CharacterSet.init(charactersIn: ":.")
+        )
         if components.count >= 2 {
             m = Int(components[0]) ?? 0
             s = Int(components[1]) ?? 0
@@ -146,24 +110,37 @@ public class PhotoTools {
     }
     
     /// 根据视频地址获取视频封面
-    public class func getVideoThumbnailImage(videoURL: URL?,
-                                             atTime: TimeInterval) -> UIImage? {
-        if videoURL == nil {
+    public class func getVideoThumbnailImage(
+        videoURL: URL?,
+        atTime: TimeInterval
+    ) -> UIImage? {
+        guard let videoURL = videoURL else {
             return nil
         }
-        let urlAsset = AVURLAsset.init(url: videoURL!)
-        return getVideoThumbnailImage(avAsset: urlAsset as AVAsset, atTime: atTime)
+        let urlAsset = AVURLAsset(url: videoURL)
+        return getVideoThumbnailImage(
+            avAsset: urlAsset as AVAsset,
+            atTime: atTime
+        )
     }
     
     /// 根据视频地址获取视频封面
-    public class func getVideoThumbnailImage(avAsset: AVAsset?,
-                                             atTime: TimeInterval) -> UIImage? {
+    public class func getVideoThumbnailImage(
+        avAsset: AVAsset?,
+        atTime: TimeInterval
+    ) -> UIImage? {
         if let avAsset = avAsset {
             let assetImageGenerator = AVAssetImageGenerator.init(asset: avAsset)
             assetImageGenerator.appliesPreferredTrackTransform = true
             assetImageGenerator.apertureMode = .encodedPixels
             do {
-                let thumbnailImageRef = try assetImageGenerator.copyCGImage(at: CMTime(value: CMTimeValue(atTime), timescale: avAsset.duration.timescale), actualTime: nil)
+                let thumbnailImageRef = try assetImageGenerator.copyCGImage(
+                    at: CMTime(
+                        value: CMTimeValue(atTime),
+                        timescale: avAsset.duration.timescale
+                    ),
+                    actualTime: nil
+                )
                 let image = UIImage.init(cgImage: thumbnailImageRef)
                 return image
             } catch { }
@@ -172,104 +149,60 @@ public class PhotoTools {
     }
     
     /// 获视频缩略图
-    public class  func getVideoThumbnailImage(url: URL, atTime: TimeInterval, completion: @escaping (URL, UIImage) -> Void) {
-        let asset = AVAsset(url: url)
+    @discardableResult
+    public class func getVideoThumbnailImage(
+        url: URL,
+        atTime: TimeInterval,
+        imageGenerator: ((AVAssetImageGenerator) -> Void)? = nil,
+        completion: @escaping (URL, UIImage?, AVAssetImageGenerator.Result) -> Void
+    ) -> AVAsset {
+        let asset = AVURLAsset(url: url)
         asset.loadValuesAsynchronously(forKeys: ["duration"]) {
             let generator = AVAssetImageGenerator(asset: asset)
             generator.appliesPreferredTrackTransform = true
-            generator.requestedTimeToleranceAfter = .zero
-            generator.requestedTimeToleranceBefore = .zero
+//            generator.requestedTimeToleranceAfter = .zero
+//            generator.requestedTimeToleranceBefore = .zero
             let time = CMTime(value: CMTimeValue(atTime), timescale: asset.duration.timescale)
             let array = [NSValue(time: time)]
-            generator.generateCGImagesAsynchronously(forTimes: array) { (requestedTime, cgImage, actualTime, result, error) in
+            generator.generateCGImagesAsynchronously(
+                forTimes: array
+            ) { (requestedTime, cgImage, actualTime, result, error) in
                 if let image = cgImage, result == .succeeded {
-                    DispatchQueue.main.async {
-                        completion(url, UIImage(cgImage: image))
+                    var image = UIImage(cgImage: image)
+                    if image.imageOrientation != .up,
+                       let img = image.normalizedImage() {
+                        image = img
                     }
-                }
-            }
-        }
-    }
-    
-    /// 导出编辑视频
-    /// - Parameters:
-    ///   - avAsset: 视频对应的 AVAsset 数据
-    ///   - outputURL: 指定视频导出的地址，为nil时默认为临时目录
-    ///   - startTime: 需要裁剪的开始时间
-    ///   - endTime: 需要裁剪的结束时间
-    ///   - presentName: 导出的质量
-    ///   - completion: 导出完成
-    public class func exportEditVideo(for avAsset: AVAsset,
-                                      outputURL: URL? = nil,
-                                      startTime: TimeInterval,
-                                      endTime: TimeInterval,
-                                      presentName: String,
-                                      completion:@escaping (URL?, Error?) -> Void) {
-        let timescale = avAsset.duration.timescale
-        let start = CMTime(value: CMTimeValue(startTime * TimeInterval(timescale)), timescale: timescale)
-        let end = CMTime(value: CMTimeValue(endTime * TimeInterval(timescale)), timescale: timescale)
-        let timeRang = CMTimeRange(start: start, end: end)
-        exportEditVideo(for: avAsset, outputURL: outputURL, timeRang: timeRang, presentName: presentName, completion: completion)
-    }
-    
-    /// 导出编辑视频
-    /// - Parameters:
-    ///   - avAsset: 视频对应的 AVAsset 数据
-    ///   - outputURL: 指定视频导出的地址，为nil时默认为临时目录
-    ///   - timeRang: 需要裁剪的时间区域
-    ///   - presentName: 导出的质量
-    ///   - completion: 导出完成
-    public class func exportEditVideo(for avAsset: AVAsset,
-                                      outputURL: URL? = nil,
-                                      timeRang: CMTimeRange,
-                                      presentName: String,
-                                      completion:@escaping (URL?, Error?) -> Void) {
-        if AVAssetExportSession.allExportPresets().contains(presentName) {
-            let videoURL = outputURL == nil ? PhotoTools.getVideoTmpURL() : outputURL
-            if let exportSession = AVAssetExportSession.init(asset: avAsset, presetName: presentName) {
-                let supportedTypeArray = exportSession.supportedFileTypes
-                exportSession.outputURL = videoURL
-                if supportedTypeArray.contains(AVFileType.mp4) {
-                    exportSession.outputFileType = .mp4
-                }else if supportedTypeArray.isEmpty {
-                    completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
-                    return
+                    DispatchQueue.main.async {
+                        completion(url, image, result)
+                    }
                 }else {
-                    exportSession.outputFileType = supportedTypeArray.first
-                }
-                exportSession.shouldOptimizeForNetworkUse = true
-                exportSession.timeRange = timeRang
-                exportSession.exportAsynchronously(completionHandler: {
                     DispatchQueue.main.async {
-                        switch exportSession.status {
-                        case .completed:
-                            completion(videoURL, nil)
-                            break
-                        case .failed, .cancelled:
-                            completion(nil, exportSession.error)
-                            break
-                        default: break
-                        }
+                        completion(url, nil, result)
                     }
-                })
-            }else {
-                completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
-                return
+                }
             }
-        }else {
-            completion(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + presentName))
-            return
+            DispatchQueue.main.async {
+                imageGenerator?(generator)
+            }
         }
+        return asset
     }
     
     #if canImport(Kingfisher)
-    public class func downloadNetworkImage(with url: URL,
-                                           options: KingfisherOptionsInfo,
-                                           progressBlock: DownloadProgressBlock? = nil,
-                                           completionHandler: ((UIImage?) -> Void)? = nil) {
+    public class func downloadNetworkImage(
+        with url: URL,
+        cancelOrigianl: Bool = true,
+        options: KingfisherOptionsInfo,
+        progressBlock: DownloadProgressBlock? = nil,
+        completionHandler: ((UIImage?) -> Void)? = nil
+    ) {
         let key = url.cacheKey
         if ImageCache.default.isCached(forKey: key) {
-            ImageCache.default.retrieveImage(forKey: key) { (result) in
+            ImageCache.default.retrieveImage(
+                forKey: key,
+                options: options
+            ) { (result) in
                 switch result {
                 case .success(let value):
                     completionHandler?(value.image)
@@ -279,15 +212,34 @@ public class PhotoTools {
             }
             return
         }
-        ImageDownloader.default.downloadImage(with: url, options: options, progressBlock: progressBlock) { (result) in
+        ImageDownloader.default.downloadImage(
+            with: url,
+            options: options,
+            progressBlock: progressBlock
+        ) { (result) in
             switch result {
             case .success(let value):
-                if let gifImage = DefaultImageProcessor.default.process(item: .data(value.originalData), options: .init([]))  {
-                    ImageCache.default.store(gifImage, original: value.originalData, forKey: key)
+                if let gifImage = DefaultImageProcessor.default.process(
+                    item: .data(value.originalData),
+                    options: .init([])
+                ) {
+                    if cancelOrigianl {
+                        ImageCache.default.store(
+                            gifImage,
+                            original: value.originalData,
+                            forKey: key
+                        )
+                    }
                     completionHandler?(gifImage)
                     return
                 }
-                ImageCache.default.store(value.image, original: value.originalData, forKey: key)
+                if cancelOrigianl {
+                    ImageCache.default.store(
+                        value.image,
+                        original: value.originalData,
+                        forKey: key
+                    )
+                }
                 completionHandler?(value.image)
             case .failure(_):
                 completionHandler?(nil)
@@ -296,15 +248,28 @@ public class PhotoTools {
     }
     #endif
     
-    class func transformImageSize(_ imageSize: CGSize, to view: UIView) -> CGRect {
-        return transformImageSize(imageSize, toViewSize: view.size)
+    class func transformImageSize(
+        _ imageSize: CGSize,
+        to view: UIView
+    ) -> CGRect {
+        return transformImageSize(
+            imageSize,
+            toViewSize: view.size
+        )
     }
     
-    class func transformImageSize(_ imageSize: CGSize, toViewSize viewSize: CGSize, directions: [PhotoToolsTransformImageSizeDirections] = [.horizontal, .vertical]) -> CGRect {
+    class func transformImageSize(
+        _ imageSize: CGSize,
+        toViewSize viewSize: CGSize,
+        directions: [PhotoToolsTransformImageSizeDirections] = [.horizontal, .vertical]
+    ) -> CGRect {
         var size: CGSize = .zero
         var center: CGPoint = .zero
         
-        func handleVertical(_ imageSize: CGSize, _ viewSize: CGSize) -> (CGSize, CGPoint) {
+        func handleVertical(
+            _ imageSize: CGSize,
+            _ viewSize: CGSize
+        ) -> (CGSize, CGPoint) {
             let aspectRatio = viewSize.width / imageSize.width
             let contentWidth = viewSize.width
             let contentHeight = imageSize.height * aspectRatio
@@ -315,7 +280,10 @@ public class PhotoTools {
             }
             return (_size, .zero)
         }
-        func handleHorizontal(_ imageSize: CGSize, _ viewSize: CGSize) -> (CGSize, CGPoint) {
+        func handleHorizontal(
+            _ imageSize: CGSize,
+            _ viewSize: CGSize
+        ) -> (CGSize, CGPoint) {
             let aspectRatio = viewSize.height / imageSize.height
             var contentWidth = imageSize.width * aspectRatio
             var contentHeight = viewSize.height
@@ -371,6 +339,62 @@ public class PhotoTools {
             rectY = (viewSize.height - size.height) * 0.5
         }
         return CGRect(x: (viewSize.width - size.width) * 0.5, y: rectY, width: size.width, height: size.height)
+    }
+    
+    class func exportSessionFileLengthLimit(
+        seconds: Double,
+        exportPreset: ExportPreset,
+        videoQuality: Int
+    ) -> Int64 {
+        if videoQuality > 0 {
+            var ratioParam: Double = 0
+            if exportPreset == .ratio_640x480 {
+                ratioParam = 0.02
+            }else if exportPreset == .ratio_960x540 {
+                ratioParam = 0.04
+            }else if exportPreset == .ratio_1280x720 {
+                ratioParam = 0.08
+            }
+            let quality = Double(min(videoQuality, 10))
+            return Int64(seconds * ratioParam * quality * 1000 * 1000)
+        }
+        return 0
+    }
+    
+    class func getBasicAnimation(
+        _ keyPath: String,
+        _ fromValue: Any?,
+        _ toValue: Any?,
+        _ duration: TimeInterval
+    ) -> CABasicAnimation {
+        let animation = CABasicAnimation.init(keyPath: keyPath)
+        animation.fromValue = fromValue
+        animation.toValue = toValue
+        animation.duration = duration
+        animation.fillMode = .backwards
+        animation.timingFunction = .init(name: CAMediaTimingFunctionName.linear)
+        return animation
+    }
+    
+    class func getGradientShadowLayer(_ isTop: Bool) -> CAGradientLayer {
+        let layer = CAGradientLayer()
+        layer.contentsScale = UIScreen.main.scale
+        let blackColor = UIColor.black
+        layer.colors = [blackColor.withAlphaComponent(0).cgColor,
+                        blackColor.withAlphaComponent(0.2).cgColor,
+                        blackColor.withAlphaComponent(0.4).cgColor,
+                        blackColor.withAlphaComponent(0.6).cgColor,
+                        blackColor.withAlphaComponent(0.8).cgColor]
+        if isTop {
+            layer.startPoint = CGPoint(x: 0, y: 1)
+            layer.endPoint = CGPoint(x: 0, y: 0)
+        }else {
+            layer.startPoint = CGPoint(x: 0, y: 0)
+            layer.endPoint = CGPoint(x: 0, y: 1)
+        }
+        layer.locations = [0.1, 0.3, 0.5, 0.7, 0.9]
+        layer.borderWidth = 0.0
+        return layer
     }
 }
 

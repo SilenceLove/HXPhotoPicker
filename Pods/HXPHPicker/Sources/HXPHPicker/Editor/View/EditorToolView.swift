@@ -7,38 +7,27 @@
 
 import UIKit
 
-protocol EditorToolViewDelegate: NSObjectProtocol {
+protocol EditorToolViewDelegate: AnyObject {
     func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions)
     func toolView(didFinishButtonClick toolView: EditorToolView)
 }
 
-class EditorToolScrollView: UICollectionView {
-    override func touchesShouldCancel(in view: UIView) -> Bool {
+public class EditorToolScrollView: UICollectionView {
+    public override func touchesShouldCancel(in view: UIView) -> Bool {
         true
     }
 }
 
-class EditorToolView: UIView {
+public class EditorToolView: UIView {
     weak var delegate: EditorToolViewDelegate?
     var config: EditorToolViewConfiguration
-     
-    lazy var maskLayer: CAGradientLayer = {
-        let layer = CAGradientLayer.init()
-        layer.contentsScale = UIScreen.main.scale
-        let blackColor = UIColor.black
-        layer.colors = [blackColor.withAlphaComponent(0).cgColor,
-                        blackColor.withAlphaComponent(0.3).cgColor,
-                        blackColor.withAlphaComponent(0.4).cgColor,
-                        blackColor.withAlphaComponent(0.5).cgColor,
-                        blackColor.withAlphaComponent(0.6).cgColor]
-        layer.startPoint = CGPoint(x: 0, y: 0)
-        layer.endPoint = CGPoint(x: 0, y: 1)
-        layer.locations = [0.1, 0.3, 0.5, 0.7, 0.9]
-        layer.borderWidth = 0.0
+    
+    public lazy var maskLayer: CAGradientLayer = {
+        let layer = PhotoTools.getGradientShadowLayer(false)
         return layer
     }()
     
-    lazy var flowLayout: UICollectionViewFlowLayout = {
+    public lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout.init()
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumLineSpacing = 15
@@ -47,8 +36,11 @@ class EditorToolView: UIView {
         return flowLayout
     }()
     
-    lazy var collectionView: EditorToolScrollView = {
-        let collectionView = EditorToolScrollView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 50), collectionViewLayout: flowLayout)
+    public lazy var collectionView: EditorToolScrollView = {
+        let collectionView = EditorToolScrollView(
+            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
+            collectionViewLayout: flowLayout
+        )
         collectionView.delaysContentTouches = false
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
@@ -66,7 +58,7 @@ class EditorToolView: UIView {
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 12 + UIDevice.leftMargin, bottom: 0, right: 0)
     }
     
-    lazy var finishButton: UIButton = {
+    public lazy var finishButton: UIButton = {
         let finishButton = UIButton.init(type: .custom)
         finishButton.setTitle("完成".localized, for: .normal)
         finishButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
@@ -92,8 +84,17 @@ class EditorToolView: UIView {
     }
     func configColor() {
         let isDark = PhotoManager.isDark
-        finishButton.setTitleColor(isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor, for: .normal)
-        finishButton.setBackgroundImage(UIImage.image(for: isDark ? config.finishButtonDarkBackgroundColor : config.finishButtonBackgroundColor, havingSize: .zero), for: .normal)
+        finishButton.setTitleColor(
+            isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor,
+            for: .normal
+        )
+        finishButton.setBackgroundImage(
+            UIImage.image(
+                for: isDark ? config.finishButtonDarkBackgroundColor : config.finishButtonBackgroundColor,
+                havingSize: .zero
+            ),
+            for: .normal
+        )
     }
     func deselected() {
         if let indexPath = currentSelectedIndexPath {
@@ -110,11 +111,14 @@ class EditorToolView: UIView {
     
     func reloadMusic(isSelected: Bool) {
         musicCellShowBox = isSelected
-        for (index, option) in config.toolOptions.enumerated() {
-            if option.type == .music {
-                collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
-                return
-            }
+        for (index, option) in config.toolOptions.enumerated() where
+            option.type == .music {
+            collectionView.reloadItems(
+                at: [
+                    IndexPath(item: index, section: 0)
+                ]
+            )
+            return
         }
     }
     
@@ -122,10 +126,17 @@ class EditorToolView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
-        maskLayer.frame = CGRect(x: 0, y: stretchMask ? -70 : -10, width: width, height: stretchMask ? height + 70 : height + 10)
-        var finishWidth = (finishButton.currentTitle?.width(ofFont: finishButton.titleLabel!.font, maxHeight: 33) ?? 0) + 20
+        maskLayer.frame = CGRect(
+            x: 0,
+            y: stretchMask ? -70 : -10,
+            width: width,
+            height: stretchMask ? height + 70 : height + 10
+        )
+        var finishWidth = (finishButton.currentTitle?.width(
+                            ofFont: finishButton.titleLabel!.font,
+                            maxHeight: 33) ?? 0) + 20
         if finishWidth < 60 {
             finishWidth = 60
         }
@@ -138,12 +149,18 @@ class EditorToolView: UIView {
 }
 
 extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate, EditorToolViewCellDelegate {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         config.toolOptions.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditorToolViewCellID", for: indexPath) as! EditorToolViewCell
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "EditorToolViewCellID",
+            for: indexPath
+        ) as! EditorToolViewCell
         let model = config.toolOptions[indexPath.item]
         cell.delegate = self
         cell.boxColor = config.musicSelectedColor
@@ -167,7 +184,10 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate, 
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
         collectionView.deselectItem(at: indexPath, animated: false)
     }
     

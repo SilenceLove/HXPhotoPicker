@@ -8,7 +8,6 @@
 import UIKit
 import Photos
 
-
 public extension PHAssetCollection {
     
     /// 是否相机胶卷
@@ -20,7 +19,7 @@ public extension PHAssetCollection {
             versionStr.append("0")
         }
         let version = Int(versionStr) ?? 0
-        if version >= 800 && version <= 802  {
+        if version >= 800 && version <= 802 {
             return assetCollectionSubtype == .smartAlbumRecentlyAdded
         }else {
             return assetCollectionSubtype == .smartAlbumUserLibrary

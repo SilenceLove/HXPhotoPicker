@@ -12,16 +12,24 @@ import Kingfisher
 
 extension PhotoEditorViewController {
     #if HXPICKER_ENABLE_PICKER
+    // swiftlint:disable function_body_length
+    // swiftlint:disable cyclomatic_complexity
     func requestImage() {
+        // swiftlint:enable: function_body_length
+        // swiftlint:enable: cyclomatic_complexity
         if photoAsset.isLocalAsset {
             ProgressHUD.showLoading(addedTo: view, animated: true)
             DispatchQueue.global().async {
                 if self.photoAsset.mediaType == .photo {
                     var image = self.photoAsset.localImageAsset!.image!
+                    image = self.fixImageOrientation(image)
                     if self.photoAsset.mediaSubType.isGif {
                         if let imageData = self.photoAsset.localImageAsset?.imageData {
                             #if canImport(Kingfisher)
-                            if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))  {
+                            if let gifImage = DefaultImageProcessor.default.process(
+                                item: .data(imageData),
+                                options: .init([])
+                            ) {
                                 image = gifImage
                             }
                             #endif
@@ -29,7 +37,10 @@ extension PhotoEditorViewController {
                             do {
                                 let imageData = try Data.init(contentsOf: imageURL)
                                 #if canImport(Kingfisher)
-                                if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))  {
+                                if let gifImage = DefaultImageProcessor.default.process(
+                                    item: .data(imageData),
+                                    options: .init([])
+                                ) {
                                     image = gifImage
                                 }
                                 #endif
@@ -42,10 +53,11 @@ extension PhotoEditorViewController {
                         self.requestAssetCompletion(image: image)
                     }
                 }else {
-                    self.filterHDImageHandler(image: self.photoAsset.localVideoAsset!.image!)
+                    let image = self.fixImageOrientation(self.photoAsset.localVideoAsset!.image!)
+                    self.filterHDImageHandler(image: image)
                     DispatchQueue.main.async {
                         ProgressHUD.hide(forView: self.view, animated: true)
-                        self.requestAssetCompletion(image: self.photoAsset.localVideoAsset!.image!)
+                        self.requestAssetCompletion(image: image)
                     }
                 }
             }
@@ -59,8 +71,9 @@ extension PhotoEditorViewController {
                 }
             } resultHandler: { [weak self] (image) in
                 guard let self = self else { return }
-                if let image = image {
+                if var image = image {
                     DispatchQueue.global().async {
+                        image = self.fixImageOrientation(image)
                         self.filterHDImageHandler(image: image)
                         DispatchQueue.main.async {
                             ProgressHUD.hide(forView: self.view, animated: true)
@@ -69,7 +82,12 @@ extension PhotoEditorViewController {
                     }
                 }else {
                     ProgressHUD.hide(forView: self.view, animated: true)
-                    PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: "图片获取失败!".localized, actionTitle: "确定".localized) { (alertAction) in
+                    PhotoTools.showConfirm(
+                        viewController: self,
+                        title: "提示".localized,
+                        message: "图片获取失败!".localized,
+                        actionTitle: "确定".localized
+                    ) { (alertAction) in
                         self.didBackClick()
                     }
                 }
@@ -78,19 +96,29 @@ extension PhotoEditorViewController {
         } else {
             ProgressHUD.showLoading(addedTo: view, animated: true)
             if photoAsset.phAsset != nil && !photoAsset.isGifAsset {
-                photoAsset.requestImageData(filterEditor: true,
-                                            iCloudHandler: nil,
-                                            progressHandler: nil) {
-                    [weak self] asset, result in
+                photoAsset.requestImageData(
+                    filterEditor: true,
+                    iCloudHandler: nil,
+                    progressHandler: nil
+                ) { [weak self] asset, result in
                     guard let self = self else { return }
                     switch result {
                     case .success(let dataResult):
-                        let image = UIImage.init(data: dataResult.imageData)?.scaleSuitableSize()
+                        guard var image = UIImage(data: dataResult.imageData) else {
+                            ProgressHUD.hide(forView: self.view, animated: true)
+                            self.requestAssetFailure(isICloud: false)
+                            return
+                        }
+                        if dataResult.imageData.count > 3000000,
+                           let sImage = image.scaleSuitableSize() {
+                            image = sImage
+                        }
                         DispatchQueue.global().async {
-                            self.filterHDImageHandler(image: image!)
+                            image = self.fixImageOrientation(image)
+                            self.filterHDImageHandler(image: image)
                             DispatchQueue.main.async {
                                 ProgressHUD.hide(forView: self.view, animated: true)
-                                self.requestAssetCompletion(image: image!)
+                                self.requestAssetCompletion(image: image)
                             }
                         }
                     case .failure(let error):
@@ -104,7 +132,9 @@ extension PhotoEditorViewController {
                 }
                 return
             }
-            photoAsset.requestAssetImageURL(filterEditor: true) { [weak self] result in
+            photoAsset.requestAssetImageURL(
+                filterEditor: true
+            ) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(let response):
@@ -114,7 +144,10 @@ extension PhotoEditorViewController {
                         if self.photoAsset.isGifAsset == true {
                             do {
                                 let imageData = try Data.init(contentsOf: imageURL)
-                                if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))  {
+                                if let gifImage = DefaultImageProcessor.default.process(
+                                    item: .data(imageData),
+                                    options: .init([])
+                                ) {
                                     self.filterHDImageHandler(image: gifImage)
                                     DispatchQueue.main.async {
                                         ProgressHUD.hide(forView: self.view, animated: true)
@@ -125,7 +158,8 @@ extension PhotoEditorViewController {
                             }catch {}
                         }
                         #endif
-                        if let image = UIImage.init(contentsOfFile: imageURL.path)?.scaleSuitableSize() {
+                        if var image = UIImage.init(contentsOfFile: imageURL.path)?.scaleSuitableSize() {
+                            image = self.fixImageOrientation(image)
                             self.filterHDImageHandler(image: image)
                             DispatchQueue.main.async {
                                 ProgressHUD.hide(forView: self.view, animated: true)
@@ -137,7 +171,6 @@ extension PhotoEditorViewController {
                 case .failure(_):
                     ProgressHUD.hide(forView: self.view, animated: true)
                     self.requestAssetFailure(isICloud: false)
-                    break
                 }
             }
         }
@@ -171,7 +204,7 @@ extension PhotoEditorViewController {
     #endif
     
     func requestAssetCompletion(image: UIImage) {
-        if imageInitializeCompletion == true {
+        if !imageInitializeCompletion {
             imageView.setImage(image)
             filterView.image = filterImage
             if let editedData = editResult?.editedData {
@@ -183,16 +216,30 @@ extension PhotoEditorViewController {
                 imageView.startCropping(true)
                 croppingAction()
             }
+            imageInitializeCompletion = true
         }
         setFilterImage()
         setImage(image)
     }
     func requestAssetFailure(isICloud: Bool) {
         ProgressHUD.hide(forView: view, animated: true)
-        let text = isICloud ? "iCloud同步失败" : "图片获取失败!"
-        PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: text.localized, actionTitle: "确定".localized) { (alertAction) in
+        let text = isICloud ? "iCloud同步失败".localized : "图片获取失败!".localized
+        PhotoTools.showConfirm(
+            viewController: self,
+            title: "提示".localized,
+            message: text.localized,
+            actionTitle: "确定".localized
+        ) { (alertAction) in
             self.didBackClick()
         }
+    }
+    func fixImageOrientation(_ image: UIImage) -> UIImage {
+        var image = image
+        if image.imageOrientation != .up,
+           let nImage = image.normalizedImage() {
+            image = nImage
+        }
+        return image
     }
     func filterHDImageHandler(image: UIImage) {
         if config.fixedCropState {

@@ -15,15 +15,11 @@ import Kingfisher
 #endif
 
 extension UIImage {
-    var width : CGFloat {
-        get {
-            return size.width
-        }
+    var width: CGFloat {
+        size.width
     }
-    var height : CGFloat {
-        get {
-            return size.height
-        }
+    var height: CGFloat {
+        size.height
     }
     
     class func image(for named: String?) -> UIImage? {
@@ -31,7 +27,7 @@ extension UIImage {
             return nil
         }
         let bundle = PhotoManager.shared.bundle
-        var image : UIImage?
+        var image: UIImage?
         if bundle != nil {
             var path = bundle?.path(forResource: "images", ofType: nil)
             if path != nil {
@@ -47,16 +43,17 @@ extension UIImage {
     
     func scaleSuitableSize() -> UIImage? {
         var imageSize = self.size
-        while (imageSize.width * imageSize.height > 3 * 1000 * 1000) {
+        while imageSize.width * imageSize.height > 3 * 1000 * 1000 {
             imageSize.width *= 0.5
             imageSize.height *= 0.5
         }
         return self.scaleToFillSize(size: imageSize)
     }
-    func scaleToFillSize(size: CGSize, equalRatio: Bool = false) -> UIImage? {
+    func scaleToFillSize(size: CGSize, equalRatio: Bool = false, scale: CGFloat = 0) -> UIImage? {
         if __CGSizeEqualToSize(self.size, size) {
             return self
         }
+        let scale = scale == 0 ? self.scale : scale
         let rect: CGRect
         if size.width / size.height != width / height && equalRatio {
             let scale = size.width / width
@@ -66,11 +63,16 @@ extension UIImage {
                 scaleWidth = size.height / scaleHeight * size.width
                 scaleHeight = size.height
             }
-            rect = CGRect(x: -(scaleWidth - size.height) * 0.5, y: -(scaleHeight - size.height) * 0.5, width: scaleWidth, height: scaleHeight)
+            rect = CGRect(
+                x: -(scaleWidth - size.height) * 0.5,
+                y: -(scaleHeight - size.height) * 0.5,
+                width: scaleWidth,
+                height: scaleHeight
+            )
         }else {
             rect = CGRect(origin: .zero, size: size)
         }
-        UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
         self.draw(in: rect)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -80,7 +82,11 @@ extension UIImage {
         if toScale == 1 {
             return self
         }
-        UIGraphicsBeginImageContextWithOptions(CGSize(width: width * toScale, height: height * toScale), false, self.scale)
+        UIGraphicsBeginImageContextWithOptions(
+            CGSize(width: width * toScale, height: height * toScale),
+            false,
+            self.scale
+        )
         self.draw(in: CGRect(x: 0, y: 0, width: width * toScale, height: height * toScale))
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -138,13 +144,15 @@ extension UIImage {
                                  size.height / viewHeight)
 
         // Scale cropRect to handle images larger than shown-on-screen size
-        let cropZone = CGRect(x:cropRect.origin.x * imageViewScale,
-                              y:cropRect.origin.y * imageViewScale,
-                              width:cropRect.size.width * imageViewScale,
-                              height:cropRect.size.height * imageViewScale)
+        let cropZone = CGRect(
+            x: cropRect.origin.x * imageViewScale,
+            y: cropRect.origin.y * imageViewScale,
+            width: cropRect.size.width * imageViewScale,
+            height: cropRect.size.height * imageViewScale
+        )
 
         // Perform cropping in Core Graphics
-        guard let cutImageRef: CGImage = cgImage?.cropping(to:cropZone)
+        guard let cutImageRef: CGImage = cgImage?.cropping(to: cropZone)
         else {
             return nil
         }
@@ -249,7 +257,7 @@ extension UIImage {
         }
         return self
     }
-    func animateImageFrame() -> ([UIImage], [Double], Double)? {
+    func animateCGImageFrame() -> ([CGImage], [Double], Double)? { // swiftlint:disable:this large_tuple
         #if canImport(Kingfisher)
         if let imageData = kf.gifRepresentation() {
 //            let info: [String: Any] = [
@@ -261,7 +269,7 @@ extension UIImage {
             }
             let frameCount = CGImageSourceGetCount(imageSource)
             
-            var images = [UIImage]()
+            var images = [CGImage]()
             var delays = [Double]()
             var gifDuration = 0.0
             
@@ -278,14 +286,27 @@ extension UIImage {
                     delay = PhotoTools.getFrameDuration(from: imageSource, at: i)
                     gifDuration += delay
                 }
-                let image = UIImage.init(cgImage: imageRef, scale: 1, orientation: .up)
-                images.append(image)
+                images.append(imageRef)
                 delays.append(delay)
             }
             return (images, delays, gifDuration)
         }
         #endif
         return nil
+    }
+    func animateImageFrame() -> ([UIImage], [Double], Double)? { // swiftlint:disable:this large_tuple
+        guard let data = animateCGImageFrame() else { return nil }
+        
+        let cgImages = data.0
+        let delays = data.1
+        let gifDuration = data.2
+        
+        var images: [UIImage] = []
+        for imageRef in cgImages {
+            let image = UIImage.init(cgImage: imageRef, scale: 1, orientation: .up)
+            images.append(image)
+        }
+        return (images, delays, gifDuration)
     }
     func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
         if images.isEmpty {
@@ -315,5 +336,14 @@ extension UIImage {
         let mergeImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return mergeImage
+    }
+    class func gradualShadowImage(_ havingSize: CGSize) -> UIImage? {
+        let layer = PhotoTools.getGradientShadowLayer(true)
+        layer.frame = CGRect(origin: .zero, size: havingSize)
+        UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen.main.scale)
+        layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
     }
 }

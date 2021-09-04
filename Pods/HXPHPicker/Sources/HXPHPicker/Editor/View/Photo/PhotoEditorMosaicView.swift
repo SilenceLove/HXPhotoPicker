@@ -73,7 +73,10 @@ class PhotoEditorMosaicView: UIView, UIGestureRecognizerDelegate {
     var smearAngles: [CGFloat] = []
     var smearColors: [UIColor] = []
     
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
         if otherGestureRecognizer.isKind(of: UITapGestureRecognizer.self) &&
             otherGestureRecognizer.view is PhotoEditorView {
             return true
@@ -116,8 +119,24 @@ class PhotoEditorMosaicView: UIView, UIGestureRecognizerDelegate {
                 }
             }else if type == .smear {
                 let image = "hx_editor_mosaic_brush_image".image?.withRenderingMode(.alwaysTemplate)
-                let pointXArray = [point.x - 4, point.x + 4, point.x - 3, point.x + 3, point.x - 2, point.x + 2, point.x]
-                let pointYArray = [point.y - 4, point.y + 4, point.y - 3, point.y + 3, point.y - 2, point.y + 2, point.y]
+                let pointXArray = [
+                    point.x - 4,
+                    point.x + 4,
+                    point.x - 3,
+                    point.x + 3,
+                    point.x - 2,
+                    point.x + 2,
+                    point.x
+                ]
+                let pointYArray = [
+                    point.y - 4,
+                    point.y + 4,
+                    point.y - 3,
+                    point.y + 3,
+                    point.y - 2,
+                    point.y + 2,
+                    point.y
+                ]
                 let pointX = pointXArray[Int(arc4random() % 6)]
                 let pointY = pointYArray[Int(arc4random() % 6)]
                 let newPoint = CGPoint(x: pointX, y: pointY)
@@ -127,7 +146,13 @@ class PhotoEditorMosaicView: UIView, UIGestureRecognizerDelegate {
                 }
                 var angle: CGFloat = 0
                 if let startPoint = mosaicPoints.last {
-                    angle = getAngleBetweenPoint(startPoint: CGPoint(x: startPoint.x * width, y: startPoint.y * height), endPoint: newPoint)
+                    angle = getAngleBetweenPoint(
+                        startPoint: CGPoint(
+                            x: startPoint.x * width,
+                            y: startPoint.y * height
+                        ),
+                        endPoint: newPoint
+                    )
                 }
                 let imageWidth = imageWidth / scale
                 if let colorLayer = createSmearLayer(at: newPoint, image: image, imageWidth: imageWidth, angle: angle) {
@@ -172,12 +197,23 @@ class PhotoEditorMosaicView: UIView, UIGestureRecognizerDelegate {
             break
         }
     }
-    func createSmearLayer(at point: CGPoint, image: UIImage?, imageWidth: CGFloat, angle: CGFloat, smearColor: UIColor? = nil) -> PhotoEditorMosaicSmearLayer? {
+    func createSmearLayer(
+        at point: CGPoint,
+        image: UIImage?,
+        imageWidth: CGFloat,
+        angle: CGFloat,
+        smearColor: UIColor? = nil
+    ) -> PhotoEditorMosaicSmearLayer? {
         guard let colorImage = image else {
             return nil
         }
         let imageHeight = colorImage.height * (imageWidth / colorImage.width)
-        let rect = CGRect(x: point.x - imageWidth * 0.5, y: point.y - imageHeight * 0.5, width: imageWidth, height: imageHeight)
+        let rect = CGRect(
+            x: point.x - imageWidth * 0.5,
+            y: point.y - imageHeight * 0.5,
+            width: imageWidth,
+            height: imageHeight
+        )
         var color = smearColor
         if color == nil {
             color = delegate?.mosaicView(self, splashColor: point)
@@ -204,7 +240,7 @@ class PhotoEditorMosaicView: UIView, UIGestureRecognizerDelegate {
         let c = abs(p3.x - p2.x)
         let d = abs(p3.y - p2.y)
         
-        if (a < 1.0 && b < 1.0) || (c < 1.0 && d < 1.0){
+        if (a < 1.0 && b < 1.0) || (c < 1.0 && d < 1.0) {
             return 0
         }
         let e = a * c + b * d
@@ -361,7 +397,9 @@ class PhotoEditorMosaicSmearLayer: CALayer {
     }
     override func draw(in ctx: CGContext) {
         ctx.saveGState()
-        if let image = "hx_editor_mosaic_brush_image".image?.withRenderingMode(.alwaysTemplate), let cgImage = image.cgImage {
+        if let image = "hx_editor_mosaic_brush_image".image?.withRenderingMode(
+            .alwaysTemplate
+        ), let cgImage = image.cgImage {
             let colorRef = CGColorSpaceCreateDeviceRGB()
             let contextRef = CGContext(data: nil,
                                        width: Int(image.width),

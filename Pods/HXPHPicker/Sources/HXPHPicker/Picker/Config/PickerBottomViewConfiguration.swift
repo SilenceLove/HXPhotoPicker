@@ -42,7 +42,7 @@ public class PickerBottomViewConfiguration {
     public var previewButtonDisableTitleDarkColor: UIColor?
     
     /// 隐藏原图按钮
-    public var originalButtonHidden : Bool = false
+    public var originalButtonHidden: Bool = false
     
     /// 原图按钮标题颜色
     public lazy var originalButtonTitleColor: UIColor = .systemTintColor
@@ -54,10 +54,10 @@ public class PickerBottomViewConfiguration {
     public var showOriginalFileSize: Bool = true
     
     /// 原图加载菊花类型
-    public var originalLoadingStyle : UIActivityIndicatorView.Style = .gray
+    public var originalLoadingStyle: UIActivityIndicatorView.Style = .gray
     
     /// 暗黑风格下原图加载菊花类型
-    public var originalLoadingDarkStyle : UIActivityIndicatorView.Style = .white
+    public var originalLoadingDarkStyle: UIActivityIndicatorView.Style = .white
     
     /// 原图按钮选择框相关配置
     public lazy var originalSelectBox: SelectBoxConfiguration = {

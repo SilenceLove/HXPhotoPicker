@@ -52,17 +52,32 @@ class AlbumTitleView: UIControl {
    }
    
    private lazy var titleLb: UILabel = {
-       let text = "相册".localized
-    let font = UIFont.semiboldPingFang(ofSize: 18)
-       let titleLb = UILabel.init(frame: CGRect(x: 10, y: 0, width: text.width(ofFont: font, maxHeight: height), height: height))
-       titleLb.text = text
-       titleLb.font = font
-       titleLb.textAlignment = .center
-       return titleLb
+        let text = "相册".localized
+        let font = UIFont.semiboldPingFang(ofSize: 18)
+        let titleLb = UILabel(
+            frame: CGRect(
+                x: 10,
+                y: 0,
+                width: text.width(ofFont: font, maxHeight: height),
+                height: height
+            )
+        )
+        titleLb.text = text
+        titleLb.font = font
+        titleLb.textAlignment = .center
+        return titleLb
    }()
    
-   lazy var arrowView: AlbumTitleArrowView = {
-       let arrowView = AlbumTitleArrowView.init(frame: CGRect(x: titleLb.frame.maxX + 5, y: 0, width: 20, height: 20), config: self.config)
+   lazy var arrowView: ArrowView = {
+       let arrowView = ArrowView(
+        frame: CGRect(
+            x: titleLb.frame.maxX + 5,
+            y: 0,
+            width: 20,
+            height: 20
+        ),
+        config: self.config.arrow
+       )
        
        return arrowView
    }()

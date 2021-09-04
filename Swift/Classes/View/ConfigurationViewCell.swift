@@ -83,24 +83,33 @@ class ConfigurationViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        titleLabel.x = 20
-        let titleLbWidth = titleLabel.text!.width(ofFont: titleLabel.font, maxHeight: CGFloat(MAXFLOAT))
-        titleLabel.width = titleLbWidth > width - 50 ? width - 50 : titleLbWidth
-        titleLabel.height = titleLabel.text!.height(ofFont: titleLabel.font, maxWidth: titleLabel.width)
-        titleLabel.y = height * 0.5 - 2 - titleLabel.height
+        titleLabel.hx.x = 20
+        let titleLbWidth = titleLabel.text!.hx.width(ofFont: titleLabel.font, maxHeight: CGFloat(MAXFLOAT))
+        titleLabel.hx.width = titleLbWidth > hx.width - 50 ? hx.width - 50 : titleLbWidth
+        titleLabel.hx.height = titleLabel.text!.hx.height(ofFont: titleLabel.font, maxWidth: titleLabel.hx.width)
+        titleLabel.hx.y = hx.height * 0.5 - 2 - titleLabel.hx.height
         
-        tagsButton.x = 16
-        tagsButton.width = tagsButton.titleLabel!.text!.width(ofFont: tagsButton.titleLabel!.font, maxHeight: CGFloat(MAXFLOAT)) + 8
-        tagsButton.height = tagsButton.titleLabel!.text!.height(ofFont: tagsButton.titleLabel!.font, maxWidth: CGFloat(MAXFLOAT)) + 4
-        tagsButton.y = height * 0.5 + 2
+        tagsButton.hx.x = 16
+        tagsButton.hx.width = tagsButton.titleLabel!.text!.hx.width(
+            ofFont: tagsButton.titleLabel!.font,
+            maxHeight: CGFloat(MAXFLOAT)
+        ) + 8
+        tagsButton.hx.height = tagsButton.titleLabel!.text!.hx.height(
+            ofFont: tagsButton.titleLabel!.font,
+            maxWidth: CGFloat(MAXFLOAT)
+        ) + 4
+        tagsButton.hx.y = hx.height * 0.5 + 2
         
-        contentLabel.width = contentLabel.text!.width(ofFont: contentLabel.font, maxHeight: CGFloat(MAXFLOAT))
-        contentLabel.height = contentLabel.text!.height(ofFont: contentLabel.font, maxWidth: contentLabel.width)
-        contentLabel.centerY = height * 0.5
-        contentLabel.x = width - 20 - contentLabel.width
+        contentLabel.hx.width = contentLabel.text!.hx.width(ofFont: contentLabel.font, maxHeight: CGFloat(MAXFLOAT))
+        contentLabel.hx.height = contentLabel.text!.hx.height(
+            ofFont: contentLabel.font,
+            maxWidth: contentLabel.hx.width
+        )
+        contentLabel.hx.centerY = hx.height * 0.5
+        contentLabel.hx.x = hx.width - 20 - contentLabel.hx.width
         
-        colorView.centerY = height * 0.5
-        colorView.x = width - 10 - colorView.width
+        colorView.hx.centerY = hx.height * 0.5
+        colorView.hx.x = hx.width - 10 - colorView.hx.width
     }
     
     public func setupData(_ rowType: ConfigRowTypeRule, _ content: String) {
@@ -117,4 +126,3 @@ class ConfigurationViewCell: UITableViewCell {
         contentLabel.isHidden = true
     }
 }
-

@@ -7,36 +7,18 @@
 
 import UIKit
 import HXPHPicker
+import CoreLocation
 
 class HomeViewController: UITableViewController {
     
-    var reachability: Reachability?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Photo Kit"
-        reachability = try? .init()
-        reachability?.whenReachable = { reachability in
-            if reachability.connection != .unavailable {
-                print("网络连接：可用")
-                if reachability.connection == .wifi {
-                    print("连接类型：WiFi")
-                } else {
-                    print("连接类型：移动网络")
-                }
-            } else {
-                print("网络连接：不可用")
-            }
-        }
-        do{
-            try reachability?.startNotifier()
-        }catch {
-            print("could not start reachability notifier")
-        }
+        navigationItem.title = "Photo Picker"
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
     }
+    
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -58,7 +40,16 @@ class HomeViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
-        if let rowType = rowType as? ApplicationRowType  {
+        if let rowType = rowType as? HomeRowType {
+            if rowType == .camera {
+                let camerController = rowType.controller as! CameraController
+                camerController.autoDismiss = false
+                camerController.cameraDelegate = self
+                present(camerController, animated: true, completion: nil)
+                return
+            }
+        }
+        if let rowType = rowType as? ApplicationRowType {
             if rowType == .customCell {
                 let vc = rowType.controller as! PhotoPickerController
                 vc.pickerDelegate = self
@@ -101,6 +92,7 @@ extension HomeViewController {
     enum HomeRowType: CaseIterable, HomeRowTypeRule {
         case picker
         case editor
+        case camera
         
         var title: String {
             switch self {
@@ -108,6 +100,8 @@ extension HomeViewController {
                 return "Picker"
             case .editor:
                 return "Editor"
+            case .camera:
+                return "Camera"
             }
         }
         
@@ -125,6 +119,8 @@ extension HomeViewController {
                 } else {
                     return EditorConfigurationViewController(style: .grouped)
                 }
+            case .camera:
+                return CameraController(config: .init(), type: .all)
             }
         }
     }
@@ -133,7 +129,9 @@ extension HomeViewController {
         case preselectAsset
         case collectionView
         case customCell
+        case weChat
         case weChatMoment
+        case photoBrowser
         
         var title: String {
             switch self {
@@ -145,8 +143,12 @@ extension HomeViewController {
                 return "Picker+UICollectionView"
             case .customCell:
                 return "Picker+CustomCell"
+            case .weChat:
+                return "WeChat"
             case .weChatMoment:
                 return "WeChat-Moment"
+            case .photoBrowser:
+                return "Photo Browser"
             }
         }
         
@@ -178,13 +180,16 @@ extension HomeViewController {
                 )
                 pickerController.autoDismiss = false
                 return pickerController
+            case .weChat:
+                return WeChatViewController()
             case .weChatMoment:
                 return WeChatMometViewController()
+            case .photoBrowser:
+                return PhotoBrowserViewController()
             }
         }
     }
 }
-
 
 extension HomeViewController: PhotoPickerControllerDelegate {
     func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
@@ -204,5 +209,24 @@ extension UITableViewCell {
     
     static var reuseIdentifier: String {
         return String(describing: Self.self)
+    }
+}
+extension HomeViewController: CameraControllerDelegate {
+    func cameraController(
+        _ cameraController: CameraController,
+        didFinishWithResult result: CameraController.Result,
+        location: CLLocation?) {
+        cameraController.dismiss(animated: true) {
+            let photoAsset: PhotoAsset
+            switch result {
+            case .image(let image):
+                photoAsset = PhotoAsset(localImageAsset: .init(image: image))
+            case .video(let videoURL):
+                photoAsset = PhotoAsset(localVideoAsset: .init(videoURL: videoURL))
+            }
+            let pickerResultVC = PickerResultViewController.init()
+            pickerResultVC.selectedAssets = [photoAsset]
+            self.navigationController?.pushViewController(pickerResultVC, animated: true)
+        }
     }
 }

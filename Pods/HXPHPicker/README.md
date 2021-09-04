@@ -1,4 +1,5 @@
-# HXPHPicker
+<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/hxphpickerpreview.png">
+
 <p align="left">
 <a href="https://github.com/SilenceLove/HXPHPicker"><img src="https://badgen.net/badge/icon/iOS%2010.0%2B?color=cyan&icon=apple&label"></a>
 <a href="https://github.com/SilenceLove/HXPHPicker"><img src="http://img.shields.io/cocoapods/v/HXPHPicker.svg?logo=cocoapods&logoColor=ffffff"></a>
@@ -34,7 +35,9 @@
     - [x] 马赛克
     - [x] 滤镜
 - [x] 编辑视频（支持网络资源）
-    - [x] 配乐
+    - [x] 贴纸（支持GIF）
+    - [x] 文字
+    - [x] 配乐（支持歌词字幕）
     - [x] 裁剪
 - [x] 相册展现方式
     - [x] 单独列表
@@ -56,8 +59,8 @@
 ## <a id="要求"></a> 要求
 
 - iOS 10.0+
-- Xcode 12.0+
-- Swift 5.3+
+- Xcode 12.5+
+- Swift 5.4+
 
 ## 安装
 
@@ -67,7 +70,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.1.6"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.2.1"))
 ]
 ```
 
@@ -95,13 +98,13 @@ github "SilenceLove/HXPHPicker"
 
 按需在你的 Info.plist 中添加以下键值:
 
-| Key | 备注 |
-| ----- | ---- |
-| NSPhotoLibraryUsageDescription | 允许访问相册 |
-| NSPhotoLibraryAddUsageDescription | 允许保存图片至相册 |
-| PHPhotoLibraryPreventAutomaticLimitedAccessAlert | 设置为 `YES` iOS 14+ 以禁用自动弹出添加更多照片的弹框(已适配 Limited 功能，可由用户主动触发，提升用户体验)|
-| NSCameraUsageDescription | 允许使用相机 |
-| NSMicrophoneUsageDescription | 允许使用麦克风 |
+| Key | 模块 | 备注 |
+| ----- | ----  | ---- |
+| NSPhotoLibraryUsageDescription | Picker | 允许访问相册 |
+| NSPhotoLibraryAddUsageDescription | Picker | 允许保存图片至相册 |
+| PHPhotoLibraryPreventAutomaticLimitedAccessAlert | Picker | 设置为 `YES` iOS 14+ 以禁用自动弹出添加更多照片的弹框(Picker 已适配 Limited 功能，可由用户主动触发，提升用户体验)|
+| NSCameraUsageDescription | Camera | 允许使用相机 |
+| NSMicrophoneUsageDescription | Camera | 允许使用麦克风 |
 
 ### 快速上手
 ```swift
@@ -155,10 +158,11 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
-| [v1.1.6](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#116) | 2021-08-02 | 12.5.1 | 5.3 | 10.0+ |
-| [v1.1.5](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#115) | 2021-07-28 | 12.5.1 | 5.3 | 10.0+ |
-| [v1.1.4](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#114) | 2021-07-16 | 12.5.1 | 5.3 | 10.0+ |
-| [v1.1.3](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#113) | 2021-07-14 | 12.5.1 | 5.3 | 10.0+ |
+| [v1.2.1](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#121) | 2021-09-04 | 12.5.1 | 5.4.2 | 10.0+ |
+| [v1.1.9](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#119) | 2021-08-16 | 12.5.1 | 5.4.2 | 10.0+ |
+| [v1.1.7](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#117) | 2021-08-06 | 12.5.1 | 5.4.2 | 10.0+ |
+| [v1.1.6](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#116) | 2021-08-02 | 12.5.1 | 5.4.2 | 10.0+ |
+| [v1.1.5](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#115) | 2021-07-28 | 12.5.1 | 5.4.2 | 10.0+ |
 
 ## 版权协议
 

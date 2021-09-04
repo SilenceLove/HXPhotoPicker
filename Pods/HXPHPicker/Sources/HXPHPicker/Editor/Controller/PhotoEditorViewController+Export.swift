@@ -24,7 +24,12 @@ extension PhotoEditorViewController {
                     self.didBackClick()
                 }else {
                     ProgressHUD.hide(forView: self.view, animated: true)
-                    ProgressHUD.showWarning(addedTo: self.view, text: "图片获取失败!".localized, animated: true, delayHide: 1.5)
+                    ProgressHUD.showWarning(
+                        addedTo: self.view,
+                        text: "图片获取失败!".localized,
+                        animated: true,
+                        delayHide: 1.5
+                    )
                 }
             }
         }else {

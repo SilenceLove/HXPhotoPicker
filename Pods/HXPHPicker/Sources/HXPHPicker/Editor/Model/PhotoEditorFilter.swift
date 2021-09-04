@@ -27,9 +27,11 @@ public struct PhotoEditorFilterInfo {
     /// 滤镜处理器，内部会传入未添加滤镜的图片，返回添加滤镜之后的图片
     public let filterHandler: PhotoEditorFilterHandler
     
-    public init(filterName: String,
-                defaultValue: Float,
-                filterHandler: @escaping PhotoEditorFilterHandler) {
+    public init(
+        filterName: String,
+        defaultValue: Float = -1,
+        filterHandler: @escaping PhotoEditorFilterHandler
+    ) {
         self.filterName = filterName
         self.defaultValue = defaultValue
         self.filterHandler = filterHandler
@@ -41,8 +43,10 @@ class PhotoEditorFilter: Equatable, Codable {
     let filterName: String
     let defaultValue: Float
     
-    init(filterName: String,
-         defaultValue: Float) {
+    init(
+        filterName: String,
+        defaultValue: Float
+    ) {
         self.filterName = filterName
         self.defaultValue = defaultValue
     }
@@ -51,7 +55,10 @@ class PhotoEditorFilter: Equatable, Codable {
     var isSelected: Bool = false
     var sourceIndex: Int = 0
     
-    static func == (lhs: PhotoEditorFilter, rhs: PhotoEditorFilter) -> Bool {
+    static func == (
+        lhs: PhotoEditorFilter,
+        rhs: PhotoEditorFilter
+    ) -> Bool {
         lhs === rhs
     }
 }

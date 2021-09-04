@@ -50,7 +50,16 @@ class ProgressImageView: UIView {
     }
     func drawCircle() {
         let circlePath = UIBezierPath.init()
-        circlePath.addArc(withCenter: CGPoint(x: width * 0.5, y: height * 0.5), radius: width * 0.5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        circlePath.addArc(
+            withCenter: CGPoint(
+                x: width * 0.5,
+                y: height * 0.5
+            ),
+            radius: width * 0.5,
+            startAngle: 0,
+            endAngle: 2 * .pi,
+            clockwise: true
+        )
         circleLayer.path = circlePath.cgPath
         circleLayer.lineWidth = 1.5
         circleLayer.strokeColor = UIColor.white.cgColor
@@ -79,7 +88,16 @@ class ProgressImageView: UIView {
 //        lineLayer.add(lineAimation, forKey: "")
         
         let pointPath = UIBezierPath.init()
-        pointPath.addArc(withCenter: CGPoint(x: width * 0.5, y: height - 15), radius: 1, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        pointPath.addArc(
+            withCenter: CGPoint(
+                x: width * 0.5,
+                y: height - 15
+            ),
+            radius: 1,
+            startAngle: 0,
+            endAngle: 2 * .pi,
+            clockwise: true
+        )
         pointLayer.path = pointPath.cgPath
         pointLayer.lineWidth = 1
         pointLayer.strokeColor = UIColor.white.cgColor
@@ -105,7 +123,6 @@ class ProgressImageView: UIView {
     private func scale(_ numerator: CGFloat) -> CGFloat {
         return numerator / 30 * height
     }
-    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

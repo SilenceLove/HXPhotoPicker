@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol AlbumViewDelegate: NSObjectProtocol {
+protocol AlbumViewDelegate: AnyObject {
     func albumView(_ albumView: AlbumView, didSelectRowAt assetCollection: PhotoAssetCollection)
 }
 
@@ -16,13 +16,13 @@ class AlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     
     weak var delegate: AlbumViewDelegate?
     
-    lazy var tableView : UITableView = {
+    lazy var tableView: UITableView = {
         let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
         if AssetManager.authorizationStatusIsLimited() {
             tableView.tableHeaderView = promptLb
         }
-        tableView.dataSource = self;
-        tableView.delegate = self;
+        tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorStyle = .none
         if let customCellClass = config.customCellClass {
             tableView.register(customCellClass, forCellReuseIdentifier: "AlbumViewCellID")

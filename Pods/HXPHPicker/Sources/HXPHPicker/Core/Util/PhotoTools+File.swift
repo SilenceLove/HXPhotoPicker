@@ -35,7 +35,7 @@ extension PhotoTools {
         var folderSize = 0
         childFiles?.forEach({ (fileName) in
             let fileAbsolutePath = path + "/" + fileName
-            folderSize = folderSize + fileSize(atPath: fileAbsolutePath)
+            folderSize += fileSize(atPath: fileAbsolutePath)
         })
         return folderSize
     }
@@ -43,6 +43,13 @@ extension PhotoTools {
     /// 获取系统缓存文件夹路径
     public class func getSystemCacheFolderPath() -> String {
         return NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last!
+    }
+    
+    /// 获取图片缓存文件夹路径
+    public class func getImageCacheFolderPath() -> String {
+        var cachePath = getSystemCacheFolderPath()
+        cachePath.append(contentsOf: "/com.silence.HXPHPicker/imageCache")
+        return cachePath
     }
     
     /// 获取视频缓存文件夹路径
@@ -93,7 +100,7 @@ extension PhotoTools {
                 try fileManager.createDirectory(atPath: cachePath, withIntermediateDirectories: true, attributes: nil)
             } catch {}
         }
-        cachePath.append(contentsOf: "/" + key.md5() + ".mp4")
+        cachePath.append(contentsOf: "/" + key.md5 + ".mp4")
         return URL.init(fileURLWithPath: cachePath)
     }
     
@@ -104,7 +111,7 @@ extension PhotoTools {
         if !fileManager.fileExists(atPath: cachePath) {
             try? fileManager.createDirectory(atPath: cachePath, withIntermediateDirectories: true, attributes: nil)
         }
-        cachePath.append(contentsOf: "/" + key.md5() + ".mp3")
+        cachePath.append(contentsOf: "/" + key.md5 + ".mp3")
         return URL.init(fileURLWithPath: cachePath)
     }
     
@@ -165,7 +172,9 @@ extension PhotoTools {
     }
     
     @discardableResult
-    class func write(toFile fileURL:URL? = nil, image: UIImage?) -> URL? {
+    class func write(
+        toFile fileURL: URL? = nil,
+        image: UIImage?) -> URL? {
         if let imageData = getImageData(for: image) {
             return write(toFile: fileURL, imageData: imageData)
         }
@@ -173,7 +182,9 @@ extension PhotoTools {
     }
     
     @discardableResult
-    class func write(toFile fileURL:URL? = nil, imageData: Data) -> URL? {
+    class func write(
+        toFile fileURL: URL? = nil,
+        imageData: Data) -> URL? {
         let imageURL = fileURL == nil ? getImageTmpURL(imageData.isGif ? .gif : .jpg) : fileURL!
         do {
             if FileManager.default.fileExists(atPath: imageURL.path) {

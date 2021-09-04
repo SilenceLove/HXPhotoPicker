@@ -15,14 +15,14 @@ public enum PhotoError: LocalizedError {
         case exportFailed
     }
     
-    case error(type: Type , message: String)
+    case error(type: Type, message: String)
 }
 
 public extension PhotoError {
      var errorDescription: String? {
         switch self {
         case let .error(_, message):
-                return message
+            return message
         }
     }
 }
@@ -34,6 +34,8 @@ public enum AssetError: Error {
     case exportFailed(Error?)
     /// 无效的 Data
     case invalidData
+    /// 无效的编辑数据
+    case invalidEditedData
     /// phAsset为空
     case invalidPHAsset
     /// 网络地址为空
@@ -42,12 +44,12 @@ public enum AssetError: Error {
     case localURLIsEmpty
     /// 类型错误，例：本来是 .photo 却去获取 videoURL
     case typeError
-    /// 从系统相册获取数据失败, [AnyHashable : Any]?: 系统获取失败的信息
-    case requestFailed([AnyHashable : Any]?)
+    /// 从系统相册获取数据失败, [AnyHashable: Any]?: 系统获取失败的信息
+    case requestFailed([AnyHashable: Any]?)
     /// 需要同步ICloud上的资源
     case needSyncICloud
     /// 同步ICloud失败
-    case syncICloudFailed([AnyHashable : Any]?)
+    case syncICloudFailed([AnyHashable: Any]?)
     /// 指定地址存在其他文件，删除已存在的文件时发生错误
     case removeFileFailed
     /// PHAssetResource 为空

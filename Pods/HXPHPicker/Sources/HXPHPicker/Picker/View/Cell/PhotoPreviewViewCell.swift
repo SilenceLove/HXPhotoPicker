@@ -11,7 +11,7 @@ import Photos
 import PhotosUI
 import ImageIO
 
-protocol PhotoPreviewViewCellDelegate: NSObjectProtocol {
+protocol PhotoPreviewViewCellDelegate: AnyObject {
     func cell(singleTap cell: PhotoPreviewViewCell)
     func cell(longPress cell: PhotoPreviewViewCell)
     func photoCell(networkImagedownloadSuccess photoCell: PhotoPreviewViewCell)
@@ -23,9 +23,9 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     weak var delegate: PhotoPreviewViewCellDelegate?
     
     var scrollContentView: PhotoPreviewContentView!
-    lazy var scrollView : UIScrollView = {
+    lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView.init()
-        scrollView.delegate = self;
+        scrollView.delegate = self
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
         scrollView.bouncesZoom = true
@@ -127,7 +127,15 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
             let maximumZoomScale = scrollView.maximumZoomScale
             let zoomWidth = width / maximumZoomScale
             let zoomHeight = height / maximumZoomScale
-            scrollView.zoom(to: CGRect(x: touchPoint.x - zoomWidth / 2, y: touchPoint.y - zoomHeight / 2, width: zoomWidth, height: zoomHeight), animated: true)
+            scrollView.zoom(
+                to: CGRect(
+                    x: touchPoint.x - zoomWidth / 2,
+                    y: touchPoint.y - zoomHeight / 2,
+                    width: zoomWidth,
+                    height: zoomHeight
+                ),
+                animated: true
+            )
         }
     }
     @objc func longPressClick(longPress: UILongPressGestureRecognizer) {
@@ -139,9 +147,14 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         return scrollContentView
     }
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        let offsetX = (scrollView.width > scrollView.contentSize.width) ? (scrollView.width - scrollView.contentSize.width) * 0.5 : 0.0;
-        let offsetY = (scrollView.height > scrollView.contentSize.height) ? (scrollView.height - scrollView.contentSize.height) * 0.5 : 0.0;
-        scrollContentView.center = CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX, y: scrollView.contentSize.height * 0.5 + offsetY);
+        let offsetX = (scrollView.width > scrollView.contentSize.width) ?
+            (scrollView.width - scrollView.contentSize.width) * 0.5 : 0.0
+        let offsetY = (scrollView.height > scrollView.contentSize.height) ?
+            (scrollView.height - scrollView.contentSize.height) * 0.5 : 0.0
+        scrollContentView.center = CGPoint(
+            x: scrollView.contentSize.width * 0.5 + offsetX,
+            y: scrollView.contentSize.height * 0.5 + offsetY
+        )
     }
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if !scrollView.isTracking && scrollView.isDecelerating {
@@ -166,6 +179,3 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
         }
     }
 }
-
-
-
