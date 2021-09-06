@@ -262,13 +262,16 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 }
 + (void)showUnusableCameraAlert:(UIViewController *)vc {
     hx_showAlert(vc, [NSBundle hx_localizedStringForKey:@"无法使用相机"], [NSBundle hx_localizedStringForKey:@"请在设置-隐私-相机中允许访问相机"], [NSBundle hx_localizedStringForKey:@"取消"], [NSBundle hx_localizedStringForKey:@"设置"] , nil, ^{
-        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-        if (@available(iOS 10.0, *)) {
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-        }else {
-            [[UIApplication sharedApplication] openURL:url];
-        }
+        [self openSetting];
     });
+}
++ (void)openSetting {
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if (@available(iOS 10.0, *)) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    }else {
+        [[UIApplication sharedApplication] openURL:url];
+    }
 }
 + (void)exportEditVideoForAVAsset:(AVAsset *)asset
                         timeRange:(CMTimeRange)timeRange

@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
 #import "HXCustomCollectionReusableView.h"
+#import "HXPhotoLimitView.h"
 
 @class
 HXPhotoViewController ,
@@ -62,6 +63,7 @@ HXCustomCameraController;
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXAlbumModel *albumModel;
 @property (strong, nonatomic) HXPhotoBottomView *bottomView;
+@property (strong, nonatomic) HXPhotoLimitView *limitView;
 - (HXPhotoViewCell *)currentPreviewCell:(HXPhotoModel *)model;
 - (BOOL)scrollToModel:(HXPhotoModel *)model;
 - (void)scrollToPoint:(HXPhotoViewCell *)cell rect:(CGRect)rect;

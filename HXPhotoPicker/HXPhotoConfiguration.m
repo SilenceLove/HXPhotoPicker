@@ -109,6 +109,11 @@
     }
     self.allowSlidingSelection = YES;
     self.livePhotoAutoPlay = YES;
+    
+    self.photoListLimitBlurStyle = UIBlurEffectStyleLight;
+    self.photoListLimitTextColor = [UIColor hx_colorWithHexStr:@"#666666"];
+    self.photoListLimitSettingColor = self.themeColor;
+    self.photoListLimitCloseColor = self.themeColor;
 }
 - (void)setLivePhotoAutoPlay:(BOOL)livePhotoAutoPlay {
     _livePhotoAutoPlay = livePhotoAutoPlay;
@@ -267,6 +272,10 @@
     self.cellSelectedTitleColor = [UIColor whiteColor];
     self.cellDarkSelectBgColor = wxColor;
     self.cellDarkSelectTitleColor = [UIColor whiteColor];
+    self.photoListLimitBlurStyle = UIBlurEffectStyleDark;
+    self.photoListLimitTextColor = [UIColor hx_colorWithHexStr:@"#999999"];
+    self.photoListLimitSettingColor = wxColor;
+    self.photoListLimitCloseColor = [UIColor whiteColor];
     self.previewSelectedBtnBgColor = wxColor;
     self.selectedTitleColor = [UIColor whiteColor];
     self.previewDarkSelectBgColor = wxColor;

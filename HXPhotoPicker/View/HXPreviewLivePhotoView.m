@@ -206,7 +206,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             imageDownloadCompletion = YES;
             if (error) {
-                [[UIApplication sharedApplication].keyWindow hx_showImageHUDText:@"下载失败!"];
+                [[UIApplication sharedApplication].keyWindow hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"下载失败，请重试！"]];
             }
             if (image) {
 #if HasSDWebImage

@@ -192,6 +192,7 @@
 		7B4E66612487AD5C00077EE1 /* HXPhotoPreviewImageViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E66232487AD5C00077EE1 /* HXPhotoPreviewImageViewCell.m */; };
 		7B5A71CC25538F010064A61B /* HXAssetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5A71CB25538F010064A61B /* HXAssetManager.m */; };
 		7B5B75BF24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5B75BE24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m */; };
+		7B5E713C26E5ACE00008DE7F /* HXPhotoLimitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5E713B26E5ACE00008DE7F /* HXPhotoLimitView.m */; };
 		7B64186124F76C67003A5723 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7B64186024F76C67003A5723 /* README.md */; };
 		7B752DE82372ADF000580F35 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE72372ADF000580F35 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7B752DEA2372ADF300580F35 /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B752DE92372ADF300580F35 /* PhotosUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -714,6 +715,8 @@
 		7B5A71CB25538F010064A61B /* HXAssetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXAssetManager.m; sourceTree = "<group>"; };
 		7B5B75BD24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoEditGraffitiColorSizeView.h; sourceTree = "<group>"; };
 		7B5B75BE24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoEditGraffitiColorSizeView.m; sourceTree = "<group>"; };
+		7B5E713A26E5ACE00008DE7F /* HXPhotoLimitView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoLimitView.h; sourceTree = "<group>"; };
+		7B5E713B26E5ACE00008DE7F /* HXPhotoLimitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPhotoLimitView.m; sourceTree = "<group>"; };
 		7B64186024F76C67003A5723 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		7B752DE72372ADF000580F35 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		7B752DE92372ADF300580F35 /* PhotosUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotosUI.framework; path = System/Library/Frameworks/PhotosUI.framework; sourceTree = SDKROOT; };
@@ -1281,6 +1284,8 @@
 				7B4E661D2487AD5B00077EE1 /* HXPreviewVideoView.m */,
 				7BAF875F24C14D5C00ACAF85 /* HXCameraBottomView.h */,
 				7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */,
+				7B5E713A26E5ACE00008DE7F /* HXPhotoLimitView.h */,
+				7B5E713B26E5ACE00008DE7F /* HXPhotoLimitView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1806,6 +1811,7 @@
 				7B4D4C4F24B858C600B03846 /* HXPhotoEditImageView.m in Sources */,
 				7B4E664D2487AD5C00077EE1 /* HXPhotoPreviewBottomView.m in Sources */,
 				7B4E665A2487AD5C00077EE1 /* HXFullScreenCameraPlayView.m in Sources */,
+				7B5E713C26E5ACE00008DE7F /* HXPhotoLimitView.m in Sources */,
 				7B08597824FA58DF00E93091 /* Demo5ViewController.m in Sources */,
 				7B4E66532487AD5C00077EE1 /* HXPhotoBottomSelectView.m in Sources */,
 				7B08596724FA58DF00E93091 /* Demo11ViewController.m in Sources */,

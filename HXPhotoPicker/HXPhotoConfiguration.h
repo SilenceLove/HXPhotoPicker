@@ -274,6 +274,15 @@ HXPhotoPreviewViewController;
 
 #pragma mark - < UI相关 >
 
+/// 限制提示视图：背景样式
+@property (assign, nonatomic) UIBlurEffectStyle photoListLimitBlurStyle;
+/// 限制提示视图：文本颜色
+@property (strong, nonatomic) UIColor *photoListLimitTextColor;
+/// 限制提示视图：设置按钮颜色
+@property (strong, nonatomic) UIColor *photoListLimitSettingColor;
+/// 限制提示视图：关闭按钮颜色
+@property (strong, nonatomic) UIColor *photoListLimitCloseColor;
+
 /// 照片列表上相机cell上的相机未预览时的图标
 @property (copy, nonatomic) NSString *photoListTakePhotoNormalImageNamed;
 

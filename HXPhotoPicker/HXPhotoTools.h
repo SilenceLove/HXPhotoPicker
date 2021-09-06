@@ -68,7 +68,7 @@
 /// 显示因未授权无法使用相机的alert
 /// @param vc 弹出的控制器
 + (void)showUnusableCameraAlert:(UIViewController * _Nullable)vc;
-
++ (void)openSetting;
 /// 导出裁剪的视频
 /// @param asset 视频AVAsset
 /// @param timeRange 裁剪时间区域
