@@ -1847,7 +1847,20 @@
                     });
                     return;
                 }
-    
+                if (orientation != UIImageOrientationUp) {
+                    UIImage *image = [[[UIImage alloc] initWithData:imageData] hx_normalizedImage];
+                    [weakSelf getImageURLWithImage:image success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                        weakSelf.imageURL = imageURL;
+                        if (success) {
+                            success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+                        }
+                    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                        if (failed) {
+                            failed(nil, weakSelf);
+                        }
+                    }];
+                    return;
+                }
                 [weakSelf getImageURLWithImageData:imageData success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
                     weakSelf.imageURL = imageURL;
                     if (success) {
