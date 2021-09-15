@@ -410,9 +410,7 @@
     NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
                                                      forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
     AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:videoURL options:opts];
-    float second = 0;
-    second = urlAsset.duration.value / urlAsset.duration.timescale;
-    return [self initWithVideoURL:videoURL videoTime:second];
+    return [self initWithVideoURL:videoURL videoTime:CMTimeGetSeconds(urlAsset.duration)];
 }
 - (instancetype)initWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
     if (self = [super init]) {

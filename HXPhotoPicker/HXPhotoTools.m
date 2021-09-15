@@ -275,10 +275,35 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 }
 + (void)exportEditVideoForAVAsset:(AVAsset *)asset
                         timeRange:(CMTimeRange)timeRange
-                       presetName:(NSString *)presetName
-                          success:(void (^)(NSURL *))success
-                           failed:(void (^)(NSError *))failed {
-    
+                        exportPreset:(HXVideoEditorExportPreset)exportPreset
+                        videoQuality:(NSInteger)videoQuality
+                        success:(void (^)(NSURL *))success
+                        failed:(void (^)(NSError *))failed {
+                            
+    NSString *presetName;
+    switch (exportPreset) {
+        case HXVideoEditorExportPresetLowQuality:
+            presetName = AVAssetExportPresetLowQuality;
+            break;
+        case HXVideoEditorExportPresetMediumQuality:
+            presetName = AVAssetExportPresetMediumQuality;
+            break;
+        case HXVideoEditorExportPresetHighQuality:
+            presetName = AVAssetExportPresetHighestQuality;
+            break;
+        case HXVideoEditorExportPresetRatio_640x480:
+            presetName = AVAssetExportPreset640x480;
+            break;
+        case HXVideoEditorExportPresetRatio_960x540:
+            presetName = AVAssetExportPreset960x540;
+            break;
+        case HXVideoEditorExportPresetRatio_1280x720:
+            presetName = AVAssetExportPreset1280x720;
+            break;
+        default:
+            presetName = AVAssetExportPresetMediumQuality;
+            break;
+    }
     NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:asset];
     if ([presets containsObject:presetName]) {
         NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
@@ -298,7 +323,10 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
             exportSession.outputFileType = [supportedTypeArray objectAtIndex:0];
         }
         exportSession.timeRange = timeRange;
-        
+        exportSession.shouldOptimizeForNetworkUse = YES;
+        if (videoQuality > 0) {
+            exportSession.fileLengthLimit = [self exportSessionFileLengthLimitWithSeconds:CMTimeGetSeconds(asset.duration) exportPreset:exportPreset videoQuality:videoQuality];
+        }
         [exportSession exportAsynchronouslyWithCompletionHandler:^{
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (exportSession.status == AVAssetExportSessionStatusCompleted) {
@@ -317,6 +345,23 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
             failed([NSError errorWithDomain:[NSString stringWithFormat:@"该设备不支持:%@",presetName] code:-111 userInfo:nil]); 
         }
     }
+}
++ (NSInteger)exportSessionFileLengthLimitWithSeconds:(CGFloat)seconds
+                                        exportPreset:(HXVideoEditorExportPreset)exportPreset
+                                        videoQuality:(NSInteger)videoQuality {
+    if (videoQuality > 0) {
+        CGFloat ratioParam = 0;
+        if (exportPreset == HXVideoEditorExportPresetRatio_640x480) {
+            ratioParam = 0.02;
+        }else if (exportPreset == HXVideoEditorExportPresetRatio_960x540) {
+            ratioParam = 0.04;
+        }else if (exportPreset == HXVideoEditorExportPresetRatio_1280x720) {
+            ratioParam = 0.08;
+        }
+        NSInteger quality = MIN(videoQuality, 10);
+        return seconds * ratioParam * quality * 1000 * 1000;
+    }
+    return 0;
 }
 + (NSString *)getBytesFromDataLength:(NSUInteger)dataLength {
     NSString *bytes;

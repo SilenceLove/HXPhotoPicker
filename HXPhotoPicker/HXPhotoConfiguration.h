@@ -171,7 +171,12 @@ HXPhotoPreviewViewController;
 
 /// 导出裁剪视频的质量
 /// iPhoneX -> AVAssetExportPresetHighestQuality
-@property (copy, nonatomic) NSString *editVideoExportPresetName;
+@property (copy, nonatomic) NSString *editVideoExportPresetName DEPRECATED_MSG_ATTRIBUTE("Invalid attribute, use editVideoExportPreset and videoQuality");
+
+/// 导出裁剪视频的分辨率 默认 HXVideoEditorExportPresetRatio_960x540
+@property (assign, nonatomic) HXVideoEditorExportPreset editVideoExportPreset;
+/// 导出裁剪视频的质量[0-10] 默认 6
+@property (assign, nonatomic) NSInteger videoQuality;
 
 /// 编辑视频时裁剪的最小秒数，如果小于1秒，则为1秒
 @property (assign, nonatomic) NSInteger minVideoClippingTime;

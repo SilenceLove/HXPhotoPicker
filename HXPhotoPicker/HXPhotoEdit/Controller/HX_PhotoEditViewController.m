@@ -121,7 +121,7 @@
 }
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     if (!self.supportRotation) {
-        return UIInterfaceOrientationMaskPortrait;
+        return self.configuration.supportedInterfaceOrientations;
     }
     if (self.configuration.supportRotation) {
         return UIInterfaceOrientationMaskAll;

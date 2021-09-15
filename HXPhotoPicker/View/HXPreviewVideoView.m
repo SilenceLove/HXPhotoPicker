@@ -183,6 +183,11 @@
 }
 - (void)pausePlayerAndShowNaviBar {
     [self.player.currentItem seekToTime:CMTimeMake(0, 1)];
+    if ([HXPhotoCommon photoCommon].videoAutoPlayType == HXVideoAutoPlayTypeOnce) {
+        self.isPlayer = NO;
+        self.playBtn.hidden = NO;
+        return;
+    }
     [self.player play];
     self.isPlayer = YES;
 }
@@ -288,7 +293,8 @@
                         self.playBtn.hidden = NO;
                     }
 #endif
-                }else if ([HXPhotoCommon photoCommon].videoAutoPlayType == HXVideoAutoPlayTypeAll) {
+                }else if ([HXPhotoCommon photoCommon].videoAutoPlayType == HXVideoAutoPlayTypeAll ||
+                          [HXPhotoCommon photoCommon].videoAutoPlayType == HXVideoAutoPlayTypeOnce) {
                     [self videoDidPlay];
                     self.playBtnDidPlay = YES;
                 }else {

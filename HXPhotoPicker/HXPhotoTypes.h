@@ -74,7 +74,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoStyle) {
 typedef NS_ENUM(NSUInteger, HXVideoAutoPlayType) {
     HXVideoAutoPlayTypeNormal = 0, //!< 不自动播放
     HXVideoAutoPlayTypeWiFi,       //!< wifi网络下自动播放
-    HXVideoAutoPlayTypeAll         //!< 蜂窝移动和wifi网络下自动播放
+    HXVideoAutoPlayTypeAll,        //!< 蜂窝移动和wifi网络下自动播放
+    HXVideoAutoPlayTypeOnce        //!< 自动播放一次
 };
 
 typedef NS_ENUM(NSUInteger, HXConfigurationType) {
@@ -129,6 +130,15 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
     HXPhotoModelFormatJPG,          //!< JPG格式
     HXPhotoModelFormatGIF,          //!< GIF格式
     HXPhotoModelFormatHEIC          //!< HEIC格式
+};
+
+typedef NS_ENUM(NSUInteger, HXVideoEditorExportPreset) {
+    HXVideoEditorExportPresetLowQuality = 0,
+    HXVideoEditorExportPresetMediumQuality,
+    HXVideoEditorExportPresetHighQuality,
+    HXVideoEditorExportPresetRatio_640x480,
+    HXVideoEditorExportPresetRatio_960x540,
+    HXVideoEditorExportPresetRatio_1280x720
 };
 
 

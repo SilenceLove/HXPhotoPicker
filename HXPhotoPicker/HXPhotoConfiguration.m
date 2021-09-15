@@ -52,12 +52,14 @@
     self.languageType = HXPhotoLanguageTypeSys;
     self.popupTableViewCellHeight = 65.f;
     if (HX_IS_IPhoneX_All) {
-        self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
+//        self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
         self.popupTableViewHeight = 450;
     }else {
-        self.editVideoExportPresetName = AVAssetExportPresetMediumQuality;
+//        self.editVideoExportPresetName = AVAssetExportPresetMediumQuality;
         self.popupTableViewHeight = 350;
     }
+    self.editVideoExportPreset = HXVideoEditorExportPresetRatio_960x540;
+    self.videoQuality = 6;
     self.popupTableViewHorizontalHeight = 250; 
     self.albumShowMode = HXPhotoAlbumShowModeDefault;
     
@@ -85,7 +87,7 @@
     self.navBarTranslucent = YES;
     self.bottomViewTranslucent = YES;
     self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
-    self.videoAutoPlayType = HXVideoAutoPlayTypeWiFi;
+    self.videoAutoPlayType = HXVideoAutoPlayTypeOnce;
     self.previewSelectedBtnBgColor = self.themeColor;
     self.changeOriginalTinColor = YES;
     self.downloadNetworkVideo = YES;

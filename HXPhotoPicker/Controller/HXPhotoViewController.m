@@ -1599,6 +1599,13 @@ HX_PhotoEditViewControllerDelegate
         cell.selectMaskLayer.hidden = YES;
         selectBtn.selected = NO;
     }else {
+        if (self.manager.shouldSelectModel) {
+            NSString *str = self.manager.shouldSelectModel(cell.model);
+            if (str) {
+                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:str]];
+                return;
+            }
+        }
         NSString *str = [self.manager maximumOfJudgment:cell.model];
         if (str) {
             if ([str isEqualToString:@"selectVideoBeyondTheLimitTimeAutoEdit"]) {

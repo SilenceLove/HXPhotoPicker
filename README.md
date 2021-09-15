@@ -716,7 +716,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
-- v3.2.2　-　iOS 14 图片选择部分，限制提示
+- v3.2.3　-　iOS 14 图片选择部分，限制提示
 - v3.2.2　-　修改静音状态下播放视频没有声音。pod导入的支持自定义HXPhotoView的itemSize，导入方式为 pod 'HXPhotoPicker/CustomItem'
 - v3.2.1　-　优化转场动画、手势返回、修复系统相册编辑过的图片获取原图大小时错误问题、国际化完善、修复获取gif的URL时为静态图的问题
 - v3.2.0　-　修复特殊情况下获取视频地址崩溃问题

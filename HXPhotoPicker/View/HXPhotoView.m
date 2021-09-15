@@ -430,7 +430,7 @@
     [self deleteModelWithIndex:index];
 }
 - (void)photoPreviewSelectLaterDidEditClick:(HXPhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
-    if (self.manager.configuration.useWxPhotoEdit) {
+    if (self.manager.configuration.useWxPhotoEdit && afterModel.subType == HXPhotoModelMediaSubTypePhoto) {
         [self.collectionView reloadData];
         [self dragCellCollectionViewCellEndMoving:self.collectionView];
         return;
