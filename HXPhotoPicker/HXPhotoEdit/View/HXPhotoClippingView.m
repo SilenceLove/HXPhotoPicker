@@ -273,52 +273,52 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     if (!_isReseting) {
         _isReseting = YES;
         self.mirrorType = HXPhotoClippingViewMirrorType_None;
+        HXWeakSelf
+        void(^animateBlock)(void) = ^{
+            HXStrongSelf
+            strongSelf.transform = CGAffineTransformIdentity;
+            strongSelf.angle = 0;
+            strongSelf.minimumZoomScale = strongSelf.first_minimumZoomScale;
+            [strongSelf setZoomScale:strongSelf.minimumZoomScale];
+            strongSelf.frame = (CGRect){CGPointZero, strongSelf.imageView.hx_size};
+            strongSelf.center = CGPointMake(strongSelf.superview.center.x-strongSelf.offsetSuperCenter.x/2, strongSelf.superview.center.y-strongSelf.offsetSuperCenter.y/2);
+            // strongSelf.saveRect = strongSelf.frame;
+            // 重设contentSize
+            strongSelf.contentSize = strongSelf.imageView.hx_size;
+            // 重置contentOffset
+            strongSelf.contentOffset = CGPointZero;
+        };
         if (CGRectEqualToRect(rect, CGRectZero)) {
             [UIView animateWithDuration:0.25
                                   delay:0.0
                                 options:UIViewAnimationOptionBeginFromCurrentState
                              animations:^{
-                                 self.transform = CGAffineTransformIdentity;
-                                 self.angle = 0;
-                                 self.minimumZoomScale = self.first_minimumZoomScale;
-                                 [self setZoomScale:self.minimumZoomScale];
-                                 self.frame = (CGRect){CGPointZero, self.imageView.hx_size};
-                                 self.center = CGPointMake(self.superview.center.x-self.offsetSuperCenter.x/2, self.superview.center.y-self.offsetSuperCenter.y/2);
-                                 self.saveRect = self.frame;
-                                 /** 重设contentSize */
-                                 self.contentSize = self.imageView.hx_size;
-                                 /** 重置contentOffset */
-                                 self.contentOffset = CGPointZero;
-                                 if ([self.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
-                                     void (^block)(CGRect) = [self.clippingDelegate clippingViewWillBeginZooming:self];
-                                     if (block) block(self.frame);
-                                 }
-                             } completion:^(BOOL finished) {
-                                 if ([self.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
-                                     [self.clippingDelegate clippingViewDidEndZooming:self];
-                                 }
-                                 self->_isReseting = NO;
-                             }];
+                HXStrongSelf
+                if (animateBlock) animateBlock();
+                strongSelf.saveRect = strongSelf.frame;
+                if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
+                    void (^block)(CGRect) = [strongSelf.clippingDelegate clippingViewWillBeginZooming:strongSelf];
+                    if (block) block(strongSelf.frame);
+                }
+            } completion:^(BOOL finished) {
+                HXStrongSelf
+                if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
+                    [strongSelf.clippingDelegate clippingViewDidEndZooming:strongSelf];
+                }
+                strongSelf->_isReseting = NO;
+            }];
         } else {
             [UIView animateWithDuration:0.25
                                   delay:0.0
                                 options:UIViewAnimationOptionBeginFromCurrentState
                              animations:^{
-                                 self.transform = CGAffineTransformIdentity;
-                                 self.angle = 0;
-                                 self.minimumZoomScale = self.first_minimumZoomScale;
-                                 [self setZoomScale:self.minimumZoomScale];
-                                 self.frame = (CGRect){CGPointZero, self.imageView.hx_size};
-                                 self.center = CGPointMake(self.superview.center.x-self.offsetSuperCenter.x/2, self.superview.center.y-self.offsetSuperCenter.y/2);
-                                 /** 重设contentSize */
-                                 self.contentSize = self.imageView.hx_size;
-                                 /** 重置contentOffset */
-                                 self.contentOffset = CGPointZero;
-                                 [self zoomInToRect:rect];
-                                 [self zoomOutToRect:rect completion:^{
-                                     self->_isReseting = NO;
-                                 }];
-                             } completion:nil];
+                HXStrongSelf
+                if (animateBlock) animateBlock();
+                [strongSelf zoomInToRect:rect];
+                [strongSelf zoomOutToRect:rect completion:^{
+                    strongSelf->_isReseting = NO;
+                }];
+            } completion:nil];
         }
     }
 }
@@ -386,28 +386,29 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
     CGFloat scale = MIN(CGRectGetWidth(self.editRect) / width, CGRectGetHeight(self.editRect) / height);
     
     /** 指定位置=当前显示位置 或者 当前缩放已达到最大，并且仍然发生缩放的情况； 免去以下计算，以当前显示大小为准 */
+    HXWeakSelf
     if (CGRectEqualToRect(HXRoundFrame(self.frame), HXRoundFrame(rect)) || (HXRound(self.zoomScale) == HXRound(self.maximumZoomScale) && HXRound(scale) > 1.f)) {
-        
         [UIView animateWithDuration:0.25
                               delay:0.0
                             options:UIViewAnimationOptionBeginFromCurrentState
                          animations:^{
-                             /** 只需要移动到中点 */
-                             self.center = CGPointMake(self.superview.center.x-self.offsetSuperCenter.x/2, self.superview.center.y-self.offsetSuperCenter.y/2);
-                             self.saveRect = self.frame;
-                             
-                             if ([self.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
-                                 void (^block)(CGRect) = [self.clippingDelegate clippingViewWillBeginZooming:self];
-                                 if (block) block(self.frame);
-                             }
-                         } completion:^(BOOL finished) {
-                             if ([self.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
-                                 [self.clippingDelegate clippingViewDidEndZooming:self];
-                             }
-                             if (completion) {
-                                 completion();
-                             }
-                         }];
+            // 只需要移动到中点
+            HXStrongSelf
+            strongSelf.center = CGPointMake(strongSelf.superview.center.x-strongSelf.offsetSuperCenter.x/2, strongSelf.superview.center.y-strongSelf.offsetSuperCenter.y/2);
+            strongSelf.saveRect = strongSelf.frame;
+            if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
+                void (^block)(CGRect) = [strongSelf.clippingDelegate clippingViewWillBeginZooming:strongSelf];
+                if (block) block(strongSelf.frame);
+            }
+        } completion:^(BOOL finished) {
+            HXStrongSelf
+            if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
+                [strongSelf.clippingDelegate clippingViewDidEndZooming:strongSelf];
+            }
+            if (completion) {
+                completion();
+            }
+        }];
         return;
     }
     
@@ -441,29 +442,30 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
                           delay:0.0
                         options:UIViewAnimationOptionBeginFromCurrentState
                      animations:^{
-                         self.frame = cropRect;
-                         self.saveRect = self.frame;
-                         [self setZoomScale:zoomScale];
-                         /** 重新调整contentSize */
-                         self.contentSize = self.imageView.hx_size;
-                         [self setContentOffset:contentOffset];
-                         
-                         /** 设置完实际大小后再次计算最小缩放系数 */
-                         [self resetMinimumZoomScale];
-                         [self setZoomScale:self.zoomScale];
-                         
-                         if ([self.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
-                             void (^block)(CGRect) = [self.clippingDelegate clippingViewWillBeginZooming:self];
-                             if (block) block(self.frame);
-                         }
-                     } completion:^(BOOL finished) {
-                         if ([self.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
-                             [self.clippingDelegate clippingViewDidEndZooming:self];
-                         }
-                         if (completion) {
-                             completion();
-                         }
-                     }];
+        HXStrongSelf
+        strongSelf.frame = cropRect;
+        strongSelf.saveRect = strongSelf.frame;
+        [strongSelf setZoomScale:zoomScale];
+        // 重新调整contentSize
+        strongSelf.contentSize = strongSelf.imageView.hx_size;
+        [strongSelf setContentOffset:contentOffset];
+        // 设置完实际大小后再次计算最小缩放系数
+        [strongSelf resetMinimumZoomScale];
+        [strongSelf setZoomScale:strongSelf.zoomScale];
+        
+        if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
+            void (^block)(CGRect) = [strongSelf.clippingDelegate clippingViewWillBeginZooming:strongSelf];
+            if (block) block(strongSelf.frame);
+        }
+    } completion:^(BOOL finished) {
+        HXStrongSelf
+        if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
+            [strongSelf.clippingDelegate clippingViewDidEndZooming:strongSelf];
+        }
+        if (completion) {
+            completion();
+        }
+    }];
 }
 
 - (void)zoomToRect:(CGRect)rect {
@@ -518,20 +520,21 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
             newAngle = 0;
         
         _angle = newAngle;
-        
+        HXWeakSelf
         [UIView animateWithDuration:0.35f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.8f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            HXStrongSelf
+            [strongSelf transformRotate:strongSelf.angle];
             
-            [self transformRotate:self.angle];
-            
-            if ([self.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
-                void (^block)(CGRect) = [self.clippingDelegate clippingViewWillBeginZooming:self];
-                if (block) block(self.frame);
+            if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewWillBeginZooming:)]) {
+                void (^block)(CGRect) = [strongSelf.clippingDelegate clippingViewWillBeginZooming:strongSelf];
+                if (block) block(strongSelf.frame);
             }
             
         } completion:^(BOOL complete) {
-            self->_isRotating = NO;
-            if ([self.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
-                [self.clippingDelegate clippingViewDidEndZooming:self];
+            HXStrongSelf
+            strongSelf->_isRotating = NO;
+            if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
+                [strongSelf.clippingDelegate clippingViewDidEndZooming:strongSelf];
             }
         }];
         
@@ -557,56 +560,59 @@ NSString *const kHXClippingViewData_zoomingView = @"HXClippingViewData_zoomingVi
             case -270:  angleInRadians = -(M_PI + M_PI_2);  break;
             default:                                        break;
         }
+        HXWeakSelf
         CGAffineTransform rotateTransform = CGAffineTransformRotate(CGAffineTransformIdentity ,angleInRadians);
         [UIView animateWithDuration:0.25 animations:^{
-            if (self.mirrorType == HXPhotoClippingViewMirrorType_None) {
+            HXStrongSelf
+            if (strongSelf.mirrorType == HXPhotoClippingViewMirrorType_None) {
                 // 没有镜像翻转
-                if (self.angle == 0) {
+                if (strongSelf.angle == 0) {
                     // 上
-                    self.transform = CGAffineTransformScale(rotateTransform ,-1.0, 1.0);
-                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
-                }else if (self.angle == -90 || self.angle == 90) {
+                    strongSelf.transform = CGAffineTransformScale(rotateTransform ,-1.0, 1.0);
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                }else if (strongSelf.angle == -90 || strongSelf.angle == 90) {
                     // 左
-                    self.transform = CGAffineTransformScale(rotateTransform ,1.0, -1.0);
-                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
-                    self.angle = 270;
-                }else if (self.angle == -180 || self.angle == 180) {
+                    strongSelf.transform = CGAffineTransformScale(rotateTransform ,1.0, -1.0);
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                    strongSelf.angle = 270;
+                }else if (strongSelf.angle == -180 || strongSelf.angle == 180) {
                     // 下
-                    self.transform = CGAffineTransformScale(rotateTransform ,-1.0, 1.0);
-                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
-                }else if (self.angle == -270 || self.angle == 270) {
+                    strongSelf.transform = CGAffineTransformScale(rotateTransform ,-1.0, 1.0);
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                }else if (strongSelf.angle == -270 || strongSelf.angle == 270) {
                     // 右
-                    self.transform = CGAffineTransformScale(CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2), -1, 1);
-                    self.angle = 90;
-                    self.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
+                    strongSelf.transform = CGAffineTransformScale(CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2), -1, 1);
+                    strongSelf.angle = 90;
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_Horizontal;
                 }
-            }else if (self.mirrorType == HXPhotoClippingViewMirrorType_Horizontal){
+            }else if (strongSelf.mirrorType == HXPhotoClippingViewMirrorType_Horizontal){
                 // 水平翻转了
-                if (self.angle == 0) {
+                if (strongSelf.angle == 0) {
                     // 上
-                    self.transform = CGAffineTransformScale(rotateTransform ,1.0, 1.0);
-                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
-                }else if (self.angle == -90 || self.angle == 90) {
+                    strongSelf.transform = CGAffineTransformScale(rotateTransform ,1.0, 1.0);
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_None;
+                }else if (strongSelf.angle == -90 || strongSelf.angle == 90) {
                     // 左
                     CGAffineTransform transfrom = CGAffineTransformRotate(CGAffineTransformIdentity, -(M_PI + M_PI_2));
-                    self.transform = transfrom;
-                    self.angle = -270;
-                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
-                }else if (self.angle == -180 || self.angle == 180) {
+                    strongSelf.transform = transfrom;
+                    strongSelf.angle = -270;
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_None;
+                }else if (strongSelf.angle == -180 || strongSelf.angle == 180) {
                     // 下
-                    self.transform = CGAffineTransformScale(rotateTransform ,1.0, 1.0);
-                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
-                }else if (self.angle == -270 || self.angle == 270) {
+                    strongSelf.transform = CGAffineTransformScale(rotateTransform ,1.0, 1.0);
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_None;
+                }else if (strongSelf.angle == -270 || strongSelf.angle == 270) {
                     // 右
-                    self.transform = CGAffineTransformScale(CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2) , 1, 1);
-                    self.angle = -90;
-                    self.mirrorType = HXPhotoClippingViewMirrorType_None;
+                    strongSelf.transform = CGAffineTransformScale(CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2) , 1, 1);
+                    strongSelf.angle = -90;
+                    strongSelf.mirrorType = HXPhotoClippingViewMirrorType_None;
                 }
             }
         } completion:^(BOOL finished) {
-            self.isMirrorFlip = NO;
-            if ([self.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
-                [self.clippingDelegate clippingViewDidEndZooming:self];
+            HXStrongSelf
+            strongSelf.isMirrorFlip = NO;
+            if ([strongSelf.clippingDelegate respondsToSelector:@selector(clippingViewDidEndZooming:)]) {
+                [strongSelf.clippingDelegate clippingViewDidEndZooming:strongSelf];
             }
         }];
     }

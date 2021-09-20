@@ -205,7 +205,6 @@
 		7B8629A8237D0F8400F8A584 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A7237D0F8400F8A584 /* libsqlite3.tbd */; };
 		7B8629AA237D0F8D00F8A584 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629A9237D0F8C00F8A584 /* EventKit.framework */; };
 		7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AB237D0F9400F8A584 /* Contacts.framework */; };
-		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
 		7B881BAD26B8E0B800CC44CC /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B881BAC26B8E0B700CC44CC /* Reachability.swift */; };
 		7B8BFB1C2585191D00510339 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */; };
 		7BAF876124C14D5C00ACAF85 /* HXCameraBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */; };
@@ -773,7 +772,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */,
 				7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */,
 				7B8629AA237D0F8D00F8A584 /* EventKit.framework in Frameworks */,
 				7B8629A8237D0F8400F8A584 /* libsqlite3.tbd in Frameworks */,
@@ -1530,7 +1528,7 @@
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 1220;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = "洪欣";
 				TargetAttributes = {
 					7B3EDEBD255E185900937B4A = {
@@ -2016,7 +2014,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Swift/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -2047,7 +2045,7 @@
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = Swift/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPHPickerExample;
@@ -2107,7 +2105,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -2161,9 +2159,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

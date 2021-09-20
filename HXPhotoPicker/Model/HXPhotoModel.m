@@ -960,7 +960,7 @@
         if (success) success(self.photoEdit.editPreviewData, self.photoEdit.editPreviewImage.imageOrientation, self, nil);
         return 0;
     }
-    HXWeakSelf
+    // HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
 #if HasSDWebImage
         [[SDWebImageManager sharedManager] loadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
