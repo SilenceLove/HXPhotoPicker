@@ -9,7 +9,7 @@
 <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
 </p>
 
-> [Swift版本(支持图片滤镜、视频添加背景音乐)](https://github.com/SilenceLove/HXPHPicker)
+> [Swift版本](https://github.com/SilenceLove/HXPHPicker)
 
 | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_4.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_1.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_2.PNG"> |
 | ------ | ------ | ------ |
@@ -65,13 +65,13 @@
 ``` ruby
 # 将以下内容添加到您的Podfile中：
 # 不使用网络图片功能
-pod 'HXPhotoPicker', '~> 3.2.3'
+pod 'HXPhotoPicker', '~> 3.2.4'
   
 # 使用SDWebImage加载网络图片
-pod 'HXPhotoPicker/SDWebImage', '~> 3.2.3'
+pod 'HXPhotoPicker/SDWebImage', '~> 3.2.4'
   
 # 使用YYWebImage加载网络图片
-pod 'HXPhotoPicker/YYWebImage', '~> 3.2.3'
+pod 'HXPhotoPicker/YYWebImage', '~> 3.2.4'
 
 # 搜索不到库或最新版时请执行
 pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
@@ -716,6 +716,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
+- v3.2.4　-　编辑视频导出压缩逻辑优化，支持设置压缩等级。修复了部分问题
 - v3.2.3　-　iOS 14 图片选择部分，限制提示
 - v3.2.2　-　修改静音状态下播放视频没有声音。pod导入的支持自定义HXPhotoView的itemSize，导入方式为 pod 'HXPhotoPicker/CustomItem'
 - v3.2.1　-　优化转场动画、手势返回、修复系统相册编辑过的图片获取原图大小时错误问题、国际化完善、修复获取gif的URL时为静态图的问题
