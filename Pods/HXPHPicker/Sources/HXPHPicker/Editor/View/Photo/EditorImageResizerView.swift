@@ -45,6 +45,7 @@ class EditorImageResizerView: UIView {
 //        print("deinit", self)
     }
     var exportScale: CGFloat = UIScreen.main.scale
+    var animationDuration: TimeInterval = 0.25
     /// 裁剪配置
     var cropConfig: PhotoCroppingConfiguration
     weak var delegate: EditorImageResizerViewDelegate?
@@ -317,7 +318,7 @@ class EditorImageResizerView: UIView {
                 // 缩放之后裁剪框对应的图片中心点要和之前的一致
                 var offsetX = controlBeforeRect.midX * zoomScale - scrollViewContentInset.left
                 var offsetY = controlBeforeRect.midY * zoomScale - scrollViewContentInset.top
-                UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
+                UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
                     self.scrollView.contentInset = scrollViewContentInset
                     self.scrollView.zoomScale = zoomScale
                     let controlAfterRect = self.maskBgView.convert(self.controlView.frame, to: self.imageView)
@@ -334,7 +335,7 @@ class EditorImageResizerView: UIView {
                 scrollView.contentInset = scrollViewContentInset
                 let offset = checkZoomOffset(scrollView.contentOffset, scrollViewContentInset)
                 if !offset.equalTo(scrollView.contentOffset) {
-                    UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
+                    UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
                         self.scrollView.contentOffset = offset
                     } completion: { (isFinished) in
                         self.changedMaskRectCompletion()

@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 
 // MARK: 相机配置类
-public class SystemCameraConfiguration {
+public struct SystemCameraConfiguration {
     
     /// 媒体类型[kUTTypeImage, kUTTypeMovie]
     public var mediaTypes: [String] = []

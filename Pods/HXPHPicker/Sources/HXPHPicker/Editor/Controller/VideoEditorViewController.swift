@@ -173,15 +173,15 @@ open class VideoEditorViewController: BaseViewController {
     
     /// 请求获取AVAsset完成
     var reqeustAssetCompletion: Bool = false
-    var needRequest: Bool = false
-    var requestType: Int = 0
+    private var needRequest: Bool = false
+    private var requestType: Int = 0
     var loadingView: ProgressHUD?
     
     var onceState: State = .normal
     var assetRequestID: PHImageRequestID?
     var didEdited: Bool = false
     var firstPlay: Bool = false
-    var firstLayoutSubviews: Bool = true
+    private var firstLayoutSubviews: Bool = true
     var videoSize: CGSize = .zero
     
     /// 不是在音乐列表选中的音乐数据（不包括搜索）
@@ -208,7 +208,9 @@ open class VideoEditorViewController: BaseViewController {
         if state != .normal {
             return
         }
-        playerView.stickerView.deselectedSticker()
+        if toolOptions.isSticker {
+            playerView.stickerView.deselectedSticker()
+        }
         if isSearchMusic {
             hideSearchMusicView()
             return
@@ -336,6 +338,7 @@ open class VideoEditorViewController: BaseViewController {
     /// 视频导出会话
     var exportSession: AVAssetExportSession?
     
+    var toolOptions: EditorToolView.Options = []
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -344,14 +347,36 @@ open class VideoEditorViewController: BaseViewController {
         initView()
     }
     func initView() {
+        for options in config.toolView.toolOptions {
+            switch options.type {
+            case .graffiti:
+                toolOptions.insert(.graffiti)
+            case .chartlet:
+                toolOptions.insert(.chartlet)
+            case .text:
+                toolOptions.insert(.text)
+            case .cropping:
+                toolOptions.insert(.cropping)
+            case .mosaic:
+                toolOptions.insert(.mosaic)
+            case .filter:
+                toolOptions.insert(.filter)
+            case .music:
+                toolOptions.insert(.music)
+            }
+        }
         view.backgroundColor = .black
         view.addSubview(scrollView)
         view.addSubview(cropView)
         view.addSubview(cropConfirmView)
         view.addSubview(toolView)
-        view.addSubview(musicView)
-        view.addSubview(searchMusicView)
-        view.addSubview(chartletView)
+        if toolOptions.contains(.music) {
+            view.addSubview(musicView)
+            view.addSubview(searchMusicView)
+        }
+        if toolOptions.isSticker {
+            view.addSubview(chartletView)
+        }
         view.layer.addSublayer(topMaskLayer)
         view.addSubview(topView)
         if needRequest {
@@ -420,8 +445,10 @@ open class VideoEditorViewController: BaseViewController {
         playerView.stickerView.removeAllSticker()
         rotateBeforeData = cropView.getRotateBeforeData()
         playerView.pause()
-        musicView.reset()
-        searchMusicView.deselect()
+        if toolOptions.contains(.music) {
+            searchMusicView.deselect()
+            musicView.reset()
+        }
         backgroundMusicPath = nil
         stopPlayTimer()
     }
@@ -437,7 +464,6 @@ open class VideoEditorViewController: BaseViewController {
             height: 50 + UIDevice.bottomMargin
         )
         toolView.reloadContentInset()
-        cropView.frame = CGRect(x: 0, y: toolView.y - 100, width: view.width, height: 100)
         topView.width = view.width
         topView.height = navigationController?.navigationBar.height ?? 44
         if let modalPresentationStyle = navigationController?.modalPresentationStyle, UIDevice.isPortrait {
@@ -448,13 +474,18 @@ open class VideoEditorViewController: BaseViewController {
             topView.y = UIDevice.generalStatusBarHeight
         }
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
+        cropView.frame = CGRect(x: 0, y: toolView.y - 100, width: view.width, height: 100)
         cropConfirmView.frame = toolView.frame
         scrollView.frame = view.bounds
-        setChartletViewFrame()
-        setMusicViewFrame()
-        setSearchMusicViewFrame()
-        if orientationDidChange {
-            searchMusicView.reloadData()
+        if toolOptions.isSticker {
+            setChartletViewFrame()
+        }
+        if toolOptions.contains(.music) {
+            setMusicViewFrame()
+            setSearchMusicViewFrame()
+            if orientationDidChange {
+                searchMusicView.reloadData()
+            }
         }
         if needRequest {
             firstLayoutSubviews = false

@@ -9,7 +9,7 @@ import UIKit
 
 extension PhotoTools {
     
-    class func focusAnimation(for view: UIView, at point: CGPoint) {
+    static func focusAnimation(for view: UIView, at point: CGPoint) {
         view.layer.removeAnimation(forKey: "focusViewAnimation")
         view.center = point
         view.transform = .identity

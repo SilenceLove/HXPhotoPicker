@@ -16,7 +16,7 @@ class PickerCamerViewCell: UICollectionViewCell {
     }()
     
     lazy var imageView: UIImageView = {
-        let imageView = UIImageView.init()
+        let imageView = UIImageView()
         return imageView
     }()
     
@@ -25,7 +25,7 @@ class PickerCamerViewCell: UICollectionViewCell {
             configProperty()
         }
     }
-    
+    var allowPreview = true
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(captureView)
@@ -36,6 +36,9 @@ class PickerCamerViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     func configProperty() {
+        if captureView.sessionCompletion {
+            return
+        }
         let isCache = PhotoManager.shared.cameraPreviewImage != nil
         if (captureView.previewLayer?.session != nil || isCache) && canPreview() {
             imageView.image = UIImage.image(for: config?.cameraDarkImageName)
@@ -48,8 +51,15 @@ class PickerCamerViewCell: UICollectionViewCell {
         }
         backgroundColor = PhotoManager.isDark ? config?.backgroundDarkColor : config?.backgroundColor
         imageView.size = imageView.image?.size ?? .zero
-        if let allowPreview = config?.allowPreview, allowPreview == true {
+        if let allowPreview = config?.allowPreview, allowPreview {
             requestCameraAccess()
+        }else {
+            imageView.image = UIImage.image(
+                for: PhotoManager.isDark ?
+                    config?.cameraDarkImageName :
+                    config?.cameraImageName
+            )
+            captureView.isHidden = true
         }
     }
     func canPreview() -> Bool {
@@ -64,9 +74,12 @@ class PickerCamerViewCell: UICollectionViewCell {
             captureView.isHidden = true
             return
         }
+        if captureView.sessionCompletion || !allowPreview {
+            return
+        }
         AssetManager.requestCameraAccess { (granted) in
             if granted {
-                self.startSeesion()
+                self.startSession()
             }else {
                 PhotoTools.showNotCameraAuthorizedAlert(
                     viewController: self.viewController()
@@ -74,7 +87,7 @@ class PickerCamerViewCell: UICollectionViewCell {
             }
         }
     }
-    func startSeesion() {
+    func startSession() {
         captureView.startSession { [weak self] isFinished in
             if isFinished {
                 self?.imageView.image = UIImage.image(
@@ -82,6 +95,9 @@ class PickerCamerViewCell: UICollectionViewCell {
                 )
             }
         }
+    }
+    func stopSession() {
+        captureView.stopSession()
     }
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -98,6 +114,6 @@ class PickerCamerViewCell: UICollectionViewCell {
         }
     }
     deinit {
-        captureView.stopSession()
+        stopSession()
     }
 }

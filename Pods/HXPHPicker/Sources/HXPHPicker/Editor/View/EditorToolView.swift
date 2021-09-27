@@ -100,6 +100,7 @@ public class EditorToolView: UIView {
         if let indexPath = currentSelectedIndexPath {
             let cell = collectionView.cellForItem(at: indexPath) as? EditorToolViewCell
             cell?.isSelectedImageView = false
+            currentSelectedIndexPath = nil
         }
     }
     
@@ -107,6 +108,7 @@ public class EditorToolView: UIView {
         deselected()
         let cell = collectionView.cellForItem(at: indexPath) as? EditorToolViewCell
         cell?.isSelectedImageView = true
+        currentSelectedIndexPath = indexPath
     }
     
     func reloadMusic(isSelected: Bool) {
@@ -200,10 +202,8 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate, 
             if let selectedIndexPath = currentSelectedIndexPath,
                selectedIndexPath.item == indexPath.item {
                 deselected()
-                currentSelectedIndexPath = nil
             }else {
                 selected(indexPath: indexPath)
-                currentSelectedIndexPath = indexPath
             }
         }
         delegate?.toolView(self, didSelectItemAt: option)

@@ -24,7 +24,7 @@ class SystemCameraViewController: UIImagePickerController {
             layoutEditView(view: viewController.view)
         }
     }
-    func layoutEditView(view: UIView) {
+    private func layoutEditView(view: UIView) {
         var imageScrollView: UIScrollView?
         getSubviewsOfView(v: view).forEach { (subView) in
             if NSStringFromClass(subView.classForCoder) == "PLCropOverlayCropView" {
@@ -47,7 +47,7 @@ class SystemCameraViewController: UIImagePickerController {
             }
         }
     }
-    func getSubviewsOfView(v: UIView) -> [UIView] {
+    private func getSubviewsOfView(v: UIView) -> [UIView] {
         var allView: [UIView] = [v]
         v.subviews.forEach { (subView) in
             allView.append(contentsOf: getSubviewsOfView(v: subView))

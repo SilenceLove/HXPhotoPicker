@@ -15,7 +15,7 @@ extension EditorImageResizerView {
     /// 显示遮罩界面
     func hiddenMaskView(_ animated: Bool, onlyLines: Bool = false) {
         if animated {
-            UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
                 if !onlyLines {
                     self.maskBgView.alpha = 0
                 }
@@ -41,7 +41,7 @@ extension EditorImageResizerView {
         if animated {
             self.maskBgView.isHidden = false
             self.maskLinesView.isHidden = false
-            UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
                 self.maskBgView.alpha = 1
                 self.maskLinesView.alpha = 1
             }

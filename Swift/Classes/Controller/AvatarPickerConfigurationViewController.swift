@@ -39,10 +39,10 @@ class AvatarPickerConfigurationViewController: UITableViewController {
         let fixedRatio = config.photoEditor.cropping.fixedRatio
         let fixedCropState = config.photoEditor.fixedCropState
         let isRoundCrop = config.photoEditor.cropping.isRoundCrop
-        config.photoList.camera.photoEditor.cropping.aspectRatioType = aspectRatioType
-        config.photoList.camera.photoEditor.cropping.fixedRatio = fixedRatio
-        config.photoList.camera.photoEditor.fixedCropState = fixedCropState
-        config.photoList.camera.photoEditor.cropping.isRoundCrop = isRoundCrop
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.aspectRatioType = aspectRatioType
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.fixedRatio = fixedRatio
+        config.photoList.cameraType.customConfig?.photoEditor.fixedCropState = fixedCropState
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.isRoundCrop = isRoundCrop
         
         let vc = PhotoPickerController.init(config: config)
         vc.pickerDelegate = self

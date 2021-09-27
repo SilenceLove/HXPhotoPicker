@@ -18,7 +18,7 @@ extension PhotoManager: URLSessionDownloadDelegate {
         completionHandler: @escaping (URL?, Error?, Any?) -> Void
     ) -> URLSessionDownloadTask {
         let key = url.absoluteString
-        if key.hasSuffix("mp4") && PhotoTools.isCached(forVideo: key) {
+        if (key.hasSuffix("mp4") || key.hasSuffix("MP4")) && PhotoTools.isCached(forVideo: key) {
             let videoURL = PhotoTools.getVideoCacheURL(for: key)
             if let fileURL = fileURL,
                videoURL.absoluteString != fileURL.absoluteString {
@@ -29,7 +29,7 @@ extension PhotoManager: URLSessionDownloadDelegate {
             }
             return URLSessionDownloadTask()
         }
-        if key.hasSuffix("mp3") && PhotoTools.isCached(forAudio: key) {
+        if (key.hasSuffix("mp3") || key.hasSuffix("MP3")) && PhotoTools.isCached(forAudio: key) {
             let audioURL = PhotoTools.getAudioTmpURL(for: key)
             if let fileURL = fileURL,
                audioURL.absoluteString != fileURL.absoluteString {
@@ -123,13 +123,13 @@ extension PhotoManager: URLSessionDownloadDelegate {
                 completionHandler?(url, nil, ext)
             }
         }else {
-            var url: URL
-            if key.hasSuffix("mp4") {
+            let url: URL
+            if key.hasSuffix("mp4") || key.hasSuffix("MP4") {
                 let videoURL = PhotoTools.getVideoCacheURL(for: key)
                 PhotoTools.removeFile(fileURL: videoURL)
                 try? FileManager.default.moveItem(at: location, to: videoURL)
                 url = videoURL
-            }else if key.hasSuffix("mp3") {
+            }else if key.hasSuffix("mp3") || key.hasSuffix("mp3") {
                 let audioURL = PhotoTools.getAudioTmpURL(for: key)
                 PhotoTools.removeFile(fileURL: audioURL)
                 try? FileManager.default.moveItem(at: location, to: audioURL)
@@ -149,7 +149,9 @@ extension PhotoManager: URLSessionDownloadDelegate {
         task: URLSessionTask,
         didCompleteWithError error: Error?
     ) {
-        let responseURL = task.currentRequest!.url!
+        guard let responseURL = task.currentRequest?.url else {
+            return
+        }
         let key = responseURL.absoluteString
         let ext = downloadExts[key]
         if let error = error {

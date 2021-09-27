@@ -12,8 +12,10 @@ import CoreServices
 import AVKit
 
 extension PhotoTools {
-    class func createAnimatedImage(images: [UIImage],
-                                   delays: [Double]) -> URL? {
+    static func createAnimatedImage(
+        images: [UIImage],
+        delays: [Double]
+    ) -> URL? {
         if images.isEmpty || delays.isEmpty {
             return nil
         }
@@ -53,7 +55,7 @@ extension PhotoTools {
         return nil
     }
     
-    class func checkNetworkURL(for url: URL) -> Bool {
+    static func checkNetworkURL(for url: URL) -> Bool {
         if checkLocalURL(for: url.path) {
             return false
         }
@@ -65,11 +67,11 @@ extension PhotoTools {
         return UIApplication.shared.canOpenURL(url)
     }
     
-    class func checkLocalURL(for path: String) -> Bool {
+    static func checkLocalURL(for path: String) -> Bool {
         FileManager.default.fileExists(atPath: path)
     }
     
-    class func getFrameDuration(from gifInfo: [String: Any]?) -> TimeInterval {
+    static func getFrameDuration(from gifInfo: [String: Any]?) -> TimeInterval {
         let defaultFrameDuration = 0.1
         guard let gifInfo = gifInfo else { return defaultFrameDuration }
         
@@ -81,8 +83,10 @@ extension PhotoTools {
         return frameDuration.doubleValue > 0.011 ? frameDuration.doubleValue : defaultFrameDuration
     }
 
-    class func getFrameDuration(from imageSource: CGImageSource,
-                                at index: Int) -> TimeInterval {
+    static func getFrameDuration(
+        from imageSource: CGImageSource,
+        at index: Int
+    ) -> TimeInterval {
         guard let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, index, nil)
             as? [String: Any] else { return 0.0 }
 
@@ -90,10 +94,10 @@ extension PhotoTools {
         return getFrameDuration(from: gifInfo)
     }
     
-    public class func defaultColors() -> [String] {
+    public static func defaultColors() -> [String] {
         ["#ffffff", "#2B2B2B", "#FA5150", "#FEC200", "#07C160", "#10ADFF", "#6467EF"]
     }
-    class func defaultMusicInfos() -> [VideoEditorMusicInfo] {
+    static func defaultMusicInfos() -> [VideoEditorMusicInfo] {
         var infos: [VideoEditorMusicInfo] = []
         if let audioURL = URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3"), // swiftlint:disable:this line_length
            let lrc = "天外来物".lrc {
@@ -107,14 +111,14 @@ extension PhotoTools {
         return infos
     }
     #if canImport(Kingfisher)
-    public class func defaultTitleChartlet() -> [EditorChartlet] {
+    public static func defaultTitleChartlet() -> [EditorChartlet] {
         let title = EditorChartlet(
             url: URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy_s_highlighted.png")
         )
         return [title]
     }
     
-    public class func defaultNetworkChartlet() -> [EditorChartlet] {
+    public static func defaultNetworkChartlet() -> [EditorChartlet] {
         var chartletList: [EditorChartlet] = []
         for index in 1...40 {
             let urlString = "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy" + String(index) + ".png"
@@ -128,7 +132,7 @@ extension PhotoTools {
     #endif
     
     /// 默认滤镜
-    public class func defaultFilters() -> [PhotoEditorFilterInfo] {
+    public static func defaultFilters() -> [PhotoEditorFilterInfo] {
         return [
             PhotoEditorFilterInfo(
                 filterName: "老电影".localized,
@@ -220,8 +224,10 @@ extension PhotoTools {
         ]
     }
     
-    class func oldMovie(_ image: UIImage,
-                        value: Float) -> UIImage? {
+    static func oldMovie(
+        _ image: UIImage,
+        value: Float
+    ) -> UIImage? {
         let inputImage = CIImage.init(image: image)!
         let sepiaToneFilter = CIFilter(name: "CISepiaTone")!
         sepiaToneFilter.setValue(inputImage, forKey: kCIInputImageKey)
@@ -290,7 +296,7 @@ extension PhotoTools {
     ///   - videoQuality: 导出的质量
     ///   - completion: 导出完成
     @discardableResult
-    class func exportEditVideo(
+    static func exportEditVideo(
         for avAsset: AVAsset,
         outputURL: URL? = nil,
         timeRang: CMTimeRange,
@@ -398,7 +404,7 @@ extension PhotoTools {
         }
     }
     
-    class func mixComposition(
+    static func mixComposition(
         for videoAsset: AVAsset,
         videoTrack: AVAssetTrack
     ) throws -> AVMutableComposition {
@@ -420,7 +426,7 @@ extension PhotoTools {
         return mixComposition
     }
     
-    class func audioMix(
+    static func audioMix(
         for videoAsset: AVAsset,
         videoTrack: AVAssetTrack,
         mixComposition: AVMutableComposition,
@@ -564,7 +570,7 @@ extension PhotoTools {
         return audioMix
     }
     
-    class func videoComposition(
+    static func videoComposition(
         for videoAsset: AVAsset,
         videoTrack: AVAssetTrack,
         mixComposition: AVMutableComposition,
@@ -662,7 +668,7 @@ extension PhotoTools {
         return videoComposition
     }
     
-    class func videoFixed(
+    static func videoFixed(
         videoAsset: AVAsset,
         videoTrack: AVAssetTrack,
         composition: AVMutableComposition,
@@ -721,7 +727,7 @@ extension PhotoTools {
         
         return videoComposition
     }
-    class func textAnimationLayer(
+    static func textAnimationLayer(
         music: VideoEditorMusic,
         size: CGSize,
         fontSize: CGFloat,
@@ -834,7 +840,7 @@ extension PhotoTools {
         bgLayer.addSublayer(animationLayer)
         return bgLayer
     }
-    class func animationLayer(
+    static func animationLayer(
         image: UIImage,
         beginTime: CFTimeInterval,
         videoDuration: TimeInterval

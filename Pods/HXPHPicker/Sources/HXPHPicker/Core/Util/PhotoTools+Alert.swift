@@ -10,7 +10,7 @@ import UIKit
 extension PhotoTools {
     
     /// 跳转系统设置界面
-    public class func openSettingsURL() {
+    static func openSettingsURL() {
         if let openURL = URL(string: UIApplication.openSettingsURLString) {
             if #available(iOS 10, *) {
                 UIApplication.shared.open(openURL, options: [:], completionHandler: nil)
@@ -21,7 +21,7 @@ extension PhotoTools {
     }
     
     /// 显示UIAlertController
-    public class func showAlert(
+    public static func showAlert(
         viewController: UIViewController?,
         title: String?,
         message: String? = nil,
@@ -66,7 +66,7 @@ extension PhotoTools {
         viewController.present(alertController, animated: true, completion: nil)
     }
     
-    public class func showConfirm(
+    static func showConfirm(
         viewController: UIViewController? ,
         title: String? ,
         message: String?,
@@ -100,7 +100,7 @@ extension PhotoTools {
     }
     
     /// 显示没有相机权限弹窗
-    public class func showNotCameraAuthorizedAlert(
+    static func showNotCameraAuthorizedAlert(
         viewController: UIViewController?
     ) {
         guard let vc = viewController else { return }

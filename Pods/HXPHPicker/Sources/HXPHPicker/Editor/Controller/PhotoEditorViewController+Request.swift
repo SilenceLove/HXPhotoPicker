@@ -12,19 +12,39 @@ import Kingfisher
 
 extension PhotoEditorViewController {
     #if HXPICKER_ENABLE_PICKER
-    // swiftlint:disable function_body_length
-    // swiftlint:disable cyclomatic_complexity
     func requestImage() {
-        // swiftlint:enable: function_body_length
-        // swiftlint:enable: cyclomatic_complexity
         if photoAsset.isLocalAsset {
+            requestLocalAsset()
+        }else if photoAsset.isNetworkAsset {
+            requestNetworkAsset()
+        } else {
             ProgressHUD.showLoading(addedTo: view, animated: true)
-            DispatchQueue.global().async {
-                if self.photoAsset.mediaType == .photo {
-                    var image = self.photoAsset.localImageAsset!.image!
-                    image = self.fixImageOrientation(image)
-                    if self.photoAsset.mediaSubType.isGif {
-                        if let imageData = self.photoAsset.localImageAsset?.imageData {
+            if photoAsset.phAsset != nil && !photoAsset.isGifAsset {
+                requestAssetData()
+                return
+            }
+            requestAssetURL()
+        }
+    }
+    func requestLocalAsset() {
+        ProgressHUD.showLoading(addedTo: view, animated: true)
+        DispatchQueue.global().async {
+            if self.photoAsset.mediaType == .photo {
+                var image = self.photoAsset.localImageAsset!.image!
+                image = self.fixImageOrientation(image)
+                if self.photoAsset.mediaSubType.isGif {
+                    if let imageData = self.photoAsset.localImageAsset?.imageData {
+                        #if canImport(Kingfisher)
+                        if let gifImage = DefaultImageProcessor.default.process(
+                            item: .data(imageData),
+                            options: .init([])
+                        ) {
+                            image = gifImage
+                        }
+                        #endif
+                    }else if let imageURL = self.photoAsset.localImageAsset?.imageURL {
+                        do {
+                            let imageData = try Data.init(contentsOf: imageURL)
                             #if canImport(Kingfisher)
                             if let gifImage = DefaultImageProcessor.default.process(
                                 item: .data(imageData),
@@ -33,145 +53,133 @@ extension PhotoEditorViewController {
                                 image = gifImage
                             }
                             #endif
-                        }else if let imageURL = self.photoAsset.localImageAsset?.imageURL {
-                            do {
-                                let imageData = try Data.init(contentsOf: imageURL)
-                                #if canImport(Kingfisher)
-                                if let gifImage = DefaultImageProcessor.default.process(
-                                    item: .data(imageData),
-                                    options: .init([])
-                                ) {
-                                    image = gifImage
-                                }
-                                #endif
-                            }catch {}
-                        }
+                        }catch {}
                     }
-                    self.filterHDImageHandler(image: image)
-                    DispatchQueue.main.async {
-                        ProgressHUD.hide(forView: self.view, animated: true)
-                        self.requestAssetCompletion(image: image)
-                    }
-                }else {
-                    let image = self.fixImageOrientation(self.photoAsset.localVideoAsset!.image!)
-                    self.filterHDImageHandler(image: image)
-                    DispatchQueue.main.async {
-                        ProgressHUD.hide(forView: self.view, animated: true)
-                        self.requestAssetCompletion(image: image)
-                    }
+                }
+                self.filterHDImageHandler(image: image)
+                DispatchQueue.main.async {
+                    ProgressHUD.hide(forView: self.view, animated: true)
+                    self.requestAssetCompletion(image: image)
+                }
+            }else {
+                let image = self.fixImageOrientation(self.photoAsset.localVideoAsset!.image!)
+                self.filterHDImageHandler(image: image)
+                DispatchQueue.main.async {
+                    ProgressHUD.hide(forView: self.view, animated: true)
+                    self.requestAssetCompletion(image: image)
                 }
             }
-        }else if photoAsset.isNetworkAsset {
-            #if canImport(Kingfisher)
-            let loadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
-            photoAsset.getNetworkImage(urlType: .original, filterEditor: true) { (receiveSize, totalSize) in
-                let progress = Double(receiveSize) / Double(totalSize)
-                if progress > 0 {
-                    loadingView?.updateText(text: "图片下载中".localized + "(" + String(Int(progress * 100)) + "%)")
+        }
+    }
+    func requestNetworkAsset() {
+        #if canImport(Kingfisher)
+        let loadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
+        photoAsset.getNetworkImage(urlType: .original, filterEditor: true) { (receiveSize, totalSize) in
+            let progress = Double(receiveSize) / Double(totalSize)
+            if progress > 0 {
+                loadingView?.updateText(text: "图片下载中".localized + "(" + String(Int(progress * 100)) + "%)")
+            }
+        } resultHandler: { [weak self] (image) in
+            guard let self = self else { return }
+            if var image = image {
+                DispatchQueue.global().async {
+                    image = self.fixImageOrientation(image)
+                    self.filterHDImageHandler(image: image)
+                    DispatchQueue.main.async {
+                        ProgressHUD.hide(forView: self.view, animated: true)
+                        self.requestAssetCompletion(image: image)
+                    }
                 }
-            } resultHandler: { [weak self] (image) in
-                guard let self = self else { return }
-                if var image = image {
-                    DispatchQueue.global().async {
+            }else {
+                ProgressHUD.hide(forView: self.view, animated: true)
+                PhotoTools.showConfirm(
+                    viewController: self,
+                    title: "提示".localized,
+                    message: "图片获取失败!".localized,
+                    actionTitle: "确定".localized
+                ) { (alertAction) in
+                    self.didBackClick()
+                }
+            }
+        }
+        #endif
+    }
+    
+    func requestAssetData() {
+        photoAsset.requestImageData(
+            filterEditor: true,
+            iCloudHandler: nil,
+            progressHandler: nil
+        ) { [weak self] asset, result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let dataResult):
+                guard var image = UIImage(data: dataResult.imageData) else {
+                    ProgressHUD.hide(forView: self.view, animated: true)
+                    self.requestAssetFailure(isICloud: false)
+                    return
+                }
+                if dataResult.imageData.count > 3000000,
+                   let sImage = image.scaleSuitableSize() {
+                    image = sImage
+                }
+                DispatchQueue.global().async {
+                    image = self.fixImageOrientation(image)
+                    self.filterHDImageHandler(image: image)
+                    DispatchQueue.main.async {
+                        ProgressHUD.hide(forView: self.view, animated: true)
+                        self.requestAssetCompletion(image: image)
+                    }
+                }
+            case .failure(let error):
+                ProgressHUD.hide(forView: self.view, animated: true)
+                if let inICloud = error.info?.inICloud {
+                    self.requestAssetFailure(isICloud: inICloud)
+                }else {
+                    self.requestAssetFailure(isICloud: false)
+                }
+            }
+        }
+    }
+    
+    func requestAssetURL() {
+        photoAsset.requestAssetImageURL(
+            filterEditor: true
+        ) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let response):
+                DispatchQueue.global().async {
+                    let imageURL = response.url
+                    #if canImport(Kingfisher)
+                    if self.photoAsset.isGifAsset == true,
+                       let imageData = try? Data.init(contentsOf: imageURL) {
+                        if let gifImage = DefaultImageProcessor.default.process(
+                            item: .data(imageData),
+                            options: .init([])
+                        ) {
+                            self.filterHDImageHandler(image: gifImage)
+                            DispatchQueue.main.async {
+                                ProgressHUD.hide(forView: self.view, animated: true)
+                                self.requestAssetCompletion(image: gifImage)
+                            }
+                            return
+                        }
+                    }
+                    #endif
+                    if var image = UIImage.init(contentsOfFile: imageURL.path)?.scaleSuitableSize() {
                         image = self.fixImageOrientation(image)
                         self.filterHDImageHandler(image: image)
                         DispatchQueue.main.async {
                             ProgressHUD.hide(forView: self.view, animated: true)
                             self.requestAssetCompletion(image: image)
                         }
-                    }
-                }else {
-                    ProgressHUD.hide(forView: self.view, animated: true)
-                    PhotoTools.showConfirm(
-                        viewController: self,
-                        title: "提示".localized,
-                        message: "图片获取失败!".localized,
-                        actionTitle: "确定".localized
-                    ) { (alertAction) in
-                        self.didBackClick()
+                        return
                     }
                 }
-            }
-            #endif
-        } else {
-            ProgressHUD.showLoading(addedTo: view, animated: true)
-            if photoAsset.phAsset != nil && !photoAsset.isGifAsset {
-                photoAsset.requestImageData(
-                    filterEditor: true,
-                    iCloudHandler: nil,
-                    progressHandler: nil
-                ) { [weak self] asset, result in
-                    guard let self = self else { return }
-                    switch result {
-                    case .success(let dataResult):
-                        guard var image = UIImage(data: dataResult.imageData) else {
-                            ProgressHUD.hide(forView: self.view, animated: true)
-                            self.requestAssetFailure(isICloud: false)
-                            return
-                        }
-                        if dataResult.imageData.count > 3000000,
-                           let sImage = image.scaleSuitableSize() {
-                            image = sImage
-                        }
-                        DispatchQueue.global().async {
-                            image = self.fixImageOrientation(image)
-                            self.filterHDImageHandler(image: image)
-                            DispatchQueue.main.async {
-                                ProgressHUD.hide(forView: self.view, animated: true)
-                                self.requestAssetCompletion(image: image)
-                            }
-                        }
-                    case .failure(let error):
-                        ProgressHUD.hide(forView: self.view, animated: true)
-                        if let inICloud = error.info?.inICloud {
-                            self.requestAssetFailure(isICloud: inICloud)
-                        }else {
-                            self.requestAssetFailure(isICloud: false)
-                        }
-                    }
-                }
-                return
-            }
-            photoAsset.requestAssetImageURL(
-                filterEditor: true
-            ) { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success(let response):
-                    DispatchQueue.global().async {
-                        let imageURL = response.url
-                        #if canImport(Kingfisher)
-                        if self.photoAsset.isGifAsset == true {
-                            do {
-                                let imageData = try Data.init(contentsOf: imageURL)
-                                if let gifImage = DefaultImageProcessor.default.process(
-                                    item: .data(imageData),
-                                    options: .init([])
-                                ) {
-                                    self.filterHDImageHandler(image: gifImage)
-                                    DispatchQueue.main.async {
-                                        ProgressHUD.hide(forView: self.view, animated: true)
-                                        self.requestAssetCompletion(image: gifImage)
-                                    }
-                                    return
-                                }
-                            }catch {}
-                        }
-                        #endif
-                        if var image = UIImage.init(contentsOfFile: imageURL.path)?.scaleSuitableSize() {
-                            image = self.fixImageOrientation(image)
-                            self.filterHDImageHandler(image: image)
-                            DispatchQueue.main.async {
-                                ProgressHUD.hide(forView: self.view, animated: true)
-                                self.requestAssetCompletion(image: image)
-                            }
-                            return
-                        }
-                    }
-                case .failure(_):
-                    ProgressHUD.hide(forView: self.view, animated: true)
-                    self.requestAssetFailure(isICloud: false)
-                }
+            case .failure(_):
+                ProgressHUD.hide(forView: self.view, animated: true)
+                self.requestAssetFailure(isICloud: false)
             }
         }
     }

@@ -9,7 +9,7 @@
 import UIKit
 
 // MARK: 照片列表Cell配置类
-public class PhotoListCellConfiguration {
+public struct PhotoListCellConfiguration {
     
     /// 自定义不带选择框的cell
     /// 继承 PhotoPickerBaseViewCell 只有UIImageView，其他控件需要自己添加
@@ -29,10 +29,8 @@ public class PhotoListCellConfiguration {
     public var backgroundDarkColor: UIColor?
     
     /// 缩略图的清晰度，越大越清楚，越小越模糊
-    /// 为0时，默认为 cell.width * 2
-    public var targetWidth: CGFloat = 0 {
-        didSet { PhotoManager.shared.targetWidth = targetWidth }
-    }
+    /// 默认为 250
+    public var targetWidth: CGFloat = 250
     
     /// cell在不可选择状态下是否显示禁用遮罩
     /// 如果限制了照片/视频的文件大小，则无效
@@ -45,7 +43,7 @@ public class PhotoListCellConfiguration {
     public var selectBoxRightMargin: CGFloat = 5
     
     /// 选择框相关配置
-    public lazy var selectBox: SelectBoxConfiguration = .init()
+    public var selectBox: SelectBoxConfiguration = .init()
     
-    public init() { PhotoManager.shared.targetWidth = targetWidth }
+    public init() { }
 }

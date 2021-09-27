@@ -25,7 +25,7 @@ class VideoEditorPlayerView: VideoPlayerView {
     var playEndTime: CMTime?
     var isPlaying: Bool = false
     var shouldPlay = true
-    var addObserverReadyForDisplay = false
+    var readyForDisplayObservation: NSKeyValueObservation?
     
     lazy var coverImageView: UIImageView = {
         let imageView = UIImageView.init()
@@ -76,13 +76,19 @@ class VideoEditorPlayerView: VideoPlayerView {
                 name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
                 object: player.currentItem
             )
-            playerLayer.addObserver(
-                self,
-                forKeyPath: "readyForDisplay",
-                options: [.new, .old],
-                context: nil
-            )
-            addObserverReadyForDisplay = true
+            readyForDisplayObservation = playerLayer
+                .observe(
+                    \.isReadyForDisplay,
+                    options: [.new, .old]
+                ) { [weak self] playerLayer, change in
+                guard let self = self else { return }
+                if playerLayer.isReadyForDisplay {
+                    self.setupStickerViewFrame()
+                    self.coverImageView.isHidden = true
+                    self.play()
+                    self.delegate?.playerView(self)
+                }
+            }
         }
     }
     @objc func appDidEnterBackground() {
@@ -129,27 +135,6 @@ class VideoEditorPlayerView: VideoPlayerView {
             }
         }
     }
-    // swiftlint:disable block_based_kvo
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey: Any]?,
-        context: UnsafeMutableRawPointer?
-    ) {
-        // swiftlint:enable block_based_kvo
-        if object is AVPlayerLayer &&
-            keyPath == "readyForDisplay" {
-            if object as? AVPlayerLayer != playerLayer {
-                return
-            }
-            if playerLayer.isReadyForDisplay {
-                setupStickerViewFrame()
-                coverImageView.isHidden = true
-                play()
-                delegate?.playerView(self)
-            }
-        }
-    }
     func setupStickerViewFrame() {
         stickerView.frame = bounds
     }
@@ -162,9 +147,7 @@ class VideoEditorPlayerView: VideoPlayerView {
         fatalError("init(coder:) has not been implemented")
     }
     deinit {
-        if addObserverReadyForDisplay {
-            playerLayer.removeObserver(self, forKeyPath: "readyForDisplay")
-        }
+        readyForDisplayObservation = nil
         NotificationCenter.default.removeObserver(self)
     }
 }

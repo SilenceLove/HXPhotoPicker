@@ -21,7 +21,6 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     
     /// 工具视图配置
     public lazy var toolView: EditorToolViewConfiguration = {
-        let config = EditorToolViewConfiguration.init()
         let graffiti = EditorToolOptions(
             imageName: "hx_editor_tools_graffiti",
             type: .graffiti
@@ -46,8 +45,7 @@ open class PhotoEditorConfiguration: EditorConfiguration {
             imageName: "hx_editor_tools_filter",
             type: .filter
         )
-        config.toolOptions = [graffiti, chartlet, text, crop, mosaic, filter]
-        return config
+        return .init(toolOptions: [graffiti, chartlet, text, crop, mosaic, filter])
     }()
     
     /// 画笔颜色数组
@@ -76,11 +74,11 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     
     public struct FilterConfig {
         /// 滤镜信息
-        public let infos: [PhotoEditorFilterInfo]
+        public var infos: [PhotoEditorFilterInfo]
         /// 滤镜选中颜色
-        public let selectedColor: UIColor
+        public var selectedColor: UIColor
         public init(
-            infos: [PhotoEditorFilterInfo],
+            infos: [PhotoEditorFilterInfo] = [],
             selectedColor: UIColor = .systemTintColor
         ) {
             self.infos = infos
@@ -89,26 +87,16 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     }
     
     /// 马赛克配置
-    public lazy var mosaic: MosaicConfig = .init(mosaicWidth: 20,
-                                                 mosaiclineWidth: 25,
-                                                 smearWidth: 30)
+    public lazy var mosaic: MosaicConfig = .init()
     
     public struct MosaicConfig {
         /// 生成马赛克的大小
-        public let mosaicWidth: CGFloat
+        public var mosaicWidth: CGFloat = 20
         /// 涂鸦时马赛克的线宽
-        public let mosaiclineWidth: CGFloat
+        public var mosaiclineWidth: CGFloat = 25
         /// 涂抹的宽度
-        public let smearWidth: CGFloat
+        public var smearWidth: CGFloat = 30
         
-        public init(
-            mosaicWidth: CGFloat,
-            mosaiclineWidth: CGFloat,
-            smearWidth: CGFloat
-        ) {
-            self.mosaicWidth = mosaicWidth
-            self.mosaiclineWidth = mosaiclineWidth
-            self.smearWidth = smearWidth
-        }
+        public init() { }
     }
 }

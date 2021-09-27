@@ -440,13 +440,11 @@ class SliderView: UIView {
         let currentWidth = self.value * width
         if isAnimation {
             UIView.animate(
-                withDuration: 0.25,
+                withDuration: 0.1,
                 delay: 0,
                 options: [
                     .curveLinear,
-                    .allowUserInteraction,
-                    .overrideInheritedDuration,
-                    .overrideInheritedCurve
+                    .allowUserInteraction
                 ]
             ) {
                 self.thumbView.centerX = 5 + (self.width - 10) * self.value

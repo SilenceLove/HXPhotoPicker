@@ -11,7 +11,7 @@ import Photos
 public extension AssetManager {
     
     // MARK: 获取LivePhoto里的图片Data和视频地址
-    class func requestLivePhoto(
+    static func requestLivePhoto(
         content asset: PHAsset,
         imageDataHandler: @escaping (Data?) -> Void,
         videoHandler: @escaping (URL?) -> Void,
@@ -144,7 +144,7 @@ public extension AssetManager {
     ///   - forAsset: 对应的 PHAsset 对象
     ///   - fileURL: 指定视频地址
     ///   - completionHandler: 获取完成
-    class func requestLivePhoto(
+    static func requestLivePhoto(
         videoURL forAsset: PHAsset,
         toFile fileURL: URL,
         completionHandler: @escaping (URL?, LivePhotoError?) -> Void
@@ -253,7 +253,7 @@ public extension AssetManager {
         }
     }
     // MARK: 获取LivePhoto里的图片地址和视频地址
-    class func requestLivePhoto(
+    static func requestLivePhoto(
         contentURL asset: PHAsset,
         imageURLHandler: @escaping (URL?) -> Void,
         videoHandler: @escaping (URL?) -> Void,

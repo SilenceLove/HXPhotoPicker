@@ -19,7 +19,18 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         let timeRang: CMTimeRange
         if let startTime = playerView.playStartTime,
            let endTime = playerView.playEndTime {
-            timeRang = CMTimeRange(start: startTime, end: endTime)
+            if endTime.seconds - startTime.seconds > config.cropping.maximumVideoCroppingTime {
+                let seconds = Double(config.cropping.maximumVideoCroppingTime)
+                timeRang = CMTimeRange(
+                    start: startTime,
+                    end: CMTime(
+                        seconds: seconds,
+                        preferredTimescale: endTime.timescale
+                    )
+                )
+            }else {
+                timeRang = CMTimeRange(start: startTime, end: endTime)
+            }
         }else {
             timeRang = .zero
         }

@@ -11,7 +11,7 @@ import UIKit
 import Kingfisher
 #endif
 
-class ImageView: UIView {
+final class ImageView: UIView {
     lazy var imageView: UIImageView = {
         var imageView: UIImageView
         #if canImport(Kingfisher)

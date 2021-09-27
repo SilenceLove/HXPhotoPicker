@@ -17,7 +17,7 @@ public extension AssetManager {
     /// - Parameters:
     ///   - asset: 对应的 PHAsset 数据
     ///   - resultHandler: 获取结果
-    class func requestVideoURL(
+    static func requestVideoURL(
         for asset: PHAsset,
         exportPreset: ExportPreset = .ratio_960x540,
         videoQuality: Int = 5,
@@ -41,7 +41,7 @@ public extension AssetManager {
     /// - Parameters:
     ///   - asset: 对应的 PHAsset 数据
     ///   - resultHandler: 获取结果
-    class func requestVideoURL(
+    static func requestVideoURL(
         mp4Format asset: PHAsset,
         exportPreset: ExportPreset = .ratio_960x540,
         videoQuality: Int = 5,
@@ -62,7 +62,7 @@ public extension AssetManager {
     ///   - asset: 对应的 PHAsset 数据
     ///   - fileURL: 指定视频地址
     ///   - resultHandler: 获取结果
-    class func requestVideoURL(
+    static func requestVideoURL(
         for asset: PHAsset,
         toFile fileURL: URL,
         exportPreset: ExportPreset = .ratio_960x540,

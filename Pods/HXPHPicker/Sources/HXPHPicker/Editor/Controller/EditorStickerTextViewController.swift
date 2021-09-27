@@ -24,10 +24,10 @@ class EditorStickerTextController: UINavigationController {
     }
 }
 
-class EditorStickerTextViewController: BaseViewController {
+final class EditorStickerTextViewController: BaseViewController {
     weak var delegate: EditorStickerTextViewControllerDelegate?
-    let config: EditorTextConfig
-    let stickerItem: EditorStickerItem?
+    private let config: EditorTextConfig
+    private let stickerItem: EditorStickerItem?
     init(config: EditorTextConfig,
          stickerItem: EditorStickerItem? = nil) {
         self.config = config
@@ -110,7 +110,12 @@ class EditorStickerTextViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .clear
+        if let nav = navigationController,
+           nav.modalPresentationStyle == .fullScreen {
+            view.backgroundColor = "#666666".color
+        }else {
+            view.backgroundColor = .clear
+        }
         navigationController?.view.backgroundColor = .clear
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: cancelButton)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: finishButton)

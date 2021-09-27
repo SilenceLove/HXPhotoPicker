@@ -14,10 +14,10 @@ extension ProgressHUD {
         case success
     }
 }
-class ProgressHUD: UIView {
-    var mode: Mode
+final class ProgressHUD: UIView {
+    private var mode: Mode
     
-    lazy var backgroundView: UIView = {
+    private lazy var backgroundView: UIView = {
         let backgroundView = UIView.init()
         backgroundView.layer.cornerRadius = 5
         backgroundView.layer.masksToBounds = true
@@ -26,18 +26,18 @@ class ProgressHUD: UIView {
         return backgroundView
     }()
     
-    lazy var contentView: UIView = {
+    private lazy var contentView: UIView = {
         let contentView = UIView.init()
         return contentView
     }()
     
-    lazy var blurEffectView: UIVisualEffectView = {
+    private lazy var blurEffectView: UIVisualEffectView = {
         let effect = UIBlurEffect.init(style: .dark)
         let blurEffectView = UIVisualEffectView(effect: effect)
         return blurEffectView
     }()
     
-    lazy var indicatorView: UIView = {
+    private lazy var indicatorView: UIView = {
         if indicatorType == .circle {
             let indicatorView = ProgressIndefiniteView(
                 frame: CGRect(
@@ -55,7 +55,7 @@ class ProgressHUD: UIView {
         }
     }()
     
-    lazy var textLb: UILabel = {
+    private lazy var textLb: UILabel = {
         let textLb = UILabel.init()
         textLb.textColor = .white
         textLb.textAlignment = .center
@@ -64,7 +64,7 @@ class ProgressHUD: UIView {
         return textLb
     }()
     
-    lazy var imageView: ProgressImageView = {
+    private lazy var imageView: ProgressImageView = {
         let imageView = ProgressImageView(
             frame: CGRect(
                 x: 0, y: 0,
@@ -102,7 +102,7 @@ class ProgressHUD: UIView {
         super.init(frame: view.bounds)
         initView()
     }
-    func initView() {
+    private func initView() {
         addSubview(backgroundView)
         contentView.addSubview(textLb)
         if mode == .indicator {
@@ -257,7 +257,7 @@ class ProgressHUD: UIView {
         addedTo view: UIView?,
         animated: Bool
     ) -> ProgressHUD? {
-        return showLoading(
+        showLoading(
             addedTo: view,
             text: nil,
             animated: animated
@@ -269,7 +269,7 @@ class ProgressHUD: UIView {
         afterDelay: TimeInterval,
         animated: Bool
     ) -> ProgressHUD? {
-        return showLoading(
+        showLoading(
             addedTo: view,
             text: nil,
             afterDelay: afterDelay,
@@ -282,7 +282,7 @@ class ProgressHUD: UIView {
         text: String?,
         animated: Bool
     ) -> ProgressHUD? {
-        return showLoading(
+        showLoading(
             addedTo: view,
             text: text,
             afterDelay: 0,

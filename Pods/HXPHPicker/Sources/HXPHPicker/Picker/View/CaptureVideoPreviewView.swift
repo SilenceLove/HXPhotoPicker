@@ -104,12 +104,22 @@ class CaptureVideoPreviewView: UIView {
         if !sessionCompletion {
             return
         }
-        sessionCompletion = true
+        let effect = UIBlurEffect(style: .light)
+        shadeView.effect = effect
+        shadeView.viewWithTag(1)?.alpha = 1
+        imageMaskView.alpha = 1
+        addSubview(imageMaskView)
+        addSubview(shadeView)
+        
+        sessionCompletion = false
         DispatchQueue.global().async {
             self.previewLayer?.session?.stopRunning()
         }
     }
-    
+    func removeMask() {
+        imageMaskView.removeFromSuperview()
+        shadeView.removeFromSuperview()
+    }
     override func layoutSubviews() {
         super.layoutSubviews()
         imageMaskView.frame = bounds

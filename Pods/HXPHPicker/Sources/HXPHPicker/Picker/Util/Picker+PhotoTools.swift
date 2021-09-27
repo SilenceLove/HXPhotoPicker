@@ -14,7 +14,7 @@ extension PhotoTools {
     /// - Parameters:
     ///   - viewController: 需要弹窗的viewController
     ///   - status: 权限类型
-    public class func showNotAuthorizedAlert(
+    static func showNotAuthorizedAlert(
         viewController: UIViewController?,
         status: PHAuthorizationStatus
     ) {
@@ -34,7 +34,7 @@ extension PhotoTools {
     }
     
     /// 转换相册名称为当前语言
-    public class func transformAlbumName(
+    static func transformAlbumName(
         for collection: PHAssetCollection
     ) -> String? {
         if collection.assetCollectionType == .album {
@@ -86,7 +86,7 @@ extension PhotoTools {
         }
         return albumName
     }
-    public class func getVideoCoverImage(
+    static func getVideoCoverImage(
         for photoAsset: PhotoAsset,
         completionHandler: @escaping (PhotoAsset, UIImage?) -> Void) {
         if photoAsset.mediaType == .video {
@@ -138,7 +138,7 @@ extension PhotoTools {
     ///   - presentName: 导出的质量
     ///   - completion: 导出完成
     @discardableResult
-    public class func exportEditVideo(
+    public static func exportEditVideo(
         for avAsset: AVAsset,
         outputURL: URL? = nil,
         startTime: TimeInterval,
@@ -201,7 +201,7 @@ extension PhotoTools {
         }
     }
     
-    public class func getVideoDuration(
+    public static func getVideoDuration(
         for photoAsset: PhotoAsset,
         completionHandler:
             @escaping (PhotoAsset, TimeInterval) -> Void
@@ -247,7 +247,7 @@ extension PhotoTools {
     }
     
     /// 将字节转换成字符串
-    public class func transformBytesToString(bytes: Int) -> String {
+    static func transformBytesToString(bytes: Int) -> String {
         if CGFloat(bytes) >= 0.5 * 1000 * 1000 {
             return String.init(format: "%0.1fM", arguments: [CGFloat(bytes) / 1000 / 1000])
         }else if bytes >= 1000 {
@@ -259,7 +259,7 @@ extension PhotoTools {
     
     /// 获取和微信主题一致的配置
     // swiftlint:disable function_body_length
-    public class func getWXPickerConfig(isMoment: Bool = false) -> PickerConfiguration {
+    public static func getWXPickerConfig(isMoment: Bool = false) -> PickerConfiguration {
         // swiftlint:enable function_body_length
         let config = PickerConfiguration.init()
         if isMoment {
@@ -301,7 +301,6 @@ extension PhotoTools {
         config.photoList.titleView.arrow.backgroundColor = "#B2B2B2".color
         config.photoList.titleView.arrow.arrowColor = "#2E2F30".color
         
-        config.photoList.cell.targetWidth = 250
         config.photoList.cell.selectBox.selectedBackgroundColor = wxColor
         config.photoList.cell.selectBox.titleColor = .white
         
@@ -376,8 +375,10 @@ extension PhotoTools {
         #endif
         
         #if HXPICKER_ENABLE_CAMERA
-        config.photoList.camera.videoMaximumDuration = 15
-        config.photoList.camera.tintColor = wxColor
+        let cameraConfig = CameraConfiguration()
+        cameraConfig.videoMaximumDuration = 15
+        cameraConfig.tintColor = wxColor
+        config.photoList.cameraType = .custom(cameraConfig)
         #endif
         
         config.notAuthorized.closeButtonImageName = "hx_picker_notAuthorized_close_dark"

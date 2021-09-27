@@ -11,7 +11,8 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
     
     /// 选择按钮
     public lazy var selectControl: SelectBoxView = {
-        let selectControl = SelectBoxView.init()
+        let selectControl = SelectBoxView()
+        selectControl.isHidden = true
         selectControl.backgroundColor = .clear
         selectControl.addTarget(self, action: #selector(didSelectControlClick(control:)), for: .touchUpInside)
         return selectControl
@@ -30,6 +31,22 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         super.initView()
         contentView.addSubview(selectControl)
         contentView.layer.addSublayer(disableMaskLayer)
+    }
+    
+    private var firstLoadCompletion: Bool = false
+    
+    open override func requestThumbnailImage(targetWidth: CGFloat) {
+        photoView.requestThumbnailImage(
+            targetWidth: targetWidth
+        ) { [weak self] image, photoAsset in
+            guard let self = self else { return }
+            if self.photoAsset == photoAsset {
+                if !self.firstLoadCompletion {
+                    self.selectControl.isHidden = false
+                    self.firstLoadCompletion = true
+                }
+            }
+        }
     }
     
     /// 选择框点击事件
@@ -91,11 +108,24 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         if selectControl.frame.equalTo(rect) {
             return
         }
-        selectControl.frame = rect
+        if let photoAsset = photoAsset, photoAsset.isScrolling {
+            let x = selectControl.x
+            selectControl.frame = rect
+            selectControl.x = x
+        }else {
+            selectControl.frame = rect
+        }
     }
     
     open override func layoutView() {
         super.layoutView()
-        updateSelectControlSize(width: selectControl.width, height: selectControl.height)
+        updateSelectControlSize()
+    }
+    
+    func updateSelectControlSize() {
+        updateSelectControlSize(
+            width: selectControl.width,
+            height: selectControl.height
+        )
     }
 }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class PickerConfiguration: BaseConfiguration {
+public class PickerConfiguration: BaseConfiguration {
     
     /// 资源可选项，控制获取系统相册资源的类型
     /// .livePhoto .gifPhoto 是photo的子项
@@ -35,9 +35,6 @@ open class PickerConfiguration: BaseConfiguration {
     
     /// 获取资源列表时是否按创建时间排序
     public var creationDate: Bool = false
-    
-    /// 获取资源列表后是否按倒序展示
-    public var reverseOrder: Bool = false
     
     /// 资源列表照片Cell点击动作
     public var photoSelectionTapAction: SelectionTapAction = .preview

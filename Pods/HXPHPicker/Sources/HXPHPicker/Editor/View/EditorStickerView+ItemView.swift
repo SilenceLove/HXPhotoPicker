@@ -87,7 +87,7 @@ extension EditorStickerView: EditorStickerItemViewDelegate {
                 trashView.layer.removeAllAnimations()
                 let animaiton = CAKeyframeAnimation(keyPath: "transform.scale")
                 animaiton.duration = 0.3
-                animaiton.values = [1.1, 0.9, 1.05, 0.95, 1]
+                animaiton.values = [1.05, 0.95, 1.025, 0.975, 1]
                 trashView.layer.add(animaiton, forKey: nil)
                 hasImpactFeedback = true
             }
@@ -116,6 +116,8 @@ extension EditorStickerView: EditorStickerItemViewDelegate {
                 audioView = nil
                 delegate?.stickerView(didRemoveAudio: self)
             }
+            itemView.isDelete = true
+            itemView.isEnabled = false
             UIView.animate(withDuration: 0.25) {
                 itemView.alpha = 0
             } completion: { _ in

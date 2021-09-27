@@ -10,7 +10,7 @@ import UIKit
  
 class DeniedAuthorizationView: UIView {
     
-    var config: NotAuthorizedConfiguration?
+    let config: NotAuthorizedConfiguration
     
     lazy var navigationBar: UINavigationBar = {
         let navigationBar = UINavigationBar.init()
@@ -57,14 +57,16 @@ class DeniedAuthorizationView: UIView {
         return jumpBtn
     }()
     
-    init(config: NotAuthorizedConfiguration?) {
-        super.init(frame: CGRect.zero)
+    init(config: NotAuthorizedConfiguration) {
         self.config = config
+        super.init(frame: CGRect.zero)
         configView()
     }
     
     func configView() {
-        addSubview(navigationBar)
+        if !config.hiddenCloseButton {
+            addSubview(navigationBar)
+        }
         addSubview(titleLb)
         addSubview(subTitleLb)
         addSubview(jumpBtn)
@@ -81,15 +83,15 @@ class DeniedAuthorizationView: UIView {
         configColor()
     }
     func configColor() {
-        let closeButtonImageName = config?.closeButtonImageName ?? "hx_picker_notAuthorized_close"
-        let closeButtonDarkImageName = config?.closeButtonDarkImageName ?? "hx_picker_notAuthorized_close_dark"
+        let closeButtonImageName = config.closeButtonImageName
+        let closeButtonDarkImageName = config.closeButtonDarkImageName
         let isDark = PhotoManager.isDark
         closeBtn.setImage(UIImage.image(for: isDark ? closeButtonDarkImageName : closeButtonImageName), for: .normal)
-        backgroundColor = isDark ? config?.darkBackgroundColor : config?.backgroundColor
-        titleLb.textColor = isDark ? config?.titleDarkColor : config?.titleColor
-        subTitleLb.textColor = isDark ? config?.darkSubTitleColor : config?.subTitleColor
-        jumpBtn.backgroundColor = isDark ? config?.jumpButtonDarkBackgroundColor : config?.jumpButtonBackgroundColor
-        jumpBtn.setTitleColor(isDark ? config?.jumpButtonTitleDarkColor : config?.jumpButtonTitleColor, for: .normal)
+        backgroundColor = isDark ? config.darkBackgroundColor : config.backgroundColor
+        titleLb.textColor = isDark ? config.titleDarkColor : config.titleColor
+        subTitleLb.textColor = isDark ? config.darkSubTitleColor : config.subTitleColor
+        jumpBtn.backgroundColor = isDark ? config.jumpButtonDarkBackgroundColor : config.jumpButtonBackgroundColor
+        jumpBtn.setTitleColor(isDark ? config.jumpButtonTitleDarkColor : config.jumpButtonTitleColor, for: .normal)
     }
     @objc func didCloseClick() {
         self.viewController()?.dismiss(animated: true, completion: nil)
@@ -114,9 +116,15 @@ class DeniedAuthorizationView: UIView {
         titleLb.frame = CGRect(x: 0, y: 0, width: width, height: titleHeight)
         
         let subTitleHeight = subTitleLb.text?.height(ofFont: subTitleLb.font, maxWidth: width - 40) ?? 0
+        let subTitleY: CGFloat
+        if barHeight == 0 {
+            subTitleY = height / 2 - subTitleHeight
+        }else {
+            subTitleY = height / 2 - subTitleHeight - 30 - UIDevice.topMargin
+        }
         subTitleLb.frame = CGRect(
             x: 20,
-            y: height / 2 - subTitleHeight - 30 - UIDevice.topMargin,
+            y: subTitleY,
             width: width - 40,
             height: subTitleHeight
         )
@@ -127,9 +135,15 @@ class DeniedAuthorizationView: UIView {
         if jumpBtnWidth < 150 {
             jumpBtnWidth = 150
         }
+        let jumpY: CGFloat
+        if barHeight == 0 {
+            jumpY = height - UIDevice.bottomMargin - 20 - jumpBtnBottomMargin
+        }else {
+            jumpY = height - UIDevice.bottomMargin - 40 - jumpBtnBottomMargin
+        }
         jumpBtn.frame = CGRect(
             x: 0,
-            y: height - UIDevice.bottomMargin - 40 - jumpBtnBottomMargin,
+            y: jumpY,
             width: jumpBtnWidth,
             height: 40
         )

@@ -57,7 +57,7 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
         }
     }
     
-    func contentView(updateContentSize contentView: PhotoPreviewContentView) {
+    public func contentView(updateContentSize contentView: PhotoPreviewContentView) {
         guard let videoAsset = photoAsset.networkVideoAsset,
               videoAsset.coverImage == nil,
               videoAsset.videoSize.equalTo(.zero) else {
@@ -73,10 +73,10 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
             setupScrollViewContentSize()
         }
     }
-    func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView) {
+    public func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView) {
         
     }
-    func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentView) {
+    public func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentView) {
         
     }
     

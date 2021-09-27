@@ -5,7 +5,7 @@
 //  Created by Slience on 2021/8/25.
 //
 
-import Foundation
+import UIKit
 
 public extension PhotoAsset {
     

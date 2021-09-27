@@ -20,7 +20,10 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
     public func animationController(
         forDismissed dismissed: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
-        PickerTransition(type: .dismiss)
+        if disablesCustomDismiss {
+            return nil
+        }
+        return PickerTransition(type: .dismiss)
     }
     
     public func interactionControllerForDismissal(

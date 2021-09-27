@@ -45,9 +45,9 @@ public class PhotoPeekViewController: UIViewController {
         return view
     }()
     
-    var photoAsset: PhotoAsset!
-    var progress: CGFloat = 0
-    var isCamera = false
+    fileprivate var photoAsset: PhotoAsset!
+    fileprivate var progress: CGFloat = 0
+    fileprivate var isCamera = false
     
     public init(_ photoAsset: PhotoAsset) {
         self.photoAsset = photoAsset
@@ -118,11 +118,11 @@ extension PhotoPeekViewController: PhotoPreviewVideoViewDelegate {
         progress = duration / CGFloat(photoAsset.videoDuration)
         setupProgressView()
     }
-    func setupProgressView() {
+    fileprivate func setupProgressView() {
         if progress == 0 {
             progressView.width = 0
         }else {
-            UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: 0.1, delay: 0, options: .curveLinear) {
                 self.progressView.width = self.view.width * self.progress
             }
         }

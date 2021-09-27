@@ -58,7 +58,7 @@ public enum SelectionTapAction: Equatable {
 public extension PickerResult {
     struct Options: OptionSet {
         public static let photo = Options(rawValue: 1 << 0)
-        public static let video = Options(rawValue: 1 << 0)
+        public static let video = Options(rawValue: 1 << 1)
         public static let any: Options = [.photo, .video]
         public let rawValue: Int
         
@@ -223,4 +223,12 @@ extension PickerAssetOptions {
         }
         return result
     }
+}
+
+/// Sort 排序规则
+public enum Sort: Equatable {
+    /// ASC 升序
+    case asc
+    /// DESC 降序
+    case desc
 }

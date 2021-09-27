@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class PhotoCroppingConfiguration {
+public struct PhotoCroppingConfiguration {
     
     /// 圆形裁剪框
     public var isRoundCrop: Bool = false
@@ -22,7 +22,7 @@ public class PhotoCroppingConfiguration {
     public var maskType: EditorImageResizerMaskView.MaskType = .darkBlurEffect
     
     /// 宽高比选中颜色
-    public lazy var aspectRatioSelectedColor: UIColor = .systemTintColor
+    public var aspectRatioSelectedColor: UIColor = .systemTintColor
     
     public init() { }
 }

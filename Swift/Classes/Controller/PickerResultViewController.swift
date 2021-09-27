@@ -415,7 +415,7 @@ class PickerResultViewController: UIViewController,
                 style = .automatic
             }
         }
-        let config = PhotoBrowser.Configuration()
+        var config = PhotoBrowser.Configuration()
         config.showDelete = true
         config.modalPresentationStyle = style
         let cell = collectionView.cellForItem(at: indexPath) as? ResultViewCell
@@ -928,8 +928,6 @@ class ResultViewCell: PhotoPickerViewCell {
     }
     override func initView() {
         super.initView()
-        // 默认是隐藏的，需要显示出来
-        isHidden = false
         contentView.addSubview(deleteButton)
     }
     

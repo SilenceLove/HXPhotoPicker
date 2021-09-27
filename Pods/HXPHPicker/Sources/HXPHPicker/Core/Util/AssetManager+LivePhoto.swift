@@ -22,7 +22,7 @@ public extension AssetManager {
     /// - Returns: 请求ID
     @available(iOS 9.1, *)
     @discardableResult
-    class func requestLivePhoto(
+    static func requestLivePhoto(
         for asset: PHAsset,
         targetSize: CGSize,
         iCloudHandler: @escaping (PHImageRequestID) -> Void,
@@ -69,7 +69,7 @@ public extension AssetManager {
     
     @available(iOS 9.1, *)
     @discardableResult
-    class func requestLivePhoto(
+    static func requestLivePhoto(
         for asset: PHAsset,
         targetSize: CGSize,
         isNetworkAccessAllowed: Bool,
@@ -90,7 +90,7 @@ public extension AssetManager {
     
     @available(iOS 9.1, *)
     @discardableResult
-    class func requestLivePhoto(
+    static func requestLivePhoto(
         for asset: PHAsset,
         targetSize: CGSize,
         options: PHLivePhotoRequestOptions,

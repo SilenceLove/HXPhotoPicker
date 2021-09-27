@@ -14,7 +14,7 @@ public class CameraConfiguration: BaseConfiguration {
     /// 相机类型
     public var cameraType: CameraController.CameraType = .normal
     
-    /// 相机预算分辨率
+    /// 相机分辨率
     public var sessionPreset: Preset = .hd1920x1080
     
     /// 摄像头默认位置
@@ -51,7 +51,6 @@ public class CameraConfiguration: BaseConfiguration {
     #endif
     
     /// 允许启动定位
-    /// 需要在跳转之前请求授权，内部不会主动请求授权
     public var allowLocation: Bool = true
     
     public override init() {
@@ -143,7 +142,7 @@ extension CameraConfiguration {
     }
     
     #if HXPICKER_ENABLE_EDITOR
-    func setupEditorColor() {
+    fileprivate func setupEditorColor() {
         videoEditor.cropView.finishButtonBackgroundColor = tintColor
         videoEditor.cropView.finishButtonDarkBackgroundColor = tintColor
         videoEditor.toolView.finishButtonBackgroundColor = tintColor
@@ -160,8 +159,7 @@ extension CameraConfiguration {
         photoEditor.cropConfimView.finishButtonDarkBackgroundColor = tintColor
         photoEditor.cropping.aspectRatioSelectedColor = tintColor
         photoEditor.filter = .init(
-            infos: PhotoTools.defaultFilters(),
-            selectedColor: tintColor
+            infos: PhotoTools.defaultFilters()
         )
         photoEditor.text.tintColor = tintColor
     }

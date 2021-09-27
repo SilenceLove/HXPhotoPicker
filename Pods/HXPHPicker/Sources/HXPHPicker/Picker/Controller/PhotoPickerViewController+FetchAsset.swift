@@ -16,8 +16,8 @@ extension PhotoPickerViewController {
             fetchAssetCollections()
             title = ""
             navigationItem.titleView = titleView
-            if picker.cameraAssetCollection != nil {
-                assetCollection = picker.cameraAssetCollection
+            if let cameraAssetCollection = picker.cameraAssetCollection {
+                assetCollection = cameraAssetCollection
                 assetCollection.isSelected = true
                 titleView.title = assetCollection.albumName
                 fetchPhotoAssets()
@@ -70,16 +70,17 @@ extension PhotoPickerViewController {
     func fetchPhotoAssets() {
         guard let picker = pickerController else { return }
         picker.fetchPhotoAssets(assetCollection: assetCollection) { [weak self] (photoAssets, photoAsset) in
-            self?.canAddCamera = true
-            self?.assets = photoAssets
-            self?.setupEmptyView()
-            self?.collectionView.reloadData()
-            self?.scrollToAppropriatePlace(photoAsset: photoAsset)
-            if self != nil && self!.showLoading {
-                ProgressHUD.hide(forView: self?.view, animated: true)
-                self?.showLoading = false
+            guard let self = self else { return }
+            self.canAddCamera = true
+            self.assets = photoAssets
+            self.setupEmptyView()
+            self.collectionView.reloadData()
+            self.scrollToAppropriatePlace(photoAsset: photoAsset)
+            if self.showLoading {
+                ProgressHUD.hide(forView: self.view, animated: true)
+                self.showLoading = false
             }else {
-                ProgressHUD.hide(forView: self?.navigationController?.view, animated: false)
+                ProgressHUD.hide(forView: self.navigationController?.view, animated: false)
             }
         }
     }

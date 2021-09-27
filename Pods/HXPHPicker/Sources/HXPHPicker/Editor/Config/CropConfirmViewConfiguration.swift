@@ -7,37 +7,25 @@
 
 import UIKit
 
-public class CropConfirmViewConfiguration {
+public struct CropConfirmViewConfiguration {
     
     /// 完成按钮标题颜色
-    public lazy var finishButtonTitleColor: UIColor = {
-        return .white
-    }()
+    public var finishButtonTitleColor: UIColor =  .white
     
     /// 暗黑风格下完成按钮标题颜色
-    public lazy var finishButtonTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public var finishButtonTitleDarkColor: UIColor = .white
     
     /// 完成按钮的背景颜色
-    public lazy var finishButtonBackgroundColor: UIColor = {
-        return .systemTintColor
-    }()
+    public var finishButtonBackgroundColor: UIColor = .systemTintColor
     
     /// 暗黑风格下完成按钮选的背景颜色
-    public lazy var finishButtonDarkBackgroundColor: UIColor = {
-        return .systemTintColor
-    }()
+    public var finishButtonDarkBackgroundColor: UIColor = .systemTintColor
     
     /// 取消按钮标题颜色
-    public lazy var cancelButtonTitleColor: UIColor = {
-        return .white
-    }()
+    public var cancelButtonTitleColor: UIColor = .white
     
     /// 暗黑风格下取消按钮标题颜色
-    public lazy var cancelButtonTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public var cancelButtonTitleDarkColor: UIColor = .white
     
     /// 取消按钮的背景颜色
     public var cancelButtonBackgroundColor: UIColor?
@@ -46,14 +34,10 @@ public class CropConfirmViewConfiguration {
     public var cancelButtonDarkBackgroundColor: UIColor?
     
     /// 还原按钮标题颜色
-    public lazy var resetButtonTitleColor: UIColor = {
-        return .white
-    }()
+    public var resetButtonTitleColor: UIColor = .white
     
     /// 暗黑风格下还原按钮标题颜色
-    public lazy var resetButtonTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public var resetButtonTitleDarkColor: UIColor = .white
     
     /// 还原按钮的背景颜色
     public var resetButtonBackgroundColor: UIColor?

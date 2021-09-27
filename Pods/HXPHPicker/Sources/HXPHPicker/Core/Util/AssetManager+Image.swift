@@ -19,9 +19,11 @@ public extension AssetManager {
     ///   - completion: 完成
     /// - Returns: 请求ID
     @discardableResult
-    class func requestThumbnailImage(for asset: PHAsset,
-                                     targetWidth: CGFloat,
-                                     completion: ImageResultHandler?) -> PHImageRequestID {
+    static func requestThumbnailImage(
+        for asset: PHAsset,
+        targetWidth: CGFloat,
+        completion: ImageResultHandler?
+    ) -> PHImageRequestID {
         let options = PHImageRequestOptions.init()
         options.resizeMode = .fast
         return requestImage(
@@ -48,7 +50,7 @@ public extension AssetManager {
     ///   - resultHandler: 回调
     /// - Returns: 请求ID
     @discardableResult
-    class func requestImage(
+    static func requestImage(
         for asset: PHAsset,
         targetSize: CGSize,
         options: PHImageRequestOptions,

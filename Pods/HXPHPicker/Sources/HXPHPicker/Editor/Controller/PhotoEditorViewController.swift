@@ -22,7 +22,7 @@ open class PhotoEditorViewController: BaseViewController {
     /// 当前编辑的图片
     public private(set) var image: UIImage!
     
-    /// 资源类型
+    /// 来源
     public let sourceType: EditorController.SourceType
     
     /// 当前编辑状态
@@ -107,8 +107,8 @@ open class PhotoEditorViewController: BaseViewController {
     var filterHDImage: UIImage?
     var mosaicImage: UIImage?
     var thumbnailImage: UIImage!
-    var needRequest: Bool = false
-    var requestType: Int = 0
+    private var needRequest: Bool = false
+    private var requestType: Int = 0
     
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -253,9 +253,27 @@ open class PhotoEditorViewController: BaseViewController {
     var orientationDidChange: Bool = false
     var imageViewDidChange: Bool = true
     var currentToolOption: EditorToolOptions?
-    
+    var toolOptions: EditorToolView.Options = []
     open override func viewDidLoad() {
         super.viewDidLoad()
+        for options in config.toolView.toolOptions {
+            switch options.type {
+            case .graffiti:
+                toolOptions.insert(.graffiti)
+            case .chartlet:
+                toolOptions.insert(.chartlet)
+            case .text:
+                toolOptions.insert(.text)
+            case .cropping:
+                toolOptions.insert(.cropping)
+            case .mosaic:
+                toolOptions.insert(.mosaic)
+            case .filter:
+                toolOptions.insert(.filter)
+            case .music:
+                toolOptions.insert(.music)
+            }
+        }
         let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
         singleTap.delegate = self
         view.addGestureRecognizer(singleTap)
@@ -264,8 +282,10 @@ open class PhotoEditorViewController: BaseViewController {
         view.clipsToBounds = true
         view.addSubview(imageView)
         view.addSubview(toolView)
-        view.addSubview(cropConfirmView)
-        view.addSubview(cropToolView)
+        if toolOptions.contains(.cropping) {
+            view.addSubview(cropConfirmView)
+            view.addSubview(cropToolView)
+        }
         if config.fixedCropState {
             state = .cropping
             toolView.alpha = 0
@@ -274,10 +294,18 @@ open class PhotoEditorViewController: BaseViewController {
             topView.isHidden = true
         }else {
             state = config.state
-            view.addSubview(brushColorView)
-            view.addSubview(chartletView)
-            view.addSubview(mosaicToolView)
-            view.addSubview(filterView)
+            if toolOptions.contains(.graffiti) {
+                view.addSubview(brushColorView)
+            }
+            if toolOptions.contains(.chartlet) {
+                view.addSubview(chartletView)
+            }
+            if toolOptions.contains(.mosaic) {
+                view.addSubview(mosaicToolView)
+            }
+            if toolOptions.contains(.filter) {
+                view.addSubview(filterView)
+            }
         }
         view.layer.addSublayer(topMaskLayer)
         view.addSubview(topView)
@@ -302,10 +330,14 @@ open class PhotoEditorViewController: BaseViewController {
             singleTap()
         }
         imageView.undoAllDraw()
+        if toolOptions.contains(.graffiti) {
+            brushColorView.canUndo = imageView.canUndoDraw
+        }
         imageView.undoAllMosaic()
+        if toolOptions.contains(.mosaic) {
+            mosaicToolView.canUndo = imageView.canUndoMosaic
+        }
         imageView.undoAllSticker()
-        brushColorView.canUndo = imageView.canUndoDraw
-        mosaicToolView.canUndo = imageView.canUndoMosaic
         imageView.reset(false)
         imageView.finishCropping(false)
         if config.fixedCropState {
@@ -340,13 +372,24 @@ open class PhotoEditorViewController: BaseViewController {
             topView.y = UIDevice.generalStatusBarHeight
         }
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
-        cropConfirmView.frame = toolView.frame
-        cropToolView.frame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
-        brushColorView.frame = cropToolView.frame
-        mosaicToolView.frame = brushColorView.frame
-        cropToolView.updateContentInset()
-        setChartletViewFrame()
-        setFilterViewFrame()
+        let cropToolFrame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
+        if toolOptions.contains(.cropping) {
+            cropConfirmView.frame = toolView.frame
+            cropToolView.frame = cropToolFrame
+            cropToolView.updateContentInset()
+        }
+        if toolOptions.contains(.graffiti) {
+            brushColorView.frame = cropToolFrame
+        }
+        if toolOptions.contains(.mosaic) {
+            mosaicToolView.frame = cropToolFrame
+        }
+        if toolOptions.isSticker {
+            setChartletViewFrame()
+        }
+        if toolOptions.contains(.filter) {
+            setFilterViewFrame()
+        }
         if !imageView.frame.equalTo(view.bounds) && !imageView.frame.isEmpty && !imageViewDidChange {
             imageView.frame = view.bounds
             imageView.reset(false)
@@ -361,8 +404,12 @@ open class PhotoEditorViewController: BaseViewController {
 //                setFilterImage()
                 if let editedData = editResult?.editedData {
                     imageView.setEditedData(editedData: editedData)
-                    brushColorView.canUndo = imageView.canUndoDraw
-                    mosaicToolView.canUndo = imageView.canUndoMosaic
+                    if toolOptions.contains(.graffiti) {
+                        brushColorView.canUndo = imageView.canUndoDraw
+                    }
+                    if toolOptions.contains(.mosaic) {
+                        mosaicToolView.canUndo = imageView.canUndoMosaic
+                    }
                 }
                 if state == .cropping {
                     imageView.startCropping(true)
@@ -446,80 +493,11 @@ open class PhotoEditorViewController: BaseViewController {
     func setImage(_ image: UIImage) {
         self.image = image
     }
+    func setState(_ state: State) {
+        self.state = state
+    }
 }
 
-extension PhotoEditorViewController: EditorToolViewDelegate {
-    func toolView(didFinishButtonClick toolView: EditorToolView) {
-        exportResources()
-    }
-    func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions) {
-        switch model.type {
-        case .graffiti:
-            currentToolOption = nil
-            imageView.mosaicEnabled = false
-            hiddenMosaicToolView()
-            imageView.drawEnabled = !imageView.drawEnabled
-            toolView.stretchMask = imageView.drawEnabled
-            toolView.layoutSubviews()
-            if imageView.drawEnabled {
-                imageView.stickerEnabled = false
-                showBrushColorView()
-                currentToolOption = model
-            }else {
-                imageView.stickerEnabled = true
-                hiddenBrushColorView()
-            }
-        case .chartlet:
-            chartletView.firstRequest()
-            imageView.deselectedSticker()
-            imageView.drawEnabled = false
-            imageView.mosaicEnabled = false
-            imageView.stickerEnabled = false
-            imageView.isEnabled = false
-            showChartlet = true
-            hidenTopView()
-            showChartletView()
-        case .text:
-            imageView.deselectedSticker()
-            let textVC = EditorStickerTextViewController(config: config.text)
-            textVC.delegate = self
-            let nav = EditorStickerTextController(rootViewController: textVC)
-            nav.modalPresentationStyle = config.text.modalPresentationStyle
-            present(nav, animated: true, completion: nil)
-        case .cropping:
-            imageView.drawEnabled = false
-            imageView.mosaicEnabled = false
-            imageView.stickerEnabled = false
-            state = .cropping
-            imageView.startCropping(true)
-            croppingAction()
-        case .mosaic:
-            currentToolOption = nil
-            imageView.drawEnabled = false
-            hiddenBrushColorView()
-            imageView.mosaicEnabled = !imageView.mosaicEnabled
-            toolView.stretchMask = imageView.mosaicEnabled
-            toolView.layoutSubviews()
-            if imageView.mosaicEnabled {
-                imageView.stickerEnabled = false
-                showMosaicToolView()
-                currentToolOption = model
-            }else {
-                imageView.stickerEnabled = true
-                hiddenMosaicToolView()
-            }
-        case .filter:
-            imageView.drawEnabled = false
-            imageView.mosaicEnabled = false
-            imageView.stickerEnabled = false
-            isFilter = true
-            hidenTopView()
-            showFilterView()
-        default:
-            break
-        }
-    }
-}
 extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
     func brushColorView(didUndoButton colorView: PhotoEditorBrushColorView) {
         imageView.undoDraw()
@@ -604,8 +582,10 @@ extension PhotoEditorViewController: PhotoEditorViewDelegate {
         mosaicToolView.canUndo = editorView.canUndoMosaic
     }
     func editorView(_ editorView: PhotoEditorView, updateStickerText item: EditorStickerItem) {
-        let textVC = EditorStickerTextViewController(config: config.text,
-                                                     stickerItem: item)
+        let textVC = EditorStickerTextViewController(
+            config: config.text,
+            stickerItem: item
+        )
         textVC.delegate = self
         let nav = EditorStickerTextController(rootViewController: textVC)
         nav.modalPresentationStyle = config.text.modalPresentationStyle
@@ -639,67 +619,6 @@ extension PhotoEditorViewController: PhotoEditorMosaicToolViewDelegate {
         mosaicToolView.canUndo = imageView.canUndoMosaic
     }
 }
-extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
-    func filterView(shouldSelectFilter filterView: PhotoEditorFilterView) -> Bool {
-        true
-    }
-    
-    func filterView(
-        _ filterView: PhotoEditorFilterView,
-        didSelected filter: PhotoEditorFilter,
-        atItem: Int
-    ) {
-        if filter.isOriginal {
-            imageView.imageResizerView.filter = nil
-            imageView.updateImage(image)
-            imageView.setMosaicOriginalImage(mosaicImage)
-            return
-        }
-        imageView.imageResizerView.filter = filter
-        ProgressHUD.showLoading(addedTo: view, animated: true)
-        let value = filterView.sliderView.value
-        let lastImage = imageView.image
-        DispatchQueue.global().async {
-            let filterInfo = self.config.filter.infos[atItem]
-            if let newImage = filterInfo.filterHandler(self.thumbnailImage, lastImage, value, .touchUpInside) {
-                let mosaicImage = newImage.mosaicImage(level: self.config.mosaic.mosaicWidth)
-                DispatchQueue.main.sync {
-                    ProgressHUD.hide(forView: self.view, animated: true)
-                    self.imageView.updateImage(newImage)
-                    self.imageView.imageResizerView.filterValue = value
-                    self.imageView.setMosaicOriginalImage(mosaicImage)
-                }
-            }else {
-                DispatchQueue.main.sync {
-                    ProgressHUD.hide(forView: self.view, animated: true)
-                    ProgressHUD.showWarning(addedTo: self.view, text: "设置失败!".localized, animated: true, delayHide: 1.5)
-                }
-            }
-        }
-    }
-    func filterView(_ filterView: PhotoEditorFilterView,
-                    didChanged value: Float) {
-        let filterInfo = config.filter.infos[filterView.currentSelectedIndex - 1]
-        if let newImage = filterInfo.filterHandler(thumbnailImage, imageView.image, value, .valueChanged) {
-            imageView.updateImage(newImage)
-            imageView.imageResizerView.filterValue = value
-            if mosaicToolView.canUndo {
-                let mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)
-                imageView.setMosaicOriginalImage(mosaicImage)
-            }
-        }
-    }
-    func filterView(_ filterView: PhotoEditorFilterView, touchUpInside value: Float) {
-        let filterInfo = config.filter.infos[filterView.currentSelectedIndex - 1]
-        if let newImage = filterInfo.filterHandler(thumbnailImage, imageView.image, value, .touchUpInside) {
-            imageView.updateImage(newImage)
-            imageView.imageResizerView.filterValue = value
-            let mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)
-            imageView.setMosaicOriginalImage(mosaicImage)
-        }
-    }
-}
-
 extension PhotoEditorViewController: UIGestureRecognizerDelegate {
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if touch.view is EditorStickerContentView {
@@ -715,89 +634,5 @@ extension PhotoEditorViewController: UIGestureRecognizerDelegate {
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
         true
-    }
-}
-
-extension PhotoEditorViewController: EditorStickerTextViewControllerDelegate {
-    func stickerTextViewController(
-        _ controller: EditorStickerTextViewController,
-        didFinish stickerItem: EditorStickerItem
-    ) {
-        imageView.updateSticker(item: stickerItem)
-    }
-    
-    func stickerTextViewController(
-        _ controller: EditorStickerTextViewController,
-        didFinish stickerText: EditorStickerText
-    ) {
-        let item = EditorStickerItem(
-            image: stickerText.image,
-            imageData: nil,
-            text: stickerText
-        )
-        imageView.addSticker(item: item, isSelected: false)
-    }
-}
-
-extension PhotoEditorViewController: EditorChartletViewDelegate {
-    func chartletView(
-        _ chartletView: EditorChartletView,
-        loadTitleChartlet response: @escaping ([EditorChartlet]) -> Void
-    ) {
-        if let editorDelegate = delegate {
-            editorDelegate.photoEditorViewController(
-                self,
-                loadTitleChartlet: response
-            )
-        }else {
-            #if canImport(Kingfisher)
-            let titles = PhotoTools.defaultTitleChartlet()
-            response(titles)
-            #else
-            response([])
-            #endif
-        }
-    }
-    func chartletView(backClick chartletView: EditorChartletView) {
-        singleTap()
-    }
-    func chartletView(
-        _ chartletView: EditorChartletView,
-        titleChartlet: EditorChartlet,
-        titleIndex: Int,
-        loadChartletList response: @escaping (Int, [EditorChartlet]) -> Void
-    ) {
-        if let editorDelegate = delegate {
-            editorDelegate.photoEditorViewController(
-                self,
-                titleChartlet: titleChartlet,
-                titleIndex: titleIndex,
-                loadChartletList: response
-            )
-        }else {
-            /// 默认加载这些贴图
-            #if canImport(Kingfisher)
-            let chartletList = PhotoTools.defaultNetworkChartlet()
-            response(titleIndex, chartletList)
-            #else
-            response(titleIndex, [])
-            #endif
-        }
-    }
-    func chartletView(
-        _ chartletView: EditorChartletView,
-        didSelectImage image: UIImage,
-        imageData: Data?
-    ) {
-        let item = EditorStickerItem(
-            image: image,
-            imageData: imageData,
-            text: nil
-        )
-        imageView.addSticker(
-            item: item,
-            isSelected: false
-        )
-        singleTap()
     }
 }

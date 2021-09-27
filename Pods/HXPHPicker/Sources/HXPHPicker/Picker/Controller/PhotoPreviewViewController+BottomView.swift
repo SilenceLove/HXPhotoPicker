@@ -81,6 +81,7 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             return
         }
         if !pickerController.selectedAssetArray.isEmpty {
+            delegate?.previewViewController(didFinishButton: self)
             pickerController.finishCallback()
             return
         }
@@ -113,6 +114,15 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
                     for: photoAsset,
                     showHUD: true
                 ) {
+                    if isExternalPickerPreview {
+                        delegate?.previewViewController(
+                            self,
+                            didSelectBox: photoAsset,
+                            isSelected: true,
+                            updateCell: false
+                        )
+                    }
+                    delegate?.previewViewController(didFinishButton: self)
                     pickerController.singleFinishCallback(
                         for: photoAsset
                     )
@@ -123,6 +133,15 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
                         for: photoAsset,
                         showHUD: true
                     ) {
+                        if isExternalPickerPreview {
+                            delegate?.previewViewController(
+                                self,
+                                didSelectBox: photoAsset,
+                                isSelected: true,
+                                updateCell: false
+                            )
+                        }
+                        delegate?.previewViewController(didFinishButton: self)
                         pickerController.singleFinishCallback(
                             for: photoAsset
                         )
@@ -131,6 +150,15 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
                     if pickerController.addedPhotoAsset(
                         photoAsset: photoAsset
                     ) {
+                        if isExternalPickerPreview {
+                            delegate?.previewViewController(
+                                self,
+                                didSelectBox: photoAsset,
+                                isSelected: true,
+                                updateCell: false
+                            )
+                        }
+                        delegate?.previewViewController(didFinishButton: self)
                         pickerController.finishCallback()
                     }
                 }

@@ -8,7 +8,7 @@
 import UIKit
 
 // MARK: 相册标题视图配置类，弹窗展示相册列表时有效
-public class AlbumTitleViewConfiguration {
+public struct AlbumTitleViewConfiguration {
     
     /// 背景颜色
     public var backgroundColor: UIColor?
@@ -17,7 +17,7 @@ public class AlbumTitleViewConfiguration {
     public var backgroudDarkColor: UIColor?
     
     /// 箭头配置
-    public lazy var arrow: ArrowViewConfiguration = .init()
+    public var arrow: ArrowViewConfiguration = .init()
     
     public init() { }
 }

@@ -11,8 +11,8 @@ import CoreLocation
 extension CameraViewController: CLLocationManagerDelegate {
     
     var allowLocation: Bool {
-        let whenIn = Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") as? Bool ?? false
-        let always = Bundle.main.object(forInfoDictionaryKey: "NSLocationAlwaysUsageDescription") as? Bool ?? false
+        let whenIn = Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil
+        let always = Bundle.main.object(forInfoDictionaryKey: "NSLocationAlwaysUsageDescription") != nil
         return config.allowLocation && (whenIn || always)
     }
     

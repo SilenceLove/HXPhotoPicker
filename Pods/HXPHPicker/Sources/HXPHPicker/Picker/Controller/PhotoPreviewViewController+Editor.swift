@@ -22,6 +22,15 @@ extension PhotoPreviewViewController: PhotoEditorViewControllerDelegate {
         }else {
             if (videoLoadSingleCell && photoAsset.mediaType == .video) || !isMultipleSelect {
                 if picker.canSelectAsset(for: photoAsset, showHUD: true) {
+                    if isExternalPickerPreview {
+                        delegate?.previewViewController(
+                            self,
+                            didSelectBox: photoAsset,
+                            isSelected: true,
+                            updateCell: false
+                        )
+                    }
+                    delegate?.previewViewController(didFinishButton: self)
                     picker.singleFinishCallback(for: photoAsset)
                 }
                 return
@@ -44,6 +53,15 @@ extension PhotoPreviewViewController: PhotoEditorViewControllerDelegate {
         }
         if !isMultipleSelect {
             if picker.canSelectAsset(for: photoAsset, showHUD: true) {
+                if isExternalPickerPreview {
+                    delegate?.previewViewController(
+                        self,
+                        didSelectBox: photoAsset,
+                        isSelected: true,
+                        updateCell: false
+                    )
+                }
+                delegate?.previewViewController(didFinishButton: self)
                 picker.singleFinishCallback(for: photoAsset)
             }
             return
@@ -220,6 +238,15 @@ extension PhotoPreviewViewController: VideoEditorViewControllerDelegate {
         }else {
             if videoLoadSingleCell || !isMultipleSelect {
                 if picker.canSelectAsset(for: photoAsset, showHUD: true) {
+                    if isExternalPickerPreview {
+                        delegate?.previewViewController(
+                            self,
+                            didSelectBox: photoAsset,
+                            isSelected: true,
+                            updateCell: false
+                        )
+                    }
+                    delegate?.previewViewController(didFinishButton: self)
                     picker.singleFinishCallback(for: photoAsset)
                 }
                 return
@@ -244,6 +271,15 @@ extension PhotoPreviewViewController: VideoEditorViewControllerDelegate {
         }
         if videoLoadSingleCell || !isMultipleSelect {
             if picker.canSelectAsset(for: photoAsset, showHUD: true) {
+                if isExternalPickerPreview {
+                    delegate?.previewViewController(
+                        self,
+                        didSelectBox: photoAsset,
+                        isSelected: true,
+                        updateCell: false
+                    )
+                }
+                delegate?.previewViewController(didFinishButton: self)
                 picker.singleFinishCallback(for: photoAsset)
             }
             return

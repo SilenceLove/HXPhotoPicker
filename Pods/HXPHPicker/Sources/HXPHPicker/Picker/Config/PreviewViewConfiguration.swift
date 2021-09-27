@@ -9,7 +9,7 @@
 import UIKit
 
 // MARK: 预览界面配置类
-public class PreviewViewConfiguration {
+public struct PreviewViewConfiguration {
     
     /// 自定义视频Cell
     public var customVideoCellClass: PreviewVideoViewCell.Type?
@@ -20,13 +20,13 @@ public class PreviewViewConfiguration {
     }
     
     /// 背景颜色
-    public lazy var backgroundColor: UIColor = .white
+    public var backgroundColor: UIColor = .white
     
     /// 暗黑风格下背景颜色
-    public lazy var backgroundDarkColor: UIColor = .black
+    public var backgroundDarkColor: UIColor = .black
     
     /// 选择框配置
-    public lazy var selectBox: SelectBoxConfiguration = .init()
+    public var selectBox: SelectBoxConfiguration = .init()
     
     /// 视频播放类型
     public var videoPlayType: PhotoPreviewViewController.PlayType = .normal
@@ -41,16 +41,7 @@ public class PreviewViewConfiguration {
     public var showBottomView: Bool = true
     
     /// 底部视图相关配置
-    public lazy var bottomView: PickerBottomViewConfiguration = {
-        let config = PickerBottomViewConfiguration.init()
-        config.previewButtonHidden = true
-        config.disableFinishButtonWhenNotSelected = false
-        #if HXPICKER_ENABLE_EDITOR
-        config.editButtonHidden = false
-        #endif
-        config.showSelectedView = true
-        return config
-    }()
+    public var bottomView: PickerBottomViewConfiguration
     
     /// 取消按钮的配置只有当是外部预览时才有效，文字和图片颜色通过 navigationTintColor 设置
     /// 取消按钮类型
@@ -65,5 +56,15 @@ public class PreviewViewConfiguration {
     /// 暗黑模式下取消按钮图片名
     public var cancelDarkImageName: String = "hx_picker_photolist_cancel"
     
-    public init() { PhotoManager.shared.loadNetworkVideoMode = loadNetworkVideoMode }
+    public init() {
+        PhotoManager.shared.loadNetworkVideoMode = loadNetworkVideoMode
+        var bottomConfig = PickerBottomViewConfiguration.init()
+        bottomConfig.previewButtonHidden = true
+        bottomConfig.disableFinishButtonWhenNotSelected = false
+        #if HXPICKER_ENABLE_EDITOR
+        bottomConfig.editButtonHidden = false
+        #endif
+        bottomConfig.showSelectedView = true
+        self.bottomView = bottomConfig
+    }
 }

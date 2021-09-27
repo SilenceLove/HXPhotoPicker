@@ -324,7 +324,7 @@ extension PickerConfigurationViewController {
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func reverseOrderAction(_ indexPath: IndexPath) {
-        config.reverseOrder = !config.reverseOrder
+        config.photoList.sort = config.photoList.sort == .asc ? .desc : .asc
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func photoSelectionTapActionAction(_ indexPath: IndexPath) {
@@ -472,7 +472,7 @@ extension PickerConfigurationViewController {
             case .creationDate:
                 return config.creationDate ? "是" : "否"
             case .reverseOrder:
-                return config.reverseOrder ? "是" : "否"
+                return config.photoList.sort == .desc ? "是" : "否"
             case .photoSelectionTapAction:
                 return config.photoSelectionTapAction.title
             case .videoSelectionTapAction:

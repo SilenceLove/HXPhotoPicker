@@ -12,16 +12,7 @@ import PhotosUI
 
 extension PhotoManager {
     struct AssociatedKeys {
-        static var targetWidthKey: String = "targetWidth"
         static var loadNetworkVideoMode: String = "loadNetworkVideoMode"
-    }
-    var targetWidth: CGFloat {
-        get {
-            objc_getAssociatedObject(self, &AssociatedKeys.targetWidthKey) as? CGFloat ?? 0
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.targetWidthKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
     }
     public var loadNetworkVideoMode: PhotoAsset.LoadNetworkVideoMode {
         get {

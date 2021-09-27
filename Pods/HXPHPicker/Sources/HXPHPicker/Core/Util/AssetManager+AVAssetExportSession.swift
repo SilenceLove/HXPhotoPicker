@@ -20,7 +20,7 @@ public extension AssetManager {
     ///   - resultHandler: AVAssetExportSession
     /// - Returns: 请求ID
     @discardableResult
-    class func requestExportSession(
+    static func requestExportSession(
         forVideo asset: PHAsset,
         exportPreset: String,
         deliveryMode: PHVideoRequestOptionsDeliveryMode = .automatic,
@@ -68,7 +68,7 @@ public extension AssetManager {
     
     /// 获取 AVAssetExportSession
     @discardableResult
-    class func requestExportSession(
+    static func requestExportSession(
         forVideo asset: PHAsset,
         exportPreset: String,
         version: PHVideoRequestOptionsVersion,
@@ -92,7 +92,7 @@ public extension AssetManager {
     
     /// 获取 AVAssetExportSession
     @discardableResult
-    class func requestExportSession(
+    static func requestExportSession(
         forVideo asset: PHAsset,
         options: PHVideoRequestOptions,
         exportPreset: String,
@@ -106,7 +106,7 @@ public extension AssetManager {
         )
     }
     
-    class func exportVideoURL(
+    static func exportVideoURL(
         forVideo asset: PHAsset,
         toFile fileURL: URL,
         exportPreset: ExportPreset,
@@ -143,7 +143,7 @@ public extension AssetManager {
     }
     
     @discardableResult
-    class func exportVideoURL(
+    static func exportVideoURL(
         forVideo avAsset: AVAsset,
         toFile fileURL: URL,
         exportPreset: ExportPreset,

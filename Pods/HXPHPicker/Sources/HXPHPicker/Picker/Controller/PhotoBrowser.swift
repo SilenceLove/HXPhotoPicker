@@ -9,7 +9,7 @@ import UIKit
 
 open class PhotoBrowser: PhotoPickerController {
     
-    public class Configuration {
+    public struct Configuration {
         /// 导航栏 标题、删除、取消 按钮颜色
         public var tintColor: UIColor = .white
         /// 网络视频加载方式
@@ -56,7 +56,7 @@ open class PhotoBrowser: PhotoPickerController {
         previewConfig.prefersStatusBarHidden = true
         previewConfig.statusBarStyle = .lightContent
         
-        let pConfig = PreviewViewConfiguration()
+        var pConfig = PreviewViewConfiguration()
         pConfig.singleClickCellAutoPlayVideo = false
         pConfig.showBottomView = false
         pConfig.cancelType = .image
@@ -128,10 +128,10 @@ open class PhotoBrowser: PhotoPickerController {
     public typealias TransitionHandler = (Int) -> UIView?
     public typealias AssetHandler = (Int, PhotoAsset, PhotoBrowser) -> Void
     
-    let transitionHandler: TransitionHandler?
-    let deleteAssetHandler: AssetHandler?
-    let longPressHandler: AssetHandler?
-    let transitionalImage: UIImage?
+    private let transitionHandler: TransitionHandler?
+    private let deleteAssetHandler: AssetHandler?
+    private let longPressHandler: AssetHandler?
+    private let transitionalImage: UIImage?
     
     lazy var titleLabel: UILabel = {
         let titleLabel = UILabel.init()

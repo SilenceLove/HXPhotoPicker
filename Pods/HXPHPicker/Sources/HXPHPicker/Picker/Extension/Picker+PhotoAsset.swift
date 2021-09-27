@@ -28,9 +28,18 @@ extension PhotoAsset {
         }
         completion(false, self)
     }
-    
+    var inICloud: Bool {
+        guard let phAsset = phAsset else {
+            return false
+        }
+        if downloadStatus != .succeed && !phAsset.isLocallayAvailable {
+            return true
+        }
+        return false
+    }
     func checkICloundStatus(
         allowSyncPhoto: Bool,
+        hudAddedTo: UIView? = UIApplication.shared.keyWindow,
         completion: @escaping (Bool) -> Void
     ) -> Bool {
         guard let phAsset = phAsset else {
@@ -40,12 +49,11 @@ extension PhotoAsset {
             return false
         }
         if downloadStatus != .succeed && phAsset.inICloud {
-            let keyWindow = UIApplication.shared.keyWindow
             var loadingView: ProgressHUD?
             if mediaType == .photo {
                 requestImageData { _, _ in
                     loadingView = ProgressHUD.showLoading(
-                        addedTo: keyWindow,
+                        addedTo: hudAddedTo,
                         text: "正在同步iCloud".localized + "...",
                         animated: true
                     )
@@ -56,13 +64,13 @@ extension PhotoAsset {
                 } resultHandler: { _, result in
                     switch result {
                     case .success(_):
-                        ProgressHUD.hide(forView: keyWindow, animated: true)
+                        ProgressHUD.hide(forView: hudAddedTo, animated: true)
                         loadingView = nil
                         completion(true)
                     case .failure(_):
-                        ProgressHUD.hide(forView: keyWindow, animated: false)
+                        ProgressHUD.hide(forView: hudAddedTo, animated: false)
                         ProgressHUD.showWarning(
-                            addedTo: keyWindow,
+                            addedTo: hudAddedTo,
                             text: "iCloud同步失败".localized,
                             animated: true,
                             delayHide: 1.5
@@ -74,20 +82,20 @@ extension PhotoAsset {
             }else if mediaType == .video {
                 requestAVAsset { _, _ in
                     loadingView = ProgressHUD.showLoading(
-                        addedTo: keyWindow,
+                        addedTo: hudAddedTo,
                         text: "正在同步iCloud".localized + "...",
                         animated: true
                     )
                 } progressHandler: { _, progress in
                     loadingView?.updateText(text: "正在同步iCloud".localized + "(" + String(Int(progress * 100)) + "%)")
                 } success: { _, _, _ in
-                    ProgressHUD.hide(forView: keyWindow, animated: true)
+                    ProgressHUD.hide(forView: hudAddedTo, animated: true)
                     loadingView = nil
                     completion(true)
                 } failure: { _, _, _ in
-                    ProgressHUD.hide(forView: keyWindow, animated: false)
+                    ProgressHUD.hide(forView: hudAddedTo, animated: false)
                     ProgressHUD.showWarning(
-                        addedTo: keyWindow,
+                        addedTo: hudAddedTo,
                         text: "iCloud同步失败".localized,
                         animated: true,
                         delayHide: 1.5

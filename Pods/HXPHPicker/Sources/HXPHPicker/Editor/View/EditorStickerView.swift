@@ -89,7 +89,8 @@ class EditorStickerView: UIView {
                     return selectView.contentView
                 }
             }
-            if let itemView = view.superview as? EditorStickerItemView {
+            if let itemView = view.superview as? EditorStickerItemView,
+               !itemView.isDelete {
                 if itemView != selectView {
                     deselectedSticker()
                 }

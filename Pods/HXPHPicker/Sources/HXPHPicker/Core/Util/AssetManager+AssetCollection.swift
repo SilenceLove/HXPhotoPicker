@@ -14,7 +14,7 @@ public extension AssetManager {
     /// 获取系统相册
     /// - Parameter options: 选型
     /// - Returns: 相册列表
-    class func fetchSmartAlbums(
+    static func fetchSmartAlbums(
         options: PHFetchOptions?
     ) -> PHFetchResult<PHAssetCollection> {
         return PHAssetCollection.fetchAssetCollections(
@@ -27,7 +27,7 @@ public extension AssetManager {
     /// 获取用户创建的相册
     /// - Parameter options: 选项
     /// - Returns: 相册列表
-    class func fetchUserAlbums(
+    static func fetchUserAlbums(
         options: PHFetchOptions?
     ) -> PHFetchResult<PHAssetCollection> {
         return PHAssetCollection.fetchAssetCollections(
@@ -42,7 +42,7 @@ public extension AssetManager {
     ///   - filterInvalid: 过滤无效的相册
     ///   - options: 可选项
     ///   - usingBlock: 枚举每一个相册集合
-    class func enumerateAllAlbums(
+    static func enumerateAllAlbums(
         filterInvalid: Bool,
         options: PHFetchOptions?,
         usingBlock :@escaping (PHAssetCollection) -> Void
@@ -73,7 +73,7 @@ public extension AssetManager {
     /// 获取相机胶卷资源集合
     /// - Parameter options: 可选项
     /// - Returns: 相机胶卷集合
-    class func fetchCameraRollAlbum(
+    static func fetchCameraRollAlbum(
         options: PHFetchOptions?
     ) -> PHAssetCollection? {
         let smartAlbums = fetchSmartAlbums(options: options)
@@ -94,7 +94,7 @@ public extension AssetManager {
     /// 创建相册
     /// - Parameter collectionName: 相册名
     /// - Returns: 对应的 PHAssetCollection 数据
-    class func createAssetCollection(
+    static func createAssetCollection(
         for collectionName: String
     ) -> PHAssetCollection? {
         let collections = PHAssetCollection.fetchAssetCollections(

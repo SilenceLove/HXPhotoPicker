@@ -69,6 +69,30 @@ public extension EditorToolOptions {
     }
 }
 
+extension EditorToolView {
+    
+    struct Options: OptionSet {
+        static let graffiti = Options(rawValue: 1 << 0)
+        static let chartlet = Options(rawValue: 1 << 1)
+        static let text = Options(rawValue: 1 << 2)
+        static let mosaic = Options(rawValue: 1 << 3)
+        static let filter = Options(rawValue: 1 << 4)
+        static let music = Options(rawValue: 1 << 5)
+        static let cropping = Options(rawValue: 1 << 6)
+        let rawValue: Int
+        
+        var isSticker: Bool {
+            if self.contains(.chartlet) || self.contains(.text) {
+                return true
+            }
+            return false
+        }
+        init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+    }
+}
+
 /// 裁剪时遮罩类型
 public extension EditorImageResizerMaskView {
     enum MaskType {
@@ -119,49 +143,6 @@ extension EditorImageResizerView {
     }
 }
 
-extension EditorChartletConfig {
-    func mutableCopy() -> EditorChartletConfig {
-        let config = EditorChartletConfig()
-        config.viewHeight = viewHeight
-        config.rowCount = rowCount
-        config.loadScene = loadScene
-        config.titles = titles
-        return config
-    }
-}
-
-extension VideoCroppingConfiguration {
-    func mutableCopy() -> VideoCroppingConfiguration {
-        let config = VideoCroppingConfiguration()
-        config.maximumVideoCroppingTime = maximumVideoCroppingTime
-        config.minimumVideoCroppingTime = minimumVideoCroppingTime
-        return config
-    }
-}
-extension EditorTextConfig {
-    func mutableCopy() -> EditorTextConfig {
-        let config = EditorTextConfig()
-        config.colors = colors
-        config.tintColor = tintColor
-        config.font = font
-        config.maximumLimitTextLength = maximumLimitTextLength
-        config.modalPresentationStyle = modalPresentationStyle
-        return config
-    }
-}
-
-extension VideoEditorConfiguration.MusicConfig {
-    func mutableCopy() -> VideoEditorConfiguration.MusicConfig {
-        let config = VideoEditorConfiguration.MusicConfig()
-        config.showSearch = showSearch
-        config.tintColor = tintColor
-        config.placeholder = placeholder
-        config.autoPlayWhenScrollingStops = autoPlayWhenScrollingStops
-        config.infos = infos
-        return config
-    }
-}
-
 extension VideoEditorConfiguration {
     func mutableCopy() -> Any {
         let config = VideoEditorConfiguration()
@@ -172,7 +153,7 @@ extension VideoEditorConfiguration {
         config.chartlet = chartlet
         config.text = text
         config.music = music
-        config.cropping = cropping.mutableCopy()
+        config.cropping = cropping
         config.cropView = cropView
         config.toolView = toolView
         return config

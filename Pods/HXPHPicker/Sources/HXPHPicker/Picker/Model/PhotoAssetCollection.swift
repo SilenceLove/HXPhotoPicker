@@ -84,15 +84,23 @@ extension PhotoAssetCollection {
     
     /// 枚举相册里的资源
     open func enumerateAssets(
-        usingBlock: @escaping (PhotoAsset) -> Void
+        options opts: NSEnumerationOptions = .concurrent,
+        usingBlock: @escaping (PhotoAsset, Int, UnsafeMutablePointer<ObjCBool>) -> Void
     ) {
         if result == nil {
             fetchResult()
         }
-        result?.enumerateObjects({ (asset, index, stop) in
-            let photoAsset = PhotoAsset.init(asset: asset)
-            usingBlock(photoAsset)
-        })
+        if opts == .reverse {
+            result?.enumerateObjects(options: opts, using: { asset, index, stop in
+                let photoAsset = PhotoAsset(asset: asset)
+                usingBlock(photoAsset, index, stop)
+            })
+        }else {
+            result?.enumerateObjects({ (asset, index, stop) in
+                let photoAsset = PhotoAsset(asset: asset)
+                usingBlock(photoAsset, index, stop)
+            })
+        }
     }
 }
 

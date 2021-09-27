@@ -19,7 +19,8 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             return
         }
         #if HXPICKER_ENABLE_CAMERA
-        if config.cameraType == .custom {
+        switch config.cameraType {
+        case .custom(let camerConfig):
             let type: CameraController.CaptureType
             if pickerController.config.selectOptions.isPhoto &&
                 pickerController.config.selectOptions.isVideo {
@@ -29,28 +30,33 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             }else {
                 type = .video
             }
-            config.camera.languageType = pickerController.config.languageType
-            config.camera.appearanceStyle = pickerController.config.appearanceStyle
+            camerConfig.languageType = pickerController.config.languageType
+            camerConfig.appearanceStyle = pickerController.config.appearanceStyle
             let vc = CameraController(
-                config: config.camera,
+                config: camerConfig,
                 type: type,
                 delegate: self
             )
             vc.autoDismiss = false
             present(vc, animated: true)
             return
+        default:
+            break
         }
         #endif
+        guard let camerConfig = config.cameraType.systemConfig else {
+            return
+        }
         let imagePickerController = SystemCameraViewController.init()
         imagePickerController.sourceType = .camera
         imagePickerController.delegate = self
-        imagePickerController.videoMaximumDuration = config.systemCamera.videoMaximumDuration
-        imagePickerController.videoQuality = config.systemCamera.videoQuality
-        imagePickerController.allowsEditing = config.systemCamera.allowsEditing
-        imagePickerController.cameraDevice = config.systemCamera.cameraDevice
+        imagePickerController.videoMaximumDuration = camerConfig.videoMaximumDuration
+        imagePickerController.videoQuality = camerConfig.videoQuality
+        imagePickerController.allowsEditing = camerConfig.allowsEditing
+        imagePickerController.cameraDevice = camerConfig.cameraDevice
         var mediaTypes: [String] = []
-        if !config.systemCamera.mediaTypes.isEmpty {
-            mediaTypes = config.systemCamera.mediaTypes
+        if !camerConfig.mediaTypes.isEmpty {
+            mediaTypes = camerConfig.mediaTypes
         }else {
             if pickerController.config.selectOptions.isPhoto {
                 mediaTypes.append(kUTTypeImage as String)
@@ -135,13 +141,16 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             )
             return
         }
+        guard let systemCamera = config.cameraType.systemConfig else {
+            return
+        }
         let avAsset = AVAsset.init(url: videoURL)
         PhotoTools.exportEditVideo(
             for: avAsset,
             startTime: startTime,
             endTime: endTime,
-            exportPreset: config.systemCamera.editExportPreset,
-            videoQuality: config.systemCamera.editVideoQuality
+            exportPreset: systemCamera.editExportPreset,
+            videoQuality: systemCamera.editVideoQuality
         ) { (url, error) in
             guard let url = url, error == nil else {
                 ProgressHUD.hide(forView: self.navigationController?.view, animated: false)

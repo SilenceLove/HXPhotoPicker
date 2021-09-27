@@ -32,7 +32,7 @@ public class PhotoPickerViewController: BaseViewController {
         collectionViewLayout.minimumInteritemSpacing = space
         return collectionViewLayout
     }()
-    lazy var collectionView: UICollectionView = {
+    public lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView.init(frame: view.bounds, collectionViewLayout: collectionViewLayout)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -88,7 +88,7 @@ public class PhotoPickerViewController: BaseViewController {
     
     var cameraCell: PickerCamerViewCell {
         var indexPath: IndexPath
-        if !pickerController!.config.reverseOrder {
+        if config.sort == .asc {
             indexPath = IndexPath(item: assets.count, section: 0)
         }else {
             indexPath = IndexPath(item: 0, section: 0)
@@ -117,8 +117,7 @@ public class PhotoPickerViewController: BaseViewController {
     var isMultipleSelect: Bool = false
     var videoLoadSingleCell = false
     var needOffset: Bool {
-        pickerController != nil &&
-            pickerController!.config.reverseOrder &&
+        config.sort == .desc &&
             config.allowAddCamera &&
             canAddCamera
     }
@@ -189,8 +188,7 @@ public class PhotoPickerViewController: BaseViewController {
             view.addGestureRecognizer(swipeSelectPanGR!)
         }
     }
-     
-    public override func deviceOrientationDidChanged(notify: Notification) {
+    public override func deviceOrientationWillChanged(notify: Notification) {
         guard #available(iOS 13.0, *) else {
             beforeOrientationIndexPath = collectionView.indexPathsForVisibleItems.first
             orientationDidChange = true
@@ -317,7 +315,7 @@ public class PhotoPickerViewController: BaseViewController {
 // MARK: Function
 extension PhotoPickerViewController {
     
-    func initView() {
+    private func initView() {
         guard let picker = pickerController else { return }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
@@ -363,13 +361,13 @@ extension PhotoPickerViewController {
             )
         }
     }
-    func configData() {
+    private func configData() {
         guard let picker = pickerController else { return }
         isMultipleSelect = picker.config.selectMode == .multiple
         videoLoadSingleCell = picker.singleVideo
         updateTitle()
     }
-    func configColor() {
+    private func configColor() {
         guard let picker = pickerController else { return }
         let isDark = PhotoManager.isDark
         view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
@@ -439,8 +437,7 @@ extension PhotoPickerViewController {
         }
     }
     func scrollToAppropriatePlace(photoAsset: PhotoAsset?) {
-        guard let picker = pickerController, !assets.isEmpty else { return }
-        var item = !picker.config.reverseOrder ? assets.count - 1 : 0
+        var item = config.sort == .asc ? assets.count - 1 : 0
         if let photoAsset = photoAsset {
             item = assets.firstIndex(of: photoAsset) ?? item
             if needOffset {
@@ -502,9 +499,8 @@ extension PhotoPickerViewController {
         return photoAsset
     }
     func addedPhotoAsset(for photoAsset: PhotoAsset) {
-        guard let picker = pickerController else { return }
         let indexPath: IndexPath
-        if picker.config.reverseOrder {
+        if config.sort == .desc {
             assets.insert(photoAsset, at: 0)
             indexPath = IndexPath(
                 item: needOffset ? 1 : 0,
@@ -527,22 +523,18 @@ extension PhotoPickerViewController {
         )
     }
     func changedAssetCollection(collection: PhotoAssetCollection?) {
+        guard let picker = pickerController else { return }
         ProgressHUD.showLoading(
             addedTo: navigationController?.view,
             animated: true
         )
-        if collection == nil {
-            updateTitle()
-            fetchPhotoAssets()
-            reloadAlbumData()
-            return
+        if let collection = collection {
+            if picker.config.albumShowMode == .popup {
+                assetCollection.isSelected = false
+                collection.isSelected = true
+            }
+            assetCollection = collection
         }
-        guard let picker = pickerController else { return }
-        if picker.config.albumShowMode == .popup {
-            assetCollection.isSelected = false
-            collection?.isSelected = true
-        }
-        assetCollection = collection
         updateTitle()
         fetchPhotoAssets()
         reloadAlbumData()

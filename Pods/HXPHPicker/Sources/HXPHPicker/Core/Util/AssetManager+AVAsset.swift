@@ -30,7 +30,7 @@ public extension AssetManager {
     ///   - resultHandler: AVAsset，AVAudioMix，info，downloadSuccess
     /// - Returns: 请求ID
     @discardableResult
-    class func requestAVAsset(
+    static func requestAVAsset(
         for asset: PHAsset,
         deliveryMode: PHVideoRequestOptionsDeliveryMode = .automatic,
         iCloudHandler: ((PHImageRequestID) -> Void)?,
@@ -110,7 +110,7 @@ public extension AssetManager {
     ///   - resultHandler: 获取结果
     /// - Returns: 请求ID
     @discardableResult
-    class func requestAVAsset(
+    static func requestAVAsset(
         for asset: PHAsset,
         version: PHVideoRequestOptionsVersion,
         deliveryMode: PHVideoRequestOptionsDeliveryMode,
@@ -137,7 +137,7 @@ public extension AssetManager {
     ///   - resultHandler: 获取结果
     /// - Returns: 请求ID
     @discardableResult
-    class func requestAVAsset(
+    static func requestAVAsset(
         for asset: PHAsset,
         options: PHVideoRequestOptions,
         resultHandler: @escaping AVAssetResultHandler

@@ -18,7 +18,9 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         guard let picker = pickerController else {
             return
         }
-        let vc = PhotoPreviewViewController(config: picker.config.previewView)
+        let vc = PhotoPreviewViewController(
+            config: picker.config.previewView
+        )
         vc.previewAssets = previewAssets
         vc.currentPreviewIndex = currentPreviewIndex
         vc.delegate = self

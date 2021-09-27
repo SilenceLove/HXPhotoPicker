@@ -132,6 +132,7 @@ extension HomeViewController {
         case weChat
         case weChatMoment
         case photoBrowser
+        case pickerView
         
         var title: String {
             switch self {
@@ -149,6 +150,8 @@ extension HomeViewController {
                 return "WeChat-Moment"
             case .photoBrowser:
                 return "Photo Browser"
+            case .pickerView:
+                return "Picker View"
             }
         }
         
@@ -186,6 +189,8 @@ extension HomeViewController {
                 return WeChatMometViewController()
             case .photoBrowser:
                 return PhotoBrowserViewController()
+            case .pickerView:
+                return WindowPickerViewController()
             }
         }
     }

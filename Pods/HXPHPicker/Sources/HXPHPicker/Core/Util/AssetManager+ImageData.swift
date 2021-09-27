@@ -31,7 +31,7 @@ public extension AssetManager {
     ///   - resultHandler: 获取结果
     /// - Returns: 请求ID
     @discardableResult
-    class func requestImageData(
+    static func requestImageData(
         for asset: PHAsset,
         version: PHImageRequestOptionsVersion,
         iCloudHandler: ((PHImageRequestID) -> Void)?,
@@ -84,7 +84,7 @@ public extension AssetManager {
     
     /// 请求imageData，注意处理 HEIC格式
     @discardableResult
-    class func requestImageData(
+    static func requestImageData(
         for asset: PHAsset,
         version: PHImageRequestOptionsVersion,
         isNetworkAccessAllowed: Bool,
@@ -102,7 +102,7 @@ public extension AssetManager {
             resultHandler: resultHandler
         )
     }
-    class func transformImageOrientation(
+    static func transformImageOrientation(
         orientation: CGImagePropertyOrientation
     ) -> UIImage.Orientation {
         switch orientation {
@@ -128,7 +128,7 @@ public extension AssetManager {
     }
     /// 请求imageData，注意处理 HEIC格式
     @discardableResult
-    class func requestImageData(
+    static func requestImageData(
         for asset: PHAsset,
         options: PHImageRequestOptions,
         resultHandler: @escaping ImageDataResultHandler

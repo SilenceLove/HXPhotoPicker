@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class EditorChartletConfig {
+public struct EditorChartletConfig {
     public enum LoadScene {
         /// cell显示时
         case cellDisplay

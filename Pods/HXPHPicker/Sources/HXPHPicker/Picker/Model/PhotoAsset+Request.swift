@@ -127,7 +127,10 @@ public extension PhotoAsset {
             }
             return nil
         }
-        return AssetManager.requestThumbnailImage(for: phAsset, targetWidth: targetWidth) { (image, info) in
+        return AssetManager.requestThumbnailImage(
+            for: phAsset,
+            targetWidth: targetWidth
+        ) { (image, info) in
             completion?(image, self, info)
         }
     }

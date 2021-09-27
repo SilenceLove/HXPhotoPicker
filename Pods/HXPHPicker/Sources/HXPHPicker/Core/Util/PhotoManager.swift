@@ -10,7 +10,7 @@ import UIKit
 import Photos
 import PhotosUI
 
-public class PhotoManager: NSObject {
+public final class PhotoManager: NSObject {
     
     public static let shared = PhotoManager()
     

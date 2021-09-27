@@ -8,9 +8,7 @@
 import UIKit
 import CoreMotion
 
-// Reference: https://medium.com/@PabloDomine/developing-camille-how-to-determine
-// -device-orientation-in-a-camera-app-4c622d251993
-class DeviceOrientationHelper {
+final class DeviceOrientationHelper {
     // Singleton is recommended because an app should create only a single instance of the CMMotionManager class.
     static let shared = DeviceOrientationHelper()
     

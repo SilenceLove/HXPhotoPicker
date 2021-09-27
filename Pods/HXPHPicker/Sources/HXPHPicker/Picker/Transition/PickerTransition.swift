@@ -348,8 +348,14 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 presentPreviewImageForIndexAt: currentPreviewIndex) {
                 pushImageView.image = image
             }
-            if !pickerController.selectedAssetArray.isEmpty {
-                let photoAsset = pickerController.selectedAssetArray[currentPreviewIndex]
+            var photoAsset: PhotoAsset?
+            if pickerController.isExternalPickerPreview {
+                photoAsset = pickerController.previewViewController()?.previewAssets[currentPreviewIndex]
+            }else if !pickerController.selectedAssetArray.isEmpty {
+                photoAsset = pickerController.selectedAssetArray[currentPreviewIndex]
+            }
+            
+            if let photoAsset = photoAsset {
                 var reqeustAsset = photoAsset.phAsset != nil
                 #if HXPICKER_ENABLE_EDITOR
                 if photoAsset.videoEdit != nil || photoAsset.photoEdit != nil {

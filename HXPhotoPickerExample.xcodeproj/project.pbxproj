@@ -49,24 +49,6 @@
 		7B08597A24FA58DF00E93091 /* Demo10ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08594E24FA58DE00E93091 /* Demo10ViewController.m */; };
 		7B08597B24FA58DF00E93091 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B08595024FA58DE00E93091 /* SettingViewController.m */; };
 		7B08597C24FA58DF00E93091 /* WxMomentViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */; };
-		7B1379A026E365460067BE66 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13798C26E365450067BE66 /* UIDevice+Extension.swift */; };
-		7B1379A126E365460067BE66 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13798D26E365450067BE66 /* UIFont+Extension.swift */; };
-		7B1379A226E365460067BE66 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13798E26E365450067BE66 /* UIImage+Extension.swift */; };
-		7B1379A326E365460067BE66 /* RowTypeRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13798F26E365450067BE66 /* RowTypeRule.swift */; };
-		7B1379A426E365460067BE66 /* Core+UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799026E365450067BE66 /* Core+UIColor.swift */; };
-		7B1379A526E365460067BE66 /* WeChatMometViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799226E365450067BE66 /* WeChatMometViewController.swift */; };
-		7B1379A626E365460067BE66 /* EditorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799326E365450067BE66 /* EditorConfigurationViewController.swift */; };
-		7B1379A726E365460067BE66 /* WeChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799426E365450067BE66 /* WeChatViewController.swift */; };
-		7B1379A826E365460067BE66 /* PickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799526E365450067BE66 /* PickerResultViewController.swift */; };
-		7B1379A926E365460067BE66 /* AvatarPickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799626E365450067BE66 /* AvatarPickerConfigurationViewController.swift */; };
-		7B1379AA26E365460067BE66 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799726E365450067BE66 /* HomeViewController.swift */; };
-		7B1379AB26E365460067BE66 /* CustomPickerCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799826E365450067BE66 /* CustomPickerCellViewController.swift */; };
-		7B1379AC26E365460067BE66 /* PickerColorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799926E365450067BE66 /* PickerColorConfigurationViewController.swift */; };
-		7B1379AD26E365460067BE66 /* PhotoBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799A26E365450067BE66 /* PhotoBrowserViewController.swift */; };
-		7B1379AE26E365460067BE66 /* PickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799B26E365450067BE66 /* PickerConfigurationViewController.swift */; };
-		7B1379AF26E365460067BE66 /* PickerResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B13799C26E365450067BE66 /* PickerResultViewController.xib */; };
-		7B1379B026E365460067BE66 /* ConfigurationViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799E26E365450067BE66 /* ConfigurationViewCell.swift */; };
-		7B1379B126E365460067BE66 /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13799F26E365450067BE66 /* CustomPickerCellView.swift */; };
 		7B1379C226E365510067BE66 /* picker_example_image.JPG in Resources */ = {isa = PBXBuildFile; fileRef = 7B1379B326E365510067BE66 /* picker_example_image.JPG */; };
 		7B1379C326E365510067BE66 /* hx_sticker_yuanqimanman.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B1379B426E365510067BE66 /* hx_sticker_yuanqimanman.png */; };
 		7B1379C426E365510067BE66 /* hx_sticker_housailei.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B1379B526E365510067BE66 /* hx_sticker_housailei.png */; };
@@ -398,6 +380,25 @@
 		7BD52F7B24FE258200AE3D7C /* HXPhotoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65AF2487AD5B00077EE1 /* HXPhotoConfiguration.m */; };
 		7BD52F7C24FE258200AE3D7C /* HXPhotoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65DA2487AD5B00077EE1 /* HXPhotoManager.m */; };
 		7BD52F7D24FE258200AE3D7C /* HXPhotoTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65D92487AD5B00077EE1 /* HXPhotoTools.m */; };
+		7BE48B8B2701BE2A00A77C72 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B762701BE2A00A77C72 /* UIDevice+Extension.swift */; };
+		7BE48B8C2701BE2A00A77C72 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B772701BE2A00A77C72 /* UIFont+Extension.swift */; };
+		7BE48B8D2701BE2A00A77C72 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B782701BE2A00A77C72 /* UIImage+Extension.swift */; };
+		7BE48B8E2701BE2A00A77C72 /* RowTypeRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B792701BE2A00A77C72 /* RowTypeRule.swift */; };
+		7BE48B8F2701BE2A00A77C72 /* Core+UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B7A2701BE2A00A77C72 /* Core+UIColor.swift */; };
+		7BE48B902701BE2A00A77C72 /* WeChatMometViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B7C2701BE2A00A77C72 /* WeChatMometViewController.swift */; };
+		7BE48B912701BE2A00A77C72 /* EditorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B7D2701BE2A00A77C72 /* EditorConfigurationViewController.swift */; };
+		7BE48B922701BE2A00A77C72 /* WindowPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B7E2701BE2A00A77C72 /* WindowPickerViewController.swift */; };
+		7BE48B932701BE2A00A77C72 /* WeChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B7F2701BE2A00A77C72 /* WeChatViewController.swift */; };
+		7BE48B942701BE2A00A77C72 /* PickerResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B802701BE2A00A77C72 /* PickerResultViewController.swift */; };
+		7BE48B952701BE2A00A77C72 /* AvatarPickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B812701BE2A00A77C72 /* AvatarPickerConfigurationViewController.swift */; };
+		7BE48B962701BE2A00A77C72 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B822701BE2A00A77C72 /* HomeViewController.swift */; };
+		7BE48B972701BE2A00A77C72 /* CustomPickerCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B832701BE2A00A77C72 /* CustomPickerCellViewController.swift */; };
+		7BE48B982701BE2A00A77C72 /* PickerColorConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B842701BE2A00A77C72 /* PickerColorConfigurationViewController.swift */; };
+		7BE48B992701BE2A00A77C72 /* PhotoBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B852701BE2A00A77C72 /* PhotoBrowserViewController.swift */; };
+		7BE48B9A2701BE2A00A77C72 /* PickerConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B862701BE2A00A77C72 /* PickerConfigurationViewController.swift */; };
+		7BE48B9B2701BE2A00A77C72 /* PickerResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BE48B872701BE2A00A77C72 /* PickerResultViewController.xib */; };
+		7BE48B9C2701BE2A00A77C72 /* ConfigurationViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B892701BE2A00A77C72 /* ConfigurationViewCell.swift */; };
+		7BE48B9D2701BE2A00A77C72 /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE48B8A2701BE2A00A77C72 /* CustomPickerCellView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -482,24 +483,6 @@
 		7B08595024FA58DE00E93091 /* SettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingViewController.m; sourceTree = "<group>"; };
 		7B08595124FA58DE00E93091 /* WxMomentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WxMomentViewCell.xib; sourceTree = "<group>"; };
 		7B08595224FA58DE00E93091 /* Demo6SubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Demo6SubViewController.h; sourceTree = "<group>"; };
-		7B13798C26E365450067BE66 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
-		7B13798D26E365450067BE66 /* UIFont+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
-		7B13798E26E365450067BE66 /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
-		7B13798F26E365450067BE66 /* RowTypeRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowTypeRule.swift; sourceTree = "<group>"; };
-		7B13799026E365450067BE66 /* Core+UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Core+UIColor.swift"; sourceTree = "<group>"; };
-		7B13799226E365450067BE66 /* WeChatMometViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeChatMometViewController.swift; sourceTree = "<group>"; };
-		7B13799326E365450067BE66 /* EditorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B13799426E365450067BE66 /* WeChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeChatViewController.swift; sourceTree = "<group>"; };
-		7B13799526E365450067BE66 /* PickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerResultViewController.swift; sourceTree = "<group>"; };
-		7B13799626E365450067BE66 /* AvatarPickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B13799726E365450067BE66 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		7B13799826E365450067BE66 /* CustomPickerCellViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellViewController.swift; sourceTree = "<group>"; };
-		7B13799926E365450067BE66 /* PickerColorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerColorConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B13799A26E365450067BE66 /* PhotoBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoBrowserViewController.swift; sourceTree = "<group>"; };
-		7B13799B26E365450067BE66 /* PickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerConfigurationViewController.swift; sourceTree = "<group>"; };
-		7B13799C26E365450067BE66 /* PickerResultViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerResultViewController.xib; sourceTree = "<group>"; };
-		7B13799E26E365450067BE66 /* ConfigurationViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewCell.swift; sourceTree = "<group>"; };
-		7B13799F26E365450067BE66 /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
 		7B1379B326E365510067BE66 /* picker_example_image.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = picker_example_image.JPG; sourceTree = "<group>"; };
 		7B1379B426E365510067BE66 /* hx_sticker_yuanqimanman.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hx_sticker_yuanqimanman.png; sourceTree = "<group>"; };
 		7B1379B526E365510067BE66 /* hx_sticker_housailei.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hx_sticker_housailei.png; sourceTree = "<group>"; };
@@ -753,6 +736,25 @@
 		7BC371482505D24F00E2D05C /* HXPhotoEditChartletContentViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HXPhotoEditChartletContentViewCell.xib; sourceTree = "<group>"; };
 		7BD52EC024FE250E00AE3D7C /* HXPhotoPicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HXPhotoPicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BD52EC324FE250E00AE3D7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7BE48B762701BE2A00A77C72 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
+		7BE48B772701BE2A00A77C72 /* UIFont+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
+		7BE48B782701BE2A00A77C72 /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		7BE48B792701BE2A00A77C72 /* RowTypeRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RowTypeRule.swift; sourceTree = "<group>"; };
+		7BE48B7A2701BE2A00A77C72 /* Core+UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Core+UIColor.swift"; sourceTree = "<group>"; };
+		7BE48B7C2701BE2A00A77C72 /* WeChatMometViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeChatMometViewController.swift; sourceTree = "<group>"; };
+		7BE48B7D2701BE2A00A77C72 /* EditorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BE48B7E2701BE2A00A77C72 /* WindowPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowPickerViewController.swift; sourceTree = "<group>"; };
+		7BE48B7F2701BE2A00A77C72 /* WeChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeChatViewController.swift; sourceTree = "<group>"; };
+		7BE48B802701BE2A00A77C72 /* PickerResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerResultViewController.swift; sourceTree = "<group>"; };
+		7BE48B812701BE2A00A77C72 /* AvatarPickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarPickerConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BE48B822701BE2A00A77C72 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		7BE48B832701BE2A00A77C72 /* CustomPickerCellViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellViewController.swift; sourceTree = "<group>"; };
+		7BE48B842701BE2A00A77C72 /* PickerColorConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerColorConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BE48B852701BE2A00A77C72 /* PhotoBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoBrowserViewController.swift; sourceTree = "<group>"; };
+		7BE48B862701BE2A00A77C72 /* PickerConfigurationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerConfigurationViewController.swift; sourceTree = "<group>"; };
+		7BE48B872701BE2A00A77C72 /* PickerResultViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PickerResultViewController.xib; sourceTree = "<group>"; };
+		7BE48B892701BE2A00A77C72 /* ConfigurationViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewCell.swift; sourceTree = "<group>"; };
+		7BE48B8A2701BE2A00A77C72 /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
 		7BE8DFD624C68B2800306042 /* HXPhotoViewCellCustomProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewCellCustomProtocol.h; sourceTree = "<group>"; };
 		C629E186D5E5B5CCE9BB584A /* Pods-HXPHPickerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPHPickerExample.debug.xcconfig"; path = "Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample.debug.xcconfig"; sourceTree = "<group>"; };
 		D634D25CE084AB88B72380DC /* Pods-HXPHPickerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPHPickerExample.release.xcconfig"; path = "Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample.release.xcconfig"; sourceTree = "<group>"; };
@@ -908,55 +910,6 @@
 			path = assets;
 			sourceTree = "<group>";
 		};
-		7B13798A26E365450067BE66 /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				7B13798B26E365450067BE66 /* Extension */,
-				7B13799126E365450067BE66 /* Controller */,
-				7B13799D26E365450067BE66 /* View */,
-			);
-			path = Classes;
-			sourceTree = "<group>";
-		};
-		7B13798B26E365450067BE66 /* Extension */ = {
-			isa = PBXGroup;
-			children = (
-				7B13799026E365450067BE66 /* Core+UIColor.swift */,
-				7B13798F26E365450067BE66 /* RowTypeRule.swift */,
-				7B13798C26E365450067BE66 /* UIDevice+Extension.swift */,
-				7B13798D26E365450067BE66 /* UIFont+Extension.swift */,
-				7B13798E26E365450067BE66 /* UIImage+Extension.swift */,
-			);
-			path = Extension;
-			sourceTree = "<group>";
-		};
-		7B13799126E365450067BE66 /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-				7B13799626E365450067BE66 /* AvatarPickerConfigurationViewController.swift */,
-				7B13799826E365450067BE66 /* CustomPickerCellViewController.swift */,
-				7B13799326E365450067BE66 /* EditorConfigurationViewController.swift */,
-				7B13799726E365450067BE66 /* HomeViewController.swift */,
-				7B13799A26E365450067BE66 /* PhotoBrowserViewController.swift */,
-				7B13799926E365450067BE66 /* PickerColorConfigurationViewController.swift */,
-				7B13799B26E365450067BE66 /* PickerConfigurationViewController.swift */,
-				7B13799526E365450067BE66 /* PickerResultViewController.swift */,
-				7B13799C26E365450067BE66 /* PickerResultViewController.xib */,
-				7B13799226E365450067BE66 /* WeChatMometViewController.swift */,
-				7B13799426E365450067BE66 /* WeChatViewController.swift */,
-			);
-			path = Controller;
-			sourceTree = "<group>";
-		};
-		7B13799D26E365450067BE66 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				7B13799E26E365450067BE66 /* ConfigurationViewCell.swift */,
-				7B13799F26E365450067BE66 /* CustomPickerCellView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		7B1379B226E365510067BE66 /* Images */ = {
 			isa = PBXGroup;
 			children = (
@@ -1013,7 +966,7 @@
 		7B3EDEBF255E185900937B4A /* Swift */ = {
 			isa = PBXGroup;
 			children = (
-				7B13798A26E365450067BE66 /* Classes */,
+				7BE48B742701BE2A00A77C72 /* Classes */,
 				7B3EDEC0255E185900937B4A /* AppDelegate.swift */,
 				7B881BAC26B8E0B700CC44CC /* Reachability.swift */,
 				7B3EDEC6255E185900937B4A /* Main.storyboard */,
@@ -1362,6 +1315,56 @@
 			path = HXPhotoPickerFramework;
 			sourceTree = "<group>";
 		};
+		7BE48B742701BE2A00A77C72 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				7BE48B7B2701BE2A00A77C72 /* Controller */,
+				7BE48B752701BE2A00A77C72 /* Extension */,
+				7BE48B882701BE2A00A77C72 /* View */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		7BE48B752701BE2A00A77C72 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				7BE48B762701BE2A00A77C72 /* UIDevice+Extension.swift */,
+				7BE48B772701BE2A00A77C72 /* UIFont+Extension.swift */,
+				7BE48B782701BE2A00A77C72 /* UIImage+Extension.swift */,
+				7BE48B792701BE2A00A77C72 /* RowTypeRule.swift */,
+				7BE48B7A2701BE2A00A77C72 /* Core+UIColor.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		7BE48B7B2701BE2A00A77C72 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				7BE48B812701BE2A00A77C72 /* AvatarPickerConfigurationViewController.swift */,
+				7BE48B832701BE2A00A77C72 /* CustomPickerCellViewController.swift */,
+				7BE48B7D2701BE2A00A77C72 /* EditorConfigurationViewController.swift */,
+				7BE48B822701BE2A00A77C72 /* HomeViewController.swift */,
+				7BE48B852701BE2A00A77C72 /* PhotoBrowserViewController.swift */,
+				7BE48B842701BE2A00A77C72 /* PickerColorConfigurationViewController.swift */,
+				7BE48B862701BE2A00A77C72 /* PickerConfigurationViewController.swift */,
+				7BE48B802701BE2A00A77C72 /* PickerResultViewController.swift */,
+				7BE48B872701BE2A00A77C72 /* PickerResultViewController.xib */,
+				7BE48B7C2701BE2A00A77C72 /* WeChatMometViewController.swift */,
+				7BE48B7F2701BE2A00A77C72 /* WeChatViewController.swift */,
+				7BE48B7E2701BE2A00A77C72 /* WindowPickerViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		7BE48B882701BE2A00A77C72 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7BE48B892701BE2A00A77C72 /* ConfigurationViewCell.swift */,
+				7BE48B8A2701BE2A00A77C72 /* CustomPickerCellView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1582,6 +1585,7 @@
 				7B3EDECA255E185B00937B4A /* Assets.xcassets in Resources */,
 				7B3EDEC8255E185900937B4A /* Main.storyboard in Resources */,
 				7B1379CC26E365510067BE66 /* hx_sticker_zaizaijia.png in Resources */,
+				7BE48B9B2701BE2A00A77C72 /* PickerResultViewController.xib in Resources */,
 				7B1379EA26E365560067BE66 /* 世间美好与你环环相扣 in Resources */,
 				7B1379EC26E365560067BE66 /* 天外来物 in Resources */,
 				7B1379C826E365510067BE66 /* picker_example_gif_image.GIF in Resources */,
@@ -1591,7 +1595,6 @@
 				7B1379CA26E365510067BE66 /* hx_sticker_yuanqishaonv.png in Resources */,
 				7B1379F126E365560067BE66 /* 少女的祈祷.mp3 in Resources */,
 				7B1379E526E365560067BE66 /* 爱你.mp3 in Resources */,
-				7B1379AF26E365460067BE66 /* PickerResultViewController.xib in Resources */,
 				7B1379E626E365560067BE66 /* 少女的祈祷 in Resources */,
 				7B1379E826E365560067BE66 /* 嘉宾.mp3 in Resources */,
 				7B1379C926E365510067BE66 /* hx_sticker_wow.png in Resources */,
@@ -1733,25 +1736,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B1379AD26E365460067BE66 /* PhotoBrowserViewController.swift in Sources */,
-				7B1379B126E365460067BE66 /* CustomPickerCellView.swift in Sources */,
-				7B1379A326E365460067BE66 /* RowTypeRule.swift in Sources */,
-				7B1379A426E365460067BE66 /* Core+UIColor.swift in Sources */,
-				7B1379A826E365460067BE66 /* PickerResultViewController.swift in Sources */,
-				7B1379A726E365460067BE66 /* WeChatViewController.swift in Sources */,
-				7B1379B026E365460067BE66 /* ConfigurationViewCell.swift in Sources */,
-				7B1379AE26E365460067BE66 /* PickerConfigurationViewController.swift in Sources */,
+				7BE48B972701BE2A00A77C72 /* CustomPickerCellViewController.swift in Sources */,
+				7BE48B8E2701BE2A00A77C72 /* RowTypeRule.swift in Sources */,
+				7BE48B992701BE2A00A77C72 /* PhotoBrowserViewController.swift in Sources */,
+				7BE48B9C2701BE2A00A77C72 /* ConfigurationViewCell.swift in Sources */,
+				7BE48B8F2701BE2A00A77C72 /* Core+UIColor.swift in Sources */,
 				7B3EDEC1255E185900937B4A /* AppDelegate.swift in Sources */,
-				7B1379A626E365460067BE66 /* EditorConfigurationViewController.swift in Sources */,
-				7B1379A026E365460067BE66 /* UIDevice+Extension.swift in Sources */,
-				7B1379A226E365460067BE66 /* UIImage+Extension.swift in Sources */,
-				7B1379A926E365460067BE66 /* AvatarPickerConfigurationViewController.swift in Sources */,
-				7B1379AB26E365460067BE66 /* CustomPickerCellViewController.swift in Sources */,
-				7B1379A126E365460067BE66 /* UIFont+Extension.swift in Sources */,
+				7BE48B932701BE2A00A77C72 /* WeChatViewController.swift in Sources */,
+				7BE48B912701BE2A00A77C72 /* EditorConfigurationViewController.swift in Sources */,
+				7BE48B962701BE2A00A77C72 /* HomeViewController.swift in Sources */,
+				7BE48B8B2701BE2A00A77C72 /* UIDevice+Extension.swift in Sources */,
+				7BE48B942701BE2A00A77C72 /* PickerResultViewController.swift in Sources */,
+				7BE48B8D2701BE2A00A77C72 /* UIImage+Extension.swift in Sources */,
+				7BE48B8C2701BE2A00A77C72 /* UIFont+Extension.swift in Sources */,
+				7BE48B982701BE2A00A77C72 /* PickerColorConfigurationViewController.swift in Sources */,
 				7B881BAD26B8E0B800CC44CC /* Reachability.swift in Sources */,
-				7B1379AA26E365460067BE66 /* HomeViewController.swift in Sources */,
-				7B1379AC26E365460067BE66 /* PickerColorConfigurationViewController.swift in Sources */,
-				7B1379A526E365460067BE66 /* WeChatMometViewController.swift in Sources */,
+				7BE48B952701BE2A00A77C72 /* AvatarPickerConfigurationViewController.swift in Sources */,
+				7BE48B922701BE2A00A77C72 /* WindowPickerViewController.swift in Sources */,
+				7BE48B9D2701BE2A00A77C72 /* CustomPickerCellView.swift in Sources */,
+				7BE48B902701BE2A00A77C72 /* WeChatMometViewController.swift in Sources */,
+				7BE48B9A2701BE2A00A77C72 /* PickerConfigurationViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

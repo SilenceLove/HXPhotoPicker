@@ -13,20 +13,20 @@ import PhotosUI
 import Kingfisher
 #endif
 
-protocol PhotoPreviewContentViewDelete: AnyObject {
+public protocol PhotoPreviewContentViewDelete: AnyObject {
     func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView)
     func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentView)
     func contentView(updateContentSize contentView: PhotoPreviewContentView)
 }
 
-class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
+open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
     
-    enum `Type`: Int {
+    public enum `Type`: Int {
         case photo
         case livePhoto
         case video
     }
-    weak var delegate: PhotoPreviewContentViewDelete?
+    public weak var delegate: PhotoPreviewContentViewDelete?
     
     lazy var imageView: ImageView = {
         let view = ImageView()
@@ -474,10 +474,11 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
     }
     func hudSuperview() -> UIView? {
         if !isPeek {
-            return superview?.superview
-        }else {
-            return self
+            if let view = superview?.superview {
+                return view
+            }
         }
+        return self
     }
     func showLoadingView(text: String) {
         loadingView = ProgressHUD.showLoading(addedTo: hudSuperview(), text: text.localized, animated: true)
@@ -611,7 +612,7 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
             imageView.stopAnimatedImage()
         }
     }
-    func livePhotoView(
+    public func livePhotoView(
         _ livePhotoView: PHLivePhotoView,
         didEndPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle
     ) {
@@ -620,7 +621,7 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
         }
     }
     
-    override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         imageView.frame = bounds
         if type == .livePhoto {
@@ -638,7 +639,7 @@ class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
 //            print("deinit \(self)")
 //        }
     }
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     

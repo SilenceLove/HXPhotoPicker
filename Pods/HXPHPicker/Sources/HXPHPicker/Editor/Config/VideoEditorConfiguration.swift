@@ -33,7 +33,7 @@ open class VideoEditorConfiguration: EditorConfiguration {
     /// 音乐配置
     public lazy var music: MusicConfig = .init()
     
-    public class MusicConfig {
+    public struct MusicConfig {
         /// 显示搜索
         public var showSearch: Bool = true
         /// 完成按钮背景颜色、搜索框光标颜色
@@ -60,7 +60,6 @@ open class VideoEditorConfiguration: EditorConfiguration {
     
     /// 工具视图配置
     public lazy var toolView: EditorToolViewConfiguration = {
-        let config = EditorToolViewConfiguration.init()
         let chartlet = EditorToolOptions(
             imageName: "hx_editor_photo_tools_emoji",
             type: .chartlet
@@ -77,7 +76,6 @@ open class VideoEditorConfiguration: EditorConfiguration {
             imageName: "hx_editor_video_crop",
             type: .cropping
         )
-        config.toolOptions = [chartlet, text, music, crop]
-        return config
+        return .init(toolOptions: [chartlet, text, music, crop])
     }()
 }

@@ -23,6 +23,9 @@ extension PhotoPickerController {
             self,
             didFinishSelection: result
         )
+        if isExternalPickerPreview {
+            disablesCustomDismiss = true
+        }
         if autoDismiss {
             dismiss(animated: true, completion: nil)
         }
@@ -40,6 +43,9 @@ extension PhotoPickerController {
             self,
             didFinishSelection: result
         )
+        if isExternalPickerPreview {
+            disablesCustomDismiss = true
+        }
         if autoDismiss {
             dismiss(animated: true, completion: nil)
         }
@@ -56,6 +62,10 @@ extension PhotoPickerController {
         pickerDelegate?.pickerController(didCancel: self)
         if autoDismiss {
             dismiss(animated: true, completion: nil)
+        }else {
+            if pickerDelegate == nil && cancelHandler == nil {
+                dismiss(animated: true, completion: nil)
+            }
         }
     }
     func originalButtonCallback() {
@@ -488,8 +498,8 @@ extension PhotoPickerController {
                 canSelect = shouldSelect
             }
         }
-        if !canSelect && text != nil && showHUD {
-            ProgressHUD.showWarning(addedTo: view, text: text!, animated: true, delayHide: 1.5)
+        if let text = text, !canSelect, showHUD {
+            ProgressHUD.showWarning(addedTo: view, text: text, animated: true, delayHide: 1.5)
         }
         return canSelect
     }

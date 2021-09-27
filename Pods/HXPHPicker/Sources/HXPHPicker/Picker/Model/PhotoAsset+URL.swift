@@ -13,7 +13,7 @@ public extension PhotoAsset {
     typealias AssetURLCompletion = (Result<AssetURLResult, AssetError>) -> Void
     
     /// 获取url
-    ///   - completion: result 
+    ///   - completion: 获取完成
     func getAssetURL(
         completion: @escaping AssetURLCompletion
     ) {
@@ -35,7 +35,7 @@ public extension PhotoAsset {
     }
     
     /// 获取图片url
-    ///   - completion: result
+    ///   - completion: 获取完成
     func getImageURL(
         completion: @escaping AssetURLCompletion
     ) {
@@ -57,7 +57,7 @@ public extension PhotoAsset {
     ///   - exportPreset: 视频分辨率，不传获取的就是原始视频
     ///   - videoQuality: 视频质量[0-10]
     ///   - exportSession: 导出视频时对应的 AVAssetExportSession
-    ///   - completion: result
+    ///   - completion: 获取完成
     func getVideoURL(
         exportPreset: ExportPreset? = nil,
         videoQuality: Int = 6,
@@ -78,6 +78,8 @@ public extension PhotoAsset {
         )
     }
     
+    /// 获取LivePhoto里的图片和视频URL
+    /// - Parameter completion: 获取完成
     func getLivePhotoURL(
         completion: @escaping AssetURLCompletion
     ) {

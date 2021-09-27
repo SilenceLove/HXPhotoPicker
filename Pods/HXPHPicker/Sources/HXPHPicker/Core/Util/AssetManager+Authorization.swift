@@ -12,7 +12,7 @@ public extension AssetManager {
     
     /// 获取当前相册权限状态
     /// - Returns: 权限状态
-    class func authorizationStatus() -> PHAuthorizationStatus {
+    static func authorizationStatus() -> PHAuthorizationStatus {
         let status: PHAuthorizationStatus
         if #available(iOS 14, *) {
             status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
@@ -25,7 +25,7 @@ public extension AssetManager {
     
     /// 获取相机权限
     /// - Parameter completionHandler: 获取结果
-    class func requestCameraAccess(
+    static func requestCameraAccess(
         completionHandler: @escaping (Bool) -> Void
     ) {
         AVCaptureDevice.requestAccess(
@@ -39,12 +39,12 @@ public extension AssetManager {
     
     /// 当前相机权限状态
     /// - Returns: 权限状态
-    class func cameraAuthorizationStatus() -> AVAuthorizationStatus {
+    static func cameraAuthorizationStatus() -> AVAuthorizationStatus {
         AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
     }
     
     /// 当前相册权限状态是否是Limited
-    class func authorizationStatusIsLimited() -> Bool {
+    static func authorizationStatusIsLimited() -> Bool {
         if #available(iOS 14, *) {
             if authorizationStatus() == .limited {
                 return true
@@ -56,7 +56,7 @@ public extension AssetManager {
     /// 请求获取相册权限
     /// - Parameters:
     ///   - handler: 请求权限完成
-    class func requestAuthorization(
+    static func requestAuthorization(
         with handler: @escaping (PHAuthorizationStatus) -> Void
     ) {
         let status = authorizationStatus()

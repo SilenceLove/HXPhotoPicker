@@ -28,6 +28,32 @@ protocol PhotoPreviewViewControllerDelegate: AnyObject {
         _ previewController: PhotoPreviewViewController,
         networkImagedownloadSuccess photoAsset: PhotoAsset
     )
+    func previewViewController(
+        didFinishButton previewController: PhotoPreviewViewController
+    )
+}
+extension PhotoPreviewViewControllerDelegate {
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        didOriginalButton isOriginal: Bool
+    ) { }
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        didSelectBox photoAsset: PhotoAsset,
+        isSelected: Bool,
+        updateCell: Bool
+    ) { }
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        editAssetFinished photoAsset: PhotoAsset
+    ) { }
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        networkImagedownloadSuccess photoAsset: PhotoAsset
+    ) { }
+    func previewViewController(
+        didFinishButton previewController: PhotoPreviewViewController
+    ) { }
 }
 
 public class PhotoPreviewViewController: BaseViewController {
@@ -41,6 +67,7 @@ public class PhotoPreviewViewController: BaseViewController {
     /// 是否是外部预览
     public var isExternalPreview: Bool = false
     
+    var isExternalPickerPreview: Bool = false
     var orientationDidChange: Bool = false
     var statusBarShouldBeHidden: Bool = false
     var videoLoadSingleCell = false
@@ -252,13 +279,13 @@ public class PhotoPreviewViewController: BaseViewController {
 // MARK: Function
 extension PhotoPreviewViewController {
      
-    func initView() {
+    private func initView() {
         view.addSubview(collectionView)
         if config.showBottomView {
             view.addSubview(bottomView)
             bottomView.updateFinishButtonTitle()
         }
-        if let pickerController = pickerController, isExternalPreview {
+        if let pickerController = pickerController, (isExternalPreview || isExternalPickerPreview) {
 //            statusBarShouldBeHidden = pickerController.config.prefersStatusBarHidden
             if pickerController.modalPresentationStyle != .custom {
                 configColor()
@@ -267,6 +294,15 @@ extension PhotoPreviewViewController {
         if isMultipleSelect || isExternalPreview {
             videoLoadSingleCell = pickerController!.singleVideo
             if !isExternalPreview {
+                if isExternalPickerPreview {
+                    let cancelItem = UIBarButtonItem(
+                        image: "hx_picker_photolist_cancel".image,
+                        style: .done,
+                        target: self,
+                        action: #selector(didCancelItemClick)
+                    )
+                    navigationItem.leftBarButtonItem = cancelItem
+                }
                 navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: selectBoxControl)
             }else {
                 var cancelItem: UIBarButtonItem
@@ -325,6 +361,15 @@ extension PhotoPreviewViewController {
                 }
             }
         }else if !isMultipleSelect {
+            if isExternalPickerPreview {
+                let cancelItem = UIBarButtonItem(
+                    image: "hx_picker_photolist_cancel".image,
+                    style: .done,
+                    target: self,
+                    action: #selector(didCancelItemClick)
+                )
+                navigationItem.leftBarButtonItem = cancelItem
+            }
             if !previewAssets.isEmpty {
                 if currentPreviewIndex == 0 {
                     let photoAsset = previewAssets.first!

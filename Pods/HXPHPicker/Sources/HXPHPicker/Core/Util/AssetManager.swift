@@ -9,7 +9,7 @@
 import UIKit
 import Photos
 
-public class AssetManager {
+public struct AssetManager {
     
     /// 保存资源到系统相册
     /// - Parameters:
@@ -19,7 +19,7 @@ public class AssetManager {
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
     ///   - completion: PHAsset为空则保存失败
-    public class func saveSystemAlbum(
+    public static func saveSystemAlbum(
         forAsset asset: Any,
         mediaType: PHAssetMediaType,
         customAlbumName: String? = nil,
@@ -90,7 +90,7 @@ public class AssetManager {
     }
     
     /// 保存图片到系统相册
-    public class func saveSystemAlbum(
+    public static func saveSystemAlbum(
         forImage image: UIImage,
         customAlbumName: String? = nil,
         completion: @escaping (PHAsset?) -> Void
@@ -104,7 +104,7 @@ public class AssetManager {
     }
     
     /// 保存视频到系统相册
-    public class func saveSystemAlbum(
+    public static func saveSystemAlbum(
         forVideoURL videoURL: URL,
         customAlbumName: String? = nil,
         completion: @escaping (PHAsset?) -> Void
@@ -117,4 +117,5 @@ public class AssetManager {
         )
     }
     
+    private init() { }
 }

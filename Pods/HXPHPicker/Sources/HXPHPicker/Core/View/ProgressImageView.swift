@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ProgressImageView: UIView {
+final class ProgressImageView: UIView {
     
     lazy var circleLayer: CAShapeLayer = {
         let circleLayer = CAShapeLayer.init()
@@ -48,7 +48,7 @@ class ProgressImageView: UIView {
     }
     func startAnimation() {
     }
-    func drawCircle() {
+    private func drawCircle() {
         let circlePath = UIBezierPath.init()
         circlePath.addArc(
             withCenter: CGPoint(
@@ -72,7 +72,7 @@ class ProgressImageView: UIView {
 //        circleLayer.add(circleAimation, forKey: "")
     }
     
-    func drawExclamationPoint() {
+    private func drawExclamationPoint() {
         let linePath = UIBezierPath.init()
         linePath.move(to: CGPoint(x: width * 0.5, y: 15))
         linePath.addLine(to: CGPoint(x: width * 0.5, y: height - 22))
@@ -108,7 +108,7 @@ class ProgressImageView: UIView {
 //        pointAimation.duration = 0.5
 //        pointLayer.add(pointAimation, forKey: "")
     }
-    func drawTickLayer() {
+    private func drawTickLayer() {
         let tickPath = UIBezierPath.init()
         tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
         tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))

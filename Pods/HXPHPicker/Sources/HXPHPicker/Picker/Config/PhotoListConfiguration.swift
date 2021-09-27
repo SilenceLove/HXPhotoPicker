@@ -9,15 +9,21 @@
 import UIKit
 
 // MARK: 照片列表配置类
-public class PhotoListConfiguration {
+public struct PhotoListConfiguration {
     /// 相册标题视图配置
-    public lazy var titleView: AlbumTitleViewConfiguration = .init()
+    public var titleView: AlbumTitleViewConfiguration = .init()
+    
+    /// 列表排序方式
+    /// - Default: ASC
+    /// - ASC:  升序排列，自动滚动到底部
+    /// - DESC: 倒序排列，自动滚动到顶部
+    public var sort: Sort = .asc
     
     /// 背景颜色
-    public lazy var backgroundColor: UIColor = .white
+    public var backgroundColor: UIColor = .white
     
     /// 暗黑风格下背景颜色
-    public lazy var backgroundDarkColor: UIColor = "#2E2F30".color
+    public var backgroundDarkColor: UIColor = "#2E2F30".color
     
     /// 取消按钮的配置只有当 albumShowMode = .popup 时有效
     /// 取消按钮类型
@@ -51,6 +57,7 @@ public class PhotoListConfiguration {
     public var allowSwipeToSelect: Bool = true
     
     /// 滑动选择时允许自动向上/下滚动
+    /// 当 allowSyncICloudWhenSelectPhoto = true 时，自动滚动失效
     public var swipeSelectAllowAutoScroll: Bool = true
     
     /// 自动向上/下滚动时的速率
@@ -63,43 +70,22 @@ public class PhotoListConfiguration {
     public var autoSwipeBottomAreaHeight: CGFloat = 100
     
     /// cell相关配置
-    public lazy var cell: PhotoListCellConfiguration = .init()
+    public var cell: PhotoListCellConfiguration = .init()
     
     /// 底部视图相关配置
-    public lazy var bottomView: PickerBottomViewConfiguration = .init()
+    public var bottomView: PickerBottomViewConfiguration = .init()
     
     /// 允许添加相机
     public var allowAddCamera: Bool = true
     
     /// 相机cell配置
-    public lazy var cameraCell: PhotoListCameraCellConfiguration = .init()
+    public var cameraCell: PhotoListCameraCellConfiguration = .init()
     
     /// 单选模式下，拍照完成之后直接选中并且完成选择
     public var finishSelectionAfterTakingPhoto: Bool = false
     
     /// 相机类型
-    #if HXPICKER_ENABLE_CAMERA
-    public var cameraType: CameraType = .custom
-    #else
-    public var cameraType: CameraType = .system
-    #endif
-    
-    /// 系统相机配置
-    public lazy var systemCamera: SystemCameraConfiguration = .init()
-    
-    #if HXPICKER_ENABLE_CAMERA
-    /// 自带的相机配置
-    public lazy var camera: CameraConfiguration = .init()
-    #endif
-    
-    public enum CameraType {
-        /// 系统相机
-        case system
-        #if HXPICKER_ENABLE_CAMERA
-        /// 自带相机
-        case custom
-        #endif
-    }
+    public var cameraType: CameraType
     
     /// 拍照完成后是否选择
     public var takePictureCompletionToSelected: Bool = true
@@ -111,7 +97,46 @@ public class PhotoListConfiguration {
     public var customAlbumName: String?
     
     /// 没有资源时展示的相关配置
-    public lazy var emptyView: EmptyViewConfiguration = .init()
+    public var emptyView: EmptyViewConfiguration = .init()
     
-    public init() { }
+    public init() {
+        #if HXPICKER_ENABLE_CAMERA
+        cameraType = .custom(.init())
+        #else
+        cameraType = .system(.init())
+        #endif
+    }
+}
+
+extension PhotoListConfiguration {
+    public enum CameraType {
+        /// 系统相机
+        case system(SystemCameraConfiguration)
+        #if HXPICKER_ENABLE_CAMERA
+        /// 自带相机
+        case custom(CameraConfiguration)
+        #endif
+        
+        public var systemConfig: SystemCameraConfiguration? {
+            switch self {
+            case .system(let config):
+                return config
+            #if HXPICKER_ENABLE_CAMERA
+            default:
+                return nil
+            #endif
+            }
+        }
+        
+        #if HXPICKER_ENABLE_CAMERA
+        public var customConfig: CameraConfiguration? {
+            switch self {
+            case .custom(let config):
+                return config
+            default:
+                return nil
+            }
+        }
+        #endif
+    }
 }

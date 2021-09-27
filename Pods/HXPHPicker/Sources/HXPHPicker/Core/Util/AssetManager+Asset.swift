@@ -14,7 +14,7 @@ public extension AssetManager {
     /// 根据 Asset 的本地唯一标识符获取 Asset
     /// - Parameter withLocalIdentifiers: 本地唯一标识符
     /// - Returns: 对应获取的 PHAsset
-    class func fetchAssets(
+    static func fetchAssets(
         withLocalIdentifiers: [String]
     ) -> PHFetchResult<PHAsset> {
         PHAsset.fetchAssets(
@@ -26,7 +26,7 @@ public extension AssetManager {
     /// 根据 Asset 的本地唯一标识符获取 Asset
     /// - Parameter withLocalIdentifiers: 本地唯一标识符
     /// - Returns: 对应获取的 PHAsset
-    class func fetchAsset
+    static func fetchAsset
     (withLocalIdentifier: String
     ) -> PHAsset? {
         return fetchAssets(
@@ -36,7 +36,7 @@ public extension AssetManager {
     
     /// 根据下载获取的信息判断资源是否存在iCloud上
     /// - Parameter info: 下载获取的信息
-    class func assetIsInCloud(
+    static func assetIsInCloud(
         for info: [AnyHashable: Any]?
     ) -> Bool {
         if let info = info, info.inICloud {
@@ -47,7 +47,7 @@ public extension AssetManager {
     
     /// 判断资源是否取消了下载
     /// - Parameter info: 下载获取的信息
-    class func assetCancelDownload(
+    static func assetCancelDownload(
         for info: [AnyHashable: Any]?
     ) -> Bool {
         if let info = info, info.isCancel {
@@ -58,7 +58,7 @@ public extension AssetManager {
     
     /// 判断资源是否下载错误
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadError(
+    static func assetDownloadError(
         for info: [AnyHashable: Any]?
     ) -> Bool {
         if let info = info, info.isError {
@@ -69,7 +69,7 @@ public extension AssetManager {
     
     /// 判断资源下载得到的是否为退化的
     /// - Parameter info: 下载获取的信息
-    class func assetIsDegraded(
+    static func assetIsDegraded(
         for info: [AnyHashable: Any]?
     ) -> Bool {
         if let info = info, info.isDegraded {
@@ -80,7 +80,7 @@ public extension AssetManager {
     
     /// 判断资源是否下载完成
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadFinined(
+    static func assetDownloadFinined(
         for info: [AnyHashable: Any]?
     ) -> Bool {
         if let info = info, info.downloadFinined {

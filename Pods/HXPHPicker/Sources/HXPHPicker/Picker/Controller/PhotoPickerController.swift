@@ -121,6 +121,7 @@ open class PhotoPickerController: UINavigationController {
             singleVideo = true
         }
         isPreviewAsset = false
+        isExternalPickerPreview = false
         super.init(nibName: nil, bundle: nil)
         pickerDelegate = delegate
         var photoVC: UIViewController
@@ -158,6 +159,7 @@ open class PhotoPickerController: UINavigationController {
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         self.config = config
         isPreviewAsset = true
+        isExternalPickerPreview = false
         super.init(nibName: nil, bundle: nil)
         pickerDelegate = delegate
         let vc = PhotoPreviewViewController(config: config.previewView)
@@ -176,6 +178,32 @@ open class PhotoPickerController: UINavigationController {
     
     public var finishHandler: FinishHandler?
     public var cancelHandler: CancelHandler?
+    
+    let isExternalPickerPreview: Bool
+    init(pickerPreview config: PickerConfiguration,
+         previewAssets: [PhotoAsset],
+         currentIndex: Int,
+         modalPresentationStyle: UIModalPresentationStyle = .custom,
+         delegate: PhotoPickerControllerDelegate? = nil) {
+        PhotoManager.shared.appearanceStyle = config.appearanceStyle
+        PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
+        self.config = config
+        isPreviewAsset = false
+        isExternalPickerPreview = true
+        super.init(nibName: nil, bundle: nil)
+        pickerDelegate = delegate
+        let vc = PhotoPreviewViewController(config: config.previewView)
+        vc.previewAssets = previewAssets
+        vc.currentPreviewIndex = currentIndex
+        vc.isExternalPickerPreview = true
+        self.viewControllers = [vc]
+        self.modalPresentationStyle = modalPresentationStyle
+        if modalPresentationStyle == .custom {
+            transitioningDelegate = self
+            modalPresentationCapturesStatusBarAppearance = true
+        }
+    }
+    var disablesCustomDismiss = false
     
     /// 所有资源集合
     var assetCollectionsArray: [PhotoAssetCollection] = []
@@ -212,7 +240,7 @@ open class PhotoPickerController: UINavigationController {
     }()
     public override var modalPresentationStyle: UIModalPresentationStyle {
         didSet {
-            if isPreviewAsset && modalPresentationStyle == .custom {
+            if (isPreviewAsset || isExternalPickerPreview) && modalPresentationStyle == .custom {
                 transitioningDelegate = self
                 modalPresentationCapturesStatusBarAppearance = true
             }
@@ -226,13 +254,12 @@ open class PhotoPickerController: UINavigationController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        PhotoManager.shared.targetWidth = config.photoList.cell.targetWidth
         PhotoManager.shared.indicatorType = config.indicatorType
         PhotoManager.shared.loadNetworkVideoMode = config.previewView.loadNetworkVideoMode
         configColor()
         navigationBar.isTranslucent = config.navigationBarIsTranslucent
         selectOptions = config.selectOptions
-        if !isPreviewAsset {
+        if !isPreviewAsset && !isExternalPickerPreview {
             setOptions()
             requestAuthorization()
         }else {
@@ -296,7 +323,7 @@ open class PhotoPickerController: UINavigationController {
     }
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        if !isPreviewAsset && presentingViewController == nil {
+        if !isPreviewAsset && presentingViewController == nil && !isExternalPickerPreview {
             didDismiss()
         }
     }
@@ -340,13 +367,28 @@ extension PhotoPickerController {
             configBackgroundColor()
         }
         let isDark = PhotoManager.isDark
-        navigationBar.titleTextAttributes =
-            [NSAttributedString.Key.foregroundColor: isDark ?
-                config.navigationTitleDarkColor :
-                config.navigationTitleColor
-            ]
-        navigationBar.tintColor = isDark ? config.navigationDarkTintColor : config.navigationTintColor
-        navigationBar.barStyle = isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
+        let titleTextAttributes = [NSAttributedString.Key.foregroundColor: isDark ?
+                                   config.navigationTitleDarkColor :
+                                   config.navigationTitleColor
+                               ]
+        navigationBar.titleTextAttributes = titleTextAttributes
+        let tintColor = isDark ? config.navigationDarkTintColor : config.navigationTintColor
+        navigationBar.tintColor = tintColor
+        let barStyle = isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
+        navigationBar.barStyle = barStyle
+        
+        if #available(iOS 15.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.titleTextAttributes = titleTextAttributes
+            switch barStyle {
+            case .default:
+                appearance.backgroundEffect = UIBlurEffect(style: .light)
+            default:
+                appearance.backgroundEffect = UIBlurEffect(style: .dark)
+            }
+            navigationBar.standardAppearance = appearance
+            navigationBar.scrollEdgeAppearance = appearance
+        }
     }
     private func requestAuthorization() {
         if !config.allowLoadPhotoLibrary {
@@ -386,7 +428,8 @@ extension PhotoPickerController {
             canAddAsset = true
             return
         }
-        for photoAsset in selectedAssetArray {
+        let array = selectedAssetArray
+        for photoAsset in array {
             if photoAsset.mediaType == .photo {
                 selectedPhotoAssetArray.append(photoAsset)
                 #if HXPICKER_ENABLE_EDITOR
@@ -397,7 +440,10 @@ extension PhotoPickerController {
                 #endif
             }else if photoAsset.mediaType == .video {
                 if singleVideo {
-                    selectedAssetArray.remove(at: selectedAssetArray.firstIndex(of: photoAsset)!)
+                    if let index = selectedAssetArray.firstIndex(of: photoAsset) {
+                        canAddAsset = false
+                        selectedAssetArray.remove(at: index)
+                    }
                 }else {
                     selectedVideoAssetArray.append(photoAsset)
                 }

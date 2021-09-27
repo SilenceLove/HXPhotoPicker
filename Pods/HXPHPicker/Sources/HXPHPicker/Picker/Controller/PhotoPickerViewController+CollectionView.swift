@@ -19,10 +19,8 @@ extension PhotoPickerViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        if let pickerController = pickerController,
-           config.allowAddCamera,
-           canAddCamera {
-            if !pickerController.config.reverseOrder {
+        if config.allowAddCamera && canAddCamera {
+            if config.sort == .asc {
                 if indexPath.item == assets.count {
                     return cameraCell
                 }
@@ -64,7 +62,7 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
         forItemAt indexPath: IndexPath
     ) {
         if let pickerController = pickerController,
-           let myCell: PhotoPickerBaseViewCell = cell as? PhotoPickerBaseViewCell {
+           let myCell = cell as? PhotoPickerBaseViewCell {
             let photoAsset = getPhotoAsset(for: indexPath.item)
             if !photoAsset.isSelected &&
                 config.cell.showDisableMask &&
@@ -77,6 +75,10 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             }else {
                 myCell.canSelect = true
             }
+            myCell.updateSelectedState(
+                isSelected: photoAsset.isSelected,
+                animated: false
+            )
         }
     }
     public func collectionView(
@@ -84,7 +86,7 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
         didEndDisplaying cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
-        let myCell: PhotoPickerBaseViewCell? = cell as? PhotoPickerBaseViewCell
+        let myCell = cell as? PhotoPickerBaseViewCell
         myCell?.cancelRequest()
     }
     public func collectionView(

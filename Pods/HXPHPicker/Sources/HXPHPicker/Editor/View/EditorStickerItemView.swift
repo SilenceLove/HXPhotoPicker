@@ -33,7 +33,13 @@ class EditorStickerItemView: UIView {
         return externalBorder
     }()
     var item: EditorStickerItem
-    
+    var isEnabled: Bool = true {
+        didSet {
+            isUserInteractionEnabled = isEnabled
+            contentView.isUserInteractionEnabled = isEnabled
+        }
+    }
+    var isDelete: Bool = false
     var scale: CGFloat
     var touching: Bool = false
     var isSelected: Bool = false {
@@ -116,6 +122,9 @@ class EditorStickerItemView: UIView {
     }
     
     @objc func contentViewTapClick(tapGR: UITapGestureRecognizer) {
+        if isDelete {
+            return
+        }
         if let shouldTouch = delegate?.stickerItemView(shouldTouchBegan: self), !shouldTouch {
             return
         }
@@ -131,6 +140,9 @@ class EditorStickerItemView: UIView {
         firstTouch = true
     }
     @objc func contentViewPanClick(panGR: UIPanGestureRecognizer) {
+        if isDelete {
+            return
+        }
         if let shouldTouch = delegate?.stickerItemView(shouldTouchBegan: self), !shouldTouch {
             return
         }
@@ -170,6 +182,9 @@ class EditorStickerItemView: UIView {
         }
     }
     @objc func contentViewPinchClick(pinchGR: UIPinchGestureRecognizer) {
+        if isDelete {
+            return
+        }
         if let shouldTouch = delegate?.stickerItemView(shouldTouchBegan: self), !shouldTouch {
             return
         }
@@ -194,6 +209,9 @@ class EditorStickerItemView: UIView {
         }
     }
     @objc func contentViewRotationClick(rotationGR: UIRotationGestureRecognizer) {
+        if isDelete {
+            return
+        }
         if let shouldTouch = delegate?.stickerItemView(shouldTouchBegan: self), !shouldTouch {
             return
         }

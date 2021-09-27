@@ -16,7 +16,7 @@ public extension AssetManager {
     /// - Parameters:
     ///   - asset: 对应的 PHAsset 数据
     ///   - resultHandler: 获取结果
-    class func requestImageURL(
+    static func requestImageURL(
         for asset: PHAsset,
         resultHandler: @escaping ImageURLResultHandler
     ) {
@@ -32,7 +32,7 @@ public extension AssetManager {
     ///   - asset: 对应的 PHAsset 数据
     ///   - suffix: 后缀格式
     ///   - resultHandler: 获取结果
-    class func requestImageURL(
+    static func requestImageURL(
         for asset: PHAsset,
         suffix: String,
         resultHandler: @escaping ImageURLResultHandler
@@ -50,7 +50,7 @@ public extension AssetManager {
     ///   - asset: 对应的 PHAsset 数据
     ///   - fileURL: 指定本地地址
     ///   - resultHandler: 获取结果
-    class func requestImageURL(
+    static func requestImageURL(
         for asset: PHAsset,
         toFile fileURL: URL,
         resultHandler: @escaping ImageURLResultHandler
@@ -118,7 +118,7 @@ public extension AssetManager {
     ///   - resultHandler: 获取结果
     /// - Returns: 请求ID
     @discardableResult
-    class func requestImageURL(
+    static func requestImageURL(
         for asset: PHAsset,
         resultHandler: @escaping (URL?, UIImage?) -> Void
     ) -> PHContentEditingInputRequestID {

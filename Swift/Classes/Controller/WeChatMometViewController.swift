@@ -30,9 +30,9 @@ class WeChatMometViewController: UIViewController {
         config.photoEditor.cropping.fixedRatio = true
         config.photoEditor.fixedCropState = true
         
-        config.photoList.camera.photoEditor.cropping.aspectRatioType = .ratio_1x1
-        config.photoList.camera.photoEditor.cropping.fixedRatio = true
-        config.photoList.camera.photoEditor.fixedCropState = true
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.aspectRatioType = .ratio_1x1
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.fixedRatio = true
+        config.photoList.cameraType.customConfig?.photoEditor.fixedCropState = true
         
         presentPicker(config)
     }

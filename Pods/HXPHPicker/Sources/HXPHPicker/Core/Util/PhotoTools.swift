@@ -12,10 +12,10 @@ import Photos
 import Kingfisher
 #endif
 
-public class PhotoTools {
+public struct PhotoTools {
     
     /// 根据PHAsset资源获取对应的目标大小
-    public class func transformTargetWidthToSize(
+    public static func transformTargetWidthToSize(
         targetWidth: CGFloat,
         asset: PHAsset
     ) -> CGSize {
@@ -39,7 +39,7 @@ public class PhotoTools {
     }
     
     /// 转换视频时长为 mm:ss 格式的字符串
-    public class func transformVideoDurationToString(
+    public static func transformVideoDurationToString(
         duration: TimeInterval
     ) -> String {
         let time = Int(round(Double(duration)))
@@ -77,7 +77,7 @@ public class PhotoTools {
     }
     
     /// 根据视频地址获取视频时长
-    public class func getVideoDuration(
+    public static func getVideoDuration(
         videoURL: URL?
     ) -> TimeInterval {
         guard let videoURL = videoURL else {
@@ -90,7 +90,7 @@ public class PhotoTools {
     }
     
     /// 根据视频时长(00:00:00)获取秒
-    class func getVideoTime(forVideo duration: String) -> TimeInterval {
+    static func getVideoTime(forVideo duration: String) -> TimeInterval {
         var m = 0
         var s = 0
         var ms = 0
@@ -110,7 +110,7 @@ public class PhotoTools {
     }
     
     /// 根据视频地址获取视频封面
-    public class func getVideoThumbnailImage(
+    public static func getVideoThumbnailImage(
         videoURL: URL?,
         atTime: TimeInterval
     ) -> UIImage? {
@@ -125,7 +125,7 @@ public class PhotoTools {
     }
     
     /// 根据视频地址获取视频封面
-    public class func getVideoThumbnailImage(
+    public static func getVideoThumbnailImage(
         avAsset: AVAsset?,
         atTime: TimeInterval
     ) -> UIImage? {
@@ -150,7 +150,7 @@ public class PhotoTools {
     
     /// 获视频缩略图
     @discardableResult
-    public class func getVideoThumbnailImage(
+    public static func getVideoThumbnailImage(
         url: URL,
         atTime: TimeInterval,
         imageGenerator: ((AVAssetImageGenerator) -> Void)? = nil,
@@ -190,7 +190,7 @@ public class PhotoTools {
     }
     
     #if canImport(Kingfisher)
-    public class func downloadNetworkImage(
+    public static func downloadNetworkImage(
         with url: URL,
         cancelOrigianl: Bool = true,
         options: KingfisherOptionsInfo,
@@ -248,7 +248,7 @@ public class PhotoTools {
     }
     #endif
     
-    class func transformImageSize(
+    static func transformImageSize(
         _ imageSize: CGSize,
         to view: UIView
     ) -> CGRect {
@@ -258,7 +258,7 @@ public class PhotoTools {
         )
     }
     
-    class func transformImageSize(
+    static func transformImageSize(
         _ imageSize: CGSize,
         toViewSize viewSize: CGSize,
         directions: [PhotoToolsTransformImageSizeDirections] = [.horizontal, .vertical]
@@ -341,7 +341,7 @@ public class PhotoTools {
         return CGRect(x: (viewSize.width - size.width) * 0.5, y: rectY, width: size.width, height: size.height)
     }
     
-    class func exportSessionFileLengthLimit(
+    static func exportSessionFileLengthLimit(
         seconds: Double,
         exportPreset: ExportPreset,
         videoQuality: Int
@@ -361,7 +361,7 @@ public class PhotoTools {
         return 0
     }
     
-    class func getBasicAnimation(
+    static func getBasicAnimation(
         _ keyPath: String,
         _ fromValue: Any?,
         _ toValue: Any?,
@@ -376,7 +376,7 @@ public class PhotoTools {
         return animation
     }
     
-    class func getGradientShadowLayer(_ isTop: Bool) -> CAGradientLayer {
+    static func getGradientShadowLayer(_ isTop: Bool) -> CAGradientLayer {
         let layer = CAGradientLayer()
         layer.contentsScale = UIScreen.main.scale
         let blackColor = UIColor.black
@@ -396,6 +396,8 @@ public class PhotoTools {
         layer.borderWidth = 0.0
         return layer
     }
+    
+    private init() { }
 }
 
 enum PhotoToolsTransformImageSizeDirections {

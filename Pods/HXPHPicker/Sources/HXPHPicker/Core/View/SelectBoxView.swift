@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class SelectBoxView: UIControl {
+public final class SelectBoxView: UIControl {
     
     public enum Style: Int {
         /// 数字
@@ -33,9 +33,8 @@ public class SelectBoxView: UIControl {
         }
     }
     var textSize: CGSize = CGSize.zero
-    lazy var config: SelectBoxConfiguration = {
-        return SelectBoxConfiguration.init()
-    }()
+    public lazy var config: SelectBoxConfiguration = .init()
+    
     lazy var backgroundLayer: CAShapeLayer = {
         let backgroundLayer = CAShapeLayer.init()
         backgroundLayer.contentsScale = UIScreen.main.scale
@@ -55,14 +54,14 @@ public class SelectBoxView: UIControl {
         return tickLayer
     }()
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         layer.addSublayer(backgroundLayer)
         layer.addSublayer(textLayer)
         layer.addSublayer(tickLayer)
     }
     
-    func backgroundPath() -> CGPath {
+    private func backgroundPath() -> CGPath {
         let strokePath = UIBezierPath(
             roundedRect: CGRect(
                 x: 0,
@@ -74,7 +73,7 @@ public class SelectBoxView: UIControl {
         )
         return strokePath.cgPath
     }
-    func drawBackgroundLayer() {
+    private func drawBackgroundLayer() {
         backgroundLayer.path = backgroundPath()
         if isSelected {
             backgroundLayer.fillColor = PhotoManager.isDark ?
@@ -91,7 +90,7 @@ public class SelectBoxView: UIControl {
                 config.borderColor.cgColor
         }
     }
-    func drawTextLayer() {
+    private func drawTextLayer() {
         if config.style != .number {
             textLayer.isHidden = true
             return
@@ -121,14 +120,14 @@ public class SelectBoxView: UIControl {
         textLayer.foregroundColor = PhotoManager.isDark ? config.titleDarkColor.cgColor : config.titleColor.cgColor
     }
     
-    func tickPath() -> CGPath {
+    private func tickPath() -> CGPath {
         let tickPath = UIBezierPath.init()
         tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
         tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))
         tickPath.addLine(to: CGPoint(x: width - scale(7), y: scale(9)))
         return tickPath.cgPath
     }
-    func drawTickLayer() {
+    private func drawTickLayer() {
         if config.style != .tick {
             tickLayer.isHidden = true
             return

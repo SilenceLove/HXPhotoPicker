@@ -42,8 +42,18 @@ extension EditorImageResizerView {
             if !otherImages.isEmpty {
                 otherImage = UIImage.merge(
                     images: otherImages
-                )?.scaleToFillSize(
-                    size: inputImage.size
+                )
+                let fillSize: CGSize
+                let inpuSize = inputImage.width * inputImage.height
+                if inpuSize > 15000000,
+                   let image = inputImage.scaleImage(toScale: 0.6) {
+                    inputImage = image
+                    fillSize = image.size
+                }else {
+                    fillSize = inputImage.size
+                }
+                otherImage = otherImage?.scaleToFillSize(
+                    size: fillSize
                 )
             }
             var crop_Rect = cropRect

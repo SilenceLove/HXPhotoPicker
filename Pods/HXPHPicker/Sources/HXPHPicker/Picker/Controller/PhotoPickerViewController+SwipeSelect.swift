@@ -197,14 +197,14 @@ extension PhotoPickerViewController {
             break
         }
     }
-    func clearSwipeSelectData() {
+    private func clearSwipeSelectData() {
         swipeSelectAutoScrollTimer?.cancel()
         swipeSelectAutoScrollTimer = nil
         swipeSelectBeganIndexPath = nil
         swipeSelectState = nil
         swipeSelectedIndexArray = nil
     }
-    func panGRChangedUpdateState(index: Int, state: SwipeSelectState) {
+    private func panGRChangedUpdateState(index: Int, state: SwipeSelectState) {
         if index >= assets.count && !needOffset {
             return
         }
@@ -223,7 +223,11 @@ extension PhotoPickerViewController {
         }
         updateCellSelectedState(for: index, isSelected: state == .select)
     }
-    func swipeSelectAutoScroll() {
+    private func swipeSelectAutoScroll() {
+        guard let pickerController = pickerController,
+              !pickerController.config.allowSyncICloudWhenSelectPhoto else {
+            return
+        }
         if !config.swipeSelectAllowAutoScroll {
             return
         }
@@ -240,7 +244,7 @@ extension PhotoPickerViewController {
         })
         swipeSelectAutoScrollTimer?.resume()
     }
-    func startAutoScroll() {
+    private func startAutoScroll() {
         if let localPoint = swipeSelectLastLocalPoint {
             let topRect = CGRect(
                 x: 0,

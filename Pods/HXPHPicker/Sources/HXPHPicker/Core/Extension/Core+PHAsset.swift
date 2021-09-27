@@ -39,33 +39,39 @@ public extension PHAsset {
     /// 如果在获取到PHAsset之前还未下载的iCloud，之后下载了还是会返回存在
     var inICloud: Bool {
         var isICloud = false
-        if mediaType == PHAssetMediaType.image {
-            let options = PHImageRequestOptions.init()
-            options.isSynchronous = true
-            options.deliveryMode = .fastFormat
-            options.resizeMode = .fast
-            AssetManager.requestImageData(for: self, options: options) { (result) in
-                switch result {
-                case .failure(let error):
-                    if AssetManager.assetIsInCloud(for: error.info) {
-                        isICloud = true
-                    }
-                default:
-                    break
+        var hasICloud = false
+        let options = PHImageRequestOptions()
+        options.isSynchronous = true
+        options.deliveryMode = .fastFormat
+        options.resizeMode = .fast
+        AssetManager.requestImageData(for: self, options: options) { (result) in
+            switch result {
+            case .failure(let error):
+                if let inICloud = error.info?.inICloud {
+                    isICloud = inICloud
+                    hasICloud = true
                 }
-            }
-        }else if mediaType == PHAssetMediaType.video {
-            if let isICloud = self.value(forKey: "isCloudPlaceholder") as? Bool,
-               isICloud {
-                return true
-            }
-            let resourceArray = PHAssetResource.assetResources(for: self)
-            let bIsLocallayAvailable = resourceArray.first?.value(forKey: "locallyAvailable") as? Bool ?? true
-            if !bIsLocallayAvailable {
-                isICloud = true
+            default:
+                break
             }
         }
+        if hasICloud {
+            return isICloud
+        }
+        if mediaType == PHAssetMediaType.video {
+            isICloud = !isLocallayAvailable
+        }
         return isICloud
+    }
+    
+    var isLocallayAvailable: Bool {
+        if let isICloud = self.value(forKey: "isCloudPlaceholder") as? Bool,
+           isICloud {
+            return false
+        }
+        let resourceArray = PHAssetResource.assetResources(for: self)
+        let isLocallayAvailable = resourceArray.first?.value(forKey: "locallyAvailable") as? Bool ?? true
+        return isLocallayAvailable
     }
     
     func checkAdjustmentStatus(completion: @escaping (Bool) -> Void) {

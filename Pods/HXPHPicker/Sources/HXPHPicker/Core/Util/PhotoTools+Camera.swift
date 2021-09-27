@@ -13,17 +13,17 @@ import QuartzCore
 
 extension PhotoTools {
     
-    class func cameraPreviewImageURL() -> URL {
+    static func cameraPreviewImageURL() -> URL {
         var cachePath = getImageCacheFolderPath()
         cachePath.append(contentsOf: "/" + "cameraPreviewImage".md5)
         return URL(fileURLWithPath: cachePath)
     }
-    class func isCacheCameraPreviewImage() -> Bool {
+    static func isCacheCameraPreviewImage() -> Bool {
         let imageCacheURL = cameraPreviewImageURL()
         return FileManager.default.fileExists(atPath: imageCacheURL.path)
     }
     
-    class func saveCameraPreviewImage(_ image: UIImage) {
+    static func saveCameraPreviewImage(_ image: UIImage) {
         if let data = getImageData(for: image),
            !data.isEmpty {
             do {
@@ -47,7 +47,7 @@ extension PhotoTools {
         }
     }
     
-    class func getCameraPreviewImage() -> UIImage? {
+    static func getCameraPreviewImage() -> UIImage? {
         do {
             let cacheURL = cameraPreviewImageURL()
             if !FileManager.default.fileExists(atPath: cacheURL.path) {
@@ -61,7 +61,7 @@ extension PhotoTools {
         return nil
     }
     
-    class func createImage(from sampleBuffer: CMSampleBuffer) -> UIImage? {
+    static func createImage(from sampleBuffer: CMSampleBuffer) -> UIImage? {
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
           return nil
         }

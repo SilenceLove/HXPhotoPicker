@@ -7,12 +7,12 @@
 
 import UIKit
 
-extension PhotoTools {
+public extension PhotoTools {
     
     /// 获取文件大小
     /// - Parameter path: 文件路径
     /// - Returns: 文件大小
-    public class func fileSize(atPath path: String) -> Int {
+    static func fileSize(atPath path: String) -> Int {
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: path) {
             do {
@@ -28,7 +28,7 @@ extension PhotoTools {
     /// 获取文件夹里的所有文件大小
     /// - Parameter path: 文件夹路径
     /// - Returns: 文件夹大小
-    public class func folderSize(atPath path: String) -> Int {
+    static func folderSize(atPath path: String) -> Int {
         let fileManager = FileManager.default
         if !fileManager.fileExists(atPath: path) { return 0 }
         let childFiles = fileManager.subpaths(atPath: path)
@@ -41,58 +41,58 @@ extension PhotoTools {
     }
     
     /// 获取系统缓存文件夹路径
-    public class func getSystemCacheFolderPath() -> String {
+    static func getSystemCacheFolderPath() -> String {
         return NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last!
     }
     
     /// 获取图片缓存文件夹路径
-    public class func getImageCacheFolderPath() -> String {
+    static func getImageCacheFolderPath() -> String {
         var cachePath = getSystemCacheFolderPath()
         cachePath.append(contentsOf: "/com.silence.HXPHPicker/imageCache")
         return cachePath
     }
     
     /// 获取视频缓存文件夹路径
-    public class func getVideoCacheFolderPath() -> String {
+    static func getVideoCacheFolderPath() -> String {
         var cachePath = getSystemCacheFolderPath()
         cachePath.append(contentsOf: "/com.silence.HXPHPicker/videoCache")
         return cachePath
     }
     
-    public class func getAudioTmpFolderPath() -> String {
+    static func getAudioTmpFolderPath() -> String {
         var tmpPath = NSTemporaryDirectory()
         tmpPath.append(contentsOf: "com.silence.HXPHPicker/audioCache")
         return tmpPath
     }
     
     /// 删除缓存
-    public class func removeCache() {
+    static func removeCache() {
         removeVideoCache()
         removeAudioCache()
     }
     
     /// 删除视频缓存
     @discardableResult
-    public class func removeVideoCache() -> Bool {
+    static func removeVideoCache() -> Bool {
         return removeFile(filePath: getVideoCacheFolderPath())
     }
     
     /// 删除音频临时缓存
     @discardableResult
-    public class func removeAudioCache() -> Bool {
+    static func removeAudioCache() -> Bool {
         return removeFile(filePath: getAudioTmpFolderPath())
     }
     
     /// 获取视频缓存文件大小
     @discardableResult
-    public class func getVideoCacheFileSize() -> Int {
+    static func getVideoCacheFileSize() -> Int {
         return folderSize(atPath: getVideoCacheFolderPath())
     }
     
     /// 获取视频缓存文件地址
     /// - Parameter key: 生成文件的key
     @discardableResult
-    public class func getVideoCacheURL(for key: String) -> URL {
+    static func getVideoCacheURL(for key: String) -> URL {
         var cachePath = getVideoCacheFolderPath()
         let fileManager = FileManager.default
         if !fileManager.fileExists(atPath: cachePath) {
@@ -105,7 +105,7 @@ extension PhotoTools {
     }
     
     @discardableResult
-    public class func getAudioTmpURL(for key: String) -> URL {
+    static func getAudioTmpURL(for key: String) -> URL {
         var cachePath = getAudioTmpFolderPath()
         let fileManager = FileManager.default
         if !fileManager.fileExists(atPath: cachePath) {
@@ -118,14 +118,14 @@ extension PhotoTools {
     /// 视频是否有缓存
     /// - Parameter key: 对应视频的key
     @discardableResult
-    public class func isCached(forVideo key: String) -> Bool {
+    static func isCached(forVideo key: String) -> Bool {
         let fileManager = FileManager.default
         let filePath = getVideoCacheURL(for: key).path
         return fileManager.fileExists(atPath: filePath)
     }
     
     @discardableResult
-    public class func isCached(forAudio key: String) -> Bool {
+    static func isCached(forAudio key: String) -> Bool {
         let fileManager = FileManager.default
         let filePath = getAudioTmpURL(for: key).path
         return fileManager.fileExists(atPath: filePath)
@@ -133,7 +133,7 @@ extension PhotoTools {
     
     /// 获取对应后缀的临时路径
     @discardableResult
-    public class func getTmpURL(for suffix: String) -> URL {
+    static func getTmpURL(for suffix: String) -> URL {
         var tmpPath = NSTemporaryDirectory()
         tmpPath.append(contentsOf: String.fileName(suffix: suffix))
         let tmpURL = URL.init(fileURLWithPath: tmpPath)
@@ -141,7 +141,7 @@ extension PhotoTools {
     }
     /// 获取图片临时路径
     @discardableResult
-    public class func getImageTmpURL(_ imageContentType: ImageContentType = .jpg) -> URL {
+    static func getImageTmpURL(_ imageContentType: ImageContentType = .jpg) -> URL {
         var suffix: String
         switch imageContentType {
         case .jpg:
@@ -157,12 +157,12 @@ extension PhotoTools {
     }
     /// 获取视频临时路径
     @discardableResult
-    public class func getVideoTmpURL() -> URL {
+    static func getVideoTmpURL() -> URL {
         return getTmpURL(for: "mp4")
     }
     /// 将UIImage转换成Data
     @discardableResult
-    public class func getImageData(for image: UIImage?) -> Data? {
+    static func getImageData(for image: UIImage?) -> Data? {
         if let pngData = image?.pngData() {
             return pngData
         }else if let jpegData = image?.jpegData(compressionQuality: 1) {
@@ -172,7 +172,7 @@ extension PhotoTools {
     }
     
     @discardableResult
-    class func write(
+    static func write(
         toFile fileURL: URL? = nil,
         image: UIImage?) -> URL? {
         if let imageData = getImageData(for: image) {
@@ -182,7 +182,7 @@ extension PhotoTools {
     }
     
     @discardableResult
-    class func write(
+    static func write(
         toFile fileURL: URL? = nil,
         imageData: Data) -> URL? {
         let imageURL = fileURL == nil ? getImageTmpURL(imageData.isGif ? .gif : .jpg) : fileURL!
@@ -198,7 +198,7 @@ extension PhotoTools {
     }
     
     @discardableResult
-    class func copyFile(at srcURL: URL, to dstURL: URL) -> Bool {
+    static func copyFile(at srcURL: URL, to dstURL: URL) -> Bool {
         if srcURL.path == dstURL.path {
             return true
         }
@@ -214,12 +214,12 @@ extension PhotoTools {
     }
     
     @discardableResult
-    class func removeFile(fileURL: URL) -> Bool {
+    static func removeFile(fileURL: URL) -> Bool {
         removeFile(filePath: fileURL.path)
     }
     
     @discardableResult
-    class func removeFile(filePath: String) -> Bool {
+    static func removeFile(filePath: String) -> Bool {
         do {
             if FileManager.default.fileExists(atPath: filePath) {
                 try FileManager.default.removeItem(atPath: filePath)

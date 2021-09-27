@@ -57,7 +57,7 @@ extension EditorImageResizerView: EditorImageResizerControlViewDelegate {
     func startControlTimer() {
         controlTimer?.invalidate()
         let timer = Timer.scheduledTimer(
-            timeInterval: 1,
+            timeInterval: 0.5,
             target: self,
             selector: #selector(controlTimerAction),
             userInfo: nil,
@@ -149,7 +149,10 @@ extension EditorImageResizerView: EditorImageResizerControlViewDelegate {
         let zoomScale = getZoomScale(fromRect: controlBeforeRect, toRect: controlAfterRect)
         let needZoomScale = zoomScale != scrollView.zoomScale
         if animated {
-            UIView.animate(withDuration: 0.25, delay: 0, options: [.curveLinear]) {
+            isUserInteractionEnabled = false
+            let currentOffset = scrollView.contentOffset
+            scrollView.setContentOffset(currentOffset, animated: false)
+            UIView.animate(withDuration: animationDuration, delay: 0, options: [.curveLinear]) {
                 self.updateScrollViewContentInset(rect)
                 if needZoomScale {
                     /// 需要进行缩放
@@ -168,6 +171,7 @@ extension EditorImageResizerView: EditorImageResizerControlViewDelegate {
                 self.maskBgViewisShowing = false
                 self.inControlTimer = false
                 self.delegate?.imageResizerView(didEndChangedMaskRect: self)
+                self.isUserInteractionEnabled = true
             }
         }else {
             updateScrollViewContentInset(rect)

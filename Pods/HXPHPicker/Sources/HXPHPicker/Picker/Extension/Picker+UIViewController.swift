@@ -21,6 +21,7 @@ public extension HXPickerWrapper where Base: UIViewController {
     @discardableResult
     func present(
         picker config: PickerConfiguration,
+        selectedAssets: [PhotoAsset] = [],
         delegate: PhotoPickerControllerDelegate? = nil,
         finish: PhotoPickerController.FinishHandler? = nil,
         cancel: PhotoPickerController.CancelHandler? = nil
@@ -29,6 +30,7 @@ public extension HXPickerWrapper where Base: UIViewController {
             picker: config,
             delegate: delegate
         )
+        pickerController.selectedAssetArray = selectedAssets
         pickerController.finishHandler = finish
         pickerController.cancelHandler = cancel
         base.present(
