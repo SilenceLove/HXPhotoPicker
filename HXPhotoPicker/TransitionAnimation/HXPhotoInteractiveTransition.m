@@ -227,7 +227,9 @@
         }
         toVC.navigationController.navigationBar.alpha = 0;
         toVC.bottomView.alpha = 0;
+        toVC.limitView.alpha = 0;
     }else {
+        toVC.limitView.alpha = 1;
         toVC.bottomView.alpha = 1;
         self.bgView.backgroundColor = [HXPhotoCommon photoCommon].isDark ? [UIColor blackColor] : fromVC.manager.configuration.previewPhotoViewBgColor;
     }
@@ -277,6 +279,7 @@
     if (!fromVC.bottomView.userInteractionEnabled) {
         HXPhotoViewController *toVC = (HXPhotoViewController *)[self.transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
         toVC.bottomView.alpha = 1 - scale;
+        toVC.limitView.alpha = 1 - scale;
         toVC.navigationController.navigationBar.alpha = 1 - scale;
     }
 }
@@ -303,8 +306,10 @@
         self.bgView.alpha = 1;
         if (!fromVC.bottomView.userInteractionEnabled) {
             toVC.bottomView.alpha = 0;
+            toVC.limitView.alpha = 0;
         }else {
             toVC.bottomView.alpha = 1;
+            toVC.limitView.alpha = 1;
         }
     } completion:^(BOOL finished) {
 //        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
@@ -367,6 +372,7 @@
         self.bgView.alpha = 0;
         toVC.navigationController.navigationBar.alpha = 1;
         toVC.bottomView.alpha = 1;
+        toVC.limitView.alpha = 1;
     }completion:^(BOOL finished) {
 //        toVC.navigationController.navigationBar.userInteractionEnabled = YES;
         if (finished) {

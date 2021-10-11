@@ -36,6 +36,10 @@ typedef NS_ENUM(NSUInteger, HXPhotoEditAspectRatio) {
 /// 旋转之后会重置编辑的内容
 @property (assign, nonatomic) BOOL supportRotation;
 
+/// 不可旋转时支持的方向
+@property (assign, nonatomic) UIInterfaceOrientationMask supportedInterfaceOrientations;
+
+
 #pragma mark - < 画笔相关 >
 /// 画笔颜色数组
 @property (copy, nonatomic) NSArray<UIColor *> *drawColors;

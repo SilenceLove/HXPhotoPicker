@@ -7,32 +7,10 @@
 
 import UIKit
 import Photos
+
 #if canImport(Kingfisher)
 import Kingfisher
 #endif
-
-public protocol PhotoEditorViewControllerDelegate: AnyObject {
-    
-    /// 编辑完成
-    /// - Parameters:
-    ///   - photoEditorViewController: 对应的 PhotoEditorViewController
-    ///   - result: 编辑后的数据
-    func photoEditorViewController(_ photoEditorViewController: PhotoEditorViewController, didFinish result: PhotoEditResult)
-    
-    /// 点击完成按钮，但是照片未编辑
-    /// - Parameters:
-    ///   - photoEditorViewController: 对应的 PhotoEditorViewController
-    func photoEditorViewController(didFinishWithUnedited photoEditorViewController: PhotoEditorViewController)
-    
-    /// 取消编辑
-    /// - Parameter photoEditorViewController: 对应的 PhotoEditorViewController
-    func photoEditorViewController(didCancel photoEditorViewController: PhotoEditorViewController)
-}
-public extension PhotoEditorViewControllerDelegate {
-    func photoEditorViewController(_ photoEditorViewController: PhotoEditorViewController, didFinish result: PhotoEditResult) {}
-    func photoEditorViewController(didFinishWithUnedited photoEditorViewController: PhotoEditorViewController) {}
-    func photoEditorViewController(didCancel photoEditorViewController: PhotoEditorViewController) {}
-}
 
 open class PhotoEditorViewController: BaseViewController {
     
@@ -44,8 +22,8 @@ open class PhotoEditorViewController: BaseViewController {
     /// 当前编辑的图片
     public private(set) var image: UIImage!
     
-    /// 资源类型
-    public let assetType: EditorController.AssetType
+    /// 来源
+    public let sourceType: EditorController.SourceType
     
     /// 当前编辑状态
     public private(set) var state: State = .normal
@@ -53,17 +31,22 @@ open class PhotoEditorViewController: BaseViewController {
     /// 上一次的编辑结果
     public let editResult: PhotoEditResult?
     
+    /// 确认/取消之后自动退出界面
+    public var autoBack: Bool = true
+    
     /// 编辑image
     /// - Parameters:
     ///   - image: 对应的 UIImage
     ///   - editResult: 上一次编辑结果
     ///   - config: 编辑配置
-    public init(image: UIImage,
-                editResult: PhotoEditResult? = nil,
-                config: PhotoEditorConfiguration) {
+    public init(
+        image: UIImage,
+        editResult: PhotoEditResult? = nil,
+        config: PhotoEditorConfiguration
+    ) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
-        assetType = .local
+        sourceType = .local
         self.image = image
         self.config = config
         self.editResult = editResult
@@ -79,12 +62,14 @@ open class PhotoEditorViewController: BaseViewController {
     ///   - photoAsset: 对应数据的 PhotoAsset
     ///   - editResult: 上一次编辑结果
     ///   - config: 编辑配置
-    public init(photoAsset: PhotoAsset,
-                editResult: PhotoEditResult? = nil,
-                config: PhotoEditorConfiguration) {
+    public init(
+        photoAsset: PhotoAsset,
+        editResult: PhotoEditResult? = nil,
+        config: PhotoEditorConfiguration
+    ) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
-        assetType = .picker
+        sourceType = .picker
         requestType = 1
         needRequest = true
         self.config = config
@@ -96,19 +81,21 @@ open class PhotoEditorViewController: BaseViewController {
     
     #if canImport(Kingfisher)
     /// 当前编辑的网络图片地址
-    public var networkImageURL: URL?
+    public private(set) var networkImageURL: URL?
     
     /// 编辑网络图片
     /// - Parameters:
     ///   - networkImageURL: 对应的网络地址
     ///   - editResult: 上一次编辑结果
     ///   - config: 编辑配置
-    public init(networkImageURL: URL,
-                editResult: PhotoEditResult? = nil,
-                config: PhotoEditorConfiguration) {
+    public init(
+        networkImageURL: URL,
+        editResult: PhotoEditResult? = nil,
+        config: PhotoEditorConfiguration
+    ) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
-        assetType = .network
+        sourceType = .network
         requestType = 2
         needRequest = true
         self.networkImageURL = networkImageURL
@@ -117,24 +104,47 @@ open class PhotoEditorViewController: BaseViewController {
         super.init(nibName: nil, bundle: nil)
     }
     #endif
-    
-    var needRequest: Bool = false
-    var requestType: Int = 0
+    var filterHDImage: UIImage?
+    var mosaicImage: UIImage?
+    var thumbnailImage: UIImage!
+    private var needRequest: Bool = false
+    private var requestType: Int = 0
     
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     lazy var imageView: PhotoEditorView = {
         let imageView = PhotoEditorView.init(config: config)
         imageView.editorDelegate = self
-        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap(tap:)))
-        imageView.addGestureRecognizer(singleTap)
         return imageView
     }()
     var topViewIsHidden: Bool = false
-    @objc func singleTap(tap: UITapGestureRecognizer) {
+    @objc func singleTap() {
         if state == .cropping {
+            return
+        }
+        imageView.deselectedSticker()
+        func resetOtherOption() {
+            if let option = currentToolOption {
+                if option.type == .graffiti {
+                    imageView.drawEnabled = true
+                }else if option.type == .mosaic {
+                    imageView.mosaicEnabled = true
+                }
+            }
+            showTopView()
+        }
+        if isFilter {
+            isFilter = false
+            resetOtherOption()
+            hiddenFilterView()
+            return
+        }
+        if showChartlet {
+            imageView.isEnabled = true
+            showChartlet = false
+            resetOtherOption()
+            hiddenChartletView()
             return
         }
         if topViewIsHidden {
@@ -143,52 +153,53 @@ open class PhotoEditorViewController: BaseViewController {
             hidenTopView()
         }
     }
-    lazy var cropConfirmView: EditorCropConfirmView = {
+    
+    /// 裁剪确认视图
+    public lazy var cropConfirmView: EditorCropConfirmView = {
         let cropConfirmView = EditorCropConfirmView.init(config: config.cropConfimView, showReset: true)
         cropConfirmView.alpha = 0
         cropConfirmView.isHidden = true
         cropConfirmView.delegate = self
         return cropConfirmView
     }()
-    lazy var toolView: EditorToolView = {
+    public lazy var toolView: EditorToolView = {
         let toolView = EditorToolView.init(config: config.toolView)
         toolView.delegate = self
         return toolView
     }()
     
-    lazy var topView: UIView = {
+    public lazy var topView: UIView = {
         let view = UIView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
         let cancelBtn = UIButton.init(frame: CGRect(x: 0, y: 0, width: 57, height: 44))
         cancelBtn.setImage(UIImage.image(for: "hx_editor_back"), for: .normal)
-        cancelBtn.addTarget(self, action: #selector(didBackClick), for: .touchUpInside)
+        cancelBtn.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
         view.addSubview(cancelBtn)
         return view
     }()
-    @objc func didBackClick() {
-        delegate?.photoEditorViewController(didCancel: self)
-        if let navigationController = navigationController, navigationController.viewControllers.count > 1 {
-            navigationController.popViewController(animated: true)
-        }else {
-            dismiss(animated: true, completion: nil)
+    
+    @objc func didBackButtonClick() {
+        didBackClick(true)
+    }
+    
+    func didBackClick(_ isCancel: Bool = false) {
+        if isCancel {
+            delegate?.photoEditorViewController(didCancel: self)
+        }
+        if autoBack {
+            if let navigationController = navigationController, navigationController.viewControllers.count > 1 {
+                navigationController.popViewController(animated: true)
+            }else {
+                dismiss(animated: true, completion: nil)
+            }
         }
     }
     
-    lazy var topMaskLayer: CAGradientLayer = {
-        let layer = CAGradientLayer.init()
-        layer.contentsScale = UIScreen.main.scale
-        let blackColor = UIColor.black
-        layer.colors = [blackColor.withAlphaComponent(0).cgColor,
-                        blackColor.withAlphaComponent(0.15).cgColor,
-                        blackColor.withAlphaComponent(0.35).cgColor,
-                        blackColor.withAlphaComponent(0.6).cgColor]
-        layer.startPoint = CGPoint(x: 0, y: 1)
-        layer.endPoint = CGPoint(x: 0, y: 0)
-        layer.locations = [0.15, 0.35, 0.6, 0.9]
-        layer.borderWidth = 0.0
+    public lazy var topMaskLayer: CAGradientLayer = {
+        let layer = PhotoTools.getGradientShadowLayer(true)
         return layer
     }()
     
-    lazy var brushColorView: PhotoEditorBrushColorView = {
+    public lazy var brushColorView: PhotoEditorBrushColorView = {
         let view = PhotoEditorBrushColorView.init(frame: .zero)
         view.delegate = self
         view.brushColors = config.brushColors
@@ -197,17 +208,44 @@ open class PhotoEditorViewController: BaseViewController {
         view.isHidden = true
         return view
     }()
+    var showChartlet: Bool = false
+    lazy var chartletView: EditorChartletView = {
+        let view = EditorChartletView(
+            config: config.chartlet,
+            editorType: .photo
+        )
+        view.delegate = self
+        return view
+    }()
     
-    lazy var cropToolView: PhotoEditorCropToolView = {
+    public lazy var cropToolView: PhotoEditorCropToolView = {
         var showRatios = true
-        if config.cropConfig.fixedRatio || config.cropConfig.isRoundCrop {
+        if config.cropping.fixedRatio || config.cropping.isRoundCrop {
             showRatios = false
         }
         let view = PhotoEditorCropToolView.init(showRatios: showRatios)
         view.delegate = self
-        view.themeColor = config.cropConfig.aspectRatioSelectedColor
+        view.themeColor = config.cropping.aspectRatioSelectedColor
         view.alpha = 0
         view.isHidden = true
+        return view
+    }()
+    lazy var mosaicToolView: PhotoEditorMosaicToolView = {
+        let view = PhotoEditorMosaicToolView(selectedColor: config.toolView.toolSelectedColor)
+        view.delegate = self
+        view.alpha = 0
+        view.isHidden = true
+        return view
+    }()
+    var isFilter = false
+    var filterImage: UIImage?
+    lazy var filterView: PhotoEditorFilterView = {
+        let filter = editResult?.editedData.filter
+        let value = editResult?.editedData.filterValue
+        let view = PhotoEditorFilterView.init(filterConfig: config.filter,
+                                              sourceIndex: filter?.sourceIndex ?? -1,
+                                              value: value ?? 0)
+        view.delegate = self
         return view
     }()
     
@@ -215,9 +253,39 @@ open class PhotoEditorViewController: BaseViewController {
     var orientationDidChange: Bool = false
     var imageViewDidChange: Bool = true
     var currentToolOption: EditorToolOptions?
-    
+    var toolOptions: EditorToolView.Options = []
     open override func viewDidLoad() {
         super.viewDidLoad()
+        for options in config.toolView.toolOptions {
+            switch options.type {
+            case .graffiti:
+                toolOptions.insert(.graffiti)
+            case .chartlet:
+                toolOptions.insert(.chartlet)
+            case .text:
+                toolOptions.insert(.text)
+            case .cropping:
+                toolOptions.insert(.cropping)
+            case .mosaic:
+                toolOptions.insert(.mosaic)
+            case .filter:
+                toolOptions.insert(.filter)
+            case .music:
+                toolOptions.insert(.music)
+            }
+        }
+        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
+        singleTap.delegate = self
+        view.addGestureRecognizer(singleTap)
+        view.isExclusiveTouch = true
+        view.backgroundColor = .black
+        view.clipsToBounds = true
+        view.addSubview(imageView)
+        view.addSubview(toolView)
+        if toolOptions.contains(.cropping) {
+            view.addSubview(cropConfirmView)
+            view.addSubview(cropToolView)
+        }
         if config.fixedCropState {
             state = .cropping
             toolView.alpha = 0
@@ -226,17 +294,21 @@ open class PhotoEditorViewController: BaseViewController {
             topView.isHidden = true
         }else {
             state = config.state
+            if toolOptions.contains(.graffiti) {
+                view.addSubview(brushColorView)
+            }
+            if toolOptions.contains(.chartlet) {
+                view.addSubview(chartletView)
+            }
+            if toolOptions.contains(.mosaic) {
+                view.addSubview(mosaicToolView)
+            }
+            if toolOptions.contains(.filter) {
+                view.addSubview(filterView)
+            }
         }
-        view.backgroundColor = .black
-        view.clipsToBounds = true
-        view.addSubview(imageView)
-        view.addSubview(toolView)
-        view.addSubview(brushColorView)
-        view.addSubview(cropConfirmView)
-        view.addSubview(cropToolView)
         view.layer.addSublayer(topMaskLayer)
         view.addSubview(topView)
-        
         if needRequest {
             if requestType == 1 {
                 #if HXPICKER_ENABLE_PICKER
@@ -247,11 +319,25 @@ open class PhotoEditorViewController: BaseViewController {
                 requestNetworkImage()
                 #endif
             }
+        }else {
+            if !config.fixedCropState {
+                localImageHandler()
+            }
         }
     }
     open override func deviceOrientationWillChanged(notify: Notification) {
+        if showChartlet {
+            singleTap()
+        }
         imageView.undoAllDraw()
-        brushColorView.canUndo = imageView.canUndoDraw
+        if toolOptions.contains(.graffiti) {
+            brushColorView.canUndo = imageView.canUndoDraw
+        }
+        imageView.undoAllMosaic()
+        if toolOptions.contains(.mosaic) {
+            mosaicToolView.canUndo = imageView.canUndoMosaic
+        }
+        imageView.undoAllSticker()
         imageView.reset(false)
         imageView.finishCropping(false)
         if config.fixedCropState {
@@ -266,13 +352,19 @@ open class PhotoEditorViewController: BaseViewController {
     }
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        toolView.frame = CGRect(x: 0, y: view.height - UIDevice.bottomMargin - 50, width: view.width, height: 50 + UIDevice.bottomMargin)
+        toolView.frame = CGRect(
+            x: 0,
+            y: view.height - UIDevice.bottomMargin - 50,
+            width: view.width,
+            height: 50 + UIDevice.bottomMargin
+        )
         toolView.reloadContentInset()
         topView.width = view.width
         topView.height = navigationController?.navigationBar.height ?? 44
         let cancelButton = topView.subviews.first
         cancelButton?.x = UIDevice.leftMargin
-        if let modalPresentationStyle = navigationController?.modalPresentationStyle, UIDevice.isPortrait {
+        if let modalPresentationStyle = navigationController?.modalPresentationStyle,
+           UIDevice.isPortrait {
             if modalPresentationStyle == .fullScreen || modalPresentationStyle == .custom {
                 topView.y = UIDevice.generalStatusBarHeight
             }
@@ -280,10 +372,24 @@ open class PhotoEditorViewController: BaseViewController {
             topView.y = UIDevice.generalStatusBarHeight
         }
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
-        cropConfirmView.frame = toolView.frame
-        cropToolView.frame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
-        brushColorView.frame = cropToolView.frame
-        cropToolView.updateContentInset()
+        let cropToolFrame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
+        if toolOptions.contains(.cropping) {
+            cropConfirmView.frame = toolView.frame
+            cropToolView.frame = cropToolFrame
+            cropToolView.updateContentInset()
+        }
+        if toolOptions.contains(.graffiti) {
+            brushColorView.frame = cropToolFrame
+        }
+        if toolOptions.contains(.mosaic) {
+            mosaicToolView.frame = cropToolFrame
+        }
+        if toolOptions.isSticker {
+            setChartletViewFrame()
+        }
+        if toolOptions.contains(.filter) {
+            setFilterViewFrame()
+        }
         if !imageView.frame.equalTo(view.bounds) && !imageView.frame.isEmpty && !imageViewDidChange {
             imageView.frame = view.bounds
             imageView.reset(false)
@@ -295,16 +401,22 @@ open class PhotoEditorViewController: BaseViewController {
         if !imageInitializeCompletion {
             if !needRequest || image != nil {
                 imageView.setImage(image)
+//                setFilterImage()
                 if let editedData = editResult?.editedData {
                     imageView.setEditedData(editedData: editedData)
-                    brushColorView.canUndo = imageView.canUndoDraw
+                    if toolOptions.contains(.graffiti) {
+                        brushColorView.canUndo = imageView.canUndoDraw
+                    }
+                    if toolOptions.contains(.mosaic) {
+                        mosaicToolView.canUndo = imageView.canUndoMosaic
+                    }
                 }
                 if state == .cropping {
                     imageView.startCropping(true)
                     croppingAction()
                 }
+                imageInitializeCompletion = true
             }
-            imageInitializeCompletion = true
         }
         if orientationDidChange {
             imageView.orientationDidChange()
@@ -313,6 +425,44 @@ open class PhotoEditorViewController: BaseViewController {
             }
             orientationDidChange = false
             imageViewDidChange = true
+        }
+    }
+    func setChartletViewFrame() {
+        var viewHeight = config.chartlet.viewHeight
+        if viewHeight > view.height {
+            viewHeight = view.height * 0.6
+        }
+        if showChartlet {
+            chartletView.frame = CGRect(
+                x: 0,
+                y: view.height - viewHeight - UIDevice.bottomMargin,
+                width: view.width,
+                height: viewHeight + UIDevice.bottomMargin
+            )
+        }else {
+            chartletView.frame = CGRect(
+                x: 0,
+                y: view.height,
+                width: view.width,
+                height: viewHeight + UIDevice.bottomMargin
+            )
+        }
+    }
+    func setFilterViewFrame() {
+        if isFilter {
+            filterView.frame = CGRect(
+                x: 0,
+                y: view.height - 150 - UIDevice.bottomMargin,
+                width: view.width,
+                height: 150 + UIDevice.bottomMargin
+            )
+        }else {
+            filterView.frame = CGRect(
+                x: 0,
+                y: view.height + 10,
+                width: view.width,
+                height: 150 + UIDevice.bottomMargin
+            )
         }
     }
     open override var prefersStatusBarHidden: Bool {
@@ -326,7 +476,8 @@ open class PhotoEditorViewController: BaseViewController {
     }
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if navigationController?.topViewController != self && navigationController?.viewControllers.contains(self) == false {
+        if navigationController?.topViewController != self &&
+            navigationController?.viewControllers.contains(self) == false {
             navigationController?.setNavigationBarHidden(false, animated: true)
         }
     }
@@ -338,283 +489,15 @@ open class PhotoEditorViewController: BaseViewController {
             navigationController?.setNavigationBarHidden(true, animated: true)
         }
     }
-}
-extension PhotoEditorViewController {
-    #if HXPICKER_ENABLE_PICKER
-    func requestImage() {
-        if photoAsset.isLocalAsset {
-            if photoAsset.mediaType == .photo {
-                var image = photoAsset.localImageAsset!.image!
-                if photoAsset.mediaSubType.isGif {
-                    if let imageData = photoAsset.localImageAsset?.imageData {
-                        #if canImport(Kingfisher)
-                        if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))  {
-                            image = gifImage
-                        }
-                        #endif
-                    }else if let imageURL = photoAsset.localImageAsset?.imageURL {
-                        do {
-                            let imageData = try Data.init(contentsOf: imageURL)
-                            #if canImport(Kingfisher)
-                            if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))  {
-                                image = gifImage
-                            }
-                            #endif
-                        }catch {}
-                    }
-                }
-                requestAssetCompletion(image: image)
-            }else {
-                requestAssetCompletion(image: photoAsset.localVideoAsset!.image!)
-            }
-        }else if photoAsset.isNetworkAsset {
-            #if canImport(Kingfisher)
-            let loadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
-            photoAsset.getNetworkImage(urlType: .original, filterEditor: true) { (receiveSize, totalSize) in
-                let progress = Double(receiveSize) / Double(totalSize)
-                if progress > 0 {
-                    loadingView?.updateText(text: "图片下载中".localized + "(" + String(Int(progress * 100)) + "%)")
-                }
-            } resultHandler: { [weak self] (image) in
-                if let image = image {
-                    ProgressHUD.hide(forView: self?.view, animated: true)
-                    self?.requestAssetCompletion(image: image)
-                }else {
-                    ProgressHUD.hide(forView: self?.view, animated: true)
-                    PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: "图片获取失败!".localized, actionTitle: "确定".localized) { (alertAction) in
-                        self?.didBackClick()
-                    }
-                }
-            }
-            #endif
-        } else {
-            ProgressHUD.showLoading(addedTo: view, animated: true)
-            if photoAsset.phAsset != nil && !photoAsset.isGifAsset {
-                photoAsset.requestImageData(filterEditor: true,
-                                            iCloudHandler: nil,
-                                            progressHandler: nil) {
-                    [weak self] (asset, imageData, imageOrientation, info) in
-                    let image = UIImage.init(data: imageData)?.scaleSuitableSize()
-                    ProgressHUD.hide(forView: self?.view, animated: true)
-                    self?.requestAssetCompletion(image: image!)
-                } failure: { [weak self] (asset, info) in
-                    ProgressHUD.hide(forView: self?.view, animated: true)
-                    self?.requestAssetFailure()
-                }
-                return
-            }
-            photoAsset.requestAssetImageURL(filterEditor: true) {
-                [weak self] (imageUrl) in
-                DispatchQueue.global().async {
-                    if let imageUrl = imageUrl {
-                        #if canImport(Kingfisher)
-                        if self?.photoAsset.isGifAsset == true {
-                            do {
-                                let imageData = try Data.init(contentsOf: imageUrl)
-                                if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))  {
-                                    DispatchQueue.main.async {
-                                        ProgressHUD.hide(forView: self?.view, animated: true)
-                                        self?.requestAssetCompletion(image: gifImage)
-                                    }
-                                    return
-                                }
-                            }catch {}
-                        }
-                        #endif
-                        if let image = UIImage.init(contentsOfFile: imageUrl.path)?.scaleSuitableSize() {
-                            DispatchQueue.main.async {
-                                ProgressHUD.hide(forView: self?.view, animated: true)
-                                self?.requestAssetCompletion(image: image)
-                            }
-                            return
-                        }
-                    }
-                    DispatchQueue.main.async {
-                        ProgressHUD.hide(forView: self?.view, animated: true)
-                        self?.requestAssetFailure()
-                    }
-                }
-            }
-        }
-    }
-    #endif
     
-    #if canImport(Kingfisher)
-    func requestNetworkImage() {
-        let url = networkImageURL!
-        let loadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
-        PhotoTools.downloadNetworkImage(with: url, options: [.backgroundDecode]) { (receiveSize, totalSize) in
-            let progress = Double(receiveSize) / Double(totalSize)
-            if progress > 0 {
-                loadingView?.updateText(text: "图片下载中".localized + "(" + String(Int(progress * 100)) + "%)")
-            }
-        } completionHandler: { [weak self] (image) in
-            ProgressHUD.hide(forView: self?.view, animated: true)
-            if let image = image {
-                self?.requestAssetCompletion(image: image)
-            }else {
-                self?.requestAssetFailure()
-            }
-        }
-    }
-    #endif
-    
-    func requestAssetCompletion(image: UIImage) {
-        if imageInitializeCompletion == true {
-            imageView.setImage(image)
-            if let editedData = editResult?.editedData {
-                imageView.setEditedData(editedData: editedData)
-                brushColorView.canUndo = imageView.canUndoDraw
-            }
-            if state == .cropping {
-                imageView.startCropping(true)
-                croppingAction()
-            }
-        }
+    func setImage(_ image: UIImage) {
         self.image = image
     }
-    func requestAssetFailure() {
-        ProgressHUD.hide(forView: view, animated: true)
-        PhotoTools.showConfirm(viewController: self, title: "提示".localized, message: "图片获取失败!".localized, actionTitle: "确定".localized) { (alertAction) in
-            self.didBackClick()
-        }
+    func setState(_ state: State) {
+        self.state = state
     }
 }
-// MARK: EditorToolViewDelegate
-extension PhotoEditorViewController: EditorToolViewDelegate {
-     
-    func toolView(didFinishButtonClick toolView: EditorToolView) {
-        editResources()
-    }
-    func editResources() {
-        if imageView.canReset() ||
-            imageView.imageResizerView.hasCropping ||
-            imageView.canUndoDraw {
-            
-            ProgressHUD.showLoading(addedTo: view, animated: true)
-            imageView.cropping { [weak self] (result) in
-                if let result = result, let self = self {
-                    self.delegate?.photoEditorViewController(self, didFinish: result)
-                    self.didBackClick()
-                }else {
-                    ProgressHUD.hide(forView: self?.view, animated: true)
-                    ProgressHUD.showWarning(addedTo: self?.view, text: "图片获取失败!".localized, animated: true, delayHide: 1.5)
-                }
-            }
-        }else {
-            delegate?.photoEditorViewController(didFinishWithUnedited: self)
-            didBackClick()
-        }
-    }
-    func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions) {
-        if model.type == .graffiti {
-            imageView.drawEnabled = !imageView.drawEnabled
-            toolView.stretchMask = imageView.drawEnabled
-            toolView.layoutSubviews()
-            if imageView.drawEnabled {
-                showBrushColorView()
-                currentToolOption = model
-            }else {
-                hiddenBrushColorView()
-                currentToolOption = nil
-            }
-        }else if model.type == .cropping {
-            imageView.drawEnabled = false
-            state = .cropping
-            imageView.startCropping(true)
-            croppingAction()
-        }
-    }
-    
-    func showBrushColorView() {
-        brushColorView.isHidden = false
-        UIView.animate(withDuration: 0.25) {
-            self.brushColorView.alpha = 1
-        }
-    }
-    
-    func hiddenBrushColorView() {
-        if brushColorView.isHidden {
-            return
-        }
-        UIView.animate(withDuration: 0.25) {
-            self.brushColorView.alpha = 0
-        } completion: { (_) in
-            guard let option = self.currentToolOption, option.type == .graffiti else {
-                return
-            }
-            self.brushColorView.isHidden = true
-        }
-    }
-    
-    func croppingAction() {
-        if state == .cropping {
-            cropConfirmView.isHidden = false
-            cropToolView.isHidden = false
-            hidenTopView()
-        }else {
-            if let option = currentToolOption {
-                if option.type == .graffiti {
-                    imageView.drawEnabled = true
-                }
-            }
-            showTopView()
-        }
-        UIView.animate(withDuration: 0.25) {
-            self.cropConfirmView.alpha = self.state == .cropping ? 1 : 0
-            self.cropToolView.alpha = self.state == .cropping ? 1 : 0
-        } completion: { (isFinished) in
-            if self.state != .cropping {
-                self.cropConfirmView.isHidden = true
-                self.cropToolView.isHidden = true
-            }
-        }
 
-    }
-    func showTopView() {
-        topViewIsHidden = false
-        toolView.isHidden = false
-        topView.isHidden = false
-        var showBrush = false
-        if let option = currentToolOption {
-            if option.type == .graffiti {
-                showBrush = true
-                brushColorView.isHidden = false
-            }
-        }
-        UIView.animate(withDuration: 0.25) {
-            self.toolView.alpha = 1
-            self.topView.alpha = 1
-            self.topMaskLayer.isHidden = false
-            if showBrush {
-                self.brushColorView.alpha = 1
-            }
-        }
-    }
-    func hidenTopView() {
-        topViewIsHidden = true
-        var hiddenBrush = false
-        if let option = currentToolOption {
-            if option.type == .graffiti {
-                hiddenBrush = true
-            }
-        }
-        UIView.animate(withDuration: 0.25) {
-            self.toolView.alpha = 0
-            self.topView.alpha = 0
-            self.topMaskLayer.isHidden = true
-            if hiddenBrush {
-                self.brushColorView.alpha = 0
-            }
-        } completion: { (isFinished) in
-            if self.topViewIsHidden {
-                self.toolView.isHidden = true
-                self.topView.isHidden = true
-                self.brushColorView.isHidden = true
-            }
-        }
-    }
-}
 extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
     func brushColorView(didUndoButton colorView: PhotoEditorBrushColorView) {
         imageView.undoDraw()
@@ -624,6 +507,7 @@ extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
         imageView.drawColorHex = colorHex
     }
 }
+
 // MARK: EditorCropConfirmViewDelegate
 extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     
@@ -632,7 +516,7 @@ extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     func cropConfirmView(didFinishButtonClick cropConfirmView: EditorCropConfirmView) {
         if config.fixedCropState {
             imageView.imageResizerView.finishCropping(false, completion: nil, updateCrop: false)
-            editResources()
+            exportResources()
             return
         }
         state = .normal
@@ -652,7 +536,7 @@ extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     /// - Parameter cropConfirmView: 裁剪视图
     func cropConfirmView(didCancelButtonClick cropConfirmView: EditorCropConfirmView) {
         if config.fixedCropState {
-            didBackClick()
+            didBackClick(true)
             return
         }
         state = .normal
@@ -683,11 +567,9 @@ extension PhotoEditorViewController: PhotoEditorViewDelegate {
     }
     
     func editorView(willDisappearCrop editorView: PhotoEditorView) {
-        
     }
     
     func editorView(didDisappearCrop editorView: PhotoEditorView) {
-        
     }
     
     func editorView(drawViewBeganDraw editorView: PhotoEditorView) {
@@ -697,6 +579,17 @@ extension PhotoEditorViewController: PhotoEditorViewDelegate {
     func editorView(drawViewEndDraw editorView: PhotoEditorView) {
         showTopView()
         brushColorView.canUndo = editorView.canUndoDraw
+        mosaicToolView.canUndo = editorView.canUndoMosaic
+    }
+    func editorView(_ editorView: PhotoEditorView, updateStickerText item: EditorStickerItem) {
+        let textVC = EditorStickerTextViewController(
+            config: config.text,
+            stickerItem: item
+        )
+        textVC.delegate = self
+        let nav = EditorStickerTextController(rootViewController: textVC)
+        nav.modalPresentationStyle = config.text.modalPresentationStyle
+        present(nav, animated: true, completion: nil)
     }
 }
 
@@ -711,5 +604,35 @@ extension PhotoEditorViewController: PhotoEditorCropToolViewDelegate {
     
     func cropToolView(didChangedAspectRatio cropToolView: PhotoEditorCropToolView, at model: PhotoEditorCropToolModel) {
         imageView.changedAspectRatio(of: CGSize(width: model.widthRatio, height: model.heightRatio))
+    }
+}
+extension PhotoEditorViewController: PhotoEditorMosaicToolViewDelegate {
+    func mosaicToolView(
+        _ mosaicToolView: PhotoEditorMosaicToolView,
+        didChangedMosaicType type: PhotoEditorMosaicView.MosaicType
+    ) {
+        imageView.mosaicType = type
+    }
+    
+    func mosaicToolView(didUndoClick mosaicToolView: PhotoEditorMosaicToolView) {
+        imageView.undoMosaic()
+        mosaicToolView.canUndo = imageView.canUndoMosaic
+    }
+}
+extension PhotoEditorViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view is EditorStickerContentView {
+            return false
+        }
+        if let isDescendant = touch.view?.isDescendant(of: imageView), isDescendant {
+            return true
+        }
+        return false
+    }
+    public func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        true
     }
 }

@@ -9,7 +9,7 @@ import UIKit
 import Photos
 
 @available(iOS 9.1, *)
-public typealias LivePhotoResultHandler = (PHLivePhoto?, [AnyHashable : Any]?) -> Void
+public typealias LivePhotoResultHandler = (PHLivePhoto?, [AnyHashable: Any]?) -> Void
 
 public extension AssetManager {
     
@@ -22,19 +22,31 @@ public extension AssetManager {
     /// - Returns: 请求ID
     @available(iOS 9.1, *)
     @discardableResult
-    class func requestLivePhoto(for asset: PHAsset,
-                                targetSize: CGSize,
-                                iCloudHandler: @escaping (PHImageRequestID) -> Void,
-                                progressHandler: @escaping PHAssetImageProgressHandler,
-                                resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?, Bool) -> Void) -> PHImageRequestID {
-        return requestLivePhoto(for: asset, targetSize: targetSize, isNetworkAccessAllowed: false, progressHandler: progressHandler) { (livePhoto, info) in
+    static func requestLivePhoto(
+        for asset: PHAsset,
+        targetSize: CGSize,
+        iCloudHandler: @escaping (PHImageRequestID) -> Void,
+        progressHandler: @escaping PHAssetImageProgressHandler,
+        resultHandler: @escaping (PHLivePhoto?, [AnyHashable: Any]?, Bool) -> Void
+    ) -> PHImageRequestID {
+        return requestLivePhoto(
+            for: asset,
+            targetSize: targetSize,
+            isNetworkAccessAllowed: false,
+            progressHandler: progressHandler
+        ) { (livePhoto, info) in
             if self.assetDownloadFinined(for: info) {
                 DispatchQueue.main.async {
                     resultHandler(livePhoto, info, true)
                 }
             }else {
                 if self.assetIsInCloud(for: info) {
-                    let iCloudRequestID = self.requestLivePhoto(for: asset, targetSize: targetSize, isNetworkAccessAllowed: true, progressHandler: progressHandler) { (livePhoto, info) in
+                    let iCloudRequestID = self.requestLivePhoto(
+                        for: asset,
+                        targetSize: targetSize,
+                        isNetworkAccessAllowed: true,
+                        progressHandler: progressHandler
+                    ) { (livePhoto, info) in
                         DispatchQueue.main.async {
                             if self.assetDownloadFinined(for: info) {
                                 resultHandler(livePhoto, info, true)
@@ -57,24 +69,39 @@ public extension AssetManager {
     
     @available(iOS 9.1, *)
     @discardableResult
-    class func requestLivePhoto(for asset: PHAsset,
-                                targetSize: CGSize,
-                                isNetworkAccessAllowed: Bool,
-                                progressHandler: @escaping PHAssetImageProgressHandler,
-                                resultHandler: @escaping LivePhotoResultHandler) -> PHImageRequestID {
+    static func requestLivePhoto(
+        for asset: PHAsset,
+        targetSize: CGSize,
+        isNetworkAccessAllowed: Bool,
+        progressHandler: @escaping PHAssetImageProgressHandler,
+        resultHandler: @escaping LivePhotoResultHandler
+    ) -> PHImageRequestID {
         let options = PHLivePhotoRequestOptions.init()
         options.deliveryMode = .highQualityFormat
         options.isNetworkAccessAllowed = isNetworkAccessAllowed
         options.progressHandler = progressHandler
-        return requestLivePhoto(for: asset, targetSize: targetSize, options: options, resultHandler: resultHandler)
+        return requestLivePhoto(
+            for: asset,
+            targetSize: targetSize,
+            options: options,
+            resultHandler: resultHandler
+        )
     }
     
     @available(iOS 9.1, *)
     @discardableResult
-    class func requestLivePhoto(for asset: PHAsset,
-                                targetSize: CGSize,
-                                options: PHLivePhotoRequestOptions,
-                                resultHandler: @escaping LivePhotoResultHandler) -> PHImageRequestID {
-        return PHImageManager.default().requestLivePhoto(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options, resultHandler: resultHandler)
+    static func requestLivePhoto(
+        for asset: PHAsset,
+        targetSize: CGSize,
+        options: PHLivePhotoRequestOptions,
+        resultHandler: @escaping LivePhotoResultHandler
+    ) -> PHImageRequestID {
+        return PHImageManager.default().requestLivePhoto(
+            for: asset,
+            targetSize: targetSize,
+            contentMode: .aspectFill,
+            options: options,
+            resultHandler: resultHandler
+        )
     }
 }

@@ -8,22 +8,25 @@
 import UIKit
 #if canImport(Kingfisher)
 import Kingfisher
-
 #endif
 
 public extension PhotoAsset {
     
     #if canImport(Kingfisher)
     /// 获取网络图片的地址，编辑过就是本地地址，未编辑就是网络地址
-    /// - Parameter resultHandler: 地址、是否为网络地址
-    func getNetworkImageURL(resultHandler: @escaping (URL?, Bool) -> Void) {
+    /// - Parameter resultHandler: 图片地址、是否为网络地址
+    func getNetworkImageURL(resultHandler: AssetURLCompletion) {
         #if HXPICKER_ENABLE_EDITOR
         if let photoEdit = photoEdit {
-            resultHandler(photoEdit.editedImageURL, false) 
+            resultHandler(.success(.init(url: photoEdit.editedImageURL, urlType: .local, mediaType: .photo)))
             return
         }
         #endif
-        resultHandler(networkImageAsset?.originalURL, true)
+        if let url = networkImageAsset?.originalURL {
+            resultHandler(.success(.init(url: url, urlType: .network, mediaType: .photo)))
+        }else {
+            resultHandler(.failure(.networkURLIsEmpty))
+        }
     }
     
     /// 获取网络图片
@@ -47,7 +50,15 @@ public extension PhotoAsset {
         #endif
         let isThumbnail = urlType == .thumbnail
         let url = isThumbnail ? networkImageAsset!.thumbnailURL : networkImageAsset!.originalURL
-        let options: KingfisherOptionsInfo = isThumbnail ? .init([.onlyLoadFirstFrame, .cacheOriginalImage]) : .init([.backgroundDecode])
+        let options: KingfisherOptionsInfo = isThumbnail ?
+            .init(
+                [.onlyLoadFirstFrame,
+             .cacheOriginalImage]
+            )
+            :
+            .init(
+                [.backgroundDecode]
+            )
         
         PhotoTools.downloadNetworkImage(with: url, options: options, progressBlock: progressBlock) { (image) in
             if let image = image {
@@ -60,14 +71,18 @@ public extension PhotoAsset {
     #endif
     
     /// 获取网络视频的地址，编辑过就是本地地址，未编辑就是网络地址
-    /// - Parameter resultHandler: 地址、是否为网络地址
-    func getNetworkVideoURL(resultHandler: @escaping (URL?, Bool) -> Void) {
+    /// - Parameter resultHandler: 视频地址、是否为网络地址
+    func getNetworkVideoURL(resultHandler: AssetURLCompletion) {
         #if HXPICKER_ENABLE_EDITOR
         if let videoEdit = videoEdit {
-            resultHandler(videoEdit.editedURL, false)
+            resultHandler(.success(.init(url: videoEdit.editedURL, urlType: .local, mediaType: .video)))
             return
         }
         #endif
-        resultHandler(networkVideoAsset?.videoURL, true)
+        if let url = networkVideoAsset?.videoURL {
+            resultHandler(.success(.init(url: url, urlType: .network, mediaType: .video)))
+        }else {
+            resultHandler(.failure(.networkURLIsEmpty))
+        }
     }
 }

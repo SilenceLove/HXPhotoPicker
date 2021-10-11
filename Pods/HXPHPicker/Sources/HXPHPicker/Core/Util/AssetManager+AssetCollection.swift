@@ -14,33 +14,46 @@ public extension AssetManager {
     /// 获取系统相册
     /// - Parameter options: 选型
     /// - Returns: 相册列表
-    class func fetchSmartAlbums(options : PHFetchOptions?) -> PHFetchResult<PHAssetCollection> {
-        return PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: options)
+    static func fetchSmartAlbums(
+        options: PHFetchOptions?
+    ) -> PHFetchResult<PHAssetCollection> {
+        return PHAssetCollection.fetchAssetCollections(
+            with: .smartAlbum,
+            subtype: .any,
+            options: options
+        )
     }
     
     /// 获取用户创建的相册
     /// - Parameter options: 选项
     /// - Returns: 相册列表
-    class func fetchUserAlbums(options : PHFetchOptions?) -> PHFetchResult<PHAssetCollection> {
-        return PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: options)
+    static func fetchUserAlbums(
+        options: PHFetchOptions?
+    ) -> PHFetchResult<PHAssetCollection> {
+        return PHAssetCollection.fetchAssetCollections(
+            with: .album,
+            subtype: .any,
+            options: options
+        )
     }
-    
     
     /// 获取所有相册
     /// - Parameters:
     ///   - filterInvalid: 过滤无效的相册
     ///   - options: 可选项
     ///   - usingBlock: 枚举每一个相册集合
-    class func enumerateAllAlbums(filterInvalid: Bool,
-                                  options : PHFetchOptions?,
-                                  usingBlock :@escaping (PHAssetCollection)->()) {
+    static func enumerateAllAlbums(
+        filterInvalid: Bool,
+        options: PHFetchOptions?,
+        usingBlock :@escaping (PHAssetCollection) -> Void
+    ) {
         let smartAlbums = fetchSmartAlbums(options: nil)
         let userAlbums = fetchUserAlbums(options: nil)
         let albums = [smartAlbums, userAlbums]
         for result in albums {
             result.enumerateObjects { (collection, index, stop) in
                 if !collection.isKind(of: PHAssetCollection.self) {
-                    return;
+                    return
                 }
                 if filterInvalid {
                     if  collection.estimatedAssetCount <= 0 ||
@@ -49,7 +62,7 @@ public extension AssetManager {
                         collection.assetCollectionSubtype.rawValue == 212 ||
                         collection.assetCollectionSubtype.rawValue == 204 ||
                         collection.assetCollectionSubtype.rawValue == 1000000201 {
-                        return;
+                        return
                     }
                 }
                 usingBlock(collection)
@@ -60,9 +73,11 @@ public extension AssetManager {
     /// 获取相机胶卷资源集合
     /// - Parameter options: 可选项
     /// - Returns: 相机胶卷集合
-    class func fetchCameraRollAlbum(options: PHFetchOptions?) -> PHAssetCollection? {
+    static func fetchCameraRollAlbum(
+        options: PHFetchOptions?
+    ) -> PHAssetCollection? {
         let smartAlbums = fetchSmartAlbums(options: options)
-        var assetCollection : PHAssetCollection?
+        var assetCollection: PHAssetCollection?
         smartAlbums.enumerateObjects { (collection, index, stop) in
             if  !collection.isKind(of: PHAssetCollection.self) ||
                 collection.estimatedAssetCount <= 0 {
@@ -79,8 +94,14 @@ public extension AssetManager {
     /// 创建相册
     /// - Parameter collectionName: 相册名
     /// - Returns: 对应的 PHAssetCollection 数据
-    class func createAssetCollection(for collectionName: String) -> PHAssetCollection? {
-        let collections = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumRegular, options: nil)
+    static func createAssetCollection(
+        for collectionName: String
+    ) -> PHAssetCollection? {
+        let collections = PHAssetCollection.fetchAssetCollections(
+            with: .album,
+            subtype: .albumRegular,
+            options: nil
+        )
         var assetCollection: PHAssetCollection?
         collections.enumerateObjects { (collection, index, stop) in
             if collection.localizedTitle == collectionName {
@@ -92,10 +113,15 @@ public extension AssetManager {
             do {
                 var createCollectionID: String?
                 try PHPhotoLibrary.shared().performChangesAndWait {
-                    createCollectionID = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: collectionName).placeholderForCreatedAssetCollection.localIdentifier
+                    createCollectionID = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(
+                        withTitle: collectionName
+                    ).placeholderForCreatedAssetCollection.localIdentifier
                 }
                 if let createCollectionID = createCollectionID {
-                    assetCollection = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [createCollectionID], options: nil).firstObject
+                    assetCollection = PHAssetCollection.fetchAssetCollections(
+                        withLocalIdentifiers: [createCollectionID],
+                        options: nil
+                    ).firstObject
                 }
             }catch {}
         }

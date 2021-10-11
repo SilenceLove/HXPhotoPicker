@@ -33,9 +33,17 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
     lazy var selectedView: PhotoPreviewSelectedView = {
         let selectedView = PhotoPreviewSelectedView.init(frame: CGRect(x: 0, y: 0, width: width, height: 70))
         if let customSelectedViewCellClass = config.customSelectedViewCellClass {
-            selectedView.collectionView.register(customSelectedViewCellClass, forCellWithReuseIdentifier: NSStringFromClass(PhotoPreviewSelectedViewCell.self))
+            selectedView.collectionView.register(
+                customSelectedViewCellClass,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(PhotoPreviewSelectedViewCell.self)
+            )
         }else {
-            selectedView.collectionView.register(PhotoPreviewSelectedViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoPreviewSelectedViewCell.self))
+            selectedView.collectionView.register(
+                PhotoPreviewSelectedViewCell.self,
+                forCellWithReuseIdentifier:
+                    NSStringFromClass(PhotoPreviewSelectedViewCell.self)
+            )
         }
         selectedView.delegate = self
         selectedView.tickColor = config.selectedViewTickColor
@@ -47,7 +55,11 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         promptView.addSubview(promptIcon)
         promptView.addSubview(promptLb)
         promptView.addSubview(promptArrow)
-        promptView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didPromptViewClick)))
+        promptView.addGestureRecognizer(
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(didPromptViewClick))
+        )
         return promptView
     }()
     @objc func didPromptViewClick() {
@@ -93,7 +105,10 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         previewBtn.addTarget(self, action: #selector(didPreviewButtonClick(button:)), for: .touchUpInside)
         previewBtn.isHidden = config.previewButtonHidden
         previewBtn.height = 50
-        let previewWidth : CGFloat = previewBtn.currentTitle!.localized.width(ofFont: previewBtn.titleLabel!.font, maxHeight: 50)
+        let previewWidth: CGFloat = previewBtn.currentTitle!.localized.width(
+            ofFont: previewBtn.titleLabel!.font,
+            maxHeight: 50
+        )
         previewBtn.width = previewWidth
         return previewBtn
     }()
@@ -110,7 +125,10 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         editBtn.addTarget(self, action: #selector(didEditBtnButtonClick(button:)), for: .touchUpInside)
         editBtn.isHidden = config.editButtonHidden
         editBtn.height = 50
-        let editWidth : CGFloat = editBtn.currentTitle!.localized.width(ofFont: editBtn.titleLabel!.font, maxHeight: 50)
+        let editWidth: CGFloat = editBtn.currentTitle!.localized.width(
+            ofFont: editBtn.titleLabel!.font,
+            maxHeight: 50
+        )
         editBtn.width = editWidth
         return editBtn
     }()
@@ -165,10 +183,18 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
                 return
             }
             originalLoadingDelayTimer?.invalidate()
-            let timer = Timer.init(timeInterval: 0.1, target: self, selector: #selector(showOriginalLoading(timer:)), userInfo: nil, repeats: false)
+            let timer = Timer(
+                timeInterval: 0.1,
+                target: self,
+                selector: #selector(showOriginalLoading(timer:)),
+                userInfo: nil,
+                repeats: false
+            )
             RunLoop.main.add(timer, forMode: .common)
             originalLoadingDelayTimer = timer
-            pickerController.requestSelectedAssetFileSize(isPreview: isPreview) { [weak self] (bytes, bytesString) in
+            pickerController.requestSelectedAssetFileSize(
+                isPreview: isPreview
+            ) { [weak self] (bytes, bytesString) in
                 self?.originalLoadingDelayTimer?.invalidate()
                 self?.originalLoadingDelayTimer = nil
                 self?.originalLoadingView.stopAnimating()
@@ -214,10 +240,10 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         return originalTitleLb
     }()
     
-    lazy var boxControl: PhotoPickerSelectBoxView = {
-        let boxControl = PhotoPickerSelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
+    lazy var boxControl: SelectBoxView = {
+        let boxControl = SelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
         boxControl.config = config.originalSelectBox
-        boxControl.backgroundColor = UIColor.clear
+        boxControl.backgroundColor = .clear
         return boxControl
     }()
     var showOriginalLoadingView: Bool = false
@@ -242,11 +268,16 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         hx_delegate?.bottomView(didFinishButtonClick: self)
     }
     var allowLoadPhotoLibrary: Bool
-    var isMultipleSelect : Bool
+    var isMultipleSelect: Bool
     var isExternalPreview: Bool
     var isPreview: Bool
     
-    init(config: PickerBottomViewConfiguration, allowLoadPhotoLibrary: Bool, isMultipleSelect: Bool, isPreview: Bool, isExternalPreview: Bool) {
+    init(
+        config: PickerBottomViewConfiguration,
+        allowLoadPhotoLibrary: Bool,
+        isMultipleSelect: Bool,
+        isPreview: Bool,
+        isExternalPreview: Bool) {
         self.isPreview = isPreview
         self.isExternalPreview = isExternalPreview
         self.allowLoadPhotoLibrary = allowLoadPhotoLibrary
@@ -254,7 +285,11 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         self.isMultipleSelect = isMultipleSelect
         super.init(frame: CGRect.zero)
         layoutSubviews()
-        if config.showPrompt && AssetManager.authorizationStatusIsLimited() && allowLoadPhotoLibrary && !isPreview && !isExternalPreview {
+        if config.showPrompt &&
+            AssetManager.authorizationStatusIsLimited() &&
+            allowLoadPhotoLibrary &&
+            !isPreview &&
+            !isExternalPreview {
             addSubview(promptView)
         }
         if isExternalPreview {
@@ -276,11 +311,23 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         isTranslucent = config.isTranslucent
     }
     
-    convenience init(config: PickerBottomViewConfiguration, allowLoadPhotoLibrary: Bool) {
-        self.init(config: config, allowLoadPhotoLibrary: allowLoadPhotoLibrary, isMultipleSelect: true, isPreview: false, isExternalPreview: false)
+    convenience init(
+        config: PickerBottomViewConfiguration,
+        allowLoadPhotoLibrary: Bool) {
+        self.init(
+            config: config,
+            allowLoadPhotoLibrary: allowLoadPhotoLibrary,
+            isMultipleSelect: true,
+            isPreview: false,
+            isExternalPreview: false
+        )
     }
     func updatePromptView() {
-        if config.showPrompt && AssetManager.authorizationStatusIsLimited() && allowLoadPhotoLibrary && !isPreview && !isExternalPreview {
+        if config.showPrompt &&
+            AssetManager.authorizationStatusIsLimited() &&
+            allowLoadPhotoLibrary &&
+            !isPreview &&
+            !isExternalPreview {
             if promptView.superview == nil {
                 addSubview(promptView)
                 configPromptColor()
@@ -293,45 +340,7 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         barTintColor = isDark ? config.barTintDarkColor : config.barTintColor
         barStyle = isDark ? config.barDarkStyle : config.barStyle
         if !isExternalPreview {
-            previewBtn.setTitleColor(isDark ? config.previewButtonTitleDarkColor : config.previewButtonTitleColor, for: .normal)
-            #if HXPICKER_ENABLE_EDITOR
-            editBtn.setTitleColor(isDark ? config.editButtonTitleDarkColor : config.editButtonTitleColor, for: .normal)
-            #endif
-            if isDark {
-                if config.previewButtonDisableTitleDarkColor != nil {
-                    previewBtn.setTitleColor(config.previewButtonDisableTitleDarkColor, for: .disabled)
-                }else {
-                    previewBtn.setTitleColor(config.previewButtonTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
-                }
-                #if HXPICKER_ENABLE_EDITOR
-                if config.editButtonDisableTitleDarkColor != nil {
-                    editBtn.setTitleColor(config.editButtonDisableTitleDarkColor, for: .disabled)
-                }else {
-                    editBtn.setTitleColor(config.editButtonTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
-                }
-                #endif
-            }else {
-                if config.previewButtonDisableTitleColor != nil {
-                    previewBtn.setTitleColor(config.previewButtonDisableTitleColor, for: .disabled)
-                }else {
-                    previewBtn.setTitleColor(config.previewButtonTitleColor.withAlphaComponent(0.6), for: .disabled)
-                }
-                #if HXPICKER_ENABLE_EDITOR
-                if config.editButtonDisableTitleColor != nil {
-                    editBtn.setTitleColor(config.editButtonDisableTitleColor, for: .disabled)
-                }else {
-                    editBtn.setTitleColor(config.editButtonTitleColor.withAlphaComponent(0.6), for: .disabled)
-                }
-                #endif
-            }
-            originalLoadingView.style = isDark ? config.originalLoadingDarkStyle : config.originalLoadingStyle
-            originalTitleLb.textColor = isDark ? config.originalButtonTitleDarkColor : config.originalButtonTitleColor
-            
-            let finishBtnBackgroundColor = isDark ? config.finishButtonDarkBackgroundColor : config.finishButtonBackgroundColor
-            finishBtn.setTitleColor(isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor, for: .normal)
-            finishBtn.setTitleColor(isDark ? config.finishButtonDisableTitleDarkColor : config.finishButtonDisableTitleColor, for: .disabled)
-            finishBtn.setBackgroundImage(UIImage.image(for: finishBtnBackgroundColor, havingSize: CGSize.zero), for: .normal)
-            finishBtn.setBackgroundImage(UIImage.image(for: isDark ? config.finishButtonDisableDarkBackgroundColor : config.finishButtonDisableBackgroundColor, havingSize: CGSize.zero), for: .disabled)
+            configCoreColor()
         }else {
             #if HXPICKER_ENABLE_EDITOR
             if isDark {
@@ -351,8 +360,84 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         }
         configPromptColor()
     }
+    func configCoreColor() {
+        let isDark = PhotoManager.isDark
+        previewBtn.setTitleColor(
+            isDark ?
+                config.previewButtonTitleDarkColor :
+                config.previewButtonTitleColor,
+            for: .normal
+        )
+        #if HXPICKER_ENABLE_EDITOR
+        editBtn.setTitleColor(isDark ? config.editButtonTitleDarkColor : config.editButtonTitleColor, for: .normal)
+        #endif
+        if isDark {
+            if config.previewButtonDisableTitleDarkColor != nil {
+                previewBtn.setTitleColor(config.previewButtonDisableTitleDarkColor, for: .disabled)
+            }else {
+                previewBtn.setTitleColor(config.previewButtonTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
+            }
+            #if HXPICKER_ENABLE_EDITOR
+            if config.editButtonDisableTitleDarkColor != nil {
+                editBtn.setTitleColor(config.editButtonDisableTitleDarkColor, for: .disabled)
+            }else {
+                editBtn.setTitleColor(config.editButtonTitleDarkColor.withAlphaComponent(0.6), for: .disabled)
+            }
+            #endif
+        }else {
+            if config.previewButtonDisableTitleColor != nil {
+                previewBtn.setTitleColor(config.previewButtonDisableTitleColor, for: .disabled)
+            }else {
+                previewBtn.setTitleColor(config.previewButtonTitleColor.withAlphaComponent(0.6), for: .disabled)
+            }
+            #if HXPICKER_ENABLE_EDITOR
+            if config.editButtonDisableTitleColor != nil {
+                editBtn.setTitleColor(config.editButtonDisableTitleColor, for: .disabled)
+            }else {
+                editBtn.setTitleColor(config.editButtonTitleColor.withAlphaComponent(0.6), for: .disabled)
+            }
+            #endif
+        }
+        originalLoadingView.style = isDark ? config.originalLoadingDarkStyle : config.originalLoadingStyle
+        originalTitleLb.textColor = isDark ? config.originalButtonTitleDarkColor : config.originalButtonTitleColor
+        
+        let finishBtnBackgroundColor = isDark ?
+            config.finishButtonDarkBackgroundColor :
+            config.finishButtonBackgroundColor
+        finishBtn.setTitleColor(
+            isDark ?
+                config.finishButtonTitleDarkColor :
+                config.finishButtonTitleColor,
+            for: .normal
+        )
+        finishBtn.setTitleColor(
+            isDark ?
+                config.finishButtonDisableTitleDarkColor :
+                config.finishButtonDisableTitleColor,
+            for: .disabled
+        )
+        finishBtn.setBackgroundImage(
+            UIImage.image(
+                for: finishBtnBackgroundColor,
+                havingSize: CGSize.zero
+            ),
+            for: .normal
+        )
+        finishBtn.setBackgroundImage(
+            UIImage.image(
+                for: isDark ?
+                    config.finishButtonDisableDarkBackgroundColor :
+                    config.finishButtonDisableBackgroundColor,
+                havingSize: CGSize.zero
+            ),
+            for: .disabled
+        )
+    }
     func configPromptColor() {
-        if config.showPrompt && AssetManager.authorizationStatusIsLimited() && allowLoadPhotoLibrary && !isPreview && !isExternalPreview {
+        if config.showPrompt &&
+            AssetManager.authorizationStatusIsLimited()
+            && allowLoadPhotoLibrary &&
+            !isPreview && !isExternalPreview {
             let isDark = PhotoManager.isDark
             promptLb.textColor = isDark ? config.promptTitleDarkColor : config.promptTitleColor
             promptIcon.tintColor = isDark ? config.promptIconDarkColor : config.promptIconColor
@@ -373,7 +458,15 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         if selectCount > 0 {
             finishBtn.isEnabled = true
             previewBtn.isEnabled = true
-            finishBtn.setTitle("完成".localized + " (" + String(format: "%d", arguments: [selectCount]) + ")", for: .normal)
+            finishBtn.setTitle(
+                "完成".localized + " (" +
+                    String(
+                    format: "%d",
+                    arguments: [selectCount]
+                    )
+                    + ")",
+                for: .normal
+            )
         }else {
             finishBtn.isEnabled = !config.disableFinishButtonWhenNotSelected
             previewBtn.isEnabled = false
@@ -385,11 +478,19 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         if isExternalPreview {
            return
         }
-        var finishWidth : CGFloat = finishBtn.currentTitle!.localized.width(ofFont: finishBtn.titleLabel!.font, maxHeight: 50) + 20
+        var finishWidth: CGFloat = finishBtn.currentTitle!.localized.width(
+            ofFont: finishBtn.titleLabel!.font,
+            maxHeight: 50
+        ) + 20
         if finishWidth < 60 {
             finishWidth = 60
         }
-        finishBtn.frame = CGRect(x: width - UIDevice.rightMargin - finishWidth - 12, y: 0, width: finishWidth, height: 33)
+        finishBtn.frame = CGRect(
+            x: width - UIDevice.rightMargin - finishWidth - 12,
+            y: 0,
+            width: finishWidth,
+            height: 33
+        )
         finishBtn.centerY = 25
     }
     func updateOriginalButtonFrame() {
@@ -415,7 +516,15 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         if isExternalPreview {
            return
         }
-        originalTitleLb.frame = CGRect(x: boxControl.frame.maxX + 5, y: 0, width: originalTitleLb.text!.width(ofFont: originalTitleLb.font, maxHeight: 50), height: 50)
+        originalTitleLb.frame = CGRect(
+            x: boxControl.frame.maxX + 5,
+            y: 0,
+            width: originalTitleLb.text!.width(
+                ofFont: originalTitleLb.font,
+                maxHeight: 50
+            ),
+            height: 50
+        )
         boxControl.centerY = originalTitleLb.height * 0.5
         originalLoadingView.centerY = originalBtn.height * 0.5
         originalLoadingView.x = originalTitleLb.frame.maxX + 3
@@ -438,7 +547,11 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
             updateFinishButtonFrame()
             updateOriginalButtonFrame()
         }
-        if config.showPrompt && AssetManager.authorizationStatusIsLimited() && allowLoadPhotoLibrary && !isPreview && !isExternalPreview {
+        if config.showPrompt &&
+            AssetManager.authorizationStatusIsLimited() &&
+            allowLoadPhotoLibrary &&
+            !isPreview &&
+            !isExternalPreview {
             promptView.width = width
             promptIcon.x = 12 + UIDevice.leftMargin
             promptIcon.centerY = promptView.height * 0.5
@@ -457,7 +570,12 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
                 if !config.editButtonHidden {
                     selectedView.x = editBtn.frame.maxX + 12
                     selectedView.width = width - selectedView.x
-                    selectedView.collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 5, right: 12 + UIDevice.rightMargin)
+                    selectedView.collectionViewLayout.sectionInset = UIEdgeInsets(
+                        top: 10,
+                        left: 0,
+                        bottom: 5,
+                        right: 12 + UIDevice.rightMargin
+                    )
                 }else {
                     selectedView.width = width
                 }

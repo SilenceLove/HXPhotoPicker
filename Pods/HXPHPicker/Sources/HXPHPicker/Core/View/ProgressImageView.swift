@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ProgressImageView: UIView {
+final class ProgressImageView: UIView {
     
     lazy var circleLayer: CAShapeLayer = {
         let circleLayer = CAShapeLayer.init()
@@ -48,9 +48,18 @@ class ProgressImageView: UIView {
     }
     func startAnimation() {
     }
-    func drawCircle() {
+    private func drawCircle() {
         let circlePath = UIBezierPath.init()
-        circlePath.addArc(withCenter: CGPoint(x: width * 0.5, y: height * 0.5), radius: width * 0.5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        circlePath.addArc(
+            withCenter: CGPoint(
+                x: width * 0.5,
+                y: height * 0.5
+            ),
+            radius: width * 0.5,
+            startAngle: 0,
+            endAngle: 2 * .pi,
+            clockwise: true
+        )
         circleLayer.path = circlePath.cgPath
         circleLayer.lineWidth = 1.5
         circleLayer.strokeColor = UIColor.white.cgColor
@@ -63,7 +72,7 @@ class ProgressImageView: UIView {
 //        circleLayer.add(circleAimation, forKey: "")
     }
     
-    func drawExclamationPoint() {
+    private func drawExclamationPoint() {
         let linePath = UIBezierPath.init()
         linePath.move(to: CGPoint(x: width * 0.5, y: 15))
         linePath.addLine(to: CGPoint(x: width * 0.5, y: height - 22))
@@ -79,7 +88,16 @@ class ProgressImageView: UIView {
 //        lineLayer.add(lineAimation, forKey: "")
         
         let pointPath = UIBezierPath.init()
-        pointPath.addArc(withCenter: CGPoint(x: width * 0.5, y: height - 15), radius: 1, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        pointPath.addArc(
+            withCenter: CGPoint(
+                x: width * 0.5,
+                y: height - 15
+            ),
+            radius: 1,
+            startAngle: 0,
+            endAngle: 2 * .pi,
+            clockwise: true
+        )
         pointLayer.path = pointPath.cgPath
         pointLayer.lineWidth = 1
         pointLayer.strokeColor = UIColor.white.cgColor
@@ -90,7 +108,7 @@ class ProgressImageView: UIView {
 //        pointAimation.duration = 0.5
 //        pointLayer.add(pointAimation, forKey: "")
     }
-    func drawTickLayer() {
+    private func drawTickLayer() {
         let tickPath = UIBezierPath.init()
         tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
         tickPath.addLine(to: CGPoint(x: width * 0.5 - scale(2), y: height - scale(8)))
@@ -105,7 +123,6 @@ class ProgressImageView: UIView {
     private func scale(_ numerator: CGFloat) -> CGFloat {
         return numerator / 30 * height
     }
-    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

@@ -10,7 +10,7 @@ import UIKit
 import Photos
 import PhotosUI
 
-public class PhotoManager: NSObject {
+public final class PhotoManager: NSObject {
     
     public static let shared = PhotoManager()
     
@@ -23,20 +23,18 @@ public class PhotoManager: NSObject {
     
     /// 当前是否处于暗黑模式
     public class var isDark: Bool {
-        get {
-            if shared.appearanceStyle == .normal {
-                return false
-            }
-            if shared.appearanceStyle == .dark {
-                return true
-            }
-            if #available(iOS 13.0, *) {
-                if UITraitCollection.current.userInterfaceStyle == .dark {
-                    return true
-                }
-            }
+        if shared.appearanceStyle == .normal {
             return false
         }
+        if shared.appearanceStyle == .dark {
+            return true
+        }
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return true
+            }
+        }
+        return false
     }
     
     /// 当前语言文件，每次创建PhotoPickerController判断是否需要重新创建
@@ -50,62 +48,43 @@ public class PhotoManager: NSObject {
     var bundle: Bundle?
     /// 是否使用了自定义的语言
     var isCustomLanguage: Bool = false
+    /// 加载指示器类型
+    var indicatorType: BaseConfiguration.IndicatorType = .circle
     
-    private lazy var downloadSession: URLSession = {
+    lazy var downloadSession: URLSession = {
         let session = URLSession.init(configuration: .default, delegate: self, delegateQueue: nil)
-        
         return session
     }()
     
-    var downloadTasks: [String : URLSessionDownloadTask] = [:]
+    lazy var audioSession: AVAudioSession = {
+        let session = AVAudioSession.sharedInstance()
+        return session
+    }()
     
-    var downloadCompletions: [String : (URL?, Error?) -> Void] = [:]
+    var audioPlayer: AVAudioPlayer?
+    var audioPlayFinish: (() -> Void)?
     
-    var downloadProgresss: [String : (Double, URLSessionDownloadTask) -> Void] = [:]
+    var downloadTasks: [String: URLSessionDownloadTask] = [:]
+    var downloadCompletions: [String: (URL?, Error?, Any?) -> Void] = [:]
+    var downloadProgresss: [String: (Double, URLSessionDownloadTask) -> Void] = [:]
+    var downloadFileURLs: [String: URL] = [:]
+    var downloadExts: [String: Any] = [:]
     
-    @discardableResult
-    public func downloadTask(with url: URL,
-                      progress: @escaping (Double, URLSessionDownloadTask) -> Void,
-                      completionHandler: @escaping (URL?, Error?) -> Void) -> URLSessionDownloadTask {
-        let key = url.absoluteString
-        downloadProgresss[key] = progress
-        downloadCompletions[key] = completionHandler
-        if let task = downloadTasks[key] {
-            if task.state == .suspended {
-                task.resume()
-                return task
+    var cameraPreviewImage: UIImage? = PhotoTools.getCameraPreviewImage()
+    
+    func saveCameraPreview() {
+        if let image = cameraPreviewImage {
+            DispatchQueue.global().async {
+                PhotoTools.saveCameraPreviewImage(image)
             }
-        } 
-        let task = downloadSession.downloadTask(with: url)
-        downloadTasks[key] = task
-        task.resume()
-        return task
-    }
-    
-    public func suspendTask(_ url: URL) {
-        let key = url.absoluteString
-        let task = downloadTasks[key]
-        if task?.state.rawValue == 1 {
-            return
         }
-        task?.suspend()
-        downloadCompletions.removeValue(forKey: key)
-        downloadProgresss.removeValue(forKey: key)
-    }
-    
-    public func removeTask(_ url: URL) {
-        let key = url.absoluteString
-        let task = downloadTasks[key]
-        task?.cancel()
-        downloadCompletions.removeValue(forKey: key)
-        downloadProgresss.removeValue(forKey: key)
-        downloadTasks.removeValue(forKey: key)
     }
     
     private override init() {
         super.init()
-        self.createBundle()
+        createBundle()
     }
+    
     @discardableResult
     func createBundle() -> Bundle? {
         if self.bundle == nil {

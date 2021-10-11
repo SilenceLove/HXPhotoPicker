@@ -14,21 +14,31 @@ public extension AssetManager {
     /// 根据 Asset 的本地唯一标识符获取 Asset
     /// - Parameter withLocalIdentifiers: 本地唯一标识符
     /// - Returns: 对应获取的 PHAsset
-    class func fetchAssets(withLocalIdentifiers: [String]) -> PHFetchResult<PHAsset> {
-        PHAsset.fetchAssets(withLocalIdentifiers: withLocalIdentifiers, options: nil)
+    static func fetchAssets(
+        withLocalIdentifiers: [String]
+    ) -> PHFetchResult<PHAsset> {
+        PHAsset.fetchAssets(
+            withLocalIdentifiers: withLocalIdentifiers,
+            options: nil
+        )
     }
-    
     
     /// 根据 Asset 的本地唯一标识符获取 Asset
     /// - Parameter withLocalIdentifiers: 本地唯一标识符
     /// - Returns: 对应获取的 PHAsset
-    class func fetchAsset(withLocalIdentifier: String) -> PHAsset? {
-        return fetchAssets(withLocalIdentifiers: [withLocalIdentifier]).firstObject
+    static func fetchAsset
+    (withLocalIdentifier: String
+    ) -> PHAsset? {
+        return fetchAssets(
+            withLocalIdentifiers: [withLocalIdentifier]
+        ).firstObject
     }
     
     /// 根据下载获取的信息判断资源是否存在iCloud上
     /// - Parameter info: 下载获取的信息
-    class func assetIsInCloud(for info: [AnyHashable : Any]?) -> Bool {
+    static func assetIsInCloud(
+        for info: [AnyHashable: Any]?
+    ) -> Bool {
         if let info = info, info.inICloud {
             return true
         }
@@ -37,7 +47,9 @@ public extension AssetManager {
     
     /// 判断资源是否取消了下载
     /// - Parameter info: 下载获取的信息
-    class func assetCancelDownload(for info: [AnyHashable : Any]?) -> Bool {
+    static func assetCancelDownload(
+        for info: [AnyHashable: Any]?
+    ) -> Bool {
         if let info = info, info.isCancel {
             return true
         }
@@ -46,7 +58,9 @@ public extension AssetManager {
     
     /// 判断资源是否下载错误
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadError(for info: [AnyHashable : Any]?) -> Bool {
+    static func assetDownloadError(
+        for info: [AnyHashable: Any]?
+    ) -> Bool {
         if let info = info, info.isError {
             return true
         }
@@ -55,7 +69,9 @@ public extension AssetManager {
     
     /// 判断资源下载得到的是否为退化的
     /// - Parameter info: 下载获取的信息
-    class func assetIsDegraded(for info: [AnyHashable : Any]?) -> Bool {
+    static func assetIsDegraded(
+        for info: [AnyHashable: Any]?
+    ) -> Bool {
         if let info = info, info.isDegraded {
             return true
         }
@@ -64,7 +80,9 @@ public extension AssetManager {
     
     /// 判断资源是否下载完成
     /// - Parameter info: 下载获取的信息
-    class func assetDownloadFinined(for info: [AnyHashable : Any]?) -> Bool {
+    static func assetDownloadFinined(
+        for info: [AnyHashable: Any]?
+    ) -> Bool {
         if let info = info, info.downloadFinined {
             return true
         }

@@ -12,19 +12,19 @@ import Photos
 open class PhotoAssetCollection: Equatable {
     
     /// 相册名称
-    public var albumName : String?
+    public var albumName: String?
     
     /// 相册里的资源数量
-    public var count : Int = 0
+    public var count: Int = 0
     
     /// PHAsset 集合
-    public var result : PHFetchResult<PHAsset>?
+    public var result: PHFetchResult<PHAsset>?
     
     /// 相册对象
-    public var collection : PHAssetCollection?
+    public var collection: PHAssetCollection?
     
     /// 获取 PHFetchResult 中的 PHAsset 时的选项
-    public var options : PHFetchOptions?
+    public var options: PHFetchOptions?
     
     /// 是否选中
     public var isSelected: Bool = false
@@ -40,13 +40,17 @@ open class PhotoAssetCollection: Equatable {
     
     private var coverImage: UIImage?
     
-    public init(collection: PHAssetCollection? , options: PHFetchOptions?) {
+    public init(
+        collection: PHAssetCollection?,
+        options: PHFetchOptions?) {
         self.collection = collection
         self.options = options
         fetchResult()
     }
     
-    public init(albumName: String?, coverImage: UIImage?) {
+    public init(
+        albumName: String?,
+        coverImage: UIImage?) {
         self.albumName = albumName
         self.coverImage = coverImage
     }
@@ -62,7 +66,9 @@ extension PhotoAssetCollection {
     /// 请求获取相册封面图片
     /// - Parameter completion: 会回调多次
     /// - Returns: 请求ID
-    open func requestCoverImage(completion: ((UIImage?, PhotoAssetCollection, [AnyHashable : Any]?) -> Void)?) -> PHImageRequestID? {
+    open func requestCoverImage(
+        completion: ((UIImage?, PhotoAssetCollection, [AnyHashable: Any]?) -> Void)?
+    ) -> PHImageRequestID? {
         if realCoverImage != nil {
             completion?(realCoverImage, self, nil)
             return nil
@@ -77,26 +83,35 @@ extension PhotoAssetCollection {
     }
     
     /// 枚举相册里的资源
-    open func enumerateAssets(usingBlock :@escaping (PhotoAsset)->()) {
+    open func enumerateAssets(
+        options opts: NSEnumerationOptions = .concurrent,
+        usingBlock: @escaping (PhotoAsset, Int, UnsafeMutablePointer<ObjCBool>) -> Void
+    ) {
         if result == nil {
             fetchResult()
         }
-        result?.enumerateObjects({ (asset, index, stop) in
-            let photoAsset = PhotoAsset.init(asset: asset)
-            usingBlock(photoAsset)
-        })
+        if opts == .reverse {
+            result?.enumerateObjects(options: opts, using: { asset, index, stop in
+                let photoAsset = PhotoAsset(asset: asset)
+                usingBlock(photoAsset, index, stop)
+            })
+        }else {
+            result?.enumerateObjects({ (asset, index, stop) in
+                let photoAsset = PhotoAsset(asset: asset)
+                usingBlock(photoAsset, index, stop)
+            })
+        }
     }
 }
 
-// MARK:
 extension PhotoAssetCollection {
      
     func fetchResult() {
-        if collection == nil {
+        guard let collection = collection  else {
             return
         }
-        albumName = PhotoTools.transformAlbumName(for: collection!)
-        result = PHAsset.fetchAssets(in: collection!, options: options)
+        albumName = PhotoTools.transformAlbumName(for: collection)
+        result = PHAsset.fetchAssets(in: collection, options: options)
         count = result?.count ?? 0
     }
     

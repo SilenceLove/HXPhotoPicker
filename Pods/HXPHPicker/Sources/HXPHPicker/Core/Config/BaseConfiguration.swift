@@ -27,5 +27,20 @@ open class BaseConfiguration {
     /// 支持的方向
     public var supportedInterfaceOrientations: UIInterfaceOrientationMask = .all
     
-    public init() { }
+    /// 加载指示器类型
+    public var indicatorType: IndicatorType = .circle {
+        didSet { PhotoManager.shared.indicatorType = indicatorType }
+    }
+    
+    public init() { PhotoManager.shared.indicatorType = indicatorType }
+}
+
+public extension BaseConfiguration {
+    /// 加载指示器类型
+    enum IndicatorType {
+        /// 渐变圆环
+        case circle
+        /// 系统菊花
+        case system
+    }
 }

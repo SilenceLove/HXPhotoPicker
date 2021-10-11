@@ -289,30 +289,6 @@
     }
     return YES;
 }
-//- (void)contentSizeToFit {
-//    //先判断一下有没有文字（没文字就没必要设置居中了）
-//    if([self.textView.text length] > 0) {
-//        //textView的contentSize属性
-//        CGSize contentSize = self.textView.contentSize;
-//        //textView的内边距属性
-//        UIEdgeInsets offset;
-//        CGSize newSize = contentSize;
-//        //如果文字内容高度没有超过textView的高度
-//        if(contentSize.height <= self.textView.frame.size.height) {
-//            //textView的高度减去文字高度除以2就是Y方向的偏移量，也就是textView的上内边距
-//            CGFloat offsetY = (self.textView.frame.size.height - contentSize.height) / 2;
-//            offset = UIEdgeInsetsMake(offsetY, 0, 0, 0);
-//        }else { //如果文字高度超出textView的高度
-//            newSize = self.textView.frame.size;
-//            offset = UIEdgeInsetsZero;
-//            newSize = contentSize;
-//        }
-//
-//        //根据前面计算设置textView的ContentSize和Y方向偏移量
-//        [self.textView setContentSize:newSize];
-//        [self.textView setContentInset:offset];
-//    }
-//}
 - (IBAction)didCancelClick:(id)sender {
     [self hide];
 }
@@ -322,6 +298,7 @@
         [self hide];
         return;
     }
+    self.textView.tintColor = [UIColor clearColor];
     if (self.completion) {
         HXPhotoEditTextModel *textModel = [[HXPhotoEditTextModel alloc] init];
         for (UIView *view in self.textView.subviews) {
@@ -394,6 +371,7 @@
                                       actualCharacterRange:NULL];
     NSMutableArray *rectArray = @[].mutableCopy;
     HXWeakSelf
+    
     [self.textView.layoutManager enumerateLineFragmentsForGlyphRange:glyphRange usingBlock:^(CGRect rect, CGRect usedRect, NSTextContainer * _Nonnull textContainer, NSRange glyphRange, BOOL * _Nonnull stop) {
         CGRect newRect = usedRect;
         NSString *glyphStr = (weakSelf.textView.text.length >= (glyphRange.location + glyphRange.length) && weakSelf.textView.text.length) ? [weakSelf.textView.text substringWithRange:glyphRange] : nil;

@@ -6,12 +6,17 @@
 //  Copyright © 2020 Silence. All rights reserved.
 //
 
-
 import UIKit
 import Photos
 import HXPHPicker
+import Kingfisher
 
-class PickerResultViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDragDelegate, UICollectionViewDropDelegate, ResultViewCellDelegate {
+class PickerResultViewController: UIViewController,
+                                  UICollectionViewDataSource,
+                                  UICollectionViewDelegate,
+                                  UICollectionViewDragDelegate,
+                                  UICollectionViewDropDelegate,
+                                  ResultViewCellDelegate {
      
     @IBOutlet weak var collectionViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionViewHeightConstraint: NSLayoutConstraint!
@@ -22,18 +27,18 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     var row_Count: Int = UI_USER_INTERFACE_IDIOM() == .pad ? 5 : 3
     
     var addCell: ResultAddViewCell {
-        get {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ResultAddViewCellID", for: IndexPath(item: selectedAssets.count, section: 0)) as! ResultAddViewCell
-            return cell
-        }
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "ResultAddViewCellID",
+            for: IndexPath(item: selectedAssets.count, section: 0)
+        ) as! ResultAddViewCell
+        return cell
     }
     var canSetAddCell: Bool {
-        get {
-            if selectedAssets.count == config.maximumSelectedCount && config.maximumSelectedCount > 0 {
-                return false
-            }
-            return true
+        if selectedAssets.count == config.maximumSelectedCount &&
+            config.maximumSelectedCount > 0 {
+            return false
         }
+        return true
     }
     var beforeRowCount: Int = 0
     
@@ -49,12 +54,24 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     var localAssetArray: [PhotoAsset] = []
     
     var preselect: Bool = false
+    var isPublish: Bool = false
     
-    weak var previewTitleLabel: UILabel?
-    weak var currentPickerController: PhotoPickerController?
+    var localCachePath: String {
+        var cachePath = PhotoTools.getSystemCacheFolderPath()
+        cachePath.append(contentsOf: "/com.silence.WeChat_Moment")
+        return cachePath
+    }
+    var localURL: URL {
+        var cachePath = localCachePath
+        cachePath.append(contentsOf: "/PhotoAssets")
+        return URL.init(fileURLWithPath: cachePath)
+    }
     
     init() {
-        super.init(nibName:"PickerResultViewController",bundle: nil)
+        super.init(
+            nibName: "PickerResultViewController",
+            bundle: nil
+        )
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -63,7 +80,6 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         collectionViewTopConstraint.constant = 20
         collectionView.register(ResultViewCell.self, forCellWithReuseIdentifier: "ResultViewCellID")
         collectionView.register(ResultAddViewCell.self, forCellWithReuseIdentifier: "ResultAddViewCellID")
@@ -72,23 +88,77 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
             collectionView.dropDelegate = self
             collectionView.dragInteractionEnabled = true
         }else {
-            let longGestureRecognizer = UILongPressGestureRecognizer.init(target: self, action: #selector(longGestureRecognizerClick(longGestureRecognizer:)))
+            let longGestureRecognizer = UILongPressGestureRecognizer(
+                target: self,
+                action: #selector(
+                    longGestureRecognizerClick(longGestureRecognizer:)
+                )
+            )
             collectionView.addGestureRecognizer(longGestureRecognizer)
         }
         view.backgroundColor = UIColor.white
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "设置", style:    .done, target: self, action: #selector(didSettingButtonClick))
+        if isPublish {
+            title = "Moment"
+            let publishBtn = UIBarButtonItem(
+                title: "发布",
+                style: .done,
+                target: self,
+                action: #selector(didPublishBtnClick)
+            )
+            navigationItem.rightBarButtonItems = [publishBtn]
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                title: "取消",
+                style: .done,
+                target: self,
+                action: #selector(didCancelButtonClick)
+            )
+            
+            if let localData = FileManager.default.contents(atPath: localURL.path),
+               let datas = try? JSONDecoder().decode([Data].self, from: localData) {
+                var photoAssets: [PhotoAsset] = []
+                for data in datas {
+                    if let photoAsset = PhotoAsset.decoder(data: data) {
+                        photoAssets.append(photoAsset)
+                    }
+                }
+                selectedAssets = photoAssets
+            }
+        }else {
+            let settingBtn = UIBarButtonItem.init(
+                title: "设置",
+                style: .done,
+                target: self,
+                action: #selector(didSettingButtonClick)
+            )
+            let clearBtn = UIBarButtonItem.init(
+                title: "清空缓存",
+                style: .done,
+                target: self,
+                action: #selector(didClearButtonClick)
+            )
+            navigationItem.rightBarButtonItems = [settingBtn, clearBtn]
+        }
         
         if preselect {
+            config.previewView.loadNetworkVideoMode = .play
             config.maximumSelectedVideoDuration = 0
             config.maximumSelectedVideoCount = 0
-            let networkVideoURL = URL.init(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_video.mp4")!
+            let networkVideoURL = URL(
+                string:
+                    "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_video.mp4"
+            )!
             let networkVideoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL))
             selectedAssets.append(networkVideoAsset)
             localAssetArray.append(networkVideoAsset)
             
             #if canImport(Kingfisher)
-            let networkImageURL = URL.init(string: "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif")!
-            let networkImageAsset = PhotoAsset.init(networkImageAsset: NetworkImageAsset.init(thumbnailURL: networkImageURL, originalURL: networkImageURL))
+            let networkImageURL = URL(string: "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif")!
+            let networkImageAsset = PhotoAsset(
+                networkImageAsset: NetworkImageAsset(
+                    thumbnailURL: networkImageURL,
+                    originalURL: networkImageURL
+                )
+            )
             selectedAssets.append(networkImageAsset)
             localAssetArray.append(networkImageAsset)
             #endif
@@ -104,12 +174,16 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
                 localAssetArray.append(videoAsset)
             }
             
-            let networkVideoURL1 = URL.init(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_tiantaichuifeng.mp4")!
+            let networkVideoURL1 = URL(
+                string:
+                    "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/395826883-1-208.mp4"
+            )!
             let networkVideoAsset1 = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL1))
             selectedAssets.append(networkVideoAsset1)
             localAssetArray.append(networkVideoAsset1)
         }
     }
+    
     @objc func longGestureRecognizerClick(longGestureRecognizer: UILongPressGestureRecognizer) {
         let touchPoint = longGestureRecognizer.location(in: collectionView)
         let touchIndexPath = collectionView.indexPathForItem(at: touchPoint)
@@ -121,7 +195,6 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
                 }
                 collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
             }
-            break
         case .changed:
             if let selectedIndexPath = touchIndexPath {
                 if canSetAddCell && selectedIndexPath.item == selectedAssets.count {
@@ -129,19 +202,16 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
                 }
             }
             collectionView.updateInteractiveMovementTargetPosition(touchPoint)
-            break
         case .ended:
             collectionView.endInteractiveMovement()
-            break
         default:
             collectionView.cancelInteractiveMovement()
-            break
         }
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let flowLayout: UICollectionViewFlowLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        let itemWidth = Int((view.width - 24 - CGFloat(row_Count - 1))) / row_Count
+        let itemWidth = Int((view.hx.width - 24 - CGFloat(row_Count - 1))) / row_Count
         flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         flowLayout.minimumInteritemSpacing = 1
         flowLayout.minimumLineSpacing = 1
@@ -159,10 +229,10 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     func configCollectionViewHeight() {
         let rowCount = getCollectionViewrowCount()
         beforeRowCount = rowCount
-        let itemWidth = Int((view.width - 24 - CGFloat(row_Count - 1))) / row_Count
+        let itemWidth = Int((view.hx.width - 24 - CGFloat(row_Count - 1))) / row_Count
         var heightConstraint = CGFloat(rowCount * itemWidth + rowCount)
-        if heightConstraint > view.height - UIDevice.navigationBarHeight - 20 - 150 {
-            heightConstraint = view.height - UIDevice.navigationBarHeight - 20 - 150
+        if heightConstraint > view.hx.height - UIDevice.navigationBarHeight - 20 - 150 {
+            heightConstraint = view.hx.height - UIDevice.navigationBarHeight - 20 - 150
         }
         collectionViewHeightConstraint.constant = heightConstraint
     }
@@ -187,6 +257,59 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
         pickerConfigVC.config = config
         present(UINavigationController.init(rootViewController: pickerConfigVC), animated: true, completion: nil)
     }
+    @objc func didClearButtonClick() {
+        PhotoTools.removeCache()
+        ImageCache.default.clearCache()
+    }
+    func removeLocalPhotoAssetFile() {
+        if FileManager.default.fileExists(atPath: localURL.path) {
+            try? FileManager.default.removeItem(at: localURL)
+        }
+    }
+    @objc func didPublishBtnClick() {
+        removeLocalPhotoAssetFile()
+        dismiss(animated: true, completion: nil)
+    }
+    @objc func didCancelButtonClick() {
+        if selectedAssets.isEmpty {
+            removeLocalPhotoAssetFile()
+            dismiss(animated: true, completion: nil)
+            return
+        }
+        PhotoTools.showAlert(
+            viewController: self,
+            title: "是否将此次编辑保留?",
+            message: nil,
+            leftActionTitle: "不保留",
+            leftHandler: { _ in
+            self.removeLocalPhotoAssetFile()
+            self.dismiss(animated: true, completion: nil)
+        }, rightActionTitle: "保留") { _ in
+            var datas: [Data] = []
+            for photoAsset in self.selectedAssets {
+                if let data = photoAsset.encode() {
+                    datas.append(data)
+                }
+            }
+            do {
+                if !FileManager.default.fileExists(atPath: self.localCachePath) {
+                    try FileManager.default.createDirectory(
+                        atPath: self.localCachePath,
+                        withIntermediateDirectories: true,
+                        attributes: nil
+                    )
+                }
+                if FileManager.default.fileExists(atPath: self.localURL.path) {
+                    try FileManager.default.removeItem(at: self.localURL)
+                }
+                let data = try JSONEncoder().encode(datas)
+                try data.write(to: self.localURL)
+            } catch {
+                print(error)
+            }
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
     
     /// 跳转选择资源界面
     @IBAction func selectButtonClick(_ sender: UIButton) {
@@ -209,102 +332,56 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     @IBAction func didRequestSelectedAssetURL(_ sender: Any) {
         let total = selectedAssets.count
         if total == 0 {
-            ProgressHUD.showWarning(addedTo: self.view, text: "请先选择资源", animated: true, delay: 1.5)
+            view.hx.showWarning(
+                text: "请先选择资源",
+                delayHide: 1.5,
+                animated: true
+            )
             return
         }
-        var count = 0
-        for photoAsset in selectedAssets {
-            if photoAsset.mediaType == .photo {
-                if photoAsset.isNetworkAsset {
-                    #if canImport(Kingfisher)
-                    photoAsset.getNetworkImageURL { (url, isNetwork) in
-                        count += 1
-                        print(isNetwork ? "网络图片：" : "编辑后的网络图片", url!)
-                        if count == total {
-                            ProgressHUD.hide(forView: self.view, animated: false)
-                            ProgressHUD.showSuccess(addedTo: self.view, text: "获取完成", animated: true, delay: 1.5)
-                        }
-                    }
-                    continue
-                    #endif
+        view.hx.show(animated: true)
+        let result = PickerResult(photoAssets: selectedAssets, isOriginal: false)
+        result.getURLs { result, photoAsset, index in
+            print("第" + String(index + 1) + "个")
+            switch result {
+            case .success(let response):
+                if let livePhoto = response.livePhoto {
+                    print("LivePhoto里的图片地址：", livePhoto.imageURL)
+                    print("LivePhoto里的视频地址：", livePhoto.videoURL)
+                    return
                 }
-                if photoAsset.mediaSubType == .livePhoto {
-                    var imageURL: URL?
-                    var videoURL: URL?
-                    AssetManager.requestLivePhoto(contentURL: photoAsset.phAsset!) { (url) in
-                        imageURL = url
-                    } videoHandler: { (url) in
-                        videoURL = url
-                    } completionHandler: { [weak self] (error) in
-                        count += 1
-                        if error == nil {
-                            let image = UIImage.init(contentsOfFile: imageURL!.path)
-                            print("LivePhoto中的图片：\(String(describing: image!))")
-                            print("LivePhoto中的视频地址：\(videoURL!)")
-                        }else {
-                            print("LivePhoto中的内容获取失败\(error!)")
-                        }
-                        if count == total {
-                            ProgressHUD.hide(forView: self?.view, animated: false)
-                            ProgressHUD.showSuccess(addedTo: self?.view, text: "获取完成", animated: true, delay: 1.5)
-                        }
-                    }
-                }else {
-                    count += 1
-                    photoAsset.requestImageURL { [weak self] (imageURL) in
-                        if imageURL != nil {
-                            print("图片地址：\(imageURL!)")
-                        }else {
-                            print("图片地址获取失败")
-                        }
-                        if count == total {
-                            ProgressHUD.hide(forView: self?.view, animated: false)
-                            ProgressHUD.showSuccess(addedTo: self?.view, text: "获取完成", animated: true, delay: 1.5)
-                        }
-                    }
-//                    print("图片：\(photoAsset.originalImage!)")
-//                    if count == total {
-//                        ProgressHUD.hide(forView: weakSelf?.navigationController?.view, animated: true)
-//                    }
-                }
-            }else {
-                if photoAsset.isNetworkAsset {
-                    photoAsset.getNetworkVideoURL { (videoURL, isNetwork) in
-                        count += 1
-                        print(isNetwork ? "网络视频：" : "编辑后的网络视频", videoURL!)
-                        if count == total {
-                            ProgressHUD.hide(forView: self.view, animated: false)
-                            ProgressHUD.showSuccess(addedTo: self.view, text: "获取完成", animated: true, delay: 1.5)
-                        }
-                    }
-                    continue
-                }
-                photoAsset.requestVideoURL { [weak self] (videoURL) in
-                    count += 1
-                    if videoURL == nil {
-                        print("视频地址获取失败")
-                    }else {
-                        print("视频地址：\(videoURL!)")
-                    }
-                    if count == total {
-                        ProgressHUD.hide(forView: self?.view, animated: false)
-                        ProgressHUD.showSuccess(addedTo: self?.view, text: "获取完成", animated: true, delay: 1.5)
-                    }
-                }
+                print(response.urlType == .network ?
+                        response.mediaType == .photo ?
+                            "网络图片地址：" : "网络视频地址：" :
+                        response.mediaType == .photo ?
+                            "本地图片地址" : "本地视频地址",
+                      response.url)
+            case .failure(let error):
+                print("地址获取失败", error)
             }
+        } completionHandler: { urls in
+            self.view.hx.hide(animated: false)
+            self.view.hx.showSuccess(text: "获取完成", delayHide: 1.5, animated: true)
         }
     }
     
     // MARK: UICollectionViewDataSource
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int) -> Int {
         return canSetAddCell ? selectedAssets.count + 1 : selectedAssets.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if canSetAddCell && indexPath.item == selectedAssets.count {
             return addCell
         }
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ResultViewCellID", for: indexPath) as! ResultViewCell
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "ResultViewCellID",
+            for: indexPath
+        ) as! ResultViewCell
         cell.resultDelegate = self
         cell.photoAsset = selectedAssets[indexPath.item]
         return cell
@@ -332,50 +409,142 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
         if selectedAssets.isEmpty {
             return
         }
-//        let config = VideoEditorConfiguration.init()
-//        config.languageType = .english
-//        let vc = EditorController.init(photoAsset: selectedAssets.first!, config: config)
-////        vc.videoEditorDelegate = self
-//        present(vc, animated: true, completion: nil)
-//        return
-        // modalPresentationStyle = .custom 会使用框架自带的动画效果
-        // 预览时可以重新初始化一个config设置单独的颜色或其他配置
-        let previewConfig = PhotoTools.getWXPickerConfig()
-        // 编辑器配置保持一致
-        previewConfig.photoEditor = config.photoEditor
-//        previewConfig.prefersStatusBarHidden = true
-//        previewConfig.previewView.bottomView.showSelectedView = false
         var style: UIModalPresentationStyle = .custom
         if previewStyleControl.selectedSegmentIndex == 1 {
             if #available(iOS 13.0, *) {
                 style = .automatic
             }
         }
-        let pickerController = PhotoPickerController.init(preview: previewConfig, currentIndex: indexPath.item, modalPresentationStyle: style)
-        pickerController.selectedAssetArray = selectedAssets
-        pickerController.pickerDelegate = self
-        // 透明导航栏建议修改取消图片,换张带阴影的图片
-//        config.previewView.cancelImageName = ""
-//        pickerController.navigationBar.setBackgroundImage(UIImage.image(for: UIColor.clear, havingSize: .zero), for: .default)
-//        pickerController.navigationBar.shadowImage = UIImage.image(for: UIColor.clear, havingSize: .zero)
-        
-        let titleLabel = UILabel.init()
-        titleLabel.size = CGSize(width: 100, height: 30)
-        titleLabel.textColor = .white
-        titleLabel.font = UIFont.semiboldPingFang(ofSize: 17)
-        titleLabel.textAlignment = .center
-        titleLabel.text = String(indexPath.item + 1) + "/" + String(selectedAssets.count)
-        pickerController.previewViewController()?.navigationItem.titleView = titleLabel
-        previewTitleLabel = titleLabel
-        pickerController.previewViewController()?.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "删除", style: .done, target: self, action: #selector(deletePreviewAsset))
-        present(pickerController, animated: true, completion: nil)
-        self.currentPickerController = pickerController
-    }
-    @objc func deletePreviewAsset() {
-        PhotoTools.showAlert(viewController: self.currentPickerController, title: "是否删除当前资源", message: nil, leftActionTitle: "确定", leftHandler: { (alertAction) in
-            self.currentPickerController?.deleteCurrentPreviewPhotoAsset()
-        }, rightActionTitle: "取消") { (alertAction) in
+        var config = PhotoBrowser.Configuration()
+        config.showDelete = true
+        config.modalPresentationStyle = style
+        let cell = collectionView.cellForItem(at: indexPath) as? ResultViewCell
+        PhotoBrowser.show(
+            // 预览的资源数组
+            selectedAssets,
+            // 当前预览的位置
+            pageIndex: indexPath.item,
+            // 预览相关配置
+            config: config,
+            // 转场动画初始的 UIImage
+            transitionalImage: cell?.photoView.image
+        ) { index in
+            // 转场过渡时起始/结束时 对应的 UIView
+            self.collectionView.cellForItem(
+                at: IndexPath(
+                    item: index,
+                    section: 0
+                )
+            ) as? ResultViewCell
+        } deleteAssetHandler: { index, photoAsset, photoBrowser in
+            // 点击了删除按钮
+            PhotoTools.showAlert(
+                viewController: photoBrowser,
+                title: "是否删除当前资源",
+                leftActionTitle: "确定",
+                leftHandler: { (alertAction) in
+                    photoBrowser.deleteCurrentPreviewPhotoAsset()
+                    self.previewDidDeleteAsset(
+                        index: index
+                    )
+                }, rightActionTitle: "取消") { (alertAction) in }
+        } longPressHandler: { index, photoAsset, photoBrowser in
+            // 长按事件
+            self.previewLongPressClick(
+                photoAsset: photoAsset,
+                photoBrowser: photoBrowser
+            )
         }
+    }
+    
+    func previewLongPressClick(photoAsset: PhotoAsset, photoBrowser: PhotoBrowser) {
+        let alert = UIAlertController(title: "长按事件", message: nil, preferredStyle: .actionSheet)
+        alert.addAction(
+            .init(
+                title: "保存",
+                style: .default,
+                handler: { alertAction in
+            photoBrowser.view.hx.show(animated: true)
+            func saveImage(_ image: UIImage) {
+                AssetManager.saveSystemAlbum(forImage: image) { phAsset in
+                    if phAsset != nil {
+                        photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
+                    }else {
+                        photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                    }
+                }
+            }
+            func saveVideo(_ videoURL: URL) {
+                AssetManager.saveSystemAlbum(forVideoURL: videoURL) { phAsset in
+                    if phAsset != nil {
+                        photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
+                    }else {
+                        photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                    }
+                }
+            }
+            photoAsset.getAssetURL { result in
+                switch result {
+                case .success(let response):
+                    if response.mediaType == .photo {
+                        if response.urlType == .network {
+                            PhotoTools.downloadNetworkImage(
+                                with: response.url,
+                                options: [],
+                                completionHandler: { image in
+                                photoBrowser.view.hx.hide(animated: true)
+                                if let image = image {
+                                    saveImage(image)
+                                }else {
+                                    photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                                }
+                            })
+                        }else {
+                            let image = UIImage(contentsOfFile: response.url.path)!
+                            saveImage(image)
+                        }
+                    }else {
+                        if response.urlType == .network {
+                            PhotoManager.shared.downloadTask(
+                                with: response.url,
+                                progress: nil) { videoURL, error, _ in
+                                photoBrowser.view.hx.hide(animated: true)
+                                if let videoURL = videoURL {
+                                    saveVideo(videoURL)
+                                }else {
+                                    photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                                }
+                            }
+                        }else {
+                            saveVideo(response.url)
+                        }
+                    }
+                case .failure(_):
+                    photoBrowser.view.hx.hide(animated: true)
+                    photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                }
+            }
+        }))
+        alert.addAction(
+            .init(
+                title: "删除",
+                style: .destructive,
+                handler: { alertAction in
+            photoBrowser.deleteCurrentPreviewPhotoAsset()
+        }))
+        alert.addAction(.init(title: "取消", style: .cancel, handler: nil))
+        if UIDevice.isPad {
+            let pop = alert.popoverPresentationController
+            pop?.permittedArrowDirections = .any
+            pop?.sourceView = photoBrowser.view
+            pop?.sourceRect = CGRect(
+                x: photoBrowser.view.hx.width * 0.5,
+                y: photoBrowser.view.hx.height,
+                width: 0,
+                height: 0
+            )
+        }
+        photoBrowser.present(alert, animated: true, completion: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, canEditItemAt indexPath: IndexPath) -> Bool {
@@ -384,13 +553,19 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
         }
         return true
     }
-    func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        moveItemAt sourceIndexPath: IndexPath,
+        to destinationIndexPath: IndexPath) {
         let sourceAsset = selectedAssets[sourceIndexPath.item]
         selectedAssets.remove(at: sourceIndexPath.item)
         selectedAssets.insert(sourceAsset, at: destinationIndexPath.item)
     }
     @available(iOS 11.0, *)
-    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        itemsForBeginning session: UIDragSession,
+        at indexPath: IndexPath) -> [UIDragItem] {
         let itemProvider = NSItemProvider.init()
         let dragItem = UIDragItem.init(itemProvider: itemProvider)
         dragItem.localObject = indexPath
@@ -406,7 +581,11 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
         return true
     }
     @available(iOS 11.0, *)
-    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        dropSessionDidUpdate session: UIDropSession,
+        withDestinationIndexPath
+            destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
         if let sourceIndexPath = session.items.first?.localObject as? IndexPath {
             if canSetAddCell && sourceIndexPath.item == selectedAssets.count {
                 return UICollectionViewDropProposal.init(operation: .forbidden, intent: .insertAtDestinationIndexPath)
@@ -425,8 +604,11 @@ class PickerResultViewController: UIViewController, UICollectionViewDataSource, 
     }
     
     @available(iOS 11.0, *)
-    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
-        if let destinationIndexPath = coordinator.destinationIndexPath, let sourceIndexPath = coordinator.items.first?.sourceIndexPath {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        performDropWith coordinator: UICollectionViewDropCoordinator) {
+        if let destinationIndexPath = coordinator.destinationIndexPath,
+           let sourceIndexPath = coordinator.items.first?.sourceIndexPath {
             collectionView.isUserInteractionEnabled = false
             collectionView.performBatchUpdates {
                 let sourceAsset = selectedAssets[sourceIndexPath.item]
@@ -455,7 +637,14 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
         isOriginal = result.isOriginal
         collectionView.reloadData()
         updateCollectionViewHeight()
-        
+        result.getVideoURL { session, photoAsset, index in
+            print("\n", session, "\n", index)
+        } videoURLHandler: { result, photoAsset, index in
+            print("\n", index)
+        } completionHandler: { urls in
+            print("\n", urls)
+        }
+
 //        result.getImage { (image, photoAsset, index) in
 //            if let image = image {
 //                print("success", image)
@@ -465,15 +654,12 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
 //        } completionHandler: { (images) in
 //            print(images)
 //        }
-//        result.getURLs { (url, isNetwork, index, type) in
-//            print(type == .photo ? isNetwork ? "网络图片：" : "图片：" : isNetwork ? "网络视频" : "视频：", url! , "index:" , index)
-//        } completionHandler: { (urls) in
-//
-//        }
         pickerController.dismiss(animated: true, completion: nil)
     }
     
-    func pickerController(_ pickerController: PhotoPickerController, didEditAsset photoAsset: PhotoAsset, atIndex: Int) {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        didEditAsset photoAsset: PhotoAsset, atIndex: Int) {
         if pickerController.isPreviewAsset {
             selectedAssets[atIndex] = photoAsset
             collectionView.reloadItems(at: [IndexPath.init(item: atIndex, section: 0)])
@@ -482,37 +668,66 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     func pickerController(didCancel pickerController: PhotoPickerController) {
         pickerController.dismiss(animated: true, completion: nil)
     }
-    func pickerController(_ pickerController: PhotoPickerController, didDismissComplete localCameraAssetArray: [PhotoAsset]) {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        didDismissComplete localCameraAssetArray: [PhotoAsset]) {
         setNeedsStatusBarAppearanceUpdate()
         self.localCameraAssetArray = localCameraAssetArray
     }
-    func pickerController(_ pikcerController: PhotoPickerController, previewUpdateCurrentlyDisplayedAsset photoAsset: PhotoAsset, atIndex: Int) {
-        previewTitleLabel?.text = String(atIndex + 1) + "/" + String(selectedAssets.count)
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        viewControllersWillAppear viewController: UIViewController) {
+        if pickerController.isPreviewAsset {
+            let navHeight = viewController.navigationController?.navigationBar.hx.height ?? 0
+            viewController.navigationController?.navigationBar.setBackgroundImage(
+                UIImage.gradualShadowImage(
+                    CGSize(
+                        width: view.hx.width,
+                        height: UIDevice.isAllIPhoneX ? navHeight + 54 : navHeight + 30
+                    )
+                ),
+                for: .default
+            )
+        }
     }
-    func pickerController(_ pickerController: PhotoPickerController, previewDidDeleteAsset photoAsset: PhotoAsset, atIndex: Int) {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        previewDidDeleteAsset photoAsset: PhotoAsset, atIndex: Int) {
+        previewDidDeleteAsset(index: atIndex)
+    }
+    func previewDidDeleteAsset(index: Int) {
         let isFull = selectedAssets.count == config.maximumSelectedCount
-        selectedAssets.remove(at: atIndex)
+        selectedAssets.remove(at: index)
         if isFull {
             collectionView.reloadData()
         }else {
-            collectionView.deleteItems(at: [IndexPath.init(item: atIndex, section: 0)])
+            collectionView.deleteItems(at: [IndexPath.init(item: index, section: 0)])
         }
         updateCollectionViewHeight()
     }
-    func pickerController(_ pickerController: PhotoPickerController, presentPreviewViewForIndexAt index: Int) -> UIView? {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        presentPreviewViewForIndexAt index: Int) -> UIView? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
         return cell
     }
-    func pickerController(_ pickerController: PhotoPickerController, presentPreviewImageForIndexAt index: Int) -> UIImage? {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        presentPreviewImageForIndexAt index: Int) -> UIImage? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? ResultViewCell
-        return cell?.imageView.image
+        return cell?.photoView.image
     }
-    func pickerController(_ pickerController: PhotoPickerController, dismissPreviewViewForIndexAt index: Int) -> UIView? {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        dismissPreviewViewForIndexAt index: Int) -> UIView? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
         return cell
     }
     
-    func pickerController(_ pickerController: PhotoPickerController, previewNetworkImageDownloadSuccess photoAsset: PhotoAsset, atIndex: Int) {
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        previewNetworkImageDownloadSuccess photoAsset: PhotoAsset,
+        atIndex: Int) {
         if pickerController.isPreviewAsset {
             let cell = collectionView.cellForItem(at: IndexPath(item: atIndex, section: 0)) as! ResultViewCell
             if cell.downloadStatus == .failed {
@@ -520,17 +735,169 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
             }
         }
     }
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        loadTitleChartlet editorViewController: UIViewController,
+        response: @escaping ([EditorChartlet]) -> Void) {
+        // 模仿延迟加加载数据
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            var titles = PhotoTools.defaultTitleChartlet()
+            let localTitleChartlet = EditorChartlet(image: UIImage(named: "hx_sticker_cover"))
+            titles.append(localTitleChartlet)
+            let gifTitleChartlet = EditorChartlet(
+                url: URL(
+                    string:
+                        "https://gifimage.net/wp-content/uploads/2017/11/gif-button-2.gif"
+                )
+            )
+            titles.append(gifTitleChartlet)
+            response(titles)
+        }
+    }
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        loadChartletList editorViewController: UIViewController,
+        titleChartlet: EditorChartlet,
+        titleIndex: Int,
+        response: @escaping (Int, [EditorChartlet]) -> Void) {
+        if titleIndex == 0 {
+            response(titleIndex, PhotoTools.defaultNetworkChartlet())
+        }else if titleIndex == 1 {
+            let imageNameds = [
+                "hx_sticker_haoxinqing",
+                "hx_sticker_housailei",
+                "hx_sticker_jintianfenkeai",
+                "hx_sticker_keaibiaoq",
+                "hx_sticker_kehaixing",
+                "hx_sticker_saihong",
+                "hx_sticker_wow",
+                "hx_sticker_woxiangfazipai",
+                "hx_sticker_xiaochuzhujiao",
+                "hx_sticker_yuanqimanman",
+                "hx_sticker_yuanqishaonv",
+                "hx_sticker_zaizaijia"
+            ]
+            var list: [EditorChartlet] = []
+            for imageNamed in imageNameds {
+                let chartlet = EditorChartlet(
+                    image: UIImage(
+                        contentsOfFile: Bundle.main.path(
+                            forResource: imageNamed,
+                            ofType: "png"
+                        )!
+                    )
+                )
+                list.append(chartlet)
+            }
+            response(titleIndex, list)
+        }else {
+            response(titleIndex, gifChartlet())
+        }
+    }
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        videoEditor videoEditorViewController: VideoEditorViewController,
+        loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+        var musics: [VideoEditorMusicInfo] = []
+        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
+        let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
+        let lrc1 = try! String(contentsOfFile: lyricUrl1.path) // swiftlint:disable:this force_try
+        let music1 = VideoEditorMusicInfo.init(audioURL: audioUrl1,
+                                               lrc: lrc1,
+                                               urlType: .network)
+        musics.append(music1)
+        let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
+        let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
+        let lrc2 = try! String(contentsOfFile: lyricUrl2.path) // swiftlint:disable:this force_try
+        let music2 = VideoEditorMusicInfo.init(audioURL: audioUrl2,
+                                               lrc: lrc2,
+                                               urlType: .network)
+        musics.append(music2)
+        let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
+        let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
+        let lrc3 = try! String(contentsOfFile: lyricUrl3.path) // swiftlint:disable:this force_try
+        let music3 = VideoEditorMusicInfo.init(audioURL: audioUrl3,
+                                               lrc: lrc3,
+                                               urlType: .network)
+        musics.append(music3)
+        let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
+        let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
+        let lrc4 = try! String(contentsOfFile: lyricUrl4.path) // swiftlint:disable:this force_try
+        let music4 = VideoEditorMusicInfo.init(audioURL: audioUrl4,
+                                               lrc: lrc4,
+                                               urlType: .network)
+        musics.append(music4)
+        let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
+        let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
+        let lrc5 = try! String(contentsOfFile: lyricUrl5.path) // swiftlint:disable:this force_try
+        let music5 = VideoEditorMusicInfo.init(audioURL: audioUrl5,
+                                               lrc: lrc5,
+                                               urlType: .network)
+        musics.append(music5)
+        let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
+        let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
+        let lrc6 = try! String(contentsOfFile: lyricUrl6.path) // swiftlint:disable:this force_try
+        let music6 = VideoEditorMusicInfo.init(audioURL: audioUrl6,
+                                               lrc: lrc6,
+                                               urlType: .network)
+        musics.append(music6)
+        let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
+        let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
+        let lrc7 = try! String(contentsOfFile: lyricUrl7.path) // swiftlint:disable:this force_try
+        let music7 = VideoEditorMusicInfo.init(audioURL: audioUrl7,
+                                               lrc: lrc7,
+                                               urlType: .network)
+        musics.append(music7)
+        let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
+        let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
+        let lrc8 = try! String(contentsOfFile: lyricUrl8.path) // swiftlint:disable:this force_try
+        let music8 = VideoEditorMusicInfo.init(audioURL: audioUrl8,
+                                               lrc: lrc8,
+                                               urlType: .network)
+        musics.append(music8)
+        completionHandler(musics)
+        return false
+    }
+    
+    func gifChartlet() -> [EditorChartlet] {
+        var gifs: [EditorChartlet] = []
+        gifs.append(.init(url: URL(string: "https://img95.699pic.com/photo/40112/1849.gif_wh860.gif")))
+        gifs.append(.init(url: URL(string: "https://img95.699pic.com/photo/40112/1680.gif_wh860.gif")))
+        gifs.append(.init(url: URL(string: "https://img95.699pic.com/photo/40110/3660.gif_wh860.gif")))
+        gifs.append(.init(url: URL(string: "https://pic.qqtn.com/up/2017-10/2017102615224886590.gif")))
+        gifs.append(.init(url: URL(string: "https://img.99danji.com/uploadfile/2021/0220/20210220103405450.gif")))
+        gifs.append(.init(url: URL(string: "https://imgo.youxihezi.net/img2021/2/20/11/2021022051733236.gif")))
+        gifs.append(
+            .init(
+                url: URL(
+                    string:
+                        "https://qqpublic.qpic.cn/qq_public/0/0-2868806511-17879434A38D4DCC1A378F9528C76152/0?fmt=gif&size=136&h=431&w=480&ppv=1.gif" // swiftlint:disable:this line_length
+                )
+            )
+        )
+        gifs.append(
+            .init(
+                url: URL(
+                    string:
+                        "http://qqpublic.qpic.cn/qq_public/0/0-464434317-3A491192B7B04D124C793264F3E7DAE4/0?fmt=gif&size=335&h=361&w=450&ppv=1.gif" // swiftlint:disable:this line_length
+                )
+            )
+        )
+        gifs.append(.init(url: URL(string: "http://pic.qqtn.com/up/2017-5/2017053118074857711.gif")))
+        gifs.append(.init(url: URL(string: "https://pic.diydoutu.com/bq/1493.gif")))
+        return gifs
+    }
 }
 
 class ResultAddViewCell: PhotoPickerBaseViewCell {
     override func initView() {
         super.initView()
         isHidden = false
-        imageView.image = UIImage.image(for: "hx_picker_add_img")
+        photoView.placeholder = UIImage.image(for: "hx_picker_add_img")
     }
 }
 
-@objc protocol ResultViewCellDelegate: NSObjectProtocol {
+@objc protocol ResultViewCellDelegate: AnyObject {
     @objc optional func cell(didDeleteButton cell: ResultViewCell)
 }
 
@@ -539,26 +906,33 @@ class ResultViewCell: PhotoPickerViewCell {
     lazy var deleteButton: UIButton = {
         let deleteButton = UIButton.init(type: .custom)
         deleteButton.setImage(UIImage.init(named: "hx_compose_delete"), for: .normal)
-        deleteButton.size = deleteButton.currentImage?.size ?? .zero
+        deleteButton.hx.size = deleteButton.currentImage?.size ?? .zero
         deleteButton.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
         return deleteButton
     }()
+    override var photoAsset: PhotoAsset! {
+        didSet {
+            // 隐藏被编辑过的标示
+            assetEditMarkIcon.isHidden = true
+        }
+    }
     override func requestThumbnailImage() {
         // 因为这里的cell不会很多，重新设置 targetWidth，使图片更加清晰
-        super.requestThumbnailImage(targetWidth: width * UIScreen.main.scale)
+        super.requestThumbnailImage(targetWidth: hx.width * UIScreen.main.scale)
     }
     @objc func didDeleteButtonClick() {
         resultDelegate?.cell?(didDeleteButton: self)
     }
+    func hideDelete() {
+        deleteButton.isHidden = true
+    }
     override func initView() {
         super.initView()
-        // 默认是隐藏的，需要显示出来
-        isHidden = false
         contentView.addSubview(deleteButton)
     }
     
     override func layoutView() {
         super.layoutView()
-        deleteButton.x = width - deleteButton.width
+        deleteButton.hx.x = hx.width - deleteButton.hx.width
     }
 }

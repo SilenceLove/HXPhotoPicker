@@ -52,12 +52,14 @@
     self.languageType = HXPhotoLanguageTypeSys;
     self.popupTableViewCellHeight = 65.f;
     if (HX_IS_IPhoneX_All) {
-        self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
+//        self.editVideoExportPresetName = AVAssetExportPresetHighestQuality;
         self.popupTableViewHeight = 450;
     }else {
-        self.editVideoExportPresetName = AVAssetExportPresetMediumQuality;
+//        self.editVideoExportPresetName = AVAssetExportPresetMediumQuality;
         self.popupTableViewHeight = 350;
     }
+    self.editVideoExportPreset = HXVideoEditorExportPresetRatio_960x540;
+    self.videoQuality = 6;
     self.popupTableViewHorizontalHeight = 250; 
     self.albumShowMode = HXPhotoAlbumShowModeDefault;
     
@@ -85,7 +87,7 @@
     self.navBarTranslucent = YES;
     self.bottomViewTranslucent = YES;
     self.selectVideoBeyondTheLimitTimeAutoEdit = NO;
-    self.videoAutoPlayType = HXVideoAutoPlayTypeWiFi;
+    self.videoAutoPlayType = HXVideoAutoPlayTypeOnce;
     self.previewSelectedBtnBgColor = self.themeColor;
     self.changeOriginalTinColor = YES;
     self.downloadNetworkVideo = YES;
@@ -109,6 +111,11 @@
     }
     self.allowSlidingSelection = YES;
     self.livePhotoAutoPlay = YES;
+    
+    self.photoListLimitBlurStyle = UIBlurEffectStyleLight;
+    self.photoListLimitTextColor = [UIColor hx_colorWithHexStr:@"#666666"];
+    self.photoListLimitSettingColor = self.themeColor;
+    self.photoListLimitCloseColor = self.themeColor;
 }
 - (void)setLivePhotoAutoPlay:(BOOL)livePhotoAutoPlay {
     _livePhotoAutoPlay = livePhotoAutoPlay;
@@ -267,6 +274,10 @@
     self.cellSelectedTitleColor = [UIColor whiteColor];
     self.cellDarkSelectBgColor = wxColor;
     self.cellDarkSelectTitleColor = [UIColor whiteColor];
+    self.photoListLimitBlurStyle = UIBlurEffectStyleDark;
+    self.photoListLimitTextColor = [UIColor hx_colorWithHexStr:@"#999999"];
+    self.photoListLimitSettingColor = wxColor;
+    self.photoListLimitCloseColor = [UIColor whiteColor];
     self.previewSelectedBtnBgColor = wxColor;
     self.selectedTitleColor = [UIColor whiteColor];
     self.previewDarkSelectBgColor = wxColor;

@@ -376,7 +376,7 @@ HXVideoEditBottomViewDelegate
     [self.view hx_showLoadingHUDText:[NSBundle hx_localizedStringForKey:@"处理中"]];
     self.bottomView.userInteractionEnabled = NO;
     HXWeakSelf
-    [HXPhotoTools exportEditVideoForAVAsset:self.avAsset timeRange:[self getTimeRange] presetName:self.manager.configuration.editVideoExportPresetName success:^(NSURL *videoURL) {
+    [HXPhotoTools exportEditVideoForAVAsset:self.avAsset timeRange:[self getTimeRange] exportPreset:self.manager.configuration.editVideoExportPreset videoQuality:self.manager.configuration.videoQuality success:^(NSURL *videoURL) {
         if (weakSelf.manager.configuration.editAssetSaveSystemAblum) {
             [HXPhotoTools saveVideoToCustomAlbumWithName:weakSelf.manager.configuration.customAlbumName videoURL:videoURL location:weakSelf.model.location complete:^(HXPhotoModel * _Nullable model, BOOL success) {
                 weakSelf.bottomView.userInteractionEnabled = YES;

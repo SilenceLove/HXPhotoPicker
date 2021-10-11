@@ -410,9 +410,7 @@
     NSDictionary *opts = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
                                                      forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
     AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:videoURL options:opts];
-    float second = 0;
-    second = urlAsset.duration.value / urlAsset.duration.timescale;
-    return [self initWithVideoURL:videoURL videoTime:second];
+    return [self initWithVideoURL:videoURL videoTime:CMTimeGetSeconds(urlAsset.duration)];
 }
 - (instancetype)initWithVideoURL:(NSURL *)videoURL videoTime:(NSTimeInterval)videoTime {
     if (self = [super init]) {
@@ -1746,6 +1744,41 @@
         }
     });
 }
+
+- (void)getImageURLWithImageData:(NSData *)imageData
+                         success:(HXModelImageURLSuccessBlock _Nullable)success
+                          failed:(HXModelFailedBlock _Nullable)failed{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        NSString *suffix;
+        if (self.photoEdit) {
+            suffix = @"jpeg";
+        }else {
+            if (UIImagePNGRepresentation([UIImage imageWithData:imageData])) {
+                suffix = @"png";
+            }else {
+                suffix = @"jpeg";
+            }
+        }
+        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:[NSString stringWithFormat:@".%@",suffix]];
+        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+        NSURL *imageURL = [self writeWithImageData:imageData toFile:fullPathToFile];
+        if (imageURL != nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (success) {
+                    success(imageURL, self, nil);
+                }
+            });
+        }else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (failed) {
+                    failed(nil, self);
+                }
+            });
+        }
+    });
+}
+
 - (NSURL *)writeWithImageData:(NSData *)imageData toFile:(NSString *)filePath {
     if ([imageData writeToFile:filePath atomically:YES]) {
         return [NSURL fileURLWithPath:filePath];
@@ -1814,11 +1847,21 @@
                     });
                     return;
                 }
-                UIImage *image = [UIImage imageWithData:imageData];
-                if (image.imageOrientation != UIImageOrientationUp) {
-                    image = [image hx_normalizedImage];
+                if (orientation != UIImageOrientationUp) {
+                    UIImage *image = [[[UIImage alloc] initWithData:imageData] hx_normalizedImage];
+                    [weakSelf getImageURLWithImage:image success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                        weakSelf.imageURL = imageURL;
+                        if (success) {
+                            success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);
+                        }
+                    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                        if (failed) {
+                            failed(nil, weakSelf);
+                        }
+                    }];
+                    return;
                 }
-                [weakSelf getImageURLWithImage:image success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                [weakSelf getImageURLWithImageData:imageData success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
                     weakSelf.imageURL = imageURL;
                     if (success) {
                         success(imageURL, HXPhotoModelMediaSubTypePhoto, NO, weakSelf);

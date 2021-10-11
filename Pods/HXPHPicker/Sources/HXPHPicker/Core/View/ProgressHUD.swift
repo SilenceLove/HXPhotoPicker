@@ -14,10 +14,10 @@ extension ProgressHUD {
         case success
     }
 }
-class ProgressHUD: UIView {
-    var mode : Mode
+final class ProgressHUD: UIView {
+    private var mode: Mode
     
-    lazy var backgroundView: UIView = {
+    private lazy var backgroundView: UIView = {
         let backgroundView = UIView.init()
         backgroundView.layer.cornerRadius = 5
         backgroundView.layer.masksToBounds = true
@@ -26,53 +26,83 @@ class ProgressHUD: UIView {
         return backgroundView
     }()
     
-    lazy var contentView: UIView = {
+    private lazy var contentView: UIView = {
         let contentView = UIView.init()
         return contentView
     }()
     
-    lazy var blurEffectView: UIVisualEffectView = {
+    private lazy var blurEffectView: UIVisualEffectView = {
         let effect = UIBlurEffect.init(style: .dark)
-        let blurEffectView = UIVisualEffectView.init(effect: effect)
+        let blurEffectView = UIVisualEffectView(effect: effect)
         return blurEffectView
     }()
     
-    lazy var indicatorView : UIActivityIndicatorView = {
-        let indicatorView = UIActivityIndicatorView.init(style: .whiteLarge)
-        indicatorView.hidesWhenStopped = true
-        return indicatorView
+    private lazy var indicatorView: UIView = {
+        if indicatorType == .circle {
+            let indicatorView = ProgressIndefiniteView(
+                frame: CGRect(
+                    origin: .zero,
+                    size: CGSize(width: 45, height: 45)
+                )
+            )
+            indicatorView.startAnimating()
+            return indicatorView
+        }else {
+            let indicatorView = UIActivityIndicatorView(style: .whiteLarge)
+            indicatorView.hidesWhenStopped = true
+            indicatorView.startAnimating()
+            return indicatorView
+        }
     }()
     
-    lazy var textLb: UILabel = {
+    private lazy var textLb: UILabel = {
         let textLb = UILabel.init()
         textLb.textColor = .white
         textLb.textAlignment = .center
         textLb.font = UIFont.systemFont(ofSize: 16)
-        textLb.numberOfLines = 0;
+        textLb.numberOfLines = 0
         return textLb
     }()
     
-    lazy var imageView: ProgressImageView = {
-        let imageView = ProgressImageView.init(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
+    private lazy var imageView: ProgressImageView = {
+        let imageView = ProgressImageView(
+            frame: CGRect(
+                x: 0, y: 0,
+                width: 60, height: 60
+            )
+        )
         return imageView
     }()
     
     lazy var tickView: ProgressImageView = {
-        let tickView = ProgressImageView.init(tickFrame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        let tickView = ProgressImageView(
+            tickFrame: CGRect(
+                x: 0, y: 0,
+                width: 80, height: 80
+            )
+        )
         return tickView
     }()
     
-    var text : String?
-    var finished : Bool = false
-    var showDelayTimer : Timer?
-    var hideDelayTimer : Timer?
+    /// 加载指示器类型
+    let indicatorType: BaseConfiguration.IndicatorType
     
-    init(addedTo view: UIView, mode: Mode) {
+    var text: String?
+    var finished: Bool = false
+    var showDelayTimer: Timer?
+    var hideDelayTimer: Timer?
+    
+    init(
+        addedTo view: UIView,
+        mode: Mode,
+        indicatorType: BaseConfiguration.IndicatorType = .system
+    ) {
+        self.indicatorType = indicatorType
         self.mode = mode
         super.init(frame: view.bounds)
         initView()
     }
-    func initView() {
+    private func initView() {
         addSubview(backgroundView)
         contentView.addSubview(textLb)
         if mode == .indicator {
@@ -86,13 +116,26 @@ class ProgressHUD: UIView {
         
     }
     
-    private func showHUD(text: String?, animated: Bool, afterDelay: TimeInterval) {
+    private func showHUD(
+        text: String?,
+        animated: Bool,
+        afterDelay: TimeInterval
+    ) {
         self.text = text
         textLb.text = text
         updateFrame()
         if afterDelay > 0 {
-            let timer = Timer.init(timeInterval: afterDelay, target: self, selector: #selector(handleShowTimer(timer:)), userInfo: animated, repeats: false)
-            RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
+            let timer = Timer(
+                timeInterval: afterDelay,
+                target: self,
+                selector: #selector(handleShowTimer(timer:)),
+                userInfo: animated,
+                repeats: false
+            )
+            RunLoop.current.add(
+                timer,
+                forMode: RunLoop.Mode.common
+            )
             self.showDelayTimer = timer
         }else {
             showViews(animated: animated)
@@ -113,11 +156,20 @@ class ProgressHUD: UIView {
             self.backgroundView.alpha = 1
         }
     }
-    func hide(withAnimated animated: Bool, afterDelay: TimeInterval) {
+    func hide(
+        withAnimated animated: Bool,
+        afterDelay: TimeInterval
+    ) {
         finished = true
         self.showDelayTimer?.invalidate()
         if afterDelay > 0 {
-            let timer = Timer.init(timeInterval: afterDelay, target: self, selector: #selector(handleHideTimer(timer:)), userInfo: animated, repeats: false)
+            let timer = Timer(
+                timeInterval: afterDelay,
+                target: self,
+                selector: #selector(handleHideTimer(timer:)),
+                userInfo: animated,
+                repeats: false
+            )
             RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
             self.hideDelayTimer = timer
         }else {
@@ -132,11 +184,13 @@ class ProgressHUD: UIView {
             UIView.animate(withDuration: 0.25) {
                 self.backgroundView.alpha = 0
             } completion: { (finished) in
+                self.indicatorView._stopAnimating()
                 self.removeFromSuperview()
             }
         }else {
-            self.backgroundView.alpha = 0
+            backgroundView.alpha = 0
             removeFromSuperview()
+            indicatorView._stopAnimating()
         }
     }
     func updateText(text: String) {
@@ -164,7 +218,6 @@ class ProgressHUD: UIView {
         let centenrX = textMaxWidth / 2
         textLb.centerX = centenrX
         if mode == .indicator {
-            indicatorView.startAnimating()
             indicatorView.centerX = centenrX
             if text != nil {
                 textLb.y = indicatorView.frame.maxY + 10
@@ -200,64 +253,166 @@ class ProgressHUD: UIView {
         blurEffectView.frame = backgroundView.bounds
     }
     @discardableResult
-    class func showLoading(addedTo view: UIView?, animated: Bool) -> ProgressHUD? {
-        return showLoading(addedTo: view, text: nil, animated: animated)
+    class func showLoading(
+        addedTo view: UIView?,
+        animated: Bool
+    ) -> ProgressHUD? {
+        showLoading(
+            addedTo: view,
+            text: nil,
+            animated: animated
+        )
     }
     @discardableResult
-    class func showLoading(addedTo view: UIView?, afterDelay: TimeInterval, animated: Bool) -> ProgressHUD? {
-        return showLoading(addedTo: view, text: nil, afterDelay: afterDelay, animated: animated)
+    class func showLoading(
+        addedTo view: UIView?,
+        afterDelay: TimeInterval,
+        animated: Bool
+    ) -> ProgressHUD? {
+        showLoading(
+            addedTo: view,
+            text: nil,
+            afterDelay: afterDelay,
+            animated: animated
+        )
     }
     @discardableResult
-    class func showLoading(addedTo view: UIView?, text: String?, animated: Bool) -> ProgressHUD? {
-        return showLoading(addedTo: view, text: text, afterDelay: 0, animated: animated)
+    class func showLoading(
+        addedTo view: UIView?,
+        text: String?,
+        animated: Bool
+    ) -> ProgressHUD? {
+        showLoading(
+            addedTo: view,
+            text: text,
+            afterDelay: 0,
+            animated: animated
+        )
     }
     @discardableResult
-    class func showLoading(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) -> ProgressHUD? {
-        if view == nil {
-            return nil
+    class func showLoading(
+        addedTo view: UIView?,
+        text: String?,
+        afterDelay: TimeInterval ,
+        animated: Bool,
+        indicatorType: BaseConfiguration.IndicatorType? = nil
+    ) -> ProgressHUD? {
+        guard let view = view else { return nil }
+        let type: BaseConfiguration.IndicatorType
+        if let indicatorType = indicatorType {
+            type = indicatorType
+        }else {
+            type = PhotoManager.shared.indicatorType
         }
-        let progressView = ProgressHUD.init(addedTo: view!, mode: .indicator)
-        progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
-        view!.addSubview(progressView)
+        let progressView = ProgressHUD(
+            addedTo: view,
+            mode: .indicator,
+            indicatorType: type
+        )
+        progressView.showHUD(
+            text: text,
+            animated: animated,
+            afterDelay: afterDelay
+        )
+        view.addSubview(progressView)
         return progressView
     }
-    class func showWarning(addedTo view: UIView?, text: String?, animated: Bool, delayHide: TimeInterval) {
-        self.showWarning(addedTo: view, text: text, afterDelay: 0, animated: animated)
-        self.hide(forView: view, animated: animated, afterDelay: delayHide)
+    class func showWarning(
+        addedTo view: UIView?,
+        text: String?,
+        animated: Bool,
+        delayHide: TimeInterval
+    ) {
+        self.showWarning(
+            addedTo: view,
+            text: text,
+            afterDelay: 0,
+            animated: animated
+        )
+        self.hide(
+            forView: view,
+            animated: animated,
+            afterDelay: delayHide
+        )
     }
-    class func showWarning(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
-        if view == nil {
-            return
-        }
-        let progressView = ProgressHUD.init(addedTo: view!, mode: .image)
-        progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
-        view!.addSubview(progressView)
+    class func showWarning(
+        addedTo view: UIView?,
+        text: String?,
+        afterDelay: TimeInterval,
+        animated: Bool
+    ) {
+        guard let view = view else { return }
+        let progressView = ProgressHUD(
+            addedTo: view,
+            mode: .image
+        )
+        progressView.showHUD(
+            text: text,
+            animated: animated,
+            afterDelay: afterDelay
+        )
+        view.addSubview(progressView)
     }
-    class func showSuccess(addedTo view: UIView?, text: String?, animated: Bool, delayHide: TimeInterval) {
-        self.showSuccess(addedTo: view, text: text, afterDelay: 0, animated: animated)
-        self.hide(forView: view, animated: animated, afterDelay: delayHide)
+    class func showSuccess(
+        addedTo view: UIView?,
+        text: String?,
+        animated: Bool,
+        delayHide: TimeInterval
+    ) {
+        self.showSuccess(
+            addedTo: view,
+            text: text,
+            afterDelay: 0,
+            animated: animated
+        )
+        self.hide(
+            forView: view,
+            animated: animated,
+            afterDelay: delayHide
+        )
     }
-    class func showSuccess(addedTo view: UIView?, text: String?, afterDelay: TimeInterval , animated: Bool) {
-        if view == nil {
-            return
-        }
-        let progressView = ProgressHUD.init(addedTo: view!, mode: .success)
-        progressView.showHUD(text: text, animated: animated, afterDelay: afterDelay)
-        view!.addSubview(progressView)
+    class func showSuccess(
+        addedTo view: UIView?,
+        text: String?,
+        afterDelay: TimeInterval,
+        animated: Bool
+    ) {
+        guard let view = view else { return }
+        let progressView = ProgressHUD(
+            addedTo: view,
+            mode: .success
+        )
+        progressView.showHUD(
+            text: text,
+            animated: animated,
+            afterDelay: afterDelay
+        )
+        view.addSubview(progressView)
     }
     
-    class func hide(forView view:UIView? ,animated: Bool) {
-        hide(forView: view, animated: animated, afterDelay: 0)
+    class func hide(
+        forView view: UIView?,
+        animated: Bool
+    ) {
+        hide(
+            forView: view,
+            animated: animated,
+            afterDelay: 0
+        )
     }
     
-    class func hide(forView view:UIView? ,animated: Bool ,afterDelay: TimeInterval) {
-        if view == nil {
-            return
-        }
-        for subView in view!.subviews {
-            if subView is ProgressHUD {
-                (subView as! ProgressHUD).hide(withAnimated: animated, afterDelay: afterDelay)
-            }
+    class func hide(
+        forView view: UIView?,
+        animated: Bool,
+        afterDelay: TimeInterval
+    ) {
+        guard let view = view else { return }
+        for subView in view.subviews where
+            subView is ProgressHUD {
+            (subView as! ProgressHUD).hide(
+                withAnimated: animated,
+                afterDelay: afterDelay
+            )
         }
     }
     override func layoutSubviews() {
@@ -270,5 +425,127 @@ class ProgressHUD: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+class ProgressIndefiniteView: UIView {
+    
+    lazy var circleLayer: CAShapeLayer = {
+        let circleLayer = CAShapeLayer()
+        circleLayer.frame = bounds
+        circleLayer.contentsScale = UIScreen.main.scale
+        circleLayer.strokeColor = UIColor.white.cgColor
+        circleLayer.fillColor = UIColor.clear.cgColor
+        circleLayer.lineCap = .round
+        circleLayer.lineJoin = .bevel
+        circleLayer.lineWidth = lineWidth
+        let path = UIBezierPath(
+            arcCenter: CGPoint(x: width * 0.5, y: height * 0.5),
+            radius: width * 0.5 - lineWidth * 0.5,
+            startAngle: -CGFloat.pi * 0.5,
+            endAngle: -CGFloat.pi * 0.5 + CGFloat.pi * 4,
+            clockwise: true
+        )
+        circleLayer.path = path.cgPath
+        circleLayer.mask = maskLayer
+        return circleLayer
+    }()
+    
+    lazy var maskLayer: CALayer = {
+        let maskLayer = CALayer()
+        maskLayer.contentsScale = UIScreen.main.scale
+        maskLayer.frame = bounds
+        let topLayer = CAGradientLayer.init()
+        topLayer.frame = CGRect(x: width * 0.5, y: 0, width: width * 0.5, height: height)
+        topLayer.colors = [
+            UIColor.white.withAlphaComponent(0.8).cgColor,
+            UIColor.white.withAlphaComponent(0.4).cgColor
+        ]
+        topLayer.startPoint = CGPoint(x: 0, y: 0)
+        topLayer.endPoint = CGPoint(x: 0, y: 1)
+        maskLayer.addSublayer(topLayer)
+        let bottomLayer = CAGradientLayer.init()
+        bottomLayer.frame = CGRect(x: 0, y: 0, width: width * 0.5, height: height)
+        bottomLayer.colors = [
+            UIColor.white.withAlphaComponent(0.4).cgColor,
+            UIColor.white.withAlphaComponent(0).cgColor
+        ]
+        bottomLayer.startPoint = CGPoint(x: 0, y: 1)
+        bottomLayer.endPoint = CGPoint(x: 0, y: 0)
+        maskLayer.addSublayer(bottomLayer)
+        return maskLayer
+    }()
+    var isAnimating: Bool = false
+    let lineWidth: CGFloat
+    
+    init(frame: CGRect, lineWidth: CGFloat = 3) {
+        self.lineWidth = lineWidth
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        if newSuperview != nil {
+            layer.addSublayer(circleLayer)
+        }else {
+            circleLayer.removeFromSuperlayer()
+            _stopAnimating()
+        }
+    }
+    func startAnimating() {
+        if isAnimating { return }
+        isAnimating = true
+        let duration: CFTimeInterval = 0.4
+        let animation = CABasicAnimation(keyPath: "transform.rotation")
+        animation.fromValue = 0
+        animation.toValue = CGFloat.pi * 2
+        animation.duration = duration
+        animation.repeatCount = MAXFLOAT
+        animation.isRemovedOnCompletion = false
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+        circleLayer.mask?.add(animation, forKey: nil)
+
+        let animationGroup = CAAnimationGroup()
+        animationGroup.duration = duration
+        animationGroup.repeatCount = MAXFLOAT
+        animationGroup.isRemovedOnCompletion = false
+        animationGroup.timingFunction = CAMediaTimingFunction(name: .linear)
+
+        let strokeStartAnimation = CABasicAnimation(keyPath: "strokeStart")
+        strokeStartAnimation.fromValue = 0.015
+        strokeStartAnimation.toValue = 0.515
+
+        let strokeEndAnimation = CABasicAnimation(keyPath: "strokeEnd")
+        strokeEndAnimation.fromValue = 0.485
+        strokeEndAnimation.toValue = 0.985
+
+        animationGroup.animations = [strokeStartAnimation, strokeEndAnimation]
+        circleLayer.add(animationGroup, forKey: nil)
+    }
+    func stopAnimating() {
+        if !isAnimating { return }
+        maskLayer.removeAllAnimations()
+        isAnimating = false
+    }
+}
+
+fileprivate extension UIView {
+    func _startAnimating() {
+        if let indefiniteView = self as? ProgressIndefiniteView {
+            indefiniteView.startAnimating()
+        }else if let indefiniteView = self as? UIActivityIndicatorView {
+            indefiniteView.startAnimating()
+        }
+    }
+    func _stopAnimating() {
+        if let indefiniteView = self as? ProgressIndefiniteView {
+            indefiniteView.stopAnimating()
+        }else if let indefiniteView = self as? UIActivityIndicatorView {
+            indefiniteView.stopAnimating()
+        }
     }
 }

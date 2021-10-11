@@ -7,33 +7,30 @@
 
 import UIKit
 
-public class EditorToolViewConfiguration {
+public struct EditorToolViewConfiguration {
     
     /// 工具栏item选项
-    public lazy var toolOptions: [EditorToolOptions] = []
+    public var toolOptions: [EditorToolOptions]
     
     /// 工具栏选项按钮选中颜色
-    public lazy var toolSelectedColor: UIColor = .systemTintColor
+    public var toolSelectedColor: UIColor = .systemTintColor
+    
+    /// 配乐选中时的颜色
+    public var musicSelectedColor: UIColor = .systemTintColor
     
     /// 完成按钮标题颜色
-    public lazy var finishButtonTitleColor: UIColor = {
-        return .white
-    }()
+    public var finishButtonTitleColor: UIColor = .white
     
     /// 暗黑风格下完成按钮标题颜色
-    public lazy var finishButtonTitleDarkColor: UIColor = {
-        return .white
-    }()
+    public var finishButtonTitleDarkColor: UIColor = .white
     
     /// 完成按钮的背景颜色
-    public lazy var finishButtonBackgroundColor: UIColor = {
-        return .systemTintColor
-    }()
+    public var finishButtonBackgroundColor: UIColor = .systemTintColor
     
     /// 暗黑风格下完成按钮选的背景颜色
-    public lazy var finishButtonDarkBackgroundColor: UIColor = {
-        return .systemTintColor
-    }()
+    public var finishButtonDarkBackgroundColor: UIColor = .systemTintColor
     
-    public init() { }
+    public init(toolOptions: [EditorToolOptions] = []) {
+        self.toolOptions = toolOptions
+    }
 }

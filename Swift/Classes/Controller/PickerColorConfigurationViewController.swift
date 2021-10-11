@@ -33,7 +33,12 @@ class PickerColorConfigurationViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "确定", style: .done, target: self, action: #selector(backClick))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "确定",
+            style: .done,
+            target: self,
+            action: #selector(backClick)
+        )
     }
     
     @objc func backClick() {
@@ -51,7 +56,10 @@ class PickerColorConfigurationViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ConfigurationViewCell.reuseIdentifier, for: indexPath) as! ConfigurationViewCell
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: ConfigurationViewCell.reuseIdentifier,
+            for: indexPath
+        ) as! ConfigurationViewCell
         let rowType = ColorConfigSection.allCases[indexPath.section].allRowCase[indexPath.row]
         cell.setupColorData(rowType, getRowColor(rowType))
         return cell
@@ -69,7 +77,9 @@ class PickerColorConfigurationViewController: UITableViewController {
     }
 }
 extension PickerColorConfigurationViewController {
+    // swiftlint:disable cyclomatic_complexity
     func getRowColor(_ rowType: ConfigRowTypeRule) -> UIColor? {
+        // swiftlint:enable cyclomatic_complexity
         if let pickerRwoType = rowType as? PickerColorConfigRow {
             switch pickerRwoType {
             case .navigationViewBackgroundColor:
@@ -129,17 +139,17 @@ extension PickerColorConfigurationViewController {
             case .backgroundDarkColor:
                 return config.photoList.backgroundDarkColor
             case .titleViewBackgroundColor:
-                return config.photoList.titleViewConfig.backgroundColor
+                return config.photoList.titleView.backgroundColor
             case .titleViewBackgroundDarkColor:
-                return config.photoList.titleViewConfig.backgroudDarkColor
+                return config.photoList.titleView.backgroudDarkColor
             case .titleViewArrowBackgroundColor:
-                return config.photoList.titleViewConfig.arrowBackgroundColor
+                return config.photoList.titleView.arrow.backgroundColor
             case .titleViewArrowBackgroudDarkColor:
-                return config.photoList.titleViewConfig.arrowBackgroudDarkColor
+                return config.photoList.titleView.arrow.backgroudDarkColor
             case .titleViewArrowColor:
-                return config.photoList.titleViewConfig.arrowColor
+                return config.photoList.titleView.arrow.arrowColor
             case .titleViewArrowDarkColor:
-                return config.photoList.titleViewConfig.arrowDarkColor
+                return config.photoList.titleView.arrow.arrowDarkColor
             case .cellTitleColor:
                 return config.photoList.cell.selectBox.titleColor
             case .cellTitleDarkColor:
@@ -194,7 +204,9 @@ extension PickerColorConfigurationViewController {
 }
 extension PickerColorConfigurationViewController: UIColorPickerViewControllerDelegate {
     @available(iOS 14.0, *)
+    // swiftlint:disable cyclomatic_complexity
     func colorPickerViewControllerDidSelectColor(_ viewController: UIColorPickerViewController) {
+        // swiftlint:enable cyclomatic_complexity
         if let indexPath = currentSelectedIndexPath {
             let rowType = ColorConfigSection.allCases[indexPath.section].allRowCase[indexPath.row]
             let color = viewController.selectedColor
@@ -257,17 +269,17 @@ extension PickerColorConfigurationViewController: UIColorPickerViewControllerDel
                 case .backgroundDarkColor:
                     config.photoList.backgroundDarkColor = color
                 case .titleViewBackgroundColor:
-                    config.photoList.titleViewConfig.backgroundColor = color
+                    config.photoList.titleView.backgroundColor = color
                 case .titleViewBackgroundDarkColor:
-                    config.photoList.titleViewConfig.backgroudDarkColor = color
+                    config.photoList.titleView.backgroudDarkColor = color
                 case .titleViewArrowBackgroundColor:
-                    config.photoList.titleViewConfig.arrowBackgroundColor = color
+                    config.photoList.titleView.arrow.backgroundColor = color
                 case .titleViewArrowBackgroudDarkColor:
-                    config.photoList.titleViewConfig.arrowBackgroudDarkColor = color
+                    config.photoList.titleView.arrow.backgroudDarkColor = color
                 case .titleViewArrowColor:
-                    config.photoList.titleViewConfig.arrowColor = color
+                    config.photoList.titleView.arrow.arrowColor = color
                 case .titleViewArrowDarkColor:
-                    config.photoList.titleViewConfig.arrowDarkColor = color
+                    config.photoList.titleView.arrow.arrowDarkColor = color
                 case .cellTitleColor:
                     config.photoList.cell.selectBox.titleColor = color
                 case .cellTitleDarkColor:
@@ -372,7 +384,9 @@ extension PickerColorConfigurationViewController {
             return "." + self.rawValue
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? PickerColorConfigurationViewController else { return { _ in } }
             return controller.changedColorAction(_: )
         }
@@ -437,7 +451,9 @@ extension PickerColorConfigurationViewController {
             return ".albumList" + self.rawValue
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? PickerColorConfigurationViewController else { return { _ in } }
             return controller.changedColorAction(_: )
         }
@@ -523,7 +539,9 @@ extension PickerColorConfigurationViewController {
             return "." + self.rawValue
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? PickerColorConfigurationViewController else { return { _ in } }
             return controller.changedColorAction(_: )
         }
@@ -580,10 +598,11 @@ extension PickerColorConfigurationViewController {
             return "." + self.rawValue
         }
         
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? PickerColorConfigurationViewController else { return { _ in } }
             return controller.changedColorAction(_: )
         }
     }
 }
-

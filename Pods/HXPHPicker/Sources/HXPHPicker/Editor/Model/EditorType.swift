@@ -13,7 +13,7 @@ public extension EditorController {
         case video
     }
     
-    enum AssetType {
+    enum SourceType {
         /// 本地
         case local
         /// 网络
@@ -43,13 +43,53 @@ public extension VideoEditorViewController {
     }
 }
 
-/// 编辑工具模型
+/// 编辑工具
 public extension EditorToolOptions {
     enum `Type` {
-        /// 涂鸦
+        /// photo - 涂鸦
         case graffiti
+        
+        /// photo - 贴图
+        case chartlet
+        
+        /// photo - 文本
+        case text
+        
+        /// photo - 马赛克
+        case mosaic
+        
+        /// photo - 滤镜
+        case filter
+        
+        /// video - 配乐
+        case music
+        
         /// 裁剪
         case cropping
+    }
+}
+
+extension EditorToolView {
+    
+    struct Options: OptionSet {
+        static let graffiti = Options(rawValue: 1 << 0)
+        static let chartlet = Options(rawValue: 1 << 1)
+        static let text = Options(rawValue: 1 << 2)
+        static let mosaic = Options(rawValue: 1 << 3)
+        static let filter = Options(rawValue: 1 << 4)
+        static let music = Options(rawValue: 1 << 5)
+        static let cropping = Options(rawValue: 1 << 6)
+        let rawValue: Int
+        
+        var isSticker: Bool {
+            if self.contains(.chartlet) || self.contains(.text) {
+                return true
+            }
+            return false
+        }
+        init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
     }
 }
 
@@ -97,9 +137,25 @@ extension PhotoEditorView {
 }
 
 extension EditorImageResizerView {
-    enum MirrorType {
+    enum MirrorType: Int, Codable {
         case none
         case horizontal
     }
 }
 
+extension VideoEditorConfiguration {
+    func mutableCopy() -> Any {
+        let config = VideoEditorConfiguration()
+        config.exportPreset = exportPreset
+        config.videoQuality = videoQuality
+        config.defaultState = defaultState
+        config.mustBeTailored = mustBeTailored
+        config.chartlet = chartlet
+        config.text = text
+        config.music = music
+        config.cropping = cropping
+        config.cropView = cropView
+        config.toolView = toolView
+        return config
+    }
+}

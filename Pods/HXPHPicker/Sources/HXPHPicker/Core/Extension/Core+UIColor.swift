@@ -27,7 +27,7 @@ extension UIColor {
         let blue  = CGFloat(b) / 255.0
         self.init(red: red, green: green, blue: blue, alpha: 1)
     }
-    class var systemTintColor: UIColor {
+    public class var systemTintColor: UIColor {
         UIColor.init(red: 0, green: 0.47843137254901963, blue: 1, alpha: 1)
     }
     

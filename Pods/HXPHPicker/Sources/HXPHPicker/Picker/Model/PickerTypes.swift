@@ -34,8 +34,10 @@ public struct PickerAssetOptions: OptionSet {
 }
 
 public enum PickerSelectMode: Int {
-    case single = 0         //!< 单选模式
-    case multiple = 1       //!< 多选模式
+    /// 单选模式
+    case single = 0
+    /// 多选模式
+    case multiple = 1
 }
 
 /// 资源列表Cell点击动作
@@ -49,14 +51,14 @@ public enum SelectionTapAction: Equatable {
     case quickSelect
     
     /// 打开编辑器
-    /// - 点击资源时会进入编辑界面
+    /// - 点击资源时如果可以编辑的话，就会进入编辑界面
     case openEditor
 }
 
 public extension PickerResult {
     struct Options: OptionSet {
         public static let photo = Options(rawValue: 1 << 0)
-        public static let video = Options(rawValue: 1 << 0)
+        public static let video = Options(rawValue: 1 << 1)
         public static let any: Options = [.photo, .video]
         public let rawValue: Int
         
@@ -142,42 +144,58 @@ public extension PhotoAsset {
         }
     }
     enum DownloadStatus: Int {
-        case unknow         //!< 未知，不用下载或还未开始下载
-        case succeed        //!< 下载成功
-        case downloading    //!< 下载中
-        case canceled       //!< 取消下载
-        case failed         //!< 下载失败
+        /// 未知，不用下载或还未开始下载
+        case unknow
+        /// 下载成功
+        case succeed
+        /// 下载中
+        case downloading
+        /// 取消下载
+        case canceled
+        /// 下载失败
+        case failed
+    }
+    
+    /// 网络视频加载方式
+    enum LoadNetworkVideoMode {
+        /// 先下载
+        case download
+        /// 直接播放
+        case play
     }
 }
 
 public enum AlbumShowMode: Int {
-    case normal = 0         //!< 正常展示
-    case popup = 1          //!< 弹出展示
+    /// 正常展示
+    case normal = 0
+    /// 弹出展示
+    case popup = 1
 }
 
 public extension PhotoPickerViewController {
     enum CancelType {
-        case text   //!< 文本
-        case image  //!< 图片
+        /// 文本
+        case text
+        /// 图片
+        case image
     }
     enum CancelPosition {
-        case left   //!< 左边
-        case right  //!< 右边
-    }
-}
-
-public extension PhotoPickerSelectBoxView {
-    enum Style: Int {
-        case number //!< 数字
-        case tick   //!< √
+        /// 左边
+        case left
+        /// 右边
+        case right
     }
 }
 
 public extension PhotoPreviewViewController {
-    enum VideoPlayType {
-        case normal     //!< 正常状态，不自动播放
-        case auto       //!< 自动播放
-        case once       //!< 自动播放一次
+    enum PlayType {
+        /// 视频不自动播放
+        /// LivePhoto需要长按播放
+        case normal
+        /// 自动循环播放
+        case auto
+        /// 只有第一次自动播放
+        case once
     }
 }
 
@@ -205,4 +223,12 @@ extension PickerAssetOptions {
         }
         return result
     }
+}
+
+/// Sort 排序规则
+public enum Sort: Equatable {
+    /// ASC 升序
+    case asc
+    /// DESC 降序
+    case desc
 }

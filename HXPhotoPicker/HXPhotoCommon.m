@@ -42,6 +42,7 @@ static id instance;
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.audioSessionCategory = AVAudioSessionCategoryPlayback;
         self.isVCBasedStatusBarAppearance = [[[NSBundle mainBundle]objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"] boolValue];
         
 #if HasAFNetworking

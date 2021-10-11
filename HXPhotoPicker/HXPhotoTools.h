@@ -68,16 +68,16 @@
 /// 显示因未授权无法使用相机的alert
 /// @param vc 弹出的控制器
 + (void)showUnusableCameraAlert:(UIViewController * _Nullable)vc;
-
++ (void)openSetting;
 /// 导出裁剪的视频
 /// @param asset 视频AVAsset
 /// @param timeRange 裁剪时间区域
-/// @param presetName 导出的视频质量
-+ (void)exportEditVideoForAVAsset:(AVAsset * _Nullable)asset
++ (void)exportEditVideoForAVAsset:(AVAsset *_Nullable)asset
                         timeRange:(CMTimeRange)timeRange
-                       presetName:(NSString * _Nullable)presetName
-                          success:(void (^ _Nullable)(NSURL * _Nullable videoURL))success
-                           failed:(void (^ _Nullable)(NSError * _Nullable error))failed;
+                        exportPreset:(HXVideoEditorExportPreset)exportPreset
+                        videoQuality:(NSInteger)videoQuality
+                          success:(void (^_Nullable)(NSURL *_Nullable))success
+                           failed:(void (^_Nullable)(NSError *_Nullable))failed;
 
 /// 转换视频时长为字符串 mm:ss / HH:mm:ss
 + (NSString * _Nullable)transformVideoTimeToString:(NSTimeInterval)duration;

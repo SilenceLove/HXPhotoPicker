@@ -19,8 +19,13 @@ class CustomPickerCellViewController: UIViewController {
 //        config.photoList.cell.customSingleCellClass = CustomPickerViewCell.self
         config.photoList.cell.customSelectableCellClass = CustomPickerViewCell.self
         view.backgroundColor = .white
-        title = "CustomCell";
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "打开选择器", style: .done, target: self, action: #selector(openPickerController))
+        title = "CustomCell"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "打开选择器",
+            style: .done,
+            target: self,
+            action: #selector(openPickerController)
+        )
     }
     
     @objc func openPickerController() {

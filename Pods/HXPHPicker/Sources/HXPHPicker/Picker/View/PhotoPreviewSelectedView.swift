@@ -8,19 +8,27 @@
 
 import UIKit
 
-protocol PhotoPreviewSelectedViewDelegate: NSObjectProtocol {
+protocol PhotoPreviewSelectedViewDelegate: AnyObject {
     func selectedView(_ selectedView: PhotoPreviewSelectedView, didSelectItemAt photoAsset: PhotoAsset)
 }
 
-class PhotoPreviewSelectedView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+class PhotoPreviewSelectedView: UIView,
+                                UICollectionViewDataSource,
+                                UICollectionViewDelegate,
+                                UICollectionViewDelegateFlowLayout {
     weak var delegate: PhotoPreviewSelectedViewDelegate?
     
-    lazy var collectionViewLayout : UICollectionViewFlowLayout = {
+    lazy var collectionViewLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout.init()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 5
         layout.minimumInteritemSpacing = 5
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.leftMargin, bottom: 5, right: 12 + UIDevice.rightMargin)
+        layout.sectionInset = UIEdgeInsets(
+            top: 10,
+            left: 12 + UIDevice.leftMargin,
+            bottom: 5,
+            right: 12 + UIDevice.rightMargin
+        )
         return layout
     }()
 
@@ -47,7 +55,12 @@ class PhotoPreviewSelectedView: UIView, UICollectionViewDataSource, UICollection
     }
     func reloadSectionInset() {
         if x == 0 {
-            collectionViewLayout.sectionInset = UIEdgeInsets(top: 10, left: 12 + UIDevice.leftMargin, bottom: 5, right: 12 + UIDevice.rightMargin)
+            collectionViewLayout.sectionInset = UIEdgeInsets(
+                top: 10,
+                left: 12 + UIDevice.leftMargin,
+                bottom: 5,
+                right: 12 + UIDevice.rightMargin
+            )
         }
     }
     func reloadData(photoAssets: [PhotoAsset]) {
@@ -58,7 +71,11 @@ class PhotoPreviewSelectedView: UIView, UICollectionViewDataSource, UICollection
     func reloadData(photoAsset: PhotoAsset) {
         if let index = photoAssetArray.firstIndex(of: photoAsset) {
             collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
-            collectionView.selectItem(at: currentSelectedIndexPath, animated: false, scrollPosition: .centeredHorizontally)
+            collectionView.selectItem(
+                at: currentSelectedIndexPath,
+                animated: false,
+                scrollPosition: .centeredHorizontally
+            )
         }
     }
     
@@ -134,8 +151,14 @@ class PhotoPreviewSelectedView: UIView, UICollectionViewDataSource, UICollection
         photoAssetArray.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(PhotoPreviewSelectedViewCell.self), for: indexPath) as! PhotoPreviewSelectedViewCell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: NSStringFromClass(PhotoPreviewSelectedViewCell.self),
+            for: indexPath
+        ) as! PhotoPreviewSelectedViewCell
         cell.tickColor = tickColor
         cell.photoAsset = photoAssetArray[indexPath.item]
         return cell
@@ -144,11 +167,19 @@ class PhotoPreviewSelectedView: UIView, UICollectionViewDataSource, UICollection
         currentSelectedIndexPath = indexPath
         delegate?.selectedView(self, didSelectItemAt: photoAssetArray[indexPath.item])
     }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
         let photoAsset = photoAssetArray[indexPath.item]
         return getItemSize(photoAsset: photoAsset)
     }
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didEndDisplaying cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
         let myCell = cell as! PhotoPreviewSelectedViewCell
         myCell.cancelRequest()
     }

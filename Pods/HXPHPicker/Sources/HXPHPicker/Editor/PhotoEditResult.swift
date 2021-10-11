@@ -9,7 +9,7 @@ import UIKit
 
 public struct PhotoEditResult {
     
-    public enum ImageType {
+    public enum ImageType: Int, Codable {
         /// 静态图
         case normal
         /// 动图
@@ -30,13 +30,17 @@ public struct PhotoEditResult {
     let editedData: PhotoEditData
 }
 
-struct PhotoEditData {
+struct PhotoEditData: Codable {
     let isPortrait: Bool
     let cropData: PhotoEditCropData?
     let brushData: [PhotoEditorBrushData]
+    let filter: PhotoEditorFilter?
+    let filterValue: Float
+    let mosaicData: [PhotoEditorMosaicData]
+    let stickerData: EditorStickerData?
 }
 
-struct PhotoEditCropData {
+struct PhotoEditCropData: Codable {
     let cropSize: CGSize
     let zoomScale: CGFloat
     let contentInset: UIEdgeInsets
@@ -47,4 +51,34 @@ struct PhotoEditCropData {
     let angle: CGFloat
     let transform: CGAffineTransform
     let mirrorType: EditorImageResizerView.MirrorType
+}
+
+extension PhotoEditResult: Codable {
+    enum CodingKeys: CodingKey {
+        case editedImage
+        case editedImageURL
+        case imageType
+        case editedData
+    }
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let imageData = try container.decode(Data.self, forKey: .editedImage)
+        editedImage = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(imageData) as! UIImage
+        editedImageURL = try container.decode(URL.self, forKey: .editedImageURL)
+        imageType = try container.decode(ImageType.self, forKey: .imageType)
+        editedData = try container.decode(PhotoEditData.self, forKey: .editedData)
+    }
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if #available(iOS 11.0, *) {
+            let imageData = try NSKeyedArchiver.archivedData(withRootObject: editedImage, requiringSecureCoding: false)
+            try container.encode(imageData, forKey: .editedImage)
+        } else {
+            let imageData = NSKeyedArchiver.archivedData(withRootObject: editedImage)
+            try container.encode(imageData, forKey: .editedImage)
+        }
+        try container.encode(editedImageURL, forKey: .editedImageURL)
+        try container.encode(imageType, forKey: .imageType)
+        try container.encode(editedData, forKey: .editedData)
+    }
 }

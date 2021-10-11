@@ -12,5 +12,5 @@ end
 target "HXPHPickerExample" do
   platform:ios,'10.0'
   use_frameworks!
-  pod 'HXPHPicker/Full'
+  pod 'HXPHPicker', '~> 1.2.2'
 end

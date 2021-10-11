@@ -9,16 +9,16 @@
 import UIKit
 
 // MARK: 照片列表相机Cell配置类
-public class PhotoListCameraCellConfiguration {
+public struct PhotoListCameraCellConfiguration {
     
     /// 允许相机预览
     public var allowPreview: Bool = true
     
     /// 背景颜色
-    public var backgroundColor : UIColor?
+    public var backgroundColor: UIColor?
     
     /// 暗黑风格下背景颜色
-    public var backgroundDarkColor : UIColor?
+    public var backgroundDarkColor: UIColor?
     
     /// 相机图标
     public var cameraImageName: String = "hx_picker_photoList_photograph"

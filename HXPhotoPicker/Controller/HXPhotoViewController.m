@@ -281,6 +281,9 @@ HX_PhotoEditViewControllerDelegate
 #pragma mark - < private >
 - (void)setupUI {
     [self.view addSubview:self.collectionView];
+    if ([HXPhotoTools authorizationStatusIsLimited]) {
+        [self.view addSubview:self.limitView];
+    }
     if (!self.manager.configuration.singleSelected) {
         [self.view addSubview:self.bottomView];
     }
@@ -1596,6 +1599,13 @@ HX_PhotoEditViewControllerDelegate
         cell.selectMaskLayer.hidden = YES;
         selectBtn.selected = NO;
     }else {
+        if (self.manager.shouldSelectModel) {
+            NSString *str = self.manager.shouldSelectModel(cell.model);
+            if (str) {
+                [self.view hx_showImageHUDText: [NSBundle hx_localizedStringForKey:str]];
+                return;
+            }
+        }
         NSString *str = [self.manager maximumOfJudgment:cell.model];
         if (str) {
             if ([str isEqualToString:@"selectVideoBeyondTheLimitTimeAutoEdit"]) {
@@ -2144,6 +2154,20 @@ HX_PhotoEditViewControllerDelegate
             }
         }];
     }
+}
+- (HXPhotoLimitView *)limitView {
+    if (!_limitView) {
+        CGFloat y = self.view.hx_h - hxBottomMargin - 15 - 40;
+        if (!self.manager.configuration.singleSelected) {
+            y = self.view.hx_h - self.bottomView.hx_h - 10 - 40;
+        }
+        _limitView = [[HXPhotoLimitView alloc] initWithFrame:CGRectMake(12, y, self.view.hx_w - 24, 40)];
+        [_limitView setBlurEffectStyle:self.manager.configuration.photoListLimitBlurStyle];
+        [_limitView setTextColor:self.manager.configuration.photoListLimitTextColor];
+        [_limitView setSettingColor:self.manager.configuration.photoListLimitSettingColor];
+        [_limitView setCloseColor:self.manager.configuration.photoListLimitCloseColor];
+    }
+    return _limitView;
 }
 - (HXPhotoBottomView *)bottomView {
     if (!_bottomView) {

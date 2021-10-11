@@ -20,11 +20,14 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
     weak var previewViewController: PhotoPreviewViewController?
     weak var pickerController: PhotoPickerController?
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
-        let panGestureRecognizer = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerAction(panGR:)))
+        let panGestureRecognizer = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(panGestureRecognizerAction(panGR:))
+        )
         return panGestureRecognizer
     }()
     lazy var backgroundView: UIView = {
-        let backgroundView = UIView.init()
+        let backgroundView = UIView()
         return backgroundView
     }()
     var previewView: PhotoPreviewViewCell?
@@ -56,17 +59,51 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         panGestureRecognizer.delegate = self
         pickerController.view.addGestureRecognizer(panGestureRecognizer)
     }
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith
+            otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if otherGestureRecognizer is UITapGestureRecognizer && otherGestureRecognizer.view is UIScrollView {
+            return false
+        }
         return !(previewViewController?.collectionView.isDragging ?? false)
     }
     
     @objc func panGestureRecognizerAction(panGR: UIPanGestureRecognizer) {
+        let preposition = prepositionInteration(panGR: panGR)
+        if !preposition.0 {
+            return
+        }
+        let isTracking = preposition.1
+        switch panGR.state {
+        case .began:
+            beginInteration(panGR: panGR)
+        case .changed:
+            changeInteration(
+                panGR: panGR,
+                isTracking: isTracking
+            )
+        case .ended, .cancelled, .failed:
+            endInteration(panGR: panGR)
+        default:
+            break
+        }
+    }
+    func prepositionInteration(
+        panGR: UIPanGestureRecognizer) -> (Bool, Bool) {
         var isTracking = false
         if type == .pop {
-            if let cell = previewViewController?.getCell(for: previewViewController?.currentPreviewIndex ?? 0), let contentView = cell.scrollContentView {
+            if let cell = previewViewController?.getCell(
+                for: previewViewController?.currentPreviewIndex ?? 0),
+               let contentView = cell.scrollContentView {
                 let toRect = contentView.convert(contentView.bounds, to: cell.scrollView)
-                if  (cell.scrollView.isZooming || cell.scrollView.isZoomBouncing || cell.scrollView.contentOffset.y > 0 || !cell.allowInteration || (toRect.minX != 0 && contentView.width > cell.scrollView.width)) && !canInteration {
-                    return
+                if  (cell.scrollView.isZooming ||
+                        cell.scrollView.isZoomBouncing ||
+                        cell.scrollView.contentOffset.y > 0 ||
+                        !cell.allowInteration ||
+                        (toRect.minX != 0 && contentView.width > cell.scrollView.width))
+                        && !canInteration {
+                    return (false, isTracking)
                 }else {
                     isTracking = cell.scrollView.isTracking
                 }
@@ -74,116 +111,24 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         }else {
             let previewVC = pickerController?.previewViewController()
             if pickerController?.topViewController != previewVC {
-                return
+                return (false, isTracking)
             }
-            if let cell = previewVC?.getCell(for: previewVC?.currentPreviewIndex ?? 0), let contentView = cell.scrollContentView {
+            if let cell = previewVC?.getCell(
+                for: previewVC?.currentPreviewIndex ?? 0),
+               let contentView = cell.scrollContentView {
                 let toRect = contentView.convert(contentView.bounds, to: cell.scrollView)
-                if  (cell.scrollView.isZooming || cell.scrollView.isZoomBouncing || cell.scrollView.contentOffset.y > 0 || !cell.allowInteration || (toRect.minX != 0 && contentView.width > cell.scrollView.width)) && !canInteration {
-                    return
+                if  (cell.scrollView.isZooming ||
+                        cell.scrollView.isZoomBouncing ||
+                        cell.scrollView.contentOffset.y > 0 ||
+                        !cell.allowInteration ||
+                        (toRect.minX != 0 && contentView.width > cell.scrollView.width)) && !canInteration {
+                    return (false, isTracking)
                 }else {
                     isTracking = cell.scrollView.isTracking
                 }
             }
         }
-        switch panGR.state {
-        case .began:
-            beginInteration(panGR: panGR)
-            break
-        case .changed:
-            if !canInteration || !beganInterPercent {
-                if isTracking {
-                    beginInteration(panGR: panGR)
-                    if canInteration {
-                        slidingGap = panGR.translation(in: panGR.view)
-                    }
-                }
-                return
-            }
-            if let previewViewController = previewViewController, let previewView = previewView {
-                let translation = panGR.translation(in: panGR.view)
-                var scale = (translation.y - slidingGap.y) / (previewViewController.view.height)
-                if (scale > 1) {
-                    scale = 1
-                }else if scale < 0 {
-                    scale = 0
-                }
-                var previewViewScale = 1 - scale
-                if previewViewScale < 0.4 {
-                    previewViewScale = 0.4
-                }
-                previewView.center = CGPoint(x: previewCenter.x + (translation.x - slidingGap.x), y: previewCenter.y + (translation.y - slidingGap.y))
-                previewView.transform = CGAffineTransform.init(scaleX: previewViewScale, y: previewViewScale)
-                
-                var alpha = 1 - scale * 2
-                if alpha < 0 {
-                    alpha = 0
-                }
-                backgroundView.alpha = alpha
-                let toVC = transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
-                if !previewViewController.statusBarShouldBeHidden {
-                    previewViewController.bottomView.alpha = alpha
-                    if type == .pop {
-                        if previewViewController.bottomView.mask != nil {
-                            let maskY = 70 * (1 - alpha)
-                            let maskWidth = previewViewController.bottomView.width
-                            let maskHeight = previewViewController.bottomView.height - maskY
-                            previewViewController.bottomView.mask?.frame = CGRect(x: 0, y: maskY, width: maskWidth, height: maskHeight)
-                        }
-                        if toVC?.bottomView.mask != nil {
-                            let maskY = 70 * alpha
-                            let maskWidth = previewViewController.bottomView.width
-                            let maskHeight = 50 + UIDevice.bottomMargin + 70 * (1 - alpha)
-                            toVC?.bottomView.mask?.frame = CGRect(x: 0, y: maskY, width: maskWidth, height: maskHeight)
-                            
-                        }
-//                        if previewViewController.bottomView.mask == nil &&
-//                            toVC?.bottomView.mask == nil {
-//                            toVC?.bottomView.alpha = 1 - alpha
-//                        }
-                    }else {
-                        previewViewController.navigationController?.navigationBar.alpha = alpha
-                        navigationBarAlpha = alpha
-                    }
-                }else {
-                    if type == .pop {
-                        toVC?.navigationController?.navigationBar.alpha = 1 - alpha
-                        toVC?.bottomView.alpha = 1 - alpha
-                    }
-                }
-                
-                update(1 - alpha)
-            }
-            break
-        case .ended, .cancelled, .failed:
-            canTransition = false
-            if !canInteration {
-                return
-            }
-            if let previewViewController = previewViewController {
-                let translation = panGR.translation(in: panGR.view)
-                let scale = (translation.y - slidingGap.y) / (previewViewController.view.height)
-                if scale < 0.15 {
-                    cancel()
-                    interPercentDidCancel()
-                }else {
-                    finish()
-                    interPercentDidFinish()
-                }
-            }else {
-                finish()
-                backgroundView.removeFromSuperview()
-                previewView?.removeFromSuperview()
-                previewView = nil
-                previewViewController = nil
-                toView = nil
-                transitionContext?.completeTransition(true)
-                transitionContext = nil
-            }
-            slidingGap = .zero
-            break
-        default:
-            break
-        }
+        return (true, isTracking)
     }
     func beginInteration(panGR: UIPanGestureRecognizer) {
         if canInteration {
@@ -211,6 +156,118 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             pickerController.dismiss(animated: true, completion: nil)
         }
     }
+    func changeInteration(
+        panGR: UIPanGestureRecognizer,
+        isTracking: Bool) {
+        if !canInteration || !beganInterPercent {
+            if isTracking {
+                beginInteration(panGR: panGR)
+                if canInteration {
+                    slidingGap = panGR.translation(in: panGR.view)
+                }
+            }
+            return
+        }
+        if let previewViewController = previewViewController, let previewView = previewView {
+            let translation = panGR.translation(in: panGR.view)
+            var scale = (translation.y - slidingGap.y) / (previewViewController.view.height)
+            if scale > 1 {
+                scale = 1
+            }else if scale < 0 {
+                scale = 0
+            }
+            var previewViewScale = 1 - scale
+            if previewViewScale < 0.4 {
+                previewViewScale = 0.4
+            }
+            previewView.center = CGPoint(
+                x: previewCenter.x + (translation.x - slidingGap.x),
+                y: previewCenter.y + (translation.y - slidingGap.y)
+            )
+            previewView.transform = CGAffineTransform.init(scaleX: previewViewScale, y: previewViewScale)
+            
+            var alpha = 1 - scale * 2
+            if alpha < 0 {
+                alpha = 0
+            }
+            backgroundView.alpha = alpha
+            let toVC = transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
+            if !previewViewController.statusBarShouldBeHidden {
+                let hasPreviewMask = previewViewController.bottomView.mask != nil
+                if hasPreviewMask {
+                    var bottomViewAlpha = 1 - scale * 1.5
+                    if bottomViewAlpha < 0 {
+                        bottomViewAlpha = 0
+                    }
+                    previewViewController.bottomView.alpha = bottomViewAlpha
+                }else {
+                    previewViewController.bottomView.alpha = alpha
+                }
+                if type == .pop {
+                    var maskScale = 1 - scale * 2.85
+                    if maskScale < 0 {
+                        maskScale = 0
+                    }
+                    if hasPreviewMask {
+                        let maskY = 70 * (1 - maskScale)
+                        let maskWidth = previewViewController.bottomView.width
+                        let maskHeight = previewViewController.bottomView.height - maskY
+                        previewViewController.bottomView.mask?.frame = CGRect(
+                            x: 0,
+                            y: maskY,
+                            width: maskWidth,
+                            height: maskHeight
+                        )
+                    }
+                    if toVC?.bottomView.mask != nil {
+                        let maskY = 70 * maskScale
+                        let maskWidth = previewViewController.bottomView.width
+                        let maskHeight = 50 + UIDevice.bottomMargin + 70 * (1 - maskScale)
+                        toVC?.bottomView.mask?.frame = CGRect(x: 0, y: maskY, width: maskWidth, height: maskHeight)
+                        
+                    }
+                }else {
+                    previewViewController.navigationController?.navigationBar.alpha = alpha
+                    navigationBarAlpha = alpha
+                }
+            }else {
+                if type == .pop {
+                    toVC?.navigationController?.navigationBar.alpha = 1 - alpha
+                    toVC?.bottomView.alpha = 1 - alpha
+                }
+            }
+            
+            update(1 - alpha)
+        }
+    }
+    func endInteration(
+        panGR: UIPanGestureRecognizer) {
+        canTransition = false
+        if !canInteration {
+            return
+        }
+        if let previewViewController = previewViewController {
+            let translation = panGR.translation(in: panGR.view)
+            let scale = (translation.y - slidingGap.y) / (previewViewController.view.height)
+            if scale < 0.15 {
+                cancel()
+                interPercentDidCancel()
+            }else {
+                finish()
+                interPercentDidFinish()
+            }
+        }else {
+            finish()
+            backgroundView.removeFromSuperview()
+            previewView?.removeFromSuperview()
+            previewView = nil
+            previewViewController = nil
+            toView = nil
+            transitionContext?.completeTransition(true)
+            transitionContext = nil
+        }
+        slidingGap = .zero
+    }
     func interPercentDidCancel() {
         if let previewViewController = previewViewController, let previewView = previewView {
             panGestureRecognizer.isEnabled = false
@@ -226,7 +283,13 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         let maskWidth = previewViewController.bottomView.width
                         if previewViewController.bottomView.mask != nil {
                             let maskHeight = previewViewController.bottomView.height
-                            previewViewController.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight)
+                            previewViewController.bottomView.mask?.frame = CGRect(
+                                origin: .zero,
+                                size: CGSize(
+                                    width: maskWidth,
+                                    height: maskHeight
+                                )
+                            )
                         }
                         if toVC?.bottomView.mask != nil {
                             let maskHeight = 50 + UIDevice.bottomMargin
@@ -269,6 +332,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 self.transitionContext?.completeTransition(false)
                 self.transitionContext = nil
             }
+        }else {
+            toView?.isHidden = false
+            toView = nil
         }
     }
     func interPercentDidFinish() {
@@ -277,7 +343,11 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             var toRect = toView?.convert(toView?.bounds ?? .zero, to: transitionContext?.containerView) ?? .zero
             if type == .dismiss, let pickerController = pickerController {
                 if toRect.isEmpty {
-                    toRect = pickerController.pickerDelegate?.pickerController(pickerController, dismissPreviewFrameForIndexAt: previewViewController.currentPreviewIndex) ?? .zero
+                    toRect = pickerController.pickerDelegate?.pickerController(
+                        pickerController,
+                        dismissPreviewFrameForIndexAt:
+                            previewViewController.currentPreviewIndex
+                    ) ?? .zero
                 }
                 if let toView = toView, toView.layer.cornerRadius > 0 {
                     previewView.layer.masksToBounds = true
@@ -289,7 +359,12 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             previewView.scrollContentView.isBacking = true
             let toVC = self.transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
             
-            UIView.animate(withDuration: 0.45, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.layoutSubviews, .curveEaseOut]) {
+            UIView.animate(
+                withDuration: 0.45,
+                delay: 0,
+                usingSpringWithDamping: 0.8,
+                initialSpringVelocity: 0,
+                options: [.layoutSubviews, .curveEaseOut]) {
                 if let toView = self.toView, toView.layer.cornerRadius > 0 {
                     previewView.layer.cornerRadius = toView.layer.cornerRadius
                 }
@@ -309,7 +384,12 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         let maskWidth = previewViewController.bottomView.width
                         if previewViewController.bottomView.mask != nil {
                             let maskHeight = previewViewController.bottomView.height - 70
-                            previewViewController.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: maskWidth, height: maskHeight)
+                            previewViewController.bottomView.mask?.frame = CGRect(
+                                x: 0,
+                                y: 70,
+                                width: maskWidth,
+                                height: maskHeight
+                            )
                         }
                         if toVC?.bottomView.mask != nil {
                             let maskHeight = UIDevice.bottomMargin + 120
@@ -334,7 +414,10 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     self.backgroundView.removeFromSuperview()
                     previewView.removeFromSuperview()
                     if self.type == .dismiss, let pickerController = self.pickerController {
-                        pickerController.pickerDelegate?.pickerController(pickerController, previewDismissComplete: previewViewController.currentPreviewIndex)
+                        pickerController.pickerDelegate?.pickerController(
+                            pickerController,
+                            previewDismissComplete: previewViewController.currentPreviewIndex
+                        )
                     }else if self.type == .pop {
                         toVC?.collectionView.layer.removeAllAnimations()
                     }
@@ -346,6 +429,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     self.transitionContext = nil
                 }
             }
+        }else {
+            toView?.isHidden = false
+            toView = nil
         }
     }
     override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
@@ -373,7 +459,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             UIView.animate(withDuration: 0.25) {
                 if !previewViewController.statusBarShouldBeHidden {
                     previewViewController.bottomView.alpha = 1
-                    if AssetManager.authorizationStatusIsLimited() && pickerViewController.config.bottomView.showPrompt {
+                    if AssetManager.authorizationStatusIsLimited() &&
+                        pickerViewController.config.bottomView.showPrompt {
                         pickerViewController.bottomView.alpha = 0
                     }
                 }
@@ -431,11 +518,25 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             }
         }
         if previewShowSelectedView && !pickerShowParompt {
-            let maskView = UIView.init(frame: CGRect(x: 0, y: 0, width: previewViewController.view.width, height: 120 + UIDevice.bottomMargin))
+            let maskView = UIView(
+                frame: CGRect(
+                    x: 0,
+                    y: 0,
+                    width: previewViewController.view.width,
+                    height: 120 + UIDevice.bottomMargin
+                )
+            )
             maskView.backgroundColor = .white
             previewViewController.bottomView.mask = maskView
         }else if !previewShowSelectedView && pickerShowParompt {
-            let maskView = UIView.init(frame: CGRect(x: 0, y: 70, width: previewViewController.view.width, height: 50 + UIDevice.bottomMargin))
+            let maskView = UIView(
+                frame: CGRect(
+                    x: 0,
+                    y: 70,
+                    width: previewViewController.view.width,
+                    height: 50 + UIDevice.bottomMargin
+                )
+            )
             maskView.backgroundColor = .white
             pickerViewController.bottomView.mask = maskView
         }
@@ -457,7 +558,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             backgroundView.frame = containerView.bounds
             backgroundView.backgroundColor = previewBackgroundColor
             containerView.addSubview(backgroundView)
-            if let view = pickerController.pickerDelegate?.pickerController(pickerController, dismissPreviewViewForIndexAt: previewViewController.currentPreviewIndex) {
+            if let view = pickerController.pickerDelegate?.pickerController(
+                pickerController,
+                dismissPreviewViewForIndexAt: previewViewController.currentPreviewIndex) {
                 toView = view
             }
             
@@ -494,4 +597,3 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         }
     }
 }
-

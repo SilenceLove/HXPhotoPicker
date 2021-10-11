@@ -22,6 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HXPhotoCommon : NSObject
 @property (strong, nonatomic, nullable) NSBundle *languageBundle;
 @property (strong, nonatomic, nullable) NSBundle *photoPickerBundle;
+
+/// 默认 AVAudioSessionCategoryPlayback
+@property (copy, nonatomic) AVAudioSessionCategory audioSessionCategory;
 /// 小图请求大小
 @property (assign, nonatomic) CGFloat requestWidth;
 /// 相册风格

@@ -1,4 +1,5 @@
-# HXPHPicker
+<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/hxphpickerpreview.png">
+
 <p align="left">
 <a href="https://github.com/SilenceLove/HXPHPicker"><img src="https://badgen.net/badge/icon/iOS%2010.0%2B?color=cyan&icon=apple&label"></a>
 <a href="https://github.com/SilenceLove/HXPHPicker"><img src="http://img.shields.io/cocoapods/v/HXPHPicker.svg?logo=cocoapods&logoColor=ffffff"></a>
@@ -28,11 +29,15 @@
 - [x] 支持滑动选择
 - [x] 编辑图片（支持动图、网络资源）
     - [x] 涂鸦
-    - [ ] 贴纸
-    - [ ] 文字
+    - [x] 贴纸
+    - [x] 文字
     - [x] 裁剪
-    - [ ] 马赛克
+    - [x] 马赛克
+    - [x] 滤镜
 - [x] 编辑视频（支持网络资源）
+    - [x] 贴纸（支持GIF）
+    - [x] 文字
+    - [x] 配乐（支持歌词字幕）
     - [x] 裁剪
 - [x] 相册展现方式
     - [x] 单独列表
@@ -54,8 +59,8 @@
 ## <a id="要求"></a> 要求
 
 - iOS 10.0+
-- Xcode 12.0+
-- Swift 5.3+
+- Xcode 12.5+
+- Swift 5.4+
 
 ## 安装
 
@@ -65,7 +70,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.1.1"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.2.2"))
 ]
 ```
 
@@ -87,17 +92,19 @@ github "SilenceLove/HXPHPicker"
 
 ## 使用方法
 
+> 我们在 [Wiki](https://github.com/SilenceLove/HXPHPicker/wiki) 中提供了更详细的使用说明。
+
 ### 准备工作
 
 按需在你的 Info.plist 中添加以下键值:
 
-| Key | 备注 |
-| ----- | ---- |
-| NSPhotoLibraryUsageDescription | 允许访问相册 |
-| NSPhotoLibraryAddUsageDescription | 允许保存图片至相册 |
-| PHPhotoLibraryPreventAutomaticLimitedAccessAlert | 设置为 `YES` iOS 14+ 以禁用自动弹出添加更多照片的弹框(已适配 Limited 功能，可由用户主动触发，提升用户体验)|
-| NSCameraUsageDescription | 允许使用相机 |
-| NSMicrophoneUsageDescription | 允许使用麦克风 |
+| Key | 模块 | 备注 |
+| ----- | ----  | ---- |
+| NSPhotoLibraryUsageDescription | Picker | 允许访问相册 |
+| NSPhotoLibraryAddUsageDescription | Picker | 允许保存图片至相册 |
+| PHPhotoLibraryPreventAutomaticLimitedAccessAlert | Picker | 设置为 `YES` iOS 14+ 以禁用自动弹出添加更多照片的弹框(Picker 已适配 Limited 功能，可由用户主动触发，提升用户体验)|
+| NSCameraUsageDescription | Camera | 允许使用相机 |
+| NSMicrophoneUsageDescription | Camera | 允许使用麦克风 |
 
 ### 快速上手
 ```swift
@@ -151,11 +158,8 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
-| [v1.1.1](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#111) | 2021-06-17 | 12.2 | 5.3 | 10.0+ |
-| [v1.1.0](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#110) | 2021-06-08 | 12.2 | 5.3 | 10.0+ |
-| [v1.0.9](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#109) | 2021-06-04 | 12.2 | 5.3 | 10.0+ |
-| [v1.0.8](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#108) | 2021-05-20 | 12.2 | 5.3 | 9.0+ |
-| [v1.0.7](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#107) | 2021-05-17 | 12.2 | 5.3 | 9.0+ |
+| [v1.2.2](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#122) | 2021-09-24 | 12.5.1 | 5.4.2 | 10.0+ |
+| [v1.2.1](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#121) | 2021-09-04 | 12.5.1 | 5.4.2 | 10.0+ |
 
 ## 版权协议
 

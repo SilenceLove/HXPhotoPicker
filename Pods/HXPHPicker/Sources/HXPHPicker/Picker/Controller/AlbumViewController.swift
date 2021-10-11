@@ -11,16 +11,18 @@ import Photos
 
 public class AlbumViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate {
     
-    lazy var tableView : UITableView = {
-        let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
-        if AssetManager.authorizationStatusIsLimited() &&
-            pickerController!.config.allowLoadPhotoLibrary{
-            tableView.tableHeaderView = promptLb
-        }
-        tableView.dataSource = self;
-        tableView.delegate = self;
+    public lazy var tableView: UITableView = {
+        let tableView = UITableView(
+            frame: .zero,
+            style: .plain
+        )
+        tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorStyle = .none
-        tableView.register(AlbumViewCell.self, forCellReuseIdentifier: "cellId")
+        tableView.register(
+            AlbumViewCell.self,
+            forCellReuseIdentifier: "cellId"
+        )
         if #available(iOS 11.0, *) {
             tableView.contentInsetAdjustmentBehavior = .never
         } else {
@@ -30,7 +32,9 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
         return tableView
     }()
     lazy var promptLb: UILabel = {
-        let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
+        let promptLb = UILabel(
+            frame: CGRect(x: 0, y: 0, width: 0, height: 40)
+        )
         promptLb.text = "只能查看允许访问的照片和相关相册".localized
         promptLb.textAlignment = .center
         promptLb.font = UIFont.systemFont(ofSize: 14)
@@ -39,17 +43,18 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
         return promptLb
     }()
     lazy var titleLabel: UILabel = {
-        let titleLabel = UILabel.init()
+        let titleLabel = UILabel()
         titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
         titleLabel.textAlignment = .center
         return titleLabel
     }()
-    var config: AlbumListConfiguration?
+    let config: AlbumListConfiguration
     var assetCollectionsArray: [PhotoAssetCollection] = []
-    var orientationDidChange : Bool = false
+    var orientationDidChange: Bool = false
     var beforeOrientationIndexPath: IndexPath?
     var canFetchAssetCollections: Bool = false
-    init() {
+    init(config: AlbumListConfiguration) {
+        self.config = config
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {
@@ -57,56 +62,80 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
     }
     public override func viewDidLoad() {
         super.viewDidLoad()
+        guard let picker = pickerController else { return }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
-        config = pickerController!.config.albumList
         title = "返回".localized
         navigationItem.titleView = titleLabel
-        let backItem = UIBarButtonItem.init(title: "取消".localized, style: .done, target: self, action: #selector(didCancelItemClick))
+        let backItem = UIBarButtonItem(
+            title: "取消".localized,
+            style: .done,
+            target: self,
+            action: #selector(didCancelItemClick)
+        )
         navigationItem.rightBarButtonItem = backItem
         view.addSubview(tableView)
+        if AssetManager.authorizationStatusIsLimited() &&
+            picker.config.allowLoadPhotoLibrary {
+            tableView.tableHeaderView = promptLb
+        }
         configColor()
         fetchCameraAssetCollection()
     }
     func configColor() {
         let isDark = PhotoManager.isDark
-        tableView.backgroundColor = isDark ? config!.backgroundDarkColor : config!.backgroundColor
-        view.backgroundColor = isDark ? config!.backgroundDarkColor : config!.backgroundColor
-        promptLb.textColor = isDark ? config!.limitedStatusPromptDarkColor : config!.limitedStatusPromptColor
-        titleLabel.textColor = isDark ? pickerController?.config.navigationTitleDarkColor : pickerController?.config.navigationTitleColor
+        tableView.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
+        view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
+        promptLb.textColor = isDark ? config.limitedStatusPromptDarkColor : config.limitedStatusPromptColor
+        titleLabel.textColor = isDark ?
+            pickerController?.config.navigationTitleDarkColor :
+            pickerController?.config.navigationTitleColor
     }
     public override func deviceOrientationDidChanged(notify: Notification) {
         beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
         orientationDidChange = true
     }
-    func fetchCameraAssetCollection() {
+    private func fetchCameraAssetCollection() {
         if pickerController?.cameraAssetCollection != nil {
-            self.pushPhotoPickerController(assetCollection: pickerController?.cameraAssetCollection, animated: false)
-            self.canFetchAssetCollections = true
+            pushPhotoPickerController(
+                assetCollection: pickerController?.cameraAssetCollection,
+                animated: false
+            )
+            canFetchAssetCollections = true
             titleLabel.text = "相册".localized
         }else {
-            pickerController?.fetchCameraAssetCollectionCompletion = { [weak self] (assetCollection) in
+            pickerController?
+                .fetchCameraAssetCollectionCompletion = { [weak self] (assetCollection) in
                 
                 var cameraAssetCollection = assetCollection
                 if cameraAssetCollection == nil {
-                    cameraAssetCollection = PhotoAssetCollection.init(albumName: self?.config?.emptyAlbumName.localized, coverImage: self?.config!.emptyCoverImageName.image)
+                    cameraAssetCollection = PhotoAssetCollection(
+                        albumName: self?.config.emptyAlbumName.localized,
+                        coverImage: self?.config.emptyCoverImageName.image
+                    )
                 }
                 self?.canFetchAssetCollections = true
                 self?.titleLabel.text = "相册".localized
                 if self?.navigationController?.topViewController is PhotoPickerViewController {
                     let vc = self?.navigationController?.topViewController as! PhotoPickerViewController
-                    vc.changedAssetCollection(collection: cameraAssetCollection)
+                    vc.changedAssetCollection(
+                        collection: cameraAssetCollection
+                    )
                     return
                 }
-                self?.pushPhotoPickerController(assetCollection: cameraAssetCollection, animated: false)
+                self?.pushPhotoPickerController(
+                    assetCollection: cameraAssetCollection,
+                    animated: false
+                )
             }
         }
     }
     
-    func fetchAssetCollections() {
+    private func fetchAssetCollections() {
         ProgressHUD.showLoading(addedTo: view, animated: true)
         pickerController?.fetchAssetCollections()
-        pickerController?.fetchAssetCollectionsCompletion = { [weak self] (assetCollectionsArray) in
+        pickerController?
+            .fetchAssetCollectionsCompletion = { [weak self] (assetCollectionsArray) in
             self?.reloadTableView(assetCollectionsArray: assetCollectionsArray)
             ProgressHUD.hide(forView: self?.view, animated: true)
         }
@@ -114,19 +143,27 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
     func reloadTableView(assetCollectionsArray: [PhotoAssetCollection]) {
         self.assetCollectionsArray = assetCollectionsArray
         if self.assetCollectionsArray.isEmpty {
-            let assetCollection = PhotoAssetCollection.init(albumName: self.config?.emptyAlbumName.localized, coverImage: self.config!.emptyCoverImageName.image)
+            let assetCollection = PhotoAssetCollection(
+                albumName: self.config.emptyAlbumName.localized,
+                coverImage: self.config.emptyCoverImageName.image
+            )
             self.assetCollectionsArray.append(assetCollection)
         }
         self.tableView.reloadData()
     }
     func updatePrompt() {
+        guard let picker = pickerController else { return }
         if AssetManager.authorizationStatusIsLimited() &&
-            pickerController!.config.allowLoadPhotoLibrary {
+            picker.config.allowLoadPhotoLibrary {
             tableView.tableHeaderView = promptLb
         }
     }
-    private func pushPhotoPickerController(assetCollection: PhotoAssetCollection?, animated: Bool) {
-        let photoVC = PhotoPickerViewController.init()
+    private func pushPhotoPickerController(
+        assetCollection: PhotoAssetCollection?,
+        animated: Bool
+    ) {
+        guard let picker = pickerController else { return }
+        let photoVC = PhotoPickerViewController(config: picker.config.photoList)
         photoVC.assetCollection = assetCollection
         photoVC.showLoading = animated
         navigationController?.pushViewController(photoVC, animated: animated)
@@ -136,31 +173,49 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
         pickerController?.cancelCallback()
     }
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return assetCollectionsArray.count
+    public func tableView(
+        _ tableView: UITableView,
+        numberOfRowsInSection section: Int
+    ) -> Int {
+        assetCollectionsArray.count
     }
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellId") as! AlbumViewCell
+    public func tableView(
+        _ tableView: UITableView,
+        cellForRowAt indexPath: IndexPath
+    ) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: "cellId"
+        ) as! AlbumViewCell
         let assetCollection = assetCollectionsArray[indexPath.row]
         cell.assetCollection = assetCollection
         cell.config = config
         return cell
     }
-    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return config!.cellHeight
+    public func tableView(
+        _ tableView: UITableView,
+        heightForRowAt indexPath: IndexPath
+    ) -> CGFloat {
+        config.cellHeight
     }
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
         tableView.deselectRow(at: indexPath, animated: true)
         let assetCollection = assetCollectionsArray[indexPath.row]
         pushPhotoPickerController(assetCollection: assetCollection, animated: true)
     }
     
-    public func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    public func tableView(
+        _ tableView: UITableView,
+        didEndDisplaying cell: UITableViewCell,
+        forRowAt indexPath: IndexPath
+    ) {
         let myCell: AlbumViewCell = cell as! AlbumViewCell
         myCell.cancelRequest()
     }
     
-    func changeSubviewFrame() {
+    private func changeSubviewFrame() {
         if AssetManager.authorizationStatusIsLimited() {
             promptLb.width = view.width
         }
@@ -171,14 +226,29 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
         titleLabel.size = CGSize(width: titleWidth, height: 30)
         let margin: CGFloat = UIDevice.leftMargin
         tableView.frame = CGRect(x: margin, y: 0, width: view.width - 2 * margin, height: view.height)
-        if navigationController?.modalPresentationStyle == .fullScreen && UIDevice.isPortrait {
-            tableView.contentInset = UIEdgeInsets.init(top: UIDevice.navigationBarHeight, left: 0, bottom: UIDevice.bottomMargin, right: 0)
-        }else {
-            tableView.contentInset = UIEdgeInsets.init(top: navigationController!.navigationBar.height, left: 0, bottom: UIDevice.bottomMargin, right: 0)
+        if let nav = navigationController {
+            if nav.modalPresentationStyle == .fullScreen && UIDevice.isPortrait {
+                tableView.contentInset = UIEdgeInsets(
+                    top: UIDevice.navigationBarHeight,
+                    left: 0,
+                    bottom: UIDevice.bottomMargin,
+                    right: 0
+                )
+            }else {
+                tableView.contentInset = UIEdgeInsets(
+                    top: nav.navigationBar.height,
+                    left: 0,
+                    bottom: UIDevice.bottomMargin,
+                    right: 0
+                )
+            }
         }
         if orientationDidChange {
             if !assetCollectionsArray.isEmpty {
-                tableView.scrollToRow(at: beforeOrientationIndexPath ?? IndexPath.init(row: 0, section: 0), at: .top, animated: false)
+                tableView.scrollToRow(
+                    at: beforeOrientationIndexPath ?? IndexPath.init(row: 0, section: 0),
+                    at: .top, animated: false
+                )
             }
             orientationDidChange = false
         }
@@ -189,7 +259,8 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
     }
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.popoverPresentationController?.delegate = self as? UIPopoverPresentationControllerDelegate;
+        navigationController?.popoverPresentationController?.delegate = self as?
+            UIPopoverPresentationControllerDelegate
         pickerController?.viewControllersWillAppear(self)
     }
     public override func viewDidAppear(_ animated: Bool) {

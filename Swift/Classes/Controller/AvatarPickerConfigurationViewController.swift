@@ -16,19 +16,34 @@ class AvatarPickerConfigurationViewController: UITableViewController {
         navigationItem.title = "Avatar Picker"
         config.selectMode = .single
         config.selectOptions = .photo
+        config.photoList.finishSelectionAfterTakingPhoto = true
         config.photoSelectionTapAction = .openEditor
         config.photoEditor.fixedCropState = true
-        config.photoEditor.cropConfig.isRoundCrop = true
-        config.photoEditor.cropConfig.aspectRatioType = .ratio_1x1
-        config.photoEditor.cropConfig.fixedRatio = true
+        config.photoEditor.cropping.isRoundCrop = true
+        config.photoEditor.cropping.aspectRatioType = .ratio_1x1
+        config.photoEditor.cropping.fixedRatio = true
         
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "打开选择器", style: .done, target: self, action: #selector(openPickerController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "打开选择器",
+            style: .done,
+            target: self,
+            action: #selector(openPickerController)
+        )
     }
     
     @objc func openPickerController() {
+        let aspectRatioType = config.photoEditor.cropping.aspectRatioType
+        let fixedRatio = config.photoEditor.cropping.fixedRatio
+        let fixedCropState = config.photoEditor.fixedCropState
+        let isRoundCrop = config.photoEditor.cropping.isRoundCrop
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.aspectRatioType = aspectRatioType
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.fixedRatio = fixedRatio
+        config.photoList.cameraType.customConfig?.photoEditor.fixedCropState = fixedCropState
+        config.photoList.cameraType.customConfig?.photoEditor.cropping.isRoundCrop = isRoundCrop
+        
         let vc = PhotoPickerController.init(config: config)
         vc.pickerDelegate = self
         vc.autoDismiss = false
@@ -46,7 +61,10 @@ class AvatarPickerConfigurationViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ConfigurationViewCell.reuseIdentifier, for: indexPath) as! ConfigurationViewCell
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: ConfigurationViewCell.reuseIdentifier,
+            for: indexPath
+        ) as! ConfigurationViewCell
         let rowType = AvatarPickerSection.allCases[indexPath.section].allRowCase[indexPath.row]
         cell.setupData(rowType, getRowContent(rowType))
         return cell
@@ -96,13 +114,13 @@ extension AvatarPickerConfigurationViewController {
             case .fixedCropState:
                 return config.photoEditor.fixedCropState ? "true" : "false"
             case .isRoundCrop:
-                return config.photoEditor.cropConfig.isRoundCrop ? "true" : "false"
+                return config.photoEditor.cropping.isRoundCrop ? "true" : "false"
             case .fixedRatio:
-                return config.photoEditor.cropConfig.fixedRatio ? "true" : "false"
+                return config.photoEditor.cropping.fixedRatio ? "true" : "false"
             case .aspectRatioType:
-                return config.photoEditor.cropConfig.aspectRatioType.title 
+                return config.photoEditor.cropping.aspectRatioType.title
             case .maskType:
-                switch config.photoEditor.cropConfig.maskType {
+                switch config.photoEditor.cropping.maskType {
                 case .blackColor:
                     return "blackColor"
                 case .darkBlurEffect:
@@ -155,11 +173,11 @@ extension AvatarPickerConfigurationViewController {
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func isRoundCropAction(_ indexPath: IndexPath) {
-        config.photoEditor.cropConfig.isRoundCrop = !config.photoEditor.cropConfig.isRoundCrop
+        config.photoEditor.cropping.isRoundCrop = !config.photoEditor.cropping.isRoundCrop
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func fixedRatioAction(_ indexPath: IndexPath) {
-        config.photoEditor.cropConfig.fixedRatio = !config.photoEditor.cropConfig.fixedRatio
+        config.photoEditor.cropping.fixedRatio = !config.photoEditor.cropping.fixedRatio
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     func aspectRatioTypeAction(_ indexPath: IndexPath) {
@@ -179,7 +197,7 @@ extension AvatarPickerConfigurationViewController {
             let heightTextFiled = alert.textFields?.last
             let heightRatioStr = heightTextFiled?.text ?? "0"
             let heightRatio = Int(heightRatioStr.count == 0 ? "0" : heightRatioStr)!
-            self.config.photoEditor.cropConfig.aspectRatioType = .custom(CGSize(width: widthRatio, height: heightRatio))
+            self.config.photoEditor.cropping.aspectRatioType = .custom(CGSize(width: widthRatio, height: heightRatio))
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
@@ -193,11 +211,11 @@ extension AvatarPickerConfigurationViewController {
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:
-                    self.config.photoEditor.cropConfig.maskType = .blackColor
+                    self.config.photoEditor.cropping.maskType = .blackColor
                 case 1:
-                    self.config.photoEditor.cropConfig.maskType = .darkBlurEffect
+                    self.config.photoEditor.cropping.maskType = .darkBlurEffect
                 case 2:
-                    self.config.photoEditor.cropConfig.maskType = .lightBlurEffect
+                    self.config.photoEditor.cropping.maskType = .lightBlurEffect
                 default:
                     break
                 }
@@ -209,7 +227,7 @@ extension AvatarPickerConfigurationViewController {
     }
 }
 extension AvatarPickerConfigurationViewController {
-    enum AvatarPickerSection: Int, CaseIterable  {
+    enum AvatarPickerSection: Int, CaseIterable {
         case pickerOptions
         case photoEditOptions
         var title: String {
@@ -250,7 +268,9 @@ extension AvatarPickerConfigurationViewController {
         var detailTitle: String {
             return "." + self.rawValue
         }
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? AvatarPickerConfigurationViewController else {
                 return { _ in }
             }
@@ -290,9 +310,11 @@ extension AvatarPickerConfigurationViewController {
             if self == .fixedCropState {
                 return "." + rawValue
             }
-            return ".cropConfig." + rawValue
+            return ".cropping." + rawValue
         }
-        func getFunction<T>(_ controller: T) -> ((IndexPath) -> Void) where T : UIViewController {
+        func getFunction<T>(
+            _ controller: T
+        ) -> ((IndexPath) -> Void) where T: UIViewController {
             guard let controller = controller as? AvatarPickerConfigurationViewController else {
                 return { _ in }
             }

@@ -387,7 +387,7 @@
         [[self hx_viewController] presentViewController:vc animated:YES completion:nil];
     }
 }
-#if HXPhotoViewCustomItemSize
+#if HXPhotoViewCustomItemSize || HXPhotoViewCustomItemSizeEnable
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     BOOL isAddItem = NO;
     if (self.tempShowAddCell && indexPath.item == self.dataList.count) {
@@ -430,7 +430,7 @@
     [self deleteModelWithIndex:index];
 }
 - (void)photoPreviewSelectLaterDidEditClick:(HXPhotoPreviewViewController *)previewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {
-    if (self.manager.configuration.useWxPhotoEdit) {
+    if (self.manager.configuration.useWxPhotoEdit && afterModel.subType == HXPhotoModelMediaSubTypePhoto) {
         [self.collectionView reloadData];
         [self dragCellCollectionViewCellEndMoving:self.collectionView];
         return;
@@ -1010,11 +1010,15 @@
     if (itemW <= 0) {
         itemW = 100;
     }
+#if HXPhotoViewCustomItemSizeEnable
+    itemW = 100;
+#else
     if (!HXPhotoViewCustomItemSize) {
         self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
     }else {
         itemW = 100;
     }
+#endif
 
     NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
     NSInteger numOfLinesNew = 0;

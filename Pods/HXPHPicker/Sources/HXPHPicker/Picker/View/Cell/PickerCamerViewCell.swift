@@ -10,15 +10,13 @@ import UIKit
 import AVKit
 
 class PickerCamerViewCell: UICollectionViewCell {
+    lazy var captureView: CaptureVideoPreviewView = {
+        let view = CaptureVideoPreviewView(isCell: true)
+        return view
+    }()
     
-    override class var layerClass: AnyClass {
-        return AVCaptureVideoPreviewLayer.self
-    }
-    
-    var previewLayer: AVCaptureVideoPreviewLayer?
-    var startSeesionCompletion: Bool = false
     lazy var imageView: UIImageView = {
-        let imageView = UIImageView.init()
+        let imageView = UIImageView()
         return imageView
     }()
     
@@ -27,11 +25,10 @@ class PickerCamerViewCell: UICollectionViewCell {
             configProperty()
         }
     }
-    
+    var allowPreview = true
     override init(frame: CGRect) {
         super.init(frame: frame)
-        previewLayer = layer as? AVCaptureVideoPreviewLayer
-        previewLayer?.videoGravity = .resizeAspectFill
+        contentView.addSubview(captureView)
         contentView.addSubview(imageView)
     }
     
@@ -39,57 +36,72 @@ class PickerCamerViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     func configProperty() {
-        if previewLayer?.session != nil {
+        if captureView.sessionCompletion {
+            return
+        }
+        let isCache = PhotoManager.shared.cameraPreviewImage != nil
+        if (captureView.previewLayer?.session != nil || isCache) && canPreview() {
             imageView.image = UIImage.image(for: config?.cameraDarkImageName)
         }else {
-            imageView.image = UIImage.image(for: PhotoManager.isDark ? config?.cameraDarkImageName : config?.cameraImageName)
+            imageView.image = UIImage.image(
+                for: PhotoManager.isDark ?
+                    config?.cameraDarkImageName :
+                    config?.cameraImageName
+            )
         }
         backgroundColor = PhotoManager.isDark ? config?.backgroundDarkColor : config?.backgroundColor
         imageView.size = imageView.image?.size ?? .zero
-        if let allowPreview = config?.allowPreview, allowPreview == true {
+        if let allowPreview = config?.allowPreview, allowPreview {
             requestCameraAccess()
+        }else {
+            imageView.image = UIImage.image(
+                for: PhotoManager.isDark ?
+                    config?.cameraDarkImageName :
+                    config?.cameraImageName
+            )
+            captureView.isHidden = true
         }
     }
+    func canPreview() -> Bool {
+        if !UIImagePickerController.isSourceTypeAvailable(.camera) ||
+            AssetManager.cameraAuthorizationStatus() == .denied {
+            return false
+        }
+        return true
+    }
     func requestCameraAccess() {
-        if startSeesionCompletion {
+        if !canPreview() {
+            captureView.isHidden = true
             return
         }
-        if !UIImagePickerController.isSourceTypeAvailable(.camera) {
+        if captureView.sessionCompletion || !allowPreview {
             return
         }
         AssetManager.requestCameraAccess { (granted) in
             if granted {
-                self.startSeesion()
+                self.startSession()
             }else {
-                PhotoTools.showNotCameraAuthorizedAlert(viewController: self.viewController())
+                PhotoTools.showNotCameraAuthorizedAlert(
+                    viewController: self.viewController()
+                )
             }
         }
     }
-    func startSeesion() {
-        self.startSeesionCompletion = true
-        DispatchQueue.global().async {
-            let session = AVCaptureSession.init()
-            session.beginConfiguration()
-            if session.canSetSessionPreset(AVCaptureSession.Preset.high) {
-                session.sessionPreset = .high
-            }
-            if let videoDevice = AVCaptureDevice.default(for: .video) {
-                do {
-                    let videoInput = try AVCaptureDeviceInput.init(device: videoDevice)
-                    session.addInput(videoInput)
-                    session.commitConfiguration()
-                    session.startRunning()
-                    self.previewLayer?.session = session
-                    DispatchQueue.main.async {
-                        self.imageView.image = UIImage.image(for: self.config?.cameraDarkImageName)
-                    }
-                }catch {}
+    func startSession() {
+        captureView.startSession { [weak self] isFinished in
+            if isFinished {
+                self?.imageView.image = UIImage.image(
+                    for: self?.config?.cameraDarkImageName
+                )
             }
         }
     }
-    
+    func stopSession() {
+        captureView.stopSession()
+    }
     override func layoutSubviews() {
         super.layoutSubviews()
+        captureView.frame = bounds
         imageView.center = CGPoint(x: width * 0.5, y: height * 0.5)
     }
     
@@ -100,5 +112,8 @@ class PickerCamerViewCell: UICollectionViewCell {
                 configProperty()
             }
         }
+    }
+    deinit {
+        stopSession()
     }
 }

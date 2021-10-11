@@ -34,7 +34,7 @@ CLLocationManagerDelegate
 @property (strong, nonatomic) UIButton *changeCameraBtn;
 @property (strong, nonatomic) HXCameraBottomView *bottomView;
 @property (strong, nonatomic) NSTimer *timer;
-@property (assign, nonatomic) NSUInteger time;
+@property (assign, nonatomic) NSDate *dateVideoStarted;
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) HXCustomCameraPlayVideoView *playVideoView;
 @property (strong, nonatomic) UIButton *doneBtn;
@@ -116,6 +116,7 @@ CLLocationManagerDelegate
     [self.view addSubview:self.previewView];
     self.cameraController = [[HXCustomCameraController alloc] init];
     self.cameraController.defaultFrontCamera = self.manager.configuration.defaultFrontCamera;
+    self.cameraController.videoMaximumDuration = self.manager.configuration.videoMaximumDuration;
     self.cameraController.sessionPreset = self.manager.configuration.sessionPreset;
     self.cameraController.videoCodecKey = self.manager.configuration.videoCodecKey;
     self.cameraController.delegate = self;
@@ -386,12 +387,13 @@ CLLocationManagerDelegate
     if (!self.videoURL) {
         cameraModel = [HXPhotoModel photoModelWithImage:self.imageView.image];
     }else {
-        if (self.time < self.manager.configuration.videoMinimumDuration) {
+        NSTimeInterval timeElapsed = [[NSDate date] timeIntervalSinceDate:self.dateVideoStarted];
+        if (timeElapsed < self.manager.configuration.videoMinimumDuration) {
             [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"录制时间少于%0.f秒"], self.manager.configuration.videoMinimumDuration]];
             return;
         }
         [self.playVideoView stopPlay];
-        cameraModel = [HXPhotoModel photoModelWithVideoURL:self.videoURL videoTime:self.time];
+        cameraModel = [HXPhotoModel photoModelWithVideoURL:self.videoURL videoTime:timeElapsed];
     }
     cameraModel.creationDate = [NSDate date];
     cameraModel.location = self.location;
@@ -571,23 +573,23 @@ CLLocationManagerDelegate
     [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"拍摄失败"]];
 }
 - (void)startTimer {
-    self.time = 0;
-    [self.timer invalidate];
-    self.timer = [NSTimer timerWithTimeInterval:0.2f
-                                         target:self
-                                       selector:@selector(updateTimeDisplay)
-                                       userInfo:nil
-                                        repeats:YES];
-    [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+    self.dateVideoStarted = [NSDate date];
+//    [self.timer invalidate];
+//    self.timer = [NSTimer timerWithTimeInterval:0.2f
+//                                         target:self
+//                                       selector:@selector(updateTimeDisplay)
+//                                       userInfo:nil
+//                                        repeats:YES];
+//    [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
 
 - (void)updateTimeDisplay {
-    CMTime duration = self.cameraController.recordedDuration;
-    NSTimeInterval time = CMTimeGetSeconds(duration);
-    self.time = (NSInteger)time;
-    if (time + 0.4f >= self.manager.configuration.videoMaximumDuration) {
-        [self.bottomView videoRecordEnd];
-    }
+//    CMTime duration = self.cameraController.recordedDuration;
+//    NSTimeInterval time = CMTimeGetSeconds(duration);
+//    self.time = (NSInteger)time;
+//    if (time + 0.4f >= self.manager.configuration.videoMaximumDuration) {
+//        [self.bottomView videoRecordEnd];
+//    }
 }
 
 - (void)stopTimer {
@@ -605,7 +607,8 @@ CLLocationManagerDelegate
 }
 - (void)videoFinishRecording:(NSURL *)videoURL {
     [self.bottomView stopRecord];
-    if (self.time < self.manager.configuration.videoMinimumDuration) {
+    NSTimeInterval timeElapsed = [[NSDate date] timeIntervalSinceDate:self.dateVideoStarted];
+    if (timeElapsed < self.manager.configuration.videoMinimumDuration) {
         self.bottomView.hidden = NO;
         self.cancelBtn.selected = NO;
         self.cancelBtn.hx_w = 50;
@@ -631,7 +634,6 @@ CLLocationManagerDelegate
     self.cancelBtn.hidden = NO;
 }
 - (void)mediaCaptureFailedWithError:(NSError *)error {
-    self.time = 0;
     [self stopTimer];
     [self.bottomView stopRecord];
     [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"录制视频失败!"]];

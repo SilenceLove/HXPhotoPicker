@@ -7,3 +7,24 @@
 //
 
 class HXPHPicker {}
+
+public struct HXPickerWrapper<Base> {
+    public let base: Base
+    public init(_ base: Base) {
+        self.base = base
+    }
+}
+public protocol HXPickerCompatible: AnyObject { }
+public protocol HXPickerCompatibleValue {}
+extension HXPickerCompatible {
+    public var hx: HXPickerWrapper<Self> {
+        get { return HXPickerWrapper(self) }
+        set { } // swiftlint:disable:this unused_setter_value
+    }
+}
+extension HXPickerCompatibleValue {
+    public var hx: HXPickerWrapper<Self> {
+        get { return HXPickerWrapper(self) }
+        set { } // swiftlint:disable:this unused_setter_value
+    }
+}
