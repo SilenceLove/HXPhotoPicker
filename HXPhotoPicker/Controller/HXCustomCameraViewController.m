@@ -580,7 +580,6 @@ CLLocationManagerDelegate
     [self.view hx_showImageHUDText:[NSBundle hx_localizedStringForKey:@"拍摄失败"]];
 }
 - (void)startTimer {
-    self.dateVideoStarted = [NSDate date];
 //    [self.timer invalidate];
 //    self.timer = [NSTimer timerWithTimeInterval:0.2f
 //                                         target:self
@@ -614,6 +613,9 @@ CLLocationManagerDelegate
 }
 - (void)videoFinishRecording:(NSURL *)videoURL {
     [self.bottomView stopRecord];
+    if (!self.dateVideoStarted) {
+        self.dateVideoStarted = [NSDate date];
+    }
     NSTimeInterval timeElapsed = [[NSDate date] timeIntervalSinceDate:self.dateVideoStarted];
     if (timeElapsed < self.manager.configuration.videoMinimumDuration) {
         self.bottomView.hidden = NO;
@@ -676,11 +678,12 @@ CLLocationManagerDelegate
 }
 - (void)playViewAnimateCompletion {
     if (self.bottomView.inTranscribe) {
-        dispatch_async(dispatch_queue_create("com.hxdatephotopicker.kamera", NULL), ^{
+        self.dateVideoStarted = [NSDate date];
+        dispatch_async(dispatch_queue_create("com.hxdatephotopicker.camera", NULL), ^{
             [self.cameraController startRecording];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self startTimer];
-            });
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                [self startTimer];
+//            });
         });
     }
 }
