@@ -263,6 +263,20 @@ UITableViewDelegate
             self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor blackColor]};
         }
     }
+    if (@available(iOS 15.0, *)) {
+        UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
+        appearance.titleTextAttributes = self.navigationController.navigationBar.titleTextAttributes;
+        switch (self.manager.configuration.navBarStyle) {
+            case UIBarStyleDefault:
+                appearance.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+                break;
+            default:
+                appearance.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+                break;
+        }
+        self.navigationController.navigationBar.standardAppearance = appearance;
+        self.navigationController.navigationBar.scrollEdgeAppearance = appearance;
+    }
 }
 - (void)configTableView {
     [self.view addSubview:self.tableView];

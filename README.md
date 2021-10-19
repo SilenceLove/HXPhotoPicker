@@ -65,13 +65,13 @@
 ``` ruby
 # 将以下内容添加到您的Podfile中：
 # 不使用网络图片功能
-pod 'HXPhotoPicker', '~> 3.2.4'
+pod 'HXPhotoPicker', '~> 3.2.5'
   
 # 使用SDWebImage加载网络图片
-pod 'HXPhotoPicker/SDWebImage', '~> 3.2.4'
+pod 'HXPhotoPicker/SDWebImage', '~> 3.2.5'
   
 # 使用YYWebImage加载网络图片
-pod 'HXPhotoPicker/YYWebImage', '~> 3.2.4'
+pod 'HXPhotoPicker/YYWebImage', '~> 3.2.5'
 
 # 搜索不到库或最新版时请执行
 pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
@@ -716,6 +716,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
+- v3.2.5　-　适配iOS15
 - v3.2.4　-　编辑视频导出压缩逻辑优化，支持设置压缩等级。修复了部分问题
 - v3.2.3　-　iOS 14 图片选择部分，限制提示
 - v3.2.2　-　修改静音状态下播放视频没有声音。pod导入的支持自定义HXPhotoView的itemSize，导入方式为 pod 'HXPhotoPicker/CustomItem'

@@ -354,6 +354,20 @@ HX_PhotoEditViewControllerDelegate
     
     _albumBgView.backgroundColor = [albumBgColor colorWithAlphaComponent:0.5f];
     
+    if (@available(iOS 15.0, *)) {
+        UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
+        appearance.titleTextAttributes = self.navigationController.navigationBar.titleTextAttributes;
+        switch (self.manager.configuration.navBarStyle) {
+            case UIBarStyleDefault:
+                appearance.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+                break;
+            default:
+                appearance.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+                break;
+        }
+        self.navigationController.navigationBar.standardAppearance = appearance;
+        self.navigationController.navigationBar.scrollEdgeAppearance = appearance;
+    }
 }
 - (void)deviceOrientationChanged:(NSNotification *)notify {
     self.beforeOrientationIndexPath = [self.collectionView indexPathsForVisibleItems].firstObject;
@@ -1063,6 +1077,9 @@ HX_PhotoEditViewControllerDelegate
     }
 }
 - (void)collectionViewReloadFinishedWithFirstSelectModel:(HXPhotoModel *)firstSelectModel {
+    if (self.allArray.count == 0) {
+        return;
+    }
     if (!self.manager.configuration.singleSelected) {
         self.bottomView.selectCount = self.manager.selectedArray.count;
     }
