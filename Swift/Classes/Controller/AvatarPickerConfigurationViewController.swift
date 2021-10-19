@@ -135,15 +135,18 @@ extension AvatarPickerConfigurationViewController {
     
     func selectOptionsAction(_ indexPath: IndexPath) {
         let alert = UIAlertController.init(title: "selectOptions", message: nil, preferredStyle: .alert)
-        alert.addAction(UIAlertAction.init(title: "photo", style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction.init(title: "photo", style: .default, handler: { [weak self] (action) in
+            guard let self = self else { return }
             self.config.selectOptions = .photo
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
-        alert.addAction(UIAlertAction.init(title: "gif+photo", style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction.init(title: "gif+photo", style: .default, handler: { [weak self] (action) in
+            guard let self = self else { return }
             self.config.selectOptions = [.gifPhoto]
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
-        alert.addAction(UIAlertAction.init(title: "livePhoto+photo", style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction.init(title: "livePhoto+photo", style: .default, handler: { [weak self] (action) in
+            guard let self = self else { return }
             self.config.selectOptions = [.livePhoto]
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
@@ -157,7 +160,8 @@ extension AvatarPickerConfigurationViewController {
         let alert = UIAlertController.init(title: "albumShowMode", message: nil, preferredStyle: .alert)
         let titles = ["normal", "popup"]
         for title in titles {
-            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
+                guard let self = self else { return }
                 self.config.albumShowMode = AlbumShowMode.init(rawValue: titles.firstIndex(of: action.title!)!)!
                 self.tableView.reloadRows(at: [indexPath], with: .fade)
             }))
@@ -190,7 +194,8 @@ extension AvatarPickerConfigurationViewController {
             textfield.keyboardType = .numberPad
             textfield.placeholder = "输入高度比"
         }
-        alert.addAction(UIAlertAction.init(title: "确定", style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction.init(title: "确定", style: .default, handler: { [weak self] (action) in
+            guard let self = self else { return }
             let widthTextFiled = alert.textFields?.first
             let widthRatioStr = widthTextFiled?.text ?? "0"
             let widthRatio = Int(widthRatioStr.count == 0 ? "0" : widthRatioStr)!
@@ -207,7 +212,8 @@ extension AvatarPickerConfigurationViewController {
         let alert = UIAlertController.init(title: "maskTypeAction", message: nil, preferredStyle: .alert)
         let titles = ["blackColor", "darkBlurEffect", "lightBlurEffect"]
         for title in titles {
-            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
+                guard let self = self else { return }
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:

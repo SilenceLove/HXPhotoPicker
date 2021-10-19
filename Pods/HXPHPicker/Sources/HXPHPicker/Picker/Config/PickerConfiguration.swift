@@ -77,6 +77,9 @@ public class PickerConfiguration: BaseConfiguration {
     
     /// 照片编辑配置
     public lazy var photoEditor: PhotoEditorConfiguration = .init()
+    
+    /// 跳转编辑界面自定义转场动画
+    public var editorCustomTransition: Bool = true
     #endif
     
     /// 状态栏样式
@@ -96,6 +99,8 @@ public class PickerConfiguration: BaseConfiguration {
     
     /// 暗黑风格下导航栏样式
     public var navigationBarDarkStyle: UIBarStyle = .black
+    
+    public var adaptiveBarAppearance: Bool = true
     
     /// 导航栏标题颜色
     public var navigationTitleColor: UIColor = .black

@@ -264,6 +264,9 @@ class WindowPickerViewController: UIViewController {
         changeButton.hx.centerX = view.hx.width * 0.5
         view.addSubview(changeButton)
         pickerView.fetchAsset()
+        
+        /// 获取相册列表
+//        print(manager.fetchAssetCollections(for: .init()))
     }
     
     @objc
@@ -440,6 +443,17 @@ extension WindowPickerViewController: PhotoPickerViewDelegate {
         let point = gestureRecognizer.location(in: UIApplication.shared.keyWindow)
         if point.y < sendBgView.frame.maxY {
             view.hx.showSuccess(text: "发送成功", delayHide: 1.5, animated: true)
+            /*
+             获取Asset的URL
+             photoAsset.getAssetURL { result in
+                 switch result {
+                 case .success(let result):
+                     print(result.url)
+                 case .failure(let error):
+                     print(error)
+                 }
+             }
+             */
             if photoAsset.isSelected {
                 pickerView.deselect(at: photoAsset)
             }

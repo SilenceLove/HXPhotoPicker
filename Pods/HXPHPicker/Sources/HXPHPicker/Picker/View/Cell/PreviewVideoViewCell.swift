@@ -57,6 +57,12 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
         }
     }
     
+    public func contentView(requestSucceed contentView: PhotoPreviewContentView) {
+        delegate?.cell(requestSucceed: self)
+    }
+    public func contentView(requestFailed contentView: PhotoPreviewContentView) {
+        delegate?.cell(requestFailed: self)
+    }
     public func contentView(updateContentSize contentView: PhotoPreviewContentView) {
         guard let videoAsset = photoAsset.networkVideoAsset,
               videoAsset.coverImage == nil,

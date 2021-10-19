@@ -23,11 +23,14 @@ protocol PhotoEditorViewDelegate: AnyObject {
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     weak var editorDelegate: PhotoEditorViewDelegate?
     lazy var imageResizerView: EditorImageResizerView = {
-        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropping,
-                                                           mosaicConfig: config.mosaic)
+        let imageResizerView = EditorImageResizerView(
+            cropConfig: config.cropping,
+            mosaicConfig: config.mosaic
+        )
         imageResizerView.exportScale = config.scale
-        imageResizerView.imageView.drawView.lineColor = config.brushColors[config.defaultBrushColorIndex].color
-        imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
+        let brush = config.brush
+        imageResizerView.imageView.drawView.lineColor = brush.colors[brush.defaultColorIndex].color
+        imageResizerView.imageView.drawView.lineWidth = brush.lineWidth
         imageResizerView.delegate = self
         imageResizerView.imageView.delegate = self
         return imageResizerView
@@ -37,14 +40,27 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         didSet { imageResizerView.zoomScale = zoomScale }
     }
     
+    /// 编辑配置
     var config: PhotoEditorConfiguration
-    
+    /// 当前裁剪状态
     var state: State = .normal
+    /// 图片缩放比例
     var imageScale: CGFloat = 1
+    /// 是否可以缩放
     var canZoom = true
+    /// 裁剪大小
     var cropSize: CGSize = .zero
-    
+    /// 当前编辑的图片
     var image: UIImage? { imageResizerView.imageView.image }
+    /// 画笔宽度
+    var brushLineWidth: CGFloat {
+        get {
+            imageResizerView.imageView.drawView.lineWidth
+        }
+        set {
+            imageResizerView.imageView.drawView.lineWidth = newValue
+        }
+    }
     
     var isEnabled: Bool = false {
         didSet {
@@ -91,7 +107,17 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         }
         addSubview(imageResizerView)
     }
-    
+    func getTransitionImageViewFrame(with imageSize: CGSize, viewSize: CGSize) -> CGRect {
+        let imageScale = imageSize.width / imageSize.height
+        let imageWidth = viewSize.width
+        let imageHeight = imageWidth / imageScale
+        let imageX: CGFloat = 0
+        var imageY: CGFloat = 0
+        if imageHeight < viewSize.height {
+            imageY = (viewSize.height - imageHeight) * 0.5
+        }
+        return CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight)
+    }
     func updateImageViewFrame() {
         let imageWidth = width
         var imageHeight: CGFloat

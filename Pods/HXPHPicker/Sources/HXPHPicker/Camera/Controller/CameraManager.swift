@@ -5,7 +5,7 @@
 //  Created by Slience on 2021/8/30.
 //
 
-import Foundation
+import UIKit
 import AVFoundation
 
 class CameraManager: NSObject {
@@ -462,27 +462,8 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     ) {
         photoWillCapture?()
     }
-    @available(iOS 11.0, *)
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         let data = photo.fileDataRepresentation()
-        photoCompletion?(data)
-    }
-    func photoOutput(
-        _ output: AVCapturePhotoOutput,
-        didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
-        previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
-        resolvedSettings: AVCaptureResolvedPhotoSettings,
-        bracketSettings: AVCaptureBracketedStillImageSettings?,
-        error: Error?
-    ) {
-        guard let buffer = photoSampleBuffer else {
-            photoCompletion?(nil)
-            return
-        }
-        let data = AVCapturePhotoOutput
-            .jpegPhotoDataRepresentation(
-                forJPEGSampleBuffer: buffer,
-                previewPhotoSampleBuffer: previewPhotoSampleBuffer)
         photoCompletion?(data)
     }
 }
@@ -512,7 +493,7 @@ extension CameraManager: AVCaptureFileOutputRecordingDelegate {
         }
         if UIDevice.belowIphone7 {
             movieOutput.setOutputSettings(
-                [AVVideoCodecKey: AVVideoCodecH264],
+                [AVVideoCodecKey: AVVideoCodecType.h264],
                 for: connection
             )
         }

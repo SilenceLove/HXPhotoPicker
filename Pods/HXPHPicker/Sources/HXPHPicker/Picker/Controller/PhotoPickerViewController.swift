@@ -489,6 +489,13 @@ extension PhotoPickerViewController {
             collectionView.reloadItems(at: [indexPath])
         }
     }
+    func resetICloud(for photoAsset: PhotoAsset) {
+        guard let cell = getCell(for: photoAsset),
+              cell.inICloud else {
+            return
+        }
+        cell.requestICloudState()
+    }
     func getPhotoAsset(for index: Int) -> PhotoAsset {
         var photoAsset: PhotoAsset
         if needOffset {

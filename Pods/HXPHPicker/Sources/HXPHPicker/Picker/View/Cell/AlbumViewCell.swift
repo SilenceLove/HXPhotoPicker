@@ -82,6 +82,7 @@ open class AlbumViewCell: UITableViewCell {
     
     /// 获取相册封面图片，重写此方法修改封面图片
     open func requestCoverImage() {
+        cancelRequest()
         requestID = assetCollection?.requestCoverImage(completion: { [weak self] (image, assetCollection, info) in
             guard let self = self else { return }
             if let info = info, info.isCancel { return }
@@ -161,5 +162,8 @@ open class AlbumViewCell: UITableViewCell {
     }
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    deinit {
+        cancelRequest()
     }
 }

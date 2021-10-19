@@ -133,6 +133,12 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
 
 // MARK: PhotoPreviewViewCellDelegate
 extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
+    func cell(requestSucceed cell: PhotoPreviewViewCell) {
+        delegate?.previewViewController(self, requestSucceed: cell.photoAsset)
+    }
+    func cell(requestFailed cell: PhotoPreviewViewCell) {
+        delegate?.previewViewController(self, requestFailed: cell.photoAsset)
+    }
     func cell(singleTap cell: PhotoPreviewViewCell) {
         if navigationController == nil {
             return

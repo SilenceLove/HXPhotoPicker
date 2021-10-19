@@ -20,6 +20,9 @@ extension PhotoEditorViewController {
             imageView.cropping { [weak self] (result) in
                 guard let self = self else { return }
                 if let result = result {
+                    ProgressHUD.hide(forView: self.view, animated: false)
+                    self.isFinishedBack = true
+                    self.transitionalImage = result.editedImage
                     self.delegate?.photoEditorViewController(self, didFinish: result)
                     self.didBackClick()
                 }else {
@@ -33,6 +36,7 @@ extension PhotoEditorViewController {
                 }
             }
         }else {
+            transitionalImage = image
             delegate?.photoEditorViewController(didFinishWithUnedited: self)
             didBackClick()
         }

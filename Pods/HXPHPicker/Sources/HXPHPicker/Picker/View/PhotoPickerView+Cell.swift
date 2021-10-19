@@ -66,7 +66,7 @@ extension PhotoPickerView: PhotoPickerViewCellDelegate {
             let inICloud = cell.photoAsset.checkICloundStatus(
                 allowSyncPhoto: manager.config.allowSyncICloudWhenSelectPhoto,
                 hudAddedTo: self,
-                completion: { isSuccess in
+                completion: { _, isSuccess in
                 if isSuccess {
                     addAsset()
                 }

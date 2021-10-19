@@ -69,6 +69,7 @@ open class PhotoThumbnailView: UIView {
         completion: ((UIImage?, PhotoAsset) -> Void)? = nil
     ) {
         guard let photoAsset = photoAsset else { return }
+        cancelRequest()
         if photoAsset.isNetworkAsset ||
             photoAsset.mediaSubType == .localVideo {
             
@@ -116,8 +117,8 @@ open class PhotoThumbnailView: UIView {
             #endif
         }else {
             requestID = photoAsset.requestThumbnailImage(
-                targetWidth: targetWidth,
-                completion: { [weak self] (image, photoAsset, info) in
+                targetWidth: targetWidth
+            ) { [weak self] (image, photoAsset, info) in
                 guard let self = self else { return }
                 if let info = info, info.isCancel { return }
                 if let image = image, self.photoAsset == photoAsset {
@@ -127,7 +128,7 @@ open class PhotoThumbnailView: UIView {
                     }
                 }
                 completion?(image, photoAsset)
-            })
+            }
         }
     }
     private func requestCompletion(_ image: UIImage?) {

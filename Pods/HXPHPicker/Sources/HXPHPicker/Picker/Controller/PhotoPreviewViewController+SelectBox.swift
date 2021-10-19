@@ -43,7 +43,7 @@ extension PhotoPreviewViewController {
             }
             let inICloud = photoAsset.checkICloundStatus(
                 allowSyncPhoto: picker.config.allowSyncICloudWhenSelectPhoto
-            ) { isSuccess in
+            ) { _, isSuccess in
                 if isSuccess {
                     addAsset()
                     if canUpdate {

@@ -220,11 +220,10 @@ extension PhotoEditorViewController {
                 brushColorView.canUndo = imageView.canUndoDraw
                 mosaicToolView.canUndo = imageView.canUndoMosaic
             }
-            if state == .cropping {
-                imageView.startCropping(true)
-                croppingAction()
-            }
             imageInitializeCompletion = true
+            if transitionCompletion {
+                initializeStartCropping()
+            }
         }
         setFilterImage()
         setImage(image)

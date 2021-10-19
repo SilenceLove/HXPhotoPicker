@@ -140,30 +140,41 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
             return
         }
         let avAsset = AVAsset.init(url: videoURL)
-        PhotoTools.exportEditVideo(
-            for: avAsset,
-            startTime: startTime,
-            endTime: endTime,
-            exportPreset: systemCamera.editExportPreset,
-            videoQuality: systemCamera.editVideoQuality
-        ) { (url, error) in
-            guard let url = url, error == nil else {
-                ProgressHUD.hide(forView: self, animated: false)
-                ProgressHUD.showWarning(
-                    addedTo: self,
-                    text: "视频导出失败".localized,
-                    animated: true,
-                    delayHide: 1.5
-                )
+        avAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+            if avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
+                DispatchQueue.main.async {
+                    self.showExportFailed()
+                }
                 return
             }
-            if self.config.saveSystemAlbum {
-                self.saveSystemAlbum(for: url, mediaType: .video)
-                return
+            PhotoTools.exportEditVideo(
+                for: avAsset,
+                startTime: startTime,
+                endTime: endTime,
+                exportPreset: systemCamera.editExportPreset,
+                videoQuality: systemCamera.editVideoQuality
+            ) { (url, error) in
+                guard let url = url, error == nil else {
+                    self.showExportFailed()
+                    return
+                }
+                if self.config.saveSystemAlbum {
+                    self.saveSystemAlbum(for: url, mediaType: .video)
+                    return
+                }
+                let phAsset: PhotoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: url))
+                self.addedCameraPhotoAsset(phAsset)
             }
-            let phAsset: PhotoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: url))
-            self.addedCameraPhotoAsset(phAsset)
         }
+    }
+    func showExportFailed() {
+        ProgressHUD.hide(forView: self, animated: false)
+        ProgressHUD.showWarning(
+            addedTo: self,
+            text: "视频导出失败".localized,
+            animated: true,
+            delayHide: 1.5
+        )
     }
     func saveSystemAlbum(
         for asset: Any,

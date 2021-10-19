@@ -25,6 +25,7 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             return
         }
         #if HXPICKER_ENABLE_EDITOR && HXPICKER_ENABLE_PICKER
+        beforeNavDelegate = navigationController?.delegate
         let pickerConfig = picker.config
         if photoAsset.mediaType == .video && pickerConfig.editorOptions.isVideo {
             let cell = getCell(
@@ -52,6 +53,9 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             )
             videoEditorVC.coverImage = cell?.scrollContentView.imageView.image
             videoEditorVC.delegate = self
+            if pickerConfig.editorCustomTransition {
+                navigationController?.delegate = videoEditorVC
+            }
             navigationController?.pushViewController(
                 videoEditorVC,
                 animated: true
@@ -67,6 +71,9 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
                 config: photoEditorConfig
             )
             photoEditorVC.delegate = self
+            if pickerConfig.editorCustomTransition {
+                navigationController?.delegate = photoEditorVC
+            }
             navigationController?.pushViewController(
                 photoEditorVC,
                 animated: true
@@ -166,7 +173,7 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
         }
         let inICloud = photoAsset.checkICloundStatus(
             allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto
-        ) { isSuccess in
+        ) { _, isSuccess in
             if isSuccess {
                 addAsset()
             }

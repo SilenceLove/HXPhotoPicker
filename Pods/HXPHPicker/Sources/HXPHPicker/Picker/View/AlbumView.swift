@@ -103,10 +103,10 @@ class AlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
         tableView.reloadData()
     }
     
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let myCell: AlbumViewCell = cell as! AlbumViewCell
-        myCell.cancelRequest()
-    }
+//    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        let myCell: AlbumViewCell = cell as! AlbumViewCell
+//        myCell.cancelRequest()
+//    }
     
     override func layoutSubviews() {
         super.layoutSubviews()

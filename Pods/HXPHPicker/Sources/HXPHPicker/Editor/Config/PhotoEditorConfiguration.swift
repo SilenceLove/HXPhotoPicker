@@ -48,14 +48,8 @@ open class PhotoEditorConfiguration: EditorConfiguration {
         return .init(toolOptions: [graffiti, chartlet, text, crop, mosaic, filter])
     }()
     
-    /// 画笔颜色数组
-    public lazy var brushColors: [String] = PhotoTools.defaultColors()
-    
-    /// 默认画笔颜色索引
-    public var defaultBrushColorIndex: Int = 2
-    
-    /// 画笔宽度
-    public var brushLineWidth: CGFloat = 5
+    /// 画笔
+    public lazy var brush: BrushConfig = .init()
     
     /// 贴图
     public lazy var chartlet: EditorChartletConfig = .init()
@@ -72,6 +66,43 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     /// 滤镜配置
     public lazy var filter: FilterConfig = .init(infos: PhotoTools.defaultFilters())
     
+    /// 马赛克配置
+    public lazy var mosaic: MosaicConfig = .init()
+    
+    public struct BrushConfig {
+        
+        /// 画笔颜色数组
+        public var colors: [String] = PhotoTools.defaultColors()
+        
+        /// 默认画笔颜色索引
+        public var defaultColorIndex: Int = 2
+        
+        /// 初始画笔宽度
+        public var lineWidth: CGFloat = 5
+        
+        /// 画笔最大宽度
+        public var maximumLinewidth: CGFloat = 20
+        
+        /// 画笔最小宽度
+        public var minimumLinewidth: CGFloat = 2
+        
+        /// 显示画笔尺寸大小滑动条
+        public var showSlider: Bool = true
+        
+        public init() { }
+    }
+    
+    public struct MosaicConfig {
+        /// 生成马赛克的大小
+        public var mosaicWidth: CGFloat = 20
+        /// 涂鸦时马赛克的线宽
+        public var mosaiclineWidth: CGFloat = 25
+        /// 涂抹的宽度
+        public var smearWidth: CGFloat = 30
+        
+        public init() { }
+    }
+    
     public struct FilterConfig {
         /// 滤镜信息
         public var infos: [PhotoEditorFilterInfo]
@@ -84,19 +115,5 @@ open class PhotoEditorConfiguration: EditorConfiguration {
             self.infos = infos
             self.selectedColor = selectedColor
         }
-    }
-    
-    /// 马赛克配置
-    public lazy var mosaic: MosaicConfig = .init()
-    
-    public struct MosaicConfig {
-        /// 生成马赛克的大小
-        public var mosaicWidth: CGFloat = 20
-        /// 涂鸦时马赛克的线宽
-        public var mosaiclineWidth: CGFloat = 25
-        /// 涂抹的宽度
-        public var smearWidth: CGFloat = 30
-        
-        public init() { }
     }
 }

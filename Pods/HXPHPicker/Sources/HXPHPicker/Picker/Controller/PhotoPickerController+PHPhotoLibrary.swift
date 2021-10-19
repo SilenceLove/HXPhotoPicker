@@ -70,10 +70,6 @@ extension PhotoPickerController: PHPhotoLibraryChangeObserver {
                         albumName: self.config.albumList.emptyAlbumName.localized,
                         coverImage: self.config.albumList.emptyCoverImageName.image
                     )
-                    assetCollection.count = 0
-                    assetCollection.coverAsset = nil
-                }else {
-                    assetCollection.fetchCoverAsset()
                 }
                 return true
             }

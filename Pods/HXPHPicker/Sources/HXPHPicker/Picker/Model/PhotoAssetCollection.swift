@@ -32,9 +32,6 @@ open class PhotoAssetCollection: Equatable {
     /// 是否是相机胶卷
     public var isCameraRoll: Bool = false
     
-    /// 封面PHAsset
-    var coverAsset: PHAsset?
-    
     /// 真实的封面图片，如果不为nil就是封面
     var realCoverImage: UIImage?
     
@@ -42,7 +39,8 @@ open class PhotoAssetCollection: Equatable {
     
     public init(
         collection: PHAssetCollection?,
-        options: PHFetchOptions?) {
+        options: PHFetchOptions?
+    ) {
         self.collection = collection
         self.options = options
         fetchResult()
@@ -50,7 +48,8 @@ open class PhotoAssetCollection: Equatable {
     
     public init(
         albumName: String?,
-        coverImage: UIImage?) {
+        coverImage: UIImage?
+    ) {
         self.albumName = albumName
         self.coverImage = coverImage
     }
@@ -73,33 +72,42 @@ extension PhotoAssetCollection {
             completion?(realCoverImage, self, nil)
             return nil
         }
-        if coverAsset == nil {
-            completion?(coverImage, self, nil)
-            return nil
+        if let result = result, result.count > 0 {
+            let asset = result.object(at: result.count - 1)
+            return AssetManager.requestThumbnailImage(
+                for: asset,
+                targetWidth: 160
+            ) { (image, info) in
+                completion?(image, self, info)
+            }
         }
-        return AssetManager.requestThumbnailImage(for: coverAsset!, targetWidth: 160) { (image, info) in
-            completion?(image, self, info)
-        }
+        completion?(coverImage, self, nil)
+        return nil
     }
     
     /// 枚举相册里的资源
     open func enumerateAssets(
         options opts: NSEnumerationOptions = .concurrent,
-        usingBlock: @escaping (PhotoAsset, Int, UnsafeMutablePointer<ObjCBool>) -> Void
+        usingBlock: ((PhotoAsset, Int, UnsafeMutablePointer<ObjCBool>) -> Void)?
     ) {
         if result == nil {
             fetchResult()
         }
+        guard let result = result else {
+            return
+        }
         if opts == .reverse {
-            result?.enumerateObjects(options: opts, using: { asset, index, stop in
+            result.enumerateObjects(
+                options: opts
+            ) { asset, index, stop in
                 let photoAsset = PhotoAsset(asset: asset)
-                usingBlock(photoAsset, index, stop)
-            })
+                usingBlock?(photoAsset, index, stop)
+            }
         }else {
-            result?.enumerateObjects({ (asset, index, stop) in
+            result.enumerateObjects { asset, index, stop in
                 let photoAsset = PhotoAsset(asset: asset)
-                usingBlock(photoAsset, index, stop)
-            })
+                usingBlock?(photoAsset, index, stop)
+            }
         }
     }
 }
@@ -118,13 +126,9 @@ extension PhotoAssetCollection {
     func changeResult(for result: PHFetchResult<PHAsset>) {
         self.result = result
         count = result.count
-        if collection != nil {
-            albumName = PhotoTools.transformAlbumName(for: collection!)
+        if let collection = collection {
+            albumName = PhotoTools.transformAlbumName(for: collection)
         }
-    }
-    
-    func fetchCoverAsset() {
-        coverAsset = result?.lastObject
     }
     
     func change(albumName: String?, coverImage: UIImage?) {

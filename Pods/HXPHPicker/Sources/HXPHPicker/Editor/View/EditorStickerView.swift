@@ -153,7 +153,7 @@ class EditorStickerView: UIView {
     @discardableResult
     func add(sticker item: EditorStickerItem, isSelected: Bool) -> EditorStickerItemView {
         selectView?.isSelected = false
-        let itemView = EditorStickerItemView.init(item: item, scale: scale)
+        let itemView = EditorStickerItemView(item: item, scale: scale)
         itemView.delegate = self
         var pScale: CGFloat
         if item.text == nil && item.music == nil {

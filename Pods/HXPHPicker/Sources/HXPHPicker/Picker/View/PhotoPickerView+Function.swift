@@ -174,6 +174,13 @@ extension PhotoPickerView {
             collectionView.reloadItems(at: [indexPath])
         }
     }
+    func resetICloud(for photoAsset: PhotoAsset) {
+        guard let cell = getCell(for: photoAsset),
+              cell.inICloud else {
+            return
+        }
+        cell.requestICloudState()
+    }
     func getPhotoAsset(for index: Int) -> PhotoAsset {
         var photoAsset: PhotoAsset
         if needOffset {
@@ -251,7 +258,7 @@ extension PhotoPickerView {
                 let inICloud = photoAsset.checkICloundStatus(
                     allowSyncPhoto: manager.config.allowSyncICloudWhenSelectPhoto,
                     hudAddedTo: self,
-                    completion: { isSuccess in
+                    completion: { _, isSuccess in
                     if isSuccess {
                         addAsset(showTip: true)
                     }
@@ -289,6 +296,10 @@ extension PhotoPickerView {
             let point = pan.location(in: collectionView)
             if let indexPath = collectionView.indexPathForItem(at: point),
                let cell = collectionView.cellForItem(at: indexPath) as? PhotoPickerBaseViewCell {
+                if let pickerCell = cell as? PhotoPickerViewCell,
+                   pickerCell.inICloud {
+                    return
+                }
                 dragView.image = cell.photoView.image
                 let keyWindow = UIApplication.shared.keyWindow
                 let rect = cell.convert(cell.photoView.frame, to: keyWindow)

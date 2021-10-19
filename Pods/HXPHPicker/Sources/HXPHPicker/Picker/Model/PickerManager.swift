@@ -54,13 +54,11 @@ public class PickerManager: NSObject {
         requestAssetBytesQueue.maxConcurrentOperationCount = 1
         return requestAssetBytesQueue
     }()
-    fileprivate var bytesOperationName: String?
     fileprivate lazy var fetchAssetQueue: OperationQueue = {
         let fetchAssetQueue = OperationQueue.init()
         fetchAssetQueue.maxConcurrentOperationCount = 1
         return fetchAssetQueue
     }()
-    fileprivate var fetchAssetOperationName: String?
     
     var fetchAssetsCompletion: (([PhotoAsset], PhotoAsset?) -> Void)?
     var reloadAssetCollection: (() -> Void)?
@@ -70,8 +68,40 @@ public class PickerManager: NSObject {
     var didDeselectAsset: ((PhotoAsset, Int) -> Void)?
     
     deinit {
+        cancelFetchAssetQueue()
+        cancelRequestAssetFileSize()
 //        print("deinit\(self)")
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+    }
+}
+
+public extension PickerManager {
+    
+    /// 获取相册集合
+    /// - Parameters:
+    ///   - options: 获取 PHFetchResult 中的 PHAsset 时的选项
+    ///   - showEmptyCollection: 是否显示空集合
+    /// - Returns: 相册集合
+    func fetchAssetCollections(
+        for options: PHFetchOptions,
+        showEmptyCollection: Bool = false
+    ) -> [PhotoAssetCollection] {
+        var assetCollectionsArray: [PhotoAssetCollection] = []
+        PhotoManager.shared.fetchAssetCollections(
+            for: options,
+            showEmptyCollection: showEmptyCollection
+        ) { (assetCollection, isCameraRoll, stop) in
+            guard let assetCollection = assetCollection else {
+                stop.pointee = true
+                return
+            }
+            if isCameraRoll {
+                assetCollectionsArray.insert(assetCollection, at: 0)
+            }else {
+                assetCollectionsArray.append(assetCollection)
+            }
+        }
+        return assetCollectionsArray
     }
 }
 
@@ -84,12 +114,17 @@ extension PickerManager {
             canAddAsset = true
             return
         }
-        for photoAsset in selectedAssetArray {
+        
+        let array = selectedAssetArray
+        for photoAsset in array {
             if photoAsset.mediaType == .photo {
                 selectedPhotoAssetArray.append(photoAsset)
             }else if photoAsset.mediaType == .video {
                 if singleVideo {
-                    selectedAssetArray.remove(at: selectedAssetArray.firstIndex(of: photoAsset)!)
+                    if let index = selectedAssetArray.firstIndex(of: photoAsset) {
+                        canAddAsset = false
+                        selectedAssetArray.remove(at: index)
+                    }
                 }else {
                     selectedVideoAssetArray.append(photoAsset)
                 }
@@ -113,12 +148,12 @@ extension PickerManager {
     }
     
     func fetchAssets(
-        completion: @escaping ([PhotoAsset], PhotoAsset?) -> Void
+        completion: (([PhotoAsset], PhotoAsset?) -> Void)?
     ) {
         fetchAssetsCompletion = completion
         fetchCameraAssetCollection { [weak self] assetCollection in
             guard let self = self else {
-                completion([], nil)
+                completion?([], nil)
                 return
             }
             self.fetchPhotoAssets(
@@ -128,7 +163,9 @@ extension PickerManager {
     }
     
     /// 获取相机胶卷资源集合
-    func fetchCameraAssetCollection(completion: @escaping (PhotoAssetCollection) -> Void) {
+    func fetchCameraAssetCollection(
+        completion: ((PhotoAssetCollection) -> Void)?
+    ) {
         if !config.allowLoadPhotoLibrary {
             let collection: PhotoAssetCollection
             if let assetCollection = cameraAssetCollection {
@@ -140,7 +177,7 @@ extension PickerManager {
                 )
                 cameraAssetCollection = collection
             }
-            completion(collection)
+            completion?(collection)
             return
         }
         if config.creationDate {
@@ -153,17 +190,15 @@ extension PickerManager {
             options: options
         ) { [weak self] (assetCollection) in
             guard let self = self else { return }
-            if assetCollection.count == 0 {
-                self.cameraAssetCollection = PhotoAssetCollection(
+            var collection = assetCollection
+            if collection.count == 0 {
+                collection = PhotoAssetCollection(
                     albumName: self.config.albumList.emptyAlbumName.localized,
                     coverImage: self.config.albumList.emptyCoverImageName.image
                 )
-            }else {
-                // 获取封面
-                self.cameraAssetCollection = assetCollection
-                self.cameraAssetCollection?.fetchCoverAsset()
             }
-            completion(self.cameraAssetCollection!)
+            self.cameraAssetCollection = collection
+            completion?(collection)
         }
     }
     
@@ -171,11 +206,14 @@ extension PickerManager {
     /// - Parameters:
     ///   - assetCollection: 相册
     ///   - completion: 完成回调
+    // swiftlint:disable cyclomatic_complexity
     func fetchPhotoAssets(
         assetCollection: PhotoAssetCollection?
     ) {
+        // swiftlint:enable cyclomatic_complexity
         cancelFetchAssetQueue()
-        let operation = BlockOperation {
+        let operation = BlockOperation()
+        operation.addExecutionBlock { [unowned operation] in
             for photoAsset in self.localAssetArray {
                 photoAsset.isSelected = false
             }
@@ -231,15 +269,26 @@ extension PickerManager {
                     }
                 }
             }
+            if operation.isCancelled {
+                return
+            }
             localAssets.append(contentsOf: self.localCameraAssetArray.reversed())
             localAssets.append(contentsOf: self.localAssetArray)
             var photoAssets = [PhotoAsset]()
             photoAssets.reserveCapacity(assetCollection?.count ?? 10)
             var lastAsset: PhotoAsset?
-            assetCollection?.enumerateAssets(
-                options: self.fetchLimit > 0 ? .reverse : .concurrent,
-                usingBlock: { [weak self] (photoAsset, index, stop) in
-                guard let self = self else { return }
+            assetCollection?
+                .enumerateAssets(
+                    options: self.fetchLimit > 0 ? .reverse : .concurrent,
+                    usingBlock: { [weak self] (photoAsset, index, stop) in
+                guard let self = self else {
+                    stop.pointee = true
+                    return
+                }
+                if operation.isCancelled {
+                    stop.pointee = true
+                    return
+                }
                 if self.selectOptions.contains(.gifPhoto) {
                     if photoAsset.phAsset!.isImageAnimated {
                         photoAsset.mediaSubType = .imageAnimated
@@ -268,11 +317,7 @@ extension PickerManager {
                     asset = phAsset
                     lastAsset = phAsset
                 }
-//                if self.config.photoList.sort == .desc {
-//                    photoAssets.insert(asset, at: 0)
-//                }else {
-                    photoAssets.append(asset)
-//                }
+                photoAssets.append(asset)
                 if self.fetchLimit > 0 && photoAssets.count > self.fetchLimit {
                     stop.pointee = true
                 }
@@ -285,22 +330,16 @@ extension PickerManager {
             }else {
                 photoAssets.append(contentsOf: localAssets.reversed())
             }
-            if let operation =
-                self.fetchAssetQueue.operations.first {
-                if operation.isCancelled || operation.name != self.fetchAssetOperationName {
-                    return
-                }
+            if operation.isCancelled {
+                return
             }
             DispatchQueue.main.async {
                 self.fetchAssetsCompletion?(photoAssets, lastAsset)
             }
         }
-        fetchAssetOperationName = UUID().uuidString
-        operation.name = fetchAssetOperationName
         fetchAssetQueue.addOperation(operation)
     }
     private func cancelFetchAssetQueue() {
-        fetchAssetOperationName = nil
         fetchAssetQueue.cancelAllOperations()
     }
 }
@@ -318,17 +357,12 @@ public extension PickerManager {
             completion(0, "")
             return
         }
-        let operation = BlockOperation.init {
+        let operation = BlockOperation()
+        operation.addExecutionBlock { [unowned operation] in
             var totalFileSize = 0
             var total: Int = 0
              
             func calculationCompletion(_ totalSize: Int) {
-                if let operation =
-                    self.requestAssetBytesQueue.operations.first {
-                    if operation.isCancelled || operation.name != self.bytesOperationName {
-                        return
-                    }
-                }
                 DispatchQueue.main.async {
                     completion(
                         totalSize,
@@ -340,6 +374,9 @@ public extension PickerManager {
             }
             
             for photoAsset in self.selectedAssetArray {
+                if operation.isCancelled {
+                    return
+                }
                 if let fileSize = photoAsset.getPFileSize() {
                     totalFileSize += fileSize
                     total += 1
@@ -348,9 +385,12 @@ public extension PickerManager {
                     }
                     continue
                 }
-                photoAsset.checkAdjustmentStatus { (isAdjusted, asset) in
+                let requestId = photoAsset.checkAdjustmentStatus { (isAdjusted, asset) in
                     if isAdjusted {
                         if asset.mediaType == .photo {
+                            if operation.isCancelled {
+                                return
+                            }
                             asset.requestImageData(
                                 iCloudHandler: nil,
                                 progressHandler: nil
@@ -371,6 +411,9 @@ public extension PickerManager {
                                 }
                             }
                         }else {
+                            if operation.isCancelled {
+                                return
+                            }
                             asset.requestAVAsset(iCloudHandler: nil, progressHandler: nil) { (sAsset, avAsset, info) in
                                 if let urlAsset = avAsset as? AVURLAsset {
                                     totalFileSize += urlAsset.url.fileSize
@@ -395,16 +438,22 @@ public extension PickerManager {
                         calculationCompletion(totalFileSize)
                     }
                 }
+                if let id = requestId {
+                    photoAsset.adjustmentStatusId = id
+                }
             }
         }
-        bytesOperationName = UUID().uuidString
-        operation.name = bytesOperationName
         requestAssetBytesQueue.addOperation(operation)
     }
     
     /// 取消获取资源文件大小
     func cancelRequestAssetFileSize() {
-        bytesOperationName = nil
+        for photoAsset in selectedAssetArray {
+            if let id = photoAsset.adjustmentStatusId {
+                photoAsset.phAsset?.cancelContentEditingInputRequest(id)
+                photoAsset.adjustmentStatusId = nil
+            }
+        }
         requestAssetBytesQueue.cancelAllOperations()
     }
 }

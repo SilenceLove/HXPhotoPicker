@@ -25,13 +25,16 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     public weak var delegate: PhotoPickerViewCellDelegate?
     /// 配置
     public var config: PhotoListCellConfiguration? {
-        didSet { configColor() }
+        didSet {
+            configColor()
+        }
     }
     /// 展示图片
     public lazy var photoView: PhotoThumbnailView = {
         let photoView = PhotoThumbnailView()
         return photoView
     }()
+    
     /// 是否可以选择
     open var canSelect = true
     
@@ -51,8 +54,10 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
             updateSelectedState(isSelected: photoAsset.isSelected, animated: false)
             photoView.photoAsset = photoAsset
             requestThumbnailImage()
+            requestICloudState()
         }
     }
+    
     /// 初始化
     open func initView() {
         contentView.addSubview(photoView)
@@ -86,14 +91,54 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     open func updateSelectedState(isSelected: Bool, animated: Bool) {
         selectedTitle = isSelected ? String(photoAsset.selectIndex + 1) : "0"
     }
+    
+    /// 是否在iCloud上，只有获取过iCloud状态之后才确定
+    open var inICloud: Bool = false
+    
+    /// 获取iCloud上的状态的请求id
+    public var iCloudRequestID: PHImageRequestID?
+    
+    /// 获取是否在iCloud
+    open func requestICloudState() {
+        guard let config = config,
+              config.showICloudMark else {
+            return
+        }
+        cancelICloudRequest()
+        iCloudRequestID = photoAsset.requestICloudState { [weak self] photoAsset, inICloud in
+            guard let self = self,
+                  self.photoAsset == photoAsset else {
+                return
+            }
+            self.iCloudRequestID = nil
+            self.requestICloudStateCompletion(inICloud)
+        }
+    }
+    
+    /// 获取iCloud上状态完成
+    open func requestICloudStateCompletion(_ inICloud: Bool) {
+        self.inICloud = inICloud
+    }
+    
     /// 布局，重写此方法修改布局
     open func layoutView() {
         photoView.frame = bounds
     }
+    
     /// 取消请求资源图片
     public func cancelRequest() {
         photoView.cancelRequest()
+        cancelICloudRequest()
     }
+    
+    open func cancelICloudRequest() {
+        inICloud = false
+        if let id = iCloudRequestID {
+            PHImageManager.default().cancelImageRequest(id)
+            iCloudRequestID = nil
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         initView()
@@ -109,6 +154,9 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
                 configColor()
             }
         }
+    }
+    deinit {
+        cancelRequest()
     }
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

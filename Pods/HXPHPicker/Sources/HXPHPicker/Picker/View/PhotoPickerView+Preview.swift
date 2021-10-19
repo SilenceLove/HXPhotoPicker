@@ -77,6 +77,13 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
             cell.requestThumbnailImage()
         }
     }
+    
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        requestSucceed photoAsset: PhotoAsset
+    ) {
+        resetICloud(for: photoAsset)
+    }
 }
 
 extension PhotoPickerView: PhotoPickerControllerDelegate {

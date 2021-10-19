@@ -24,8 +24,11 @@ final class ImageView: UIView {
         return imageView
     }()
     var image: UIImage? {
-        didSet {
-            setImage(image, animated: false)
+        get {
+            my.image
+        }
+        set {
+            setImage(newValue, animated: false)
         }
     }
     

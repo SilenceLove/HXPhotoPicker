@@ -14,9 +14,19 @@ import Kingfisher
 #endif
 
 public protocol PhotoPreviewContentViewDelete: AnyObject {
+    func contentView(requestSucceed contentView: PhotoPreviewContentView)
+    func contentView(requestFailed contentView: PhotoPreviewContentView)
     func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView)
     func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentView)
     func contentView(updateContentSize contentView: PhotoPreviewContentView)
+}
+
+public extension PhotoPreviewContentViewDelete {
+    func contentView(requestSucceed contentView: PhotoPreviewContentView) { }
+    func contentView(requestFailed contentView: PhotoPreviewContentView) { }
+    func contentView(networkImagedownloadSuccess contentView: PhotoPreviewContentView) { }
+    func contentView(networkImagedownloadFailed contentView: PhotoPreviewContentView) { }
+    func contentView(updateContentSize contentView: PhotoPreviewContentView) { }
 }
 
 open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
@@ -341,14 +351,14 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
             return
         }
         #endif
-        requestID = photoAsset.requestImageData(iCloudHandler: { [weak self] asset, iCloudRequestID in
+        requestID = photoAsset.requestImageData(iCloudHandler: { [weak self] photoAsset, iCloudRequestID in
             guard let self = self else { return }
-            if asset == self.photoAsset {
+            if photoAsset == self.photoAsset && photoAsset.downloadStatus != .succeed {
                 self.requestShowDonwloadICloudHUD(iCloudRequestID: iCloudRequestID)
             }
-        }, progressHandler: { [weak self] asset, progress in
+        }, progressHandler: { [weak self] photoAsset, progress in
             guard let self = self else { return }
-            if asset == self.photoAsset {
+            if photoAsset == self.photoAsset && photoAsset.downloadStatus != .succeed {
                 self.requestUpdateProgress(progress: progress, isICloud: true)
             }
         }, resultHandler: { [weak self] asset, result in
@@ -400,12 +410,12 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
             targetSize: targetSize,
             iCloudHandler: { [weak self] (asset, requestID) in
             guard let self = self else { return }
-            if asset == self.photoAsset {
+            if asset == self.photoAsset && asset.downloadStatus != .succeed {
                 self.requestShowDonwloadICloudHUD(iCloudRequestID: requestID)
             }
         }, progressHandler: {  [weak self](asset, progress) in
             guard let self = self else { return }
-            if asset == self.photoAsset {
+            if asset == self.photoAsset && asset.downloadStatus != .succeed {
                 self.requestUpdateProgress(progress: progress, isICloud: true)
             }
         }, success: { [weak self] (asset, livePhoto, info) in
@@ -433,12 +443,12 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
     func requestAVAsset() {
         requestID = photoAsset.requestAVAsset(iCloudHandler: { [weak self] (asset, requestID) in
             guard let self = self else { return }
-            if asset == self.photoAsset {
+            if asset == self.photoAsset && asset.downloadStatus != .succeed {
                 self.requestShowDonwloadICloudHUD(iCloudRequestID: requestID)
             }
         }, progressHandler: { [weak self] (asset, progress) in
             guard let self = self else { return }
-            if asset == self.photoAsset {
+            if asset == self.photoAsset && asset.downloadStatus != .succeed {
                 self.requestUpdateProgress(progress: progress, isICloud: true)
             }
         }, success: { [weak self] (asset, avAsset, info) in
@@ -491,11 +501,13 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
     func requestSucceed() {
         resetLoadingState()
         ProgressHUD.hide(forView: hudSuperview(), animated: true)
+        delegate?.contentView(requestSucceed: self)
     }
     func requestFailed(info: [AnyHashable: Any]?, isICloud: Bool) {
         loadingView?.removeFromSuperview()
         resetLoadingState()
         if let info = info, !info.isCancel {
+            delegate?.contentView(requestFailed: self)
             let text = (info.inICloud && isICloud) ? "iCloud同步失败".localized : "下载失败".localized
             ProgressHUD.hide(forView: hudSuperview(), animated: false)
             ProgressHUD.showWarning(addedTo: hudSuperview(), text: text.localized, animated: true, delayHide: 2)

@@ -327,6 +327,31 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
         dismissPreviewFrameForIndexAt index: Int
     ) -> CGRect
     
+    /// 转场动画
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        animateTransition type: PickerTransitionType
+    )
+    
+    /// 手势返回的进度
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        interPercentUpdate scale: CGFloat,
+        type: PickerInteractiveTransitionType
+    )
+    
+    /// 手势返回完成动画
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        interPercentDidFinishAnimation type: PickerInteractiveTransitionType
+    )
+    
+    /// 手势返回取消动画
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        interPercentDidCancelAnimation type: PickerInteractiveTransitionType
+    )
+    
     /// 外部预览自定义 present 完成
     func pickerController(
         _ pickerController: PhotoPickerController,
@@ -569,6 +594,27 @@ public extension PhotoPickerControllerDelegate {
         _ pickerController: PhotoPickerController,
         dismissPreviewFrameForIndexAt index: Int
     ) -> CGRect { .zero }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        animateTransition type: PickerTransitionType
+    ) { }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        interPercentDidFinishAnimation type: PickerInteractiveTransitionType
+    ) { }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        interPercentDidCancelAnimation type: PickerInteractiveTransitionType
+    ) { }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        interPercentUpdate scale: CGFloat,
+        type: PickerInteractiveTransitionType
+    ) { }
     
     func pickerController(
         _ pickerController: PhotoPickerController,

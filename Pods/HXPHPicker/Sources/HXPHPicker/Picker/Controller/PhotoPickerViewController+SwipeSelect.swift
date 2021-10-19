@@ -294,10 +294,14 @@ extension PhotoPickerViewController {
         if photoAsset.isSelected != isSelected {
             if isSelected {
                 func addAsset(showTip: Bool) {
+                    resetICloud(for: photoAsset)
                     if pickerController.canSelectAsset(for: photoAsset, showHUD: showTip) {
                         pickerController.addedPhotoAsset(photoAsset: photoAsset)
-                        if let cell = getCell(for: item) {
-                            cell.updateSelectedState(isSelected: isSelected, animated: false)
+                        if let cell = getCell(for: photoAsset) {
+                            cell.updateSelectedState(
+                                isSelected: isSelected,
+                                animated: false
+                            )
                         }
                     }else {
                         showHUD = true
@@ -305,7 +309,7 @@ extension PhotoPickerViewController {
                 }
                 let inICloud = photoAsset.checkICloundStatus(
                     allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto,
-                    completion: { isSuccess in
+                    completion: { _, isSuccess in
                     if isSuccess {
                         addAsset(showTip: true)
                     }

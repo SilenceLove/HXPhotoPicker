@@ -9,17 +9,15 @@
 import UIKit
 import Photos
 
-extension PickerTransition {
-    enum `Type` {
-        case push
-        case pop
-        case present
-        case dismiss
-    }
+public enum PickerTransitionType {
+    case push
+    case pop
+    case present
+    case dismiss
 }
 
 class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
-    var type: `Type` = .push
+    let type: PickerTransitionType
     var requestID: PHImageRequestID?
     lazy var pushImageView: UIImageView = {
         let imageView = UIImageView.init()
@@ -28,12 +26,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         return imageView
     }()
     
-    init(type: `Type`) {
-        super.init()
+    init(type: PickerTransitionType) {
         self.type = type
+        super.init()
     }
     
-    func transitionDuration(
+    public func transitionDuration(
         using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         if type == .dismiss {
             return 0.65
@@ -41,7 +39,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         return 0.5
     }
     
-    func animateTransition(
+    public func animateTransition(
         using transitionContext: UIViewControllerContextTransitioning) {
         if type == .push || type == .pop {
             pushTransition(using: transitionContext)
@@ -248,7 +246,8 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             delay: 0,
             usingSpringWithDamping: 0.8,
             initialSpringVelocity: 0,
-            options: [.layoutSubviews, .curveEaseOut]) {
+            options: [.layoutSubviews, .curveEaseOut]
+        ) {
             if self.type == .push {
                 self.pushImageView.frame = rect
             }else if self.type == .pop {
@@ -258,6 +257,10 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }else {
                     fromView?.frame = rect
                 }
+            }
+            if let picker = pickerVC?.pickerController {
+                picker.pickerDelegate?
+                    .pickerController(picker, animateTransition: self.type)
             }
         } completion: { (isFinished) in
             pickerVC?.bottomView.mask = nil
@@ -434,7 +437,8 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             delay: 0,
             usingSpringWithDamping: 0.8,
             initialSpringVelocity: 0,
-            options: [.layoutSubviews, .curveEaseOut]) {
+            options: [.layoutSubviews, .curveEaseOut]
+        ) {
             if self.type == .present {
                 pickerController.navigationBar.alpha = 1
                 if self.pushImageView.layer.cornerRadius > 0 {
@@ -453,6 +457,8 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     fromView.frame = toRect
                 }
             }
+            pickerController.pickerDelegate?
+                .pickerController(pickerController, animateTransition: self.type)
         } completion: { (isFinished) in
             previewView?.isHidden = false
             if self.type == .present {

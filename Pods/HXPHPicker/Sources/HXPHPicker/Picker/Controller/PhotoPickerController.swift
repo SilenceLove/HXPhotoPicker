@@ -228,6 +228,11 @@ open class PhotoPickerController: UINavigationController {
         assetCollectionsQueue.maxConcurrentOperationCount = 1
         return assetCollectionsQueue
     }()
+    lazy var assetsQueue: OperationQueue = {
+        let assetCollectionsQueue = OperationQueue()
+        assetCollectionsQueue.maxConcurrentOperationCount = 1
+        return assetCollectionsQueue
+    }()
     lazy var requestAssetBytesQueue: OperationQueue = {
         let requestAssetBytesQueue = OperationQueue.init()
         requestAssetBytesQueue.maxConcurrentOperationCount = 1
@@ -331,6 +336,10 @@ open class PhotoPickerController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
     deinit {
+        cancelFetchAssetsQueue()
+        cancelAssetCollectionsQueue()
+        cancelRequestAssetFileSize(isPreview: false)
+        previewRequestAssetBytesQueue.cancelAllOperations()
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
 }
@@ -377,6 +386,9 @@ extension PhotoPickerController {
         let barStyle = isDark ? config.navigationBarDarkStyle : config.navigationBarStyle
         navigationBar.barStyle = barStyle
         
+        if !config.adaptiveBarAppearance {
+            return
+        }
         if #available(iOS 15.0, *) {
             let appearance = UINavigationBarAppearance()
             appearance.titleTextAttributes = titleTextAttributes

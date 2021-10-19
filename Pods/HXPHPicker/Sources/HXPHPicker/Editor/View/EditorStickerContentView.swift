@@ -207,31 +207,35 @@ class EditorStickerContentView: UIView {
             }
             CATransaction.commit()
             updateText()
-            let timer = Timer.scheduledTimer(
-                withTimeInterval: 0.5,
-                repeats: true, block: { [weak self] timer in
-                    if let player = PhotoManager.shared.audioPlayer {
-                        CATransaction.begin()
-                        CATransaction.setDisableActions(true)
-                        let lyric = self?.item.music?.lyric(atTime: player.currentTime)
-                        self?.textLayer.string = lyric?.lyric
-                        self?.updateText()
-                        CATransaction.commit()
-//                        print(player.currentTime)
-                    }else {
-                        timer.invalidate()
-                        self?.timer = nil
-                    }
-//                    print("正在循环")
-            })
-            RunLoop.current.add(timer, forMode: .common)
-            self.timer = timer
+            startTimer()
         }else {
             if item.text != nil {
                 imageView.layer.shadowColor = UIColor.black.withAlphaComponent(0.8).cgColor
             }
             addSubview(imageView)
         }
+    }
+    func startTimer() {
+        invalidateTimer()
+        let timer = Timer.scheduledTimer(
+            withTimeInterval: 0.5,
+            repeats: true, block: { [weak self] timer in
+                if let player = PhotoManager.shared.audioPlayer {
+                    CATransaction.begin()
+                    CATransaction.setDisableActions(true)
+                    let lyric = self?.item.music?.lyric(atTime: player.currentTime)
+                    self?.textLayer.string = lyric?.lyric
+                    self?.updateText()
+                    CATransaction.commit()
+//                        print(player.currentTime)
+                }else {
+                    timer.invalidate()
+                    self?.timer = nil
+                }
+//                    print("正在循环")
+        })
+        RunLoop.current.add(timer, forMode: .common)
+        self.timer = timer
     }
     func invalidateTimer() {
         self.timer?.invalidate()

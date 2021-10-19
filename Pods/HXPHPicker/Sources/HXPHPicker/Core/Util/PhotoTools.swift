@@ -158,6 +158,12 @@ public struct PhotoTools {
     ) -> AVAsset {
         let asset = AVURLAsset(url: url)
         asset.loadValuesAsynchronously(forKeys: ["duration"]) {
+            if asset.statusOfValue(forKey: "duration", error: nil) != .loaded {
+                DispatchQueue.main.async {
+                    completion(url, nil, .failed)
+                }
+                return
+            }
             let generator = AVAssetImageGenerator(asset: asset)
             generator.appliesPreferredTrackTransform = true
 //            generator.requestedTimeToleranceAfter = .zero

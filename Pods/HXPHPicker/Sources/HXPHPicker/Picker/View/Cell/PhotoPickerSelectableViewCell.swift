@@ -31,11 +31,15 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         super.initView()
         contentView.addSubview(selectControl)
         contentView.layer.addSublayer(disableMaskLayer)
+        contentView.addSubview(iCloudMarkView)
     }
     
     private var firstLoadCompletion: Bool = false
     
     open override func requestThumbnailImage(targetWidth: CGFloat) {
+        if firstLoadCompletion {
+            selectControl.isHidden = false
+        }
         photoView.requestThumbnailImage(
             targetWidth: targetWidth
         ) { [weak self] image, photoAsset in
@@ -49,9 +53,17 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         }
     }
     
+    open override func requestICloudStateCompletion(_ inICloud: Bool) {
+        super.requestICloudStateCompletion(inICloud)
+        selectControl.isHidden = inICloud
+    }
+    
     /// 选择框点击事件
     /// - Parameter control: 选择框
     @objc open func didSelectControlClick(control: SelectBoxView) {
+        if inICloud {
+            return
+        }
         selectedAction(self.selectControl.isSelected)
     }
     

@@ -12,7 +12,10 @@ import AVKit
 extension VideoEditorViewController: VideoEditorPlayerViewDelegate {
     func playerView(_ playerViewReadyForDisplay: VideoEditorPlayerView) {
         if firstPlay {
-            croppingAction()
+            if state == .cropping {
+                pState = .normal
+                croppingAction()
+            }
             firstPlay = false
         }
     }

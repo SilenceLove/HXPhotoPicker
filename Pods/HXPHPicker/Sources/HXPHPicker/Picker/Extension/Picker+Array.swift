@@ -139,7 +139,7 @@ public extension Array where Element == PhotoAsset {
         for (index, photoAsset) in enumerated() {
             queue.async(
                 group: group,
-                execute: DispatchWorkItem.init(block: {
+                execute: DispatchWorkItem(block: {
                     let semaphore = DispatchSemaphore(value: 0)
                     var mediatype: PhotoAsset.MediaType = .photo
                     if options.contains([.photo, .video]) {

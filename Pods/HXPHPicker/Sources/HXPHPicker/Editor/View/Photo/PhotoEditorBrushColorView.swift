@@ -8,25 +8,81 @@
 import UIKit
 
 protocol PhotoEditorBrushColorViewDelegate: AnyObject {
-    func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor colorHex: String)
-    func brushColorView(didUndoButton colorView: PhotoEditorBrushColorView)
+    func brushColorView(
+        _ colorView: PhotoEditorBrushColorView,
+        changedColor colorHex: String
+    )
+    func brushColorView(
+        didUndoButton colorView: PhotoEditorBrushColorView
+    )
+    func brushColorView(
+        touchDown colorView: PhotoEditorBrushColorView
+    )
+    func brushColorView(
+        _ colorView: PhotoEditorBrushColorView,
+        didChangedBrushLine lineWidth: CGFloat
+    )
+    func brushColorView(
+        touchUpOutside colorView: PhotoEditorBrushColorView
+    )
 }
 
 public class PhotoEditorBrushColorView: UIView {
     weak var delegate: PhotoEditorBrushColorViewDelegate?
-    var brushColors: [String] = []
-    var currentColorIndex: Int = 0 {
-        didSet {
-            collectionView.selectItem(
-                at: IndexPath(
-                    item: currentColorIndex,
-                    section: 0
-                ),
-                animated: true,
-                scrollPosition: .centeredHorizontally
-            )
-        }
+    let config: PhotoEditorConfiguration.BrushConfig
+    let brushColors: [String]
+    lazy var brushSizeSlider: UISlider = {
+        let slider = UISlider()
+        slider.maximumTrackTintColor = .white.withAlphaComponent(0.4)
+        slider.minimumTrackTintColor = .white
+        let image = UIImage.image(for: .white, havingSize: CGSize(width: 20, height: 20), radius: 10)
+        slider.setThumbImage(image, for: .normal)
+        slider.setThumbImage(image, for: .highlighted)
+        slider.layer.shadowColor = UIColor.black.withAlphaComponent(0.4).cgColor
+        slider.layer.shadowRadius = 4
+        slider.layer.shadowOpacity = 0.5
+        slider.layer.shadowOffset = CGSize(width: 0, height: 0)
+        slider.value = Float(config.lineWidth / (config.maximumLinewidth - config.minimumLinewidth))
+        slider.addTarget(
+            self,
+            action: #selector(sliderDidChanged(slider:)),
+            for: .valueChanged
+        )
+        slider.addTarget(
+            self,
+            action: #selector(sliderTouchDown(slider:)),
+            for: [
+                .touchDown
+            ]
+        )
+        slider.addTarget(
+            self,
+            action: #selector(sliderTouchUpOutside(slider:)),
+            for: [
+                .touchUpInside,
+                .touchCancel,
+                .touchUpOutside
+            ]
+        )
+        slider.isHidden = !config.showSlider
+        return slider
+    }()
+    
+    @objc func sliderDidChanged(slider: UISlider) {
+        let lineWidth = (
+            config.maximumLinewidth - config.minimumLinewidth
+        ) * CGFloat(slider.value) + config.minimumLinewidth
+        delegate?.brushColorView(self, didChangedBrushLine: lineWidth)
     }
+    
+    @objc func sliderTouchDown(slider: UISlider) {
+        delegate?.brushColorView(touchDown: self)
+    }
+    
+    @objc func sliderTouchUpOutside(slider: UISlider) {
+        delegate?.brushColorView(touchUpOutside: self)
+    }
+    
     lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout.init()
         flowLayout.scrollDirection = .horizontal
@@ -71,27 +127,49 @@ public class PhotoEditorBrushColorView: UIView {
         delegate?.brushColorView(didUndoButton: self)
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(config: PhotoEditorConfiguration.BrushConfig) {
+        self.config = config
+        self.brushColors = config.colors
+        super.init(frame: .zero)
         addSubview(collectionView)
         addSubview(undoButton)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        addSubview(brushSizeSlider)
+        collectionView.selectItem(
+            at: IndexPath(
+                item: config.defaultColorIndex,
+                section: 0
+            ),
+            animated: true,
+            scrollPosition: .centeredHorizontally
+        )
     }
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        
-        collectionView.frame = bounds
+        brushSizeSlider.frame = CGRect(
+            x: UIDevice.leftMargin + 20,
+            y: 0,
+            width: width - 40 - UIDevice.leftMargin - UIDevice.rightMargin,
+            height: 20
+        )
+        let cHeight: CGFloat = 60
+        collectionView.frame = CGRect(x: 0, y: brushSizeSlider.frame.maxY + 5, width: width, height: cHeight)
         flowLayout.sectionInset = UIEdgeInsets(
             top: 0,
             left: 12 + UIDevice.leftMargin,
             bottom: 0,
-            right: height + UIDevice.rightMargin
+            right: cHeight + UIDevice.rightMargin
         )
-        undoButton.frame = CGRect(x: width - UIDevice.rightMargin - height, y: 0, width: height, height: height)
+        undoButton.frame = CGRect(
+            x: width - UIDevice.rightMargin - cHeight,
+            y: collectionView.y,
+            width: cHeight,
+            height: cHeight
+        )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

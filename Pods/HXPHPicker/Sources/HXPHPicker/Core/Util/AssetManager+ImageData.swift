@@ -91,7 +91,7 @@ public extension AssetManager {
         progressHandler: PHAssetImageProgressHandler?,
         resultHandler: @escaping ImageDataResultHandler
     ) -> PHImageRequestID {
-        let options = PHImageRequestOptions.init()
+        let options = PHImageRequestOptions()
         options.version = version
         options.resizeMode = .fast
         options.isNetworkAccessAllowed = isNetworkAccessAllowed

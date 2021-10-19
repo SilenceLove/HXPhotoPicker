@@ -41,22 +41,6 @@ extension KF.Builder: KFOptionSetter {
     public var delegateObserver: AnyObject { self }
 }
 
-#if canImport(SwiftUI) && canImport(Combine)
-@available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *)
-extension KFImage: KFOptionSetter {
-    public var options: KingfisherParsedOptionsInfo {
-        get { context.binder.options }
-        nonmutating set { context.binder.options = newValue }
-    }
-
-    public var onFailureDelegate: Delegate<KingfisherError, Void> { context.binder.onFailureDelegate }
-    public var onSuccessDelegate: Delegate<RetrieveImageResult, Void> { context.binder.onSuccessDelegate }
-    public var onProgressDelegate: Delegate<(Int64, Int64), Void> { context.binder.onProgressDelegate }
-
-    public var delegateObserver: AnyObject { context.binder }
-}
-#endif
-
 // MARK: - Life cycles
 extension KFOptionSetter {
     /// Sets the progress block to current builder.
@@ -303,7 +287,7 @@ extension KFOptionSetter {
     /// Sets a retry strategy that will be used when something gets wrong during the image retrieving.
     /// - Parameter strategy: The provided strategy to define how the retrying should happen.
     /// - Returns: A `Self` value with changes applied.
-    public func retry(_ strategy: RetryStrategy) -> Self {
+    public func retry(_ strategy: RetryStrategy?) -> Self {
         options.retryStrategy = strategy
         return self
     }
@@ -342,12 +326,24 @@ extension KFOptionSetter {
 
     /// Sets whether the image setting for an image view should happen with transition even when retrieved from cache.
     /// - Parameter enabled: Enable the force transition or not.
-    /// - Returns: A `KF.Builder` with changes applied.
+    /// - Returns: A `Self` with changes applied.
     public func forceTransition(_ enabled: Bool = true) -> Self {
         options.forceTransition = enabled
         return self
     }
 
+    /// Sets the image that will be used if an image retrieving task fails.
+    /// - Parameter image: The image that will be used when something goes wrong.
+    /// - Returns: A `Self` with changes applied.
+    ///
+    /// If set and an image retrieving error occurred Kingfisher will set provided image (or empty)
+    /// in place of requested one. It's useful when you don't want to show placeholder
+    /// during loading time but wants to use some default image when requests will be failed.
+    ///
+    public func onFailureImage(_ image: KFCrossPlatformImage?) -> Self {
+        options.onFailureImage = .some(image)
+        return self
+    }
 }
 
 // MARK: - Request Modifier

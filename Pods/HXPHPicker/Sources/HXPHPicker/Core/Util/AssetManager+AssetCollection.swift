@@ -45,11 +45,12 @@ public extension AssetManager {
     static func enumerateAllAlbums(
         filterInvalid: Bool,
         options: PHFetchOptions?,
-        usingBlock :@escaping (PHAssetCollection) -> Void
+        usingBlock :@escaping (PHAssetCollection, Int, UnsafeMutablePointer<ObjCBool>) -> Void
     ) {
         let smartAlbums = fetchSmartAlbums(options: nil)
         let userAlbums = fetchUserAlbums(options: nil)
         let albums = [smartAlbums, userAlbums]
+        var stopAblums: Bool = false
         for result in albums {
             result.enumerateObjects { (collection, index, stop) in
                 if !collection.isKind(of: PHAssetCollection.self) {
@@ -65,7 +66,11 @@ public extension AssetManager {
                         return
                     }
                 }
-                usingBlock(collection)
+                usingBlock(collection, index, stop)
+                stopAblums = stop.pointee.boolValue
+            }
+            if stopAblums {
+                break
             }
         }
     }

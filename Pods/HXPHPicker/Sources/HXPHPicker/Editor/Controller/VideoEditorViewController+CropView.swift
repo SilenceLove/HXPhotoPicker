@@ -70,7 +70,10 @@ extension VideoEditorViewController: VideoEditorCropViewDelegate {
         playTimer.schedule(deadline: .now(), repeating: .microseconds(Int(microseconds)), leeway: .microseconds(0))
         playTimer.setEventHandler(handler: {
             DispatchQueue.main.sync {
-                self.playerView.resetPlay()
+                self.playerView.resetPlay { [weak self] time in
+                    guard let self = self else { return }
+                    self.cropView.startLineAnimation(at: time)
+                }
             }
         })
         playTimer.resume()

@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import Photos
 
 // MARK: ViewControllers function
 extension PhotoPickerController {
@@ -185,26 +186,12 @@ extension PhotoPickerController {
         completion: @escaping (Int, String) -> Void
     ) {
         cancelRequestAssetFileSize(isPreview: isPreview)
-        let operation = BlockOperation.init {
+        let operation = BlockOperation()
+        operation.addExecutionBlock { [unowned operation] in
             var totalFileSize = 0
             var total: Int = 0
              
             func calculationCompletion(_ totalSize: Int) {
-                if isPreview {
-                    if let operation =
-                        self.previewRequestAssetBytesQueue.operations.first {
-                        if operation.isCancelled {
-                            return
-                        }
-                    }
-                }else {
-                    if let operation =
-                        self.requestAssetBytesQueue.operations.first {
-                        if operation.isCancelled {
-                            return
-                        }
-                    }
-                }
                 DispatchQueue.main.async {
                     completion(
                         totalSize,
@@ -216,6 +203,9 @@ extension PhotoPickerController {
             }
             
             for photoAsset in self.selectedAssetArray {
+                if operation.isCancelled {
+                    return
+                }
                 if let fileSize = photoAsset.getPFileSize() {
                     totalFileSize += fileSize
                     total += 1
@@ -224,7 +214,7 @@ extension PhotoPickerController {
                     }
                     continue
                 }
-                photoAsset.checkAdjustmentStatus { (isAdjusted, asset) in
+                let requestId = photoAsset.checkAdjustmentStatus { (isAdjusted, asset) in
                     if isAdjusted {
                         if asset.mediaType == .photo {
                             asset.requestImageData(
@@ -271,6 +261,7 @@ extension PhotoPickerController {
                         calculationCompletion(totalFileSize)
                     }
                 }
+                photoAsset.adjustmentStatusId = requestId
             }
         }
         if isPreview {
@@ -283,6 +274,12 @@ extension PhotoPickerController {
     /// 取消获取资源文件大小
     /// - Parameter isPreview: 是否预览界面
     func cancelRequestAssetFileSize(isPreview: Bool) {
+        for photoAsset in selectedAssetArray {
+            if let id = photoAsset.adjustmentStatusId {
+                photoAsset.phAsset?.cancelContentEditingInputRequest(id)
+                photoAsset.adjustmentStatusId = nil
+            }
+        }
         if isPreview {
             previewRequestAssetBytesQueue.cancelAllOperations()
         }else {

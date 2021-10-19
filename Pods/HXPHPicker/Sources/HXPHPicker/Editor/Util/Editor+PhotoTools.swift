@@ -306,7 +306,7 @@ extension PhotoTools {
         originalAudioVolume: Float,
         exportPreset: ExportPreset,
         videoQuality: Int,
-        completion:@escaping (URL?, Error?) -> Void
+        completion: ((URL?, Error?) -> Void)?
     ) -> AVAssetExportSession? {
         if AVAssetExportSession.exportPresets(compatibleWith: avAsset).contains(exportPreset.name) {
             do {
@@ -356,7 +356,7 @@ extension PhotoTools {
                     if supportedTypeArray.contains(AVFileType.mp4) {
                         exportSession.outputFileType = .mp4
                     }else if supportedTypeArray.isEmpty {
-                        completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
+                        completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
                         return nil
                     }else {
                         exportSession.outputFileType = supportedTypeArray.first
@@ -382,26 +382,24 @@ extension PhotoTools {
                         DispatchQueue.main.async {
                             switch exportSession.status {
                             case .completed:
-                                completion(videoURL, nil)
+                                completion?(videoURL, nil)
                             case .failed, .cancelled:
-                                completion(nil, exportSession.error)
+                                completion?(nil, exportSession.error)
                             default: break
                             }
                         }
                     })
                     return exportSession
                 }else {
-                    completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
-                    return nil
+                    completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
                 }
             } catch {
-                completion(nil, PhotoError.error(type: .exportFailed, message: "导出失败：" + error.localizedDescription))
-                return nil
+                completion?(nil, PhotoError.error(type: .exportFailed, message: "导出失败：" + error.localizedDescription))
             }
         }else {
-            completion(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
-            return nil
+            completion?(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
         }
+        return nil
     }
     
     static func mixComposition(

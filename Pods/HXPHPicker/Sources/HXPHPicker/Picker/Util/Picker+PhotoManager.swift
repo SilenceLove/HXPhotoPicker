@@ -25,7 +25,8 @@ extension PhotoManager {
             objc_setAssociatedObject(
                 self,
                 &AssociatedKeys.loadNetworkVideoMode,
-                newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+                newValue,
+                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
             )
         }
     }
@@ -58,15 +59,22 @@ extension PhotoManager {
     public func fetchAssetCollections(
         for options: PHFetchOptions,
         showEmptyCollection: Bool,
-        completion: @escaping ([PhotoAssetCollection]) -> Void
+        completion: (([PhotoAssetCollection]) -> Void)?
     ) {
         DispatchQueue.global().async {
             var assetCollectionsArray = [PhotoAssetCollection]()
             AssetManager.enumerateAllAlbums(
                 filterInvalid: true,
                 options: nil
-            ) { (collection) in
-                let assetCollection = PhotoAssetCollection.init(collection: collection, options: options)
+            ) { (collection, index, stop) in
+                if completion == nil {
+                    stop.pointee = true
+                    return
+                }
+                let assetCollection = PhotoAssetCollection(
+                    collection: collection,
+                    options: options
+                )
                 if showEmptyCollection == false && assetCollection.count == 0 {
                     return
                 }
@@ -77,7 +85,7 @@ extension PhotoManager {
                 }
             }
             DispatchQueue.main.async {
-                completion(assetCollectionsArray)
+                completion?(assetCollectionsArray)
             }
         }
     }
@@ -89,12 +97,12 @@ extension PhotoManager {
     public func fetchAssetCollections(
         for options: PHFetchOptions,
         showEmptyCollection: Bool,
-        usingBlock: @escaping (PhotoAssetCollection?, Bool) -> Void
+        usingBlock: ((PhotoAssetCollection?, Bool, UnsafeMutablePointer<ObjCBool>) -> Void)?
     ) {
         AssetManager.enumerateAllAlbums(
             filterInvalid: true,
             options: nil
-        ) { (collection) in
+        ) { (collection, index, stop) in
             let assetCollection = PhotoAssetCollection(
                 collection: collection,
                 options: options
@@ -102,9 +110,10 @@ extension PhotoManager {
             if showEmptyCollection == false && assetCollection.count == 0 {
                 return
             }
-            usingBlock(assetCollection, collection.isCameraRoll)
+            usingBlock?(assetCollection, collection.isCameraRoll, stop)
         }
-        usingBlock(nil, false)
+        var result = ObjCBool(true)
+        usingBlock?(nil, false, &result)
     }
     
     /// 获取相机胶卷资源集合

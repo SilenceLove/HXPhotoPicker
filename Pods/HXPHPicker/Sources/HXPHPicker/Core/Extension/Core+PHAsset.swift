@@ -38,35 +38,38 @@ public extension PHAsset {
     
     /// 如果在获取到PHAsset之前还未下载的iCloud，之后下载了还是会返回存在
     var inICloud: Bool {
-        var isICloud = false
-        var hasICloud = false
-        let options = PHImageRequestOptions()
-        options.isSynchronous = true
-        options.deliveryMode = .fastFormat
-        options.resizeMode = .fast
-        AssetManager.requestImageData(for: self, options: options) { (result) in
-            switch result {
-            case .failure(let error):
-                if let inICloud = error.info?.inICloud {
-                    isICloud = inICloud
-                    hasICloud = true
-                }
-            default:
-                break
-            }
+        if let isCloud = isCloudPlaceholder, isCloud {
+            return true
         }
-        if hasICloud {
+        var isICloud = false
+        if mediaType == .image {
+            let options = PHImageRequestOptions()
+            options.isSynchronous = true
+            options.deliveryMode = .fastFormat
+            options.resizeMode = .fast
+            AssetManager.requestImageData(for: self, options: options) { (result) in
+                switch result {
+                case .failure(let error):
+                    if let inICloud = error.info?.inICloud {
+                        isICloud = inICloud
+                    }
+                default:
+                    break
+                }
+            }
+            return isICloud
+        }else {
+            return !isLocallayAvailable
+        }
+    }
+    var isCloudPlaceholder: Bool? {
+        if let isICloud = self.value(forKey: "isCloudPlaceholder") as? Bool {
             return isICloud
         }
-        if mediaType == PHAssetMediaType.video {
-            isICloud = !isLocallayAvailable
-        }
-        return isICloud
+        return nil
     }
-    
     var isLocallayAvailable: Bool {
-        if let isICloud = self.value(forKey: "isCloudPlaceholder") as? Bool,
-           isICloud {
+        if let isCloud = isCloudPlaceholder, isCloud {
             return false
         }
         let resourceArray = PHAssetResource.assetResources(for: self)
@@ -74,8 +77,12 @@ public extension PHAsset {
         return isLocallayAvailable
     }
     
-    func checkAdjustmentStatus(completion: @escaping (Bool) -> Void) {
-        self.requestContentEditingInput(with: nil) { (input, info) in
+    @discardableResult
+    func checkAdjustmentStatus(completion: @escaping (Bool) -> Void) -> PHContentEditingInputRequestID {
+        requestContentEditingInput(with: nil) { (input, info) in
+            if let isCancel = info[PHContentEditingInputCancelledKey] as? Int, isCancel == 1 {
+                return
+            }
             let avAsset = input?.audiovisualAsset
             var isAdjusted: Bool = false
             if let path = avAsset != nil ? avAsset?.description : input?.fullSizeImageURL?.path {

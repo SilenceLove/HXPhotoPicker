@@ -28,6 +28,10 @@
 import UIKit
 #endif
 
+#if canImport(CarPlay)
+import CarPlay
+#endif
+
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
 import AppKit
 #endif
@@ -159,7 +163,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    public func set(to attachment: NSTextAttachment, attributedView: KFCrossPlatformView) -> DownloadTask? {
+    public func set(to attachment: NSTextAttachment, attributedView: @autoclosure @escaping () -> KFCrossPlatformView) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
         return attachment.kf.setImage(
             with: source,
@@ -211,6 +215,29 @@ extension KF.Builder {
         )
     }
     #endif // end of canImport(UIKit)
+    
+    #if canImport(CarPlay)
+    
+    /// Builds the image task request and sets it to the image for a list item.
+    /// - Parameters:
+    ///   - listItem: The list item which loads the task and should be set with the image.
+    /// - Returns: A task represents the image downloading, if initialized.
+    ///            This value is `nil` if the image is being loaded from cache.
+    @available(iOS 14.0, *)
+    @discardableResult
+    public func set(to listItem: CPListItem) -> DownloadTask? {
+        let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
+        return listItem.kf.setImage(
+            with: source,
+            placeholder: placeholderImage,
+            parsedOptions: options,
+            progressBlock: progressBlock,
+            completionHandler: resultHandler
+        )
+        
+    }
+    
+    #endif
 
     #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     /// Builds the image task request and sets it to a button.
@@ -363,25 +390,31 @@ extension KF.Builder {
         return self
     }
 
-    /// Sets the image that will be used if an image retrieving task fails.
-    /// - Parameter image: The image that will be used when something goes wrong.
-    /// - Returns: A `KF.Builder` with changes applied.
-    ///
-    /// If set and an image retrieving error occurred Kingfisher will set provided image (or empty)
-    /// in place of requested one. It's useful when you don't want to show placeholder
-    /// during loading time but wants to use some default image when requests will be failed.
-    ///
-    public func onFailureImage(_ image: KFCrossPlatformImage?) -> Self {
-        options.onFailureImage = .some(image)
-        return self
-    }
-
     /// Enables progressive image loading with a specified `ImageProgressive` setting to process the
     /// progressive JPEG data and display it in a progressive way.
     /// - Parameter progressive: The progressive settings which is used while loading.
     /// - Returns: A `KF.Builder` with changes applied.
     public func progressiveJPEG(_ progressive: ImageProgressive? = .default) -> Self {
         options.progressiveJPEG = progressive
+        return self
+    }
+}
+
+// MARK: - Deprecated
+extension KF.Builder {
+    /// Starts the loading process of `self` immediately.
+    ///
+    /// By default, a `KFImage` will not load its source until the `onAppear` is called. This is a lazily loading
+    /// behavior and provides better performance. However, when you refresh the view, the lazy loading also causes a
+    /// flickering since the loading does not happen immediately. Call this method if you want to start the load at once
+    /// could help avoiding the flickering, with some performance trade-off.
+    ///
+    /// - Deprecated: This is not necessary anymore since `@StateObject` is used for holding the image data.
+    /// It does nothing now and please just remove it.
+    ///
+    /// - Returns: The `Self` value with changes applied.
+    @available(*, deprecated, message: "This is not necessary anymore since `@StateObject` is used. It does nothing now and please just remove it.")
+    public func loadImmediately(_ start: Bool = true) -> Self {
         return self
     }
 }

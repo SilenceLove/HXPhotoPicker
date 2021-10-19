@@ -71,4 +71,8 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
             bottomView.updateFinishButtonTitle()
         }
     }
+    
+    func previewViewController(_ previewController: PhotoPreviewViewController, requestSucceed photoAsset: PhotoAsset) {
+        resetICloud(for: photoAsset)
+    }
 }

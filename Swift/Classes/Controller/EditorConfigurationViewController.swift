@@ -409,7 +409,8 @@ extension EditorConfigurationViewController {
         let alert = UIAlertController.init(title: "state", message: nil, preferredStyle: .alert)
         let titles = ["normal", "cropping"]
         for title in titles {
-            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
+                guard let self = self else { return }
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:
@@ -451,7 +452,8 @@ extension EditorConfigurationViewController {
             UIAlertAction(
                 title: "确定",
                 style: .default,
-                handler: { (action) in
+                handler: { [weak self] (action) in
+                    guard let self = self else { return }
             let widthTextFiled = alert.textFields?.first
             let widthRatioStr = widthTextFiled?.text ?? "0"
             let widthRatio = Int(widthRatioStr.count == 0 ? "0" : widthRatioStr)!
@@ -468,7 +470,8 @@ extension EditorConfigurationViewController {
         let alert = UIAlertController.init(title: "maskTypeAction", message: nil, preferredStyle: .alert)
         let titles = ["blackColor", "darkBlurEffect", "lightBlurEffect"]
         for title in titles {
-            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
+                guard let self = self else { return }
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:
@@ -490,7 +493,8 @@ extension EditorConfigurationViewController {
         let alert = UIAlertController.init(title: "exportPresetNameAction", message: nil, preferredStyle: .alert)
         let titles = ["lowQuality", "mediumQuality", "highestQuality"]
         for title in titles {
-            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
+                guard let self = self else { return }
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:
@@ -512,7 +516,8 @@ extension EditorConfigurationViewController {
         let alert = UIAlertController.init(title: "defaultState", message: nil, preferredStyle: .alert)
         let titles = ["normal", "cropping"]
         for title in titles {
-            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
+                guard let self = self else { return }
                 let index = titles.firstIndex(of: action.title!)!
                 switch index {
                 case 0:
@@ -543,7 +548,8 @@ extension EditorConfigurationViewController {
             UIAlertAction(
                 title: "确定",
                 style: .default,
-                handler: { (action) in
+                handler: { [weak self] (action) in
+                    guard let self = self else { return }
             let textFiled = alert.textFields?.first
             let time = Int(textFiled?.text ?? "0")!
             self.videoConfig.cropping.maximumVideoCroppingTime = TimeInterval(time)
@@ -563,7 +569,8 @@ extension EditorConfigurationViewController {
             UIAlertAction(
                 title: "确定",
                 style: .default,
-                handler: { (action) in
+                handler: { [weak self] (action) in
+                    guard let self = self else { return }
             let textFiled = alert.textFields?.first
             let time = Int(textFiled?.text ?? "0")!
             self.videoConfig.cropping.minimumVideoCroppingTime = TimeInterval(time)

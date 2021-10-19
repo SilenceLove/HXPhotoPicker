@@ -8,15 +8,13 @@
 
 import UIKit
 
-extension PickerInteractiveTransition {
-    enum `Type` {
-        case pop
-        case dismiss
-    }
+public enum PickerInteractiveTransitionType {
+    case pop
+    case dismiss
 }
 
 class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestureRecognizerDelegate {
-    var type: `Type`
+    var type: PickerInteractiveTransitionType
     weak var previewViewController: PhotoPreviewViewController?
     weak var pickerController: PhotoPickerController?
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
@@ -44,7 +42,10 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
     var navigationBarAlpha: CGFloat = 1
     var canTransition: Bool = false
     
-    init(panGestureRecognizerFor previewViewController: PhotoPreviewViewController, type: `Type`) {
+    init(
+        panGestureRecognizerFor previewViewController: PhotoPreviewViewController,
+        type: PickerInteractiveTransitionType
+    ) {
         self.type = type
         super.init()
         self.previewViewController = previewViewController
@@ -52,14 +53,16 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         previewViewController.view.addGestureRecognizer(panGestureRecognizer)
     }
     
-    init(panGestureRecognizerFor pickerController: PhotoPickerController, type: `Type`) {
+    init(
+        panGestureRecognizerFor pickerController: PhotoPickerController,
+        type: PickerInteractiveTransitionType) {
         self.type = type
         super.init()
         self.pickerController = pickerController
         panGestureRecognizer.delegate = self
         pickerController.view.addGestureRecognizer(panGestureRecognizer)
     }
-    func gestureRecognizer(
+    public func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith
             otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -236,7 +239,10 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     toVC?.bottomView.alpha = 1 - alpha
                 }
             }
-            
+            if let picker = pickerController {
+                picker.pickerDelegate?
+                    .pickerController(picker, interPercentUpdate: alpha, type: type)
+            }
             update(1 - alpha)
         }
     }
@@ -304,6 +310,10 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         toVC?.bottomView.alpha = 0
                     }
                 }
+                if let picker = self.pickerController {
+                    picker.pickerDelegate?
+                        .pickerController(picker, interPercentDidCancelAnimation: self.type)
+                }
             } completion: { (isFinished) in
                 previewViewController.bottomView.mask = nil
                 toVC?.bottomView.mask = nil
@@ -364,7 +374,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 delay: 0,
                 usingSpringWithDamping: 0.8,
                 initialSpringVelocity: 0,
-                options: [.layoutSubviews, .curveEaseOut]) {
+                options: [.layoutSubviews, .curveEaseOut]
+            ) {
                 if let toView = self.toView, toView.layer.cornerRadius > 0 {
                     previewView.layer.cornerRadius = toView.layer.cornerRadius
                 }
@@ -404,6 +415,10 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                         toVC?.navigationController?.navigationBar.alpha = 1
                     }
                 }
+                if let picker = self.pickerController {
+                    picker.pickerDelegate?
+                        .pickerController(picker, interPercentDidFinishAnimation: self.type)
+                }
             } completion: { (isFinished) in
                 previewViewController.bottomView.mask = nil
                 toVC?.bottomView.mask = nil
@@ -434,7 +449,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             toView = nil
         }
     }
-    override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
+    public override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         self.transitionContext = transitionContext
         if type == .pop {
             popTransition(transitionContext)

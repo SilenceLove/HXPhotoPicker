@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PreviewLivePhotoViewCell: PhotoPreviewViewCell {
+class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete {
     
     var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once {
         didSet {
@@ -18,6 +18,7 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         scrollContentView = PhotoPreviewContentView.init(type: .livePhoto)
+        scrollContentView.delegate = self
         initView()
     }
     
@@ -25,4 +26,10 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func contentView(requestSucceed contentView: PhotoPreviewContentView) {
+        delegate?.cell(requestSucceed: self)
+    }
+    func contentView(requestFailed contentView: PhotoPreviewContentView) {
+        delegate?.cell(requestFailed: self)
+    }
 }

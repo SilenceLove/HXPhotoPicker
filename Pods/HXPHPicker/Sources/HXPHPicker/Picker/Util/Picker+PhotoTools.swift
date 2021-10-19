@@ -145,8 +145,8 @@ extension PhotoTools {
         endTime: TimeInterval,
         exportPreset: ExportPreset = .ratio_960x540,
         videoQuality: Int = 5,
-        completion:
-            @escaping (URL?, Error?) -> Void) -> AVAssetExportSession? {
+        completion: ((URL?, Error?) -> Void)?
+    ) -> AVAssetExportSession? {
         if AVAssetExportSession.exportPresets(
             compatibleWith: avAsset).contains(exportPreset.name) {
             let videoURL = outputURL == nil ? PhotoTools.getVideoTmpURL() : outputURL
@@ -163,7 +163,7 @@ extension PhotoTools {
                 if supportedTypeArray.contains(AVFileType.mp4) {
                     exportSession.outputFileType = .mp4
                 }else if supportedTypeArray.isEmpty {
-                    completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
+                    completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
                     return nil
                 }else {
                     exportSession.outputFileType = supportedTypeArray.first
@@ -183,22 +183,21 @@ extension PhotoTools {
                     DispatchQueue.main.async {
                         switch exportSession.status {
                         case .completed:
-                            completion(videoURL, nil)
+                            completion?(videoURL, nil)
                         case .failed, .cancelled:
-                            completion(nil, exportSession.error)
+                            completion?(nil, exportSession.error)
                         default: break
                         }
                     }
                 })
                 return exportSession
             }else {
-                completion(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
-                return nil
+                completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
             }
         }else {
-            completion(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
-            return nil
+            completion?(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
         }
+        return nil
     }
     
     public static func getVideoDuration(
@@ -231,6 +230,12 @@ extension PhotoTools {
             if let url = url {
                 let avAsset = AVURLAsset(url: url)
                 avAsset.loadValuesAsynchronously(forKeys: ["duration"]) {
+                    if avAsset.statusOfValue(forKey: "duration", error: nil) != .loaded {
+                        DispatchQueue.main.async {
+                            completionHandler(photoAsset, 0)
+                        }
+                        return
+                    }
                     let duration = avAsset.duration.seconds
                     if photoAsset.isNetworkAsset {
                         photoAsset.networkVideoAsset?.duration = duration

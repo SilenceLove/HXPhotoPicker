@@ -1,24 +1,24 @@
 PODS:
-  - HXPHPicker (1.2.2):
-    - HXPHPicker/Full (= 1.2.2)
-  - HXPHPicker/Camera (1.2.2):
+  - HXPHPicker (1.2.3):
+    - HXPHPicker/Full (= 1.2.3)
+  - HXPHPicker/Camera (1.2.3):
     - HXPHPicker/Core
-  - HXPHPicker/Core (1.2.2)
-  - HXPHPicker/Editor (1.2.2):
+  - HXPHPicker/Core (1.2.3)
+  - HXPHPicker/Editor (1.2.3):
     - HXPHPicker/Core
-  - HXPHPicker/Full (1.2.2):
+  - HXPHPicker/Full (1.2.3):
     - HXPHPicker/Lite
-    - Kingfisher (~> 6.0)
-  - HXPHPicker/Lite (1.2.2):
+    - Kingfisher (~> 7.0)
+  - HXPHPicker/Lite (1.2.3):
     - HXPHPicker/Camera
     - HXPHPicker/Editor
     - HXPHPicker/Picker
-  - HXPHPicker/Picker (1.2.2):
+  - HXPHPicker/Picker (1.2.3):
     - HXPHPicker/Core
-  - Kingfisher (6.3.1)
+  - Kingfisher (7.1.0)
 
 DEPENDENCIES:
-  - HXPHPicker (~> 1.2.2)
+  - HXPHPicker (~> 1.2.3)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -26,9 +26,9 @@ SPEC REPOS:
     - Kingfisher
 
 SPEC CHECKSUMS:
-  HXPHPicker: b04f9b8e5b3c2b5a18f7fce07135b32a182c2f8b
-  Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
+  HXPHPicker: 5e53192207648efb6883118d41874b2395ed9954
+  Kingfisher: cdabaf49be7ee7cc124f0f276b355edf61903cf8
 
-PODFILE CHECKSUM: c146be9a9cba826487348ea791f8bba6a62359fd
+PODFILE CHECKSUM: a5df2d51dfc04dafd0f763d968e86e7b3eab0d7f
 
 COCOAPODS: 1.10.1

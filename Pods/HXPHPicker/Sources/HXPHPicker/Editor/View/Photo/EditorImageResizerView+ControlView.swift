@@ -152,7 +152,11 @@ extension EditorImageResizerView: EditorImageResizerControlViewDelegate {
             isUserInteractionEnabled = false
             let currentOffset = scrollView.contentOffset
             scrollView.setContentOffset(currentOffset, animated: false)
-            UIView.animate(withDuration: animationDuration, delay: 0, options: [.curveLinear]) {
+            UIView.animate(
+                withDuration: animationDuration,
+                delay: 0,
+                options: [.curveLinear]
+            ) {
                 self.updateScrollViewContentInset(rect)
                 if needZoomScale {
                     /// 需要进行缩放

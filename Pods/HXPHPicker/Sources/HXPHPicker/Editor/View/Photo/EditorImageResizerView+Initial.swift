@@ -222,6 +222,7 @@ extension EditorImageResizerView {
             scrollView.contentInset = UIEdgeInsets(top: top, left: left, bottom: top, right: left)
         }
     }
+    
     /// 更新边距
     func updateContentInsets() {
         if UIDevice.isPortrait {

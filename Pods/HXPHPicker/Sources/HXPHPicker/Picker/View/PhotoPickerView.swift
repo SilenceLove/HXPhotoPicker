@@ -12,7 +12,7 @@ open class PhotoPickerView: UIView {
     public let manager: PickerManager
     
     /// 已选数组
-    /// 需要reload
+    /// 赋值之后需要 collectionView.reloadData()
     public var selectedAssets: [PhotoAsset] {
         get {
             manager.selectedAssetArray
@@ -22,7 +22,7 @@ open class PhotoPickerView: UIView {
         }
     }
     
-    /// 是否原图，预览界面是的选中原图按钮
+    /// 是否原图，预览界面时选中原图按钮
     public var isOriginal: Bool = false
     
     /// 启用拖动手势
@@ -77,6 +77,11 @@ open class PhotoPickerView: UIView {
         }
     }
     
+    /// 初始化选择视图
+    /// - Parameters:
+    ///   - manager: 管理数据
+    ///   - scrollDirection: 布局方向
+    ///   - delegate: 代理
     public init(
         manager: PickerManager,
         scrollDirection: UICollectionView.ScrollDirection = .vertical,
@@ -98,6 +103,8 @@ open class PhotoPickerView: UIView {
         self.delegate = delegate
         setup()
     }
+    
+    /// 内容视图
     public lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: bounds,

@@ -741,18 +741,21 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
         response: @escaping ([EditorChartlet]) -> Void) {
         // 模仿延迟加加载数据
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            var titles = PhotoTools.defaultTitleChartlet()
-            let localTitleChartlet = EditorChartlet(image: UIImage(named: "hx_sticker_cover"))
-            titles.append(localTitleChartlet)
-            let gifTitleChartlet = EditorChartlet(
-                url: URL(
-                    string:
-                        "https://gifimage.net/wp-content/uploads/2017/11/gif-button-2.gif"
-                )
-            )
-            titles.append(gifTitleChartlet)
-            response(titles)
+            response(self.getChartletTitles())
         }
+    }
+    func getChartletTitles() -> [EditorChartlet] {
+        var titles = PhotoTools.defaultTitleChartlet()
+        let localTitleChartlet = EditorChartlet(image: UIImage(named: "hx_sticker_cover"))
+        titles.append(localTitleChartlet)
+        let gifTitleChartlet = EditorChartlet(
+            url: URL(
+                string:
+                    "https://gifimage.net/wp-content/uploads/2017/11/gif-button-2.gif"
+            )
+        )
+        titles.append(gifTitleChartlet)
+        return titles
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
@@ -760,9 +763,12 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
         titleChartlet: EditorChartlet,
         titleIndex: Int,
         response: @escaping (Int, [EditorChartlet]) -> Void) {
-        if titleIndex == 0 {
-            response(titleIndex, PhotoTools.defaultNetworkChartlet())
-        }else if titleIndex == 1 {
+        response(titleIndex, getChartletList(index: titleIndex))
+    }
+    func getChartletList(index: Int) -> [EditorChartlet] {
+        if index == 0 {
+            return PhotoTools.defaultNetworkChartlet()
+        }else if index == 1 {
             let imageNameds = [
                 "hx_sticker_haoxinqing",
                 "hx_sticker_housailei",
@@ -789,15 +795,20 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
                 )
                 list.append(chartlet)
             }
-            response(titleIndex, list)
+            return list
         }else {
-            response(titleIndex, gifChartlet())
+            return gifChartlet()
         }
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
         videoEditor videoEditorViewController: VideoEditorViewController,
         loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
+        completionHandler(getMusics())
+        return false
+    }
+    
+    func getMusics() -> [VideoEditorMusicInfo] {
         var musics: [VideoEditorMusicInfo] = []
         let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
         let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
@@ -855,8 +866,7 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
                                                lrc: lrc8,
                                                urlType: .network)
         musics.append(music8)
-        completionHandler(musics)
-        return false
+        return musics
     }
     
     func gifChartlet() -> [EditorChartlet] {

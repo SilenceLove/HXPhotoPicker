@@ -107,6 +107,9 @@ open class PhotoEditorViewController: BaseViewController {
     var filterHDImage: UIImage?
     var mosaicImage: UIImage?
     var thumbnailImage: UIImage!
+    var transitionalImage: UIImage?
+    var transitionCompletion: Bool = true
+    var isFinishedBack: Bool = false
     private var needRequest: Bool = false
     private var requestType: Int = 0
     
@@ -114,7 +117,7 @@ open class PhotoEditorViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     lazy var imageView: PhotoEditorView = {
-        let imageView = PhotoEditorView.init(config: config)
+        let imageView = PhotoEditorView(config: config)
         imageView.editorDelegate = self
         return imageView
     }()
@@ -178,10 +181,12 @@ open class PhotoEditorViewController: BaseViewController {
     }()
     
     @objc func didBackButtonClick() {
+        transitionalImage = image
         didBackClick(true)
     }
     
     func didBackClick(_ isCancel: Bool = false) {
+        imageView.imageResizerView.stopShowMaskBgTimer()
         if isCancel {
             delegate?.photoEditorViewController(didCancel: self)
         }
@@ -198,12 +203,14 @@ open class PhotoEditorViewController: BaseViewController {
         let layer = PhotoTools.getGradientShadowLayer(true)
         return layer
     }()
-    
+    lazy var brushSizeView: BrushSizeView = {
+        let lineWidth = imageView.brushLineWidth + 4
+        let view = BrushSizeView(frame: CGRect(origin: .zero, size: CGSize(width: lineWidth, height: lineWidth)))
+        return view
+    }()
     public lazy var brushColorView: PhotoEditorBrushColorView = {
-        let view = PhotoEditorBrushColorView.init(frame: .zero)
+        let view = PhotoEditorBrushColorView(config: config.brush)
         view.delegate = self
-        view.brushColors = config.brushColors
-        view.currentColorIndex = config.defaultBrushColorIndex
         view.alpha = 0
         view.isHidden = true
         return view
@@ -242,9 +249,11 @@ open class PhotoEditorViewController: BaseViewController {
     lazy var filterView: PhotoEditorFilterView = {
         let filter = editResult?.editedData.filter
         let value = editResult?.editedData.filterValue
-        let view = PhotoEditorFilterView.init(filterConfig: config.filter,
-                                              sourceIndex: filter?.sourceIndex ?? -1,
-                                              value: value ?? 0)
+        let view = PhotoEditorFilterView(
+            filterConfig: config.filter,
+            sourceIndex: filter?.sourceIndex ?? -1,
+            value: value ?? 0
+        )
         view.delegate = self
         return view
     }()
@@ -379,7 +388,7 @@ open class PhotoEditorViewController: BaseViewController {
             cropToolView.updateContentInset()
         }
         if toolOptions.contains(.graffiti) {
-            brushColorView.frame = cropToolFrame
+            brushColorView.frame = CGRect(x: 0, y: cropConfirmView.y - 85, width: view.width, height: 85)
         }
         if toolOptions.contains(.mosaic) {
             mosaicToolView.frame = cropToolFrame
@@ -411,11 +420,10 @@ open class PhotoEditorViewController: BaseViewController {
                         mosaicToolView.canUndo = imageView.canUndoMosaic
                     }
                 }
-                if state == .cropping {
-                    imageView.startCropping(true)
-                    croppingAction()
-                }
                 imageInitializeCompletion = true
+                if transitionCompletion {
+                    initializeStartCropping()
+                }
             }
         }
         if orientationDidChange {
@@ -426,6 +434,13 @@ open class PhotoEditorViewController: BaseViewController {
             orientationDidChange = false
             imageViewDidChange = true
         }
+    }
+    func initializeStartCropping() {
+        if !imageInitializeCompletion || state != .cropping {
+            return
+        }
+        imageView.startCropping(true)
+        croppingAction()
     }
     func setChartletViewFrame() {
         var viewHeight = config.chartlet.viewHeight
@@ -506,6 +521,68 @@ extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
     func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor colorHex: String) {
         imageView.drawColorHex = colorHex
     }
+    func brushColorView(touchDown colorView: PhotoEditorBrushColorView) {
+        let lineWidth = imageView.brushLineWidth + 4
+        brushSizeView.size = CGSize(width: lineWidth, height: lineWidth)
+        brushSizeView.center = CGPoint(x: view.width * 0.5, y: view.height * 0.5)
+        brushSizeView.alpha = 0
+        view.addSubview(brushSizeView)
+        UIView.animate(withDuration: 0.2) {
+            self.brushSizeView.alpha = 1
+        }
+    }
+    func brushColorView(touchUpOutside colorView: PhotoEditorBrushColorView) {
+        UIView.animate(withDuration: 0.2) {
+            self.brushSizeView.alpha = 0
+        } completion: { _ in
+            self.brushSizeView.removeFromSuperview()
+        }
+    }
+    func brushColorView(
+        _ colorView: PhotoEditorBrushColorView,
+        didChangedBrushLine lineWidth: CGFloat
+    ) {
+        imageView.brushLineWidth = lineWidth
+        brushSizeView.size = CGSize(width: lineWidth + 4, height: lineWidth + 4)
+        brushSizeView.center = CGPoint(x: view.width * 0.5, y: view.height * 0.5)
+    }
+    
+    class BrushSizeView: UIView {
+        lazy var borderLayer: CAShapeLayer = {
+            let borderLayer = CAShapeLayer()
+            borderLayer.strokeColor = UIColor.white.cgColor
+            borderLayer.fillColor = UIColor.clear.cgColor
+            borderLayer.lineWidth = 2
+            borderLayer.shadowColor = UIColor.black.withAlphaComponent(0.4).cgColor
+            borderLayer.shadowRadius = 2
+            borderLayer.shadowOpacity = 0.5
+            borderLayer.shadowOffset = CGSize(width: 0, height: 0)
+            return borderLayer
+        }()
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            layer.addSublayer(borderLayer)
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            borderLayer.frame = bounds
+            
+            let path = UIBezierPath(
+                arcCenter: CGPoint(x: width * 0.5, y: height * 0.5),
+                radius: width * 0.5 - 1,
+                startAngle: 0,
+                endAngle: CGFloat.pi * 2,
+                clockwise: true
+            )
+            borderLayer.path = path.cgPath
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
 }
 
 // MARK: EditorCropConfirmViewDelegate
@@ -536,6 +613,7 @@ extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     /// - Parameter cropConfirmView: 裁剪视图
     func cropConfirmView(didCancelButtonClick cropConfirmView: EditorCropConfirmView) {
         if config.fixedCropState {
+            transitionalImage = image
             didBackClick(true)
             return
         }
@@ -634,5 +712,21 @@ extension PhotoEditorViewController: UIGestureRecognizerDelegate {
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
         true
+    }
+}
+
+extension PhotoEditorViewController: UINavigationControllerDelegate {
+    public func navigationController(
+        _ navigationController: UINavigationController,
+        animationControllerFor operation: UINavigationController.Operation,
+        from fromVC: UIViewController,
+        to toVC: UIViewController
+    ) -> UIViewControllerAnimatedTransitioning? {
+        if operation == .push {
+            return EditorTransition(mode: .push)
+        }else if operation == .pop {
+            return EditorTransition(mode: .pop)
+        }
+        return nil
     }
 }

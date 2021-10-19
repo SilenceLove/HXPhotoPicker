@@ -119,6 +119,38 @@ extension PhotoPreviewViewController: PhotoEditorViewControllerDelegate {
     public func photoEditorViewController(didCancel photoEditorViewController: PhotoEditorViewController) {
         
     }
+    public func photoEditorViewController(
+        transitionPreviewImage photoEditorViewController: PhotoEditorViewController
+    ) -> UIImage? {
+        guard let photoAsset = photoEditorViewController.photoAsset else {
+            return nil
+        }
+        return getCell(for: photoAsset)?.scrollContentView.imageView.image
+    }
+    
+    public func photoEditorViewController(
+        transitionDuration photoEditorViewController: PhotoEditorViewController
+    ) -> TimeInterval {
+        0.35
+    }
+    
+    public func photoEditorViewController(
+        transitioBegenPreviewView photoEditorViewController: PhotoEditorViewController
+    ) -> UIView? {
+        guard let photoAsset = photoEditorViewController.photoAsset else {
+            return nil
+        }
+        return getCell(for: photoAsset)?.scrollContentView
+    }
+    
+    public func photoEditorViewController(
+        transitioEndPreviewView photoEditorViewController: PhotoEditorViewController
+    ) -> UIView? {
+        guard let photoAsset = photoEditorViewController.photoAsset else {
+            return nil
+        }
+        return getCell(for: photoAsset)?.scrollContentView
+    }
 }
 // MARK: VideoEditorViewControllerDelegate
 extension PhotoPreviewViewController: VideoEditorViewControllerDelegate {
@@ -294,6 +326,38 @@ extension PhotoPreviewViewController: VideoEditorViewControllerDelegate {
     }
     public func videoEditorViewController(didCancel videoEditorViewController: VideoEditorViewController) {
         
+    }
+    public func videoEditorViewController(
+        transitionPreviewImage videoEditorViewController: VideoEditorViewController
+    ) -> UIImage? {
+        guard let photoAsset = videoEditorViewController.photoAsset else {
+            return nil
+        }
+        return getCell(for: photoAsset)?.scrollContentView.imageView.image
+    }
+    
+    public func videoEditorViewController(
+        transitionDuration videoEditorViewController: VideoEditorViewController
+    ) -> TimeInterval {
+        0.35
+    }
+    
+    public func videoEditorViewController(
+        transitioBegenPreviewView videoEditorViewController: VideoEditorViewController
+    ) -> UIView? {
+        guard let photoAsset = videoEditorViewController.photoAsset else {
+            return nil
+        }
+        return getCell(for: photoAsset)?.scrollContentView
+    }
+    
+    public func videoEditorViewController(
+        transitioEndPreviewView videoEditorViewController: VideoEditorViewController
+    ) -> UIView? {
+        guard let photoAsset = videoEditorViewController.photoAsset else {
+            return nil
+        }
+        return getCell(for: photoAsset)?.scrollContentView
     }
 }
 #endif

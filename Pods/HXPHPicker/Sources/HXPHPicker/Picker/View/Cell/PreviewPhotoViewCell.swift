@@ -18,7 +18,12 @@ class PreviewPhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDelete 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+    func contentView(requestSucceed contentView: PhotoPreviewContentView) {
+        delegate?.cell(requestSucceed: self)
+    }
+    func contentView(requestFailed contentView: PhotoPreviewContentView) {
+        delegate?.cell(requestFailed: self)
+    }
     func contentView(updateContentSize contentView: PhotoPreviewContentView) {
         setupScrollViewContentSize()
     }

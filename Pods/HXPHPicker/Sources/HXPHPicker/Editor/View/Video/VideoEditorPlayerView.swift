@@ -119,18 +119,20 @@ class VideoEditorPlayerView: VideoPlayerView {
             delegate?.playerView(self, didPlayAt: player.currentTime())
         }
     }
-    func resetPlay() {
+    func resetPlay(completion: ((CMTime) -> Void)? = nil) {
         isPlaying = false
         if let startTime = playStartTime {
             seek(to: startTime) { (isFinished) in
                 if isFinished {
                     self.play()
+                    completion?(self.player.currentTime())
                 }
             }
         }else {
             seek(to: CMTime.zero) { (isFinished) in
                 if isFinished {
                     self.play()
+                    completion?(self.player.currentTime())
                 }
             }
         }

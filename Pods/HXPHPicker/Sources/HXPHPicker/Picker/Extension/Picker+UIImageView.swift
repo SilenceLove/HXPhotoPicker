@@ -91,38 +91,28 @@ extension UIImageView {
             url = videoAsset.videoURL
         }
         if let url = url, loadVideoCover {
-//            func loadVideoCover() {
-                let provider = AVAssetImageDataProvider(assetURL: url, seconds: 0.1)
-                provider.assetImageGenerator.appliesPreferredTrackTransform = true
-                let task = KF.dataProvider(provider)
-                    .onSuccess { (result) in
-                        let image = result.image
-                        let videoSize: CGSize?
-                        if asset.isNetworkAsset {
-                            videoSize = asset.networkVideoAsset?.videoSize
-                        }else {
-                            videoSize = asset.localVideoAsset?.videoSize
-                        }
-                        if let videoSize = videoSize, videoSize.equalTo(.zero) {
-                            asset.localVideoAsset?.videoSize = image.size
-                            asset.networkVideoAsset?.videoSize = image.size
-                        }
-                        completionHandler?(image, nil, asset)
+            let provider = AVAssetImageDataProvider(assetURL: url, seconds: 0.1)
+            provider.assetImageGenerator.appliesPreferredTrackTransform = true
+            let task = KF.dataProvider(provider)
+                .onSuccess { (result) in
+                    let image = result.image
+                    let videoSize: CGSize?
+                    if asset.isNetworkAsset {
+                        videoSize = asset.networkVideoAsset?.videoSize
+                    }else {
+                        videoSize = asset.localVideoAsset?.videoSize
                     }
-                    .onFailure { (error) in
-                        completionHandler?(nil, error, asset)
+                    if let videoSize = videoSize, videoSize.equalTo(.zero) {
+                        asset.localVideoAsset?.videoSize = image.size
+                        asset.networkVideoAsset?.videoSize = image.size
                     }
-                    .set(to: self)
-//                downloadTask?(task)
-                return task
-//            }
-//            let avAsset = AVURLAsset(url: url)
-//            avAsset.loadValuesAsynchronously(forKeys: ["duration"]) {
-//                DispatchQueue.main.async {
-//                    loadVideoCover()
-//                }
-//            }
-//            return avAsset
+                    completionHandler?(image, nil, asset)
+                }
+                .onFailure { (error) in
+                    completionHandler?(nil, error, asset)
+                }
+                .set(to: self)
+            return task
         }
         return kf.setImage(
             with: url,

@@ -10,7 +10,8 @@ import UIKit
 extension PhotoPickerView {
     
     /// 重新加载Asset
-    /// - Parameter assetCollection: 相册集合
+    /// 可以通过获取相册集合 manager.fetchAssetCollections()
+    /// - Parameter assetCollection: 相册
     public func reloadAsset(assetCollection: PhotoAssetCollection?) {
         if assetCollection == nil {
             if config.allowAddCamera {
@@ -69,6 +70,8 @@ extension PhotoPickerView {
         updateCellSelectedState(for: index, isSelected: false)
     }
     
+    /// 取消选择
+    /// - Parameter photoAsset: 对应的 PhotoAsset
     public func deselect(at photoAsset: PhotoAsset) {
         if let index = getIndexPath(for: photoAsset)?.item {
             deselect(at: index)
@@ -82,6 +85,8 @@ extension PhotoPickerView {
     }
     
     /// 移除选择的内容
+    /// 只是移除的manager里的已选数据
+    /// cell选中状态需要调用 deselectAll()
     public func removeSelectedAssets() {
         manager.removeSelectedAssets()
     }

@@ -23,7 +23,7 @@ extension VideoEditorViewController: EditorToolViewDelegate {
                 let seconds = Double(config.cropping.maximumVideoCroppingTime)
                 timeRang = CMTimeRange(
                     start: startTime,
-                    end: CMTime(
+                    duration: CMTime(
                         seconds: seconds,
                         preferredTimescale: endTime.timescale
                     )
@@ -62,27 +62,39 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         hasSticker: Bool,
         stickerInfos: [EditorStickerInfo]
     ) {
-        DispatchQueue.global().async {
-            var audioURL: URL?
-            if let musicPath = self.backgroundMusicPath {
-                audioURL = URL(fileURLWithPath: musicPath)
+        avAsset.loadValuesAsynchronously(
+            forKeys: ["tracks"]
+        ) { [weak self] in
+            guard let self = self else { return }
+            if self.avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
+                DispatchQueue.main.async {
+                    self.showErrorHUD()
+                }
+                return
             }
-            self.exportSession = PhotoTools.exportEditVideo(
-                for: self.avAsset,
-                outputURL: self.config.videoExportURL,
-                timeRang: timeRang,
-                stickerInfos: stickerInfos,
-                audioURL: audioURL,
-                audioVolume: self.backgroundMusicVolume,
-                originalAudioVolume: self.playerView.player.volume,
-                exportPreset: self.config.exportPreset,
-                videoQuality: self.config.videoQuality
-            ) {  [weak self] videoURL, error in
-                if let videoURL = videoURL {
-                    self?.editFinishCallBack(videoURL)
-                    self?.backAction()
-                }else {
-                    self?.showErrorHUD()
+            DispatchQueue.global().async {
+                var audioURL: URL?
+                if let musicPath = self.backgroundMusicPath {
+                    audioURL = URL(fileURLWithPath: musicPath)
+                }
+                self.exportSession = PhotoTools.exportEditVideo(
+                    for: self.avAsset,
+                    outputURL: self.config.videoExportURL,
+                    timeRang: timeRang,
+                    stickerInfos: stickerInfos,
+                    audioURL: audioURL,
+                    audioVolume: self.backgroundMusicVolume,
+                    originalAudioVolume: self.playerView.player.volume,
+                    exportPreset: self.config.exportPreset,
+                    videoQuality: self.config.videoQuality
+                ) {  [weak self] videoURL, error in
+                    if let videoURL = videoURL {
+                        ProgressHUD.hide(forView: self?.view, animated: false)
+                        self?.editFinishCallBack(videoURL)
+                        self?.backAction()
+                    }else {
+                        self?.showErrorHUD()
+                    }
                 }
             }
         }
