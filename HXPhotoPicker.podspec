@@ -18,40 +18,40 @@ Pod::Spec.new do |s|
   
   s.subspec 'Default' do |de|
     de.source_files = "HXPhotoPicker/**/*.{h,m}"
-    de.resources    = "HXPhotoPicker/Resources/*.{bundle}"
+    de.resources = "HXPhotoPicker/Resources/*.{bundle}"
   end
   
   s.subspec 'SDWebImage' do |sd|
     sd.source_files = "HXPhotoPicker/**/*.{h,m}"
     sd.dependency 'SDWebImage', '~> 5.0'
-    sd.resources    = "HXPhotoPicker/Resources/*.{bundle}"
+    sd.resources = "HXPhotoPicker/Resources/*.{bundle}"
   end
   
   s.subspec 'SDWebImage_AF' do |sd_af|
     sd_af.source_files = "HXPhotoPicker/**/*.{h,m}"
     sd_af.dependency 'SDWebImage', '~> 5.0'
     sd_af.dependency 'AFNetworking'
-    sd_af.resources    = "HXPhotoPicker/Resources/*.{bundle}"
+    sd_af.resources = "HXPhotoPicker/Resources/*.{bundle}"
   end
   
   s.subspec 'YYWebImage' do |yy|
     yy.source_files = "HXPhotoPicker/**/*.{h,m}"
     yy.dependency 'YYWebImage', '~> 1.0.5'
-    yy.resources    = "HXPhotoPicker/Resources/*.{bundle}"
+    yy.resources = "HXPhotoPicker/Resources/*.{bundle}"
   end
   
   s.subspec 'YYWebImage_AF' do |yy_af|
     yy_af.source_files = "HXPhotoPicker/**/*.{h,m}"
     yy_af.dependency 'YYWebImage', '~> 1.0.5'
     yy_af.dependency 'AFNetworking'
-    yy_af.resources    = "HXPhotoPicker/Resources/*.{bundle}"
+    yy_af.resources = "HXPhotoPicker/Resources/*.{bundle}"
   end
   
   s.subspec 'CustomItem' do |customItem|
     customItem.source_files = "HXPhotoPicker/**/*.{h,m}"
     customItem.dependency 'SDWebImage', '~> 5.0'
     customItem.dependency 'AFNetworking'
-    customItem.resources    = "HXPhotoPicker/Resources/*.{bundle}"
+    customItem.resources = "HXPhotoPicker/Resources/*.{bundle}"
     customItem.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => 'HXPhotoViewCustomItemSizeEnable=1'}
   end
 end
