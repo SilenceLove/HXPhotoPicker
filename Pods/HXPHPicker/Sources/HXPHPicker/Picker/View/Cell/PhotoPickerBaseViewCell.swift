@@ -32,6 +32,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     /// 展示图片
     public lazy var photoView: PhotoThumbnailView = {
         let photoView = PhotoThumbnailView()
+        photoView.fadeImage = PhotoManager.shared.firstLoadAssets
         return photoView
     }()
     

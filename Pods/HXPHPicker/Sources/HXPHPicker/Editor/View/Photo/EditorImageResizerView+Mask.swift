@@ -93,7 +93,6 @@ extension EditorImageResizerView {
             userInfo: nil,
             repeats: false
         )
-        RunLoop.main.add(timer, forMode: .common)
         maskBgShowTimer = timer
     }
     func stopShowMaskBgTimer() {

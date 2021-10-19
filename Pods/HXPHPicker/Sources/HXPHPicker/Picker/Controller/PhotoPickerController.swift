@@ -336,6 +336,7 @@ open class PhotoPickerController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
     deinit {
+        PhotoManager.shared.firstLoadAssets = false
         cancelFetchAssetsQueue()
         cancelAssetCollectionsQueue()
         cancelRequestAssetFileSize(isPreview: false)

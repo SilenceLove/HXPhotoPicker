@@ -536,7 +536,6 @@ extension CameraManager: AVCaptureFileOutputRecordingDelegate {
             }
         )
         dateVideoStarted = Date()
-        RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
     }
     

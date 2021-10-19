@@ -8,14 +8,15 @@
 import UIKit
 import Photos
 
+public enum EditorTransitionMode {
+    case push
+    case pop
+//    case present
+//    case dismiss
+}
+
 class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
-    enum Mode {
-        case push
-        case pop
-//        case present
-//        case dismiss
-    }
-    let mode: Mode
+    let mode: EditorTransitionMode
     var requestID: PHImageRequestID?
     lazy var previewView: UIImageView = {
         let imageView = UIImageView()
@@ -25,7 +26,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
     }()
     var transitionView: UIView?
     
-    init(mode: Mode) {
+    init(mode: EditorTransitionMode) {
         self.mode = mode
         super.init()
     }
@@ -35,12 +36,12 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
         if let editorVC = transitionContext?.viewController(
             forKey: mode == .push ? .to : .from
         ) as? PhotoEditorViewController {
-            return editorVC.delegate?.photoEditorViewController(transitionDuration: editorVC) ?? 0.55
+            return editorVC.delegate?.photoEditorViewController(editorVC, transitionDuration: mode) ?? 0.55
         }
         if let editorVC = transitionContext?.viewController(
             forKey: mode == .push ? .to : .from
         ) as? VideoEditorViewController {
-            return editorVC.delegate?.videoEditorViewController(transitionDuration: editorVC) ?? 0.55
+            return editorVC.delegate?.videoEditorViewController(editorVC, transitionDuration: mode) ?? 0.55
         }
         return 0.55
     }
@@ -244,6 +245,12 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     toRect = .zero
                 }
                 #endif
+                if toRect.width < editorVC.view.width {
+                    toRect.origin.x = (editorVC.view.width - toRect.width) * 0.5
+                }
+                if toRect.height < editorVC.view.height {
+                    toRect.origin.y = (editorVC.view.height - toRect.height) * 0.5
+                }
             }else {
                 let view = editorVC.playerView
                 view.playerLayer.videoGravity = .resizeAspectFill
@@ -377,7 +384,8 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 #endif
                 if let editorVC = editorVC as? PhotoEditorViewController {
                     if let image = self.previewView.image,
-                       editorVC.editResult == nil {
+                       editorVC.editResult == nil,
+                       editorVC.imageView.image == nil {
                         editorVC.imageView.setImage(image)
                     }
                     editorVC.view.backgroundColor = .black

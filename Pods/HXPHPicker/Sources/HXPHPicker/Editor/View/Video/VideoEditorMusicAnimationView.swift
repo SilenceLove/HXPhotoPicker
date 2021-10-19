@@ -13,6 +13,12 @@ class VideoEditorMusicAnimationLayer: CALayer {
     var isAnimatoning: Bool = false
     let scale: CGFloat
     var animationBeginTime: CFTimeInterval = AVCoreAnimationBeginTimeAtZero
+    
+    override init(layer: Any) {
+        self.scale = 1
+        super.init(layer: layer)
+    }
+    
     init(hexColor: String = "#333333",
          scale: CGFloat = 1) {
         self.scale = scale

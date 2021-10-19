@@ -40,7 +40,7 @@ public extension PickerResult {
     ///   - completionHandler: 全部获取完成(失败的不会添加)
     func getImage(
         compressionScale: CGFloat = 0.5,
-        imageHandler: ((UIImage?, PhotoAsset, Int) -> Void)? = nil,
+        imageHandler: ImageHandler? = nil,
         completionHandler: @escaping ([UIImage]) -> Void
     ) {
         photoAssets.getImage(
@@ -54,14 +54,14 @@ public extension PickerResult {
     /// - Parameters:
     ///   - exportPreset: 视频分辨率，默认ratio_640x480，传 nil 获取则是原始视频
     ///   - videoQuality: 视频质量[0-10]，默认4
-    ///   - exportSession: 导出视频时对应的 AVAssetExportSession   
+    ///   - exportSession: 导出视频时对应的 AVAssetExportSession，exportPreset不为nil时触发
     ///   - videoURLHandler: 每一次获取视频地址都会触发
     ///   - completionHandler: 全部获取完成(失败的不会添加)
     func getVideoURL(
         exportPreset: ExportPreset? = .ratio_640x480,
         videoQuality: Int = 4,
-        exportSession: ((AVAssetExportSession, PhotoAsset, Int) -> Void)? = nil,
-        videoURLHandler: ((Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void)? = nil,
+        exportSession: AVAssetExportSessionHandler? = nil,
+        videoURLHandler: URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         photoAssets.getVideoURL(
@@ -100,9 +100,7 @@ public extension PickerResult {
     ///   - completionHandler: 全部获取完成
     func getURLs(
         options: Options = .any,
-        urlReceivedHandler handler: (
-            (Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void
-        )? = nil,
+        urlReceivedHandler handler: URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         photoAssets.getURLs(
@@ -111,4 +109,13 @@ public extension PickerResult {
             completionHandler: completionHandler
         )
     }
+}
+
+extension PickerResult {
+    /// 图片、PhotoAsset 对象、索引
+    public typealias ImageHandler = (UIImage?, PhotoAsset, Int) -> Void
+    /// 导出视频时对应的 AVAssetExportSession 对象、PhotoAsset 对象、索引
+    public typealias AVAssetExportSessionHandler = (AVAssetExportSession, PhotoAsset, Int) -> Void
+    /// 获取URL的结果、PhotoAsset 对象、索引
+    public typealias URLHandler = (Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void
 }

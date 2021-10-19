@@ -477,13 +477,11 @@ extension PhotoPreviewViewController {
     }
     func setCurrentCellImage(image: UIImage?) {
         guard let image = image,
-              let cell = getCell(for: currentPreviewIndex) else {
+              let cell = getCell(for: currentPreviewIndex),
+              !cell.scrollContentView.requestCompletion else {
             return
         }
-        if !cell.photoAsset.mediaSubType.isGif {
-            cell.cancelRequest()
-            cell.scrollContentView.imageView.image = image
-        }
+        cell.scrollContentView.imageView.image = image
     }
     func deleteCurrentPhotoAsset() {
         if previewAssets.isEmpty || !isExternalPreview {

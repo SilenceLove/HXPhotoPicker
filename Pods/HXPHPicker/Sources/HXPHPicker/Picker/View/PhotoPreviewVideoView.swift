@@ -47,7 +47,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
     var playerTime: CGFloat = 0
     override var avAsset: AVAsset? {
         didSet {
-            do { try AVAudioSession.sharedInstance().setCategory(.playback) } catch {}
+            try? AVAudioSession.sharedInstance().setCategory(.playback)
             delegate?.videoView(showPlayButton: self)
             if isNetwork && PhotoManager.shared.loadNetworkVideoMode == .play {
                 delegate?.videoView(self, isPlaybackLikelyToKeepUp: false)
@@ -168,7 +168,10 @@ class PhotoPreviewVideoView: VideoPlayerView {
         return self
     }
     func hideLoading() {
-        ProgressHUD.hide(forView: loadingSuperview(), animated: true)
+        ProgressHUD.hide(
+            forView: loadingSuperview() ?? loadingView?.superview,
+            animated: true
+        )
     }
     func cancelPlayer() {
         if player.currentItem != nil {

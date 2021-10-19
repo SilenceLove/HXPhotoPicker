@@ -15,7 +15,6 @@ extension UIImageView {
     
     #if canImport(Kingfisher)
     @discardableResult
-    // swiftlint:disable function_body_length
     func setImage(
         for asset: PhotoAsset,
         urlType: DonwloadURLType,
@@ -23,7 +22,6 @@ extension UIImageView {
         downloadTask: ((Kingfisher.DownloadTask?) -> Void)? = nil,
         completionHandler: ((UIImage?, KingfisherError?, PhotoAsset) -> Void)? = nil
     ) -> Any? {
-        // swiftlint:enable function_body_length
         #if HXPICKER_ENABLE_EDITOR
         if let photoEdit = asset.photoEdit {
             if urlType == .thumbnail {
@@ -61,7 +59,7 @@ extension UIImageView {
             let processor = DownsamplingImageProcessor(size: imageAsset.thumbnailSize)
             options = isThumbnail ?
                 [.onlyLoadFirstFrame, .processor(processor), .cacheOriginalImage] :
-                [.backgroundDecode]
+                []
         }else if let videoAsset = asset.networkVideoAsset {
             if let coverImage = videoAsset.coverImage {
                 image = coverImage

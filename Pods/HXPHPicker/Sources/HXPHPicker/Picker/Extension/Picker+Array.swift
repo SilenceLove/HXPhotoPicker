@@ -17,7 +17,7 @@ public extension Array where Element == PhotoAsset {
     ///   - completionHandler: 全部获取完成(失败的不会添加)
     func getImage(
         compressionScale: CGFloat = 0.5,
-        imageHandler: ((UIImage?, PhotoAsset, Int) -> Void)? = nil,
+        imageHandler: PickerResult.ImageHandler? = nil,
         completionHandler: @escaping ([UIImage]) -> Void
     ) {
         let group = DispatchGroup()
@@ -48,14 +48,14 @@ public extension Array where Element == PhotoAsset {
     /// - Parameters:
     ///   - exportPreset: 视频分辨率，默认ratio_640x480，传 nil 获取则是原始视频
     ///   - videoQuality: 视频质量[0-10]，默认4
-    ///   - exportSession: 导出视频时对应的 AVAssetExportSession
+    ///   - exportSession: 导出视频时对应的 AVAssetExportSession，exportPreset不为nil时触发
     ///   - videoURLHandler: 每一次获取视频地址都会触发
     ///   - completionHandler: 全部获取完成(失败的不会添加)
     func getVideoURL(
         exportPreset: ExportPreset? = .ratio_640x480,
         videoQuality: Int = 4,
-        exportSession: ((AVAssetExportSession, PhotoAsset, Int) -> Void)? = nil,
-        videoURLHandler: ((Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void)? = nil,
+        exportSession: PickerResult.AVAssetExportSessionHandler? = nil,
+        videoURLHandler: PickerResult.URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         let group = DispatchGroup()
@@ -128,9 +128,7 @@ public extension Array where Element == PhotoAsset {
     ///     - urls: 获取成功的url集合
     func getURLs(
         options: PickerResult.Options = .any,
-        urlReceivedHandler handler: (
-            (Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void
-        )? = nil,
+        urlReceivedHandler handler: PickerResult.URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         let group = DispatchGroup()

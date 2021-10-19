@@ -133,7 +133,7 @@ extension PhotoTools {
     
     /// 默认滤镜
     public static func defaultFilters() -> [PhotoEditorFilterInfo] {
-        return [
+        [
             PhotoEditorFilterInfo(
                 filterName: "老电影".localized,
                 defaultValue: 1
@@ -308,10 +308,22 @@ extension PhotoTools {
         videoQuality: Int,
         completion: ((URL?, Error?) -> Void)?
     ) -> AVAssetExportSession? {
-        if AVAssetExportSession.exportPresets(compatibleWith: avAsset).contains(exportPreset.name) {
+        var timeRang = timeRang
+        let exportPresets = AVAssetExportSession.exportPresets(compatibleWith: avAsset)
+        if exportPresets.contains(exportPreset.name) {
             do {
                 guard let videoTrack = avAsset.tracks(withMediaType: .video).first else {
                     throw NSError(domain: "Video track is nil", code: 500, userInfo: nil)
+                }
+                let videoTotalSeconds = videoTrack.timeRange.duration.seconds
+                if timeRang.start.seconds + timeRang.duration.seconds > videoTotalSeconds {
+                    timeRang = CMTimeRange(
+                        start: timeRang.start,
+                        duration: CMTime(
+                            seconds: videoTotalSeconds - timeRang.start.seconds,
+                            preferredTimescale: timeRang.start.timescale
+                        )
+                    )
                 }
                 let videoURL = outputURL ?? PhotoTools.getVideoTmpURL()
                 let mixComposition = try mixComposition(

@@ -17,9 +17,13 @@ open class CameraController: UINavigationController {
         #endif
     }
     
+    /// 相机拍摄类型
     public enum CaptureType {
+        // 拍照
         case photo
+        // 录制
         case video
+        // 拍照和录制
         case all
     }
     

@@ -49,6 +49,15 @@ open class VideoEditorConfiguration: EditorConfiguration {
         ///  loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
         public var infos: [VideoEditorMusicInfo] = []
         
+        /// 获取音乐列表, infos 为空时才会触发
+        /// handler = { response -> Bool in
+        ///     // 传入音乐数据
+        ///     response(self.getMusics())
+        ///     // 是否显示loading
+        ///     return false
+        /// }
+        public var handler: ((@escaping ([VideoEditorMusicInfo]) -> Void) -> Bool)?
+        
         public init() { }
     }
     

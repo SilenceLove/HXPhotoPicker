@@ -392,6 +392,11 @@ class PhotoEditorMosaicSmearLayer: CALayer {
         super.init()
     }
     
+    override init(layer: Any) {
+        data = .init(rect: .zero, color: .clear)
+        super.init(layer: layer)
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

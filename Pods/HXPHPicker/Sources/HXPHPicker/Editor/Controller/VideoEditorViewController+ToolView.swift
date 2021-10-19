@@ -42,9 +42,14 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         }
         if hasAudio || timeRang != .zero || hasSticker {
             let stickerInfos = playerView.stickerView.getStickerInfo()
-            ProgressHUD.showLoading(
+//            exportLoadingView = ProgressHUD.showLoading(
+//                addedTo: view,
+//                text: "正在处理...".localized,
+//                animated: true
+//            )
+            exportLoadingView = ProgressHUD.showProgress(
                 addedTo: view,
-                text: "视频导出中".localized,
+                text: "正在处理...".localized,
                 animated: true
             )
             exportVideoURL(
@@ -66,13 +71,11 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             forKeys: ["tracks"]
         ) { [weak self] in
             guard let self = self else { return }
-            if self.avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
-                DispatchQueue.main.async {
-                    self.showErrorHUD()
-                }
-                return
-            }
             DispatchQueue.global().async {
+                if self.avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
+                    self.showErrorHUD()
+                    return
+                }
                 var audioURL: URL?
                 if let musicPath = self.backgroundMusicPath {
                     audioURL = URL(fileURLWithPath: musicPath)
@@ -89,11 +92,28 @@ extension VideoEditorViewController: EditorToolViewDelegate {
                     videoQuality: self.config.videoQuality
                 ) {  [weak self] videoURL, error in
                     if let videoURL = videoURL {
-                        ProgressHUD.hide(forView: self?.view, animated: false)
+                        ProgressHUD.hide(forView: self?.view, animated: true)
                         self?.editFinishCallBack(videoURL)
                         self?.backAction()
                     }else {
                         self?.showErrorHUD()
+                    }
+                }
+                DispatchQueue.main.async {
+                    Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
+                        guard let self = self,
+                              let session = self.exportSession else {
+                            timer.invalidate()
+                            return
+                        }
+                        let progress = session.progress
+                        self.exportLoadingView?.progress = CGFloat(progress)
+                        if progress >= 1 ||
+                            session.status == .completed ||
+                            session.status == .failed ||
+                            session.status == .cancelled {
+                            timer.invalidate()
+                        }
                     }
                 }
             }
@@ -101,7 +121,7 @@ extension VideoEditorViewController: EditorToolViewDelegate {
     }
     func showErrorHUD() {
         ProgressHUD.hide(forView: view, animated: true)
-        ProgressHUD.showWarning(addedTo: view, text: "导出失败".localized, animated: true, delayHide: 1.5)
+        ProgressHUD.showWarning(addedTo: view, text: "处理失败".localized, animated: true, delayHide: 1.5)
     }
     func editFinishCallBack(_ videoURL: URL) {
         if let currentCropOffset = currentCropOffset {
@@ -157,21 +177,35 @@ extension VideoEditorViewController: EditorToolViewDelegate {
                 return
             }
             if musicView.musics.isEmpty {
-                if let editorDelegate = delegate {
-                    if editorDelegate.videoEditorViewController(
-                        self,
-                        loadMusic: { [weak self] infos in
-                            self?.musicView.reloadData(infos: infos)
-                    }) {
+                if let loadHandler = config.music.handler {
+                    let showLoading = loadHandler { [weak self] infos in
+                        self?.musicView.reloadData(infos: infos)
+                    }
+                    if showLoading {
                         musicView.showLoading()
                     }
                 }else {
-                    let infos = PhotoTools.defaultMusicInfos()
-                    if infos.isEmpty {
-                        ProgressHUD.showWarning(addedTo: view, text: "暂无配乐".localized, animated: true, delayHide: 1.5)
-                        return
+                    if let editorDelegate = delegate {
+                        if editorDelegate.videoEditorViewController(
+                            self,
+                            loadMusic: { [weak self] infos in
+                                self?.musicView.reloadData(infos: infos)
+                        }) {
+                            musicView.showLoading()
+                        }
                     }else {
-                        musicView.reloadData(infos: infos)
+                        let infos = PhotoTools.defaultMusicInfos()
+                        if infos.isEmpty {
+                            ProgressHUD.showWarning(
+                                addedTo: view,
+                                text: "暂无配乐".localized,
+                                animated: true,
+                                delayHide: 1.5
+                            )
+                            return
+                        }else {
+                            musicView.reloadData(infos: infos)
+                        }
                     }
                 }
             }

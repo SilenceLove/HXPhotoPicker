@@ -329,6 +329,7 @@ open class VideoEditorViewController: BaseViewController {
     
     /// 视频导出会话
     var exportSession: AVAssetExportSession?
+    var exportLoadingView: ProgressHUD?
     
     var toolOptions: EditorToolView.Options = []
     required public init?(coder: NSCoder) {
@@ -611,7 +612,11 @@ open class VideoEditorViewController: BaseViewController {
         if !scrollView.contentSize.equalTo(playerView.size) {
             scrollView.contentSize = playerView.size
         }
-        if state == .cropping && transitionCompletion {
+        if state == .normal && UIDevice.isPad {
+            scrollView.minimumZoomScale = 1.1
+            scrollView.zoomScale = 1.1
+            setupScrollViewScale()
+        }else if state == .cropping && transitionCompletion {
             setupScrollViewScale()
         }
     }
@@ -687,9 +692,10 @@ open class VideoEditorViewController: BaseViewController {
         navigationController?.setNavigationBarHidden(true, animated: true)
     }
     deinit {
-        avAsset.cancelLoading()
+        if let asset = avAsset {
+            asset.cancelLoading()
+        }
         exportSession?.cancelExport()
-//        print("deinit \(self)")
     }
 }
 

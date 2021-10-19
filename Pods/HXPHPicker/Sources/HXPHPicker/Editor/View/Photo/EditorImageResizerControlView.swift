@@ -529,7 +529,7 @@ class EditorImageResizerControlView: UIView {
         }
         frame = CGRect(x: rectX, y: rectY, width: rectW, height: rectH)
     }
-    /// 代码沉余，待优化
+    
     @objc func panGestureRecognizerHandler(pan: UIPanGestureRecognizer) {
         let view = pan.view
         let point = pan.translation(in: view)

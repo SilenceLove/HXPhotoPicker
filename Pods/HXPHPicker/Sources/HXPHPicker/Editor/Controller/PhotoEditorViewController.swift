@@ -34,6 +34,13 @@ open class PhotoEditorViewController: BaseViewController {
     /// 确认/取消之后自动退出界面
     public var autoBack: Bool = true
     
+    public var finishHandler: FinishHandler?
+    
+    public var cancelHandler: CancelHandler?
+    
+    public typealias FinishHandler = (PhotoEditorViewController, PhotoEditResult?) -> Void
+    public typealias CancelHandler = (PhotoEditorViewController) -> Void
+    
     /// 编辑image
     /// - Parameters:
     ///   - image: 对应的 UIImage
@@ -182,6 +189,7 @@ open class PhotoEditorViewController: BaseViewController {
     
     @objc func didBackButtonClick() {
         transitionalImage = image
+        cancelHandler?(self)
         didBackClick(true)
     }
     
@@ -614,6 +622,7 @@ extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     func cropConfirmView(didCancelButtonClick cropConfirmView: EditorCropConfirmView) {
         if config.fixedCropState {
             transitionalImage = image
+            cancelHandler?(self)
             didBackClick(true)
             return
         }

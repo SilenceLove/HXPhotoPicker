@@ -43,7 +43,6 @@ open class PhotoAssetCollection: Equatable {
     ) {
         self.collection = collection
         self.options = options
-        fetchResult()
     }
     
     public init(

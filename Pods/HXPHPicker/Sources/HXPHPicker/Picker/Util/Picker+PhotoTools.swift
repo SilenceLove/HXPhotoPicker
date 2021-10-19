@@ -130,12 +130,10 @@ extension PhotoTools {
     /// - Parameters:
     ///   - avAsset: 视频对应的 AVAsset 数据
     ///   - outputURL: 指定视频导出的地址，为nil时默认为临时目录
-    ///   - timeRang: 需要裁剪的时间区域
-    ///   - overlayImage: 贴纸
-    ///   - audioURL: 需要添加的音频地址
-    ///   - audioVolume: 需要添加的音频音量
-    ///   - originalAudioVolume: 视频原始音频音量
-    ///   - presentName: 导出的质量
+    ///   - startTime: 需要裁剪的开始时间
+    ///   - endTime: 需要裁剪的结束时间
+    ///   - exportPreset: 导出的分辨率
+    ///   - videoQuality: 导出的质量
     ///   - completion: 导出完成
     @discardableResult
     public static func exportEditVideo(
@@ -147,17 +145,33 @@ extension PhotoTools {
         videoQuality: Int = 5,
         completion: ((URL?, Error?) -> Void)?
     ) -> AVAssetExportSession? {
-        if AVAssetExportSession.exportPresets(
-            compatibleWith: avAsset).contains(exportPreset.name) {
+        let exportPresets = AVAssetExportSession.exportPresets(compatibleWith: avAsset)
+        if exportPresets.contains(exportPreset.name) {
+            guard let videoTrack = avAsset.tracks(withMediaType: .video).first else {
+                completion?(nil, NSError(domain: "Video track is nil", code: 500, userInfo: nil))
+                return nil
+            }
             let videoURL = outputURL == nil ? PhotoTools.getVideoTmpURL() : outputURL
             if let exportSession = AVAssetExportSession(
                 asset: avAsset,
-                presetName: exportPreset.name) {
+                presetName: exportPreset.name
+            ) {
                 let timescale = avAsset.duration.timescale
                 let start = CMTime(value: CMTimeValue(startTime * TimeInterval(timescale)), timescale: timescale)
-                let end = CMTime(value: CMTimeValue(endTime * TimeInterval(timescale)), timescale: timescale)
-                let timeRang = CMTimeRange(start: start, end: end)
-                
+                let timeRang: CMTimeRange
+                let videoTotalSeconds = videoTrack.timeRange.duration.seconds
+                if startTime + endTime > videoTotalSeconds {
+                    timeRang = CMTimeRange(
+                        start: start,
+                        duration: CMTime(
+                            seconds: videoTotalSeconds - startTime,
+                            preferredTimescale: timescale
+                        )
+                    )
+                }else {
+                    let end = CMTime(value: CMTimeValue(endTime * TimeInterval(timescale)), timescale: timescale)
+                    timeRang = CMTimeRange(start: start, end: end)
+                }
                 let supportedTypeArray = exportSession.supportedFileTypes
                 exportSession.outputURL = videoURL
                 if supportedTypeArray.contains(AVFileType.mp4) {
@@ -200,25 +214,26 @@ extension PhotoTools {
         return nil
     }
     
+    @discardableResult
     public static func getVideoDuration(
         for photoAsset: PhotoAsset,
         completionHandler:
             @escaping (PhotoAsset, TimeInterval) -> Void
-    ) {
+    ) -> AVAsset? {
         if photoAsset.mediaType == .video {
             var url: URL?
             if let videoAsset = photoAsset.localVideoAsset,
                photoAsset.isLocalAsset {
                 if videoAsset.duration > 0 {
                     completionHandler(photoAsset, videoAsset.duration)
-                    return
+                    return nil
                 }
                 url = videoAsset.videoURL
             }else if let videoAsset = photoAsset.networkVideoAsset,
                      photoAsset.mediaSubType.isNetwork {
                 if videoAsset.duration > 0 {
                     completionHandler(photoAsset, videoAsset.duration)
-                    return
+                    return nil
                 }
                 let key = videoAsset.videoURL.absoluteString
                 if isCached(forVideo: key) {
@@ -247,8 +262,10 @@ extension PhotoTools {
                         completionHandler(photoAsset, duration)
                     }
                 }
+                return avAsset
             }
         }
+        return nil
     }
     
     /// 将字节转换成字符串

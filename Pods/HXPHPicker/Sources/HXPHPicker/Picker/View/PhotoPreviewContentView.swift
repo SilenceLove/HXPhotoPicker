@@ -114,7 +114,7 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
         #if canImport(Kingfisher)
         if photoAsset.mediaSubType != .networkVideo {
             if !ImageCache.default.isCached(forKey: photoAsset.networkImageAsset!.originalURL.cacheKey) {
-                showLoadingView(text: "正在下载".localized)
+                showLoadingView(text: nil)
             }
         }
         imageTask = imageView.setImage(
@@ -198,7 +198,7 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
             }
             if loadingView == nil {
                 ProgressHUD.hide(forView: hudSuperview(), animated: false)
-                showLoadingView(text: "正在下载".localized)
+                showLoadingView(text: nil)
             }else {
                 loadingView?.isHidden = false
             }
@@ -352,27 +352,30 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
         }
         #endif
         requestID = photoAsset.requestImageData(iCloudHandler: { [weak self] photoAsset, iCloudRequestID in
-            guard let self = self else { return }
-            if photoAsset == self.photoAsset && photoAsset.downloadStatus != .succeed {
-                self.requestShowDonwloadICloudHUD(iCloudRequestID: iCloudRequestID)
+            guard let self = self,
+                  photoAsset == self.photoAsset,
+                  photoAsset.downloadStatus != .succeed else {
+                return
             }
+            self.requestShowDonwloadICloudHUD(iCloudRequestID: iCloudRequestID)
         }, progressHandler: { [weak self] photoAsset, progress in
-            guard let self = self else { return }
-            if photoAsset == self.photoAsset && photoAsset.downloadStatus != .succeed {
-                self.requestUpdateProgress(progress: progress, isICloud: true)
+            guard let self = self,
+                  photoAsset == self.photoAsset,
+                  photoAsset.downloadStatus != .succeed else {
+                return
             }
+            self.requestUpdateProgress(progress: progress, isICloud: true)
         }, resultHandler: { [weak self] asset, result in
-            guard let self = self else { return }
+            guard let self = self,
+                  self.photoAsset == asset else { return }
             switch result {
             case .success(let dataResult):
                 if asset.mediaSubType.isGif {
-                    if asset == self.photoAsset {
-                        self.requestSucceed()
-                        self.imageView.setImageData(dataResult.imageData)
-                        self.setAnimatedImageCompletion = true
-                        self.requestID = nil
-                        self.requestCompletion = true
-                    }
+                    self.requestSucceed()
+                    self.imageView.setImageData(dataResult.imageData)
+                    self.setAnimatedImageCompletion = true
+                    self.requestID = nil
+                    self.requestCompletion = true
                 }else {
                     DispatchQueue.global().async {
                         var image = UIImage.init(data: dataResult.imageData)
@@ -390,9 +393,7 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
                     }
                 }
             case .failure(let error):
-                if asset == self.photoAsset {
-                    self.requestFailed(info: error.info, isICloud: true)
-                }
+                self.requestFailed(info: error.info, isICloud: true)
             }
         })
     }
@@ -479,8 +480,7 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
         showLoadingView(text: "正在同步iCloud".localized)
     }
     func requestUpdateProgress(progress: Double, isICloud: Bool) {
-        let text = isICloud ? "正在同步iCloud".localized : "正在下载".localized
-        loadingView?.updateText(text: text.localized + "(" + String(Int(progress * 100)) + "%)")
+        loadingView?.progress = CGFloat(progress)
     }
     func hudSuperview() -> UIView? {
         if !isPeek {
@@ -490,8 +490,12 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
         }
         return self
     }
-    func showLoadingView(text: String) {
-        loadingView = ProgressHUD.showLoading(addedTo: hudSuperview(), text: text.localized, animated: true)
+    func showLoadingView(text: String?) {
+        loadingView = ProgressHUD.showProgress(
+            addedTo: hudSuperview(),
+            text: text?.localized,
+            animated: true
+        )
     }
     func resetLoadingState() {
         UIApplication.shared.isNetworkActivityIndicatorVisible = false

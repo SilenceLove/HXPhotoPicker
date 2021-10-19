@@ -32,7 +32,8 @@
 "视频导出失败" = "Ekspor video gagal";
 "保存失败" = "Gagal menyimpan";
 "所有照片" = "Semua foto";
-"视频导出中" = "Ekspor video";
+"正在处理..." = "Pengolahan...";
+"处理失败" = "Pemrosesan gagal";
 "导出失败" = "Ekspor gagal";
 "视频加载中" = "Pemuatan video";
 "视频加载失败!" = "Video gagal dimuat!";

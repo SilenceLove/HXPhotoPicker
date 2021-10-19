@@ -66,7 +66,8 @@ public protocol PhotoEditorViewControllerDelegate: AnyObject {
     
     /// 转场动画时长
     func photoEditorViewController(
-        transitionDuration photoEditorViewController: PhotoEditorViewController
+        _ photoEditorViewController: PhotoEditorViewController,
+        transitionDuration mode: EditorTransitionMode
     ) -> TimeInterval
     
     /// 跳转界面时起始的视图，用于获取位置大小。与 transitioBegenPreviewFrame 一样
@@ -152,9 +153,10 @@ public extension PhotoEditorViewControllerDelegate {
     }
     
     func photoEditorViewController(
-        transitionDuration photoEditorViewController: PhotoEditorViewController
+        _ photoEditorViewController: PhotoEditorViewController,
+        transitionDuration mode: EditorTransitionMode
     ) -> TimeInterval {
-        if photoEditorViewController.state == .cropping {
+        if photoEditorViewController.state == .cropping && mode == .push {
             return 0.35
         }
         return 0.55
@@ -278,7 +280,8 @@ public protocol VideoEditorViewControllerDelegate: AnyObject {
     
     /// 转场动画时长
     func videoEditorViewController(
-        transitionDuration videoEditorViewController: VideoEditorViewController
+        _ videoEditorViewController: VideoEditorViewController,
+        transitionDuration mode: EditorTransitionMode
     ) -> TimeInterval
     
     /// 跳转界面时起始的视图，用于获取位置大小。与 presentPreviewImageAt 一样
@@ -377,9 +380,10 @@ public extension VideoEditorViewControllerDelegate {
     }
     
     func videoEditorViewController(
-        transitionDuration videoEditorViewController: VideoEditorViewController
+        _ videoEditorViewController: VideoEditorViewController,
+        transitionDuration mode: EditorTransitionMode
     ) -> TimeInterval {
-        if videoEditorViewController.state == .cropping {
+        if videoEditorViewController.state == .cropping && mode == .push {
             return 0.35
         }
         return 0.55

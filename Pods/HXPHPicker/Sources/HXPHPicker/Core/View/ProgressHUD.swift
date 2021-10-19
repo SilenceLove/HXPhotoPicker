@@ -11,11 +11,39 @@ extension ProgressHUD {
     enum Mode {
         case indicator
         case image
+        case circleProgress
         case success
     }
 }
+
 final class ProgressHUD: UIView {
-    private var mode: Mode
+    var mode: Mode {
+        didSet {
+            if mode == oldValue {
+                return
+            }
+            switch oldValue {
+            case .indicator:
+                indicatorView.removeFromSuperview()
+            case .image:
+                imageView.removeFromSuperview()
+            case .success:
+                tickView.removeFromSuperview()
+            case .circleProgress:
+                circleView.removeFromSuperview()
+            }
+            if mode == .indicator {
+                contentView.addSubview(indicatorView)
+            }else if mode == .image {
+                contentView.addSubview(imageView)
+            }else if mode == .success {
+                contentView.addSubview(tickView)
+            }else if mode == .circleProgress {
+                contentView.addSubview(circleView)
+            }
+            updateFrame()
+        }
+    }
     
     private lazy var backgroundView: UIView = {
         let backgroundView = UIView.init()
@@ -42,7 +70,7 @@ final class ProgressHUD: UIView {
             let indicatorView = ProgressIndefiniteView(
                 frame: CGRect(
                     origin: .zero,
-                    size: CGSize(width: 45, height: 45)
+                    size: CGSize(width: 40, height: 40)
                 )
             )
             indicatorView.startAnimating()
@@ -73,6 +101,20 @@ final class ProgressHUD: UIView {
         )
         return imageView
     }()
+    var progress: CGFloat = 0 {
+        didSet {
+            circleView.progress = progress
+        }
+    }
+    private lazy var circleView: ProgressCircleView = {
+        let view = ProgressCircleView(
+            frame: CGRect(
+                origin: .zero,
+                size: CGSize(width: 50, height: 50)
+            )
+        )
+        return view
+    }()
     
     lazy var tickView: ProgressImageView = {
         let tickView = ProgressImageView(
@@ -87,7 +129,12 @@ final class ProgressHUD: UIView {
     /// 加载指示器类型
     let indicatorType: BaseConfiguration.IndicatorType
     
-    var text: String?
+    var text: String? {
+        didSet {
+            textLb.text = text
+            updateFrame()
+        }
+    }
     var finished: Bool = false
     var showDelayTimer: Timer?
     var hideDelayTimer: Timer?
@@ -111,6 +158,8 @@ final class ProgressHUD: UIView {
             contentView.addSubview(imageView)
         }else if mode == .success {
             contentView.addSubview(tickView)
+        }else if mode == .circleProgress {
+            contentView.addSubview(circleView)
         }
         backgroundView.addSubview(contentView)
         
@@ -122,21 +171,15 @@ final class ProgressHUD: UIView {
         afterDelay: TimeInterval
     ) {
         self.text = text
-        textLb.text = text
-        updateFrame()
         if afterDelay > 0 {
-            let timer = Timer(
+            let timer = Timer.scheduledTimer(
                 timeInterval: afterDelay,
                 target: self,
                 selector: #selector(handleShowTimer(timer:)),
                 userInfo: animated,
                 repeats: false
             )
-            RunLoop.current.add(
-                timer,
-                forMode: RunLoop.Mode.common
-            )
-            self.showDelayTimer = timer
+            showDelayTimer = timer
         }else {
             showViews(animated: animated)
         }
@@ -193,11 +236,6 @@ final class ProgressHUD: UIView {
             indicatorView._stopAnimating()
         }
     }
-    func updateText(text: String) {
-        self.text = text
-        textLb.text = text
-        updateFrame()
-    }
     private func updateFrame() {
         if text != nil {
             var textWidth = text!.width(ofFont: textLb.font, maxHeight: 15)
@@ -220,7 +258,7 @@ final class ProgressHUD: UIView {
         if mode == .indicator {
             indicatorView.centerX = centenrX
             if text != nil {
-                textLb.y = indicatorView.frame.maxY + 10
+                textLb.y = indicatorView.frame.maxY + 12
             }else {
                 textLb.y = indicatorView.frame.maxY
             }
@@ -230,6 +268,13 @@ final class ProgressHUD: UIView {
                 textLb.y = imageView.frame.maxY + 15
             }else {
                 textLb.y = imageView.frame.maxY
+            }
+        }else if mode == .circleProgress {
+            circleView.centerX = centenrX
+            if text != nil {
+                textLb.y = circleView.frame.maxY + 12
+            }else {
+                textLb.y = circleView.frame.maxY
             }
         }else if mode == .success {
             tickView.centerX = centenrX
@@ -352,6 +397,25 @@ final class ProgressHUD: UIView {
             afterDelay: afterDelay
         )
         view.addSubview(progressView)
+    }
+    class func showProgress(
+        addedTo view: UIView?,
+        progress: CGFloat = 0,
+        text: String? = nil,
+        animated: Bool
+    ) -> ProgressHUD? {
+        guard let view = view else { return nil}
+        let progressView = ProgressHUD(
+            addedTo: view,
+            mode: .circleProgress
+        )
+        progressView.showHUD(
+            text: text,
+            animated: animated,
+            afterDelay: 0
+        )
+        view.addSubview(progressView)
+        return progressView
     }
     class func showSuccess(
         addedTo view: UIView?,
@@ -478,7 +542,7 @@ class ProgressIndefiniteView: UIView {
     var isAnimating: Bool = false
     let lineWidth: CGFloat
     
-    init(frame: CGRect, lineWidth: CGFloat = 3) {
+    init(frame: CGRect, lineWidth: CGFloat = 3.5) {
         self.lineWidth = lineWidth
         super.init(frame: frame)
     }

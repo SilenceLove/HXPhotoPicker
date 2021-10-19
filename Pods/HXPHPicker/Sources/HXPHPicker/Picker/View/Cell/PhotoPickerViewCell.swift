@@ -64,9 +64,13 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         return disableMaskLayer
     }()
     
+    /// 获取视频时长时的 AVAsset 对象
+    var videoDurationAsset: AVAsset?
+    
     /// 资源对象
     open override var photoAsset: PhotoAsset! {
         didSet {
+            cancelGetVideoDuration()
             switch photoAsset.mediaSubType {
             case .imageAnimated, .localGifImage:
                 assetTypeLb.text = "GIF"
@@ -82,10 +86,11 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
                     assetTypeLb.text = videoTime
                 }else {
                     assetTypeLb.text = nil
-                    PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
+                    videoDurationAsset = PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
                         guard let self = self else { return }
                         if self.photoAsset == asset {
                             self.assetTypeLb.text = asset.videoTime
+                            self.videoDurationAsset = nil
                         }
                     }
                 }
@@ -197,6 +202,14 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
             setupHighlightedMask()
         }
     }
+    
+    func cancelGetVideoDuration() {
+        if let avAsset = videoDurationAsset {
+            avAsset.cancelLoading()
+            videoDurationAsset = nil
+        }
+    }
+    
     open override func cancelICloudRequest() {
         super.cancelICloudRequest()
         iCloudMarkView.isHidden = true

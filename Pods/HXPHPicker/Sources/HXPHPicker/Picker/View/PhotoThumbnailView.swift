@@ -62,6 +62,9 @@ open class PhotoThumbnailView: UIView {
     public var task: Any?
     
     private var _image: UIImage?
+    private var firstLoadImage: Bool = true
+    
+    var fadeImage: Bool = false
     
     /// 获取图片，重写此方法可以修改图片
     open func requestThumbnailImage(
@@ -69,6 +72,9 @@ open class PhotoThumbnailView: UIView {
         completion: ((UIImage?, PhotoAsset) -> Void)? = nil
     ) {
         guard let photoAsset = photoAsset else { return }
+        if _image != nil {
+            firstLoadImage = false
+        }
         cancelRequest()
         if photoAsset.isNetworkAsset ||
             photoAsset.mediaSubType == .localVideo {
@@ -132,8 +138,12 @@ open class PhotoThumbnailView: UIView {
         }
     }
     private func requestCompletion(_ image: UIImage?) {
+        if fadeImage {
+            imageView.setImage(image, animated: _image == nil ? false : firstLoadImage)
+        }else {
+            imageView.image = image
+        }
         _image = image
-        imageView.image = image
     }
     /// 布局，重写此方法修改布局
     open func layoutView() {

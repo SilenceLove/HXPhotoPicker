@@ -266,11 +266,9 @@ extension PhotoPickerController {
                 }
                 photoAssets.append(asset)
             })
+            photoAssets.append(contentsOf: localAssets.reversed())
             if self.config.photoList.sort == .desc {
                 photoAssets.reverse()
-                photoAssets.insert(contentsOf: localAssets, at: 0)
-            }else {
-                photoAssets.append(contentsOf: localAssets.reversed())
             }
             if operation.isCancelled {
                 return

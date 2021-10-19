@@ -16,7 +16,7 @@ extension PhotoEditorViewController {
             imageView.hasFilter ||
             imageView.hasSticker {
             imageView.deselectedSticker()
-            ProgressHUD.showLoading(addedTo: view, animated: true)
+            ProgressHUD.showLoading(addedTo: view, text: "正在处理...", animated: true)
             imageView.cropping { [weak self] (result) in
                 guard let self = self else { return }
                 if let result = result {
@@ -24,12 +24,13 @@ extension PhotoEditorViewController {
                     self.isFinishedBack = true
                     self.transitionalImage = result.editedImage
                     self.delegate?.photoEditorViewController(self, didFinish: result)
+                    self.finishHandler?(self, result)
                     self.didBackClick()
                 }else {
                     ProgressHUD.hide(forView: self.view, animated: true)
                     ProgressHUD.showWarning(
                         addedTo: self.view,
-                        text: "图片获取失败!".localized,
+                        text: "处理失败".localized,
                         animated: true,
                         delayHide: 1.5
                     )
@@ -38,6 +39,7 @@ extension PhotoEditorViewController {
         }else {
             transitionalImage = image
             delegate?.photoEditorViewController(didFinishWithUnedited: self)
+            finishHandler?(self, nil)
             didBackClick()
         }
     }

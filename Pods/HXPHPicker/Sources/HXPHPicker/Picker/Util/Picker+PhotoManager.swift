@@ -11,9 +11,8 @@ import Photos
 import PhotosUI
 
 extension PhotoManager {
-    struct AssociatedKeys {
-        static var loadNetworkVideoMode: String = "loadNetworkVideoMode"
-    }
+    
+    /// 加载网络视频方式
     public var loadNetworkVideoMode: PhotoAsset.LoadNetworkVideoMode {
         get {
             objc_getAssociatedObject(
@@ -31,21 +30,101 @@ extension PhotoManager {
         }
     }
     
-    var cameraAlbumLocalIdentifierSelectOptions: PickerAssetOptions? {
+    var cacheCameraAlbum: Bool {
+        get {
+            cacheCamera
+        }
+        set {
+            if newValue == cacheCamera {
+                return
+            }
+            objc_setAssociatedObject(
+                self,
+                &AssociatedKeys.cacheCameraAlbum,
+                newValue,
+                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
+            if newValue {
+                PHPhotoLibrary.shared().register(self)
+            }else {
+                PHPhotoLibrary.shared().unregisterChangeObserver(self)
+            }
+        }
+    }
+    
+    private var cacheCamera: Bool {
+        objc_getAssociatedObject(
+            self,
+            &AssociatedKeys.cacheCameraAlbum
+        ) as? Bool ?? false
+    }
+    
+    var firstLoadAssets: Bool {
+        get {
+            objc_getAssociatedObject(
+                self,
+                &AssociatedKeys.firstLoadAssets
+            ) as? Bool ?? true
+        }
+        set {
+            objc_setAssociatedObject(
+                self,
+                &AssociatedKeys.firstLoadAssets,
+                newValue,
+                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
+        }
+    }
+    
+    private var cameraAlbumResult: PHFetchResult<PHAsset>? {
+        get {
+            objc_getAssociatedObject(
+                self,
+                &AssociatedKeys.cameraAlbumResult
+            ) as? PHFetchResult<PHAsset>
+        }
+        set {
+            objc_setAssociatedObject(
+                self,
+                &AssociatedKeys.cameraAlbumResult,
+                newValue,
+                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
+        }
+    }
+    
+    private var cameraAlbumResultOptions: PickerAssetOptions? {
+        get {
+            objc_getAssociatedObject(
+                self,
+                &AssociatedKeys.cameraAlbumResultOptions
+            ) as? PickerAssetOptions
+        }
+        set {
+            objc_setAssociatedObject(
+                self,
+                &AssociatedKeys.cameraAlbumResultOptions,
+                newValue,
+                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
+        }
+    }
+    
+    private var cameraAlbumLocalIdentifierSelectOptions: PickerAssetOptions? {
         let identifierType = UserDefaults.standard.integer(
             forKey: PhotoManager.CameraAlbumLocal.identifierType.rawValue
         )
         return PickerAssetOptions(rawValue: identifierType)
     }
     
-    var cameraAlbumLocalLanguage: String? {
+    private var cameraAlbumLocalLanguage: String? {
         let language = UserDefaults.standard.string(
             forKey: PhotoManager.CameraAlbumLocal.language.rawValue
         )
         return language
     }
     
-    var cameraAlbumLocalIdentifier: String? {
+    private var cameraAlbumLocalIdentifier: String? {
         let identifier = UserDefaults.standard.string(
             forKey: PhotoManager.CameraAlbumLocal.identifier.rawValue
         )
@@ -75,6 +154,7 @@ extension PhotoManager {
                     collection: collection,
                     options: options
                 )
+                assetCollection.fetchResult()
                 if showEmptyCollection == false && assetCollection.count == 0 {
                     return
                 }
@@ -107,6 +187,7 @@ extension PhotoManager {
                 collection: collection,
                 options: options
             )
+            assetCollection.fetchResult()
             if showEmptyCollection == false && assetCollection.count == 0 {
                 return
             }
@@ -125,22 +206,25 @@ extension PhotoManager {
         DispatchQueue.global().async {
             var useLocalIdentifier = false
             let language = Locale.preferredLanguages.first
-            if self.cameraAlbumLocalIdentifier != nil {
-                let localOptions = self.cameraAlbumLocalIdentifierSelectOptions
-                if  ((localOptions?.isPhoto == true && localOptions?.isVideo == true) ||
-                        selectOptions == self.cameraAlbumLocalIdentifierSelectOptions) &&
-                    self.cameraAlbumLocalLanguage == language {
+            if let localOptions = self.cameraAlbumLocalIdentifierSelectOptions,
+               let localLanguage = self.cameraAlbumLocalLanguage,
+               localLanguage == language,
+               self.cameraAlbumLocalIdentifier != nil {
+                if (localOptions.isPhoto && localOptions.isVideo) ||
+                    selectOptions == localOptions {
                     useLocalIdentifier = true
                 }
             }
-            let collection: PHAssetCollection?
-            if useLocalIdentifier == true {
-                let identifiers: [String] = [self.cameraAlbumLocalIdentifier!]
+            var collection: PHAssetCollection?
+            if let localIdentifier = self.cameraAlbumLocalIdentifier,
+               useLocalIdentifier {
+                let identifiers: [String] = [localIdentifier]
                 collection = PHAssetCollection.fetchAssetCollections(
                     withLocalIdentifiers: identifiers,
                     options: nil
                 ).firstObject
-            }else {
+            }
+            if collection == nil {
                 collection = AssetManager.fetchCameraRollAlbum(options: nil)
                 UserDefaults.standard.set(
                     collection?.localIdentifier,
@@ -150,16 +234,50 @@ extension PhotoManager {
                     selectOptions.rawValue,
                     forKey: PhotoManager.CameraAlbumLocal.identifierType.rawValue
                 )
-                UserDefaults.standard.set(language, forKey: PhotoManager.CameraAlbumLocal.language.rawValue)
+                UserDefaults.standard.set(
+                    language, forKey: PhotoManager.CameraAlbumLocal.language.rawValue
+                )
             }
             let assetCollection = PhotoAssetCollection(
                 collection: collection,
                 options: options
             )
+            if let fetchResult = self.cameraAlbumResult,
+               let options = self.cameraAlbumResultOptions,
+               (options == selectOptions || (options.isPhoto && options.isVideo)) {
+                assetCollection.changeResult(for: fetchResult)
+            }else {
+                assetCollection.fetchResult()
+                if self.cacheCameraAlbum {
+                    self.cameraAlbumResult = assetCollection.result
+                    self.cameraAlbumResultOptions = selectOptions
+                }
+            }
             assetCollection.isCameraRoll = true
             DispatchQueue.main.async {
                 completion(assetCollection)
             }
         }
+    }
+}
+
+extension PhotoManager: PHPhotoLibraryChangeObserver {
+    public func photoLibraryDidChange(_ changeInstance: PHChange) {
+        guard let fetchResult = cameraAlbumResult,
+              let changeResult = changeInstance.changeDetails(for: fetchResult) else {
+            return
+        }
+        let result = changeResult.fetchResultAfterChanges
+        cameraAlbumResult = result
+    }
+}
+
+extension PhotoManager {
+    private struct AssociatedKeys {
+        static var loadNetworkVideoMode: String = "loadNetworkVideoMode"
+        static var cacheCameraAlbum: String = "cacheCameraAlbum"
+        static var cameraAlbumResult: String = "cameraAlbumResult"
+        static var cameraAlbumResultOptions: String = "cameraAlbumResultOptions"
+        static var firstLoadAssets: String = "firstLoadAssets"
     }
 }

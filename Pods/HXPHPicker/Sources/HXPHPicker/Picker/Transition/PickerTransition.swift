@@ -151,6 +151,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         toViewSize: toVC.view.size,
                         directions: [.horizontal]
                     )
+                    if rect.width < toVC.view.width {
+                        rect.origin.x = (toVC.view.width - rect.width) * 0.5
+                    }
+                    if rect.height < toVC.view.height {
+                        rect.origin.y = (toVC.view.height - rect.height) * 0.5
+                    }
                 }else {
                     rect = PhotoTools.transformImageSize(
                         photoAsset.imageSize,

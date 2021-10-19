@@ -12,10 +12,9 @@ extension URL {
         absoluteString.hasSuffix("gif") || absoluteString.hasSuffix("GIF")
     }
     var fileSize: Int {
-         do {
-            let fileSize = try resourceValues(forKeys: [.fileSizeKey])
-            return fileSize.fileSize ?? 0
-         } catch {}
-        return 0
+        guard let fileSize = try? resourceValues(forKeys: [.fileSizeKey]) else {
+            return 0
+        }
+        return fileSize.fileSize ?? 0
     }
 }

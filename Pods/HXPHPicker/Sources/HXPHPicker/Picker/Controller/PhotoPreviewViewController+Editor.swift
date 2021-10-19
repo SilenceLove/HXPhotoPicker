@@ -127,9 +127,9 @@ extension PhotoPreviewViewController: PhotoEditorViewControllerDelegate {
         }
         return getCell(for: photoAsset)?.scrollContentView.imageView.image
     }
-    
     public func photoEditorViewController(
-        transitionDuration photoEditorViewController: PhotoEditorViewController
+        _ photoEditorViewController: PhotoEditorViewController,
+        transitionDuration mode: EditorTransitionMode
     ) -> TimeInterval {
         0.35
     }
@@ -337,7 +337,8 @@ extension PhotoPreviewViewController: VideoEditorViewControllerDelegate {
     }
     
     public func videoEditorViewController(
-        transitionDuration videoEditorViewController: VideoEditorViewController
+        _ videoEditorViewController: VideoEditorViewController,
+        transitionDuration mode: EditorTransitionMode
     ) -> TimeInterval {
         0.35
     }

@@ -437,6 +437,9 @@ extension PhotoPickerViewController {
         }
     }
     func scrollToAppropriatePlace(photoAsset: PhotoAsset?) {
+        if assets.isEmpty {
+            return
+        }
         var item = config.sort == .asc ? assets.count - 1 : 0
         if let photoAsset = photoAsset {
             item = assets.firstIndex(of: photoAsset) ?? item

@@ -23,5 +23,19 @@ public struct EditorChartletConfig {
     /// 贴图标题
     public var titles: [EditorChartlet] = []
     
+    /// 加载标题, titles 为空时才会触发
+    /// titleHandler = { response in
+    ///     // 传入标题数据
+    ///     response(self.getChartletTitles())
+    /// }
+    public var titleHandler: ((@escaping EditorTitleChartletResponse) -> Void)?
+    
+    /// 加载贴图列表
+    /// listHandler = { titleIndex, response in
+    ///     // 传入标题下标，对应标题下的贴纸数据
+    ///     response(titleIndex, self.getChartlets())
+    /// }
+    public var listHandler: ((Int, @escaping EditorChartletListResponse) -> Void)?
+    
     public init() { }
 }

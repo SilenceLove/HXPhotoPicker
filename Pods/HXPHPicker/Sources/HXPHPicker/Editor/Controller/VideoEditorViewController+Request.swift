@@ -25,10 +25,11 @@ extension VideoEditorViewController {
             deliveryMode: .highQualityFormat
         ) { [weak self] (photoAsset, requestID) in
             self?.assetRequestID = requestID
-            loadingView?.updateText(text: "正在同步iCloud".localized + "...")
+            loadingView?.mode = .circleProgress
+            loadingView?.text = "正在同步iCloud".localized + "..."
         } progressHandler: { (photoAsset, progress) in
             if progress > 0 {
-                loadingView?.updateText(text: "正在同步iCloud".localized + "(" + String(Int(progress * 100)) + "%)")
+                loadingView?.progress = CGFloat(progress)
             }
         } success: { [weak self] (photoAsset, avAsset, info) in
             ProgressHUD.hide(forView: self?.view, animated: false)
@@ -131,7 +132,8 @@ extension VideoEditorViewController {
                 with: videoURL
             ) { [weak self] (progress, task) in
                 if progress > 0 {
-                    self?.loadingView?.updateText(text: "视频下载中".localized + "(" + String(Int(progress * 100)) + "%)")
+                    self?.loadingView?.mode = .circleProgress
+                    self?.loadingView?.progress = CGFloat(progress)
                 }
             } completionHandler: { [weak self] (url, error, _) in
                 if let url = url {

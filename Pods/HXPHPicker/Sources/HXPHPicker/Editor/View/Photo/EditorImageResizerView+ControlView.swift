@@ -63,7 +63,6 @@ extension EditorImageResizerView: EditorImageResizerControlViewDelegate {
             userInfo: nil,
             repeats: false
         )
-        RunLoop.main.add(timer, forMode: .common)
         controlTimer = timer
         inControlTimer = true
     }

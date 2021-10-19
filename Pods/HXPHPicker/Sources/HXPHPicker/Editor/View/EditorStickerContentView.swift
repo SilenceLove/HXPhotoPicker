@@ -234,7 +234,6 @@ class EditorStickerContentView: UIView {
                 }
 //                    print("正在循环")
         })
-        RunLoop.current.add(timer, forMode: .common)
         self.timer = timer
     }
     func invalidateTimer() {

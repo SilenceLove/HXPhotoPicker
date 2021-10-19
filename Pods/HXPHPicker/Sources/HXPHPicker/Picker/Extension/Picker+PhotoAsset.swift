@@ -161,15 +161,13 @@ extension PhotoAsset {
     ) {
         var loadingView: ProgressHUD?
         syncICloud { _, _ in
-            loadingView = ProgressHUD.showLoading(
+            loadingView = ProgressHUD.showProgress(
                 addedTo: view,
                 text: "正在同步iCloud".localized + "...",
                 animated: true
             )
         } progressHandler: { _, progress in
-            loadingView?.updateText(
-                text: "正在同步iCloud".localized + "(" + String(Int(progress * 100)) + "%)"
-            )
+            loadingView?.progress = CGFloat(progress)
         } completionHandler: { photoAsset, isSuccess in
             ProgressHUD.hide(forView: view, animated: isSuccess)
             if !isSuccess {

@@ -43,8 +43,7 @@ extension PhotoEditorViewController {
                         }
                         #endif
                     }else if let imageURL = self.photoAsset.localImageAsset?.imageURL {
-                        do {
-                            let imageData = try Data.init(contentsOf: imageURL)
+                        if let imageData = try? Data(contentsOf: imageURL) {
                             #if canImport(Kingfisher)
                             if let gifImage = DefaultImageProcessor.default.process(
                                 item: .data(imageData),
@@ -53,7 +52,7 @@ extension PhotoEditorViewController {
                                 image = gifImage
                             }
                             #endif
-                        }catch {}
+                        }
                     }
                 }
                 self.filterHDImageHandler(image: image)
@@ -75,9 +74,11 @@ extension PhotoEditorViewController {
         #if canImport(Kingfisher)
         let loadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
         photoAsset.getNetworkImage(urlType: .original, filterEditor: true) { (receiveSize, totalSize) in
-            let progress = Double(receiveSize) / Double(totalSize)
+            let progress = CGFloat(receiveSize) / CGFloat(totalSize)
             if progress > 0 {
-                loadingView?.updateText(text: "图片下载中".localized + "(" + String(Int(progress * 100)) + "%)")
+                loadingView?.mode = .circleProgress
+                loadingView?.text = "图片下载中".localized
+                loadingView?.progress = progress
             }
         } resultHandler: { [weak self] (image) in
             guard let self = self else { return }
@@ -190,9 +191,11 @@ extension PhotoEditorViewController {
         let url = networkImageURL!
         let loadingView = ProgressHUD.showLoading(addedTo: view, animated: true)
         PhotoTools.downloadNetworkImage(with: url, options: [.backgroundDecode]) { (receiveSize, totalSize) in
-            let progress = Double(receiveSize) / Double(totalSize)
+            let progress = CGFloat(receiveSize) / CGFloat(totalSize)
             if progress > 0 {
-                loadingView?.updateText(text: "图片下载中".localized + "(" + String(Int(progress * 100)) + "%)")
+                loadingView?.mode = .circleProgress
+                loadingView?.text = "图片下载中".localized
+                loadingView?.progress = progress
             }
         } completionHandler: { [weak self] (image) in
             guard let self = self else { return }

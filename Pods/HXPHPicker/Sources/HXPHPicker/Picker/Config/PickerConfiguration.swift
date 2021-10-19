@@ -125,4 +125,12 @@ public class PickerConfiguration: BaseConfiguration {
     
     /// 未授权提示界面相关配置
     public lazy var notAuthorized: NotAuthorizedConfiguration = .init()
+    
+    /// 是否缓存相机胶卷相册
+    public var isCacheCameraAlbum: Bool = true
+    
+    public override init() {
+        super.init()
+        PhotoManager.shared.cacheCameraAlbum = isCacheCameraAlbum
+    }
 }

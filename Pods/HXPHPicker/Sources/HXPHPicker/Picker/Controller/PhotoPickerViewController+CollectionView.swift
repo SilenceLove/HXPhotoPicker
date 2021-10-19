@@ -87,18 +87,8 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 isSelected: photoAsset.isSelected,
                 animated: false
             )
-//            let pickerCell = myCell as? PhotoPickerViewCell
-//            pickerCell?.requestICloudState()
         }
     }
-//    public func collectionView(
-//        _ collectionView: UICollectionView,
-//        didEndDisplaying cell: UICollectionViewCell,
-//        forItemAt indexPath: IndexPath
-//    ) {
-//        let myCell = cell as? PhotoPickerBaseViewCell
-//        myCell?.cancelRequest()
-//    }
     public func collectionView(
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
