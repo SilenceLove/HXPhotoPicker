@@ -254,7 +254,8 @@ extension PhotoPickerView: CameraControllerDelegate {
             case .video(let videoURL):
                 asset = videoURL
                 mediaType = .video
-                photoAsset = .init(localVideoAsset: .init(videoURL: videoURL))
+                let videoDuration = PhotoTools.getVideoDuration(videoURL: videoURL)
+                photoAsset = .init(localVideoAsset: .init(videoURL: videoURL, duration: videoDuration))
             }
             if self.config.saveSystemAlbum {
                 self.saveSystemAlbum(

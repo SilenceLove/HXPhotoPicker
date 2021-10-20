@@ -423,6 +423,7 @@ extension PhotoPickerController {
                 self.albumViewController()?.updatePrompt()
                 self.pickerViewController()?.reloadAlbumData()
                 self.pickerViewController()?.updateBottomPromptView()
+                PhotoManager.shared.registerPhotoChangeObserver()
             }
         }
     }

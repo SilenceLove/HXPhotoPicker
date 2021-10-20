@@ -185,6 +185,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         for asset: Any,
         mediaType: PHAssetMediaType,
         location: CLLocation? = nil,
+        isCapture: Bool = false,
         completion: (() -> Void)? = nil) {
         AssetManager.saveSystemAlbum(
             forAsset: asset,
@@ -193,7 +194,11 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             location: location
         ) { (phAsset) in
             if let phAsset = phAsset {
-                self.addedCameraPhotoAsset(PhotoAsset(asset: phAsset), completion: completion)
+                self.addedCameraPhotoAsset(
+                    PhotoAsset(asset: phAsset),
+                    isCapture: isCapture,
+                    completion: completion
+                )
             }else {
                 DispatchQueue.main.async {
                     ProgressHUD.hide(
@@ -213,13 +218,17 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
     }
     func addedCameraPhotoAsset(
         _ photoAsset: PhotoAsset,
+        isCapture: Bool = false,
         completion: (() -> Void)? = nil
     ) {
         func addPhotoAsset(_ photoAsset: PhotoAsset) {
             guard let picker = pickerController else { return }
             ProgressHUD.hide(forView: navigationController?.view, animated: true)
             if config.takePictureCompletionToSelected {
-                if picker.addedPhotoAsset(photoAsset: photoAsset) {
+                if picker.addedPhotoAsset(
+                    photoAsset: photoAsset,
+                    filterEditor: true
+                ) {
                     updateCellSelectedTitle()
                 }
             }
@@ -234,7 +243,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             bottomView.updateFinishButtonTitle()
             setupEmptyView()
             if picker.config.selectMode == .single && config.finishSelectionAfterTakingPhoto {
-                quickSelect(photoAsset)
+                quickSelect(photoAsset, isCapture: isCapture)
             }
             completion?()
         }
@@ -255,7 +264,7 @@ extension PhotoPickerViewController: CameraControllerDelegate {
             cameraController.dismiss(animated: true)
             return
         }
-        let didDismiss: Bool
+        var didDismiss: Bool
         if picker.config.selectMode == .single &&
            config.finishSelectionAfterTakingPhoto {
             didDismiss = false
@@ -280,29 +289,43 @@ extension PhotoPickerViewController: CameraControllerDelegate {
             case .video(let videoURL):
                 asset = videoURL
                 mediaType = .video
-                photoAsset = .init(localVideoAsset: .init(videoURL: videoURL))
+                let videoDuration = PhotoTools.getVideoDuration(videoURL: videoURL)
+                photoAsset = .init(localVideoAsset: .init(videoURL: videoURL, duration: videoDuration))
             }
-            var canSelect = false
-            if !picker.canSelectAsset(for: photoAsset, showHUD: true) {
+            var canSelect = true
+            if !picker.canSelectAsset(
+                for: photoAsset,
+                showHUD: true,
+                filterEditor: true
+            ) {
                 if !didDismiss {
-                    DispatchQueue.main.sync {
+                    DispatchQueue.main.async {
                         cameraController.dismiss(animated: true)
                     }
+                    didDismiss = true
                 }
-                canSelect = true
+                canSelect = false
+            }
+            if !didDismiss && !picker.autoDismiss {
+                DispatchQueue.main.async {
+                    cameraController.dismiss(animated: true)
+                }
+                didDismiss = true
             }
             if self.config.saveSystemAlbum {
                 self.saveSystemAlbum(
                     for: asset,
                     mediaType: mediaType,
-                    location: location
+                    location: location,
+                    isCapture: true
                 ) { [weak self] in
                     self?.cameraControllerDismiss(canSelect)
                 }
                 return
             }
             self.addedCameraPhotoAsset(
-                photoAsset
+                photoAsset,
+                isCapture: true
             ) { [weak self] in
                 self?.cameraControllerDismiss(canSelect)
             }
@@ -310,10 +333,13 @@ extension PhotoPickerViewController: CameraControllerDelegate {
     }
     
     func cameraControllerDismiss(_ canSelect: Bool) {
-        if let picker = pickerController,
+        guard let picker = pickerController,
            picker.config.selectMode == .single,
            config.finishSelectionAfterTakingPhoto,
-           canSelect {
+           canSelect else {
+            return
+        }
+        if picker.autoDismiss {
             presentingViewController?.dismiss(animated: true)
         }
     }

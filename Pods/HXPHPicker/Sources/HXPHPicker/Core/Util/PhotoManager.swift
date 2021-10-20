@@ -37,6 +37,24 @@ public final class PhotoManager: NSObject {
         return false
     }
     
+    #if HXPICKER_ENABLE_PICKER
+    /// 加载网络视频方式
+    public var loadNetworkVideoMode: PhotoAsset.LoadNetworkVideoMode = .download
+    
+    var isCacheCameraAlbum: Bool = false {
+        didSet {
+            if isCacheCameraAlbum == oldValue {
+                return
+            }
+            registerPhotoChangeObserver()
+        }
+    }
+    var didRegisterObserver: Bool = false
+    var firstLoadAssets: Bool = true
+    var cameraAlbumResult: PHFetchResult<PHAsset>?
+    var cameraAlbumResultOptions: PickerAssetOptions?
+    #endif
+    
     /// 当前语言文件，每次创建PhotoPickerController判断是否需要重新创建
     var languageBundle: Bundle?
     /// 当前语言类型，每次创建PhotoPickerController时赋值

@@ -167,11 +167,21 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             }
         }
     }
-    func quickSelect(_ photoAsset: PhotoAsset) {
+    func quickSelect(
+        _ photoAsset: PhotoAsset,
+        isCapture: Bool = false
+    ) {
+        guard let picker = pickerController else {
+            return
+        }
         if !photoAsset.isSelected {
             if !isMultipleSelect || (videoLoadSingleCell && photoAsset.mediaType == .video) {
-                if pickerController?.canSelectAsset(for: photoAsset, showHUD: true) == true {
-                    pickerController?.singleFinishCallback(for: photoAsset)
+                if picker.canSelectAsset(
+                    for: photoAsset,
+                    showHUD: true,
+                    filterEditor: isCapture
+                ) {
+                    picker.singleFinishCallback(for: photoAsset)
                 }
             }else {
                 if let cell = getCell(for: photoAsset) as? PhotoPickerViewCell {

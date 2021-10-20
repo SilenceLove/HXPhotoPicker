@@ -298,7 +298,10 @@ extension UIImage {
         let layer = PhotoTools.getGradientShadowLayer(true)
         layer.frame = CGRect(origin: .zero, size: havingSize)
         UIGraphicsBeginImageContextWithOptions(havingSize, false, UIScreen.main.scale)
-        layer.render(in: UIGraphicsGetCurrentContext()!)
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return nil
+        }
+        layer.render(in: context)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image

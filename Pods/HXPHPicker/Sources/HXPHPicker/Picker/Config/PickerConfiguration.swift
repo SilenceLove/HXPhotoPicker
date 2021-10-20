@@ -131,6 +131,6 @@ public class PickerConfiguration: BaseConfiguration {
     
     public override init() {
         super.init()
-        PhotoManager.shared.cacheCameraAlbum = isCacheCameraAlbum
+        PhotoManager.shared.isCacheCameraAlbum = isCacheCameraAlbum
     }
 }

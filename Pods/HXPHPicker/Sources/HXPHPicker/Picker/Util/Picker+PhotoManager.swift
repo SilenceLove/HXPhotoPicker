@@ -12,101 +12,25 @@ import PhotosUI
 
 extension PhotoManager {
     
-    /// 加载网络视频方式
-    public var loadNetworkVideoMode: PhotoAsset.LoadNetworkVideoMode {
-        get {
-            objc_getAssociatedObject(
-                self,
-                &AssociatedKeys.loadNetworkVideoMode
-            ) as? PhotoAsset.LoadNetworkVideoMode ?? .download
+    func registerPhotoChangeObserver() {
+        let status = AssetManager.authorizationStatus()
+        if status == .notDetermined || status == .denied {
+            return
         }
-        set {
-            objc_setAssociatedObject(
-                self,
-                &AssociatedKeys.loadNetworkVideoMode,
-                newValue,
-                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
-        }
-    }
-    
-    var cacheCameraAlbum: Bool {
-        get {
-            cacheCamera
-        }
-        set {
-            if newValue == cacheCamera {
+        if isCacheCameraAlbum {
+            if didRegisterObserver {
                 return
             }
-            objc_setAssociatedObject(
-                self,
-                &AssociatedKeys.cacheCameraAlbum,
-                newValue,
-                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
-            if newValue {
-                PHPhotoLibrary.shared().register(self)
-            }else {
-                PHPhotoLibrary.shared().unregisterChangeObserver(self)
+            PHPhotoLibrary.shared().register(self)
+            didRegisterObserver = true
+        }else {
+            if !didRegisterObserver {
+                return
             }
-        }
-    }
-    
-    private var cacheCamera: Bool {
-        objc_getAssociatedObject(
-            self,
-            &AssociatedKeys.cacheCameraAlbum
-        ) as? Bool ?? false
-    }
-    
-    var firstLoadAssets: Bool {
-        get {
-            objc_getAssociatedObject(
-                self,
-                &AssociatedKeys.firstLoadAssets
-            ) as? Bool ?? true
-        }
-        set {
-            objc_setAssociatedObject(
-                self,
-                &AssociatedKeys.firstLoadAssets,
-                newValue,
-                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
-        }
-    }
-    
-    private var cameraAlbumResult: PHFetchResult<PHAsset>? {
-        get {
-            objc_getAssociatedObject(
-                self,
-                &AssociatedKeys.cameraAlbumResult
-            ) as? PHFetchResult<PHAsset>
-        }
-        set {
-            objc_setAssociatedObject(
-                self,
-                &AssociatedKeys.cameraAlbumResult,
-                newValue,
-                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
-        }
-    }
-    
-    private var cameraAlbumResultOptions: PickerAssetOptions? {
-        get {
-            objc_getAssociatedObject(
-                self,
-                &AssociatedKeys.cameraAlbumResultOptions
-            ) as? PickerAssetOptions
-        }
-        set {
-            objc_setAssociatedObject(
-                self,
-                &AssociatedKeys.cameraAlbumResultOptions,
-                newValue,
-                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-            )
+            PHPhotoLibrary.shared().unregisterChangeObserver(self)
+            cameraAlbumResult = nil
+            cameraAlbumResultOptions = nil
+            didRegisterObserver = false
         }
     }
     
@@ -248,7 +172,7 @@ extension PhotoManager {
                 assetCollection.changeResult(for: fetchResult)
             }else {
                 assetCollection.fetchResult()
-                if self.cacheCameraAlbum {
+                if self.isCacheCameraAlbum {
                     self.cameraAlbumResult = assetCollection.result
                     self.cameraAlbumResultOptions = selectOptions
                 }
@@ -269,15 +193,5 @@ extension PhotoManager: PHPhotoLibraryChangeObserver {
         }
         let result = changeResult.fetchResultAfterChanges
         cameraAlbumResult = result
-    }
-}
-
-extension PhotoManager {
-    private struct AssociatedKeys {
-        static var loadNetworkVideoMode: String = "loadNetworkVideoMode"
-        static var cacheCameraAlbum: String = "cacheCameraAlbum"
-        static var cameraAlbumResult: String = "cameraAlbumResult"
-        static var cameraAlbumResultOptions: String = "cameraAlbumResultOptions"
-        static var firstLoadAssets: String = "firstLoadAssets"
     }
 }

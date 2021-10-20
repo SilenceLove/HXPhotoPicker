@@ -114,10 +114,14 @@ open class PhotoAsset: Equatable {
     /// - Parameters:
     ///   - localVideoAsset: 对应本地视频的 LocalVideoAsset
     public init(localVideoAsset: LocalVideoAsset) {
-        if localVideoAsset.duration > 0 {
-            pVideoTime = PhotoTools.transformVideoDurationToString(duration: localVideoAsset.duration)
-            pVideoDuration = localVideoAsset.duration
+        let videoDuration: TimeInterval
+        if localVideoAsset.duration == 0 {
+            videoDuration = PhotoTools.getVideoDuration(videoURL: localVideoAsset.videoURL)
+        }else {
+            videoDuration = localVideoAsset.duration
         }
+        pVideoTime = PhotoTools.transformVideoDurationToString(duration: videoDuration)
+        pVideoDuration = videoDuration
         self.localVideoAsset = localVideoAsset
         mediaType = .video
         mediaSubType = .localVideo

@@ -312,7 +312,10 @@ extension PhotoPickerController {
     /// - Parameter photoAsset: 对应的PhotoAsset对象
     /// - Returns: 添加结果
     @discardableResult
-    func addedPhotoAsset(photoAsset: PhotoAsset) -> Bool {
+    func addedPhotoAsset(
+        photoAsset: PhotoAsset,
+        filterEditor: Bool = false
+    ) -> Bool {
         if singleVideo && photoAsset.mediaType == .video {
             return false
         }
@@ -324,7 +327,11 @@ extension PhotoPickerController {
             photoAsset.isSelected = true
             return true
         }
-        let canSelect = canSelectAsset(for: photoAsset, showHUD: true)
+        let canSelect = canSelectAsset(
+            for: photoAsset,
+            showHUD: true,
+            filterEditor: filterEditor
+        )
         if canSelect {
             pickerDelegate?.pickerController(
                 self,
@@ -390,10 +397,13 @@ extension PhotoPickerController {
     ///   - photoAsset: 对应的PhotoAsset
     ///   - showHUD: 是否显示HUD
     /// - Returns: 结果
+    // swiftlint:disable cyclomatic_complexity
     func canSelectAsset(
         for photoAsset: PhotoAsset,
-        showHUD: Bool
+        showHUD: Bool,
+        filterEditor: Bool = false
     ) -> Bool {
+        // swiftlint:enable cyclomatic_complexity
         var canSelect = true
         var text: String?
         if photoAsset.mediaType == .photo {
@@ -434,7 +444,7 @@ extension PhotoPickerController {
             if config.maximumSelectedVideoDuration > 0 {
                 if round(photoAsset.videoDuration) > Double(config.maximumSelectedVideoDuration) {
                     #if HXPICKER_ENABLE_EDITOR
-                    if !config.editorOptions.contains(.video) {
+                    if !config.editorOptions.contains(.video) || filterEditor {
                         text = String(
                             format: "视频最大时长为%d秒，无法选择".localized,
                             arguments: [config.maximumSelectedVideoDuration]
@@ -496,7 +506,13 @@ extension PhotoPickerController {
             }
         }
         if let text = text, !canSelect, showHUD {
-            ProgressHUD.showWarning(addedTo: view, text: text, animated: true, delayHide: 1.5)
+            if DispatchQueue.isMain {
+                ProgressHUD.showWarning(addedTo: view, text: text, animated: true, delayHide: 1.5)
+            }else {
+                DispatchQueue.main.async {
+                    ProgressHUD.showWarning(addedTo: self.view, text: text, animated: true, delayHide: 1.5)
+                }
+            }
         }
         return canSelect
     }

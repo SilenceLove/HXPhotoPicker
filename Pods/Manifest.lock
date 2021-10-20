@@ -27,7 +27,7 @@ PODS:
   - Kingfisher (7.1.1)
 
 DEPENDENCIES:
-  - HXPHPicker (~> 1.2.4)
+  - HXPHPicker
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -38,6 +38,6 @@ SPEC CHECKSUMS:
   HXPHPicker: 5b5f9a0b330fb7cbe050ac4a6cd15350a42f8cdd
   Kingfisher: f738f9c4a3415823b8e2985d10aa2d6a9f37bc4d
 
-PODFILE CHECKSUM: 42f1d214158df57b2f64fa6edf9bdfd7fff90a82
+PODFILE CHECKSUM: 456071287b73c9b1a638958526857600d42a1aa6
 
 COCOAPODS: 1.10.1
