@@ -34,7 +34,7 @@ CLLocationManagerDelegate
 @property (strong, nonatomic) UIButton *changeCameraBtn;
 @property (strong, nonatomic) HXCameraBottomView *bottomView;
 @property (strong, nonatomic) NSTimer *timer;
-@property (assign, nonatomic) NSDate *dateVideoStarted;
+@property (strong, nonatomic) NSDate *dateVideoStarted;
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) HXCustomCameraPlayVideoView *playVideoView;
 @property (strong, nonatomic) UIButton *doneBtn;
@@ -678,9 +678,9 @@ CLLocationManagerDelegate
 }
 - (void)playViewAnimateCompletion {
     if (self.bottomView.inTranscribe) {
-        self.dateVideoStarted = [NSDate date];
         dispatch_async(dispatch_queue_create("com.hxdatephotopicker.camera", NULL), ^{
             [self.cameraController startRecording];
+            self.dateVideoStarted = [NSDate date];
 //            dispatch_async(dispatch_get_main_queue(), ^{
 //                [self startTimer];
 //            });
