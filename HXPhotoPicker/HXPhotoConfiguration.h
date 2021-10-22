@@ -279,6 +279,21 @@ HXPhotoPreviewViewController;
 
 #pragma mark - < UI相关 >
 
+/// 相册权限为选择部分时，照片列表添加cell的背景颜色
+@property (strong, nonatomic) UIColor *photoListLimitCellBackgroundColor;
+/// 相册权限为选择部分时，照片列表添加cell暗黑模式下的背景颜色
+@property (strong, nonatomic) UIColor *photoListLimitCellBackgroundDarkColor;
+/// 相册权限为选择部分时，照片列表添加cell的加号颜色
+@property (strong, nonatomic) UIColor *photoListLimitCellLineColor;
+/// 相册权限为选择部分时，照片列表添加cell暗黑模式下的加号颜色
+@property (strong, nonatomic) UIColor *photoListLimitCellLineDarkColor;
+/// 相册权限为选择部分时，照片列表添加cell的文字颜色
+@property (strong, nonatomic) UIColor *photoListLimitCellTextColor;
+/// 相册权限为选择部分时，照片列表添加cell暗黑模式下的文字颜色
+@property (strong, nonatomic) UIColor *photoListLimitCellTextDarkColor;
+/// 相册权限为选择部分时，照片列表添加cell的文字字体
+@property (strong, nonatomic) UIFont *photoListLimitCellTextFont;
+
 /// 限制提示视图：背景样式
 @property (assign, nonatomic) UIBlurEffectStyle photoListLimitBlurStyle;
 /// 限制提示视图：文本颜色

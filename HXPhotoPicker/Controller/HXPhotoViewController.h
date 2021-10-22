@@ -111,6 +111,18 @@ HXCustomCameraController;
 - (void)stopRunning;
 @end
 
+@interface HXPhotoLimitViewCell : UICollectionViewCell
+@property (strong, nonatomic) UIColor *bgColor;
+@property (strong, nonatomic) UIColor *bgDarkColor;
+@property (strong, nonatomic) UIColor *lineColor;
+@property (strong, nonatomic) UIColor *lineDarkColor;
+@property (strong, nonatomic) UIColor *textColor;
+@property (strong, nonatomic) UIColor *textDarkColor;
+@property (strong, nonatomic) UIFont *textFont;
+
+- (void)config;
+@end
+
 @interface HXPhotoViewSectionFooterView : UICollectionReusableView
 @property (assign, nonatomic) NSInteger photoCount;
 @property (assign, nonatomic) NSInteger videoCount;

@@ -116,6 +116,14 @@
     self.photoListLimitTextColor = [UIColor hx_colorWithHexStr:@"#666666"];
     self.photoListLimitSettingColor = self.themeColor;
     self.photoListLimitCloseColor = self.themeColor;
+    
+    self.photoListLimitCellBackgroundColor = [UIColor hx_colorWithHexStr:@"#f1f1f1"];
+    self.photoListLimitCellBackgroundDarkColor = [UIColor hx_colorWithHexStr:@"#333333"];
+    self.photoListLimitCellLineColor = [UIColor hx_colorWithHexStr:@"#999999"];
+    self.photoListLimitCellLineDarkColor = [UIColor hx_colorWithHexStr:@"#ffffff"];
+    self.photoListLimitCellTextColor = [UIColor hx_colorWithHexStr:@"#999999"];
+    self.photoListLimitCellTextDarkColor = [UIColor hx_colorWithHexStr:@"#ffffff"];
+    self.photoListLimitCellTextFont = [UIFont hx_mediumPingFangOfSize:14];
 }
 - (void)setLivePhotoAutoPlay:(BOOL)livePhotoAutoPlay {
     _livePhotoAutoPlay = livePhotoAutoPlay;
@@ -309,6 +317,10 @@
     self.photoListViewBgColor = [UIColor hx_colorWithHexStr:@"#2E2F30"];
     self.photoListBottomPhotoCountTextColor = [UIColor whiteColor];
     self.previewPhotoViewBgColor = [UIColor blackColor];
+    
+    self.photoListLimitCellBackgroundColor = [UIColor hx_colorWithHexStr:@"#383838"];
+    self.photoListLimitCellLineColor = [UIColor hx_colorWithHexStr:@"#ffffff"];
+    self.photoListLimitCellTextColor = [UIColor hx_colorWithHexStr:@"#ffffff"];
 }
 - (HXPhotoEditConfiguration *)photoEditConfigur {
     if (!_photoEditConfigur) {

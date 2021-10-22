@@ -713,6 +713,20 @@
             [allArray insertObject:model atIndex:0];
         }
     }
+    if ([HXPhotoTools authorizationStatusIsLimited]) {
+        HXPhotoModel *model = [[HXPhotoModel alloc] init];
+        model.type = HXPhotoModelMediaTypeLimit;
+        if (!self.configuration.reverseDate) {
+            if (self.configuration.openCamera) {
+                [allArray insertObject:model atIndex:allArray.count - 1];
+            }else {
+                [allArray addObject:model];
+            }
+        }else {
+            [allArray insertObject:model atIndex:cameraIndex];
+        }
+        cameraIndex++;
+    }
     if (_tempCameraAssetModels && !self.configuration.singleSelected) {
         NSInteger index = 0;
         for (HXPhotoModel *model in _tempCameraAssetModels) {
