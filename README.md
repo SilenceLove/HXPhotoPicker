@@ -65,13 +65,13 @@
 ``` ruby
 # 将以下内容添加到您的Podfile中：
 # 不使用网络图片功能
-pod 'HXPhotoPicker', '~> 3.2.5'
+pod 'HXPhotoPicker', '~> 3.2.6'
   
 # 使用SDWebImage加载网络图片
-pod 'HXPhotoPicker/SDWebImage', '~> 3.2.5'
+pod 'HXPhotoPicker/SDWebImage', '~> 3.2.6'
   
 # 使用YYWebImage加载网络图片
-pod 'HXPhotoPicker/YYWebImage', '~> 3.2.5'
+pod 'HXPhotoPicker/YYWebImage', '~> 3.2.6'
 
 # 搜索不到库或最新版时请执行
 pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
@@ -716,15 +716,9 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
+- v3.2.6　-　相册权限为"选中的照片"时，照片列表添加更多按钮、修复iPhone se 系统 12.2 版本录制视频，松开奔溃
 - v3.2.5　-　适配iOS15
 - v3.2.4　-　编辑视频导出压缩逻辑优化，支持设置压缩等级。修复了部分问题
-- v3.2.3　-　iOS 14 图片选择部分，限制提示
-- v3.2.2　-　修改静音状态下播放视频没有声音。pod导入的支持自定义HXPhotoView的itemSize，导入方式为 pod 'HXPhotoPicker/CustomItem'
-- v3.2.1　-　优化转场动画、手势返回、修复系统相册编辑过的图片获取原图大小时错误问题、国际化完善、修复获取gif的URL时为静态图的问题
-- v3.2.0　-　修复特殊情况下获取视频地址崩溃问题
-- v3.1.9　-　优化连续编辑大图出现的内存问题，修复相机拍照后预览崩溃问题
-- v3.1.8　-　修复保存自定义相册无效问题
-- v3.1.7　-　修复相机闪光灯失效问题、视频转场动画效果优化、HXPhotoModel添加获取原视频地址方法、添加属性控制预览界面是否直接加载原图
 ```
 </details>
    
@@ -732,6 +726,13 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>历史记录</strong></summary>
    
 ```
+- v3.2.3　-　iOS 14 图片选择部分，限制提示
+- v3.2.2　-　修改静音状态下播放视频没有声音。pod导入的支持自定义HXPhotoView的itemSize，导入方式为 pod 'HXPhotoPicker/CustomItem'
+- v3.2.1　-　优化转场动画、手势返回、修复系统相册编辑过的图片获取原图大小时错误问题、国际化完善、修复获取gif的URL时为静态图的问题
+- v3.2.0　-　修复特殊情况下获取视频地址崩溃问题
+- v3.1.9　-　优化连续编辑大图出现的内存问题，修复相机拍照后预览崩溃问题
+- v3.1.8　-　修复保存自定义相册无效问题
+- v3.1.7　-　修复相机闪光灯失效问题、视频转场动画效果优化、HXPhotoModel添加获取原视频地址方法、添加属性控制预览界面是否直接加载原图
 - v3.1.6　-　修复相机界面内存泄漏问题、相册权限为部分时拍照错乱问题、requestImageAfterFinishingSelection为YES时未获取原图问题
 - v3.1.5　-　修复获取保存本地的视频时，选中下标错误显示为视频时长、优化手势动画效果、编辑图片时支持圆形裁剪框
 - v3.1.4　-　fix previewPhoto为nil
