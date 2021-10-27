@@ -167,6 +167,8 @@ CLLocationManagerDelegate
     
     if (@available(iOS 15.0, *)) {
         UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
+        appearance.shadowImage = [[UIImage alloc] init];
+        appearance.shadowColor = [UIColor clearColor];
         appearance.titleTextAttributes = self.customNavigationBar.titleTextAttributes;
         appearance.backgroundEffect = nil;
         self.customNavigationBar.standardAppearance = appearance;
@@ -698,6 +700,7 @@ CLLocationManagerDelegate
     if (!_customNavigationBar) {
         _customNavigationBar = [[UINavigationBar alloc] init];
         _customNavigationBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        _customNavigationBar.shadowImage = [[UIImage alloc] init];
         [_customNavigationBar pushNavigationItem:self.navItem animated:NO];
     }
     return _customNavigationBar;

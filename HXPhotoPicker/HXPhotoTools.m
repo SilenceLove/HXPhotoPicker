@@ -306,6 +306,15 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     }
     NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:asset];
     if ([presets containsObject:presetName]) {
+        
+        AVAssetTrack *videoTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+        NSTimeInterval videoTotalSeconds = CMTimeGetSeconds(videoTrack.timeRange.duration);
+        NSTimeInterval startSeconds = CMTimeGetSeconds(timeRange.start);
+        NSTimeInterval timeRangeDuration = CMTimeGetSeconds(timeRange.duration);
+        if (startSeconds + timeRangeDuration > videoTotalSeconds) {
+            timeRange = CMTimeRangeMake(timeRange.start, CMTimeMake(videoTotalSeconds - startSeconds, timeRange.start.timescale));
+        }
+        
         NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
         NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
         NSURL *videoURL = [NSURL fileURLWithPath:fullPathToFile];
