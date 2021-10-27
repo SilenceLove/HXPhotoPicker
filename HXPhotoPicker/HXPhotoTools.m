@@ -312,7 +312,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
         NSTimeInterval startSeconds = CMTimeGetSeconds(timeRange.start);
         NSTimeInterval timeRangeDuration = CMTimeGetSeconds(timeRange.duration);
         if (startSeconds + timeRangeDuration > videoTotalSeconds) {
-            timeRange = CMTimeRangeMake(timeRange.start, CMTimeMake(videoTotalSeconds - startSeconds, timeRange.start.timescale));
+            timeRange = CMTimeRangeMake(timeRange.start, CMTimeMakeWithSeconds(videoTotalSeconds - startSeconds, timeRange.duration.timescale));
         }
         
         NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
