@@ -240,7 +240,8 @@
         self.fromCell.center = self.transitionImgViewCenter;
         self.bgView.alpha = 1;
     } completion:^(BOOL finished) {
-        if (finished) {
+        UIApplicationState applicationState = [UIApplication sharedApplication].applicationState;
+        if (applicationState == UIApplicationStateBackground || finished) {
             fromVC.collectionView.hidden = NO;
             if (!fromVC.bottomView.userInteractionEnabled) {
                 fromVC.view.backgroundColor = [UIColor blackColor];
