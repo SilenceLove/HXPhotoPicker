@@ -24,20 +24,25 @@ public extension AssetManager {
         targetWidth: CGFloat,
         completion: ImageResultHandler?
     ) -> PHImageRequestID {
-        let options = PHImageRequestOptions.init()
+        let options = PHImageRequestOptions()
         options.resizeMode = .fast
+        var isSimplify = false
+        #if HXPICKER_ENABLE_PICKER
+        isSimplify = PhotoManager.shared.thumbnailLoadMode == .simplify
+        #endif
         return requestImage(
             for: asset,
-            targetSize: PhotoTools.transformTargetWidthToSize(
+            targetSize: isSimplify ? .init(
+                width: targetWidth,
+                height: targetWidth
+            ) : PhotoTools.transformTargetWidthToSize(
                 targetWidth: targetWidth,
                 asset: asset
             ),
             options: options
         ) { (image, info) in
-            if completion != nil {
-                DispatchQueue.main.async {
-                    completion!(image, info)
-                }
+            DispatchQueue.main.async {
+                completion?(image, info)
             }
         }
     }

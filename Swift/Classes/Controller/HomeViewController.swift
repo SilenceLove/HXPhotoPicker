@@ -8,6 +8,9 @@
 import UIKit
 import HXPHPicker
 import CoreLocation
+#if canImport(GDPerformanceView_Swift)
+import GDPerformanceView_Swift
+#endif
 
 class HomeViewController: UITableViewController {
     
@@ -17,6 +20,14 @@ class HomeViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        #if canImport(GDPerformanceView_Swift)
+        PerformanceMonitor.shared().pause()
+        PerformanceMonitor.shared().start()
+        #endif
     }
     
     // MARK: - Table view data source
@@ -227,7 +238,8 @@ extension HomeViewController: CameraControllerDelegate {
             case .image(let image):
                 photoAsset = PhotoAsset(localImageAsset: .init(image: image))
             case .video(let videoURL):
-                photoAsset = PhotoAsset(localVideoAsset: .init(videoURL: videoURL))
+                let videoDuration = PhotoTools.getVideoDuration(videoURL: videoURL)
+                photoAsset = .init(localVideoAsset: .init(videoURL: videoURL, duration: videoDuration))
             }
             let pickerResultVC = PickerResultViewController.init()
             pickerResultVC.selectedAssets = [photoAsset]

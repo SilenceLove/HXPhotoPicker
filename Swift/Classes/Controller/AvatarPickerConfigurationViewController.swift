@@ -340,7 +340,7 @@ extension AvatarPickerConfigurationViewController {
     }
 }
 
-extension PhotoCroppingConfiguration.AspectRatioType {
+extension EditorCropSizeConfiguration.AspectRatioType {
     var title: String {
         switch self {
         case .ratio_1x1:

@@ -120,9 +120,9 @@ class PhotoPreviewSelectedView: UIView,
         photoAssetArray[index] = photoAsset
         collectionView.reloadItems(at: [IndexPath.init(item: index, section: 0)])
     }
-    func scrollTo(photoAsset: PhotoAsset?, isAnimated: Bool) {
+    func scrollTo(photoAsset: PhotoAsset?, isAnimated: Bool = true) {
         if photoAsset == nil {
-            deSelectedCurrentIndexPath()
+            deselectedCurrentIndexPath()
             return
         }
         if photoAssetArray.contains(photoAsset!) {
@@ -134,13 +134,10 @@ class PhotoPreviewSelectedView: UIView,
             collectionView.selectItem(at: indexPath, animated: isAnimated, scrollPosition: .centeredHorizontally)
             currentSelectedIndexPath = indexPath
         }else {
-            deSelectedCurrentIndexPath()
+            deselectedCurrentIndexPath()
         }
     }
-    func scrollTo(photoAsset: PhotoAsset?) {
-        scrollTo(photoAsset: photoAsset, isAnimated: true)
-    }
-    func deSelectedCurrentIndexPath() {
+    func deselectedCurrentIndexPath() {
         if currentSelectedIndexPath != nil {
             collectionView.deselectItem(at: currentSelectedIndexPath!, animated: true)
             currentSelectedIndexPath = nil

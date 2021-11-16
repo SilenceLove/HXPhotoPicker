@@ -261,6 +261,7 @@ open class PhotoPickerController: UINavigationController {
         super.viewDidLoad()
         PhotoManager.shared.indicatorType = config.indicatorType
         PhotoManager.shared.loadNetworkVideoMode = config.previewView.loadNetworkVideoMode
+        PhotoManager.shared.thumbnailLoadMode = .complete
         configColor()
         navigationBar.isTranslucent = config.navigationBarIsTranslucent
         selectOptions = config.selectOptions
@@ -336,6 +337,7 @@ open class PhotoPickerController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
     deinit {
+        PhotoManager.shared.thumbnailLoadMode = .complete
         PhotoManager.shared.firstLoadAssets = false
         cancelFetchAssetsQueue()
         cancelAssetCollectionsQueue()

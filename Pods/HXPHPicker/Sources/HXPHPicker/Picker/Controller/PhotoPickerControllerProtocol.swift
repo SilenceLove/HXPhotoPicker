@@ -138,7 +138,7 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
         videoEditorShouldClickMusicTool videoEditorViewController: VideoEditorViewController
     ) -> Bool
     
-    /// 视频编辑器加载配乐信息，当musicConfig.infos为空时触发
+    /// 视频编辑器加载配乐信息，当music.infos为空时触发
     /// 返回 true 内部会显示加载状态，调用 completionHandler 后恢复
     /// - Parameters:
     ///   - pickerController: 对应的 PhotoPickerController

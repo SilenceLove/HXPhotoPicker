@@ -71,54 +71,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     open override var photoAsset: PhotoAsset! {
         didSet {
             cancelGetVideoDuration()
-            switch photoAsset.mediaSubType {
-            case .imageAnimated, .localGifImage:
-                assetTypeLb.text = "GIF"
-                assetTypeMaskView.isHidden = false
-            case .networkImage(let isGif):
-                assetTypeLb.text = isGif ? "GIF" : nil
-                assetTypeMaskView.isHidden = !isGif
-            case .livePhoto:
-                assetTypeLb.text = "Live"
-                assetTypeMaskView.isHidden = false
-            case .video, .localVideo, .networkVideo:
-                if let videoTime = photoAsset.videoTime {
-                    assetTypeLb.text = videoTime
-                }else {
-                    assetTypeLb.text = nil
-                    videoDurationAsset = PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
-                        guard let self = self else { return }
-                        if self.photoAsset == asset {
-                            self.assetTypeLb.text = asset.videoTime
-                            self.videoDurationAsset = nil
-                        }
-                    }
-                }
-                assetTypeMaskView.isHidden = false
-//                #if HXPICKER_ENABLE_EDITOR
-//                if photoAsset.videoEdit == nil {
-//                    assetTypeIcon.image = UIImage.image(for: "hx_picker_cell_video_icon")
-//                }else {
-//                    assetTypeIcon.image = UIImage.image(for: "hx_picker_cell_video_edit_icon")
-//                }
-//                #endif
-            default:
-                assetTypeLb.text = nil
-                assetTypeMaskView.isHidden = true
-            }
-            assetEditMarkIcon.isHidden = true
-            if photoAsset.mediaType == .photo {
-                #if HXPICKER_ENABLE_EDITOR
-                if let photoEdit = photoAsset.photoEdit {
-                    if photoEdit.imageType == .normal {
-                        assetTypeLb.text = nil
-                    }
-                    assetEditMarkIcon.isHidden = false
-                    assetTypeMaskView.isHidden = false
-                }
-                #endif
-            }
-            assetTypeIcon.isHidden = photoAsset.mediaType != .video
+            setupState()
         }
     }
     
@@ -203,18 +156,6 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         }
     }
     
-    func cancelGetVideoDuration() {
-        if let avAsset = videoDurationAsset {
-            avAsset.cancelLoading()
-            videoDurationAsset = nil
-        }
-    }
-    
-    open override func cancelICloudRequest() {
-        super.cancelICloudRequest()
-        iCloudMarkView.isHidden = true
-    }
-    
     /// 设置高亮遮罩
     open func setupHighlightedMask() {
         guard let photoAsset = photoAsset else { return }
@@ -223,7 +164,90 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         }
     }
     
+    open override func requestThumbnailCompletion(_ image: UIImage?) {
+        super.requestThumbnailCompletion(image)
+        if !didLoadCompletion {
+            didLoadCompletion = true
+            setupState()
+        }
+    }
+    
+    open override func cancelICloudRequest() {
+        super.cancelICloudRequest()
+        iCloudMarkView.isHidden = true
+    }
+    private var didLoadCompletion: Bool = false
+    
     deinit {
         disableMaskLayer.backgroundColor = nil
+    }
+}
+
+// MARK: request
+extension PhotoPickerViewCell {
+    
+    func cancelGetVideoDuration() {
+        if let avAsset = videoDurationAsset {
+            avAsset.cancelLoading()
+            videoDurationAsset = nil
+        }
+    }
+}
+
+// MARK: private
+extension PhotoPickerViewCell {
+    
+    private func setupState() {
+        if !didLoadCompletion {
+            return
+        }
+        switch photoAsset.mediaSubType {
+        case .imageAnimated, .localGifImage:
+            assetTypeLb.text = "GIF"
+            assetTypeMaskView.isHidden = false
+        case .networkImage(let isGif):
+            assetTypeLb.text = isGif ? "GIF" : nil
+            assetTypeMaskView.isHidden = !isGif
+        case .livePhoto:
+            assetTypeLb.text = "Live"
+            assetTypeMaskView.isHidden = false
+        case .video, .localVideo, .networkVideo:
+            if let videoTime = photoAsset.videoTime {
+                assetTypeLb.text = videoTime
+            }else {
+                assetTypeLb.text = nil
+                videoDurationAsset = PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
+                    guard let self = self else { return }
+                    if self.photoAsset == asset {
+                        self.assetTypeLb.text = asset.videoTime
+                        self.videoDurationAsset = nil
+                    }
+                }
+            }
+            assetTypeMaskView.isHidden = false
+//                #if HXPICKER_ENABLE_EDITOR
+//                if photoAsset.videoEdit == nil {
+//                    assetTypeIcon.image = UIImage.image(for: "hx_picker_cell_video_icon")
+//                }else {
+//                    assetTypeIcon.image = UIImage.image(for: "hx_picker_cell_video_edit_icon")
+//                }
+//                #endif
+        default:
+            assetTypeLb.text = nil
+            assetTypeMaskView.isHidden = true
+        }
+        assetEditMarkIcon.isHidden = true
+        if photoAsset.mediaType == .photo {
+            #if HXPICKER_ENABLE_EDITOR
+            if let photoEdit = photoAsset.photoEdit {
+                if photoEdit.imageType == .normal {
+                    assetTypeLb.text = nil
+                }
+                assetEditMarkIcon.isHidden = false
+                assetTypeMaskView.isHidden = false
+            }
+            #endif
+        }
+        assetTypeIcon.isHidden = photoAsset.mediaType != .video
     }
 }

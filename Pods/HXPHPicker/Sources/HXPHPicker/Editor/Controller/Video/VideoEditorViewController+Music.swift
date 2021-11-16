@@ -9,8 +9,11 @@ import UIKit
 
 // MARK: VideoEditorMusicViewDelegate
 extension VideoEditorViewController: VideoEditorMusicViewDelegate {
+    func removeAudioSticker() {
+        videoView.imageResizerView.imageView.stickerView.removeAudioView()
+    }
     func musicView(_ musicView: VideoEditorMusicView, didShowLyricButton isSelected: Bool, music: VideoEditorMusic?) {
-        playerView.stickerView.removeAudioView()
+        removeAudioSticker()
         if !isSelected {
             return
         }
@@ -18,13 +21,12 @@ extension VideoEditorViewController: VideoEditorMusicViewDelegate {
             image: UIImage(),
             imageData: nil,
             text: nil,
-            music: music ?? otherMusic,
-            videoSize: playerFrame.size
+            music: music ?? otherMusic
         )
         if item.music == nil {
             return
         }
-        playerView.stickerView.add(sticker: item, isSelected: false)
+        videoView.addSticker(item: item, isSelected: false)
     }
     func musicView(_ musicView: VideoEditorMusicView, didSelectMusic audioPath: String?) {
         backgroundMusicPath = audioPath
@@ -32,7 +34,7 @@ extension VideoEditorViewController: VideoEditorMusicViewDelegate {
     }
     func musicView(deselectMusic musicView: VideoEditorMusicView) {
         backgroundMusicPath = nil
-        playerView.stickerView.removeAudioView()
+        removeAudioSticker()
     }
     func musicView(didSearchButton musicView: VideoEditorMusicView) {
         searchMusicView.searchView.becomeFirstResponder()
@@ -43,9 +45,9 @@ extension VideoEditorViewController: VideoEditorMusicViewDelegate {
     }
     func musicView(_ musicView: VideoEditorMusicView, didOriginalSoundButtonClick isSelected: Bool) {
         if isSelected {
-            playerView.player.volume = 1
+            videoView.playerView.player.volume = 1
         }else {
-            playerView.player.volume = 0
+            videoView.playerView.player.volume = 0
         }
     }
 }

@@ -1,0 +1,6 @@
+framework module GDPerformanceView_Swift {
+  umbrella header "GDPerformanceView-Swift-umbrella.h"
+
+  export *
+  module * { export * }
+}

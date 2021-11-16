@@ -22,14 +22,11 @@ struct EditorStickerItem {
     let imageData: Data?
     let text: EditorStickerText?
     let music: VideoEditorMusic?
-    let videoSize: CGSize?
     var frame: CGRect {
         var width = UIScreen.main.bounds.width - 80
         if music != nil {
             let height: CGFloat = 60
-            if let videoSize = videoSize {
-                width = videoSize.width - 40
-            }
+            width = UIScreen.main.bounds.width - 40
             return CGRect(origin: .zero, size: CGSize(width: width, height: height))
         }
         if text != nil {
@@ -65,7 +62,6 @@ struct EditorStickerItem {
         self.imageData = imageData
         self.text = text
         self.music = music
-        self.videoSize = videoSize
     }
 }
 
@@ -110,7 +106,6 @@ extension EditorStickerItem: Codable {
         case imageData
         case text
         case music
-        case videoSize
     }
     
     init(from decoder: Decoder) throws {
@@ -132,7 +127,6 @@ extension EditorStickerItem: Codable {
         self.image = image
         text = try container.decodeIfPresent(EditorStickerText.self, forKey: .text)
         music = try container.decodeIfPresent(VideoEditorMusic.self, forKey: .music)
-        videoSize = try container.decodeIfPresent(CGSize.self, forKey: .videoSize)
     }
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -154,7 +148,6 @@ extension EditorStickerItem: Codable {
         }
         try container.encodeIfPresent(text, forKey: .text)
         try container.encodeIfPresent(music, forKey: .music)
-        try container.encodeIfPresent(videoSize, forKey: .videoSize)
     }
 }
 

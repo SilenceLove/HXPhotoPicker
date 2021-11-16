@@ -64,7 +64,7 @@ class CaptureVideoPreviewView: UIView {
                     if session.canSetSessionPreset(AVCaptureSession.Preset.low) {
                         session.sessionPreset = .low
                     }
-                    if session.canAddOutput(self.videoOutput) {
+                    if session.canAddOutput(self.videoOutput) && !self.canAddOutput {
                         self.canAddOutput = true
                         session.addOutput(self.videoOutput)
                     }
@@ -116,6 +116,12 @@ class CaptureVideoPreviewView: UIView {
             self.previewLayer?.session?.stopRunning()
         }
     }
+    func removeSampleBufferDelegate() {
+        if isCell && canAddOutput {
+            videoOutput.setSampleBufferDelegate(nil, queue: nil)
+            canAddOutput = false
+        }
+    }
     func removeMask() {
         imageMaskView.removeFromSuperview()
         shadeView.removeFromSuperview()
@@ -129,12 +135,6 @@ class CaptureVideoPreviewView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    deinit {
-        if isCell && canAddOutput {
-            videoOutput.setSampleBufferDelegate(nil, queue: nil)
-            canAddOutput = false
-        }
-    }
 }
 
 extension CaptureVideoPreviewView: AVCaptureVideoDataOutputSampleBufferDelegate {
@@ -144,7 +144,9 @@ extension CaptureVideoPreviewView: AVCaptureVideoDataOutputSampleBufferDelegate 
         from connection: AVCaptureConnection
     ) {
         if isCell && canAddOutput {
-            if let image = PhotoTools.createImage(from: sampleBuffer)?.rotation(to: .right) {
+            if let image = PhotoTools.createImage(
+                from: sampleBuffer
+            )?.rotation(to: .right) {
                 PhotoManager.shared.cameraPreviewImage = image
             }
         }

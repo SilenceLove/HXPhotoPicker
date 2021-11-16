@@ -1,5 +1,5 @@
 //
-//  VideoCroppingConfiguration.swift
+//  VideoCropTimeConfiguration.swift
 //  HXPHPicker
 //
 //  Created by Slience on 2021/1/10.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-public struct VideoCroppingConfiguration {
+public struct VideoCropTimeConfiguration {
     
     /// 视频最大裁剪时长，最小1
     public var maximumVideoCroppingTime: TimeInterval = 10

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 protocol PhotoEditorViewDelegate: AnyObject {
     func editorView(willBeginEditing editorView: PhotoEditorView)
@@ -18,17 +19,20 @@ protocol PhotoEditorViewDelegate: AnyObject {
     func editorView(drawViewBeganDraw editorView: PhotoEditorView)
     func editorView(drawViewEndDraw editorView: PhotoEditorView)
     func editorView(_ editorView: PhotoEditorView, updateStickerText item: EditorStickerItem)
+    func editorView(didRemoveAudio editorView: PhotoEditorView)
 }
 
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     weak var editorDelegate: PhotoEditorViewDelegate?
+    let editType: PhotoEditorContentView.EditType
     lazy var imageResizerView: EditorImageResizerView = {
         let imageResizerView = EditorImageResizerView(
-            cropConfig: config.cropping,
-            mosaicConfig: config.mosaic
+            editType: editType,
+            cropConfig: cropConfig,
+            mosaicConfig: mosaicConfig
         )
-        imageResizerView.exportScale = config.scale
-        let brush = config.brush
+        imageResizerView.exportScale = exportScale
+        let brush = brushConfig
         imageResizerView.imageView.drawView.lineColor = brush.colors[brush.defaultColorIndex].color
         imageResizerView.imageView.drawView.lineWidth = brush.lineWidth
         imageResizerView.delegate = self
@@ -41,7 +45,10 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     }
     
     /// 编辑配置
-    var config: PhotoEditorConfiguration
+    let cropConfig: EditorCropSizeConfiguration
+    let mosaicConfig: PhotoEditorConfiguration.Mosaic
+    let brushConfig: EditorBrushConfiguration
+    let exportScale: CGFloat
     /// 当前裁剪状态
     var state: State = .normal
     /// 图片缩放比例
@@ -87,13 +94,26 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     var mosaicType: PhotoEditorMosaicView.MosaicType = .mosaic {
         didSet { imageResizerView.imageView.mosaicView.type = mosaicType }
     }
+    var playerView: VideoEditorPlayerView {
+        imageResizerView.imageView.videoView
+    }
     var canUndoDraw: Bool { imageResizerView.imageView.drawView.canUndo }
     var canUndoMosaic: Bool { imageResizerView.imageView.mosaicView.canUndo }
     var hasSticker: Bool { imageResizerView.imageView.stickerView.count > 0 }
     var hasFilter: Bool { imageResizerView.filter != nil }
     
-    init(config: PhotoEditorConfiguration) {
-        self.config = config
+    init(
+        editType: PhotoEditorContentView.EditType,
+        cropConfig: EditorCropSizeConfiguration,
+        mosaicConfig: PhotoEditorConfiguration.Mosaic,
+        brushConfig: EditorBrushConfiguration,
+        exportScale: CGFloat
+    ) {
+        self.editType = editType
+        self.cropConfig = cropConfig
+        self.mosaicConfig = mosaicConfig
+        self.brushConfig = brushConfig
+        self.exportScale = exportScale
         super.init(frame: .zero)
         delegate = self
         minimumZoomScale = 1.0
@@ -137,7 +157,11 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         contentSize = CGSize(width: imageWidth, height: imageHeight)
         imageResizerView.frame = CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight)
     }
-    
+    func setAVAsset(_ asset: AVAsset, coverImage: UIImage) {
+        imageScale = coverImage.width / coverImage.height
+        updateImageViewFrame()
+        imageResizerView.setAVAsset(asset, coverImage: coverImage)
+    }
     func setImage(_ image: UIImage) {
         imageScale = image.width / image.height
         updateImageViewFrame()
@@ -167,9 +191,25 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         imageResizerView.setMosaicData(mosaicData: editedData.mosaicData)
         imageResizerView.setStickerData(stickerData: editedData.stickerData)
         updateImageViewFrame()
-        if config.cropping.isRoundCrop {
+        if cropConfig.isRoundCrop {
             imageResizerView.layer.cornerRadius = cropSize.width * 0.5
         }
+    }
+    func getVideoEditedData() -> VideoEditedCropSize {
+        imageResizerView.getVideoEditedData()
+    }
+    func setVideoEditedData(editedData: VideoEditedCropSize) {
+        if editedData.isPortrait != UIDevice.isPortrait {
+            return
+        }
+        if let cropData = editedData.cropData {
+            cropSize = cropData.cropSize
+            imageResizerView.setCropData(cropData: cropData)
+            cancelCropping(canShowMask: false, false)
+        }
+        imageResizerView.setBrushData(brushData: editedData.brushData)
+        imageResizerView.setStickerData(stickerData: editedData.stickerData)
+        updateImageViewFrame()
     }
     
     func resetZoomScale(_ animated: Bool) {
@@ -195,6 +235,21 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
             }
         }
         setContentOffset(CGPoint(x: -contentInset.left, y: -contentInset.top), animated: false)
+    }
+    
+    func startCropTime(_ animated: Bool) {
+        editorDelegate?.editorView(willAppearCrop: self)
+        state = .cropping
+        isScrollEnabled = false
+        resetZoomScale(animated)
+        imageResizerView.startCropTime(animated)
+    }
+    func cancelCropTime(_ animated: Bool) {
+        editorDelegate?.editorView(willDisappearCrop: self)
+        state = .normal
+        isScrollEnabled = true
+        resetZoomScale(animated)
+        imageResizerView.cancelCropTime(animated)
     }
     
     func startCropping(_ animated: Bool) {
@@ -237,7 +292,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
             guard let self = self else { return }
             self.imageResizerView.zoomScale = self.zoomScale
             self.editorDelegate?.editorView(didDisappearCrop: self)
-            if self.config.cropping.isRoundCrop {
+            if self.cropConfig.isRoundCrop {
                 self.imageResizerView.layer.cornerRadius = self.cropSize.width * 0.5
             }
             completion?()
@@ -288,6 +343,28 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
                 }
             }
         }
+    }
+    func getVideoCropData() -> VideoEditorCropSizeData {
+        let toRect = imageResizerView.getCroppingRect()
+        let viewSize = imageResizerView.imageView.size
+        let cropRect = CGRect(
+            x: CGFloat(Int(toRect.minX)) / viewSize.width,
+            y: CGFloat(Int(toRect.minY)) / viewSize.height,
+            width: toRect.width / viewSize.width,
+            height: toRect.height / viewSize.height
+        )
+        var drawLayer: CALayer?
+        if imageResizerView.imageView.drawView.count > 0 {
+            drawLayer = imageResizerView.imageView.drawView.layer
+        }
+        return .init(
+            canReset: canReset(),
+            cropRect: cropRect,
+            mirrorType: imageResizerView.mirrorType,
+            angle: imageResizerView.currentAngle,
+            drawLayer: drawLayer,
+            stickerInfos: imageResizerView.imageView.stickerView.getStickerInfo()
+        )
     }
     func changedAspectRatio(of aspectRatio: CGSize) {
         imageResizerView.changedAspectRatio(of: aspectRatio)
@@ -394,6 +471,9 @@ extension PhotoEditorView: PhotoEditorContentViewDelegate {
     func contentView(drawViewEndDraw contentView: PhotoEditorContentView) {
         editorDelegate?.editorView(drawViewEndDraw: self)
     }
+    func contentView(didRemoveAudio contentView: PhotoEditorContentView) {
+        editorDelegate?.editorView(didRemoveAudio: self)
+    }
 }
 extension PhotoEditorView: EditorImageResizerViewDelegate {
     func imageResizerView(willChangedMaskRect imageResizerView: EditorImageResizerView) {
@@ -419,4 +499,13 @@ extension PhotoEditorView: EditorImageResizerViewDelegate {
     func imageResizerView(didEndZooming imageResizerView: EditorImageResizerView) {
         editorDelegate?.editorView(didEndEditing: self)
     }
+}
+
+struct VideoEditorCropSizeData {
+    let canReset: Bool
+    let cropRect: CGRect
+    let mirrorType: EditorImageResizerView.MirrorType
+    let angle: CGFloat
+    let drawLayer: CALayer?
+    let stickerInfos: [EditorStickerInfo]
 }

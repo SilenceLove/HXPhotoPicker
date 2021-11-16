@@ -124,10 +124,6 @@ public class EditorToolView: UIView {
         }
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     public override func layoutSubviews() {
         super.layoutSubviews()
         maskLayer.frame = CGRect(
@@ -147,6 +143,10 @@ public class EditorToolView: UIView {
         finishButton.x = width - finishButton.width - 12 - UIDevice.rightMargin
         finishButton.centerY = 25
         collectionView.width = finishButton.x - 12
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

@@ -29,7 +29,7 @@ protocol PhotoEditorBrushColorViewDelegate: AnyObject {
 
 public class PhotoEditorBrushColorView: UIView {
     weak var delegate: PhotoEditorBrushColorViewDelegate?
-    let config: PhotoEditorConfiguration.BrushConfig
+    let config: EditorBrushConfiguration
     let brushColors: [String]
     lazy var brushSizeSlider: UISlider = {
         let slider = UISlider()
@@ -127,7 +127,7 @@ public class PhotoEditorBrushColorView: UIView {
         delegate?.brushColorView(didUndoButton: self)
     }
     
-    init(config: PhotoEditorConfiguration.BrushConfig) {
+    init(config: EditorBrushConfiguration) {
         self.config = config
         self.brushColors = config.colors
         super.init(frame: .zero)
@@ -236,8 +236,8 @@ class PhotoEditorBrushColorViewCell: UICollectionViewCell {
     override var isSelected: Bool {
         didSet {
             UIView.animate(withDuration: 0.2) {
-                self.colorBgView.transform = self.isSelected ? .init(scaleX: 1.2, y: 1.2) : .identity
-                self.colorView.transform = self.isSelected ? .init(scaleX: 1.25, y: 1.25) : .identity
+                self.colorBgView.transform = self.isSelected ? .init(scaleX: 1.25, y: 1.25) : .identity
+                self.colorView.transform = self.isSelected ? .init(scaleX: 1.3, y: 1.3) : .identity
             }
         }
     }

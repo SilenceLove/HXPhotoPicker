@@ -62,31 +62,32 @@ extension VideoEditorViewController {
     }
     
     func assetRequestComplete() {
-        videoSize = PhotoTools.getVideoThumbnailImage(avAsset: avAsset, atTime: 0.1)?.size ?? view.size
-        if let stickerData = editResult?.stickerData {
-            let playerFrame: CGRect
-            if UIDevice.isPad {
-                playerFrame = PhotoTools.transformImageSize(videoSize, toViewSize: view.size, directions: [.horizontal])
-            }else {
-                playerFrame = PhotoTools.transformImageSize(videoSize, to: view)
-            }
-            playerView.stickerView.setStickerData(
-                stickerData: stickerData,
-                viewSize: playerFrame.size
-            )
-            musicView.showLyricButton.isSelected = stickerData.showLyric
-            if stickerData.showLyric {
-                otherMusic = stickerData.items[stickerData.LyricIndex].item.music
-            }
-        }
-        playerView.avAsset = avAsset
+        let image = PhotoTools.getVideoThumbnailImage(avAsset: avAsset, atTime: 0.1)
+        videoSize = image?.size ?? view.size
+        videoView.setAVAsset(avAsset, coverImage: image ?? .init())
         cropView.avAsset = avAsset
         if orientationDidChange {
             setCropViewFrame()
-            setPlayerViewFrame()
+        }
+        if !videoInitializeCompletion {
+            setEditedSizeData()
+            videoInitializeCompletion = true
         }
         if transitionCompletion {
             setAsset()
+        }
+    }
+    
+    func setEditedSizeData() {
+        if let sizeData = editResult?.sizeData {
+            videoView.setVideoEditedData(editedData: sizeData)
+            brushColorView.canUndo = videoView.canUndoDraw
+            if let stickerData = sizeData.stickerData {
+                musicView.showLyricButton.isSelected = stickerData.showLyric
+                if stickerData.showLyric {
+                    otherMusic = stickerData.items[stickerData.LyricIndex].item.music
+                }
+            }
         }
     }
     
@@ -94,21 +95,21 @@ extension VideoEditorViewController {
         if setAssetCompletion {
             return
         }
-        playerView.configAsset()
+        videoView.playerView.configAsset()
         if let editResult = editResult {
-            playerView.player.volume = editResult.videoSoundVolume
+            videoView.playerView.player.volume = editResult.videoSoundVolume
             musicView.originalSoundButton.isSelected = editResult.videoSoundVolume > 0
             if let audioURL = editResult.backgroundMusicURL {
                 backgroundMusicPath = audioURL.path
                 musicView.backgroundButton.isSelected = true
                 PhotoManager.shared.playMusic(filePath: audioURL.path) {
                 }
-                playerView.stickerView.audioView?.contentView.startTimer()
+                videoView.imageResizerView.imageView.stickerView.audioView?.contentView.startTimer()
                 backgroundMusicVolume = editResult.backgroundMusicVolume
             }
         }
         if !orientationDidChange {
-            playerView.resetPlay()
+            videoView.playerView.resetPlay()
             startPlayTimer()
         }
         setAssetCompletion = true
@@ -144,7 +145,7 @@ extension VideoEditorViewController {
                     #endif
                     self?.loadingView = nil
                     ProgressHUD.hide(forView: self?.view, animated: false)
-                    self?.pAVAsset = AVAsset.init(url: url)
+                    self?.pAVAsset = AVAsset(url: url)
                     self?.avassetLoadValuesAsynchronously()
                 }else {
                     if let error = error as NSError?, error.code == NSURLErrorCancelled {

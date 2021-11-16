@@ -112,7 +112,7 @@ public class PickerConfiguration: BaseConfiguration {
     public var navigationTintColor: UIColor?
     
     /// 暗黑风格下TintColor
-    public var navigationDarkTintColor: UIColor = .white
+    public var navigationDarkTintColor: UIColor?
     
     /// 相册列表配置
     public lazy var albumList: AlbumListConfiguration = .init()

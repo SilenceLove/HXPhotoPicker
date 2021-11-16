@@ -163,7 +163,7 @@ open class PhotoAsset: Equatable {
         }
     }
     
-    /// iCloud下载状态
+    /// iCloud下载状态，确定不在iCloud上的为 .succeed
     public var downloadStatus: DownloadStatus = .unknow
     
     /// iCloud下载进度，如果取消了会记录上次进度

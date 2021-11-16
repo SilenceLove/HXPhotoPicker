@@ -392,18 +392,7 @@ extension PhotoPickerController {
         return true
     }
     
-    /// 是否能够选择Asset
-    /// - Parameters:
-    ///   - photoAsset: 对应的PhotoAsset
-    ///   - showHUD: 是否显示HUD
-    /// - Returns: 结果
-    // swiftlint:disable cyclomatic_complexity
-    func canSelectAsset(
-        for photoAsset: PhotoAsset,
-        showHUD: Bool,
-        filterEditor: Bool = false
-    ) -> Bool {
-        // swiftlint:enable cyclomatic_complexity
+    private func canSelectPhoto(_ photoAsset: PhotoAsset) -> (Bool, String?) {
         var canSelect = true
         var text: String?
         if photoAsset.mediaType == .photo {
@@ -432,7 +421,17 @@ extension PhotoPickerController {
                     canSelect = false
                 }
             }
-        }else if photoAsset.mediaType == .video {
+        }
+        return (canSelect, text)
+    }
+    
+    private func canSelectVideo(
+        _ photoAsset: PhotoAsset,
+        filterEditor: Bool
+    ) -> (Bool, String?) {
+        var canSelect = true
+        var text: String?
+        if photoAsset.mediaType == .video {
             if config.maximumSelectedVideoFileSize > 0 {
                 if photoAsset.fileSize > config.maximumSelectedVideoFileSize {
                     text = "视频大小超过最大限制".localized + PhotoTools.transformBytesToString(
@@ -495,6 +494,30 @@ extension PhotoPickerController {
                     canSelect = false
                 }
             }
+        }
+        return (canSelect, text)
+    }
+    
+    /// 是否能够选择Asset
+    /// - Parameters:
+    ///   - photoAsset: 对应的PhotoAsset
+    ///   - showHUD: 是否显示HUD
+    /// - Returns: 结果
+    func canSelectAsset(
+        for photoAsset: PhotoAsset,
+        showHUD: Bool,
+        filterEditor: Bool = false
+    ) -> Bool {
+        var canSelect = true
+        var text: String?
+        if photoAsset.mediaType == .photo {
+            let result = canSelectPhoto(photoAsset)
+            canSelect = result.0
+            text = result.1
+        }else if photoAsset.mediaType == .video {
+            let result = canSelectVideo(photoAsset, filterEditor: filterEditor)
+            canSelect = result.0
+            text = result.1
         }
         if let shouldSelect = pickerDelegate?.pickerController(
             self,

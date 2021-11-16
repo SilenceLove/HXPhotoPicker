@@ -100,12 +100,12 @@ class EditorChartletView: UIView {
     let editorType: EditorController.EditorType
     var previewView: EditorChartletPreviewView?
     var previewIndex: Int = -1
-    let config: EditorChartletConfig
+    let config: EditorChartletConfiguration
     var titles: [EditorChartletTitle] = []
     var selectedTitleIndex: Int = 0
     var configTitles: [EditorChartlet] = []
     init(
-        config: EditorChartletConfig,
+        config: EditorChartletConfiguration,
         editorType: EditorController.EditorType
     ) {
         self.config = config

@@ -20,7 +20,7 @@ class PickerCamerViewCell: UICollectionViewCell {
         return imageView
     }()
     
-    var config: PhotoListCameraCellConfiguration? {
+    var config: PhotoListConfiguration.CameraCell? {
         didSet {
             configProperty()
         }
@@ -114,6 +114,7 @@ class PickerCamerViewCell: UICollectionViewCell {
         }
     }
     deinit {
+        captureView.removeSampleBufferDelegate()
         stopSession()
     }
 }

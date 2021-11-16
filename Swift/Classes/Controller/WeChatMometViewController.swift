@@ -77,8 +77,8 @@ class WeChatMometViewController: UIViewController {
         presentPicker(config)
     }
     func presentPicker(_ config: PickerConfiguration) {
-        let pickerController = hx.present(
-            picker: config
+        let pickerController = Photo.picker(
+            config
         ) { [weak self] result, picker in
             guard let self = self else { return }
             let completion: (() -> Void)?

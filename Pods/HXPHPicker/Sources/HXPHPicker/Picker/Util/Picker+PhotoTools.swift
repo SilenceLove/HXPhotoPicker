@@ -280,9 +280,7 @@ extension PhotoTools {
     }
     
     /// 获取和微信主题一致的配置
-    // swiftlint:disable function_body_length
     public static func getWXPickerConfig(isMoment: Bool = false) -> PickerConfiguration {
-        // swiftlint:enable function_body_length
         let config = PickerConfiguration.init()
         if isMoment {
             config.maximumSelectedCount = 9
@@ -323,10 +321,23 @@ extension PhotoTools {
         config.photoList.titleView.arrow.backgroundColor = "#B2B2B2".color
         config.photoList.titleView.arrow.arrowColor = "#2E2F30".color
         
+        config.photoList.cell.customSelectableCellClass = PhotoPickerWeChatViewCell.self
         config.photoList.cell.selectBox.selectedBackgroundColor = wxColor
         config.photoList.cell.selectBox.titleColor = .white
+        config.photoList.cell.selectBox.style = .tick
+        config.photoList.cell.selectBox.size = CGSize(width: 23, height: 23)
         
+        #if canImport(Kingfisher)
+        config.photoList.cell.kf_indicatorColor = .white
+        #endif
+        
+        config.photoList.cameraCell.backgroundColor = "#404040".color
         config.photoList.cameraCell.cameraImageName = "hx_picker_photoList_photograph_white"
+        
+        config.photoList.limitCell.backgroundColor = "#404040".color
+        config.photoList.limitCell.lineColor = .white
+        config.photoList.limitCell.titleColor = .white
+        config.photoList.assetNumber.textColor = "#ffffff".color
         
         config.photoList.bottomView.barStyle = .black
         config.photoList.bottomView.previewButtonTitleColor = .white

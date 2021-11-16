@@ -38,6 +38,10 @@ extension PhotoPickerView {
     }
     
     func setupEmptyView() {
+        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+            emptyView.removeFromSuperview()
+            return
+        }
         if assets.isEmpty {
             collectionView.addSubview(emptyView)
         }else {
@@ -60,7 +64,7 @@ extension PhotoPickerView {
         if let photoAsset = photoAsset,
            var item = assets.firstIndex(of: photoAsset) {
             if needOffset {
-                item += 1
+                item += offsetIndex
             }
             collectionView.scrollToItem(
                 at: IndexPath(item: item, section: 0),
@@ -123,7 +127,7 @@ extension PhotoPickerView {
         if let photoAsset = photoAsset {
             item = assets.firstIndex(of: photoAsset) ?? item
             if needOffset {
-                item += 1
+                item += offsetIndex
             }
         }
         collectionView.scrollToItem(
@@ -163,7 +167,7 @@ extension PhotoPickerView {
         }
         if var item = assets.firstIndex(of: photoAsset) {
             if needOffset {
-                item += 1
+                item += offsetIndex
             }
             return IndexPath(item: item, section: 0)
         }
@@ -184,7 +188,7 @@ extension PhotoPickerView {
     func getPhotoAsset(for index: Int) -> PhotoAsset {
         var photoAsset: PhotoAsset
         if needOffset {
-            photoAsset = assets[index - 1]
+            photoAsset = assets[index - offsetIndex]
         }else {
             photoAsset = assets[index]
         }
@@ -195,13 +199,13 @@ extension PhotoPickerView {
         if config.sort == .desc {
             assets.insert(photoAsset, at: 0)
             indexPath = IndexPath(
-                item: needOffset ? 1 : 0,
+                item: needOffset ? offsetIndex : 0,
                 section: 0
             )
         }else {
             assets.append(photoAsset)
             indexPath = IndexPath(
-                item: needOffset ? assets.count : assets.count - 1,
+                item: assets.count - 1,
                 section: 0
             )
         }

@@ -179,8 +179,8 @@ class VideoEditorSearchMusicView: UIView {
     var isLoading = false
     var isLoadMore = false
     var hasMore = false
-    let config: VideoEditorConfiguration.MusicConfig
-    init(config: VideoEditorConfiguration.MusicConfig) {
+    let config: VideoEditorConfiguration.Music
+    init(config: VideoEditorConfiguration.Music) {
         self.config = config
         super.init(frame: .zero)
         musics = getMusics(infos: config.infos)

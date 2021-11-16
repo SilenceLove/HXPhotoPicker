@@ -111,8 +111,8 @@ class PhotoEditorFilterView: UIView {
         }
     }
     var currentSelectedIndex: Int
-    let filterConfig: PhotoEditorConfiguration.FilterConfig
-    init(filterConfig: PhotoEditorConfiguration.FilterConfig,
+    let filterConfig: PhotoEditorConfiguration.Filter
+    init(filterConfig: PhotoEditorConfiguration.Filter,
          sourceIndex: Int,
          value: Float) {
         self.filterConfig = filterConfig

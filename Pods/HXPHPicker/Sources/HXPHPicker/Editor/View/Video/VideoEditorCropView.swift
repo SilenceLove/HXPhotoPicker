@@ -32,7 +32,7 @@ class VideoEditorCropView: UIView {
             videoSize = PhotoTools.getVideoThumbnailImage(avAsset: avAsset, atTime: 0.1)?.size ?? .zero
         }
     }
-    var config: VideoCroppingConfiguration
+    var config: VideoCropTimeConfiguration
     
     var videoFrameCount: Int = 0
     lazy var frameMaskView: VideoEditorFrameMaskView = {
@@ -98,13 +98,13 @@ class VideoEditorCropView: UIView {
     var lineDidAnimate = false
     var imageGenerator: AVAssetImageGenerator?
     
-    convenience init(avAsset: AVAsset, config: VideoCroppingConfiguration) {
+    convenience init(avAsset: AVAsset, config: VideoCropTimeConfiguration) {
         self.init(config: config)
         self.avAsset = avAsset
         videoSize = PhotoTools.getVideoThumbnailImage(avAsset: avAsset, atTime: 0.1)?.size ?? .zero
     }
     
-    init(config: VideoCroppingConfiguration) {
+    init(config: VideoCropTimeConfiguration) {
         self.config = config
         super.init(frame: .zero)
         addSubview(collectionView)

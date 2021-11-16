@@ -16,7 +16,7 @@ public enum ExportPreset {
     case ratio_960x540
     case ratio_1280x720
     
-    var name: String {
+    public var name: String {
         switch self {
         case .lowQuality:
             return AVAssetExportPresetLowQuality

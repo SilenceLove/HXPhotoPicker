@@ -34,28 +34,26 @@ open class PhotoPickerSelectableViewCell: PhotoPickerViewCell {
         contentView.addSubview(iCloudMarkView)
     }
     
-    private var firstLoadCompletion: Bool = false
+    private var didLoadCompletion: Bool = false
     
     open override func requestThumbnailImage(targetWidth: CGFloat) {
-        if firstLoadCompletion {
+        if didLoadCompletion {
             selectControl.isHidden = false
         }
-        photoView.requestThumbnailImage(
-            targetWidth: targetWidth
-        ) { [weak self] image, photoAsset in
-            guard let self = self else { return }
-            if self.photoAsset == photoAsset {
-                if !self.firstLoadCompletion {
-                    self.selectControl.isHidden = false
-                    self.firstLoadCompletion = true
-                }
-            }
+        super.requestThumbnailImage(targetWidth: targetWidth)
+    }
+    open override func requestThumbnailCompletion(_ image: UIImage?) {
+        super.requestThumbnailCompletion(image)
+        if !didLoadCompletion {
+            selectControl.isHidden = false
+            didLoadCompletion = true
         }
     }
     
     open override func requestICloudStateCompletion(_ inICloud: Bool) {
         super.requestICloudStateCompletion(inICloud)
         selectControl.isHidden = inICloud
+        selectControl.isEnabled = !inICloud
     }
     
     /// 选择框点击事件

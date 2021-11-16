@@ -153,9 +153,9 @@ class VideoEditorMusicView: UIView {
     var currentPlayIndex: Int = -2
     var beforeIsSelect = false
     var musics: [VideoEditorMusic] = []
-    let config: VideoEditorConfiguration.MusicConfig
+    let config: VideoEditorConfiguration.Music
     var didEnterPlayGround = false
-    init(config: VideoEditorConfiguration.MusicConfig) {
+    init(config: VideoEditorConfiguration.Music) {
         self.config = config
         super.init(frame: .zero)
         setMusics(infos: config.infos)

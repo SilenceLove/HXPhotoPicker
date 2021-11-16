@@ -32,21 +32,21 @@ extension VideoEditorViewController: VideoEditorCropViewDelegate {
         
     }
     func pausePlay(at time: CMTime) {
-        if state == .cropping && !orientationDidChange {
+        if state == .cropTime && !orientationDidChange {
             stopPlayTimer()
-            playerView.shouldPlay = false
-            playerView.playStartTime = time
-            playerView.pause()
-            playerView.seek(to: time)
+            videoView.playerView.shouldPlay = false
+            videoView.playerView.playStartTime = time
+            videoView.playerView.pause()
+            videoView.playerView.seek(to: time)
             cropView.stopLineAnimation()
         }
     }
     func startPlay(at time: CMTime) {
-        if state == .cropping && !orientationDidChange {
-            playerView.playStartTime = time
-            playerView.playEndTime = cropView.getEndTime(real: true)
-            playerView.resetPlay()
-            playerView.shouldPlay = true
+        if state == .cropTime && !orientationDidChange {
+            videoView.playerView.playStartTime = time
+            videoView.playerView.playEndTime = cropView.getEndTime(real: true)
+            videoView.playerView.resetPlay()
+            videoView.playerView.shouldPlay = true
             startPlayTimer()
         }
     }
@@ -64,13 +64,13 @@ extension VideoEditorViewController: VideoEditorCropViewDelegate {
         if reset {
             microseconds = (endTime.seconds - startTime.seconds) * 1000000
         }else {
-            let seconds = playerView.player.currentTime().seconds - cropView.getStartTime(real: true).seconds
+            let seconds = videoView.playerView.player.currentTime().seconds - cropView.getStartTime(real: true).seconds
             microseconds = seconds * 1000000
         }
         playTimer.schedule(deadline: .now(), repeating: .microseconds(Int(microseconds)), leeway: .microseconds(0))
         playTimer.setEventHandler(handler: {
             DispatchQueue.main.sync {
-                self.playerView.resetPlay { [weak self] time in
+                self.videoView.playerView.resetPlay { [weak self] time in
                     guard let self = self else { return }
                     self.cropView.startLineAnimation(at: time)
                 }

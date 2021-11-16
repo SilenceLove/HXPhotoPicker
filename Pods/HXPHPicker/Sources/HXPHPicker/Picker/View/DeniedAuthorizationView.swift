@@ -137,7 +137,7 @@ class DeniedAuthorizationView: UIView {
         }
         let jumpY: CGFloat
         if barHeight == 0 {
-            jumpY = height - UIDevice.bottomMargin - 20 - jumpBtnBottomMargin
+            jumpY = height - UIDevice.bottomMargin - 50
         }else {
             jumpY = height - UIDevice.bottomMargin - 40 - jumpBtnBottomMargin
         }

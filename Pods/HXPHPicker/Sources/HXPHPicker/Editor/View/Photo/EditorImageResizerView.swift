@@ -40,14 +40,10 @@ class EditorImageResizerView: UIView {
         case right
         case down
     }
-    
-    deinit {
-//        print("deinit", self)
-    }
     var exportScale: CGFloat = UIScreen.main.scale
     var animationDuration: TimeInterval = 0.25
     /// 裁剪配置
-    var cropConfig: PhotoCroppingConfiguration
+    var cropConfig: EditorCropSizeConfiguration
     weak var delegate: EditorImageResizerViewDelegate?
     lazy var containerView: PhotoEditorContainerView = {
         let containerView = PhotoEditorContainerView.init()
@@ -75,11 +71,15 @@ class EditorImageResizerView: UIView {
         return scrollView
     }()
     
-    let mosaicConfig: PhotoEditorConfiguration.MosaicConfig
+    let mosaicConfig: PhotoEditorConfiguration.Mosaic
     lazy var imageView: PhotoEditorContentView = {
-        let imageView = PhotoEditorContentView.init(mosaicConfig: mosaicConfig)
+        let imageView = PhotoEditorContentView(
+            editType: editType,
+            mosaicConfig: mosaicConfig
+        )
         imageView.itemViewMoveToCenter = { [weak self] rect -> Bool in
-            guard let self = self, let view = self.viewController()?.view else { return false }
+            guard let self = self,
+                  let view = self.viewController()?.view else { return false }
             var newRect = self.convert(self.bounds, to: view)
             if newRect.width > view.width {
                 newRect.origin.x = 0
@@ -216,9 +216,13 @@ class EditorImageResizerView: UIView {
     
     var filter: PhotoEditorFilter?
     var filterValue: Float = 0
-    
-    init(cropConfig: PhotoCroppingConfiguration,
-         mosaicConfig: PhotoEditorConfiguration.MosaicConfig) {
+    let editType: PhotoEditorContentView.EditType
+    init(
+        editType: PhotoEditorContentView.EditType,
+        cropConfig: EditorCropSizeConfiguration,
+        mosaicConfig: PhotoEditorConfiguration.Mosaic
+    ) {
+        self.editType = editType
         self.cropConfig = cropConfig
         self.mosaicConfig = mosaicConfig
         super.init(frame: .zero)

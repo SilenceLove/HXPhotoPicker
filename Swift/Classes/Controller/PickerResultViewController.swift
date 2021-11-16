@@ -529,8 +529,11 @@ class PickerResultViewController: UIViewController,
             .init(
                 title: "删除",
                 style: .destructive,
-                handler: { alertAction in
-            photoBrowser.deleteCurrentPreviewPhotoAsset()
+                handler: { [weak self] alertAction in
+                    photoBrowser.deleteCurrentPreviewPhotoAsset()
+                    if let index = photoBrowser.previewViewController()?.currentPreviewIndex {
+                        self?.previewDidDeleteAsset(index: index)
+                    }
         }))
         alert.addAction(.init(title: "取消", style: .cancel, handler: nil))
         if UIDevice.isPad {
@@ -637,13 +640,10 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
         isOriginal = result.isOriginal
         collectionView.reloadData()
         updateCollectionViewHeight()
-        result.getVideoURL { session, photoAsset, index in
-            print("\n", session, "\n", index)
-        } videoURLHandler: { result, photoAsset, index in
-            print("\n", index)
-        } completionHandler: { urls in
-            print("\n", urls)
-        }
+        
+//        result.getURLs { urls in
+//            print(urls)
+//        }
 
 //        result.getImage { (image, photoAsset, index) in
 //            if let image = image {

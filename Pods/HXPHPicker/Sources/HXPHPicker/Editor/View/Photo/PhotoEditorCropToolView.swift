@@ -56,6 +56,7 @@ public class PhotoEditorCropToolView: UIView {
         }
         return ratioModels
     }()
+    var isVideo: Bool = false
     var showRatios: Bool
     var themeColor: UIColor?
     var currentSelectedModel: PhotoEditorCropToolModel?
@@ -119,6 +120,7 @@ extension PhotoEditorCropToolView: UICollectionViewDataSource {
         ) as! PhotoEditorCropToolHeaderView
         headerView.delegate = self
         headerView.showRatios = showRatios
+        headerView.isVideo = isVideo
         return headerView
     }
 }
@@ -169,7 +171,7 @@ extension PhotoEditorCropToolView: UICollectionViewDelegate, UICollectionViewDel
         layout collectionViewLayout: UICollectionViewLayout,
         referenceSizeForHeaderInSection section: Int
     ) -> CGSize {
-        CGSize(width: 100, height: 50)
+        CGSize(width: isVideo ? 60 : 100, height: 50)
     }
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         var selectedIndexPath: IndexPath?
@@ -248,6 +250,11 @@ class PhotoEditorCropToolHeaderView: UICollectionReusableView {
             lineView.isHidden = !showRatios
         }
     }
+    var isVideo: Bool = false {
+        didSet {
+            rotateButton.isHidden = isVideo
+        }
+    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(rotateButton)
@@ -257,14 +264,19 @@ class PhotoEditorCropToolHeaderView: UICollectionReusableView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        rotateButton.centerY = height * 0.5
-        rotateButton.x = 20
-        
-        mirrorHorizontallyButton.x = rotateButton.frame.maxX + 10
-        mirrorHorizontallyButton.centerY = rotateButton.centerY
+        if !isVideo {
+            rotateButton.centerY = height * 0.5
+            rotateButton.x = 20
+            
+            mirrorHorizontallyButton.x = rotateButton.frame.maxX + 10
+            mirrorHorizontallyButton.centerY = rotateButton.centerY
+        }else {
+            mirrorHorizontallyButton.x = 20
+            mirrorHorizontallyButton.centerY = height * 0.5
+        }
         
         lineView.x = width - 2
-        lineView.centerY = rotateButton.centerY
+        lineView.centerY = mirrorHorizontallyButton.centerY
     }
     
     required init?(coder: NSCoder) {

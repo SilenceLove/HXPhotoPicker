@@ -8,6 +8,158 @@
 import UIKit
 
 extension EditorImageResizerView {
+    
+    func startCropTime(_ animated: Bool) {
+        state = .cropping
+        updateContentInsets(true)
+        let margin: CGFloat = UIDevice.isPortrait ? 30 : 15
+//        resetOther()
+        if hasCropping {
+            mirrorType = oldMirrorType
+            currentAngle = oldAngle
+            if !isFixedRatio {
+                controlView.fixedRatio = false
+            }
+            // 之前有裁剪记录
+            maskBgView.alpha = 1
+            maskBgView.isHidden = false
+            maskBgView.updateBlackMask(isShow: true, animated: false, completion: nil)
+        }else {
+            currentAngle = 0
+            /// 之前没有裁剪记录时，需要清除上一次设置的宽高比
+            if !isFixedRatio {
+                // 没有固定比例，重新设置的默认比例
+                controlViewAspectRatio()
+                checkOriginalRatio()
+                controlView.fixedRatio = false
+                currentAspectRatio = controlView.aspectRatio
+            }
+        }
+        clipsToBounds = false
+//        controlView.isUserInteractionEnabled = true
+        /// 获取初始缩放比例
+        let zoomScale = hasCropping ? oldZoomScale : getInitialZoomScale()
+        /// 最小缩放比例
+        let minimumZoomScale = hasCropping ? oldMinimumZoomScale : zoomScale
+        scrollView.minimumZoomScale = minimumZoomScale
+        scrollView.maximumZoomScale = hasCropping ? oldMaximumZoomScale : 20
+        /// 获取裁剪框位置发小
+        let maskViewFrame = hasCropping ?
+            CGRect(origin: .init(x: oldMaskRect.minX, y: oldMaskRect.minY - margin),
+                   size: oldMaskRect.size) :
+            getMaskViewFrame()
+        /// 更新裁剪框
+        updateMaskViewFrame(to: maskViewFrame, animated: animated)
+        if animated {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
+                if self.hasCropping {
+                    self.scrollView.contentInset = UIEdgeInsets(
+                        top: self.oldContentInset.top - margin,
+                        left: self.oldContentInset.left,
+                        bottom: self.oldContentInset.bottom + margin,
+                        right: self.oldContentInset.right
+                    )
+                }
+                self.scrollView.zoomScale = zoomScale
+                if self.hasCropping {
+                    self.scrollView.contentOffset = self.checkZoomOffset(
+                        .init(x: self.oldContentOffset.x, y: self.oldContentOffset.y + margin),
+                        self.scrollView.contentInset
+                    )
+                }else {
+                    if !self.isOriginalRatio {
+                        let offset = CGPoint(
+                            x: -self.scrollView.contentInset.left +
+                                (
+                                self.imageView.width * 0.5 - maskViewFrame.width * 0.5
+                                ),
+                            y: -self.scrollView.contentInset.top +
+                                (
+                                self.imageView.height * 0.5 - maskViewFrame.height * 0.5
+                                )
+                        )
+                        self.scrollView.contentOffset = offset
+                    }
+                }
+            }
+        }else {
+            if hasCropping {
+                scrollView.contentInset = UIEdgeInsets(
+                    top: oldContentInset.top - margin,
+                    left: oldContentInset.left,
+                    bottom: oldContentInset.bottom + margin,
+                    right: oldContentInset.right
+                )
+            }
+            scrollView.zoomScale = zoomScale
+            if hasCropping {
+                scrollView.contentOffset = checkZoomOffset(
+                    .init(x: oldContentOffset.x, y: oldContentOffset.y + margin),
+                    scrollView.contentInset
+                )
+            }else {
+                if !isOriginalRatio {
+                    let offset = CGPoint(
+                        x: -scrollView.contentInset.left +
+                            (
+                                imageView.width * 0.5 - maskViewFrame.width * 0.5
+                            ),
+                        y: -scrollView.contentInset.top + (
+                            imageView.height * 0.5 - maskViewFrame.height * 0.5
+                        )
+                    )
+                    scrollView.contentOffset = offset
+                }
+            }
+        }
+    }
+    
+    func cancelCropTime(_ animated: Bool) {
+        state = .normal
+        resetOther()
+        if hasCropping {
+            scrollView.minimumZoomScale = getScrollViewMinimumZoomScale(oldMaskRect)
+            // 计算裁剪框的位置
+            let maxWidth = containerView.width
+            let rectW = maxWidth
+            let scale = maxWidth / controlView.width
+            let rectH = oldMaskRect.height * scale
+            var rectY: CGFloat = 0
+            if rectH < containerView.height {
+                rectY = (containerView.height - rectH) * 0.5
+            }
+            let maskRect = CGRect(x: 0, y: rectY, width: rectW, height: rectH)
+            let zoomScale = scrollView.zoomScale * scale
+            if zoomScale > scrollView.maximumZoomScale {
+                scrollView.maximumZoomScale = zoomScale
+            }
+            // 更新
+            updateCropRect(maskRect: maskRect, zoomScale: zoomScale, animated: animated) { [weak self] () in
+                self?.clipsToBounds = true
+            }
+        }else {
+            /// 还原到初始状态
+            clipsToBounds = false
+            currentAngle = 0
+            mirrorType = .none
+            let maskRect = getMaskRect()
+            updateMaskViewFrame(to: maskRect, animated: animated)
+            hiddenMaskView(cropConfig.isRoundCrop ? false : animated)
+            scrollView.minimumZoomScale = 1
+            let scrollViewContentInset = getScrollViewContentInset(maskRect)
+            let offset =  CGPoint(x: -scrollViewContentInset.left, y: -scrollViewContentInset.top)
+            updateScrollViewContent(
+                contentInset: nil,
+                zoomScale: 1,
+                contentOffset: offset,
+                animated: animated,
+                resetAngle: true
+            ) {
+            }
+        }
+        updateContentInsets(false)
+    }
+    
     /// 开始裁剪
     func startCorpping(_ animated: Bool, completion: (() -> Void)?) {
         state = .cropping

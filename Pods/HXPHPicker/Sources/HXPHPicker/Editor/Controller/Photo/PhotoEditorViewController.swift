@@ -26,7 +26,7 @@ open class PhotoEditorViewController: BaseViewController {
     public let sourceType: EditorController.SourceType
     
     /// 当前编辑状态
-    public private(set) var state: State = .normal
+    public var state: State { pState }
     
     /// 上一次的编辑结果
     public let editResult: PhotoEditResult?
@@ -111,6 +111,7 @@ open class PhotoEditorViewController: BaseViewController {
         super.init(nibName: nil, bundle: nil)
     }
     #endif
+    var pState: State = .normal
     var filterHDImage: UIImage?
     var mosaicImage: UIImage?
     var thumbnailImage: UIImage!
@@ -124,7 +125,13 @@ open class PhotoEditorViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     lazy var imageView: PhotoEditorView = {
-        let imageView = PhotoEditorView(config: config)
+        let imageView = PhotoEditorView(
+            editType: .image,
+            cropConfig: config.cropping,
+            mosaicConfig: config.mosaic,
+            brushConfig: config.brush,
+            exportScale: config.scale
+        )
         imageView.editorDelegate = self
         return imageView
     }()
@@ -195,6 +202,16 @@ open class PhotoEditorViewController: BaseViewController {
     
     func didBackClick(_ isCancel: Bool = false) {
         imageView.imageResizerView.stopShowMaskBgTimer()
+        if let type = currentToolOption?.type {
+            switch type {
+            case .graffiti:
+                hiddenBrushColorView()
+            case .mosaic:
+                hiddenMosaicToolView()
+            default:
+                break
+            }
+        }
         if isCancel {
             delegate?.photoEditorViewController(didCancel: self)
         }
@@ -281,14 +298,16 @@ open class PhotoEditorViewController: BaseViewController {
                 toolOptions.insert(.chartlet)
             case .text:
                 toolOptions.insert(.text)
-            case .cropping:
-                toolOptions.insert(.cropping)
+            case .cropSize:
+                toolOptions.insert(.cropSize)
             case .mosaic:
                 toolOptions.insert(.mosaic)
             case .filter:
                 toolOptions.insert(.filter)
             case .music:
                 toolOptions.insert(.music)
+            default:
+                break
             }
         }
         let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
@@ -299,18 +318,18 @@ open class PhotoEditorViewController: BaseViewController {
         view.clipsToBounds = true
         view.addSubview(imageView)
         view.addSubview(toolView)
-        if toolOptions.contains(.cropping) {
+        if toolOptions.contains(.cropSize) {
             view.addSubview(cropConfirmView)
             view.addSubview(cropToolView)
         }
         if config.fixedCropState {
-            state = .cropping
+            pState = .cropping
             toolView.alpha = 0
             toolView.isHidden = true
             topView.alpha = 0
             topView.isHidden = true
         }else {
-            state = config.state
+            pState = config.state
             if toolOptions.contains(.graffiti) {
                 view.addSubview(brushColorView)
             }
@@ -360,7 +379,7 @@ open class PhotoEditorViewController: BaseViewController {
         if config.fixedCropState {
             return
         }
-        state = .normal
+        pState = .normal
         croppingAction()
     }
     open override func deviceOrientationDidChanged(notify: Notification) {
@@ -390,7 +409,7 @@ open class PhotoEditorViewController: BaseViewController {
         }
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
         let cropToolFrame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
-        if toolOptions.contains(.cropping) {
+        if toolOptions.contains(.cropSize) {
             cropConfirmView.frame = toolView.frame
             cropToolView.frame = cropToolFrame
             cropToolView.updateContentInset()
@@ -515,227 +534,5 @@ open class PhotoEditorViewController: BaseViewController {
     
     func setImage(_ image: UIImage) {
         self.image = image
-    }
-    func setState(_ state: State) {
-        self.state = state
-    }
-}
-
-extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
-    func brushColorView(didUndoButton colorView: PhotoEditorBrushColorView) {
-        imageView.undoDraw()
-        brushColorView.canUndo = imageView.canUndoDraw
-    }
-    func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor colorHex: String) {
-        imageView.drawColorHex = colorHex
-    }
-    func brushColorView(touchDown colorView: PhotoEditorBrushColorView) {
-        let lineWidth = imageView.brushLineWidth + 4
-        brushSizeView.size = CGSize(width: lineWidth, height: lineWidth)
-        brushSizeView.center = CGPoint(x: view.width * 0.5, y: view.height * 0.5)
-        brushSizeView.alpha = 0
-        view.addSubview(brushSizeView)
-        UIView.animate(withDuration: 0.2) {
-            self.brushSizeView.alpha = 1
-        }
-    }
-    func brushColorView(touchUpOutside colorView: PhotoEditorBrushColorView) {
-        UIView.animate(withDuration: 0.2) {
-            self.brushSizeView.alpha = 0
-        } completion: { _ in
-            self.brushSizeView.removeFromSuperview()
-        }
-    }
-    func brushColorView(
-        _ colorView: PhotoEditorBrushColorView,
-        didChangedBrushLine lineWidth: CGFloat
-    ) {
-        imageView.brushLineWidth = lineWidth
-        brushSizeView.size = CGSize(width: lineWidth + 4, height: lineWidth + 4)
-        brushSizeView.center = CGPoint(x: view.width * 0.5, y: view.height * 0.5)
-    }
-    
-    class BrushSizeView: UIView {
-        lazy var borderLayer: CAShapeLayer = {
-            let borderLayer = CAShapeLayer()
-            borderLayer.strokeColor = UIColor.white.cgColor
-            borderLayer.fillColor = UIColor.clear.cgColor
-            borderLayer.lineWidth = 2
-            borderLayer.shadowColor = UIColor.black.withAlphaComponent(0.4).cgColor
-            borderLayer.shadowRadius = 2
-            borderLayer.shadowOpacity = 0.5
-            borderLayer.shadowOffset = CGSize(width: 0, height: 0)
-            return borderLayer
-        }()
-        
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            layer.addSublayer(borderLayer)
-        }
-        
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            borderLayer.frame = bounds
-            
-            let path = UIBezierPath(
-                arcCenter: CGPoint(x: width * 0.5, y: height * 0.5),
-                radius: width * 0.5 - 1,
-                startAngle: 0,
-                endAngle: CGFloat.pi * 2,
-                clockwise: true
-            )
-            borderLayer.path = path.cgPath
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-    }
-}
-
-// MARK: EditorCropConfirmViewDelegate
-extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
-    
-    /// 点击完成按钮
-    /// - Parameter cropConfirmView: 裁剪视图
-    func cropConfirmView(didFinishButtonClick cropConfirmView: EditorCropConfirmView) {
-        if config.fixedCropState {
-            imageView.imageResizerView.finishCropping(false, completion: nil, updateCrop: false)
-            exportResources()
-            return
-        }
-        state = .normal
-        imageView.finishCropping(true)
-        croppingAction()
-    }
-    
-    /// 点击还原按钮
-    /// - Parameter cropConfirmView: 裁剪视图
-    func cropConfirmView(didResetButtonClick cropConfirmView: EditorCropConfirmView) {
-        cropConfirmView.resetButton.isEnabled = false
-        imageView.reset(true)
-        cropToolView.reset(animated: true)
-    }
-    
-    /// 点击取消按钮
-    /// - Parameter cropConfirmView: 裁剪视图
-    func cropConfirmView(didCancelButtonClick cropConfirmView: EditorCropConfirmView) {
-        if config.fixedCropState {
-            transitionalImage = image
-            cancelHandler?(self)
-            didBackClick(true)
-            return
-        }
-        state = .normal
-        imageView.cancelCropping(true)
-        croppingAction()
-    }
-}
-
-// MARK: PhotoEditorViewDelegate
-extension PhotoEditorViewController: PhotoEditorViewDelegate {
-    func checkResetButton() {
-        cropConfirmView.resetButton.isEnabled = imageView.canReset()
-    }
-    func editorView(willBeginEditing editorView: PhotoEditorView) {
-    }
-    
-    func editorView(didEndEditing editorView: PhotoEditorView) {
-        checkResetButton()
-    }
-    
-    func editorView(willAppearCrop editorView: PhotoEditorView) {
-        cropToolView.reset(animated: false)
-        cropConfirmView.resetButton.isEnabled = false
-    }
-    
-    func editorView(didAppear editorView: PhotoEditorView) {
-        checkResetButton()
-    }
-    
-    func editorView(willDisappearCrop editorView: PhotoEditorView) {
-    }
-    
-    func editorView(didDisappearCrop editorView: PhotoEditorView) {
-    }
-    
-    func editorView(drawViewBeganDraw editorView: PhotoEditorView) {
-        hidenTopView()
-    }
-    
-    func editorView(drawViewEndDraw editorView: PhotoEditorView) {
-        showTopView()
-        brushColorView.canUndo = editorView.canUndoDraw
-        mosaicToolView.canUndo = editorView.canUndoMosaic
-    }
-    func editorView(_ editorView: PhotoEditorView, updateStickerText item: EditorStickerItem) {
-        let textVC = EditorStickerTextViewController(
-            config: config.text,
-            stickerItem: item
-        )
-        textVC.delegate = self
-        let nav = EditorStickerTextController(rootViewController: textVC)
-        nav.modalPresentationStyle = config.text.modalPresentationStyle
-        present(nav, animated: true, completion: nil)
-    }
-}
-
-extension PhotoEditorViewController: PhotoEditorCropToolViewDelegate {
-    func cropToolView(didRotateButtonClick cropToolView: PhotoEditorCropToolView) {
-        imageView.rotate()
-    }
-    
-    func cropToolView(didMirrorHorizontallyButtonClick cropToolView: PhotoEditorCropToolView) {
-        imageView.mirrorHorizontally(animated: true)
-    }
-    
-    func cropToolView(didChangedAspectRatio cropToolView: PhotoEditorCropToolView, at model: PhotoEditorCropToolModel) {
-        imageView.changedAspectRatio(of: CGSize(width: model.widthRatio, height: model.heightRatio))
-    }
-}
-extension PhotoEditorViewController: PhotoEditorMosaicToolViewDelegate {
-    func mosaicToolView(
-        _ mosaicToolView: PhotoEditorMosaicToolView,
-        didChangedMosaicType type: PhotoEditorMosaicView.MosaicType
-    ) {
-        imageView.mosaicType = type
-    }
-    
-    func mosaicToolView(didUndoClick mosaicToolView: PhotoEditorMosaicToolView) {
-        imageView.undoMosaic()
-        mosaicToolView.canUndo = imageView.canUndoMosaic
-    }
-}
-extension PhotoEditorViewController: UIGestureRecognizerDelegate {
-    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if touch.view is EditorStickerContentView {
-            return false
-        }
-        if let isDescendant = touch.view?.isDescendant(of: imageView), isDescendant {
-            return true
-        }
-        return false
-    }
-    public func gestureRecognizer(
-        _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
-    ) -> Bool {
-        true
-    }
-}
-
-extension PhotoEditorViewController: UINavigationControllerDelegate {
-    public func navigationController(
-        _ navigationController: UINavigationController,
-        animationControllerFor operation: UINavigationController.Operation,
-        from fromVC: UIViewController,
-        to toVC: UIViewController
-    ) -> UIViewControllerAnimatedTransitioning? {
-        if operation == .push {
-            return EditorTransition(mode: .push)
-        }else if operation == .pop {
-            return EditorTransition(mode: .pop)
-        }
-        return nil
     }
 }

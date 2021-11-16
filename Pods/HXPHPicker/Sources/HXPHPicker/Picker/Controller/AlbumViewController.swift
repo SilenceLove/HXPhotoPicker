@@ -281,7 +281,4 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
             }
         }
     }
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
 }

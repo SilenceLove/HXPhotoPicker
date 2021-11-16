@@ -13,4 +13,5 @@ target "HXPHPickerExample" do
   platform:ios,'12.0'
   use_frameworks!
   pod 'HXPHPicker'
+  pod 'GDPerformanceView-Swift'
 end

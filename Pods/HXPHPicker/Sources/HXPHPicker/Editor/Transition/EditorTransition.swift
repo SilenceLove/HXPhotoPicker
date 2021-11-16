@@ -214,7 +214,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             if mode == .push {
                 editorVC.transitionCompletion = false
                 editorVC.toolView.alpha = 0
-                if editorVC.state == .cropping {
+                if editorVC.state == .cropTime {
                     isSpring = false
                 }
                 if let view = editorVC.delegate?.videoEditorViewController(transitioBegenPreviewView: editorVC) {
@@ -230,17 +230,26 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 #if HXPICKER_ENABLE_PICKER
                 photoAsset = editorVC.photoAsset
                 if let photoAsset = photoAsset {
-                    toRect = editorVC.getPlayerViewFrame(photoAsset.imageSize)
+                    toRect = editorVC.videoView.getTransitionImageViewFrame(
+                        with: photoAsset.imageSize,
+                        viewSize: toVC.view.size
+                    )
                 }else {
                     if let image = image {
-                        toRect = editorVC.getPlayerViewFrame(image.size)
+                        toRect = editorVC.videoView.getTransitionImageViewFrame(
+                            with: image.size,
+                            viewSize: toVC.view.size
+                        )
                     }else {
                         toRect = .zero
                     }
                 }
                 #else
                 if let image = image {
-                    toRect = editorVC.getPlayerViewFrame(image.size)
+                    toRect = editorVC.videoView.getTransitionImageViewFrame(
+                        with: image.size,
+                        viewSize: toVC.view.size
+                    )
                 }else {
                     toRect = .zero
                 }
@@ -252,7 +261,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     toRect.origin.y = (editorVC.view.height - toRect.height) * 0.5
                 }
             }else {
-                let view = editorVC.playerView
+                let view = editorVC.videoView.playerView
                 view.playerLayer.videoGravity = .resizeAspectFill
                 fromRect = view.convert(view.bounds, to: contentView)
                 previewView.frame = fromRect
@@ -267,7 +276,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     ) ?? .zero
                 }
             }
-            editorVC.scrollView.isHidden = true
+            editorVC.videoView.isHidden = true
             editorVC.view.backgroundColor = .clear
         }else {
             previewView.removeFromSuperview()
@@ -320,17 +329,13 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     editorVC.toolView.alpha = self.mode == .push ? 1 : 0
                 }
             }else if let editorVC = editorVC as? VideoEditorViewController {
-                if editorVC.state != .cropping {
+                if editorVC.state != .cropTime {
                     editorVC.toolView.alpha = self.mode == .push ? 1 : 0
                 }
                 if self.mode == .pop {
-                    if editorVC.onceState == .cropping {
+                    if editorVC.onceState == .cropTime {
                         editorVC.cropView.alpha = 0
                         editorVC.cropConfirmView.alpha = 0
-                    }
-                    
-                    if let videoPlayerVIew = self.previewView.subviews.first as? VideoEditorPlayerView {
-                        videoPlayerVIew.stickerView.alpha = 0
                     }
                 }
             }
@@ -394,7 +399,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     editorVC.initializeStartCropping()
                 }else if let editorVC = editorVC as? VideoEditorViewController {
                     editorVC.view.backgroundColor = .black
-                    editorVC.scrollView.isHidden = false
+                    editorVC.videoView.isHidden = false
                     editorVC.transitionCompletion = true
                     if editorVC.reqeustAssetCompletion {
                         editorVC.setAsset()

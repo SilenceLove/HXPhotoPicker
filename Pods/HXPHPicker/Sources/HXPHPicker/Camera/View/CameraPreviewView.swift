@@ -133,6 +133,9 @@ class CameraPreviewView: UIView {
     }
     
     func resetMask(_ image: UIImage?) {
+        if #available(iOS 13.0, *) {
+            return
+        }
         imageMaskView.image = image
         imageMaskView.alpha = 1
         addSubview(imageMaskView)

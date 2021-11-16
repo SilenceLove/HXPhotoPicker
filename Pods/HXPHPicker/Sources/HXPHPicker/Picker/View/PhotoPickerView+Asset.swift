@@ -94,7 +94,7 @@ extension PhotoPickerView {
     /// 清空
     public func clear() {
         removeSelectedAssets()
-        canAddCamera = false
+        didFetchAsset = false
         allowPreview = false
         isFirst = true
         assets.removeAll()
@@ -119,7 +119,7 @@ extension PhotoPickerView {
     ) {
         resetScrollCell()
         if isFirst {
-            canAddCamera = true
+            didFetchAsset = true
             allowPreview = true
             isFirst = false
         }

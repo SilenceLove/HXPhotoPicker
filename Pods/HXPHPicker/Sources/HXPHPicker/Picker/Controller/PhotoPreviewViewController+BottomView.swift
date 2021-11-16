@@ -38,7 +38,7 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             )
             if isExceedsTheLimit {
                 videoEditorConfig = pickerConfig.videoEditor.mutableCopy() as! VideoEditorConfiguration
-                videoEditorConfig.defaultState = .cropping
+                videoEditorConfig.defaultState = .cropTime
                 videoEditorConfig.mustBeTailored = true
             }else {
                 videoEditorConfig = pickerConfig.videoEditor

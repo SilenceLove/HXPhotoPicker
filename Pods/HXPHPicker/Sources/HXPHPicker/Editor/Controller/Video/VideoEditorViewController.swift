@@ -45,7 +45,7 @@ open class VideoEditorViewController: BaseViewController {
     
     /// 视频原声音量
     public var videoVolume: Float = 1 {
-        didSet { playerView.player.volume = videoVolume }
+        didSet { videoView.playerView.player.volume = videoVolume }
     }
     
     /// 界面消失之后取消下载网络视频
@@ -59,6 +59,13 @@ open class VideoEditorViewController: BaseViewController {
     
     /// 确认/取消之后自动退出界面
     public var autoBack: Bool = true
+    
+    public var finishHandler: FinishHandler?
+    
+    public var cancelHandler: CancelHandler?
+    
+    public typealias FinishHandler = (VideoEditorViewController, VideoEditResult?) -> Void
+    public typealias CancelHandler = (VideoEditorViewController) -> Void
     
     /// 根据视频地址初始化
     /// - Parameters:
@@ -168,6 +175,7 @@ open class VideoEditorViewController: BaseViewController {
     private var requestType: Int = 0
     var loadingView: ProgressHUD?
     
+    var videoInitializeCompletion = false
     var setAssetCompletion: Bool = false
     var transitionCompletion: Bool = true
     var onceState: State = .normal
@@ -178,80 +186,21 @@ open class VideoEditorViewController: BaseViewController {
     
     /// 不是在音乐列表选中的音乐数据（不包括搜索）
     var otherMusic: VideoEditorMusic?
-    
-    lazy var scrollView: ScrollView = {
-        let scrollView = ScrollView.init()
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.showsVerticalScrollIndicator = false
-        scrollView.delegate = self
-        scrollView.isScrollEnabled = false
-        scrollView.minimumZoomScale = 1.0
-        scrollView.maximumZoomScale = 2.0
-        if #available(iOS 11.0, *) {
-            scrollView.contentInsetAdjustmentBehavior = .never
+    lazy var videoView: PhotoEditorView = {
+        let videoView = PhotoEditorView(
+            editType: .video,
+            cropConfig: .init(),
+            mosaicConfig: .init(),
+            brushConfig: .init(),
+            exportScale: 1
+        )
+        if let avAsset = avAsset {
+            let image = coverImage ?? PhotoTools.getVideoThumbnailImage(avAsset: avAsset, atTime: 0.1)
+            videoView.setAVAsset(avAsset, coverImage: image ?? .init())
         }
-        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
-        singleTap.delegate = self
-        scrollView.addGestureRecognizer(singleTap)
-        scrollView.addSubview(playerView)
-        return scrollView
-    }()
-    @objc func singleTap() {
-        if state != .normal {
-            return
-        }
-        if toolOptions.isSticker {
-            playerView.stickerView.deselectedSticker()
-        }
-        if isSearchMusic {
-            hideSearchMusicView()
-            return
-        }
-        if showChartlet {
-            showChartlet = false
-            playerView.stickerView.isUserInteractionEnabled = true
-            hiddenChartletView()
-        }
-        if isMusicState {
-            playerView.stickerView.isUserInteractionEnabled = true
-            isMusicState = false
-            updateMusicView()
-        }
-        if topView.isHidden == true {
-            showTopView()
-        }else {
-            hidenTopView()
-        }
-    }
-    func showTopView() {
-        toolView.isHidden = false
-        topView.isHidden = false
-        UIView.animate(withDuration: 0.25) {
-            self.toolView.alpha = 1
-            self.topView.alpha = 1
-            self.topMaskLayer.isHidden = false
-        }
-    }
-    func hidenTopView() {
-        UIView.animate(withDuration: 0.25) {
-            self.toolView.alpha = 0
-            self.topView.alpha = 0
-            self.topMaskLayer.isHidden = true
-        } completion: { (isFinished) in
-            self.toolView.isHidden = true
-            self.topView.isHidden = true
-        }
-    }
-    lazy var playerView: VideoEditorPlayerView = {
-        let playerView: VideoEditorPlayerView
-        if needRequest {
-            playerView = VideoEditorPlayerView.init()
-        }else {
-            playerView = VideoEditorPlayerView.init(avAsset: avAsset)
-        }
-        playerView.coverImageView.image = coverImage
-        playerView.delegate = self
-        return playerView
+        videoView.playerView.delegate = self
+        videoView.editorDelegate = self
+        return videoView
     }()
     lazy var musicView: VideoEditorMusicView = {
         let view = VideoEditorMusicView.init(config: config.music)
@@ -265,6 +214,36 @@ open class VideoEditorViewController: BaseViewController {
     }()
     var isMusicState = false
     var isSearchMusic = false
+    lazy var brushColorView: PhotoEditorBrushColorView = {
+        let view = PhotoEditorBrushColorView(config: config.brush)
+        view.delegate = self
+        view.alpha = 0
+        view.isHidden = true
+        return view
+    }()
+    lazy var brushSizeView: PhotoEditorViewController.BrushSizeView = {
+        let lineWidth = videoView.brushLineWidth + 4
+        let view = PhotoEditorViewController.BrushSizeView(
+            frame: CGRect(
+                origin: .zero,
+                size: CGSize(width: lineWidth, height: lineWidth)
+            )
+        )
+        return view
+    }()
+    lazy var cropToolView: PhotoEditorCropToolView = {
+        var showRatios = true
+        if config.sizeCrop.fixedRatio || config.sizeCrop.isRoundCrop {
+            showRatios = false
+        }
+        let view = PhotoEditorCropToolView(showRatios: showRatios)
+        view.delegate = self
+        view.isVideo = true
+        view.themeColor = config.sizeCrop.aspectRatioSelectedColor
+        view.alpha = 0
+        view.isHidden = true
+        return view
+    }()
     lazy var cropView: VideoEditorCropView = {
         let cropView: VideoEditorCropView
         if needRequest {
@@ -282,7 +261,7 @@ open class VideoEditorViewController: BaseViewController {
         toolView.delegate = self
         return toolView
     }()
-    public lazy var cropConfirmView: EditorCropConfirmView = {
+    lazy var cropConfirmView: EditorCropConfirmView = {
         let cropConfirmView = EditorCropConfirmView.init(config: config.cropView)
         cropConfirmView.alpha = 0
         cropConfirmView.isHidden = true
@@ -313,8 +292,8 @@ open class VideoEditorViewController: BaseViewController {
         return view
     }()
     var isPresentText = false
-    var playerFrame: CGRect = .zero
     var orientationDidChange: Bool = true
+    var videoViewDidChange: Bool = true
     /// 当前裁剪框的位置大小
     var currentValidRect: CGRect = .zero
     /// 当前裁剪框帧画面的偏移量
@@ -339,7 +318,7 @@ open class VideoEditorViewController: BaseViewController {
         super.viewDidLoad()
         initView()
     }
-    func initView() {
+    func initOptions() {
         for options in config.toolView.toolOptions {
             switch options.type {
             case .graffiti:
@@ -348,8 +327,10 @@ open class VideoEditorViewController: BaseViewController {
                 toolOptions.insert(.chartlet)
             case .text:
                 toolOptions.insert(.text)
-            case .cropping:
-                toolOptions.insert(.cropping)
+            case .cropSize:
+                toolOptions.insert(.cropSize)
+            case .cropTime:
+                toolOptions.insert(.cropTime)
             case .mosaic:
                 toolOptions.insert(.mosaic)
             case .filter:
@@ -358,11 +339,23 @@ open class VideoEditorViewController: BaseViewController {
                 toolOptions.insert(.music)
             }
         }
+    }
+    func initView() {
+        initOptions()
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTap))
+        singleTap.delegate = self
+        view.addGestureRecognizer(singleTap)
+        view.isExclusiveTouch = true
         view.backgroundColor = .black
-        view.addSubview(scrollView)
+        view.clipsToBounds = true
+        view.addSubview(videoView)
+        view.addSubview(cropToolView)
         view.addSubview(cropView)
         view.addSubview(cropConfirmView)
         view.addSubview(toolView)
+        if toolOptions.contains(.graffiti) {
+            view.addSubview(brushColorView)
+        }
         if toolOptions.contains(.music) {
             view.addSubview(musicView)
             view.addSubview(searchMusicView)
@@ -386,11 +379,11 @@ open class VideoEditorViewController: BaseViewController {
         if let editResult = editResult {
             didEdited = true
             if let cropData = editResult.cropData {
-                playerView.playStartTime = CMTimeMakeWithSeconds(
+                videoView.playerView.playStartTime = CMTimeMakeWithSeconds(
                     cropData.startTime,
                     preferredTimescale: cropData.preferredTimescale
                 )
-                playerView.playEndTime = CMTimeMakeWithSeconds(
+                videoView.playerView.playEndTime = CMTimeMakeWithSeconds(
                     cropData.endTime,
                     preferredTimescale: cropData.preferredTimescale
                 )
@@ -409,6 +402,7 @@ open class VideoEditorViewController: BaseViewController {
     }
     @objc func didBackClick() {
         backAction()
+        cancelHandler?(self)
         delegate?.videoEditorViewController(didCancel: self)
     }
     func backAction() {
@@ -435,9 +429,18 @@ open class VideoEditorViewController: BaseViewController {
         if showChartlet {
             singleTap()
         }
-        playerView.stickerView.removeAllSticker()
+        videoView.undoAllSticker()
+        videoView.undoAllDraw()
+        videoView.reset(false)
+        if state == .cropSize {
+            pState = .normal
+            toolCropSizeAnimation()
+        }else if state == .cropTime {
+            cancelCropTime(false)
+        }
+        videoView.finishCropping(false)
         rotateBeforeData = cropView.getRotateBeforeData()
-        playerView.pause()
+        videoView.playerView.pause()
         if toolOptions.contains(.music) {
             searchMusicView.deselect()
             musicView.reset()
@@ -447,6 +450,7 @@ open class VideoEditorViewController: BaseViewController {
     }
     open override func deviceOrientationDidChanged(notify: Notification) {
         orientationDidChange = true
+        videoViewDidChange = false
     }
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -467,9 +471,25 @@ open class VideoEditorViewController: BaseViewController {
             topView.y = UIDevice.generalStatusBarHeight
         }
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
-        cropView.frame = CGRect(x: 0, y: toolView.y - 100, width: view.width, height: 100)
+        cropView.frame = CGRect(x: 0, y: toolView.y - (UIDevice.isPortrait ? 100 : 90), width: view.width, height: 100)
         cropConfirmView.frame = toolView.frame
-        scrollView.frame = view.bounds
+        if !videoView.frame.equalTo(view.bounds) && !videoView.frame.isEmpty && !videoViewDidChange {
+            videoView.frame = view.bounds
+            videoView.reset(false)
+            videoView.finishCropping(false)
+            orientationDidChange = true
+        }else {
+            videoView.frame = view.bounds
+        }
+        if toolOptions.contains(.cropSize) {
+            let cropToolFrame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
+            cropConfirmView.frame = toolView.frame
+            cropToolView.frame = cropToolFrame
+            cropToolView.updateContentInset()
+        }
+        if toolOptions.contains(.graffiti) {
+            brushColorView.frame = CGRect(x: 0, y: cropConfirmView.y - 85, width: view.width, height: 85)
+        }
         if toolOptions.isSticker {
             setChartletViewFrame()
         }
@@ -480,23 +500,158 @@ open class VideoEditorViewController: BaseViewController {
                 searchMusicView.reloadData()
             }
         }
+        if orientationDidChange {
+            if videoView.playerView.avAsset != nil {
+                videoView.orientationDidChange()
+            }
+            videoViewDidChange = true
+        }
         if needRequest {
             if reqeustAssetCompletion {
-                setPlayerViewFrame()
                 setCropViewFrame()
-            }else {
-                if let size = coverImage?.size {
-                    playerView.frame = getPlayerViewFrame(size)
-                }else {
-                    playerView.frame = scrollView.bounds
-                }
-                scrollView.contentSize = playerView.size
             }
         }else {
-            setPlayerViewFrame()
             setCropViewFrame()
         }
     }
+    open override var prefersStatusBarHidden: Bool {
+        return config.prefersStatusBarHidden
+    }
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        isPresentText = false
+    }
+    open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isPresentText {
+            return
+        }
+        stopAllOperations()
+    }
+    public func stopAllOperations() {
+        stopPlayTimer()
+        PhotoManager.shared.stopPlayMusic()
+        if let url = networkVideoURL, viewDidDisappearCancelDownload {
+            PhotoManager.shared.suspendTask(url)
+            pNetworkVideoURL = nil
+        }
+        viewDidDisappearCancelDownload = true
+    }
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if navigationController?.topViewController != self &&
+            navigationController?.viewControllers.contains(self) == false {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+        }
+    }
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    deinit {
+        if let asset = avAsset {
+            asset.cancelLoading()
+        }
+        exportSession?.cancelExport()
+    }
+}
+
+extension VideoEditorViewController: UINavigationControllerDelegate {
+    public func navigationController(
+        _ navigationController: UINavigationController,
+        animationControllerFor operation: UINavigationController.Operation,
+        from fromVC: UIViewController,
+        to toVC: UIViewController
+    ) -> UIViewControllerAnimatedTransitioning? {
+        if operation == .push {
+            return EditorTransition(mode: .push)
+        }else if operation == .pop {
+            return EditorTransition(mode: .pop)
+        }
+        return nil
+    }
+}
+
+extension VideoEditorViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view is EditorStickerContentView {
+            return false
+        }
+        if let isDescendant = touch.view?.isDescendant(of: videoView), isDescendant {
+            return true
+        }
+        return false
+    }
+    public func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        true
+    }
+}
+
+// MARK: singleTap
+extension VideoEditorViewController {
+    
+    @objc func singleTap() {
+        if state != .normal {
+            return
+        }
+        if toolOptions.isSticker {
+            videoView.deselectedSticker()
+        }
+        if isSearchMusic {
+            hideSearchMusicView()
+            return
+        }
+        if showChartlet {
+            showChartlet = false
+            videoView.stickerEnabled = true
+            hiddenChartletView()
+        }
+        if isMusicState {
+            videoView.stickerEnabled = true
+            isMusicState = false
+            updateMusicView()
+        }
+        if topView.isHidden == true {
+            showTopView()
+        }else {
+            hidenTopView()
+        }
+    }
+    func showTopView() {
+        if videoView.drawEnabled {
+            showBrushColorView()
+        }
+        toolView.isHidden = false
+        topView.isHidden = false
+        UIView.animate(withDuration: 0.25) {
+            self.toolView.alpha = 1
+            self.topView.alpha = 1
+            self.topMaskLayer.isHidden = false
+        }
+    }
+    func hidenTopView() {
+        if videoView.drawEnabled {
+            hiddenBrushColorView()
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.toolView.alpha = 0
+            self.topView.alpha = 0
+            self.topMaskLayer.isHidden = true
+        } completion: { (isFinished) in
+            if self.toolView.alpha == 0 {
+                self.toolView.isHidden = true
+                self.topView.isHidden = true
+            }
+        }
+    }
+}
+
+// MARK: setup frame
+extension VideoEditorViewController {
+    
     func setChartletViewFrame() {
         var viewHeight = config.chartlet.viewHeight
         if viewHeight > view.height {
@@ -532,9 +687,9 @@ open class VideoEditorViewController: BaseViewController {
                 validWithScale: rotateBeforeData.2
             )
             cropView.updateTimeLabels()
-            if state == .cropping || didEdited {
-                playerView.playStartTime = cropView.getStartTime(real: true)
-                playerView.playEndTime = cropView.getEndTime(real: true)
+            if state == .cropTime || didEdited {
+                videoView.playerView.playStartTime = cropView.getStartTime(real: true)
+                videoView.playerView.playEndTime = cropView.getEndTime(real: true)
             }
             if let rotateBeforeStorageData = rotateBeforeStorageData {
                 rotateAfterSetStorageData(
@@ -544,7 +699,7 @@ open class VideoEditorViewController: BaseViewController {
                 )
             }
             if transitionCompletion {
-                playerView.resetPlay()
+                videoView.playerView.resetPlay()
                 startPlayTimer()
             }
         }
@@ -591,150 +746,5 @@ open class VideoEditorViewController: BaseViewController {
         let validX = validMaxWidth * validXScale + validInitialX
         let vaildWidth = validMaxWidth * validWithScale
         currentValidRect = CGRect(x: validX, y: 0, width: vaildWidth, height: cropView.itemHeight)
-    }
-    func getPlayerViewFrame(_ videoSize: CGSize) -> CGRect {
-        let playerFrame: CGRect
-        if UIDevice.isPad {
-            playerFrame = PhotoTools.transformImageSize(videoSize, toViewSize: view.size, directions: [.horizontal])
-        }else {
-            playerFrame = PhotoTools.transformImageSize(videoSize, to: view)
-        }
-        return playerFrame
-    }
-    func setPlayerViewFrame() {
-        scrollView.minimumZoomScale = 1
-        scrollView.zoomScale = 1
-        let playerFrame = getPlayerViewFrame(videoSize)
-        if !playerView.frame.equalTo(playerFrame) && orientationDidChange {
-            playerView.frame = playerFrame
-        }
-        self.playerFrame = playerFrame
-        if !scrollView.contentSize.equalTo(playerView.size) {
-            scrollView.contentSize = playerView.size
-        }
-        if state == .normal && UIDevice.isPad {
-            scrollView.minimumZoomScale = 1.1
-            scrollView.zoomScale = 1.1
-            setupScrollViewScale()
-        }else if state == .cropping && transitionCompletion {
-            setupScrollViewScale()
-        }
-    }
-    func setupScrollViewScale() {
-        if state == .normal {
-            scrollView.minimumZoomScale = 1
-            scrollView.zoomScale = 1
-        }else if state == .cropping {
-            let scale = cropVideoRect().width / playerFrame.width
-            scrollView.minimumZoomScale = scale
-            scrollView.zoomScale = scale
-        }
-    }
-    func cropVideoRect() -> CGRect {
-        let leftMargin = 30 + UIDevice.leftMargin
-        let width = view.width - leftMargin * 2
-        var y: CGFloat = 10
-        var height = cropView.y - y - 5
-        if let modalPresentationStyle = navigationController?.modalPresentationStyle, UIDevice.isPortrait {
-            if modalPresentationStyle == .fullScreen ||
-                modalPresentationStyle == .custom {
-                height -= UIDevice.generalStatusBarHeight
-                y += UIDevice.generalStatusBarHeight
-            }
-        }else if (modalPresentationStyle == .fullScreen || modalPresentationStyle == .custom) && UIDevice.isPortrait {
-            height -= UIDevice.generalStatusBarHeight
-            y += UIDevice.generalStatusBarHeight
-        }
-        let rect = PhotoTools.transformImageSize(
-            videoSize,
-            toViewSize: CGSize(width: width, height: height),
-            directions: [.horizontal]
-        )
-        return CGRect(
-            x: leftMargin + (width - rect.width) * 0.5,
-            y: y + (height - rect.height) * 0.5,
-            width: rect.width,
-            height: rect.height
-        )
-    }
-    open override var prefersStatusBarHidden: Bool {
-        return config.prefersStatusBarHidden
-    }
-    open override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        isPresentText = false
-    }
-    open override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if isPresentText {
-            return
-        }
-        stopAllOperations()
-    }
-    public func stopAllOperations() {
-        stopPlayTimer()
-        PhotoManager.shared.stopPlayMusic()
-        if let url = networkVideoURL, viewDidDisappearCancelDownload {
-            PhotoManager.shared.suspendTask(url)
-            pNetworkVideoURL = nil
-        }
-        viewDidDisappearCancelDownload = true
-    }
-    open override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if navigationController?.topViewController != self &&
-            navigationController?.viewControllers.contains(self) == false {
-            navigationController?.setNavigationBarHidden(false, animated: true)
-        }
-    }
-    open override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
-    }
-    deinit {
-        if let asset = avAsset {
-            asset.cancelLoading()
-        }
-        exportSession?.cancelExport()
-    }
-}
-
-extension VideoEditorViewController: UIScrollViewDelegate, UIGestureRecognizerDelegate {
-    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return playerView
-    }
-    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        let offsetX = (scrollView.width > scrollView.contentSize.width) ?
-            (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
-        let offsetY = (scrollView.height > scrollView.contentSize.height) ?
-            (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
-        let centerX = scrollView.contentSize.width * 0.5 + offsetX
-        let centerY = scrollView.contentSize.height * 0.5 + offsetY
-        playerView.center = CGPoint(x: centerX, y: centerY)
-        if state == .cropping {
-            playerView.y = cropVideoRect().minY
-        }
-    }
-    class ScrollView: UIScrollView, UIGestureRecognizerDelegate {
-        
-        public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-            return false
-        }
-    }
-}
-
-extension VideoEditorViewController: UINavigationControllerDelegate {
-    public func navigationController(
-        _ navigationController: UINavigationController,
-        animationControllerFor operation: UINavigationController.Operation,
-        from fromVC: UIViewController,
-        to toVC: UIViewController
-    ) -> UIViewControllerAnimatedTransitioning? {
-        if operation == .push {
-            return EditorTransition(mode: .push)
-        }else if operation == .pop {
-            return EditorTransition(mode: .pop)
-        }
-        return nil
     }
 }

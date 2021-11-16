@@ -479,6 +479,10 @@ extension PickerConfigurationViewController {
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
     }
+    func addCameraAction(_ indexPath: IndexPath) {
+        config.photoList.allowAddCamera = !config.photoList.allowAddCamera
+        tableView.reloadRows(at: [indexPath], with: .fade)
+    }
     func getRowContent(_ rowType: ConfigRowTypeRule) -> String {
         if let rowType = rowType as? ConfigRowType {
             switch rowType {
@@ -520,6 +524,8 @@ extension PickerConfigurationViewController {
                 return String(config.photoList.rowNumber)
             case .videoPlayType:
                 return config.previewView.videoPlayType.title
+            case .addCamera:
+                return config.photoList.allowAddCamera ? "true" : "false"
             }
         }
         if rowType is ViewControllerOptionsRowType {
@@ -640,6 +646,7 @@ extension PickerConfigurationViewController {
         case maximumSelectedVideoDuration
         case minimumSelectedVideoDuration
         case videoPlayType
+        case addCamera
         
         var title: String {
             switch self {
@@ -681,6 +688,8 @@ extension PickerConfigurationViewController {
                 return "每行显示数量"
             case .videoPlayType:
                 return "视频播放类型"
+            case .addCamera:
+                return "列表添加相机"
             }
         }
         var detailTitle: String {
@@ -689,6 +698,9 @@ extension PickerConfigurationViewController {
             }
             if self == .videoPlayType {
                 return ".previewView.videoPlayType"
+            }
+            if self == .addCamera {
+                return ".PhotoList.allowAddCamera"
             }
             return "." + self.rawValue
         }
@@ -737,6 +749,8 @@ extension PickerConfigurationViewController {
                 return controller.photoRowNumberAction(_:)
             case .videoPlayType:
                 return controller.videoPlayTypeAction(_:)
+            case .addCamera:
+                return controller.addCameraAction(_:)
             }
         }
     }

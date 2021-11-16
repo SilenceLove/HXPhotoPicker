@@ -18,8 +18,8 @@ public enum PhotoError: LocalizedError {
     case error(type: Type, message: String)
 }
 
-public extension PhotoError {
-     var errorDescription: String? {
+extension PhotoError {
+    public var errorDescription: String? {
         switch self {
         case let .error(_, message):
             return message

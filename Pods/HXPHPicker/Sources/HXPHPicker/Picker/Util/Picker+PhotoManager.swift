@@ -193,5 +193,6 @@ extension PhotoManager: PHPhotoLibraryChangeObserver {
         }
         let result = changeResult.fetchResultAfterChanges
         cameraAlbumResult = result
+        PhotoManager.shared.firstLoadAssets = true
     }
 }

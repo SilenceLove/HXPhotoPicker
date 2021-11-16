@@ -175,8 +175,10 @@ class WeChatViewCell: UITableViewCell {
         view.hidesWhenStopped = true
         return view
     }()
+    var avAsset: AVAsset?
     var photoAsset: PhotoAsset! {
         didSet {
+            avAsset?.cancelLoading()
             pictureView.cancelRequest()
             pictureView.photoAsset = photoAsset
             if photoAsset.isGifAsset {
@@ -196,7 +198,7 @@ class WeChatViewCell: UITableViewCell {
                         stateLb.text = videoTime
                     }else {
                         stateLb.text = nil
-                        PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
+                        avAsset = PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
                             guard let self = self else { return }
                             if self.photoAsset == asset {
                                 self.stateLb.text = asset.videoTime

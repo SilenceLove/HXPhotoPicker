@@ -35,7 +35,7 @@ open class PhotoEditorConfiguration: EditorConfiguration {
         )
         let crop = EditorToolOptions(
             imageName: "hx_editor_photo_crop",
-            type: .cropping
+            type: .cropSize
         )
         let mosaic = EditorToolOptions(
             imageName: "hx_editor_tools_mosaic",
@@ -49,50 +49,27 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     }()
     
     /// 画笔
-    public lazy var brush: BrushConfig = .init()
+    public lazy var brush: EditorBrushConfiguration = .init()
     
     /// 贴图
-    public lazy var chartlet: EditorChartletConfig = .init()
+    public lazy var chartlet: EditorChartletConfiguration = .init()
     
     /// 文本
-    public lazy var text: EditorTextConfig = .init()
+    public lazy var text: EditorTextConfiguration = .init()
     
     /// 裁剪配置
-    public lazy var cropping: PhotoCroppingConfiguration = .init()
+    public lazy var cropping: EditorCropSizeConfiguration = .init()
     
     /// 裁剪确认视图配置
     public lazy var cropConfimView: CropConfirmViewConfiguration = .init()
     
     /// 滤镜配置
-    public lazy var filter: FilterConfig = .init(infos: PhotoTools.defaultFilters())
+    public lazy var filter: Filter = .init(infos: PhotoTools.defaultFilters())
     
     /// 马赛克配置
-    public lazy var mosaic: MosaicConfig = .init()
+    public lazy var mosaic: Mosaic = .init()
     
-    public struct BrushConfig {
-        
-        /// 画笔颜色数组
-        public var colors: [String] = PhotoTools.defaultColors()
-        
-        /// 默认画笔颜色索引
-        public var defaultColorIndex: Int = 2
-        
-        /// 初始画笔宽度
-        public var lineWidth: CGFloat = 5
-        
-        /// 画笔最大宽度
-        public var maximumLinewidth: CGFloat = 20
-        
-        /// 画笔最小宽度
-        public var minimumLinewidth: CGFloat = 2
-        
-        /// 显示画笔尺寸大小滑动条
-        public var showSlider: Bool = true
-        
-        public init() { }
-    }
-    
-    public struct MosaicConfig {
+    public struct Mosaic {
         /// 生成马赛克的大小
         public var mosaicWidth: CGFloat = 20
         /// 涂鸦时马赛克的线宽
@@ -103,7 +80,7 @@ open class PhotoEditorConfiguration: EditorConfiguration {
         public init() { }
     }
     
-    public struct FilterConfig {
+    public struct Filter {
         /// 滤镜信息
         public var infos: [PhotoEditorFilterInfo]
         /// 滤镜选中颜色

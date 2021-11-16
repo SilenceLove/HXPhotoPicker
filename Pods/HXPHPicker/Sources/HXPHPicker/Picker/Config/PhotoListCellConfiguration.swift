@@ -48,5 +48,9 @@ public struct PhotoListCellConfiguration {
     /// 选择框相关配置
     public var selectBox: SelectBoxConfiguration = .init()
     
+    #if canImport(Kingfisher)
+    public var kf_indicatorColor: UIColor?
+    #endif
+    
     public init() { }
 }

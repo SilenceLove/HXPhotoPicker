@@ -64,13 +64,21 @@ public class EditorImageResizerMaskView: UIView {
     var animationDuration: TimeInterval = 0.25
     let isMask: Bool
     let maskType: MaskType
+    
+    var isCropTime: Bool = false {
+        didSet {
+            backgroundColor = .black.withAlphaComponent(isCropTime ? 1 : 0.6)
+            visualEffectView.isHidden = isCropTime
+        }
+    }
+    
     init(isMask: Bool, maskType: MaskType = .blackColor) {
         self.isMask = isMask
         self.maskType = maskType
         super.init(frame: .zero)
         if isMask {
             if maskType == .blackColor {
-                backgroundColor = UIColor.black.withAlphaComponent(0.6)
+                backgroundColor = .black.withAlphaComponent(0.6)
             }else {
                 addSubview(visualEffectView)
             }
@@ -86,7 +94,7 @@ public class EditorImageResizerMaskView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    func updateBlackMask(isShow: Bool, animated: Bool, completion: (() -> Void)?) {
+    func updateBlackMask(isShow: Bool, animated: Bool, completion: (() -> Void)? = nil) {
         if animated {
             if isShow {
                 blackMaskView.isHidden = false

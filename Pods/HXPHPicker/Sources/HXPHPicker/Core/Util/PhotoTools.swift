@@ -35,7 +35,7 @@ public struct PhotoTools {
             width = targetWidth / height * width * scale
             height = targetWidth * scale
         }
-        return CGSize.init(width: width, height: height)
+        return CGSize(width: width, height: height)
     }
     
     /// 转换视频时长为 mm:ss 格式的字符串

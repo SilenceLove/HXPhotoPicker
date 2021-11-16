@@ -26,6 +26,10 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     /// 配置
     public var config: PhotoListCellConfiguration? {
         didSet {
+            photoView.targetWidth = config?.targetWidth ?? 250
+            #if canImport(Kingfisher)
+            photoView.kf_indicatorColor = config?.kf_indicatorColor
+            #endif
             configColor()
         }
     }
@@ -80,7 +84,14 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     
     /// 获取图片，重写此方法可以修改图片
     open func requestThumbnailImage(targetWidth: CGFloat) {
-        photoView.requestThumbnailImage(targetWidth: targetWidth)
+        photoView.requestThumbnailImage(targetWidth: targetWidth) { [weak self] in
+            guard let self = self, self.photoAsset == $1 else { return }
+            self.requestThumbnailCompletion($0)
+        }
+    }
+    
+    open func requestThumbnailCompletion(_ image: UIImage?) {
+        
     }
     
     /// 更新已选状态
@@ -106,6 +117,9 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
             return
         }
         cancelICloudRequest()
+        if PhotoManager.shared.thumbnailLoadMode == .simplify {
+            return
+        }
         iCloudRequestID = photoAsset.requestICloudState { [weak self] photoAsset, inICloud in
             guard let self = self,
                   self.photoAsset == photoAsset else {
@@ -119,6 +133,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     /// 获取iCloud上状态完成
     open func requestICloudStateCompletion(_ inICloud: Bool) {
         self.inICloud = inICloud
+        requestICloudCompletion = true
     }
     
     /// 布局，重写此方法修改布局
@@ -133,6 +148,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     }
     
     open func cancelICloudRequest() {
+        requestICloudCompletion = false
         inICloud = false
         if let id = iCloudRequestID {
             PHImageManager.default().cancelImageRequest(id)
@@ -143,6 +159,7 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         initView()
+        addLoadModeObserver()
     }
     open override func layoutSubviews() {
         super.layoutSubviews()
@@ -156,10 +173,43 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
             }
         }
     }
+    var requestICloudCompletion = false
+    var observation: Any?
     deinit {
         cancelRequest()
+        if let observation = observation {
+            NotificationCenter.default.removeObserver(observation)
+            self.observation = nil
+        }
     }
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension PhotoPickerBaseViewCell {
+    
+    private func addLoadModeObserver() {
+        observation = NotificationCenter
+            .default
+            .addObserver(
+                forName: .ThumbnailLoadModeDidChange,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
+                guard let self = self else { return }
+                let mode = PhotoManager.shared.thumbnailLoadMode
+                if mode == .simplify {
+                    self.photoView.cancelRequest()
+                    if !self.requestICloudCompletion {
+                        self.cancelICloudRequest()
+                    }
+                    return
+                }
+                self.photoView.reloadImage()
+                if !self.requestICloudCompletion {
+                    self.requestICloudState()
+                }
+            }
     }
 }

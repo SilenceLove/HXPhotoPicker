@@ -11,6 +11,7 @@ import CoreGraphics
 import CoreMedia
 import QuartzCore
 
+#if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
 extension PhotoTools {
     
     static func cameraPreviewImageURL() -> URL {
@@ -195,3 +196,4 @@ extension PhotoTools {
         return UIImage(cgImage: cgImage)
     }
 }
+#endif

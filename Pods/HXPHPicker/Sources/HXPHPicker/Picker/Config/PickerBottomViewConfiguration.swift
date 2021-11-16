@@ -33,7 +33,7 @@ public struct PickerBottomViewConfiguration {
     public var previewButtonTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下预览按钮标题颜色
-    public var previewButtonTitleDarkColor: UIColor = .white
+    public var previewButtonTitleDarkColor: UIColor = .systemTintColor
     
     /// 预览按钮禁用下的标题颜色
     public var previewButtonDisableTitleColor: UIColor?
@@ -48,7 +48,7 @@ public struct PickerBottomViewConfiguration {
     public var originalButtonTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下预览按钮标题颜色
-    public var originalButtonTitleDarkColor: UIColor = .white
+    public var originalButtonTitleDarkColor: UIColor = .systemTintColor
     
     /// 显示原图文件大小
     public var showOriginalFileSize: Bool = true
@@ -66,25 +66,25 @@ public struct PickerBottomViewConfiguration {
     public var finishButtonTitleColor: UIColor = .white
     
     /// 暗黑风格下完成按钮标题颜色
-    public var finishButtonTitleDarkColor: UIColor = .black
+    public var finishButtonTitleDarkColor: UIColor = .white
     
     /// 完成按钮禁用下的标题颜色
     public var finishButtonDisableTitleColor: UIColor = .white.withAlphaComponent(0.6)
     
     /// 暗黑风格下完成按钮禁用下的标题颜色
-    public var finishButtonDisableTitleDarkColor: UIColor = .black.withAlphaComponent(0.6)
+    public var finishButtonDisableTitleDarkColor: UIColor = .white.withAlphaComponent(0.6)
     
     /// 完成按钮选中时的背景颜色
     public var finishButtonBackgroundColor: UIColor = .systemTintColor
     
     /// 暗黑风格下完成按钮选中时的背景颜色
-    public var finishButtonDarkBackgroundColor: UIColor = .white
+    public var finishButtonDarkBackgroundColor: UIColor = .systemTintColor
     
     /// 完成按钮禁用时的背景颜色
     public var finishButtonDisableBackgroundColor: UIColor = .systemTintColor
     
     /// 暗黑风格下完成按钮禁用时的背景颜色
-    public var finishButtonDisableDarkBackgroundColor: UIColor = .white.withAlphaComponent(0.4)
+    public var finishButtonDisableDarkBackgroundColor: UIColor = .systemTintColor
     
     /// 未选择资源时是否禁用完成按钮
     public var disableFinishButtonWhenNotSelected: Bool = true
@@ -98,7 +98,7 @@ public struct PickerBottomViewConfiguration {
     public var editButtonTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下编辑按钮标题颜色
-    public var editButtonTitleDarkColor: UIColor = .white
+    public var editButtonTitleDarkColor: UIColor = .systemTintColor
     
     /// 编辑按钮禁用下的标题颜色
     public var editButtonDisableTitleColor: UIColor?
@@ -112,19 +112,19 @@ public struct PickerBottomViewConfiguration {
     public var promptIconColor: UIColor = .systemTintColor
     
     /// 暗黑风格下提示图标颜色
-    public var promptIconDarkColor: UIColor = .white
+    public var promptIconDarkColor: UIColor = .systemTintColor
     
     /// 提示语颜色
     public var promptTitleColor: UIColor = .systemTintColor
     
     /// 暗黑风格下提示语颜色
-    public var promptTitleDarkColor: UIColor = .white
+    public var promptTitleDarkColor: UIColor = .systemTintColor
     
     /// 提示语颜色
     public var promptArrowColor: UIColor = .systemTintColor
     
     /// 暗黑风格下提示语颜色
-    public var promptArrowDarkColor: UIColor = .white
+    public var promptArrowDarkColor: UIColor = .systemTintColor
     
     /// 显示已选资源
     public var showSelectedView: Bool = false
@@ -141,13 +141,13 @@ public struct PickerBottomViewConfiguration {
         // 原图按钮选中时的背景颜色
         boxConfig.selectedBackgroundColor = .systemTintColor
         // 暗黑风格下原图按钮选中时的背景颜色
-        boxConfig.selectedBackgroudDarkColor = UIColor.white
+        boxConfig.selectedBackgroudDarkColor = .systemTintColor
         // 原图按钮未选中时的边框宽度
         boxConfig.borderWidth = 1
         // 原图按钮未选中时的边框颜色
-        boxConfig.borderColor = boxConfig.selectedBackgroundColor
+        boxConfig.borderColor = .systemTintColor
         // 暗黑风格下原图按钮未选中时的边框颜色
-        boxConfig.borderDarkColor = UIColor.white
+        boxConfig.borderDarkColor = .systemTintColor
         // 原图按钮未选中时框框中间的颜色
         boxConfig.backgroundColor = UIColor.white.withAlphaComponent(0.3)
         // 原图按钮选中时的勾勾宽度

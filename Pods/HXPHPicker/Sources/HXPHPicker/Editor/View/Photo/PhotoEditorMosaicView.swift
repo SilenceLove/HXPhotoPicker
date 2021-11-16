@@ -52,7 +52,7 @@ class PhotoEditorMosaicView: UIView, UIGestureRecognizerDelegate {
     }
     var canUndo: Bool { !mosaicPaths.isEmpty }
     
-    init(mosaicConfig: PhotoEditorConfiguration.MosaicConfig) {
+    init(mosaicConfig: PhotoEditorConfiguration.Mosaic) {
         mosaicLineWidth = mosaicConfig.mosaiclineWidth
         imageWidth = mosaicConfig.smearWidth
         super.init(frame: .zero)

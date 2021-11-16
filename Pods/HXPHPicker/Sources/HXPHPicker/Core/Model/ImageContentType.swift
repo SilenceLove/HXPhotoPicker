@@ -9,7 +9,7 @@ import UIKit
 
 public enum ImageContentType: String {
     case jpg, png, gif, unknown
-    var fileExtension: String {
+    public var fileExtension: String {
         return self.rawValue
     }
 }

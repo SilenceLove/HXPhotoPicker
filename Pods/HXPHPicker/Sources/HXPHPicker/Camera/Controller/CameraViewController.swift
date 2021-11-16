@@ -281,6 +281,12 @@ open class CameraViewController: BaseViewController {
         }
         bottomView.addGesture(for: type)
         startLocation()
+        if #available(iOS 13.0, *) {
+        }else {
+            previewView.removeMask()
+            bottomView.hiddenTip()
+            bottomView.isGestureEnable = true
+        }
     }
     
     func addSwithCameraButton() {

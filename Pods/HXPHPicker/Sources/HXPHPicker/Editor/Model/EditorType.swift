@@ -38,21 +38,23 @@ public extension VideoEditorViewController {
     enum State: Int {
         /// 正常状态
         case normal
-        /// 裁剪状态
-        case cropping
+        /// 裁剪时长状态
+        case cropTime
+        /// 裁剪尺寸状态
+        case cropSize
     }
 }
 
 /// 编辑工具
 public extension EditorToolOptions {
     enum `Type` {
-        /// photo - 涂鸦
+        /// 涂鸦
         case graffiti
         
-        /// photo - 贴图
+        /// 贴图
         case chartlet
         
-        /// photo - 文本
+        /// 文本
         case text
         
         /// photo - 马赛克
@@ -64,8 +66,11 @@ public extension EditorToolOptions {
         /// video - 配乐
         case music
         
-        /// 裁剪
-        case cropping
+        /// 尺寸裁剪（video-未完成）
+        case cropSize
+        
+        /// video - 时长裁剪
+        case cropTime
     }
 }
 
@@ -78,7 +83,8 @@ extension EditorToolView {
         static let mosaic = Options(rawValue: 1 << 3)
         static let filter = Options(rawValue: 1 << 4)
         static let music = Options(rawValue: 1 << 5)
-        static let cropping = Options(rawValue: 1 << 6)
+        static let cropSize = Options(rawValue: 1 << 6)
+        static let cropTime = Options(rawValue: 1 << 6)
         let rawValue: Int
         
         var isSticker: Bool {
@@ -106,7 +112,7 @@ public extension EditorImageResizerMaskView {
 }
 
 /// 默认宽高比类型
-public extension PhotoCroppingConfiguration {
+public extension EditorCropSizeConfiguration {
     enum AspectRatioType: Equatable {
         /// 原始宽高比
         case original

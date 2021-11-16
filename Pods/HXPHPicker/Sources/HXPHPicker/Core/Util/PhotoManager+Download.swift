@@ -7,6 +7,7 @@
 
 import UIKit
 
+#if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_EDITOR
 extension PhotoManager: URLSessionDownloadDelegate {
     
     @discardableResult
@@ -163,3 +164,4 @@ extension PhotoManager: URLSessionDownloadDelegate {
         self.removeTask(responseURL)
     }
 }
+#endif

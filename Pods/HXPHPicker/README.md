@@ -35,6 +35,7 @@
     - [x] 马赛克
     - [x] 滤镜
 - [x] 编辑视频（支持网络资源）
+    - [x] 涂鸦
     - [x] 贴纸（支持GIF）
     - [x] 文字
     - [x] 配乐（支持歌词字幕）
@@ -70,7 +71,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.2.4"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.2.6"))
 ]
 ```
 
@@ -115,13 +116,29 @@ class ViewController: UIViewController {
     func presentPickerController() {
         // 设置与微信主题一致的配置
         let config = PhotoTools.getWXPickerConfig()
-        let pickerController = PhotoPickerController.init(picker: config)
+        
+        // 方法一：
+        let pickerController = PhotoPickerController(picker: config)
         pickerController.pickerDelegate = self
         // 当前被选择的资源对应的 PhotoAsset 对象数组
         pickerController.selectedAssetArray = selectedAssets 
         // 是否选中原图
         pickerController.isOriginal = isOriginal
         present(pickerController, animated: true, completion: nil)
+        
+        // 方法二：
+        Photo.picker(
+            config
+        ) { result, pickerController in
+            // 选择完成的回调
+            // result 选择结果
+            //  .photoAssets 当前选择的数据
+            //  .isOriginal 是否选中了原图
+            // photoPickerController 对应的照片选择控制器
+        } cancel: { pickerController in
+            // 取消的回调
+            // photoPickerController 对应的照片选择控制器 
+        }
     }
 }
 
@@ -158,6 +175,7 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v1.2.5](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#125) | 2021-11-11 | 12.5.1 | 5.4.2 | 12.0+ |
 | [v1.2.4](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#124) | 2021-10-19 | 12.5.1 | 5.4.2 | 12.0+ |
 
 ## 版权协议

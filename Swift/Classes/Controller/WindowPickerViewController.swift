@@ -19,8 +19,12 @@ class WindowPickerViewController: UIViewController {
         manager.config.photoList.cell.backgroundColor = .white
         manager.config.photoList.cell.targetWidth = 300
         manager.config.photoList.cameraCell.allowPreview = false
+        manager.config.photoList.cameraCell.backgroundColor = UIColor(hexString: "#f1f1f1")
         manager.config.photoList.emptyView.titleColor = UIColor(hexString: "#666666")
         manager.config.photoList.emptyView.subTitleColor = UIColor(hexString: "#666666")
+        manager.config.photoList.limitCell.lineColor = UIColor(hexString: "#999999")
+        manager.config.photoList.limitCell.titleColor = UIColor(hexString: "#999999")
+        manager.config.photoList.limitCell.backgroundColor = UIColor(hexString: "#f1f1f1")
         manager.config.notAuthorized.backgroundColor = .white
         manager.config.notAuthorized.titleColor = UIColor(hexString: "#666666")
         manager.config.notAuthorized.subTitleColor = UIColor(hexString: "#666666")

@@ -1,5 +1,5 @@
 //
-//  EditorChartletConfig.swift
+//  EditorChartletConfiguration.swift
 //  HXPHPicker
 //
 //  Created by Slience on 2021/8/16.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-public struct EditorChartletConfig {
+public struct EditorChartletConfiguration {
     public enum LoadScene {
         /// cell显示时
         case cellDisplay

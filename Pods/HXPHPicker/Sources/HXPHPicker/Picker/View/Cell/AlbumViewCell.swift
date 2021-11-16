@@ -108,8 +108,8 @@ open class AlbumViewCell: UITableViewCell {
             selectedBgView.backgroundColor = config?.cellSelectedDarkColor
             selectedBackgroundView = selectedBgView
         }else {
-            if config?.cellSelectedColor != nil {
-                selectedBgView.backgroundColor = config?.cellSelectedColor
+            if let color = config?.cellSelectedColor {
+                selectedBgView.backgroundColor = color
                 selectedBackgroundView = selectedBgView
             }else {
                 selectedBackgroundView = nil

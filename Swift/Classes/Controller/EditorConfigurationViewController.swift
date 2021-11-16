@@ -43,9 +43,25 @@ class EditorConfigurationViewController: UITableViewController {
                             ofType: ".JPG"
                         )!
                     )!
-                    let vc = EditorController.init(image: image, config: photoConfig)
-                    vc.photoEditorDelegate = self
-                    present(vc, animated: true, completion: nil)
+                    Photo.edit(
+                        photo: image,
+                        config: photoConfig
+                    ) { [weak self] controller, result in
+                        guard let self = self else { return }
+                        let pickerResultVC = PickerResultViewController()
+                        let pickerConfig = PickerConfiguration()
+                        pickerConfig.photoEditor = self.photoConfig
+                        pickerResultVC.config = pickerConfig
+                        let localImageAsset = LocalImageAsset.init(image: controller.image)
+                        let photoAsset = PhotoAsset(localImageAsset: localImageAsset)
+                        photoAsset.photoEdit = result
+                        pickerResultVC.selectedAssets = [photoAsset]
+                        self.navigationController?.pushViewController(pickerResultVC, animated: true)
+                    }
+
+//                    let vc = EditorController.init(image: image, config: photoConfig)
+//                    vc.photoEditorDelegate = self
+//                    present(vc, animated: true, completion: nil)
                 }else {
                     #if canImport(Kingfisher)
                     let networkURL = URL(
@@ -523,7 +539,7 @@ extension EditorConfigurationViewController {
                 case 0:
                     self.videoConfig.defaultState = .normal
                 case 1:
-                    self.videoConfig.defaultState = .cropping
+                    self.videoConfig.defaultState = .cropTime
                 default:
                     break
                 }
@@ -745,7 +761,7 @@ extension EditorConfigurationViewController {
 
 extension VideoEditorViewController.State {
     var title: String {
-        if self == .cropping {
+        if self == .cropTime {
             return "裁剪"
         }
         return "正常"

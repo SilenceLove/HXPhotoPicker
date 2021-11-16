@@ -8,9 +8,6 @@
 
 import UIKit
 import Photos
-#if canImport(Kingfisher)
-import Kingfisher
-#endif
 
 open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     
@@ -35,6 +32,9 @@ open class PhotoPreviewSelectedViewCell: UICollectionViewCell {
     open var tickColor: UIColor? {
         didSet {
             tickView.tickLayer.strokeColor = tickColor?.cgColor
+            #if canImport(Kingfisher)
+            photoView.kf_indicatorColor = tickColor
+            #endif
         }
     }
     

@@ -10,7 +10,9 @@ import UIKit
 open class BaseViewController: UIViewController {
     open override func viewDidLoad() {
         super.viewDidLoad()
-        
+        if #available(iOS 13.0, *) {
+            return
+        }
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(deviceOrientationDidChanged(notify:)),
@@ -31,6 +33,18 @@ open class BaseViewController: UIViewController {
     
     @objc open func deviceOrientationWillChanged(notify: Notification) {
         
+    }
+    
+    open override func viewWillTransition(
+        to size: CGSize,
+        with coordinator: UIViewControllerTransitionCoordinator
+    ) {
+        super.viewWillTransition(to: size, with: coordinator)
+        guard #available(iOS 13.0, *) else {
+            return
+        }
+        deviceOrientationWillChanged(notify: .init(name: UIApplication.willChangeStatusBarOrientationNotification))
+        deviceOrientationDidChanged(notify: .init(name: UIApplication.didChangeStatusBarOrientationNotification))
     }
     
     deinit {

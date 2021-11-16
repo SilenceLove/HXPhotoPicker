@@ -115,7 +115,7 @@ public final class SelectBoxView: UIControl {
             width: textWidth,
             height: textHeight
         )
-        textLayer.font = CGFont.init(font.fontName as CFString)
+        textLayer.font = CGFont(font.fontName as CFString)
         textLayer.fontSize = config.titleFontSize
         textLayer.foregroundColor = PhotoManager.isDark ? config.titleDarkColor.cgColor : config.titleColor.cgColor
     }
@@ -162,5 +162,15 @@ public final class SelectBoxView: UIControl {
             return self
         }
         return super.hitTest(point, with: event)
+    }
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                drawBackgroundLayer()
+                drawTextLayer()
+                drawTickLayer()
+            }
+        }
     }
 }

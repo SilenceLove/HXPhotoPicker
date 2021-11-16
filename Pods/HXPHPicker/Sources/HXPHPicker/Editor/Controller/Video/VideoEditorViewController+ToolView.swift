@@ -14,11 +14,10 @@ extension VideoEditorViewController: EditorToolViewDelegate {
     /// 导出视频
     /// - Parameter toolView: 底部工具视频
     func toolView(didFinishButtonClick toolView: EditorToolView) {
-        playerView.stickerView.deselectedSticker()
-        let hasSticker = playerView.stickerView.count > 0
+        videoView.deselectedSticker()
         let timeRang: CMTimeRange
-        if let startTime = playerView.playStartTime,
-           let endTime = playerView.playEndTime {
+        if let startTime = videoView.playerView.playStartTime,
+           let endTime = videoView.playerView.playEndTime {
             if endTime.seconds - startTime.seconds > config.cropping.maximumVideoCroppingTime {
                 let seconds = Double(config.cropping.maximumVideoCroppingTime)
                 timeRang = CMTimeRange(
@@ -35,18 +34,22 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             timeRang = .zero
         }
         let hasAudio: Bool
-        if backgroundMusicPath != nil || playerView.player.volume < 1 {
+        if backgroundMusicPath != nil || videoView.playerView.player.volume < 1 {
             hasAudio = true
         }else {
             hasAudio = false
         }
-        if hasAudio || timeRang != .zero || hasSticker {
-            let stickerInfos = playerView.stickerView.getStickerInfo()
-//            exportLoadingView = ProgressHUD.showLoading(
-//                addedTo: view,
-//                text: "正在处理...".localized,
-//                animated: true
-//            )
+        let hasCropSize: Bool
+        if videoView.canReset() ||
+            videoView.imageResizerView.hasCropping ||
+            videoView.canUndoDraw ||
+            videoView.hasFilter ||
+            videoView.hasSticker {
+            hasCropSize = true
+        }else {
+            hasCropSize = false
+        }
+        if hasAudio || timeRang != .zero || hasCropSize {
             exportLoadingView = ProgressHUD.showProgress(
                 addedTo: view,
                 text: "正在处理...".localized,
@@ -54,18 +57,19 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             )
             exportVideoURL(
                 timeRang: timeRang,
-                hasSticker: hasSticker,
-                stickerInfos: stickerInfos
+                hasCropSize: hasCropSize,
+                cropSizeData: videoView.getVideoCropData()
             )
             return
         }
         delegate?.videoEditorViewController(didFinishWithUnedited: self)
+        finishHandler?(self, nil)
         backAction()
     }
     func exportVideoURL(
         timeRang: CMTimeRange,
-        hasSticker: Bool,
-        stickerInfos: [EditorStickerInfo]
+        hasCropSize: Bool,
+        cropSizeData: VideoEditorCropSizeData
     ) {
         avAsset.loadValuesAsynchronously(
             forKeys: ["tracks"]
@@ -84,10 +88,10 @@ extension VideoEditorViewController: EditorToolViewDelegate {
                     for: self.avAsset,
                     outputURL: self.config.videoExportURL,
                     timeRang: timeRang,
-                    stickerInfos: stickerInfos,
+                    cropSizeData: cropSizeData,
                     audioURL: audioURL,
                     audioVolume: self.backgroundMusicVolume,
-                    originalAudioVolume: self.playerView.player.volume,
+                    originalAudioVolume: self.videoView.playerView.player.volume,
                     exportPreset: self.config.exportPreset,
                     videoQuality: self.config.videoQuality
                 ) {  [weak self] videoURL, error in
@@ -133,8 +137,8 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         }
         rotateBeforeData = cropView.getRotateBeforeData()
         var cropData: VideoCropData?
-        if let startTime = playerView.playStartTime,
-           let endTime = playerView.playEndTime,
+        if let startTime = videoView.playerView.playStartTime,
+           let endTime = videoView.playerView.playEndTime,
            let rotateBeforeStorageData = rotateBeforeStorageData,
            let rotateBeforeData = rotateBeforeData {
             cropData = VideoCropData(
@@ -157,79 +161,169 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         if let audioPath = backgroundMusicPath {
             backgroundMusicURL = URL(fileURLWithPath: audioPath)
         }
-        let stickerData = playerView.stickerView.stickerData()
         let editResult = VideoEditResult(
             editedURL: videoURL,
             cropData: cropData,
-            videoSoundVolume: playerView.player.volume,
+            videoSoundVolume: videoView.playerView.player.volume,
             backgroundMusicURL: backgroundMusicURL,
             backgroundMusicVolume: backgroundMusicVolume,
-            stickerData: stickerData
+            sizeData: videoView.getVideoEditedData()
         )
         delegate?.videoEditorViewController(self, didFinish: editResult)
+        finishHandler?(self, editResult)
     }
     func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions) {
-        playerView.stickerView.isUserInteractionEnabled = false
-        playerView.stickerView.deselectedSticker()
-        if model.type == .music {
-            if let shouldClick = delegate?.videoEditorViewController(shouldClickMusicTool: self),
-               !shouldClick {
-                return
-            }
-            if musicView.musics.isEmpty {
-                if let loadHandler = config.music.handler {
-                    let showLoading = loadHandler { [weak self] infos in
-                        self?.musicView.reloadData(infos: infos)
-                    }
-                    if showLoading {
+        videoView.stickerEnabled = false
+        videoView.deselectedSticker()
+        switch model.type {
+        case .graffiti:
+            toolGraffitiClick()
+        case .music:
+            toolMusicClick()
+        case .cropSize:
+            toolCropSizeClick()
+        case .cropTime:
+            toolCropTimeClick()
+        case .chartlet:
+            toolChartletClick()
+        case .text:
+            toolTextClick()
+        default:
+            break
+        }
+    }
+    
+    func toolGraffitiClick() {
+        videoView.drawEnabled = !videoView.drawEnabled
+        toolView.stretchMask = videoView.drawEnabled
+        toolView.layoutSubviews()
+        if videoView.drawEnabled {
+            videoView.stickerEnabled = false
+            showBrushColorView()
+        }else {
+            videoView.stickerEnabled = true
+            hiddenBrushColorView()
+        }
+    }
+    
+    func toolMusicClick() {
+        if let shouldClick = delegate?.videoEditorViewController(shouldClickMusicTool: self),
+           !shouldClick {
+            return
+        }
+        toolView.deselected()
+        videoView.drawEnabled = false
+        hiddenBrushColorView()
+        if musicView.musics.isEmpty {
+            if let loadHandler = config.music.handler {
+                let showLoading = loadHandler { [weak self] infos in
+                    self?.musicView.reloadData(infos: infos)
+                }
+                if showLoading {
+                    musicView.showLoading()
+                }
+            }else {
+                if let editorDelegate = delegate {
+                    if editorDelegate.videoEditorViewController(
+                        self,
+                        loadMusic: { [weak self] infos in
+                            self?.musicView.reloadData(infos: infos)
+                    }) {
                         musicView.showLoading()
                     }
                 }else {
-                    if let editorDelegate = delegate {
-                        if editorDelegate.videoEditorViewController(
-                            self,
-                            loadMusic: { [weak self] infos in
-                                self?.musicView.reloadData(infos: infos)
-                        }) {
-                            musicView.showLoading()
-                        }
+                    let infos = PhotoTools.defaultMusicInfos()
+                    if infos.isEmpty {
+                        ProgressHUD.showWarning(
+                            addedTo: view,
+                            text: "暂无配乐".localized,
+                            animated: true,
+                            delayHide: 1.5
+                        )
+                        return
                     }else {
-                        let infos = PhotoTools.defaultMusicInfos()
-                        if infos.isEmpty {
-                            ProgressHUD.showWarning(
-                                addedTo: view,
-                                text: "暂无配乐".localized,
-                                animated: true,
-                                delayHide: 1.5
-                            )
-                            return
-                        }else {
-                            musicView.reloadData(infos: infos)
-                        }
+                        musicView.reloadData(infos: infos)
                     }
                 }
             }
-            isMusicState = !isMusicState
-            musicView.reloadContentOffset()
-            updateMusicView()
+        }
+        isMusicState = !isMusicState
+        musicView.reloadContentOffset()
+        updateMusicView()
+        hidenTopView()
+    }
+    
+    func toolCropSizeClick() {
+        toolView.deselected()
+        videoView.drawEnabled = false
+        hiddenBrushColorView()
+        videoView.stickerEnabled = false
+        videoView.startCropping(true)
+        pState = .cropSize
+        toolCropSizeAnimation()
+    }
+    
+    func toolCropSizeAnimation() {
+        if state == .cropSize {
+            cropConfirmView.showReset = true
+            cropConfirmView.isHidden = false
+            cropToolView.isHidden = false
             hidenTopView()
-        }else if model.type == .cropping {
-            croppingAction()
-        }else if model.type == .chartlet {
-            chartletView.firstRequest()
-            showChartlet = true
-            hidenTopView()
-            showChartletView()
-        }else if model.type == .text {
-            playerView.stickerView.isUserInteractionEnabled = true
-            if config.text.modalPresentationStyle == .fullScreen {
-                isPresentText = true
+        }else {
+            showTopView()
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.cropConfirmView.alpha = self.state == .cropSize ? 1 : 0
+            self.cropToolView.alpha = self.state == .cropSize ? 1 : 0
+        } completion: { (isFinished) in
+            if self.state != .cropSize {
+                self.cropConfirmView.isHidden = true
+                self.cropToolView.isHidden = true
             }
-            let textVC = EditorStickerTextViewController(config: config.text)
-            textVC.delegate = self
-            let nav = EditorStickerTextController(rootViewController: textVC)
-            nav.modalPresentationStyle = config.text.modalPresentationStyle
-            present(nav, animated: true, completion: nil)
+        }
+    }
+    
+    func toolChartletClick() {
+        toolView.deselected()
+        videoView.drawEnabled = false
+        hiddenBrushColorView()
+        chartletView.firstRequest()
+        showChartlet = true
+        hidenTopView()
+        showChartletView()
+    }
+    
+    func toolTextClick() {
+        toolView.deselected()
+        videoView.drawEnabled = false
+        hiddenBrushColorView()
+        videoView.stickerEnabled = true
+        if config.text.modalPresentationStyle == .fullScreen {
+            isPresentText = true
+        }
+        let textVC = EditorStickerTextViewController(config: config.text)
+        textVC.delegate = self
+        let nav = EditorStickerTextController(rootViewController: textVC)
+        nav.modalPresentationStyle = config.text.modalPresentationStyle
+        present(nav, animated: true, completion: nil)
+    }
+    
+    func showBrushColorView() {
+        brushColorView.isHidden = false
+        UIView.animate(withDuration: 0.25) {
+            self.brushColorView.alpha = 1
+        }
+    }
+    
+    func hiddenBrushColorView() {
+        if brushColorView.isHidden {
+            return
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.brushColorView.alpha = 0
+        } completion: { (_) in
+            if self.videoView.drawEnabled { return }
+            self.brushColorView.isHidden = true
         }
     }
     
@@ -254,11 +348,15 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         }
     }
     
-    /// 进入裁剪界面
-    func croppingAction() {
+    /// 进入裁剪时长界面
+    func toolCropTimeClick() {
         if state == .normal {
-            beforeStartTime = playerView.playStartTime
-            beforeEndTime = playerView.playEndTime
+            toolView.deselected()
+            videoView.drawEnabled = false
+            hiddenBrushColorView()
+            cropConfirmView.showReset = false
+            beforeStartTime = videoView.playerView.playStartTime
+            beforeEndTime = videoView.playerView.playEndTime
             if let offset = currentCropOffset {
                 cropView.collectionView.setContentOffset(offset, animated: false)
             }else {
@@ -270,21 +368,21 @@ extension VideoEditorViewController: EditorToolViewDelegate {
                 cropView.resetValidRect()
             }else {
                 cropView.frameMaskView.validRect = currentValidRect
-                cropView.startLineAnimation(at: playerView.player.currentTime())
+                cropView.startLineAnimation(at: videoView.playerView.player.currentTime())
             }
-            playerView.playStartTime = cropView.getStartTime(real: true)
-            playerView.playEndTime = cropView.getEndTime(real: true)
+            videoView.playerView.playStartTime = cropView.getStartTime(real: true)
+            videoView.playerView.playEndTime = cropView.getEndTime(real: true)
             cropConfirmView.isHidden = false
             cropView.isHidden = false
             cropView.updateTimeLabels()
-            pState = .cropping
+            pState = .cropTime
             if currentValidRect.equalTo(.zero) {
-                playerView.resetPlay()
+                videoView.playerView.resetPlay()
                 startPlayTimer()
             }
             hidenTopView()
+            videoView.startCropTime(true)
             UIView.animate(withDuration: 0.25, delay: 0, options: [.layoutSubviews]) {
-                self.setupScrollViewScale()
                 self.cropView.alpha = 1
                 self.cropConfirmView.alpha = 1
             }
@@ -293,12 +391,11 @@ extension VideoEditorViewController: EditorToolViewDelegate {
 }
 
 extension VideoEditorViewController: EditorStickerTextViewControllerDelegate {
-    
     func stickerTextViewController(
         _ controller: EditorStickerTextViewController,
         didFinish stickerItem: EditorStickerItem
     ) {
-        playerView.stickerView.update(item: stickerItem)
+        videoView.updateSticker(item: stickerItem)
     }
     
     func stickerTextViewController(
@@ -310,9 +407,20 @@ extension VideoEditorViewController: EditorStickerTextViewControllerDelegate {
             imageData: nil,
             text: stickerText
         )
-        playerView.stickerView.add(
-            sticker: item,
-            isSelected: false
-        )
+        videoView.addSticker(item: item, isSelected: false)
+    }
+}
+
+extension VideoEditorViewController: PhotoEditorCropToolViewDelegate {
+    func cropToolView(didRotateButtonClick cropToolView: PhotoEditorCropToolView) {
+        videoView.rotate()
+    }
+    
+    func cropToolView(didMirrorHorizontallyButtonClick cropToolView: PhotoEditorCropToolView) {
+        videoView.mirrorHorizontally(animated: true)
+    }
+    
+    func cropToolView(didChangedAspectRatio cropToolView: PhotoEditorCropToolView, at model: PhotoEditorCropToolModel) {
+        videoView.changedAspectRatio(of: CGSize(width: model.widthRatio, height: model.heightRatio))
     }
 }

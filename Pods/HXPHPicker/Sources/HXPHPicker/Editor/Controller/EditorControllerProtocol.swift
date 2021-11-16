@@ -233,7 +233,7 @@ public protocol VideoEditorViewControllerDelegate: AnyObject {
         shouldClickMusicTool videoEditorViewController: VideoEditorViewController
     ) -> Bool
     
-    /// 加载配乐信息，当musicConfig.infos为空时触发
+    /// 加载配乐信息，当music.infos为空时触发
     /// 返回 true 内部会显示加载状态，调用 completionHandler 后恢复
     /// - Parameters:
     ///   - videoEditorViewController: 对应的 VideoEditorViewController
@@ -383,7 +383,7 @@ public extension VideoEditorViewControllerDelegate {
         _ videoEditorViewController: VideoEditorViewController,
         transitionDuration mode: EditorTransitionMode
     ) -> TimeInterval {
-        if videoEditorViewController.state == .cropping && mode == .push {
+        if videoEditorViewController.state == .cropTime && mode == .push {
             return 0.35
         }
         return 0.55

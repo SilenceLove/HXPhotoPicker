@@ -556,8 +556,8 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
             break
         }
         currentLoadAssetLocalIdentifier = nil
-        if requestID != nil {
-            PHImageManager.default().cancelImageRequest(requestID!)
+        if let id = requestID {
+            PHImageManager.default().cancelImageRequest(id)
             requestID = nil
         }
         stopAnimatedImage()
