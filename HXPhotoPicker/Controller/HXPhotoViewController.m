@@ -1157,6 +1157,9 @@ HX_PhotoEditViewControllerDelegate
         self.albumModel.realCount = self.photoCount + self.videoCount;
     }
     [self collectionViewAddModel:model beforeModel:nil];
+    if ([self.delegate respondsToSelector:@selector(photoViewControllerDidChangeSelect:selected:)]) {
+        [self.delegate photoViewControllerDidChangeSelect:model selected:model.selected];
+    }
 }
 - (void)collectionViewAddModel:(HXPhotoModel *)model beforeModel:(HXPhotoModel *)beforeModel {
     
