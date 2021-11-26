@@ -1157,6 +1157,9 @@ HX_PhotoEditViewControllerDelegate
         self.albumModel.realCount = self.photoCount + self.videoCount;
     }
     [self collectionViewAddModel:model beforeModel:nil];
+    if ([self.delegate respondsToSelector:@selector(photoViewControllerDidChangeSelect:selected:)]) {
+        [self.delegate photoViewControllerDidChangeSelect:model selected:model.selected];
+    }
 }
 - (void)collectionViewAddModel:(HXPhotoModel *)model beforeModel:(HXPhotoModel *)beforeModel {
     
@@ -1414,6 +1417,7 @@ HX_PhotoEditViewControllerDelegate
                         vc.delegate = self;
                         vc.onlyCliping = YES;
                         vc.supportRotation = YES;
+                        vc.isAutoBack = NO;
                         vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
                         vc.modalPresentationCapturesStatusBarAppearance = YES;
                         [self presentViewController:vc animated:YES completion:nil];
@@ -1780,6 +1784,24 @@ HX_PhotoEditViewControllerDelegate
     }
     [self.collectionView reloadData];
     [self.bottomView requestPhotosBytes];
+    if (photoEditingVC.isAutoBack) {
+        return;
+    }
+    if (photoEditingVC.navigationController.viewControllers.count <= 1) {
+        [photoEditingVC dismissViewControllerAnimated:YES completion:nil];
+    }else {
+        [photoEditingVC.navigationController popViewControllerAnimated:YES];
+    }
+}
+- (void)photoEditingControllerDidCancel:(HX_PhotoEditViewController *)photoEditingVC {
+    if (photoEditingVC.isAutoBack) {
+        return;
+    }
+    if (photoEditingVC.navigationController.viewControllers.count <= 1) {
+        [photoEditingVC dismissViewControllerAnimated:YES completion:nil];
+    }else {
+        [photoEditingVC.navigationController popViewControllerAnimated:YES];
+    }
 }
 #pragma mark - < HXPhotoEditViewControllerDelegate >
 - (void)photoEditViewControllerDidClipClick:(HXPhotoEditViewController *)photoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel {

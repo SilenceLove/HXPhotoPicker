@@ -64,6 +64,7 @@
     if (self) {
         self.transitioningDelegate = self;
         self.modalPresentationStyle = UIModalPresentationCustom;
+        self.isAutoBack = YES;
     }
     return self;
 }
@@ -73,6 +74,7 @@
         self.transitioningDelegate = self;
         self.modalPresentationStyle = UIModalPresentationCustom;
         self.configuration = configuration;
+        self.isAutoBack = YES;
     }
     return self;
 }
@@ -84,6 +86,7 @@
         self.modalPresentationStyle = UIModalPresentationCustom;
         self.photoEdit = photoEdit;
         self.configuration = configuration;
+        self.isAutoBack = YES;
     }
     return self;
 }
@@ -95,6 +98,7 @@
         self.modalPresentationStyle = UIModalPresentationCustom;
         self.editImage = editImage;
         self.configuration = configuration;
+        self.isAutoBack = YES;
     }
     return self;
 }
@@ -104,6 +108,9 @@
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+    if (!self.isAutoBack && !self.isCancel) {
+        return nil;
+    }
     return [HXPhotoEditTransition transitionWithType:HXPhotoEditTransitionTypeDismiss model:self.photoModel];
 }
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
@@ -573,10 +580,16 @@
     return _backBtn;
 }
 - (void)didBackClick {
+    self.isCancel = YES;
     if (self.cancelBlock) {
         self.cancelBlock(self);
     }
-    self.isCancel = YES;
+    if ([self.delegate respondsToSelector:@selector(photoEditingControllerDidCancel:)]) {
+        [self.delegate photoEditingControllerDidCancel:self];
+    }
+    if (!self.isAutoBack) {
+        return;
+    }
     if (self.navigationController.viewControllers.count <= 1) {
         [self dismissViewControllerAnimated:YES completion:nil];
     }else {
@@ -715,6 +728,9 @@
 - (void)dissmissClick {
     [self.view hx_handleLoading:NO];
     self.view.userInteractionEnabled = YES;
+    if (!self.isAutoBack) {
+        return;
+    }
     if (self.navigationController.viewControllers.count <= 1) {
         [self dismissViewControllerAnimated:YES completion:nil];
     }else {

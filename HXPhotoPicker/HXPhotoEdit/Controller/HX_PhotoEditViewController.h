@@ -81,6 +81,7 @@ typedef void (^ HX_PhotoEditViewControllerDidCancelBlock)(HX_PhotoEditViewContro
 - (void)hideImageView;
 - (void)hiddenTopBottomView;
 - (void)showTopBottomView;
+@property (assign, nonatomic) BOOL isAutoBack;
 @end
 
 NS_ASSUME_NONNULL_END
