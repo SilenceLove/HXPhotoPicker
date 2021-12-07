@@ -11,6 +11,7 @@
 
 @class HXPhotoManager;
 @class HXPhotoEdit;
+@class HXAssetURLResult;
 
 @interface HXPhotoModel : NSObject<NSCoding>
 /// 创建日期
@@ -328,6 +329,18 @@
 /// 获取原视频地址
 - (void)getVideoURLWithSuccess:(HXModelURLHandler _Nullable)success
                         failed:(HXModelFailedBlock _Nullable)failed;
+
+/// 获取图片地址
+/// @param resultHandler 获取结果
+- (void)getImageURLWithResultHandler:(void (^ _Nullable)(HXAssetURLResult * _Nullable result, HXPhotoModel * _Nonnull photoModel))resultHandler;
+
+/// 获取视频地址
+/// @param exportPreset 导出的视频分辨率, HXVideoExportPresetRatio_Original 为获取原始视频
+/// @param videoQuality 导出的视频质量 [1-10]
+/// @param resultHandler 导出结果
+- (void)getVideoURLWithExportPreset:(HXVideoExportPreset)exportPreset
+                       videoQuality:(NSInteger)videoQuality
+                      resultHandler:(void (^ _Nullable)(HXAssetURLResult * _Nullable result, HXPhotoModel * _Nonnull photoModel))resultHandler;
 
 @property (assign, nonatomic) CGFloat previewContentOffsetX;
 

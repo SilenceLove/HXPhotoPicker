@@ -37,6 +37,7 @@
 #import "HXPhotoEdit.h"
 #import "HXAssetManager.h"
 #import "PHAsset+HXExtension.h"
+#import "HXPickerResult.h"
 
 @implementation HXPhotoModel
 - (void)setSelectIndexStr:(NSString *)selectIndexStr {
@@ -1942,6 +1943,160 @@
         if (failed) {
             failed(nil, self);
         }
+    }
+}
+
+- (void)getImageURLWithResultHandler:(void (^ _Nullable)(HXAssetURLResult * _Nullable, HXPhotoModel *))resultHandler {
+    if (self.subType != HXPhotoModelMediaSubTypePhoto) {
+        if (resultHandler) {
+            resultHandler(nil, self);
+        }
+        return;
+    }
+    HXWeakSelf
+    if (self.photoEdit) {
+        [self getCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:imageURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypePhoto];
+            if (resultHandler) {
+                resultHandler(result, weakSelf);
+            }
+        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+            if (resultHandler) {
+                resultHandler(nil, weakSelf);
+            }
+        }];
+        return;
+    }
+    if (self.type == HXPhotoModelMediaTypeCameraPhoto) {
+        if (self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
+            self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
+            HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:self.networkPhotoUrl urlType:HXAssetURLTypeNetwork mediaType:HXPhotoModelMediaSubTypePhoto];
+            if (resultHandler) {
+                resultHandler(result, self);
+            }
+        }else {
+            [self getCameraImageURLWithSuccess:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:imageURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypePhoto];
+                if (resultHandler) {
+                    resultHandler(result, weakSelf);
+                }
+            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                if (resultHandler) {
+                    resultHandler(nil, weakSelf);
+                }
+            }];
+        }
+        return;
+    }
+    [self requestImageDataStartRequestICloud:nil progressHandler:nil success:^(NSData * _Nullable imageData, UIImageOrientation orientation, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+        if (model.type == HXPhotoModelMediaTypePhotoGif) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".gif"];
+                NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+                NSURL *imageURL = [weakSelf writeWithImageData:imageData toFile:fullPathToFile];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (imageURL != nil) {
+                        weakSelf.imageURL = imageURL;
+                        HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:imageURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypePhoto];
+                        if (resultHandler) {
+                            resultHandler(result, weakSelf);
+                        }
+                    }else {
+                        if (resultHandler) {
+                            resultHandler(nil, weakSelf);
+                        }
+                    }
+                });
+            });
+            return;
+        }
+        if (orientation != UIImageOrientationUp) {
+            UIImage *image = [[[UIImage alloc] initWithData:imageData] hx_normalizedImage];
+            [weakSelf getImageURLWithImage:image success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+                weakSelf.imageURL = imageURL;
+                HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:imageURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypePhoto];
+                if (resultHandler) {
+                    resultHandler(result, weakSelf);
+                }
+            } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+                if (resultHandler) {
+                    resultHandler(nil, weakSelf);
+                }
+            }];
+            return;
+        }
+        [weakSelf getImageURLWithImageData:imageData success:^(NSURL * _Nullable imageURL, HXPhotoModel * _Nullable model, NSDictionary * _Nullable info) {
+            weakSelf.imageURL = imageURL;
+            HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:imageURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypePhoto];
+            if (resultHandler) {
+                resultHandler(result, weakSelf);
+            }
+        } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+            if (resultHandler) {
+                resultHandler(nil, weakSelf);
+            }
+        }];
+    } failed:^(NSDictionary * _Nullable info, HXPhotoModel * _Nullable model) {
+        if (resultHandler) {
+            resultHandler(nil, weakSelf);
+        }
+    }];
+}
+
+- (void)getVideoURLWithExportPreset:(HXVideoExportPreset)exportPreset
+                       videoQuality:(NSInteger)videoQuality
+                      resultHandler:(void (^ _Nullable)(HXAssetURLResult * _Nullable, HXPhotoModel *))resultHandler {
+    if (self.subType != HXPhotoModelMediaSubTypeVideo) {
+        if (resultHandler) {
+            resultHandler(nil, self);
+        }
+        return;
+    }
+    if (self.type == HXPhotoModelMediaTypeCameraVideo) {
+        if (self.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeLocal) {
+            HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:self.videoURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypeVideo];
+            if (resultHandler) {
+                resultHandler(result, self);
+            }
+        }else if (self.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+            HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:self.videoURL urlType:HXAssetURLTypeNetwork mediaType:HXPhotoModelMediaSubTypeVideo];
+            if (resultHandler) {
+                resultHandler(result, self);
+            }
+        }
+        return;
+    }
+    if (exportPreset == HXVideoExportPresetRatio_Original) {
+        [HXAssetManager requestVideoURL:self.asset completion:^(NSURL * _Nullable videoURL) {
+            __strong typeof(self) strongSelf = self;
+            if (videoURL) {
+                HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:videoURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypeVideo];
+                if (resultHandler) {
+                    resultHandler(result, strongSelf);
+                }
+            }else {
+                if (resultHandler) {
+                    resultHandler(nil, strongSelf);
+                }
+            }
+        }];
+    }else {
+        [HXAssetManager requestVideoURLForAsset:self.asset
+                                         toFile:nil
+                                   exportPreset:exportPreset videoQuality:videoQuality
+                                  resultHandler:^(NSURL * _Nullable videoURL) {
+            __strong typeof(self) strongSelf = self;
+            if (videoURL) {
+                HXAssetURLResult *result = [[HXAssetURLResult alloc] initWithUrl:videoURL urlType:HXAssetURLTypeLocal mediaType:HXPhotoModelMediaSubTypeVideo];
+                if (resultHandler) {
+                    resultHandler(result, strongSelf);
+                }
+            }else {
+                if (resultHandler) {
+                    resultHandler(nil, strongSelf);
+                }
+            }
+        }];
     }
 }
 @end

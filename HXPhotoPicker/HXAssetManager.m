@@ -10,6 +10,7 @@
 #import "HXAlbumModel.h"
 #import "NSString+HXExtension.h"
 #import "PHAsset+HXExtension.h"
+#import "HXPhotoTools.h"
 
 @implementation HXAssetManager
 
@@ -261,6 +262,97 @@
             });
         }
     }];
+}
+
++ (void)requestVideoURLForAsset:(PHAsset *)asset
+                         toFile:(NSURL * _Nullable)fileURL
+                   exportPreset:(HXVideoExportPreset)exportPreset
+                   videoQuality:(NSInteger)videoQuality
+                  resultHandler:(void (^ _Nullable)(NSURL * _Nullable))resultHandler {
+    [self requestAVAssetForAsset:asset networkAccessAllowed:YES progressHandler:nil completion:^(AVAsset * _Nonnull asset, AVAudioMix * _Nonnull audioMix, NSDictionary * _Nonnull info) {
+        if (asset == nil) {
+            if (resultHandler) {
+                resultHandler(nil);
+            }
+            return;
+        }
+        NSString *fileName = [[NSString hx_fileName] stringByAppendingString:@".mp4"];
+        NSString *fullPathToFile = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+        NSURL *videoURL = fileURL ?:  [NSURL fileURLWithPath:fullPathToFile];
+        NSString *presetName = [self presetName:exportPreset];
+        NSArray *presets = [AVAssetExportSession exportPresetsCompatibleWithAsset:asset];
+        if (![presets containsObject:presetName]) {
+            if (resultHandler) {
+                resultHandler(nil);
+            }
+            return;
+        }
+        AVAssetExportSession *session = [AVAssetExportSession exportSessionWithAsset:asset presetName:presetName];
+        session.outputURL = videoURL;
+        session.shouldOptimizeForNetworkUse = YES;
+        NSArray *supportedTypeArray = session.supportedFileTypes;
+        if ([supportedTypeArray containsObject:AVFileTypeMPEG4]) {
+            session.outputFileType = AVFileTypeMPEG4;
+        }else if (supportedTypeArray.count == 0) {
+            if (resultHandler) {
+                resultHandler(nil);
+            }
+            return;
+        }else {
+            session.outputFileType = [supportedTypeArray objectAtIndex:0];
+        }
+        if (videoQuality > 0) {
+            session.fileLengthLimit = [self exportSessionFileLengthLimitWithSeconds:CMTimeGetSeconds(asset.duration) exportPreset:exportPreset videoQuality:videoQuality];
+        }
+        [session exportAsynchronouslyWithCompletionHandler:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (session.status == AVAssetExportSessionStatusCompleted) {
+                    if (resultHandler) {
+                        resultHandler(videoURL);
+                    }
+                }else {
+                    if (resultHandler) {
+                        resultHandler(nil);
+                    }
+                }
+            });
+        }];
+    }];
+}
++ (NSString *)presetName:(HXVideoExportPreset)exportPreset {
+    switch (exportPreset) {
+        case HXVideoEditorExportPresetLowQuality:
+            return AVAssetExportPresetLowQuality;
+        case HXVideoEditorExportPresetMediumQuality:
+            return AVAssetExportPresetMediumQuality;
+        case HXVideoEditorExportPresetHighQuality:
+            return AVAssetExportPresetHighestQuality;
+        case HXVideoEditorExportPresetRatio_640x480:
+            return AVAssetExportPreset640x480;
+        case HXVideoEditorExportPresetRatio_960x540:
+            return AVAssetExportPreset960x540;
+        case HXVideoEditorExportPresetRatio_1280x720:
+            return AVAssetExportPreset1280x720;
+        default:
+            return AVAssetExportPresetMediumQuality;
+    }
+}
++ (NSInteger)exportSessionFileLengthLimitWithSeconds:(CGFloat)seconds
+                                        exportPreset:(HXVideoExportPreset)exportPreset
+                                        videoQuality:(NSInteger)videoQuality {
+    if (videoQuality > 0) {
+        CGFloat ratioParam = 0;
+        if (exportPreset == HXVideoEditorExportPresetRatio_640x480) {
+            ratioParam = 0.02;
+        }else if (exportPreset == HXVideoEditorExportPresetRatio_960x540) {
+            ratioParam = 0.04;
+        }else if (exportPreset == HXVideoEditorExportPresetRatio_1280x720) {
+            ratioParam = 0.08;
+        }
+        NSInteger quality = MIN(videoQuality, 10);
+        return seconds * ratioParam * quality * 1000 * 1000;
+    }
+    return 0;
 }
 + (UIImageOrientation)imageOrientationWithCGImageOrientation:(CGImagePropertyOrientation)orientation {
     UIImageOrientation sureOrientation;

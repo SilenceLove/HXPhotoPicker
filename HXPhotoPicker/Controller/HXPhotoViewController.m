@@ -2067,6 +2067,11 @@ HX_PhotoEditViewControllerDelegate
                                         videos:videoList
                                       original:isOriginal];
     }
+    if ([self.delegate respondsToSelector:@selector(photoViewController:didDoneWithResult:)]) {
+        HXPickerResult *result = [[HXPickerResult alloc] initWithModels:allList isOriginal:isOriginal];
+        [self.delegate photoViewController:self
+                         didDoneWithResult:result];
+    }
     if (self.doneBlock) {
         self.doneBlock(allList, photoList, videoList, isOriginal, self, self.manager);
     } 

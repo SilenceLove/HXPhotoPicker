@@ -119,6 +119,9 @@
                               header:(void (^ _Nullable)(AVAssetWriter * _Nullable writer, AVAssetReader * _Nullable videoReader, AVAssetReader * _Nullable audioReader))header
                           completion:(void (^ _Nullable)(BOOL success))completion;
 
++ (NSInteger)exportSessionFileLengthLimitWithSeconds:(CGFloat)seconds
+                                        exportPreset:(HXVideoEditorExportPreset)exportPreset
+                                        videoQuality:(NSInteger)videoQuality;
 
 
 #pragma mark - < 获取本地文件大小 >

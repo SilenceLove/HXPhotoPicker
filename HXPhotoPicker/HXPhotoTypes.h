@@ -142,6 +142,16 @@ typedef NS_ENUM(NSUInteger, HXVideoEditorExportPreset) {
     HXVideoEditorExportPresetRatio_1280x720
 };
 
+typedef NS_ENUM(NSUInteger, HXVideoExportPreset) {
+    HXVideoExportPresetLowQuality = 0,
+    HXVideoExportPresetMediumQuality,
+    HXVideoExportPresetHighQuality,
+    HXVideoExportPresetRatio_640x480,
+    HXVideoExportPresetRatio_960x540,
+    HXVideoExportPresetRatio_1280x720,
+    HXVideoExportPresetRatio_Original // 原始视频
+};
+
 
 typedef void (^ HXModelStartRequestICloud)(PHImageRequestID iCloudRequestId, HXPhotoModel * _Nullable model);
 

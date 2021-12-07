@@ -10,6 +10,7 @@
 #import "HXPhotoManager.h"
 #import "HXCustomCollectionReusableView.h"
 #import "HXPhotoLimitView.h"
+#import "HXPickerResult.h"
 
 @class
 HXPhotoViewController ,
@@ -42,6 +43,9 @@ HXCustomCameraController;
                      photos:(NSArray<HXPhotoModel *> *)photoList
                      videos:(NSArray<HXPhotoModel *> *)videoList
                    original:(BOOL)original;
+
+- (void)photoViewController:(HXPhotoViewController *)photoViewController
+          didDoneWithResult:(HXPickerResult *)result;
 
 /**
  改变了选择

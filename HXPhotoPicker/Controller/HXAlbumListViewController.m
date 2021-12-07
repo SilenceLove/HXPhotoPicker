@@ -309,6 +309,12 @@ UITableViewDelegate
         self.doneBlock(allList, photoList, videoList, original, self, self.manager);
     }
 }
+- (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneWithResult:(HXPickerResult *)result {
+    if ([self.delegate respondsToSelector:@selector(albumListViewController:didDoneWithResult:)]) {
+        [self.delegate albumListViewController:self
+                             didDoneWithResult:result];
+    }
+}
 - (void)photoViewControllerDidCancel:(HXPhotoViewController *)photoViewController {
     [self cancelClick];
 }

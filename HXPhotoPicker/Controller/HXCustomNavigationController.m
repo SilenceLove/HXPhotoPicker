@@ -257,10 +257,20 @@
         [self.hx_delegate photoNavigationViewController:self didDoneAllList:allList photos:photoList videos:videoList original:original];
     }
 }
+- (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneWithResult:(HXPickerResult *)result {
+    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneWithResult:)]) {
+        [self.hx_delegate photoNavigationViewController:self didDoneWithResult:result];
+    }
+}
 #pragma mark - < HXPhotoViewControllerDelegate >
 - (void)photoViewControllerFinishDismissCompletion:(HXPhotoViewController *)photoViewController {
     if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewControllerFinishDismissCompletion:)]) {
         [self.hx_delegate photoNavigationViewControllerFinishDismissCompletion:self];
+    }
+}
+- (void)photoViewController:(HXPhotoViewController *)photoViewController didDoneWithResult:(HXPickerResult *)result {
+    if ([self.hx_delegate respondsToSelector:@selector(photoNavigationViewController:didDoneWithResult:)]) {
+        [self.hx_delegate photoNavigationViewController:self didDoneWithResult:result];
     }
 }
 - (void)photoViewControllerCancelDismissCompletion:(HXPhotoViewController *)photoViewController {

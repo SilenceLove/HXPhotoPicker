@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "HXPhotoManager.h"
+#import "HXPickerResult.h"
 @class HXPhotoModel, HXCustomNavigationController;
 
 @protocol HXCustomNavigationControllerDelegate <NSObject>
@@ -26,6 +27,9 @@
                                photos:(NSArray<HXPhotoModel *> *)photoList
                                videos:(NSArray<HXPhotoModel *> *)videoList
                              original:(BOOL)original;
+
+- (void)photoNavigationViewController:(HXCustomNavigationController *)photoNavigationViewController
+                      didDoneWithResult:(HXPickerResult *)result;
 
 /**
  点击取消
