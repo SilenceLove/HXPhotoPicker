@@ -360,6 +360,7 @@
     self.manager.configuration.videoCanEdit = self.videoCanEditSwitch.on;
     self.manager.configuration.creationDateSort = self.createTimeSortSwitch.on;
     HXWeakSelf
+//    [self hx_presentSelectPhotoControllerWithManager:self.manager delegate:self];
     [self hx_presentSelectPhotoControllerWithManager:self.manager didDone:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, BOOL isOriginal, UIViewController *viewController, HXPhotoManager *manager) {
         weakSelf.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
         weakSelf.original.text = isOriginal ? @"YES" : @"NO";
@@ -383,6 +384,14 @@
     }
     [self.manager clearSelectedList];
 }
+//- (void)photoNavigationViewController:(HXCustomNavigationController *)photoNavigationViewController didDoneWithResult:(HXPickerResult *)result {
+//    NSLog(@"开始");
+//    [result getURLsWithVideoExportPreset:HXVideoExportPresetRatio_960x540 videoQuality:6 UrlHandler:^(HXAssetURLResult * _Nullable result, HXPhotoModel * _Nonnull photoModel, NSInteger index) {
+//        NSLog(@"%@, %ld", result.url, index);
+//    } completionHandler:^{
+//        NSLog(@"结束");
+//    }];
+//}
 - (void)albumListViewController:(HXAlbumListViewController *)albumListViewController didDoneAllList:(NSArray<HXPhotoModel *> *)allList photos:(NSArray<HXPhotoModel *> *)photoList videos:(NSArray<HXPhotoModel *> *)videoList original:(BOOL)original {
     self.total.text = [NSString stringWithFormat:@"总数量：%ld   ( 照片：%ld   视频：%ld )",allList.count, photoList.count, videoList.count];
     //    [NSString stringWithFormat:@"%ld个",allList.count];

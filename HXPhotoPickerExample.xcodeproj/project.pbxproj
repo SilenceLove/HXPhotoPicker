@@ -172,6 +172,9 @@
 		7B4E665F2487AD5C00077EE1 /* HXCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E661E2487AD5B00077EE1 /* HXCircleProgressView.m */; };
 		7B4E66602487AD5C00077EE1 /* HXPhotoPreviewViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E661F2487AD5B00077EE1 /* HXPhotoPreviewViewCell.m */; };
 		7B4E66612487AD5C00077EE1 /* HXPhotoPreviewImageViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E66232487AD5C00077EE1 /* HXPhotoPreviewImageViewCell.m */; };
+		7B50E7CB275DF914000ACE37 /* HXPickerResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B50E7C9275DF914000ACE37 /* HXPickerResult.h */; };
+		7B50E7CC275DF914000ACE37 /* HXPickerResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B50E7CA275DF914000ACE37 /* HXPickerResult.m */; };
+		7B50E7CD275DF914000ACE37 /* HXPickerResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B50E7CA275DF914000ACE37 /* HXPickerResult.m */; };
 		7B5A71CC25538F010064A61B /* HXAssetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5A71CB25538F010064A61B /* HXAssetManager.m */; };
 		7B5B75BF24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5B75BE24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.m */; };
 		7B5E713C26E5ACE00008DE7F /* HXPhotoLimitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5E713B26E5ACE00008DE7F /* HXPhotoLimitView.m */; };
@@ -694,6 +697,8 @@
 		7B4E66242487AD5C00077EE1 /* HXPhotoTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoTools.h; sourceTree = "<group>"; };
 		7B4E66262487AD5C00077EE1 /* HXPhotoCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoCommon.h; sourceTree = "<group>"; };
 		7B4E66292487AD5C00077EE1 /* HXPhotoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HXPhotoManager.h; sourceTree = "<group>"; };
+		7B50E7C9275DF914000ACE37 /* HXPickerResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPickerResult.h; sourceTree = "<group>"; };
+		7B50E7CA275DF914000ACE37 /* HXPickerResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXPickerResult.m; sourceTree = "<group>"; };
 		7B5A71CA25538F010064A61B /* HXAssetManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXAssetManager.h; sourceTree = "<group>"; };
 		7B5A71CB25538F010064A61B /* HXAssetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXAssetManager.m; sourceTree = "<group>"; };
 		7B5B75BD24E689CE000AECFC /* HXPhotoEditGraffitiColorSizeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoEditGraffitiColorSizeView.h; sourceTree = "<group>"; };
@@ -1188,6 +1193,8 @@
 				7B4E65F32487AD5B00077EE1 /* HXPhotoModel.m */,
 				7BE8DFD624C68B2800306042 /* HXPhotoViewCellCustomProtocol.h */,
 				7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */,
+				7B50E7C9275DF914000ACE37 /* HXPickerResult.h */,
+				7B50E7CA275DF914000ACE37 /* HXPickerResult.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1427,6 +1434,7 @@
 				7BD52F0124FE256A00AE3D7C /* HXPreviewContentView.h in Headers */,
 				7BD52F0224FE256A00AE3D7C /* HXPreviewImageView.h in Headers */,
 				7BD52F0324FE256A00AE3D7C /* HXPreviewLivePhotoView.h in Headers */,
+				7B50E7CB275DF914000ACE37 /* HXPickerResult.h in Headers */,
 				7BD52F0424FE256A00AE3D7C /* HXPreviewVideoView.h in Headers */,
 				7BD52F0524FE256A00AE3D7C /* HXCameraBottomView.h in Headers */,
 				7BD52F0624FE256A00AE3D7C /* HXAlbumListViewController.h in Headers */,
@@ -1765,6 +1773,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B50E7CC275DF914000ACE37 /* HXPickerResult.m in Sources */,
 				7B4E663C2487AD5C00077EE1 /* UILabel+HXExtension.m in Sources */,
 				7B4D4C5A24B858C600B03846 /* HXPhotoEditingView.m in Sources */,
 				7B4E66552487AD5C00077EE1 /* HXPreviewContentView.m in Sources */,
@@ -1968,6 +1977,7 @@
 				7BD52F7424FE258200AE3D7C /* UIViewController+HXExtension.m in Sources */,
 				7BD52F7524FE258200AE3D7C /* HXPhotoEditTransition.m in Sources */,
 				7BD52F7624FE258200AE3D7C /* HXPhotoInteractiveTransition.m in Sources */,
+				7B50E7CD275DF914000ACE37 /* HXPickerResult.m in Sources */,
 				7BD52F7724FE258200AE3D7C /* HXPhotoPersentInteractiveTransition.m in Sources */,
 				7BD52F7824FE258200AE3D7C /* HXPhotoViewPresentTransition.m in Sources */,
 				7BD52F7924FE258200AE3D7C /* HXPhotoViewTransition.m in Sources */,
