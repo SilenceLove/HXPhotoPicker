@@ -65,13 +65,13 @@
 ``` ruby
 # 将以下内容添加到您的Podfile中：
 # 不使用网络图片功能
-pod 'HXPhotoPicker', '~> 3.3.0'
+pod 'HXPhotoPicker', '~> 3.3.1'
   
 # 使用SDWebImage加载网络图片
-pod 'HXPhotoPicker/SDWebImage', '~> 3.3.0'
+pod 'HXPhotoPicker/SDWebImage', '~> 3.3.1'
   
 # 使用YYWebImage加载网络图片
-pod 'HXPhotoPicker/YYWebImage', '~> 3.3.0'
+pod 'HXPhotoPicker/YYWebImage', '~> 3.3.1'
 
 # 搜索不到库或最新版时请执行
 pod repo update 或 rm ~/Library/Caches/CocoaPods/search_index.json
@@ -716,6 +716,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
+- v3.3.1　-　修复相册权限未`选择部分`，照片列表未添加相机cell时,滑动到最后一个然后返回会崩溃问题
 - v3.3.0　-　HXPhotoModel添加压缩视频方法
 - v3.2.9　-　修复在iOS15上，单选模式裁剪图片之后的界面显示问题
 - v3.2.7　-　完善iOS15适配，修复裁剪视频时可能会出现导出失败的问题

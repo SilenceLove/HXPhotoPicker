@@ -127,6 +127,14 @@
                     }];
                 }
             } cancelClick:nil];
+            
+//            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+//                PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+//                [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:nil];
+//                [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:nil];
+//            } completionHandler:^(BOOL success, NSError * _Nullable error) {
+//                NSSLog(@"保存livePhoto - > %d, %@", success, error)
+//            }];
         };
     }else {
         self.manager.configuration.previewRespondsToLongPress = nil;
