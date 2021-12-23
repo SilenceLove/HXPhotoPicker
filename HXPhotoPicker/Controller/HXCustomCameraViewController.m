@@ -165,14 +165,16 @@ CLLocationManagerDelegate
     self.customNavigationBar.translucent = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBecomeActive) name:UIApplicationWillEnterForegroundNotification object:nil];
     
-    if (@available(iOS 15.0, *)) {
+    if (@available(iOS 13.0, *)) {
         UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
         appearance.shadowImage = [[UIImage alloc] init];
         appearance.shadowColor = [UIColor clearColor];
         appearance.titleTextAttributes = self.customNavigationBar.titleTextAttributes;
         appearance.backgroundEffect = nil;
         self.customNavigationBar.standardAppearance = appearance;
-        self.customNavigationBar.scrollEdgeAppearance = appearance;
+        if (@available(iOS 15.0, *)) {
+            self.customNavigationBar.scrollEdgeAppearance = appearance;
+        }
     }
 }
 - (void)applicationBecomeActive {

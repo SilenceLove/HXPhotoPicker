@@ -208,6 +208,10 @@
                              contentMode:(PHImageContentMode)contentMode
                                  options:(PHImageRequestOptions *)options
                               completion:(void (^)(UIImage *result, NSDictionary<NSString *, id> *info))completion {
+    if (!asset) {
+        completion(nil, nil);
+        return -1;
+    }
     return [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:targetSize contentMode:contentMode options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
