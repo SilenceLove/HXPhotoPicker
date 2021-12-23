@@ -12,47 +12,106 @@ extension PhotoAsset {
     /// 获取本地图片地址
     func requestLocalImageURL(
         toFile fileURL: URL? = nil,
+        compressionQuality: CGFloat? = nil,
         resultHandler: @escaping AssetURLCompletion
     ) {
         #if HXPICKER_ENABLE_EDITOR
         if photoEdit != nil {
             getEditedImageURL(
                 toFile: fileURL,
+                compressionQuality: compressionQuality,
                 resultHandler: resultHandler
             )
             return
         }
         #endif
-        if let localImageURL = getLocalImageAssetURL() {
-            var url = localImageURL
-            if let fileURL = fileURL {
-                if PhotoTools.copyFile(at: localImageURL, to: fileURL) {
-                    url = fileURL
-                }else {
-                    resultHandler(.failure(.fileWriteFailed))
-                    return
+        func result(_ result: Result<AssetURLResult, AssetError>) {
+            if DispatchQueue.isMain {
+                resultHandler(result)
+            }else {
+                DispatchQueue.main.async {
+                    resultHandler(result)
                 }
             }
-            resultHandler(
-                .success(
-                    .init(
-                        url: url,
-                        urlType: .local,
-                        mediaType: .photo
+        }
+        if let localImageURL = getLocalImageAssetURL() {
+            func completion(_ imageURL: URL) {
+                var url = imageURL
+                if let fileURL = fileURL {
+                    if PhotoTools.copyFile(at: imageURL, to: fileURL) {
+                        url = fileURL
+                    }else {
+                        result(.failure(.fileWriteFailed))
+                        return
+                    }
+                }
+                result(
+                    .success(
+                        .init(
+                            url: url,
+                            urlType: .local,
+                            mediaType: .photo
+                        )
                     )
                 )
-            )
+            }
+            if let compressionQuality = compressionQuality,
+               !isGifAsset {
+                DispatchQueue.global().async {
+                    guard let imageData = try? Data(contentsOf: localImageURL) else {
+                        result(.failure(.imageCompressionFailed))
+                        return
+                    }
+                    if let data = PhotoTools.imageCompress(
+                        imageData,
+                        compressionQuality: compressionQuality
+                    ),
+                       let url = PhotoTools.write(
+                        toFile: fileURL,
+                        imageData: data
+                    ) {
+                        completion(url)
+                    }else {
+                        result(.failure(.imageCompressionFailed))
+                    }
+                }
+            }else {
+                completion(localImageURL)
+            }
             return
         }
         DispatchQueue.global().async {
             var error: AssetError?
             if let imageData = self.getLocalImageData() {
-                if let imageURL = PhotoTools.write(
-                    toFile: fileURL,
-                    imageData: imageData
-                ) {
-                    DispatchQueue.main.async {
-                        resultHandler(
+                if let compressionQuality = compressionQuality,
+                   !self.isGifAsset {
+                    if let data = PhotoTools.imageCompress(
+                        imageData,
+                        compressionQuality: compressionQuality
+                    ),
+                       let url = PhotoTools.write(
+                        toFile: fileURL,
+                        imageData: data
+                       ) {
+                        result(
+                            .success(
+                                .init(
+                                    url: url,
+                                    urlType: .local,
+                                    mediaType: .photo
+                                )
+                            )
+                        )
+                        return
+                    }else {
+                        error = .imageCompressionFailed
+                    }
+                }else {
+                    if let imageURL = PhotoTools.write(
+                        toFile: fileURL,
+                        imageData: imageData
+                    ) {
+                        result(
                             .success(
                                 .init(
                                     url: imageURL,
@@ -61,21 +120,19 @@ extension PhotoAsset {
                                 )
                             )
                         )
+                        return
+                    }else {
+                        error = .fileWriteFailed
                     }
-                    return
-                }else {
-                    error = .fileWriteFailed
                 }
             }else {
                 error = .invalidData
             }
-            DispatchQueue.main.async {
-                resultHandler(
-                    .failure(
-                        error!
-                    )
+            result(
+                .failure(
+                    error!
                 )
-            }
+            )
         }
     }
     

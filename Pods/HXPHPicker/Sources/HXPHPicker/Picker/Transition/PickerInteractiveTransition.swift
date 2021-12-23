@@ -112,7 +112,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 }
             }
         }else {
-            let previewVC = pickerController?.previewViewController()
+            let previewVC = pickerController?.previewViewController
             if pickerController?.topViewController != previewVC {
                 return (false, isTracking)
             }
@@ -492,10 +492,16 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             let photoAsset = previewViewController.previewAssets[previewViewController.currentPreviewIndex]
             if let pickerCell = pickerViewController.getCell(for: photoAsset) {
                 pickerViewController.scrollCellToVisibleArea(pickerCell)
+                DispatchQueue.main.async {
+                    pickerViewController.changeCellLoadMode(.complete)
+                }
                 toView = pickerCell
             }else {
                 pickerViewController.scrollToCenter(for: photoAsset)
                 pickerViewController.reloadCell(for: photoAsset)
+                DispatchQueue.main.async {
+                    pickerViewController.changeCellLoadMode(.complete)
+                }
                 let pickerCell = pickerViewController.getCell(for: photoAsset)
                 toView = pickerCell
             }
@@ -563,7 +569,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         let pickerController = transitionContext.viewController(forKey: .from) as! PhotoPickerController
         pickerControllerBackgroundColor = pickerController.view.backgroundColor
         pickerController.view.backgroundColor = .clear
-        if let previewViewController = pickerController.previewViewController() {
+        if let previewViewController = pickerController.previewViewController {
             self.previewViewController = previewViewController
             previewBackgroundColor = previewViewController.view.backgroundColor
             previewViewController.view.backgroundColor = .clear

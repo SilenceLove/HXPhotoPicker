@@ -175,7 +175,6 @@ open class PhotoAsset: Equatable {
     var pVideoDuration: TimeInterval = 0
     var playerTime: CGFloat = 0
     var isScrolling = false
-    var adjustmentStatusId: PHContentEditingInputRequestID?
     
     var identifie: String {
         if let phAsset = phAsset {
@@ -368,6 +367,7 @@ extension PhotoAsset {
     }
     func requestAssetImageURL(
         toFile fileURL: URL? = nil,
+        compressionQuality: CGFloat? = nil,
         filterEditor: Bool = false,
         resultHandler: @escaping AssetURLCompletion
     ) {
@@ -375,6 +375,7 @@ extension PhotoAsset {
         if (photoEdit != nil || videoEdit != nil) && !filterEditor {
             getEditedImageURL(
                 toFile: fileURL,
+                compressionQuality: compressionQuality,
                 resultHandler: resultHandler
             )
             return
@@ -414,32 +415,102 @@ extension PhotoAsset {
         ) { (result) in
             switch result {
             case .success(let imageURL):
-                if isGif && self.mediaSubType != .imageAnimated {
-                    // 本质上是gif，需要变成静态图
-                    do {
-                        let imageData = PhotoTools.getImageData(
-                            for: UIImage(
-                                contentsOfFile: imageURL.path
+                func resultSuccess(_ url: URL) {
+                    if DispatchQueue.isMain {
+                        resultHandler(
+                            .success(
+                                .init(
+                                    url: url,
+                                    urlType: .local,
+                                    mediaType: .photo
+                                )
                             )
                         )
-                        if FileManager.default.fileExists(atPath: imageURL.path) {
-                            try FileManager.default.removeItem(at: imageURL)
+                    }else {
+                        DispatchQueue.main.async {
+                            resultHandler(
+                                .success(
+                                    .init(
+                                        url: url,
+                                        urlType: .local,
+                                        mediaType: .photo
+                                    )
+                                )
+                            )
                         }
-                        try imageData?.write(to: imageURL)
-                    } catch {
+                    }
+                }
+                if isGif && self.mediaSubType != .imageAnimated {
+                    // 本质上是gif，需要变成静态图
+                    guard let imageData = try? Data(contentsOf: imageURL),
+                          let image = UIImage(data: imageData) else {
                         resultHandler(.failure(.fileWriteFailed))
                         return
                     }
+                    DispatchQueue.global().async {
+                        if let compressionQuality = compressionQuality {
+                            if FileManager.default.fileExists(atPath: imageURL.path) {
+                                try? FileManager.default.removeItem(at: imageURL)
+                            }
+                            if let data = PhotoTools.imageCompress(
+                                imageData,
+                                compressionQuality: compressionQuality
+                            ),
+                               let url = PhotoTools.write(
+                                toFile: imageURL,
+                                imageData: data
+                            ) {
+                                resultSuccess(url)
+                            }else {
+                                DispatchQueue.main.async {
+                                    resultHandler(.failure(.imageCompressionFailed))
+                                }
+                            }
+                            return
+                        }
+                        do {
+                            let imageData = PhotoTools.getImageData(for: image)
+                            if FileManager.default.fileExists(atPath: imageURL.path) {
+                                try FileManager.default.removeItem(at: imageURL)
+                            }
+                            try imageData?.write(to: imageURL)
+                            resultSuccess(imageURL)
+                        } catch {
+                            DispatchQueue.main.async {
+                                resultHandler(.failure(.fileWriteFailed))
+                            }
+                        }
+                    }
+                    return
+                }else if !isGif {
+                    if let compressionQuality = compressionQuality {
+                        guard let imageData = try? Data(contentsOf: imageURL) else {
+                            resultHandler(.failure(.imageCompressionFailed))
+                            return
+                        }
+                        DispatchQueue.global().async {
+                            if FileManager.default.fileExists(atPath: imageURL.path) {
+                                try? FileManager.default.removeItem(at: imageURL)
+                            }
+                            if let data = PhotoTools.imageCompress(
+                                imageData,
+                                compressionQuality: compressionQuality
+                            ),
+                               let url = PhotoTools.write(
+                                toFile: imageURL,
+                                imageData: data
+                            ) {
+                                resultSuccess(url)
+                            }else {
+                                DispatchQueue.main.async {
+                                    resultHandler(.failure(.imageCompressionFailed))
+                                }
+                            }
+                        }
+                        return
+                    }
                 }
-                resultHandler(
-                    .success(
-                        .init(
-                            url: imageURL,
-                            urlType: .local,
-                            mediaType: .photo
-                        )
-                    )
-                )
+                resultSuccess(imageURL)
             case .failure(let error):
                 resultHandler(.failure(error))
             }
@@ -449,7 +520,7 @@ extension PhotoAsset {
     func requestAssetVideoURL(
         toFile fileURL: URL? = nil,
         exportPreset: ExportPreset? = nil,
-        videoQuality: Int = 5,
+        videoQuality: Int? = 5,
         exportSession: ((AVAssetExportSession) -> Void)? = nil,
         resultHandler: @escaping AssetURLCompletion
     ) {
@@ -472,7 +543,8 @@ extension PhotoAsset {
             return
         }
         let toFile = fileURL == nil ? PhotoTools.getVideoTmpURL() : fileURL!
-        if let exportPreset = exportPreset {
+        if let exportPreset = exportPreset,
+           let videoQuality = videoQuality {
             AssetManager.exportVideoURL(
                 forVideo: phAsset,
                 toFile: toFile,

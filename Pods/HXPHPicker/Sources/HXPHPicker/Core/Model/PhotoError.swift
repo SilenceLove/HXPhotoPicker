@@ -46,9 +46,9 @@ public enum AssetError: Error {
     case typeError
     /// 从系统相册获取数据失败, [AnyHashable: Any]?: 系统获取失败的信息
     case requestFailed([AnyHashable: Any]?)
-    /// 需要同步ICloud上的资源
+    /// 需要同步iCloud上的资源
     case needSyncICloud
-    /// 同步ICloud失败
+    /// 同步iCloud失败
     case syncICloudFailed([AnyHashable: Any]?)
     /// 指定地址存在其他文件，删除已存在的文件时发生错误
     case removeFileFailed
@@ -62,4 +62,6 @@ public enum AssetError: Error {
     case exportLivePhotoVideoURLFailed(Error?)
     /// 导出livePhoto里的地址失败（图片失败信息,视频失败信息）
     case exportLivePhotoURLFailed(Error?, Error?)
+    /// 图片压缩失败
+    case imageCompressionFailed
 }

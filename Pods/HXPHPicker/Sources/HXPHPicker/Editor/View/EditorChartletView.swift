@@ -70,8 +70,38 @@ class EditorChartletView: UIView {
             view.contentInsetAdjustmentBehavior = .never
         }
         view.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewCellTitleID")
+        let pan = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(titleBgViewPanGestureRecognizerClick(pan:))
+        )
+        view.addGestureRecognizer(pan)
         return view
     }()
+    var initialY: CGFloat = 0
+    @objc
+    func titleBgViewPanGestureRecognizerClick(pan: UIPanGestureRecognizer) {
+        let point = pan.translation(in: titleBgView)
+        switch pan.state {
+        case .began:
+            initialY = self.y
+        case .changed:
+            if point.y < 0 {
+                y = initialY
+            }else {
+                y = initialY + point.y
+            }
+        case .ended, .cancelled, .failed:
+            if point.y > 100 {
+                delegate?.chartletView(backClick: self)
+            }else {
+                UIView.animate(withDuration: 0.25) {
+                    self.y = self.initialY
+                }
+            }
+        default:
+            break
+        }
+    }
     lazy var listFlowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal

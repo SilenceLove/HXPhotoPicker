@@ -159,7 +159,9 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         initView()
-        addLoadModeObserver()
+        if PhotoManager.shared.hasThumbnailLoadMode {
+            addLoadModeObserver()
+        }
     }
     open override func layoutSubviews() {
         super.layoutSubviews()

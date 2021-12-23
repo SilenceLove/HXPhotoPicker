@@ -115,9 +115,9 @@ open class PhotoBrowser: PhotoPickerController {
         )
         navigationBar.barTintColor = .clear
         navigationBar.backgroundColor = .clear
-        previewViewController()?.navigationItem.titleView = titleLabel
+        previewViewController?.navigationItem.titleView = titleLabel
         if showDelete {
-            previewViewController()?.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            previewViewController?.navigationItem.rightBarButtonItem = UIBarButtonItem(
                 title: "删除".localized,
                 style: .done,
                 target: self,
@@ -160,7 +160,7 @@ open class PhotoBrowser: PhotoPickerController {
     fileprivate var didHidden: Bool = false
     
     @objc func deletePreviewAsset() {
-        guard let preview = previewViewController(),
+        guard let preview = previewViewController,
               !preview.previewAssets.isEmpty else {
             return
         }
@@ -220,9 +220,10 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
         previewUpdateCurrentlyDisplayedAsset photoAsset: PhotoAsset,
         atIndex: Int
     ) {
-        if let preview = previewViewController() {
-            titleLabel.text = String(atIndex + 1) + "/" + String(preview.previewAssets.count)
+        guard let preview = previewViewController else {
+            return
         }
+        titleLabel.text = String(atIndex + 1) + "/" + String(preview.previewAssets.count)
     }
     
     public func pickerController(

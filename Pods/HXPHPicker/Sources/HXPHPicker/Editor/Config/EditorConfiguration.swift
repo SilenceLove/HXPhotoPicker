@@ -5,7 +5,7 @@
 //  Created by Slience on 2021/1/9.
 //
 
-import Foundation
+import UIKit
 
 open class EditorConfiguration: BaseConfiguration {
     

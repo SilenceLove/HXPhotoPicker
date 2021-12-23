@@ -95,9 +95,11 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
                 saveSystemAlbum(for: image, mediaType: .image)
                 return
             }
-            addedCameraPhotoAsset(PhotoAsset(
-                localImageAsset: .init(image: image)
-            ))
+            addedCameraPhotoAsset(
+                PhotoAsset(
+                    localImageAsset: .init(image: image)
+                )
+            )
             return
         }
         DispatchQueue.main.async {

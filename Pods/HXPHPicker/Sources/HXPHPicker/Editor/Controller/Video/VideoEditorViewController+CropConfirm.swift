@@ -20,7 +20,7 @@ extension VideoEditorViewController: EditorCropConfirmViewDelegate {
         if state == .cropTime {
             didEdited = true
             pState = .normal
-            cropView.stopScroll()
+            cropView.stopScroll(nil)
             currentCropOffset = cropView.collectionView.contentOffset
             currentValidRect = cropView.frameMaskView.validRect
             videoView.playerView.playStartTime = cropView.getStartTime(real: true)
@@ -60,23 +60,25 @@ extension VideoEditorViewController: EditorCropConfirmViewDelegate {
     
     func cancelCropTime(_ animation: Bool) {
         pState = .normal
-        cropView.stopScroll()
+        cropView.stopScroll(currentCropOffset)
+        if currentValidRect.equalTo(.zero) {
+            cropView.resetValidRect()
+        }else {
+            cropView.frameMaskView.validRect = currentValidRect
+        }
         cropView.stopLineAnimation()
         videoView.playerView.playStartTime = beforeStartTime
         videoView.playerView.playEndTime = beforeEndTime
         hiddenCropConfirmView()
-        if let currentCropOffset = currentCropOffset,
-           cropView.collectionView.contentOffset.equalTo(currentCropOffset),
-           cropView.frameMaskView.validRect.equalTo(currentValidRect) {
-            cropView.stopLineAnimation()
-            videoView.playerView.resetPlay()
-            if let startTime = beforeStartTime, let endTime = beforeEndTime {
-                startPlayTimer(startTime: startTime, endTime: endTime)
-            }else {
-                stopPlayTimer()
-            }
-        }
         videoView.cancelCropTime(animation)
+        
+        cropView.stopLineAnimation()
+        videoView.playerView.resetPlay()
+        if let startTime = beforeStartTime, let endTime = beforeEndTime {
+            startPlayTimer(startTime: startTime, endTime: endTime)
+        }else {
+            stopPlayTimer()
+        }
     }
     
     func hiddenCropConfirmView() {

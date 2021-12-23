@@ -83,12 +83,12 @@ extension PhotoPickerController {
             for phAsset in self.selectedAssetArray where
                 phAsset.phAsset == nil {
                 let inLocal = self.localAssetArray.contains(
-                    where: { (localAsset) -> Bool in
-                    return localAsset.isEqual(phAsset)
+                    where: {
+                    $0.isEqual(phAsset)
                 })
                 let inLocalCamera = self.localCameraAssetArray.contains(
-                    where: { (localAsset) -> Bool in
-                        return localAsset.isEqual(phAsset)
+                    where: {
+                        $0.isEqual(phAsset)
                     }
                 )
                 if !inLocal && !inLocalCamera {
@@ -131,15 +131,15 @@ extension PhotoPickerController {
                         self.assetCollectionsArray.append(assetCollection)
                     }
                 }else {
-                    if self.cameraAssetCollection != nil {
+                    if let cameraAssetCollection = self.cameraAssetCollection {
                         self.cameraAssetCollection?.count += localCount
                         if coverImage != nil {
                             self.cameraAssetCollection?.realCoverImage = coverImage
                         }
                         if !self.assetCollectionsArray.isEmpty {
-                            self.assetCollectionsArray[0] = self.cameraAssetCollection!
+                            self.assetCollectionsArray[0] = cameraAssetCollection
                         }else {
-                            self.assetCollectionsArray.append(self.cameraAssetCollection!)
+                            self.assetCollectionsArray.append(cameraAssetCollection)
                         }
                     }
                     DispatchQueue.main.async {
@@ -168,18 +168,18 @@ extension PhotoPickerController {
                 selectedPhotoAssets.append(photoAsset)
             }else {
                 let inLocal = localAssetArray
-                    .contains { (localAsset) -> Bool in
-                    if localAsset.isEqual(photoAsset) {
-                        localAssetArray[localAssetArray.firstIndex(of: localAsset)!] = photoAsset
+                    .contains {
+                    if $0.isEqual(photoAsset) {
+                        localAssetArray[localAssetArray.firstIndex(of: $0)!] = photoAsset
                         return true
                     }
                     return false
                 }
                 let inLocalCamera = localCameraAssetArray
-                    .contains(where: { (localAsset) -> Bool in
-                    if localAsset.isEqual(photoAsset) {
+                    .contains(where: {
+                    if $0.isEqual(photoAsset) {
                         localCameraAssetArray[
-                            localCameraAssetArray.firstIndex(of: localAsset)!
+                            localCameraAssetArray.firstIndex(of: $0)!
                         ] = photoAsset
                         return true
                     }
@@ -215,12 +215,8 @@ extension PhotoPickerController {
         operation.addExecutionBlock { [unowned operation] in
             var photoCount = 0
             var videoCount = 0
-            for photoAsset in self.localAssetArray {
-                photoAsset.isSelected = false
-            }
-            for photoAsset in self.localCameraAssetArray {
-                photoAsset.isSelected = false
-            }
+            self.localAssetArray.forEach { $0.isSelected = false }
+            self.localCameraAssetArray.forEach { $0.isSelected = false }
             let result = self.getSelectAsset()
             let selectedAssets = result.0
             let selectedPhotoAssets = result.1
@@ -275,8 +271,8 @@ extension PhotoPickerController {
                 photoAssets.append(asset)
             })
             if self.config.photoList.showAssetNumber {
-                for localAsset in localAssets {
-                    if localAsset.mediaType == .photo {
+                localAssets.forEach {
+                    if $0.mediaType == .photo {
                         photoCount += 1
                     }else {
                         videoCount += 1

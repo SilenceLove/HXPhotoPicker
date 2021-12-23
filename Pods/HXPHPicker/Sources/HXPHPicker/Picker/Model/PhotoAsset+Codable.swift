@@ -8,7 +8,7 @@
 import UIKit
 
 extension PhotoAsset {
-    struct Simplify: Codable {
+    private struct Simplify: Codable {
         let phLocalIdentifier: String?
         let localImageAsset: LocalImageAsset?
         let localVideoAsset: LocalVideoAsset?

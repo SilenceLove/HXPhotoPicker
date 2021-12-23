@@ -43,13 +43,13 @@ extension PhotoManager {
             default:
                 if let fixedLanguage = fixedCustomLanguage {
                     isCustomLanguage = true
-                    languageBundle = Bundle.init(path: fixedLanguage.path)
+                    languageBundle = Bundle(path: fixedLanguage.path)
                     return languageBundle
                 }
                 for customLanguage in customLanguages {
                     if Locale.preferredLanguages.contains(customLanguage.language) {
                         isCustomLanguage = true
-                        languageBundle = Bundle.init(path: customLanguage.path)
+                        languageBundle = Bundle(path: customLanguage.path)
                         return languageBundle
                     }
                 }
@@ -76,9 +76,8 @@ extension PhotoManager {
                     }
                 }
             }
-            let path = bundle?.path(forResource: language, ofType: "lproj")
-            if path != nil {
-                languageBundle = Bundle.init(path: path!)
+            if let path = bundle?.path(forResource: language, ofType: "lproj") {
+                languageBundle = Bundle(path: path)
             }
             self.languageType = languageType
         }

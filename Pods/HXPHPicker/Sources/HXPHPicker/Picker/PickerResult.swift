@@ -52,8 +52,8 @@ public extension PickerResult {
     
     /// 获取视频地址
     /// - Parameters:
-    ///   - exportPreset: 视频分辨率，默认ratio_640x480，传 nil 获取则是原始视频
-    ///   - videoQuality: 视频质量[0-10]，默认4
+    ///   - exportPreset: 视频分辨率，默认`ratio_640x480`，传 nil 获取则是原始视频
+    ///   - videoQuality: 视频质量[0-10]，默认4，`exportPreset`不为nil时有效
     ///   - exportSession: 导出视频时对应的 AVAssetExportSession，exportPreset不为nil时触发
     ///   - videoURLHandler: 每一次获取视频地址都会触发
     ///   - completionHandler: 全部获取完成(失败的不会添加)
@@ -77,34 +77,40 @@ public extension PickerResult {
 // MARK: Get Original URL
 public extension PickerResult {
     
-    /// 获取已选资源的地址（原图）
+    /// 获取已选资源的地址
     /// 不包括网络资源，如果网络资源编辑过则会获取
     /// - Parameters:
     ///   - options: 获取的类型
+    ///   - compression: 压缩参数，nil - 原图
     ///   - completion: result
     func getURLs(
         options: Options = .any,
+        compression: PhotoAsset.Compression? = nil,
         completion: @escaping ([URL]) -> Void
     ) {
         photoAssets.getURLs(
             options: options,
+            compression: compression,
             completion: completion
         )
     }
     
-    /// 获取已选资源的地址（原图）
+    /// 获取已选资源的地址
     /// 包括网络图片
     /// - Parameters:
     ///   - options: 获取的类型
+    ///   - compression: 压缩参数，nil - 原图
     ///   - handler: 获取到url的回调
     ///   - completionHandler: 全部获取完成
     func getURLs(
         options: Options = .any,
+        compression: PhotoAsset.Compression? = nil,
         urlReceivedHandler handler: URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         photoAssets.getURLs(
             options: options,
+            compression: compression,
             urlReceivedHandler: handler,
             completionHandler: completionHandler
         )

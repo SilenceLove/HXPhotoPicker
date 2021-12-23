@@ -107,10 +107,10 @@ extension VideoEditorViewController {
                 videoView.imageResizerView.imageView.stickerView.audioView?.contentView.startTimer()
                 backgroundMusicVolume = editResult.backgroundMusicVolume
             }
-        }
-        if !orientationDidChange {
-            videoView.playerView.resetPlay()
-            startPlayTimer()
+            if !orientationDidChange && editResult.cropData != nil {
+                videoView.playerView.resetPlay()
+                startPlayTimer()
+            }
         }
         setAssetCompletion = true
     }

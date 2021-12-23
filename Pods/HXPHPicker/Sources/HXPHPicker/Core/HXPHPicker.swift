@@ -6,8 +6,11 @@
 //  Copyright © 2020 Silence. All rights reserved.
 //
 
+import UIKit
+
 class HXPHPicker {}
 
+#if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA || HXPICKER_ENABLE_EDITOR
 public enum Photo {
     
     #if HXPICKER_ENABLE_PICKER
@@ -141,6 +144,7 @@ public enum Photo {
     #endif
     
     #if HXPICKER_ENABLE_CAMERA
+    @discardableResult
     public static func capture(
         _ config: CameraConfiguration,
         type: CameraController.CaptureType = .all,
@@ -156,6 +160,7 @@ public enum Photo {
     }
     #endif
 }
+#endif
 
 public struct HXPickerWrapper<Base> {
     public let base: Base

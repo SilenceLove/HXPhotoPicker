@@ -59,6 +59,7 @@ public class PickerManager: NSObject {
         fetchAssetQueue.maxConcurrentOperationCount = 1
         return fetchAssetQueue
     }()
+    var requestAdjustmentStatusIds: [[PHContentEditingInputRequestID: PHAsset]] = []
     
     var fetchAssetsCompletion: (([PhotoAsset], PhotoAsset?) -> Void)?
     var reloadAssetCollection: (() -> Void)?
@@ -366,6 +367,7 @@ public extension PickerManager {
             var total: Int = 0
              
             func calculationCompletion(_ totalSize: Int) {
+                self.requestAdjustmentStatusIds.removeAll()
                 DispatchQueue.main.async {
                     completion(
                         totalSize,
@@ -441,8 +443,8 @@ public extension PickerManager {
                         calculationCompletion(totalFileSize)
                     }
                 }
-                if let id = requestId {
-                    photoAsset.adjustmentStatusId = id
+                if let id = requestId, let phAsset = photoAsset.phAsset {
+                    self.requestAdjustmentStatusIds.append([id: phAsset])
                 }
             }
         }
@@ -451,12 +453,12 @@ public extension PickerManager {
     
     /// 取消获取资源文件大小
     func cancelRequestAssetFileSize() {
-        for photoAsset in selectedAssetArray {
-            if let id = photoAsset.adjustmentStatusId {
-                photoAsset.phAsset?.cancelContentEditingInputRequest(id)
-                photoAsset.adjustmentStatusId = nil
+        for map in requestAdjustmentStatusIds {
+            if let id = map.keys.first, let phAsset = map.values.first {
+                phAsset.cancelContentEditingInputRequest(id)
             }
         }
+        requestAdjustmentStatusIds.removeAll()
         requestAssetBytesQueue.cancelAllOperations()
     }
 }

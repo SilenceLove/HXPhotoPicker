@@ -99,25 +99,26 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
         willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
-        if let pickerController = pickerController,
-           let myCell = cell as? PhotoPickerBaseViewCell {
-            let photoAsset = getPhotoAsset(for: indexPath.item)
-            if !photoAsset.isSelected &&
-                config.cell.showDisableMask &&
-                pickerController.config.maximumSelectedVideoFileSize == 0 &&
-                pickerController.config.maximumSelectedPhotoFileSize == 0 {
-                myCell.canSelect = pickerController.canSelectAsset(
-                    for: photoAsset,
-                    showHUD: false
-                )
-            }else {
-                myCell.canSelect = true
-            }
-            myCell.updateSelectedState(
-                isSelected: photoAsset.isSelected,
-                animated: false
-            )
+        guard let pickerController = pickerController,
+              let myCell = cell as? PhotoPickerBaseViewCell else {
+            return
         }
+        let photoAsset = getPhotoAsset(for: indexPath.item)
+        if !photoAsset.isSelected &&
+            config.cell.showDisableMask &&
+            pickerController.config.maximumSelectedVideoFileSize == 0 &&
+            pickerController.config.maximumSelectedPhotoFileSize == 0 {
+            myCell.canSelect = pickerController.canSelectAsset(
+                for: photoAsset,
+                showHUD: false
+            )
+        }else {
+            myCell.canSelect = true
+        }
+        myCell.updateSelectedState(
+            isSelected: photoAsset.isSelected,
+            animated: false
+        )
     }
     public func collectionView(
         _ collectionView: UICollectionView,
@@ -180,16 +181,17 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 return
             }
             let item = needOffset ? indexPath.item - offsetIndex : indexPath.item
-            if let pickerController = pickerController {
-                if !pickerController.shouldClickCell(photoAsset: myCell.photoAsset, index: item) {
-                    return
-                }
+            guard let picker = pickerController else {
+                return
+            }
+            if !picker.shouldClickCell(photoAsset: myCell.photoAsset, index: item) {
+                return
             }
             var selectionTapAction: SelectionTapAction
             if photoAsset.mediaType == .photo {
-                selectionTapAction = pickerController!.config.photoSelectionTapAction
+                selectionTapAction = picker.config.photoSelectionTapAction
             }else {
-                selectionTapAction = pickerController!.config.videoSelectionTapAction
+                selectionTapAction = picker.config.videoSelectionTapAction
             }
             switch selectionTapAction {
             case .preview:
@@ -462,18 +464,29 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
         return true
     }
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if !config.loadClearImageWhenScrollingStops {
+        if collectionView.contentSize.height < collectionView.height {
             return
         }
-        PhotoManager.shared.thumbnailLoadModeDidChange(.simplify)
+        changeCellLoadMode(.simplify)
+    }
+    public func scrollViewDidEndDragging(
+        _ scrollView: UIScrollView,
+        willDecelerate decelerate: Bool
+    ) {
+        if !decelerate && !scrollToTop {
+            changeCellLoadMode(.complete)
+        }
     }
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if !scrollView.isTracking && !scrollToTop {
+            changeCellLoadMode(.complete)
+        }
+    }
+    func changeCellLoadMode(_ mode: PhotoManager.ThumbnailLoadMode) {
         if !config.loadClearImageWhenScrollingStops {
             return
         }
-        if !scrollView.isTracking && !scrollToTop {
-            PhotoManager.shared.thumbnailLoadModeDidChange(.complete)
-        }
+        PhotoManager.shared.thumbnailLoadModeDidChange(mode)
     }
 }
 

@@ -335,13 +335,13 @@ open class PhotoPreviewContentView: UIView, PHLivePhotoViewDelegate {
         if let photoEdit = photoAsset.photoEdit {
             if photoEdit.imageType == .gif {
                 do {
-                    let imageData = try Data.init(contentsOf: photoEdit.editedImageURL)
+                    let imageData = try Data(contentsOf: photoEdit.editedImageURL)
                     imageView.setImageData(imageData)
                 }catch {
                     imageView.setImage(photoEdit.editedImage, animated: true)
                 }
             }else {
-                if let image = UIImage.init(contentsOfFile: photoEdit.editedImageURL.path) {
+                if let image = UIImage(contentsOfFile: photoEdit.editedImageURL.path) {
                     imageView.setImage(image)
                 }else {
                     imageView.setImage(photoEdit.editedImage, animated: true)

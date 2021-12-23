@@ -406,6 +406,7 @@ open class VideoEditorViewController: BaseViewController {
         delegate?.videoEditorViewController(didCancel: self)
     }
     func backAction() {
+        hiddenBrushColorView()
         stopAllOperations()
         if let requestID = assetRequestID {
             PHImageManager.default().cancelImageRequest(requestID)

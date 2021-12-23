@@ -91,18 +91,21 @@ public extension Array where Element == PhotoAsset {
         }
     }
     
-    /// 获取已选资源的地址（原图）
+    /// 获取已选资源的地址
     /// 不包括网络资源，如果网络资源编辑过则会获取
     /// - Parameters:
     ///   - options: 获取的类型
+    ///   - compression: 压缩参数，nil - 原图
     ///   - completion: result
     func getURLs(
         options: PickerResult.Options = .any,
+        compression: PhotoAsset.Compression? = nil,
         completion: @escaping ([URL]) -> Void
     ) {
         var urls: [URL] = []
         getURLs(
-            options: options
+            options: options,
+            compression: compression
         ) { result, photoAsset, index in
             switch result {
             case .success(let response):
@@ -117,9 +120,10 @@ public extension Array where Element == PhotoAsset {
         }
     }
     
-    /// 获取已选资源的地址（原图）包括网络图片
+    /// 获取已选资源的地址，包括网络图片
     /// - Parameters:
     ///   - options: 获取的类型
+    ///   - compression: 压缩参数，nil - 原图
     ///   - handler: 获取到url的回调
     ///     - result: 获取的结果
     ///     - photoAsset: 对应的 PhotoAsset 对象
@@ -128,6 +132,7 @@ public extension Array where Element == PhotoAsset {
     ///     - urls: 获取成功的url集合
     func getURLs(
         options: PickerResult.Options = .any,
+        compression: PhotoAsset.Compression? = nil,
         urlReceivedHandler handler: PickerResult.URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
@@ -165,16 +170,23 @@ public extension Array where Element == PhotoAsset {
                     }
                     if mediatype == .photo {
                         if photoAsset.mediaSubType == .livePhoto {
-                            photoAsset.getLivePhotoURL { result in
+                            photoAsset.getLivePhotoURL(
+                                compression: compression
+                            ) { result in
                                 resultHandler(result)
                             }
                         }else {
-                            photoAsset.getImageURL { result in
+                            photoAsset.getImageURL(
+                                compressionQuality: compression?.imageCompressionQuality
+                            ) { result in
                                 resultHandler(result)
                             }
                         }
                     }else {
-                        photoAsset.getVideoURL { result in
+                        photoAsset.getVideoURL(
+                            exportPreset: compression?.videoExportPreset,
+                            videoQuality: compression?.videoQuality
+                        ) { result in
                             resultHandler(result)
                         }
                     }

@@ -5,7 +5,7 @@
 //  Created by Slience on 2021/8/31.
 //
 
-import Foundation
+import UIKit
 import CoreLocation
 
 public protocol CameraControllerDelegate: AnyObject {

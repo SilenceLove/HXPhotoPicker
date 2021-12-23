@@ -43,7 +43,9 @@ extension PhotoPreviewViewController: PhotoEditorViewControllerDelegate {
         delegate?.previewViewController(self, editAssetFinished: photoAsset)
         picker.didEditAsset(photoAsset: photoAsset, atIndex: currentPreviewIndex)
     }
-    public func photoEditorViewController(didFinishWithUnedited photoEditorViewController: PhotoEditorViewController) {
+    public func photoEditorViewController(
+        didFinishWithUnedited photoEditorViewController: PhotoEditorViewController
+    ) {
         guard let picker = pickerController else { return }
         let photoAsset = photoEditorViewController.photoAsset!
         let beforeHasEdit = photoAsset.photoEdit != nil

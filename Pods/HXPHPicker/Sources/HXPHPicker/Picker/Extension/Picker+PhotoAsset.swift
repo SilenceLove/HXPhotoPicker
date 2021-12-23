@@ -141,6 +141,7 @@ extension PhotoAsset {
             }
         }else {
             return requestAVAsset(
+                deliveryMode: .highQualityFormat,
                 iCloudHandler: iCloudHandler,
                 progressHandler: progressHandler
             ) { [weak self] _, _, _ in

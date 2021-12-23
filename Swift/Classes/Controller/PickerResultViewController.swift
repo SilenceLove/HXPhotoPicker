@@ -340,8 +340,14 @@ class PickerResultViewController: UIViewController,
             return
         }
         view.hx.show(animated: true)
-        let result = PickerResult(photoAssets: selectedAssets, isOriginal: false)
-        result.getURLs { result, photoAsset, index in
+//        let compression = PhotoAsset.Compression(
+//            imageCompressionQuality: 0.5,
+//            videoExportPreset: .ratio_960x540,
+//            videoQuality: 6
+//        )
+        selectedAssets.getURLs(
+            compression: nil
+        ) { result, photoAsset, index in
             print("第" + String(index + 1) + "个")
             switch result {
             case .success(let response):
@@ -531,7 +537,7 @@ class PickerResultViewController: UIViewController,
                 style: .destructive,
                 handler: { [weak self] alertAction in
                     photoBrowser.deleteCurrentPreviewPhotoAsset()
-                    if let index = photoBrowser.previewViewController()?.currentPreviewIndex {
+                    if let index = photoBrowser.previewViewController?.currentPreviewIndex {
                         self?.previewDidDeleteAsset(index: index)
                     }
         }))

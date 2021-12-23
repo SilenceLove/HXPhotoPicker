@@ -22,7 +22,7 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
         )
         previewVC.selectedAssetArray = manager.selectedAssetArray
         previewVC.isOriginal = isOriginal
-        previewVC.previewViewController()?.delegate = self
+        previewVC.previewViewController?.delegate = self
         previewVC.autoDismiss = false
         viewController()?.present(previewVC, animated: animated)
     }

@@ -361,16 +361,16 @@ extension VideoEditorCropView {
             preferredTimescale: avAsset.duration.timescale
         )
     }
-    func stopScroll() {
+    func stopScroll(_ offset: CGPoint?) {
         let inset = collectionView.contentInset
-        var offset = collectionView.contentOffset
+        var currentOffset = offset ?? collectionView.contentOffset
         let maxOffsetX = contentWidth - (collectionView.width - inset.left)
-        if offset.x < -inset.left {
-            offset.x = -inset.left
-        }else if offset.x > maxOffsetX {
-            offset.x = maxOffsetX
+        if currentOffset.x < -inset.left {
+            currentOffset.x = -inset.left
+        }else if currentOffset.x > maxOffsetX {
+            currentOffset.x = maxOffsetX
         }
-        collectionView.setContentOffset(offset, animated: false)
+        collectionView.setContentOffset(currentOffset, animated: false)
     }
 }
 extension VideoEditorCropView: UICollectionViewDataSource,

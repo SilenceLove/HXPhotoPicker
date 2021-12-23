@@ -132,9 +132,15 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 if toView == nil {
                     pickerVC?.scrollToCenter(for: photoAsset!)
                     pickerVC?.reloadCell(for: photoAsset!)
+                    DispatchQueue.main.async {
+                        pickerVC?.changeCellLoadMode(.complete)
+                    }
                     toView = pickerVC?.getCell(for: photoAsset!)
                 }else {
                     pickerVC?.scrollCellToVisibleArea(toView as! PhotoPickerBaseViewCell)
+                    DispatchQueue.main.async {
+                        pickerVC?.changeCellLoadMode(.complete)
+                    }
                 }
             }
             
@@ -321,7 +327,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         var fromView: UIView
         var previewView: UIView?
         var toRect: CGRect = .zero
-        let previewViewController = pickerController.previewViewController()
+        let previewViewController = pickerController.previewViewController
         if type == .present {
             containerView.addSubview(contentView)
             containerView.addSubview(toVC.view)
@@ -359,7 +365,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }
             var photoAsset: PhotoAsset?
             if pickerController.isExternalPickerPreview {
-                photoAsset = pickerController.previewViewController()?.previewAssets[currentPreviewIndex]
+                photoAsset = pickerController.previewViewController?.previewAssets[currentPreviewIndex]
             }else if !pickerController.selectedAssetArray.isEmpty {
                 photoAsset = pickerController.selectedAssetArray[currentPreviewIndex]
             }

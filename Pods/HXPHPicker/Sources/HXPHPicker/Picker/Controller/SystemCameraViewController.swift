@@ -49,8 +49,8 @@ class SystemCameraViewController: UIImagePickerController {
     }
     private func getSubviewsOfView(v: UIView) -> [UIView] {
         var allView: [UIView] = [v]
-        v.subviews.forEach { (subView) in
-            allView.append(contentsOf: getSubviewsOfView(v: subView))
+        v.subviews.forEach {
+            allView.append(contentsOf: getSubviewsOfView(v: $0))
         }
         return allView
     }

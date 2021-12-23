@@ -79,10 +79,10 @@ extension PhotoPickerViewController {
             self.videoCount = videoCount
             self.setupEmptyView()
             self.collectionView.reloadData()
-            DispatchQueue.main.async {
-                // collectionView reload 完成之后
+//            DispatchQueue.main.async {
+//                // collectionView reload 完成之后
                 self.scrollToAppropriatePlace(photoAsset: photoAsset)
-            }
+//            }
             if self.showLoading {
                 ProgressHUD.hide(forView: self.view, animated: true)
                 self.showLoading = false

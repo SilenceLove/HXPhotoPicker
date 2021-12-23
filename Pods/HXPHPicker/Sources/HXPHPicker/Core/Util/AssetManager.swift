@@ -33,8 +33,10 @@ public struct AssetManager {
         }else {
             if let displayName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String {
                 albumName = displayName.count > 0 ? displayName : "PhotoPicker"
+            }else if let bundleName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String {
+                albumName = bundleName.count > 0 ? bundleName : "PhotoPicker"
             }else {
-                albumName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String
+                albumName = "PhotoPicker"
             }
         }
         requestAuthorization { (status) in

@@ -20,6 +20,9 @@ public class CameraConfiguration: BaseConfiguration {
     /// 摄像头默认位置
     public var position: DevicePosition = .back
     
+    /// 闪光灯模式
+    public var flashMode: AVCaptureDevice.FlashMode = .auto
+    
     /// 视频最大录制时长
     public var videoMaximumDuration: TimeInterval = 60
     

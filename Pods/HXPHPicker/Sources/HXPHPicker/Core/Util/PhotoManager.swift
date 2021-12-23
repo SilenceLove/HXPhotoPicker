@@ -67,7 +67,7 @@ public final class PhotoManager: NSObject {
     var firstLoadAssets: Bool = true
     var cameraAlbumResult: PHFetchResult<PHAsset>?
     var cameraAlbumResultOptions: PickerAssetOptions?
-    
+    var hasThumbnailLoadMode: Bool = false
     var thumbnailLoadMode: ThumbnailLoadMode = .complete
     #endif
     
@@ -156,7 +156,7 @@ extension PhotoManager {
         case complete
     }
     func thumbnailLoadModeDidChange(_ mode: ThumbnailLoadMode) {
-        if thumbnailLoadMode == mode {
+        if thumbnailLoadMode == mode || !hasThumbnailLoadMode {
             return
         }
         thumbnailLoadMode = mode

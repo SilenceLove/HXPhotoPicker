@@ -51,8 +51,7 @@ class CameraManager: NSObject {
     )
     
     var activeVideoInput: AVCaptureDeviceInput?
-    private(set) var flashMode: AVCaptureDevice.FlashMode = .auto
-    
+    private var flashMode: AVCaptureDevice.FlashMode
     private var recordDuration: TimeInterval = 0
     private var photoWillCapture: (() -> Void)?
     private var photoCompletion: ((Data?) -> Void)?
@@ -63,6 +62,7 @@ class CameraManager: NSObject {
     private var videoDidStartRecording: ((TimeInterval) -> Void)?
     
     init(config: CameraConfiguration) {
+        self.flashMode = config.flashMode
         self.config = config
         super.init()
         DeviceOrientationHelper.shared.startDeviceOrientationNotifier()
@@ -317,14 +317,16 @@ extension CameraManager {
                 try camera.lockForConfiguration()
                 camera.videoZoomFactor = zoom
                 camera.unlockForConfiguration()
-            } catch { }
+            } catch {
+                print(error)
+            }
         }
     }
     
-    func rampZoom(to value: CGFloat) throws {
+    func rampZoom(to value: CGFloat, withRate rate: Float = 1) throws {
         guard let camera = activeCamera else { return }
         try camera.lockForConfiguration()
-        camera.ramp(toVideoZoomFactor: value, withRate: 1)
+        camera.ramp(toVideoZoomFactor: value, withRate: rate)
         camera.unlockForConfiguration()
     }
     

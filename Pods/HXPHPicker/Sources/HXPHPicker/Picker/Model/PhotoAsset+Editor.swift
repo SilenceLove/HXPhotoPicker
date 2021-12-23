@@ -29,36 +29,64 @@ extension PhotoAsset {
     }
     func getEditedImageURL(
         toFile fileURL: URL? = nil,
+        compressionQuality: CGFloat? = nil,
         resultHandler: @escaping AssetURLCompletion
     ) {
+        func result(_ result: Result<AssetURLResult, AssetError>) {
+            if DispatchQueue.isMain {
+                resultHandler(result)
+            }else {
+                DispatchQueue.main.async {
+                    resultHandler(result)
+                }
+            }
+        }
         if let photoEdit = photoEdit {
-            let url: URL
-            if let fileURL = fileURL {
-                if PhotoTools.copyFile(
-                    at: photoEdit.editedImageURL,
-                    to: fileURL
-                ) {
-                    url = fileURL
+            func completion(_ imageURL: URL) {
+                let url: URL
+                if let fileURL = fileURL {
+                    if PhotoTools.copyFile(
+                        at: imageURL,
+                        to: fileURL
+                    ) {
+                        url = fileURL
+                    }else {
+                        result(.failure(.fileWriteFailed))
+                        return
+                    }
                 }else {
-                    resultHandler(
-                        .failure(
-                            .fileWriteFailed
-                        )
-                    )
-                    return
+                    url = imageURL
+                }
+                result(.success(
+                    .init(
+                        url: url, urlType: .local, mediaType: .photo
+                    ))
+                )
+            }
+            let imageURL = photoEdit.editedImageURL
+            if let compressionQuality = compressionQuality,
+               photoEdit.imageType != .gif {
+                DispatchQueue.global().async {
+                    guard let imageData = try? Data(contentsOf: imageURL) else {
+                        result(.failure(.imageCompressionFailed))
+                        return
+                    }
+                    if let data = PhotoTools.imageCompress(
+                        imageData,
+                        compressionQuality: compressionQuality
+                    ),
+                        let url = PhotoTools.write(
+                        toFile: fileURL,
+                        imageData: data
+                    ) {
+                        completion(url)
+                    }else {
+                        result(.failure(.imageCompressionFailed))
+                    }
                 }
             }else {
-                url = photoEdit.editedImageURL
+                completion(imageURL)
             }
-            resultHandler(
-                .success(
-                    .init(
-                        url: url,
-                        urlType: .local,
-                        mediaType: .photo
-                    )
-                )
-            )
         }else if let videoEdit = videoEdit {
             DispatchQueue.global().async {
                 let imageData = PhotoTools.getImageData(
@@ -82,13 +110,7 @@ extension PhotoAsset {
                     }
                     return
                 }
-                DispatchQueue.main.async {
-                    resultHandler(
-                        .failure(
-                            imageData == nil ? .invalidData : .fileWriteFailed
-                        )
-                    )
-                }
+                result(.failure(imageData == nil ? .invalidData : .fileWriteFailed))
             }
         }
     }

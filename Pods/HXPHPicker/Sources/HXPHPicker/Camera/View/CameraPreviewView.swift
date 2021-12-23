@@ -133,7 +133,7 @@ class CameraPreviewView: UIView {
     }
     
     func resetMask(_ image: UIImage?) {
-        if #available(iOS 13.0, *) {
+        guard #available(iOS 13.0, *) else {
             return
         }
         imageMaskView.image = image

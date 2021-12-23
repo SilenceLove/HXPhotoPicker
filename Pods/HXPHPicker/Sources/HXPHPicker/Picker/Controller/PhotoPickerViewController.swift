@@ -74,7 +74,7 @@ public class PhotoPickerViewController: BaseViewController {
                     NSStringFromClass(PickerCamerViewCell.classForCoder())
             )
         }
-        if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
+        if #available(iOS 14.0, *), config.allowAddLimit {
             collectionView.register(
                 PhotoPickerLimitCell.self,
                 forCellWithReuseIdentifier:
@@ -249,6 +249,7 @@ public class PhotoPickerViewController: BaseViewController {
         guard let picker = pickerController else {
             return
         }
+        PhotoManager.shared.hasThumbnailLoadMode = picker.config.photoList.loadClearImageWhenScrollingStops
         allowLoadPhotoLibrary = picker.config.allowLoadPhotoLibrary
         if AssetManager.authorizationStatus() == .notDetermined {
             didFetchAsset = true
@@ -645,24 +646,21 @@ extension PhotoPickerViewController {
     }
     func updateCellSelectedTitle() {
         guard let picker = pickerController else { return }
-        for visibleCell in collectionView.visibleCells {
-            if visibleCell is PhotoPickerBaseViewCell,
-               let photoAsset = (visibleCell as? PhotoPickerBaseViewCell)?.photoAsset {
-                let cell = visibleCell as! PhotoPickerBaseViewCell
-                if !photoAsset.isSelected &&
-                    config.cell.showDisableMask &&
-                    picker.config.maximumSelectedVideoFileSize == 0  &&
-                    picker.config.maximumSelectedPhotoFileSize == 0 {
-                    cell.canSelect = picker.canSelectAsset(
-                        for: photoAsset,
-                        showHUD: false
-                    )
-                }
-                cell.updateSelectedState(
-                    isSelected: photoAsset.isSelected,
-                    animated: false
+        for case let cell as PhotoPickerBaseViewCell in collectionView.visibleCells {
+            guard let photoAsset = cell.photoAsset else { continue }
+            if !photoAsset.isSelected &&
+                config.cell.showDisableMask &&
+                picker.config.maximumSelectedVideoFileSize == 0  &&
+                picker.config.maximumSelectedPhotoFileSize == 0 {
+                cell.canSelect = picker.canSelectAsset(
+                    for: photoAsset,
+                    showHUD: false
                 )
             }
+            cell.updateSelectedState(
+                isSelected: photoAsset.isSelected,
+                animated: false
+            )
         }
     }
     

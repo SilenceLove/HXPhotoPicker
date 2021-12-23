@@ -10,11 +10,34 @@ import AVFoundation
 
 public extension PhotoAsset {
     
+    /// 压缩参数
+    struct Compression {
+        /// 图片压缩质量 [0.1 - 0.9]，nil - 不压缩
+        public let imageCompressionQuality: CGFloat?
+        /// 视频分辨率，nil - 不压缩
+        public let videoExportPreset: ExportPreset?
+        /// 视频质量 [1-10]，nil - 不压缩
+        public let videoQuality: Int?
+        
+        public init(
+            imageCompressionQuality: CGFloat? = nil,
+            videoExportPreset: ExportPreset? = nil,
+            videoQuality: Int? = nil
+        ) {
+            self.imageCompressionQuality = imageCompressionQuality
+            self.videoExportPreset = videoExportPreset
+            self.videoQuality = videoQuality
+        }
+    }
+    
     typealias AssetURLCompletion = (Result<AssetURLResult, AssetError>) -> Void
     
     /// 获取url
+    /// - Parameters:
+    ///   - compression: 压缩参数，nil - 原图
     ///   - completion: 获取完成
     func getAssetURL(
+        compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
         if mediaType == .photo {
@@ -25,18 +48,24 @@ public extension PhotoAsset {
                 return
             }
             getImageURL(
+                compressionQuality: compression?.imageCompressionQuality,
                 completion: completion
             )
         }else {
             getVideoURL(
+                exportPreset: compression?.videoExportPreset,
+                videoQuality: compression?.videoQuality,
                 completion: completion
             )
         }
     }
     
     /// 获取图片url
+    /// - Parameters:
+    ///   - compressionQuality: 压缩比例[0.1-0.9]，不传就是原图。gif不会压缩
     ///   - completion: 获取完成
     func getImageURL(
+        compressionQuality: CGFloat? = nil,
         completion: @escaping AssetURLCompletion
     ) {
         #if canImport(Kingfisher)
@@ -48,6 +77,7 @@ public extension PhotoAsset {
         }
         #endif
         requestImageURL(
+            compressionQuality: compressionQuality,
             resultHandler: completion
         )
     }
@@ -60,7 +90,7 @@ public extension PhotoAsset {
     ///   - completion: 获取完成
     func getVideoURL(
         exportPreset: ExportPreset? = nil,
-        videoQuality: Int = 6,
+        videoQuality: Int? = 6,
         exportSession: ((AVAssetExportSession) -> Void)? = nil,
         completion: @escaping AssetURLCompletion
     ) {
@@ -79,11 +109,15 @@ public extension PhotoAsset {
     }
     
     /// 获取LivePhoto里的图片和视频URL
-    /// - Parameter completion: 获取完成
+    /// - Parameters:
+    ///   - compression: 压缩参数，nil - 原图
+    ///   - completion: 获取完成
     func getLivePhotoURL(
+        compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
         requestLivePhotoURL(
+            compression: compression,
             completion: completion
         )
     }

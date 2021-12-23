@@ -57,7 +57,7 @@ public struct PhotoListConfiguration {
     public var allowAddMenuElements: Bool = true
     
     /// 允许滑动选择
-    public var allowSwipeToSelect: Bool = true
+    public var allowSwipeToSelect: Bool = false
     
     /// 滑动选择时允许自动向上/下滚动
     /// 当 allowSyncICloudWhenSelectPhoto = true 时，自动滚动失效
