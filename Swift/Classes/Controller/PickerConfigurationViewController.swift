@@ -222,12 +222,16 @@ extension PickerConfigurationViewController {
             "korean",
             "english",
             "thai",
-            "indonesia"
+            "indonesia",
+            "vietnamese",
+            "russian",
+            "german",
+            "french"
         ]
         for title in titles {
             alert.addAction(UIAlertAction.init(title: title, style: .default, handler: { [weak self] (action) in
                 guard let self = self else { return }
-                self.config.languageType = LanguageType.init(rawValue: titles.firstIndex(of: action.title!)!)!
+                self.config.languageType = LanguageType(rawValue: titles.firstIndex(of: action.title!)!)!
                 self.tableView.reloadRows(at: [indexPath], with: .fade)
             }))
         }
@@ -775,6 +779,14 @@ extension LanguageType {
             return "泰语"
         case .indonesia:
             return "印尼语"
+        case .vietnamese:
+            return "越南语"
+        case .russian:
+            return "俄语"
+        case .german:
+            return "德语"
+        case .french:
+            return "法语"
         }
     }
 }

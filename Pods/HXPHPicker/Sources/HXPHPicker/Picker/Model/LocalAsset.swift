@@ -51,6 +51,18 @@ public struct LocalVideoAsset {
     }
 }
 
+public struct LocalLivePhotoAsset {
+    /// 封面图片本地地址
+    public let imageURL: URL
+    /// 视频内容地址（支持本地、网络）
+    public let videoURL: URL
+    
+    public init(imageURL: URL, videoURL: URL) {
+        self.imageURL = imageURL
+        self.videoURL = videoURL
+    }
+}
+
 extension LocalImageAsset: Codable {
     enum CodingKeys: CodingKey {
         case image
@@ -115,5 +127,22 @@ extension LocalVideoAsset: Codable {
         }
         try container.encode(duration, forKey: .duration)
         try container.encode(videoSize, forKey: .videoSize)
+    }
+}
+
+extension LocalLivePhotoAsset: Codable {
+    enum CodingKeys: CodingKey {
+        case imageURL
+        case videoURL
+    }
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        imageURL = try container.decode(URL.self, forKey: .imageURL)
+        videoURL = try container.decode(URL.self, forKey: .videoURL)
+    }
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(imageURL, forKey: .imageURL)
+        try container.encode(videoURL, forKey: .videoURL)
     }
 }

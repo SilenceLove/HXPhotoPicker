@@ -13,6 +13,28 @@ open class EditorConfiguration: BaseConfiguration {
         super.init()
         prefersStatusBarHidden = true
     }
+    
+    public struct Filter {
+        /// 滤镜信息
+        public var infos: [PhotoEditorFilterInfo]
+        /// 滤镜选中颜色
+        public var selectedColor: UIColor
+        
+        /// 编辑视频时，是否加载上次滤镜效果
+        /// 如果滤镜数据与上次编辑时的滤镜数据不一致会导致加载错乱
+        /// 请确保滤镜数据与上一次的数据一致之后再加载
+        public var isLoadLastFilter: Bool
+        
+        public init(
+            infos: [PhotoEditorFilterInfo] = [],
+            selectedColor: UIColor = .systemTintColor,
+            isLoadLastFilter: Bool = true
+        ) {
+            self.infos = infos
+            self.selectedColor = selectedColor
+            self.isLoadLastFilter = isLoadLastFilter
+        }
+    }
 }
 
 public struct EditorCropSizeConfiguration {
@@ -54,6 +76,12 @@ public struct EditorBrushConfiguration {
     
     /// 显示画笔尺寸大小滑动条
     public var showSlider: Bool = true
+    
+    /// 添加自定义颜色 - iOS14 以上有效
+    public var addCustomColor: Bool = true
+    
+    /// 自定义默认颜色 - iOS14 以上有效
+    public var customDefaultColor: UIColor = "#9EB6DC".color
     
     public init() { }
 }

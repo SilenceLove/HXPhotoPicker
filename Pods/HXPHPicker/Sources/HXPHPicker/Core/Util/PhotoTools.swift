@@ -371,14 +371,15 @@ public struct PhotoTools {
         _ keyPath: String,
         _ fromValue: Any?,
         _ toValue: Any?,
-        _ duration: TimeInterval
+        _ duration: TimeInterval,
+        _ timingFunctionName: CAMediaTimingFunctionName = .linear
     ) -> CABasicAnimation {
         let animation = CABasicAnimation.init(keyPath: keyPath)
         animation.fromValue = fromValue
         animation.toValue = toValue
         animation.duration = duration
         animation.fillMode = .backwards
-        animation.timingFunction = .init(name: CAMediaTimingFunctionName.linear)
+        animation.timingFunction = .init(name: timingFunctionName)
         return animation
     }
     

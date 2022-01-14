@@ -21,8 +21,27 @@ public struct AssetURLResult {
     public struct LivePhoto {
         /// 图片地址
         public let imageURL: URL
+        
+        /// 图片地址类型
+        public let imageURLType: URLType
+        
         /// 视频地址
         public let videoURL: URL
+        
+        /// 视频地址类型
+        public let videoURLType: URLType
+        
+        init(
+            imageURL: URL,
+            imageURLType: URLType = .local,
+            videoURL: URL,
+            videoURLType: URLType = .local
+        ) {
+            self.imageURL = imageURL
+            self.imageURLType = imageURLType
+            self.videoURL = videoURL
+            self.videoURLType = videoURLType
+        }
     }
     
     /// 地址

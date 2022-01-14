@@ -212,7 +212,7 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
             // 选中
             requestAssetBytes()
         }
-        viewController()?.pickerController?.isOriginal = boxControl.isSelected
+        viewController?.pickerController?.isOriginal = boxControl.isSelected
         hx_delegate?.bottomView(self, didOriginalButtonClick: boxControl.isSelected)
         boxControl.layer.removeAnimation(forKey: "SelectControlAnimation")
         let keyAnimation = CAKeyframeAnimation.init(keyPath: "transform.scale")
@@ -231,7 +231,7 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
             cancelRequestAssetFileSize()
             return
         }
-        if let pickerController = viewController()?.pickerController {
+        if let pickerController = viewController?.pickerController {
             if pickerController.selectedAssetArray.isEmpty {
                 cancelRequestAssetFileSize()
                 return
@@ -278,7 +278,7 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         }
         originalLoadingDelayTimer?.invalidate()
         originalLoadingDelayTimer = nil
-        if let pickerController = viewController()?.pickerController {
+        if let pickerController = viewController?.pickerController {
             pickerController.cancelRequestAssetFileSize(isPreview: sourceType == .preview)
         }
         showOriginalLoadingView = false
@@ -448,7 +448,7 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         }
         requestAssetBytes()
         var selectCount = 0
-        if let pickerController = viewController()?.pickerController {
+        if let pickerController = viewController?.pickerController {
             if pickerController.config.selectMode == .multiple {
                 selectCount = pickerController.selectedAssetArray.count
             }
@@ -502,11 +502,17 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
             originalBtn.frame = CGRect(x: 0, y: 0, width: originalTitleLb.frame.maxX, height: 50)
         }
         originalBtn.centerX = width / 2
-        if originalBtn.frame.maxX > finishBtn.x {
+        let originalMinX: CGFloat
+        #if HXPICKER_ENABLE_EDITOR
+        originalMinX = sourceType == .preview ? editBtn.frame.maxX + 2 : previewBtn.frame.maxX + 2
+        #else
+        originalMinX = sourceType == .preview ? 10 : previewBtn.frame.maxX + 2
+        #endif
+        if originalBtn.frame.maxX > finishBtn.x || originalBtn.x < originalMinX {
             originalBtn.x = finishBtn.x - originalBtn.width
-            if originalBtn.x < previewBtn.frame.maxX + 2 {
-                originalBtn.x = previewBtn.frame.maxX + 2
-                originalTitleLb.width = finishBtn.x - previewBtn.frame.maxX - 2 - 5 - boxControl.width
+            if originalBtn.x < originalMinX {
+                originalBtn.x = originalMinX
+                originalTitleLb.width = finishBtn.x - originalMinX - 5 - boxControl.width
             }
         }
     }
@@ -523,6 +529,9 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
             ),
             height: 50
         )
+        if originalTitleLb.width > width - previewBtn.frame.maxX - finishBtn.width - 12 {
+            originalTitleLb.width = width - previewBtn.frame.maxX - finishBtn.width - 12
+        }
         boxControl.centerY = originalTitleLb.height * 0.5
         originalLoadingView.centerY = originalBtn.height * 0.5
         originalLoadingView.x = originalTitleLb.frame.maxX + 3

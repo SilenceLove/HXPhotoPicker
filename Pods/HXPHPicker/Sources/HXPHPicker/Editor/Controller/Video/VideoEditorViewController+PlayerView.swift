@@ -114,6 +114,9 @@ extension VideoEditorViewController: PhotoEditorBrushColorViewDelegate {
     func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor colorHex: String) {
         videoView.drawColorHex = colorHex
     }
+    func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor color: UIColor) {
+        videoView.drawColor = color
+    }
     func brushColorView(touchDown colorView: PhotoEditorBrushColorView) {
         let lineWidth = videoView.brushLineWidth + 4
         brushSizeView.size = CGSize(width: lineWidth, height: lineWidth)

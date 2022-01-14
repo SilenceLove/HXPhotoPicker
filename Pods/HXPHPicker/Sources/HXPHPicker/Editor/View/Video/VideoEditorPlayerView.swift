@@ -23,6 +23,8 @@ class VideoEditorPlayerView: VideoPlayerView {
     var shouldPlay = true
     var readyForDisplayObservation: NSKeyValueObservation?
     
+    var filterInfo: PhotoEditorFilterInfo?
+    var filterValue: Float = 0
     lazy var coverImageView: UIImageView = {
         let imageView = UIImageView.init()
         return imageView
@@ -44,6 +46,25 @@ class VideoEditorPlayerView: VideoPlayerView {
         if let avAsset = avAsset {
             try? AVAudioSession.sharedInstance().setCategory(.playback)
             let playerItem = AVPlayerItem.init(asset: avAsset)
+            let videoComposition = AVMutableVideoComposition(
+                asset: avAsset
+            ) { [weak self] request in
+                let source = request.sourceImage.clampedToExtent()
+                guard let ciImage = self?.applyFilter(source) else {
+                    request.finish(
+                        with: NSError(
+                            domain: "videoComposition filter error：ciImage is nil",
+                            code: 500,
+                            userInfo: nil
+                        )
+                    )
+                    return
+                }
+                request.finish(with: ciImage, context: nil)
+            }
+            videoComposition.renderScale = 1
+            videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+            playerItem.videoComposition = videoComposition
             player.replaceCurrentItem(with: playerItem)
             playerLayer.player = player
             NotificationCenter.default.addObserver(
@@ -134,5 +155,23 @@ class VideoEditorPlayerView: VideoPlayerView {
     deinit {
         readyForDisplayObservation = nil
         NotificationCenter.default.removeObserver(self)
+    }
+}
+
+extension VideoEditorPlayerView {
+    
+    func applyFilter(_ source: CIImage) -> CIImage {
+        guard let info = filterInfo else {
+            return source
+        }
+        guard let ciImage = info.videoFilterHandler?(source, filterValue) else {
+            return source
+        }
+        return ciImage
+    }
+    
+    func setFilter(_ info: PhotoEditorFilterInfo?, value: Float) {
+        filterInfo = info
+        filterValue = value
     }
 }

@@ -51,7 +51,7 @@ extension EditorImageResizerView {
         /// 更新裁剪框
         updateMaskViewFrame(to: maskViewFrame, animated: animated)
         if animated {
-            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut) {
                 if self.hasCropping {
                     self.scrollView.contentInset = UIEdgeInsets(
                         top: self.oldContentInset.top - margin,
@@ -198,7 +198,7 @@ extension EditorImageResizerView {
         /// 更新裁剪框
         updateMaskViewFrame(to: maskViewFrame, animated: animated)
         if animated {
-            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut) {
                 if self.hasCropping {
                     self.scrollView.contentInset = self.oldContentInset
                 }
@@ -318,7 +318,7 @@ extension EditorImageResizerView {
         
         let scrollCotentInset = getScrollViewContentInset(maskRect)
         if animated {
-            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut) {
                 self.updateScrollViewContentInset(maskRect)
                 self.scrollView.zoomScale = zoomScale
                 self.scrollView.contentOffset = self.getZoomOffset(
@@ -560,7 +560,7 @@ extension EditorImageResizerView {
             )
             updateMaskViewFrame(to: maskRect, animated: true)
         }
-        UIView.animate(withDuration: animationDuration, delay: 0, options: [.curveLinear]) {
+        UIView.animate(withDuration: animationDuration, delay: 0, options: [.curveEaseOut]) {
             self.rotateHandler(
                 angleInRadians: angleInRadians,
                 beforeZoomScale: beforeZoomScale,
@@ -611,7 +611,7 @@ extension EditorImageResizerView {
             rotateTransform = angleInRadians == 0 ? identityTransForm : identityTransForm.rotated(by: angleInRadians)
         }
         if animated {
-            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut) {
                 self.scrollView.transform = rotateTransform
                 self.scrollView.frame = scrollViewFrame
             }
@@ -628,7 +628,7 @@ extension EditorImageResizerView {
         delegate?.imageResizerView(willChangedMaskRect: self)
         maskLinesView.setupShadow(true)
         if animated {
-            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut) {
                 self.mirrorHorizontallyHandler()
             } completion: { (_) in
                 self.maskLinesView.setupShadow(false)
@@ -688,7 +688,7 @@ extension EditorImageResizerView {
             UIView.animate(
                 withDuration: animationDuration,
                 delay: 0,
-                options: .curveLinear
+                options: .curveEaseOut
             ) {
                 if resetAngle {
                     self.resetScrollViewTransform()

@@ -33,7 +33,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
                 delegate: self
             )
             vc.autoDismiss = false
-            viewController()?.present(vc, animated: true)
+            viewController?.present(vc, animated: true)
             return
         default:
             break
@@ -61,7 +61,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
             }
         }
         imagePickerController.mediaTypes = mediaTypes
-        viewController()?.present(imagePickerController, animated: true)
+        viewController?.present(imagePickerController, animated: true)
     }
     
     public func imagePickerController(

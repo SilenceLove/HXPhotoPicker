@@ -189,7 +189,8 @@ class WeChatViewCell: UITableViewCell {
                     stateLb.text = "GIF"
                     stateMaskLayer.isHidden = false
                 }
-            }else if photoAsset.mediaSubType == .livePhoto {
+            }else if photoAsset.mediaSubType == .livePhoto ||
+                        photoAsset.mediaSubType == .localLivePhoto {
                 stateLb.text = "Live"
                 stateMaskLayer.isHidden = false
             }else {
@@ -270,7 +271,7 @@ extension WeChatViewCell: UIContextMenuInteractionDelegate {
         _ interaction: UIContextMenuInteraction,
         configurationForMenuAtLocation location: CGPoint
     ) -> UIContextMenuConfiguration? {
-        guard let viewSize = hx.viewController()?.view.hx.size else {
+        guard let viewSize = hx.viewController?.view.hx.size else {
             return nil
         }
         return .init(identifier: nil) {

@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreLocation
+import AVFoundation
 
 public protocol CameraControllerDelegate: AnyObject {
     
@@ -24,6 +25,24 @@ public protocol CameraControllerDelegate: AnyObject {
     /// 取消拍摄
     /// - Parameter cameraController: 对应的 CameraController
     func cameraController(didCancel cameraController: CameraController)
+    
+    /// 闪光灯模式发生了改变
+    func cameraController(
+        _ cameraController: CameraController,
+        flashModeDidChanged flashMode: AVCaptureDevice.FlashMode
+    )
+    
+    /// 切换前后摄像头
+    func cameraController(
+        _ cameraController: CameraController,
+        didSwitchCameraCompletion position: AVCaptureDevice.Position
+    )
+    
+    /// takePhotoMode = .click 拍照类型发生改变
+    func cameraController(
+        _ cameraController: CameraController,
+        didChangeTakeType takeType: CameraBottomViewTakeType
+    )
 }
 
 public extension CameraControllerDelegate {
@@ -42,6 +61,18 @@ public extension CameraControllerDelegate {
             cameraController.dismiss(animated: true)
         }
     }
+    func cameraController(
+        _ cameraController: CameraController,
+        flashModeDidChanged flashMode: AVCaptureDevice.FlashMode
+    ) { }
+    func cameraController(
+        _ cameraController: CameraController,
+        didSwitchCameraCompletion position: AVCaptureDevice.Position
+    ) { }
+    func cameraController(
+        _ cameraController: CameraController,
+        didChangeTakeType takeType: CameraBottomViewTakeType
+    ) { }
 }
 
 public protocol CameraViewControllerDelegate: AnyObject {
@@ -60,6 +91,24 @@ public protocol CameraViewControllerDelegate: AnyObject {
     /// 取消拍摄
     /// - Parameter cameraViewController: 对应的 CameraViewController
     func cameraViewController(didCancel cameraViewController: CameraViewController)
+    
+    /// 闪光灯模式发生了改变
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        flashModeDidChanged flashMode: AVCaptureDevice.FlashMode
+    )
+    
+    /// 切换前后摄像头
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didSwitchCameraCompletion position: AVCaptureDevice.Position
+    )
+    
+    /// takePhotoMode = .click 拍照类型发生改变
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didChangeTakeType takeType: CameraBottomViewTakeType
+    )
 }
 
 public extension CameraViewControllerDelegate {
@@ -77,6 +126,18 @@ public extension CameraViewControllerDelegate {
             cameraViewController.dismiss(animated: true)
         }
     }
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        flashModeDidChanged flashMode: AVCaptureDevice.FlashMode
+    ) { }
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didSwitchCameraCompletion position: AVCaptureDevice.Position
+    ) { }
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didChangeTakeType takeType: CameraBottomViewTakeType
+    ) { }
 }
 
 protocol CameraResultViewControllerDelegate: AnyObject {

@@ -293,8 +293,7 @@ extension EditorImageResizerView {
             isPortrait: UIDevice.isPortrait,
             cropData: cropData,
             brushData: brushData,
-            filter: filter,
-            filterValue: filterValue,
+            hasFilter: hasFilter,
             mosaicData: mosaicData,
             stickerData: stickerData
         )
@@ -326,7 +325,8 @@ extension EditorImageResizerView {
             isPortrait: UIDevice.isPortrait,
             cropData: cropData,
             brushData: brushData,
-            stickerData: stickerData
+            stickerData: stickerData,
+            filter: videoFilter
         )
     }
 }

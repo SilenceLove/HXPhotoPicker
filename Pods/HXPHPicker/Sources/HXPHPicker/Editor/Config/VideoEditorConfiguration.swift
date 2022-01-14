@@ -42,6 +42,9 @@ open class VideoEditorConfiguration: EditorConfiguration {
     /// 音乐配置
     public lazy var music: Music = .init()
     
+    /// 滤镜配置
+    public lazy var filter: Filter = .init(infos: PhotoTools.defaultVideoFilters())
+    
     public struct Music {
         /// 显示搜索
         public var showSearch: Bool = true
@@ -90,10 +93,10 @@ open class VideoEditorConfiguration: EditorConfiguration {
             imageName: "hx_editor_photo_tools_text",
             type: .text
         )
-//        let cropSize = EditorToolOptions(
-//            imageName: "hx_editor_photo_crop",
-//            type: .cropSize
-//        )
+        let cropSize = EditorToolOptions(
+            imageName: "hx_editor_photo_crop",
+            type: .cropSize
+        )
         let music = EditorToolOptions.init(
             imageName: "hx_editor_tools_music",
             type: .music
@@ -102,6 +105,10 @@ open class VideoEditorConfiguration: EditorConfiguration {
             imageName: "hx_editor_video_crop",
             type: .cropTime
         )
-        return .init(toolOptions: [graffiti, chartlet, text, music, /*cropSize,*/ cropTime])
+        let filter = EditorToolOptions(
+            imageName: "hx_editor_tools_filter",
+            type: .filter
+        )
+        return .init(toolOptions: [graffiti, chartlet, text, music, /*cropSize,*/ cropTime, filter])
     }()
 }

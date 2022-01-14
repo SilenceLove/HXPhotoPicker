@@ -15,6 +15,9 @@ extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
     func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor colorHex: String) {
         imageView.drawColorHex = colorHex
     }
+    func brushColorView(_ colorView: PhotoEditorBrushColorView, changedColor color: UIColor) {
+        imageView.drawColor = color
+    }
     func brushColorView(touchDown colorView: PhotoEditorBrushColorView) {
         let lineWidth = imageView.brushLineWidth + 4
         brushSizeView.size = CGSize(width: lineWidth, height: lineWidth)

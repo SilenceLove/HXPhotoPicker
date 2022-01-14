@@ -315,14 +315,18 @@ extension PhotoTools {
     }
     
     /// 获取和微信主题一致的配置
-    public static func getWXPickerConfig(isMoment: Bool = false) -> PickerConfiguration {
+    // swiftlint:disable function_body_length
+    public static func getWXPickerConfig(
+        isMoment: Bool = false
+    ) -> PickerConfiguration {
+        // swiftlint:enable function_body_length
         let config = PickerConfiguration.init()
         if isMoment {
             config.maximumSelectedCount = 9
             config.maximumSelectedVideoCount = 1
             config.videoSelectionTapAction = .openEditor
             config.allowSelectedTogether = false
-            config.maximumSelectedVideoDuration = 15
+            config.maximumSelectedVideoDuration = 60
         }else {
             config.maximumSelectedVideoDuration = 480
             config.maximumSelectedCount = 9
@@ -400,9 +404,10 @@ extension PhotoTools {
         config.previewView.backgroundColor = .black
         config.previewView.selectBox.tickColor = .white
         config.previewView.selectBox.selectedBackgroundColor = wxColor
-        
+        config.previewView.livePhotoMark.blurStyle = .dark
+        config.previewView.livePhotoMark.textColor = "#ffffff".color
+        config.previewView.livePhotoMark.imageColor = "#ffffff".color
         config.previewView.bottomView.barStyle = .black
-        
         config.previewView.bottomView.originalButtonTitleColor = .white
         config.previewView.bottomView.originalSelectBox.backgroundColor = .clear
         config.previewView.bottomView.originalSelectBox.borderColor = .white
@@ -419,7 +424,7 @@ extension PhotoTools {
         #if HXPICKER_ENABLE_EDITOR
         config.previewView.bottomView.editButtonTitleColor = .white
         
-        config.videoEditor.cropping.maximumVideoCroppingTime = 15
+        config.videoEditor.cropping.maximumVideoCroppingTime = 60
         config.videoEditor.cropView.finishButtonBackgroundColor = wxColor
         config.videoEditor.cropView.finishButtonDarkBackgroundColor = wxColor
         config.videoEditor.toolView.finishButtonBackgroundColor = wxColor
@@ -428,6 +433,10 @@ extension PhotoTools {
         config.videoEditor.toolView.musicSelectedColor = wxColor
         config.videoEditor.music.tintColor = wxColor
         config.videoEditor.text.tintColor = wxColor
+        config.videoEditor.filter = .init(
+            infos: defaultVideoFilters(),
+            selectedColor: wxColor
+        )
         
         config.photoEditor.toolView.toolSelectedColor = wxColor
         config.photoEditor.toolView.finishButtonBackgroundColor = wxColor
@@ -444,7 +453,7 @@ extension PhotoTools {
         
         #if HXPICKER_ENABLE_CAMERA
         let cameraConfig = CameraConfiguration()
-        cameraConfig.videoMaximumDuration = 15
+        cameraConfig.videoMaximumDuration = 60
         cameraConfig.tintColor = wxColor
         config.photoList.cameraType = .custom(cameraConfig)
         #endif

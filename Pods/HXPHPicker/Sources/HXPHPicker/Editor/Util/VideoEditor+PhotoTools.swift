@@ -306,7 +306,6 @@ extension PhotoTools {
         }
         return audioMix
     }
-    // swiftlint:disable function_body_length
     static func videoComposition(
         for videoAsset: AVAsset,
         videoTrack: AVAssetTrack,
@@ -315,32 +314,25 @@ extension PhotoTools {
         animationBeginTime: CFTimeInterval,
         videoDuration: TimeInterval
     ) throws -> AVMutableVideoComposition {
-        // swiftlint:enable function_body_length
         let videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
-        var renderSize = videoComposition.renderSize
-        let cropRect = CGRect(
-            x: renderSize.width * cropSizeData.cropRect.minX,
-            y: renderSize.height * cropSizeData.cropRect.minY,
-            width: renderSize.width * cropSizeData.cropRect.width,
-            height: renderSize.height * cropSizeData.cropRect.height
-        )
+        videoComposition.customVideoCompositorClass = VideoFilterCompositor.self
+        let renderSize = videoComposition.renderSize
         // https://stackoverflow.com/a/45013962
-        renderSize = CGSize(
-            width: floor(renderSize.width / 16) * 16,
-            height: floor(renderSize.height / 16) * 16
-        )
-        
-        let cropOrientation = cropOrientation(cropSizeData)
+//        renderSize = CGSize(
+//            width: floor(renderSize.width / 16) * 16,
+//            height: floor(renderSize.height / 16) * 16
+//        )
         let stickerInfos = cropSizeData.stickerInfos
         var drawImage: UIImage?
         if let image = cropSizeData.drawLayer?.convertedToImage() {
             cropSizeData.drawLayer?.contents = nil
             drawImage = image
         }
-        
+        var watermarkLayerTrackID: CMPersistentTrackID?
         if !stickerInfos.isEmpty || drawImage != nil {
             let bounds = CGRect(origin: .zero, size: renderSize)
             let overlaylayer = CALayer()
+            overlaylayer.backgroundColor = UIColor.clear.cgColor
             if let drawImage = drawImage {
                 let drawLayer = CALayer()
                 drawLayer.contents = drawImage.cgImage
@@ -391,247 +383,55 @@ extension PhotoTools {
                     overlaylayer.addSublayer(imageLayer)
                 }
             }
-            overlaylayer.frame = getOverlayFrame(
-                cropOrientation: cropOrientation,
-                cropRect: cropRect,
-                rect: bounds
-            )
+            overlaylayer.frame = bounds
             
-            /// 这种方式模拟器会崩溃
-            /// https://developer.apple.com/forums/thread/133681
-//            let videolayer = CALayer()
-//            videolayer.frame = bounds
-//
-//            let parentLayer = CALayer()
-//            parentLayer.frame = bounds
-//            parentLayer.isGeometryFlipped = true
-//            parentLayer.addSublayer(videolayer)
-//            parentLayer.addSublayer(overlaylayer)
-//
-//            let animationTool = AVVideoCompositionCoreAnimationTool(
-//                postProcessingAsVideoLayer: videolayer,
-//                in: parentLayer
-//            )
-//            videoComposition.animationTool = animationTool
-            
-            let watermarkLayerTrackID = videoAsset.unusedTrackID()
+            let trackID = videoAsset.unusedTrackID()
             videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
                 additionalLayer: overlaylayer,
-                asTrackID: watermarkLayerTrackID
+                asTrackID: trackID
             )
-            let watermarkLayerInstruction = AVMutableVideoCompositionLayerInstruction()
-            watermarkLayerInstruction.trackID = watermarkLayerTrackID
-            
-            let videoInstruction: AVMutableVideoCompositionInstruction
-            let videoLayerInstruction: AVMutableVideoCompositionLayerInstruction
-            if let instructions = videoComposition.instructions.first as? AVMutableVideoCompositionInstruction {
-                videoInstruction = instructions
-            }else {
-                videoInstruction = AVMutableVideoCompositionInstruction()
-                videoInstruction.timeRange = CMTimeRange(
-                    start: CMTime.zero,
-                    duration: videoTrack.timeRange.duration
-                )
-            }
-            if let layerInstruction = videoInstruction
-                .layerInstructions.last as? AVMutableVideoCompositionLayerInstruction {
-                videoLayerInstruction = layerInstruction
-            }else {
-                videoLayerInstruction = AVMutableVideoCompositionLayerInstruction(
-                    assetTrack: videoTrack
-                )
-            }
-            videoInstruction.layerInstructions = [
-                cropSizeData.canReset ? videoLayerInstructionFixed(
-                    videoComposition: videoComposition,
-                    videoLayerInstruction: watermarkLayerInstruction,
-                    cropOrientation: cropOrientation,
-                    cropRect: cropRect
-                ) :
-                watermarkLayerInstruction,
-                cropSizeData.canReset ? videoLayerInstructionFixed(
-                    videoComposition: videoComposition,
-                    videoLayerInstruction: videoLayerInstruction,
-                    cropOrientation: cropOrientation,
-                    cropRect: cropRect
-                ) : videoLayerInstruction
-            ]
-            videoComposition.instructions = [videoInstruction]
-        }else {
-            if cropSizeData.canReset {
-                let videoInstruction: AVMutableVideoCompositionInstruction
-                let videoLayerInstruction: AVMutableVideoCompositionLayerInstruction
-                if let instructions = videoComposition.instructions.first as? AVMutableVideoCompositionInstruction {
-                    videoInstruction = instructions
-                }else {
-                    videoInstruction = AVMutableVideoCompositionInstruction()
-                    videoInstruction.timeRange = CMTimeRange(
-                        start: CMTime.zero,
-                        duration: videoTrack.timeRange.duration
-                    )
-                }
-                if let layerInstruction = videoInstruction
-                    .layerInstructions.last as? AVMutableVideoCompositionLayerInstruction {
-                    videoLayerInstruction = layerInstruction
-                }else {
-                    videoLayerInstruction = AVMutableVideoCompositionLayerInstruction(
-                        assetTrack: videoTrack
-                    )
-                }
-                videoInstruction.layerInstructions = [
-                    videoLayerInstructionFixed(
-                        videoComposition: videoComposition,
-                        videoLayerInstruction: videoLayerInstruction,
-                        cropOrientation: cropOrientation,
-                        cropRect: cropRect
-                    )
-                ]
-                videoComposition.instructions = [videoInstruction]
-            }
+            watermarkLayerTrackID = trackID
         }
-        if cropSizeData.canReset {
-            renderSize = cropRect.size
-            switch cropOrientation {
-            case .left, .leftMirrored, .right, .rightMirrored:
-                renderSize = CGSize(width: renderSize.height, height: renderSize.width)
-            default:
-                break
-            }
-        }
-        videoComposition.renderScale = 1
-        videoComposition.renderSize = renderSize
-        videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 60)
-        return videoComposition
-    }
-    static func videoLayerInstructionFixed(
-        videoComposition: AVMutableVideoComposition,
-        videoLayerInstruction: AVMutableVideoCompositionLayerInstruction,
-        cropOrientation: UIImage.Orientation,
-        cropRect: CGRect
-    ) -> AVMutableVideoCompositionLayerInstruction {
-        let videoSize = videoComposition.renderSize
-        let renderRect = cropRect
-        var renderSize = renderRect.size
-        // https://stackoverflow.com/a/45013962
-        renderSize = CGSize(
-            width: floor(renderSize.width / 16) * 16,
-            height: floor(renderSize.height / 16) * 16
-        )
-        var trans: CGAffineTransform
-        switch cropOrientation {
-        case .upMirrored:
-            trans = .init(translationX: videoSize.width, y: 0)
-            trans = trans.scaledBy(x: -1, y: 1)
-        case .left:
-            trans = .init(translationX: 0, y: videoSize.width)
-            trans = trans.rotated(by: 3 * CGFloat.pi * 0.5)
-        case .rightMirrored:
-            trans = .init(scaleX: -1, y: 1)
-            trans = trans.rotated(by: CGFloat.pi * 0.5)
-        case .down:
-            trans = .init(translationX: videoSize.width, y: videoSize.height)
-            trans = trans.rotated(by: CGFloat.pi)
-        case .downMirrored:
-            trans = .init(translationX: 0, y: videoSize.height)
-            trans = trans.scaledBy(x: 1, y: -1)
-        case .right:
-            trans = .init(translationX: videoSize.height, y: 0)
-            trans = trans.rotated(by: CGFloat.pi * 0.5)
-        case .leftMirrored:
-            trans = .init(translationX: videoSize.height, y: videoSize.width)
-            trans = trans.scaledBy(x: -1, y: 1)
-            trans = trans.rotated(by: 3 * CGFloat.pi * 0.5)
-        default:
-            trans = .identity
-        }
-//        trans = trans.translatedBy(x: -renderRect.minX, y: -renderRect.minY)
-//        videoLayerInstruction.setTransform(trans, at: .zero)
-        return videoLayerInstruction
-    }
-    static func getOverlayFrame(
-        cropOrientation: UIImage.Orientation,
-        cropRect: CGRect,
-        rect: CGRect
-    ) -> CGRect {
-        rect
-//        var x: CGFloat = 0
-//        var y: CGFloat = 0
-//        switch cropOrientation {
-//        case .up:
-////            x = -cropRect.minX
-//            break
-//        case .upMirrored:
-//
-//            break
-//        case .left:
-//
-//            break
-//        case .rightMirrored:
-//
-//            break
-//        case .down:
-//
-//            break
-//        case .downMirrored:
-//
-//            break
-//        case .right:
-//
-//            break
-//        case .leftMirrored:
-//
-//            break
-//        }
-//        return CGRect(x: x, y: y, width: rect.width, height: rect.height)
-    }
-    static func cropOrientation(
-        _ cropSizeData: VideoEditorCropSizeData
-    ) -> UIImage.Orientation {
-        let angle = cropSizeData.angle
-        let mirrorType = cropSizeData.mirrorType
+        var newInstructions: [AVVideoCompositionInstructionProtocol] = []
         
-        var rotate = CGFloat.pi * angle / 180
-        if rotate != 0 {
-            rotate = CGFloat.pi * 2 + rotate
-        }
-        let isHorizontal = mirrorType == .horizontal
-        if rotate > 0 || isHorizontal {
-            let angle = labs(Int(angle))
-            switch angle {
-            case 0, 360:
-                if isHorizontal {
-                    // upMirrored
-                    return .upMirrored
-                }
-            case 90:
-                if !isHorizontal {
-                    // left
-                    return .left
-                }else {
-                    // rightMirrored
-                    return .rightMirrored
-                }
-            case 180:
-                if !isHorizontal {
-                    // down
-                    return .down
-                }else {
-                    // downMirrored
-                    return .downMirrored
-                }
-            case 270:
-                if !isHorizontal {
-                    // right
-                    return .right
-                }else {
-                    // leftMirrored
-                    return .leftMirrored
-                }
-            default:
-                break
+        for instruction in videoComposition.instructions where instruction is AVVideoCompositionInstruction {
+            let videoInstruction = instruction as! AVVideoCompositionInstruction
+            let layerInstructions = videoInstruction.layerInstructions
+            var sourceTrackIDs: [NSValue] = []
+            if let trackID = watermarkLayerTrackID {
+                sourceTrackIDs.append(trackID as NSValue)
             }
+            for layerInstruction in layerInstructions {
+                sourceTrackIDs.append(layerInstruction.trackID as NSValue)
+            }
+            let newInstruction = CustomVideoCompositionInstruction(
+                sourceTrackIDs: sourceTrackIDs,
+                timeRange: instruction.timeRange,
+                hasSticker: watermarkLayerTrackID == nil ? false : true,
+                filterInfo: cropSizeData.filter,
+                filterValue: cropSizeData.filterValue
+            )
+            newInstructions.append(newInstruction)
         }
-        return .up
+        if newInstructions.isEmpty {
+            var sourceTrackIDs: [NSValue] = []
+            if let trackID = watermarkLayerTrackID {
+                sourceTrackIDs.append(trackID as NSValue)
+            }
+            sourceTrackIDs.append(videoTrack.trackID as NSValue)
+            let newInstruction = CustomVideoCompositionInstruction(
+                sourceTrackIDs: sourceTrackIDs,
+                timeRange: videoTrack.timeRange,
+                hasSticker: watermarkLayerTrackID == nil ? false : true,
+                filterInfo: cropSizeData.filter,
+                filterValue: cropSizeData.filterValue
+            )
+            newInstructions.append(newInstruction)
+        }
+        videoComposition.instructions = newInstructions
+        videoComposition.renderScale = 1
+        videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+        return videoComposition
     }
     static func textAnimationLayer(
         music: VideoEditorMusic,

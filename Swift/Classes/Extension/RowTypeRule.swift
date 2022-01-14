@@ -18,17 +18,3 @@ protocol ConfigRowTypeRule {
     
     func getFunction<T: UIViewController>(_ controller: T) -> ((IndexPath) -> Void)
 }
-
-protocol RowTypeRule {
-    var title: String { get }
-    var options: String { get }
-    
-    func getFunction<T: UIViewController>(_ controller: T) -> ((IndexPath) -> Void)
-}
-
-extension RowTypeRule {
-    
-    func getFunction<T: UIViewController>(_ controller: T) -> ((IndexPath) -> Void) {
-        return { _ in  }
-    }
-}

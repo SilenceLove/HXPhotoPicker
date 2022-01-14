@@ -83,8 +83,8 @@ extension CameraViewController: CameraBottomViewDelegate {
         #endif
         cameraManager.startRecording { [weak self] duration in
             self?.bottomView.startTakeMaskLayerPath(duration: duration)
-        } progress: { progress, time in
-            
+        } progress: { [weak self] progress, time in
+            self?.bottomView.updateVideoTime(time)
         } completion: { [weak self] videoURL, error in
             guard let self = self else { return }
             self.recordingCompletion(videoURL: videoURL, error: error)
@@ -180,7 +180,12 @@ extension CameraViewController: CameraBottomViewDelegate {
             dismiss(animated: true, completion: nil)
         }
     }
-    
+    func bottomView(
+        _ bottomView: CameraBottomView,
+        didChangeTakeType takeType: CameraBottomViewTakeType
+    ) {
+        delegate?.cameraViewController(self, didChangeTakeType: takeType)
+    }
     func openPhotoResult(_ image: UIImage) {
         let vc = CameraResultViewController(
             image: image,

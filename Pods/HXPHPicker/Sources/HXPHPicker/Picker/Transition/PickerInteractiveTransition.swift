@@ -348,7 +348,8 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         }
     }
     func interPercentDidFinish() {
-        if let previewViewController = previewViewController, let previewView = previewView {
+        if let previewViewController = previewViewController,
+            let previewView = previewView {
             panGestureRecognizer.isEnabled = false
             var toRect = toView?.convert(toView?.bounds ?? .zero, to: transitionContext?.containerView) ?? .zero
             if type == .dismiss, let pickerController = pickerController {

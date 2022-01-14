@@ -79,18 +79,4 @@ open class PhotoEditorConfiguration: EditorConfiguration {
         
         public init() { }
     }
-    
-    public struct Filter {
-        /// 滤镜信息
-        public var infos: [PhotoEditorFilterInfo]
-        /// 滤镜选中颜色
-        public var selectedColor: UIColor
-        public init(
-            infos: [PhotoEditorFilterInfo] = [],
-            selectedColor: UIColor = .systemTintColor
-        ) {
-            self.infos = infos
-            self.selectedColor = selectedColor
-        }
-    }
 }

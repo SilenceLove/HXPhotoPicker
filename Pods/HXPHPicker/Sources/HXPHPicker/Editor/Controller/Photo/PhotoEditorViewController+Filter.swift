@@ -18,12 +18,12 @@ extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
         atItem: Int
     ) {
         if filter.isOriginal {
-            imageView.imageResizerView.filter = nil
+            imageView.imageResizerView.hasFilter = false
             imageView.updateImage(image)
             imageView.setMosaicOriginalImage(mosaicImage)
             return
         }
-        imageView.imageResizerView.filter = filter
+        imageView.imageResizerView.hasFilter = true
         ProgressHUD.showLoading(addedTo: view, animated: true)
         let value = filterView.sliderView.value
         let lastImage = imageView.image
@@ -34,7 +34,6 @@ extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
                 DispatchQueue.main.sync {
                     ProgressHUD.hide(forView: self.view, animated: true)
                     self.imageView.updateImage(newImage)
-                    self.imageView.imageResizerView.filterValue = value
                     self.imageView.setMosaicOriginalImage(mosaicImage)
                 }
             }else {
@@ -50,7 +49,6 @@ extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
         let filterInfo = config.filter.infos[filterView.currentSelectedIndex - 1]
         if let newImage = filterInfo.filterHandler(thumbnailImage, imageView.image, value, .valueChanged) {
             imageView.updateImage(newImage)
-            imageView.imageResizerView.filterValue = value
             if mosaicToolView.canUndo {
                 let mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)
                 imageView.setMosaicOriginalImage(mosaicImage)
@@ -61,7 +59,6 @@ extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
         let filterInfo = config.filter.infos[filterView.currentSelectedIndex - 1]
         if let newImage = filterInfo.filterHandler(thumbnailImage, imageView.image, value, .touchUpInside) {
             imageView.updateImage(newImage)
-            imageView.imageResizerView.filterValue = value
             let mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)
             imageView.setMosaicOriginalImage(mosaicImage)
         }

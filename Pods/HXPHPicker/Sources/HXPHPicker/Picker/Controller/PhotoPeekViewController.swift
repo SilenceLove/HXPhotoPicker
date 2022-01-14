@@ -23,7 +23,8 @@ public class PhotoPeekViewController: UIViewController {
     lazy var contentView: PhotoPreviewContentView = {
         let type: PhotoPreviewContentView.`Type`
         if photoAsset.mediaType == .photo {
-            if photoAsset.mediaSubType == .livePhoto {
+            if photoAsset.mediaSubType == .livePhoto ||
+                photoAsset.mediaSubType == .localLivePhoto {
                 type = .livePhoto
             }else {
                 type = .photo

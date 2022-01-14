@@ -31,6 +31,7 @@ extension VideoEditorViewController: VideoEditorMusicViewDelegate {
     func musicView(_ musicView: VideoEditorMusicView, didSelectMusic audioPath: String?) {
         backgroundMusicPath = audioPath
         otherMusic = nil
+        PhotoManager.shared.changeAudioPlayerVolume(backgroundMusicVolume)
     }
     func musicView(deselectMusic musicView: VideoEditorMusicView) {
         backgroundMusicPath = nil
@@ -43,11 +44,29 @@ extension VideoEditorViewController: VideoEditorMusicViewDelegate {
             self.setSearchMusicViewFrame()
         }
     }
+    func musicView(didVolumeButton musicView: VideoEditorMusicView) {
+        showVolumeView()
+    }
     func musicView(_ musicView: VideoEditorMusicView, didOriginalSoundButtonClick isSelected: Bool) {
+        hasOriginalSound = isSelected
         if isSelected {
-            videoView.playerView.player.volume = 1
+            videoView.playerView.player.volume = videoVolume
         }else {
             videoView.playerView.player.volume = 0
+        }
+    }
+    func showVolumeView() {
+        isShowVolume = true
+        UIView.animate(withDuration: 0.25) {
+            self.setVolumeViewFrame()
+            self.musicView.alpha = 0
+        }
+    }
+    func hiddenVolumeView() {
+        isShowVolume = false
+        UIView.animate(withDuration: 0.25) {
+            self.setVolumeViewFrame()
+            self.musicView.alpha = 1
         }
     }
 }
@@ -104,6 +123,16 @@ extension VideoEditorViewController: VideoEditorSearchMusicViewDelegate {
                 self.searchMusicView.deselect()
             }
             self.searchMusicView.clearData()
+        }
+    }
+}
+
+// MARK: VideoEditorVolumeViewDelegate
+extension VideoEditorViewController: VideoEditorVolumeViewDelegate {
+    func volumeView(didChanged volumeView: VideoEditorVolumeView) {
+        backgroundMusicVolume = volumeView.musicVolume
+        if hasOriginalSound {
+            videoVolume = volumeView.originalVolume
         }
     }
 }

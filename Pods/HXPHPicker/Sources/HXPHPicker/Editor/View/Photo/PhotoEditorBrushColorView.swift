@@ -13,6 +13,10 @@ protocol PhotoEditorBrushColorViewDelegate: AnyObject {
         changedColor colorHex: String
     )
     func brushColorView(
+        _ colorView: PhotoEditorBrushColorView,
+        changedColor color: UIColor
+    )
+    func brushColorView(
         didUndoButton colorView: PhotoEditorBrushColorView
     )
     func brushColorView(
@@ -127,6 +131,20 @@ public class PhotoEditorBrushColorView: UIView {
         delegate?.brushColorView(didUndoButton: self)
     }
     
+    var canAddCustom: Bool {
+        if #available(iOS 14.0, *), config.addCustomColor {
+            return true
+        }else {
+            return false
+        }
+    }
+    lazy var customColor: PhotoEditorBrushCustomColor = {
+        let custom = PhotoEditorBrushCustomColor(
+            color: config.customDefaultColor
+        )
+        return custom
+    }()
+    
     init(config: EditorBrushConfiguration) {
         self.config = config
         self.brushColors = config.colors
@@ -175,7 +193,11 @@ public class PhotoEditorBrushColorView: UIView {
 
 extension PhotoEditorBrushColorView: UICollectionViewDataSource, UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        brushColors.count
+        if canAddCustom {
+            return brushColors.count + 1
+        }else {
+            return brushColors.count
+        }
     }
     public func collectionView(
         _ collectionView: UICollectionView,
@@ -185,7 +207,11 @@ extension PhotoEditorBrushColorView: UICollectionViewDataSource, UICollectionVie
             withReuseIdentifier: "PhotoEditorBrushColorViewCellID",
             for: indexPath
         ) as! PhotoEditorBrushColorViewCell
-        cell.colorHex = brushColors[indexPath.item]
+        if canAddCustom && indexPath.item == brushColors.count {
+            cell.customColor = customColor
+        }else {
+            cell.colorHex = brushColors[indexPath.item]
+        }
         return cell
     }
     public func collectionView(
@@ -197,9 +223,57 @@ extension PhotoEditorBrushColorView: UICollectionViewDataSource, UICollectionVie
             at: .centeredHorizontally,
             animated: true
         )
+        if canAddCustom {
+            if indexPath.item == brushColors.count {
+                if #available(iOS 14.0, *) {
+                    didSelectCustomColor(customColor.color)
+                    if !customColor.isFirst && !customColor.isSelected {
+                        customColor.isSelected = true
+                        return
+                    }
+                    let vc = UIColorPickerViewController()
+                    vc.delegate = self
+                    vc.selectedColor = customColor.color
+                    viewController?.present(vc, animated: true, completion: nil)
+                    customColor.isFirst = false
+                    customColor.isSelected = true
+                }
+                return
+            }
+            customColor.isSelected = false
+        }
         delegate?.brushColorView(
             self,
             changedColor: brushColors[indexPath.item]
+        )
+    }
+}
+
+@available(iOS 14.0, *)
+extension PhotoEditorBrushColorView: UIColorPickerViewControllerDelegate {
+    public func colorPickerViewControllerDidSelectColor(
+        _ viewController: UIColorPickerViewController
+    ) {
+        if #available(iOS 15.0, *) {
+            return
+        }
+        didSelectCustomColor(viewController.selectedColor)
+    }
+    @available(iOS 15.0, *)
+    public func colorPickerViewController(
+        _ viewController: UIColorPickerViewController, didSelect color: UIColor, continuously: Bool
+    ) {
+        didSelectCustomColor(color)
+    }
+    func didSelectCustomColor(_ color: UIColor) {
+        customColor.color = color
+        let cell = collectionView.cellForItem(
+            at: .init(item: brushColors.count, section: 0)
+        ) as? PhotoEditorBrushColorViewCell
+        cell?.customColor = customColor
+        delegate?.brushColorView(
+            self,
+            changedColor: customColor.color
         )
     }
 }
@@ -210,6 +284,37 @@ class PhotoEditorBrushColorViewCell: UICollectionViewCell {
         view.size = CGSize(width: 22, height: 22)
         view.layer.cornerRadius = 11
         view.layer.masksToBounds = true
+        view.addSubview(imageView)
+        return view
+    }()
+    
+    lazy var imageView: UIImageView = {
+        let view = UIImageView(image: "hx_editor_brush_color_custom".image)
+        view.isHidden = true
+        
+        let bgLayer = CAShapeLayer()
+        bgLayer.contentsScale = UIScreen.main.scale
+        bgLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
+        bgLayer.fillColor = UIColor.white.cgColor
+        let bgPath = UIBezierPath(
+            roundedRect: CGRect(x: 1.5, y: 1.5, width: 19, height: 19),
+            cornerRadius: 19 * 0.5
+        )
+        bgLayer.path = bgPath.cgPath
+        view.layer.addSublayer(bgLayer)
+
+        let maskLayer = CAShapeLayer()
+        maskLayer.contentsScale = UIScreen.main.scale
+        maskLayer.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
+        let maskPath = UIBezierPath(rect: bgLayer.bounds)
+        maskPath.append(
+            UIBezierPath(
+                roundedRect: CGRect(x: 3, y: 3, width: 16, height: 16),
+                cornerRadius: 8
+            ).reversing()
+        )
+        maskLayer.path = maskPath.cgPath
+        view.layer.mask = maskLayer
         return view
     }()
     
@@ -223,6 +328,8 @@ class PhotoEditorBrushColorViewCell: UICollectionViewCell {
     
     var colorHex: String! {
         didSet {
+            imageView.isHidden = true
+            guard let colorHex = colorHex else { return }
             let color = colorHex.color
             if color.isWhite {
                 colorBgView.backgroundColor = "#dadada".color
@@ -230,6 +337,16 @@ class PhotoEditorBrushColorViewCell: UICollectionViewCell {
                 colorBgView.backgroundColor = .white
             }
             colorView.backgroundColor = color
+        }
+    }
+    
+    var customColor: PhotoEditorBrushCustomColor? {
+        didSet {
+            guard let customColor = customColor else {
+                return
+            }
+            imageView.isHidden = false
+            colorView.backgroundColor = customColor.color
         }
     }
     
@@ -256,6 +373,13 @@ class PhotoEditorBrushColorViewCell: UICollectionViewCell {
         super.layoutSubviews()
         
         colorBgView.center = CGPoint(x: width / 2, y: height / 2)
+        imageView.frame = colorBgView.bounds
         colorView.center = CGPoint(x: width / 2, y: height / 2)
     }
+}
+
+struct PhotoEditorBrushCustomColor {
+    var isFirst: Bool = true
+    var isSelected: Bool = false
+    var color: UIColor
 }

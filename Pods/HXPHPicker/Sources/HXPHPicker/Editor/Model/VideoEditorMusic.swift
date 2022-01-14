@@ -24,16 +24,11 @@ public struct VideoEditorMusicInfo {
     /// 如果不包含的话那么显示歌词功能将会出错
     public let lrc: String
     
-    /// 地址类型
-    public let urlType: URLType
-    
     public init(
         audioURL: URL,
-        lrc: String,
-        urlType: URLType = .unknown) {
+        lrc: String) {
         self.audioURL = audioURL
         self.lrc = lrc
-        self.urlType = urlType
     }
 }
 
@@ -48,7 +43,6 @@ class VideoEditorMusic: Equatable, Codable {
     
     var isLoading: Bool = false
     var isSelected: Bool = false
-    var urlType: VideoEditorMusicInfo.URLType = .unknown
     
     var localAudioPath: String?
     var metaData: [String: String] = [:]

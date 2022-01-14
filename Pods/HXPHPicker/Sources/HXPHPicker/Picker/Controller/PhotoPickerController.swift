@@ -405,7 +405,7 @@ extension PhotoPickerController {
             appearance.titleTextAttributes = titleTextAttributes
             switch barStyle {
             case .default:
-                appearance.backgroundEffect = UIBlurEffect(style: .light)
+                appearance.backgroundEffect = UIBlurEffect(style: .extraLight)
             default:
                 appearance.backgroundEffect = UIBlurEffect(style: .dark)
             }
@@ -492,7 +492,9 @@ extension PhotoPickerController {
         #endif
         var cameraAssetArray: [PhotoAsset] = []
         for photoAsset in localCameraAssetArray {
-            cameraAssetArray.append(photoAsset.copyCamera())
+            if let cameraAsset = photoAsset.cameraAsset {
+                cameraAssetArray.append(cameraAsset)
+            }
         }
         PhotoManager.shared.saveCameraPreview()
         pickerDelegate?.pickerController(self, didDismissComplete: cameraAssetArray)

@@ -10,6 +10,7 @@
 "编辑" = "edit";
 "返回" = "kembali";
 "还原" = "pengurangan";
+"自由" = "Gratis";
 "没有可选资源" = "Tidak ada sumber daya opsional";
 "照片和视频不能同时选择" = "Foto dan video tidak dapat dipilih secara bersamaan";
 "最多只能选择%d张照片" = "Anda hanya dapat memilih maksimal %d foto";
@@ -83,6 +84,11 @@
 "更多" = "Lagi";
 "张照片" = "Foto";
 "个视频" = "Video";
+"实况" = "Hidup";
+"照片" = "Foto";
+"视频" = "video";
+"点击摄像" = "Klik untuk merekam";
+"音量" = "volume";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

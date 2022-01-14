@@ -5,13 +5,13 @@
 //  Created by Slience on 2021/9/1.
 //
 
+#if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
 import UIKit
 import Accelerate
 import CoreGraphics
 import CoreMedia
 import QuartzCore
 
-#if HXPICKER_ENABLE_PICKER || HXPICKER_ENABLE_CAMERA
 extension PhotoTools {
     
     static func cameraPreviewImageURL() -> URL {

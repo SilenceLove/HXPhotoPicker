@@ -25,6 +25,9 @@ public struct VideoEditResult {
     /// 视频时长 秒
     public let videoDuration: TimeInterval
     
+    /// 是否有原视频音乐
+    public let hasOriginalSound: Bool
+    
     /// 原视频音量
     public let videoSoundVolume: Float
     
@@ -43,6 +46,7 @@ public struct VideoEditResult {
     init(
         editedURL: URL,
         cropData: VideoCropData?,
+        hasOriginalSound: Bool,
         videoSoundVolume: Float,
         backgroundMusicURL: URL?,
         backgroundMusicVolume: Float,
@@ -55,6 +59,7 @@ public struct VideoEditResult {
         coverImage = PhotoTools.getVideoThumbnailImage(videoURL: editedURL, atTime: 0.1)
         self.editedURL = editedURL
         self.cropData = cropData
+        self.hasOriginalSound = hasOriginalSound
         self.videoSoundVolume = videoSoundVolume
         self.backgroundMusicURL = backgroundMusicURL
         self.backgroundMusicVolume = backgroundMusicVolume
@@ -110,6 +115,7 @@ struct VideoEditedCropSize: Codable {
     let cropData: PhotoEditCropData?
     let brushData: [PhotoEditorBrushData]
     let stickerData: EditorStickerData?
+    let filter: VideoEditorFilter?
 }
 
 extension VideoEditResult: Codable {
@@ -120,6 +126,7 @@ extension VideoEditResult: Codable {
         case editedFileSize
         case videoTime
         case videoDuration
+        case hasOriginalSound
         case videoSoundVolume
         case backgroundMusicURL
         case backgroundMusicVolume
@@ -137,6 +144,7 @@ extension VideoEditResult: Codable {
         editedFileSize = try container.decode(Int.self, forKey: .editedFileSize)
         videoTime = try container.decode(String.self, forKey: .videoTime)
         videoDuration = try container.decode(TimeInterval.self, forKey: .videoDuration)
+        hasOriginalSound = try container.decode(Bool.self, forKey: .hasOriginalSound)
         videoSoundVolume = try container.decode(Float.self, forKey: .videoSoundVolume)
         backgroundMusicURL = try container.decodeIfPresent(URL.self, forKey: .backgroundMusicURL)
         backgroundMusicVolume = try container.decode(Float.self, forKey: .backgroundMusicVolume)
@@ -150,6 +158,7 @@ extension VideoEditResult: Codable {
         try container.encode(editedFileSize, forKey: .editedFileSize)
         try container.encode(videoTime, forKey: .videoTime)
         try container.encode(videoDuration, forKey: .videoDuration)
+        try container.encode(hasOriginalSound, forKey: .hasOriginalSound)
         try container.encode(videoSoundVolume, forKey: .videoSoundVolume)
         try container.encode(backgroundMusicURL, forKey: .backgroundMusicURL)
         try container.encode(backgroundMusicVolume, forKey: .backgroundMusicVolume)

@@ -201,17 +201,10 @@ extension PhotoPickerViewCell {
         if !didLoadCompletion {
             return
         }
-        switch photoAsset.mediaSubType {
-        case .imageAnimated, .localGifImage:
+        if photoAsset.isGifAsset {
             assetTypeLb.text = "GIF"
             assetTypeMaskView.isHidden = false
-        case .networkImage(let isGif):
-            assetTypeLb.text = isGif ? "GIF" : nil
-            assetTypeMaskView.isHidden = !isGif
-        case .livePhoto:
-            assetTypeLb.text = "Live"
-            assetTypeMaskView.isHidden = false
-        case .video, .localVideo, .networkVideo:
+        }else if photoAsset.mediaSubType.isVideo {
             if let videoTime = photoAsset.videoTime {
                 assetTypeLb.text = videoTime
             }else {
@@ -232,7 +225,11 @@ extension PhotoPickerViewCell {
 //                    assetTypeIcon.image = UIImage.image(for: "hx_picker_cell_video_edit_icon")
 //                }
 //                #endif
-        default:
+        }else if photoAsset.mediaSubType == .livePhoto ||
+                    photoAsset.mediaSubType == .localLivePhoto {
+            assetTypeLb.text = "Live"
+            assetTypeMaskView.isHidden = false
+        }else {
             assetTypeLb.text = nil
             assetTypeMaskView.isHidden = true
         }
@@ -240,11 +237,9 @@ extension PhotoPickerViewCell {
         if photoAsset.mediaType == .photo {
             #if HXPICKER_ENABLE_EDITOR
             if let photoEdit = photoAsset.photoEdit {
-                if photoEdit.imageType == .normal {
-                    assetTypeLb.text = nil
-                }
-                assetEditMarkIcon.isHidden = false
-                assetTypeMaskView.isHidden = false
+                assetTypeLb.text = photoEdit.imageType == .gif ? "GIF" : nil
+                assetEditMarkIcon.isHidden = photoEdit.imageType != .gif
+                assetTypeMaskView.isHidden = photoEdit.imageType != .gif
             }
             #endif
         }

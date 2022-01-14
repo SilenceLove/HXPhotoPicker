@@ -54,22 +54,6 @@ extension PhotoTools {
         return nil
     }
     
-    static func checkNetworkURL(for url: URL) -> Bool {
-        if checkLocalURL(for: url.path) {
-            return false
-        }
-        if let scheme = url.scheme {
-            if scheme == "http" || scheme == "https" {
-                return true
-            }
-        }
-        return UIApplication.shared.canOpenURL(url)
-    }
-    
-    static func checkLocalURL(for path: String) -> Bool {
-        FileManager.default.fileExists(atPath: path)
-    }
-    
     static func getFrameDuration(from gifInfo: [String: Any]?) -> TimeInterval {
         let defaultFrameDuration = 0.1
         guard let gifInfo = gifInfo else { return defaultFrameDuration }
@@ -102,8 +86,7 @@ extension PhotoTools {
            let lrc = "天外来物".lrc {
             let info = VideoEditorMusicInfo(
                 audioURL: audioURL,
-                lrc: lrc,
-                urlType: .network
+                lrc: lrc
             )
             infos.append(info)
         }
@@ -134,15 +117,6 @@ extension PhotoTools {
     public static func defaultFilters() -> [PhotoEditorFilterInfo] {
         [
             PhotoEditorFilterInfo(
-                filterName: "老电影".localized,
-                defaultValue: 1
-            ) { (image, lastImage, value, event) in
-                if event == .touchUpInside {
-                    return oldMovie(image, value: value)
-                }
-                return nil
-            },
-            PhotoEditorFilterInfo(
                 filterName: "怀旧".localized
             ) { (image, _, _, _) in
                 image.filter(
@@ -151,18 +125,10 @@ extension PhotoTools {
                 )
             },
             PhotoEditorFilterInfo(
-                filterName: "黑白".localized
+                filterName: "岁月".localized
             ) { (image, _, _, _) in
                 image.filter(
-                    name: "CIPhotoEffectNoir",
-                    parameters: [:]
-                )
-            },
-            PhotoEditorFilterInfo(
-                filterName: "色调".localized
-            ) { (image, _, _, _) in
-                image.filter(
-                    name: "CIPhotoEffectTonal",
+                    name: "CIPhotoEffectTransfer",
                     parameters: [:]
                 )
             },
@@ -179,22 +145,6 @@ extension PhotoTools {
                     )
                 }
                 return nil
-            },
-            PhotoEditorFilterInfo(
-                filterName: "岁月".localized
-            ) { (image, _, _, _) in
-                image.filter(
-                    name: "CIPhotoEffectTransfer",
-                    parameters: [:]
-                )
-            },
-            PhotoEditorFilterInfo(
-                filterName: "单色".localized
-            ) { (image, _, _, _) in
-                image.filter(
-                    name: "CIPhotoEffectMono",
-                    parameters: [:]
-                )
             },
             PhotoEditorFilterInfo(
                 filterName: "褪色".localized
@@ -219,15 +169,170 @@ extension PhotoTools {
                     name: "CIPhotoEffectChrome",
                     parameters: [:]
                 )
+            },
+            PhotoEditorFilterInfo(
+                filterName: "老电影".localized,
+                defaultValue: 1
+            ) { (image, lastImage, value, event) in
+                if event == .touchUpInside {
+                    return oldMovie(image, value: value) as? UIImage
+                }
+                return nil
+            },
+            PhotoEditorFilterInfo(
+                filterName: "色调".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectTonal",
+                    parameters: [:]
+                )
+            },
+            PhotoEditorFilterInfo(
+                filterName: "单色".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectMono",
+                    parameters: [:]
+                )
+            },
+            PhotoEditorFilterInfo(
+                filterName: "黑白".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectNoir",
+                    parameters: [:]
+                )
+            }
+        ]
+    }
+    
+    public static func defaultVideoFilters() -> [PhotoEditorFilterInfo] {
+        [
+            PhotoEditorFilterInfo(
+                filterName: "怀旧".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectInstant",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectInstant", parameters: [:])
+            },
+            PhotoEditorFilterInfo(
+                filterName: "岁月".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectTransfer",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectTransfer", parameters: [:])
+            },
+            PhotoEditorFilterInfo(
+                filterName: "模糊".localized,
+                defaultValue: 0.5
+            ) { (image, lastImage, value, event) in
+                if event == .touchUpInside {
+                    return image.filter(
+                        name: "CIGaussianBlur",
+                        parameters: [
+                            kCIInputRadiusKey: NSNumber(value: 10 * value)
+                        ]
+                    )
+                }
+                return nil
+            } videoFilterHandler: {
+                $0.filter(
+                    name: "CIGaussianBlur",
+                    parameters: [
+                        kCIInputRadiusKey: NSNumber(value: 10 * $1)
+                    ]
+                )
+            },
+            PhotoEditorFilterInfo(
+                filterName: "褪色".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectFade",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectFade", parameters: [:])
+            },
+            PhotoEditorFilterInfo(
+                filterName: "冲印".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectProcess",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectProcess", parameters: [:])
+            },
+            PhotoEditorFilterInfo(
+                filterName: "铬黄".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectChrome",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectChrome", parameters: [:])
+            },
+            PhotoEditorFilterInfo(
+                filterName: "老电影".localized,
+                defaultValue: 1
+            ) { (image, lastImage, value, event) in
+                if event == .touchUpInside {
+                    return oldMovie(image, value: value) as? UIImage
+                }
+                return nil
+            } videoFilterHandler: {
+                oldMovie($0, value: $1) as? CIImage
+            },
+            PhotoEditorFilterInfo(
+                filterName: "色调".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectTonal",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectTonal", parameters: [:])
+            },
+            PhotoEditorFilterInfo(
+                filterName: "单色".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectMono",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectMono", parameters: [:])
+            },
+            PhotoEditorFilterInfo(
+                filterName: "黑白".localized
+            ) { (image, _, _, _) in
+                image.filter(
+                    name: "CIPhotoEffectNoir",
+                    parameters: [:]
+                )
+            } videoFilterHandler: { ciImage, _ in
+                ciImage.filter(name: "CIPhotoEffectNoir", parameters: [:])
             }
         ]
     }
     
     static func oldMovie(
-        _ image: UIImage,
+        _ image: Any,
         value: Float
-    ) -> UIImage? {
-        let inputImage = CIImage.init(image: image)!
+    ) -> Any? {
+        let inputImage: CIImage
+        if image is UIImage {
+            inputImage = CIImage.init(image: image as! UIImage)!
+        }else {
+            inputImage = image as! CIImage
+        }
         let sepiaToneFilter = CIFilter(name: "CISepiaTone")!
         sepiaToneFilter.setValue(inputImage, forKey: kCIInputImageKey)
         sepiaToneFilter.setValue(value, forKey: kCIInputIntensityKey)
@@ -275,10 +380,14 @@ extension PhotoTools {
         multiplyCompositingFilter.setValue(minimumComponentFilter.outputImage, forKey: kCIInputBackgroundImageKey)
         multiplyCompositingFilter.setValue(sourceOverCompositingFilter.outputImage, forKey: kCIInputImageKey)
         let outputImage = multiplyCompositingFilter.outputImage!
-        let context = CIContext(options: nil)
-        if let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
-            return UIImage(cgImage: cgImage)
+        if image is UIImage {
+            let context = CIContext(options: nil)
+            if let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
+                return UIImage(cgImage: cgImage)
+            }
+            return nil
+        }else {
+            return outputImage
         }
-        return nil
     }
 }

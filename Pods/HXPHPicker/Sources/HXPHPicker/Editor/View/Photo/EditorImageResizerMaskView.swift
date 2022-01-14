@@ -61,7 +61,7 @@ public class EditorImageResizerMaskView: UIView {
     }()
     /// 圆形裁剪框
     var isRoundCrop: Bool = false
-    var animationDuration: TimeInterval = 0.25
+    var animationDuration: TimeInterval = 0.3
     let isMask: Bool
     let maskType: MaskType
     
@@ -99,7 +99,7 @@ public class EditorImageResizerMaskView: UIView {
             if isShow {
                 blackMaskView.isHidden = false
             }
-            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveLinear) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut) {
                 self.blackMaskView.alpha = isShow ? 1 : 0
             } completion: { (_) in
                 if !isShow {
@@ -127,7 +127,8 @@ public class EditorImageResizerMaskView: UIView {
                     "path",
                     maskLayer.path,
                     maskPath.cgPath,
-                    animationDuration
+                    animationDuration,
+                    .easeOut
                 )
                 maskLayer.add(maskAnimation, forKey: nil)
             }
@@ -162,7 +163,8 @@ public class EditorImageResizerMaskView: UIView {
                     "path",
                     frameLayer.path,
                     framePath.cgPath,
-                    animationDuration
+                    animationDuration,
+                    .easeOut
                 )
                 frameLayer.add(frameAnimation, forKey: nil)
                 if !isRoundCrop {
@@ -170,13 +172,15 @@ public class EditorImageResizerMaskView: UIView {
                         "path",
                         gridlinesLayer.path,
                         gridlinePath.cgPath,
-                        animationDuration
+                        animationDuration,
+                        .easeOut
                     )
                     gridlinesLayer.add(gridlinesAnimation, forKey: nil)
                     let dotsAnimation = PhotoTools.getBasicAnimation(
                         "path",
                         dotsLayer.path,
-                        dotsPath.cgPath, animationDuration
+                        dotsPath.cgPath, animationDuration,
+                        .easeOut
                     )
                     dotsLayer.add(dotsAnimation, forKey: nil)
                 }

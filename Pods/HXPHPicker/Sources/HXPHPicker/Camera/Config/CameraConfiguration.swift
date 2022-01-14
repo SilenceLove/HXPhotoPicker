@@ -20,14 +20,19 @@ public class CameraConfiguration: BaseConfiguration {
     /// 摄像头默认位置
     public var position: DevicePosition = .back
     
-    /// 闪光灯模式
+    /// 默认闪光灯模式
     public var flashMode: AVCaptureDevice.FlashMode = .auto
     
     /// 视频最大录制时长
+    /// takePhotoMode = .click 支持不限制最大时长 (0 - 不限制)
+    /// takePhotoMode = .press 最小 1
     public var videoMaximumDuration: TimeInterval = 60
     
     /// 视频最短录制时长
     public var videoMinimumDuration: TimeInterval = 1
+    
+    /// 拍照方式
+    public var takePhotoMode: TakePhotoMode = .press
     
     /// 主题色
     public var tintColor: UIColor = .systemTintColor {
@@ -104,6 +109,13 @@ extension CameraConfiguration {
         case back
         /// 前置
         case front
+    }
+    
+    public enum TakePhotoMode {
+        /// 长按
+        case press
+        /// 点击（支持不限制最大时长）
+        case click
     }
     
     public enum Preset {

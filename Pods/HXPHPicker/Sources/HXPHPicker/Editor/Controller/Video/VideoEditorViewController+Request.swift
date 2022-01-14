@@ -63,7 +63,9 @@ extension VideoEditorViewController {
     
     func assetRequestComplete() {
         let image = PhotoTools.getVideoThumbnailImage(avAsset: avAsset, atTime: 0.1)
+        filterImageHandler(image: image)
         videoSize = image?.size ?? view.size
+        coverImage = image
         videoView.setAVAsset(avAsset, coverImage: image ?? .init())
         cropView.avAsset = avAsset
         if orientationDidChange {
@@ -97,8 +99,14 @@ extension VideoEditorViewController {
         }
         videoView.playerView.configAsset()
         if let editResult = editResult {
-            videoView.playerView.player.volume = editResult.videoSoundVolume
-            musicView.originalSoundButton.isSelected = editResult.videoSoundVolume > 0
+            hasOriginalSound = editResult.hasOriginalSound
+            if hasOriginalSound {
+                videoVolume = editResult.videoSoundVolume
+            }else {
+                videoView.playerView.player.volume = 0
+            }
+            volumeView.originalVolume = videoVolume
+            musicView.originalSoundButton.isSelected = hasOriginalSound
             if let audioURL = editResult.backgroundMusicURL {
                 backgroundMusicPath = audioURL.path
                 musicView.backgroundButton.isSelected = true
@@ -106,13 +114,46 @@ extension VideoEditorViewController {
                 }
                 videoView.imageResizerView.imageView.stickerView.audioView?.contentView.startTimer()
                 backgroundMusicVolume = editResult.backgroundMusicVolume
+                volumeView.musicVolume = backgroundMusicVolume
             }
             if !orientationDidChange && editResult.cropData != nil {
                 videoView.playerView.resetPlay()
                 startPlayTimer()
             }
+            if let videoFilter = editResult.sizeData?.filter,
+               config.filter.isLoadLastFilter,
+               videoFilter.index < config.filter.infos.count {
+                let filterInfo = config.filter.infos[videoFilter.index]
+                videoView.playerView.setFilter(filterInfo, value: videoFilter.value)
+            }
+            videoView.imageResizerView.videoFilter = editResult.sizeData?.filter
         }
         setAssetCompletion = true
+    }
+    
+    func filterImageHandler(image: UIImage?) {
+        guard let image = image else {
+            return
+        }
+        var hasFilter = false
+        var thumbnailImage: UIImage?
+        for option in config.toolView.toolOptions where option.type == .filter {
+            hasFilter = true
+        }
+        if hasFilter {
+            DispatchQueue.global().async {
+                thumbnailImage = image.scaleToFillSize(
+                    size: CGSize(width: 80, height: 80),
+                    equalRatio: true
+                )
+                if thumbnailImage == nil {
+                    thumbnailImage = image
+                }
+                DispatchQueue.main.async {
+                    self.filterView.image = thumbnailImage
+                }
+            }
+        }
     }
 }
 

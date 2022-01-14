@@ -172,11 +172,14 @@ extension PhotoAsset {
             var image: UIImage?
             if let img = localImageAsset?.image {
                 image = img
-            }else  if let imageURL = self.localImageAsset?.imageURL,
+            }else  if let imageURL = localImageAsset?.imageURL,
                let img = UIImage(contentsOfFile: imageURL.path) {
                 localImageAsset?.image = img
                 image = img
-            }
+            }else if let imageURL = localLivePhoto?.imageURL,
+                     let img = UIImage(contentsOfFile: imageURL.path) {
+                image = img
+           }
             if let image = image, urlType == .thumbnail {
                 DispatchQueue.global().async {
                     let thumbnail = image.scaleToFillSize(
@@ -264,14 +267,14 @@ extension PhotoAsset {
     
     func getLocalImageAssetURL() -> URL? {
         #if HXPICKER_ENABLE_EDITOR
-        if photoEdit == nil {
-            return localImageAsset?.imageURL
-        }else {
+        if photoEdit != nil {
             return nil
         }
-        #else
-        return localImageAsset?.imageURL
         #endif
+        if mediaSubType == .localLivePhoto {
+            return localLivePhoto?.imageURL
+        }
+        return localImageAsset?.imageURL
     }
     func getLocalImageData() -> Data? {
         #if HXPICKER_ENABLE_EDITOR
@@ -286,6 +289,9 @@ extension PhotoAsset {
             return imageData
         }else if let localImage = localImageAsset?.image,
                  let imageData = PhotoTools.getImageData(for: localImage) {
+            return imageData
+        }else if let imageURL = localLivePhoto?.imageURL,
+                 let imageData = try? Data(contentsOf: imageURL) {
             return imageData
         }else {
             if mediaType == .video {

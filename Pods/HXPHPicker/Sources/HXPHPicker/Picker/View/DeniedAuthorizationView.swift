@@ -94,7 +94,7 @@ class DeniedAuthorizationView: UIView {
         jumpBtn.setTitleColor(isDark ? config.jumpButtonTitleDarkColor : config.jumpButtonTitleColor, for: .normal)
     }
     @objc func didCloseClick() {
-        self.viewController()?.dismiss(animated: true, completion: nil)
+        self.viewController?.dismiss(animated: true, completion: nil)
     }
     @objc func jumpSetting() {
         PhotoTools.openSettingsURL()
@@ -104,7 +104,7 @@ class DeniedAuthorizationView: UIView {
         super.layoutSubviews()
         var barHeight: CGFloat = 0
         var barY: CGFloat = 0
-        if let pickerController = viewController() as? PhotoPickerController {
+        if let pickerController = viewController as? PhotoPickerController {
             barHeight = pickerController.navigationBar.height
             if pickerController.modalPresentationStyle == .fullScreen {
                 barY = UIDevice.statusBarHeight

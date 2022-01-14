@@ -37,8 +37,6 @@ open class PreviewVideoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDe
         }
     }
     
-    var statusBarShouldBeHidden = false
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         scrollContentView = PhotoPreviewContentView.init(type: .video)

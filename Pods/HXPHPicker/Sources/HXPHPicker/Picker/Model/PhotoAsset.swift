@@ -95,6 +95,9 @@ open class PhotoAsset: Equatable {
         setMediaType()
     }
     
+    /// 本地图片
+    public var localImageAsset: LocalImageAsset?
+    
     /// 初始化本地图片
     /// - Parameters:
     ///   - localImageAsset: 对应本地图片的 LocalImageAsset
@@ -109,6 +112,9 @@ open class PhotoAsset: Equatable {
             mediaSubType = .localImage
         }
     }
+    
+    /// 本地视频
+    public var localVideoAsset: LocalVideoAsset?
     
     /// 初始化本地视频
     /// - Parameters:
@@ -126,10 +132,15 @@ open class PhotoAsset: Equatable {
         mediaType = .video
         mediaSubType = .localVideo
     }
-    /// 本地图片
-    public var localImageAsset: LocalImageAsset?
-    /// 本地视频
-    public var localVideoAsset: LocalVideoAsset?
+    /// 本地LivePhoto
+    public var localLivePhoto: LocalLivePhotoAsset?
+    
+    /// 初始化本地LivePhoto
+    public init(localLivePhoto: LocalLivePhotoAsset) {
+        mediaType = .photo
+        mediaSubType = .localLivePhoto
+        self.localLivePhoto = localLivePhoto
+    }
     
     /// 本地/网络Asset的唯一标识符
     public private(set) lazy var localAssetIdentifier: String = UUID().uuidString
@@ -190,16 +201,20 @@ open class PhotoAsset: Equatable {
 
 // MARK: Self-use
 extension PhotoAsset {
-     
-    func copyCamera() -> PhotoAsset {
-        var photoAsset: PhotoAsset
+    
+    var cameraAsset: PhotoAsset? {
+        var photoAsset: PhotoAsset?
         if mediaType == .photo {
-            photoAsset = PhotoAsset.init(localImageAsset: localImageAsset!)
+            if let localImageAsset = localImageAsset {
+                photoAsset = PhotoAsset(localImageAsset: localImageAsset)
+            }
         }else {
-            photoAsset = PhotoAsset.init(localVideoAsset: localVideoAsset!)
+            if let localVideoAsset = localVideoAsset {
+                photoAsset = PhotoAsset(localVideoAsset: localVideoAsset)
+            }
         }
-        photoAsset.localAssetIdentifier = localAssetIdentifier
-        photoAsset.localIndex = localIndex
+        photoAsset?.localAssetIdentifier = localAssetIdentifier
+        photoAsset?.localIndex = localIndex
         return photoAsset
     }
     
@@ -227,10 +242,13 @@ extension PhotoAsset {
         #endif
         guard let phAsset = phAsset else {
             if mediaType == .photo {
+                if let livePhoto = localLivePhoto {
+                    return UIImage(contentsOfFile: livePhoto.imageURL.path)
+                }
                 if let image = localImageAsset?.image {
                     return image
                 }else if let imageURL = localImageAsset?.imageURL {
-                    let image = UIImage.init(contentsOfFile: imageURL.path)
+                    let image = UIImage(contentsOfFile: imageURL.path)
                     localImageAsset?.image = image
                 }
                 return localImageAsset?.image
@@ -285,17 +303,25 @@ extension PhotoAsset {
             if let localImage = localImageAsset?.image {
                 size = localImage.size
             }else if let localImageData = localImageAsset?.imageData,
-                     let image = UIImage.init(data: localImageData) {
+                     let image = UIImage(data: localImageData) {
                 size = image.size
             }else if let imageURL = localImageAsset?.imageURL,
-                     let image = UIImage.init(contentsOfFile: imageURL.path) {
+                     let image = UIImage(contentsOfFile: imageURL.path) {
                 localImageAsset?.image = image
                 size = image.size
-            }else if let videoSize = localVideoAsset?.videoSize,
-                     !videoSize.equalTo(.zero) {
-                size = videoSize
-            }else if let localImage = localVideoAsset?.image {
-                size = localImage.size
+            }else if let localLivePhoto = localLivePhoto,
+                     let image = UIImage(contentsOfFile: localLivePhoto.imageURL.path) {
+                size = image.size
+            }else if let localVideoAsset = localVideoAsset {
+                if !localVideoAsset.videoSize.equalTo(.zero) {
+                    size = localVideoAsset.videoSize
+                }else if let localImage = localVideoAsset.image {
+                    size = localImage.size
+                }else {
+                    let image = PhotoTools.getVideoThumbnailImage(videoURL: localVideoAsset.videoURL, atTime: 0.1)
+                    self.localVideoAsset?.image = image
+                    size = image?.size ?? .init(width: 200, height: 200)
+                }
             }else if let networkVideo = networkVideoAsset {
                 if !networkVideo.videoSize.equalTo(.zero) {
                     size = networkVideo.videoSize
@@ -404,7 +430,7 @@ extension PhotoAsset {
             if mediaSubType == .imageAnimated {
                 suffix = "gif"
             }else {
-                suffix = "jpeg"
+                suffix = "png"
             }
             imageFileURL = PhotoTools.getTmpURL(for: suffix)
         }

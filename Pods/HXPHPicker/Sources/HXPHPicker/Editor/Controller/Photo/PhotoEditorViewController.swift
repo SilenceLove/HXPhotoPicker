@@ -272,12 +272,9 @@ open class PhotoEditorViewController: BaseViewController {
     var isFilter = false
     var filterImage: UIImage?
     lazy var filterView: PhotoEditorFilterView = {
-        let filter = editResult?.editedData.filter
-        let value = editResult?.editedData.filterValue
         let view = PhotoEditorFilterView(
             filterConfig: config.filter,
-            sourceIndex: filter?.sourceIndex ?? -1,
-            value: value ?? 0
+            hasLastFilter: editResult?.editedData.hasFilter ?? false
         )
         view.delegate = self
         return view
@@ -362,6 +359,8 @@ open class PhotoEditorViewController: BaseViewController {
         }
     }
     open override func deviceOrientationWillChanged(notify: Notification) {
+        orientationDidChange = true
+        imageViewDidChange = false
         if showChartlet {
             singleTap()
         }
@@ -383,8 +382,8 @@ open class PhotoEditorViewController: BaseViewController {
         croppingAction()
     }
     open override func deviceOrientationDidChanged(notify: Notification) {
-        orientationDidChange = true
-        imageViewDidChange = false
+//        orientationDidChange = true
+//        imageViewDidChange = false
     }
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -408,14 +407,14 @@ open class PhotoEditorViewController: BaseViewController {
             topView.y = UIDevice.generalStatusBarHeight
         }
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
-        let cropToolFrame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
+        let cropToolFrame = CGRect(x: 0, y: toolView.y - 60, width: view.width, height: 60)
         if toolOptions.contains(.cropSize) {
             cropConfirmView.frame = toolView.frame
             cropToolView.frame = cropToolFrame
             cropToolView.updateContentInset()
         }
         if toolOptions.contains(.graffiti) {
-            brushColorView.frame = CGRect(x: 0, y: cropConfirmView.y - 85, width: view.width, height: 85)
+            brushColorView.frame = CGRect(x: 0, y: toolView.y - 85, width: view.width, height: 85)
         }
         if toolOptions.contains(.mosaic) {
             mosaicToolView.frame = cropToolFrame

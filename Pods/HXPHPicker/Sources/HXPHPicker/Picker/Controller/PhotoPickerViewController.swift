@@ -281,7 +281,11 @@ public class PhotoPickerViewController: BaseViewController {
         var collectionTop: CGFloat = UIDevice.navigationBarHeight
         if let nav = navigationController {
             if nav.modalPresentationStyle == .fullScreen && UIDevice.isPortrait {
-                collectionTop = UIDevice.navigationBarHeight
+                if UIApplication.shared.isStatusBarHidden {
+                    collectionTop = nav.navigationBar.height + UIDevice.generalStatusBarHeight
+                }else {
+                    collectionTop = UIDevice.navigationBarHeight
+                }
             }else {
                 collectionTop = nav.navigationBar.height
             }

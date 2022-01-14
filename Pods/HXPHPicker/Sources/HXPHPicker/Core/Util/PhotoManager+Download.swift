@@ -106,7 +106,14 @@ extension PhotoManager: URLSessionDownloadDelegate {
         downloadTask: URLSessionDownloadTask,
         didFinishDownloadingTo location: URL
     ) {
-        let responseURL = downloadTask.currentRequest!.url!
+        let responseURL: URL
+        if let url = downloadTask.originalRequest?.url {
+            responseURL = url
+        }else if let url = downloadTask.currentRequest?.url {
+            responseURL = url
+        }else {
+            return
+        }
         let key = responseURL.absoluteString
         let completionHandler = downloadCompletions[key]
         let ext = downloadExts[key]
@@ -150,7 +157,12 @@ extension PhotoManager: URLSessionDownloadDelegate {
         task: URLSessionTask,
         didCompleteWithError error: Error?
     ) {
-        guard let responseURL = task.currentRequest?.url else {
+        let responseURL: URL
+        if let url = task.originalRequest?.url {
+            responseURL = url
+        }else if let url = task.currentRequest?.url {
+            responseURL = url
+        }else {
             return
         }
         let key = responseURL.absoluteString

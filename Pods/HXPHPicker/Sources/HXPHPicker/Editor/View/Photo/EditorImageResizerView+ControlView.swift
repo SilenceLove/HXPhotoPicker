@@ -154,7 +154,7 @@ extension EditorImageResizerView: EditorImageResizerControlViewDelegate {
             UIView.animate(
                 withDuration: animationDuration,
                 delay: 0,
-                options: [.curveLinear]
+                options: [.curveEaseOut]
             ) {
                 self.updateScrollViewContentInset(rect)
                 if needZoomScale {

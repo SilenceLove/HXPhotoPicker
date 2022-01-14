@@ -7,77 +7,83 @@
 <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
 </p>
 
-## <a id="功能"></a> 功能
+`HXPHPicker` is a photo/video selector-supports LivePhoto, GIF selection, iCloud resource online download, photo/video editing
 
-- [x] UI 外观支持浅色/深色/自动/自定义
-- [x] 支持多选/混合内容选择
-- [x] 支持的媒体类型：
+> [中文说明](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/README_CN.md)
+
+## <a id="Features"></a> Features
+
+- [x] UI Appearance supports light/dark/auto/custom
+- [x] Support multiple selection/mixed content selection
+- [x] Supported media types：
     - [x] Photo
     - [x] GIF
     - [x] Live Photo
     - [x] Video
-- [x] 支持的本地资源类型：
+- [x] Supported local media types：
     - [x] Photo
     - [x] Video
     - [x] GIF
-    - [ ] Live Photo
-- [x] 支持的网络资源类型：
+    - [x] Live Photo
+- [x] Supported network media types：
     - [x] Photo
     - [x] Video
-- [x] 支持下载iCloud上的资源
-- [x] 支持手势返回
-- [x] 支持滑动选择
-- [x] 编辑图片（支持动图、网络资源）
-    - [x] 涂鸦
-    - [x] 贴纸
-    - [x] 文字
-    - [x] 裁剪
-    - [x] 马赛克
-    - [x] 滤镜
-- [x] 编辑视频（支持网络资源）
-    - [x] 涂鸦
-    - [x] 贴纸（支持GIF）
-    - [x] 文字
-    - [x] 配乐（支持歌词字幕）
-    - [x] 裁剪
-- [x] 相册展现方式
-    - [x] 单独列表
-    - [x] 弹窗
-- [x] 多平台支持
+- [x] Support downloading assets on iCloud
+- [x] Support gesture back
+- [x] Support sliding selection
+- [x] Edit pictures (support animated pictures, network pictures)
+    - [x] Graffiti
+    - [x] Sticker
+    - [x] Text
+    - [x] Crop
+    - [x] Mosaic
+    - [x] Filter
+- [x] Edit video (support network video)
+    - [x] Graffiti
+    - [x] Stickers (support GIF)
+    - [x] Text
+    - [x] Soundtrack (support lyrics and subtitles)
+    - [x] Crop
+    - [x] Filter
+- [x] Album display mode
+    - [x] Separate list
+    - [x] Pop-ups
+- [x] Multi-platform support
     - [x] iOS
     - [x] iPadOS
-- [x] 国际化支持
-    - [x] 英文 (en)
-    - [x] 简体中文 (zh-Hans)
-    - [x] 繁体中文 (zh-Hant)
-    - [x] 日语 (ja)
-    - [x] 韩语 (ko)
-    - [x] 泰语 (th)
-    - [x] 印尼语 (id)
-    - [x] 自定义语言 (custom)
-    - [ ] 更多支持... (欢迎PR)
+- [x] Internationalization support
+    - [x] English (en)
+    - [x] Chinese, Simplified (zh-Hans)
+    - [x] Chinese, traditional (zh-Hant)
+    - [x] Japanese (ja)
+    - [x] Korean (ko)
+    - [x] Thai (th)
+    - [x] Indonesian (id)
+    - [x] Vietnamese (vi)
+    - [x] Custom language (custom)
+    - [ ] More support... (Pull requests welcome)
 
-## <a id="要求"></a> 要求
+## <a id="Requirements"></a> Requirements
 
 - iOS 12.0+
 - Xcode 12.5+
 - Swift 5.4+
 
-## 安装
+## Installation
 
 ### [Swift Package Manager](https://swift.org/package-manager/)
 
-⚠️ 需要 Xcode 12.0 及以上版本来支持资源文件/本地化文件的添加。
+⚠️ Needs Xcode 12.0+ to support resources and localization files
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.3.0"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.3.1"))
 ]
 ```
 
 ### [CocoaPods](https://guides.cocoapods.org/using/using-cocoapods.html)
 
-将下面内容添加到 `Podfile`，并执行依赖更新。
+Add this to Podfile, and then update dependency:
 
 ```swift
 pod 'HXPHPicker'
@@ -85,71 +91,71 @@ pod 'HXPHPicker'
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
-将下面内容添加到 `Cartfile`，并执行依赖更新。
+Add the following content to `Cartfile` and perform dependency update.
 
 ```swift
 github "SilenceLove/HXPHPicker"
 ```
 
-## 使用方法
+## Usage
 
-> 我们在 [Wiki](https://github.com/SilenceLove/HXPHPicker/wiki) 中提供了更详细的使用说明。
+> [Wiki](https://github.com/SilenceLove/HXPHPicker/wiki)
 
-### 准备工作
+### Prepare
 
-按需在你的 Info.plist 中添加以下键值:
+Add these keys to your Info.plist when needed:
 
-| Key | 模块 | 备注 |
+| Key | Module | Info |
 | ----- | ----  | ---- |
-| NSPhotoLibraryUsageDescription | Picker | 允许访问相册 |
-| NSPhotoLibraryAddUsageDescription | Picker | 允许保存图片至相册 |
-| PHPhotoLibraryPreventAutomaticLimitedAccessAlert | Picker | 设置为 `YES` iOS 14+ 以禁用自动弹出添加更多照片的弹框(Picker 已适配 Limited 功能，可由用户主动触发，提升用户体验)|
-| NSCameraUsageDescription | Camera | 允许使用相机 |
-| NSMicrophoneUsageDescription | Camera | 允许使用麦克风 |
+| NSPhotoLibraryUsageDescription | Picker | Allow access to album |
+| NSPhotoLibraryAddUsageDescription | Picker | Allow to save pictures to album |
+| PHPhotoLibraryPreventAutomaticLimitedAccessAlert | Picker | Set YES to prevent automatic limited access alert in iOS 14+ (Picker has been adapted with Limited features that can be triggered by the user to enhance the user experience) |
+| NSCameraUsageDescription | Camera | Allow camera |
+| NSMicrophoneUsageDescription | Camera | Allow microphone |
 
-### 快速上手
+### Quick Start
 ```swift
 import HXPHPicker
 
 class ViewController: UIViewController {
 
     func presentPickerController() {
-        // 设置与微信主题一致的配置
+        // Set the configuration consistent with the WeChat theme
         let config = PhotoTools.getWXPickerConfig()
         
-        // 方法一：
+        // Method 1：
         let pickerController = PhotoPickerController(picker: config)
         pickerController.pickerDelegate = self
-        // 当前被选择的资源对应的 PhotoAsset 对象数组
+        // The array of PhotoAsset objects corresponding to the currently selected asset
         pickerController.selectedAssetArray = selectedAssets 
-        // 是否选中原图
+        // Whether to select the original image
         pickerController.isOriginal = isOriginal
         present(pickerController, animated: true, completion: nil)
         
-        // 方法二：
+        // Method 2：
         Photo.picker(
             config
         ) { result, pickerController in
-            // 选择完成的回调
-            // result 选择结果
-            //  .photoAssets 当前选择的数据
-            //  .isOriginal 是否选中了原图
-            // photoPickerController 对应的照片选择控制器
+            // Select completion callback
+            // result Select result
+            //  .photoAssets Currently selected data
+            //  .isOriginal Whether the original image is selected
+            // photoPickerController Corresponding photo selection controller
         } cancel: { pickerController in
-            // 取消的回调
-            // photoPickerController 对应的照片选择控制器 
+            // Cancelled callback
+            // photoPickerController Corresponding photo selection controller
         }
     }
 }
 
 extension ViewController: PhotoPickerControllerDelegate {
     
-    /// 选择完成之后调用
+    /// Called after the selection is complete
     /// - Parameters:
-    ///   - pickerController: 对应的 PhotoPickerController
-    ///   - result: 选择的结果
-    ///     result.photoAssets  选择的资源数组
-    ///     result.isOriginal   是否选中原图
+    ///   - pickerController: corresponding PhotoPickerController
+    ///   - result: Selected result
+    ///     result.photoAssets  Selected asset array
+    ///     result.isOriginal   Whether to select the original image
     func pickerController(_ pickerController: PhotoPickerController, 
                             didFinishSelection result: PickerResult) {
         result.getImage { (image, photoAsset, index) in
@@ -163,28 +169,27 @@ extension ViewController: PhotoPickerControllerDelegate {
         }
     }
     
-    /// 点击取消时调用
-    /// - Parameter pickerController: 对应的 PhotoPickerController
+    /// Called when cancel is clicked
+    /// - Parameter pickerController: Corresponding PhotoPickerController
     func pickerController(didCancel pickerController: PhotoPickerController) {
         
     }
 }
 ```
 
-## 更新日志
+## Release Notes
 
-| 版本 | 发布时间 | Xcode | Swift | iOS |
+| Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v1.3.2](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#132) | 2022-01-14 | 13.1.0 | 5.4.2 | 12.0+ |
+| [v1.3.1](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#131) | 2022-01-05 | 13.1.0 | 5.4.2 | 12.0+ |
 | [v1.3.0](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#130) | 2021-12-16 | 13.1.0 | 5.4.2 | 12.0+ |
 | [v1.2.9](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#129) | 2021-12-02 | 13.1.0 | 5.4.2 | 12.0+ |
 | [v1.2.8](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#128) | 2021-11-26 | 12.5.1 | 5.4.2 | 12.0+ |
 
-## 版权协议
+## License
 
-HXPHPicker 基于 MIT 协议进行分发和使用，更多信息参见[协议文件](./LICENSE)。
+HXPHPicker is released under the MIT license. See LICENSE for details.
 
 
-## 👨🏻‍💻
-<img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/IMG_3838(20211015-101117).PNG" width="200" height="200">
-
-[回到顶部](#readme)
+[Top](#readme)

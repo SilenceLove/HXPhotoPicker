@@ -34,7 +34,7 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             timeRang = .zero
         }
         let hasAudio: Bool
-        if backgroundMusicPath != nil || videoView.playerView.player.volume < 1 {
+        if backgroundMusicPath != nil || videoVolume < 1 || !hasOriginalSound {
             hasAudio = true
         }else {
             hasAudio = false
@@ -44,7 +44,8 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             videoView.imageResizerView.hasCropping ||
             videoView.canUndoDraw ||
             videoView.hasFilter ||
-            videoView.hasSticker {
+            videoView.hasSticker ||
+            videoView.imageResizerView.videoFilter != nil {
             hasCropSize = true
         }else {
             hasCropSize = false
@@ -91,7 +92,7 @@ extension VideoEditorViewController: EditorToolViewDelegate {
                     cropSizeData: cropSizeData,
                     audioURL: audioURL,
                     audioVolume: self.backgroundMusicVolume,
-                    originalAudioVolume: self.videoView.playerView.player.volume,
+                       originalAudioVolume: self.hasOriginalSound ? self.videoVolume : 0,
                     exportPreset: self.config.exportPreset,
                     videoQuality: self.config.videoQuality
                 ) {  [weak self] videoURL, error in
@@ -164,7 +165,8 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         let editResult = VideoEditResult(
             editedURL: videoURL,
             cropData: cropData,
-            videoSoundVolume: videoView.playerView.player.volume,
+            hasOriginalSound: hasOriginalSound,
+            videoSoundVolume: videoVolume,
             backgroundMusicURL: backgroundMusicURL,
             backgroundMusicVolume: backgroundMusicVolume,
             sizeData: videoView.getVideoEditedData()
@@ -188,6 +190,8 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             toolChartletClick()
         case .text:
             toolTextClick()
+        case .filter:
+            toolFilterClick()
         default:
             break
         }
@@ -306,6 +310,15 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         let nav = EditorStickerTextController(rootViewController: textVC)
         nav.modalPresentationStyle = config.text.modalPresentationStyle
         present(nav, animated: true, completion: nil)
+    }
+    
+    func toolFilterClick() {
+        toolView.deselected()
+        videoView.drawEnabled = false
+        videoView.stickerEnabled = false
+        hiddenBrushColorView()
+        hidenTopView()
+        showFilterView()
     }
     
     func showBrushColorView() {

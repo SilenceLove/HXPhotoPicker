@@ -164,7 +164,7 @@ class EditorStickerItemView: UIView {
                 isDelete = panIsDelete
             }
             self.delegate?.stickerItemView(touchEnded: self)
-            let rect = convert(contentView.frame, to: superview?.viewController()?.view)
+            let rect = convert(contentView.frame, to: superview?.viewController?.view)
             if let moveToCenter = delegate?.stickerItemView(self, moveToCenter: rect), !isDelete {
                 let keyWindow = UIApplication.shared.keyWindow
                 if let view = keyWindow, moveToCenter,

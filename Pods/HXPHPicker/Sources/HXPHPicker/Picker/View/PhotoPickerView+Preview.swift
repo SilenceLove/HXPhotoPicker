@@ -24,7 +24,7 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
         previewVC.isOriginal = isOriginal
         previewVC.previewViewController?.delegate = self
         previewVC.autoDismiss = false
-        viewController()?.present(previewVC, animated: animated)
+        viewController?.present(previewVC, animated: animated)
     }
     
     func previewViewController(didFinishButton previewController: PhotoPreviewViewController) {

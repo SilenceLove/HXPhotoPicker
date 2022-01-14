@@ -57,7 +57,7 @@ public struct NetworkImageAsset: Codable {
 }
 #endif
 
-/// 网络视频目前只支持下载完之后播放
+/// 网络视频
 public struct NetworkVideoAsset {
     
     /// 网络视频地址

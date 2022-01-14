@@ -192,7 +192,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 if granted {
                     self.presentCameraViewController()
                 }else {
-                    PhotoTools.showNotCameraAuthorizedAlert(viewController: self.viewController())
+                    PhotoTools.showNotCameraAuthorizedAlert(viewController: self.viewController)
                 }
             }
         }else if cell is PhotoPickerLimitCell {
@@ -287,7 +287,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 config: config,
                 delegate: self
             )
-            viewController()?.present(photoEditorVC, animated: animated)
+            viewController?.present(photoEditorVC, animated: animated)
             return true
         }
         #endif
@@ -327,7 +327,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 delegate: self
             )
             videoEditorVC.videoEditor?.coverImage = coverImage
-            viewController()?.present(videoEditorVC, animated: animated)
+            viewController?.present(videoEditorVC, animated: animated)
             return true
         }
         #endif

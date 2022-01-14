@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreLocation
+import AVFoundation
 
 open class CameraController: UINavigationController {
     
@@ -124,5 +125,23 @@ extension CameraController: CameraViewControllerDelegate {
     }
     public func cameraViewController(didCancel cameraViewController: CameraViewController) {
         cameraDelegate?.cameraController(didCancel: self)
+    }
+    public func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        flashModeDidChanged flashMode: AVCaptureDevice.FlashMode
+    ) {
+        cameraDelegate?.cameraController(self, flashModeDidChanged: flashMode)
+    }
+    public func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didSwitchCameraCompletion position: AVCaptureDevice.Position
+    ) {
+        cameraDelegate?.cameraController(self, didSwitchCameraCompletion: position)
+    }
+    public func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didChangeTakeType takeType: CameraBottomViewTakeType
+    ) {
+        cameraDelegate?.cameraController(self, didChangeTakeType: takeType)
     }
 }

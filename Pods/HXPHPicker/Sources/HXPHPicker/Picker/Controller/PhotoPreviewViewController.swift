@@ -222,14 +222,18 @@ public class PhotoPreviewViewController: BaseViewController {
         view.clipsToBounds = true
         initView()
     }
-    public override func deviceOrientationDidChanged(notify: Notification) {
+    public override func deviceOrientationWillChanged(notify: Notification) {
         orientationDidChange = true
-        let cell = getCell(for: currentPreviewIndex)
-        if cell?.photoAsset.mediaSubType == .livePhoto {
-            if #available(iOS 9.1, *) {
-                cell?.scrollContentView.livePhotoView.stopPlayback()
+        if let cell = getCell(for: currentPreviewIndex) {
+            if cell.photoAsset.mediaSubType == .livePhoto ||
+                cell.photoAsset.mediaSubType == .localLivePhoto {
+                if #available(iOS 9.1, *) {
+                    cell.scrollContentView.livePhotoView.stopPlayback()
+                }
             }
         }
+    }
+    public override func deviceOrientationDidChanged(notify: Notification) {
         if config.bottomView.showSelectedView && (isMultipleSelect || isExternalPreview) && config.showBottomView {
             bottomView.selectedView.reloadSectionInset()
         }

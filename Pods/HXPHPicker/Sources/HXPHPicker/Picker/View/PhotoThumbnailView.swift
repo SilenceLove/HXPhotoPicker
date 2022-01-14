@@ -123,7 +123,7 @@ extension PhotoThumbnailView {
                     if image != nil {
                         self.downloadStatus = .succeed
                     }else {
-                        if error!.isTaskCancelled {
+                        if let error = error, error.isTaskCancelled {
                             self.downloadStatus = .canceled
                         }else {
                             self.downloadStatus = .failed

@@ -24,4 +24,12 @@ public enum LanguageType: Int {
     case thai = 6
     /// 印尼语
     case indonesia = 7
+    /// 越南语
+    case vietnamese = 8
+    /// 俄语
+    case russian = 9
+    /// 德语
+    case german = 10
+    /// 法语
+    case french = 11
 }

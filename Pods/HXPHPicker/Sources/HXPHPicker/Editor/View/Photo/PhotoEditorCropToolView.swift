@@ -304,6 +304,7 @@ class PhotoEditorCropToolViewCell: UICollectionViewCell {
         label.textColor = .white
         label.textAlignment = .center
         label.font = UIFont.mediumPingFang(ofSize: 12)
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     var themeColor: UIColor?

@@ -102,7 +102,7 @@ extension PhotoAsset {
     }
     func getLocalFileSize() -> Int {
         var fileSize = 0
-        if self.mediaType == .photo {
+        if mediaType == .photo {
             #if canImport(Kingfisher)
             if let networkImageAsset = networkImageAsset, fileSize == 0 {
                 if networkImageAsset.fileSize > 0 {
@@ -112,6 +112,11 @@ extension PhotoAsset {
                 return fileSize
             }
             #endif
+            if let livePhoto = localLivePhoto {
+                fileSize += PhotoTools.fileSize(atPath: livePhoto.imageURL.path)
+                fileSize += PhotoTools.fileSize(atPath: livePhoto.videoURL.path)
+                return fileSize
+            }
             if let imageData = getLocalImageData() {
                 fileSize = imageData.count
             }

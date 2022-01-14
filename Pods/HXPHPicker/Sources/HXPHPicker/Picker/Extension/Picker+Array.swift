@@ -28,9 +28,9 @@ public extension Array where Element == PhotoAsset {
                 group: group,
                 execute: DispatchWorkItem(block: {
                     let semaphore = DispatchSemaphore(value: 0)
-                    photoAsset.requestImage(compressionScale: compressionScale) { image, phAsset in
-                        imageHandler?(image, phAsset, index)
-                        if let image = image {
+                    photoAsset.requestImage(compressionScale: compressionScale) {
+                        imageHandler?($0, $1, index)
+                        if let image = $0 {
                             images.append(image)
                         }
                         semaphore.signal()
@@ -72,14 +72,14 @@ public extension Array where Element == PhotoAsset {
                         exportSession: { session in
                             exportSession?(session, photoAsset, index)
                         }
-                    ) { result in
-                        switch result {
+                    ) {
+                        switch $0 {
                         case .success(let response):
                             videoURLs.append(response.url)
                         case .failure(_):
                             break
                         }
-                        videoURLHandler?(result, photoAsset, index)
+                        videoURLHandler?($0, photoAsset, index)
                         semaphore.signal()
                     }
                     semaphore.wait()
@@ -153,7 +153,8 @@ public extension Array where Element == PhotoAsset {
                         mediatype = .video
                     }
                     #if HXPICKER_ENABLE_EDITOR
-                    if photoAsset.mediaSubType == .livePhoto &&
+                    if (photoAsset.mediaSubType == .livePhoto ||
+                        photoAsset.mediaSubType == .localLivePhoto) &&
                         photoAsset.photoEdit != nil {
                         mediatype = .photo
                     }
@@ -169,25 +170,26 @@ public extension Array where Element == PhotoAsset {
                         semaphore.signal()
                     }
                     if mediatype == .photo {
-                        if photoAsset.mediaSubType == .livePhoto {
+                        if photoAsset.mediaSubType == .livePhoto ||
+                            photoAsset.mediaSubType == .localLivePhoto {
                             photoAsset.getLivePhotoURL(
                                 compression: compression
-                            ) { result in
-                                resultHandler(result)
+                            ) {
+                                resultHandler($0)
                             }
                         }else {
                             photoAsset.getImageURL(
                                 compressionQuality: compression?.imageCompressionQuality
-                            ) { result in
-                                resultHandler(result)
+                            ) {
+                                resultHandler($0)
                             }
                         }
                     }else {
                         photoAsset.getVideoURL(
                             exportPreset: compression?.videoExportPreset,
                             videoQuality: compression?.videoQuality
-                        ) { result in
-                            resultHandler(result)
+                        ) {
+                            resultHandler($0)
                         }
                     }
                     semaphore.wait()

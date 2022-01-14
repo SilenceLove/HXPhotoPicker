@@ -1,3 +1,5 @@
+> [推荐使用：Swift版本（照片/视频编辑器支持添加滤镜效果）](https://github.com/SilenceLove/HXPHPicker)
+
 <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tip_2.png">
 
 <p align="center">
@@ -8,8 +10,6 @@
 <a href="https://developer.apple.com/Objective-C"><img src="http://img.shields.io/badge/language-ObjC-red.svg?logo=common-workflow-language"></a>
 <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
 </p>
-
-> [Swift版本](https://github.com/SilenceLove/HXPHPicker)
 
 | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/show_tag_4.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_1.PNG"> | <img src="http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/sample_graph_2.PNG"> |
 | ------ | ------ | ------ |

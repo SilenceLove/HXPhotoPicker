@@ -22,12 +22,15 @@ class CameraManager: NSObject {
     
     lazy var movieOutput: AVCaptureMovieFileOutput = {
         let output = AVCaptureMovieFileOutput()
-        let timeScale: Int32 = 30 // FPS
-        let maxDuration = CMTimeMakeWithSeconds(
-            max(1, config.videoMaximumDuration),
-            preferredTimescale: timeScale
-        )
-        output.maxRecordedDuration = maxDuration
+        if config.takePhotoMode == .press ||
+            (config.takePhotoMode == .click && config.videoMaximumDuration > 0) {
+            let timeScale: Int32 = 30 // FPS
+            let maxDuration = CMTimeMakeWithSeconds(
+                max(1, max(1, config.videoMaximumDuration)),
+                preferredTimescale: timeScale
+            )
+            output.maxRecordedDuration = maxDuration
+        }
         return output
     }()
     
@@ -51,7 +54,9 @@ class CameraManager: NSObject {
     )
     
     var activeVideoInput: AVCaptureDeviceInput?
-    private var flashMode: AVCaptureDevice.FlashMode
+    
+    var flashModeDidChanged: ((AVCaptureDevice.FlashMode) -> Void)?
+    private(set) var flashMode: AVCaptureDevice.FlashMode
     private var recordDuration: TimeInterval = 0
     private var photoWillCapture: (() -> Void)?
     private var photoCompletion: ((Data?) -> Void)?
@@ -255,10 +260,13 @@ extension CameraManager {
         return camera.hasFlash
     }
     
+    @discardableResult
     func setFlashMode(_ mode: AVCaptureDevice.FlashMode) -> Bool {
+        if flashMode == mode { return true }
         let contains = flashModeContains(mode)
         if contains {
             flashMode = mode
+            flashModeDidChanged?(flashMode)
         }
         return contains
     }
@@ -529,7 +537,7 @@ extension CameraManager: AVCaptureFileOutputRecordingDelegate {
             block: { [weak self] timer in
                 guard let self = self else { return }
                 let timeElapsed = Date().timeIntervalSince(self.dateVideoStarted)
-                let progress = Float(timeElapsed) / Float(self.config.videoMaximumDuration)
+                let progress = Float(timeElapsed) / Float(max(1, self.config.videoMaximumDuration))
                 self.recordDuration = timeElapsed
                 // VideoOutput configuration is responsible for stopping the recording. Not here.
                 DispatchQueue.main.async {

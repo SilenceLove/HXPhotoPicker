@@ -44,6 +44,13 @@ public extension PhotoAsset {
                     return true
                 }
             }
+            if let localLivePhoto = localLivePhoto,
+               let phLocalLivePhoto = photoAsset.localLivePhoto {
+                if localLivePhoto.imageURL.path == phLocalLivePhoto.imageURL.path &&
+                    localLivePhoto.videoURL.path == phLocalLivePhoto.videoURL.path {
+                    return true
+                }
+            }
             if let localVideoAsset = localVideoAsset,
                let phLocalVideoAsset = photoAsset.localVideoAsset {
                 if localVideoAsset.videoURL == phLocalVideoAsset.videoURL {

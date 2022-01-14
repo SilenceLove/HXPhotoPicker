@@ -66,7 +66,7 @@ extension UIView: HXPickerCompatible {
         }
     }
     
-    func viewController() -> UIViewController? {
+    var viewController: UIViewController? {
         var next = superview
         while next != nil {
             let nextResponder = next?.next
@@ -78,6 +78,19 @@ extension UIView: HXPickerCompatible {
         }
         return nil
     }
+    
+//    func viewController() -> UIViewController? {
+//        var next = superview
+//        while next != nil {
+//            let nextResponder = next?.next
+//            if nextResponder is UINavigationController ||
+//                nextResponder is UIViewController {
+//                return nextResponder as? UIViewController
+//            }
+//            next = next?.superview
+//        }
+//        return nil
+//    }
     
     /// UIView转UIImage
     /// - Returns: UIImage
@@ -127,9 +140,8 @@ public extension HXPickerWrapper where Base: UIView {
         get { base.centerY }
         set { base.centerY = newValue }
     }
-    
-    func viewController() -> UIViewController? {
-        base.viewController()
+    var viewController: UIViewController? {
+        base.viewController
     }
     
     func show(

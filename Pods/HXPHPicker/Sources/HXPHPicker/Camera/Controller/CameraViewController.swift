@@ -20,6 +20,22 @@ open class CameraViewController: BaseViewController {
     /// 内部自动dismiss
     public var autoDismiss: Bool = true
     
+    /// takePhotoMode = .click 拍照类型
+    public var takeType: CameraBottomViewTakeType {
+        bottomView.takeType
+    }
+    
+    /// 闪光灯模式
+    public var flashMode: AVCaptureDevice.FlashMode {
+        cameraManager.flashMode
+    }
+    
+    /// 设置闪光灯模式
+    @discardableResult
+    public func setFlashMode(_ flashMode: AVCaptureDevice.FlashMode) -> Bool {
+        cameraManager.setFlashMode(flashMode)
+    }
+    
     public init(
         config: CameraConfiguration,
         type: CameraController.CaptureType,
@@ -42,6 +58,10 @@ open class CameraViewController: BaseViewController {
     
     lazy var cameraManager: CameraManager = {
         let manager = CameraManager(config: config)
+        manager.flashModeDidChanged = { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.cameraViewController(self, flashModeDidChanged: $0)
+        }
         return manager
     }()
     
@@ -54,7 +74,10 @@ open class CameraViewController: BaseViewController {
     #endif
     
     lazy var bottomView: CameraBottomView = {
-        let view = CameraBottomView(tintColor: config.tintColor)
+        let view = CameraBottomView(
+            tintColor: config.tintColor,
+            takePhotoMode: config.takePhotoMode
+        )
         view.delegate = self
         return view
     }()
@@ -134,13 +157,20 @@ open class CameraViewController: BaseViewController {
     }
     
     @objc
-    func didSwitchCameraClick() {
+    public func didSwitchCameraClick() {
         if config.cameraType == .normal {
             do {
                 try cameraManager.switchCameras()
             } catch {
                 print(error)
                 switchCameraFailed()
+            }
+            delegate?.cameraViewController(
+                self,
+                didSwitchCameraCompletion: cameraManager.activeCamera?.position ?? .unspecified
+            )
+            if !cameraManager.setFlashMode(config.flashMode) {
+                cameraManager.setFlashMode(.off)
             }
         }else {
             #if canImport(GPUImage)
@@ -303,6 +333,7 @@ open class CameraViewController: BaseViewController {
         #if canImport(GPUImage)
         if config.cameraType == .gpu {
             gpuView.resetMetal()
+            return
         }
         #endif
         previewView.resetOrientation()

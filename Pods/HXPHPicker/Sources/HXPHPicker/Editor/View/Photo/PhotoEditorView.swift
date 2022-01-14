@@ -91,6 +91,9 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     var drawColorHex: String = "#ffffff" {
         didSet { imageResizerView.imageView.drawView.lineColor = drawColorHex.color }
     }
+    var drawColor: UIColor = .white {
+        didSet { imageResizerView.imageView.drawView.lineColor = drawColor }
+    }
     var mosaicType: PhotoEditorMosaicView.MosaicType = .mosaic {
         didSet { imageResizerView.imageView.mosaicView.type = mosaicType }
     }
@@ -100,7 +103,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     var canUndoDraw: Bool { imageResizerView.imageView.drawView.canUndo }
     var canUndoMosaic: Bool { imageResizerView.imageView.mosaicView.canUndo }
     var hasSticker: Bool { imageResizerView.imageView.stickerView.count > 0 }
-    var hasFilter: Bool { imageResizerView.filter != nil }
+    var hasFilter: Bool { imageResizerView.videoFilter != nil || imageResizerView.hasFilter }
     
     init(
         editType: PhotoEditorContentView.EditType,
@@ -177,8 +180,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         imageResizerView.getEditedData()
     }
     func setEditedData(editedData: PhotoEditData) {
-        imageResizerView.filter = editedData.filter
-        imageResizerView.filterValue = editedData.filterValue
+        imageResizerView.hasFilter = editedData.hasFilter
         if editedData.isPortrait != UIDevice.isPortrait {
             return
         }
@@ -363,7 +365,9 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
             mirrorType: imageResizerView.mirrorType,
             angle: imageResizerView.currentAngle,
             drawLayer: drawLayer,
-            stickerInfos: imageResizerView.imageView.stickerView.getStickerInfo()
+            stickerInfos: imageResizerView.imageView.stickerView.getStickerInfo(),
+            filter: playerView.filterInfo,
+            filterValue: playerView.filterValue
         )
     }
     func changedAspectRatio(of aspectRatio: CGSize) {
@@ -508,4 +512,6 @@ struct VideoEditorCropSizeData {
     let angle: CGFloat
     let drawLayer: CALayer?
     let stickerInfos: [EditorStickerInfo]
+    let filter: PhotoEditorFilterInfo?
+    let filterValue: Float
 }

@@ -165,6 +165,11 @@ open class VideoEditorViewController: BaseViewController {
     }
     #endif
     
+    var hasOriginalSound: Bool = true {
+        didSet {
+            volumeView.hasOriginalSound = hasOriginalSound
+        }
+    }
     var pState: State
     var pAVAsset: AVAsset!
     var pNetworkVideoURL: URL?
@@ -212,8 +217,14 @@ open class VideoEditorViewController: BaseViewController {
         view.delegate = self
         return view
     }()
+    lazy var volumeView: VideoEditorVolumeView = {
+        let view = VideoEditorVolumeView(config.music.tintColor)
+        view.delegate = self
+        return view
+    }()
     var isMusicState = false
     var isSearchMusic = false
+    var isShowVolume = false
     lazy var brushColorView: PhotoEditorBrushColorView = {
         let view = PhotoEditorBrushColorView(config: config.brush)
         view.delegate = self
@@ -238,7 +249,6 @@ open class VideoEditorViewController: BaseViewController {
         }
         let view = PhotoEditorCropToolView(showRatios: showRatios)
         view.delegate = self
-        view.isVideo = true
         view.themeColor = config.sizeCrop.aspectRatioSelectedColor
         view.alpha = 0
         view.isHidden = true
@@ -255,6 +265,15 @@ open class VideoEditorViewController: BaseViewController {
         cropView.alpha = 0
         cropView.isHidden = true
         return cropView
+    }()
+    var isFilter = false
+    lazy var filterView: PhotoEditorFilterView = {
+        let view = PhotoEditorFilterView(
+            filterConfig: config.filter,
+            hasLastFilter: editResult?.sizeData?.filter != nil
+        )
+        view.delegate = self
+        return view
     }()
     public lazy var toolView: EditorToolView = {
         let toolView = EditorToolView.init(config: config.toolView)
@@ -359,6 +378,10 @@ open class VideoEditorViewController: BaseViewController {
         if toolOptions.contains(.music) {
             view.addSubview(musicView)
             view.addSubview(searchMusicView)
+            view.addSubview(volumeView)
+        }
+        if toolOptions.contains(.filter) {
+            view.addSubview(filterView)
         }
         if toolOptions.isSticker {
             view.addSubview(chartletView)
@@ -420,6 +443,8 @@ open class VideoEditorViewController: BaseViewController {
         }
     }
     open override func deviceOrientationWillChanged(notify: Notification) {
+        orientationDidChange = true
+        videoViewDidChange = false
         if let currentCropOffset = currentCropOffset {
             rotateBeforeStorageData = cropView.getRotateBeforeData(
                 offsetX: currentCropOffset.x,
@@ -450,8 +475,8 @@ open class VideoEditorViewController: BaseViewController {
         stopPlayTimer()
     }
     open override func deviceOrientationDidChanged(notify: Notification) {
-        orientationDidChange = true
-        videoViewDidChange = false
+//        orientationDidChange = true
+//        videoViewDidChange = false
     }
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -483,13 +508,13 @@ open class VideoEditorViewController: BaseViewController {
             videoView.frame = view.bounds
         }
         if toolOptions.contains(.cropSize) {
-            let cropToolFrame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
+            let cropToolFrame = CGRect(x: 0, y: toolView.y - 60, width: view.width, height: 60)
             cropConfirmView.frame = toolView.frame
             cropToolView.frame = cropToolFrame
             cropToolView.updateContentInset()
         }
         if toolOptions.contains(.graffiti) {
-            brushColorView.frame = CGRect(x: 0, y: cropConfirmView.y - 85, width: view.width, height: 85)
+            brushColorView.frame = CGRect(x: 0, y: toolView.y - 85, width: view.width, height: 85)
         }
         if toolOptions.isSticker {
             setChartletViewFrame()
@@ -497,9 +522,13 @@ open class VideoEditorViewController: BaseViewController {
         if toolOptions.contains(.music) {
             setMusicViewFrame()
             setSearchMusicViewFrame()
+            setVolumeViewFrame()
             if orientationDidChange {
                 searchMusicView.reloadData()
             }
+        }
+        if toolOptions.contains(.filter) {
+            setFilterViewFrame()
         }
         if orientationDidChange {
             if videoView.playerView.avAsset != nil {
@@ -604,6 +633,14 @@ extension VideoEditorViewController {
         if isSearchMusic {
             hideSearchMusicView()
             return
+        }
+        if isShowVolume {
+            hiddenVolumeView()
+            return
+        }
+        if isFilter {
+            videoView.stickerEnabled = true
+            hiddenFilterView()
         }
         if showChartlet {
             showChartlet = false
@@ -726,6 +763,23 @@ extension VideoEditorViewController {
             height: musicHeight
         )
     }
+    func setFilterViewFrame() {
+        if isFilter {
+            filterView.frame = CGRect(
+                x: 0,
+                y: view.height - 150 - UIDevice.bottomMargin,
+                width: view.width,
+                height: 150 + UIDevice.bottomMargin
+            )
+        }else {
+            filterView.frame = CGRect(
+                x: 0,
+                y: view.height + 10,
+                width: view.width,
+                height: 150 + UIDevice.bottomMargin
+            )
+        }
+    }
     func setSearchMusicViewFrame() {
         var viewHeight: CGFloat = view.height * 0.75 + UIDevice.bottomMargin
         if !UIDevice.isPad && !UIDevice.isPortrait {
@@ -737,7 +791,25 @@ extension VideoEditorViewController {
             searchMusicView.frame = CGRect(x: 0, y: view.height - viewHeight, width: view.width, height: viewHeight)
         }
     }
-    
+    func setVolumeViewFrame() {
+        let marginHeight: CGFloat = 120
+        let volumeY: CGFloat
+        let volumeHeight: CGFloat
+        if !isShowVolume {
+            volumeY = view.height
+            volumeHeight = marginHeight
+        }else {
+            volumeY = view.height - marginHeight - UIDevice.bottomMargin - 20
+            volumeHeight = marginHeight
+        }
+        let marginWidth = UIDevice.leftMargin + UIDevice.rightMargin + 30
+        volumeView.frame = CGRect(
+            x: marginWidth * 0.5,
+            y: volumeY,
+            width: view.width - marginWidth,
+            height: volumeHeight
+        )
+    }
     func rotateAfterSetStorageData(offsetXScale: CGFloat, validXScale: CGFloat, validWithScale: CGFloat) {
         let insert = cropView.collectionView.contentInset
         let offsetX = -insert.left + cropView.contentWidth * offsetXScale

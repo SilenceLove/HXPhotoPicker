@@ -20,12 +20,7 @@ class HomeViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         #if canImport(GDPerformanceView_Swift)
-        PerformanceMonitor.shared().pause()
         PerformanceMonitor.shared().start()
         #endif
     }

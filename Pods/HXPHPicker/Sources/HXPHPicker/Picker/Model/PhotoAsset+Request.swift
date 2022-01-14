@@ -338,6 +338,13 @@ public extension PhotoAsset {
         }
         #endif
         guard let phAsset = phAsset else {
+            if mediaSubType == .localLivePhoto {
+                requestLocalLivePhotoURL(
+                    compression: compression,
+                    completion: completion
+                )
+                return
+            }
             completion(.failure(.invalidPHAsset))
             return
         }
@@ -464,6 +471,170 @@ public extension PhotoAsset {
                 }
             }
         }
+    }
+    
+    class LocalLivePhotoRequest {
+        var videoURL: URL
+        var writer: AVAssetWriter?
+        var videoInput: AVAssetWriterInput?
+        var videoReader: AVAssetReader?
+        var audioInput: AVAssetWriterInput?
+        var audioReader: AVAssetReader?
+        var requestID: PHLivePhotoRequestID?
+        
+        var isCancel: Bool = false
+        
+        init(videoURL: URL) {
+            self.videoURL = videoURL
+        }
+        
+        func cancelRequest() {
+            isCancel = true
+            PhotoManager.shared.removeTask(videoURL)
+            writer?.cancelWriting()
+            videoInput?.markAsFinished()
+            videoReader?.cancelReading()
+            audioInput?.markAsFinished()
+            audioReader?.cancelReading()
+            if let requestID = requestID {
+                PHLivePhoto.cancelRequest(withRequestID: requestID)
+            }
+        }
+    }
+    
+    @discardableResult
+    func requestLocalLivePhoto(
+        URLHandler: ((URL?, URL?) -> Void)? = nil,
+        success: ((PhotoAsset, PHLivePhoto) -> Void)? = nil,
+        failure: PhotoAssetFailureHandler? = nil
+    ) -> LocalLivePhotoRequest? {
+        guard let livePhoto = localLivePhoto else {
+            failure?(self, nil, .localLivePhotoIsEmpty)
+            return nil
+        }
+        let videoURL = livePhoto.videoURL
+        let request = LocalLivePhotoRequest(videoURL: videoURL)
+        func write(videoURL: URL) {
+            DispatchQueue.global().async {
+                PhotoTools.getLivePhotoJPGURL(livePhoto.imageURL) { url in
+                    guard let imageURL = url else {
+                        DispatchQueue.main.async {
+                            URLHandler?(nil, nil)
+                            failure?(self, nil, .localLivePhotoWriteImageFailed)
+                        }
+                        return
+                    }
+                    if request.isCancel {
+                        DispatchQueue.main.async {
+                            URLHandler?(imageURL, nil)
+                            failure?(self, nil, .localLivePhotoCancelWrite)
+                        }
+                        return
+                    }
+                    PhotoTools.getLivePhotoVideoMovURL(
+                        videoURL
+                    ) { writer, videoInput, videoReader, audioInput, audioReader in
+                        request.writer = writer
+                        request.videoInput = videoInput
+                        request.videoReader = videoReader
+                        request.audioInput = audioInput
+                        request.audioReader = audioReader
+                    } completion: { url in
+                        guard let videoURL = url else {
+                            DispatchQueue.main.async {
+                                URLHandler?(imageURL, nil)
+                                failure?(self, nil, .localLivePhotoWriteVideoFailed)
+                            }
+                            return
+                        }
+                        DispatchQueue.main.async {
+                            URLHandler?(imageURL, videoURL)
+                        }
+                        if success == nil && failure == nil {
+                            return
+                        }
+                        let image = UIImage(contentsOfFile: imageURL.path)
+                        request.requestID = PHLivePhoto.request(
+                            withResourceFileURLs: [videoURL, imageURL],
+                            placeholderImage: image,
+                            targetSize: .zero,
+                            contentMode: .aspectFill
+                        ) { phLivePhoto, info in
+                            guard let phLivePhoto = phLivePhoto else {
+                                DispatchQueue.main.async {
+                                    failure?(self, nil, .localLivePhotoWriteVideoFailed)
+                                }
+                                return
+                            }
+                            let isDegraded = info[PHLivePhotoInfoIsDegradedKey] as? Int
+                            let isCancel = info[PHLivePhotoInfoCancelledKey] as? Int
+                            DispatchQueue.main.async {
+                                if let isDegraded = isDegraded {
+                                    if isDegraded == 0 {
+                                        success?(self, phLivePhoto)
+                                    }
+                                }else if let isCancel = isCancel {
+                                    if isCancel == 0 {
+                                        success?(self, phLivePhoto)
+                                    }else {
+                                        failure?(self, info, .localLivePhotoRequestFailed)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if videoURL.isFileURL {
+            write(videoURL: videoURL)
+        }else {
+            PhotoManager.shared.downloadTask(with: videoURL) { url, error, ext in
+                guard let videoURL = url else {
+                    URLHandler?(nil, nil)
+                    failure?(self, nil, .videoDownloadFailed)
+                    return
+                }
+                write(videoURL: videoURL)
+            }
+        }
+        return request
+    }
+    
+    func requestLocalLivePhotoURL(
+        compression: Compression? = nil,
+        completion: @escaping AssetURLCompletion
+    ) {
+        #if HXPICKER_ENABLE_EDITOR
+        if photoEdit != nil {
+            getEditedImageURL(
+                compressionQuality: compression?.imageCompressionQuality,
+                resultHandler: completion
+            )
+            return
+        }
+        #endif
+        guard let localLivePhoto = localLivePhoto else {
+            completion(.failure(.localLivePhotoIsEmpty))
+            return
+        }
+        let imageURL = localLivePhoto.imageURL
+        let videoURL = localLivePhoto.videoURL
+        completion(
+            .success(
+                .init(
+                    url: imageURL,
+                    urlType: .local,
+                    mediaType: .photo,
+                    livePhoto: .init(
+                        imageURL: imageURL,
+                        imageURLType: .local,
+                        videoURL: videoURL,
+                        videoURLType: videoURL.isFileURL ? .local : .network
+                    )
+                )
+            )
+        )
     }
 }
 

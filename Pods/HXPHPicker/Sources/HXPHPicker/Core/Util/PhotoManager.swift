@@ -103,6 +103,8 @@ public final class PhotoManager: NSObject {
     }
     #endif
     
+    let uuid: String = UUID().uuidString
+    
     private override init() {
         super.init()
         createBundle()
@@ -144,6 +146,7 @@ public final class PhotoManager: NSObject {
         }
         return self.bundle
     }
+    
 }
 
 #if HXPICKER_ENABLE_PICKER

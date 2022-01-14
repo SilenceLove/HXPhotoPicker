@@ -22,7 +22,7 @@ public extension AssetManager {
     ) {
         requestImageURL(
             for: asset,
-            suffix: "jpeg",
+            suffix: "png",
             resultHandler: resultHandler
         )
     }

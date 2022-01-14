@@ -42,6 +42,8 @@ public enum AssetError: Error {
     case networkURLIsEmpty
     /// 本地地址为空
     case localURLIsEmpty
+    /// 本地LocalLivePhoto为空
+    case localLivePhotoIsEmpty
     /// 类型错误，例：本来是 .photo 却去获取 videoURL
     case typeError
     /// 从系统相册获取数据失败, [AnyHashable: Any]?: 系统获取失败的信息
@@ -64,4 +66,14 @@ public enum AssetError: Error {
     case exportLivePhotoURLFailed(Error?, Error?)
     /// 图片压缩失败
     case imageCompressionFailed
+    /// 视频下载失败
+    case videoDownloadFailed
+    /// 本地livePhoto取消写入
+    case localLivePhotoCancelWrite
+    /// 本地livePhoto图片写入失败
+    case localLivePhotoWriteImageFailed
+    /// 本地livePhoto视频写入失败
+    case localLivePhotoWriteVideoFailed
+    /// 本地livePhoto合成失败
+    case localLivePhotoRequestFailed
 }

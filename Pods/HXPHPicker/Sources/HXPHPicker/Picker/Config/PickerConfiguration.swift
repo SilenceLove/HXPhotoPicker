@@ -126,7 +126,7 @@ public class PickerConfiguration: BaseConfiguration {
     /// 未授权提示界面相关配置
     public lazy var notAuthorized: NotAuthorizedConfiguration = .init()
     
-    /// 是否缓存相机胶卷相册
+    /// 是否缓存[相机胶卷/所有照片]相册
     public var isCacheCameraAlbum: Bool = true
     
     public override init() {

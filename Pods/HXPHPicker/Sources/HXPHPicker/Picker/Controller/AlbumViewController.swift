@@ -91,7 +91,7 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
             pickerController?.config.navigationTitleDarkColor :
             pickerController?.config.navigationTitleColor
     }
-    public override func deviceOrientationDidChanged(notify: Notification) {
+    public override func deviceOrientationWillChanged(notify: Notification) {
         beforeOrientationIndexPath = tableView.indexPathsForVisibleRows?.first
         orientationDidChange = true
     }

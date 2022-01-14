@@ -115,6 +115,8 @@ class CameraPreviewView: UIView {
     }
     
     func resetOrientation() {
+        guard let capture = previewLayer?.connection,
+              capture.isVideoOrientationSupported else { return }
         let videoOrientation: AVCaptureVideoOrientation
         let interfaceOrientation = UIApplication.shared.statusBarOrientation
         switch interfaceOrientation {
@@ -129,7 +131,7 @@ class CameraPreviewView: UIView {
         default:
             videoOrientation = .portrait
         }
-        previewLayer?.connection?.videoOrientation = videoOrientation
+        capture.videoOrientation = videoOrientation
     }
     
     func resetMask(_ image: UIImage?) {
