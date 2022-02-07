@@ -11,11 +11,13 @@ import AVFoundation
 // MARK: 相机配置类
 public class CameraConfiguration: BaseConfiguration {
     
+    public var modalPresentationStyle: UIModalPresentationStyle
+    
     /// 相机类型
     public var cameraType: CameraController.CameraType = .normal
     
     /// 相机分辨率
-    public var sessionPreset: Preset = .hd1920x1080
+    public var sessionPreset: Preset = .hd1280x720
     
     /// 摄像头默认位置
     public var position: DevicePosition = .back
@@ -62,6 +64,11 @@ public class CameraConfiguration: BaseConfiguration {
     public var allowLocation: Bool = true
     
     public override init() {
+        if #available(iOS 13.0, *) {
+            modalPresentationStyle = .automatic
+        } else {
+            modalPresentationStyle = .fullScreen
+        }
         super.init()
         /// shouldAutorotate 能够旋转
         /// supportedInterfaceOrientations 支持的方向
@@ -158,14 +165,20 @@ extension CameraConfiguration {
     
     #if HXPICKER_ENABLE_EDITOR
     fileprivate func setupEditorColor() {
-        videoEditor.cropView.finishButtonBackgroundColor = tintColor
-        videoEditor.cropView.finishButtonDarkBackgroundColor = tintColor
+        
+        videoEditor.cropConfirmView.finishButtonBackgroundColor = tintColor
+        videoEditor.cropConfirmView.finishButtonDarkBackgroundColor = tintColor
+        videoEditor.cropSize.aspectRatioSelectedColor = tintColor
         videoEditor.toolView.finishButtonBackgroundColor = tintColor
         videoEditor.toolView.finishButtonDarkBackgroundColor = tintColor
         videoEditor.toolView.toolSelectedColor = tintColor
         videoEditor.toolView.musicSelectedColor = tintColor
         videoEditor.music.tintColor = tintColor
         videoEditor.text.tintColor = tintColor
+        videoEditor.filter = .init(
+            infos: videoEditor.filter.infos,
+            selectedColor: tintColor
+        )
         
         photoEditor.toolView.toolSelectedColor = tintColor
         photoEditor.toolView.finishButtonBackgroundColor = tintColor
@@ -174,7 +187,8 @@ extension CameraConfiguration {
         photoEditor.cropConfimView.finishButtonDarkBackgroundColor = tintColor
         photoEditor.cropping.aspectRatioSelectedColor = tintColor
         photoEditor.filter = .init(
-            infos: PhotoTools.defaultFilters()
+            infos: photoEditor.filter.infos,
+            selectedColor: tintColor
         )
         photoEditor.text.tintColor = tintColor
     }

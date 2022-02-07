@@ -22,7 +22,7 @@ class VideoFilterCompositor: NSObject, AVVideoCompositing {
         String(kCVPixelBufferMetalCompatibilityKey): true
     ]
     
-    private let context = CIContext()
+    private let context = CIContext(options: nil)
     private let renderContextQueue: DispatchQueue = DispatchQueue(label: "com.HXPHPicker.videoeditorrendercontextqueue")
     private let renderingQueue: DispatchQueue = DispatchQueue(label: "com.HXPHPicker.videoeditorrenderingqueue")
     private var renderContextDidChange = false
@@ -68,45 +68,111 @@ class VideoFilterCompositor: NSObject, AVVideoCompositing {
     func newRenderdPixelBuffer(
         for request: AVAsynchronousVideoCompositionRequest
     ) -> CVPixelBuffer? {
-        guard let instruction = request.videoCompositionInstruction as? CustomVideoCompositionInstruction
-               else {
+        guard let instruction = request.videoCompositionInstruction as? CustomVideoCompositionInstruction,
+              let trackID = instruction.requiredSourceTrackIDs?.first as? CMPersistentTrackID,
+              let pixelBuffer = request.sourceFrame(byTrackID: trackID) else {
             return nil
         }
-        if !instruction.hasSticker {
-            guard let trackID = instruction.requiredSourceTrackIDs?.first as? CMPersistentTrackID,
-                  let sourcePixelBuffer = request.sourceFrame(byTrackID: trackID) else {
-                      return renderContext?.newPixelBuffer()
+        guard let sourcePixelBuffer = fixOrientation(
+                pixelBuffer,
+                instruction.videoOrientation,
+                instruction.cropSizeData
+              ),
+              let resultPixelBuffer = applyFillter(
+                sourcePixelBuffer,
+                instruction.filterInfo,
+                instruction.filterValue
+              )
+        else {
+            return renderContext?.newPixelBuffer()
+        }
+        var watermarkPixelBuffer: CVPixelBuffer?
+        if let watermarkTrackID = instruction.watermarkTrackID {
+            watermarkPixelBuffer = request.sourceFrame(byTrackID: watermarkTrackID)
+        }
+        let endPixelBuffer = addWatermark(
+            watermarkPixelBuffer,
+            resultPixelBuffer
+        )
+        if let sizeData = instruction.cropSizeData, sizeData.isRoundCrop {
+            return roundCrop(endPixelBuffer)
+        }
+        return endPixelBuffer
+    }
+    
+    func fixOrientation(
+        _ pixelBuffer: CVPixelBuffer,
+        _ videoOrientation: AVCaptureVideoOrientation,
+        _ cropSizeData: VideoEditorCropSizeData?
+    ) -> CVPixelBuffer? {
+        var ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        var size = CGSize(
+            width: CVPixelBufferGetWidth(pixelBuffer),
+            height: CVPixelBufferGetHeight(pixelBuffer)
+        )
+        switch videoOrientation {
+        case .portrait:
+            ciImage = ciImage.oriented(.right)
+            size = .init(width: size.height, height: size.width)
+        case .portraitUpsideDown:
+            ciImage = ciImage.oriented(.left)
+        case .landscapeRight:
+            break
+        case .landscapeLeft:
+            ciImage = ciImage.oriented(.down)
+            size = .init(width: size.height, height: size.width)
+        @unknown default:
+            break
+        }
+        if let cropSizeData = cropSizeData {
+            let x = size.width * cropSizeData.cropRect.minX
+            var y = size.height * cropSizeData.cropRect.minY
+            let width = size.width * cropSizeData.cropRect.width
+            let height = size.height * cropSizeData.cropRect.height
+            y = size.height - height - y
+            ciImage = ciImage.cropped(
+                to: .init(x: x, y: y, width: width, height: height)
+            ).transformed(by: .init(translationX: -x, y: -y))
+            size = .init(width: width, height: height)
+            
+            let orientation = PhotoTools.cropOrientation(cropSizeData)
+            switch orientation {
+            case .upMirrored:
+                ciImage = ciImage.oriented(.upMirrored)
+            case .left:
+                ciImage = ciImage.oriented(.left)
+                size = .init(width: size.height, height: size.width)
+            case .leftMirrored:
+                ciImage = ciImage.oriented(.rightMirrored)
+                size = .init(width: size.height, height: size.width)
+            case .right:
+                ciImage = ciImage.oriented(.right)
+                size = .init(width: size.height, height: size.width)
+            case .rightMirrored:
+                ciImage = ciImage.oriented(.leftMirrored)
+                size = .init(width: size.height, height: size.width)
+            case .down:
+                ciImage = ciImage.oriented(.down)
+            case .downMirrored:
+                ciImage = ciImage.oriented(.downMirrored)
+            default:
+                break
             }
-            guard let resultPixelBuffer = instruction.applyFillter(sourcePixelBuffer) else {
-                return sourcePixelBuffer
-            }
-            return resultPixelBuffer
         }
-        let sourceTrackID = instruction.requiredSourceTrackIDs?[1] as? CMPersistentTrackID
-        guard let trackID = sourceTrackID,
-              let sourcePixelBuffer = request.sourceFrame(byTrackID: trackID) else {
-                  return renderContext?.newPixelBuffer()
+        guard let newPixelBuffer = PhotoTools.createPixelBuffer(size) else {
+            return nil
         }
-        guard let resultPixelBuffer = instruction.applyFillter(sourcePixelBuffer) else {
-            let watermarkTrackID = instruction.requiredSourceTrackIDs?.first as? CMPersistentTrackID
-            if let trackID = watermarkTrackID,
-               let watermarkPixelBuffer = request.sourceFrame(byTrackID: trackID) {
-                return addWatermark(watermarkPixelBuffer, sourcePixelBuffer)
-            }
-            return sourcePixelBuffer
-        }
-        let watermarkTrackID = instruction.requiredSourceTrackIDs?.first as? CMPersistentTrackID
-        if let trackID = watermarkTrackID,
-           let watermarkPixelBuffer = request.sourceFrame(byTrackID: trackID) {
-            return addWatermark(watermarkPixelBuffer, resultPixelBuffer)
-        }
-        return resultPixelBuffer
+        context.render(ciImage, to: newPixelBuffer)
+        return newPixelBuffer
     }
     
     func addWatermark(
-        _ watermarkPixelBuffer: CVPixelBuffer,
+        _ watermarkPixelBuffer: CVPixelBuffer?,
         _ bgPixelBuffer: CVPixelBuffer
     ) -> CVPixelBuffer {
+        guard let watermarkPixelBuffer = watermarkPixelBuffer else {
+            return bgPixelBuffer
+        }
         var watermarkCGImage: CGImage?
         VTCreateCGImageFromCVPixelBuffer(watermarkPixelBuffer, options: nil, imageOut: &watermarkCGImage)
         guard let watermarkCGImage = watermarkCGImage else {
@@ -119,14 +185,47 @@ class VideoFilterCompositor: NSObject, AVVideoCompositing {
         }
         let watermarkCIImage = CIImage(cgImage: watermarkCGImage)
         let bgCIImage = CIImage(cgImage: bgCGImage)
-        let ciFilter = CIFilter(name: "CISourceOverCompositing")
-        ciFilter?.setDefaults()
-        ciFilter?.setValue(watermarkCIImage, forKey: kCIInputImageKey)
-        ciFilter?.setValue(bgCIImage, forKey: kCIInputBackgroundImageKey)
-        if let outputImage = ciFilter?.outputImage {
+        if let outputImage = watermarkCIImage.sourceOverCompositing(bgCIImage) {
             context.render(outputImage, to: bgPixelBuffer)
         }
         return bgPixelBuffer
+    }
+    
+    func applyFillter(
+        _ pixelBuffer: CVPixelBuffer,
+        _ info: PhotoEditorFilterInfo?,
+        _ value: Float
+    ) -> CVPixelBuffer? {
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let size = CGSize(
+            width: CVPixelBufferGetWidth(pixelBuffer),
+            height: CVPixelBufferGetHeight(pixelBuffer)
+        )
+        if let outputImage = info?.videoFilterHandler?(ciImage.clampedToExtent(), value),
+           let newPixelBuffer = PhotoTools.createPixelBuffer(size) {
+            context.render(outputImage, to: newPixelBuffer)
+            return newPixelBuffer
+        }
+        return pixelBuffer
+    }
+    
+    func roundCrop(
+        _ pixelBuffer: CVPixelBuffer
+    ) -> CVPixelBuffer {
+        var ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let blurredImage = ciImage.clampedToExtent().filter(
+            name: "CIGaussianBlur",
+            parameters: [kCIInputRadiusKey: 40]
+        )
+        guard let ci_Image = ciImage.image?.roundCropping()?.ci_Image else {
+            return pixelBuffer
+        }
+        if let blurredImage = blurredImage,
+           let result = ci_Image.sourceOverCompositing(blurredImage) {
+            ciImage = result
+        }
+        context.render(ciImage, to: pixelBuffer)
+        return pixelBuffer
     }
 }
 
@@ -141,53 +240,33 @@ class CustomVideoCompositionInstruction: NSObject, AVVideoCompositionInstruction
     
     var passthroughTrackID: CMPersistentTrackID
     
+    let watermarkTrackID: CMPersistentTrackID?
+    let videoOrientation: AVCaptureVideoOrientation
+    let cropSizeData: VideoEditorCropSizeData?
     let filterInfo: PhotoEditorFilterInfo?
     let filterValue: Float
-    let hasSticker: Bool
     init(
         sourceTrackIDs: [NSValue],
+        watermarkTrackID: CMPersistentTrackID?,
         timeRange: CMTimeRange,
-        hasSticker: Bool,
+        videoOrientation: AVCaptureVideoOrientation,
+        cropSizeData: VideoEditorCropSizeData?,
         filterInfo: PhotoEditorFilterInfo? = nil,
         filterValue: Float = 0
     ) {
         requiredSourceTrackIDs = sourceTrackIDs
-        self.timeRange = timeRange
+        if let watermarkTrackID = watermarkTrackID {
+            requiredSourceTrackIDs?.append(watermarkTrackID as NSValue)
+        }
         passthroughTrackID = kCMPersistentTrackID_Invalid
+        self.watermarkTrackID = watermarkTrackID
+        self.timeRange = timeRange
         containsTweening = true
         enablePostProcessing = false
-        self.hasSticker = hasSticker
+        self.videoOrientation = videoOrientation
+        self.cropSizeData = cropSizeData
         self.filterInfo = filterInfo
         self.filterValue = filterValue
         super.init()
-    }
-    
-    private let context = CIContext()
-    func applyFillter(_ pixelBuffer: CVPixelBuffer) -> CVPixelBuffer? {
-        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-        let size = CGSize(
-            width: CVPixelBufferGetWidth(pixelBuffer),
-            height: CVPixelBufferGetHeight(pixelBuffer)
-        )
-        if let outputImage = filterInfo?.videoFilterHandler?(ciImage, filterValue),
-           let newPixelBuffer = createPixelBuffer(size) {
-            context.render(outputImage, to: newPixelBuffer)
-            return newPixelBuffer
-        }
-        return pixelBuffer
-    }
-    
-    func createPixelBuffer(_ size: CGSize) -> CVPixelBuffer? {
-        var pixelBuffer: CVPixelBuffer?
-        let pixelBufferAttributes = [kCVPixelBufferIOSurfacePropertiesKey: [:]]
-        CVPixelBufferCreate(
-            nil,
-            Int(size.width),
-            Int(size.height),
-            kCVPixelFormatType_32BGRA,
-            pixelBufferAttributes as CFDictionary,
-            &pixelBuffer
-        )
-        return pixelBuffer
     }
 }

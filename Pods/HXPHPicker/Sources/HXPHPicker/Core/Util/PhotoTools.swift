@@ -374,7 +374,7 @@ public struct PhotoTools {
         _ duration: TimeInterval,
         _ timingFunctionName: CAMediaTimingFunctionName = .linear
     ) -> CABasicAnimation {
-        let animation = CABasicAnimation.init(keyPath: keyPath)
+        let animation = CABasicAnimation(keyPath: keyPath)
         animation.fromValue = fromValue
         animation.toValue = toValue
         animation.duration = duration

@@ -71,7 +71,15 @@ class PhotoEditorContentView: UIView {
         view.delegate = self
         return view
     }()
-    
+    lazy var longPressGesture: UILongPressGestureRecognizer = {
+        let long = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(longPressGestureRecognizerClick(_:))
+        )
+        long.minimumPressDuration = 0.2
+        long.isEnabled = false
+        return long
+    }()
     let mosaicConfig: PhotoEditorConfiguration.Mosaic
     let editType: EditType
     init(
@@ -84,11 +92,42 @@ class PhotoEditorContentView: UIView {
         if editType == .image {
             addSubview(imageView)
             addSubview(mosaicView)
+            
         }else {
             addSubview(videoView)
         }
         addSubview(drawView)
         addSubview(stickerView)
+        addGestureRecognizer(longPressGesture)
+    }
+    var originalImage: UIImage?
+    var tempImage: UIImage?
+    @objc
+    func longPressGestureRecognizerClick(
+        _ longPressGesture: UILongPressGestureRecognizer
+    ) {
+        switch longPressGesture.state {
+        case .began:
+            if editType == .image {
+                tempImage = imageView.image
+                if let image = originalImage {
+                    setImage(image)
+                }
+            }else {
+                videoView.isLookOriginal = true
+            }
+        case .ended, .cancelled, .failed:
+            if editType == .image {
+                if let image = tempImage {
+                    setImage(image)
+                }
+                tempImage = nil
+            }else {
+                videoView.isLookOriginal = false
+            }
+        default:
+            break
+        }
     }
     func setMosaicOriginalImage(_ image: UIImage?) {
         mosaicView.originalImage = image

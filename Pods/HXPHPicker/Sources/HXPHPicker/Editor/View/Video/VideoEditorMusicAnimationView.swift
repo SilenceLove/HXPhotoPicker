@@ -23,12 +23,17 @@ class VideoEditorMusicAnimationLayer: CALayer {
          scale: CGFloat = 1) {
         self.scale = scale
         super.init()
+        contentsScale = UIScreen.main.scale
         for _ in 0..<12 {
             let shapeLayer = CAShapeLayer()
             shapeLayer.contentsScale = UIScreen.main.scale
             shapeLayer.fillColor = UIColor.clear.cgColor
             shapeLayer.strokeColor = hexColor.color.cgColor
             shapeLayer.lineWidth = 1 * scale
+            shapeLayer.shadowOpacity = 0.4
+            shapeLayer.shadowOffset = CGSize(width: 0, height: -1)
+            shapeLayer.shouldRasterize = true
+            shapeLayer.rasterizationScale = shapeLayer.contentsScale
             addSublayer(shapeLayer)
             animationLayers.append(shapeLayer)
         }

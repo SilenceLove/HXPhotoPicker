@@ -23,6 +23,7 @@ class VideoEditorPlayerView: VideoPlayerView {
     var shouldPlay = true
     var readyForDisplayObservation: NSKeyValueObservation?
     
+    var isLookOriginal: Bool = false
     var filterInfo: PhotoEditorFilterInfo?
     var filterValue: Float = 0
     lazy var coverImageView: UIImageView = {
@@ -45,26 +46,8 @@ class VideoEditorPlayerView: VideoPlayerView {
     func configAsset() {
         if let avAsset = avAsset {
             try? AVAudioSession.sharedInstance().setCategory(.playback)
-            let playerItem = AVPlayerItem.init(asset: avAsset)
-            let videoComposition = AVMutableVideoComposition(
-                asset: avAsset
-            ) { [weak self] request in
-                let source = request.sourceImage.clampedToExtent()
-                guard let ciImage = self?.applyFilter(source) else {
-                    request.finish(
-                        with: NSError(
-                            domain: "videoComposition filter error：ciImage is nil",
-                            code: 500,
-                            userInfo: nil
-                        )
-                    )
-                    return
-                }
-                request.finish(with: ciImage, context: nil)
-            }
-            videoComposition.renderScale = 1
-            videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
-            playerItem.videoComposition = videoComposition
+            let playerItem = AVPlayerItem(asset: avAsset)
+            playerItem.videoComposition = videoComposition(avAsset)
             player.replaceCurrentItem(with: playerItem)
             playerLayer.player = player
             NotificationCenter.default.addObserver(
@@ -98,6 +81,27 @@ class VideoEditorPlayerView: VideoPlayerView {
                     }
             }
         }
+    }
+    func videoComposition(_ avAsset: AVAsset) -> AVMutableVideoComposition {
+        let videoComposition = AVMutableVideoComposition(
+            asset: avAsset
+        ) { [weak self] request in
+            let source = request.sourceImage.clampedToExtent()
+            guard let ciImage = self?.applyFilter(source) else {
+                request.finish(
+                    with: NSError(
+                        domain: "videoComposition filter error：ciImage is nil",
+                        code: 500,
+                        userInfo: nil
+                    )
+                )
+                return
+            }
+            request.finish(with: ciImage, context: nil)
+        }
+        videoComposition.renderScale = 1
+        videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+        return videoComposition
     }
     @objc func appDidEnterBackground() {
         pause()
@@ -161,6 +165,9 @@ class VideoEditorPlayerView: VideoPlayerView {
 extension VideoEditorPlayerView {
     
     func applyFilter(_ source: CIImage) -> CIImage {
+        if isLookOriginal {
+            return source
+        }
         guard let info = filterInfo else {
             return source
         }

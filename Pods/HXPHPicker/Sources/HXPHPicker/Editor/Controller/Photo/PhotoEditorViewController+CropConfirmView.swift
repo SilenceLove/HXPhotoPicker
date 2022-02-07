@@ -15,6 +15,9 @@ extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
     func cropConfirmView(didFinishButtonClick cropConfirmView: EditorCropConfirmView) {
         if config.fixedCropState {
             imageView.imageResizerView.finishCropping(false, completion: nil, updateCrop: false)
+            if config.cropping.isRoundCrop {
+                imageView.imageResizerView.layer.cornerRadius = 1
+            }
             exportResources()
             return
         }

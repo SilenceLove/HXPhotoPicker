@@ -117,6 +117,21 @@ extension PhotoTools {
     public static func defaultFilters() -> [PhotoEditorFilterInfo] {
         [
             PhotoEditorFilterInfo(
+                filterName: "唯美".localized
+            ) { image, _, _, _ in
+                nashvilleFilter(image)
+            },
+            PhotoEditorFilterInfo(
+                filterName: "梦幻".localized
+            ) { (image, _, _, _) in
+                toasterFilter(image)
+            },
+            PhotoEditorFilterInfo(
+                filterName: "1977"
+            ) { (image, _, _, _) in
+                apply1977Filter(image)
+            },
+            PhotoEditorFilterInfo(
                 filterName: "怀旧".localized
             ) { (image, _, _, _) in
                 image.filter(
@@ -134,15 +149,10 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "模糊".localized,
-                defaultValue: 0.5
+                defaultValue: 0.2
             ) { (image, lastImage, value, event) in
                 if event == .touchUpInside {
-                    return image.filter(
-                        name: "CIGaussianBlur",
-                        parameters: [
-                            kCIInputRadiusKey: NSNumber(value: 10 * value)
-                        ]
-                    )
+                    return image.blurredImage(50 * value)
                 }
                 return nil
             },
@@ -175,7 +185,7 @@ extension PhotoTools {
                 defaultValue: 1
             ) { (image, lastImage, value, event) in
                 if event == .touchUpInside {
-                    return oldMovie(image, value: value) as? UIImage
+                    return oldMovie(image, value: value)
                 }
                 return nil
             },
@@ -209,6 +219,27 @@ extension PhotoTools {
     public static func defaultVideoFilters() -> [PhotoEditorFilterInfo] {
         [
             PhotoEditorFilterInfo(
+                filterName: "唯美".localized
+            ) { (image, _, _, _) in
+                nashvilleFilter(image)
+            } videoFilterHandler: { ciImage, _ in
+                nashvilleFilter(ciImage)
+            },
+            PhotoEditorFilterInfo(
+                filterName: "梦幻".localized
+            ) { (image, _, _, _) in
+                toasterFilter(image)
+            } videoFilterHandler: { ciImage, _ in
+                toasterFilter(ciImage)
+            },
+            PhotoEditorFilterInfo(
+                filterName: "1977"
+            ) { (image, _, _, _) in
+                apply1977Filter(image)
+            } videoFilterHandler: { ciImage, _ in
+                apply1977Filter(ciImage)
+            },
+            PhotoEditorFilterInfo(
                 filterName: "怀旧".localized
             ) { (image, _, _, _) in
                 image.filter(
@@ -230,23 +261,16 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "模糊".localized,
-                defaultValue: 0.5
+                defaultValue: 0.2
             ) { (image, lastImage, value, event) in
                 if event == .touchUpInside {
-                    return image.filter(
-                        name: "CIGaussianBlur",
-                        parameters: [
-                            kCIInputRadiusKey: NSNumber(value: 10 * value)
-                        ]
-                    )
+                    return image.blurredImage(50.0 * value)
                 }
                 return nil
             } videoFilterHandler: {
                 $0.filter(
                     name: "CIGaussianBlur",
-                    parameters: [
-                        kCIInputRadiusKey: NSNumber(value: 10 * $1)
-                    ]
+                    parameters: [kCIInputRadiusKey: 50.0 * $1]
                 )
             },
             PhotoEditorFilterInfo(
@@ -284,11 +308,11 @@ extension PhotoTools {
                 defaultValue: 1
             ) { (image, lastImage, value, event) in
                 if event == .touchUpInside {
-                    return oldMovie(image, value: value) as? UIImage
+                    return oldMovie(image, value: value)
                 }
                 return nil
             } videoFilterHandler: {
-                oldMovie($0, value: $1) as? CIImage
+                oldMovie($0, value: $1)
             },
             PhotoEditorFilterInfo(
                 filterName: "色调".localized
@@ -323,16 +347,35 @@ extension PhotoTools {
         ]
     }
     
-    static func oldMovie(
-        _ image: Any,
+    public static func nashvilleFilter(
+        _ image: CIImage
+    ) -> CIImage? {
+        let backgroundImage = getColorImage(red: 247, green: 176, blue: 153, alpha: Int(255 * 0.56),
+                                            rect: image.extent)
+        let backgroundImage2 = getColorImage(red: 0, green: 70, blue: 150, alpha: Int(255 * 0.4),
+                                             rect: image.extent)
+        return image
+            .applyingFilter("CIDarkenBlendMode", parameters: [
+                "inputBackgroundImage": backgroundImage
+                ])
+            .applyingFilter("CISepiaTone", parameters: [
+                "inputIntensity": 0.2
+                ])
+            .applyingFilter("CIColorControls", parameters: [
+                "inputSaturation": 1.2,
+                "inputBrightness": 0.05,
+                "inputContrast": 1.1
+                ])
+            .applyingFilter("CILightenBlendMode", parameters: [
+                "inputBackgroundImage": backgroundImage2
+                ])
+    }
+    
+    public static func oldMovie(
+        _ image: CIImage,
         value: Float
-    ) -> Any? {
-        let inputImage: CIImage
-        if image is UIImage {
-            inputImage = CIImage.init(image: image as! UIImage)!
-        }else {
-            inputImage = image as! CIImage
-        }
+    ) -> CIImage? {
+        let inputImage = image
         let sepiaToneFilter = CIFilter(name: "CISepiaTone")!
         sepiaToneFilter.setValue(inputImage, forKey: kCIInputImageKey)
         sepiaToneFilter.setValue(value, forKey: kCIInputIntensityKey)
@@ -379,15 +422,71 @@ extension PhotoTools {
         let multiplyCompositingFilter = CIFilter(name: "CIMultiplyCompositing")!
         multiplyCompositingFilter.setValue(minimumComponentFilter.outputImage, forKey: kCIInputBackgroundImageKey)
         multiplyCompositingFilter.setValue(sourceOverCompositingFilter.outputImage, forKey: kCIInputImageKey)
-        let outputImage = multiplyCompositingFilter.outputImage!
-        if image is UIImage {
-            let context = CIContext(options: nil)
-            if let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
-                return UIImage(cgImage: cgImage)
-            }
-            return nil
-        }else {
-            return outputImage
-        }
+        return multiplyCompositingFilter.outputImage
+    }
+    
+    public static func toasterFilter(_ ciImage: CIImage) -> CIImage? {
+        let width = ciImage.extent.width
+        let height = ciImage.extent.height
+        let centerWidth = width / 2.0
+        let centerHeight = height / 2.0
+        let radius0 = min(width / 4.0, height / 4.0)
+        let radius1 = min(width / 1.5, height / 1.5)
+        
+        let color0 = self.getColor(red: 128, green: 78, blue: 15, alpha: 255)
+        let color1 = self.getColor(red: 79, green: 0, blue: 79, alpha: 255)
+        let circle = CIFilter(name: "CIRadialGradient", parameters: [
+            "inputCenter": CIVector(x: centerWidth, y: centerHeight),
+            "inputRadius0": radius0,
+            "inputRadius1": radius1,
+            "inputColor0": color0,
+            "inputColor1": color1
+            ])?.outputImage?.cropped(to: ciImage.extent)
+        
+        return ciImage
+            .applyingFilter("CIColorControls", parameters: [
+                "inputSaturation": 1.0,
+                "inputBrightness": 0.01,
+                "inputContrast": 1.1
+                ])
+            .applyingFilter("CIScreenBlendMode", parameters: [
+                "inputBackgroundImage": circle!
+                ])
+    }
+    
+    public static func apply1977Filter(_ ciImage: CIImage) -> CIImage? {
+        let filterImage = getColorImage(red: 243, green: 106, blue: 188, alpha: Int(255 * 0.1), rect: ciImage.extent)
+        let backgroundImage = ciImage
+            .applyingFilter("CIColorControls", parameters: [
+                "inputSaturation": 1.3,
+                "inputBrightness": 0.1,
+                "inputContrast": 1.05
+                ])
+            .applyingFilter("CIHueAdjust", parameters: [
+                "inputAngle": 0.3
+                ])
+        return filterImage
+            .applyingFilter("CIScreenBlendMode", parameters: [
+                "inputBackgroundImage": backgroundImage
+                ])
+            .applyingFilter("CIToneCurve", parameters: [
+                "inputPoint0": CIVector(x: 0, y: 0),
+                "inputPoint1": CIVector(x: 0.25, y: 0.20),
+                "inputPoint2": CIVector(x: 0.5, y: 0.5),
+                "inputPoint3": CIVector(x: 0.75, y: 0.80),
+                "inputPoint4": CIVector(x: 1, y: 1)
+                ])
+    }
+    
+    private static func getColor(red: Int, green: Int, blue: Int, alpha: Int = 255) -> CIColor {
+        return CIColor(red: CGFloat(Double(red) / 255.0),
+                       green: CGFloat(Double(green) / 255.0),
+                       blue: CGFloat(Double(blue) / 255.0),
+                       alpha: CGFloat(Double(alpha) / 255.0))
+    }
+    
+    private static func getColorImage(red: Int, green: Int, blue: Int, alpha: Int = 255, rect: CGRect) -> CIImage {
+        let color = self.getColor(red: red, green: green, blue: blue, alpha: alpha)
+        return CIImage(color: color).cropped(to: rect)
     }
 }

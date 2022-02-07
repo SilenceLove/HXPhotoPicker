@@ -29,7 +29,11 @@ class EditorStickerItemView: UIView {
     }()
     lazy var externalBorder: CALayer = {
         let externalBorder = CALayer()
-        
+        externalBorder.shadowOpacity = 0.3
+        externalBorder.shadowOffset = CGSize(width: 0, height: 0)
+        externalBorder.shadowRadius = 1
+        externalBorder.shouldRasterize = true
+        externalBorder.rasterizationScale = UIScreen.main.scale
         return externalBorder
     }()
     var item: EditorStickerItem
@@ -47,9 +51,6 @@ class EditorStickerItemView: UIView {
             if isSelected == newValue {
                 return
             }
-//            if item.text != nil {
-//                layer.shadowColor = newValue ? UIColor.black.withAlphaComponent(0.8).cgColor : UIColor.clear.cgColor
-//            }
             if item.music == nil {
                 externalBorder.cornerRadius = newValue ? 1 / scale : 0
                 externalBorder.borderWidth = newValue ? 1 / scale : 0
@@ -68,6 +69,8 @@ class EditorStickerItemView: UIView {
     var initialScale: CGFloat = 1
     var initialPoint: CGPoint = .zero
     var initialRadian: CGFloat = 0
+    var initialAngle: CGFloat = 0
+    var initialMirrorType: EditorImageResizerView.MirrorType = .none
     
     init(item: EditorStickerItem, scale: CGFloat) {
         self.item = item
@@ -82,16 +85,14 @@ class EditorStickerItemView: UIView {
             height: height + margin
         )
         layer.addSublayer(externalBorder)
+        contentView.scale = scale
         addSubview(contentView)
-//        if item.text != nil {
-//            layer.shadowColor = UIColor.black.withAlphaComponent(0.8).cgColor
-//        }
         if item.music == nil {
             externalBorder.borderColor = UIColor.white.cgColor
         }
-        layer.shadowOpacity = 0.3
-        layer.shadowOffset = CGSize(width: 0, height: 0)
-        layer.shadowRadius = 1
+//        layer.shadowOpacity = 0.3
+//        layer.shadowOffset = CGSize(width: 0, height: 0)
+//        layer.shadowRadius = 1
         initGestures()
     }
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -148,6 +149,7 @@ class EditorStickerItemView: UIView {
         }
         switch panGR.state {
         case .began:
+//            layer.shadowOpacity = 0
             touching = true
             firstTouch = true
             delegate?.stickerItemView(didTouchBegan: self)
@@ -158,6 +160,7 @@ class EditorStickerItemView: UIView {
             center = CGPoint(x: initialPoint.x + point.x, y: initialPoint.y + point.y)
             delegate?.stickerItemView(self, panGestureRecognizerChanged: panGR)
         case .ended, .cancelled, .failed:
+//            layer.shadowOpacity = 0.3
             touching = false
             var isDelete = false
             if let panIsDelete = delegate?.stickerItemView(panGestureRecognizerEnded: self) {
@@ -190,6 +193,7 @@ class EditorStickerItemView: UIView {
         }
         switch pinchGR.state {
         case .began:
+//            layer.shadowOpacity = 0
             touching = true
             firstTouch = true
             delegate?.stickerItemView(didTouchBegan: self)
@@ -199,6 +203,7 @@ class EditorStickerItemView: UIView {
         case .changed:
             update(pinchScale: initialScale * pinchGR.scale, isPinch: true, isMirror: true)
         case .ended, .cancelled, .failed:
+//            layer.shadowOpacity = 0.3
             touching = false
             delegate?.stickerItemView(touchEnded: self)
         default:
@@ -217,6 +222,7 @@ class EditorStickerItemView: UIView {
         }
         switch rotationGR.state {
         case .began:
+//            layer.shadowOpacity = 0
             firstTouch = true
             touching = true
             isSelected = true
@@ -255,6 +261,7 @@ class EditorStickerItemView: UIView {
             }
             update(pinchScale: pinchScale, rotation: radian, isMirror: true)
         case .ended, .cancelled, .failed:
+//            layer.shadowOpacity = 0.3
             touching = false
             delegate?.stickerItemView(touchEnded: self)
             rotationGR.rotation = 0
@@ -375,6 +382,8 @@ class EditorStickerItemView: UIView {
         }
         transform = transform.rotated(by: radian)
         if isSelected && item.music == nil {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
             if touching {
                 externalBorder.borderWidth = 1
                 externalBorder.cornerRadius = 1
@@ -382,6 +391,7 @@ class EditorStickerItemView: UIView {
                 externalBorder.borderWidth = 1 / scale
                 externalBorder.cornerRadius = 1 / scale
             }
+            CATransaction.commit()
         }
     }
     func update(item: EditorStickerItem) {

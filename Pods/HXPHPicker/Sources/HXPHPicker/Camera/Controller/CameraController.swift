@@ -62,6 +62,7 @@ open class CameraController: UINavigationController {
         self.config = config
         cameraDelegate = delegate
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let cameraVC = CameraViewController(
             config: config,
             type: type,

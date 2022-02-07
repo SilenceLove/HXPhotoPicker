@@ -6,6 +6,7 @@
 "相册" = "album Foto";
 "完成" = "bawa";
 "原图" = "Gambar asli";
+"原片" = "Gambar asli";
 "预览" = "Pratinjau";
 "编辑" = "edit";
 "返回" = "kembali";
@@ -47,6 +48,8 @@
 "图片下载中" = "Pengunduhan gambar";
 "视频下载中" = "Pengunduhan video";
 "设置失败!" = "Penyiapan gagal!";
+"唯美" = "Nashville";
+"梦幻" = "Toaster";
 "老电影" = "film lama";
 "怀旧" = "Nostalgia";
 "黑白" = "Hitam dan putih";

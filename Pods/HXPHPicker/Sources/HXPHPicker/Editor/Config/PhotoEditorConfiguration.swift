@@ -68,6 +68,9 @@ open class PhotoEditorConfiguration: EditorConfiguration {
     
     /// 马赛克配置
     public lazy var mosaic: Mosaic = .init()
+}
+
+extension PhotoEditorConfiguration {
     
     public struct Mosaic {
         /// 生成马赛克的大小

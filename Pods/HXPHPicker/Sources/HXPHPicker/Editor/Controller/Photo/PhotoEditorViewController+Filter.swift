@@ -24,21 +24,22 @@ extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
             return
         }
         imageView.imageResizerView.hasFilter = true
-        ProgressHUD.showLoading(addedTo: view, animated: true)
+//        ProgressHUD.showLoading(addedTo: view, animated: true)
         let value = filterView.sliderView.value
         let lastImage = imageView.image
         DispatchQueue.global().async {
             let filterInfo = self.config.filter.infos[atItem]
-            if let newImage = filterInfo.filterHandler(self.thumbnailImage, lastImage, value, .touchUpInside) {
+            if let ciImage = self.thumbnailImage.ci_Image,
+               let newImage = filterInfo.filterHandler(ciImage, lastImage, value, .touchUpInside)?.image {
                 let mosaicImage = newImage.mosaicImage(level: self.config.mosaic.mosaicWidth)
                 DispatchQueue.main.sync {
-                    ProgressHUD.hide(forView: self.view, animated: true)
+//                    ProgressHUD.hide(forView: self.view, animated: true)
                     self.imageView.updateImage(newImage)
                     self.imageView.setMosaicOriginalImage(mosaicImage)
                 }
             }else {
                 DispatchQueue.main.sync {
-                    ProgressHUD.hide(forView: self.view, animated: true)
+//                    ProgressHUD.hide(forView: self.view, animated: true)
                     ProgressHUD.showWarning(addedTo: self.view, text: "设置失败!".localized, animated: true, delayHide: 1.5)
                 }
             }
@@ -47,7 +48,8 @@ extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
     func filterView(_ filterView: PhotoEditorFilterView,
                     didChanged value: Float) {
         let filterInfo = config.filter.infos[filterView.currentSelectedIndex - 1]
-        if let newImage = filterInfo.filterHandler(thumbnailImage, imageView.image, value, .valueChanged) {
+        if let ciImage = thumbnailImage.ci_Image,
+           let newImage = filterInfo.filterHandler(ciImage, imageView.image, value, .valueChanged)?.image {
             imageView.updateImage(newImage)
             if mosaicToolView.canUndo {
                 let mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)
@@ -57,7 +59,8 @@ extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
     }
     func filterView(_ filterView: PhotoEditorFilterView, touchUpInside value: Float) {
         let filterInfo = config.filter.infos[filterView.currentSelectedIndex - 1]
-        if let newImage = filterInfo.filterHandler(thumbnailImage, imageView.image, value, .touchUpInside) {
+        if let ciImage = thumbnailImage.ci_Image,
+           let newImage = filterInfo.filterHandler(ciImage, imageView.image, value, .touchUpInside)?.image {
             imageView.updateImage(newImage)
             let mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)
             imageView.setMosaicOriginalImage(mosaicImage)

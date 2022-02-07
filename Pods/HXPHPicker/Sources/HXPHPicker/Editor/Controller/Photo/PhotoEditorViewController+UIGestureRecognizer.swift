@@ -21,6 +21,10 @@ extension PhotoEditorViewController: UIGestureRecognizerDelegate {
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        true
+        if otherGestureRecognizer is UILongPressGestureRecognizer &&
+            otherGestureRecognizer.view is PhotoEditorContentView {
+            return false
+        }
+        return true
     }
 }

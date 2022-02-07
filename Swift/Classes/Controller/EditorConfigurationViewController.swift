@@ -398,9 +398,9 @@ extension EditorConfigurationViewController {
             case .mustBeTailored:
                 return videoConfig.mustBeTailored ? "true" : "false"
             case .maximumVideoCroppingTime:
-                return String(Int(videoConfig.cropping.maximumVideoCroppingTime))
+                return String(Int(videoConfig.cropTime.maximumVideoCroppingTime))
             case .minimumVideoCroppingTime:
-                return String(Int(videoConfig.cropping.minimumVideoCroppingTime))
+                return String(Int(videoConfig.cropTime.minimumVideoCroppingTime))
             }
         }
         return ""
@@ -547,7 +547,7 @@ extension EditorConfigurationViewController {
     }
     func maximumVideoCroppingTimeAction(_ indexPath: IndexPath) {
         let alert = UIAlertController.init(title: "maximumVideoCroppingTime", message: nil, preferredStyle: .alert)
-        let maximumVideoCroppingTime: Int = Int(videoConfig.cropping.maximumVideoCroppingTime)
+        let maximumVideoCroppingTime: Int = Int(videoConfig.cropTime.maximumVideoCroppingTime)
         alert.addTextField { (textfield) in
             textfield.keyboardType = .numberPad
             textfield.text = String(maximumVideoCroppingTime)
@@ -560,7 +560,7 @@ extension EditorConfigurationViewController {
                     guard let self = self else { return }
             let textFiled = alert.textFields?.first
             let time = Int(textFiled?.text ?? "0")!
-            self.videoConfig.cropping.maximumVideoCroppingTime = TimeInterval(time)
+            self.videoConfig.cropTime.maximumVideoCroppingTime = TimeInterval(time)
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
@@ -568,7 +568,7 @@ extension EditorConfigurationViewController {
     }
     func minimumVideoCroppingTimeAction(_ indexPath: IndexPath) {
         let alert = UIAlertController.init(title: "maximumVideoCroppingTime", message: nil, preferredStyle: .alert)
-        let minimumVideoCroppingTime: Int = Int(videoConfig.cropping.minimumVideoCroppingTime)
+        let minimumVideoCroppingTime: Int = Int(videoConfig.cropTime.minimumVideoCroppingTime)
         alert.addTextField { (textfield) in
             textfield.keyboardType = .numberPad
             textfield.text = String(minimumVideoCroppingTime)
@@ -581,7 +581,7 @@ extension EditorConfigurationViewController {
                     guard let self = self else { return }
             let textFiled = alert.textFields?.first
             let time = Int(textFiled?.text ?? "0")!
-            self.videoConfig.cropping.minimumVideoCroppingTime = TimeInterval(time)
+            self.videoConfig.cropTime.minimumVideoCroppingTime = TimeInterval(time)
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))

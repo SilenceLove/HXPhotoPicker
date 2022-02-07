@@ -66,7 +66,8 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
             }
         }
         imagePickerController.mediaTypes = mediaTypes
-        present(imagePickerController, animated: true, completion: nil)
+        imagePickerController.modalPresentationStyle = .fullScreen
+        present(imagePickerController, animated: true)
     }
     
     public func imagePickerController(

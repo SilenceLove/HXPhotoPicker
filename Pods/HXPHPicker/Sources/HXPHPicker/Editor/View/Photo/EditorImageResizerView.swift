@@ -209,7 +209,9 @@ class EditorImageResizerView: UIView {
     }
     
     var isDrawing: Bool { imageView.drawView.isDrawing }
-    
+    var cropTime_AspectRatio: CGSize = .zero
+    var cropTime_FixedRatio: Bool = false
+    var cropTime_IsOriginalRatio: Bool = false
     var zoomScale: CGFloat = 1 {
         didSet { imageView.zoomScale = zoomScale * scrollView.zoomScale }
     }
@@ -293,7 +295,6 @@ class EditorImageResizerView: UIView {
             // 停止定时器
             stopControlTimer()
             stopShowMaskBgTimer()
-            maskLinesView.setupShadow(true)
             inControlTimer = false
             // 停止滑动
             scrollView.setContentOffset(scrollView.contentOffset, animated: false)
@@ -350,7 +351,6 @@ class EditorImageResizerView: UIView {
         }
     }
     func changedMaskRectCompletion() {
-        maskLinesView.setupShadow(false)
         delegate?.imageResizerView(didEndChangedMaskRect: self)
         if maskBgShowTimer == nil && maskBgView.alpha == 0 {
             showMaskBgView()

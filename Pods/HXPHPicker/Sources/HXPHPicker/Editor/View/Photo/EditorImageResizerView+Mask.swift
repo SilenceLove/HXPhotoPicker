@@ -73,6 +73,9 @@ extension EditorImageResizerView {
     ///   - rect: 指定位置
     ///   - animated: 是否需要动画效果
     func updateMaskViewFrame(to rect: CGRect, animated: Bool) {
+        if rect.width.isNaN || rect.height.isNaN {
+            return
+        }
         /// 手势控制视图
         controlView.frame = rect
         /// 更新遮罩位置大小
@@ -105,6 +108,7 @@ extension EditorImageResizerView {
             return
         }
         maskBgView.layer.removeAllAnimations()
+        maskLinesView.showGridlinesLayer(false)
         UIView.animate(withDuration: 0.2) {
             self.maskBgView.alpha = 1
         }
@@ -116,6 +120,7 @@ extension EditorImageResizerView {
             return
         }
         maskBgView.layer.removeAllAnimations()
+        maskLinesView.showGridlinesLayer(true)
         UIView.animate(withDuration: 0.2) {
             self.maskBgView.alpha = 0
         }

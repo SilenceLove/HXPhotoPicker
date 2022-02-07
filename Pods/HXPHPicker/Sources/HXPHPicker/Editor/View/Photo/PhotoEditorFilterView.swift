@@ -112,11 +112,14 @@ class PhotoEditorFilterView: UIView {
     }
     var currentSelectedIndex: Int
     let filterConfig: PhotoEditorConfiguration.Filter
-    init(filterConfig: PhotoEditorConfiguration.Filter,
-         hasLastFilter: Bool) {
+    init(
+        filterConfig: PhotoEditorConfiguration.Filter,
+        hasLastFilter: Bool,
+        isVideo: Bool = false
+    ) {
         self.filterConfig = filterConfig
         let originalFilter = PhotoEditorFilter(
-            filterName: "原图".localized,
+            filterName: isVideo ? "原片".localized : "原图".localized,
             defaultValue: -1
         )
         originalFilter.isOriginal = true
@@ -251,13 +254,13 @@ extension PhotoEditorFilterView: UICollectionViewDataSource, UICollectionViewDel
 
 extension PhotoEditorFilterView: PhotoEditorFilterViewCellDelegate {
     func filterViewCell(fetchFilter cell: PhotoEditorFilterViewCell) -> UIImage? {
-        if let image = image,
+        if let image = image?.ci_Image,
            let index = filters.firstIndex(of: cell.filter) {
             let filterInfo = filterConfig.infos[index - 1]
             return filterInfo.filterHandler(image,
                                             cell.imageView.image,
                                             filterInfo.defaultValue,
-                                            .touchUpInside)
+                                            .touchUpInside)?.image
         }
         return nil
     }

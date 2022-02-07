@@ -66,7 +66,7 @@ public extension EditorToolOptions {
         /// video - 配乐
         case music
         
-        /// 尺寸裁剪（video-未完成）
+        /// 尺寸裁剪
         case cropSize
         
         /// video - 时长裁剪
@@ -155,13 +155,17 @@ extension VideoEditorConfiguration {
         config.exportPreset = exportPreset
         config.videoQuality = videoQuality
         config.defaultState = defaultState
+        config.videoExportURL = videoExportURL
         config.mustBeTailored = mustBeTailored
+        config.brush = brush
         config.chartlet = chartlet
         config.text = text
         config.music = music
-        config.cropping = cropping
-        config.cropView = cropView
+        config.cropTime = cropTime
+        config.cropSize = cropSize
+        config.cropConfirmView = cropConfirmView
         config.toolView = toolView
+        config.filter = filter
         return config
     }
 }

@@ -41,6 +41,7 @@ struct PhotoEditData: Codable {
 
 struct PhotoEditCropData: Codable {
     let cropSize: CGSize
+    let isRoundCrop: Bool
     let zoomScale: CGFloat
     let contentInset: UIEdgeInsets
     let offsetScale: CGPoint

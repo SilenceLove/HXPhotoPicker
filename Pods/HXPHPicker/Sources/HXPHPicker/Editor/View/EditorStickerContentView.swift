@@ -180,15 +180,13 @@ class EditorStickerContentView: UIView {
         }
         return view
     }()
+    var scale: CGFloat = 1
     var item: EditorStickerItem
     weak var timer: Timer?
     init(item: EditorStickerItem) {
         self.item = item
         super.init(frame: item.frame)
         if item.music != nil {
-            layer.shadowColor = UIColor.black.withAlphaComponent(0.6).cgColor
-            layer.shadowOpacity = 0.4
-            layer.shadowOffset = CGSize(width: 0, height: 1)
             addSubview(animationView)
             layer.addSublayer(textLayer)
             CATransaction.begin()
@@ -207,6 +205,10 @@ class EditorStickerContentView: UIView {
             }
             addSubview(imageView)
         }
+        layer.shadowOpacity = 0.4
+        layer.shadowOffset = CGSize(width: 0, height: 1)
+        layer.shouldRasterize = true
+        layer.rasterizationScale = UIScreen.main.scale
     }
     func startTimer() {
         invalidateTimer()
@@ -214,18 +216,21 @@ class EditorStickerContentView: UIView {
             withTimeInterval: 0.5,
             repeats: true, block: { [weak self] timer in
                 if let player = PhotoManager.shared.audioPlayer {
+                    let lyric = self?.item.music?.lyric(atTime: player.currentTime)
+                    if let str = self?.textLayer.string as? String,
+                       let lyricStr = lyric?.lyric,
+                       str == lyricStr {
+                       return
+                    }
                     CATransaction.begin()
                     CATransaction.setDisableActions(true)
-                    let lyric = self?.item.music?.lyric(atTime: player.currentTime)
                     self?.textLayer.string = lyric?.lyric
                     self?.updateText()
                     CATransaction.commit()
-//                        print(player.currentTime)
                 }else {
                     timer.invalidate()
                     self?.timer = nil
                 }
-//                    print("正在循环")
         })
         self.timer = timer
     }
@@ -235,13 +240,21 @@ class EditorStickerContentView: UIView {
     }
     func update(item: EditorStickerItem) {
         self.item = item
-        frame = item.frame
-        imageView.image = item.image
+        if !frame.equalTo(item.frame) {
+            frame = item.frame
+        }
+        if imageView.image != item.image {
+            imageView.image = item.image
+        }
     }
     func updateText() {
-        if var height = (textLayer.string as? String)?.height(ofFont: textLayer.font as! UIFont, maxWidth: width) {
+        if var height = (textLayer.string as? String)?.height(
+            ofFont: textLayer.font as! UIFont, maxWidth: width * scale
+        ) {
             height = min(100, height)
-            textLayer.frame = CGRect(origin: .zero, size: CGSize(width: width, height: height))
+            if textLayer.frame.height != height {
+                textLayer.frame = CGRect(origin: .zero, size: CGSize(width: width * scale, height: height))
+            }
         }
         animationView.frame = CGRect(x: 2, y: -23, width: 20, height: 15)
     }

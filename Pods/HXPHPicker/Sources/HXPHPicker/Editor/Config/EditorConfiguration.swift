@@ -39,7 +39,7 @@ open class EditorConfiguration: BaseConfiguration {
 
 public struct EditorCropSizeConfiguration {
     
-    /// 圆形裁剪框（裁剪图片时有效）
+    /// 圆形裁剪框
     public var isRoundCrop: Bool = false
     
     /// 固定比例
@@ -53,6 +53,10 @@ public struct EditorCropSizeConfiguration {
     
     /// 宽高比选中颜色
     public var aspectRatioSelectedColor: UIColor = .systemTintColor
+    
+    /// 宽高比数组 [[宽, 高]]
+    /// [0, 0]：自由，数组第一个会自动选中，请将第一个设置为[0, 0]
+    public var aspectRatios: [[Int]] = [[0, 0], [1, 1], [3, 2], [2, 3], [4, 3], [3, 4], [16, 9], [9, 16]]
     
     public init() { }
 }

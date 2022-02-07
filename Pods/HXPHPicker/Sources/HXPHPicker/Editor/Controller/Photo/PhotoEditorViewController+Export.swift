@@ -17,9 +17,9 @@ extension PhotoEditorViewController {
             imageView.hasSticker {
             imageView.deselectedSticker()
             ProgressHUD.showLoading(addedTo: view, text: "正在处理...", animated: true)
-            imageView.cropping { [weak self] (result) in
+            imageView.cropping { [weak self] in
                 guard let self = self else { return }
-                if let result = result {
+                if let result = $0 {
                     ProgressHUD.hide(forView: self.view, animated: false)
                     self.isFinishedBack = true
                     self.transitionalImage = result.editedImage

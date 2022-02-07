@@ -18,8 +18,8 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         let timeRang: CMTimeRange
         if let startTime = videoView.playerView.playStartTime,
            let endTime = videoView.playerView.playEndTime {
-            if endTime.seconds - startTime.seconds > config.cropping.maximumVideoCroppingTime {
-                let seconds = Double(config.cropping.maximumVideoCroppingTime)
+            if endTime.seconds - startTime.seconds > config.cropTime.maximumVideoCroppingTime {
+                let seconds = Double(config.cropTime.maximumVideoCroppingTime)
                 timeRang = CMTimeRange(
                     start: startTime,
                     duration: CMTime(
@@ -319,6 +319,7 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         hiddenBrushColorView()
         hidenTopView()
         showFilterView()
+        videoView.canLookOriginal = true
     }
     
     func showBrushColorView() {

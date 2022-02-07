@@ -62,10 +62,12 @@ extension PhotoEditorViewController: EditorToolViewDelegate {
                 hiddenMosaicToolView()
             }
         case .filter:
+            deselectedDraw()
             disableImageSubView()
             isFilter = true
             hidenTopView()
             showFilterView()
+            imageView.canLookOriginal = true
         default:
             break
         }

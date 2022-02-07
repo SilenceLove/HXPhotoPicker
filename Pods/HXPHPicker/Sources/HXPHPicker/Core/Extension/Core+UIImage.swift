@@ -230,25 +230,25 @@ extension UIImage {
     }
     func rotation(angle: Int, isHorizontal: Bool) -> UIImage? {
         switch angle {
-        case 0, 360:
+        case 0, 360, -360:
             if isHorizontal {
                 return rotation(to: .upMirrored)
             }
-        case 90:
+        case 90, -270:
             if !isHorizontal {
-                return rotation(to: .left)
+                return rotation(to: .right)
             }else {
                 return rotation(to: .rightMirrored)
             }
-        case 180:
+        case 180, -180:
             if !isHorizontal {
                 return rotation(to: .down)
             }else {
                 return rotation(to: .downMirrored)
             }
-        case 270:
+        case 270, -90:
             if !isHorizontal {
-                return rotation(to: .right)
+                return rotation(to: .left)
             }else {
                 return rotation(to: .leftMirrored)
             }

@@ -443,15 +443,14 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
         }
     }
     func updateFinishButtonTitle() {
-        if sourceType == .browser {
-           return
+        guard let picker = viewController?.pickerController,
+              sourceType != .browser else {
+            return
         }
         requestAssetBytes()
         var selectCount = 0
-        if let pickerController = viewController?.pickerController {
-            if pickerController.config.selectMode == .multiple {
-                selectCount = pickerController.selectedAssetArray.count
-            }
+        if picker.config.selectMode == .multiple {
+            selectCount = picker.selectedAssetArray.count
         }
         if selectCount > 0 {
             finishBtn.isEnabled = true
@@ -466,7 +465,11 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
                 for: .normal
             )
         }else {
-            finishBtn.isEnabled = !config.disableFinishButtonWhenNotSelected
+            if picker.config.selectMode == .single {
+                finishBtn.isEnabled = true
+            }else {
+                finishBtn.isEnabled = !config.disableFinishButtonWhenNotSelected
+            }
             previewBtn.isEnabled = false
             finishBtn.setTitle("完成".localized, for: .normal)
         }

@@ -15,6 +15,7 @@ extension EditorImageResizerView {
         mosaicLayer: CALayer?,
         drawLayer: CALayer?,
         stickerLayer: CALayer?,
+        isRoundCrop: Bool,
         viewWidth: CGFloat,
         viewHeight: CGFloat
     ) -> (UIImage, URL, PhotoEditResult.ImageType)? { // swiftlint:disable:this large_tuple
@@ -80,6 +81,7 @@ extension EditorImageResizerView {
                     if let newImage = cropImage(
                         currentImage,
                         toRect: crop_Rect,
+                        isRoundCrop: isRoundCrop,
                         viewWidth: viewWidth,
                         viewHeight: viewHeight
                     ) {
@@ -106,6 +108,7 @@ extension EditorImageResizerView {
             if let image = cropImage(
                 inputImage,
                 toRect: crop_Rect,
+                isRoundCrop: isRoundCrop,
                 viewWidth: viewWidth,
                 viewHeight: viewHeight
             ),
@@ -121,6 +124,7 @@ extension EditorImageResizerView {
     func cropImage(
         _ inputImage: UIImage?,
         toRect cropRect: CGRect,
+        isRoundCrop: Bool,
         viewWidth: CGFloat,
         viewHeight: CGFloat
     ) -> UIImage? {
@@ -129,7 +133,7 @@ extension EditorImageResizerView {
             viewWidth: viewWidth,
             viewHeight: viewHeight
         )
-        if cropConfig.isRoundCrop {
+        if isRoundCrop {
             image = image?.roundCropping()
         }
         var rotate = CGFloat.pi * currentAngle / 180
@@ -138,7 +142,7 @@ extension EditorImageResizerView {
         }
         let isHorizontal = mirrorType == .horizontal
         if rotate > 0 || isHorizontal {
-            let angle = labs(Int(currentAngle))
+            let angle = Int(currentAngle)
             image = image?.rotation(angle: angle, isHorizontal: isHorizontal)
         }
         return image

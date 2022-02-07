@@ -314,9 +314,14 @@ extension PhotoTools {
         animationBeginTime: CFTimeInterval,
         videoDuration: TimeInterval
     ) throws -> AVMutableVideoComposition {
-        let videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
-        videoComposition.customVideoCompositorClass = VideoFilterCompositor.self
+        let videoComposition = videoFixed(
+            composition: mixComposition,
+            assetOrientation: videoAsset.videoOrientation
+        )
         let renderSize = videoComposition.renderSize
+        cropVideoSize(videoComposition, cropSizeData)
+        let overlaySize = videoComposition.renderSize
+        videoComposition.customVideoCompositorClass = VideoFilterCompositor.self
         // https://stackoverflow.com/a/45013962
 //        renderSize = CGSize(
 //            width: floor(renderSize.width / 16) * 16,
@@ -332,25 +337,24 @@ extension PhotoTools {
         if !stickerInfos.isEmpty || drawImage != nil {
             let bounds = CGRect(origin: .zero, size: renderSize)
             let overlaylayer = CALayer()
-            overlaylayer.backgroundColor = UIColor.clear.cgColor
+            let bgLayer = CALayer()
             if let drawImage = drawImage {
                 let drawLayer = CALayer()
                 drawLayer.contents = drawImage.cgImage
                 drawLayer.frame = bounds
                 drawLayer.contentsScale = UIScreen.main.scale
-                overlaylayer.addSublayer(drawLayer)
+                bgLayer.addSublayer(drawLayer)
             }
             for info in stickerInfos {
                 let center = CGPoint(
                     x: info.centerScale.x * bounds.width,
-                    y: bounds.height - info.centerScale.y * bounds.height
+                    y: info.centerScale.y * bounds.height
                 )
                 let size = CGSize(
                     width: info.sizeScale.width * bounds.width,
                     height: info.sizeScale.height * bounds.height
                 )
-                var transform = CATransform3DMakeScale(info.scale, info.scale, 1)
-                transform = CATransform3DRotate(transform, info.angel, 0, 0, -1)
+                let transform = stickerLayerOrientation(cropSizeData, info)
                 if let music = info.music,
                    let subMusic = music.music {
                     let textLayer = textAnimationLayer(
@@ -363,11 +367,12 @@ extension PhotoTools {
                             height: music.animationSizeScale.height * bounds.height
                         ),
                         beginTime: animationBeginTime,
-                        videoDuration: videoDuration)
+                        videoDuration: videoDuration
+                    )
                     textLayer.frame = CGRect(origin: .zero, size: size)
-                    textLayer.transform = transform
                     textLayer.position = center
-                    overlaylayer.addSublayer(textLayer)
+                    bgLayer.addSublayer(textLayer)
+                    textLayer.transform = transform
                 }else {
                     let imageLayer = animationLayer(
                         image: info.image,
@@ -375,15 +380,37 @@ extension PhotoTools {
                         videoDuration: videoDuration
                     )
                     imageLayer.frame = CGRect(origin: .zero, size: size)
-                    imageLayer.transform = transform
                     imageLayer.position = center
-                    imageLayer.shadowColor = UIColor.black.withAlphaComponent(0.6).cgColor
-                    imageLayer.shadowOpacity = 0.5
+                    imageLayer.shadowOpacity = 0.4
                     imageLayer.shadowOffset = CGSize(width: 0, height: -1)
-                    overlaylayer.addSublayer(imageLayer)
+                    bgLayer.addSublayer(imageLayer)
+                    imageLayer.transform = transform
                 }
             }
-            overlaylayer.frame = bounds
+            if cropSizeData.canReset {
+                let contentLayer = CALayer()
+                let width = renderSize.width * cropSizeData.cropRect.width
+                let height = renderSize.height * cropSizeData.cropRect.height
+                let x = renderSize.width * cropSizeData.cropRect.minX
+                let y = renderSize.height * cropSizeData.cropRect.minY
+                bgLayer.frame = .init(
+                    x: -x, y: -y,
+                    width: bounds.width, height: bounds.height
+                )
+                contentLayer.addSublayer(bgLayer)
+                contentLayer.frame = .init(
+                    x: -(width - overlaySize.width) * 0.5,
+                    y: -(height - overlaySize.height) * 0.5,
+                    width: width, height: height
+                )
+                overlaylayer.addSublayer(contentLayer)
+                layerOrientation(contentLayer, cropSizeData)
+            }else {
+                bgLayer.frame = bounds
+                overlaylayer.addSublayer(bgLayer)
+            }
+            overlaylayer.isGeometryFlipped = true
+            overlaylayer.frame = .init(origin: .zero, size: overlaySize)
             
             let trackID = videoAsset.unusedTrackID()
             videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
@@ -398,16 +425,15 @@ extension PhotoTools {
             let videoInstruction = instruction as! AVVideoCompositionInstruction
             let layerInstructions = videoInstruction.layerInstructions
             var sourceTrackIDs: [NSValue] = []
-            if let trackID = watermarkLayerTrackID {
-                sourceTrackIDs.append(trackID as NSValue)
-            }
             for layerInstruction in layerInstructions {
                 sourceTrackIDs.append(layerInstruction.trackID as NSValue)
             }
             let newInstruction = CustomVideoCompositionInstruction(
                 sourceTrackIDs: sourceTrackIDs,
+                watermarkTrackID: watermarkLayerTrackID,
                 timeRange: instruction.timeRange,
-                hasSticker: watermarkLayerTrackID == nil ? false : true,
+                videoOrientation: videoAsset.videoOrientation,
+                cropSizeData: cropSizeData.canReset ? cropSizeData : nil,
                 filterInfo: cropSizeData.filter,
                 filterValue: cropSizeData.filterValue
             )
@@ -415,14 +441,13 @@ extension PhotoTools {
         }
         if newInstructions.isEmpty {
             var sourceTrackIDs: [NSValue] = []
-            if let trackID = watermarkLayerTrackID {
-                sourceTrackIDs.append(trackID as NSValue)
-            }
             sourceTrackIDs.append(videoTrack.trackID as NSValue)
             let newInstruction = CustomVideoCompositionInstruction(
                 sourceTrackIDs: sourceTrackIDs,
+                watermarkTrackID: watermarkLayerTrackID,
                 timeRange: videoTrack.timeRange,
-                hasSticker: watermarkLayerTrackID == nil ? false : true,
+                videoOrientation: videoAsset.videoOrientation,
+                cropSizeData: cropSizeData.canReset ? cropSizeData : nil,
                 filterInfo: cropSizeData.filter,
                 filterValue: cropSizeData.filterValue
             )
@@ -432,6 +457,73 @@ extension PhotoTools {
         videoComposition.renderScale = 1
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
         return videoComposition
+    }
+    static func cropVideoSize(
+        _ videoComposition: AVMutableVideoComposition,
+        _ cropSizeData: VideoEditorCropSizeData
+    ) {
+        if !cropSizeData.canReset {
+            return
+        }
+        let width = videoComposition.renderSize.width * cropSizeData.cropRect.width
+        let height = videoComposition.renderSize.height * cropSizeData.cropRect.height
+        let orientation = cropOrientation(cropSizeData)
+        switch orientation {
+        case .up, .upMirrored, .down, .downMirrored:
+            videoComposition.renderSize = .init(width: width, height: height)
+        default:
+            videoComposition.renderSize = .init(width: height, height: width)
+        }
+    }
+    private static func layerOrientation(
+        _ layer: CALayer,
+        _ cropSizeData: VideoEditorCropSizeData
+    ) {
+        if cropSizeData.canReset {
+            let orientation = cropOrientation(cropSizeData)
+            switch orientation {
+            case .upMirrored:
+                layer.transform = CATransform3DMakeScale(-1, 1, 1)
+            case .left:
+                layer.transform = CATransform3DMakeRotation(-CGFloat.pi * 0.5, 0, 0, 1)
+            case .leftMirrored:
+                var transform = CATransform3DMakeScale(-1, 1, 1)
+                transform = CATransform3DRotate(transform, -CGFloat.pi * 0.5, 0, 0, 1)
+                layer.transform = transform
+            case .right:
+                layer.transform = CATransform3DMakeRotation(CGFloat.pi * 0.5, 0, 0, 1)
+            case .rightMirrored:
+                var transform = CATransform3DMakeRotation(CGFloat.pi * 0.5, 0, 0, 1)
+                transform = CATransform3DScale(transform, 1, -1, 1)
+                layer.transform = transform
+            case .down:
+                layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 1)
+            case .downMirrored:
+                layer.transform = CATransform3DMakeScale(1, -1, 1)
+            default:
+                break
+            }
+        }
+    }
+    private static func stickerLayerOrientation(
+        _ cropSizeData: VideoEditorCropSizeData,
+        _ info: EditorStickerInfo
+    ) -> CATransform3D {
+        var transform: CATransform3D
+        switch stickerOrientation(info) {
+        case .upMirrored:
+            transform = CATransform3DMakeScale(-info.scale, info.scale, 1)
+        case .leftMirrored:
+            transform = CATransform3DMakeScale(-info.scale, info.scale, 1)
+        case .rightMirrored:
+            transform = CATransform3DMakeScale(info.scale, -info.scale, 1)
+        case .downMirrored:
+            transform = CATransform3DMakeScale(-info.scale, info.scale, 1)
+        default:
+            transform = CATransform3DMakeScale(info.scale, info.scale, 1)
+        }
+        transform = CATransform3DRotate(transform, info.angel, 0, 0, 1)
+        return transform
     }
     static func textAnimationLayer(
         music: VideoEditorMusic,
@@ -460,6 +552,8 @@ extension PhotoTools {
             textLayer.alignmentMode = .left
             textLayer.foregroundColor = UIColor.white.cgColor
             textLayer.frame = CGRect(origin: .zero, size: textSize)
+            textLayer.shadowOpacity = 0.4
+            textLayer.shadowOffset = CGSize(width: 0, height: -1)
             if index > 0 || lyric.startTime > 0 {
                 textLayer.opacity = 0
             }else {
@@ -535,13 +629,13 @@ extension PhotoTools {
         animationLayer.animationBeginTime = beginTime
         animationLayer.frame = CGRect(
             x: 2 * animationScale,
-            y: textSize.height + 8 * animationScale,
+            y: -(8 * animationScale + animationSize.height),
             width: animationSize.width,
             height: animationSize.height
         )
         animationLayer.startAnimation()
-        bgLayer.shadowColor = UIColor.black.withAlphaComponent(0.6).cgColor
-        bgLayer.shadowOpacity = 0.5
+        bgLayer.contentsScale = UIScreen.main.scale
+        bgLayer.shadowOpacity = 0.4
         bgLayer.shadowOffset = CGSize(width: 0, height: -1)
         bgLayer.addSublayer(animationLayer)
         return bgLayer
@@ -552,6 +646,7 @@ extension PhotoTools {
         videoDuration: TimeInterval
     ) -> CALayer {
         let animationLayer = CALayer()
+        animationLayer.contentsScale = UIScreen.main.scale
         animationLayer.contents = image.cgImage
         guard let gifResult = image.animateCGImageFrame() else {
             return animationLayer
@@ -587,5 +682,101 @@ extension PhotoTools {
         group.repeatCount = MAXFLOAT
         animationLayer.add(group, forKey: nil)
         return animationLayer
+    }
+    
+    static func videoFixed(
+        composition: AVMutableComposition,
+        assetOrientation: AVCaptureVideoOrientation
+    ) -> AVMutableVideoComposition {
+        let videoComposition = AVMutableVideoComposition(propertiesOf: composition)
+        guard assetOrientation != .landscapeRight else {
+            return videoComposition
+        }
+        guard let videoTrack = composition.tracks(withMediaType: .video).first else {
+            return videoComposition
+        }
+        let naturalSize = videoTrack.naturalSize
+        if assetOrientation == .portrait {
+            // 顺时针旋转90°
+            videoComposition.renderSize = CGSize(width: naturalSize.height, height: naturalSize.width)
+        } else if assetOrientation == .landscapeLeft {
+            // 顺时针旋转180°
+            videoComposition.renderSize = CGSize(width: naturalSize.width, height: naturalSize.height)
+        } else if assetOrientation == .portraitUpsideDown {
+            // 顺时针旋转270°
+            videoComposition.renderSize = CGSize(width: naturalSize.height, height: naturalSize.width)
+        }
+        return videoComposition
+    }
+    
+    static func createPixelBuffer(_ size: CGSize) -> CVPixelBuffer? {
+        var pixelBuffer: CVPixelBuffer?
+        let pixelBufferAttributes = [kCVPixelBufferIOSurfacePropertiesKey: [:]]
+        CVPixelBufferCreate(
+            nil,
+            Int(size.width),
+            Int(size.height),
+            kCVPixelFormatType_32BGRA,
+            pixelBufferAttributes as CFDictionary,
+            &pixelBuffer
+        )
+        return pixelBuffer
+    }
+    
+    static func cropOrientation(
+        _ cropSizeData: VideoEditorCropSizeData
+    ) -> UIImage.Orientation {
+        getOrientation(
+            cropSizeData.angle,
+            cropSizeData.mirrorType
+        )
+    }
+    static func stickerOrientation(
+        _ info: EditorStickerInfo
+    ) -> UIImage.Orientation {
+        getOrientation(
+            info.initialAngle,
+            info.initialMirrorType
+        )
+    }
+    private static func getOrientation(
+        _ angle: CGFloat,
+        _ mirrorType: EditorImageResizerView.MirrorType
+    ) -> UIImage.Orientation {
+        var rotate = CGFloat.pi * angle / 180
+        if rotate != 0 {
+            rotate = CGFloat.pi * 2 + rotate
+        }
+        let isHorizontal = mirrorType == .horizontal
+        if rotate > 0 || isHorizontal {
+            let angle = Int(angle)
+            switch angle {
+            case 0, 360, -360:
+                if isHorizontal {
+                    return .upMirrored
+                }
+            case 90, -270:
+                if !isHorizontal {
+                    return .right
+                }else {
+                    return .rightMirrored
+                }
+            case 180, -180:
+                if !isHorizontal {
+                    return .down
+                }else {
+                    return .downMirrored
+                }
+            case 270, -90:
+                if !isHorizontal {
+                    return .left
+                }else {
+                    return .leftMirrored
+                }
+            default:
+                break
+            }
+        }
+        return .up
     }
 }

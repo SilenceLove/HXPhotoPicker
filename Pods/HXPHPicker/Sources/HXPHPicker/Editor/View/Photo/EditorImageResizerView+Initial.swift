@@ -276,6 +276,7 @@ extension EditorImageResizerView {
         if canReset() {
             cropData = .init(
                 cropSize: cropSize,
+                isRoundCrop: layer.cornerRadius > 0 ? cropConfig.isRoundCrop : false,
                 zoomScale: oldZoomScale,
                 contentInset: oldContentInset,
                 offsetScale: offsetScale,
@@ -309,6 +310,7 @@ extension EditorImageResizerView {
         if canReset() {
             cropData = .init(
                 cropSize: cropSize,
+                isRoundCrop: layer.cornerRadius > 0 ? cropConfig.isRoundCrop : false,
                 zoomScale: oldZoomScale,
                 contentInset: oldContentInset,
                 offsetScale: offsetScale,

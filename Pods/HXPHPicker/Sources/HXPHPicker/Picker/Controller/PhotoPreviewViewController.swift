@@ -234,7 +234,9 @@ public class PhotoPreviewViewController: BaseViewController {
         }
     }
     public override func deviceOrientationDidChanged(notify: Notification) {
-        if config.bottomView.showSelectedView && (isMultipleSelect || isExternalPreview) && config.showBottomView {
+        if config.bottomView.showSelectedView &&
+            (isMultipleSelect || isExternalPreview) &&
+            config.showBottomView {
             bottomView.selectedView.reloadSectionInset()
         }
     }

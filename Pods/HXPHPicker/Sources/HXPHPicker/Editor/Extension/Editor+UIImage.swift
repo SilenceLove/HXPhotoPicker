@@ -14,12 +14,17 @@ extension UIImage {
         let scale = width * screenScale
         return filter(name: "CIPixellate", parameters: [kCIInputScaleKey: scale])
     }
-    
+    var ci_Image: CIImage? {
+        guard let cgImage = self.cgImage else {
+            return nil
+        }
+        return CIImage(cgImage: cgImage)
+    }
     func filter(name: String, parameters: [String: Any]) -> UIImage? {
         guard let image = self.cgImage else {
             return nil
         }
-
+    
         // 输入
         let input = CIImage(cgImage: image)
         // 输出

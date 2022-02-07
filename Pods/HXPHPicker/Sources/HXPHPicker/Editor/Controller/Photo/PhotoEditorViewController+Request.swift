@@ -243,6 +243,7 @@ extension PhotoEditorViewController {
         }
         setFilterImage()
         setImage(image)
+        imageView.imageResizerView.imageView.originalImage = image
     }
     func requestAssetFailure(isICloud: Bool) {
         ProgressHUD.hide(forView: view, animated: true)

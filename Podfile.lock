@@ -1,29 +1,29 @@
 PODS:
   - GDPerformanceView-Swift (2.1.1)
-  - HXPHPicker (1.3.2):
-    - HXPHPicker/Full (= 1.3.2)
-  - HXPHPicker/Camera (1.3.2):
+  - HXPHPicker (1.3.4):
+    - HXPHPicker/Full (= 1.3.4)
+  - HXPHPicker/Camera (1.3.4):
     - HXPHPicker/Core
-  - HXPHPicker/Core (1.3.2)
-  - HXPHPicker/Editor (1.3.2):
-    - HXPHPicker/Editor/KF (= 1.3.2)
-    - HXPHPicker/Editor/Lite (= 1.3.2)
-  - HXPHPicker/Editor/KF (1.3.2):
+  - HXPHPicker/Core (1.3.4)
+  - HXPHPicker/Editor (1.3.4):
+    - HXPHPicker/Editor/KF (= 1.3.4)
+    - HXPHPicker/Editor/Lite (= 1.3.4)
+  - HXPHPicker/Editor/KF (1.3.4):
     - HXPHPicker/Editor/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Editor/Lite (1.3.2):
+  - HXPHPicker/Editor/Lite (1.3.4):
     - HXPHPicker/Core
-  - HXPHPicker/Full (1.3.2):
+  - HXPHPicker/Full (1.3.4):
     - HXPHPicker/Camera
     - HXPHPicker/Editor
     - HXPHPicker/Picker
-  - HXPHPicker/Picker (1.3.2):
-    - HXPHPicker/Picker/KF (= 1.3.2)
-    - HXPHPicker/Picker/Lite (= 1.3.2)
-  - HXPHPicker/Picker/KF (1.3.2):
+  - HXPHPicker/Picker (1.3.4):
+    - HXPHPicker/Picker/KF (= 1.3.4)
+    - HXPHPicker/Picker/Lite (= 1.3.4)
+  - HXPHPicker/Picker/KF (1.3.4):
     - HXPHPicker/Picker/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Picker/Lite (1.3.2):
+  - HXPHPicker/Picker/Lite (1.3.4):
     - HXPHPicker/Core
   - Kingfisher (7.1.2)
 
@@ -39,9 +39,9 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   GDPerformanceView-Swift: 22d964fe40b19e3d914dba2586237d064de8fd77
-  HXPHPicker: 7afdd8fcbd34ae63cfe0b4db89dc941b2faa4c0f
+  HXPHPicker: 4163d1312e3db85281086770e5cad4f735062f2e
   Kingfisher: 44ed6a8504763f27bab46163adfac83f5deb240c
 
-PODFILE CHECKSUM: 58410b76c9805a58b2353f8cd17d9f5edf40cff5
+PODFILE CHECKSUM: e44679c41b896af330c5ec6690bdd5e7f09e66bd
 
 COCOAPODS: 1.10.1

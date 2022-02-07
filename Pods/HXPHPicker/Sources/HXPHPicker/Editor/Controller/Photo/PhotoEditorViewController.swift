@@ -155,6 +155,7 @@ open class PhotoEditorViewController: BaseViewController {
             isFilter = false
             resetOtherOption()
             hiddenFilterView()
+            imageView.canLookOriginal = false
             return
         }
         if showChartlet {
@@ -255,7 +256,10 @@ open class PhotoEditorViewController: BaseViewController {
         if config.cropping.fixedRatio || config.cropping.isRoundCrop {
             showRatios = false
         }
-        let view = PhotoEditorCropToolView.init(showRatios: showRatios)
+        let view = PhotoEditorCropToolView.init(
+            showRatios: showRatios,
+            scaleArray: config.cropping.aspectRatios
+        )
         view.delegate = self
         view.themeColor = config.cropping.aspectRatioSelectedColor
         view.alpha = 0

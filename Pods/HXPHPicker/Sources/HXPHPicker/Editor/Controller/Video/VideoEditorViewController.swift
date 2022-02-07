@@ -244,12 +244,15 @@ open class VideoEditorViewController: BaseViewController {
     }()
     lazy var cropToolView: PhotoEditorCropToolView = {
         var showRatios = true
-        if config.sizeCrop.fixedRatio || config.sizeCrop.isRoundCrop {
+        if config.cropSize.fixedRatio || config.cropSize.isRoundCrop {
             showRatios = false
         }
-        let view = PhotoEditorCropToolView(showRatios: showRatios)
+        let view = PhotoEditorCropToolView(
+            showRatios: showRatios,
+            scaleArray: config.cropSize.aspectRatios
+        )
         view.delegate = self
-        view.themeColor = config.sizeCrop.aspectRatioSelectedColor
+        view.themeColor = config.cropSize.aspectRatioSelectedColor
         view.alpha = 0
         view.isHidden = true
         return view
@@ -257,9 +260,9 @@ open class VideoEditorViewController: BaseViewController {
     lazy var cropView: VideoEditorCropView = {
         let cropView: VideoEditorCropView
         if needRequest {
-            cropView = VideoEditorCropView.init(config: config.cropping)
+            cropView = VideoEditorCropView.init(config: config.cropTime)
         }else {
-            cropView = VideoEditorCropView.init(avAsset: avAsset, config: config.cropping)
+            cropView = VideoEditorCropView.init(avAsset: avAsset, config: config.cropTime)
         }
         cropView.delegate = self
         cropView.alpha = 0
@@ -270,7 +273,8 @@ open class VideoEditorViewController: BaseViewController {
     lazy var filterView: PhotoEditorFilterView = {
         let view = PhotoEditorFilterView(
             filterConfig: config.filter,
-            hasLastFilter: editResult?.sizeData?.filter != nil
+            hasLastFilter: editResult?.sizeData?.filter != nil,
+            isVideo: true
         )
         view.delegate = self
         return view
@@ -281,7 +285,7 @@ open class VideoEditorViewController: BaseViewController {
         return toolView
     }()
     lazy var cropConfirmView: EditorCropConfirmView = {
-        let cropConfirmView = EditorCropConfirmView.init(config: config.cropView)
+        let cropConfirmView = EditorCropConfirmView.init(config: config.cropConfirmView)
         cropConfirmView.alpha = 0
         cropConfirmView.isHidden = true
         cropConfirmView.delegate = self
@@ -531,7 +535,7 @@ open class VideoEditorViewController: BaseViewController {
             setFilterViewFrame()
         }
         if orientationDidChange {
-            if videoView.playerView.avAsset != nil {
+            if videoView.playerView.avAsset != nil && !videoViewDidChange {
                 videoView.orientationDidChange()
             }
             videoViewDidChange = true
@@ -616,7 +620,11 @@ extension VideoEditorViewController: UIGestureRecognizerDelegate {
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        true
+        if otherGestureRecognizer is UILongPressGestureRecognizer &&
+            otherGestureRecognizer.view is PhotoEditorContentView {
+            return false
+        }
+        return true
     }
 }
 
@@ -641,6 +649,7 @@ extension VideoEditorViewController {
         if isFilter {
             videoView.stickerEnabled = true
             hiddenFilterView()
+            videoView.canLookOriginal = false
         }
         if showChartlet {
             showChartlet = false

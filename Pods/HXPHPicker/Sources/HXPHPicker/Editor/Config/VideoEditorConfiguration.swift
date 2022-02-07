@@ -27,12 +27,6 @@ open class VideoEditorConfiguration: EditorConfiguration {
     /// 画笔
     public lazy var brush: EditorBrushConfiguration = .init()
     
-    /// 裁剪配置
-    public lazy var sizeCrop: EditorCropSizeConfiguration = .init()
-    
-    /// 裁剪确认视图配置
-    public lazy var cropConfimView: CropConfirmViewConfiguration = .init()
-    
     /// 贴图配置
     public lazy var chartlet: EditorChartletConfiguration = .init()
     
@@ -45,39 +39,14 @@ open class VideoEditorConfiguration: EditorConfiguration {
     /// 滤镜配置
     public lazy var filter: Filter = .init(infos: PhotoTools.defaultVideoFilters())
     
-    public struct Music {
-        /// 显示搜索
-        public var showSearch: Bool = true
-        /// 完成按钮背景颜色、搜索框光标颜色
-        public var tintColor: UIColor = .systemTintColor
-        /// 搜索框的 placeholder
-        public var placeholder: String = ""
-        /// 滚动停止时自动播放音乐
-        public var autoPlayWhenScrollingStops: Bool = true
-        /// 配乐信息
-        /// 也可通过代理回调设置
-        /// func videoEditorViewController(
-        /// _ videoEditorViewController: VideoEditorViewController,
-        ///  loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
-        public var infos: [VideoEditorMusicInfo] = []
-        
-        /// 获取音乐列表, infos 为空时才会触发
-        /// handler = { response -> Bool in
-        ///     // 传入音乐数据
-        ///     response(self.getMusics())
-        ///     // 是否显示loading
-        ///     return false
-        /// }
-        public var handler: ((@escaping ([VideoEditorMusicInfo]) -> Void) -> Bool)?
-        
-        public init() { }
-    }
+    /// 裁剪时长配置
+    public lazy var cropTime: VideoCropTimeConfiguration = .init()
     
-    /// 裁剪配置
-    public lazy var cropping: VideoCropTimeConfiguration = .init()
+    /// 裁剪画面配置
+    public lazy var cropSize: EditorCropSizeConfiguration = .init() 
     
-    /// 裁剪视图配置
-    public lazy var cropView: CropConfirmViewConfiguration = .init()
+    /// 裁剪确认视图配置
+    public lazy var cropConfirmView: CropConfirmViewConfiguration = .init()
     
     /// 工具视图配置
     public lazy var toolView: EditorToolViewConfiguration = {
@@ -109,6 +78,37 @@ open class VideoEditorConfiguration: EditorConfiguration {
             imageName: "hx_editor_tools_filter",
             type: .filter
         )
-        return .init(toolOptions: [graffiti, chartlet, text, music, /*cropSize,*/ cropTime, filter])
+        return .init(toolOptions: [graffiti, chartlet, text, music, cropSize, cropTime, filter])
     }()
+}
+
+extension VideoEditorConfiguration {
+    
+    public struct Music {
+        /// 显示搜索
+        public var showSearch: Bool = true
+        /// 完成按钮背景颜色、搜索框光标颜色
+        public var tintColor: UIColor = .systemTintColor
+        /// 搜索框的 placeholder
+        public var placeholder: String = ""
+        /// 滚动停止时自动播放音乐
+        public var autoPlayWhenScrollingStops: Bool = true
+        /// 配乐信息
+        /// 也可通过代理回调设置
+        /// func videoEditorViewController(
+        /// _ videoEditorViewController: VideoEditorViewController,
+        ///  loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool
+        public var infos: [VideoEditorMusicInfo] = []
+        
+        /// 获取音乐列表, infos 为空时才会触发
+        /// handler = { response -> Bool in
+        ///     // 传入音乐数据
+        ///     response(self.getMusics())
+        ///     // 是否显示loading
+        ///     return false
+        /// }
+        public var handler: ((@escaping ([VideoEditorMusicInfo]) -> Void) -> Bool)?
+        
+        public init() { }
+    }
 }

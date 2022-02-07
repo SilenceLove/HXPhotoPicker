@@ -28,6 +28,14 @@ public struct PreviewViewConfiguration {
     /// 选择框配置
     public var selectBox: SelectBoxConfiguration = .init()
     
+    /// 多选模式下，未选择资源时是否禁用完成按钮
+    /// false：默认选择当前预览的资源
+    public var disableFinishButtonWhenNotSelected: Bool = false {
+        didSet {
+            bottomView.disableFinishButtonWhenNotSelected = disableFinishButtonWhenNotSelected
+        }
+    }
+    
     /// 视频播放类型
     public var videoPlayType: PhotoPreviewViewController.PlayType = .normal
     

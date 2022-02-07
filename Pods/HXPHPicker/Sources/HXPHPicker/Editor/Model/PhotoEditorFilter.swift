@@ -8,7 +8,7 @@
 import UIKit
 
 /// 需要添加滤镜的原始图片、上一次添加滤镜的图片，value，event
-public typealias PhotoEditorFilterHandler = (UIImage, UIImage?, Float, PhotoEditorFilterInfo.Event) -> UIImage?
+public typealias PhotoEditorFilterHandler = (CIImage, UIImage?, Float, PhotoEditorFilterInfo.Event) -> CIImage?
 
 public typealias VideoEditorFilterHandler = (CIImage, Float) -> CIImage?
 

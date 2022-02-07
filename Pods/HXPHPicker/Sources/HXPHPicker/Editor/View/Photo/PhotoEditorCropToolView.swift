@@ -41,8 +41,15 @@ public class PhotoEditorCropToolView: UIView {
         return collectionView
     }()
     
-    lazy var ratioModels: [PhotoEditorCropToolModel] = {
-        let scaleArray = [[0, 0], [1, 1], [3, 2], [2, 3], [4, 3], [3, 4], [16, 9], [9, 16]]
+    let ratioModels: [PhotoEditorCropToolModel]
+    var showRatios: Bool
+    var themeColor: UIColor?
+    var currentSelectedModel: PhotoEditorCropToolModel?
+    init(
+        showRatios: Bool,
+        scaleArray: [[Int]]
+    ) {
+        self.showRatios = showRatios
         var ratioModels: [PhotoEditorCropToolModel] = []
         for ratioArray in scaleArray {
             let model = PhotoEditorCropToolModel.init()
@@ -54,14 +61,7 @@ public class PhotoEditorCropToolView: UIView {
             }
             ratioModels.append(model)
         }
-        return ratioModels
-    }()
-    var isVideo: Bool = false
-    var showRatios: Bool
-    var themeColor: UIColor?
-    var currentSelectedModel: PhotoEditorCropToolModel?
-    init(showRatios: Bool) {
-        self.showRatios = showRatios
+        self.ratioModels = ratioModels
         super.init(frame: .zero)
         
         addSubview(collectionView)
@@ -120,7 +120,6 @@ extension PhotoEditorCropToolView: UICollectionViewDataSource {
         ) as! PhotoEditorCropToolHeaderView
         headerView.delegate = self
         headerView.showRatios = showRatios
-        headerView.isVideo = isVideo
         return headerView
     }
 }
@@ -171,7 +170,7 @@ extension PhotoEditorCropToolView: UICollectionViewDelegate, UICollectionViewDel
         layout collectionViewLayout: UICollectionViewLayout,
         referenceSizeForHeaderInSection section: Int
     ) -> CGSize {
-        CGSize(width: isVideo ? 60 : 100, height: 50)
+        CGSize(width: 100, height: 50)
     }
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         var selectedIndexPath: IndexPath?
@@ -250,11 +249,6 @@ class PhotoEditorCropToolHeaderView: UICollectionReusableView {
             lineView.isHidden = !showRatios
         }
     }
-    var isVideo: Bool = false {
-        didSet {
-            rotateButton.isHidden = isVideo
-        }
-    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(rotateButton)
@@ -264,16 +258,11 @@ class PhotoEditorCropToolHeaderView: UICollectionReusableView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        if !isVideo {
-            rotateButton.centerY = height * 0.5
-            rotateButton.x = 20
-            
-            mirrorHorizontallyButton.x = rotateButton.frame.maxX + 10
-            mirrorHorizontallyButton.centerY = rotateButton.centerY
-        }else {
-            mirrorHorizontallyButton.x = 20
-            mirrorHorizontallyButton.centerY = height * 0.5
-        }
+        rotateButton.centerY = height * 0.5
+        rotateButton.x = 20
+        
+        mirrorHorizontallyButton.x = rotateButton.frame.maxX + 10
+        mirrorHorizontallyButton.centerY = rotateButton.centerY
         
         lineView.x = width - 2
         lineView.centerY = mirrorHorizontallyButton.centerY
