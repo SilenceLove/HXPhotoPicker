@@ -25,6 +25,7 @@
 //#import "Demo13ViewController.h"
 #import "Demo14ViewController.h"
 #import "Demo15ViewController.h"
+#import "HXPhotoPickerExample-Swift.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -162,7 +163,12 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 
     self.showAlertCompletion = NO;
     self.title = @"Demo 1 ~ 14";
-    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    UITableView *tableView;
+    if (@available(iOS 13.0, *)) {
+        tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleInsetGrouped];
+    } else {
+        tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
+    }
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     tableView.tableFooterView = [[UIView alloc] init];
     tableView.dataSource = self;
@@ -182,9 +188,14 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 
 //     [UINavigationBar appearance].translucent = NO;
 }
-
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    if (section == 0) {
+        return 1;
+    }
     return self.list.count;
 }
 
@@ -196,23 +207,46 @@ static NSString *const kCellIdentifier = @"cell_identifier";
         cell.detailTextLabel.numberOfLines = 0;
         cell.detailTextLabel.textColor = [UIColor grayColor];
     }
-    ListItem *item = self.list[indexPath.row];
-    cell.textLabel.text = item.title;
-    cell.detailTextLabel.text = item.subTitle;
+    if (indexPath.section == 1) {
+        ListItem *item = self.list[indexPath.row];
+        cell.textLabel.text = item.title;
+        cell.detailTextLabel.text = item.subTitle;
+    }else {
+        cell.textLabel.text = @"Swift示例";
+        cell.detailTextLabel.text = @"查看Swift版本的示例";
+    }
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if (indexPath.section == 0) {
+        UIViewController *viewController;
+        if (@available(iOS 13.0, *)) {
+            viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
+        } else {
+            viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        }
+        self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
+        [self.navigationController pushViewController:viewController animated:YES];
+        return;
+    }
     ListItem *item = self.list[indexPath.row];
     UIViewController *viewController = [[item.viewControllClass alloc] init];
     viewController.title = item.title; 
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];  
     [self.navigationController pushViewController:viewController animated:YES];
-    
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (section == 0) {
+        return @"Swift";
+    }
+    return @"Objective-C";
+}
 @end
 
 @implementation ListItem
