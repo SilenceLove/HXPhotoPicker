@@ -267,7 +267,9 @@ extension EditorImageResizerView {
         scrollView.frame = containerView.bounds
     }
     
-    func getEditedData() -> PhotoEditData {
+    func getEditedData(
+        _ filterImageURL: URL?
+    ) -> PhotoEditData {
         let brushData = imageView.drawView.getBrushData()
         let rect = maskBgView.convert(controlView.frame, to: imageView)
         
@@ -295,6 +297,7 @@ extension EditorImageResizerView {
             cropData: cropData,
             brushData: brushData,
             hasFilter: hasFilter,
+            filterImageURL: filterImageURL,
             mosaicData: mosaicData,
             stickerData: stickerData
         )

@@ -13,9 +13,6 @@ open class CameraController: UINavigationController {
     
     public enum CameraType {
         case normal
-        #if canImport(GPUImage)
-        case gpu
-        #endif
     }
     
     /// 相机拍摄类型

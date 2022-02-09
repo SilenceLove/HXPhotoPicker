@@ -35,6 +35,7 @@ struct PhotoEditData: Codable {
     let cropData: PhotoEditCropData?
     let brushData: [PhotoEditorBrushData]
     let hasFilter: Bool
+    let filterImageURL: URL?
     let mosaicData: [PhotoEditorMosaicData]
     let stickerData: EditorStickerData?
 }

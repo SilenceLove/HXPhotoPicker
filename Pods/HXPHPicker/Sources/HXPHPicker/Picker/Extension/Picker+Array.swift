@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-public extension Array where Element == PhotoAsset {
+public extension Array where Element: PhotoAsset {
     
     /// 获取 image
     /// - Parameters:

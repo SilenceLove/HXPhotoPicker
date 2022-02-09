@@ -65,14 +65,6 @@ open class CameraViewController: BaseViewController {
         return manager
     }()
     
-    #if canImport(GPUImage)
-    lazy var gpuView: CameraGPUImageView = {
-        let gpuView = CameraGPUImageView(config: config)
-        gpuView.delegate = self
-        return gpuView
-    }()
-    #endif
-    
     lazy var bottomView: CameraBottomView = {
         let view = CameraBottomView(
             tintColor: config.tintColor,
@@ -113,10 +105,6 @@ open class CameraViewController: BaseViewController {
             .startDeviceOrientationNotifier()
         if config.cameraType == .normal {
             view.addSubview(previewView)
-        }else {
-            #if canImport(GPUImage)
-            view.addSubview(gpuView)
-            #endif
         }
         view.addSubview(bottomView)
         
@@ -172,10 +160,6 @@ open class CameraViewController: BaseViewController {
             if !cameraManager.setFlashMode(config.flashMode) {
                 cameraManager.setFlashMode(.off)
             }
-        }else {
-            #if canImport(GPUImage)
-            gpuView.switchCamera()
-            #endif
         }
         resetZoom()
     }
@@ -193,21 +177,10 @@ open class CameraViewController: BaseViewController {
         if config.cameraType == .normal {
             cameraManager.zoomFacto = 1
             previewView.effectiveScale = 1
-        }else {
-            #if canImport(GPUImage)
-            gpuView.rampZoom(to: 1)
-            #endif
         }
     }
     
     func setupCamera() {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            gpuView.startRunning()
-            addOutputCompletion()
-            return
-        }
-        #endif
         DispatchQueue.global().async {
             do {
                 self.cameraManager.session.beginConfiguration()
@@ -330,12 +303,6 @@ open class CameraViewController: BaseViewController {
     }
     
     @objc open override func deviceOrientationDidChanged(notify: Notification) {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            gpuView.resetMetal()
-            return
-        }
-        #endif
         previewView.resetOrientation()
     }
     
@@ -364,10 +331,6 @@ open class CameraViewController: BaseViewController {
         if requestCameraSuccess {
             if config.cameraType == .normal {
                 cameraManager.startRunning()
-            }else {
-                #if canImport(GPUImage)
-                gpuView.startRunning()
-                #endif
             }
         }
     }
@@ -377,11 +340,6 @@ open class CameraViewController: BaseViewController {
         if config.cameraType == .normal {
             cameraManager.stopRunning()
         }
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            gpuView.stopRunning()
-        }
-        #endif
     }
     
     func layoutSubviews() {
@@ -407,10 +365,6 @@ open class CameraViewController: BaseViewController {
         }
         if config.cameraType == .normal {
             previewView.frame = previewRect
-        }else {
-            #if canImport(GPUImage)
-            gpuView.frame = previewRect
-            #endif
         }
         
         let bottomHeight: CGFloat = 130
@@ -460,12 +414,3 @@ open class CameraViewController: BaseViewController {
         DeviceOrientationHelper.shared.stopDeviceOrientationNotifier()
     }
 }
-
-#if canImport(GPUImage)
-extension CameraViewController: CameraGPUImageViewDelegate {
-    func gpuImageView(didPreviewing gpuImageView: CameraGPUImageView) {
-        bottomView.isGestureEnable = true
-        bottomView.hiddenTip()
-    }
-}
-#endif

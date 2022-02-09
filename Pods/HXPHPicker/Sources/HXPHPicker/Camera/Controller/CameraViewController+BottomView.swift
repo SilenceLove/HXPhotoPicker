@@ -9,15 +9,6 @@ import UIKit
 
 extension CameraViewController: CameraBottomViewDelegate {
     func bottomView(beganTakePictures bottomView: CameraBottomView) {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            gpuView.capturePhoto { [weak self] image in
-                guard let self = self else { return }
-                self.capturePhotoCompletion(image: image)
-            }
-            return
-        }
-        #endif
         if !cameraManager.session.isRunning {
             return
         }
@@ -40,11 +31,6 @@ extension CameraViewController: CameraBottomViewDelegate {
             if config.cameraType == .normal {
                 cameraManager.stopRunning()
                 previewView.resetMask(image)
-            }else {
-                #if canImport(GPUImage)
-                gpuView.stopRunning()
-                gpuView.resetMask(image)
-                #endif
             }
             bottomView.isGestureEnable = false
             saveCameraImage(image)
@@ -68,19 +54,6 @@ extension CameraViewController: CameraBottomViewDelegate {
         }
     }
     func bottomView(beganRecording bottomView: CameraBottomView) {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            gpuView.startRecording { [weak self] duration in
-                self?.bottomView.startTakeMaskLayerPath(duration: duration)
-            } progress: { _, _ in
-                
-            } completion: { [weak self] videoURL, error in
-                guard let self = self else { return }
-                self.recordingCompletion(videoURL: videoURL, error: error)
-            }
-            return
-        }
-        #endif
         cameraManager.startRecording { [weak self] duration in
             self?.bottomView.startTakeMaskLayerPath(duration: duration)
         } progress: { [weak self] progress, time in
@@ -98,11 +71,6 @@ extension CameraViewController: CameraBottomViewDelegate {
             if config.cameraType == .normal {
                 cameraManager.stopRunning()
                 previewView.resetMask(image)
-            }else {
-                #if canImport(GPUImage)
-                gpuView.stopRunning()
-                gpuView.resetMask(image)
-                #endif
             }
             bottomView.isGestureEnable = false
             saveCameraVideo(videoURL)
@@ -135,43 +103,17 @@ extension CameraViewController: CameraBottomViewDelegate {
         }
     }
     func bottomView(endRecording bottomView: CameraBottomView) {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            gpuView.stopRecording()
-            return
-        }
-        #endif
         cameraManager.stopRecording()
     }
     func bottomView(longPressDidBegan bottomView: CameraBottomView) {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            currentZoomFacto = gpuView.effectiveScale
-            return
-        }
-        #endif
         currentZoomFacto = previewView.effectiveScale
     }
     func bottomView(_ bottomView: CameraBottomView, longPressDidChanged scale: CGFloat) {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            let remaining = gpuView.maxScale - currentZoomFacto
-            let zoomScale = currentZoomFacto + remaining * scale
-            gpuView.rampZoom(to: zoomScale)
-            return
-        }
-        #endif
         let remaining = previewView.maxScale - currentZoomFacto
         let zoomScale = currentZoomFacto + remaining * scale
         cameraManager.zoomFacto = zoomScale
     }
     func bottomView(longPressDidEnded bottomView: CameraBottomView) {
-        #if canImport(GPUImage)
-        if config.cameraType == .gpu {
-            gpuView.stopRecording()
-            return
-        }
-        #endif
         previewView.effectiveScale = cameraManager.zoomFacto
     }
     func bottomView(didBackButton bottomView: CameraBottomView) {

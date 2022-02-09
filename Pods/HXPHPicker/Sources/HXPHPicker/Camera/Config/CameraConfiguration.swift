@@ -25,6 +25,10 @@ public class CameraConfiguration: BaseConfiguration {
     /// 默认闪光灯模式
     public var flashMode: AVCaptureDevice.FlashMode = .auto
     
+    /// 录制视频时设置的 `AVVideoCodecType`，nil - 系统默认
+    /// iPhone7 以下为 `.h264`
+    public var videoCodecType: AVVideoCodecType?
+    
     /// 视频最大录制时长
     /// takePhotoMode = .click 支持不限制最大时长 (0 - 不限制)
     /// takePhotoMode = .press 最小 1

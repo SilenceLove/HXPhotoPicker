@@ -275,6 +275,7 @@ extension EditorImageResizerView {
         state = .normal
         resetOther()
         maskLinesView.showShadow(false)
+        maskLinesView.showGridlinesLayer(false)
         controlView.isUserInteractionEnabled = false
         let fromSize = getExactnessSize(imageView.size)
         let toSize = getExactnessSize(controlView.size)
@@ -373,6 +374,7 @@ extension EditorImageResizerView {
         state = .normal
         resetOther()
         maskLinesView.showShadow(false)
+        maskLinesView.showGridlinesLayer(false)
         controlView.isUserInteractionEnabled = false
         if hasCropping {
             // 之前有裁剪记录，需要恢复到之前的状态

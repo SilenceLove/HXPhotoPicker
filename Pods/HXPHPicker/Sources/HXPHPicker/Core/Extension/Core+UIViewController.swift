@@ -10,8 +10,8 @@ import UIKit
 extension UIViewController: HXPickerCompatible {
     
     class var topViewController: UIViewController? {
-        let window = UIApplication.shared.delegate?.window
-        if var topViewController = window??.rootViewController {
+        let window = UIApplication.shared.delegate?.window ?? UIApplication.shared.keyWindow
+        if var topViewController = window?.rootViewController {
             while true {
                 if let controller = topViewController.presentedViewController {
                     topViewController = controller
@@ -28,5 +28,11 @@ extension UIViewController: HXPickerCompatible {
             return topViewController
         }
         return nil
+    }
+}
+
+public extension HXPickerWrapper where Base: UIViewController {
+    static var topViewController: UIViewController? {
+        Base.topViewController
     }
 }

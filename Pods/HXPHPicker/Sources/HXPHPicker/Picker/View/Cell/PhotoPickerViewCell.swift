@@ -238,8 +238,8 @@ extension PhotoPickerViewCell {
             #if HXPICKER_ENABLE_EDITOR
             if let photoEdit = photoAsset.photoEdit {
                 assetTypeLb.text = photoEdit.imageType == .gif ? "GIF" : nil
-                assetEditMarkIcon.isHidden = photoEdit.imageType != .gif
-                assetTypeMaskView.isHidden = photoEdit.imageType != .gif
+                assetTypeMaskView.isHidden = false
+                assetEditMarkIcon.isHidden = false
             }
             #endif
         }

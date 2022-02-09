@@ -204,9 +204,6 @@ public class EditorImageResizerMaskView: UIView {
     }
     func showShadow(_ isShow: Bool) {
         frameLayer.isHidden = !isShow
-//        if !isRoundCrop {
-//            gridlinesLayer.isHidden = !isShow
-//        }
     }
     
     func showGridlinesLayer(_ isShow: Bool) {

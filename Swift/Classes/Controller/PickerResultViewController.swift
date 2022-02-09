@@ -950,8 +950,13 @@ class ResultViewCell: PhotoPickerViewCell {
     }()
     override var photoAsset: PhotoAsset! {
         didSet {
-            // 隐藏被编辑过的标示
-            assetEditMarkIcon.isHidden = true
+            if photoAsset.mediaType == .photo {
+                if let photoEdit = photoAsset.photoEdit {
+                    // 隐藏被编辑过的标示
+                    assetEditMarkIcon.isHidden = true
+                    assetTypeMaskView.isHidden = photoEdit.imageType != .gif
+                }
+            }
         }
     }
     override func requestThumbnailImage() {

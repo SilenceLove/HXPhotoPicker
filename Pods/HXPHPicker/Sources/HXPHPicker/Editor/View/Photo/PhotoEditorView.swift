@@ -181,8 +181,10 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     func setMosaicOriginalImage(_ image: UIImage?) {
         imageResizerView.setMosaicOriginalImage(image)
     }
-    func getEditedData() -> PhotoEditData {
-        imageResizerView.getEditedData()
+    func getEditedData(
+        _ filterImageURL: URL?
+    ) -> PhotoEditData {
+        imageResizerView.getEditedData(filterImageURL)
     }
     func setEditedData(editedData: PhotoEditData) {
         imageResizerView.hasFilter = editedData.hasFilter
@@ -336,6 +338,8 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         
         let isRoundCrop = cropConfig.isRoundCrop && imageResizerView.layer.cornerRadius > 0
         DispatchQueue.global().async {
+            let filterImageURL = self.imageResizerView.hasFilter ?
+                                    PhotoTools.write(image: inputImage) : nil
             let imageOptions = self.imageResizerView.cropping(
                 inputImage,
                 toRect: toRect,
@@ -352,7 +356,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
                         editedImage: imageOptions.0,
                         editedImageURL: imageOptions.1,
                         imageType: imageOptions.2,
-                        editedData: self.getEditedData()
+                        editedData: self.getEditedData(filterImageURL)
                     )
                     completion?(editResult)
                 }else {

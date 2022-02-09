@@ -27,7 +27,7 @@ open class EditorConfiguration: BaseConfiguration {
         
         public init(
             infos: [PhotoEditorFilterInfo] = [],
-            selectedColor: UIColor = .systemTintColor,
+            selectedColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor,
             isLoadLastFilter: Bool = true
         ) {
             self.infos = infos

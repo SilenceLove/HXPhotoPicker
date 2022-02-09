@@ -302,8 +302,11 @@ extension PhotoEditorViewController {
             }
         }
         
-        if let result = editResult, result.editedData.hasFilter, hasFilter {
-            if let newImage = UIImage(contentsOfFile: result.editedImageURL.path) {
+        if let result = editResult,
+           let filterURL = result.editedData.filterImageURL,
+           result.editedData.hasFilter,
+           hasFilter {
+            if let newImage = UIImage(contentsOfFile: filterURL.path) {
                 filterHDImage = newImage
                 if hasMosaic {
                     mosaicImage = newImage.mosaicImage(level: config.mosaic.mosaicWidth)

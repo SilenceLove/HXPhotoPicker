@@ -506,6 +506,11 @@ extension CameraManager: AVCaptureFileOutputRecordingDelegate {
                 [AVVideoCodecKey: AVVideoCodecType.h264],
                 for: connection
             )
+        }else if let videoCodecType = config.videoCodecType {
+            movieOutput.setOutputSettings(
+                [AVVideoCodecKey: videoCodecType],
+                for: connection
+            )
         }
         if let isSmoothAuto = activeCamera?.isSmoothAutoFocusSupported,
            isSmoothAuto {
