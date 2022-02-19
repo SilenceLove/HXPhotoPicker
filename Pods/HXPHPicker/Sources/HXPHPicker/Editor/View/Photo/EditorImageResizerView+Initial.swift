@@ -55,7 +55,11 @@ extension EditorImageResizerView {
     }
     func setImage(_ image: UIImage) {
         updateContentInsets()
-        imageScale = image.width / image.height
+        if image.size.equalTo(.zero) {
+            imageScale = 1
+        }else {
+            imageScale = image.width / image.height
+        }
         imageView.setImage(image)
         configAspectRatio()
         updateScrollView()

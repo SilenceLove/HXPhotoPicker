@@ -11,8 +11,6 @@ import AVFoundation
 // MARK: 相机配置类
 public class CameraConfiguration: BaseConfiguration {
     
-    public var modalPresentationStyle: UIModalPresentationStyle
-    
     /// 相机类型
     public var cameraType: CameraController.CameraType = .normal
     
@@ -25,9 +23,9 @@ public class CameraConfiguration: BaseConfiguration {
     /// 默认闪光灯模式
     public var flashMode: AVCaptureDevice.FlashMode = .auto
     
-    /// 录制视频时设置的 `AVVideoCodecType`，nil - 系统默认
+    /// 录制视频时设置的 `AVVideoCodecType`
     /// iPhone7 以下为 `.h264`
-    public var videoCodecType: AVVideoCodecType?
+    public var videoCodecType: AVVideoCodecType = .h264
     
     /// 视频最大录制时长
     /// takePhotoMode = .click 支持不限制最大时长 (0 - 不限制)
@@ -52,6 +50,24 @@ public class CameraConfiguration: BaseConfiguration {
     /// 摄像头最大缩放比例
     public var videoMaxZoomScale: CGFloat = 6
     
+    /// 默认滤镜对应滤镜数组的下标，为 -1 默认不加滤镜
+    public var defaultFilterIndex: Int = -1
+    
+    /// 切换滤镜显示名称
+    public var changeFilterShowName: Bool = true
+    
+    /// 拍照时的滤镜数组，请与 videoFilters 效果保持一致
+    /// 左滑/右滑切换滤镜
+    public lazy var photoFilters: [CameraFilter] = [
+        InstantFilter(), Apply1977Filter(), ToasterFilter(), TransferFilter()
+    ]
+    
+    /// 录制视频的滤镜数组，请与 photoFilters 效果保持一致
+    /// 左滑/右滑切换滤镜
+    public lazy var videoFilters: [CameraFilter] = [
+        InstantFilter(), Apply1977Filter(), ToasterFilter(), TransferFilter()
+    ]
+    
     #if HXPICKER_ENABLE_EDITOR
     /// 允许编辑
     /// true: 拍摄完成后会跳转到编辑界面
@@ -68,11 +84,6 @@ public class CameraConfiguration: BaseConfiguration {
     public var allowLocation: Bool = true
     
     public override init() {
-        if #available(iOS 13.0, *) {
-            modalPresentationStyle = .automatic
-        } else {
-            modalPresentationStyle = .fullScreen
-        }
         super.init()
         /// shouldAutorotate 能够旋转
         /// supportedInterfaceOrientations 支持的方向

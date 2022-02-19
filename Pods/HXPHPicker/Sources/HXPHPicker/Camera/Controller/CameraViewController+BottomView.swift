@@ -63,9 +63,9 @@ extension CameraViewController: CameraBottomViewDelegate {
             self.recordingCompletion(videoURL: videoURL, error: error)
         }
     }
-    func recordingCompletion(videoURL: URL, error: Error?) {
+    func recordingCompletion(videoURL: URL?, error: Error?) {
         bottomView.stopRecord()
-        if error == nil {
+        if error == nil, let videoURL = videoURL {
             resetZoom()
             let image = PhotoTools.getVideoThumbnailImage(videoURL: videoURL, atTime: 0.1)
             if config.cameraType == .normal {

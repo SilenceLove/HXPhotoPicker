@@ -166,7 +166,11 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         imageResizerView.frame = CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight)
     }
     func setAVAsset(_ asset: AVAsset, coverImage: UIImage) {
-        imageScale = coverImage.width / coverImage.height
+        if !coverImage.size.equalTo(.zero) {
+            imageScale = coverImage.width / coverImage.height
+        }else {
+            imageScale = 1
+        }
         updateImageViewFrame()
         imageResizerView.setAVAsset(asset, coverImage: coverImage)
     }

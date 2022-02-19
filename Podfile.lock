@@ -1,47 +1,51 @@
 PODS:
   - GDPerformanceView-Swift (2.1.1)
-  - HXPHPicker (1.3.5):
-    - HXPHPicker/Full (= 1.3.5)
-  - HXPHPicker/Camera (1.3.5):
+  - GPUImage (0.1.7)
+  - HXPHPicker (1.3.7):
+    - HXPHPicker/Full (= 1.3.7)
+  - HXPHPicker/Camera (1.3.7):
     - HXPHPicker/Core
-  - HXPHPicker/Core (1.3.5)
-  - HXPHPicker/Editor (1.3.5):
-    - HXPHPicker/Editor/KF (= 1.3.5)
-    - HXPHPicker/Editor/Lite (= 1.3.5)
-  - HXPHPicker/Editor/KF (1.3.5):
+  - HXPHPicker/Core (1.3.7)
+  - HXPHPicker/Editor (1.3.7):
+    - HXPHPicker/Editor/KF (= 1.3.7)
+    - HXPHPicker/Editor/Lite (= 1.3.7)
+  - HXPHPicker/Editor/KF (1.3.7):
     - HXPHPicker/Editor/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Editor/Lite (1.3.5):
+  - HXPHPicker/Editor/Lite (1.3.7):
     - HXPHPicker/Core
-  - HXPHPicker/Full (1.3.5):
+  - HXPHPicker/Full (1.3.7):
     - HXPHPicker/Camera
     - HXPHPicker/Editor
     - HXPHPicker/Picker
-  - HXPHPicker/Picker (1.3.5):
-    - HXPHPicker/Picker/KF (= 1.3.5)
-    - HXPHPicker/Picker/Lite (= 1.3.5)
-  - HXPHPicker/Picker/KF (1.3.5):
+  - HXPHPicker/Picker (1.3.7):
+    - HXPHPicker/Picker/KF (= 1.3.7)
+    - HXPHPicker/Picker/Lite (= 1.3.7)
+  - HXPHPicker/Picker/KF (1.3.7):
     - HXPHPicker/Picker/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Picker/Lite (1.3.5):
+  - HXPHPicker/Picker/Lite (1.3.7):
     - HXPHPicker/Core
   - Kingfisher (7.1.2)
 
 DEPENDENCIES:
   - GDPerformanceView-Swift
+  - GPUImage
   - HXPHPicker
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - GDPerformanceView-Swift
+    - GPUImage
     - HXPHPicker
     - Kingfisher
 
 SPEC CHECKSUMS:
   GDPerformanceView-Swift: 22d964fe40b19e3d914dba2586237d064de8fd77
-  HXPHPicker: ee50ec3bf1ae48d25658b1ac77debe2845a02f06
+  GPUImage: 733a5f0fab92df9de1c37ba9df520a833ccb406d
+  HXPHPicker: 9db7f3a87335cb02c25799679dbe7e5c655c985f
   Kingfisher: 44ed6a8504763f27bab46163adfac83f5deb240c
 
-PODFILE CHECKSUM: e44679c41b896af330c5ec6690bdd5e7f09e66bd
+PODFILE CHECKSUM: 5cdc90e8dd963e9916d0f235b4e776cc9a38c00f
 
 COCOAPODS: 1.10.1

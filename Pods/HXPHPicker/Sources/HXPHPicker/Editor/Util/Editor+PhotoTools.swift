@@ -433,8 +433,8 @@ extension PhotoTools {
         let radius0 = min(width / 4.0, height / 4.0)
         let radius1 = min(width / 1.5, height / 1.5)
         
-        let color0 = self.getColor(red: 128, green: 78, blue: 15, alpha: 255)
-        let color1 = self.getColor(red: 79, green: 0, blue: 79, alpha: 255)
+        let color0 = getColor(red: 128, green: 78, blue: 15, alpha: 255)
+        let color1 = getColor(red: 79, green: 0, blue: 79, alpha: 255)
         let circle = CIFilter(name: "CIRadialGradient", parameters: [
             "inputCenter": CIVector(x: centerWidth, y: centerHeight),
             "inputRadius0": radius0,
@@ -476,17 +476,5 @@ extension PhotoTools {
                 "inputPoint3": CIVector(x: 0.75, y: 0.80),
                 "inputPoint4": CIVector(x: 1, y: 1)
                 ])
-    }
-    
-    private static func getColor(red: Int, green: Int, blue: Int, alpha: Int = 255) -> CIColor {
-        return CIColor(red: CGFloat(Double(red) / 255.0),
-                       green: CGFloat(Double(green) / 255.0),
-                       blue: CGFloat(Double(blue) / 255.0),
-                       alpha: CGFloat(Double(alpha) / 255.0))
-    }
-    
-    private static func getColorImage(red: Int, green: Int, blue: Int, alpha: Int = 255, rect: CGRect) -> CIImage {
-        let color = self.getColor(red: red, green: green, blue: blue, alpha: alpha)
-        return CIImage(color: color).cropped(to: rect)
     }
 }

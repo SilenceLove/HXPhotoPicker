@@ -327,14 +327,18 @@ class PickerResultViewController: UIViewController,
         presentPickerController()
     }
     func presentPickerController() {
+        if pickerStyleControl.selectedSegmentIndex == 0 {
+            config.modalPresentationStyle = .fullScreen
+        }else {
+            if #available(iOS 13.0, *) {
+                config.modalPresentationStyle = .automatic
+            }
+        }
         let pickerController = PhotoPickerController.init(picker: config)
         pickerController.pickerDelegate = self
         pickerController.selectedAssetArray = selectedAssets
         pickerController.localCameraAssetArray = localCameraAssetArray
         pickerController.isOriginal = isOriginal
-        if pickerStyleControl.selectedSegmentIndex == 0 {
-            pickerController.modalPresentationStyle = .fullScreen
-        }
         pickerController.localAssetArray = localAssetArray
         pickerController.autoDismiss = false
         present(pickerController, animated: true, completion: nil)

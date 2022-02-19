@@ -47,10 +47,11 @@ open class CameraViewController: BaseViewController {
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
-    
+    private var didLayoutPreview = false
     lazy var previewView: CameraPreviewView = {
         let view = CameraPreviewView(
-            config: config
+            config: config,
+            cameraManager: cameraManager
         )
         view.delegate = self
         return view
@@ -61,6 +62,10 @@ open class CameraViewController: BaseViewController {
         manager.flashModeDidChanged = { [weak self] in
             guard let self = self else { return }
             self.delegate?.cameraViewController(self, flashModeDidChanged: $0)
+        }
+        manager.captureDidOutput = { [weak self] pixelBuffer in
+            guard let self = self else { return } 
+            self.previewView.pixelBuffer = pixelBuffer
         }
         return manager
     }()
@@ -87,6 +92,7 @@ open class CameraViewController: BaseViewController {
         manager.requestWhenInUseAuthorization()
         return manager
     }()
+    var firstShowFilterName = true
     var didLocation: Bool = false
     var currentLocation: CLLocation?
     var currentZoomFacto: CGFloat = 1
@@ -100,13 +106,6 @@ open class CameraViewController: BaseViewController {
         edgesForExtendedLayout = .all
         view.backgroundColor = .black
         navigationController?.navigationBar.tintColor = .white
-        DeviceOrientationHelper
-            .shared
-            .startDeviceOrientationNotifier()
-        if config.cameraType == .normal {
-            view.addSubview(previewView)
-        }
-        view.addSubview(bottomView)
         
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
             PhotoTools.showConfirm(
@@ -133,19 +132,27 @@ open class CameraViewController: BaseViewController {
             name: UIApplication.willEnterForegroundNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
     }
     
     @objc
-    func willEnterForeground() {
-        if requestCameraSuccess {
-            if config.cameraType == .normal {
-                try? cameraManager.addMovieOutput()
-            }
-        }
+    func willEnterForeground() { 
+    }
+    @objc
+    func didEnterBackground() {
+        previewView.clearMeatalPixelBuffer()
+        cameraManager.resetFilter()
     }
     
     @objc
     public func didSwitchCameraClick() {
+        previewView.metalView.isPaused = true
+        previewView.pixelBuffer = nil
         if config.cameraType == .normal {
             do {
                 try cameraManager.switchCameras()
@@ -162,6 +169,9 @@ open class CameraViewController: BaseViewController {
             }
         }
         resetZoom()
+        previewView.resetOrientation()
+        cameraManager.resetFilter()
+        previewView.metalView.isPaused = false
     }
     
     func switchCameraFailed() {
@@ -181,6 +191,13 @@ open class CameraViewController: BaseViewController {
     }
     
     func setupCamera() {
+        DeviceOrientationHelper
+            .shared
+            .startDeviceOrientationNotifier()
+        if config.cameraType == .normal {
+            view.addSubview(previewView)
+        }
+        view.addSubview(bottomView)
         DispatchQueue.global().async {
             do {
                 self.cameraManager.session.beginConfiguration()
@@ -189,15 +206,13 @@ open class CameraViewController: BaseViewController {
                 switch self.type {
                 case .photo:
                     try self.cameraManager.addPhotoOutput()
-                    self.cameraManager.addVideoOutput()
                 case .video:
-                    try self.cameraManager.addMovieOutput()
                     needAddAudio = true
                 case .all:
                     try self.cameraManager.addPhotoOutput()
-                    try self.cameraManager.addMovieOutput()
                     needAddAudio = true
                 }
+                self.cameraManager.addVideoOutput()
                 if !needAddAudio {
                     self.addOutputCompletion()
                 }else {
@@ -226,6 +241,7 @@ open class CameraViewController: BaseViewController {
                 if isGranted {
                     do {
                         try self.cameraManager.addAudioInput()
+                        self.cameraManager.addAudioOutput()
                     } catch {
                         DispatchQueue.main.async {
                             self.addAudioInputFailed()
@@ -263,12 +279,12 @@ open class CameraViewController: BaseViewController {
     
     func addOutputCompletion() {
         if config.cameraType == .normal {
-            self.cameraManager.session.commitConfiguration()
-            self.cameraManager.startRunning()
-            self.previewView.setSession(self.cameraManager.session)
+            cameraManager.session.commitConfiguration()
+            cameraManager.startRunning()
         }
-        self.requestCameraSuccess = true
+        requestCameraSuccess = true
         DispatchQueue.main.async {
+            self.previewView.resetOrientation()
             self.sessionCompletion()
         }
     }
@@ -284,12 +300,6 @@ open class CameraViewController: BaseViewController {
         }
         bottomView.addGesture(for: type)
         startLocation()
-        if #available(iOS 13.0, *) {
-        }else {
-            previewView.removeMask()
-            bottomView.hiddenTip()
-            bottomView.isGestureEnable = true
-        }
     }
     
     func addSwithCameraButton() {
@@ -301,8 +311,10 @@ open class CameraViewController: BaseViewController {
             action: #selector(didSwitchCameraClick)
         )
     }
-    
-    @objc open override func deviceOrientationDidChanged(notify: Notification) {
+    open override func deviceOrientationWillChanged(notify: Notification) {
+        didLayoutPreview = false
+    }
+    open override func deviceOrientationDidChanged(notify: Notification) {
         previewView.resetOrientation()
     }
     
@@ -336,10 +348,19 @@ open class CameraViewController: BaseViewController {
     }
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        PhotoManager.shared.saveCameraPreview()
+        DispatchQueue.global().async {
+            if let sampleBuffer = PhotoManager.shared.sampleBuffer,
+               let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+               let imageData = PhotoTools.jpegData(withPixelBuffer: pixelBuffer, attachments: nil) {
+                PhotoManager.shared.cameraPreviewImage = UIImage(data: imageData)
+                PhotoManager.shared.saveCameraPreview()
+                PhotoManager.shared.sampleBuffer = nil
+            }
+        }
         if config.cameraType == .normal {
             cameraManager.stopRunning()
         }
+        cameraManager.resetFilter()
     }
     
     func layoutSubviews() {
@@ -364,7 +385,10 @@ open class CameraViewController: BaseViewController {
             )
         }
         if config.cameraType == .normal {
-            previewView.frame = previewRect
+            if !didLayoutPreview {
+                previewView.frame = previewRect
+                didLayoutPreview = true
+            }
         }
         
         let bottomHeight: CGFloat = 130

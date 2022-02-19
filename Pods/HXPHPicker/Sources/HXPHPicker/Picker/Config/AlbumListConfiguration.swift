@@ -67,6 +67,9 @@ public struct AlbumListConfiguration {
     /// 暗黑风格下相册名称颜色
     public var photoCountDarkColor: UIColor = "#dadada".color
     
+    /// 是否显示照片数量
+    public var showPhotoCount: Bool = true
+    
     /// 照片数量字体
     public var photoCountFont: UIFont = .mediumPingFang(ofSize: 12)
     

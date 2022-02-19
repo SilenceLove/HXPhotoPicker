@@ -53,8 +53,12 @@ open class AlbumViewCell: UITableViewCell {
     /// 配置
     public var config: AlbumListConfiguration? {
         didSet {
-            albumNameLb.font = config?.albumNameFont
-            photoCountLb.font = config?.photoCountFont
+            guard let config = config else {
+                return
+            }
+            albumNameLb.font = config.albumNameFont
+            photoCountLb.font = config.photoCountFont
+            photoCountLb.isHidden = !config.showPhotoCount
             configColor()
         }
     }
@@ -62,9 +66,12 @@ open class AlbumViewCell: UITableViewCell {
     /// 照片集合
     public var assetCollection: PhotoAssetCollection? {
         didSet {
-            albumNameLb.text = assetCollection?.albumName
-            photoCountLb.text = String(assetCollection!.count)
-            tickView.isHidden = !(assetCollection?.isSelected ?? false)
+            guard let assetCollection = assetCollection else {
+                return
+            }
+            albumNameLb.text = assetCollection.albumName
+            photoCountLb.text = String(assetCollection.count)
+            tickView.isHidden = !assetCollection.isSelected
             requestCoverImage()
         }
     }

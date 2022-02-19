@@ -9,6 +9,8 @@ import UIKit
 
 open class BaseConfiguration {
     
+    public var modalPresentationStyle: UIModalPresentationStyle
+    
     /// 如果自带的语言不够，可以添加自定义的语言文字
     /// PhotoManager.shared.customLanguages 自定义语言数组
     /// PhotoManager.shared.fixedCustomLanguage 如果有多种自定义语言，可以固定显示某一种
@@ -32,7 +34,14 @@ open class BaseConfiguration {
         didSet { PhotoManager.shared.indicatorType = indicatorType }
     }
     
-    public init() { PhotoManager.shared.indicatorType = indicatorType }
+    public init() {
+        if #available(iOS 13.0, *) {
+            modalPresentationStyle = .automatic
+        } else {
+            modalPresentationStyle = .fullScreen
+        }
+        PhotoManager.shared.indicatorType = indicatorType
+    }
 }
 
 public extension BaseConfiguration {

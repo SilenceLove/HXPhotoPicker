@@ -86,6 +86,7 @@ extension PhotoPickerViewController: UICollectionViewDataSource {
         }
         cell.delegate = self
         cell.config = config.cell
+        cell.isRequestDirectly = false
         cell.photoAsset = photoAsset
         return cell
     }
@@ -103,6 +104,7 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
               let myCell = cell as? PhotoPickerBaseViewCell else {
             return
         }
+        myCell.request()
         let photoAsset = getPhotoAsset(for: indexPath.item)
         if !photoAsset.isSelected &&
             config.cell.showDisableMask &&
@@ -119,6 +121,16 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             isSelected: photoAsset.isSelected,
             animated: false
         )
+    }
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didEndDisplaying cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        guard let myCell = cell as? PhotoPickerBaseViewCell else {
+            return
+        }
+        myCell.cancelReload()
     }
     public func collectionView(
         _ collectionView: UICollectionView,
@@ -456,37 +468,79 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
     }
     public func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
         PhotoManager.shared.thumbnailLoadModeDidChange(.complete)
+        cellReloadImage()
         scrollToTop = false
     }
     public func scrollViewShouldScrollToTop(_ scrollView: UIScrollView) -> Bool {
         scrollToTop = true
+        scrollEndReload = true
         PhotoManager.shared.thumbnailLoadModeDidChange(.simplify)
         return true
     }
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if collectionView.contentSize.height < collectionView.height {
-            return
-        }
-        changeCellLoadMode(.simplify)
-    }
+//    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        setCellLoadMode(.complete)
+//        print("BeginDragging complete")
+//    }
     public func scrollViewDidEndDragging(
         _ scrollView: UIScrollView,
         willDecelerate decelerate: Bool
     ) {
         if !decelerate && !scrollToTop {
-            changeCellLoadMode(.complete)
+            didChangeCellLoadMode = false
+            cellReloadImage()
         }
     }
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         if !scrollView.isTracking && !scrollToTop {
-            changeCellLoadMode(.complete)
+            didChangeCellLoadMode = false
+            cellReloadImage()
         }
     }
-    func changeCellLoadMode(_ mode: PhotoManager.ThumbnailLoadMode) {
-        if !config.loadClearImageWhenScrollingStops {
+    public func scrollViewWillEndDragging(
+        _ scrollView: UIScrollView,
+        withVelocity velocity: CGPoint,
+        targetContentOffset: UnsafeMutablePointer<CGPoint>
+    ) {
+        let offset = targetContentOffset.pointee
+        let abs = abs(offset.y - scrollView.contentOffset.y)
+        if abs < 3000 {
+            if scrollReachDistance {
+                setCellLoadMode(.complete, false)
+                scrollReachDistance = false
+            }
+            return
+        }
+        targetOffsetY = offset.y
+        setCellLoadMode(.simplify)
+        scrollReachDistance = true
+    }
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if didChangeCellLoadMode {
+            if abs(targetOffsetY - scrollView.contentOffset.y) < 1250 {
+                setCellLoadMode(.complete)
+            }
+        }
+    }
+    func setCellLoadMode(
+        _ mode: PhotoManager.ThumbnailLoadMode,
+        _ judgmentIsEqual: Bool = true
+    ) {
+        if PhotoManager.shared.thumbnailLoadMode == mode && judgmentIsEqual {
             return
         }
         PhotoManager.shared.thumbnailLoadModeDidChange(mode)
+        scrollEndReload = mode == .complete
+        didChangeCellLoadMode = mode != .complete
+    }
+    func cellReloadImage() {
+        if !scrollEndReload && !didChangeCellLoadMode {
+            return
+        }
+        for baseCell in collectionView.visibleCells where baseCell is PhotoPickerBaseViewCell {
+            let cell = baseCell as! PhotoPickerBaseViewCell
+            cell.reload()
+        }
+        scrollEndReload = false
     }
 }
 

@@ -20,6 +20,10 @@ class HomeViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         #if canImport(GDPerformanceView_Swift)
         PerformanceMonitor.shared().start()
         #endif
@@ -126,7 +130,12 @@ extension HomeViewController {
                     return EditorConfigurationViewController(style: .grouped)
                 }
             case .camera:
-                return CameraController(config: .init(), type: .all)
+                let config = CameraConfiguration()
+                config.position = .front
+                config.defaultFilterIndex = 0
+                config.photoFilters = FilterTools.filters()
+                config.videoFilters = FilterTools.filters()
+                return CameraController(config: config, type: .all)
             }
         }
     }

@@ -49,6 +49,7 @@ open class EditorController: UINavigationController {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let photoEditorVC = PhotoEditorViewController(
             image: image,
             editResult: editResult,
@@ -76,6 +77,7 @@ open class EditorController: UINavigationController {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let image: UIImage
         #if canImport(Kingfisher)
         image = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))!
@@ -102,6 +104,7 @@ open class EditorController: UINavigationController {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let photoEditorVC = PhotoEditorViewController(
             networkImageURL: networkImageURL,
             editResult: editResult,
@@ -153,6 +156,7 @@ open class EditorController: UINavigationController {
         editorType = .video
         self.config = config
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let videoEditorVC = VideoEditorViewController(
             avAsset: avAsset,
             editResult: editResult,
@@ -180,6 +184,7 @@ open class EditorController: UINavigationController {
         editorType = .video
         self.config = config
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let videoEditorVC = VideoEditorViewController(
             networkVideoURL: networkVideoURL,
             editResult: editResult,
@@ -208,6 +213,7 @@ open class EditorController: UINavigationController {
         editorType = .video
         self.config = config
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let videoEditorVC = VideoEditorViewController(
             photoAsset: photoAsset,
             editResult: editResult,
@@ -235,6 +241,7 @@ open class EditorController: UINavigationController {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         let photoEditorVC = PhotoEditorViewController(
             photoAsset: photoAsset,
             config: config

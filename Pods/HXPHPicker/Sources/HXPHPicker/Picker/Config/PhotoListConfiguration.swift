@@ -19,9 +19,6 @@ public struct PhotoListConfiguration {
     /// - DESC: 倒序排列，自动滚动到顶部
     public var sort: Sort = .asc
     
-    /// 在滚动停止时Cell才加载清晰的图片，在滚动过程中只加载模糊的图片
-    public var loadClearImageWhenScrollingStops: Bool = true
-    
     /// 背景颜色
     public var backgroundColor: UIColor = .white
     

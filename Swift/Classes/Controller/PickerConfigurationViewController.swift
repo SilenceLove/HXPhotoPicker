@@ -12,15 +12,8 @@ class PickerConfigurationViewController: UITableViewController {
     
     var config: PickerConfiguration = .init()
     var showOpenPickerButton: Bool = true
-    var presentStyle: UIModalPresentationStyle = .fullScreen
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 13.0, *) {
-            presentStyle = .automatic
-        } else {
-            // Fallback on earlier versions
-            presentStyle = .fullScreen
-        }
         navigationItem.title = "Picker"
         
         tableView.cellLayoutMarginsFollowReadableWidth = true
@@ -37,8 +30,6 @@ class PickerConfigurationViewController: UITableViewController {
     @objc func openPickerController() {
         if showOpenPickerButton {
             let vc = PhotoPickerController.init(config: config)
-            // 全屏情况下才可以禁止旋转
-            vc.modalPresentationStyle = presentStyle
             vc.pickerDelegate = self
             vc.autoDismiss = false
             present(vc, animated: true, completion: nil)
@@ -208,7 +199,7 @@ extension PickerConfigurationViewController {
     }
     func presentStyleAction(_ indexPath: IndexPath) {
         if #available(iOS 13.0, *) {
-            presentStyle = presentStyle == .fullScreen ? .automatic : .fullScreen
+            config.modalPresentationStyle = config.modalPresentationStyle == .fullScreen ? .automatic : .fullScreen
         }
         self.tableView.reloadRows(at: [indexPath], with: .fade)
     }
@@ -533,7 +524,7 @@ extension PickerConfigurationViewController {
             }
         }
         if rowType is ViewControllerOptionsRowType {
-            return presentStyle == .fullScreen ? "true" : "false"
+            return config.modalPresentationStyle == .fullScreen ? "true" : "false"
         }
         return ""
     }

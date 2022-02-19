@@ -129,6 +129,7 @@ open class PhotoPickerController: UINavigationController {
         isPreviewAsset = false
         isExternalPickerPreview = false
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
         pickerDelegate = delegate
         var photoVC: UIViewController
         if config.albumShowMode == .normal {

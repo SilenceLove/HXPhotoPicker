@@ -111,8 +111,9 @@ extension PhotoTools {
                         exportSession.timeRange = timeRang
                     }
                     if videoQuality > 0 {
+                        let seconds = timeRang != .zero ? timeRang.duration.seconds : videoTotalSeconds
                         exportSession.fileLengthLimit = exportSessionFileLengthLimit(
-                            seconds: avAsset.duration.seconds,
+                            seconds: seconds,
                             exportPreset: exportPreset,
                             videoQuality: videoQuality
                         )
@@ -275,14 +276,13 @@ extension PhotoTools {
             newAudioInputParams?.trackID =  newAudioTrack?.trackID ?? kCMPersistentTrackID_Invalid
         }
         
-        if let originalVoiceTrack = mixComposition.addMutableTrack(
+        if let audioTrack = videoAsset.tracks(withMediaType: .audio).first,
+           let originalVoiceTrack = mixComposition.addMutableTrack(
             withMediaType: .audio,
             preferredTrackID: kCMPersistentTrackID_Invalid
         ) {
-            if let audioTrack = videoAsset.tracks(withMediaType: .audio).first {
-                originalVoiceTrack.preferredTransform = audioTrack.preferredTransform
-                try originalVoiceTrack.insertTimeRange(videoTimeRange, of: audioTrack, at: .zero)
-            }
+            originalVoiceTrack.preferredTransform = audioTrack.preferredTransform
+            try originalVoiceTrack.insertTimeRange(videoTimeRange, of: audioTrack, at: .zero)
             let volume: Float = originalAudioVolume
             let originalAudioInputParams = AVMutableAudioMixInputParameters(track: originalVoiceTrack)
             originalAudioInputParams.setVolumeRamp(

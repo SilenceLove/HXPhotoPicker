@@ -58,6 +58,7 @@ open class PhotoEditorViewController: BaseViewController {
         self.config = config
         self.editResult = editResult
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
     }
     
     #if HXPICKER_ENABLE_PICKER
@@ -83,6 +84,7 @@ open class PhotoEditorViewController: BaseViewController {
         self.editResult = editResult
         self.photoAsset = photoAsset
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
     }
     #endif
     
@@ -109,6 +111,7 @@ open class PhotoEditorViewController: BaseViewController {
         self.config = config
         self.editResult = editResult
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
     }
     #endif
     var pState: State = .normal

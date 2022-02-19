@@ -491,17 +491,18 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         pickerViewController.view.insertSubview(backgroundView, at: 1)
         if !previewViewController.previewAssets.isEmpty {
             let photoAsset = previewViewController.previewAssets[previewViewController.currentPreviewIndex]
+            pickerViewController.setCellLoadMode(.complete)
             if let pickerCell = pickerViewController.getCell(for: photoAsset) {
                 pickerViewController.scrollCellToVisibleArea(pickerCell)
                 DispatchQueue.main.async {
-                    pickerViewController.changeCellLoadMode(.complete)
+                    pickerViewController.cellReloadImage()
                 }
                 toView = pickerCell
             }else {
                 pickerViewController.scrollToCenter(for: photoAsset)
                 pickerViewController.reloadCell(for: photoAsset)
                 DispatchQueue.main.async {
-                    pickerViewController.changeCellLoadMode(.complete)
+                    pickerViewController.cellReloadImage()
                 }
                 let pickerCell = pickerViewController.getCell(for: photoAsset)
                 toView = pickerCell

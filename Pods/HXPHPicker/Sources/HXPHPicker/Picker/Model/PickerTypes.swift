@@ -14,7 +14,7 @@ public struct PickerAssetOptions: OptionSet {
     public static let photo = PickerAssetOptions(rawValue: 1 << 0)
     /// Video 视频
     public static let video = PickerAssetOptions(rawValue: 1 << 1)
-    /// Gif 动图
+    /// Gif 动图（包括静态图）
     public static let gifPhoto = PickerAssetOptions(rawValue: 1 << 2)
     /// LivePhoto 实况照片
     public static let livePhoto = PickerAssetOptions(rawValue: 1 << 3)

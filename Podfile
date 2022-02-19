@@ -5,6 +5,7 @@ def commonPods
   use_frameworks!
   pod 'HXPHPicker'
   pod 'GDPerformanceView-Swift'
+  pod 'GPUImage'
 end
 
 target "HXPhotoPickerExample" do

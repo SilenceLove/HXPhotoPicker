@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Photos
 
 public protocol PhotoPickerControllerDelegate: AnyObject {
     
@@ -25,6 +26,26 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
     func pickerController(
         didCancel pickerController: PhotoPickerController
     )
+    
+    /// 获取所有相册时调用
+    /// - Parameter
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - collection: 对应的每个 PHAssetCollection 对象
+    /// - Returns: 是否添加到列表显示
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        didFetchAssetCollections collection: PHAssetCollection
+    ) -> Bool
+    
+    /// 获取相册集合里的 PHAsset 时调用
+    /// - Parameter
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - asset: 对应的每个 PHAsset 对象
+    /// - Returns: 是否添加到列表显示
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        didFetchAssets asset: PHAsset
+    ) -> Bool
     
     /// 点击了原图按钮
     /// - Parameters:
@@ -377,6 +398,24 @@ public extension PhotoPickerControllerDelegate {
     }
     
     func pickerController(
+        didCancel pickerController: PhotoPickerController
+    ) {
+        if !pickerController.autoDismiss {
+            pickerController.dismiss(animated: true)
+        }
+    }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        didFetchAssetCollections collection: PHAssetCollection
+    ) -> Bool { true }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        didFetchAssets asset: PHAsset
+    ) -> Bool { true }
+    
+    func pickerController(
         _ pickerController: PhotoPickerController,
         didOriginalButton isOriginal: Bool
     ) { }
@@ -556,14 +595,6 @@ public extension PhotoPickerControllerDelegate {
         _ pickerController: PhotoPickerController,
         viewControllersDidDisappear viewController: UIViewController
     ) { }
-    
-    func pickerController(
-        didCancel pickerController: PhotoPickerController
-    ) {
-        if !pickerController.autoDismiss {
-            pickerController.dismiss(animated: true)
-        }
-    }
     
     func pickerController(
         _ pickerController: PhotoPickerController,

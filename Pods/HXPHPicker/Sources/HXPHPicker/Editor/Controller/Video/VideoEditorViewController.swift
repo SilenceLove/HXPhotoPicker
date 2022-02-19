@@ -108,6 +108,7 @@ open class VideoEditorViewController: BaseViewController {
         self.config = config
         self.pAVAsset = avAsset
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
     }
     
     /// 编辑网络视频
@@ -133,6 +134,7 @@ open class VideoEditorViewController: BaseViewController {
         self.config = config
         self.pNetworkVideoURL = networkVideoURL
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
     }
     
     #if HXPICKER_ENABLE_PICKER
@@ -162,6 +164,7 @@ open class VideoEditorViewController: BaseViewController {
         self.config = config
         self.photoAsset = photoAsset
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = config.modalPresentationStyle
     }
     #endif
     

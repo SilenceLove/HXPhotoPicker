@@ -20,33 +20,33 @@ class CameraManager: NSObject {
         return output
     }()
     
-    lazy var movieOutput: AVCaptureMovieFileOutput = {
-        let output = AVCaptureMovieFileOutput()
-        if config.takePhotoMode == .press ||
-            (config.takePhotoMode == .click && config.videoMaximumDuration > 0) {
-            let timeScale: Int32 = 30 // FPS
-            let maxDuration = CMTimeMakeWithSeconds(
-                max(1, max(1, config.videoMaximumDuration)),
-                preferredTimescale: timeScale
-            )
-            output.maxRecordedDuration = maxDuration
-        }
-        return output
-    }()
-    
     var didAddVideoOutput = false
+    let outputQueue: DispatchQueue = DispatchQueue(label: "com.hxphpicker.cameraoutput")
     lazy var videoOutput: AVCaptureVideoDataOutput = {
         let videoOutput = AVCaptureVideoDataOutput()
         videoOutput.videoSettings = [
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
         ]
         videoOutput.setSampleBufferDelegate(
             self,
-            queue: DispatchQueue(label: "com.hxphpicker.camerapreview")
+            queue: outputQueue
         )
         videoOutput.alwaysDiscardsLateVideoFrames = true
         return videoOutput
     }()
+    var didAddAudioOutput = false
+    lazy var audioOutput: AVCaptureAudioDataOutput = {
+        let audioOutput = AVCaptureAudioDataOutput()
+        audioOutput.setSampleBufferDelegate(
+            self,
+            queue: outputQueue
+        )
+        return audioOutput
+    }()
+    
+    var assetWriter: AVAssetWriter?
+    var assetWriterVideoInput: AVAssetWriterInputPixelBufferAdaptor?
+    var assetWriterAudioInput: AVAssetWriterInput?
     
     let sessionQueue: DispatchQueue = .init(
         label: "com.phpicker.sessionQueue",
@@ -55,20 +55,51 @@ class CameraManager: NSObject {
     
     var activeVideoInput: AVCaptureDeviceInput?
     
+    var isRecording: Bool = false
     var flashModeDidChanged: ((AVCaptureDevice.FlashMode) -> Void)?
+    var captureDidOutput: ((CVPixelBuffer) -> Void)?
+    
     private(set) var flashMode: AVCaptureDevice.FlashMode
     private var recordDuration: TimeInterval = 0
     private var photoWillCapture: (() -> Void)?
     private var photoCompletion: ((Data?) -> Void)?
     private var videoRecordingProgress: ((Float, TimeInterval) -> Void)?
-    private var videoCompletion: ((URL, Error?) -> Void)?
+    private var videoCompletion: ((URL?, Error?) -> Void)?
     private var timer: Timer?
     private var dateVideoStarted = Date()
     private var videoDidStartRecording: ((TimeInterval) -> Void)?
+    private var captureState: CaptureState = .end
+    private var didStartWriter = false
+    private var didWriterVideoInput = false
+    private var videoInpuCompletion = false
+    private var audioInpuCompletion = false
+    let videoFilter: CameraRenderer
+    let photoFilter: CameraRenderer
+    var filterIndex: Int {
+        get {
+            videoFilter.filterIndex
+        }
+        set {
+            videoFilter.filterIndex = newValue
+            photoFilter.filterIndex = newValue
+        }
+    }
     
     init(config: CameraConfiguration) {
         self.flashMode = config.flashMode
         self.config = config
+        var photoFilters = config.photoFilters
+        photoFilters.insert(OriginalFilter(), at: 0)
+        var videoFilters = config.videoFilters
+        videoFilters.insert(OriginalFilter(), at: 0)
+        var index = config.defaultFilterIndex
+        if index == -1 {
+            index = 0
+        }else {
+            index += 1
+        }
+        self.photoFilter = .init(photoFilters, index)
+        self.videoFilter = .init(videoFilters, index)
         super.init()
         DeviceOrientationHelper.shared.startDeviceOrientationNotifier()
     }
@@ -140,28 +171,8 @@ class CameraManager: NSObject {
         )
     }
     
-    func addMovieOutput() throws {
-        if session.canAddOutput(movieOutput) {
-            session.addOutput(movieOutput)
-            if let videoConnection = movieOutput.connection(with: .video),
-               videoConnection.isVideoStabilizationSupported {
-                videoConnection.preferredVideoStabilizationMode = .auto
-            }
-            return
-        }
-        throw NSError(
-            domain: "Can't add movie output",
-            code: 500,
-            userInfo: nil
-        )
-    }
-    
     func removePhotoOutput() {
         session.removeOutput(photoOutput)
-    }
-    
-    func removeMovieOutput() {
-        session.removeOutput(movieOutput)
     }
     
     func startRunning() {
@@ -188,10 +199,21 @@ class CameraManager: NSObject {
             didAddVideoOutput = true
         }
     }
+    
+    func addAudioOutput() {
+        if session.canAddOutput(audioOutput) {
+            session.addOutput(audioOutput)
+            didAddAudioOutput = true
+        }
+    }
     deinit {
         if didAddVideoOutput {
             videoOutput.setSampleBufferDelegate(nil, queue: nil)
             didAddVideoOutput = false
+        }
+        if didAddAudioOutput {
+            audioOutput.setSampleBufferDelegate(nil, queue: nil)
+            didAddAudioOutput = false
         }
     }
 }
@@ -385,6 +407,8 @@ extension CameraManager {
         guard let device = activeCamera else {
             return
         }
+        let textureRect = CGRect(origin: point, size: .zero)
+        let deviceRect = videoOutput.metadataOutputRectConverted(fromOutputRect: textureRect)
         let exposureMode = AVCaptureDevice.ExposureMode.continuousAutoExposure
         let focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
         let canResetFocus = device.isFocusPointOfInterestSupported &&
@@ -394,11 +418,11 @@ extension CameraManager {
         
         try device.lockForConfiguration()
         if canResetFocus {
-            device.focusPointOfInterest = point
+            device.focusPointOfInterest = deviceRect.origin
             device.focusMode = focusMode
         }
         if canResetExposure {
-            device.exposurePointOfInterest = point
+            device.exposurePointOfInterest = deviceRect.origin
             device.exposureMode = exposureMode
         }
         device.unlockForConfiguration()
@@ -434,14 +458,20 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     }
     
     func photoCaptureSettings() -> AVCapturePhotoSettings {
-        var settings = AVCapturePhotoSettings()
-        
+        let settings = AVCapturePhotoSettings(
+            format: [
+                kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)
+            ]
+        )
+        settings.previewPhotoFormat = [
+            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)
+        ]
         // Catpure Heif when available.
-        if #available(iOS 11.0, *) {
-            if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
-                settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
-            }
-        }
+//        if #available(iOS 11.0, *) {
+//            if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
+//                settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+//            }
+//        }
         
         // Catpure Highest Quality possible.
         settings.isHighResolutionPhotoEnabled = true
@@ -462,8 +492,16 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     ) {
         photoWillCapture = willBegin
         photoCompletion = completion
-        let connection = photoOutput.connection(with: .video)
-        connection?.videoOrientation = currentOrienation
+        if let connection = photoOutput.connection(with: .video) {
+            connection.videoOrientation = currentOrienation
+            if connection.isVideoMirroringSupported {
+                if activeCamera?.position == .front {
+                    connection.isVideoMirrored = true
+                }else {
+                    connection.isVideoMirrored = false
+                }
+            }
+        }
         photoOutput.capturePhoto(with: photoCaptureSettings(), delegate: self)
     }
     func photoOutput(
@@ -473,121 +511,59 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         photoWillCapture?()
     }
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        let data = photo.fileDataRepresentation()
-        photoCompletion?(data)
-    }
-}
-
-extension CameraManager: AVCaptureFileOutputRecordingDelegate {
-    
-    var isRecording: Bool {
-        movieOutput.isRecording
-    }
-    
-    func startRecording(
-        didStart: @escaping (TimeInterval) -> Void,
-        progress: @escaping (Float, TimeInterval) -> Void,
-        completion: @escaping (URL, Error?) -> Void
-    ) {
-        let videoURL = PhotoTools.getVideoTmpURL()
-        guard let connection = movieOutput.connection(with: .video),
-              !isRecording else {
-            completion(videoURL, NSError(domain: "connection is nil", code: 500, userInfo: nil))
+        guard let photoPixelBuffer = photo.previewPixelBuffer else {
+            photoCompletion?(nil)
             return
         }
-        videoDidStartRecording = didStart
-        videoRecordingProgress = progress
-        videoCompletion = completion
-        if connection.isVideoOrientationSupported {
-            connection.videoOrientation = currentOrienation
-        }
-        if UIDevice.belowIphone7 {
-            movieOutput.setOutputSettings(
-                [AVVideoCodecKey: AVVideoCodecType.h264],
-                for: connection
-            )
-        }else if let videoCodecType = config.videoCodecType {
-            movieOutput.setOutputSettings(
-                [AVVideoCodecKey: videoCodecType],
-                for: connection
-            )
-        }
-        if let isSmoothAuto = activeCamera?.isSmoothAutoFocusSupported,
-           isSmoothAuto {
-            try? activeCamera?.lockForConfiguration()
-            activeCamera?.isSmoothAutoFocusEnabled = true
-            activeCamera?.unlockForConfiguration()
-        }
-        recordDuration = 0
-        movieOutput.startRecording(
-            to: videoURL,
-            recordingDelegate: self
+        var photoFormatDescription: CMFormatDescription?
+        CMVideoFormatDescriptionCreateForImageBuffer(
+            allocator: kCFAllocatorDefault,
+            imageBuffer: photoPixelBuffer,
+            formatDescriptionOut: &photoFormatDescription
         )
-    }
-    
-    func stopRecording() {
-        invalidateTimer()
-        movieOutput.stopRecording()
-    }
-    
-    func fileOutput(
-        _ output: AVCaptureFileOutput,
-        didStartRecordingTo fileURL: URL,
-        from connections: [AVCaptureConnection]
-    ) {
-        videoDidStartRecording?(config.videoMaximumDuration)
-        let timer = Timer.scheduledTimer(
-            withTimeInterval: 1,
-            repeats: true,
-            block: { [weak self] timer in
-                guard let self = self else { return }
-                let timeElapsed = Date().timeIntervalSince(self.dateVideoStarted)
-                let progress = Float(timeElapsed) / Float(max(1, self.config.videoMaximumDuration))
-                self.recordDuration = timeElapsed
-                // VideoOutput configuration is responsible for stopping the recording. Not here.
-                DispatchQueue.main.async {
-                    self.videoRecordingProgress?(progress, timeElapsed)
+        DispatchQueue.global().async {
+            var finalPixelBuffer = photoPixelBuffer
+            if self.photoFilter.filterIndex > 0 {
+                if !self.photoFilter.isPrepared {
+                    if let formatDescription = photoFormatDescription {
+                        self.photoFilter.prepare(
+                            with: formatDescription,
+                            outputRetainedBufferCountHint: 2,
+                            imageSize: .init(
+                                width: CVPixelBufferGetWidth(photoPixelBuffer),
+                                height: CVPixelBufferGetHeight(photoPixelBuffer)
+                            )
+                        )
+                    }
                 }
+                guard let filteredBuffer = self.photoFilter.render(
+                    pixelBuffer: photoPixelBuffer
+                ) else {
+                    DispatchQueue.main.async {
+                        self.photoCompletion?(nil)
+                    }
+                    return
+                }
+                finalPixelBuffer = filteredBuffer
             }
-        )
-        dateVideoStarted = Date()
-        self.timer = timer
-    }
-    
-    func fileOutput(
-        _ output: AVCaptureFileOutput,
-        didFinishRecordingTo outputFileURL: URL,
-        from connections: [AVCaptureConnection],
-        error: Error?
-    ) {
-        invalidateTimer()
-        if recordDuration < config.videoMinimumDuration {
-            videoCompletion?(
-                outputFileURL,
-                NSError(
-                    domain: "Recording time is too short",
-                    code: 110,
-                    userInfo: nil
-                )
+            let metadataAttachments = photo.metadata as CFDictionary
+            let jpegData = PhotoTools.jpegData(
+                withPixelBuffer: finalPixelBuffer,
+                attachments: metadataAttachments
             )
-            return
+            DispatchQueue.main.async {
+                self.photoCompletion?(jpegData)
+            }
         }
-        if let error = error as NSError?,
-           let isFullyFinished = error.userInfo[AVErrorRecordingSuccessfullyFinishedKey] as? Bool ,
-           isFullyFinished {
-            videoCompletion?(outputFileURL, nil)
-        }else {
-            videoCompletion?(outputFileURL, error)
-        }
-    }
-    
-    func invalidateTimer() {
-        timer?.invalidate()
-        timer = nil
     }
 }
 
 extension CameraManager {
+    enum CaptureState {
+        case start
+        case capturing
+        case end
+    }
     var currentOrienation: AVCaptureVideoOrientation {
         let orientation = DeviceOrientationHelper.shared.currentDeviceOrientation
         switch orientation {
@@ -605,14 +581,332 @@ extension CameraManager {
     }
 }
 
-extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
+extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
+                         AVCaptureAudioDataOutputSampleBufferDelegate {
     func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
-        if let image = PhotoTools.createImage(from: sampleBuffer)?.rotation(to: .right) {
-            PhotoManager.shared.cameraPreviewImage = image
+        var finalVideoPixelBuffer: CVPixelBuffer?
+        if output == videoOutput {
+            PhotoManager.shared.sampleBuffer = sampleBuffer
+            guard let videoPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+                  let formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer)
+            else {
+                return
+            }
+            finalVideoPixelBuffer = videoPixelBuffer
+            if videoFilter.filterIndex > 0 {
+                if !videoFilter.isPrepared {
+                    videoFilter.prepare(
+                        with: formatDescription,
+                        outputRetainedBufferCountHint: 3,
+                        imageSize: .init(
+                            width: CVPixelBufferGetWidth(videoPixelBuffer),
+                            height: CVPixelBufferGetHeight(videoPixelBuffer)
+                        )
+                    )
+                }
+                guard let filteredBuffer = videoFilter.render(
+                    pixelBuffer: videoPixelBuffer
+                ) else {
+                    return
+                }
+                captureDidOutput?(filteredBuffer)
+                finalVideoPixelBuffer = filteredBuffer
+            }else {
+                captureDidOutput?(videoPixelBuffer)
+            }
         }
+        if captureState == .start && output == videoOutput {
+            if !CMSampleBufferDataIsReady(sampleBuffer) {
+                return
+            }
+            if !setupWriter(sampleBuffer) {
+                resetAssetWriter()
+                DispatchQueue.main.async {
+                    self.videoCompletion?(nil, nil)
+                }
+                return
+            }
+            guard let assetWriter = assetWriter else { return }
+            if !assetWriter.startWriting() {
+                DispatchQueue.main.async {
+                    self.videoCompletion?(nil, assetWriter.error)
+                }
+                resetAssetWriter()
+                return
+            }
+            captureState = .capturing
+        }else if captureState == .capturing {
+            if !didStartWriter {
+                guard let assetWriter = assetWriter else { return }
+                DispatchQueue.main.async {
+                    self.didStartRecording()
+                }
+                let sampleTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+                assetWriter.startSession(atSourceTime: sampleTime)
+                didStartWriter = true
+            }
+            inputAppend(output, sampleBuffer, finalVideoPixelBuffer)
+        }else if captureState == .end {
+            guard let assetWriter = assetWriter, timer != nil else {
+                return
+            }
+            inputAppend(output, sampleBuffer, finalVideoPixelBuffer)
+            if assetWriter.status != .writing {
+                return
+            }
+            if output == videoOutput {
+                if !videoInpuCompletion {
+                    videoInpuCompletion.toggle()
+                    assetWriterVideoInput?.assetWriterInput.markAsFinished()
+                }
+                if !audioInpuCompletion {
+                    return
+                }
+            }else if output == audioOutput {
+                if !audioInpuCompletion {
+                    audioInpuCompletion.toggle()
+                    assetWriterAudioInput?.markAsFinished()
+                }
+                if !videoInpuCompletion {
+                    return
+                }
+            }
+            invalidateTimer()
+            let videoURL = assetWriter.outputURL
+            assetWriter.finishWriting { [weak self] in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    self.didFinishRecording(videoURL)
+                }
+                self.resetAssetWriter()
+            }
+        }
+    }
+    private func inputAppend(
+        _ output: AVCaptureOutput,
+        _ sampleBuffer: CMSampleBuffer,
+        _ pixelBuffer: CVPixelBuffer?
+    ) {
+        if !didStartWriter { return }
+        if output == videoOutput {
+            videoInputAppend(sampleBuffer, pixelBuffer)
+        }else if output == audioOutput {
+            audioInputAppend(sampleBuffer)
+        }
+    }
+    private func audioInputAppend(
+        _ sampleBuffer: CMSampleBuffer
+    ) {
+        if let audioInput = assetWriterAudioInput,
+           audioInput.isReadyForMoreMediaData,
+           didWriterVideoInput {
+            audioInput.append(sampleBuffer)
+        }
+    }
+    private func videoInputAppend(
+        _ sampleBuffer: CMSampleBuffer,
+        _ pixelBuffer: CVPixelBuffer?
+    ) {
+        if let assetWriterVideoInput = assetWriterVideoInput,
+           assetWriterVideoInput.assetWriterInput.isReadyForMoreMediaData {
+            guard let pixelBuffer = pixelBuffer else { return }
+            let sampleTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+            if assetWriterVideoInput.append(pixelBuffer, withPresentationTime: sampleTime) {
+                if !didWriterVideoInput { didWriterVideoInput = true }
+            }
+        }
+    }
+    
+    func setupWriter(_ sampleBuffer: CMSampleBuffer) -> Bool {
+        let assetWriter: AVAssetWriter
+        do {
+            assetWriter = try AVAssetWriter(
+                url: PhotoTools.getVideoTmpURL(),
+                fileType: .mp4
+            )
+        } catch {
+            return false
+        }
+        let videoWidth: Int
+        let videoHeight: Int
+        if let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+            videoWidth = CVPixelBufferGetWidth(pixelBuffer)
+            videoHeight = CVPixelBufferGetHeight(pixelBuffer)
+        }else {
+            videoWidth = Int(config.sessionPreset.size.height)
+            videoHeight = Int(config.sessionPreset.size.width)
+        }
+//        var bitsPerPixel: Float
+//        let numPixels = videoWidth * videoHeight
+//        var bitsPerSecond: Int
+//        if numPixels < 640 * 480 {
+//            bitsPerPixel = 4.05
+//        } else {
+//            bitsPerPixel = 10.1
+//        }
+//
+//        bitsPerSecond = Int(Float(numPixels) * bitsPerPixel)
+//
+//        let compressionProperties = [
+//            AVVideoAverageBitRateKey: bitsPerSecond,
+//            AVVideoExpectedSourceFrameRateKey: 30,
+//            AVVideoMaxKeyFrameIntervalKey: 30
+//        ]
+        let videoCodecType: AVVideoCodecType
+        if UIDevice.belowIphone7 {
+            videoCodecType = .h264
+        }else {
+            videoCodecType = config.videoCodecType
+        }
+        let videoInput = AVAssetWriterInput(
+            mediaType: .video,
+            outputSettings: [
+                AVVideoCodecKey: videoCodecType,
+                AVVideoWidthKey: videoWidth,
+                AVVideoHeightKey: videoHeight
+            ]
+        )
+        videoInput.expectsMediaDataInRealTime = true
+//        videoInput.transform = .init(rotationAngle: .pi * 0.5)
+//        if currentOrienation == .landscapeRight {
+//            videoInput.transform = videoInput.transform.rotated(by: .pi * -0.5)
+//        }else if currentOrienation == .landscapeLeft {
+//            videoInput.transform = videoInput.transform.rotated(by: .pi * 0.5)
+//        }
+        if let position = activeCamera?.position, position == .front {
+            videoInput.transform = videoInput.transform.scaledBy(x: -1, y: 1)
+        }
+        
+        let audioInput = AVAssetWriterInput(
+            mediaType: .audio,
+            outputSettings: [
+                AVFormatIDKey: kAudioFormatMPEG4AAC,
+                AVNumberOfChannelsKey: 1,
+                AVSampleRateKey: 44100,
+                AVEncoderBitRateKey: 64000
+            ]
+        )
+        audioInput.expectsMediaDataInRealTime = true
+        if !assetWriter.canAdd(videoInput) ||
+            !assetWriter.canAdd(audioInput) {
+            return false
+        }
+        let inputPixelBufferInput = AVAssetWriterInputPixelBufferAdaptor(
+            assetWriterInput: videoInput,
+            sourcePixelBufferAttributes: [
+                kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+                kCVPixelBufferWidthKey as String: videoWidth,
+                kCVPixelBufferHeightKey as String: videoHeight
+            ]
+        )
+        assetWriter.add(videoInput)
+        assetWriter.add(audioInput)
+        self.assetWriter = assetWriter
+        assetWriterVideoInput = inputPixelBufferInput
+        assetWriterAudioInput = audioInput
+        return true
+    }
+    
+    func resetFilter() {
+        videoFilter.reset()
+        photoFilter.reset()
+    }
+}
+
+extension CameraManager {
+    
+    func startRecording(
+        didStart: @escaping (TimeInterval) -> Void,
+        progress: @escaping (Float, TimeInterval) -> Void,
+        completion: @escaping (URL?, Error?) -> Void
+    ) {
+        if isRecording {
+            completion(nil, NSError(domain: "is recording", code: 500, userInfo: nil))
+            return
+        }
+        videoDidStartRecording = didStart
+        videoRecordingProgress = progress
+        videoCompletion = completion
+        if let isSmoothAuto = activeCamera?.isSmoothAutoFocusSupported,
+           isSmoothAuto {
+            try? activeCamera?.lockForConfiguration()
+            activeCamera?.isSmoothAutoFocusEnabled = true
+            activeCamera?.unlockForConfiguration()
+        }
+        if let connection = photoOutput.connection(with: .video) {
+            if connection.isVideoMirroringSupported {
+                connection.isVideoMirrored = false
+            }
+        }
+        recordDuration = 0
+        captureState = .start
+        isRecording = true
+    }
+    
+    func didStartRecording() {
+        videoDidStartRecording?(config.videoMaximumDuration)
+        let timer = Timer.scheduledTimer(
+            withTimeInterval: 1,
+            repeats: true,
+            block: { [weak self] timer in
+                guard let self = self else { return }
+                let timeElapsed = Date().timeIntervalSince(self.dateVideoStarted)
+                let progress = Float(timeElapsed) / Float(max(1, self.config.videoMaximumDuration))
+                self.recordDuration = timeElapsed
+                if self.config.takePhotoMode == .press ||
+                    (self.config.takePhotoMode == .click && self.config.videoMaximumDuration > 0) {
+                    if timeElapsed >= self.config.videoMaximumDuration {
+                        self.stopRecording()
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.videoRecordingProgress?(progress, timeElapsed)
+                }
+            }
+        )
+        dateVideoStarted = Date()
+        self.timer = timer
+    }
+    
+    func stopRecording() {
+        captureState = .end
+    }
+    
+    func didFinishRecording(_ videoURL: URL) {
+        invalidateTimer()
+        if recordDuration < config.videoMinimumDuration {
+            try? FileManager.default.removeItem(at: videoURL)
+            videoCompletion?(
+                nil,
+                NSError(
+                    domain: "Recording time is too short",
+                    code: 110,
+                    userInfo: nil
+                )
+            )
+            return
+        }
+        videoCompletion?(videoURL, nil)
+        isRecording = false
+    }
+    func invalidateTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    func resetAssetWriter() {
+        didStartWriter = false
+        didWriterVideoInput = false
+        videoInpuCompletion = false
+        audioInpuCompletion = false
+        assetWriterVideoInput = nil
+        assetWriterAudioInput = nil
+        assetWriter = nil
+        invalidateTimer()
+        isRecording = false
+        captureState = .end
     }
 }

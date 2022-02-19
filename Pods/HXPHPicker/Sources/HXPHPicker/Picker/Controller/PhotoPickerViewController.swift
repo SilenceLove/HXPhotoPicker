@@ -242,6 +242,10 @@ public class PhotoPickerViewController: BaseViewController {
     
     // MARK: UIScrollView滚动相关
     var scrollToTop = false
+    var targetOffsetY: CGFloat = 0
+    var didChangeCellLoadMode: Bool = false
+    var scrollEndReload: Bool = false
+    var scrollReachDistance = false
     
     // MARK: function
     public override func viewDidLoad() {
@@ -249,7 +253,6 @@ public class PhotoPickerViewController: BaseViewController {
         guard let picker = pickerController else {
             return
         }
-        PhotoManager.shared.hasThumbnailLoadMode = picker.config.photoList.loadClearImageWhenScrollingStops
         allowLoadPhotoLibrary = picker.config.allowLoadPhotoLibrary
         if AssetManager.authorizationStatus() == .notDetermined {
             didFetchAsset = true

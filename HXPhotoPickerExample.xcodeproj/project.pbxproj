@@ -158,10 +158,8 @@
 		7B20B41527A2A94D00375FB6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B20B3A327A2A94C00375FB6 /* Assets.xcassets */; };
 		7B20B41627A2A94D00375FB6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B20B3A327A2A94C00375FB6 /* Assets.xcassets */; };
 		7B20B41827A2A94D00375FB6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B20B3A427A2A94C00375FB6 /* LaunchScreen.storyboard */; };
-		7B20B41A27A2A94D00375FB6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B20B3A627A2A94C00375FB6 /* Main.storyboard */; };
 		7B20B41C27A2A94D00375FB6 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B20B3A827A2A94C00375FB6 /* Reachability.swift */; };
 		7B20B41E27A2A94D00375FB6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B20B3A927A2A94C00375FB6 /* AppDelegate.swift */; };
-		7B20B42027A2A94D00375FB6 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7B20B3AA27A2A94C00375FB6 /* Info.plist */; };
 		7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
 		7B3C2904266F4DAF00F0622F /* PHAsset+HXExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B3C2903266F4DAF00F0622F /* PHAsset+HXExtension.m */; };
 		7B3FAFE02558EFAE0092FCE0 /* HXPhotoPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B2824182514A7CD00DEE5A0 /* HXPhotoPicker.bundle */; };
@@ -269,6 +267,10 @@
 		7B8629AC237D0F9400F8A584 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AB237D0F9400F8A584 /* Contacts.framework */; };
 		7B8629AE237D0FAA00F8A584 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8629AD237D0FAA00F8A584 /* AddressBook.framework */; };
 		7B8BFB1C2585191D00510339 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */; };
+		7B9BA7BE27C0DE72009326C1 /* GPUImageBeautifyFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9BA7BB27C0DE72009326C1 /* GPUImageBeautifyFilter.m */; };
+		7B9BA7BF27C0DE72009326C1 /* GPUImageBeautifyFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B9BA7BB27C0DE72009326C1 /* GPUImageBeautifyFilter.m */; };
+		7B9BA7C027C0DE72009326C1 /* ImageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9BA7BD27C0DE72009326C1 /* ImageFilter.swift */; };
+		7B9BA7C127C0DE72009326C1 /* ImageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9BA7BD27C0DE72009326C1 /* ImageFilter.swift */; };
 		7BAF876124C14D5C00ACAF85 /* HXCameraBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */; };
 		7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713A2505D24E00E2D05C /* HXPhotoEditGraffitiColorSizeView.xib */; };
 		7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BC3713B2505D24E00E2D05C /* HXPhotoEditStickerTrashView.xib */; };
@@ -599,7 +601,6 @@
 		7B20B3A227A2A94C00375FB6 /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
 		7B20B3A327A2A94C00375FB6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B20B3A527A2A94C00375FB6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		7B20B3A727A2A94C00375FB6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7B20B3A827A2A94C00375FB6 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		7B20B3A927A2A94C00375FB6 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7B20B3AA27A2A94C00375FB6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -803,6 +804,10 @@
 		7B8629AD237D0FAA00F8A584 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7B8BFB1B2585191D00510339 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = HXPhotoPicker.podspec; sourceTree = SOURCE_ROOT; };
 		7B8EED1A24D7C2C600957B3C /* HXPhotoTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoTypes.h; sourceTree = "<group>"; };
+		7B9BA7BB27C0DE72009326C1 /* GPUImageBeautifyFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageBeautifyFilter.m; sourceTree = "<group>"; };
+		7B9BA7BC27C0DE72009326C1 /* GPUImageBeautifyFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageBeautifyFilter.h; sourceTree = "<group>"; };
+		7B9BA7BD27C0DE72009326C1 /* ImageFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageFilter.swift; sourceTree = "<group>"; };
+		7B9BA7CA27C0E3EA009326C1 /* HXPHPickerExample-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HXPHPickerExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		7BAF875F24C14D5C00ACAF85 /* HXCameraBottomView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXCameraBottomView.h; sourceTree = "<group>"; };
 		7BAF876024C14D5C00ACAF85 /* HXCameraBottomView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HXCameraBottomView.m; sourceTree = "<group>"; };
 		7BB9FDFB24D500DB00C9A6F1 /* HXPhotoViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewProtocol.h; sourceTree = "<group>"; };
@@ -983,8 +988,8 @@
 				7B20B37B27A2A94C00375FB6 /* Images */,
 				7B20B38C27A2A94C00375FB6 /* Classes */,
 				7B20B3A327A2A94C00375FB6 /* Assets.xcassets */,
+				7B9BA7CA27C0E3EA009326C1 /* HXPHPickerExample-Bridging-Header.h */,
 				7B20B3A427A2A94C00375FB6 /* LaunchScreen.storyboard */,
-				7B20B3A627A2A94C00375FB6 /* Main.storyboard */,
 				7B20B3A827A2A94C00375FB6 /* Reachability.swift */,
 				7B20B3A927A2A94C00375FB6 /* AppDelegate.swift */,
 				7B20B3AA27A2A94C00375FB6 /* Info.plist */,
@@ -1053,6 +1058,7 @@
 				7B20B38D27A2A94C00375FB6 /* Extension */,
 				7B20B39327A2A94C00375FB6 /* Controller */,
 				7B20B3A027A2A94C00375FB6 /* View */,
+				7B9BA7BA27C0DE72009326C1 /* Model */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1427,6 +1433,16 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		7B9BA7BA27C0DE72009326C1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				7B9BA7BB27C0DE72009326C1 /* GPUImageBeautifyFilter.m */,
+				7B9BA7BC27C0DE72009326C1 /* GPUImageBeautifyFilter.h */,
+				7B9BA7BD27C0DE72009326C1 /* ImageFilter.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		7BD52EC124FE250E00AE3D7C /* HXPhotoPickerFramework */ = {
 			isa = PBXGroup;
 			children = (
@@ -1668,7 +1684,6 @@
 				7B20B3EE27A2A94D00375FB6 /* hx_sticker_haoxinqing.png in Resources */,
 				7B20B3D827A2A94D00375FB6 /* hx_sticker_woxiangfazipai.png in Resources */,
 				7B20B3E227A2A94D00375FB6 /* hx_sticker_yuanqishaonv.png in Resources */,
-				7B20B41A27A2A94D00375FB6 /* Main.storyboard in Resources */,
 				7B20B3C227A2A94D00375FB6 /* 野孩子 in Resources */,
 				7B20B3DE27A2A94D00375FB6 /* picker_example_gif_image.GIF in Resources */,
 				7B20B3BE27A2A94D00375FB6 /* 爱你 in Resources */,
@@ -1689,7 +1704,6 @@
 				7B20B3DA27A2A94D00375FB6 /* hx_sticker_xiaochuzhujiao.png in Resources */,
 				7B20B41627A2A94D00375FB6 /* Assets.xcassets in Resources */,
 				7B20B3D627A2A94D00375FB6 /* hx_sticker_housailei.png in Resources */,
-				7B20B42027A2A94D00375FB6 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1785,12 +1799,14 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GDPerformanceView-Swift/GDPerformanceView_Swift.framework",
+				"${BUILT_PRODUCTS_DIR}/GPUImage/GPUImage.framework",
 				"${BUILT_PRODUCTS_DIR}/HXPHPicker/HXPHPicker.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GDPerformanceView_Swift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GPUImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HXPHPicker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 			);
@@ -1829,12 +1845,14 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GDPerformanceView-Swift/GDPerformanceView_Swift.framework",
+				"${BUILT_PRODUCTS_DIR}/GPUImage/GPUImage.framework",
 				"${BUILT_PRODUCTS_DIR}/HXPHPicker/HXPHPicker.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GDPerformanceView_Swift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GPUImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HXPHPicker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 			);
@@ -1875,6 +1893,7 @@
 				7B20B3FE27A2A94D00375FB6 /* WindowPickerViewController.swift in Sources */,
 				7B20B3F427A2A94D00375FB6 /* UIImage+Extension.swift in Sources */,
 				7B20B41C27A2A94D00375FB6 /* Reachability.swift in Sources */,
+				7B9BA7BF27C0DE72009326C1 /* GPUImageBeautifyFilter.m in Sources */,
 				7B20B3F827A2A94D00375FB6 /* Core+UIColor.swift in Sources */,
 				7B20B40027A2A94D00375FB6 /* WeChatViewController.swift in Sources */,
 				7B20B3FC27A2A94D00375FB6 /* EditorConfigurationViewController.swift in Sources */,
@@ -1884,6 +1903,7 @@
 				7B20B40E27A2A94D00375FB6 /* PickerConfigurationViewController.swift in Sources */,
 				7B20B3F627A2A94D00375FB6 /* RowTypeRule.swift in Sources */,
 				7B20B40427A2A94D00375FB6 /* AvatarPickerConfigurationViewController.swift in Sources */,
+				7B9BA7C127C0DE72009326C1 /* ImageFilter.swift in Sources */,
 				7B20B40C27A2A94D00375FB6 /* PhotoBrowserViewController.swift in Sources */,
 				7B20B3F027A2A94D00375FB6 /* UIDevice+Extension.swift in Sources */,
 				7B20B40827A2A94D00375FB6 /* CustomPickerCellViewController.swift in Sources */,
@@ -1908,6 +1928,7 @@
 				7B4D4C6A24B858C600B03846 /* HXPhotoEditTextView.m in Sources */,
 				7B08596A24FA58DF00E93091 /* WxMomentViewCell.m in Sources */,
 				7B08595E24FA58DF00E93091 /* UITextView+Placeholder.m in Sources */,
+				7B9BA7C027C0DE72009326C1 /* ImageFilter.swift in Sources */,
 				7B4E662E2487AD5C00077EE1 /* HXPhotoPersentInteractiveTransition.m in Sources */,
 				7B4D4C6924B858C600B03846 /* HXPhotoEditGridLayer.m in Sources */,
 				7B4E66432487AD5C00077EE1 /* HXAlbumListViewController.m in Sources */,
@@ -2029,6 +2050,7 @@
 				7B4E66322487AD5C00077EE1 /* NSArray+HXExtension.m in Sources */,
 				7B4E66482487AD5C00077EE1 /* HXPhotoEditViewController.m in Sources */,
 				7B4E662C2487AD5C00077EE1 /* HXPhotoInteractiveTransition.m in Sources */,
+				7B9BA7BE27C0DE72009326C1 /* GPUImageBeautifyFilter.m in Sources */,
 				7B20B41327A2A94D00375FB6 /* CustomPickerCellView.swift in Sources */,
 				7B08595F24FA58DF00E93091 /* Demo6ViewController.m in Sources */,
 				7B4E662D2487AD5C00077EE1 /* HXPhotoViewPresentTransition.m in Sources */,
@@ -2143,14 +2165,6 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
-		7B20B3A627A2A94C00375FB6 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7B20B3A727A2A94C00375FB6 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -2183,6 +2197,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPHPickerExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "Swift/HXPHPickerExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2212,6 +2227,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence.HXPHPickerExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Swift/HXPHPickerExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
