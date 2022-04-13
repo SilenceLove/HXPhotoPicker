@@ -244,6 +244,7 @@ open class EditorController: UINavigationController {
         modalPresentationStyle = config.modalPresentationStyle
         let photoEditorVC = PhotoEditorViewController(
             photoAsset: photoAsset,
+            editResult: editResult,
             config: config
         )
         photoEditorVC.delegate = delegate

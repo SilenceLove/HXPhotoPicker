@@ -27,8 +27,8 @@ public struct EditorChartlet {
     public init(
         image: UIImage?,
         imageData: Data? = nil,
-        ext: Any? = nil)
-    {
+        ext: Any? = nil
+    ) {
         self.image = image
         self.imageData = imageData
         self.ext = ext
@@ -40,8 +40,8 @@ public struct EditorChartlet {
     #if canImport(Kingfisher)
     public init(
         url: URL?,
-        ext: Any? = nil)
-    {
+        ext: Any? = nil
+    ) {
         self.url = url
         self.ext = ext
         image = nil

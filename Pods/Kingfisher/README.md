@@ -154,8 +154,8 @@ struct ContentView: View {
 
 ### Learn More
 
-To learn the use of Kingfisher by more examples, take a look at the well-prepared [Cheat Sheet](https://github.com/onevcat/Kingfisher/wiki/Cheat-Sheet). T
-here we summarized the most common tasks in Kingfisher, you can get a better idea of what this framework can do. 
+To learn the use of Kingfisher by more examples, take a look at the well-prepared [Cheat Sheet](https://github.com/onevcat/Kingfisher/wiki/Cheat-Sheet).
+There we summarized the most common tasks in Kingfisher, you can get a better idea of what this framework can do. 
 There are also some performance tips, remember to check them too.
 
 ## Requirements
@@ -165,10 +165,10 @@ There are also some performance tips, remember to check them too.
 - Swift 5.0+
 
 > If you need to support from iOS 10 (UIKit/AppKit) or iOS 13 (SwiftUI), use Kingfisher version 6.x. But it won't work 
-> with Xcode 13 [#1802](https://github.com/onevcat/Kingfisher/issues/1802).
+> with Xcode 13.0 and Xcode 13.1 [#1802](https://github.com/onevcat/Kingfisher/issues/1802).
 >
-> If you need to use Xcode 13 but cannot upgrade to v7, use the `version6-xcode13` branch. However, you have to drop 
-> iOS 10 support due to an Xcode 13 bug.
+> If you need to use Xcode 13.0 and 13.1 but cannot upgrade to v7, use the `version6-xcode13` branch. However, you have to drop 
+> iOS 10 support due to another Xcode 13 bug.
 >
 > | UIKit | SwiftUI | Xcode | Kingfisher |
 > |---|---|---|---|
@@ -222,7 +222,7 @@ We prepared a [wiki page](https://github.com/onevcat/Kingfisher/wiki). You can f
 
 * [Installation Guide](https://github.com/onevcat/Kingfisher/wiki/Installation-Guide) - Follow it to integrate Kingfisher into your project.
 * [Cheat Sheet](https://github.com/onevcat/Kingfisher/wiki/Cheat-Sheet)- Curious about what Kingfisher could do and how would it look like when used in your project? See this page for useful code snippets. If you are already familiar with Kingfisher, you could also learn new tricks to improve the way you use Kingfisher!
-* [API Reference](https://kingfisher.onevcat.com/) - Lastly, please remember to read the full whenever you may need a more detailed reference.
+* [API Reference](https://kingfisher.onevcat.com/) - Lastly, please remember to read the full API reference whenever you need more detailed documentation.
 
 ## Other
 
@@ -247,7 +247,11 @@ Follow and contact me on [Twitter](http://twitter.com/onevcat) or [Sina Weibo](h
 Open-source projects cannot live long without your help. If you find Kingfisher is useful, please consider supporting this 
 project by becoming a sponsor. Your user icon or company logo shows up [on my blog](https://onevcat.com/tabs/about/) with a link to your home page. 
 
-Become a sponsor through [GitHub Sponsors](https://github.com/sponsors/onevcat) or [Open Collective](https://opencollective.com/kingfisher#sponsor). :heart:
+Become a sponsor through [GitHub Sponsors](https://github.com/sponsors/onevcat). :heart:
+
+Special thanks to:
+
+[![imgly](https://user-images.githubusercontent.com/1812216/106253726-271ed000-6218-11eb-98e0-c9c681925770.png)](https://img.ly/)
 
 ### License
 

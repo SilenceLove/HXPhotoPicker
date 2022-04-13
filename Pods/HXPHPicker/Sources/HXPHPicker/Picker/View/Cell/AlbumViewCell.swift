@@ -134,11 +134,16 @@ open class AlbumViewCell: UITableViewCell {
         
         albumNameLb.x = albumCoverView.frame.maxX + 10
         albumNameLb.size = CGSize(width: tickView.x - albumNameLb.x - 20, height: 16)
-        albumNameLb.centerY = height / CGFloat(2) - albumNameLb.height / CGFloat(2)
         
-        photoCountLb.x = albumCoverView.frame.maxX + 10
-        photoCountLb.y = albumNameLb.frame.maxY + 5
-        photoCountLb.size = CGSize(width: width - photoCountLb.x - 20, height: 14)
+        if let showPhotoCount = config?.showPhotoCount, showPhotoCount {
+            albumNameLb.centerY = height / 2 - albumNameLb.height / 2
+            
+            photoCountLb.x = albumCoverView.frame.maxX + 10
+            photoCountLb.y = albumNameLb.frame.maxY + 5
+            photoCountLb.size = CGSize(width: width - photoCountLb.x - 20, height: 14)
+        }else {
+            albumNameLb.centerY = height / 2
+        }
         
         bottomLineView.frame = CGRect(x: coverMargin, y: height - 0.5, width: width - coverMargin * 2, height: 0.5)
     }

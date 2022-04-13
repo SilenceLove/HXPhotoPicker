@@ -124,6 +124,30 @@ public protocol PhotoPickerControllerDelegate: AnyObject {
     
     #if HXPICKER_ENABLE_EDITOR
     
+    /// 即将编辑照片
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - photoAsset: 对应的 PhotoAsset 数据
+    ///   - editorConfig: 照片编辑配置
+    /// - Returns: 是否可以编辑
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool
+    
+    /// 即将编辑视频
+    ///   - pickerController: 对应的 PhotoPickerController
+    ///   - videoAsset: 对应的 PhotoAsset 数据
+    ///   - editorConfig: 视频编辑配置
+    /// - Returns: 是否可以编辑
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool
+    
     /// 照片/视频编辑器加载贴图标题资源
     /// - Parameters:
     ///   - pickerController: 对应的 PhotoPickerController
@@ -467,6 +491,21 @@ public extension PhotoPickerControllerDelegate {
     ) -> Bool { true }
     
     #if HXPICKER_ENABLE_EDITOR
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool { true }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool { true }
+    
     func pickerController(
         _ pickerController: PhotoPickerController,
         loadTitleChartlet editorViewController: UIViewController,

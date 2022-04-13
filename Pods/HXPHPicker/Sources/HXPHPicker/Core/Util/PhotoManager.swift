@@ -103,7 +103,6 @@ public final class PhotoManager: NSObject {
     }
     #endif
     
-    static let mainBundle = Bundle(for: HXPHPicker.self)
     let uuid: String = UUID().uuidString
     
     private override init() {
@@ -121,7 +120,7 @@ public final class PhotoManager: NSObject {
                 self.bundle = Bundle.main
             }
             #else
-            let bundle = PhotoManager.mainBundle
+            let bundle = Bundle(for: HXPHPicker.self)
             var path = bundle.path(forResource: "HXPHPicker", ofType: "bundle")
             if path == nil {
                 let associateBundleURL = Bundle.main.url(forResource: "Frameworks", withExtension: nil)
@@ -131,12 +130,6 @@ public final class PhotoManager: NSObject {
                     let associateBunle = Bundle(url: url)
                     path = associateBunle?.path(forResource: "HXPHPicker", ofType: "bundle")
                 }
-//                if associateBundleURL != nil {
-//                    associateBundleURL = associateBundleURL?.appendingPathComponent("HXPHPicker")
-//                    associateBundleURL = associateBundleURL?.appendingPathExtension("framework")
-//                    let associateBunle = Bundle.init(url: associateBundleURL!)
-//                    path = associateBunle?.path(forResource: "HXPHPicker", ofType: "bundle")
-//                }
             }
             if let path = path {
                 self.bundle = Bundle(path: path)
@@ -147,7 +140,6 @@ public final class PhotoManager: NSObject {
         }
         return self.bundle
     }
-    
 }
 
 #if HXPICKER_ENABLE_PICKER

@@ -16,6 +16,7 @@ open class VideoEditorConfiguration: EditorConfiguration {
     public var videoQuality: Int = 6
     
     /// 视频导出的地址，默认在tmp下
+    /// 每次编辑时请设置不同地址，防止之前存在的数据被覆盖
     public var videoExportURL: URL?
     
     /// 编辑控制器的默认状态

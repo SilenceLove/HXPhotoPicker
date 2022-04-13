@@ -278,6 +278,14 @@ extension PhotoPickerView: UICollectionViewDelegate {
         #if HXPICKER_ENABLE_EDITOR && HXPICKER_ENABLE_PICKER
         if manager.config.editorOptions.contains(.photo) {
             let config = manager.config.photoEditor
+            if let shouldEdit = delegate?.photoPickerView(
+                self,
+                shouldEditPhotoAsset: photoAsset,
+                editorConfig: config
+            ),
+               !shouldEdit {
+                return false
+            }
             config.languageType = manager.config.languageType
             config.appearanceStyle = manager.config.appearanceStyle
             config.indicatorType = manager.config.indicatorType
@@ -315,6 +323,14 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 config.mustBeTailored = true
             }else {
                 config = manager.config.videoEditor
+            }
+            if let shouldEdit = delegate?.photoPickerView(
+                self,
+                shouldEditVideoAsset: photoAsset,
+                editorConfig: config
+            ),
+               !shouldEdit {
+                return false
             }
             config.languageType = manager.config.languageType
             config.appearanceStyle = manager.config.appearanceStyle

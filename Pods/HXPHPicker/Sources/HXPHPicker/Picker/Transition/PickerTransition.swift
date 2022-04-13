@@ -304,13 +304,14 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
     }
     // swiftlint:disable function_body_length
     func presentTransition(
-        using transitionContext: UIViewControllerContextTransitioning) {
+        using transitionContext: UIViewControllerContextTransitioning
+    ) {
         // swiftlint:enable function_body_length
         let fromVC = transitionContext.viewController(forKey: .from)!
         let toVC = transitionContext.viewController(forKey: .to)!
         
         let containerView = transitionContext.containerView
-        let contentView = UIView.init(frame: fromVC.view.bounds)
+        let contentView = UIView()
         
         var pickerController: PhotoPickerController
         if type == .present {
@@ -326,6 +327,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         var toRect: CGRect = .zero
         let previewViewController = pickerController.previewViewController
         if type == .present {
+            contentView.frame = toVC.view.bounds
             containerView.addSubview(contentView)
             containerView.addSubview(toVC.view)
             contentView.backgroundColor = backgroundColor.withAlphaComponent(0)
@@ -390,6 +392,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
             }
         }else {
+            contentView.frame = fromVC.view.bounds
             previewViewController?.view.insertSubview(contentView, at: 0)
             previewViewController?.view.backgroundColor = .clear
             previewViewController?.collectionView.isHidden = true
@@ -425,7 +428,13 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 fromView.layer.masksToBounds = true
             }
         }
-        previewView?.isHidden = true
+        if let photoBrowser = pickerController as? PhotoBrowser {
+            if photoBrowser.hideSourceView {
+                previewView?.isHidden = true
+            }
+        }else {
+            previewView?.isHidden = true
+        }
         contentView.addSubview(fromView)
         let duration = (self.type == .dismiss && !toRect.isEmpty) ?
             transitionDuration(using: transitionContext) - 0.2 :
@@ -516,9 +525,9 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         requestID = AssetManager.requestImageData(
             for: asset,
             options: options
-        ) { (result) in
+        ) {
             var info: [AnyHashable: Any]?
-            switch result {
+            switch $0 {
             case .success(let dataResult):
                 info = dataResult.info
                 DispatchQueue.global().async {

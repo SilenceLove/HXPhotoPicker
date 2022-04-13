@@ -1,11 +1,11 @@
 ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 CLANG_MODULES_AUTOLINK = YES
 CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
-FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/GDPerformanceView-Swift" "${PODS_CONFIGURATION_BUILD_DIR}/GPUImage" "${PODS_CONFIGURATION_BUILD_DIR}/HXPHPicker" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher"
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/AFNetworking" "${PODS_CONFIGURATION_BUILD_DIR}/GDPerformanceView-Swift" "${PODS_CONFIGURATION_BUILD_DIR}/GPUImage" "${PODS_CONFIGURATION_BUILD_DIR}/HXPHPicker" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher" "${PODS_CONFIGURATION_BUILD_DIR}/Masonry" "${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/GDPerformanceView-Swift/GDPerformanceView_Swift.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/GPUImage/GPUImage.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/HXPHPicker/HXPHPicker.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.framework/Headers"
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/AFNetworking/AFNetworking.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/GDPerformanceView-Swift/GDPerformanceView_Swift.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/GPUImage/GPUImage.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/HXPHPicker/HXPHPicker.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Masonry/Masonry.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.framework/Headers"
 LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
-OTHER_LDFLAGS = $(inherited) -framework "AVFoundation" -framework "Accelerate" -framework "CFNetwork" -framework "CoreMedia" -framework "Foundation" -framework "GDPerformanceView_Swift" -framework "GPUImage" -framework "HXPHPicker" -framework "Kingfisher" -framework "OpenGLES" -framework "Photos" -framework "PhotosUI" -framework "QuartzCore" -framework "UIKit" -weak_framework "Combine" -weak_framework "SwiftUI"
+OTHER_LDFLAGS = $(inherited) -framework "AFNetworking" -framework "AVFoundation" -framework "Accelerate" -framework "CFNetwork" -framework "CoreMedia" -framework "Foundation" -framework "GDPerformanceView_Swift" -framework "GPUImage" -framework "HXPHPicker" -framework "ImageIO" -framework "Kingfisher" -framework "Masonry" -framework "OpenGLES" -framework "Photos" -framework "PhotosUI" -framework "QuartzCore" -framework "SDWebImage" -framework "UIKit" -weak_framework "Combine" -weak_framework "SwiftUI"
 OTHER_SWIFT_FLAGS = $(inherited) -D COCOAPODS
 PODS_BUILD_DIR = ${BUILD_DIR}
 PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)

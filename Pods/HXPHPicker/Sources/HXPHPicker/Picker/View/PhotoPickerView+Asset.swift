@@ -52,14 +52,12 @@ extension PhotoPickerView {
                 self.setupDeniedView()
                 return
             }
-            self.manager.reloadAssetCollection = { [weak self] in
-                guard let self = self else { return }
+            self.manager.reloadAssetCollection = {
                 self.showLoading()
             }
             self.showLoading()
-            self.manager.fetchAssets { [weak self] photoAssets, photoAsset in
-                guard let self = self else { return }
-                self.fetchAssetCompletion(photoAssets, photoAsset)
+            self.manager.fetchAssets {
+                self.fetchAssetCompletion($0, $1)
             }
         }
     }

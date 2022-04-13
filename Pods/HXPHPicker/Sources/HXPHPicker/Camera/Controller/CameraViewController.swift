@@ -385,7 +385,7 @@ open class CameraViewController: BaseViewController {
             )
         }
         if config.cameraType == .normal {
-            if !didLayoutPreview {
+            if !didLayoutPreview && AssetManager.cameraAuthorizationStatus() == .authorized {
                 previewView.frame = previewRect
                 didLayoutPreview = true
             }

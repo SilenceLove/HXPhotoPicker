@@ -133,7 +133,8 @@ open class PhotoEditorViewController: BaseViewController {
             cropConfig: config.cropping,
             mosaicConfig: config.mosaic,
             brushConfig: config.brush,
-            exportScale: config.scale
+            exportScale: config.scale,
+            editedImageURL: config.editedImageURL
         )
         imageView.editorDelegate = self
         return imageView

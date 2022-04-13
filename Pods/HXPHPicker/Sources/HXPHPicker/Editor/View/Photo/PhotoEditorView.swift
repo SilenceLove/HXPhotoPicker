@@ -29,7 +29,8 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         let imageResizerView = EditorImageResizerView(
             editType: editType,
             cropConfig: cropConfig,
-            mosaicConfig: mosaicConfig
+            mosaicConfig: mosaicConfig,
+            editedImageURL: editedImageURL
         )
         imageResizerView.exportScale = exportScale
         let brush = brushConfig
@@ -110,18 +111,21 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     var hasSticker: Bool { imageResizerView.imageView.stickerView.count > 0 }
     var hasFilter: Bool { imageResizerView.videoFilter != nil || imageResizerView.hasFilter }
     
+    var editedImageURL: URL?
     init(
         editType: PhotoEditorContentView.EditType,
         cropConfig: EditorCropSizeConfiguration,
         mosaicConfig: PhotoEditorConfiguration.Mosaic,
         brushConfig: EditorBrushConfiguration,
-        exportScale: CGFloat
+        exportScale: CGFloat,
+        editedImageURL: URL? = nil
     ) {
         self.editType = editType
         self.cropConfig = cropConfig
         self.mosaicConfig = mosaicConfig
         self.brushConfig = brushConfig
         self.exportScale = exportScale
+        self.editedImageURL = editedImageURL
         super.init(frame: .zero)
         delegate = self
         minimumZoomScale = 1.0

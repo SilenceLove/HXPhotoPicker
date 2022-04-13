@@ -66,7 +66,7 @@ public class PickerConfiguration: BaseConfiguration {
     #if HXPICKER_ENABLE_EDITOR
     /// 可编辑资源类型
     /// 视频允许编辑：当选择的视频时长超过限制将自动进入编辑界面
-    /// 显示编辑按钮的配置为：previewView.bottomView.editButtonHidden
+    /// 显示编辑按钮的配置为：previewView.bottomView.editButtonHidden = false
     public var editorOptions: PickerAssetOptions = [.photo, .video]
     
     /// 视频最大编辑时长，为0则不限制，超过限制不可编辑（视频时长超出最大选择时长才生效）

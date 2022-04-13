@@ -43,6 +43,20 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             }else {
                 videoEditorConfig = pickerConfig.videoEditor
             }
+            if !picker.shouldEditVideoAsset(
+                videoAsset: photoAsset,
+                editorConfig: videoEditorConfig,
+                atIndex: currentPreviewIndex
+            ) {
+                return
+            }
+            if let shouldEdit = delegate?.previewViewController(
+                self,
+                shouldEditVideoAsset: photoAsset,
+                editorConfig: videoEditorConfig
+            ), !shouldEdit {
+                return
+            }
             videoEditorConfig.languageType = pickerConfig.languageType
             videoEditorConfig.appearanceStyle = pickerConfig.appearanceStyle
             videoEditorConfig.indicatorType = pickerConfig.indicatorType
@@ -62,6 +76,20 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             )
         }else if pickerConfig.editorOptions.isPhoto {
             let photoEditorConfig = pickerConfig.photoEditor
+            if !picker.shouldEditPhotoAsset(
+                photoAsset: photoAsset,
+                editorConfig: photoEditorConfig,
+                atIndex: currentPreviewIndex
+            ) {
+                return
+            }
+            if let shouldEdit = delegate?.previewViewController(
+                self,
+                shouldEditPhotoAsset: photoAsset,
+                editorConfig: photoEditorConfig
+            ), !shouldEdit {
+                return
+            }
             photoEditorConfig.languageType = pickerConfig.languageType
             photoEditorConfig.appearanceStyle = pickerConfig.appearanceStyle
             photoEditorConfig.indicatorType = pickerConfig.indicatorType

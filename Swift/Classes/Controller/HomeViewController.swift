@@ -67,6 +67,7 @@ class HomeViewController: UITableViewController {
                 return
             }
         }
+//        present(rowType.controller, animated: true)
         navigationController?.pushViewController(rowType.controller, animated: true)
     }
 
@@ -132,9 +133,11 @@ extension HomeViewController {
             case .camera:
                 let config = CameraConfiguration()
                 config.position = .front
+                #if canImport(GPUImage)
                 config.defaultFilterIndex = 0
                 config.photoFilters = FilterTools.filters()
                 config.videoFilters = FilterTools.filters()
+                #endif
                 return CameraController(config: config, type: .all)
             }
         }

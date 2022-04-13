@@ -15,7 +15,7 @@ extension PhotoTools {
     ///   - avAsset: 视频对应的 AVAsset 数据
     ///   - outputURL: 指定视频导出的地址，为nil时默认为临时目录
     ///   - timeRang: 需要裁剪的时间区域，没有传 .zero
-    ///   - stickerInfos: 贴纸数组
+    ///   - cropSizeData: 编辑数据
     ///   - audioURL: 需要添加的音频地址
     ///   - audioVolume: 需要添加的音频音量
     ///   - originalAudioVolume: 视频原始音频音量
@@ -37,107 +37,106 @@ extension PhotoTools {
     ) -> AVAssetExportSession? {
         var timeRang = timeRang
         let exportPresets = AVAssetExportSession.exportPresets(compatibleWith: avAsset)
-        if exportPresets.contains(exportPreset.name) {
-            do {
-                guard let videoTrack = avAsset.tracks(withMediaType: .video).first else {
-                    throw NSError(domain: "Video track is nil", code: 500, userInfo: nil)
+        if !exportPresets.contains(exportPreset.name) {
+            completion?(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
+        }
+        do {
+            guard let videoTrack = avAsset.tracks(withMediaType: .video).first else {
+                throw NSError(domain: "Video track is nil", code: 500, userInfo: nil)
+            }
+            let videoTotalSeconds = videoTrack.timeRange.duration.seconds
+            if timeRang.start.seconds + timeRang.duration.seconds > videoTotalSeconds {
+                timeRang = CMTimeRange(
+                    start: timeRang.start,
+                    duration: CMTime(
+                        seconds: videoTotalSeconds - timeRang.start.seconds,
+                        preferredTimescale: timeRang.start.timescale
+                    )
+                )
+            }
+            let videoURL = outputURL ?? PhotoTools.getVideoTmpURL()
+            let mixComposition = try mixComposition(
+                for: avAsset,
+                videoTrack: videoTrack
+            )
+            var addVideoComposition = false
+            let animationBeginTime: CFTimeInterval
+            if timeRang == .zero {
+                animationBeginTime = AVCoreAnimationBeginTimeAtZero
+            }else {
+                animationBeginTime = timeRang.start.seconds == 0 ?
+                    AVCoreAnimationBeginTimeAtZero :
+                    timeRang.start.seconds
+            }
+            let videoComposition = try videoComposition(
+                for: avAsset,
+                videoTrack: videoTrack,
+                mixComposition: mixComposition,
+                cropSizeData: cropSizeData,
+                animationBeginTime: animationBeginTime,
+                videoDuration: timeRang == .zero ? videoTrack.timeRange.duration.seconds : timeRang.duration.seconds
+            )
+            if videoComposition.renderSize.width > 0 {
+                addVideoComposition = true
+            }
+            let audioMix = try audioMix(
+                for: avAsset,
+                videoTrack: videoTrack,
+                mixComposition: mixComposition,
+                timeRang: timeRang,
+                audioURL: audioURL,
+                audioVolume: audioVolume,
+                originalAudioVolume: originalAudioVolume
+            )
+            if let exportSession = AVAssetExportSession(
+                asset: mixComposition,
+                presetName: exportPreset.name
+            ) {
+                let supportedTypeArray = exportSession.supportedFileTypes
+                exportSession.outputURL = videoURL
+                if supportedTypeArray.contains(AVFileType.mp4) {
+                    exportSession.outputFileType = .mp4
+                }else if supportedTypeArray.isEmpty {
+                    completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
+                    return nil
+                }else {
+                    exportSession.outputFileType = supportedTypeArray.first
                 }
-                let videoTotalSeconds = videoTrack.timeRange.duration.seconds
-                if timeRang.start.seconds + timeRang.duration.seconds > videoTotalSeconds {
-                    timeRang = CMTimeRange(
-                        start: timeRang.start,
-                        duration: CMTime(
-                            seconds: videoTotalSeconds - timeRang.start.seconds,
-                            preferredTimescale: timeRang.start.timescale
-                        )
+                exportSession.shouldOptimizeForNetworkUse = true
+                if addVideoComposition {
+                    exportSession.videoComposition = videoComposition
+                }
+                if !audioMix.inputParameters.isEmpty {
+                    exportSession.audioMix = audioMix
+                }
+                if timeRang != .zero {
+                    exportSession.timeRange = timeRang
+                }
+                if videoQuality > 0 {
+                    let seconds = timeRang != .zero ? timeRang.duration.seconds : videoTotalSeconds
+                    exportSession.fileLengthLimit = exportSessionFileLengthLimit(
+                        seconds: seconds,
+                        exportPreset: exportPreset,
+                        videoQuality: videoQuality
                     )
                 }
-                let videoURL = outputURL ?? PhotoTools.getVideoTmpURL()
-                let mixComposition = try mixComposition(
-                    for: avAsset,
-                    videoTrack: videoTrack
-                )
-                var addVideoComposition = false
-                let animationBeginTime: CFTimeInterval
-                if timeRang == .zero {
-                    animationBeginTime = AVCoreAnimationBeginTimeAtZero
-                }else {
-                    animationBeginTime = timeRang.start.seconds == 0 ?
-                        AVCoreAnimationBeginTimeAtZero :
-                        timeRang.start.seconds
-                }
-                let videoComposition = try videoComposition(
-                    for: avAsset,
-                    videoTrack: videoTrack,
-                    mixComposition: mixComposition,
-                    cropSizeData: cropSizeData,
-                    animationBeginTime: animationBeginTime,
-                    videoDuration: timeRang == .zero ? videoTrack.timeRange.duration.seconds : timeRang.duration.seconds
-                )
-                if videoComposition.renderSize.width > 0 {
-                    addVideoComposition = true
-                }
-                let audioMix = try audioMix(
-                    for: avAsset,
-                    videoTrack: videoTrack,
-                    mixComposition: mixComposition,
-                    timeRang: timeRang,
-                    audioURL: audioURL,
-                    audioVolume: audioVolume,
-                    originalAudioVolume: originalAudioVolume
-                )
-                if let exportSession = AVAssetExportSession(
-                    asset: mixComposition,
-                    presetName: exportPreset.name
-                ) {
-                    let supportedTypeArray = exportSession.supportedFileTypes
-                    exportSession.outputURL = videoURL
-                    if supportedTypeArray.contains(AVFileType.mp4) {
-                        exportSession.outputFileType = .mp4
-                    }else if supportedTypeArray.isEmpty {
-                        completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
-                        return nil
-                    }else {
-                        exportSession.outputFileType = supportedTypeArray.first
-                    }
-                    exportSession.shouldOptimizeForNetworkUse = true
-                    if addVideoComposition {
-                        exportSession.videoComposition = videoComposition
-                    }
-                    if !audioMix.inputParameters.isEmpty {
-                        exportSession.audioMix = audioMix
-                    }
-                    if timeRang != .zero {
-                        exportSession.timeRange = timeRang
-                    }
-                    if videoQuality > 0 {
-                        let seconds = timeRang != .zero ? timeRang.duration.seconds : videoTotalSeconds
-                        exportSession.fileLengthLimit = exportSessionFileLengthLimit(
-                            seconds: seconds,
-                            exportPreset: exportPreset,
-                            videoQuality: videoQuality
-                        )
-                    }
-                    exportSession.exportAsynchronously(completionHandler: {
-                        DispatchQueue.main.async {
-                            switch exportSession.status {
-                            case .completed:
-                                completion?(videoURL, nil)
-                            case .failed, .cancelled:
-                                completion?(nil, exportSession.error)
-                            default: break
-                            }
+                exportSession.exportAsynchronously(completionHandler: {
+                    DispatchQueue.main.async {
+                        switch exportSession.status {
+                        case .completed:
+                            completion?(videoURL, nil)
+                        case .failed, .cancelled:
+                            completion?(nil, exportSession.error)
+                        default: break
                         }
-                    })
-                    return exportSession
-                }else {
-                    completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
-                }
-            } catch {
-                completion?(nil, PhotoError.error(type: .exportFailed, message: "导出失败：" + error.localizedDescription))
+                    }
+                })
+                return exportSession
+            }else {
+                completion?(nil, PhotoError.error(type: .exportFailed, message: "不支持导出该类型视频"))
             }
-        }else {
-            completion?(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
+        } catch {
+            completion?(nil, PhotoError.error(type: .exportFailed, message: "导出失败：" + error.localizedDescription))
         }
         return nil
     }

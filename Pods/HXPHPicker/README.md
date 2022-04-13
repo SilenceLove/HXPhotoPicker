@@ -78,7 +78,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.3.7"))
+    .package(url: "https://github.com/SilenceLove/HXPHPicker.git", .upToNextMajor(from: "1.4.0"))
 ]
 ```
 
@@ -88,6 +88,20 @@ Add this to Podfile, and then update dependency:
 
 ```swift
 pod 'HXPHPicker'
+
+/// No Kingfisher
+pod `HXPHPicker/Lite`
+
+/// Only Picker
+pod `HXPHPicker/Picker`
+pod `HXPHPicker/Picker/Lite`
+
+/// Only Editor
+pod `HXPHPicker/Editor`
+pod `HXPHPicker/Editor/Lite`
+
+/// Only Camera
+pod `HXPHPicker/Camera`
 ```
 
 ### [Carthage](https://github.com/Carthage/Carthage)
@@ -182,6 +196,8 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v1.4.0](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#140) | 2022-04-13 | 13.1.0 | 5.4.2 | 12.0+ |
+| [v1.3.9](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#139) | 2022-03-24 | 13.1.0 | 5.4.2 | 12.0+ |
 | [v1.3.7](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#137) | 2022-02-19 | 13.1.0 | 5.4.2 | 12.0+ |
 | [v1.3.5](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#135) | 2022-02-09 | 13.1.0 | 5.4.2 | 12.0+ |
 | [v1.3.4](https://github.com/SilenceLove/HXPHPicker/blob/main/Documentation/RELEASE_NOTE.md#134) | 2022-01-26 | 13.1.0 | 5.4.2 | 12.0+ |

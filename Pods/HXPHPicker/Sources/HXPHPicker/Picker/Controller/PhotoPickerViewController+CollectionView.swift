@@ -269,12 +269,20 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
               photoAsset.mediaType == .photo else {
             return false
         }
-        if !pickerController.shouldEditAsset(photoAsset: photoAsset, atIndex: assets.firstIndex(of: photoAsset) ?? 0) {
+        let editIndex = assets.firstIndex(of: photoAsset) ?? 0
+        if !pickerController.shouldEditAsset(photoAsset: photoAsset, atIndex: editIndex) {
             return false
         }
         #if HXPICKER_ENABLE_EDITOR && HXPICKER_ENABLE_PICKER
         if pickerController.config.editorOptions.contains(.photo) {
             let config = pickerController.config.photoEditor
+            if !pickerController.shouldEditPhotoAsset(
+                photoAsset: photoAsset,
+                editorConfig: config,
+                atIndex: editIndex
+            ) {
+                return false
+            }
             config.languageType = pickerController.config.languageType
             config.appearanceStyle = pickerController.config.appearanceStyle
             config.indicatorType = pickerController.config.indicatorType
@@ -303,7 +311,8 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
               photoAsset.mediaType == .video else {
             return false
         }
-        if !pickerController.shouldEditAsset(photoAsset: photoAsset, atIndex: assets.firstIndex(of: photoAsset) ?? 0) {
+        let editIndex = assets.firstIndex(of: photoAsset) ?? 0
+        if !pickerController.shouldEditAsset(photoAsset: photoAsset, atIndex: editIndex) {
             return false
         }
         #if HXPICKER_ENABLE_EDITOR && HXPICKER_ENABLE_PICKER
@@ -319,6 +328,13 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 config.mustBeTailored = true
             }else {
                 config = pickerController.config.videoEditor
+            }
+            if !pickerController.shouldEditVideoAsset(
+                videoAsset: photoAsset,
+                editorConfig: config,
+                atIndex: editIndex
+            ) {
+                return false
             }
             config.languageType = pickerController.config.languageType
             config.appearanceStyle = pickerController.config.appearanceStyle

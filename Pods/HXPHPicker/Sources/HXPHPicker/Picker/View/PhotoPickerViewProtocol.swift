@@ -97,6 +97,29 @@ public protocol PhotoPickerViewDelegate: AnyObject {
     )
     
     #if HXPICKER_ENABLE_EDITOR
+    
+    /// 即将编辑照片
+    ///   - photoPickerView: 对应的 PhotoPickerView
+    ///   - photoAsset: 对应的 PhotoAsset 数据
+    ///   - editorConfig: 照片编辑配置
+    /// - Returns: 是否可以编辑
+    func photoPickerView(
+        _ photoPickerView: PhotoPickerView,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration
+    ) -> Bool
+    
+    /// 即将编辑视频
+    ///   - photoPickerView: 对应的 PhotoPickerView
+    ///   - videoAsset: 对应的 PhotoAsset 数据
+    ///   - editorConfig: 视频编辑配置
+    /// - Returns: 是否可以编辑
+    func photoPickerView(
+        _ photoPickerView: PhotoPickerView,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration
+    ) -> Bool
+    
     /// 照片/视频编辑器加载贴图标题资源
     /// - Parameters:
     ///   - photoPickerView: 对应的 PhotoPickerView
@@ -231,6 +254,18 @@ public extension PhotoPickerViewDelegate {
     ) { }
     
     #if HXPICKER_ENABLE_EDITOR
+    func photoPickerView(
+        _ photoPickerView: PhotoPickerView,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration
+    ) -> Bool { true }
+    
+    func photoPickerView(
+        _ photoPickerView: PhotoPickerView,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration
+    ) -> Bool { true }
+    
     func photoPickerView(
         _ photoPickerView: PhotoPickerView,
         loadTitleChartlet editorViewController: UIViewController,

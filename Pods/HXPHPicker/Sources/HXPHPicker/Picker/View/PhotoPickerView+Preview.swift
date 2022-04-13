@@ -48,6 +48,36 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
         delegate?.photoPickerView(self, previewDidOriginalButton: isOriginal)
     }
     
+    #if HXPICKER_ENABLE_EDITOR
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration
+    ) -> Bool {
+        if let shouldEdit = delegate?.photoPickerView(
+            self, shouldEditPhotoAsset: photoAsset,
+            editorConfig: editorConfig
+        ) {
+            return shouldEdit
+        }
+        return true
+    }
+    
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration
+    ) -> Bool {
+        if let shouldEdit = delegate?.photoPickerView(
+            self, shouldEditVideoAsset: videoAsset,
+            editorConfig: editorConfig
+        ) {
+            return shouldEdit
+        }
+        return true
+    }
+    #endif
+    
     func previewViewController(
         _ previewController: PhotoPreviewViewController,
         editAssetFinished photoAsset: PhotoAsset

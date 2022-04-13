@@ -119,6 +119,40 @@ extension PhotoPickerController {
         }
         return true
     }
+    
+    #if HXPICKER_ENABLE_EDITOR
+    func shouldEditPhotoAsset(
+        photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool {
+        if let shouldEditAsset = pickerDelegate?.pickerController(
+            self,
+            shouldEditPhotoAsset: photoAsset,
+            editorConfig: editorConfig,
+            atIndex: atIndex
+        ) {
+            return shouldEditAsset
+        }
+        return true
+    }
+    func shouldEditVideoAsset(
+        videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool {
+        if let shouldEditAsset = pickerDelegate?.pickerController(
+            self,
+            shouldEditVideoAsset: videoAsset,
+            editorConfig: editorConfig,
+            atIndex: atIndex
+        ) {
+            return shouldEditAsset
+        }
+        return true
+    }
+    #endif
+    
     func didEditAsset(
         photoAsset: PhotoAsset,
         atIndex: Int

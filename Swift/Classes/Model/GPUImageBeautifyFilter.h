@@ -6,7 +6,8 @@
 //  Copyright © 2016年 guikz. All rights reserved.
 //
 
-#import <GPUImage/GPUImage.h>
+#if __has_include(<GPUImage/GPUImage.h>)
+#import "GPUImage/GPUImage.h"
 
 @class GPUImageCombinationFilter;
 
@@ -21,3 +22,5 @@
 - (id)initWithDegree:(float)degree;
 
 @end
+
+#endif

@@ -6,6 +6,7 @@
 //  Copyright © 2016年 guikz. All rights reserved.
 //
 
+#if __has_include(<GPUImage/GPUImage.h>)
 #import "GPUImageBeautifyFilter.h"
 
 // Internal CombinationFilter(It should not be used outside)
@@ -184,3 +185,5 @@ NSString *const kGPUImageBeautifyFragmentShaderString = SHADER_STRING
 }
 
 @end
+
+#endif

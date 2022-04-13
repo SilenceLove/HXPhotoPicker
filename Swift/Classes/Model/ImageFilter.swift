@@ -5,6 +5,7 @@
 //  Created by Slience on 2022/2/18.
 //
 
+#if canImport(GPUImage)
 import UIKit
 import VideoToolbox
 import HXPHPicker
@@ -47,3 +48,5 @@ struct FilterTools {
          filter = nil
      }
 }
+
+#endif

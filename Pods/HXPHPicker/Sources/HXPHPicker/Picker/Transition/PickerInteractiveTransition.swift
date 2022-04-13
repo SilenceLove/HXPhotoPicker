@@ -605,7 +605,13 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             previewViewController.collectionView.isScrollEnabled = false
             previewView?.scrollView.isScrollEnabled = false
             previewView?.scrollView.pinchGestureRecognizer?.isEnabled = false
-            toView?.isHidden = true
+            if let photoBrowser = pickerController as? PhotoBrowser {
+                if photoBrowser.hideSourceView {
+                    toView?.isHidden = true
+                }
+            }else {
+                toView?.isHidden = true
+            }
             beganInterPercent = true
         }
     }

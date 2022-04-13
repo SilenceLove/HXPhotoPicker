@@ -92,7 +92,8 @@ extension EditorImageResizerView {
                 if let image = images.first,
                    let imageURL = PhotoTools.createAnimatedImage(
                     images: images,
-                    delays: delays
+                    delays: delays,
+                    toFile: editedImageURL
                    ) {
                     return (image, imageURL, .gif)
                 }
@@ -112,7 +113,7 @@ extension EditorImageResizerView {
                 viewWidth: viewWidth,
                 viewHeight: viewHeight
             ),
-               let imageURL = PhotoTools.write(image: image) {
+               let imageURL = PhotoTools.write(toFile: editedImageURL, image: image) {
                 if let thumbnailImage = image.scaleImage(toScale: 0.6) {
                     return (thumbnailImage, imageURL, .normal)
                 }

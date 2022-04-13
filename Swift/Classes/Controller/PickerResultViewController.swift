@@ -24,7 +24,7 @@ class PickerResultViewController: UIViewController,
     @IBOutlet weak var pickerStyleControl: UISegmentedControl!
     @IBOutlet weak var previewStyleControl: UISegmentedControl!
     
-    var row_Count: Int = UI_USER_INTERFACE_IDIOM() == .pad ? 5 : 3
+    var row_Count: Int = UIDevice.current.userInterfaceIdiom == .pad ? 5 : 3
     
     var addCell: ResultAddViewCell {
         let cell = collectionView.dequeueReusableCell(

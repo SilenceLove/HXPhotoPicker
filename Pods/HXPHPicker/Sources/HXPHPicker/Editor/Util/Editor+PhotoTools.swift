@@ -13,13 +13,14 @@ import CoreServices
 extension PhotoTools {
     static func createAnimatedImage(
         images: [UIImage],
-        delays: [Double]
+        delays: [Double],
+        toFile filePath: URL? = nil
     ) -> URL? {
         if images.isEmpty || delays.isEmpty {
             return nil
         }
         let frameCount = images.count
-        let imageURL = getImageTmpURL(.gif)
+        let imageURL = filePath == nil ? getImageTmpURL(.gif) : filePath!
         guard let destination = CGImageDestinationCreateWithURL(
                 imageURL as CFURL,
                 kUTTypeGIF as CFString,

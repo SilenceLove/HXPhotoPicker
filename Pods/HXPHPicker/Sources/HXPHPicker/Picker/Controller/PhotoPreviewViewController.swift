@@ -20,6 +20,18 @@ protocol PhotoPreviewViewControllerDelegate: AnyObject {
         isSelected: Bool,
         updateCell: Bool
     )
+    #if HXPICKER_ENABLE_EDITOR
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration
+    ) -> Bool
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration
+    ) -> Bool
+    #endif
     func previewViewController(
         _ previewController: PhotoPreviewViewController,
         editAssetFinished photoAsset: PhotoAsset
@@ -51,6 +63,18 @@ extension PhotoPreviewViewControllerDelegate {
         isSelected: Bool,
         updateCell: Bool
     ) { }
+    #if HXPICKER_ENABLE_EDITOR
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration
+    ) -> Bool { true }
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration
+    ) -> Bool { true }
+    #endif
     func previewViewController(
         _ previewController: PhotoPreviewViewController,
         editAssetFinished photoAsset: PhotoAsset
