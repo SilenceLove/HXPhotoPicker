@@ -62,16 +62,20 @@
         if (self.type == HXPhotoModelMediaTypeLivePhoto) {
             NSArray *resources = [PHAssetResource assetResourcesForAsset:self.asset];
             for (PHAssetResource *resource in resources) {
-                id fileSize = [resource valueForKey:@"fileSize"];
-                if (fileSize && ![fileSize isKindOfClass:[NSNull class]]) {
-                    byte += [fileSize unsignedIntegerValue];
+                if ([resource respondsToSelector:@selector(fileSize)]) {
+                    id fileSize = [resource valueForKey:@"fileSize"];
+                    if (fileSize && ![fileSize isKindOfClass:[NSNull class]]) {
+                        byte += [fileSize unsignedIntegerValue];
+                    }
                 }
             }
         }else {
             PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:self.asset] firstObject];
-            id fileSize = [resource valueForKey:@"fileSize"];
-            if (fileSize && ![fileSize isKindOfClass:[NSNull class]]) {
-                byte = [fileSize unsignedIntegerValue];
+            if ([resource respondsToSelector:@selector(fileSize)]) {
+                id fileSize = [resource valueForKey:@"fileSize"];
+                if (fileSize && ![fileSize isKindOfClass:[NSNull class]]) {
+                    byte = [fileSize unsignedIntegerValue];
+                }
             }
         }
     }else {

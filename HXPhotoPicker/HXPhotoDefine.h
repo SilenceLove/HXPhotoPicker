@@ -13,7 +13,7 @@
 #import "NSBundle+HXPhotoPicker.h"
 
 /// 当前版本
-#define HXVersion @"3.3.1"
+#define HXVersion @"3.3.2"
 
 // 日志输出
 #ifdef DEBUG
