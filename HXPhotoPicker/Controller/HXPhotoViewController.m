@@ -1133,6 +1133,15 @@ HX_PhotoEditViewControllerDelegate
     model.currentAlbumIndex = self.albumModel.index;
     if (!self.manager.configuration.singleSelected) {
         [self.manager beforeListAddCameraTakePicturesModel:model];
+    }else if(self.manager.configuration.cameraPhotoJumpEdit && self.manager.configuration.singleJumpEdit){
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+#pragma clang diagnostic pop
+        self.isNewEditDismiss = YES;
+        [self.manager beforeSelectedListAddPhotoModel:model];
+        [self photoBottomViewDidDoneBtn];
+        return;
     }
     if ([HXPhotoTools authorizationStatusIsLimited]) {
         return;
