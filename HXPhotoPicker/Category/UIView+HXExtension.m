@@ -307,7 +307,7 @@
         }
         @autoreleasepool {
             UIGraphicsBeginImageContextWithOptions(size, NO, 0.0);
-            [self drawViewHierarchyInRect:(CGRect){point, self.bounds.size} afterScreenUpdates:YES];
+            [self drawViewHierarchyInRect:(CGRect){point, self.bounds.size} afterScreenUpdates:NO];
             image = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
         }
