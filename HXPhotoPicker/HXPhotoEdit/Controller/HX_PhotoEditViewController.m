@@ -665,7 +665,15 @@
             }
         };
         _toolsView.didDoneBtnBlock = ^{
-            [weakSelf startEditImage];
+            HXPhotoEditStickerView * item = weakSelf.editingView.clippingView.imageView.stickerView;
+            if(item.selectItemView){
+                [item removeSelectItem];
+            }
+            weakSelf.view.userInteractionEnabled = NO;
+            [weakSelf.view hx_showLoadingHUDText:nil];
+            [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:NO block:^(NSTimer * _Nonnull timer) {
+                [weakSelf startEditImage];
+            }];
         };
     }
     return _toolsView;
