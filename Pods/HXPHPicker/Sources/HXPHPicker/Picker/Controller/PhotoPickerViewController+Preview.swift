@@ -54,6 +54,7 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
     ) {
         if !isSelected && updateCell {
             let cell = getCell(for: photoAsset)
+            cell?.isRequestDirectly = true
             cell?.photoAsset = photoAsset
         }
         updateCellSelectedTitle()

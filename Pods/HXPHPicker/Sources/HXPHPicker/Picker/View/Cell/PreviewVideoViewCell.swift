@@ -208,4 +208,13 @@ extension PreviewVideoViewCell: PhotoPreviewVideoViewDelegate {
     func videoView(hideMaskView videoView: VideoPlayerView) {
         hideMask()
     }
+    
+    func videoView(_ videoView: VideoPlayerView, presentationSize: CGSize) {
+        if let videoAsset = photoAsset.networkVideoAsset,
+           videoAsset.videoSize.equalTo(.zero),
+           !videoAsset.videoSize.equalTo(presentationSize) {
+            photoAsset.networkVideoAsset?.videoSize = presentationSize
+            scrollContentView.updateContentSize(presentationSize)
+        }
+    }
 }

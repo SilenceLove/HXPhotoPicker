@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 open class EditorConfiguration: BaseConfiguration {
     public override init() {

@@ -20,7 +20,7 @@ extension PhotoAsset {
     }
     func getEditedImage() -> UIImage? {
         if let photoEdit = photoEdit {
-            return photoEdit.editedImage
+            return .init(contentsOfFile: photoEdit.editedImageURL.path)
         }
         if let videoEdit = videoEdit {
             return videoEdit.coverImage

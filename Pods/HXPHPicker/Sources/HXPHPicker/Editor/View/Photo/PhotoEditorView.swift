@@ -30,7 +30,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
             editType: editType,
             cropConfig: cropConfig,
             mosaicConfig: mosaicConfig,
-            editedImageURL: editedImageURL
+            urlConfig: urlConfig
         )
         imageResizerView.exportScale = exportScale
         let brush = brushConfig
@@ -111,21 +111,21 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     var hasSticker: Bool { imageResizerView.imageView.stickerView.count > 0 }
     var hasFilter: Bool { imageResizerView.videoFilter != nil || imageResizerView.hasFilter }
     
-    var editedImageURL: URL?
+    var urlConfig: EditorURLConfig?
     init(
         editType: PhotoEditorContentView.EditType,
         cropConfig: EditorCropSizeConfiguration,
         mosaicConfig: PhotoEditorConfiguration.Mosaic,
         brushConfig: EditorBrushConfiguration,
         exportScale: CGFloat,
-        editedImageURL: URL? = nil
+        urlConfig: EditorURLConfig? = nil
     ) {
         self.editType = editType
         self.cropConfig = cropConfig
         self.mosaicConfig = mosaicConfig
         self.brushConfig = brushConfig
         self.exportScale = exportScale
-        self.editedImageURL = editedImageURL
+        self.urlConfig = urlConfig
         super.init(frame: .zero)
         delegate = self
         minimumZoomScale = 1.0
@@ -348,7 +348,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         DispatchQueue.global().async {
             let filterImageURL = self.imageResizerView.hasFilter ?
                                     PhotoTools.write(image: inputImage) : nil
-            let imageOptions = self.imageResizerView.cropping(
+            self.imageResizerView.cropping(
                 inputImage,
                 toRect: toRect,
                 mosaicLayer: mosaicLayer,
@@ -357,18 +357,20 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
                 isRoundCrop: isRoundCrop,
                 viewWidth: viewWidth,
                 viewHeight: viewHeight
-            )
-            DispatchQueue.main.async {
-                if let imageOptions = imageOptions {
-                    let editResult = PhotoEditResult(
-                        editedImage: imageOptions.0,
-                        editedImageURL: imageOptions.1,
-                        imageType: imageOptions.2,
-                        editedData: self.getEditedData(filterImageURL)
-                    )
-                    completion?(editResult)
-                }else {
-                    completion?(nil)
+            ) { [weak self] result in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    if let imageOptions = result {
+                        let editResult = PhotoEditResult(
+                            editedImage: imageOptions.0,
+                            urlConfig: imageOptions.1,
+                            imageType: imageOptions.2,
+                            editedData: self.getEditedData(filterImageURL)
+                        )
+                        completion?(editResult)
+                    }else {
+                        completion?(nil)
+                    }
                 }
             }
         }

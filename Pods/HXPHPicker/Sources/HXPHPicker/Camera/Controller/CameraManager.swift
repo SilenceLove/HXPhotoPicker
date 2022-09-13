@@ -510,11 +510,52 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     ) {
         photoWillCapture?()
     }
+    
+    func photoOutput(
+        _ output: AVCapturePhotoOutput,
+        didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
+        previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
+        resolvedSettings: AVCaptureResolvedPhotoSettings,
+        bracketSettings: AVCaptureBracketedStillImageSettings?,
+        error: Error?
+    ) {
+        if #available(iOS 11.0, *) {
+            return
+        }
+        let sampleBuffer: CMSampleBuffer
+        if let previewPhotoSampleBuffer = previewPhotoSampleBuffer {
+            sampleBuffer = previewPhotoSampleBuffer
+        }else if let photoSampleBuffer = photoSampleBuffer {
+            sampleBuffer = photoSampleBuffer
+        }else {
+            photoCompletion?(nil)
+            return
+        }
+        guard let photoPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            photoCompletion?(nil)
+            return
+        }
+        let metaData = CMCopyDictionaryOfAttachments(
+            allocator: kCFAllocatorDefault,
+            target: sampleBuffer,
+            attachmentMode: kCMAttachmentMode_ShouldPropagate
+        )
+        finishProcessingPhoto(photoPixelBuffer, metaData)
+    }
+    
+    @available(iOS 11.0, *)
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let photoPixelBuffer = photo.previewPixelBuffer else {
             photoCompletion?(nil)
             return
         }
+        finishProcessingPhoto(photoPixelBuffer, photo.metadata as CFDictionary)
+    }
+    
+    func finishProcessingPhoto(
+        _ photoPixelBuffer: CVPixelBuffer,
+        _ metaData: CFDictionary?
+    ) {
         var photoFormatDescription: CMFormatDescription?
         CMVideoFormatDescriptionCreateForImageBuffer(
             allocator: kCFAllocatorDefault,
@@ -546,7 +587,7 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
                 }
                 finalPixelBuffer = filteredBuffer
             }
-            let metadataAttachments = photo.metadata as CFDictionary
+            let metadataAttachments = metaData
             let jpegData = PhotoTools.jpegData(
                 withPixelBuffer: finalPixelBuffer,
                 attachments: metadataAttachments
@@ -756,11 +797,22 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
 //            AVVideoExpectedSourceFrameRateKey: 30,
 //            AVVideoMaxKeyFrameIntervalKey: 30
 //        ]
-        let videoCodecType: AVVideoCodecType
+        let videoCodecType: Any
+        let videoH264Type: Any
+        if #available(iOS 11.0, *) {
+            videoH264Type = AVVideoCodecType.h264
+        } else {
+            videoH264Type = AVVideoCodecH264
+        }
         if UIDevice.belowIphone7 {
-            videoCodecType = .h264
+            videoCodecType = videoH264Type
         }else {
-            videoCodecType = config.videoCodecType
+            if #available(iOS 11.0, *) {
+                videoCodecType = config.videoCodecType
+            } else {
+                // Fallback on earlier versions
+                videoCodecType = AVVideoCodecH264
+            }
         }
         let videoInput = AVAssetWriterInput(
             mediaType: .video,

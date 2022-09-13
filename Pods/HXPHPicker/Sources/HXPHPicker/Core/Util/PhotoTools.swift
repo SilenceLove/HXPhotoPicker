@@ -367,6 +367,41 @@ public struct PhotoTools {
         return 0
     }
     
+    static func imageCompress(
+        _ data: Data,
+        compressionQuality: CGFloat
+    ) -> Data? {
+        guard var resultImage = UIImage(data: data) else {
+            return nil
+        }
+        let compression = max(0.1, min(0.9, compressionQuality))
+        let maxLength = Int(CGFloat(data.count) * compression)
+        var data = data
+        
+        var lastDataLength = 0
+        while data.count > maxLength && data.count != lastDataLength {
+            let dataCount = data.count
+            lastDataLength = dataCount
+            let ratio = max(CGFloat(maxLength) / CGFloat(dataCount), compression)
+            let size = CGSize(
+                width: Int(resultImage.width * ratio),
+                height: Int(resultImage.height * ratio)
+            )
+            UIGraphicsBeginImageContext(size)
+            resultImage.draw(in: CGRect(origin: .zero, size: size))
+            guard let image = UIGraphicsGetImageFromCurrentImageContext(),
+                  let imagedata = image.jpegData(compressionQuality: 1)
+            else {
+                UIGraphicsEndImageContext()
+                return data
+            }
+            UIGraphicsEndImageContext()
+            resultImage = image
+            data = imagedata
+        }
+        return data
+    }
+    
     static func getBasicAnimation(
         _ keyPath: String,
         _ fromValue: Any?,

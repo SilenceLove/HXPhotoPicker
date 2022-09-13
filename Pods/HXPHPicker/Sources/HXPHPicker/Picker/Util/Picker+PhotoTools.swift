@@ -279,41 +279,6 @@ extension PhotoTools {
         }
     }
     
-    static func imageCompress(
-        _ data: Data,
-        compressionQuality: CGFloat
-    ) -> Data? {
-        guard var resultImage = UIImage(data: data) else {
-            return nil
-        }
-        let compression = max(0.1, min(0.9, compressionQuality))
-        let maxLength = Int(CGFloat(data.count) * compression)
-        var data = data
-        
-        var lastDataLength = 0
-        while data.count > maxLength && data.count != lastDataLength {
-            let dataCount = data.count
-            lastDataLength = dataCount
-            let ratio = max(CGFloat(maxLength) / CGFloat(dataCount), compression)
-            let size = CGSize(
-                width: resultImage.width * ratio,
-                height: resultImage.height * ratio
-            )
-            UIGraphicsBeginImageContext(size)
-            resultImage.draw(in: CGRect(origin: .zero, size: size))
-            guard let image = UIGraphicsGetImageFromCurrentImageContext(),
-                  let imagedata = image.jpegData(compressionQuality: 1)
-            else {
-                UIGraphicsEndImageContext()
-                return data
-            }
-            UIGraphicsEndImageContext()
-            resultImage = image
-            data = imagedata
-        }
-        return data
-    }
-    
     /// 获取和微信主题一致的配置
     // swiftlint:disable function_body_length
     public static func getWXPickerConfig(
@@ -458,6 +423,7 @@ extension PhotoTools {
         let cameraConfig = CameraConfiguration()
         cameraConfig.videoMaximumDuration = 60
         cameraConfig.tintColor = wxColor
+        cameraConfig.modalPresentationStyle = .fullScreen
         config.photoList.cameraType = .custom(cameraConfig)
         #endif
         

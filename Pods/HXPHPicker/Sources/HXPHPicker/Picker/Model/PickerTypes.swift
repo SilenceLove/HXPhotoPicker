@@ -55,6 +55,11 @@ public enum SelectionTapAction: Equatable {
     case openEditor
 }
 
+public enum PickerPresentStyle {
+    case present
+    case push
+}
+
 public extension PickerResult {
     struct Options: OptionSet {
         public static let photo = Options(rawValue: 1 << 0)

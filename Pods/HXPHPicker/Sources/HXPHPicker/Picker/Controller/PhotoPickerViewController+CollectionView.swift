@@ -152,7 +152,7 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
         guard let cell = collectionView.cellForItem(at: indexPath) else {
             return
         }
-        if cell is PickerCamerViewCell {
+        if cell is PickerCameraViewCell {
             if !UIImagePickerController.isSourceTypeAvailable(.camera) {
                 ProgressHUD.showWarning(
                     addedTo: self.navigationController?.view,
@@ -392,7 +392,7 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 vc.delegate = self
                 vc.preferredContentSize = CGSize(width: width, height: height)
                 return vc
-            }else if sCell is PickerCamerViewCell &&
+            }else if sCell is PickerCameraViewCell &&
                      UIImagePickerController.isSourceTypeAvailable(.camera) &&
                      AssetManager.cameraAuthorizationStatus() == .authorized {
                 let vc = PhotoPeekViewController(isCamera: true)
@@ -407,7 +407,9 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             let photoAsset = cell.photoAsset!
             if picker.config.selectMode == .multiple {
                 let select = UIAction(
-                    title: photoAsset.isSelected ? "取消选择".localized : "选择".localized
+                    title: photoAsset.isSelected ? "取消选择".localized : "选择".localized,
+                    image: photoAsset.isSelected ? UIImage(systemName: "minus.circle") : UIImage(systemName: "checkmark.circle"),
+                    attributes: photoAsset.isSelected ? [.destructive] : []
                 ) { action in
                     self.updateCellSelectedState(
                         for: indexPath.item,
@@ -426,7 +428,8 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             }
             if picker.config.editorOptions.contains(options) {
                 let edit = UIAction(
-                    title: "编辑".localized
+                    title: "编辑".localized,
+                    image: UIImage(systemName: "slider.horizontal.3")
                 ) { action in
                     self.openEditor(
                         photoAsset,

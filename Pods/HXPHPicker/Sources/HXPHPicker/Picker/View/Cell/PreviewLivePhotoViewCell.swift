@@ -132,6 +132,9 @@ class PreviewLivePhotoViewCell: PhotoPreviewViewCell, PhotoPreviewContentViewDel
         if scrollContentView.livePhotoIsAnimating ||
             scrollContentView.isBacking ||
             statusBarShouldBeHidden { return }
+        if let superView = superview, !(superView is UICollectionView) {
+            return
+        }
         if !liveMarkView.isHidden && liveMarkView.alpha == 1 { return }
         liveMarkView.isHidden = false
         UIView.animate(withDuration: 0.25) {

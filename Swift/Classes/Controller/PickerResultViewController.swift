@@ -140,12 +140,13 @@ class PickerResultViewController: UIViewController,
         }
         
         if preselect {
+            config.pickerPresentStyle = .push
             config.previewView.loadNetworkVideoMode = .play
             config.maximumSelectedVideoDuration = 0
             config.maximumSelectedVideoCount = 0
             let networkVideoURL = URL(
                 string:
-                    "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_video.mp4"
+                    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
             )!
             let networkVideoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL))
             selectedAssets.append(networkVideoAsset)
@@ -674,6 +675,42 @@ class PickerResultViewController: UIViewController,
 
 // MARK: PhotoPickerControllerDelegate
 extension PickerResultViewController: PhotoPickerControllerDelegate {
+    
+    func createEditorDocumentPath() {
+        let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! + "/hxphpicker_editor"
+        if !FileManager.default.fileExists(atPath: path) {
+            try? FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+        }
+    }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        shouldEditPhotoAsset photoAsset: PhotoAsset,
+        editorConfig: PhotoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool {
+        if isPublish {
+            createEditorDocumentPath()
+            var fileName = "hxphpicker_editor/"
+            fileName += HXPickerWrapper<String>.fileName(suffix: photoAsset.isGifAsset ? "gif" : "png")
+            editorConfig.imageURLConfig = .init(fileName: fileName, type: .document)
+        }
+        return true
+    }
+    
+    func pickerController(
+        _ pickerController: PhotoPickerController,
+        shouldEditVideoAsset videoAsset: PhotoAsset,
+        editorConfig: VideoEditorConfiguration,
+        atIndex: Int
+    ) -> Bool {
+        if isPublish {
+            createEditorDocumentPath()
+            let fileName = "hxphpicker_editor/" + HXPickerWrapper<String>.fileName(suffix: "mp4")
+            editorConfig.videoURLConfig = .init(fileName: fileName, type: .document)
+        }
+        return true
+    }
     
     func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
         selectedAssets = result.photoAssets

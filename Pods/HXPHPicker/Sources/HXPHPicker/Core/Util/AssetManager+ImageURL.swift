@@ -93,18 +93,18 @@ public extension AssetManager {
                     return
                 }
                 let imageURL = fileURL
-                let options = PHAssetResourceRequestOptions.init()
+                let options = PHAssetResourceRequestOptions()
                 options.isNetworkAccessAllowed = true
                 PHAssetResourceManager.default().writeData(
                     for: imageResource,
                     toFile: imageURL,
                     options: options
-                ) { (error) in
+                ) { error in
                     DispatchQueue.main.async {
-                        if error == nil {
-                            resultHandler(.success(imageURL))
+                        if let error = error {
+                            resultHandler(.failure(.assetResourceWriteDataFailed(error)))
                         }else {
-                            resultHandler(.failure(.assetResourceWriteDataFailed(error!)))
+                            resultHandler(.success(imageURL))
                         }
                     }
                 }

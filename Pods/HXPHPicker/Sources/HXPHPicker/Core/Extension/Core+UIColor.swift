@@ -41,10 +41,34 @@ extension UIColor: HXPickerCompatible {
         }
         return false
     }
+    
+    func image(
+        for color: UIColor?,
+        havingSize: CGSize,
+        radius: CGFloat = 0
+    ) -> UIImage? {
+        .image(
+            for: color,
+            havingSize: havingSize,
+            radius: radius
+        )
+    }
 }
 
 public extension HXPickerWrapper where Base: UIColor {
     static var systemTintColor: UIColor {
         Base.systemTintColor
+    }
+    
+    func image(
+        for color: UIColor?,
+        havingSize: CGSize,
+        radius: CGFloat = 0
+    ) -> UIImage? {
+        return base.image(
+            for: color,
+            havingSize: havingSize,
+            radius: radius
+        )
     }
 }

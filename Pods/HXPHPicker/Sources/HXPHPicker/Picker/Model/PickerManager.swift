@@ -39,7 +39,8 @@ public class PickerManager: NSObject {
         if config.selectMode == .multiple &&
             !config.allowSelectedTogether &&
             config.maximumSelectedVideoCount == 1 &&
-            config.selectOptions.isPhoto && config.selectOptions.isVideo {
+            config.selectOptions.isPhoto && config.selectOptions.isVideo &&
+            config.photoList.cell.singleVideoHideSelect {
             return true
         }
         return false

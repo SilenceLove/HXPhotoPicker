@@ -85,20 +85,27 @@ extension VideoEditorViewController: EditorToolViewDelegate {
                 if let musicPath = self.backgroundMusicPath {
                     audioURL = URL(fileURLWithPath: musicPath)
                 }
+                let urlConfig: EditorURLConfig
+                if let config = self.config.videoURLConfig {
+                    urlConfig = config
+                }else {
+                    urlConfig = .init(fileName: String.fileName(suffix: "mp4"), type: .temp)
+                }
+                PhotoTools.getVideoTmpURL()
                 self.exportSession = PhotoTools.exportEditVideo(
                     for: self.avAsset,
-                    outputURL: self.config.videoExportURL,
+                    outputURL: urlConfig.url,
                     timeRang: timeRang,
                     cropSizeData: cropSizeData,
                     audioURL: audioURL,
                     audioVolume: self.backgroundMusicVolume,
-                       originalAudioVolume: self.hasOriginalSound ? self.videoVolume : 0,
+                    originalAudioVolume: self.hasOriginalSound ? self.videoVolume : 0,
                     exportPreset: self.config.exportPreset,
                     videoQuality: self.config.videoQuality
                 ) {  [weak self] videoURL, error in
-                    if let videoURL = videoURL {
+                    if videoURL != nil {
                         ProgressHUD.hide(forView: self?.view, animated: true)
-                        self?.editFinishCallBack(videoURL)
+                        self?.editFinishCallBack(urlConfig)
                         self?.backAction()
                     }else {
                         self?.showErrorHUD()
@@ -128,7 +135,7 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         ProgressHUD.hide(forView: view, animated: true)
         ProgressHUD.showWarning(addedTo: view, text: "处理失败".localized, animated: true, delayHide: 1.5)
     }
-    func editFinishCallBack(_ videoURL: URL) {
+    func editFinishCallBack(_ urlConfig: EditorURLConfig) {
         if let currentCropOffset = currentCropOffset {
             rotateBeforeStorageData = cropView.getRotateBeforeData(
                 offsetX: currentCropOffset.x,
@@ -163,7 +170,7 @@ extension VideoEditorViewController: EditorToolViewDelegate {
             backgroundMusicURL = URL(fileURLWithPath: audioPath)
         }
         let editResult = VideoEditResult(
-            editedURL: videoURL,
+            urlConfig: urlConfig,
             cropData: cropData,
             hasOriginalSound: hasOriginalSound,
             videoSoundVolume: videoVolume,
@@ -324,8 +331,10 @@ extension VideoEditorViewController: EditorToolViewDelegate {
     
     func showBrushColorView() {
         brushColorView.isHidden = false
+        brushBlockView.isHidden = false
         UIView.animate(withDuration: 0.25) {
             self.brushColorView.alpha = 1
+            self.brushBlockView.alpha = 1
         }
     }
     
@@ -335,9 +344,11 @@ extension VideoEditorViewController: EditorToolViewDelegate {
         }
         UIView.animate(withDuration: 0.25) {
             self.brushColorView.alpha = 0
+            self.brushBlockView.alpha = 0
         } completion: { (_) in
             if self.videoView.drawEnabled { return }
             self.brushColorView.isHidden = true
+            self.brushBlockView.isHidden = true
         }
     }
     

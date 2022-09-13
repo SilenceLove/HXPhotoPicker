@@ -39,6 +39,7 @@ extension PhotoTools {
         let exportPresets = AVAssetExportSession.exportPresets(compatibleWith: avAsset)
         if !exportPresets.contains(exportPreset.name) {
             completion?(nil, PhotoError.error(type: .exportFailed, message: "设备不支持导出：" + exportPreset.name))
+            return nil
         }
         do {
             guard let videoTrack = avAsset.tracks(withMediaType: .video).first else {

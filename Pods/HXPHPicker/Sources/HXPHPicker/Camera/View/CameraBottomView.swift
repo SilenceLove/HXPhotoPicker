@@ -401,6 +401,16 @@ class CameraBottomView: UIView {
         }
         return super.point(inside: point, with: event)
     }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let zqmargin:CGFloat = -10
+        let clickArea = backButton.frame.insetBy(dx: zqmargin, dy: zqmargin)
+        if clickArea.contains(point) && backButton.isUserInteractionEnabled {
+            return backButton
+        }
+        return super.hitTest(point, with: event)
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         maskLayer.frame = CGRect(x: 0, y: -20, width: width, height: height + 20)

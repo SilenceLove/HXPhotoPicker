@@ -109,8 +109,15 @@ extension PhotoTools {
         metadataItem.dataType = "com.apple.metadata.datatype.UTF-8"
         writer.metadata = [metadataItem]
         
+        let videoCodecType: Any
+        if #available(iOS 11.0, *) {
+            videoCodecType = AVVideoCodecType.h264
+        } else {
+            // Fallback on earlier versions
+            videoCodecType = AVVideoCodecH264
+        }
         let outputSetting: [String: Any] = [
-            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoCodecKey: videoCodecType,
             AVVideoWidthKey: videoTrack.naturalSize.width,
             AVVideoHeightKey: videoTrack.naturalSize.height
         ]

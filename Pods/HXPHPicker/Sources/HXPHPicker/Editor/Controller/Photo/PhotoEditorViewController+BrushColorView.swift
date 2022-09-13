@@ -50,9 +50,9 @@ extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
             borderLayer.strokeColor = UIColor.white.cgColor
             borderLayer.fillColor = UIColor.clear.cgColor
             borderLayer.lineWidth = 2
-            borderLayer.shadowColor = UIColor.black.withAlphaComponent(0.4).cgColor
+            borderLayer.shadowColor = UIColor.black.cgColor
             borderLayer.shadowRadius = 2
-            borderLayer.shadowOpacity = 0.5
+            borderLayer.shadowOpacity = 0.4
             borderLayer.shadowOffset = CGSize(width: 0, height: 0)
             return borderLayer
         }()

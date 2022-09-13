@@ -63,7 +63,7 @@ open class PhotoPreviewContentView: UIView {
     var isBacking: Bool = false
     var isPeek = false
     
-    var type: Type = .photo
+    var type: `Type` = .photo
     var requestID: PHImageRequestID?
     var requestCompletion: Bool = false
     var requestNetworkCompletion: Bool = false
@@ -79,7 +79,7 @@ open class PhotoPreviewContentView: UIView {
     }
     var livePhotoPlayType: PhotoPreviewViewController.PlayType = .once
     var currentLoadAssetLocalIdentifier: String?
-    var photoAsset: PhotoAsset! {
+    public var photoAsset: PhotoAsset! {
         didSet {
             requestFailed(info: [PHImageCancelledKey: 1], isICloud: false)
             setAnimatedImageCompletion = false
@@ -117,11 +117,15 @@ open class PhotoPreviewContentView: UIView {
     }
     
     func updateContentSize(image: UIImage) {
+        updateContentSize(image.size)
+    }
+    
+    func updateContentSize(_ size: CGSize) {
         if height == 0 || width == 0 {
             delegate?.contentView(updateContentSize: self)
             return
         }
-        let needUpdate = (width / height) != (image.width / image.height)
+        let needUpdate = (width / height) != (size.width / size.height)
         if needUpdate {
             delegate?.contentView(updateContentSize: self)
         }
@@ -131,7 +135,7 @@ open class PhotoPreviewContentView: UIView {
     
     var setAnimatedImageCompletion: Bool = false
     
-    init(type: Type) {
+    init(type: `Type`) {
         super.init(frame: CGRect.zero)
         self.type = type
         addSubview(imageView)
@@ -320,7 +324,10 @@ extension PhotoPreviewContentView {
                 networkVideoRequestCompletion(url)
                 return
             }
-            if PhotoManager.shared.loadNetworkVideoMode == .play {
+            
+            if PhotoManager.shared.loadNetworkVideoMode == .play ||
+                videoURL.path.hasSuffix("m3u8")
+                || videoURL.path.hasSuffix("M3U8") {
                 videoView.isNetwork = true
                 networkVideoRequestCompletion(videoURL)
                 return
@@ -471,7 +478,7 @@ extension PhotoPreviewContentView {
                 }
             }else {
                 if let image = UIImage(contentsOfFile: photoEdit.editedImageURL.path) {
-                    imageView.setImage(image)
+                    imageView.setImage(image, animated: true)
                 }else {
                     imageView.setImage(photoEdit.editedImage, animated: true)
                 }
@@ -507,9 +514,28 @@ extension PhotoPreviewContentView {
                     self.requestCompletion = true
                 }else {
                     DispatchQueue.global().async {
-                        var image = UIImage.init(data: dataResult.imageData)
-                        if dataResult.imageData.count > 3000000 {
-                            image = image?.scaleSuitableSize()
+                        var image: UIImage?
+                        let dataCount = CGFloat(dataResult.imageData.count)
+                        if dataCount > 3000000 {
+                            let compressionQuality: CGFloat
+                            if dataCount > 30000000 {
+                                compressionQuality = 30000000 / dataCount
+                            }else if dataCount > 15000000 {
+                                compressionQuality = 10000000 / dataCount
+                            }else if dataCount > 10000000 {
+                                compressionQuality = 6000000 / dataCount
+                            }else {
+                                compressionQuality = 3000000 / dataCount
+                            }
+                            if let imageData = PhotoTools.imageCompress(
+                                dataResult.imageData,
+                                compressionQuality: compressionQuality
+                            ) {
+                                image = .init(data: imageData)
+                            }
+                        }
+                        if image == nil {
+                            image = UIImage(data: dataResult.imageData)
                         }
                         DispatchQueue.main.async {
                             if asset == self.photoAsset {
@@ -530,7 +556,11 @@ extension PhotoPreviewContentView {
     func requestLivePhoto() {
         #if HXPICKER_ENABLE_EDITOR
         if let photoEdit = photoAsset.photoEdit {
-            imageView.setImage(photoEdit.editedImage, animated: true)
+            if let image = UIImage(contentsOfFile: photoEdit.editedImageURL.path) {
+                imageView.setImage(image, animated: true)
+            }else {
+                imageView.setImage(photoEdit.editedImage, animated: true)
+            }
             requestCompletion = true
             return
         }
@@ -573,7 +603,11 @@ extension PhotoPreviewContentView {
     func requestLocalLivePhoto() {
         #if HXPICKER_ENABLE_EDITOR
         if let photoEdit = photoAsset.photoEdit {
-            imageView.setImage(photoEdit.editedImage, animated: true)
+            if let image = UIImage(contentsOfFile: photoEdit.editedImageURL.path) {
+                imageView.setImage(image, animated: true)
+            }else {
+                imageView.setImage(photoEdit.editedImage, animated: true)
+            }
             requestCompletion = true
             return
         }

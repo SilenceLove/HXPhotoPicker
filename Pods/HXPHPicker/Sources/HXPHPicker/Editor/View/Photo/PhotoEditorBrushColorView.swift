@@ -151,7 +151,7 @@ public class PhotoEditorBrushColorView: UIView {
         super.init(frame: .zero)
         addSubview(collectionView)
         addSubview(undoButton)
-        addSubview(brushSizeSlider)
+//        addSubview(brushSizeSlider)
         collectionView.selectItem(
             at: IndexPath(
                 item: config.defaultColorIndex,
@@ -164,14 +164,14 @@ public class PhotoEditorBrushColorView: UIView {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        brushSizeSlider.frame = CGRect(
-            x: UIDevice.leftMargin + 20,
-            y: 0,
-            width: width - 40 - UIDevice.leftMargin - UIDevice.rightMargin,
-            height: 20
-        )
+//        brushSizeSlider.frame = CGRect(
+//            x: UIDevice.leftMargin + 20,
+//            y: 0,
+//            width: width - 40 - UIDevice.leftMargin - UIDevice.rightMargin,
+//            height: 20
+//        )
         let cHeight: CGFloat = 60
-        collectionView.frame = CGRect(x: 0, y: brushSizeSlider.frame.maxY + 5, width: width, height: cHeight)
+        collectionView.frame = CGRect(x: 0, y: 5, width: width, height: cHeight)
         flowLayout.sectionInset = UIEdgeInsets(
             top: 0,
             left: 12 + UIDevice.leftMargin,

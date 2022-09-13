@@ -79,19 +79,6 @@ extension UIView: HXPickerCompatible {
         return nil
     }
     
-//    func viewController() -> UIViewController? {
-//        var next = superview
-//        while next != nil {
-//            let nextResponder = next?.next
-//            if nextResponder is UINavigationController ||
-//                nextResponder is UIViewController {
-//                return nextResponder as? UIViewController
-//            }
-//            next = next?.superview
-//        }
-//        return nil
-//    }
-    
     /// UIView转UIImage
     /// - Returns: UIImage
     func convertedToImage(rect: CGRect = .zero) -> UIImage? {

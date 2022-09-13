@@ -23,6 +23,7 @@ extension PhotoPickerViewController: PhotoPickerViewCellDelegate {
             #if HXPICKER_ENABLE_EDITOR
             if photoAsset.videoEdit != nil {
                 photoAsset.videoEdit = nil
+                cell.isRequestDirectly = true
                 cell.photoAsset = photoAsset
             }else {
                 cell.updateSelectedState(

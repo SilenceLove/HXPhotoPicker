@@ -218,17 +218,17 @@ class EditorImageResizerView: UIView {
     var hasFilter: Bool = false
     var videoFilter: VideoEditorFilter?
     let editType: PhotoEditorContentView.EditType
-    var editedImageURL: URL?
+    var urlConfig: EditorURLConfig?
     init(
         editType: PhotoEditorContentView.EditType,
         cropConfig: EditorCropSizeConfiguration,
         mosaicConfig: PhotoEditorConfiguration.Mosaic,
-        editedImageURL: URL? = nil
+        urlConfig: EditorURLConfig? = nil
     ) {
         self.editType = editType
         self.cropConfig = cropConfig
         self.mosaicConfig = mosaicConfig
-        self.editedImageURL = editedImageURL
+        self.urlConfig = urlConfig
         super.init(frame: .zero)
         addSubview(containerView)
     }

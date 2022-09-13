@@ -580,12 +580,8 @@ extension PhotoPickerController {
             }
         }
         if let text = text, !canSelect, showHUD {
-            if DispatchQueue.isMain {
-                ProgressHUD.showWarning(addedTo: view, text: text, animated: true, delayHide: 1.5)
-            }else {
-                DispatchQueue.main.async {
-                    ProgressHUD.showWarning(addedTo: self.view, text: text, animated: true, delayHide: 1.5)
-                }
+            DispatchQueue.main.async {
+                ProgressHUD.showWarning(addedTo: self.view, text: text, animated: true, delayHide: 1.5)
             }
         }
         return canSelect

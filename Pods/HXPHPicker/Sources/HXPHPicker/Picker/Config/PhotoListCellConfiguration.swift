@@ -39,6 +39,9 @@ public struct PhotoListCellConfiguration {
     /// 如果限制了照片/视频的文件大小，则无效
     public var showDisableMask: Bool = true
     
+    /// 照片视频不能同时选择并且视频最大选择数为1时视频cell是否隐藏选择框
+    public var singleVideoHideSelect: Bool = true
+    
     /// 选择框顶部的间距
     public var selectBoxTopMargin: CGFloat = 5
     

@@ -224,15 +224,15 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         isCapture: Bool = false,
         completion: (() -> Void)? = nil
     ) {
-        func addPhotoAsset(_ photoAsset: PhotoAsset) {
-            guard let picker = pickerController else { return }
-            ProgressHUD.hide(forView: navigationController?.view, animated: true)
-            if config.takePictureCompletionToSelected {
+        DispatchQueue.main.async {
+            guard let picker = self.pickerController else { return }
+            ProgressHUD.hide(forView: self.navigationController?.view, animated: true)
+            if self.config.takePictureCompletionToSelected {
                 if picker.addedPhotoAsset(
                     photoAsset: photoAsset,
                     filterEditor: true
                 ) {
-                    updateCellSelectedTitle()
+                    self.updateCellSelectedTitle()
                 }
             }
             picker.updateAlbums(coverImage: photoAsset.originalImage, count: 1)
@@ -240,18 +240,15 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
                 picker.addedLocalCameraAsset(photoAsset: photoAsset)
             }
             if picker.config.albumShowMode == .popup {
-                albumView.tableView.reloadData()
+                self.albumView.tableView.reloadData()
             }
-            addedPhotoAsset(for: photoAsset)
-            bottomView.updateFinishButtonTitle()
-            setupEmptyView()
-            if picker.config.selectMode == .single && config.finishSelectionAfterTakingPhoto {
-                quickSelect(photoAsset, isCapture: isCapture)
+            self.addedPhotoAsset(for: photoAsset)
+            self.bottomView.updateFinishButtonTitle()
+            self.setupEmptyView()
+            if picker.config.selectMode == .single && self.config.finishSelectionAfterTakingPhoto {
+                self.quickSelect(photoAsset, isCapture: isCapture)
             }
             completion?()
-        }
-        DispatchQueue.main.async {
-            addPhotoAsset(photoAsset)
         }
     }
 }

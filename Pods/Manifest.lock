@@ -16,32 +16,32 @@ PODS:
     - AFNetworking/NSURLSession
   - GDPerformanceView-Swift (2.1.1)
   - GPUImage (0.1.7)
-  - HXPHPicker (1.4.0):
-    - HXPHPicker/Full (= 1.4.0)
-  - HXPHPicker/Camera (1.4.0):
+  - HXPHPicker (1.4.2):
+    - HXPHPicker/Full (= 1.4.2)
+  - HXPHPicker/Camera (1.4.2):
     - HXPHPicker/Core
-  - HXPHPicker/Core (1.4.0)
-  - HXPHPicker/Editor (1.4.0):
-    - HXPHPicker/Editor/KF (= 1.4.0)
-    - HXPHPicker/Editor/Lite (= 1.4.0)
-  - HXPHPicker/Editor/KF (1.4.0):
+  - HXPHPicker/Core (1.4.2)
+  - HXPHPicker/Editor (1.4.2):
+    - HXPHPicker/Editor/KF (= 1.4.2)
+    - HXPHPicker/Editor/Lite (= 1.4.2)
+  - HXPHPicker/Editor/KF (1.4.2):
     - HXPHPicker/Editor/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Editor/Lite (1.4.0):
+  - HXPHPicker/Editor/Lite (1.4.2):
     - HXPHPicker/Core
-  - HXPHPicker/Full (1.4.0):
+  - HXPHPicker/Full (1.4.2):
     - HXPHPicker/Camera
     - HXPHPicker/Editor
     - HXPHPicker/Picker
-  - HXPHPicker/Picker (1.4.0):
-    - HXPHPicker/Picker/KF (= 1.4.0)
-    - HXPHPicker/Picker/Lite (= 1.4.0)
-  - HXPHPicker/Picker/KF (1.4.0):
+  - HXPHPicker/Picker (1.4.2):
+    - HXPHPicker/Picker/KF (= 1.4.2)
+    - HXPHPicker/Picker/Lite (= 1.4.2)
+  - HXPHPicker/Picker/KF (1.4.2):
     - HXPHPicker/Picker/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Picker/Lite (1.4.0):
+  - HXPHPicker/Picker/Lite (1.4.2):
     - HXPHPicker/Core
-  - Kingfisher (7.2.1)
+  - Kingfisher (7.3.2)
   - Masonry (1.1.0)
   - SDWebImage (5.12.5):
     - SDWebImage/Core (= 5.12.5)
@@ -69,8 +69,8 @@ SPEC CHECKSUMS:
   AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
   GDPerformanceView-Swift: 22d964fe40b19e3d914dba2586237d064de8fd77
   GPUImage: 733a5f0fab92df9de1c37ba9df520a833ccb406d
-  HXPHPicker: 6f920091e253f1146d3b9299837d5955db0f7162
-  Kingfisher: 7c084bebf7d548c623ad41bcf765fb200efed369
+  HXPHPicker: a30fbedbe53261ff2c438a97153ff2f83c2cff71
+  Kingfisher: 0086ad83719761ba9b2cdaf6ef4d5b4878cbae23
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   SDWebImage: 0905f1b7760fc8ac4198cae0036600d67478751e
 

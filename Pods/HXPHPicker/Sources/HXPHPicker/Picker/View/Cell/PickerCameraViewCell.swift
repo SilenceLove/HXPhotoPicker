@@ -1,5 +1,5 @@
 //
-//  PickerCamerViewCell.swift
+//  PickerCameraViewCell.swift
 //  HXPHPickerExample
 //
 //  Created by Slience on 2020/12/29.
@@ -9,7 +9,7 @@
 import UIKit
 import AVKit
 
-class PickerCamerViewCell: UICollectionViewCell {
+class PickerCameraViewCell: UICollectionViewCell {
     lazy var captureView: CaptureVideoPreviewView = {
         let view = CaptureVideoPreviewView(isCell: true)
         return view

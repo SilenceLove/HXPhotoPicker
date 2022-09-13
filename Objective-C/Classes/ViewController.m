@@ -212,7 +212,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
         cell.textLabel.text = item.title;
         cell.detailTextLabel.text = item.subTitle;
     }else {
-        cell.textLabel.text = @"Swift示例";
+        cell.textLabel.text = @"Swift示例（推荐）";
         cell.detailTextLabel.text = @"查看Swift版本的示例";
     }
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;

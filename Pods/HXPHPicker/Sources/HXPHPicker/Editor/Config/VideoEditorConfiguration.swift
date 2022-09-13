@@ -15,9 +15,12 @@ open class VideoEditorConfiguration: EditorConfiguration {
     /// 视频导出的质量[0-10]
     public var videoQuality: Int = 6
     
-    /// 视频导出的地址，默认在tmp下
+    /// 返回按钮图标
+    public var backButtonImageName: String = "hx_editor_back"
+    
+    /// 视频导出的地址配置，默认在tmp下
     /// 每次编辑时请设置不同地址，防止之前存在的数据被覆盖
-    public var videoExportURL: URL?
+    public var videoURLConfig: EditorURLConfig?
     
     /// 编辑控制器的默认状态
     public var defaultState: VideoEditorViewController.State = .normal

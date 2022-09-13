@@ -25,6 +25,7 @@ extension String: HXPickerCompatibleValue {
         }
         return lrcString
     }
+    
     var md5: String {
         guard let data = data(using: .utf8) else {
             return self
@@ -140,6 +141,14 @@ extension String: HXPickerCompatibleValue {
 }
 
 public extension HXPickerWrapper where Base == String {
+    
+    static func fileName(suffix: String) -> String {
+        Base.fileName(suffix: suffix)
+    }
+    
+    var color: UIColor { base.color }
+    
+    var image: UIImage? { base.image }
     
     func size(ofAttributes attributes: [NSAttributedString.Key: Any], maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
         let constraintRect = CGSize(width: maxWidth, height: maxHeight)

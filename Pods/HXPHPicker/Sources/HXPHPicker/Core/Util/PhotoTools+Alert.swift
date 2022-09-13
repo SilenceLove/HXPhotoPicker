@@ -101,7 +101,8 @@ extension PhotoTools {
     
     /// 显示没有相机权限弹窗
     static func showNotCameraAuthorizedAlert(
-        viewController: UIViewController?
+        viewController: UIViewController?,
+        cancelHandler: (() -> Void)? = nil
     ) {
         guard let vc = viewController else { return }
         showAlert(
@@ -109,8 +110,11 @@ extension PhotoTools {
             title: "无法使用相机功能".localized,
             message: "请前往系统设置中，允许访问「相机」。".localized,
             leftActionTitle: "取消".localized,
-            leftHandler: {_ in },
-            rightActionTitle: "前往系统设置".localized) { (alertAction) in
+            leftHandler: { _ in
+                cancelHandler?()
+            },
+            rightActionTitle: "前往系统设置".localized
+        ) { (alertAction) in
             openSettingsURL()
         }
     }

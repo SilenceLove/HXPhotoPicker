@@ -213,6 +213,7 @@ public class KingfisherManager {
             with: source,
             options: info,
             downloadTaskUpdated: downloadTaskUpdated,
+            progressiveImageSetter: nil,
             completionHandler: completionHandler)
     }
 
@@ -220,8 +221,33 @@ public class KingfisherManager {
         with source: Source,
         options: KingfisherParsedOptionsInfo,
         downloadTaskUpdated: DownloadTaskUpdatedBlock? = nil,
+        progressiveImageSetter: ((KFCrossPlatformImage?) -> Void)? = nil,
+        referenceTaskIdentifierChecker: (() -> Bool)? = nil,
         completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)?) -> DownloadTask?
     {
+        var options = options
+        if let provider = ImageProgressiveProvider(options, refresh: { image in
+            guard let setter = progressiveImageSetter else {
+                return
+            }
+            guard let strategy = options.progressiveJPEG?.onImageUpdated(image) else {
+                setter(image)
+                return
+            }
+            switch strategy {
+            case .default: setter(image)
+            case .keepCurrent: break
+            case .replace(let newImage): setter(newImage)
+            }
+        }) {
+            options.onDataReceived = (options.onDataReceived ?? []) + [provider]
+        }
+        if let checker = referenceTaskIdentifierChecker {
+            options.onDataReceived?.forEach {
+                $0.onShouldApply = checker
+            }
+        }
+        
         let retrievingContext = RetrievingContext(options: options, originalSource: source)
         var retryContext: RetryContext?
 
@@ -521,10 +547,18 @@ public class KingfisherManager {
                     result.match(
                         onSuccess: { cacheResult in
                             let value: Result<RetrieveImageResult, KingfisherError>
-                            if let image = cacheResult.image {
+                            if var image = cacheResult.image {
+                                if image.kf.imageFrameCount != nil && image.kf.imageFrameCount != 1, let data = image.kf.animatedImageData {
+                                    // Always recreate animated image representation since it is possible to be loaded in different options.
+                                    // https://github.com/onevcat/Kingfisher/issues/1923
+                                    image = KingfisherWrapper.animatedImage(data: data, options: options.imageCreatingOptions) ?? .init()
+                                }
+                                if let modifier = options.imageModifier {
+                                    image = modifier.modify(image)
+                                }
                                 value = result.map {
                                     RetrieveImageResult(
-                                        image: options.imageModifier?.modify(image) ?? image,
+                                        image: image,
                                         cacheType: $0.cacheType,
                                         source: source,
                                         originalSource: context.originalSource

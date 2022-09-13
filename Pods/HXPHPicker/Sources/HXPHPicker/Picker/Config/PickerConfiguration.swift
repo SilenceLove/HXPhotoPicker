@@ -82,6 +82,15 @@ public class PickerConfiguration: BaseConfiguration {
     public var editorCustomTransition: Bool = true
     #endif
     
+    /// 选择器展示样式，当 albumShowMode = .popup 并且全屏弹出时有效
+    public var pickerPresentStyle: PickerPresentStyle = .present
+    
+    /// 当 albumShowMode = .popup 并且全屏弹出时，是否允许右滑手势返回。与微信右滑手势返回一致
+    public var allowRightSwipeGestureBack: Bool = true
+    
+    /// 右滑返回手势触发范围，距离屏幕左边的距离
+    public var rightSwipeGestureTriggerRange: CGFloat = 50
+    
     /// 状态栏样式
     public var statusBarStyle: UIStatusBarStyle = .default
     

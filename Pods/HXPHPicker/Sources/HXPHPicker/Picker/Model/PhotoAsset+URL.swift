@@ -12,17 +12,42 @@ public extension PhotoAsset {
     
     /// 压缩参数
     struct Compression {
-        /// 图片压缩质量 [0.1 - 0.9]，nil - 不压缩
-        public let imageCompressionQuality: CGFloat?
-        /// 视频分辨率，nil - 不压缩
-        public let videoExportPreset: ExportPreset?
-        /// 视频质量 [1-10]，nil - 不压缩
-        public let videoQuality: Int?
+        let imageCompressionQuality: CGFloat?
+        let videoExportPreset: ExportPreset?
+        let videoQuality: Int?
         
+        /// 压缩图片
+        /// - Parameter imageCompressionQuality: 图片压缩质量 [0.1 - 0.9]
         public init(
-            imageCompressionQuality: CGFloat? = nil,
-            videoExportPreset: ExportPreset? = nil,
-            videoQuality: Int? = nil
+            imageCompressionQuality: CGFloat
+        ) {
+            self.imageCompressionQuality = imageCompressionQuality
+            self.videoExportPreset = nil
+            self.videoQuality = nil
+        }
+        
+        /// 压缩视频
+        /// - Parameters:
+        ///   - videoExportPreset: 视频分辨率
+        ///   - videoQuality: 视频质量 [1-10]
+        public init(
+            videoExportPreset: ExportPreset,
+            videoQuality: Int
+        ) {
+            self.imageCompressionQuality = nil
+            self.videoExportPreset = videoExportPreset
+            self.videoQuality = videoQuality
+        }
+        
+        /// 压缩图片、视频
+        /// - Parameters:
+        ///   - imageCompressionQuality: 图片压缩质量 [0.1 - 0.9]
+        ///   - videoExportPreset: 视频分辨率
+        ///   - videoQuality: 视频质量 [1-10]
+        public init(
+            imageCompressionQuality: CGFloat,
+            videoExportPreset: ExportPreset,
+            videoQuality: Int
         ) {
             self.imageCompressionQuality = imageCompressionQuality
             self.videoExportPreset = videoExportPreset

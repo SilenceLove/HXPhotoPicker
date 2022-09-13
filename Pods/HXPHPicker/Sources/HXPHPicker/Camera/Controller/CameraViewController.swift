@@ -98,6 +98,7 @@ open class CameraViewController: BaseViewController {
     var currentZoomFacto: CGFloat = 1
     
     private var requestCameraSuccess = false
+    private var sessionCommitConfiguration = true
     
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,6 +109,8 @@ open class CameraViewController: BaseViewController {
         navigationController?.navigationBar.tintColor = .white
         
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
+            bottomView.isGestureEnable = false
+            view.addSubview(bottomView)
             PhotoTools.showConfirm(
                 viewController: self,
                 title: "相机不可用!".localized,
@@ -122,7 +125,13 @@ open class CameraViewController: BaseViewController {
             if isGranted {
                 self.setupCamera()
             }else {
-                PhotoTools.showNotCameraAuthorizedAlert(viewController: self)
+                self.bottomView.isGestureEnable = false
+                self.view.addSubview(self.bottomView)
+                PhotoTools.showNotCameraAuthorizedAlert(
+                    viewController: self
+                ) {
+                    self.dismiss(animated: true)
+                }
             }
         }
         
@@ -200,6 +209,7 @@ open class CameraViewController: BaseViewController {
         view.addSubview(bottomView)
         DispatchQueue.global().async {
             do {
+                self.sessionCommitConfiguration = false
                 self.cameraManager.session.beginConfiguration()
                 try self.cameraManager.startSession()
                 var needAddAudio = false
@@ -278,8 +288,9 @@ open class CameraViewController: BaseViewController {
     }
     
     func addOutputCompletion() {
+        cameraManager.session.commitConfiguration()
+        sessionCommitConfiguration = true
         if config.cameraType == .normal {
-            cameraManager.session.commitConfiguration()
             cameraManager.startRunning()
         }
         requestCameraSuccess = true
@@ -342,6 +353,9 @@ open class CameraViewController: BaseViewController {
         super.viewDidAppear(animated)
         if requestCameraSuccess {
             if config.cameraType == .normal {
+                if !sessionCommitConfiguration {
+                    cameraManager.session.commitConfiguration()
+                }
                 cameraManager.startRunning()
             }
         }

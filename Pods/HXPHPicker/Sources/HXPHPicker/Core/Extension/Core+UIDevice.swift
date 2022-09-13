@@ -36,8 +36,9 @@ extension UIDevice {
     class var statusBarHeight: CGFloat {
         let statusBarHeight: CGFloat
         let window = UIApplication.shared.windows.first
-        if #available(iOS 13.0, *) {
-            statusBarHeight = (window?.windowScene?.statusBarManager?.statusBarFrame.size.height)!
+        if #available(iOS 13.0, *),
+           let height = window?.windowScene?.statusBarManager?.statusBarFrame.size.height {
+            statusBarHeight = height
         } else {
             statusBarHeight = UIApplication.shared.statusBarFrame.size.height
         }

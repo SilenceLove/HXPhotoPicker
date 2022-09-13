@@ -15,7 +15,7 @@ class VideoPlayerView: UIView {
     }
     
     lazy var player: AVPlayer = {
-        let player = AVPlayer.init()
+        let player = AVPlayer()
         return player
     }()
     var playerLayer: AVPlayerLayer {

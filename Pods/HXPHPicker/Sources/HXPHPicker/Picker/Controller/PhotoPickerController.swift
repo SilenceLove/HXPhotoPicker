@@ -123,7 +123,8 @@ open class PhotoPickerController: UINavigationController {
         if config.selectMode == .multiple &&
             !config.allowSelectedTogether &&
             config.maximumSelectedVideoCount == 1 &&
-            config.selectOptions.isPhoto && config.selectOptions.isVideo {
+            config.selectOptions.isPhoto && config.selectOptions.isVideo &&
+            config.photoList.cell.singleVideoHideSelect {
             singleVideo = true
         }
         isPreviewAsset = false
@@ -262,9 +263,14 @@ open class PhotoPickerController: UINavigationController {
     }
     var interactiveTransition: PickerInteractiveTransition?
     
+    var dismissInteractiveTransition: PickerControllerInteractiveTransition?
+    
     #if HXPICKER_ENABLE_EDITOR
     lazy var editedPhotoAssetArray: [PhotoAsset] = []
     #endif
+    
+    var isSwipeRightBack: Bool = false
+    var allowPushPresent: Bool = false
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -277,6 +283,22 @@ open class PhotoPickerController: UINavigationController {
         if !isPreviewAsset && !isExternalPickerPreview {
             setOptions()
             requestAuthorization()
+            if modalPresentationStyle == .fullScreen &&
+                config.albumShowMode == .popup {
+                transitioningDelegate = self
+                modalPresentationCapturesStatusBarAppearance = true
+                if config.pickerPresentStyle == .push {
+                    allowPushPresent = true
+                }
+                if config.allowRightSwipeGestureBack {
+                    isSwipeRightBack = true
+                    dismissInteractiveTransition = .init(
+                        panGestureRecognizerFor: self,
+                        type: config.pickerPresentStyle == .push ? .pop : .dismiss,
+                        triggerRange: config.rightSwipeGestureTriggerRange
+                    )
+                }
+            }
         }else {
             if modalPresentationStyle == .custom {
                 interactiveTransition = PickerInteractiveTransition.init(panGestureRecognizerFor: self, type: .dismiss)

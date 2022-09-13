@@ -26,6 +26,7 @@ extension PhotoPickerViewController: PhotoEditorViewControllerDelegate {
         }
         if !photoAsset.isSelected {
             let cell = getCell(for: photoAsset)
+            cell?.isRequestDirectly = true
             cell?.photoAsset = photoAsset
             if picker.addedPhotoAsset(photoAsset: photoAsset) {
                 updateCellSelectedTitle()
@@ -52,6 +53,7 @@ extension PhotoPickerViewController: PhotoEditorViewControllerDelegate {
             return
         }
         let cell = getCell(for: photoAsset)
+        cell?.isRequestDirectly = true
         cell?.photoAsset = photoAsset
         if !photoAsset.isSelected {
             if picker.addedPhotoAsset(photoAsset: photoAsset) {
@@ -257,6 +259,7 @@ extension PhotoPickerViewController: VideoEditorViewControllerDelegate {
         }
         if !photoAsset.isSelected {
             let cell = getCell(for: photoAsset)
+            cell?.isRequestDirectly = true
             cell?.photoAsset = photoAsset
             if picker.addedPhotoAsset(photoAsset: photoAsset) {
                 updateCellSelectedTitle()
@@ -292,6 +295,7 @@ extension PhotoPickerViewController: VideoEditorViewControllerDelegate {
         }
         if beforeHasEdit {
             let cell = getCell(for: photoAsset)
+            cell?.isRequestDirectly = true
             cell?.photoAsset = photoAsset
         }
         if !photoAsset.isSelected {

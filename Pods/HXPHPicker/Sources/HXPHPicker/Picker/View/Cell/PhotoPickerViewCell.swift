@@ -130,15 +130,31 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         iCloudMarkView.x = width - iCloudMarkView.width - 5
         iCloudMarkView.y = 5
         
-        selectMaskLayer.frame = photoView.bounds
-        disableMaskLayer.frame = photoView.bounds
         assetTypeMaskView.frame = CGRect(x: 0, y: photoView.height - 25, width: width, height: 25)
-        assetTypeMaskLayer.frame = CGRect(
+        let assetTypeMakeFrame = CGRect(
             x: 0,
             y: -5,
             width: assetTypeMaskView.width,
             height: assetTypeMaskView.height + 5
         )
+        var updateFrame = false
+        if !assetTypeMaskLayer.frame.equalTo(assetTypeMakeFrame) {
+            updateFrame = true
+        }
+        if !selectMaskLayer.frame.equalTo(photoView.bounds) {
+            updateFrame = true
+        }
+        if !disableMaskLayer.frame.equalTo(photoView.bounds) {
+            updateFrame = true
+        }
+        if updateFrame {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            assetTypeMaskLayer.frame = assetTypeMakeFrame
+            selectMaskLayer.frame = photoView.bounds
+            disableMaskLayer.frame = photoView.bounds
+            CATransaction.commit()
+        }
         assetTypeLb.frame = CGRect(x: 0, y: height - 19, width: width - 5, height: 18)
         assetTypeIcon.size = assetTypeIcon.image?.size ?? .zero
         assetTypeIcon.x = 5

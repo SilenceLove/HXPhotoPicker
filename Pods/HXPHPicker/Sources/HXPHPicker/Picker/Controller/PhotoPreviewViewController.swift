@@ -273,8 +273,18 @@ public class PhotoPreviewViewController: BaseViewController {
         super.viewDidAppear(animated)
         viewDidAppear = true
         DispatchQueue.main.async {
-            let cell = self.getCell(for: self.currentPreviewIndex)
-            cell?.requestPreviewAsset()
+            if let cell = self.getCell(for: self.currentPreviewIndex) {
+                cell.requestPreviewAsset()
+            }else {
+                Timer.scheduledTimer(
+                    withTimeInterval: 0.2,
+                    repeats: false
+                ) { [weak self] _ in
+                    guard let self = self else { return }
+                    let cell = self.getCell(for: self.currentPreviewIndex)
+                    cell?.requestPreviewAsset()
+                }
+            }
         }
         pickerController?.viewControllersDidAppear(self)
         guard let picker = pickerController else {

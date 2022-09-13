@@ -11,7 +11,11 @@ import AVFoundation
 public struct VideoEditResult {
     
     /// 编辑后的视频地址
-    public let editedURL: URL
+    public var editedURL: URL {
+        urlConfig.url
+    }
+    
+    public let urlConfig: EditorURLConfig
     
     /// 编辑后的视频封面
     public let coverImage: UIImage?
@@ -44,7 +48,7 @@ public struct VideoEditResult {
     let sizeData: VideoEditedCropSize?
     
     init(
-        editedURL: URL,
+        urlConfig: EditorURLConfig,
         cropData: VideoCropData?,
         hasOriginalSound: Bool,
         videoSoundVolume: Float,
@@ -52,12 +56,12 @@ public struct VideoEditResult {
         backgroundMusicVolume: Float,
         sizeData: VideoEditedCropSize?
     ) {
-        editedFileSize = editedURL.fileSize
+        self.urlConfig = urlConfig
+        editedFileSize = urlConfig.url.fileSize
         
-        videoDuration = PhotoTools.getVideoDuration(videoURL: editedURL)
+        videoDuration = PhotoTools.getVideoDuration(videoURL: urlConfig.url)
         videoTime = PhotoTools.transformVideoDurationToString(duration: videoDuration)
-        coverImage = PhotoTools.getVideoThumbnailImage(videoURL: editedURL, atTime: 0.1)
-        self.editedURL = editedURL
+        coverImage = PhotoTools.getVideoThumbnailImage(videoURL: urlConfig.url, atTime: 0.1)
         self.cropData = cropData
         self.hasOriginalSound = hasOriginalSound
         self.videoSoundVolume = videoSoundVolume
@@ -121,7 +125,7 @@ struct VideoEditedCropSize: Codable {
 extension VideoEditResult: Codable {
     
     enum CodingKeys: String, CodingKey {
-        case editedURL
+        case urlConfig
         case coverImage
         case editedFileSize
         case videoTime
@@ -135,7 +139,7 @@ extension VideoEditResult: Codable {
     }
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        editedURL = try container.decode(URL.self, forKey: .editedURL)
+        urlConfig = try container.decode(EditorURLConfig.self, forKey: .urlConfig)
         if let coverImageData = try container.decodeIfPresent(Data.self, forKey: .coverImage) {
             coverImage = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(coverImageData) as? UIImage
         }else {
@@ -154,7 +158,7 @@ extension VideoEditResult: Codable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(editedURL, forKey: .editedURL)
+        try container.encode(urlConfig, forKey: .urlConfig)
         try container.encode(editedFileSize, forKey: .editedFileSize)
         try container.encode(videoTime, forKey: .videoTime)
         try container.encode(videoDuration, forKey: .videoDuration)

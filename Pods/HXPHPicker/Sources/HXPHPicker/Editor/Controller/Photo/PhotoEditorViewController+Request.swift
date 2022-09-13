@@ -128,16 +128,37 @@ extension PhotoEditorViewController {
             guard let self = self else { return }
             switch result {
             case .success(let dataResult):
-                guard var image = UIImage(data: dataResult.imageData) else {
-                    ProgressHUD.hide(forView: self.view, animated: true)
-                    self.requestAssetFailure(isICloud: false)
-                    return
-                }
-                if dataResult.imageData.count > 3000000,
-                   let sImage = image.scaleSuitableSize() {
-                    image = sImage
-                }
                 DispatchQueue.global().async {
+                    var image: UIImage?
+                    let dataCount = CGFloat(dataResult.imageData.count)
+                    if dataCount > 3000000 {
+                        let compressionQuality: CGFloat
+                        if dataCount > 30000000 {
+                            compressionQuality = 30000000 / dataCount
+                        }else if dataCount > 15000000 {
+                            compressionQuality = 10000000 / dataCount
+                        }else if dataCount > 10000000 {
+                            compressionQuality = 6000000 / dataCount
+                        }else {
+                            compressionQuality = 3000000 / dataCount
+                        }
+                        if let imageData = PhotoTools.imageCompress(
+                            dataResult.imageData,
+                            compressionQuality: compressionQuality
+                        ) {
+                            image = .init(data: imageData)
+                        }
+                    }
+                    if image == nil {
+                        image = UIImage(data: dataResult.imageData)
+                    }
+                    guard var image = image else {
+                        DispatchQueue.main.async {
+                            ProgressHUD.hide(forView: self.view, animated: true)
+                            self.requestAssetFailure(isICloud: false)
+                        }
+                        return
+                    }
                     image = self.fixImageOrientation(image)
                     self.filterHDImageHandler(image: image)
                     DispatchQueue.main.async {

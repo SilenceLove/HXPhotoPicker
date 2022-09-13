@@ -15,11 +15,23 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
         presenting: UIViewController,
         source: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
-        PickerTransition(type: .present)
+        if allowPushPresent {
+            return PickerControllerTransition(type: .push)
+        }
+        if isSwipeRightBack {
+            return nil
+        }
+        return PickerTransition(type: .present)
     }
     public func animationController(
         forDismissed dismissed: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
+        if allowPushPresent {
+            return PickerControllerTransition(type: .pop)
+        }
+        if isSwipeRightBack {
+            return PickerControllerTransition(type: .dismiss)
+        }
         if disablesCustomDismiss {
             return nil
         }
@@ -31,6 +43,9 @@ extension PhotoPickerController: UIViewControllerTransitioningDelegate {
     ) -> UIViewControllerInteractiveTransitioning? {
         if let canInteration = interactiveTransition?.canInteration, canInteration {
             return interactiveTransition
+        }
+        if let canInteration = dismissInteractiveTransition?.canInteration, canInteration {
+            return dismissInteractiveTransition
         }
         return nil
     }

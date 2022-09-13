@@ -15,3 +15,12 @@ extension UILabel {
         text?.width(ofFont: font, maxHeight: height > 0 ? height : CGFloat(MAXFLOAT)) ?? 0
     }
 }
+
+public extension HXPickerWrapper where Base: UILabel {
+    var textWidth: CGFloat {
+        base.textWidth
+    }
+    var textHeight: CGFloat {
+        base.textHeight
+    }
+}

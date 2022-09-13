@@ -24,6 +24,7 @@ protocol PhotoPreviewVideoViewDelegate: AnyObject {
     func videoView(_ videoView: VideoPlayerView, readyToPlay duration: CGFloat)
     func videoView(_ videoView: VideoPlayerView, didChangedBuffer duration: CGFloat)
     func videoView(_ videoView: VideoPlayerView, didChangedPlayerTime duration: CGFloat)
+    func videoView(_ videoView: VideoPlayerView, presentationSize: CGSize)
 }
 
 extension PhotoPreviewVideoViewDelegate {
@@ -39,6 +40,7 @@ extension PhotoPreviewVideoViewDelegate {
     func videoView(_ videoView: VideoPlayerView, readyToPlay duration: CGFloat) {}
     func videoView(_ videoView: VideoPlayerView, didChangedBuffer duration: CGFloat) {}
     func videoView(_ videoView: VideoPlayerView, didChangedPlayerTime duration: CGFloat) {}
+    func videoView(_ videoView: VideoPlayerView, presentationSize: CGSize) {}
 }
 
 class PhotoPreviewVideoView: VideoPlayerView {
@@ -234,6 +236,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
     var statusObservation: NSKeyValueObservation?
     var loadedTimeRangesObservation: NSKeyValueObservation?
     var playbackLikelyToKeepUpObservation: NSKeyValueObservation?
+    var presentationSizeObservation: NSKeyValueObservation?
     func addedPlayerObservers() {
         if canRemovePlayerObservers {
             return
@@ -308,6 +311,17 @@ class PhotoPreviewVideoView: VideoPlayerView {
                 self.loadingView?.isHidden = true
             }
         })
+        presentationSizeObservation = player
+            .currentItem?.observe(
+                \.presentationSize,
+                 options: [.old, .new],
+                 changeHandler: { [weak self] playerItem, change in
+                     guard let self = self else { return }
+             if playerItem.presentationSize.equalTo(.zero) {
+                 return
+             }
+             self.delegate?.videoView(self, presentationSize: playerItem.presentationSize)
+        })
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(playerItemDidPlayToEndTimeNotification(notifi:)),
@@ -327,6 +341,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
         statusObservation = nil
         loadedTimeRangesObservation = nil
         playbackLikelyToKeepUpObservation = nil
+        presentationSizeObservation = nil
         NotificationCenter.default.removeObserver(
             self,
             name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,

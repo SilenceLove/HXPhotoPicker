@@ -41,38 +41,50 @@ public struct AssetManager {
             default:
                 break
             }
-            var placeholder: PHObjectPlaceholder?
-            try? PHPhotoLibrary.shared().performChangesAndWait {
-                var creationRequest: PHAssetCreationRequest?
-                if asset is URL {
-                    if mediaType == .image {
-                        creationRequest = PHAssetCreationRequest.creationRequestForAssetFromImage(
-                            atFileURL: asset as! URL
-                        )
-                    }else if mediaType == .video {
-                        creationRequest = PHAssetCreationRequest.creationRequestForAssetFromVideo(
-                            atFileURL: asset as! URL
-                        )
+            DispatchQueue.global().async {
+                var placeholder: PHObjectPlaceholder?
+                do {
+                    try PHPhotoLibrary.shared().performChangesAndWait {
+                        var creationRequest: PHAssetCreationRequest?
+                        if asset is URL {
+                            if mediaType == .image {
+                                creationRequest = PHAssetCreationRequest.creationRequestForAssetFromImage(
+                                    atFileURL: asset as! URL
+                                )
+                            }else if mediaType == .video {
+                                creationRequest = PHAssetCreationRequest.creationRequestForAssetFromVideo(
+                                    atFileURL: asset as! URL
+                                )
+                            }
+                        }else if asset is UIImage {
+                            creationRequest = PHAssetCreationRequest.creationRequestForAsset(
+                                from: asset as! UIImage
+                            )
+                        }
+                        creationRequest?.creationDate = creationDate
+                        creationRequest?.location = location
+                        placeholder = creationRequest?.placeholderForCreatedAsset
                     }
-                }else if asset is UIImage {
-                    creationRequest = PHAssetCreationRequest.creationRequestForAsset(
-                        from: asset as! UIImage
-                    )
+                    if let placeholder = placeholder,
+                       let phAsset = self.fetchAsset(
+                        withLocalIdentifier: placeholder.localIdentifier
+                       ) {
+                        DispatchQueue.main.async {
+                            completion(phAsset)
+                        }
+                        if let albumName = albumName {
+                            saveCustomAlbum(for: phAsset, albumName: albumName)
+                        }
+                    }else {
+                        DispatchQueue.main.async {
+                            completion(nil)
+                        }
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
                 }
-                creationRequest?.creationDate = creationDate
-                creationRequest?.location = location
-                placeholder = creationRequest?.placeholderForCreatedAsset
-            }
-            if let placeholder = placeholder,
-               let phAsset = fetchAsset(
-                withLocalIdentifier: placeholder.localIdentifier
-               ) {
-                completion(phAsset)
-                if let albumName = albumName {
-                    saveCustomAlbum(for: phAsset, albumName: albumName)
-                }
-            }else {
-                completion(nil)
             }
         }
     }
@@ -127,25 +139,37 @@ public struct AssetManager {
             default:
                 break
             }
-            var placeholder: PHObjectPlaceholder?
-            try? PHPhotoLibrary.shared().performChangesAndWait {
-                let creationRequest = PHAssetCreationRequest.forAsset()
-                creationRequest.addResource(with: .photo, fileURL: imageURL, options: nil)
-                creationRequest.addResource(with: .pairedVideo, fileURL: videoURL, options: nil)
-                creationRequest.creationDate = creationDate
-                creationRequest.location = location
-                placeholder = creationRequest.placeholderForCreatedAsset
-            }
-            if let placeholder = placeholder,
-               let phAsset = fetchAsset(
-                withLocalIdentifier: placeholder.localIdentifier
-               ) {
-                completion(phAsset)
-                if let albumName = albumName {
-                    saveCustomAlbum(for: phAsset, albumName: albumName)
+            DispatchQueue.global().async {
+                var placeholder: PHObjectPlaceholder?
+                do {
+                    try PHPhotoLibrary.shared().performChangesAndWait {
+                        let creationRequest = PHAssetCreationRequest.forAsset()
+                        creationRequest.addResource(with: .photo, fileURL: imageURL, options: nil)
+                        creationRequest.addResource(with: .pairedVideo, fileURL: videoURL, options: nil)
+                        creationRequest.creationDate = creationDate
+                        creationRequest.location = location
+                        placeholder = creationRequest.placeholderForCreatedAsset
+                    }
+                    if let placeholder = placeholder,
+                       let phAsset = self.fetchAsset(
+                        withLocalIdentifier: placeholder.localIdentifier
+                       ) {
+                        DispatchQueue.main.async {
+                            completion(phAsset)
+                        }
+                        if let albumName = albumName {
+                            saveCustomAlbum(for: phAsset, albumName: albumName)
+                        }
+                    }else {
+                        DispatchQueue.main.async {
+                            completion(nil)
+                        }
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
                 }
-            }else {
-                completion(nil)
             }
         }
     }

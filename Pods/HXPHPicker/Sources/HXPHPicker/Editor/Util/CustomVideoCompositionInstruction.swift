@@ -112,14 +112,26 @@ class VideoFilterCompositor: NSObject, AVVideoCompositing {
         )
         switch videoOrientation {
         case .portrait:
-            ciImage = ciImage.oriented(.right)
+            if #available(iOS 11.0, *) {
+                ciImage = ciImage.oriented(.right)
+            } else {
+                ciImage = ciImage.oriented(forExifOrientation: 6)
+            }
             size = .init(width: size.height, height: size.width)
         case .portraitUpsideDown:
-            ciImage = ciImage.oriented(.left)
+            if #available(iOS 11.0, *) {
+                ciImage = ciImage.oriented(.left)
+            } else {
+                ciImage = ciImage.oriented(forExifOrientation: 8)
+            }
         case .landscapeRight:
             break
         case .landscapeLeft:
-            ciImage = ciImage.oriented(.down)
+            if #available(iOS 11.0, *) {
+                ciImage = ciImage.oriented(.down)
+            } else {
+                ciImage = ciImage.oriented(forExifOrientation: 3)
+            }
             size = .init(width: size.height, height: size.width)
         @unknown default:
             break
@@ -138,23 +150,51 @@ class VideoFilterCompositor: NSObject, AVVideoCompositing {
             let orientation = PhotoTools.cropOrientation(cropSizeData)
             switch orientation {
             case .upMirrored:
-                ciImage = ciImage.oriented(.upMirrored)
+                if #available(iOS 11.0, *) {
+                    ciImage = ciImage.oriented(.upMirrored)
+                } else {
+                    ciImage = ciImage.oriented(forExifOrientation: 2)
+                }
             case .left:
-                ciImage = ciImage.oriented(.left)
+                if #available(iOS 11.0, *) {
+                    ciImage = ciImage.oriented(.left)
+                } else {
+                    ciImage = ciImage.oriented(forExifOrientation: 8)
+                }
                 size = .init(width: size.height, height: size.width)
             case .leftMirrored:
-                ciImage = ciImage.oriented(.rightMirrored)
+                if #available(iOS 11.0, *) {
+                    ciImage = ciImage.oriented(.rightMirrored)
+                } else {
+                    ciImage = ciImage.oriented(forExifOrientation: 7)
+                }
                 size = .init(width: size.height, height: size.width)
             case .right:
-                ciImage = ciImage.oriented(.right)
+                if #available(iOS 11.0, *) {
+                    ciImage = ciImage.oriented(.right)
+                } else {
+                    ciImage = ciImage.oriented(forExifOrientation: 6)
+                }
                 size = .init(width: size.height, height: size.width)
             case .rightMirrored:
-                ciImage = ciImage.oriented(.leftMirrored)
+                if #available(iOS 11.0, *) {
+                    ciImage = ciImage.oriented(.leftMirrored)
+                } else {
+                    ciImage = ciImage.oriented(forExifOrientation: 5)
+                }
                 size = .init(width: size.height, height: size.width)
             case .down:
-                ciImage = ciImage.oriented(.down)
+                if #available(iOS 11.0, *) {
+                    ciImage = ciImage.oriented(.down)
+                } else {
+                    ciImage = ciImage.oriented(forExifOrientation: 3)
+                }
             case .downMirrored:
-                ciImage = ciImage.oriented(.downMirrored)
+                if #available(iOS 11.0, *) {
+                    ciImage = ciImage.oriented(.downMirrored)
+                } else {
+                    ciImage = ciImage.oriented(forExifOrientation: 4)
+                }
             default:
                 break
             }

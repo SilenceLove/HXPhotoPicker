@@ -69,9 +69,9 @@ public class PhotoPickerViewController: BaseViewController {
         }
         if config.allowAddCamera {
             collectionView.register(
-                PickerCamerViewCell.self,
+                PickerCameraViewCell.self,
                 forCellWithReuseIdentifier:
-                    NSStringFromClass(PickerCamerViewCell.classForCoder())
+                    NSStringFromClass(PickerCameraViewCell.classForCoder())
             )
         }
         if #available(iOS 14.0, *), config.allowAddLimit {
@@ -190,7 +190,7 @@ public class PhotoPickerViewController: BaseViewController {
         cell.config = config.limitCell
         return cell
     }
-    var cameraCell: PickerCamerViewCell {
+    var cameraCell: PickerCameraViewCell {
         let indexPath: IndexPath
         if config.sort == .asc {
             indexPath = IndexPath(item: assets.count, section: 0)
@@ -199,10 +199,10 @@ public class PhotoPickerViewController: BaseViewController {
         }
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: NSStringFromClass(
-                PickerCamerViewCell.classForCoder()
+                PickerCameraViewCell.classForCoder()
             ),
             for: indexPath
-        ) as! PickerCamerViewCell
+        ) as! PickerCameraViewCell
         cell.config = config.cameraCell
         return cell
     }

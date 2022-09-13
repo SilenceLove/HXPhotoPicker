@@ -38,9 +38,13 @@ public extension PhotoTools {
         return folderSize
     }
     
+    static func getSystemDocumentFolderPath() -> String {
+        NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last!
+    }
+    
     /// 获取系统缓存文件夹路径
     static func getSystemCacheFolderPath() -> String {
-        return NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last!
+        NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last!
     }
     
     /// 获取图片缓存文件夹路径
@@ -143,10 +147,14 @@ public extension PhotoTools {
         return fileManager.fileExists(atPath: filePath)
     }
     
+    static func getSystemTempFolderPath() -> String {
+        NSTemporaryDirectory()
+    }
+    
     /// 获取对应后缀的临时路径
     @discardableResult
     static func getTmpURL(for suffix: String) -> URL {
-        var tmpPath = NSTemporaryDirectory()
+        var tmpPath = getSystemTempFolderPath()
         tmpPath.append(contentsOf: String.fileName(suffix: suffix))
         let tmpURL = URL.init(fileURLWithPath: tmpPath)
         return tmpURL
