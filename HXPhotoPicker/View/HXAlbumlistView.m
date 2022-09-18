@@ -514,13 +514,17 @@
     BOOL canSet = self.superview && [self.superview isKindOfClass:NSClassFromString(@"_UITAMICAdaptorView")];
     if (canSet) {
         // 让按钮在屏幕中间
-        CGFloat temp_x = self.superview.hx_x + self.contentView.hx_x;
+        CGFloat superViewX = self.superview.hx_x;
+        if (superViewX == 0) {
+            superViewX = self.superview.superview.hx_x;
+        }
+        CGFloat temp_x = superViewX + self.contentView.hx_x;
         CGFloat windowWidth = [UIApplication sharedApplication].keyWindow.hx_w;
         CGFloat w_x = (windowWidth - self.contentView.hx_w) / 2;
         if (temp_x > w_x) {
-            CGFloat difference = temp_x - w_x;
-            if (self.contentView.hx_x - difference >= 0) {
-                self.contentView.hx_x -= difference;
+            CGFloat contentX = w_x - superViewX;
+            if (contentX >= 0) {
+                self.contentView.hx_x = contentX;
             }else {
                 self.contentView.hx_x = 0;
             }
