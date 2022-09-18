@@ -19,6 +19,7 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         )
         return panGestureRecognizer
     }()
+    weak var bgView: UIView?
     var pickerControllerBackgroundColor: UIColor?
     var beganPoint: CGPoint = .zero
     var canInteration: Bool = false
@@ -46,6 +47,11 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         pickerControllerBackgroundColor = pickerController.view.backgroundColor
         let containerView = transitionContext.containerView
         containerView.addSubview(toVC.view)
+        
+        let bgView = UIView(frame: containerView.bounds)
+        bgView.backgroundColor = .black.withAlphaComponent(0.1)
+        containerView.addSubview(bgView)
+        self.bgView = bgView
         containerView.addSubview(pickerController.view)
         if type == .pop {
             toVC.view.x = -(toVC.view.width * 0.3)
@@ -70,6 +76,7 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         guard let pickerController = pickerController else {
             return
         }
+        
         switch panGR.state {
         case .began:
             if canInteration {
@@ -100,21 +107,33 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                     pickerController.view.y = 0
                 }
             }
+            bgView?.alpha = 1 - scale
             update(scale)
         case .ended, .cancelled, .failed:
             if !canInteration {
                 return
             }
             let isFinish: Bool
+            let velocity = panGR.velocity(in: pickerController.view)
             if type == .pop {
-                isFinish = pickerController.view.x > pickerController.view.width * 0.3
+                if velocity.x > pickerController.view.width {
+                    isFinish = true
+                }else {
+                    isFinish = pickerController.view.x > pickerController.view.width * 0.3
+                }
             }else {
                 isFinish = pickerController.view.y > pickerController.view.height * 0.4
             }
             if isFinish {
                 finish()
+                var duration: TimeInterval = type == .pop ? 0.25 : 0.2
+                if type == .pop {
+                    if velocity.x > pickerController.view.width {
+                        duration *= pickerController.view.width / velocity.x
+                    }
+                }
                 UIView.animate(
-                    withDuration: 0.2,
+                    withDuration: duration,
                     delay: 0,
                     options: .curveEaseIn
                 ) {
@@ -127,9 +146,12 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                     }else {
                         pickerController.view.y = pickerController.view.height
                     }
+                    self.bgView?.alpha = 0
                 } completion: { _ in
                     self.pickerController?.view.removeFromSuperview()
                     self.pickerController = nil
+                    self.bgView?.removeFromSuperview()
+                    self.bgView = nil
                     self.canInteration = false
                     self.transitionContext?.completeTransition(true)
                     self.transitionContext = nil
@@ -150,7 +172,10 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
                     }else {
                         pickerController.view.y = 0
                     }
+                    self.bgView?.alpha = 1
                 } completion: { _ in
+                    self.bgView?.removeFromSuperview()
+                    self.bgView = nil
                     self.canInteration = false
                     self.transitionContext?.completeTransition(false)
                     self.transitionContext = nil

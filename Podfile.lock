@@ -16,30 +16,30 @@ PODS:
     - AFNetworking/NSURLSession
   - GDPerformanceView-Swift (2.1.1)
   - GPUImage (0.1.7)
-  - HXPHPicker (1.4.2):
-    - HXPHPicker/Full (= 1.4.2)
-  - HXPHPicker/Camera (1.4.2):
+  - HXPHPicker (1.4.3):
+    - HXPHPicker/Full (= 1.4.3)
+  - HXPHPicker/Camera (1.4.3):
     - HXPHPicker/Core
-  - HXPHPicker/Core (1.4.2)
-  - HXPHPicker/Editor (1.4.2):
-    - HXPHPicker/Editor/KF (= 1.4.2)
-    - HXPHPicker/Editor/Lite (= 1.4.2)
-  - HXPHPicker/Editor/KF (1.4.2):
+  - HXPHPicker/Core (1.4.3)
+  - HXPHPicker/Editor (1.4.3):
+    - HXPHPicker/Editor/KF (= 1.4.3)
+    - HXPHPicker/Editor/Lite (= 1.4.3)
+  - HXPHPicker/Editor/KF (1.4.3):
     - HXPHPicker/Editor/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Editor/Lite (1.4.2):
+  - HXPHPicker/Editor/Lite (1.4.3):
     - HXPHPicker/Core
-  - HXPHPicker/Full (1.4.2):
+  - HXPHPicker/Full (1.4.3):
     - HXPHPicker/Camera
     - HXPHPicker/Editor
     - HXPHPicker/Picker
-  - HXPHPicker/Picker (1.4.2):
-    - HXPHPicker/Picker/KF (= 1.4.2)
-    - HXPHPicker/Picker/Lite (= 1.4.2)
-  - HXPHPicker/Picker/KF (1.4.2):
+  - HXPHPicker/Picker (1.4.3):
+    - HXPHPicker/Picker/KF (= 1.4.3)
+    - HXPHPicker/Picker/Lite (= 1.4.3)
+  - HXPHPicker/Picker/KF (1.4.3):
     - HXPHPicker/Picker/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Picker/Lite (1.4.2):
+  - HXPHPicker/Picker/Lite (1.4.3):
     - HXPHPicker/Core
   - Kingfisher (7.3.2)
   - Masonry (1.1.0)
@@ -69,7 +69,7 @@ SPEC CHECKSUMS:
   AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
   GDPerformanceView-Swift: 22d964fe40b19e3d914dba2586237d064de8fd77
   GPUImage: 733a5f0fab92df9de1c37ba9df520a833ccb406d
-  HXPHPicker: a30fbedbe53261ff2c438a97153ff2f83c2cff71
+  HXPHPicker: a16d13ddc278e04ddf571b66e0662c731330e6c8
   Kingfisher: 0086ad83719761ba9b2cdaf6ef4d5b4878cbae23
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   SDWebImage: 0905f1b7760fc8ac4198cae0036600d67478751e

@@ -56,10 +56,6 @@ open class PhotoAssetCollection: Equatable {
     public static func == (lhs: PhotoAssetCollection, rhs: PhotoAssetCollection) -> Bool {
         return lhs === rhs
     }
-}
- 
-// MARK: Fetch Asset
-extension PhotoAssetCollection {
     
     /// 请求获取相册封面图片
     /// - Parameter completion: 会回调多次

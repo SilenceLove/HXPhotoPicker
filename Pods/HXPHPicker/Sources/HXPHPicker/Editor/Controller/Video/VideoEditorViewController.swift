@@ -614,6 +614,9 @@ open class VideoEditorViewController: BaseViewController {
             return
         }
         stopAllOperations()
+        if let exportSession = exportSession {
+            exportSession.cancelExport()
+        }
     }
     public func stopAllOperations() {
         stopPlayTimer()
@@ -639,7 +642,6 @@ open class VideoEditorViewController: BaseViewController {
         if let asset = avAsset {
             asset.cancelLoading()
         }
-        exportSession?.cancelExport()
     }
 }
 

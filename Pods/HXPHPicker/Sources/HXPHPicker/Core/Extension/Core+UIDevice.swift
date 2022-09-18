@@ -81,11 +81,14 @@ extension UIDevice {
     }
     class var isAllIPhoneX: Bool {
         (isIPhoneX ||
-            isIPhoneXR ||
-            isIPhoneXsMax ||
-            isIPhoneXsMax ||
-            isIPhoneTwelveMini ||
-            isIPhoneTwelve || isIPhoneTwelveProMax
+         isIPhoneXR ||
+         isIPhoneXsMax ||
+         isIPhoneXsMax ||
+         isIPhone13Mini ||
+         isIPhone13 ||
+         isIPhone13ProMax ||
+         isIPhone14Pro ||
+         isIPhone14ProMax
         )
     }
     class var isIPhoneX: Bool {
@@ -115,7 +118,7 @@ extension UIDevice {
         }
         return false
     }
-    class var isIPhoneTwelveMini: Bool {
+    class var isIPhone13Mini: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
             isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1080, height: 2340), UIScreen.main.currentMode!.size) {
@@ -124,7 +127,7 @@ extension UIDevice {
         }
         return false
     }
-    class var isIPhoneTwelve: Bool {
+    class var isIPhone13: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
             isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1170, height: 2532), UIScreen.main.currentMode!.size) {
@@ -133,10 +136,28 @@ extension UIDevice {
         }
         return false
     }
-    class var isIPhoneTwelveProMax: Bool {
+    class var isIPhone13ProMax: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
             isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1284, height: 2778), UIScreen.main.currentMode!.size) {
+                return true
+            }
+        }
+        return false
+    }
+    class var isIPhone14Pro: Bool {
+        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
+            isPad == false {
+            if __CGSizeEqualToSize(CGSize(width: 1179, height: 2556), UIScreen.main.currentMode!.size) {
+                return true
+            }
+        }
+        return false
+    }
+    class var isIPhone14ProMax: Bool {
+        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
+            isPad == false {
+            if __CGSizeEqualToSize(CGSize(width: 1290, height: 2796), UIScreen.main.currentMode!.size) {
                 return true
             }
         }

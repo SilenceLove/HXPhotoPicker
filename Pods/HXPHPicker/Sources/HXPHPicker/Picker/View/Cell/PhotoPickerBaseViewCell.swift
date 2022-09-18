@@ -191,13 +191,8 @@ open class PhotoPickerBaseViewCell: UICollectionViewCell {
     var isRequestDirectly = true
     var iCloundLoading = false
     var requestICloudCompletion = false
-    var observation: Any?
     deinit {
         cancelRequest()
-        if let observation = observation {
-            NotificationCenter.default.removeObserver(observation)
-            self.observation = nil
-        }
     }
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -217,31 +212,4 @@ extension PhotoPickerBaseViewCell {
             self.cancelICloudRequest()
         }
     }
-//    private func addLoadModeObserver() {
-//        observation = NotificationCenter
-//            .default
-//            .addObserver(
-//                forName: .ThumbnailLoadModeDidChange,
-//                object: nil,
-//                queue: .main
-//            ) { [weak self] notification in
-//                guard let self = self else { return }
-//                let mode = PhotoManager.shared.thumbnailLoadMode
-//                if mode == .simplify {
-//                    self.photoView.cancelRequest()
-//                    if !self.requestICloudCompletion {
-//                        self.cancelICloudRequest()
-//                    }
-//                    return
-//                }
-//                if let needReload = notification.userInfo?["needReload"] as? Bool,
-//                   !needReload {
-//                    return
-//                }
-//                self.photoView.reloadImage()
-//                if !self.requestICloudCompletion && !self.iCloundLoading {
-//                    self.requestICloudState()
-//                }
-//            }
-//    }
 }

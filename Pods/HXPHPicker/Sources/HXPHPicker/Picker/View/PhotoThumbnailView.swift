@@ -90,10 +90,7 @@ open class PhotoThumbnailView: UIView {
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
-
-// MARK: request
-extension PhotoThumbnailView {
+    
     /// 获取图片，重写此方法可以修改图片
     open func requestThumbnailImage(
         targetWidth: CGFloat,
