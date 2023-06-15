@@ -26,6 +26,7 @@
 #import "Demo14ViewController.h"
 #import "Demo15ViewController.h"
 #import "HXPhotoPickerExample-Swift.h"
+#import "OCPickerExampleViewController.h"
 
 static NSString *const kCellIdentifier = @"cell_identifier";
 
@@ -194,7 +195,7 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (section == 0) {
-        return 1;
+        return 2;
     }
     return self.list.count;
 }
@@ -212,8 +213,13 @@ static NSString *const kCellIdentifier = @"cell_identifier";
         cell.textLabel.text = item.title;
         cell.detailTextLabel.text = item.subTitle;
     }else {
-        cell.textLabel.text = @"Swift示例（推荐）";
-        cell.detailTextLabel.text = @"查看Swift版本的示例";
+        if (indexPath.row == 0) {
+            cell.textLabel.text = @"Swift示例";
+            cell.detailTextLabel.text = @"查看Swift版本的示例 v4.0";
+        }else if (indexPath.row == 1) {
+            cell.textLabel.text = @"OC调用Swift";
+            cell.detailTextLabel.text = @"查看示例";
+        }
     }
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
@@ -224,14 +230,20 @@ static NSString *const kCellIdentifier = @"cell_identifier";
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (indexPath.section == 0) {
-        UIViewController *viewController;
-        if (@available(iOS 13.0, *)) {
-            viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
-        } else {
-            viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        if (indexPath.row == 0) {
+            UIViewController *viewController;
+            if (@available(iOS 13.0, *)) {
+                viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
+            } else {
+                viewController = [[HomeViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            }
+            self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
+            [self.navigationController pushViewController:viewController animated:YES];
+        }else {
+            OCPickerExampleViewController *vc = [[OCPickerExampleViewController alloc] init];
+            self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
+            [self.navigationController pushViewController:vc animated:YES];
         }
-        self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
-        [self.navigationController pushViewController:viewController animated:YES];
         return;
     }
     ListItem *item = self.list[indexPath.row];
@@ -243,9 +255,9 @@ static NSString *const kCellIdentifier = @"cell_identifier";
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == 0) {
-        return @"Swift";
+        return @"Swift（Version：4.0）";
     }
-    return @"Objective-C";
+    return @"Objective-C（Version：3.0）";
 }
 @end
 

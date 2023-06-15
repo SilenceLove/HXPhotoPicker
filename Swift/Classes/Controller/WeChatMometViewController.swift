@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import HXPHPicker
+import HXPhotoPicker
 
 class WeChatMometViewController: UIViewController {
     var isImage = false
@@ -21,23 +21,28 @@ class WeChatMometViewController: UIViewController {
     }()
     @objc func didImageViewClick() {
         isImage = true
-        let config = PhotoTools.getWXPickerConfig(isMoment: true)
+        var config = PhotoTools.getWXPickerConfig(isMoment: true)
         config.selectOptions = .photo
         config.selectMode = .single
         config.photoSelectionTapAction = .openEditor
         config.photoList.finishSelectionAfterTakingPhoto = true
-        config.photoEditor.cropping.aspectRatioType = .ratio_1x1
-        config.photoEditor.cropping.fixedRatio = true
-        config.photoEditor.fixedCropState = true
-        
-        config.photoList.cameraType.customConfig?.photoEditor.cropping.aspectRatioType = .ratio_1x1
-        config.photoList.cameraType.customConfig?.photoEditor.cropping.fixedRatio = true
-        config.photoList.cameraType.customConfig?.photoEditor.fixedCropState = true
+        config.editor.cropSize.aspectRatio = .init(width: 1, height: 1)
+        config.editor.cropSize.isFixedRatio = true
+        config.editor.cropSize.aspectRatios = []
+        config.editor.cropSize.isResetToOriginal = false
+        config.editor.isFixedCropSizeState = true
+        var cameraConfig = CameraConfiguration()
+        cameraConfig.editor.cropSize.aspectRatio = .init(width: 1, height: 1)
+        cameraConfig.editor.cropSize.isFixedRatio = true
+        cameraConfig.editor.cropSize.aspectRatios = []
+        cameraConfig.editor.cropSize.isResetToOriginal = false
+        cameraConfig.editor.isFixedCropSizeState = true
+        config.photoList.cameraType = .custom(cameraConfig)
         
         presentPicker(config)
     }
     var localCachePath: String {
-        var cachePath = PhotoTools.getSystemCacheFolderPath()
+        var cachePath = HXPickerWrapper<FileManager>.cachesPath
         cachePath.append(contentsOf: "/com.silence.WeChat_Moment")
         return cachePath
     }
@@ -70,7 +75,7 @@ class WeChatMometViewController: UIViewController {
             present(nav, animated: true, completion: nil)
             return
         }
-        let config = PhotoTools.getWXPickerConfig(
+        var config = PhotoTools.getWXPickerConfig(
             isMoment: true
         )
         config.maximumSelectedVideoDuration = 60
@@ -98,7 +103,7 @@ class WeChatMometViewController: UIViewController {
             }
             picker.dismiss(animated: true, completion: completion)
         } cancel: { picker in
-            picker.dismiss(animated: true)
+            picker.dismiss(true)
         }
         pickerController.autoDismiss = false
     }

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import HXPHPicker
+import HXPhotoPicker
 import CoreLocation
 #if canImport(GDPerformanceView_Swift)
 import GDPerformanceView_Swift
@@ -131,8 +131,7 @@ extension HomeViewController {
                     return EditorConfigurationViewController(style: .grouped)
                 }
             case .camera:
-                let config = CameraConfiguration()
-                config.position = .front
+                var config = CameraConfiguration()
                 #if canImport(GPUImage)
                 config.defaultFilterIndex = 0
                 config.photoFilters = FilterTools.filters()
@@ -151,6 +150,7 @@ extension HomeViewController {
         case weChatMoment
         case photoBrowser
         case pickerView
+        case editorView
         
         var title: String {
             switch self {
@@ -170,6 +170,8 @@ extension HomeViewController {
                 return "Photo Browser"
             case .pickerView:
                 return "Picker View"
+            case .editorView:
+                return "Editor View"
             }
         }
         
@@ -189,7 +191,7 @@ extension HomeViewController {
             case .collectionView:
                 return PickerResultViewController()
             case .customCell:
-                let config: PickerConfiguration = PhotoTools.getWXPickerConfig(
+                var config: PickerConfiguration = PhotoTools.getWXPickerConfig(
                     isMoment: false
                 )
                 config.photoSelectionTapAction = .quickSelect
@@ -209,6 +211,8 @@ extension HomeViewController {
                 return PhotoBrowserViewController()
             case .pickerView:
                 return WindowPickerViewController()
+            case .editorView:
+                return TestEditorViewController()
             }
         }
     }
@@ -216,7 +220,7 @@ extension HomeViewController {
 
 extension HomeViewController: PhotoPickerControllerDelegate {
     func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
-        pickerController.dismiss(animated: true) {
+        pickerController.dismiss(true) {
             let pickerResultVC = PickerResultViewController.init()
             pickerResultVC.config = pickerController.config
             pickerResultVC.selectedAssets = result.photoAssets

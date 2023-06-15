@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import HXPHPicker
+import HXPhotoPicker
 import Photos
 
 class WeChatViewController: UIViewController {
@@ -72,13 +72,17 @@ extension WeChatViewController: UITableViewDataSource, UITableViewDelegate {
             guard let self = self,
                   let myIndexPath = self.tableView.indexPath(for: myCell)
             else { return }
+            
             PhotoBrowser.show(
-                self.photoAssets,
-                pageIndex: myIndexPath.row,
+                pageIndex: myIndexPath.item,
                 transitionalImage: myCell.pictureView.image
-            ) { index in
+            ) {
+                self.photoAssets.count
+            } assetForIndex: {
+                self.photoAssets[$0]
+            } transitionAnimator: {
                 let indexPath = IndexPath(
-                    row: index,
+                    row: $0,
                     section: 0
                 )
                 let cell = self.tableView.cellForRow(
@@ -182,7 +186,7 @@ class WeChatViewCell: UITableViewCell {
             pictureView.cancelRequest()
             pictureView.photoAsset = photoAsset
             if photoAsset.isGifAsset {
-                if let photoEdit = photoAsset.photoEdit {
+                if let photoEdit = photoAsset.photoEditedResult {
                     stateLb.text = photoEdit.imageType == .gif ? "GIF" : nil
                     stateMaskLayer.isHidden = photoEdit.imageType != .gif
                 }else {

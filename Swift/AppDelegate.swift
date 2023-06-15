@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  HXPHPicker
+//  HXPhotoPicker
 //
 //  Created by Slience on 2020/12/30.
 //

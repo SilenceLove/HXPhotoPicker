@@ -1,6 +1,6 @@
 //
 //  PickerResultViewController.swift
-//  HXPHPickerExample
+//  HXPhotoPicker
 //
 //  Created by Silence on 2020/12/18.
 //  Copyright © 2020 Silence. All rights reserved.
@@ -8,7 +8,7 @@
 
 import UIKit
 import Photos
-import HXPHPicker
+import HXPhotoPicker
 import Kingfisher
 
 class PickerResultViewController: UIViewController,
@@ -57,7 +57,7 @@ class PickerResultViewController: UIViewController,
     var isPublish: Bool = false
     
     var localCachePath: String {
-        var cachePath = PhotoTools.getSystemCacheFolderPath()
+        var cachePath = HXPickerWrapper<FileManager>.cachesPath
         cachePath.append(contentsOf: "/com.silence.WeChat_Moment")
         return cachePath
     }
@@ -74,12 +74,26 @@ class PickerResultViewController: UIViewController,
         )
     }
     
+    @objc
+    init(assets: [SwiftPhotoAsset]) {
+        var selectedAssets: [PhotoAsset] = []
+        for asset in assets {
+            selectedAssets.append(asset.photoAsset)
+        }
+        self.selectedAssets = selectedAssets
+        super.init(
+            nibName: "PickerResultViewController",
+            bundle: nil
+        )
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadFonts()
         collectionViewTopConstraint.constant = 20
         collectionView.register(ResultViewCell.self, forCellWithReuseIdentifier: "ResultViewCellID")
         collectionView.register(ResultAddViewCell.self, forCellWithReuseIdentifier: "ResultAddViewCellID")
@@ -140,13 +154,13 @@ class PickerResultViewController: UIViewController,
         }
         
         if preselect {
-            config.pickerPresentStyle = .push
+            config.pickerPresentStyle = .push(rightSwipe: .init(50))
             config.previewView.loadNetworkVideoMode = .play
             config.maximumSelectedVideoDuration = 0
             config.maximumSelectedVideoCount = 0
             let networkVideoURL = URL(
                 string:
-                    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
+                    "https://vd4.bdstatic.com/mda-niumk6kecunfhcqw/sc/cae_h264/1664464908581666807/mda-niumk6kecunfhcqw.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1671876955-0-0-d5348c926143621c0bab7727cb920cb7&bcevod_channel=searchbox_feed&pd=1&cd=0&pt=3&logid=2755343050&vid=4949060647341250402&abtest=106570_1-106693_2&klogid=2755343050"
             )!
             let networkVideoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL))
             selectedAssets.append(networkVideoAsset)
@@ -187,13 +201,71 @@ class PickerResultViewController: UIViewController,
             let livePhoto_video = Bundle.main.path(forResource: "livephoto_video", ofType: "mp4")!
             let localLivePhotoAsset = PhotoAsset(
                 localLivePhoto: .init(
-                    imageURL: URL(fileURLWithPath: livePhoto_image),
-                    videoURL: URL(fileURLWithPath: livePhoto_video)
+                    imageURL: .init(fileURLWithPath: livePhoto_image),
+                    videoURL: .init(fileURLWithPath: livePhoto_video),
+                    imageIdentifier: "local_livePhoto_image_jpeg",
+                    videoIdentifier: "local_livePhoto_video_mp4"
                 )
             )
             selectedAssets.append(localLivePhotoAsset)
             localAssetArray.append(localLivePhotoAsset)
+             
+            let localLivePhotoAsset1 = PhotoAsset(
+                localLivePhoto: .init(
+                    imageURL: URL(string: "https://f7.baidu.com/it/u=500783997,1623136713&fm=222&app=108&f=PNG@s_0,w_800,h_1000,q_80,f_auto")!,
+                    videoURL: URL(string: "https://vd3.bdstatic.com/mda-nadbjpk0hnxwyndu/720p/h264_delogo/1642148105214867253/mda-nadbjpk0hnxwyndu.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1671854745-0-0-fa941c9ac0a6fe5e56d7c6fd5739ff92&bcevod_channel=searchbox_feed&pd=1&cd=0&pt=3&logid=2145586357&vid=5423681428712102654&abtest=106570_1-106693_2&klogid=2145586357")!
+                )
+            )
+            selectedAssets.append(localLivePhotoAsset1)
+            localAssetArray.append(localLivePhotoAsset1)
         }
+    }
+    
+    func loadFonts() {
+        var masks: [EditorConfiguration.CropSize.MaskType] = []
+        if let path = Bundle.main.path(forResource: "love", ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            masks.append(.image(image))
+        }
+        if let path = Bundle.main.path(forResource: "love_text", ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            masks.append(.image(image))
+        }
+        if let path = Bundle.main.path(forResource: "stars", ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            masks.append(.image(image))
+        }
+        if let path = Bundle.main.path(forResource: "text", ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            masks.append(.image(image))
+        }
+        if let path = Bundle.main.path(forResource: "qiy", ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            masks.append(.image(image))
+        }
+        if let path = Bundle.main.path(forResource: "portrait", ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            masks.append(.image(image))
+        }
+        for family in UIFont.familyNames {
+            if UIFont.fontNames(forFamilyName: family).contains("AppleSymbols") {
+                masks.append(.text("🀚", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("�", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("🜯", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("♚", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("‬‬♞", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("‬‬‬♜", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("‬‬‬♨", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("‬‬‬☚", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("‬‬‬☛", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("‬‬‬☁", .init(name: "AppleSymbols", size: 55)!))
+                masks.append(.text("‬‬‬▚", .init(name: "AppleSymbols", size: 55)!))
+                break
+            }
+        }
+        masks.append(.text("‬‬‬Swift", UIFont.boldSystemFont(ofSize: 50)))
+        masks.append(.text("‬‬‬HXPhotoPicker", UIFont.boldSystemFont(ofSize: 50)))
+        config.editor.cropSize.maskList = masks
     }
     
     @objc func longGestureRecognizerClick(longGestureRecognizer: UILongPressGestureRecognizer) {
@@ -267,6 +339,9 @@ class PickerResultViewController: UIViewController,
         }
         pickerConfigVC.showOpenPickerButton = false
         pickerConfigVC.config = config
+        pickerConfigVC.didDoneHandler = { [weak self] in
+            self?.config = $0
+        }
         present(UINavigationController.init(rootViewController: pickerConfigVC), animated: true, completion: nil)
     }
     @objc func didClearButtonClick() {
@@ -471,6 +546,10 @@ class PickerResultViewController: UIViewController,
                     )
                 }, rightActionTitle: "取消") { (alertAction) in }
         } longPressHandler: { index, photoAsset, photoBrowser in
+            if photoAsset.mediaSubType == .localLivePhoto ||
+               photoAsset.mediaSubType == .livePhoto {
+                return
+            }
             // 长按事件
             self.previewLongPressClick(
                 photoAsset: photoAsset,
@@ -487,6 +566,16 @@ class PickerResultViewController: UIViewController,
                 style: .default,
                 handler: { alertAction in
             photoBrowser.view.hx.show(animated: true)
+            func saveAlbum(_ type: AssetManager.SaveType) {
+                AssetManager.saveSystemAlbum(type: type) {
+                    photoBrowser.view.hx.hide(animated: true)
+                    if $0 != nil {
+                        photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
+                    }else {
+                        photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                    }
+                }
+            }
             if photoAsset.mediaSubType == .localLivePhoto {
                 photoAsset.requestLocalLivePhoto { imageURL, videoURL in
                     guard let imageURL = imageURL, let videoURL = videoURL else {
@@ -494,35 +583,11 @@ class PickerResultViewController: UIViewController,
                         photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
                         return
                     }
-                    AssetManager.saveLivePhotoToAlbum(imageURL: imageURL, videoURL: videoURL) {
-                        photoBrowser.view.hx.hide(animated: true)
-                        if $0 != nil {
-                            photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
-                        }else {
-                            photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                        }
-                    }
+                    saveAlbum(.livePhoto(imageURL: imageURL, videoURL: videoURL))
                 }
                 return
             }
-            func saveImage(_ image: Any) {
-                AssetManager.saveSystemAlbum(forImage: image) { phAsset in
-                    if phAsset != nil {
-                        photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
-                    }else {
-                        photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                    }
-                }
-            }
-            func saveVideo(_ videoURL: URL) {
-                AssetManager.saveSystemAlbum(forVideoURL: videoURL) { phAsset in
-                    if phAsset != nil {
-                        photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
-                    }else {
-                        photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
-                    }
-                }
-            }
+            
             photoAsset.getAssetURL { result in
                 switch result {
                 case .success(let response):
@@ -534,14 +599,13 @@ class PickerResultViewController: UIViewController,
                                 completionHandler: { image in
                                 photoBrowser.view.hx.hide(animated: true)
                                 if let image = image {
-                                    saveImage(image)
+                                    saveAlbum(.image(image))
                                 }else {
                                     photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
                                 }
                             })
                         }else {
-                            saveImage(response.url)
-                            photoBrowser.view.hx.hide(animated: true)
+                            saveAlbum(.imageURL(response.url))
                         }
                     }else {
                         if response.urlType == .network {
@@ -550,14 +614,13 @@ class PickerResultViewController: UIViewController,
                                 progress: nil) { videoURL, error, _ in
                                 photoBrowser.view.hx.hide(animated: true)
                                 if let videoURL = videoURL {
-                                    saveVideo(videoURL)
+                                    saveAlbum(.videoURL(videoURL))
                                 }else {
                                     photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
                                 }
                             }
                         }else {
-                            photoBrowser.view.hx.hide(animated: true)
-                            saveVideo(response.url)
+                            saveAlbum(.videoURL(response.url))
                         }
                     }
                 case .failure(_):
@@ -588,7 +651,7 @@ class PickerResultViewController: UIViewController,
                 height: 0
             )
         }
-        photoBrowser.present(alert, animated: true, completion: nil)
+        photoBrowser.presendAlert(alert)
     }
     
     func collectionView(_ collectionView: UICollectionView, canEditItemAt indexPath: IndexPath) -> Bool {
@@ -677,7 +740,7 @@ class PickerResultViewController: UIViewController,
 extension PickerResultViewController: PhotoPickerControllerDelegate {
     
     func createEditorDocumentPath() {
-        let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! + "/hxphpicker_editor"
+        let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! + "/hxphotopicker_editor"
         if !FileManager.default.fileExists(atPath: path) {
             try? FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
         }
@@ -686,30 +749,34 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     func pickerController(
         _ pickerController: PhotoPickerController,
         shouldEditPhotoAsset photoAsset: PhotoAsset,
-        editorConfig: PhotoEditorConfiguration,
+        editorConfig: EditorConfiguration,
         atIndex: Int
-    ) -> Bool {
+    ) -> EditorConfiguration? {
         if isPublish {
+            var config = editorConfig
             createEditorDocumentPath()
-            var fileName = "hxphpicker_editor/"
+            var fileName = "hxphotopicker_editor/"
             fileName += HXPickerWrapper<String>.fileName(suffix: photoAsset.isGifAsset ? "gif" : "png")
-            editorConfig.imageURLConfig = .init(fileName: fileName, type: .document)
+            config.urlConfig = .init(fileName: fileName, type: .document)
+            return config
         }
-        return true
+        return editorConfig
     }
     
     func pickerController(
         _ pickerController: PhotoPickerController,
         shouldEditVideoAsset videoAsset: PhotoAsset,
-        editorConfig: VideoEditorConfiguration,
+        editorConfig: EditorConfiguration,
         atIndex: Int
-    ) -> Bool {
+    ) -> EditorConfiguration? {
         if isPublish {
+            var config = editorConfig
             createEditorDocumentPath()
-            let fileName = "hxphpicker_editor/" + HXPickerWrapper<String>.fileName(suffix: "mp4")
-            editorConfig.videoURLConfig = .init(fileName: fileName, type: .document)
+            let fileName = "hxphotopicker_editor/" + HXPickerWrapper<String>.fileName(suffix: "mp4")
+            config.urlConfig = .init(fileName: fileName, type: .document)
+            return config
         }
-        return true
+        return editorConfig
     }
     
     func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
@@ -769,8 +836,12 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
-        previewDidDeleteAsset photoAsset: PhotoAsset, atIndex: Int) {
-        previewDidDeleteAsset(index: atIndex)
+        previewDidDeleteAssets photoAssets: [PhotoAsset], at indexs: [Int]
+    ) {
+        guard let index = indexs.first else {
+            return
+        }
+        previewDidDeleteAsset(index: index)
     }
     func previewDidDeleteAsset(index: Int) {
         let isFull = selectedAssets.count == config.maximumSelectedCount
@@ -814,7 +885,7 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
-        loadTitleChartlet editorViewController: UIViewController,
+        loadTitleChartlet editorViewController: EditorViewController,
         response: @escaping ([EditorChartlet]) -> Void) {
         // 模仿延迟加加载数据
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -836,7 +907,7 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
-        loadChartletList editorViewController: UIViewController,
+        loadChartletList editorViewController: EditorViewController,
         titleChartlet: EditorChartlet,
         titleIndex: Int,
         response: @escaping (Int, [EditorChartlet]) -> Void) {
@@ -879,63 +950,11 @@ extension PickerResultViewController: PhotoPickerControllerDelegate {
     }
     func pickerController(
         _ pickerController: PhotoPickerController,
-        videoEditor videoEditorViewController: VideoEditorViewController,
-        loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
-        completionHandler(getMusics())
+        videoEditor editorViewController: EditorViewController,
+        loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]) -> Void
+    ) -> Bool {
+        completionHandler(Tools.musicInfos)
         return false
-    }
-    
-    func getMusics() -> [VideoEditorMusicInfo] {
-        var musics: [VideoEditorMusicInfo] = []
-        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
-        let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
-        let lrc1 = try! String(contentsOfFile: lyricUrl1.path) // swiftlint:disable:this force_try
-        let music1 = VideoEditorMusicInfo.init(audioURL: audioUrl1,
-                                               lrc: lrc1)
-        musics.append(music1)
-        let audioUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: "mp3")!
-        let lyricUrl2 = Bundle.main.url(forResource: "嘉宾", withExtension: nil)!
-        let lrc2 = try! String(contentsOfFile: lyricUrl2.path) // swiftlint:disable:this force_try
-        let music2 = VideoEditorMusicInfo.init(audioURL: audioUrl2,
-                                               lrc: lrc2)
-        musics.append(music2)
-        let audioUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: "mp3")!
-        let lyricUrl3 = Bundle.main.url(forResource: "少女的祈祷", withExtension: nil)!
-        let lrc3 = try! String(contentsOfFile: lyricUrl3.path) // swiftlint:disable:this force_try
-        let music3 = VideoEditorMusicInfo.init(audioURL: audioUrl3,
-                                               lrc: lrc3)
-        musics.append(music3)
-        let audioUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: "mp3")!
-        let lyricUrl4 = Bundle.main.url(forResource: "野孩子", withExtension: nil)!
-        let lrc4 = try! String(contentsOfFile: lyricUrl4.path) // swiftlint:disable:this force_try
-        let music4 = VideoEditorMusicInfo.init(audioURL: audioUrl4,
-                                               lrc: lrc4)
-        musics.append(music4)
-        let audioUrl5 = Bundle.main.url(forResource: "无赖", withExtension: "mp3")!
-        let lyricUrl5 = Bundle.main.url(forResource: "无赖", withExtension: nil)!
-        let lrc5 = try! String(contentsOfFile: lyricUrl5.path) // swiftlint:disable:this force_try
-        let music5 = VideoEditorMusicInfo.init(audioURL: audioUrl5,
-                                               lrc: lrc5)
-        musics.append(music5)
-        let audioUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: "mp3")!
-        let lyricUrl6 = Bundle.main.url(forResource: "时光正好", withExtension: nil)!
-        let lrc6 = try! String(contentsOfFile: lyricUrl6.path) // swiftlint:disable:this force_try
-        let music6 = VideoEditorMusicInfo.init(audioURL: audioUrl6,
-                                               lrc: lrc6)
-        musics.append(music6)
-        let audioUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: "mp3")!
-        let lyricUrl7 = Bundle.main.url(forResource: "世间美好与你环环相扣", withExtension: nil)!
-        let lrc7 = try! String(contentsOfFile: lyricUrl7.path) // swiftlint:disable:this force_try
-        let music7 = VideoEditorMusicInfo.init(audioURL: audioUrl7,
-                                               lrc: lrc7)
-        musics.append(music7)
-        let audioUrl8 = Bundle.main.url(forResource: "爱你", withExtension: "mp3")!
-        let lyricUrl8 = Bundle.main.url(forResource: "爱你", withExtension: nil)!
-        let lrc8 = try! String(contentsOfFile: lyricUrl8.path) // swiftlint:disable:this force_try
-        let music8 = VideoEditorMusicInfo.init(audioURL: audioUrl8,
-                                               lrc: lrc8)
-        musics.append(music8)
-        return musics
     }
     
     func gifChartlet() -> [EditorChartlet] {
@@ -992,7 +1011,7 @@ class ResultViewCell: PhotoPickerViewCell {
     override var photoAsset: PhotoAsset! {
         didSet {
             if photoAsset.mediaType == .photo {
-                if let photoEdit = photoAsset.photoEdit {
+                if let photoEdit = photoAsset.photoEditedResult {
                     // 隐藏被编辑过的标示
                     assetEditMarkIcon.isHidden = true
                     assetTypeMaskView.isHidden = photoEdit.imageType != .gif
@@ -1006,9 +1025,6 @@ class ResultViewCell: PhotoPickerViewCell {
     }
     @objc func didDeleteButtonClick() {
         resultDelegate?.cell?(didDeleteButton: self)
-    }
-    func hideDelete() {
-        deleteButton.isHidden = true
     }
     override func initView() {
         super.initView()

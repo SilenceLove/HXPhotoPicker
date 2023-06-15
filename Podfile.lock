@@ -1,79 +1,61 @@
 PODS:
-  - AFNetworking (4.0.1):
-    - AFNetworking/NSURLSession (= 4.0.1)
-    - AFNetworking/Reachability (= 4.0.1)
-    - AFNetworking/Security (= 4.0.1)
-    - AFNetworking/Serialization (= 4.0.1)
-    - AFNetworking/UIKit (= 4.0.1)
-  - AFNetworking/NSURLSession (4.0.1):
-    - AFNetworking/Reachability
-    - AFNetworking/Security
-    - AFNetworking/Serialization
-  - AFNetworking/Reachability (4.0.1)
-  - AFNetworking/Security (4.0.1)
-  - AFNetworking/Serialization (4.0.1)
-  - AFNetworking/UIKit (4.0.1):
-    - AFNetworking/NSURLSession
   - GDPerformanceView-Swift (2.1.1)
-  - GPUImage (0.1.7)
-  - HXPHPicker (1.4.3):
-    - HXPHPicker/Full (= 1.4.3)
-  - HXPHPicker/Camera (1.4.3):
-    - HXPHPicker/Core
-  - HXPHPicker/Core (1.4.3)
-  - HXPHPicker/Editor (1.4.3):
-    - HXPHPicker/Editor/KF (= 1.4.3)
-    - HXPHPicker/Editor/Lite (= 1.4.3)
-  - HXPHPicker/Editor/KF (1.4.3):
-    - HXPHPicker/Editor/Lite
+  - HXPhotoPicker (4.0.0):
+    - HXPhotoPicker/Full (= 4.0.0)
+  - HXPhotoPicker/Camera (4.0.0):
+    - HXPhotoPicker/Camera/Lite (= 4.0.0)
+    - HXPhotoPicker/Camera/Location (= 4.0.0)
+  - HXPhotoPicker/Camera/Lite (4.0.0):
+    - HXPhotoPicker/Core
+  - HXPhotoPicker/Camera/Location (4.0.0):
+    - HXPhotoPicker/Camera/Lite
+  - HXPhotoPicker/Core (4.0.0)
+  - HXPhotoPicker/Editor (4.0.0):
+    - HXPhotoPicker/Editor/KF (= 4.0.0)
+    - HXPhotoPicker/Editor/Lite (= 4.0.0)
+  - HXPhotoPicker/Editor/KF (4.0.0):
+    - HXPhotoPicker/Editor/Lite
+    - HXPhotoPicker/EditorView/KF
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Editor/Lite (1.4.3):
-    - HXPHPicker/Core
-  - HXPHPicker/Full (1.4.3):
-    - HXPHPicker/Camera
-    - HXPHPicker/Editor
-    - HXPHPicker/Picker
-  - HXPHPicker/Picker (1.4.3):
-    - HXPHPicker/Picker/KF (= 1.4.3)
-    - HXPHPicker/Picker/Lite (= 1.4.3)
-  - HXPHPicker/Picker/KF (1.4.3):
-    - HXPHPicker/Picker/Lite
+  - HXPhotoPicker/Editor/Lite (4.0.0):
+    - HXPhotoPicker/EditorView/Lite
+  - HXPhotoPicker/EditorView/KF (4.0.0):
+    - HXPhotoPicker/EditorView/Lite
     - Kingfisher (~> 7.0)
-  - HXPHPicker/Picker/Lite (1.4.3):
-    - HXPHPicker/Core
-  - Kingfisher (7.3.2)
-  - Masonry (1.1.0)
-  - SDWebImage (5.12.5):
-    - SDWebImage/Core (= 5.12.5)
-  - SDWebImage/Core (5.12.5)
+  - HXPhotoPicker/EditorView/Lite (4.0.0):
+    - HXPhotoPicker/Core
+  - HXPhotoPicker/Full (4.0.0):
+    - HXPhotoPicker/Camera
+    - HXPhotoPicker/Editor
+    - HXPhotoPicker/Picker
+  - HXPhotoPicker/Picker (4.0.0):
+    - HXPhotoPicker/Picker/KF (= 4.0.0)
+    - HXPhotoPicker/Picker/Lite (= 4.0.0)
+  - HXPhotoPicker/Picker/KF (4.0.0):
+    - HXPhotoPicker/Picker/Lite
+    - Kingfisher (~> 7.0)
+  - HXPhotoPicker/Picker/Lite (4.0.0):
+    - HXPhotoPicker/Core
+  - Kingfisher (7.6.2)
 
 DEPENDENCIES:
-  - AFNetworking
   - GDPerformanceView-Swift
-  - GPUImage
-  - HXPHPicker
-  - Masonry
-  - SDWebImage
+  - HXPhotoPicker (from `./`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - AFNetworking
     - GDPerformanceView-Swift
-    - GPUImage
-    - HXPHPicker
     - Kingfisher
-    - Masonry
-    - SDWebImage
+
+EXTERNAL SOURCES:
+  HXPhotoPicker:
+    :path: "./"
 
 SPEC CHECKSUMS:
-  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
   GDPerformanceView-Swift: 22d964fe40b19e3d914dba2586237d064de8fd77
-  GPUImage: 733a5f0fab92df9de1c37ba9df520a833ccb406d
-  HXPHPicker: a16d13ddc278e04ddf571b66e0662c731330e6c8
-  Kingfisher: 0086ad83719761ba9b2cdaf6ef4d5b4878cbae23
-  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  SDWebImage: 0905f1b7760fc8ac4198cae0036600d67478751e
+  HXPhotoPicker: 23159d37ff08e2511531dd721769904855aae139
+  Kingfisher: 6c5449c6450c5239166510ba04afe374a98afc4f
 
-PODFILE CHECKSUM: c395177dfd272f05d236e7ce49b9b37b43ac50c5
+PODFILE CHECKSUM: 6270f4f3f46cf3b976cdb07e88218a717f778a60
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

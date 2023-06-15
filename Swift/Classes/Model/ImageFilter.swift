@@ -8,7 +8,7 @@
 #if canImport(GPUImage)
 import UIKit
 import VideoToolbox
-import HXPHPicker
+import HXPhotoPicker
 import GPUImage
 
 struct FilterTools {

@@ -37,16 +37,17 @@ struct KFImageRenderer<HoldingView> : View where HoldingView: KFImageHoldingView
     let context: KFImage.Context<HoldingView>
     
     var body: some View {
-        ZStack {
-            context.configurations
-                .reduce(HoldingView.created(from: binder.loadedImage, context: context)) {
-                    current, config in config(current)
-                }
-                .opacity(binder.loaded ? 1.0 : 0.0)
+        if context.startLoadingBeforeViewAppear && !binder.loadingOrSucceeded && !binder.animating {
+            binder.markLoading()
+            DispatchQueue.main.async { binder.start(context: context) }
+        }
+        
+        return ZStack {
+            renderedImage().opacity(binder.loaded ? 1.0 : 0.0)
             if binder.loadedImage == nil {
                 ZStack {
-                    if let placeholder = context.placeholder, let view = placeholder(binder.progress) {
-                        view
+                    if let placeholder = context.placeholder {
+                        placeholder(binder.progress)
                     } else {
                         Color.clear
                     }
@@ -68,6 +69,29 @@ struct KFImageRenderer<HoldingView> : View where HoldingView: KFImageHoldingView
                     }
                 }
             }
+        }
+        // Workaround for https://github.com/onevcat/Kingfisher/issues/1988
+        // on iOS 16 there seems to be a bug that when in a List, the `onAppear` of the `ZStack` above in the
+        // `binder.loadedImage == nil` not get called. Adding this empty `onAppear` fixes it and the life cycle can
+        // work again.
+        //
+        // There is another "fix": adding an `else` clause and put a `Color.clear` there. But I believe this `onAppear`
+        // should work better.
+        //
+        // It should be a bug in iOS 16, I guess it is some kinds of over-optimization in list cell loading caused it.
+        .onAppear()
+    }
+    
+    @ViewBuilder
+    private func renderedImage() -> some View {
+        let configuredImage = context.configurations
+            .reduce(HoldingView.created(from: binder.loadedImage, context: context)) {
+                current, config in config(current)
+            }
+        if let contentConfiguration = context.contentConfiguration {
+            contentConfiguration(configuredImage)
+        } else {
+            configuredImage
         }
     }
 }

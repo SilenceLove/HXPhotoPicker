@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import HXPHPicker
+import HXPhotoPicker
 
 class CustomPickerViewCell: PhotoPickerViewCell {
     lazy var selectedMaskView: UIView = {

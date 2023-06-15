@@ -1,0 +1,272 @@
+//
+//  PhotoListConfiguration.swift
+//  HXPhotoPicker
+//
+//  Created by Slience on 2020/12/29.
+//  Copyright © 2020 Silence. All rights reserved.
+//
+
+import UIKit
+
+// MARK: Photo list configuration class / 照片列表配置类
+public struct PhotoListConfiguration {
+    
+    /// Album title view configuration
+    /// 相册标题视图配置
+    public var titleView: AlbumTitleViewConfiguration = .init()
+    
+    /// Sort the list by
+    /// 列表排序方式
+    /// - Default: ASC
+    /// - ASC:  Sort in ascending order, scroll to bottom automatically / 升序排列，自动滚动到底部
+    /// - DESC: Reverse order, auto scroll to top / 倒序排列，自动滚动到顶部
+    public var sort: Sort = .asc
+    
+    /// 背景颜色
+    public var backgroundColor: UIColor = .white
+    
+    /// Background color in dark style
+    /// 暗黑风格下背景颜色
+    public var backgroundDarkColor: UIColor = "#2E2F30".hx.color
+    
+    /// Cancel button configuration is only valid when albumShowMode = .popup
+    /// Cancel button type
+    /// 取消按钮的配置只有当 albumShowMode = .popup 时有效
+    /// 取消按钮类型
+    public var cancelType: PhotoPickerViewController.CancelType = .text
+    
+    /// Cancel button position
+    /// 取消按钮位置
+    public var cancelPosition: PhotoPickerViewController.CancelPosition = .right
+    
+    /// Cancel button image name
+    /// 取消按钮图片名
+    public var cancelImageName: String = "hx_picker_photolist_cancel"
+    
+    /// Cancel button image name in dark mode
+    /// 暗黑模式下取消按钮图片名
+    public var cancelDarkImageName: String = "hx_picker_photolist_cancel"
+    
+    /// Display quantity per line
+    /// 每行显示数量
+    public var rowNumber: Int = UIDevice.isPad ? 5 : 4
+    
+    /// Display the number of each line when the screen is horizontal
+    /// 横屏时每行显示数量
+    public var landscapeRowNumber: Int = 7
+    
+    /// Gap between each photo
+    /// 每个照片之间的间隙
+    public var spacing: CGFloat = 1
+    
+    /// Allow Haptic Touch preview, iOS13+
+    /// 允许 Haptic Touch 预览，iOS13 以上
+    public var allowHapticTouchPreview: Bool = true
+    
+    /// Haptic Touch allows adding menus when previewing, iOS13 and above
+    /// Haptic Touch 预览时允许添加菜单，iOS13 以上
+    public var allowAddMenuElements: Bool = true
+    
+    /// Allow swipe selection
+    /// 允许滑动选择
+    public var allowSwipeToSelect: Bool = false
+    
+    /// Allow automatic up/down scrolling when swiping to select
+    /// When allowSyncICloudWhenSelectPhoto = true, automatic scrolling is disabled
+    /// 滑动选择时允许自动向上/下滚动
+    /// 当 allowSyncICloudWhenSelectPhoto = true 时，自动滚动失效
+    public var swipeSelectAllowAutoScroll: Bool = true
+    
+    /// Rate when scrolling up/down automatically
+    /// 自动向上/下滚动时的速率
+    public var swipeSelectScrollSpeed: CGFloat = 1
+    
+    /// The height of the top area that triggers autoscroll
+    /// 触发自动滚动的顶部区域的高度
+    public var autoSwipeTopAreaHeight: CGFloat = 100
+    
+    /// The height of the bottom area that triggers autoscroll
+    /// 触发自动滚动的底部区域的高度
+    public var autoSwipeBottomAreaHeight: CGFloat = 100
+    
+    /// cell related configuration
+    /// cell相关配置
+    public var cell: PhotoListCellConfiguration = .init()
+    
+    /// Bottom view related configuration
+    /// 底部视图相关配置
+    public var bottomView: PickerBottomViewConfiguration = .init()
+    
+    /// Allow adding cameras
+    /// 允许添加相机
+    public var allowAddCamera: Bool = true
+    
+    /// Camera cell configuration
+    /// 相机cell配置
+    public var cameraCell: CameraCell = .init()
+    
+    /// In single-choice mode, select directly after taking a photo and complete the selection
+    /// 单选模式下，拍照完成之后直接选中并且完成选择
+    public var finishSelectionAfterTakingPhoto: Bool = false
+    
+    /// camera type
+    /// 相机类型
+    public var cameraType: CameraType
+    
+    /// Whether to choose after taking pictures
+    /// 拍照完成后是否选择
+    public var takePictureCompletionToSelected: Bool = true
+    
+    /// After the photo is completed, save it to the system album
+    /// 拍照完成后保存到系统相册
+    public var isSaveSystemAlbum: Bool = true
+    
+    /// The name saved in the custom album, or BundleName when it is empty
+    /// 保存在自定义相册的名字，为空时则取 BundleName
+    public var customAlbumName: String?
+    
+    /// When the album permission is the selected photo, it is allowed to add more cells and select more photos/videos
+    /// 当相册权限为选中的照片时，允许添加更多cell，选择更多照片/视频
+    public var allowAddLimit: Bool = true
+    
+    /// When the album permission is the selected photo, add the configuration of the photo cell
+    /// 当相册权限为选中的照片时，添加照片cell的配置
+    public var limitCell: LimitCell = .init()
+    
+    /// The bottom shows the number of photos/videos
+    /// 底部显示 照片/视频 数量
+    public var isShowAssetNumber: Bool = true
+    
+    public var assetNumber: AssetNumber = .init()
+    
+    /// Relevant configuration displayed when there is no resource
+    /// 没有资源时展示的相关配置
+    public var emptyView: EmptyViewConfiguration = .init()
+    
+    public init() {
+        #if HXPICKER_ENABLE_CAMERA
+        cameraType = .custom(.init())
+        #else
+        cameraType = .system(.init())
+        #endif
+    }
+}
+
+extension PhotoListConfiguration {
+    public enum CameraType {
+        /// system camera
+        /// 系统相机
+        case system(SystemCameraConfiguration)
+        #if HXPICKER_ENABLE_CAMERA
+        /// The frame comes with a camera
+        /// 自带相机
+        case custom(CameraConfiguration)
+        #endif
+        
+        public var systemConfig: SystemCameraConfiguration? {
+            switch self {
+            case .system(let config):
+                return config
+            #if HXPICKER_ENABLE_CAMERA
+            default:
+                return nil
+            #endif
+            }
+        }
+        
+        #if HXPICKER_ENABLE_CAMERA
+        public var customConfig: CameraConfiguration? {
+            switch self {
+            case .custom(let config):
+                return config
+            default:
+                return nil
+            }
+        }
+        #endif
+    }
+}
+
+// MARK: Photo list camera Cell configuration class / 照片列表相机Cell配置类
+extension PhotoListConfiguration {
+    
+    public struct CameraCell {
+        
+        /// Allow camera preview
+        /// 允许相机预览
+        public var allowPreview: Bool = false
+        
+        /// 背景颜色
+        public var backgroundColor: UIColor? = "#f1f1f1".hx.color
+        
+        /// Background color in dark style
+        /// 暗黑风格下背景颜色
+        public var backgroundDarkColor: UIColor? = "#404040".hx.color
+        
+        /// camera icon
+        /// 相机图标
+        public var cameraImageName: String = "hx_picker_photoList_photograph"
+        
+        /// Camera icon in dark style / icon after successful camera preview
+        /// 暗黑风格下的相机图标 / 相机预览成功之后的图标
+        public var cameraDarkImageName: String = "hx_picker_photoList_photograph_white"
+        
+        public init() { }
+    }
+}
+
+extension PhotoListConfiguration {
+    
+    public struct LimitCell {
+        
+        /// 背景颜色
+        public var backgroundColor: UIColor? = "#f1f1f1".hx.color
+        
+        /// Background color in dark mode
+        /// 暗黑模式下的背景颜色
+        public var backgroundDarkColor: UIColor? = "#404040".hx.color
+        
+        /// 加号颜色
+        public var lineColor: UIColor = "#999999".hx.color
+        
+        /// plus color in dark mode
+        /// 加号暗黑模式下的颜色
+        public var lineDarkColor: UIColor = "#ffffff".hx.color
+        
+        /// The width of the two lines of the plus sign
+        /// 加号两条线的宽度
+        public var lineWidth: CGFloat = 4
+        
+        /// plus the length of the two lines
+        /// 加号两条线的长度
+        public var lineLength: CGFloat = 25
+        
+        /// text title
+        /// 文字标题
+        public var title: String? = "更多".hx.localized
+        
+        /// title color
+        /// 标题颜色
+        public var titleColor: UIColor = "#999999".hx.color
+        
+        /// The color of the title in dark mode
+        /// 标题暗黑模式下的颜色
+        public var titleDarkColor: UIColor = "#ffffff".hx.color
+        
+        /// title font
+        /// 标题字体
+        public var titleFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 14)
+        
+        public init() { }
+    }
+}
+
+extension PhotoListConfiguration {
+    
+    public struct AssetNumber {
+        public var textColor: UIColor = "#333333".hx.color
+        public var textDarkColor: UIColor = "#ffffff".hx.color
+        public var textFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 15)
+        public init() { }
+    }
+}

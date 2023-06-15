@@ -608,6 +608,9 @@ open class ImageCache {
                 if let data = try self.diskStorage.value(forKey: computedKey, extendingExpiration: options.diskCacheAccessExtendingExpiration) {
                     image = options.cacheSerializer.image(with: data, options: options)
                 }
+                if options.backgroundDecode {
+                    image = image?.kf.decoded(scale: options.scaleFactor)
+                }
                 callbackQueue.execute { completionHandler(.success(image)) }
             } catch let error as KingfisherError {
                 callbackQueue.execute { completionHandler(.failure(error)) }
@@ -815,6 +818,21 @@ open class ImageCache {
             }
         }
     }
+    
+    #if swift(>=5.5)
+    #if canImport(_Concurrency)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+    open var diskStorageSize: UInt {
+        get async throws {
+            try await withCheckedThrowingContinuation { continuation in
+                calculateDiskStorageSize { result in
+                    continuation.resume(with: result)
+                }
+            }
+        }
+    }
+    #endif
+    #endif
     
     /// Gets the cache path for the key.
     /// It is useful for projects with web view or anyone that needs access to the local file path.

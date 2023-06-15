@@ -6,7 +6,8 @@
 //
 
 import UIKit
-import HXPHPicker
+import HXPhotoPicker
+import Kingfisher
 
 class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     lazy var flowLayout: UICollectionViewFlowLayout = {
@@ -35,11 +36,19 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         view.backgroundColor = .white
         view.addSubview(collectionView)
         
+        let clearBtn = UIBarButtonItem.init(
+            title: "清空缓存",
+            style: .done,
+            target: self,
+            action: #selector(didClearButtonClick)
+        )
+        navigationItem.rightBarButtonItems = [clearBtn]
+        
         let networkVideoURL = URL.init(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/IMG_3385.MP4")!
         let networkVideoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL))
         previewAssets.append(networkVideoAsset)
         
-        let networkVideoURL1 = URL.init(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/picker_examle_video.mp4")!
+        let networkVideoURL1 = URL.init(string: "https://vd4.bdstatic.com/mda-niumk6kecunfhcqw/sc/cae_h264/1664464908581666807/mda-niumk6kecunfhcqw.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1671876955-0-0-d5348c926143621c0bab7727cb920cb7&bcevod_channel=searchbox_feed&pd=1&cd=0&pt=3&logid=2755343050&vid=4949060647341250402&abtest=106570_1-106693_2&klogid=2755343050")!
         let networkVideoAsset1 = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL1))
         previewAssets.append(networkVideoAsset1)
         
@@ -58,9 +67,37 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
             previewAssets.append(videoAsset)
         }
         
-        let networkVideoURL2 = URL.init(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/395826883-1-208.mp4")! // swiftlint:disable:this line_length
-        let networkVideoAsset2 = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL2))
-        previewAssets.append(networkVideoAsset2)
+       let localLivePhotoAsset = PhotoAsset(
+           localLivePhoto: .init(
+               imageURL: URL(string: "https://f7.baidu.com/it/u=500783997,1623136713&fm=222&app=108&f=PNG@s_0,w_800,h_1000,q_80,f_auto")!,
+               videoURL: URL(string: "https://vd3.bdstatic.com/mda-nadbjpk0hnxwyndu/720p/h264_delogo/1642148105214867253/mda-nadbjpk0hnxwyndu.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1671854745-0-0-fa941c9ac0a6fe5e56d7c6fd5739ff92&bcevod_channel=searchbox_feed&pd=1&cd=0&pt=3&logid=2145586357&vid=5423681428712102654&abtest=106570_1-106693_2&klogid=2145586357")!
+           )
+       )
+        previewAssets.append(localLivePhotoAsset)
+        
+        let networkImageAsset1 = PhotoAsset(NetworkImageAsset(
+            thumbnailURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.bugela.com%2Fuploads%2F2021%2F04%2F19%2F9c91167166fbb24fa92e2c1b42994bc6.jpg&refer=http%3A%2F%2Fimg.bugela.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=445ae11e5b013d9ed8f3e5ce513122fe")!,
+            originalURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2Fd0%2F72%2F0d%2Fd0720db0956708d6a9f0b387597be31f.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=1764652e87980463227cba3c6fb6fe25")!,
+            thumbnailLoadMode: .varied,
+            originalLoadMode: .alwaysThumbnail
+        ))
+        previewAssets.append(networkImageAsset1)
+        
+        let networkImageAsset2 = PhotoAsset(NetworkImageAsset(
+            thumbnailURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2F75%2Fdc%2F50%2F75dc50577d3d3d2bd5fd8db728e7bf77.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=d216c4dae3c9d5f6fee735ec7fbe8771")!,
+            originalURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic_source%2Fb0%2Fd1%2Ff3%2Fb0d1f35504e4106d48c84434f2298ada.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=4c1031ae2527d6b98a17481ca24058db")!,
+            thumbnailLoadMode: .varied,
+            originalLoadMode: .alwaysThumbnail
+        ))
+        previewAssets.append(networkImageAsset2)
+        
+        let networkImageAsset3 = PhotoAsset(NetworkImageAsset(
+            thumbnailURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2Fc9%2F08%2F4a%2Fc9084a6750e3293e6aeaf981f653b734.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=22adb67d04d85fa543daeb2f49de3671")!,
+            originalURL: URL(string: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.enterdesk.com%2Fedpic_source%2F3d%2F42%2F3e%2F3d423e3cb05d7edc35c38e3173af2a0d.jpg&refer=http%3A%2F%2Fup.enterdesk.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1674462223&t=5ccb00c0328b8ba0d522ac2e17e3a7bd")!,
+            thumbnailLoadMode: .alwaysThumbnail,
+            originalLoadMode: .alwaysThumbnail
+        ))
+        previewAssets.append(networkImageAsset3)
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -78,6 +115,12 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         )
     }
     
+    @objc func didClearButtonClick() {
+        PhotoTools.removeCache()
+        ImageCache.default.clearCache()
+        collectionView.reloadData()
+    }
+    
     // MARK: UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return previewAssets.count
@@ -90,8 +133,8 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
             withReuseIdentifier: "PhotoBrowserViewCellId",
             for: indexPath
         ) as! ResultViewCell
+        cell.deleteButton.isHidden = true
         cell.photoAsset = previewAssets[indexPath.item]
-        cell.hideDelete()
         return cell
     }
     // MARK: UICollectionViewDelegate
@@ -102,7 +145,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
             at: indexPath
         ) as? ResultViewCell
         
-        PhotoBrowser.show(
+        let browser = PhotoBrowser.show(
             previewAssets,
             pageIndex: indexPath.item,
             transitionalImage: cell?.photoView.image
@@ -114,6 +157,59 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
                 )
             )
         }
+        browser.addRightItem(title: "更多") { [weak self] browser in
+            self?.shwoMoreAction(browser)
+        }
+    }
+    
+    func shwoMoreAction(_ photoBrowser: PhotoBrowser) {
+        guard let photoAsset = photoBrowser.currentAsset else {
+            return
+        }
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        if let originalURL = photoAsset.networkImageAsset?.originalURL,
+           !originalURL.hx.isCache {
+            alert.addAction(.init(title: "查看原图", style: .default, handler: { [weak self] _ in
+                photoAsset.loadNetworkOriginalImage { [weak self] in
+                    guard let self = self else { return }
+                    if let index = self.previewAssets.firstIndex(of: $0) {
+                        self.collectionView.reloadItems(at: [.init(item: index, section: 0)])
+                    }else {
+                        self.collectionView.reloadData()
+                    }
+                }
+            }))
+        }
+        alert.addAction(
+            .init(
+                title: "保存",
+                style: .default,
+                handler: { alertAction in
+                    photoBrowser.view.hx.show(animated: true)
+                    photoAsset.saveToSystemAlbum { phAsset in
+                        photoBrowser.view.hx.hide(animated: true)
+                        if phAsset == nil {
+                            photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
+                        }else {
+                            photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
+                        }
+                    }
+                }
+            )
+        )
+        alert.addAction(.init(title: "取消", style: .cancel, handler: nil))
+        if UIDevice.isPad {
+            let pop = alert.popoverPresentationController
+            pop?.permittedArrowDirections = .any
+            pop?.sourceView = photoBrowser.view
+            pop?.sourceRect = CGRect(
+                x: photoBrowser.view.hx.width * 0.5,
+                y: photoBrowser.view.hx.height,
+                width: 0,
+                height: 0
+            )
+        }
+        photoBrowser.present(alert, animated: true, completion: nil)
     }
     
     @available(iOS 13.0, *)
@@ -168,7 +264,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         ) as? ResultViewCell
         animator.addCompletion { [weak self] in
             guard let self = self else { return }
-            PhotoBrowser.show(
+            let browser = PhotoBrowser.show(
                 self.previewAssets,
                 pageIndex: indexPath.item,
                 transitionalImage: cell?.photoView.image
@@ -179,6 +275,9 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
                         section: 0
                     )
                 )
+            }
+            browser.addRightItem(title: "更多") { [weak self] browser in
+                self?.shwoMoreAction(browser)
             }
         }
     }

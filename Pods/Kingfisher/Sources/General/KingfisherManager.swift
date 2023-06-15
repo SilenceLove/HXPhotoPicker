@@ -35,7 +35,6 @@ public typealias DownloadProgressBlock = ((_ receivedSize: Int64, _ totalSize: I
 
 /// Represents the result of a Kingfisher retrieving image task.
 public struct RetrieveImageResult {
-
     /// Gets the image object of this result.
     public let image: KFCrossPlatformImage
 
@@ -50,6 +49,17 @@ public struct RetrieveImageResult {
     /// When an alternative source loading happened, the `source` will be the replacing loading target, while the
     /// `originalSource` will be kept as the initial `source` which issued the image loading process.
     public let originalSource: Source
+    
+    /// Gets the data behind the result.
+    ///
+    /// If this result is from a network downloading (when `cacheType == .none`), calling this returns the downloaded
+    /// data. If the reuslt is from cache, it serializes the image with the given cache serializer in the loading option
+    /// and returns the result.
+    ///
+    /// - Note:
+    /// This can be a time-consuming action, so if you need to use the data for multiple times, it is suggested to hold
+    /// it and prevent keeping calling this too frequently.
+    public let data: () -> Data?
 }
 
 /// A struct that stores some related information of an `KingfisherError`. It provides some context information for
@@ -181,6 +191,7 @@ public class KingfisherManager {
     ///    it returns `nil` and invoke the `completionHandler` after the cached image retrieved. Otherwise, it
     ///    will try to load the `source`, store it in cache, then call `completionHandler`.
     ///
+    @discardableResult
     public func retrieveImage(
         with source: Source,
         options: KingfisherOptionsInfo? = nil,
@@ -419,7 +430,8 @@ public class KingfisherManager {
                 image: options.imageModifier?.modify(value.image) ?? value.image,
                 cacheType: .none,
                 source: source,
-                originalSource: context.originalSource
+                originalSource: context.originalSource,
+                data: {  value.originalData }
             )
             // Add image to cache.
             let targetCache = options.targetCache ?? self.cache
@@ -543,36 +555,59 @@ public class KingfisherManager {
         if validCache {
             targetCache.retrieveImage(forKey: key, options: options) { result in
                 guard let completionHandler = completionHandler else { return }
-                options.callbackQueue.execute {
-                    result.match(
-                        onSuccess: { cacheResult in
-                            let value: Result<RetrieveImageResult, KingfisherError>
-                            if var image = cacheResult.image {
-                                if image.kf.imageFrameCount != nil && image.kf.imageFrameCount != 1, let data = image.kf.animatedImageData {
-                                    // Always recreate animated image representation since it is possible to be loaded in different options.
-                                    // https://github.com/onevcat/Kingfisher/issues/1923
-                                    image = KingfisherWrapper.animatedImage(data: data, options: options.imageCreatingOptions) ?? .init()
-                                }
-                                if let modifier = options.imageModifier {
-                                    image = modifier.modify(image)
-                                }
-                                value = result.map {
-                                    RetrieveImageResult(
-                                        image: image,
-                                        cacheType: $0.cacheType,
-                                        source: source,
-                                        originalSource: context.originalSource
-                                    )
-                                }
-                            } else {
-                                value = .failure(KingfisherError.cacheError(reason: .imageNotExisting(key: key)))
-                            }
-                            completionHandler(value)
-                        },
-                        onFailure: { _ in
+                
+                // TODO: Optimize it when we can use async across all the project.
+                func checkResultImageAndCallback(_ inputImage: KFCrossPlatformImage) {
+                    var image = inputImage
+                    if image.kf.imageFrameCount != nil && image.kf.imageFrameCount != 1, let data = image.kf.animatedImageData {
+                        // Always recreate animated image representation since it is possible to be loaded in different options.
+                        // https://github.com/onevcat/Kingfisher/issues/1923
+                        image = KingfisherWrapper.animatedImage(data: data, options: options.imageCreatingOptions) ?? .init()
+                    }
+                    if let modifier = options.imageModifier {
+                        image = modifier.modify(image)
+                    }
+                    let value = result.map {
+                        RetrieveImageResult(
+                            image: image,
+                            cacheType: $0.cacheType,
+                            source: source,
+                            originalSource: context.originalSource,
+                            data: { options.cacheSerializer.data(with: image, original: nil) }
+                        )
+                    }
+                    completionHandler(value)
+                }
+                
+                result.match { cacheResult in
+                    options.callbackQueue.execute {
+                        guard let image = cacheResult.image else {
                             completionHandler(.failure(KingfisherError.cacheError(reason: .imageNotExisting(key: key))))
+                            return
                         }
-                    )
+                        
+                        if options.cacheSerializer.originalDataUsed {
+                            let processor = options.processor
+                            (options.processingQueue ?? self.processingQueue).execute {
+                                let item = ImageProcessItem.image(image)
+                                guard let processedImage = processor.process(item: item, options: options) else {
+                                    let error = KingfisherError.processorError(
+                                        reason: .processingFailed(processor: processor, item: item))
+                                    options.callbackQueue.execute { completionHandler(.failure(error)) }
+                                    return
+                                }
+                                options.callbackQueue.execute {
+                                    checkResultImageAndCallback(processedImage)
+                                }
+                            }
+                        } else {
+                            checkResultImageAndCallback(image)
+                        }
+                    }
+                } onFailure: { error in
+                    options.callbackQueue.execute {
+                        completionHandler(.failure(KingfisherError.cacheError(reason: .imageNotExisting(key: key))))
+                    }
                 }
             }
             return true
@@ -624,11 +659,13 @@ public class KingfisherManager {
                             let coordinator = CacheCallbackCoordinator(
                                 shouldWaitForCache: options.waitForCache, shouldCacheOriginal: false)
 
+                            let image = options.imageModifier?.modify(processedImage) ?? processedImage
                             let result = RetrieveImageResult(
-                                image: options.imageModifier?.modify(processedImage) ?? processedImage,
+                                image: image,
                                 cacheType: .none,
                                 source: source,
-                                originalSource: context.originalSource
+                                originalSource: context.originalSource,
+                                data: { options.cacheSerializer.data(with: processedImage, original: nil) }
                             )
 
                             targetCache.store(

@@ -6,11 +6,12 @@
 //
 
 import UIKit
-import HXPHPicker
+import HXPhotoPicker
 
 class PickerColorConfigurationViewController: UITableViewController {
     
-    let config: PickerConfiguration
+    var config: PickerConfiguration
+    var didDoneHandler: ((PickerConfiguration) -> Void)?
     var currentSelectedIndexPath: IndexPath?
     init(config: PickerConfiguration) {
         self.config = config
@@ -42,6 +43,7 @@ class PickerColorConfigurationViewController: UITableViewController {
     }
     
     @objc func backClick() {
+        didDoneHandler?(config)
         dismiss(animated: true, completion: nil)
     }
     

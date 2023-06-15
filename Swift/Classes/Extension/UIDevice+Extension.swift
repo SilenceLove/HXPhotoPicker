@@ -9,21 +9,35 @@ import UIKit
 
 extension UIDevice {
     class var isPortrait: Bool {
-        let orientation = UIApplication.shared.statusBarOrientation
-        if  orientation == .landscapeLeft ||
-            orientation == .landscapeRight {
+        if isPad {
+            return true
+        }
+        if  statusBarOrientation == .landscapeLeft ||
+                statusBarOrientation == .landscapeRight {
             return false
         }
         return true
     }
+    class var statusBarOrientation: UIInterfaceOrientation {
+        UIApplication.shared.statusBarOrientation
+    }
     class var navigationBarHeight: CGFloat {
-        statusBarHeight + 44
+        if isPad {
+            if #available(iOS 12, *) {
+                return statusBarHeight + 50
+            }
+        }
+        return statusBarHeight + 44
+    }
+    class var generalStatusBarHeight: CGFloat {
+        isAllIPhoneX ? 44 : 20
     }
     class var statusBarHeight: CGFloat {
         let statusBarHeight: CGFloat
         let window = UIApplication.shared.windows.first
-        if #available(iOS 13.0, *) {
-            statusBarHeight = (window?.windowScene?.statusBarManager?.statusBarFrame.size.height)!
+        if #available(iOS 13.0, *),
+           let height = window?.windowScene?.statusBarManager?.statusBarFrame.size.height {
+            statusBarHeight = height
         } else {
             statusBarHeight = UIApplication.shared.statusBarFrame.size.height
         }
@@ -33,98 +47,47 @@ extension UIDevice {
         if isAllIPhoneX {
             return statusBarHeight
         }
-        return 0
+        return safeAreaInsets.top
     }
     class var leftMargin: CGFloat {
-        if isAllIPhoneX {
-            if !isPortrait {
-                return 44
-            }
-        }
-        return 0
+        safeAreaInsets.left
     }
     class var rightMargin: CGFloat {
-        if isAllIPhoneX {
-            if !isPortrait {
-                return 44
-            }
-        }
-        return 0
+        safeAreaInsets.right
     }
     class var bottomMargin: CGFloat {
-        if isAllIPhoneX {
-            if isPortrait {
-                return 34
-            }else {
-                return 21
-            }
-        }
-        return 0
+        safeAreaInsets.bottom
     }
     class var isPad: Bool {
         current.userInterfaceIdiom == .pad
     }
     class var isAllIPhoneX: Bool {
-        isIPhoneX ||
-            isIPhoneXR ||
-            isIPhoneXsMax ||
-            isIPhoneXsMax ||
-            isIPhoneTwelveMini ||
-            isIPhoneTwelve ||
-            isIPhoneTwelveProMax
-    }
-    class var isIPhoneX: Bool {
-        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
-            if __CGSizeEqualToSize(CGSize(width: 1125, height: 2436), UIScreen.main.currentMode!.size) {
-                return true
-            }
+        let safeArea = safeAreaInsets
+        let margin: CGFloat
+        if isPortrait {
+            margin = safeArea.bottom
+        }else {
+            margin = safeArea.left
         }
-        return false
+        return margin != 0
     }
-    class var isIPhoneXR: Bool {
-        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
-            if __CGSizeEqualToSize(CGSize(width: 828, height: 1792), UIScreen.main.currentMode!.size) {
-                return true
-            }
+    
+    class var safeAreaInsets: UIEdgeInsets {
+        if #available(iOS 11.0, *) {
+            return UIApplication._keyWindow?.safeAreaInsets ?? .zero
         }
-        return false
+        return .zero
     }
-    class var isIPhoneXsMax: Bool {
-        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
-            if __CGSizeEqualToSize(CGSize(width: 1242, height: 2688), UIScreen.main.currentMode!.size) {
-                return true
-            }
+}
+
+extension UIApplication {
+    class var _keyWindow: UIWindow? {
+        var window: UIWindow?
+        if #available(iOS 13.0, *) {
+            window = shared.windows.filter({ $0.isKeyWindow }).last
+        } else {
+            window = shared.delegate?.window ?? shared.keyWindow
         }
-        return false
-    }
-    class var isIPhoneTwelveMini: Bool {
-        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
-            if __CGSizeEqualToSize(CGSize(width: 1080, height: 2340), UIScreen.main.currentMode!.size) {
-                return true
-            }
-        }
-        return false
-    }
-    class var isIPhoneTwelve: Bool {
-        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
-            if __CGSizeEqualToSize(CGSize(width: 1170, height: 2532), UIScreen.main.currentMode!.size) {
-                return true
-            }
-        }
-        return false
-    }
-    class var isIPhoneTwelveProMax: Bool {
-        if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
-            if __CGSizeEqualToSize(CGSize(width: 1284, height: 2778), UIScreen.main.currentMode!.size) {
-                return true
-            }
-        }
-        return false
+        return window
     }
 }
