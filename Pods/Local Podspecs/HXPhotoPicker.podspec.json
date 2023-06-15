@@ -10,6 +10,9 @@
   "authors": {
     "SilenceLove": "294005139@qq.com"
   },
+  "swift_versions": [
+    "5.0"
+  ],
   "platforms": {
     "ios": "12.0"
   },
@@ -188,5 +191,6 @@
         ]
       }
     }
-  ]
+  ],
+  "swift_version": "5.0"
 }

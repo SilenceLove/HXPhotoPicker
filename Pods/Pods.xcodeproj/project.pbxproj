@@ -503,7 +503,7 @@
 		3206E34EFB98B2477F97FE05F868669A /* HXPhotoPicker-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "HXPhotoPicker-dummy.m"; sourceTree = "<group>"; };
 		32CD83D234A502A60BF922E87E411FE0 /* EditorMusicView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditorMusicView.swift; sourceTree = "<group>"; };
 		3357358C9C9AE3A35EED6268A7B9F3DC /* NotAuthorizedConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotAuthorizedConfiguration.swift; sourceTree = "<group>"; };
-		336F4F6B999E09905C6D3CD9076765AB /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		336F4F6B999E09905C6D3CD9076765AB /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
 		3643A59C25EE56B63DA434CA8F18CD8D /* Runtime.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Runtime.swift; path = Sources/Utility/Runtime.swift; sourceTree = "<group>"; };
 		36B9668FFF79F34C1A986026C2846137 /* EditorView+UIImage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "EditorView+UIImage.swift"; sourceTree = "<group>"; };
 		36CD326D4E5132CF1176E961246E20B5 /* EditorMosaicToolView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditorMosaicToolView.swift; sourceTree = "<group>"; };
@@ -621,7 +621,7 @@
 		78578F3F6D6E3A781BEB56D70FF2F40C /* LocalAsset.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocalAsset.swift; sourceTree = "<group>"; };
 		78FB9F551E5EA060481F5D7C75932220 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
 		7915E8755F56624DD14910469D3DE9B0 /* Core+UIImage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Core+UIImage.swift"; sourceTree = "<group>"; };
-		7935E108482D98C377F2C9D91C4A0B78 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = HXPhotoPicker.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		7935E108482D98C377F2C9D91C4A0B78 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = HXPhotoPicker.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		7940E5347C4099F4ADEBB2BB138C3E9F /* AlbumView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
 		7A32D58305F3DD108BF76A2563F71427 /* PhotoAsset+FileSize.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+FileSize.swift"; sourceTree = "<group>"; };
 		7B2A67AE509D51933AF9451D7EA8C2DA /* ImageContext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageContext.swift; path = Sources/SwiftUI/ImageContext.swift; sourceTree = "<group>"; };
@@ -683,7 +683,7 @@
 		9BA27E90DF48C2DEBFE5009452C747F8 /* AssetManager+AVAssetExportSession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AssetManager+AVAssetExportSession.swift"; sourceTree = "<group>"; };
 		9C04449DDF3AB31BE3D0D8EBD6941C72 /* Camera+PhotoTools.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Camera+PhotoTools.swift"; sourceTree = "<group>"; };
 		9C305AABCB43E404E19A1F77C127DA60 /* EditorAdjusterView+Rotate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "EditorAdjusterView+Rotate.swift"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9E6EFDFC031DA9F9977769C102296FE1 /* CustomLanguage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomLanguage.swift; sourceTree = "<group>"; };
 		9EF472E03B3139020B3B2188B824222E /* KFImage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KFImage.swift; path = Sources/SwiftUI/KFImage.swift; sourceTree = "<group>"; };
 		9FF9B841F4CF104FFFEB0534C18D90AF /* ImageProgressive.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageProgressive.swift; path = Sources/Image/ImageProgressive.swift; sourceTree = "<group>"; };
@@ -720,7 +720,7 @@
 		AFECAA488AB06CFAEEAE43CE00FB9038 /* EditorChartletViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditorChartletViewController.swift; sourceTree = "<group>"; };
 		B001CAEEE24D3F00343BCC3566BED14C /* PhotoPickerView+Editor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "PhotoPickerView+Editor.swift"; sourceTree = "<group>"; };
 		B0193D4AA185CB19DD4E8AC56103007C /* PhotoAsset+Request.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "PhotoAsset+Request.swift"; sourceTree = "<group>"; };
-		B04FB421C6AC2E001AE601D0AB99B926 /* PassThrough.metal */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.metal; path = PassThrough.metal; sourceTree = "<group>"; };
+		B04FB421C6AC2E001AE601D0AB99B926 /* PassThrough.metal */ = {isa = PBXFileReference; includeInIndex = 1; path = PassThrough.metal; sourceTree = "<group>"; };
 		B20DD62BC58BBAB197F3F2B970353299 /* CameraControllerProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CameraControllerProtocol.swift; sourceTree = "<group>"; };
 		B2293ED5A8D38CDD2AAE20E08262F76B /* EditorMaskView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditorMaskView.swift; sourceTree = "<group>"; };
 		B3845AB1EDD413E5E1739EC24C3925EE /* ExtensionHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtensionHelpers.swift; path = Sources/Utility/ExtensionHelpers.swift; sourceTree = "<group>"; };
@@ -951,6 +951,7 @@
 				726A5020C7BDD5DE9CD4EA139A4FB561 /* WKInterfaceImage+Kingfisher.swift */,
 				6CD0DF5BF333895143400CF4A3757D9F /* Support Files */,
 			);
+			name = Kingfisher;
 			path = Kingfisher;
 			sourceTree = "<group>";
 		};
@@ -1306,6 +1307,7 @@
 				1E4E4BD328499AB285F716B31F735F33 /* PreviewVideoControlViewCell.swift */,
 				99EF2071EFAC6A56F48969F70FB1D679 /* PreviewVideoViewCell.swift */,
 			);
+			name = Cell;
 			path = Cell;
 			sourceTree = "<group>";
 		};
@@ -1336,6 +1338,7 @@
 				CF70195211D32C4D494329F71C33FEBD /* WindowViewController.swift */,
 				64B781DC476EB7EE12F539339AB31D4A /* Support Files */,
 			);
+			name = "GDPerformanceView-Swift";
 			path = "GDPerformanceView-Swift";
 			sourceTree = "<group>";
 		};
@@ -2698,7 +2701,8 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				SYMROOT = "${SRCROOT}/../build";
 			};

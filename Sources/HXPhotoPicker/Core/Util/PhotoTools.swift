@@ -400,15 +400,22 @@ public struct PhotoTools {
             )
             UIGraphicsBeginImageContext(size)
             resultImage.draw(in: CGRect(origin: .zero, size: size))
-            guard let image = UIGraphicsGetImageFromCurrentImageContext(),
-                  let imagedata = image.jpegData(compressionQuality: 1)
-            else {
+            guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
+                UIGraphicsEndImageContext()
+                return data
+            }
+            let imageData: Data
+            if let data = image.pngData() {
+                imageData = data
+            }else if let data = image.jpegData(compressionQuality: 1) {
+                imageData = data
+            }else {
                 UIGraphicsEndImageContext()
                 return data
             }
             UIGraphicsEndImageContext()
             resultImage = image
-            data = imagedata
+            data = imageData
         }
         return data
     }

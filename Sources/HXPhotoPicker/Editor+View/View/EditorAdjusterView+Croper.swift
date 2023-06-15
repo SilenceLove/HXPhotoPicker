@@ -408,17 +408,16 @@ extension EditorAdjusterView {
     }
     
     fileprivate func getCompressionQuality(_ dataCount: CGFloat) -> CGFloat? {
-        var compressionQuality: CGFloat?
         if dataCount > 30000000 {
-            compressionQuality = 25000000 / dataCount
+            return 25000000 / dataCount
         }else if dataCount > 15000000 {
-            compressionQuality = 10000000 / dataCount
+            return 10000000 / dataCount
         }else if dataCount > 10000000 {
-            compressionQuality = 6000000 / dataCount
+            return 6000000 / dataCount
         }else if dataCount > 3000000 {
-            compressionQuality = 3000000 / dataCount
+            return 3000000 / dataCount
         }
-        return compressionQuality
+        return nil
     }
     
     fileprivate func compressImageData(

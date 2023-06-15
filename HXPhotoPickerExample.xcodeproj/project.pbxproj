@@ -2258,37 +2258,37 @@
 		D368794C2A399B8C00E70910 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				D368794D2A399B8C00E70910 /* EditorVideoPlayerView.swift */,
-				D368794E2A399B8C00E70910 /* EditorAdjusterView+ScrollView.swift */,
-				D368794F2A399B8C00E70910 /* EditorMaskView.swift */,
-				D36879502A399B8C00E70910 /* EditorView+Public.swift */,
-				D36879512A399B8C00E70910 /* EditorView+ScrollView.swift */,
-				D36879522A399B8C00E70910 /* EditorAdjusterView+Video.swift */,
-				D36879532A399B8C00E70910 /* EditorControlView.swift */,
-				D36879542A399B8C00E70910 /* EditorAdjusterView+ScreenRotation.swift */,
-				D36879552A399B8C00E70910 /* EditorContentView.swift */,
-				D36879562A399B8C00E70910 /* EditorAdjusterView+Croper.swift */,
-				D36879572A399B8C00E70910 /* EditorAdjusterViewProtocol.swift */,
-				D36879582A399B8C00E70910 /* EditorAdjusterView+ContentView.swift */,
-				D36879592A399B8C00E70910 /* EditorStickersView.swift */,
-				D368795A2A399B8C00E70910 /* EditorMosaicView.swift */,
-				D368795B2A399B8C00E70910 /* EditorDrawView.swift */,
 				D368795C2A399B8C00E70910 /* EditorAdjusterView.swift */,
-				D368795D2A399B8C00E70910 /* EditorStickersTrashView.swift */,
-				D368795E2A399B8C00E70910 /* EditorStickersContentView.swift */,
-				D368795F2A399B8C00E70910 /* EditorView+AdjusterView.swift */,
-				D36879602A399B8C00E70910 /* EditorStickersItemView.swift */,
-				D36879612A399B8C00E70910 /* EditorView.swift */,
-				D36879622A399B8C00E70910 /* EditorAudioAnimationView.swift */,
-				D36879632A399B8C00E70910 /* EditorFrameView+VideoPlay.swift */,
-				D36879642A399B8C00E70910 /* EditorViewProtocol.swift */,
-				D36879652A399B8C00E70910 /* EditorFrameView+Control.swift */,
+				D36879582A399B8C00E70910 /* EditorAdjusterView+ContentView.swift */,
+				D36879562A399B8C00E70910 /* EditorAdjusterView+Croper.swift */,
 				D36879662A399B8C00E70910 /* EditorAdjusterView+Edit.swift */,
 				D36879672A399B8C00E70910 /* EditorAdjusterView+FrameView.swift */,
 				D36879682A399B8C00E70910 /* EditorAdjusterView+Mirror.swift */,
 				D36879692A399B8C00E70910 /* EditorAdjusterView+Rotate.swift */,
+				D36879542A399B8C00E70910 /* EditorAdjusterView+ScreenRotation.swift */,
+				D368794E2A399B8C00E70910 /* EditorAdjusterView+ScrollView.swift */,
+				D36879522A399B8C00E70910 /* EditorAdjusterView+Video.swift */,
+				D36879572A399B8C00E70910 /* EditorAdjusterViewProtocol.swift */,
+				D36879622A399B8C00E70910 /* EditorAudioAnimationView.swift */,
+				D36879552A399B8C00E70910 /* EditorContentView.swift */,
+				D36879532A399B8C00E70910 /* EditorControlView.swift */,
+				D368795B2A399B8C00E70910 /* EditorDrawView.swift */,
 				D368796A2A399B8C00E70910 /* EditorFrameView.swift */,
+				D36879652A399B8C00E70910 /* EditorFrameView+Control.swift */,
+				D36879632A399B8C00E70910 /* EditorFrameView+VideoPlay.swift */,
+				D368794F2A399B8C00E70910 /* EditorMaskView.swift */,
+				D368795A2A399B8C00E70910 /* EditorMosaicView.swift */,
+				D368795E2A399B8C00E70910 /* EditorStickersContentView.swift */,
+				D36879602A399B8C00E70910 /* EditorStickersItemView.swift */,
+				D368795D2A399B8C00E70910 /* EditorStickersTrashView.swift */,
+				D36879592A399B8C00E70910 /* EditorStickersView.swift */,
+				D368794D2A399B8C00E70910 /* EditorVideoPlayerView.swift */,
+				D36879612A399B8C00E70910 /* EditorView.swift */,
+				D368795F2A399B8C00E70910 /* EditorView+AdjusterView.swift */,
 				D368796B2A399B8C00E70910 /* EditorView+GestureRecognizer.swift */,
+				D36879502A399B8C00E70910 /* EditorView+Public.swift */,
+				D36879512A399B8C00E70910 /* EditorView+ScrollView.swift */,
+				D36879642A399B8C00E70910 /* EditorViewProtocol.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3306,6 +3306,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = "";
 			};
 			name = Debug;
 		};
@@ -3359,6 +3360,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
