@@ -1174,7 +1174,6 @@
 		D36879B52A39A7C500E70910 /* SwiftPickerResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftPickerResult.swift; sourceTree = "<group>"; };
 		D36879B72A39A7EB00E70910 /* SwiftAssetURLResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftAssetURLResult.swift; sourceTree = "<group>"; };
 		D36879B92A39AF5E00E70910 /* SwiftPickerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftPickerConfiguration.swift; sourceTree = "<group>"; };
-		D3687A782A39B58800E70910 /* HXPhotoPickerFramework copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HXPhotoPickerFramework copy-Info.plist"; path = "/Users/hongxin/Desktop/HXPhotoPicker/HXPhotoPickerFramework copy-Info.plist"; sourceTree = "<absolute>"; };
 		D36F08D82A3AAD720038C119 /* SwiftPhotoAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftPhotoAsset.swift; sourceTree = "<group>"; };
 		D634D25CE084AB88B72380DC /* Pods-HXPHPickerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPHPickerExample.release.xcconfig"; path = "Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample.release.xcconfig"; sourceTree = "<group>"; };
 		F4A5D2707D7E9D74D09D7978 /* Pods_HXPHPickerExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HXPHPickerExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1646,7 +1645,6 @@
 				7B7E3E771E4AACD1002234EE /* Products */,
 				7B752DE62372ADEF00580F35 /* Frameworks */,
 				4577D5A9522A169F69B55034 /* Pods */,
-				D3687A782A39B58800E70910 /* HXPhotoPickerFramework copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
