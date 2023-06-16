@@ -127,7 +127,7 @@ pod 'HXPhotoPicker-Lite/Editor'
 pod 'HXPhotoPicker-Lite/Camera'
 
 v4.0以下的Objc版本
-pod 'HXPhotoPickerObjc'
+pod 'HXPhotoPickerObjC'
 ```
 
 ### 准备工作
