@@ -19,7 +19,7 @@
         if (!path) {
             NSURL *associateBundleURL = [[NSBundle mainBundle] URLForResource:@"Frameworks" withExtension:nil];
             if (associateBundleURL) {
-                associateBundleURL = [associateBundleURL URLByAppendingPathComponent:@"HXPhotoPicker"];
+                associateBundleURL = [associateBundleURL URLByAppendingPathComponent:@"HXPhotoPickerObjC"];
                 associateBundleURL = [associateBundleURL URLByAppendingPathExtension:@"framework"];
                 NSBundle *associateBunle = [NSBundle bundleWithURL:associateBundleURL];
                 path = [associateBunle pathForResource:@"HXPhotoPicker" ofType:@"bundle"];
