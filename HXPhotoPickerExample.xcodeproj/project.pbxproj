@@ -350,6 +350,7 @@
 		7BD52F7B24FE258200AE3D7C /* HXPhotoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65AF2487AD5B00077EE1 /* HXPhotoConfiguration.m */; };
 		7BD52F7C24FE258200AE3D7C /* HXPhotoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65DA2487AD5B00077EE1 /* HXPhotoManager.m */; };
 		7BD52F7D24FE258200AE3D7C /* HXPhotoTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E65D92487AD5B00077EE1 /* HXPhotoTools.m */; };
+		D30ED3EE2A3C12EF0074525C /* HXPhotoPickerObjc.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D30ED3ED2A3C12EF0074525C /* HXPhotoPickerObjc.podspec */; };
 		D36874542A39744300E70910 /* picker_example_image.JPG in Resources */ = {isa = PBXBuildFile; fileRef = D368740D2A39744200E70910 /* picker_example_image.JPG */; };
 		D36874552A39744300E70910 /* picker_example_image.JPG in Resources */ = {isa = PBXBuildFile; fileRef = D368740D2A39744200E70910 /* picker_example_image.JPG */; };
 		D36874562A39744300E70910 /* livephoto_image.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = D368740E2A39744200E70910 /* livephoto_image.jpeg */; };
@@ -814,6 +815,7 @@
 		7BE8DFD624C68B2800306042 /* HXPhotoViewCellCustomProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HXPhotoViewCellCustomProtocol.h; sourceTree = "<group>"; };
 		BD48C3E6E6347457D779C67B /* Pods_HXPhotoPickerExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HXPhotoPickerExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C629E186D5E5B5CCE9BB584A /* Pods-HXPHPickerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HXPHPickerExample.debug.xcconfig"; path = "Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample.debug.xcconfig"; sourceTree = "<group>"; };
+		D30ED3ED2A3C12EF0074525C /* HXPhotoPickerObjc.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HXPhotoPickerObjc.podspec; sourceTree = "<group>"; };
 		D368740D2A39744200E70910 /* picker_example_image.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = picker_example_image.JPG; sourceTree = "<group>"; };
 		D368740E2A39744200E70910 /* livephoto_image.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = livephoto_image.jpeg; sourceTree = "<group>"; };
 		D368740F2A39744200E70910 /* hx_sticker_yuanqimanman.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hx_sticker_yuanqimanman.png; sourceTree = "<group>"; };
@@ -1636,6 +1638,7 @@
 			children = (
 				D36874D22A39749D00E70910 /* HXPhotoPicker.podspec */,
 				D36874FF2A399AC700E70910 /* HXPhotoPicker-Lite.podspec */,
+				D30ED3ED2A3C12EF0074525C /* HXPhotoPickerObjc.podspec */,
 				7B64186024F76C67003A5723 /* README.md */,
 				D36875022A399ACD00E70910 /* README_OC.md */,
 				D36874D52A39760500E70910 /* Documentation */,
@@ -2351,23 +2354,23 @@
 		D36879782A399B8C00E70910 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				D36879792A399B8C00E70910 /* EditorViewController+Music.swift */,
-				D368797A2A399B8C00E70910 /* EditorMusicListViewController.swift */,
-				D368797B2A399B8C00E70910 /* EditorViewController+Filters.swift */,
-				D368797C2A399B8C00E70910 /* EditorStickerTextViewController.swift */,
-				D368797D2A399B8C00E70910 /* EditorViewController+LoadAsset.swift */,
-				D368797E2A399B8C00E70910 /* EditorViewController+VideoControl.swift */,
-				D368797F2A399B8C00E70910 /* EditorViewController+Ratio.swift */,
-				D36879802A399B8C00E70910 /* EditorViewController+EditorView.swift */,
-				D36879812A399B8C00E70910 /* EditorViewController+Text.swift */,
-				D36879822A399B8C00E70910 /* EditorViewController+Mosaic.swift */,
 				D36879832A399B8C00E70910 /* EditorChartletViewController.swift */,
 				D36879842A399B8C00E70910 /* EditorMaskListViewController.swift */,
+				D368797A2A399B8C00E70910 /* EditorMusicListViewController.swift */,
+				D368797C2A399B8C00E70910 /* EditorStickerTextViewController.swift */,
 				D36879852A399B8C00E70910 /* EditorViewController.swift */,
-				D36879862A399B8C00E70910 /* EditorViewController+Chartlet.swift */,
 				D36879872A399B8C00E70910 /* EditorViewController+Brush.swift */,
-				D36879882A399B8C00E70910 /* EditorViewControllerDelegate.swift */,
+				D36879862A399B8C00E70910 /* EditorViewController+Chartlet.swift */,
+				D36879802A399B8C00E70910 /* EditorViewController+EditorView.swift */,
+				D368797B2A399B8C00E70910 /* EditorViewController+Filters.swift */,
+				D368797D2A399B8C00E70910 /* EditorViewController+LoadAsset.swift */,
+				D36879822A399B8C00E70910 /* EditorViewController+Mosaic.swift */,
+				D36879792A399B8C00E70910 /* EditorViewController+Music.swift */,
+				D368797F2A399B8C00E70910 /* EditorViewController+Ratio.swift */,
+				D36879812A399B8C00E70910 /* EditorViewController+Text.swift */,
 				D36879892A399B8C00E70910 /* EditorViewController+ToolsView.swift */,
+				D368797E2A399B8C00E70910 /* EditorViewController+VideoControl.swift */,
+				D36879882A399B8C00E70910 /* EditorViewControllerDelegate.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -2748,6 +2751,7 @@
 				D36874C42A39744300E70910 /* 天外来物 in Resources */,
 				D36874F52A39760500E70910 /* bmc_qr.png in Resources */,
 				D36874D02A39744300E70910 /* livephoto_video.mp4 in Resources */,
+				D30ED3EE2A3C12EF0074525C /* HXPhotoPickerObjc.podspec in Resources */,
 				7B08596E24FA58DF00E93091 /* WxMomentViewController.xib in Resources */,
 				7BC3715C2505D25000E2D05C /* HXPhotoEditTextView.xib in Resources */,
 				7B08597024FA58DF00E93091 /* Demo4ViewController.xib in Resources */,
