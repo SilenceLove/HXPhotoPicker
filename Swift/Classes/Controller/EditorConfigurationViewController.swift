@@ -15,7 +15,7 @@ class EditorConfigurationViewController: UITableViewController {
     var didDoneHandler: ((EditorConfiguration) -> Void)?
     
     var showOpenEditorButton: Bool = true
-    let videoURL: URL = URL.init(fileURLWithPath: Bundle.main.path(forResource: "livephoto_video", ofType: "mp4")!)
+    let videoURL: URL = URL.init(fileURLWithPath: Bundle.main.path(forResource: "c81", ofType: "mp4")!)
     
     var editedResult: EditedResult?
     var editorType = 0

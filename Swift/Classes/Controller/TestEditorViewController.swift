@@ -489,7 +489,7 @@ class TestEditorViewController: BaseViewController {
                         self.audioPlayers.append(audioPlayer)
                     }
                     let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
-                    let fileNames = ["少女的祈祷", "爱你", "嘉宾", "时光正好", "世间美好与你环环相扣", "天外来物", "无赖", "野孩子"]
+                    let fileNames = ["少女的祈祷", "世间美好与你环环相扣", "天外来物", "无赖", "野孩子"]
                     for fileName in fileNames {
                         alert.addAction(.init(title: fileName, style: .default, handler: {
                             guard let title = $0.title else {

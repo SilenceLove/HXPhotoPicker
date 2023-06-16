@@ -58,7 +58,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         previewAssets.append(networkImageAsset)
         #endif
         
-        if let filePath = Bundle.main.path(forResource: "picker_example_gif_image", ofType: "GIF") {
+        if let filePath = Bundle.main.path(forResource: "IMG_0168", ofType: "GIF") {
             let gifAsset = PhotoAsset.init(localImageAsset: .init(imageURL: URL.init(fileURLWithPath: filePath)))
             previewAssets.append(gifAsset)
         }

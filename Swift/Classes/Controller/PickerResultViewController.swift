@@ -178,7 +178,7 @@ class PickerResultViewController: UIViewController,
             localAssetArray.append(networkImageAsset)
             #endif
             
-            if let filePath = Bundle.main.path(forResource: "picker_example_gif_image", ofType: "GIF") {
+            if let filePath = Bundle.main.path(forResource: "IMG_0168", ofType: "GIF") {
                 let gifAsset = PhotoAsset.init(localImageAsset: .init(imageURL: URL.init(fileURLWithPath: filePath)))
                 selectedAssets.append(gifAsset)
                 localAssetArray.append(gifAsset)
@@ -198,7 +198,7 @@ class PickerResultViewController: UIViewController,
             localAssetArray.append(networkVideoAsset1)
             
             let livePhoto_image = Bundle.main.path(forResource: "livephoto_image", ofType: "jpeg")!
-            let livePhoto_video = Bundle.main.path(forResource: "livephoto_video", ofType: "mp4")!
+            let livePhoto_video = Bundle.main.path(forResource: "c81", ofType: "mp4")!
             let localLivePhotoAsset = PhotoAsset(
                 localLivePhoto: .init(
                     imageURL: .init(fileURLWithPath: livePhoto_image),
