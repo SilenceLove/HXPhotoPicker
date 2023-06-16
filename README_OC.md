@@ -714,6 +714,7 @@ frame.size.height 就是 HXPhotoView 的正确高度
   <summary><strong>最近更新</strong></summary>
    
 ```
+- v3.3.3　-　区分ObjC版本
 - v3.3.2　-　适配iOS16、iPhone14Pro/ProMax，日语本地化文件完善，修复iOS9.3.5 获取fileSize崩溃
 - v3.3.1　-　修复相册权限为`选择部分`，照片列表未添加相机cell时,滑动到最后一个然后返回会崩溃问题
 - v3.3.0　-　HXPhotoModel添加压缩视频方法
