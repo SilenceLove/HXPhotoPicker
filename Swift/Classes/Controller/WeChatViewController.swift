@@ -119,7 +119,7 @@ extension WeChatViewController: PhotoPickerControllerDelegate {
 
 class WeChatViewCell: UITableViewCell {
     lazy var avatarView: UIImageView = {
-        let view = UIImageView(image: UIImage(named: "wx_head_icon"))
+        let view = UIImageView(image: UIImage(named: "wx_bg_image"))
         view.layer.cornerRadius = 5
         view.layer.masksToBounds = true
         view.contentMode = .scaleAspectFill

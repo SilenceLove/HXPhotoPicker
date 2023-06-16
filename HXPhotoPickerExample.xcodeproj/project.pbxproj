@@ -263,26 +263,10 @@
 		D36874AD2A39744300E70910 /* ConfigurationViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D368743F2A39744200E70910 /* ConfigurationViewCell.swift */; };
 		D36874AE2A39744300E70910 /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36874402A39744200E70910 /* CustomPickerCellView.swift */; };
 		D36874AF2A39744300E70910 /* CustomPickerCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36874402A39744200E70910 /* CustomPickerCellView.swift */; };
-		D36874B02A39744300E70910 /* 野孩子.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874422A39744200E70910 /* 野孩子.mp3 */; };
-		D36874B12A39744300E70910 /* 野孩子.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874422A39744200E70910 /* 野孩子.mp3 */; };
-		D36874B42A39744300E70910 /* 无赖.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874442A39744200E70910 /* 无赖.mp3 */; };
-		D36874B52A39744300E70910 /* 无赖.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874442A39744200E70910 /* 无赖.mp3 */; };
-		D36874B82A39744300E70910 /* 少女的祈祷 in Resources */ = {isa = PBXBuildFile; fileRef = D36874462A39744200E70910 /* 少女的祈祷 */; };
-		D36874B92A39744300E70910 /* 少女的祈祷 in Resources */ = {isa = PBXBuildFile; fileRef = D36874462A39744200E70910 /* 少女的祈祷 */; };
-		D36874BE2A39744300E70910 /* 天外来物.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874492A39744200E70910 /* 天外来物.mp3 */; };
-		D36874BF2A39744300E70910 /* 天外来物.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874492A39744200E70910 /* 天外来物.mp3 */; };
 		D36874C02A39744300E70910 /* 世间美好与你环环相扣 in Resources */ = {isa = PBXBuildFile; fileRef = D368744A2A39744200E70910 /* 世间美好与你环环相扣 */; };
 		D36874C12A39744300E70910 /* 世间美好与你环环相扣 in Resources */ = {isa = PBXBuildFile; fileRef = D368744A2A39744200E70910 /* 世间美好与你环环相扣 */; };
-		D36874C42A39744300E70910 /* 天外来物 in Resources */ = {isa = PBXBuildFile; fileRef = D368744C2A39744200E70910 /* 天外来物 */; };
-		D36874C52A39744300E70910 /* 天外来物 in Resources */ = {isa = PBXBuildFile; fileRef = D368744C2A39744200E70910 /* 天外来物 */; };
-		D36874C62A39744300E70910 /* 野孩子 in Resources */ = {isa = PBXBuildFile; fileRef = D368744D2A39744200E70910 /* 野孩子 */; };
-		D36874C72A39744300E70910 /* 野孩子 in Resources */ = {isa = PBXBuildFile; fileRef = D368744D2A39744200E70910 /* 野孩子 */; };
-		D36874C82A39744300E70910 /* 无赖 in Resources */ = {isa = PBXBuildFile; fileRef = D368744E2A39744200E70910 /* 无赖 */; };
-		D36874C92A39744300E70910 /* 无赖 in Resources */ = {isa = PBXBuildFile; fileRef = D368744E2A39744200E70910 /* 无赖 */; };
 		D36874CC2A39744300E70910 /* 世间美好与你环环相扣.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874502A39744200E70910 /* 世间美好与你环环相扣.mp3 */; };
 		D36874CD2A39744300E70910 /* 世间美好与你环环相扣.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874502A39744200E70910 /* 世间美好与你环环相扣.mp3 */; };
-		D36874CE2A39744300E70910 /* 少女的祈祷.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874512A39744200E70910 /* 少女的祈祷.mp3 */; };
-		D36874CF2A39744300E70910 /* 少女的祈祷.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D36874512A39744200E70910 /* 少女的祈祷.mp3 */; };
 		D36874D32A39749D00E70910 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D36874D22A39749D00E70910 /* HXPhotoPicker.podspec */; };
 		D36874D42A39749D00E70910 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D36874D22A39749D00E70910 /* HXPhotoPicker.podspec */; };
 		D36874E52A39760500E70910 /* RELEASE_NOTE.md in Resources */ = {isa = PBXBuildFile; fileRef = D36874D62A39760500E70910 /* RELEASE_NOTE.md */; };
@@ -666,16 +650,8 @@
 		D368743D2A39744200E70910 /* ImageFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageFilter.swift; sourceTree = "<group>"; };
 		D368743F2A39744200E70910 /* ConfigurationViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationViewCell.swift; sourceTree = "<group>"; };
 		D36874402A39744200E70910 /* CustomPickerCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPickerCellView.swift; sourceTree = "<group>"; };
-		D36874422A39744200E70910 /* 野孩子.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "野孩子.mp3"; sourceTree = "<group>"; };
-		D36874442A39744200E70910 /* 无赖.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "无赖.mp3"; sourceTree = "<group>"; };
-		D36874462A39744200E70910 /* 少女的祈祷 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "少女的祈祷"; sourceTree = "<group>"; };
-		D36874492A39744200E70910 /* 天外来物.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "天外来物.mp3"; sourceTree = "<group>"; };
 		D368744A2A39744200E70910 /* 世间美好与你环环相扣 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "世间美好与你环环相扣"; sourceTree = "<group>"; };
-		D368744C2A39744200E70910 /* 天外来物 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "天外来物"; sourceTree = "<group>"; };
-		D368744D2A39744200E70910 /* 野孩子 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "野孩子"; sourceTree = "<group>"; };
-		D368744E2A39744200E70910 /* 无赖 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "无赖"; sourceTree = "<group>"; };
 		D36874502A39744200E70910 /* 世间美好与你环环相扣.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "世间美好与你环环相扣.mp3"; sourceTree = "<group>"; };
-		D36874512A39744200E70910 /* 少女的祈祷.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "少女的祈祷.mp3"; sourceTree = "<group>"; };
 		D36874D22A39749D00E70910 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HXPhotoPicker.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		D36874D62A39760500E70910 /* RELEASE_NOTE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = RELEASE_NOTE.md; sourceTree = "<group>"; };
 		D36874DE2A39760500E70910 /* ap.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = ap.jpeg; sourceTree = "<group>"; };
@@ -1565,16 +1541,8 @@
 		D36874412A39744200E70910 /* Music */ = {
 			isa = PBXGroup;
 			children = (
-				D36874462A39744200E70910 /* 少女的祈祷 */,
-				D36874512A39744200E70910 /* 少女的祈祷.mp3 */,
 				D368744A2A39744200E70910 /* 世间美好与你环环相扣 */,
 				D36874502A39744200E70910 /* 世间美好与你环环相扣.mp3 */,
-				D368744C2A39744200E70910 /* 天外来物 */,
-				D36874492A39744200E70910 /* 天外来物.mp3 */,
-				D368744E2A39744200E70910 /* 无赖 */,
-				D36874442A39744200E70910 /* 无赖.mp3 */,
-				D368744D2A39744200E70910 /* 野孩子 */,
-				D36874422A39744200E70910 /* 野孩子.mp3 */,
 			);
 			path = Music;
 			sourceTree = "<group>";
@@ -2288,19 +2256,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				D36874CD2A39744300E70910 /* 世间美好与你环环相扣.mp3 in Resources */,
-				D36874B12A39744300E70910 /* 野孩子.mp3 in Resources */,
 				D36874572A39744300E70910 /* livephoto_image.jpeg in Resources */,
 				D36874772A39744300E70910 /* love.png in Resources */,
 				D36874A52A39744300E70910 /* PickerResultViewController.xib in Resources */,
 				D368745D2A39744300E70910 /* portrait.png in Resources */,
-				D36874C72A39744300E70910 /* 野孩子 in Resources */,
 				D36874552A39744300E70910 /* picker_example_image.JPG in Resources */,
 				D36874F82A39760500E70910 /* wp.jpeg in Resources */,
 				D36874E62A39760500E70910 /* RELEASE_NOTE.md in Resources */,
 				D36874592A39744300E70910 /* hx_sticker_yuanqimanman.png in Resources */,
 				D36874FE2A39760500E70910 /* RELEASE_NOTE_CN.md in Resources */,
 				D36874D42A39749D00E70910 /* HXPhotoPicker.podspec in Resources */,
-				D36874BF2A39744300E70910 /* 天外来物.mp3 in Resources */,
 				D368745F2A39744300E70910 /* hx_sticker_woxiangfazipai.png in Resources */,
 				D36874F62A39760500E70910 /* bmc_qr.png in Resources */,
 				D30ED4382A3C55B10074525C /* c81.mp4 in Resources */,
@@ -2314,24 +2279,19 @@
 				D368747F2A39744300E70910 /* hx_sticker_haoxinqing.png in Resources */,
 				7B20B41627A2A94D00375FB6 /* Assets.xcassets in Resources */,
 				D30ED43B2A3C56130074525C /* IMG_0168.GIF in Resources */,
-				D36874B92A39744300E70910 /* 少女的祈祷 in Resources */,
 				D368746F2A39744300E70910 /* hx_sticker_zaizaijia.png in Resources */,
 				D36874612A39744300E70910 /* hx_sticker_xiaochuzhujiao.png in Resources */,
 				D36874C12A39744300E70910 /* 世间美好与你环环相扣 in Resources */,
-				D36874C52A39744300E70910 /* 天外来物 in Resources */,
 				D36874792A39744300E70910 /* stars.png in Resources */,
 				D36874F42A39760500E70910 /* sample_graph.png in Resources */,
 				D36874672A39744300E70910 /* qiy.png in Resources */,
-				D36874B52A39744300E70910 /* 无赖.mp3 in Resources */,
 				D368747B2A39744300E70910 /* text.png in Resources */,
 				D36874FA2A39760500E70910 /* sample_graph_en.png in Resources */,
 				D36874FC2A39760500E70910 /* README_EN.md in Resources */,
 				D368746B2A39744300E70910 /* hx_sticker_yuanqishaonv.png in Resources */,
-				D36874C92A39744300E70910 /* 无赖 in Resources */,
 				D368745B2A39744300E70910 /* hx_sticker_housailei.png in Resources */,
 				D36874632A39744300E70910 /* hx_sticker_chongya.png in Resources */,
 				D36875012A399AC700E70910 /* HXPhotoPicker-Lite.podspec in Resources */,
-				D36874CF2A39744300E70910 /* 少女的祈祷.mp3 in Resources */,
 				D368747D2A39744300E70910 /* love_text.png in Resources */,
 				D36875042A399ACD00E70910 /* README_OC.md in Resources */,
 			);
@@ -2342,11 +2302,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				D368745C2A39744300E70910 /* portrait.png in Resources */,
-				D36874BE2A39744300E70910 /* 天外来物.mp3 in Resources */,
 				D36874F72A39760500E70910 /* wp.jpeg in Resources */,
 				D368746E2A39744300E70910 /* hx_sticker_zaizaijia.png in Resources */,
 				D36874FB2A39760500E70910 /* README_EN.md in Resources */,
-				D36874B42A39744300E70910 /* 无赖.mp3 in Resources */,
 				D36874742A39744300E70910 /* hx_sticker_keaibiaoq.png in Resources */,
 				D36874602A39744300E70910 /* hx_sticker_xiaochuzhujiao.png in Resources */,
 				7B08597224FA58DF00E93091 /* 0AA996F1-6566-4CA3-845F-5698DD9726A0.jpg in Resources */,
@@ -2354,13 +2312,10 @@
 				D368747A2A39744300E70910 /* text.png in Resources */,
 				D368746C2A39744300E70910 /* hx_sticker_kehaixing.png in Resources */,
 				D36874722A39744300E70910 /* hx_sticker_jintianfenkeai.png in Resources */,
-				D36874CE2A39744300E70910 /* 少女的祈祷.mp3 in Resources */,
 				D368745E2A39744300E70910 /* hx_sticker_woxiangfazipai.png in Resources */,
 				7BC3715A2505D25000E2D05C /* HXPhotoEditGraffitiColorView.xib in Resources */,
 				D36874CC2A39744300E70910 /* 世间美好与你环环相扣.mp3 in Resources */,
-				D36874C82A39744300E70910 /* 无赖 in Resources */,
 				7BC371532505D25000E2D05C /* HXPhotoEditStickerTrashView.xib in Resources */,
-				D36874B82A39744300E70910 /* 少女的祈祷 in Resources */,
 				7B08595324FA58DE00E93091 /* WxMomentPublishViewController.xib in Resources */,
 				D36874682A39744300E70910 /* hx_sticker_wow.png in Resources */,
 				7B08597C24FA58DF00E93091 /* WxMomentViewCell.xib in Resources */,
@@ -2376,13 +2331,11 @@
 				D30ED4372A3C55B10074525C /* c81.mp4 in Resources */,
 				7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */,
 				D36874F92A39760500E70910 /* sample_graph_en.png in Resources */,
-				D36874C42A39744300E70910 /* 天外来物 in Resources */,
 				D36874F52A39760500E70910 /* bmc_qr.png in Resources */,
 				D30ED3EE2A3C12EF0074525C /* HXPhotoPickerObjC.podspec in Resources */,
 				7B08596E24FA58DF00E93091 /* WxMomentViewController.xib in Resources */,
 				7BC3715C2505D25000E2D05C /* HXPhotoEditTextView.xib in Resources */,
 				7B08597024FA58DF00E93091 /* Demo4ViewController.xib in Resources */,
-				D36874C62A39744300E70910 /* 野孩子 in Resources */,
 				D36874FD2A39760500E70910 /* RELEASE_NOTE_CN.md in Resources */,
 				7BC371522505D25000E2D05C /* HXPhotoEditGraffitiColorSizeView.xib in Resources */,
 				D36874542A39744300E70910 /* picker_example_image.JPG in Resources */,
@@ -2396,7 +2349,6 @@
 				7B7E3E861E4AACD1002234EE /* Assets.xcassets in Resources */,
 				D30ED43A2A3C56130074525C /* IMG_0168.GIF in Resources */,
 				7B20B41527A2A94D00375FB6 /* Assets.xcassets in Resources */,
-				D36874B02A39744300E70910 /* 野孩子.mp3 in Resources */,
 				D36874622A39744300E70910 /* hx_sticker_chongya.png in Resources */,
 				D36874E52A39760500E70910 /* RELEASE_NOTE.md in Resources */,
 				D36874D32A39749D00E70910 /* HXPhotoPicker.podspec in Resources */,

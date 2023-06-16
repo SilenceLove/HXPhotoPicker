@@ -11,7 +11,7 @@ import HXPhotoPicker
 class WeChatMometViewController: UIViewController {
     var isImage = false
     lazy var imageView: UIImageView = {
-        let view = UIImageView(image: .init(named: "wx_head_icon"))
+        let view = UIImageView(image: .init(named: "wx_bg_image"))
         view.contentMode = .scaleAspectFill
         view.clipsToBounds = true
         view.isUserInteractionEnabled = true

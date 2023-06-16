@@ -21,7 +21,7 @@ class TestEditorViewController: BaseViewController {
         return view
     }()
     
-    var image: UIImage? = .init(named: "wx_head_icon")
+    var image: UIImage? = .init(named: "wx_bg_image")
     var videoURL: URL!
     
     var imageResult: ImageEditedResult?
@@ -489,7 +489,7 @@ class TestEditorViewController: BaseViewController {
                         self.audioPlayers.append(audioPlayer)
                     }
                     let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
-                    let fileNames = ["少女的祈祷", "世间美好与你环环相扣", "天外来物", "无赖", "野孩子"]
+                    let fileNames = ["世间美好与你环环相扣"]
                     for fileName in fileNames {
                         alert.addAction(.init(title: fileName, style: .default, handler: {
                             guard let title = $0.title else {
