@@ -106,13 +106,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     //    photoView.showAddCell = NO; 
     [scrollView addSubview:photoView];
     self.photoView = photoView;
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
-//    NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"0AA996F1-6566-4CA3-845F-5698DD9726A0" withExtension:@"jpg"];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
     
     NSURL *gifURL = [[NSBundle mainBundle] URLForResource:@"IMG_0168" withExtension:@"GIF"];
     
-    HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
-    HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithLocaImageName:@"2" selected:NO];
+    HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"wx_head_icon" selected:YES];
+    HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithLocaImageName:@"wx_bg_image" selected:NO];
     HXCustomAssetModel *assetModel3 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg"] selected:YES];
     HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
     HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
@@ -155,12 +154,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     [HXPhotoBottomSelectView showSelectViewWithModels:@[model1, model2, model3, model4, model5] selectCompletion:^(NSInteger index, HXPhotoBottomViewModel * _Nonnull model) {
         HXCustomAssetModel *assetModel9;
         if (index == 0) {
-            NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"d87" withExtension:@"jpeg"];
+            NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"livephoto_image" withExtension:@"jpeg"];
             NSURL *videoURL = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
             assetModel9 = [HXCustomAssetModel livePhotoAssetWithLocalImagePath:imageURL localVideoURL:videoURL selected:YES];
         }else if (index == 1) {
-            NSURL *vurl = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
-            assetModel9 = [HXCustomAssetModel livePhotoAssetWithImage:[UIImage imageNamed:@"1"] localVideoURL:vurl selected:YES];
+            NSURL *vurl = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
+            assetModel9 = [HXCustomAssetModel livePhotoAssetWithImage:[UIImage imageNamed:@"wx_head_icon"] localVideoURL:vurl selected:YES];
         }else if (index == 2){
             assetModel9 = [HXCustomAssetModel livePhotoAssetWithNetworkImageURL:[NSURL URLWithString:@"http://oss-cn-hangzhou.aliyuncs.com/tsnrhapp/5ed15ef7-3411-4f5e-839b-10664d796919.jpg"] networkVideoURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/fufeiduanpian.mp4"] selected:YES];
             
@@ -178,12 +177,12 @@ static const CGFloat kPhotoViewMargin = 12.0;
     } cancelClick:nil];
 }
 - (void)previewClick {
-    HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"1" selected:YES];
+    HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithLocaImageName:@"wx_head_icon" selected:YES];
     // selected 为NO 的会过滤掉
-    HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithLocaImageName:@"2" selected:NO];
+    HXCustomAssetModel *assetModel2 = [HXCustomAssetModel assetWithLocaImageName:@"wx_bg_image" selected:NO];
     HXCustomAssetModel *assetModel3 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/1466408576222.jpg"] selected:YES];
     HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/0034821a-6815-4d64-b0f2-09103d62630d.jpg"] selected:NO];
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
     HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithLocalVideoURL:url selected:YES];
     NSURL *gifURL = [[NSBundle mainBundle] URLForResource:@"IMG_0168" withExtension:@"GIF"];
     HXCustomAssetModel *assetModel6 = [HXCustomAssetModel assetWithImagePath:gifURL selected:YES];

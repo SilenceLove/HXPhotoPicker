@@ -108,7 +108,7 @@
 }
 
 - (void)editPhoto {
-    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:[UIImage imageNamed:@"1"]];
+    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:[UIImage imageNamed:@"wx_head_icon"]];
     photoModel.photoEdit = self.photoEdit;
     HXWeakSelf
     if (self.manager.configuration.useWxPhotoEdit) {
@@ -144,7 +144,7 @@
 
 - (void)editVideo {
     
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
     HXPhotoModel *videoModel = [HXPhotoModel photoModelWithVideoURL:url];
     
     HXWeakSelf

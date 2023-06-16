@@ -42,8 +42,8 @@ class EditorConfigurationViewController: UITableViewController {
                 if assetType == 0 {
                     let image = UIImage(
                         contentsOfFile: Bundle.main.path(
-                            forResource: "picker_example_image",
-                            ofType: ".JPG"
+                            forResource: "livephoto_image",
+                            ofType: "jpeg"
                         )!
                     )!
                     let vc = EditorViewController(.init(type: .image(image), result: editedResult), config: config)
@@ -61,8 +61,8 @@ class EditorConfigurationViewController: UITableViewController {
                     #else
                     let image = UIImage(
                         contentsOfFile: Bundle.main.path(
-                            forResource: "picker_example_image",
-                            ofType: ".JPG"
+                            forResource: "livephoto_image",
+                            ofType: "jpeg"
                         )!
                     )!
                     let vc = EditorViewController(.init(type: .image(image)), config: config)

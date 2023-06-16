@@ -82,7 +82,7 @@
     for (int i = 0; i < 10; i++) {
         Demo9Model *model = [[Demo9Model alloc] init];
         if (i == 0) {
-            NSURL *url = [[NSBundle mainBundle] URLForResource:@"LocalSampleVideo" withExtension:@"mp4"];
+            NSURL *url = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
 //            HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539156782143&di=dc52a95270831d8bc10e5bf78f6626b4&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fzhidao%2Fwh%253D450%252C600%2Fsign%3D038e2a1cacc27d1ea57333c02ee58158%2Fe61190ef76c6a7ef19aa309ef5faaf51f2de66fe.jpg"] selected:YES];
             HXCustomAssetModel *assetModel1 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539156872167&di=93cd047350dfc7a60fa9e89e30079b25&imgtype=0&src=http%3A%2F%2Fpic.9ht.com%2Fup%2F2018-5%2F15252310743961744.gif"] networkThumbURL:[NSURL URLWithString:@"https://goss.veer.com/creative/vcg/veer/1600water/veer-129342703.jpg"] selected:YES];
             
@@ -91,7 +91,7 @@
             HXCustomAssetModel *assetModel3 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3935625616,3616422245&fm=27&gp=0.jpg"] selected:YES];
             HXCustomAssetModel *assetModel4 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://user-images.githubusercontent.com/9622345/82725518-0bba0780-9d10-11ea-81fb-c5b29a0f7394.gif"] selected:YES];
             
-            NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"d87" withExtension:@"jpeg"];
+            NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"livephoto_image" withExtension:@"jpeg"];
             NSURL *videoURL = [[NSBundle mainBundle] URLForResource:@"c81" withExtension:@"mp4"];
             HXCustomAssetModel *assetModel5 = [HXCustomAssetModel livePhotoAssetWithLocalImagePath:imageURL localVideoURL:videoURL selected:YES];
 //            HXCustomAssetModel *assetModel5 = [HXCustomAssetModel assetWithNetworkImageURL:[NSURL URLWithString:@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539156872167&di=93cd047350dfc7a60fa9e89e30079b25&imgtype=0&src=http%3A%2F%2Fpic.9ht.com%2Fup%2F2018-5%2F15252310743961744.gif"] selected:YES];
