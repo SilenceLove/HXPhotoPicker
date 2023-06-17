@@ -1,7 +1,7 @@
 <h4 align="right">中文 | <strong><a href="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/README_EN.md">English</a></strong></h4>
       
 <p align="center">
-    <a><img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/sample_graph.png"  width = "384" height = "292.65" ></a>
+    <a><img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/sample_graph.png?raw=true"  width = "384" height = "292.65" ></a>
 </p>
 <p align="center">
     <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://travis-ci.org/SilenceLove/HXPhotoPicker.svg?branch=master"></a>
@@ -11,6 +11,18 @@
     <a href="http://mit-license.org"><img src="http://img.shields.io/badge/license-MIT-333333.svg?logo=letterboxd&logoColor=ffffff"></a>
     <div align="center">一款图片/视频选择器-支持LivePhoto、GIF选择、iCloud/网络资源在线下载、图片/视频编辑</div>
 </p>
+
+## 目录
+* [功能](#功能)
+* [要求](#要求)
+* [安装](#安装)
+* [示例](#示例)
+    * [快速使用](#示例)
+    * [如何获取](#如何获取)
+* [更新记录](#更新记录)
+* [演示效果](#演示效果)
+* [界面展示](#界面展示)
+* [支持❤️](#支持❤️) 
 
 ## <a id="功能"></a> 功能
 
@@ -81,7 +93,7 @@
 - Xcode 12.5+
 - Swift 5.4+
 
-## 安装
+## <a id="安装"></a> 安装
 
 ### [Swift Package Manager](https://swift.org/package-manager/)
 
@@ -143,7 +155,7 @@ pod 'HXPhotoPickerObjC'
 | NSCameraUsageDescription | Camera | 允许使用相机 |
 | NSMicrophoneUsageDescription | Camera | 允许使用麦克风 |
 
-### 快速上手
+### <a id="示例"></a> 快速上手
 ```swift
 import HXPhotoPicker
 
@@ -207,7 +219,7 @@ extension ViewController: PhotoPickerControllerDelegate {
 }
 ```
 
-### 如何获取
+### <a id="如何获取"></a> 如何获取
 
 #### 获取 UIImage
 
@@ -255,26 +267,40 @@ photoAsset.getURL(compression: compression) { result in
 ```
 
 
-## 更新日志
+## <a id="更新记录"></a> 更新日志
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
 | [v4.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#400) | 2023-06-15 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v3.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/README_OC.md#更新记录) | 2022-09-18 | 14.0.0 | ----- | 8.0+ |
 
+## <a id="演示效果"></a> 演示效果
+
+
+| 选择照片 | 图片编辑 | 视频编辑 | 
+| ---- | ----  | ---- |
+| [![IMAGE ALT TEXT](https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Videos/photo_list_picker_cover.png?raw=true)](https://f.video.weibocdn.com/o0/qmDmUO8ylx086iLL71aw0104120084in0E010.mp4?label=mp4_720p&template=720x1556.24.0&media_id=4913572158046219&tp=8x8A3El:YTkl0eM8&us=0&ori=1&bf=4&ot=v&ps=3lckmu&uid=3ZoTIp&ab=,8012-g2,3601-g32,8143-g0,8013-g0,7598-g0&Expires=1686974460&ssig=Zn8a9y%2FUjq&KID=unistore,video) | [![IMAGE ALT TEXT](https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Videos/photo_editor_cover.png?raw=true)](https://f.video.weibocdn.com/o0/hqxi5lhalx086iMwo1ew01041200mudo0E010.mp4?label=mp4_720p&template=720x1556.24.0&media_id=4913574867304489&tp=8x8A3El:YTkl0eM8&us=0&ori=1&bf=4&ot=v&ps=3lckmu&uid=3ZoTIp&ab=,8012-g2,3601-g32,8143-g0,8013-g0,7598-g0&Expires=1686975054&ssig=4SrJd9t%2FB1&KID=unistore,video) | [![IMAGE ALT TEXT](https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Videos/video_editor_cover.png?raw=true)](https://f.video.weibocdn.com/o0/JJ98ZsJzlx086iMxJnNe01041200bF6G0E010.mp4?label=mp4_720p&template=720x1556.24.0&media_id=4913575051853861&tp=8x8A3El:YTkl0eM8&us=0&ori=1&bf=4&ot=v&ps=3lckmu&uid=3ZoTIp&ab=,8012-g2,3601-g32,8143-g0,8013-g0,7598-g0&Expires=1686975115&ssig=rZpVfCJFmT&KID=unistore,video) | 
+
+## <a id="界面展示"></a> 界面展示
+
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_picker_list.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_preview.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_editor_filter.png?raw=true"> | 
+| ---- | ----  | ---- |
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_time.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_edit.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_crop_size.png?raw=true"> |
+
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_editor_crop_size_horizontal_screen.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_crop_size_horizontal_screen.png?raw=true"> |
+| ---- | ----  |
+
 ## 版权协议 
 HXPhotoPicker 基于 MIT 协议进行分发和使用，更多信息参见[协议文件](./LICENSE)。 
 
-## 支持❤️
+## <a id="支持❤️"></a> 支持❤️
 * [**★ Star**](#)
 * 支持作者☕️ 
     
-<div align="left"><a href="https://www.buymeacoffee.com/fengye" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a></div>
-<p/> 
-<img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/bmc_qr.png" width = "135" height = "135" />
-<img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/ap.jpeg" width = "100" height = "135.75" />  
-<img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/wp.jpeg" width = "100" height = "135.75" />
- <p/>
+<div align="left"><a href="https://www.buymeacoffee.com/fengye" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a></div> 
+
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/Support/bmc_qr.png?raw=true" width = "135" height = "135" /> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/Support/ap.jpeg?raw=true" width = "100" height = "135.75" />   | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/Support/wp.jpeg?raw=true" width = "100" height = "135.75" /> |
+| ------ | ------ | ------ | 
 
 [![Stargazers over time](https://starchart.cc/SilenceLove/HXPhotoPicker.svg)](https://starchart.cc/SilenceLove/HXPhotoPicker)
 
