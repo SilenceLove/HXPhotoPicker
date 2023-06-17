@@ -1,7 +1,7 @@
 <h4 align="right"><strong><a href="https://github.com/SilenceLove/HXPhotoPicker#readme">中文</a></strong> | English</h4>
-      
+            
 <p align="center">
-    <a><img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/sample_graph_en.png"  width = "396" height = "292.65" ></a>
+    <a><img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/sample_graph.png?raw=true"  width = "384" height = "292.65" ></a>
     
 <p align="center">
     <a href="https://github.com/SilenceLove/HXPhotoPicker"><img src="https://travis-ci.org/SilenceLove/HXPhotoPicker.svg?branch=master"></a>
@@ -84,7 +84,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "2.0"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.1"))
 ]
 ```
 
@@ -245,7 +245,23 @@ photoAsset.getURL(compression: compression) { result in
 
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.0.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#401) | 2023-06-17 | 14.3.0 | 5.7.0 | 12.0+ | 
 | [v4.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#400) | 2023-06-15 | 14.3.0 | 5.7.0 | 12.0+ | 
+
+## Demonstration effect
+
+| Choose a photo | Picture editing | Video editing | 
+| ---- | ----  | ---- |
+| [![IMAGE ALT TEXT](https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Videos/photo_list_picker_cover.png?raw=true)](https://f.video.weibocdn.com/o0/qmDmUO8ylx086iLL71aw0104120084in0E010.mp4?label=mp4_720p&template=720x1556.24.0&media_id=4913572158046219&tp=8x8A3El:YTkl0eM8&us=0&ori=1&bf=4&ot=v&ps=3lckmu&uid=3ZoTIp&ab=,8012-g2,3601-g32,8143-g0,8013-g0,7598-g0&Expires=1686974460&ssig=Zn8a9y%2FUjq&KID=unistore,video) | [![IMAGE ALT TEXT](https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Videos/photo_editor_cover.png?raw=true)](https://f.video.weibocdn.com/o0/hqxi5lhalx086iMwo1ew01041200mudo0E010.mp4?label=mp4_720p&template=720x1556.24.0&media_id=4913574867304489&tp=8x8A3El:YTkl0eM8&us=0&ori=1&bf=4&ot=v&ps=3lckmu&uid=3ZoTIp&ab=,8012-g2,3601-g32,8143-g0,8013-g0,7598-g0&Expires=1686975054&ssig=4SrJd9t%2FB1&KID=unistore,video) | [![IMAGE ALT TEXT](https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Videos/video_editor_cover.png?raw=true)](https://f.video.weibocdn.com/o0/JJ98ZsJzlx086iMxJnNe01041200bF6G0E010.mp4?label=mp4_720p&template=720x1556.24.0&media_id=4913575051853861&tp=8x8A3El:YTkl0eM8&us=0&ori=1&bf=4&ot=v&ps=3lckmu&uid=3ZoTIp&ab=,8012-g2,3601-g32,8143-g0,8013-g0,7598-g0&Expires=1686975115&ssig=rZpVfCJFmT&KID=unistore,video) | 
+
+## Views display
+
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_picker_list.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_preview.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_editor_filter.png?raw=true"> | 
+| ---- | ----  | ---- |
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_time.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_edit.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_crop_size.png?raw=true"> |
+
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_photo_editor_crop_size_horizontal_screen.png?raw=true"> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/README/Photos/sample_graph_video_editor_crop_size_horizontal_screen.png?raw=true"> |
+| ---- | ----  |
 
 ## License
 
@@ -254,12 +270,9 @@ HXPhotoPicker is released under the MIT license. See LICENSE for details.
 ## Support❤️
 * [**★ Star**](#) this repo.
 * Support with 
-<p/>
-<a href="https://www.buymeacoffee.com/fengye" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a><p/>
-<img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/bmc_qr.png" width = "135" height = "135" /><p/>
-<img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/ap.jpeg" width = "100" height = "135.75" /> 
-or
- <img src="https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/Support/wp.jpeg" width = "100" height = "135.75" />
+
+| <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/Support/bmc_qr.png?raw=true" width = "135" height = "135" /> | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/Support/ap.jpeg?raw=true" width = "100" height = "135.75" />   | <img src="https://github.com/SilenceLove/PictureMaterial/blob/main/HXPhotoPicker/Support/wp.jpeg?raw=true" width = "100" height = "135.75" /> |
+| ------ | ------ | ------ | 
 
 
 ## Stargazers over time
