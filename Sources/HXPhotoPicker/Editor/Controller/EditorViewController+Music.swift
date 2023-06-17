@@ -21,6 +21,7 @@ extension EditorViewController: EditorMusicViewDelegate {
             return
         }
         deselectedDrawTool()
+        updateBottomMaskLayer()
         if let music = music {
             if musicPlayer == nil {
                 musicPlayer = .init()

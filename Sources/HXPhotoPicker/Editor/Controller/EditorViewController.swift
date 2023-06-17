@@ -279,7 +279,6 @@ open class EditorViewController: BaseViewController {
         return button
     }()
     
-    
     lazy var maskListButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage("hx_editor_crop_mask_list".image, for: .normal)
@@ -300,7 +299,7 @@ open class EditorViewController: BaseViewController {
                 let right = UIDevice.isPad ? 30 : UIDevice.rightMargin + 15
                 return .init(top: top, left: left, bottom: UIDevice.bottomMargin + 50 + 140, right: right)
             }else {
-                return .init(top: UIDevice.topMargin + 50, left: UIDevice.leftMargin + 165, bottom: UIDevice.bottomMargin + 15, right: UIDevice.rightMargin + 165)
+                return .init(top: UIDevice.topMargin + 55, left: UIDevice.leftMargin + 165, bottom: UIDevice.bottomMargin + 15, right: UIDevice.rightMargin + 165)
             }
         }
         view.urlConfig = config.urlConfig
@@ -328,12 +327,14 @@ open class EditorViewController: BaseViewController {
     
     public lazy var topMaskView: UIView = {
         let view = UIView()
+        view.isUserInteractionEnabled = false
         view.layer.addSublayer(topMaskLayer)
         return view
     }()
     
     public lazy var bottomMaskView: UIView = {
         let view = UIView()
+        view.isUserInteractionEnabled = false
         view.layer.addSublayer(bottomMaskLayer)
         return view
     }()
@@ -539,7 +540,9 @@ open class EditorViewController: BaseViewController {
             bottomMaskLayer = PhotoTools.getGradientShadowLayer(false)
             bottomMaskView.layer.addSublayer(bottomMaskLayer)
             if isToolsDisplay {
+                topMaskView.alpha = 0
                 topMaskView.isHidden = true
+                bottomMaskView.alpha = 1
                 bottomMaskView.isHidden = false
             }
             
@@ -583,10 +586,13 @@ open class EditorViewController: BaseViewController {
         }else {
             bottomMaskLayer = PhotoTools.getGradientShadowLayer(startPoint: .init(x: 0, y: 0), endPoint: .init(x: 1, y: 0))
             bottomMaskView.isHidden = true
+            bottomMaskView.alpha = 0
             bottomMaskView.layer.addSublayer(bottomMaskLayer)
             if isToolsDisplay {
                 topMaskView.isHidden = false
+                topMaskView.alpha = 1
                 bottomMaskView.isHidden = false
+                bottomMaskView.alpha = 1
             }
             topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: UIDevice.topMargin + 50)
             
@@ -686,6 +692,8 @@ open class EditorViewController: BaseViewController {
                 switch selectedTool.type {
                 case .graffiti, .mosaic:
                     layerHeight = UIDevice.bottomMargin + 130
+                case .music:
+                    layerHeight = UIDevice.bottomMargin + 55
                 default:
                     layerHeight = UIDevice.bottomMargin + 180
                 }
@@ -699,6 +707,8 @@ open class EditorViewController: BaseViewController {
                 switch selectedTool.type {
                 case .graffiti, .mosaic:
                     layerWidth = 130 + UIDevice.rightMargin
+                case .music:
+                    layerWidth = 65 + UIDevice.rightMargin
                 default:
                     layerWidth = 180 + UIDevice.rightMargin
                 }

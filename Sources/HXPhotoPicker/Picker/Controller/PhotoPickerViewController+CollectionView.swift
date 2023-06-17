@@ -131,6 +131,9 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             return
         }
         myCell.cancelReload()
+        if let pickerCell = myCell as? PhotoPickerViewCell {
+            pickerCell.cancelSyncICloud()
+        }
     }
     public func collectionView(
         _ collectionView: UICollectionView,
@@ -185,11 +188,14 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             
             if let pickerCell = myCell as? PhotoPickerViewCell,
                pickerCell.inICloud {
-                photoAsset.syncICloud(
-                    hudAddedTo: navigationController?.view
-                ) { [weak self] photoAsset, _ in
-                    self?.resetICloud(for: photoAsset)
+                if pickerCell.photoAsset.downloadStatus != .downloading {
+                    pickerCell.syncICloud()
                 }
+//                photoAsset.syncICloud(
+//                    hudAddedTo: navigationController?.view
+//                ) { [weak self] photoAsset, _ in
+//                    self?.resetICloud(for: photoAsset)
+//                }
                 return
             }
             let item = needOffset ? indexPath.item - offsetIndex : indexPath.item

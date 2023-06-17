@@ -13,6 +13,7 @@ extension EditorViewController: EditorStickerTextViewControllerDelegate {
         if let tool = selectedTool,
            tool.type == .graffiti || tool.type == .graffiti {
             selectedTool = nil
+            updateBottomMaskLayer()
         }
         editorView.addSticker(stickerText)
         checkSelectedTool()
@@ -27,6 +28,7 @@ extension EditorViewController: EditorStickerTextViewControllerDelegate {
         if let tool = selectedTool,
            tool.type == .graffiti || tool.type == .graffiti {
             selectedTool = nil
+            updateBottomMaskLayer()
         }
         editorView.updateSticker(stickerText)
         checkSelectedTool()

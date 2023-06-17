@@ -19,6 +19,13 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         return view
     }()
     
+    /// iCloud下载进度视图
+    lazy var loaddingView: PhotoLoaddingView = {
+        let view = PhotoLoaddingView(frame: .init(origin: .zero, size: size))
+        view.isHidden = true
+        return view
+    }()
+    
     /// 资源类型标签背景
     public lazy var assetTypeMaskView: UIView = {
         let assetTypeMaskView = UIView()
@@ -80,6 +87,13 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         self.inICloud = inICloud
         iCloudMarkView.isHidden = !inICloud
         setupDisableMask()
+        if inICloud,
+           photoAsset.downloadStatus == .canceled {
+            syncICloud()
+        }else {
+            loaddingView.isHidden = true
+            loaddingView.stopAnimating()
+        }
     }
     
     /// 选中遮罩
@@ -109,6 +123,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         contentView.addSubview(assetEditMarkIcon)
         contentView.layer.addSublayer(disableMaskLayer)
         contentView.addSubview(iCloudMarkView)
+        contentView.addSubview(loaddingView)
     }
     
     /// 触发选中回调
@@ -124,6 +139,75 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         }
         disableMaskLayer.isHidden = canSelect
     }
+    
+    public var syncICloudRequestID: PHImageRequestID?
+    
+    open func cancelSyncICloud() {
+        guard let id = syncICloudRequestID else {
+            return
+        }
+        PHImageManager.default().cancelImageRequest(id)
+        syncICloudRequestID = nil
+    }
+    
+    open func checkICloundStatus(
+        allowSyncPhoto: Bool
+    ) -> Bool {
+        guard let phAsset = photoAsset.phAsset,
+              photoAsset.downloadStatus != .succeed else {
+            return false
+        }
+        if photoAsset.mediaType == .photo && !allowSyncPhoto {
+            return false
+        }
+        if phAsset.inICloud {
+            if photoAsset.downloadStatus != .downloading {
+                syncICloud()
+            }
+            return true
+        }else {
+            photoAsset.downloadStatus = .succeed
+        }
+        return false
+    }
+    
+    open func syncICloud() {
+        cancelSyncICloud()
+        disableMaskLayer.isHidden = true
+        loaddingView.isHidden = false
+        if photoAsset.downloadProgress > 0 {
+            loaddingView.progress = photoAsset.downloadProgress
+        }else {
+            loaddingView.startAnimating()
+        }
+        syncICloudRequestID = photoAsset.syncICloud { [weak self] in
+            guard let self = self, $0 == self.photoAsset else {
+                return
+            }
+            self.syncICloudRequestID = $1
+        } progressHandler: { [weak self] in
+            guard let self = self, $0 == self.photoAsset else {
+                return
+            }
+            if $1 > 0 {
+                self.loaddingView.progress = $1
+            }
+        } completionHandler: { [weak self] in
+            guard let self = self, $0 == self.photoAsset else {
+                return
+            }
+            if $1 {
+                self.requestICloudState()
+            }else {
+                if $0.downloadStatus != .canceled {
+                    self.loaddingView.isHidden = true
+                    self.loaddingView.stopAnimating()
+                }
+            }
+        }
+    }
+    
+    
     /// 布局
     open override func layoutView() {
         super.layoutView()
@@ -163,6 +247,8 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         assetEditMarkIcon.size = assetEditMarkIcon.image?.size ?? .zero
         assetEditMarkIcon.x = 5
         assetEditMarkIcon.y = height - assetEditMarkIcon.height - 5
+        
+        loaddingView.frame = bounds
     }
     
     /// 设置高亮时的遮罩
@@ -196,6 +282,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
     
     deinit {
         disableMaskLayer.backgroundColor = nil
+        cancelSyncICloud()
     }
 }
 

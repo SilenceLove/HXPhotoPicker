@@ -59,6 +59,7 @@ extension EditorViewController: EditorChartletViewControllerDelegate {
         if let tool = selectedTool,
            tool.type == .graffiti || tool.type == .graffiti {
             selectedTool = nil
+            updateBottomMaskLayer()
         }
         if let imageData = imageData {
             editorView.addSticker(imageData)
@@ -78,7 +79,6 @@ extension EditorViewController: EditorChartletViewControllerDelegate {
                 editorView.isDrawEnabled = false
                 hideBrushColorView()
                 hideMosaicToolView()
-                updateBottomMaskLayer()
                 lastSelectedTool = nil
             default:
                 break

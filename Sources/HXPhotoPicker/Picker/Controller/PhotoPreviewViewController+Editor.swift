@@ -15,6 +15,7 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         guard let photoAsset = asset.type.photoAsset else {
             return
         }
+        PhotoManager.shared.appearanceStyle = picker.config.appearanceStyle
         if let result = asset.result {
             photoAsset.editedResult = result
             if isExternalPreview {
@@ -70,6 +71,11 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
             }
         }
         delegate?.previewViewController(self, editAssetFinished: photoAsset)
+    }
+    
+    public func editorViewController(didCancel editorViewController: EditorViewController) {
+        guard let picker = pickerController else { return }
+        PhotoManager.shared.appearanceStyle = picker.config.appearanceStyle
     }
     
     public func editorViewController(

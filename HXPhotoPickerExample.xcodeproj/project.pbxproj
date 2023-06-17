@@ -265,16 +265,6 @@
 		D36874D42A39749D00E70910 /* HXPhotoPicker.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D36874D22A39749D00E70910 /* HXPhotoPicker.podspec */; };
 		D36874E52A39760500E70910 /* RELEASE_NOTE.md in Resources */ = {isa = PBXBuildFile; fileRef = D36874D62A39760500E70910 /* RELEASE_NOTE.md */; };
 		D36874E62A39760500E70910 /* RELEASE_NOTE.md in Resources */ = {isa = PBXBuildFile; fileRef = D36874D62A39760500E70910 /* RELEASE_NOTE.md */; };
-		D36874F12A39760500E70910 /* ap.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = D36874DE2A39760500E70910 /* ap.jpeg */; };
-		D36874F22A39760500E70910 /* ap.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = D36874DE2A39760500E70910 /* ap.jpeg */; };
-		D36874F32A39760500E70910 /* sample_graph.png in Resources */ = {isa = PBXBuildFile; fileRef = D36874DF2A39760500E70910 /* sample_graph.png */; };
-		D36874F42A39760500E70910 /* sample_graph.png in Resources */ = {isa = PBXBuildFile; fileRef = D36874DF2A39760500E70910 /* sample_graph.png */; };
-		D36874F52A39760500E70910 /* bmc_qr.png in Resources */ = {isa = PBXBuildFile; fileRef = D36874E02A39760500E70910 /* bmc_qr.png */; };
-		D36874F62A39760500E70910 /* bmc_qr.png in Resources */ = {isa = PBXBuildFile; fileRef = D36874E02A39760500E70910 /* bmc_qr.png */; };
-		D36874F72A39760500E70910 /* wp.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = D36874E12A39760500E70910 /* wp.jpeg */; };
-		D36874F82A39760500E70910 /* wp.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = D36874E12A39760500E70910 /* wp.jpeg */; };
-		D36874F92A39760500E70910 /* sample_graph_en.png in Resources */ = {isa = PBXBuildFile; fileRef = D36874E22A39760500E70910 /* sample_graph_en.png */; };
-		D36874FA2A39760500E70910 /* sample_graph_en.png in Resources */ = {isa = PBXBuildFile; fileRef = D36874E22A39760500E70910 /* sample_graph_en.png */; };
 		D36874FB2A39760500E70910 /* README_EN.md in Resources */ = {isa = PBXBuildFile; fileRef = D36874E32A39760500E70910 /* README_EN.md */; };
 		D36874FC2A39760500E70910 /* README_EN.md in Resources */ = {isa = PBXBuildFile; fileRef = D36874E32A39760500E70910 /* README_EN.md */; };
 		D36874FD2A39760500E70910 /* RELEASE_NOTE_CN.md in Resources */ = {isa = PBXBuildFile; fileRef = D36874E42A39760500E70910 /* RELEASE_NOTE_CN.md */; };
@@ -595,6 +585,7 @@
 		D30ED4362A3C55B10074525C /* c81.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = c81.mp4; sourceTree = "<group>"; };
 		D30ED43C2A3C5D7D0074525C /* livephoto_image.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = livephoto_image.jpeg; sourceTree = "<group>"; };
 		D30ED43F2A3C5F2D0074525C /* IMG_0168.GIF */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = IMG_0168.GIF; sourceTree = "<group>"; };
+		D3255D892A3D8DB30017D339 /* PhotoLoaddingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLoaddingView.swift; sourceTree = "<group>"; };
 		D368740F2A39744200E70910 /* hx_sticker_yuanqimanman.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hx_sticker_yuanqimanman.png; sourceTree = "<group>"; };
 		D36874102A39744200E70910 /* hx_sticker_housailei.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hx_sticker_housailei.png; sourceTree = "<group>"; };
 		D36874112A39744200E70910 /* portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait.png; sourceTree = "<group>"; };
@@ -643,11 +634,6 @@
 		D36874502A39744200E70910 /* 世间美好与你环环相扣.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "世间美好与你环环相扣.mp3"; sourceTree = "<group>"; };
 		D36874D22A39749D00E70910 /* HXPhotoPicker.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HXPhotoPicker.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		D36874D62A39760500E70910 /* RELEASE_NOTE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = RELEASE_NOTE.md; sourceTree = "<group>"; };
-		D36874DE2A39760500E70910 /* ap.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = ap.jpeg; sourceTree = "<group>"; };
-		D36874DF2A39760500E70910 /* sample_graph.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample_graph.png; sourceTree = "<group>"; };
-		D36874E02A39760500E70910 /* bmc_qr.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bmc_qr.png; sourceTree = "<group>"; };
-		D36874E12A39760500E70910 /* wp.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = wp.jpeg; sourceTree = "<group>"; };
-		D36874E22A39760500E70910 /* sample_graph_en.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample_graph_en.png; sourceTree = "<group>"; };
 		D36874E32A39760500E70910 /* README_EN.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README_EN.md; sourceTree = "<group>"; };
 		D36874E42A39760500E70910 /* RELEASE_NOTE_CN.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = RELEASE_NOTE_CN.md; sourceTree = "<group>"; };
 		D36874FF2A399AC700E70910 /* HXPhotoPicker-Lite.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "HXPhotoPicker-Lite.podspec"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -1535,23 +1521,10 @@
 			isa = PBXGroup;
 			children = (
 				D36874D62A39760500E70910 /* RELEASE_NOTE.md */,
-				D36874DD2A39760500E70910 /* Support */,
 				D36874E32A39760500E70910 /* README_EN.md */,
 				D36874E42A39760500E70910 /* RELEASE_NOTE_CN.md */,
 			);
 			path = Documentation;
-			sourceTree = "<group>";
-		};
-		D36874DD2A39760500E70910 /* Support */ = {
-			isa = PBXGroup;
-			children = (
-				D36874DE2A39760500E70910 /* ap.jpeg */,
-				D36874DF2A39760500E70910 /* sample_graph.png */,
-				D36874E02A39760500E70910 /* bmc_qr.png */,
-				D36874E12A39760500E70910 /* wp.jpeg */,
-				D36874E22A39760500E70910 /* sample_graph_en.png */,
-			);
-			path = Support;
 			sourceTree = "<group>";
 		};
 		D36878702A399B8C00E70910 /* HXPhotoPicker */ = {
@@ -1573,12 +1546,12 @@
 			isa = PBXGroup;
 			children = (
 				D36878A02A399B8C00E70910 /* HXPhotoPicker.swift */,
-				D36878722A399B8C00E70910 /* Extension */,
-				D36878882A399B8C00E70910 /* Util */,
 				D368789C2A399B8C00E70910 /* Config */,
 				D368789E2A399B8C00E70910 /* Controller */,
 				D36878A12A399B8C00E70910 /* Model */,
 				D36878AB2A399B8C00E70910 /* View */,
+				D36878882A399B8C00E70910 /* Util */,
+				D36878722A399B8C00E70910 /* Extension */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -1686,15 +1659,15 @@
 		D36878B32A399B8C00E70910 /* Picker */ = {
 			isa = PBXGroup;
 			children = (
-				D36879202A399B8C00E70910 /* AssetURLResult.swift */,
 				D36879212A399B8C00E70910 /* PickerResult.swift */,
+				D36879202A399B8C00E70910 /* AssetURLResult.swift */,
 				D36878C32A399B8C00E70910 /* Config */,
 				D36878CF2A399B8C00E70910 /* Controller */,
-				D36878B92A399B8C00E70910 /* Extension */,
+				D36878FA2A399B8C00E70910 /* View */,
 				D36878EB2A399B8C00E70910 /* Model */,
+				D36878B92A399B8C00E70910 /* Extension */,
 				D36878B42A399B8C00E70910 /* Transition */,
 				D36878BF2A399B8C00E70910 /* Util */,
-				D36878FA2A399B8C00E70910 /* View */,
 			);
 			path = Picker;
 			sourceTree = "<group>";
@@ -1735,17 +1708,17 @@
 		D36878C32A399B8C00E70910 /* Config */ = {
 			isa = PBXGroup;
 			children = (
-				D36878C42A399B8C00E70910 /* AlbumTitleViewConfiguration.swift */,
-				D36878C52A399B8C00E70910 /* PreviewViewConfiguration.swift */,
-				D36878C62A399B8C00E70910 /* PhotoListCellConfiguration.swift */,
-				D36878C72A399B8C00E70910 /* EmptyViewConfiguration.swift */,
-				D36878C82A399B8C00E70910 /* AlbumListConfiguration.swift */,
-				D36878C92A399B8C00E70910 /* NotAuthorizedConfiguration.swift */,
-				D36878CA2A399B8C00E70910 /* PickerBottomViewConfiguration.swift */,
-				D36878CB2A399B8C00E70910 /* SystemCameraConfiguration.swift */,
-				D36878CC2A399B8C00E70910 /* ArrowViewConfiguration.swift */,
-				D36878CD2A399B8C00E70910 /* PhotoListConfiguration.swift */,
 				D36878CE2A399B8C00E70910 /* PickerConfiguration.swift */,
+				D36878CD2A399B8C00E70910 /* PhotoListConfiguration.swift */,
+				D36878C62A399B8C00E70910 /* PhotoListCellConfiguration.swift */,
+				D36878C52A399B8C00E70910 /* PreviewViewConfiguration.swift */,
+				D36878CA2A399B8C00E70910 /* PickerBottomViewConfiguration.swift */,
+				D36878C82A399B8C00E70910 /* AlbumListConfiguration.swift */,
+				D36878C42A399B8C00E70910 /* AlbumTitleViewConfiguration.swift */,
+				D36878CC2A399B8C00E70910 /* ArrowViewConfiguration.swift */,
+				D36878C72A399B8C00E70910 /* EmptyViewConfiguration.swift */,
+				D36878C92A399B8C00E70910 /* NotAuthorizedConfiguration.swift */,
+				D36878CB2A399B8C00E70910 /* SystemCameraConfiguration.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -1813,7 +1786,6 @@
 				D36879042A399B8C00E70910 /* AlbumView.swift */,
 				D36878FD2A399B8C00E70910 /* ArrowView.swift */,
 				D36878FE2A399B8C00E70910 /* CaptureVideoPreviewView.swift */,
-				D36879072A399B8C00E70910 /* Cell */,
 				D36878FC2A399B8C00E70910 /* DeniedAuthorizationView.swift */,
 				D36879002A399B8C00E70910 /* EmptyView.swift */,
 				D36878FF2A399B8C00E70910 /* PhotoPickerBottomNumberView.swift */,
@@ -1832,6 +1804,7 @@
 				D368791E2A399B8C00E70910 /* PhotoPreviewSelectedView.swift */,
 				D36879152A399B8C00E70910 /* PhotoPreviewVideoView.swift */,
 				D36879012A399B8C00E70910 /* PhotoThumbnailView.swift */,
+				D36879072A399B8C00E70910 /* Cell */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1839,19 +1812,20 @@
 		D36879072A399B8C00E70910 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				D36879082A399B8C00E70910 /* PreviewVideoViewCell.swift */,
-				D36879092A399B8C00E70910 /* PreviewVideoControlViewCell.swift */,
-				D368790A2A399B8C00E70910 /* PhotoPreviewSelectedViewCell.swift */,
-				D368790B2A399B8C00E70910 /* PickerCameraViewCell.swift */,
-				D368790C2A399B8C00E70910 /* PreviewPhotoViewCell.swift */,
+				D36879102A399B8C00E70910 /* AlbumViewCell.swift */,
+				D3255D892A3D8DB30017D339 /* PhotoLoaddingView.swift */,
 				D368790D2A399B8C00E70910 /* PhotoPickerBaseViewCell.swift */,
 				D368790E2A399B8C00E70910 /* PhotoPickerLimitCell.swift */,
-				D368790F2A399B8C00E70910 /* PhotoPickerWeChatViewCell.swift */,
-				D36879102A399B8C00E70910 /* AlbumViewCell.swift */,
 				D36879112A399B8C00E70910 /* PhotoPickerSelectableViewCell.swift */,
-				D36879122A399B8C00E70910 /* PreviewLivePhotoViewCell.swift */,
 				D36879132A399B8C00E70910 /* PhotoPickerViewCell.swift */,
+				D368790F2A399B8C00E70910 /* PhotoPickerWeChatViewCell.swift */,
+				D368790A2A399B8C00E70910 /* PhotoPreviewSelectedViewCell.swift */,
 				D36879142A399B8C00E70910 /* PhotoPreviewViewCell.swift */,
+				D368790B2A399B8C00E70910 /* PickerCameraViewCell.swift */,
+				D36879122A399B8C00E70910 /* PreviewLivePhotoViewCell.swift */,
+				D368790C2A399B8C00E70910 /* PreviewPhotoViewCell.swift */,
+				D36879092A399B8C00E70910 /* PreviewVideoControlViewCell.swift */,
+				D36879082A399B8C00E70910 /* PreviewVideoViewCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -1859,11 +1833,11 @@
 		D36879222A399B8C00E70910 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
-				D36879232A399B8C00E70910 /* Util */,
 				D36879252A399B8C00E70910 /* Config */,
 				D36879272A399B8C00E70910 /* Controller */,
-				D36879312A399B8C00E70910 /* Model */,
 				D36879352A399B8C00E70910 /* View */,
+				D36879312A399B8C00E70910 /* Model */,
+				D36879232A399B8C00E70910 /* Util */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -1934,10 +1908,10 @@
 			children = (
 				D36879472A399B8C00E70910 /* ImageEditedResult.swift */,
 				D368793D2A399B8C00E70910 /* VideoEditedResult.swift */,
-				D368793E2A399B8C00E70910 /* Extension */,
-				D36879482A399B8C00E70910 /* Model */,
-				D36879442A399B8C00E70910 /* Util */,
 				D368794C2A399B8C00E70910 /* View */,
+				D36879482A399B8C00E70910 /* Model */,
+				D368793E2A399B8C00E70910 /* Extension */,
+				D36879442A399B8C00E70910 /* Util */,
 			);
 			path = "Editor+View";
 			sourceTree = "<group>";
@@ -1976,6 +1950,12 @@
 		D368794C2A399B8C00E70910 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				D36879642A399B8C00E70910 /* EditorViewProtocol.swift */,
+				D36879612A399B8C00E70910 /* EditorView.swift */,
+				D36879502A399B8C00E70910 /* EditorView+Public.swift */,
+				D36879512A399B8C00E70910 /* EditorView+ScrollView.swift */,
+				D368795F2A399B8C00E70910 /* EditorView+AdjusterView.swift */,
+				D368796B2A399B8C00E70910 /* EditorView+GestureRecognizer.swift */,
 				D368795C2A399B8C00E70910 /* EditorAdjusterView.swift */,
 				D36879582A399B8C00E70910 /* EditorAdjusterView+ContentView.swift */,
 				D36879562A399B8C00E70910 /* EditorAdjusterView+Croper.swift */,
@@ -2001,12 +1981,6 @@
 				D368795D2A399B8C00E70910 /* EditorStickersTrashView.swift */,
 				D36879592A399B8C00E70910 /* EditorStickersView.swift */,
 				D368794D2A399B8C00E70910 /* EditorVideoPlayerView.swift */,
-				D36879612A399B8C00E70910 /* EditorView.swift */,
-				D368795F2A399B8C00E70910 /* EditorView+AdjusterView.swift */,
-				D368796B2A399B8C00E70910 /* EditorView+GestureRecognizer.swift */,
-				D36879502A399B8C00E70910 /* EditorView+Public.swift */,
-				D36879512A399B8C00E70910 /* EditorView+ScrollView.swift */,
-				D36879642A399B8C00E70910 /* EditorViewProtocol.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2025,11 +1999,11 @@
 				D36879772A399B8C00E70910 /* EditedResult.swift */,
 				D36879752A399B8C00E70910 /* Config */,
 				D36879782A399B8C00E70910 /* Controller */,
-				D36879712A399B8C00E70910 /* Extension */,
+				D36879912A399B8D00E70910 /* View */,
 				D368798A2A399B8C00E70910 /* Model */,
+				D36879712A399B8C00E70910 /* Extension */,
 				D368796F2A399B8C00E70910 /* Transition */,
 				D36879732A399B8C00E70910 /* Util */,
-				D36879912A399B8D00E70910 /* View */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -2106,33 +2080,33 @@
 		D36879912A399B8D00E70910 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				D36879922A399B8D00E70910 /* EditorVolumeView.swift */,
+				D36879A22A399B8D00E70910 /* EditorBrushBlockView.swift */,
 				D36879932A399B8D00E70910 /* EditorBrushColorView.swift */,
-				D36879942A399B8D00E70910 /* EditorMusicViewCell.swift */,
-				D36879952A399B8D00E70910 /* EditorStickerTextView+Draw.swift */,
-				D36879962A399B8D00E70910 /* EditorVideoControlView.swift */,
-				D36879972A399B8D00E70910 /* EditorMusicView.swift */,
-				D36879982A399B8D00E70910 /* EditorRatioToolViewCell.swift */,
-				D36879992A399B8D00E70910 /* EditorMaskListViewCell.swift */,
-				D368799A2A399B8D00E70910 /* EditorVideoControlViewCell.swift */,
-				D368799B2A399B8D00E70910 /* EditorStickerTextView+Delegate.swift */,
 				D368799C2A399B8D00E70910 /* EditorBrushSizeView.swift */,
+				D36879A82A399B8D00E70910 /* EditorChartletPreviewView.swift */,
+				D36879AA2A399B8D00E70910 /* EditorChartletViewCell.swift */,
+				D36879A42A399B8D00E70910 /* EditorChartletViewListCell.swift */,
+				D36879AC2A399B8D00E70910 /* EditorCollectionView.swift */,
 				D368799D2A399B8D00E70910 /* EditorFilterEditView.swift */,
+				D36879A32A399B8D00E70910 /* EditorFilterParameterView.swift */,
 				D368799E2A399B8D00E70910 /* EditorFiltersView.swift */,
-				D368799F2A399B8D00E70910 /* EditorRatioToolView.swift */,
+				D36879992A399B8D00E70910 /* EditorMaskListViewCell.swift */,
 				D36879A02A399B8D00E70910 /* EditorMosaicToolView.swift */,
 				D36879A12A399B8D00E70910 /* EditorMusicLyricViewCell.swift */,
-				D36879A22A399B8D00E70910 /* EditorBrushBlockView.swift */,
-				D36879A32A399B8D00E70910 /* EditorFilterParameterView.swift */,
-				D36879A42A399B8D00E70910 /* EditorChartletViewListCell.swift */,
+				D36879972A399B8D00E70910 /* EditorMusicView.swift */,
+				D36879942A399B8D00E70910 /* EditorMusicViewCell.swift */,
+				D368799F2A399B8D00E70910 /* EditorRatioToolView.swift */,
+				D36879982A399B8D00E70910 /* EditorRatioToolViewCell.swift */,
+				D36879AB2A399B8D00E70910 /* EditorScaleView.swift */,
+				D36879A92A399B8D00E70910 /* EditorStickerTextView.swift */,
+				D36879A72A399B8D00E70910 /* EditorStickerTextView+CollectionView.swift */,
+				D368799B2A399B8D00E70910 /* EditorStickerTextView+Delegate.swift */,
+				D36879952A399B8D00E70910 /* EditorStickerTextView+Draw.swift */,
 				D36879A52A399B8D00E70910 /* EditorToolsView.swift */,
 				D36879A62A399B8D00E70910 /* EditorVideoControlMaskView.swift */,
-				D36879A72A399B8D00E70910 /* EditorStickerTextView+CollectionView.swift */,
-				D36879A82A399B8D00E70910 /* EditorChartletPreviewView.swift */,
-				D36879A92A399B8D00E70910 /* EditorStickerTextView.swift */,
-				D36879AA2A399B8D00E70910 /* EditorChartletViewCell.swift */,
-				D36879AB2A399B8D00E70910 /* EditorScaleView.swift */,
-				D36879AC2A399B8D00E70910 /* EditorCollectionView.swift */,
+				D36879962A399B8D00E70910 /* EditorVideoControlView.swift */,
+				D368799A2A399B8D00E70910 /* EditorVideoControlViewCell.swift */,
+				D36879922A399B8D00E70910 /* EditorVolumeView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2245,20 +2219,17 @@
 				D30ED4412A3C5F2D0074525C /* IMG_0168.GIF in Resources */,
 				D36874A52A39744300E70910 /* PickerResultViewController.xib in Resources */,
 				D368745D2A39744300E70910 /* portrait.png in Resources */,
-				D36874F82A39760500E70910 /* wp.jpeg in Resources */,
 				D36874E62A39760500E70910 /* RELEASE_NOTE.md in Resources */,
 				D36874592A39744300E70910 /* hx_sticker_yuanqimanman.png in Resources */,
 				D36874FE2A39760500E70910 /* RELEASE_NOTE_CN.md in Resources */,
 				D36874D42A39749D00E70910 /* HXPhotoPicker.podspec in Resources */,
 				D368745F2A39744300E70910 /* hx_sticker_woxiangfazipai.png in Resources */,
-				D36874F62A39760500E70910 /* bmc_qr.png in Resources */,
 				D30ED4382A3C55B10074525C /* c81.mp4 in Resources */,
 				D368746D2A39744300E70910 /* hx_sticker_kehaixing.png in Resources */,
 				7B20B41827A2A94D00375FB6 /* LaunchScreen.storyboard in Resources */,
 				D36874692A39744300E70910 /* hx_sticker_wow.png in Resources */,
 				D36874732A39744300E70910 /* hx_sticker_jintianfenkeai.png in Resources */,
 				D36874752A39744300E70910 /* hx_sticker_keaibiaoq.png in Resources */,
-				D36874F22A39760500E70910 /* ap.jpeg in Resources */,
 				D36874712A39744300E70910 /* hx_sticker_saihong.png in Resources */,
 				D368747F2A39744300E70910 /* hx_sticker_haoxinqing.png in Resources */,
 				7B20B41627A2A94D00375FB6 /* Assets.xcassets in Resources */,
@@ -2266,10 +2237,8 @@
 				D36874612A39744300E70910 /* hx_sticker_xiaochuzhujiao.png in Resources */,
 				D36874C12A39744300E70910 /* 世间美好与你环环相扣 in Resources */,
 				D36874792A39744300E70910 /* stars.png in Resources */,
-				D36874F42A39760500E70910 /* sample_graph.png in Resources */,
 				D36874672A39744300E70910 /* qiy.png in Resources */,
 				D368747B2A39744300E70910 /* text.png in Resources */,
-				D36874FA2A39760500E70910 /* sample_graph_en.png in Resources */,
 				D36874FC2A39760500E70910 /* README_EN.md in Resources */,
 				D368746B2A39744300E70910 /* hx_sticker_yuanqishaonv.png in Resources */,
 				D368745B2A39744300E70910 /* hx_sticker_housailei.png in Resources */,
@@ -2286,7 +2255,6 @@
 			files = (
 				D30ED43D2A3C5D7D0074525C /* livephoto_image.jpeg in Resources */,
 				D368745C2A39744300E70910 /* portrait.png in Resources */,
-				D36874F72A39760500E70910 /* wp.jpeg in Resources */,
 				D368746E2A39744300E70910 /* hx_sticker_zaizaijia.png in Resources */,
 				D36874FB2A39760500E70910 /* README_EN.md in Resources */,
 				D36874742A39744300E70910 /* hx_sticker_keaibiaoq.png in Resources */,
@@ -2314,8 +2282,6 @@
 				7BC3715D2505D25000E2D05C /* HXPhotoEditChartletPreviewView.xib in Resources */,
 				D30ED4372A3C55B10074525C /* c81.mp4 in Resources */,
 				7BC371542505D25000E2D05C /* HXPhotoEditMosaicView.xib in Resources */,
-				D36874F92A39760500E70910 /* sample_graph_en.png in Resources */,
-				D36874F52A39760500E70910 /* bmc_qr.png in Resources */,
 				D30ED3EE2A3C12EF0074525C /* HXPhotoPickerObjC.podspec in Resources */,
 				7B08596E24FA58DF00E93091 /* WxMomentViewController.xib in Resources */,
 				7BC3715C2505D25000E2D05C /* HXPhotoEditTextView.xib in Resources */,
@@ -2337,12 +2303,10 @@
 				D36874A42A39744300E70910 /* PickerResultViewController.xib in Resources */,
 				7BC371572505D25000E2D05C /* HXCameraBottomView.xib in Resources */,
 				7B2824192514A7CD00DEE5A0 /* HXPhotoPicker.bundle in Resources */,
-				D36874F32A39760500E70910 /* sample_graph.png in Resources */,
 				7B08596C24FA58DF00E93091 /* Demo1ViewController.xib in Resources */,
 				7BC3715B2505D25000E2D05C /* HXPhotoEditClippingToolBar.xib in Resources */,
 				7BC371592505D25000E2D05C /* HXPhotoEditGraffitiColorViewCell.xib in Resources */,
 				D36875002A399AC700E70910 /* HXPhotoPicker-Lite.podspec in Resources */,
-				D36874F12A39760500E70910 /* ap.jpeg in Resources */,
 				7BC371562505D25000E2D05C /* HXPhotoEditChartletListView.xib in Resources */,
 				D36874762A39744300E70910 /* love.png in Resources */,
 			);
@@ -2841,7 +2805,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 4.0.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence11.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2873,7 +2837,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 4.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence11.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

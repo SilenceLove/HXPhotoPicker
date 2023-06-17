@@ -307,19 +307,32 @@ extension PhotoPickerViewController {
                         showHUD = true
                     }
                 }
-                let inICloud = photoAsset.checkICloundStatus(
-                    allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto,
-                    completion: { _, isSuccess in
-                    if isSuccess {
-                        addAsset(showTip: true)
+                if let pickerCell = getCell(for: item) as? PhotoPickerViewCell {
+                    if photoAsset.downloadStatus != .succeed {
+                        let inICloud = pickerCell.checkICloundStatus(
+                            allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto
+                        )
+                        if !inICloud {
+                            addAsset(showTip: false)
+                        }
+                    }else {
+                        addAsset(showTip: false)
                     }
-                })
-                if inICloud {
-                    swipeSelectPanGR?.isEnabled = false
-                    clearSwipeSelectData()
-                    swipeSelectPanGR?.isEnabled = true
                 }else {
-                    addAsset(showTip: false)
+                    let inICloud = photoAsset.checkICloundStatus(
+                        allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto,
+                        completion: { _, isSuccess in
+                        if isSuccess {
+                            addAsset(showTip: true)
+                        }
+                    })
+                    if inICloud {
+                        swipeSelectPanGR?.isEnabled = false
+                        clearSwipeSelectData()
+                        swipeSelectPanGR?.isEnabled = true
+                    }else {
+                        addAsset(showTip: false)
+                    }
                 }
             }else {
                 pickerController.removePhotoAsset(photoAsset: photoAsset)

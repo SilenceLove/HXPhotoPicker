@@ -133,6 +133,7 @@ class EditorToolsView: UIView {
             }
             shadeView.width = min(toolsWidth, maxWidth)
             shadeView.height = 50
+            shadeView.y = 0
         }else {
             flowLayout.scrollDirection = .vertical
             flowLayout.itemSize = CGSize(width: 30, height: 50)

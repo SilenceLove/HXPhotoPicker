@@ -40,6 +40,9 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             )
             if isExceedsTheLimit {
                 videoEditorConfig.video.defaultSelectedToolOption = .time
+                videoEditorConfig.video.cropTime.maximumTime = TimeInterval(
+                    pickerConfig.maximumSelectedVideoDuration
+                )
             }
             guard let videoEditorConfig = picker.shouldEditVideoAsset(
                 videoAsset: photoAsset,

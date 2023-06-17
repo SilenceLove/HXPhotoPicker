@@ -66,13 +66,18 @@ extension PhotoPickerViewController: PhotoPickerViewCellDelegate {
                     updateCellSelectedTitle()
                 }
             }
-            let inICloud = cell.photoAsset.checkICloundStatus(
-                allowSyncPhoto: picker.config.allowSyncICloudWhenSelectPhoto,
-                completion: { _, isSuccess in
-                if isSuccess {
-                    addAsset()
-                }
-            })
+            let inICloud: Bool
+            if let pickerCell = cell as? PhotoPickerViewCell {
+                inICloud = pickerCell.checkICloundStatus(allowSyncPhoto: picker.config.allowSyncICloudWhenSelectPhoto)
+            }else {
+                inICloud = cell.photoAsset.checkICloundStatus(
+                    allowSyncPhoto: picker.config.allowSyncICloudWhenSelectPhoto,
+                    completion: { _, isSuccess in
+                    if isSuccess {
+                        addAsset()
+                    }
+                })
+            }
             if !inICloud {
                 addAsset()
             }

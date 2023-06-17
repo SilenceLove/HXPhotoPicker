@@ -109,6 +109,7 @@ public struct PickerBottomViewConfiguration {
     
     /// Whether to disable the finish button when no resource is selected
     /// 未选择资源时是否禁用完成按钮
+    /// 视频最大选择数量为 1 时无效
     public var disableFinishButtonWhenNotSelected: Bool = true
     
     #if HXPICKER_ENABLE_EDITOR

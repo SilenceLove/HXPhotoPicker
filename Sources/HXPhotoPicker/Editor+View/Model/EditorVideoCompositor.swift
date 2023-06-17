@@ -79,6 +79,7 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
         }
         if var sourcePixelBuffer = fixOrientation(
             pixelBuffer,
+            instruction.videoOrientation,
             instruction.cropFactor
         ) {
             if let filterPixelBuffer = instruction.filter?(sourcePixelBuffer, request.compositionTime) {
@@ -108,6 +109,7 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
     
     func fixOrientation(
         _ pixelBuffer: CVPixelBuffer,
+        _ videoOrientation: AVCaptureVideoOrientation,
         _ cropFactor: EditorAdjusterView.CropFactor
     ) -> CVPixelBuffer? {
         var ciImage = CIImage(cvPixelBuffer: pixelBuffer)
@@ -115,6 +117,36 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
             width: CVPixelBufferGetWidth(pixelBuffer),
             height: CVPixelBufferGetHeight(pixelBuffer)
         )
+        var isFixOrientation: Bool = false
+        switch videoOrientation {
+        case .portrait:
+            if #available(iOS 11.0, *) {
+                ciImage = ciImage.oriented(.right)
+            } else {
+                ciImage = ciImage.oriented(forExifOrientation: 6)
+            }
+            size = .init(width: size.height, height: size.width)
+            isFixOrientation = true
+        case .portraitUpsideDown:
+            if #available(iOS 11.0, *) {
+                ciImage = ciImage.oriented(.left)
+            } else {
+                ciImage = ciImage.oriented(forExifOrientation: 8)
+            }
+            size = .init(width: size.height, height: size.width)
+            isFixOrientation = true
+        case .landscapeRight:
+            break
+        case .landscapeLeft:
+            if #available(iOS 11.0, *) {
+                ciImage = ciImage.oriented(.down)
+            } else {
+                ciImage = ciImage.oriented(forExifOrientation: 3)
+            }
+            isFixOrientation = true
+        @unknown default:
+            break
+        }
         if cropFactor.allowCroped {
             guard let cgImage = context.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: size.width, height: size.height)) else {
                 return pixelBuffer
@@ -131,7 +163,7 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
             }else {
                 return pixelBuffer
             }
-        }else {
+        }else if !isFixOrientation {
             return pixelBuffer
         }
         guard let newPixelBuffer = PhotoTools.createPixelBuffer(size) else {

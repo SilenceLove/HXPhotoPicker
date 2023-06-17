@@ -468,7 +468,15 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
             if picker.config.selectMode == .single {
                 finishBtn.isEnabled = true
             }else {
-                finishBtn.isEnabled = !config.disableFinishButtonWhenNotSelected
+                if sourceType == .preview {
+                    if picker.config.maximumSelectedVideoCount == 1 {
+                        finishBtn.isEnabled = true
+                    }else {
+                        finishBtn.isEnabled = !config.disableFinishButtonWhenNotSelected
+                    }
+                }else {
+                    finishBtn.isEnabled = !config.disableFinishButtonWhenNotSelected
+                }
             }
             previewBtn.isEnabled = false
             finishBtn.setTitle("完成".localized, for: .normal)
