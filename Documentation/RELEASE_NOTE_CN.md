@@ -18,4 +18,4 @@
 
 ## 3.0
 
-- [Object-C版本](https://github.com/SilenceLove/HXPhotoPicker/blob/master/README_OC.md)
+- [Object-C版本](https://github.com/SilenceLove/HXPhotoPickerObjC)

@@ -273,7 +273,7 @@ photoAsset.getURL(compression: compression) { result in
 | ---- | ----  | ---- | ---- | ---- |
 | [v4.0.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#401) | 2023-06-17 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#400) | 2023-06-15 | 14.3.0 | 5.7.0 | 12.0+ |
-| [v3.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/README_OC.md#更新记录) | 2022-09-18 | 14.0.0 | ----- | 8.0+ |
+| [v3.0.0](https://github.com/SilenceLove/HXPhotoPickerObjC#-%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BD%95---update-history) | 2022-09-18 | 14.0.0 | ----- | 8.0+ |
 
 ## <a id="演示效果"></a> 演示效果
 
