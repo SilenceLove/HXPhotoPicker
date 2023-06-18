@@ -8,7 +8,6 @@
 
 #import "OCPickerExampleViewController.h"
 #import "HXPhotoPickerExample-Swift.h"
-#import "HXPhotoPicker.h"
 
 @interface OCPickerExampleViewController ()
 
@@ -27,7 +26,7 @@
 - (void)openPicker {
     SwiftPickerConfiguration *config = [[SwiftPickerConfiguration alloc] init];
     config.isAutoBack = NO;
-    HXWeakSelf
+    __weak typeof(self) weakSelf = self;
     [SwiftPicker openPicker:config fromVC:self finish:^(SwiftPickerResult * _Nonnull pickerResult, PhotoPickerController * _Nonnull photoPickerController) {
         [photoPickerController dismissViewControllerAnimated:YES completion:^{
             [weakSelf.view showLoading:@"正在获取URL，结果打印在控制台"];
