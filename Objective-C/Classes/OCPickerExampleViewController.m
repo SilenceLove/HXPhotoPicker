@@ -27,7 +27,7 @@
     SwiftPickerConfiguration *config = [[SwiftPickerConfiguration alloc] init];
     config.isAutoBack = NO;
     __weak typeof(self) weakSelf = self;
-    [SwiftPicker openPicker:config fromVC:self finish:^(SwiftPickerResult * _Nonnull pickerResult, PhotoPickerController * _Nonnull photoPickerController) {
+    PhotoPickerController *controller = [[PhotoPickerController alloc] init:config finish:^(SwiftPickerResult * _Nonnull pickerResult, PhotoPickerController * _Nonnull photoPickerController) {
         [photoPickerController dismissViewControllerAnimated:YES completion:^{
             [weakSelf.view showLoading:@"正在获取URL，结果打印在控制台"];
             NSLog(@"选择完成，正在获取URL");
@@ -43,6 +43,7 @@
     } cancel:^(PhotoPickerController * _Nonnull photoPickerController) {
         NSLog(@"取消选择");
     }];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 @end

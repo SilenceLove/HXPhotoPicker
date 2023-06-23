@@ -8,8 +8,24 @@
 
 import UIKit
 import HXPhotoPicker
+
+extension PhotoPickerController {
+    
+    @objc
+    convenience init(
+        _ config: SwiftPickerConfiguration,
+        finish: ((SwiftPickerResult, PhotoPickerController) -> Void)?,
+        cancel: ((PhotoPickerController) -> Void)?
+    ) {
+        self.init(config: config.toHX) {
+            finish?(.init(photoAssets: $0.photoAssets, isOriginal: $0.isOriginal), $1)
+        } cancel: {
+            cancel?($0)
+        }
+    }
+}
  
-class SwiftPicker: NSObject {
+class SwiftPhotoPicker: NSObject {
     
     @objc
     @discardableResult

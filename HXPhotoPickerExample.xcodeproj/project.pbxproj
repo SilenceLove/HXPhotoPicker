@@ -201,6 +201,7 @@
 		D35962922A3EC175009CCD94 /* SwiftPickerConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPickerConfiguration.swift; sourceTree = "<group>"; };
 		D35962932A3EC175009CCD94 /* SwiftPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPicker.swift; sourceTree = "<group>"; };
 		D35962942A3EC175009CCD94 /* SwiftPhotoAsset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPhotoAsset.swift; sourceTree = "<group>"; };
+		D359629F2A3F0724009CCD94 /* PhotoPickerFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerFilterViewController.swift; sourceTree = "<group>"; };
 		D368740F2A39744200E70910 /* hx_sticker_yuanqimanman.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hx_sticker_yuanqimanman.png; sourceTree = "<group>"; };
 		D36874102A39744200E70910 /* hx_sticker_housailei.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hx_sticker_housailei.png; sourceTree = "<group>"; };
 		D36874112A39744200E70910 /* portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait.png; sourceTree = "<group>"; };
@@ -585,7 +586,6 @@
 				7B08592524FA58DE00E93091 /* ViewController.m */,
 				D36879B12A399FDC00E70910 /* OCPickerExampleViewController.h */,
 				D36879B22A399FDC00E70910 /* OCPickerExampleViewController.m */,
-				D359628F2A3EC175009CCD94 /* SwiftPicker */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -662,6 +662,7 @@
 		7B7E3E781E4AACD1002234EE /* Objective-C */ = {
 			isa = PBXGroup;
 			children = (
+				D359628F2A3EC175009CCD94 /* SwiftPhotoPicker */,
 				7B08590B24FA58DE00E93091 /* Classes */,
 				7B7E3E7C1E4AACD1002234EE /* AppDelegate.h */,
 				7B7E3E7D1E4AACD1002234EE /* AppDelegate.m */,
@@ -681,7 +682,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		D359628F2A3EC175009CCD94 /* SwiftPicker */ = {
+		D359628F2A3EC175009CCD94 /* SwiftPhotoPicker */ = {
 			isa = PBXGroup;
 			children = (
 				D35962902A3EC175009CCD94 /* SwiftPickerResult.swift */,
@@ -690,7 +691,7 @@
 				D35962932A3EC175009CCD94 /* SwiftPicker.swift */,
 				D35962942A3EC175009CCD94 /* SwiftPhotoAsset.swift */,
 			);
-			path = SwiftPicker;
+			path = SwiftPhotoPicker;
 			sourceTree = "<group>";
 		};
 		D368740C2A39744200E70910 /* Images */ = {
@@ -1021,6 +1022,7 @@
 				D36878E12A399B8C00E70910 /* PhotoPickerViewController+FetchAsset.swift */,
 				D36878E52A399B8C00E70910 /* PhotoPickerViewController+Preview.swift */,
 				D36878E92A399B8C00E70910 /* PhotoPickerViewController+SwipeSelect.swift */,
+				D359629F2A3F0724009CCD94 /* PhotoPickerFilterViewController.swift */,
 				D36878D42A399B8C00E70910 /* PhotoPreviewViewController.swift */,
 				D36878DD2A399B8C00E70910 /* PhotoPreviewViewController+BottomView.swift */,
 				D36878DC2A399B8C00E70910 /* PhotoPreviewViewController+CollectionView.swift */,

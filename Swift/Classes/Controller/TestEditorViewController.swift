@@ -124,13 +124,13 @@ class TestEditorViewController: BaseViewController {
         if editorView.type != .unknown {
             alert.addAction(.init(title: "使用编辑器继续编辑", style: .default, handler: { [weak self] _ in
                 guard let self = self else { return }
+                let edtiorAsset: EditorAsset
                 if editorView.type == .image {
                     var result: EditedResult?
                     if editorView.isCropedImage {
                         result = .image(.init(data: editorView.adjustmentData), .init(cropSize: .init(isFixedRatio: editorView.isFixedRatio, aspectRatio: editorView.aspectRatio, angle: 0)))
                     }
-                    let vc = EditorViewController(.init(type: .image(image!), result: result))
-                    self.present(vc, animated: true)
+                    edtiorAsset = .init(type: .image(image!), result: result)
                 }else if editorView.type == .video {
                     var result: EditedResult?
                     if editorView.isCropedVideo {
@@ -147,9 +147,26 @@ class TestEditorViewController: BaseViewController {
                         }
                         result = .video(.init(data: editorView.adjustmentData), .init(music: music,cropSize: .init(isFixedRatio: editorView.isFixedRatio, aspectRatio: editorView.aspectRatio, angle: 0)))
                     }
-                    let vc = EditorViewController(.init(type: .video(videoURL), result: result))
-                    self.present(vc, animated: true)
+                    edtiorAsset = .init(type: .video(videoURL), result: result)
+                }else {
+                    return
                 }
+                let vc = EditorViewController(edtiorAsset) { [weak self] editorAsset, _ in
+                    guard let self = self, let result = editorAsset.result else {
+                        return
+                    }
+                    let vc = TestEditorViewController()
+                    switch result {
+                    case .image(let image, _):
+                        vc.image = editorAsset.type.image!
+                        vc.imageResult = image
+                    case .video(let video, _):
+                        vc.videoURL = editorAsset.type.videoURL!
+                        vc.videoResult = video
+                    }
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+                self.present(vc, animated: true)
                 editorView.pauseVideo()
                 for audioPlayer in self.audioPlayers {
                     audioPlayer.stopPlay()
@@ -670,7 +687,8 @@ class TestEditorViewController: BaseViewController {
         config.selectMode = .single
         config.selectOptions = [.gifPhoto, .video]
         config.previewView.bottomView.isHiddenOriginalButton = true
-        let vc = hx.present(
+        config.isAutoBack = false
+        hx.present(
             picker: config
         ) { [weak self] result, pickerController in
             guard let self = self else { return }
@@ -703,7 +721,6 @@ class TestEditorViewController: BaseViewController {
                 }
             }
         }
-        vc.autoDismiss = false
     }
     
     lazy var context: CIContext = .init()

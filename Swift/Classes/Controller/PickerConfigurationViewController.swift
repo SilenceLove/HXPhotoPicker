@@ -30,10 +30,50 @@ class PickerConfigurationViewController: UITableViewController {
     
     @objc func openPickerController() {
         if showOpenPickerButton {
-            let vc = PhotoPickerController.init(config: config)
-            vc.pickerDelegate = self
-            vc.autoDismiss = false
-            present(vc, animated: true, completion: nil)
+            if #available(iOS 13.0.0, *) {
+                Task {
+                    do {
+//                        let urlResults: [AssetURLResult] = try await PhotoPickerController.picker(config)
+//                        print(urlResults)
+                        
+//                        config.isAutoBack = false
+//                        let controller = PhotoPickerController.show(config)
+//                        let result = try await controller.picker()
+//                        let images: [UIImage] = try await result.objects()
+//                        let urls: [URL] = try await result.objects()
+//                        let urlResults: [AssetURLResult] = try await result.objects()
+//                        print(images)
+//                        await MainActor.run(body: {
+//                            controller.dismiss(true) {
+//                                let pickerResultVC = PickerResultViewController()
+//                                pickerResultVC.config = self.config
+//                                pickerResultVC.selectedAssets = result.photoAssets
+//                                pickerResultVC.isOriginal = result.isOriginal
+//                                self.navigationController?.pushViewController(pickerResultVC, animated: true)
+//                            }
+//                        })
+                        
+                        let result = try await PhotoPickerController.picker(config)
+//                        let images: [UIImage] = try await result.objects()
+//                        let urls: [URL] = try await result.objects()
+//                        let urlResults: [AssetURLResult] = try await result.objects()
+                        await MainActor.run(body: {
+                            let pickerResultVC = PickerResultViewController()
+                            pickerResultVC.config = self.config
+                            pickerResultVC.selectedAssets = result.photoAssets
+                            pickerResultVC.isOriginal = result.isOriginal
+                            self.navigationController?.pushViewController(pickerResultVC, animated: true)
+                        })
+                    } catch {
+                        print(error)
+                    }
+                }
+            } else {
+                let vc = PhotoPickerController.init(config: config)
+                vc.pickerDelegate = self
+                vc.autoDismiss = false
+                present(vc, animated: true, completion: nil)
+            }
         }else {
             didDoneHandler?(config)
             dismiss(animated: true, completion: nil)

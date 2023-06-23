@@ -86,5 +86,16 @@ class SwiftPickerConfiguration: NSObject {
            }
        }
    }
+    
+    var toHX: PickerConfiguration {
+        var config = PickerConfiguration()
+        config.isAutoBack = isAutoBack
+        config.selectOptions = selectOptions.toSwift
+        config.selectMode = selectMode.toSwift
+        config.allowSelectedTogether = allowSelectedTogether
+        config.allowSyncICloudWhenSelectPhoto = allowSyncICloudWhenSelectPhoto
+        config.albumShowMode = albumShowMode.toSwift
+        return config
+    }
 }
 
