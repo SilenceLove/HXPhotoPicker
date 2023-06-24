@@ -69,14 +69,40 @@ extension PhotoPickerViewController {
     }
     func fetchPhotoAssets() {
         guard let picker = pickerController else { return }
+        var addFilter: Bool = true
+        if let assetCollection = assetCollection,
+           let collection = assetCollection.collection {
+            if collection.isCameraRoll {
+                addFilter = true
+            }else if collection.assetCollectionType == .album {
+                addFilter = true
+            }else {
+                addFilter = false
+            }
+        }
+        let selectOptions = picker.config.selectOptions
+        if selectOptions.isVideo && !selectOptions.isPhoto {
+            addFilter = false
+        }else if selectOptions.isPhoto && !selectOptions.isVideo {
+            if !selectOptions.contains(.gifPhoto) && !selectOptions.contains(.livePhoto) {
+                addFilter = false
+            }
+        }
+        if filterOptions != .any {
+            filterOptions = .any
+        }
+        initNavItems(addFilter)
         picker.fetchPhotoAssets(
             assetCollection: assetCollection
         ) { [weak self] (photoAssets, photoAsset, photoCount, videoCount) in
             guard let self = self else { return }
             self.didFetchAsset = true
+            self.allAssets = photoAssets
             self.assets = photoAssets
             self.photoCount = photoCount
             self.videoCount = videoCount
+            self.allPhotoCount = photoCount
+            self.allVideoCount = videoCount
             self.setupEmptyView()
             self.collectionView.reloadData()
 //            DispatchQueue.main.async {

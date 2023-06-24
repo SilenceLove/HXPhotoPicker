@@ -137,6 +137,9 @@ public struct PhotoListConfiguration {
     /// 底部显示 照片/视频 数量
     public var isShowAssetNumber: Bool = true
     
+    /// 导航栏显示筛选按钮
+    public var isShowFilterItem: Bool = true
+    
     public var assetNumber: AssetNumber = .init()
     
     /// Relevant configuration displayed when there is no resource
@@ -267,6 +270,12 @@ extension PhotoListConfiguration {
         public var textColor: UIColor = "#333333".hx.color
         public var textDarkColor: UIColor = "#ffffff".hx.color
         public var textFont: UIFont = HXPickerWrapper<UIFont>.mediumPingFang(ofSize: 15)
+        
+        public var filterTitleColor: UIColor = "#555555".hx.color
+        public var filterTitleDarkColor: UIColor = "#ffffff".hx.color
+        public var filterContentColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+        public var filterContentDarkColor: UIColor = HXPickerWrapper<UIColor>.systemTintColor
+        public var filterFont: UIFont = .systemFont(ofSize: 13)
         public init() { }
     }
 }

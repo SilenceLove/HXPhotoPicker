@@ -19,6 +19,7 @@ public class PhotoPickerViewController: BaseViewController {
     }
     var assetCollection: PhotoAssetCollection!
     var assets: [PhotoAsset] = []
+    var allAssets: [PhotoAsset] = []
     var swipeSelectBeganIndexPath: IndexPath?
     var swipeSelectedIndexArray: [Int]?
     var swipeSelectState: SwipeSelectState?
@@ -155,6 +156,11 @@ public class PhotoPickerViewController: BaseViewController {
     var photoCount: Int = 0
     /// 视频数量
     var videoCount: Int = 0
+    
+    var allPhotoCount: Int = 0
+    var allVideoCount: Int = 0
+    
+    var filterOptions: PhotoPickerFilterSection.Options = .any
     
     // MARK: 屏幕旋转相关
     var orientationDidChange: Bool = false
@@ -418,6 +424,16 @@ extension PhotoPickerViewController {
             bottomView.updateFinishButtonTitle()
         }
         if picker.config.albumShowMode == .popup {
+            view.addSubview(albumBackgroudView)
+            view.addSubview(albumView)
+        }
+    }
+    func initNavItems(_ addFilter: Bool = true) {
+        guard let picker = pickerController else { return }
+        
+        let filterImageName: String = filterOptions == .any ? "hx_picker_photolist_nav_filter_normal" : "hx_picker_photolist_nav_filter_selected"
+        let filterItem = UIBarButtonItem(image: filterImageName.image, style: .done, target: self, action: #selector(didFilterItemClick))
+        if picker.config.albumShowMode == .popup {
             var cancelItem: UIBarButtonItem
             if config.cancelType == .text {
                 cancelItem = UIBarButtonItem(
@@ -440,18 +456,30 @@ extension PhotoPickerViewController {
             }
             if config.cancelPosition == .left {
                 navigationItem.leftBarButtonItem = cancelItem
+                if config.isShowFilterItem, addFilter {
+                    navigationItem.rightBarButtonItem = filterItem
+                }else {
+                    navigationItem.rightBarButtonItem = nil
+                }
             }else {
-                navigationItem.rightBarButtonItem = cancelItem
+                if config.isShowFilterItem, addFilter {
+                    navigationItem.rightBarButtonItems = [cancelItem, filterItem]
+                }else {
+                    navigationItem.rightBarButtonItem = cancelItem
+                }
             }
-            view.addSubview(albumBackgroudView)
-            view.addSubview(albumView)
         }else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(
+            let cancelItem = UIBarButtonItem(
                 title: "取消".localized,
                 style: .done,
                 target: self,
                 action: #selector(didCancelItemClick)
             )
+            if config.isShowFilterItem, addFilter {
+                navigationItem.rightBarButtonItems = [cancelItem, filterItem]
+            }else {
+                navigationItem.rightBarButtonItem = cancelItem
+            }
         }
     }
     private func configData() {
@@ -608,13 +636,25 @@ extension PhotoPickerViewController {
     func addedPhotoAsset(for photoAsset: PhotoAsset) {
         let indexPath: IndexPath
         if config.sort == .desc {
-            assets.insert(photoAsset, at: 0)
+            allAssets.insert(photoAsset, at: 0)
+            if filterOptions != .any {
+                filterPhotoAssets()
+                return
+            }else {
+                assets = allAssets
+            }
             indexPath = IndexPath(
                 item: needOffset ? offsetIndex : 0,
                 section: 0
             )
         }else {
-            assets.append(photoAsset)
+            allAssets.append(photoAsset)
+            if filterOptions != .any {
+                filterPhotoAssets()
+                return
+            }else {
+                assets = allAssets
+            }
             indexPath = IndexPath(
                 item: assets.count - 1,
                 section: 0
@@ -680,5 +720,93 @@ extension PhotoPickerViewController {
     
     @objc func didCancelItemClick() {
         pickerController?.cancelCallback()
+    }
+    
+    @objc
+    func didFilterItemClick() {
+        let vc: PhotoPickerFilterViewController
+        if #available(iOS 13.0, *) {
+            vc = PhotoPickerFilterViewController(style: .insetGrouped)
+        } else {
+            vc = PhotoPickerFilterViewController(style: .grouped)
+        }
+        if let config = pickerController?.config {
+            vc.selectOptions = config.selectOptions
+            vc.editorOptions = config.editorOptions
+            vc.selectMode = config.selectMode
+        }
+        vc.photoCount = photoCount
+        vc.videoCount = videoCount
+        vc.options = filterOptions
+        vc.didSelectedHandler = { [weak self] in
+            guard let self = self else {
+                return
+            }
+            let options = $0.options
+            self.filterOptions = options
+            self.initNavItems()
+            self.filterPhotoAssets()
+            $0.photoCount = self.photoCount
+            $0.videoCount = self.videoCount
+        }
+        let nav = UINavigationController(rootViewController: vc)
+        present(nav, animated: true)
+    }
+    
+    func filterPhotoAssets() {
+        if filterOptions == .any {
+            assets = allAssets
+            photoCount = allPhotoCount
+            videoCount = allVideoCount
+            setupEmptyView()
+            collectionView.reloadData()
+            scrollToAppropriatePlace(photoAsset: nil)
+            return
+        }
+        var photoCount: Int = 0
+        var videoCount: Int = 0
+        let assets = allAssets.filter {
+            if filterOptions.contains(.edited) {
+                if $0.editedResult != nil {
+                    if $0.mediaType == .photo {
+                        photoCount += 1
+                    }else {
+                        videoCount += 1
+                    }
+                    return true
+                }
+            }
+            if filterOptions.contains(.photo) {
+                if $0.mediaSubType.isNormalPhoto {
+                    photoCount += 1
+                    return true
+                }
+            }
+            if filterOptions.contains(.gif) {
+                if $0.mediaSubType.isGif {
+                    photoCount += 1
+                    return true
+                }
+            }
+            if filterOptions.contains(.livePhoto) {
+                if $0.mediaSubType.isLivePhoto {
+                    photoCount += 1
+                    return true
+                }
+            }
+            if filterOptions.contains(.video) {
+                if $0.mediaType == .video {
+                    videoCount += 1
+                    return true
+                }
+            }
+            return false
+        }
+        self.assets = assets
+        self.photoCount = photoCount
+        self.videoCount = videoCount
+        setupEmptyView()
+        collectionView.reloadData()
+        scrollToAppropriatePlace(photoAsset: pickerController?.selectedAssetArray.first)
     }
 }

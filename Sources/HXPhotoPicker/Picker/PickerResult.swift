@@ -52,7 +52,7 @@ public extension PickerResult {
     ///   - imageHandler: Triggered every time an image is fetched / 每一次获取image都会触发
     ///   - completionHandler: All acquisitions are completed (failures will not be added) / 全部获取完成(失败的不会添加)
     func getImage(
-        compressionScale: CGFloat = 0.5,
+        compressionScale: CGFloat? = 0.5,
         imageHandler: ImageHandler? = nil,
         completionHandler: @escaping ([UIImage]) -> Void
     ) {
@@ -121,6 +121,19 @@ public extension PickerResult {
             completionHandler: completionHandler
         )
     }
+    
+    func getURLs(
+        compression: PhotoAsset.Compression? = nil,
+        urlReceivedHandler handler: URLHandler? = nil,
+        completionHandler: @escaping ([URL]) -> Void
+    ) {
+        photoAssets.getURLs(
+            options: .any,
+            compression: compression,
+            urlReceivedHandler: handler,
+            completionHandler: completionHandler
+        )
+    }
 }
 
 extension PickerResult {
@@ -133,4 +146,50 @@ extension PickerResult {
     /// (Result of getting URL, PhotoAsset object, index)
     /// (获取URL的结果、PhotoAsset 对象, 索引)
     public typealias URLHandler = (Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void
+}
+
+@available(iOS 13.0.0, *)
+public extension PickerResult {
+    
+    func images(_ compressionScale: CGFloat? = nil) async -> [UIImage] {
+        await withCheckedContinuation { continuation in
+            getImage(compressionScale: compressionScale) {
+                continuation.resume(with: .success($0))
+            }
+        }
+    }
+    
+    func urls(_ compression: PhotoAsset.Compression? = nil) async -> [URL] {
+        await withCheckedContinuation { continuation in
+            getURLs(
+                compression: compression
+            ) {
+                continuation.resume(with: .success($0))
+            }
+        }
+    }
+    
+    func objects<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
+        try await withCheckedThrowingContinuation { continuation in
+            getObjects(compression) {
+                continuation.resume(with: $0)
+            }
+        }
+    }
+    
+    func getObjects<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression?, completion: @escaping (Result<[T], PickerError>) -> Void) {
+        Task {
+            var results: [T] = []
+            for (index, photoAsset) in photoAssets.enumerated() {
+                do {
+                    let result = try await T.fetchObject(photoAsset, compression: compression)
+                    results.append(result)
+                } catch {
+                    completion(.failure(.objsFetchFaild(photoAsset, index, error)))
+                    return
+                }
+            }
+            completion(.success(results))
+        }
+    }
 }

@@ -26,8 +26,10 @@ extension PhotoTools {
                 title: "无法访问相册中照片".localized,
                 message: "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized,
                 leftActionTitle: "取消".localized,
-                leftHandler: {_ in },
-                rightActionTitle: "前往系统设置".localized) { (alertAction) in
+                leftHandler: {_ in
+                },
+                rightActionTitle: "前往系统设置".localized
+            ) { (alertAction) in
                 openSettingsURL()
             }
         }
@@ -339,6 +341,8 @@ extension PhotoTools {
         config.photoList.limitCell.lineColor = .white
         config.photoList.limitCell.titleColor = .white
         config.photoList.assetNumber.textColor = "#ffffff".color
+        config.photoList.assetNumber.filterTitleColor = "#ffffff".color
+        config.photoList.assetNumber.filterContentColor = wxColor
         
         config.photoList.bottomView.barStyle = .black
         config.photoList.bottomView.previewButtonTitleColor = .white

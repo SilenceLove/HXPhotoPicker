@@ -1274,6 +1274,7 @@
 		D368796E2A399B8C00E70910 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				D368798F2A399B8D00E70910 /* EditorAsset.swift */,
 				D36879772A399B8C00E70910 /* EditedResult.swift */,
 				D36879752A399B8C00E70910 /* Config */,
 				D36879782A399B8C00E70910 /* Controller */,
@@ -1349,7 +1350,6 @@
 				D368798C2A399B8D00E70910 /* EditorPlayAuido.swift */,
 				D368798D2A399B8D00E70910 /* VideoEditorMusic.swift */,
 				D368798E2A399B8D00E70910 /* PhotoEditorFilter.swift */,
-				D368798F2A399B8D00E70910 /* EditorAsset.swift */,
 				D36879902A399B8D00E70910 /* EditorType.swift */,
 			);
 			path = Model;
@@ -1564,13 +1564,11 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HXPHPickerExample/Pods-HXPHPickerExample-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/GDPerformanceView-Swift/GDPerformanceView_Swift.framework",
 				"${BUILT_PRODUCTS_DIR}/HXPhotoPicker/HXPhotoPicker.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GDPerformanceView_Swift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HXPhotoPicker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 			);
@@ -1608,13 +1606,11 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HXPhotoPickerExample/Pods-HXPhotoPickerExample-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/GDPerformanceView-Swift/GDPerformanceView_Swift.framework",
 				"${BUILT_PRODUCTS_DIR}/HXPhotoPicker/HXPhotoPicker.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GDPerformanceView_Swift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HXPhotoPicker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 			);
@@ -1937,7 +1933,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.0.1;
+				MARKETING_VERSION = 4.0.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence11.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1969,7 +1965,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.0.1;
+				MARKETING_VERSION = 4.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.silence11.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

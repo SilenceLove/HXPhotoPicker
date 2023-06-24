@@ -452,12 +452,24 @@ extension PickerManager {
                 at: selectedVideoAssetArray.firstIndex(of: photoAsset)!
             )
         }
+        canAddAsset = false
         selectedAssetArray.remove(at: selectedAssetArray.firstIndex(of: photoAsset)!)
         for (index, asset) in selectedAssetArray.enumerated() {
             asset.selectIndex = index
         }
         didDeselectAsset?(photoAsset, selectedAssetArray.count + 1)
         return true
+    }
+    
+    func movePhotoAsset(fromIndex: Int, toIndex: Int) {
+        canAddAsset = false
+        let fromAsset = selectedAssetArray[fromIndex]
+        selectedAssetArray.remove(at: fromIndex)
+        canAddAsset = false
+        selectedAssetArray.insert(fromAsset, at: toIndex)
+        for (index, asset) in selectedAssetArray.enumerated() {
+            asset.selectIndex = index
+        }
     }
     
     /// 是否能够选择Asset

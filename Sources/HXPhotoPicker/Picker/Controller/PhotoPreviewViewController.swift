@@ -22,6 +22,8 @@ public class PhotoPreviewViewController: BaseViewController {
     /// 是否是外部预览
     public var isExternalPreview: Bool = false
     
+    var isPreviewSelect: Bool = false
+    
     var assetCount: Int {
         if previewAssets.isEmpty {
             return numberOfPages?() ?? 0

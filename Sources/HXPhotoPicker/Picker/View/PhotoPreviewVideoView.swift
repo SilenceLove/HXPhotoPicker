@@ -49,6 +49,9 @@ class PhotoPreviewVideoView: VideoPlayerView {
     var playerTime: CGFloat = 0
     override var avAsset: AVAsset? {
         didSet {
+            guard let avAsset = avAsset else {
+                return
+            }
             try? AVAudioSession.sharedInstance().setCategory(.playback)
             delegate?.videoView(showPlayButton: self)
             if isNetwork && PhotoManager.shared.loadNetworkVideoMode == .play {
@@ -56,7 +59,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
                 loadingView = ProgressHUD.showLoading(addedTo: loadingSuperview(), animated: true)
             }
             delegate?.videoView(resetPlay: self)
-            let playerItem = AVPlayerItem.init(asset: avAsset!)
+            let playerItem = AVPlayerItem(asset: avAsset)
             player.replaceCurrentItem(with: playerItem)
             playerLayer.player = player
             addedPlayerObservers()

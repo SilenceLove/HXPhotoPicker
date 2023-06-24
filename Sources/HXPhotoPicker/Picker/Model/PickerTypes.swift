@@ -147,6 +147,17 @@ public extension PhotoAsset {
             }
         }
         
+        public var isNormalPhoto: Bool {
+            switch self {
+            case .image, .localImage:
+                return true
+            case .networkImage(let isGif):
+                return !isGif
+            default:
+                return false
+            }
+        }
+        
         public var isVideo: Bool {
             switch self {
             case .video, .localVideo, .networkVideo:
@@ -162,6 +173,15 @@ public extension PhotoAsset {
                 return true
             case .networkImage(let isGif):
                 return isGif
+            default:
+                return false
+            }
+        }
+        
+        public var isLivePhoto: Bool {
+            switch self {
+            case .livePhoto, .localLivePhoto:
+                return true
             default:
                 return false
             }
@@ -264,4 +284,27 @@ public enum Sort: Equatable {
     case asc
     /// DESC 降序
     case desc
+}
+
+public enum PickerError: Error, LocalizedError {
+    case imageFetchFaild
+    case urlFetchFaild(AssetError)
+    case urlResultFetchFaild(AssetError)
+    case objsFetchFaild(PhotoAsset, Int, Error)
+    case canceled
+    
+    public var errorDescription: String? {
+        switch self {
+        case .imageFetchFaild:
+            return "获取 UIImage 失败"
+        case .urlFetchFaild(let error):
+            return "获取 URL 失败: \(error)"
+        case .urlResultFetchFaild(let error):
+            return "获取 AssetURLResult 失败: \(error)"
+        case .objsFetchFaild(let photoAsset, let index, let error):
+            return "PickerResult.photoAssets获取到第\(index)失败，photoAsset: \(photoAsset), error: \(error)"
+        case .canceled:
+            return "取消选择"
+        }
+    }
 }

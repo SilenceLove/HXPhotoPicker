@@ -304,6 +304,7 @@ extension PhotoPickerController {
             }else if photoAsset.mediaType == .video {
                 selectedVideoAssetArray.append(photoAsset)
             }
+            canAddAsset = false
             selectedAssetArray.append(photoAsset)
             pickerDelegate?.pickerController(
                 self,
@@ -338,6 +339,7 @@ extension PhotoPickerController {
                 at: selectedVideoAssetArray.firstIndex(of: photoAsset)!
             )
         }
+        canAddAsset = false
         selectedAssetArray.remove(at: selectedAssetArray.firstIndex(of: photoAsset)!)
         for (index, asset) in selectedAssetArray.enumerated() {
             asset.selectIndex = index
@@ -348,6 +350,17 @@ extension PhotoPickerController {
             atIndex: selectedAssetArray.count
         )
         return true
+    }
+    
+    func movePhotoAsset(fromIndex: Int, toIndex: Int) {
+        canAddAsset = false
+        let fromAsset = selectedAssetArray[fromIndex]
+        selectedAssetArray.remove(at: fromIndex)
+        canAddAsset = false
+        selectedAssetArray.insert(fromAsset, at: toIndex)
+        for (index, asset) in selectedAssetArray.enumerated() {
+            asset.selectIndex = index
+        }
     }
     
     private func canSelectPhoto(_ photoAsset: PhotoAsset) -> (Bool, String?) {
@@ -493,22 +506,14 @@ extension PhotoPickerController {
     /// 视频时长是否超过最大限制
     /// - Parameter photoAsset: 对应的PhotoAsset对象
     func videoDurationExceedsTheLimit(photoAsset: PhotoAsset) -> Bool {
-        if photoAsset.mediaType == .video {
-            if config.maximumSelectedVideoDuration > 0 {
-                if round(photoAsset.videoDuration) > Double(config.maximumSelectedVideoDuration) {
-                    return true
-                }
-            }
-        }
-        return false
+        photoAsset.mediaType == .video &&
+           config.maximumSelectedVideoDuration > 0 &&
+           round(photoAsset.videoDuration) > Double(config.maximumSelectedVideoDuration)
     }
     
     /// 选择数是否达到最大
     func selectArrayIsFull() -> Bool {
-        if selectedAssetArray.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0 {
-            return true
-        }
-        return false
+        selectedAssetArray.count >= config.maximumSelectedCount && config.maximumSelectedCount > 0
     }
     
     #if HXPICKER_ENABLE_EDITOR

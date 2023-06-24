@@ -544,24 +544,37 @@ extension PhotoAsset {
                         )
                     }
                 }
-                if isGif && self.mediaSubType != .imageAnimated {
-                    // 本质上是gif，需要变成静态图
-                    guard let imageData = try? Data(contentsOf: imageURL),
-                          let image = UIImage(data: imageData) else {
-                        resultHandler(.failure(.fileWriteFailed))
-                        return
+                func converImageURL(_ url: URL) -> URL {
+                    let imageURL: URL
+                    if url.pathExtension.uppercased() == "HEIC" {
+                        let path = url.path.replacingOccurrences(of: url.pathExtension, with: imageFileURL.pathExtension)
+                        imageURL = .init(fileURLWithPath: path)
+                    }else {
+                        imageURL = url
                     }
+                    return imageURL
+                }
+                if isGif && self.mediaSubType != .imageAnimated {
                     DispatchQueue.global().async {
+                        // 本质上是gif，需要变成静态图
+                        guard let imageData = try? Data(contentsOf: imageURL),
+                              let image = UIImage(data: imageData) else {
+                            DispatchQueue.main.async {
+                                resultHandler(.failure(.fileWriteFailed))
+                            }
+                            return
+                        }
                         if let compressionQuality = compressionQuality {
                             if FileManager.default.fileExists(atPath: imageURL.path) {
                                 try? FileManager.default.removeItem(at: imageURL)
                             }
+                            let toURL = converImageURL(imageURL)
                             if let data = PhotoTools.imageCompress(
                                 imageData,
                                 compressionQuality: compressionQuality
                             ),
                                let url = PhotoTools.write(
-                                toFile: imageURL,
+                                toFile: toURL,
                                 imageData: data
                             ) {
                                 resultSuccess(url)
@@ -573,12 +586,13 @@ extension PhotoAsset {
                             return
                         }
                         do {
+                            let toURL = converImageURL(imageURL)
                             let imageData = PhotoTools.getImageData(for: image)
                             if FileManager.default.fileExists(atPath: imageURL.path) {
                                 try FileManager.default.removeItem(at: imageURL)
                             }
-                            try imageData?.write(to: imageURL)
-                            resultSuccess(imageURL)
+                            try imageData?.write(to: toURL)
+                            resultSuccess(toURL)
                         } catch {
                             DispatchQueue.main.async {
                                 resultHandler(.failure(.fileWriteFailed))
@@ -588,20 +602,23 @@ extension PhotoAsset {
                     return
                 }else if !isGif {
                     if let compressionQuality = compressionQuality {
-                        guard let imageData = try? Data(contentsOf: imageURL) else {
-                            resultHandler(.failure(.imageCompressionFailed))
-                            return
-                        }
                         DispatchQueue.global().async {
+                            guard let imageData = try? Data(contentsOf: imageURL) else {
+                                DispatchQueue.main.async {
+                                    resultHandler(.failure(.imageCompressionFailed))
+                                }
+                                return
+                            }
                             if FileManager.default.fileExists(atPath: imageURL.path) {
                                 try? FileManager.default.removeItem(at: imageURL)
                             }
+                            let toURL = converImageURL(imageURL)
                             if let data = PhotoTools.imageCompress(
                                 imageData,
                                 compressionQuality: compressionQuality
                             ),
                                let url = PhotoTools.write(
-                                toFile: imageURL,
+                                toFile: toURL,
                                 imageData: data
                             ) {
                                 resultSuccess(url)

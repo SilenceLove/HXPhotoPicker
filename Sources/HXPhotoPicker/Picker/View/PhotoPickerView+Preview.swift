@@ -114,6 +114,11 @@ extension PhotoPickerView: PhotoPreviewViewControllerDelegate {
     ) {
         resetICloud(for: photoAsset)
     }
+    
+    func previewViewController(_ previewController: PhotoPreviewViewController, moveItem fromIndex: Int, toIndex: Int) {
+        manager.movePhotoAsset(fromIndex: fromIndex, toIndex: toIndex)
+        updateCellSelectedTitle()
+    }
 }
 
 extension PhotoPickerView: PhotoPickerControllerDelegate {

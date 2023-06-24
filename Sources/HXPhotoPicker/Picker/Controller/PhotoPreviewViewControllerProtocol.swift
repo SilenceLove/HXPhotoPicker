@@ -49,6 +49,14 @@ protocol PhotoPreviewViewControllerDelegate: AnyObject {
         _ previewController: PhotoPreviewViewController,
         requestFailed photoAsset: PhotoAsset
     )
+    func previewViewController(
+        movePhotoAsset previewController: PhotoPreviewViewController
+    )
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        moveItem fromIndex: Int,
+        toIndex: Int
+    )
 }
 extension PhotoPreviewViewControllerDelegate {
     func previewViewController(
@@ -91,5 +99,13 @@ extension PhotoPreviewViewControllerDelegate {
     func previewViewController(
         _ previewController: PhotoPreviewViewController,
         requestFailed photoAsset: PhotoAsset
+    ) { }
+    func previewViewController(
+        movePhotoAsset previewController: PhotoPreviewViewController
+    ) { }
+    func previewViewController(
+        _ previewController: PhotoPreviewViewController,
+        moveItem fromIndex: Int,
+        toIndex: Int
     ) { }
 }

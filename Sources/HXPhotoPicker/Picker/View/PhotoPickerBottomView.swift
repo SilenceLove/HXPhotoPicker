@@ -14,6 +14,7 @@ protocol PhotoPickerBottomViewDelegate: AnyObject {
     func bottomView(didFinishButtonClick bottomView: PhotoPickerBottomView)
     func bottomView(_ bottomView: PhotoPickerBottomView, didOriginalButtonClick isOriginal: Bool)
     func bottomView(_ bottomView: PhotoPickerBottomView, didSelectedItemAt photoAsset: PhotoAsset)
+    func bottomView(_ bottomView: PhotoPickerBottomView, moveItemAt fromIndex: Int, toIndex: Int)
 }
 
 extension PhotoPickerBottomViewDelegate {
@@ -22,9 +23,11 @@ extension PhotoPickerBottomViewDelegate {
     func bottomView(didFinishButtonClick bottomView: PhotoPickerBottomView) {}
     func bottomView(_ bottomView: PhotoPickerBottomView, didOriginalButtonClick isOriginal: Bool) {}
     func bottomView(_ bottomView: PhotoPickerBottomView, didSelectedItemAt photoAsset: PhotoAsset) {}
+    func bottomView(_ bottomView: PhotoPickerBottomView, moveItemAt fromIndex: Int, toIndex: Int) {}
 }
 
-class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
+class PhotoPickerBottomView: UIToolbar {
+    
     enum SourceType {
         case picker
         case preview
@@ -618,12 +621,19 @@ class PhotoPickerBottomView: UIToolbar, PhotoPreviewSelectedViewDelegate {
 }
 
 // MARK: PhotoPreviewSelectedViewDelegate
-extension PhotoPickerBottomView {
+extension PhotoPickerBottomView: PhotoPreviewSelectedViewDelegate {
     
     func selectedView(
         _ selectedView: PhotoPreviewSelectedView,
         didSelectItemAt photoAsset: PhotoAsset
     ) {
         hx_delegate?.bottomView(self, didSelectedItemAt: photoAsset)
+    }
+    
+    func selectedView(
+        _ selectedView: PhotoPreviewSelectedView,
+        moveItemAt fromIndex: Int, toIndex: Int
+    ) {
+        hx_delegate?.bottomView(self, moveItemAt: fromIndex, toIndex: toIndex)
     }
 }

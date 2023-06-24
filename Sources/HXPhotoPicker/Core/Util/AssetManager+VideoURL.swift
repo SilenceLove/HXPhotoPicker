@@ -171,10 +171,10 @@ public extension AssetManager {
             options: options
         ) { (error) in
             DispatchQueue.main.async {
-                if error == nil {
-                    resultHandler(.success(videoURL))
+                if let error = error {
+                    resultHandler(.failure(.assetResourceWriteDataFailed(error)))
                 }else {
-                    resultHandler(.failure(.assetResourceWriteDataFailed(error!)))
+                    resultHandler(.success(videoURL))
                 }
             }
         }

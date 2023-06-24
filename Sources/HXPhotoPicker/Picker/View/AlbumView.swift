@@ -53,9 +53,11 @@ class AlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
     private var currentSelectedRow: Int = 0
     var currentSelectedAssetCollection: PhotoAssetCollection? {
         didSet {
-            if currentSelectedAssetCollection != nil {
-                currentSelectedRow = assetCollectionsArray.firstIndex(of: currentSelectedAssetCollection!) ?? 0
+            guard let collection = currentSelectedAssetCollection,
+                  let index = assetCollectionsArray.firstIndex(of: collection) else {
+                return
             }
+            currentSelectedRow = index
         }
     }
     

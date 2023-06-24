@@ -327,14 +327,22 @@ public extension AssetManager {
                         videoType = .fullSizePairedVideo
                     }
                     if assetResource.type == photoType {
+                        let _imageURL: URL
+                        let isHEIC = assetResource.uniformTypeIdentifier.uppercased().hasSuffix("HEIC")
+                        if isHEIC, imageURL.pathExtension.uppercased() != "HEIC" {
+                            let path = imageURL.path.replacingOccurrences(of: imageURL.pathExtension, with: "HEIC")
+                            _imageURL = .init(fileURLWithPath: path)
+                        }else {
+                            _imageURL = imageURL
+                        }
                         PHAssetResourceManager.default().writeData(
                             for: assetResource,
-                            toFile: imageURL,
+                            toFile: _imageURL,
                             options: options
                         ) { (error) in
                             DispatchQueue.main.async {
                                 if error == nil {
-                                    imageURLHandler(imageURL)
+                                    imageURLHandler(_imageURL)
                                 }
                                 imageCompletion = true
                                 imageError = error

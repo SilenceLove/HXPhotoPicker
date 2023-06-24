@@ -457,10 +457,10 @@ extension PhotoPickerController {
             configBackgroundColor()
         }
         let isDark = PhotoManager.isDark
-        let titleTextAttributes = [NSAttributedString.Key.foregroundColor: isDark ?
-                                   config.navigationTitleDarkColor :
-                                   config.navigationTitleColor
-                               ]
+        let titleTextAttributes = [
+            NSAttributedString.Key.foregroundColor:
+                isDark ? config.navigationTitleDarkColor : config.navigationTitleColor
+        ]
         navigationBar.titleTextAttributes = titleTextAttributes
         let tintColor = isDark ? config.navigationDarkTintColor : config.navigationTintColor
         navigationBar.tintColor = tintColor
@@ -568,5 +568,68 @@ extension PhotoPickerController {
         }
         PhotoManager.shared.saveCameraPreview()
         pickerDelegate?.pickerController(self, didDismissComplete: cameraAssetArray)
+    }
+}
+
+@available(iOS 13.0.0, *)
+public extension PhotoPickerController {
+    
+    static func picker<T: PhotoAssetObject>(
+        _ config: PickerConfiguration,
+        delegate: PhotoPickerControllerDelegate? = nil,
+        compression: PhotoAsset.Compression? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> [T] {
+        let vc = show(config, delegate: delegate, fromVC: fromVC)
+        return try await vc.pickerObject(compression)
+    }
+    
+    static func picker(
+        _ config: PickerConfiguration,
+        delegate: PhotoPickerControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> PickerResult {
+        let vc = show(config, delegate: delegate, fromVC: fromVC)
+        return try await vc.picker()
+    }
+    
+    static func show(
+        _ config: PickerConfiguration,
+        delegate: PhotoPickerControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) -> PhotoPickerController {
+        let topVC = fromVC ?? UIViewController.topViewController
+        let pickerController = PhotoPickerController(picker: config, delegate: delegate)
+        topVC?.present(pickerController, animated: true)
+        return pickerController
+    }
+    
+    func picker() async throws -> PickerResult {
+        try await withCheckedThrowingContinuation { continuation in
+            finishHandler = { result, _ in
+                continuation.resume(with: .success(result))
+            }
+            cancelHandler = { _ in
+                continuation.resume(with: .failure(PickerError.canceled))
+            }
+        }
+    }
+    
+    func pickerObject<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
+        try await withCheckedThrowingContinuation { continuation in
+            finishHandler = { result, _ in
+                Task {
+                    do {
+                        let objects: [T] = try await result.objects(compression)
+                        continuation.resume(with: .success(objects))
+                    } catch {
+                        continuation.resume(with: .failure(error))
+                    }
+                }
+            }
+            cancelHandler = { _ in
+                continuation.resume(with: .failure(PickerError.canceled))
+            }
+        }
     }
 }

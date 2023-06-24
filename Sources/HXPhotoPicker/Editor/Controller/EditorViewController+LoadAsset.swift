@@ -963,17 +963,26 @@ extension EditorViewController {
     
     func selectedDefaultTool() {
         if config.isFixedCropSizeState {
+            UIView.animate {
+                self.showTools(true)
+            }
             toolsView.selectedOptionType(.cropSize)
             return
         }
         if selectedAsset.contentType == .image {
             if let optionType = config.photo.defaultSelectedToolOption {
+                UIView.animate {
+                    self.showTools(optionType == .cropSize)
+                }
                 toolsView.selectedOptionType(optionType)
             }else {
                 showChangeButton()
             }
         }else if selectedAsset.contentType == .video {
             if let optionType = config.video.defaultSelectedToolOption {
+                UIView.animate {
+                    self.showTools(optionType == .cropSize)
+                }
                 toolsView.selectedOptionType(optionType)
             }else {
                 showChangeButton()

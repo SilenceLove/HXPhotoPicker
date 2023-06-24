@@ -105,6 +105,16 @@
 "暗角" = "Skema";
 "锐化" = "Mengasah";
 "蒙版素材" = "Masker";
+"筛选" = "Saring";
+"筛选条件" = "kota yang disaring";
+"无筛选条件" = "Tanpa Filter";
+"没有项目" = "Tidak ada barang";
+"筛选结果" = "Hasil Filter";
+"所有项目" = "Semua barang";
+"已编辑" = "Diedit";
+"仅显示" = "Menunjukkan";
+"筛选照片" = "Foto";
+"筛选视频" = "Video";
 
 "HXAlbumCameraRoll" = "Semua foto";
 "HXAlbumPanoramas" = "gambar panorama";

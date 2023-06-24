@@ -79,4 +79,59 @@ public enum AssetError: Error {
     case localLivePhotoRequestFailed
 }
 
-
+extension AssetError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .fileWriteFailed:
+            return "写入文件失败"
+        case .exportFailed(let error):
+            return "导出失败: \(String(describing: error))"
+        case .invalidData:
+            return "无效的 Data"
+        case .invalidEditedData:
+            return "无效的编辑数据"
+        case .invalidPHAsset:
+            return "phAsset为空"
+        case .networkURLIsEmpty:
+            return "网络地址为空"
+        case .localURLIsEmpty:
+            return "本地地址为空"
+        case .localLivePhotoIsEmpty:
+            return "本地LocalLivePhoto为空"
+        case .typeError:
+            return "类型错误，例：本来是 .photo 却去获取 videoURL"
+        case .requestFailed(let info):
+            return "从系统相册获取数据失败, 系统获取失败的信息: \(String(describing: info))"
+        case .needSyncICloud:
+            return "需要同步iCloud上的资源"
+        case .syncICloudFailed(let info):
+            return "同步iCloud失败: \(String(describing: info))"
+        case .removeFileFailed:
+            return "指定地址存在其他文件，删除已存在的文件时发生错误"
+        case .assetResourceIsEmpty:
+            return "PHAssetResource 为空"
+        case .assetResourceWriteDataFailed(let error):
+            return "PHAssetResource写入数据错误: \(error)"
+        case .exportLivePhotoImageURLFailed(let error):
+            return "导出livePhoto里的图片地址失败: \(String(describing: error))"
+        case .exportLivePhotoVideoURLFailed(let error):
+            return "导出livePhoto里的视频地址失败: \(String(describing: error))"
+        case .exportLivePhotoURLFailed(let imageError, let videoError):
+            return "导出livePhoto里的地址失败（图片失败信息: \(String(describing: imageError)), 视频失败信息: \(String(describing: videoError))）"
+        case .imageCompressionFailed:
+            return "图片压缩失败"
+        case .imageDownloadFailed:
+            return "图片下载失败"
+        case .videoDownloadFailed:
+            return "视频下载失败"
+        case .localLivePhotoCancelWrite:
+            return "本地livePhoto取消写入"
+        case .localLivePhotoWriteImageFailed:
+            return "本地livePhoto图片写入失败"
+        case .localLivePhotoWriteVideoFailed:
+            return "本地livePhoto视频写入失败"
+        case .localLivePhotoRequestFailed:
+            return "本地livePhoto合成失败"
+        }
+    }
+}

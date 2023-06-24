@@ -10,7 +10,7 @@ import AVKit
 import Photos
 
 extension EditorViewController {
-    public typealias FinishHandler = (EditedResult?, EditorViewController) -> Void
+    public typealias FinishHandler = (EditorAsset, EditorViewController) -> Void
     public typealias CancelHandler = (EditorViewController) -> Void
 }
 
@@ -19,7 +19,7 @@ open class EditorViewController: BaseViewController {
     public weak var delegate: EditorViewControllerDelegate?
     public var config: EditorConfiguration
     public let assets: [EditorAsset]
-    public var selectedAsset: EditorAsset
+    public private(set) var selectedAsset: EditorAsset
     public var editedResult: EditedResult?
     public var finishHandler: FinishHandler?
     public var cancelHandler: CancelHandler?
@@ -542,7 +542,9 @@ open class EditorViewController: BaseViewController {
             if isToolsDisplay {
                 topMaskView.alpha = 0
                 topMaskView.isHidden = true
-                bottomMaskView.alpha = 1
+                if isTransitionCompletion {
+                    bottomMaskView.alpha = 1
+                }
                 bottomMaskView.isHidden = false
             }
             
@@ -568,12 +570,12 @@ open class EditorViewController: BaseViewController {
             mosaicToolView.frame =  .init(x: 0, y: toolsView.y - 65, width: view.width, height: 65)
             
             leftRotateButton.y = rotateScaleView.y - leftRotateButton.height - 10
-            leftRotateButton.x = UIDevice.leftMargin + 15
+            leftRotateButton.x = UIDevice.leftMargin + 20
             rightRotateButton.centerY = leftRotateButton.centerY
-            rightRotateButton.x = leftRotateButton.frame.maxX + 12
+            rightRotateButton.x = leftRotateButton.frame.maxX + 15
             
-            mirrorHorizontallyButton.x = view.width - UIDevice.rightMargin - mirrorHorizontallyButton.width - 12
-            mirrorVerticallyButton.x = mirrorHorizontallyButton.x - 12 - mirrorVerticallyButton.width
+            mirrorHorizontallyButton.x = view.width - UIDevice.rightMargin - mirrorHorizontallyButton.width - 20
+            mirrorVerticallyButton.x = mirrorHorizontallyButton.x - 15 - mirrorVerticallyButton.width
             mirrorHorizontallyButton.centerY = leftRotateButton.centerY
             mirrorVerticallyButton.centerY = mirrorHorizontallyButton.centerY
             
@@ -586,13 +588,17 @@ open class EditorViewController: BaseViewController {
         }else {
             bottomMaskLayer = PhotoTools.getGradientShadowLayer(startPoint: .init(x: 0, y: 0), endPoint: .init(x: 1, y: 0))
             bottomMaskView.isHidden = true
-            bottomMaskView.alpha = 0
+            if isTransitionCompletion {
+                bottomMaskView.alpha = 0
+            }
             bottomMaskView.layer.addSublayer(bottomMaskLayer)
             if isToolsDisplay {
                 topMaskView.isHidden = false
-                topMaskView.alpha = 1
                 bottomMaskView.isHidden = false
-                bottomMaskView.alpha = 1
+                if isTransitionCompletion {
+                    topMaskView.alpha = 1
+                    bottomMaskView.alpha = 1
+                }
             }
             topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: UIDevice.topMargin + 50)
             
@@ -602,17 +608,17 @@ open class EditorViewController: BaseViewController {
             changeButton.centerY = cancelButton.centerY
             
             leftRotateButton.centerY = cancelButton.centerY
-            leftRotateButton.x = cancelButton.frame.maxX + 12
+            leftRotateButton.x = cancelButton.frame.maxX + 15
             rightRotateButton.centerY = cancelButton.centerY
-            rightRotateButton.x = leftRotateButton.frame.maxX + 12
+            rightRotateButton.x = leftRotateButton.frame.maxX + 15
             
-            mirrorHorizontallyButton.x = finishButton.x - mirrorHorizontallyButton.width - 12
-            mirrorVerticallyButton.x = mirrorHorizontallyButton.x - 12 - mirrorVerticallyButton.width
+            mirrorHorizontallyButton.x = finishButton.x - mirrorHorizontallyButton.width - 15
+            mirrorVerticallyButton.x = mirrorHorizontallyButton.x - 15 - mirrorVerticallyButton.width
             mirrorHorizontallyButton.centerY = cancelButton.centerY
             mirrorVerticallyButton.centerY = mirrorHorizontallyButton.centerY
             
             maskListButton.centerY = mirrorVerticallyButton.centerY
-            maskListButton.x = mirrorVerticallyButton.x - 12 - maskListButton.width
+            maskListButton.x = mirrorVerticallyButton.x - 15 - maskListButton.width
             
             toolsView.frame = CGRect(
                 x: view.width - UIDevice.rightMargin - 50,
@@ -961,6 +967,7 @@ extension EditorViewController {
     
     @objc
     func didResetButtonClick(button: UIButton) {
+        rotateScaleView.stopScroll()
         if editorView.maskImage != nil {
             editorView.setMaskImage(nil, animated: true)
         }
@@ -1110,7 +1117,7 @@ extension EditorViewController {
             selectedAsset.result = nil
             delegate?.editorViewController(self, didFinish: selectedAsset)
 //            delegate?.editorViewController(self, didFinish: [])
-            finishHandler?(nil, self)
+            finishHandler?(selectedAsset, self)
             backClick()
         }
     }
@@ -1196,7 +1203,7 @@ extension EditorViewController {
         self.editedResult = editedResult
         selectedAsset.result = editedResult
         delegate?.editorViewController(self, didFinish: selectedAsset)
-        finishHandler?(editedResult, self)
+        finishHandler?(selectedAsset, self)
 //        delegate?.editorViewController(self, didFinish: [editedResult])
         backClick()
     }
@@ -1292,7 +1299,7 @@ extension EditorViewController {
                         editedResult = nil
                         selectedAsset.result = nil
                         delegate?.editorViewController(self, didFinish: selectedAsset)
-                        finishHandler?(nil, self)
+                        finishHandler?(selectedAsset, self)
                         backClick()
                     }
                 }else {
@@ -1303,7 +1310,7 @@ extension EditorViewController {
             editedResult = nil
             selectedAsset.result = nil
             delegate?.editorViewController(self, didFinish: selectedAsset)
-            finishHandler?(nil, self)
+            finishHandler?(selectedAsset, self)
 //            delegate?.editorViewController(self, didFinish: [])
             backClick()
         }
@@ -1451,7 +1458,7 @@ extension EditorViewController {
         self.editedResult = editedResult
         selectedAsset.result = editedResult
         delegate?.editorViewController(self, didFinish: selectedAsset)
-        finishHandler?(editedResult, self)
+        finishHandler?(selectedAsset, self)
 //        delegate?.editorViewController(self, didFinish: [editedResult])
         backClick()
     }
@@ -1589,9 +1596,34 @@ extension EditorViewController {
     }
     
     func transitionShow() {
+        if config.isFixedCropSizeState {
+            return
+        }
+        if selectedAsset.contentType == .image {
+            if let type = config.photo.defaultSelectedToolOption, type == .cropSize {
+                return
+            }
+        }else if selectedAsset.contentType == .video {
+            if let type = config.video.defaultSelectedToolOption, type == .cropSize {
+                return
+            }
+        }
+        showTools()
+    }
+    
+    func showTools(_ isCropSize: Bool = false) {
+        if cancelButton.alpha == 1 {
+            return
+        }
         cancelButton.alpha = 1
-        toolsView.alpha = 1
+        if !isCropSize {
+            toolsView.alpha = 1
+        }
         finishButton.alpha = 1
+        showMasks()
+    }
+    
+    func showMasks() {
         if UIDevice.isPortrait {
             if isToolsDisplay {
                 topMaskView.alpha = 0
@@ -1645,5 +1677,56 @@ extension EditorViewController: UINavigationControllerDelegate {
             return EditorTransition(mode: .pop)
         }
         return nil
+    }
+}
+
+@available(iOS 13.0.0, *)
+public extension EditorViewController {
+    
+    @discardableResult
+    static func edit(
+        _ asset: EditorAsset,
+        config: EditorConfiguration = .init(),
+        delegate: EditorViewControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> EditorAsset {
+        let vc = show(asset, config: config, delegate: delegate, fromVC: fromVC)
+        return try await vc.edit()
+    }
+    
+    @discardableResult
+    static func show(
+        _ asset: EditorAsset,
+        config: EditorConfiguration = .init(),
+        delegate: EditorViewControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) -> EditorViewController {
+        let topVC = fromVC ?? UIViewController.topViewController
+        let vc = EditorViewController(asset, config: config, delegate: delegate)
+        topVC?.present(vc, animated: true)
+        return vc
+    }
+    
+    @discardableResult
+    func edit() async throws -> EditorAsset {
+        try await withCheckedThrowingContinuation { continuation in
+            finishHandler = { result, _ in
+                continuation.resume(with: .success(result))
+            }
+            cancelHandler = { _ in
+                continuation.resume(with: .failure(EditorError.canceled))
+            }
+        }
+    }
+    
+    enum EditorError: Error, LocalizedError {
+        case canceled
+        
+        public var errorDescription: String? {
+            switch self {
+            case .canceled:
+                return "取消编辑"
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ import UIKit
 
 protocol PhotoPreviewSelectedViewDelegate: AnyObject {
     func selectedView(_ selectedView: PhotoPreviewSelectedView, didSelectItemAt photoAsset: PhotoAsset)
+    func selectedView(_ selectedView: PhotoPreviewSelectedView, moveItemAt fromIndex: Int , toIndex: Int)
 }
 
 class PhotoPreviewSelectedView: UIView,
@@ -33,12 +34,17 @@ class PhotoPreviewSelectedView: UIView,
     }()
 
     lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView.init(frame: bounds, collectionViewLayout: collectionViewLayout)
-        collectionView.backgroundColor = UIColor.clear
+        let collectionView = UICollectionView(frame: bounds, collectionViewLayout: collectionViewLayout)
+        collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            collectionView.dragDelegate = self
+            collectionView.dropDelegate = self
+            collectionView.dragInteractionEnabled = true
+        }
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
@@ -104,7 +110,7 @@ class PhotoPreviewSelectedView: UIView,
         var indexPaths: [IndexPath] = []
         for photoAsset in photoAssets {
             if let item = photoAssetArray.firstIndex(of: photoAsset) {
-                if item == currentSelectedIndexPath?.item {
+                if let indexPath = currentSelectedIndexPath, item == indexPath.item {
                     currentSelectedIndexPath = nil
                 }
                 photoAssetArray.remove(at: item)
@@ -131,13 +137,12 @@ class PhotoPreviewSelectedView: UIView,
         collectionView.reloadItems(at: [IndexPath.init(item: index, section: 0)])
     }
     func scrollTo(photoAsset: PhotoAsset?, isAnimated: Bool = true) {
-        if photoAsset == nil {
+        guard let photoAsset = photoAsset else {
             deselectedCurrentIndexPath()
             return
         }
-        if photoAssetArray.contains(photoAsset!) {
-            let item = photoAssetArray.firstIndex(of: photoAsset!) ?? 0
-            if item == currentSelectedIndexPath?.item {
+        if let item = photoAssetArray.firstIndex(of: photoAsset) {
+            if let indexPath = currentSelectedIndexPath, item == indexPath.item {
                 return
             }
             let indexPath = IndexPath(item: item, section: 0)
@@ -148,8 +153,8 @@ class PhotoPreviewSelectedView: UIView,
         }
     }
     func deselectedCurrentIndexPath() {
-        if currentSelectedIndexPath != nil {
-            collectionView.deselectItem(at: currentSelectedIndexPath!, animated: true)
+        if let indexPath = currentSelectedIndexPath {
+            collectionView.deselectItem(at: indexPath, animated: true)
             currentSelectedIndexPath = nil
         }
     }
@@ -205,11 +210,72 @@ class PhotoPreviewSelectedView: UIView,
         return CGSize(width: itemWidth, height: itemHeight)
     }
     
+    func collectionView(_ collectionView: UICollectionView, canEditItemAt indexPath: IndexPath) -> Bool {
+        true
+    }
+    
     override func layoutSubviews() {
         collectionView.frame = bounds
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+@available(iOS 11.0, *)
+extension PhotoPreviewSelectedView: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        itemsForBeginning session: UIDragSession,
+        at indexPath: IndexPath
+    ) -> [UIDragItem] {
+        let itemProvider = NSItemProvider.init()
+        let dragItem = UIDragItem.init(itemProvider: itemProvider)
+        dragItem.localObject = indexPath
+        return [dragItem]
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
+        true
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        dropSessionDidUpdate session: UIDropSession,
+        withDestinationIndexPath
+            destinationIndexPath: IndexPath?
+    ) -> UICollectionViewDropProposal {
+        var dropProposal: UICollectionViewDropProposal
+        if session.localDragSession != nil {
+            dropProposal = UICollectionViewDropProposal.init(operation: .move, intent: .insertAtDestinationIndexPath)
+        }else {
+            dropProposal = UICollectionViewDropProposal.init(operation: .copy, intent: .insertAtDestinationIndexPath)
+        }
+        return dropProposal
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        performDropWith coordinator: UICollectionViewDropCoordinator
+    ) {
+        if let destinationIndexPath = coordinator.destinationIndexPath,
+           let sourceIndexPath = coordinator.items.first?.sourceIndexPath {
+            collectionView.isUserInteractionEnabled = false
+            deselectedCurrentIndexPath()
+            collectionView.performBatchUpdates {
+                let sourceAsset = photoAssetArray[sourceIndexPath.item]
+                photoAssetArray.remove(at: sourceIndexPath.item)
+                photoAssetArray.insert(sourceAsset, at: destinationIndexPath.item)
+                collectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
+                delegate?.selectedView(self, moveItemAt: sourceIndexPath.item, toIndex: destinationIndexPath.item)
+            } completion: { (isFinish) in
+                collectionView.isUserInteractionEnabled = true
+            }
+            if let dragItem = coordinator.items.first?.dragItem {
+                coordinator.drop(dragItem, toItemAt: destinationIndexPath)
+            }
+        }
     }
 }

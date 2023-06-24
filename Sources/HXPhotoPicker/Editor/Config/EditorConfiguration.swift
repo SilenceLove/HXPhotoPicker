@@ -229,7 +229,7 @@ public extension EditorConfiguration {
         public var defaultSeletedIndex: Int = 1
         
         /// 宽高比配置
-        public var aspectRatios: [EditorRatioToolConfig] = [
+        public lazy var aspectRatios: [EditorRatioToolConfig] = [
             .init(title: "原始比例".localized, ratio: .init(width: -1, height: -1)),
             .init(title: "自由格式".localized, ratio: .zero),
             .init(title: "正方形".localized, ratio: .init(width: 1, height: 1)),

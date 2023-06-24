@@ -192,3 +192,69 @@ public extension PhotoAsset {
         }
     }
 }
+
+@available(iOS 13.0, *)
+public protocol PhotoAssetObject {
+    static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self
+}
+
+@available(iOS 13.0, *)
+extension URL: PhotoAssetObject {
+    
+    public static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self {
+        try await withCheckedThrowingContinuation { continuation in
+            photoAsset.getURL(compression: compression) {
+                switch $0 {
+                case .success(let result):
+                    continuation.resume(with: .success(result.url))
+                case .failure(let error):
+                    continuation.resume(with: .failure(PickerError.urlFetchFaild(error)))
+                }
+            }
+        }
+    }
+}
+
+@available(iOS 13.0, *)
+extension UIImage: PhotoAssetObject {
+    
+    public static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self {
+        try await photoAsset.image(compression?.imageCompressionQuality) as! Self
+    }
+}
+
+@available(iOS 13.0, *)
+extension AssetURLResult: PhotoAssetObject {
+    public static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self {
+        try await withCheckedThrowingContinuation { continuation in
+            photoAsset.getURL(compression: compression) {
+                switch $0 {
+                case .success(let reuslt):
+                    continuation.resume(with: .success(reuslt))
+                case .failure(let error):
+                    continuation.resume(with: .failure(PickerError.urlResultFetchFaild(error)))
+                }
+            }
+        }
+    }
+}
+
+@available(iOS 13.0, *)
+extension PhotoAsset {
+    
+    public func object<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression?) async throws -> T {
+        try await T.fetchObject(self, compression: compression)
+    }
+    
+    fileprivate func image(_ compressionQuality: CGFloat?) async throws -> UIImage {
+       try await withCheckedThrowingContinuation { continuation in
+           getImage(compressionQuality: compressionQuality) { image in
+               if let image = image {
+                   continuation.resume(with: .success(image))
+               }else {
+                   continuation.resume(with: .failure(PickerError.imageFetchFaild))
+               }
+           }
+       }
+   }
+}

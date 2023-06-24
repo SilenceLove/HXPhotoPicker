@@ -16,7 +16,7 @@ public extension Array where Element: PhotoAsset {
     ///   - imageHandler: 每一次获取image都会触发
     ///   - completionHandler: 全部获取完成(失败的不会添加)
     func getImage(
-        compressionScale: CGFloat = 0.5,
+        compressionScale: CGFloat? = 0.5,
         imageHandler: PickerResult.ImageHandler? = nil,
         completionHandler: @escaping ([UIImage]) -> Void
     ) {

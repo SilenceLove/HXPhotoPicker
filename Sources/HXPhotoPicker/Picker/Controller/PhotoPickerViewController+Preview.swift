@@ -13,6 +13,7 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
     func pushPreviewViewController(
         previewAssets: [PhotoAsset],
         currentPreviewIndex: Int,
+        isPreviewSelect: Bool = false,
         animated: Bool
     ) {
         guard let picker = pickerController else {
@@ -23,6 +24,7 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
         )
         vc.previewAssets = previewAssets
         vc.currentPreviewIndex = currentPreviewIndex
+        vc.isPreviewSelect = isPreviewSelect
         vc.delegate = self
         navigationController?.delegate = vc
         navigationController?.pushViewController(vc, animated: animated)
@@ -75,5 +77,9 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
     
     func previewViewController(_ previewController: PhotoPreviewViewController, requestSucceed photoAsset: PhotoAsset) {
         resetICloud(for: photoAsset)
+    }
+    
+    func previewViewController(movePhotoAsset previewController: PhotoPreviewViewController) {
+        updateCellSelectedTitle()
     }
 }

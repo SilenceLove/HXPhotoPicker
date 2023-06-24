@@ -140,7 +140,7 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     
     /// Jump edit interface style
     /// 跳转编辑界面样式
-    public var editorJumpStyle: EditorJumpStyle = .push()
+    public lazy var editorJumpStyle: EditorJumpStyle = .push()
     #endif
     
     /// Allow custom transition animations when jumping

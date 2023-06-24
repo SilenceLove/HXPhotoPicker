@@ -52,7 +52,13 @@ class PickerControllerTransition: NSObject, UIViewControllerAnimatedTransitionin
             containerView.addSubview(bgView)
             containerView.addSubview(toVC.view)
         }else {
-            if toVC.transitioningDelegate == nil || toVC is PhotoPickerController {
+            let isChartlet: Bool
+            #if HXPICKER_ENABLE_PICKER
+            isChartlet = toVC is EditorChartletViewController
+            #else
+            isChartlet = false
+            #endif
+            if (toVC.transitioningDelegate == nil || toVC is PhotoPickerController) && !isChartlet {
                 containerView.addSubview(toVC.view)
             }else {
                 if let vc = fromVC as? PhotoPickerController {

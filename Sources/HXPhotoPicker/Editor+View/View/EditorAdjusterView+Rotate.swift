@@ -10,11 +10,11 @@ import UIKit
 extension EditorAdjusterView {
     
     func rotateLeft(_ animated: Bool, completion: (() -> Void)? = nil) {
-        rotate(-90, animated: animated, isOverall: true)
+        rotate(-90, animated: animated, isOverall: true, completion: completion)
     }
     
     func rotateRight(_ animated: Bool, completion: (() -> Void)? = nil) {
-        rotate(90, animated: animated, isOverall: true)
+        rotate(90, animated: animated, isOverall: true, completion: completion)
     }
     
     /// 旋转

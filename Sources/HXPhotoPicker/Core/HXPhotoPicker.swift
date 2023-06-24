@@ -14,6 +14,26 @@ class HXPhotoPicker {}
 public enum Photo {
     
     #if HXPICKER_ENABLE_PICKER
+    
+    @available(iOS 13.0, *)
+    public static func picker<T: PhotoAssetObject>(
+        _ config: PickerConfiguration,
+        delegate: PhotoPickerControllerDelegate? = nil,
+        compression: PhotoAsset.Compression? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> [T] {
+        try await PhotoPickerController.picker(config, delegate: delegate, compression: compression, fromVC: fromVC)
+    }
+    
+    @available(iOS 13.0, *)
+    public static func picker(
+        _ config: PickerConfiguration,
+        delegate: PhotoPickerControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> PickerResult {
+        try await PhotoPickerController.picker(config, delegate: delegate, fromVC: fromVC)
+    }
+    
     @discardableResult
     public static func picker(
         _ config: PickerConfiguration,
@@ -39,6 +59,18 @@ public enum Photo {
     #endif
     
     #if HXPICKER_ENABLE_EDITOR
+    
+    @available(iOS 13.0, *)
+    @discardableResult
+    public static func edit(
+        _ asset: EditorAsset,
+        config: EditorConfiguration = .init(),
+        delegate: EditorViewControllerDelegate? = nil,
+        fromVC: UIViewController? = nil
+    ) async throws -> EditorAsset {
+        try await EditorViewController.edit(asset, config: config, delegate: delegate, fromVC: fromVC)
+    }
+    
     @discardableResult
     public static func edit(
         asset: EditorAsset,

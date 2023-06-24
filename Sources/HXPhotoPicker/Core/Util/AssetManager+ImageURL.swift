@@ -83,7 +83,14 @@ public extension AssetManager {
             resultHandler(.failure(.removeFileFailed))
             return
         }
-        let imageURL = fileURL
+        let imageURL: URL
+        let isHEIC = imageResource.uniformTypeIdentifier.uppercased().hasSuffix("HEIC")
+        if isHEIC, fileURL.pathExtension.uppercased() != "HEIC" {
+            let path = fileURL.path.replacingOccurrences(of: fileURL.pathExtension, with: "HEIC")
+            imageURL = .init(fileURLWithPath: path)
+        }else {
+            imageURL = fileURL
+        }
         let options = PHAssetResourceRequestOptions()
         options.isNetworkAccessAllowed = true
         PHAssetResourceManager.default().writeData(

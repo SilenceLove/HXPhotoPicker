@@ -597,7 +597,7 @@ class ProgressIndefiniteView: UIView {
         isAnimating = false
     }
     
-    func resetMask() {
+    lazy var circlePath: CGPath = {
         let path = UIBezierPath(
             arcCenter: CGPoint(x: width * 0.5, y: height * 0.5),
             radius: width * 0.5 - lineWidth * 0.5,
@@ -605,8 +605,16 @@ class ProgressIndefiniteView: UIView {
             endAngle: -CGFloat.pi * 0.5 + CGFloat.pi * 4,
             clockwise: true
         )
-        circleLayer.path = path.cgPath
-        circleLayer.mask = maskLayer
+        return path.cgPath
+    }()
+    
+    func resetMask() {
+        if circleLayer.path != circlePath {
+            circleLayer.path = circlePath
+        }
+        if circleLayer.mask == nil {
+            circleLayer.mask = maskLayer
+        }
     }
     
     var progress: CGFloat = 0 {

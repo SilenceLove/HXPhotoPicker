@@ -179,6 +179,14 @@ class EditorScaleView: UIView {
         }
     }
     
+    func stopScroll() {
+        if !isAngleChange {
+            return
+        }
+        let offset = collectionView.contentOffset
+        collectionView.setContentOffset(offset, animated: false)
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         if UIDevice.isPortrait {

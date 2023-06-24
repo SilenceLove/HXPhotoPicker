@@ -17,6 +17,7 @@ extension PhotoPickerViewController: PhotoPickerBottomViewDelegate {
         pushPreviewViewController(
             previewAssets: picker.selectedAssetArray,
             currentPreviewIndex: 0,
+            isPreviewSelect: true,
             animated: true
         )
     }

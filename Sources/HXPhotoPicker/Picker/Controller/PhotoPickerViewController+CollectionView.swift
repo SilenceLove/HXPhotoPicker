@@ -290,6 +290,15 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             }
             config.languageType = pickerController.config.languageType
             config.indicatorType = pickerController.config.indicatorType
+             
+            config.chartlet.albumPickerConfigHandler = { [weak self] in
+                var pickerConfig = self?.pickerController?.config ?? .init()
+                pickerConfig.selectOptions = [.photo]
+                pickerConfig.photoList.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenEditButton = true
+                return pickerConfig
+            }
             let photoEditorVC = EditorViewController(
                 .init(type: .photoAsset(photoAsset), result: photoAsset.editedResult),
                 config: config,
@@ -345,6 +354,14 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             }
             config.languageType = pickerController.config.languageType
             config.indicatorType = pickerController.config.indicatorType
+            config.chartlet.albumPickerConfigHandler = { [weak self] in
+                var pickerConfig = self?.pickerController?.config ?? .init()
+                pickerConfig.selectOptions = [.gifPhoto]
+                pickerConfig.photoList.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenEditButton = true
+                return pickerConfig
+            }
             let videoEditorVC = EditorViewController(
                 .init(type: .photoAsset(photoAsset), result: photoAsset.editedResult),
                 config: config,
@@ -371,12 +388,32 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
     @available(iOS 13.0, *)
     public func collectionView(
         _ collectionView: UICollectionView,
-        contextMenuConfigurationForItemAt indexPath: IndexPath,
-        point: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        guard let sCell = collectionView.cellForItem(at: indexPath),
+        contextMenuConfiguration configuration: UIContextMenuConfiguration,
+        highlightPreviewForItemAt indexPath: IndexPath
+    ) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? PhotoPickerBaseViewCell,
               config.allowHapticTouchPreview else {
             return nil
+        }
+        return .init(view: cell)
+    }
+    
+    @available(iOS 13.0, *)
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first,
+              let sCell = collectionView.cellForItem(at: indexPath),
+              config.allowHapticTouchPreview else {
+            return nil
+        }
+        if sCell is PickerCameraViewCell {
+            if !UIImagePickerController.isSourceTypeAvailable(.camera) ||
+               AssetManager.cameraAuthorizationStatus() != .authorized {
+                return nil
+            }
         }
         let viewSize = view.size
         return .init(
@@ -387,7 +424,7 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 let imageSize = photoAsset.imageSize
                 let aspectRatio = imageSize.width / imageSize.height
                 let maxWidth = viewSize.width - UIDevice.leftMargin - UIDevice.rightMargin - 60
-                let maxHeight = UIScreen.main.bounds.height * 0.659
+                let maxHeight = UIDevice.isPortrait ? UIScreen.main.bounds.height * 0.659 : UIScreen.main.bounds.height - UIDevice.topMargin - UIDevice.bottomMargin
                 var width = imageSize.width
                 var height = imageSize.height
                 if width > maxWidth {
@@ -404,15 +441,14 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 vc.delegate = self
                 vc.preferredContentSize = CGSize(width: width, height: height)
                 return vc
-            }else if sCell is PickerCameraViewCell &&
-                     UIImagePickerController.isSourceTypeAvailable(.camera) &&
-                     AssetManager.cameraAuthorizationStatus() == .authorized {
+            }else if sCell is PickerCameraViewCell {
                 let vc = PhotoPeekViewController(isCamera: true)
                 return vc
             }
             return nil
-        } actionProvider: { menuElements in
-            guard let picker = self.pickerController,
+        } actionProvider: { [weak self] menuElements in
+            guard let self = self,
+                  let picker = self.pickerController,
                   let cell = sCell as? PhotoPickerBaseViewCell,
                   self.config.allowAddMenuElements else { return nil }
             var menus: [UIMenuElement] = []
@@ -422,11 +458,11 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                     title: photoAsset.isSelected ? "取消选择".localized : "选择".localized,
                     image: photoAsset.isSelected ? UIImage(systemName: "minus.circle") : UIImage(systemName: "checkmark.circle"),
                     attributes: photoAsset.isSelected ? [.destructive] : []
-                ) { action in
-                    self.updateCellSelectedState(
-                        for: indexPath.item,
-                        isSelected: !photoAsset.isSelected
-                    )
+                ) { [weak self] action in
+                    guard let self = self, let cell = self.getCell(for: indexPath.item) else {
+                        return
+                    }
+                    self.cell(cell, didSelectControl: photoAsset.isSelected)
                 }
                 menus.append(select)
             }
@@ -442,8 +478,8 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
                 let edit = UIAction(
                     title: "编辑".localized,
                     image: UIImage(systemName: "slider.horizontal.3")
-                ) { action in
-                    self.openEditor(
+                ) { [weak self] action in
+                    self?.openEditor(
                         photoAsset,
                         cell,
                         animated: picker.config.selectMode == .multiple
@@ -493,6 +529,10 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             view.photoCount = photoCount
             view.videoCount = videoCount
             view.config = config.assetNumber
+            view.filterOptions = filterOptions
+            view.didFilterHandler = { [weak self] in
+                self?.didFilterItemClick()
+            }
             return view
         }
         return .init()
@@ -582,7 +622,7 @@ extension PhotoPickerViewController: UICollectionViewDelegateFlowLayout {
         referenceSizeForFooterInSection section: Int
     ) -> CGSize {
         if config.isShowAssetNumber && (photoCount > 0 || videoCount > 0) {
-            return CGSize(width: view.width, height: 50)
+            return CGSize(width: view.width, height: filterOptions == .any ? 50 : 70)
         }
         return .zero
     }

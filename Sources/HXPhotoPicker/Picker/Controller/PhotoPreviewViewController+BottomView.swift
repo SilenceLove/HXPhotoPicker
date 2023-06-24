@@ -60,6 +60,14 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             }
             videoEditorConfig.languageType = pickerConfig.languageType
             videoEditorConfig.indicatorType = pickerConfig.indicatorType
+            videoEditorConfig.chartlet.albumPickerConfigHandler = { [weak self] in
+                var pickerConfig = self?.pickerController?.config ?? .init()
+                pickerConfig.selectOptions = [.gifPhoto]
+                pickerConfig.photoList.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenEditButton = true
+                return pickerConfig
+            }
             let videoEditorVC = EditorViewController(
                 .init(
                     type: .photoAsset(photoAsset),
@@ -104,6 +112,14 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             }
             photoEditorConfig.languageType = pickerConfig.languageType
             photoEditorConfig.indicatorType = pickerConfig.indicatorType
+            photoEditorConfig.chartlet.albumPickerConfigHandler = { [weak self] in
+                var pickerConfig = self?.pickerController?.config ?? .init()
+                pickerConfig.selectOptions = [.photo]
+                pickerConfig.photoList.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenOriginalButton = true
+                pickerConfig.previewView.bottomView.isHiddenEditButton = true
+                return pickerConfig
+            }
             let photoEditorVC = EditorViewController(
                 .init(
                     type: .photoAsset(photoAsset),
@@ -292,5 +308,29 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             self,
             didOriginalButton: isOriginal
         )
+    }
+    
+    func bottomView(_ bottomView: PhotoPickerBottomView, moveItemAt fromIndex: Int, toIndex: Int) {
+        delegate?.previewViewController(self, moveItem: fromIndex, toIndex: toIndex)
+        guard let pickerController = pickerController else {
+            return
+        }
+        pickerController.movePhotoAsset(fromIndex: fromIndex, toIndex: toIndex)
+        if isPreviewSelect {
+            let fromAsset = previewAssets[fromIndex]
+            previewAssets.remove(at: fromIndex)
+            previewAssets.insert(fromAsset, at: toIndex)
+            getCell(for: currentPreviewIndex)?.cancelRequest()
+            collectionView.reloadData()
+            setupRequestPreviewTimer()
+        }
+        bottomView.selectedView.reloadData(photoAssets: pickerController.selectedAssetArray)
+        if let asset = photoAsset(for: currentPreviewIndex) {
+            updateSelectBox(asset.isSelected, photoAsset: asset)
+            DispatchQueue.main.async {
+                bottomView.selectedView.scrollTo(photoAsset: asset)
+            }
+        }
+        delegate?.previewViewController(movePhotoAsset: self)
     }
 }

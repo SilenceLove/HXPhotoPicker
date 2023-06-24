@@ -336,6 +336,7 @@ extension EditorView {
             operateHandler(operate)
         }
         operates.removeAll()
+        reloadOperates.removeAll()
     }
     
     func operateHandler(_ operate: Operate) {

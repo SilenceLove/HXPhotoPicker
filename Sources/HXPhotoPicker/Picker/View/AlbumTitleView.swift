@@ -22,10 +22,7 @@ class AlbumTitleView: UIControl {
    
    var title: String? {
        didSet {
-           if title == nil {
-               title = "相册".localized
-           }
-           titleLb.text = title
+           titleLb.text = title ?? "相册".localized
            updateTitleFrame()
        }
    }

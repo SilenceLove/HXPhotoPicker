@@ -46,7 +46,13 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         let toVC = transitionContext.viewController(forKey: .to)!
         pickerControllerBackgroundColor = pickerController.view.backgroundColor
         let containerView = transitionContext.containerView
-        if toVC.transitioningDelegate == nil || toVC is PhotoPickerController {
+        let isChartlet: Bool
+        #if HXPICKER_ENABLE_PICKER
+        isChartlet = toVC is EditorChartletViewController
+        #else
+        isChartlet = false
+        #endif
+        if (toVC.transitioningDelegate == nil || toVC is PhotoPickerController) && !isChartlet {
             containerView.addSubview(toVC.view)
         }else {
             let fromVC = transitionContext.viewController(forKey: .from)
