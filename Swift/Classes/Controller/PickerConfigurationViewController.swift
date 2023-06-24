@@ -33,37 +33,35 @@ class PickerConfigurationViewController: UITableViewController {
             if #available(iOS 13.0.0, *) {
                 Task {
                     do {
-//                        let urlResults: [AssetURLResult] = try await PhotoPickerController.picker(config)
+//                        let urlResults: [AssetURLResult] = try await PhotoPickerController.picker(config, compression: .init(imageCompressionQuality: 0.5, videoExportParameter: .init(preset: .ratio_960x540, quality: 5)))
 //                        print(urlResults)
                         
 //                        config.isAutoBack = false
 //                        let controller = PhotoPickerController.show(config)
 //                        let result = try await controller.picker()
+//                        controller.view.hx.show()
 //                        let images: [UIImage] = try await result.objects()
 //                        let urls: [URL] = try await result.objects()
 //                        let urlResults: [AssetURLResult] = try await result.objects()
 //                        print(images)
-//                        await MainActor.run(body: {
-//                            controller.dismiss(true) {
-//                                let pickerResultVC = PickerResultViewController()
-//                                pickerResultVC.config = self.config
-//                                pickerResultVC.selectedAssets = result.photoAssets
-//                                pickerResultVC.isOriginal = result.isOriginal
-//                                self.navigationController?.pushViewController(pickerResultVC, animated: true)
-//                            }
-//                        })
+//                        controller.view.hx.hide()
+//                        controller.dismiss(true) {
+//                            let pickerResultVC = PickerResultViewController()
+//                            pickerResultVC.config = self.config
+//                            pickerResultVC.selectedAssets = result.photoAssets
+//                            pickerResultVC.isOriginal = result.isOriginal
+//                            self.navigationController?.pushViewController(pickerResultVC, animated: true)
+//                        }
                         
                         let result = try await PhotoPickerController.picker(config)
 //                        let images: [UIImage] = try await result.objects()
 //                        let urls: [URL] = try await result.objects()
 //                        let urlResults: [AssetURLResult] = try await result.objects()
-                        await MainActor.run(body: {
-                            let pickerResultVC = PickerResultViewController()
-                            pickerResultVC.config = self.config
-                            pickerResultVC.selectedAssets = result.photoAssets
-                            pickerResultVC.isOriginal = result.isOriginal
-                            self.navigationController?.pushViewController(pickerResultVC, animated: true)
-                        })
+                        let pickerResultVC = PickerResultViewController()
+                        pickerResultVC.config = config
+                        pickerResultVC.selectedAssets = result.photoAssets
+                        pickerResultVC.isOriginal = result.isOriginal
+                        navigationController?.pushViewController(pickerResultVC, animated: true)
                     } catch {
                         print(error)
                     }
