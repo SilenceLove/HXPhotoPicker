@@ -101,7 +101,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.1"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.2"))
 ]
 ```
 
@@ -139,7 +139,7 @@ pod 'HXPhotoPicker-Lite/Picker'
 pod 'HXPhotoPicker-Lite/Editor'
 pod 'HXPhotoPicker-Lite/Camera'
 
-v4.0以下的Objc版本
+v4.0以下的ObjC版本
 pod 'HXPhotoPickerObjC'
 ```
 
@@ -165,7 +165,17 @@ class ViewController: UIViewController {
         // 设置与微信主题一致的配置
         let config = PickerConfiguration.default
         
-        // 方法一：
+        // 方法一：async/await
+        let images: [UIImage] = try await Photo.picker(config)
+        let urls: [URL] = try await Photo.picker(config)
+        let results: [AssetURLResult] = try await Photo.picker(config)
+        
+        let pickerResult = try await Photo.picker(config)
+        let images: [UIImage] = try await pickerResult.objects()
+        let urls: [URL] = try await pickerResult.objects()
+        let urlResults: [AssetURLResult] = try await pickerResult.objects()
+        
+        // 方法二：
         let pickerController = PhotoPickerController(picker: config)
         pickerController.pickerDelegate = self
         // 当前被选择的资源对应的 PhotoAsset 对象数组
@@ -174,7 +184,7 @@ class ViewController: UIViewController {
         pickerController.isOriginal = isOriginal
         present(pickerController, animated: true, completion: nil)
         
-        // 方法二：
+        // 方法三：
         Photo.picker(
             config
         ) { result, pickerController in
@@ -198,8 +208,15 @@ extension ViewController: PhotoPickerControllerDelegate {
     ///   - result: 选择的结果
     ///     result.photoAssets  选择的资源数组
     ///     result.isOriginal   是否选中原图
-    func pickerController(_ pickerController: PhotoPickerController, 
-                            didFinishSelection result: PickerResult) {
+    func pickerController(
+        _ pickerController: PhotoPickerController, 
+        didFinishSelection result: PickerResult
+    ) {
+        // async/await
+        let images: [UIImage] = try await result.objects()
+        let urls: [URL] = try await result.objects()
+        let urlResults: [AssetURLResult] = try await result.objects()
+        
         result.getImage { (image, photoAsset, index) in
             if let image = image {
                 print("success", image)
@@ -225,6 +242,10 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 ```swift
 /// 如果为视频的话获取则是视频封面
+// async/await
+// compression: 压缩参数，不传则不压缩 
+let image: UIImage = try await photoAsset.object(compression)
+
 /// compressionQuality: 压缩参数，不传则不压缩 
 photoAsset.getImage(compressionQuality: compressionQuality) { image in
     print(image)
@@ -234,6 +255,11 @@ photoAsset.getImage(compressionQuality: compressionQuality) { image in
 #### 获取 URL
 
 ```swift
+// async/await 
+// compression: 压缩参数，不传则不压缩 
+let url: URL = try await photoAsset.object(compression)
+let result: AssetURLResult = try await photoAsset.object(compression)
+
 /// compression: 压缩参数，不传则不压缩
 photoAsset.getURL(compression: compression) { result in
     switch result {
@@ -271,6 +297,7 @@ photoAsset.getURL(compression: compression) { result in
 
 | 版本 | 发布时间 | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.0.2](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#402) | 2023-06-24 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.1](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#401) | 2023-06-17 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.0](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE_CN.md#400) | 2023-06-15 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v3.0.0](https://github.com/SilenceLove/HXPhotoPickerObjC#-%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BD%95---update-history) | 2022-09-18 | 14.0.0 | ----- | 8.0+ |
