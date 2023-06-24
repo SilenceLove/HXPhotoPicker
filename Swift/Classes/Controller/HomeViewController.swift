@@ -24,9 +24,9 @@ class HomeViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        #if canImport(GDPerformanceView_Swift)
-//        PerformanceMonitor.shared().start()
-//        #endif
+        #if canImport(GDPerformanceView_Swift)
+        PerformanceMonitor.shared().start()
+        #endif
     }
     
     // MARK: - Table view data source

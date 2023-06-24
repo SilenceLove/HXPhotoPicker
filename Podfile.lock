@@ -1,50 +1,47 @@
 PODS:
-  - GDPerformanceView-Swift (2.1.1)
-  - HXPhotoPicker (4.0.1):
-    - HXPhotoPicker/Full (= 4.0.1)
-  - HXPhotoPicker/Camera (4.0.1):
-    - HXPhotoPicker/Camera/Lite (= 4.0.1)
-    - HXPhotoPicker/Camera/Location (= 4.0.1)
-  - HXPhotoPicker/Camera/Lite (4.0.1):
+  - HXPhotoPicker (4.0.2):
+    - HXPhotoPicker/Full (= 4.0.2)
+  - HXPhotoPicker/Camera (4.0.2):
+    - HXPhotoPicker/Camera/Lite (= 4.0.2)
+    - HXPhotoPicker/Camera/Location (= 4.0.2)
+  - HXPhotoPicker/Camera/Lite (4.0.2):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Camera/Location (4.0.1):
+  - HXPhotoPicker/Camera/Location (4.0.2):
     - HXPhotoPicker/Camera/Lite
-  - HXPhotoPicker/Core (4.0.1)
-  - HXPhotoPicker/Editor (4.0.1):
-    - HXPhotoPicker/Editor/KF (= 4.0.1)
-    - HXPhotoPicker/Editor/Lite (= 4.0.1)
-  - HXPhotoPicker/Editor/KF (4.0.1):
+  - HXPhotoPicker/Core (4.0.2)
+  - HXPhotoPicker/Editor (4.0.2):
+    - HXPhotoPicker/Editor/KF (= 4.0.2)
+    - HXPhotoPicker/Editor/Lite (= 4.0.2)
+  - HXPhotoPicker/Editor/KF (4.0.2):
     - HXPhotoPicker/Editor/Lite
     - HXPhotoPicker/EditorView/KF
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/Editor/Lite (4.0.1):
+  - HXPhotoPicker/Editor/Lite (4.0.2):
     - HXPhotoPicker/EditorView/Lite
-  - HXPhotoPicker/EditorView/KF (4.0.1):
+  - HXPhotoPicker/EditorView/KF (4.0.2):
     - HXPhotoPicker/EditorView/Lite
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/EditorView/Lite (4.0.1):
+  - HXPhotoPicker/EditorView/Lite (4.0.2):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Full (4.0.1):
+  - HXPhotoPicker/Full (4.0.2):
     - HXPhotoPicker/Camera
     - HXPhotoPicker/Editor
     - HXPhotoPicker/Picker
-  - HXPhotoPicker/Picker (4.0.1):
-    - HXPhotoPicker/Picker/KF (= 4.0.1)
-    - HXPhotoPicker/Picker/Lite (= 4.0.1)
-  - HXPhotoPicker/Picker/KF (4.0.1):
+  - HXPhotoPicker/Picker (4.0.2):
+    - HXPhotoPicker/Picker/KF (= 4.0.2)
+    - HXPhotoPicker/Picker/Lite (= 4.0.2)
+  - HXPhotoPicker/Picker/KF (4.0.2):
     - HXPhotoPicker/Picker/Lite
     - Kingfisher (~> 7.0)
-  - HXPhotoPicker/Picker/Lite (4.0.1):
+  - HXPhotoPicker/Picker/Lite (4.0.2):
     - HXPhotoPicker/Core
   - Kingfisher (7.6.2)
 
 DEPENDENCIES:
-  - GDPerformanceView-Swift
   - HXPhotoPicker (from `./`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - GDPerformanceView-Swift
     - Kingfisher
 
 EXTERNAL SOURCES:
@@ -52,10 +49,9 @@ EXTERNAL SOURCES:
     :path: "./"
 
 SPEC CHECKSUMS:
-  GDPerformanceView-Swift: 22d964fe40b19e3d914dba2586237d064de8fd77
-  HXPhotoPicker: 33d2b025886c3add4134838c41f803e342e93225
+  HXPhotoPicker: 0210ec7eab5234442480f5999c92a76cefd48b09
   Kingfisher: 6c5449c6450c5239166510ba04afe374a98afc4f
 
-PODFILE CHECKSUM: 14343f0e82a39cc30a6f664ad67276fdb893b34d
+PODFILE CHECKSUM: 93a641aa1cfe4381249e13ab1f8ec6ca35882eaf
 
 COCOAPODS: 1.12.1

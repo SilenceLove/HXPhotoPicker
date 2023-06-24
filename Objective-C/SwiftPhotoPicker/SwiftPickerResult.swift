@@ -168,6 +168,7 @@ extension AssetURLResult {
 
 /// 压缩参数
 class SwiftCompression: NSObject {
+    
     @objc
     let imageCompressionQuality: CGFloat
     
@@ -185,8 +186,7 @@ class SwiftCompression: NSObject {
     }
     
     /// 压缩视频
-    /// - Parameters:
-    ///   - quality: 视频质量 [1-10]
+    /// - Parameter videoExportParameter: 视频压缩参数
     @objc
     public init(
         videoExportParameter: SwiftVideoExportParameter
@@ -198,8 +198,7 @@ class SwiftCompression: NSObject {
     /// 压缩图片、视频
     /// - Parameters:
     ///   - imageCompressionQuality: 图片压缩质量 [0 - 1]
-    ///   - preset: 视频分辨率
-    ///   - quality: 视频质量 [1-10]
+    ///   - videoExportParameter: 视频压缩参数
     @objc
     public init(
         imageCompressionQuality: CGFloat,
@@ -231,8 +230,8 @@ class SwiftVideoExportParameter: NSObject {
     
     /// 设置视频导出参数
     /// - Parameters:
-    ///   - exportPreset: 视频导出的分辨率
-    ///   - videoQuality: 视频质量 [1 - 10]
+    ///   - preset: 视频导出的分辨率
+    ///   - quality: 视频质量 [1 - 10]
     @objc
     init(
         preset: SwiftExportPreset,

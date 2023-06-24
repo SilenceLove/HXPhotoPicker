@@ -4,7 +4,7 @@ def commonPods
   platform:ios,'12.0'
   use_frameworks!
   pod 'HXPhotoPicker', :path => './'
-  pod 'GDPerformanceView-Swift'
+#  pod 'GDPerformanceView-Swift'
 #  pod 'GPUImage'
 end
 
