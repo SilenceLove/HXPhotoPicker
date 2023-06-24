@@ -1,5 +1,26 @@
 # Release Notes
 
+## 4.0.2
+
+### Added
+
+- Picker
+  - Add filtering function to the photo list, `config.photoList.isShowFilterItem` controls whether to display the filter button
+  - The selected view at the bottom of the preview interface supports dragging to change the position
+
+### Optimizer
+
+- Picker
+  - When the photo format is `HEIC`, the suffix of the original image address is also consistent
+
+### Resolved
+
+- Picker
+  - The prompt text does not wrap when the photo list is empty
+- Editor
+  - Left and right 90° rotation complete callback not triggered
+  - It may not work when clicking restore when dragging the angle scale scrolling does not stop
+  
 ## 4.0.1
 
 ### Resolved
