@@ -53,7 +53,7 @@ class PickerControllerTransition: NSObject, UIViewControllerAnimatedTransitionin
             containerView.addSubview(toVC.view)
         }else {
             let isChartlet: Bool
-            #if HXPICKER_ENABLE_PICKER
+            #if HXPICKER_ENABLE_EDITOR
             isChartlet = toVC is EditorChartletViewController
             #else
             isChartlet = false

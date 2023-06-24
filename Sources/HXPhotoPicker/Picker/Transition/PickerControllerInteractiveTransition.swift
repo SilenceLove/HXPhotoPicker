@@ -47,7 +47,7 @@ class PickerControllerInteractiveTransition: UIPercentDrivenInteractiveTransitio
         pickerControllerBackgroundColor = pickerController.view.backgroundColor
         let containerView = transitionContext.containerView
         let isChartlet: Bool
-        #if HXPICKER_ENABLE_PICKER
+        #if HXPICKER_ENABLE_EDITOR
         isChartlet = toVC is EditorChartletViewController
         #else
         isChartlet = false

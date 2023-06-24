@@ -580,6 +580,8 @@ public extension PhotoPickerController {
         compression: PhotoAsset.Compression? = nil,
         fromVC: UIViewController? = nil
     ) async throws -> [T] {
+        var config = config
+        config.isAutoBack = false
         let vc = show(config, delegate: delegate, fromVC: fromVC)
         return try await vc.pickerObject(compression)
     }
@@ -617,7 +619,8 @@ public extension PhotoPickerController {
     
     func pickerObject<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
         try await withCheckedThrowingContinuation { continuation in
-            finishHandler = { result, _ in
+            finishHandler = { result, controller in
+                ProgressHUD.showLoading(addedTo: self.view)
                 Task {
                     do {
                         let objects: [T] = try await result.objects(compression)
@@ -625,9 +628,12 @@ public extension PhotoPickerController {
                     } catch {
                         continuation.resume(with: .failure(error))
                     }
+                    ProgressHUD.hide(forView: self.view)
+                    controller.dismiss(true)
                 }
             }
-            cancelHandler = { _ in
+            cancelHandler = { controller in
+                controller.dismiss(true)
                 continuation.resume(with: .failure(PickerError.canceled))
             }
         }

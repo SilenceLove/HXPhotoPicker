@@ -732,7 +732,9 @@ extension PhotoPickerViewController {
         }
         if let config = pickerController?.config {
             vc.selectOptions = config.selectOptions
+            #if HXPICKER_ENABLE_EDITOR
             vc.editorOptions = config.editorOptions
+            #endif
             vc.selectMode = config.selectMode
         }
         vc.photoCount = photoCount
@@ -767,6 +769,7 @@ extension PhotoPickerViewController {
         var videoCount: Int = 0
         let assets = allAssets.filter {
             if filterOptions.contains(.edited) {
+                #if HXPICKER_ENABLE_EDITOR
                 if $0.editedResult != nil {
                     if $0.mediaType == .photo {
                         photoCount += 1
@@ -775,6 +778,7 @@ extension PhotoPickerViewController {
                     }
                     return true
                 }
+                #endif
             }
             if filterOptions.contains(.photo) {
                 if $0.mediaSubType.isNormalPhoto {
