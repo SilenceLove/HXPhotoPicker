@@ -436,29 +436,57 @@ class PickerResultViewController: UIViewController,
 //            videoExportPreset: .ratio_960x540,
 //            videoQuality: 6
 //        )
-        selectedAssets.getURLs(
-            compression: nil
-        ) { result, photoAsset, index in
-            print("第" + String(index + 1) + "个")
-            switch result {
-            case .success(let response):
-                if let livePhoto = response.livePhoto {
-                    print("LivePhoto里的图片地址：", livePhoto.imageURL)
-                    print("LivePhoto里的视频地址：", livePhoto.videoURL)
-                    return
+        if #available(iOS 13.0, *) {
+            Task {
+                for (index, selectedAsset) in selectedAssets.enumerated() {
+                    do {
+                        print("第" + String(index + 1) + "个")
+                        let result: AssetURLResult = try await selectedAsset.object(nil)
+                        if let livePhoto = result.livePhoto {
+                            print("LivePhoto里的图片地址：", livePhoto.imageURL)
+                            print("LivePhoto里的视频地址：", livePhoto.videoURL)
+                        }else {
+                            print(
+                                result.urlType == .network ?
+                                result.mediaType == .photo ?
+                                "网络图片地址：" : "网络视频地址：" :
+                                    result.mediaType == .photo ?
+                                "本地图片地址" : "本地视频地址",
+                                result.url
+                            )
+                        }
+                    } catch {
+                        print("地址获取失败: ", error)
+                    }
                 }
-                print(response.urlType == .network ?
-                        response.mediaType == .photo ?
-                            "网络图片地址：" : "网络视频地址：" :
-                        response.mediaType == .photo ?
-                            "本地图片地址" : "本地视频地址",
-                      response.url)
-            case .failure(let error):
-                print("地址获取失败", error)
+                view.hx.hide(animated: false)
+                view.hx.showSuccess(text: "获取完成", delayHide: 1.5, animated: true)
             }
-        } completionHandler: { urls in
-            self.view.hx.hide(animated: false)
-            self.view.hx.showSuccess(text: "获取完成", delayHide: 1.5, animated: true)
+        } else {
+            selectedAssets.getURLs(
+                compression: nil
+            ) { result, photoAsset, index in
+                print("第" + String(index + 1) + "个")
+                switch result {
+                case .success(let response):
+                    if let livePhoto = response.livePhoto {
+                        print("LivePhoto里的图片地址：", livePhoto.imageURL)
+                        print("LivePhoto里的视频地址：", livePhoto.videoURL)
+                        return
+                    }
+                    print(response.urlType == .network ?
+                            response.mediaType == .photo ?
+                                "网络图片地址：" : "网络视频地址：" :
+                            response.mediaType == .photo ?
+                                "本地图片地址" : "本地视频地址",
+                          response.url)
+                case .failure(let error):
+                    print("地址获取失败", error)
+                }
+            } completionHandler: { urls in
+                self.view.hx.hide(animated: false)
+                self.view.hx.showSuccess(text: "获取完成", delayHide: 1.5, animated: true)
+            }
         }
     }
     
@@ -567,11 +595,12 @@ class PickerResultViewController: UIViewController,
                 handler: { alertAction in
             photoBrowser.view.hx.show(animated: true)
             func saveAlbum(_ type: AssetManager.SaveType) {
-                AssetManager.saveSystemAlbum(type: type) {
+                AssetManager.saveSystemAlbum(type: type) { result in
                     photoBrowser.view.hx.hide(animated: true)
-                    if $0 != nil {
+                    switch result {
+                    case .success(_):
                         photoBrowser.view.hx.showSuccess(text: "保存成功", delayHide: 1.5, animated: true)
-                    }else {
+                    case .failure(_):
                         photoBrowser.view.hx.showWarning(text: "保存失败", delayHide: 1.5, animated: true)
                     }
                 }

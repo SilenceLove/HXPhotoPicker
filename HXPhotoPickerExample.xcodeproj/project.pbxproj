@@ -1322,10 +1322,7 @@
 		D36879782A399B8C00E70910 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				D36879832A399B8C00E70910 /* EditorChartletViewController.swift */,
-				D36879842A399B8C00E70910 /* EditorMaskListViewController.swift */,
-				D368797A2A399B8C00E70910 /* EditorMusicListViewController.swift */,
-				D368797C2A399B8C00E70910 /* EditorStickerTextViewController.swift */,
+				D36879882A399B8C00E70910 /* EditorViewControllerDelegate.swift */,
 				D36879852A399B8C00E70910 /* EditorViewController.swift */,
 				D36879872A399B8C00E70910 /* EditorViewController+Brush.swift */,
 				D36879862A399B8C00E70910 /* EditorViewController+Chartlet.swift */,
@@ -1338,7 +1335,10 @@
 				D36879812A399B8C00E70910 /* EditorViewController+Text.swift */,
 				D36879892A399B8C00E70910 /* EditorViewController+ToolsView.swift */,
 				D368797E2A399B8C00E70910 /* EditorViewController+VideoControl.swift */,
-				D36879882A399B8C00E70910 /* EditorViewControllerDelegate.swift */,
+				D36879832A399B8C00E70910 /* EditorChartletViewController.swift */,
+				D36879842A399B8C00E70910 /* EditorMaskListViewController.swift */,
+				D368797A2A399B8C00E70910 /* EditorMusicListViewController.swift */,
+				D368797C2A399B8C00E70910 /* EditorStickerTextViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";

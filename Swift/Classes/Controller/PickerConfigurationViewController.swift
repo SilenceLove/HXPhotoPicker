@@ -52,8 +52,8 @@ class PickerConfigurationViewController: UITableViewController {
 //                            pickerResultVC.isOriginal = result.isOriginal
 //                            self.navigationController?.pushViewController(pickerResultVC, animated: true)
 //                        }
-                        
-                        let result = try await PhotoPickerController.picker(config)
+//                        config.isSelectedOriginal = true
+                        let result = try await Photo.picker(config)
 //                        let images: [UIImage] = try await result.objects()
 //                        let urls: [URL] = try await result.objects()
 //                        let urlResults: [AssetURLResult] = try await result.objects()
