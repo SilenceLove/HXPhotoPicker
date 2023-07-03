@@ -79,7 +79,7 @@ public enum AssetError: Error {
     case localLivePhotoRequestFailed
 }
 
-extension AssetError: LocalizedError {
+extension AssetError: LocalizedError, CustomStringConvertible {
     public var errorDescription: String? {
         switch self {
         case .fileWriteFailed:
@@ -133,5 +133,9 @@ extension AssetError: LocalizedError {
         case .localLivePhotoRequestFailed:
             return "本地livePhoto合成失败"
         }
+    }
+    
+    public var description: String {
+        errorDescription ?? "nil"
     }
 }

@@ -38,6 +38,9 @@ extension PhotoPickerViewController: PhotoPreviewViewControllerDelegate {
     ) {
         reloadCell(for: photoAsset)
         bottomView.updateFinishButtonTitle()
+        if filterOptions.contains(.edited) {
+            filterPhotoAssets()
+        }
     }
     func previewViewController(
         _ previewController: PhotoPreviewViewController,

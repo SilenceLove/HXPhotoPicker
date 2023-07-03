@@ -59,6 +59,7 @@ public extension PhotoAsset {
     }
     
     /// 获取url
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
     ///   - compression: 压缩参数，nil - 原图
     ///   - completion: 获取完成
@@ -69,6 +70,7 @@ public extension PhotoAsset {
         getAssetURL(compression: compression, completion: completion)
     }
     
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     func getAssetURL(
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
@@ -94,6 +96,7 @@ public extension PhotoAsset {
     }
     
     /// 获取图片url
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
     ///   - compressionQuality: 压缩比例，不传就是原图。gif不会压缩
     ///   - completion: 获取完成
@@ -242,7 +245,23 @@ extension AssetURLResult: PhotoAssetObject {
 @available(iOS 13.0, *)
 extension PhotoAsset {
     
-    public func object<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression?) async throws -> T {
+    /// - Parameter compression: 压缩参数
+    public func image(_ compression: PhotoAsset.Compression? = nil) async throws -> UIImage {
+        try await .fetchObject(self, compression: compression)
+    }
+    
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    public func url(_ compression: PhotoAsset.Compression? = nil) async throws -> URL {
+        try await .fetchObject(self, compression: compression)
+    }
+    
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    public func urlResult(_ compression: PhotoAsset.Compression? = nil) async throws -> AssetURLResult {
+        try await .fetchObject(self, compression: compression)
+    }
+    
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    public func object<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> T {
         try await T.fetchObject(self, compression: compression)
     }
     

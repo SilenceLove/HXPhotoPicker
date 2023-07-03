@@ -30,6 +30,7 @@ public struct NetworkImageAsset: Codable {
     
     /// list cell display
     /// 缩略图，列表cell展示
+    /// PhotoManager.shared.imageDownloader
     public let thumbnailURL: URL
     
     /// Size set by DownsamplingImageProcessor when Kingfisher downloads thumbnails
@@ -40,6 +41,7 @@ public struct NetworkImageAsset: Codable {
     
     /// Preview large image display
     /// 原图，预览大图展示
+    /// PhotoManager.shared.imageDownloader
     public let originalURL: URL
     
     /// The way the list Cell loads pictures
@@ -93,6 +95,9 @@ public struct NetworkVideoAsset {
     /// 网络视频地址
     public let videoURL: URL
     
+    /// AVURLAsset(url: videoURL, options: options)
+    public var options: [String: Any]?
+    
     /// 视频时长
     public var duration: TimeInterval
     
@@ -114,6 +119,7 @@ public struct NetworkVideoAsset {
     
     public init(
         videoURL: URL,
+        options: [String: Any]? = nil,
         duration: TimeInterval = 0,
         fileSize: Int = 0,
         coverImage: UIImage? = nil,
@@ -122,6 +128,7 @@ public struct NetworkVideoAsset {
         coverPlaceholder: String? = nil
     ) {
         self.videoURL = videoURL
+        self.options = options
         self.duration = duration
         self.fileSize = fileSize
         self.coverImage = coverImage
@@ -132,12 +139,14 @@ public struct NetworkVideoAsset {
     #else
     public init(
         videoURL: URL,
+        options: [String: Any]? = nil,
         duration: TimeInterval = 0,
         fileSize: Int = 0,
         coverImage: UIImage? = nil,
         videoSize: CGSize = .zero
     ) {
         self.videoURL = videoURL
+        self.options = options
         self.duration = duration
         self.fileSize = fileSize
         self.coverImage = coverImage

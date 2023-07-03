@@ -21,7 +21,7 @@ extension PhotoPickerViewController: PhotoPickerViewCellDelegate {
             picker.removePhotoAsset(photoAsset: photoAsset)
             // 清空视频编辑的数据
             #if HXPICKER_ENABLE_EDITOR
-            if photoAsset.videoEditedResult != nil {
+            if photoAsset.videoEditedResult != nil, picker.config.isDeselectVideoRemoveEdited {
                 photoAsset.editedResult = nil
                 cell.isRequestDirectly = true
                 cell.photoAsset = photoAsset

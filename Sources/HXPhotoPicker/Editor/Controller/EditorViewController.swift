@@ -425,6 +425,8 @@ open class EditorViewController: BaseViewController {
         didEnterPlayGround = false
     }
     
+    var isDismissed: Bool = false
+    var isPopTransition: Bool = false
     var isTransitionCompletion: Bool = true
     var loadAssetStatus: LoadAssetStatus = .loadding()
     var assetLoadingView: ProgressHUD?
@@ -542,7 +544,7 @@ open class EditorViewController: BaseViewController {
             if isToolsDisplay {
                 topMaskView.alpha = 0
                 topMaskView.isHidden = true
-                if isTransitionCompletion {
+                if isTransitionCompletion && !isPopTransition {
                     bottomMaskView.alpha = 1
                 }
                 bottomMaskView.isHidden = false
@@ -588,14 +590,14 @@ open class EditorViewController: BaseViewController {
         }else {
             bottomMaskLayer = PhotoTools.getGradientShadowLayer(startPoint: .init(x: 0, y: 0), endPoint: .init(x: 1, y: 0))
             bottomMaskView.isHidden = true
-            if isTransitionCompletion {
+            if isTransitionCompletion && !isPopTransition {
                 bottomMaskView.alpha = 0
             }
             bottomMaskView.layer.addSublayer(bottomMaskLayer)
             if isToolsDisplay {
                 topMaskView.isHidden = false
                 bottomMaskView.isHidden = false
-                if isTransitionCompletion {
+                if isTransitionCompletion && !isPopTransition {
                     topMaskView.alpha = 1
                     bottomMaskView.alpha = 1
                 }
@@ -853,9 +855,15 @@ open class EditorViewController: BaseViewController {
         super.viewDidDisappear(animated)
         if let vcs = navigationController?.viewControllers {
             if !vcs.contains(self) {
+                if !isDismissed {
+                    cancelHandler?(self)
+                }
                 removeVideo()
             }
         }else if presentingViewController == nil {
+            if !isDismissed {
+                cancelHandler?(self)
+            }
             removeVideo()
         }
     }
@@ -1485,6 +1493,7 @@ extension EditorViewController {
             PHImageManager.default().cancelImageRequest(assetRequestID)
         }
         if isCancel {
+            isDismissed = true
             delegate?.editorViewController(didCancel: self)
             cancelHandler?(self)
         }
@@ -1674,6 +1683,7 @@ extension EditorViewController: UINavigationControllerDelegate {
             isTransitionCompletion = false
             return EditorTransition(mode: .push)
         }else if operation == .pop {
+            isPopTransition = true
             return EditorTransition(mode: .pop)
         }
         return nil
@@ -1710,10 +1720,15 @@ public extension EditorViewController {
     @discardableResult
     func edit() async throws -> EditorAsset {
         try await withCheckedThrowingContinuation { continuation in
+            var isDimissed: Bool = false
             finishHandler = { result, _ in
+                if isDimissed { return }
+                isDimissed = true
                 continuation.resume(with: .success(result))
             }
             cancelHandler = { _ in
+                if isDimissed { return }
+                isDimissed = true
                 continuation.resume(with: .failure(EditorError.canceled))
             }
         }

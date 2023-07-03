@@ -55,6 +55,9 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
                 }
                 bottomView.updateFinishButtonTitle()
             }
+            if filterOptions.contains(.edited) {
+                filterPhotoAssets()
+            }
         }
     }
     

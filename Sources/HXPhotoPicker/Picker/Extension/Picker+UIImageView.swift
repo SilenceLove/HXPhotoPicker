@@ -40,6 +40,9 @@ extension UIImageView {
         var url: URL?
         var placeholderImage: UIImage?
         var options: KingfisherOptionsInfo = []
+        if let imageDonwloader = PhotoManager.shared.imageDownloader {
+            options += [.downloader(imageDonwloader)]
+        }
         var loadVideoCover: Bool = false
         if let imageAsset = asset.networkImageAsset {
             if isThumbnail {

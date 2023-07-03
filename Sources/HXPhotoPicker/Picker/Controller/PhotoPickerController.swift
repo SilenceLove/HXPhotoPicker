@@ -29,7 +29,7 @@ open class PhotoPickerController: UINavigationController {
         didSet { setupSelectedArray() }
     }
     
-    /// 是否选中了原图
+    /// 是否选中了原图，配置不显示原图按钮时，内部也是根据此属性来判断是否获取原图数据
     public var isOriginal: Bool = false
     
     /// fetch Assets 时的选项配置
@@ -156,6 +156,7 @@ open class PhotoPickerController: UINavigationController {
         isPreviewAsset = false
         isExternalPickerPreview = false
         super.init(nibName: nil, bundle: nil)
+        isOriginal = config.isSelectedOriginal
         autoDismiss = config.isAutoBack
         modalPresentationStyle = config.modalPresentationStyle
         pickerDelegate = delegate
@@ -198,6 +199,7 @@ open class PhotoPickerController: UINavigationController {
         isPreviewAsset = true
         isExternalPickerPreview = false
         super.init(nibName: nil, bundle: nil)
+        isOriginal = config.isSelectedOriginal
         autoDismiss = config.isAutoBack
         pickerDelegate = delegate
         let vc = PhotoPreviewViewController(config: self.config.previewView)
@@ -237,6 +239,7 @@ open class PhotoPickerController: UINavigationController {
         isPreviewAsset = false
         isExternalPickerPreview = true
         super.init(nibName: nil, bundle: nil)
+        isOriginal = config.isSelectedOriginal
         autoDismiss = config.isAutoBack
         pickerDelegate = delegate
         let vc = PhotoPreviewViewController(config: self.config.previewView)
@@ -305,6 +308,9 @@ open class PhotoPickerController: UINavigationController {
     #if HXPICKER_ENABLE_EDITOR
     lazy var editedPhotoAssetArray: [PhotoAsset] = []
     #endif
+    
+    var isDismissed: Bool = false
+    var pickerTask: Any?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -557,6 +563,12 @@ extension PhotoPickerController {
         return nil
     }
     private func didDismiss() {
+        if #available(iOS 13.0, *) {
+            if let task = pickerTask as? Task<(), Never> {
+                task.cancel()
+                pickerTask = nil
+            }
+        }
         #if HXPICKER_ENABLE_EDITOR
         removeAllEditedPhotoAsset()
         #endif
@@ -568,12 +580,17 @@ extension PhotoPickerController {
         }
         PhotoManager.shared.saveCameraPreview()
         pickerDelegate?.pickerController(self, didDismissComplete: cameraAssetArray)
+        if !isDismissed {
+            cancelHandler?(self)
+        }
     }
 }
 
 @available(iOS 13.0.0, *)
 public extension PhotoPickerController {
     
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
     static func picker<T: PhotoAssetObject>(
         _ config: PickerConfiguration,
         delegate: PhotoPickerControllerDelegate? = nil,
@@ -608,26 +625,41 @@ public extension PhotoPickerController {
     
     func picker() async throws -> PickerResult {
         try await withCheckedThrowingContinuation { continuation in
+            var isDimissed: Bool = false
             finishHandler = { result, _ in
+                if isDimissed { return }
+                isDimissed = true
                 continuation.resume(with: .success(result))
             }
             cancelHandler = { _ in
+                if isDimissed { return }
+                isDimissed = true
                 continuation.resume(with: .failure(PickerError.canceled))
             }
         }
     }
     
-    func pickerObject<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+     func pickerObject<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
         try await withCheckedThrowingContinuation { continuation in
-            finishHandler = { result, controller in
+            finishHandler = { [weak self] result, controller in
+                guard let self = self else { return }
                 ProgressHUD.showLoading(addedTo: self.view)
-                Task {
+                self.pickerTask = Task {
                     do {
                         let objects: [T] = try await result.objects(compression)
-                        continuation.resume(with: .success(objects))
+                        if !Task.isCancelled {
+                            continuation.resume(with: .success(objects))
+                        }else {
+                            self.pickerTask = nil
+                            continuation.resume(with: .failure(PickerError.canceled))
+                            return
+                        }
                     } catch {
                         continuation.resume(with: .failure(error))
                     }
+                    self.pickerTask = nil
                     ProgressHUD.hide(forView: self.view)
                     controller.dismiss(true)
                 }

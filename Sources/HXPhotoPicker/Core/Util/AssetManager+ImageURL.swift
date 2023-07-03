@@ -46,6 +46,7 @@ public extension AssetManager {
     }
     
     /// 获取原始图片地址
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
     ///   - asset: 对应的 PHAsset 数据
     ///   - fileURL: 指定本地地址
@@ -98,6 +99,37 @@ public extension AssetManager {
             toFile: imageURL,
             options: options
         ) { error in
+            if isHEIC && PhotoManager.shared.isConverHEICToPNG {
+                var pngPath = imageURL.path.replacingOccurrences(of: imageURL.pathExtension, with: "PNG")
+                if FileManager.default.fileExists(atPath: pngPath) {
+                    if let range = pngPath.range(of: ".PNG") {
+                        pngPath.removeSubrange(range)
+                        pngPath += "\(Int(Date().timeIntervalSince1970))" + ".PNG"
+                    }else {
+                        try? FileManager.default.removeItem(atPath: pngPath)
+                    }
+                }
+                let pngURL = URL(fileURLWithPath: pngPath)
+                let image = UIImage(contentsOfFile: imageURL.path)?.normalizedImage()
+                try? FileManager.default.removeItem(at: imageURL)
+                guard let data = PhotoTools.getImageData(for: image) else {
+                    DispatchQueue.main.async {
+                        resultHandler(.failure(.assetResourceWriteDataFailed(AssetError.invalidData)))
+                    }
+                    return
+                }
+                do {
+                    try data.write(to: pngURL)
+                    DispatchQueue.main.async {
+                        resultHandler(.success(pngURL))
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        resultHandler(.failure(.assetResourceWriteDataFailed(AssetError.fileWriteFailed)))
+                    }
+                }
+                return
+            }
             DispatchQueue.main.async {
                 if let error = error {
                     resultHandler(.failure(.assetResourceWriteDataFailed(error)))

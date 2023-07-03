@@ -353,7 +353,7 @@ extension PhotoPreviewContentView {
         }
         #if HXPICKER_ENABLE_EDITOR
         if let videoEdit = photoAsset.videoEditedResult {
-            networkVideoRequestCompletion(videoEdit.url)
+            networkVideoRequestCompletion(videoEdit.url, options: photoAsset.networkVideoAsset?.options)
             return
         }
         #endif
@@ -363,7 +363,7 @@ extension PhotoPreviewContentView {
             if PhotoTools.isCached(forVideo: key) {
                 let url = PhotoTools.getVideoCacheURL(for: key)
                 checkNetworkVideoFileSize(url)
-                networkVideoRequestCompletion(url)
+                networkVideoRequestCompletion(url, options: photoAsset.networkVideoAsset?.options)
                 return
             }
             
@@ -371,7 +371,7 @@ extension PhotoPreviewContentView {
                 videoURL.path.hasSuffix("m3u8")
                 || videoURL.path.hasSuffix("M3U8") {
                 videoView.isNetwork = true
-                networkVideoRequestCompletion(videoURL)
+                networkVideoRequestCompletion(videoURL, options: photoAsset.networkVideoAsset?.options)
                 return
             }
             if loadingView == nil {
@@ -397,7 +397,7 @@ extension PhotoPreviewContentView {
                     }
                     self.checkNetworkVideoFileSize(url)
                     self.requestSucceed()
-                    self.networkVideoRequestCompletion(url)
+                    self.networkVideoRequestCompletion(url, options: self.photoAsset.networkVideoAsset?.options)
                 }else {
                     if let error = error as NSError?, error.code == NSURLErrorCancelled {
                         self.requestFailed(info: [PHImageCancelledKey: 1], isICloud: false)
@@ -423,12 +423,12 @@ extension PhotoPreviewContentView {
         }
     }
     
-    func networkVideoRequestCompletion(_ videoURL: URL) {
+    func networkVideoRequestCompletion(_ videoURL: URL, options: [String: Any]?) {
         if !isPeek {
             videoView.playerTime = photoAsset.playerTime
         }
         requestNetworkCompletion = true
-        videoView.avAsset = AVAsset.init(url: videoURL)
+        videoView.avAsset = AVURLAsset(url: videoURL, options: options)
         UIView.animate(withDuration: 0.25) {
             self.videoView.alpha = 1
         }

@@ -18,10 +18,14 @@ public struct AssetManager {
         case livePhoto(imageURL: URL, videoURL: URL)
     }
     
+    public enum SaveError: Error {
+        case notDetermined
+        case phAssetIsNull
+    }
+    
     /// 保存资源到系统相册
     /// - Parameters:
-    ///   - asset: 需要保存的资源数据，UIImage / URL
-    ///   - mediaType: 资源类型，image/video
+    ///   - type: 保存类型
     ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
@@ -33,6 +37,35 @@ public struct AssetManager {
         location: CLLocation? = nil,
         completion: @escaping (PHAsset?) -> Void
     ) {
+        saveSystemAlbum(
+            type: type,
+            customAlbumName: customAlbumName,
+            creationDate: creationDate,
+            location: location
+        ) {
+            switch $0 {
+            case .success(let phAsset):
+                completion(phAsset)
+            case .failure(_):
+                completion(nil)
+            }
+        }
+    }
+    
+    /// 保存资源到系统相册
+    /// - Parameters:
+    ///   - type: 保存类型
+    ///   - customAlbumName: 需要保存到自定义相册的名称，默认BundleName
+    ///   - creationDate: 创建时间，默认当前时间
+    ///   - location: 位置信息
+    ///   - completion: 保存之后的结果
+    public static func saveSystemAlbum(
+        type: SaveType,
+        customAlbumName: String? = nil,
+        creationDate: Date = Date(),
+        location: CLLocation? = nil,
+        completion: @escaping (Result<PHAsset, Error>) -> Void
+    ) {
         var albumName: String?
         if let customAlbumName = customAlbumName, customAlbumName.count > 0 {
             albumName = customAlbumName
@@ -42,7 +75,7 @@ public struct AssetManager {
         requestAuthorization {
             switch $0 {
             case .denied, .notDetermined, .restricted:
-                completion(nil)
+                completion(.failure(SaveError.notDetermined))
                 return
             default:
                 break
@@ -79,19 +112,19 @@ public struct AssetManager {
                         withLocalIdentifier: placeholder.localIdentifier
                        ) {
                         DispatchQueue.main.async {
-                            completion(phAsset)
+                            completion(.success(phAsset))
                         }
                         if let albumName = albumName, !albumName.isEmpty {
                             saveCustomAlbum(for: phAsset, albumName: albumName)
                         }
                     }else {
                         DispatchQueue.main.async {
-                            completion(nil)
+                            completion(.failure(SaveError.phAssetIsNull))
                         }
                     }
                 } catch {
                     DispatchQueue.main.async {
-                        completion(nil)
+                        completion(.failure(error))
                     }
                 }
             }

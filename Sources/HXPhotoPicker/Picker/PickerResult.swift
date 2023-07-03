@@ -86,6 +86,7 @@ public extension PickerResult {
 public extension PickerResult {
     
     /// Get the address of the selected resource / 获取已选资源的地址
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// Does not include network resources, if the network resources are edited, they will be obtained / 不包括网络资源，如果网络资源编辑过则会获取
     /// - Parameters:
     ///   - options: type of get / 获取的类型
@@ -103,6 +104,7 @@ public extension PickerResult {
     }
     
     /// Get the address of the selected resource / 获取已选资源的地址
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// Include web images / 包括网络图片
     /// - Parameters:
     ///   - options: type of get / 获取的类型
@@ -151,45 +153,49 @@ extension PickerResult {
 @available(iOS 13.0.0, *)
 public extension PickerResult {
     
-    func images(_ compressionScale: CGFloat? = nil) async -> [UIImage] {
-        await withCheckedContinuation { continuation in
-            getImage(compressionScale: compressionScale) {
-                continuation.resume(with: .success($0))
-            }
-        }
+    /// 获取 UIImage 对象数组
+    /// - Parameter compressionScale: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    /// - Returns: UIImage 对象数组
+    func images(_ compressionScale: CGFloat? = nil) async throws -> [UIImage] {
+        try await objects(compression)
     }
     
-    func urls(_ compression: PhotoAsset.Compression? = nil) async -> [URL] {
-        await withCheckedContinuation { continuation in
-            getURLs(
-                compression: compression
-            ) {
-                continuation.resume(with: .success($0))
-            }
-        }
+    /// 获取 URL 对象数组
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    /// - Returns: URL 对象数组
+    func urls(_ compression: PhotoAsset.Compression? = nil) async throws -> [URL] {
+        try await objects(compression)
     }
     
+    /// 获取 AssetURLResult 对象数组
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    /// - Returns: AssetURLResult 对象数组
+    func urlResults(_ compression: PhotoAsset.Compression? = nil) async throws -> [AssetURLResult] {
+        try await objects(compression)
+    }
+    
+    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
     func objects<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
-        try await withCheckedThrowingContinuation { continuation in
-            getObjects(compression) {
-                continuation.resume(with: $0)
+        let _compression: PhotoAsset.Compression?
+        if let compression = compression {
+            _compression = compression
+        }else {
+            _compression = isOriginal ? nil : self.compression
+        }
+        var results: [T] = []
+        for (index, photoAsset) in photoAssets.enumerated() {
+            if Task.isCancelled { throw PickerError.canceled }
+            do {
+                let result: T = try await photoAsset.object(_compression)
+                results.append(result)
+            } catch {
+                throw PickerError.objsFetchFaild(photoAsset, index, error)
             }
         }
-    }
-    
-    func getObjects<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression?, completion: @escaping (Result<[T], PickerError>) -> Void) {
-        Task {
-            var results: [T] = []
-            for (index, photoAsset) in photoAssets.enumerated() {
-                do {
-                    let result = try await T.fetchObject(photoAsset, compression: compression)
-                    results.append(result)
-                } catch {
-                    completion(.failure(.objsFetchFaild(photoAsset, index, error)))
-                    return
-                }
-            }
-            completion(.success(results))
-        }
+        if Task.isCancelled { throw PickerError.canceled }
+        return results
     }
 }

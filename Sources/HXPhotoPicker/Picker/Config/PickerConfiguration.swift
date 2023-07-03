@@ -44,6 +44,9 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     /// 自动返回
     public var isAutoBack: Bool = true
     
+    /// 是否选中原图
+    public var isSelectedOriginal: Bool = false
+    
     /// Resource options, control the type of system album resources obtained
     /// .livePhoto .gifPhoto is a child of photo
     /// Only get still pictures and videos by default
@@ -134,6 +137,9 @@ public struct PickerConfiguration: IndicatorTypeConfig {
     /// The maximum editing time of the video. If it is 0, there is no limit. If the limit is exceeded, it cannot be edited.
     /// 视频最大编辑时长，为0则不限制，超过限制不可编辑（视频时长超出最大选择时长才生效）
     public var maximumVideoEditDuration: Int = 0
+    
+    /// 取消选择视频时，是否清空已编辑的内容
+    public var isDeselectVideoRemoveEdited: Bool = true
     
     /// 编辑器配置
     public lazy var editor: EditorConfiguration = .init()

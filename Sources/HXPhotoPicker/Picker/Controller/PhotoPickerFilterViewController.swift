@@ -67,8 +67,9 @@ class PhotoPickerFilterViewController: UITableViewController {
         navigationItem.rightBarButtonItem = .init(title: "完成".localized, style: .done, target: self, action: #selector(didDoneClick))
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(PhotoPickerFilterViewCell.self, forCellReuseIdentifier: "PhotoPickerFilterViewCellID")
-        tableView.tableFooterView = UIView(frame: .zero)
-        view.addSubview(bottomView)
+        let bottomHeight =  UIDevice.bottomMargin + 100
+        bottomView.frame = .init(x: 0, y: 20, width: view.width, height: bottomHeight)
+        tableView.tableFooterView = bottomView
         
         sections = []
         sections.append(.init(rows: [.init(title: "所有项目".localized, options: .any, isSelected: options == .any)]))
@@ -202,8 +203,12 @@ class PhotoPickerFilterViewController: UITableViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let bottomHeight =  UIDevice.bottomMargin + 100
-        bottomView.frame = .init(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
+        let contentHeight = tableView.contentSize.height
+        if contentHeight < view.height - tableView.adjustedContentInset.top {
+            bottomView.y = view.height - bottomView.height
+        }else {
+            bottomView.y = contentHeight - bottomView.height + 20
+        }
         numberView.frame = .init(x: 0, y: 0, width: view.width, height: 20)
         filterLb.frame = .init(x: 0, y: 20, width: view.width, height: 20)
     }

@@ -58,6 +58,7 @@ extension PhotoPickerController {
         }
         editedPhotoAssetArray.removeAll()
         #endif
+        isDismissed = true
         cancelHandler?(self)
         pickerDelegate?.pickerController(didCancel: self)
         if autoDismiss {

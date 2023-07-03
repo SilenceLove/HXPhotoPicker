@@ -286,7 +286,7 @@ public enum Sort: Equatable {
     case desc
 }
 
-public enum PickerError: Error, LocalizedError {
+public enum PickerError: Error, LocalizedError, CustomStringConvertible {
     case imageFetchFaild
     case urlFetchFaild(AssetError)
     case urlResultFetchFaild(AssetError)
@@ -302,9 +302,13 @@ public enum PickerError: Error, LocalizedError {
         case .urlResultFetchFaild(let error):
             return "获取 AssetURLResult 失败: \(error)"
         case .objsFetchFaild(let photoAsset, let index, let error):
-            return "PickerResult.photoAssets获取到第\(index)失败，photoAsset: \(photoAsset), error: \(error)"
+            return "PickerResult.photoAssets获取到第\(index + 1)失败，photoAsset: \(photoAsset), error: \(error)"
         case .canceled:
             return "取消选择"
         }
+    }
+    
+    public var description: String {
+        errorDescription ?? "nil"
     }
 }
