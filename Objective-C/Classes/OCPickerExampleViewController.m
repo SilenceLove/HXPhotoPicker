@@ -41,6 +41,7 @@
             }];
         }];
     } cancel:^(PhotoPickerController * _Nonnull photoPickerController) {
+        [photoPickerController dismissViewControllerAnimated:YES completion:nil];
         NSLog(@"取消选择");
     }];
     [self presentViewController:controller animated:YES completion:nil];
