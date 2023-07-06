@@ -99,6 +99,7 @@ public extension AssetManager {
             toFile: imageURL,
             options: options
         ) { error in
+            #if HXPICKER_ENABLE_PICKER
             if isHEIC && PhotoManager.shared.isConverHEICToPNG {
                 var pngPath = imageURL.path.replacingOccurrences(of: imageURL.pathExtension, with: "PNG")
                 if FileManager.default.fileExists(atPath: pngPath) {
@@ -130,6 +131,7 @@ public extension AssetManager {
                 }
                 return
             }
+            #endif
             DispatchQueue.main.async {
                 if let error = error {
                     resultHandler(.failure(.assetResourceWriteDataFailed(error)))

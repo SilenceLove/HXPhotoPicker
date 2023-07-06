@@ -334,8 +334,10 @@ extension EditorScaleView: UICollectionViewDataSource, UICollectionViewDelegate,
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        isAngleChange = true
-        state = .begin
+        if !isAngleChange {
+            isAngleChange = true
+            state = .begin
+        }
         UIView.animate(withDuration: 0.2) {
             self.centerLineView.backgroundColor = self.themeColor
         }

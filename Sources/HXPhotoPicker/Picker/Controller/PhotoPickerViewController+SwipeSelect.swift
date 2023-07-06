@@ -222,10 +222,10 @@ extension PhotoPickerViewController {
         updateCellSelectedState(for: index, isSelected: state == .select)
     }
     private func swipeSelectAutoScroll() {
-        guard let pickerController = pickerController,
-              !pickerController.config.allowSyncICloudWhenSelectPhoto else {
-            return
-        }
+//        guard let pickerController = pickerController,
+//              !pickerController.config.allowSyncICloudWhenSelectPhoto else {
+//            return
+//        }
         if !config.swipeSelectAllowAutoScroll {
             return
         }
@@ -291,13 +291,14 @@ extension PhotoPickerViewController {
         }
         var showHUD = false
         let photoAsset = getPhotoAsset(for: item)
+        let cell = getCell(for: item)
         if photoAsset.isSelected != isSelected {
             if isSelected {
                 func addAsset(showTip: Bool) {
-                    resetICloud(for: photoAsset)
+//                    resetICloud(for: photoAsset)
                     if pickerController.canSelectAsset(for: photoAsset, showHUD: showTip) {
                         pickerController.addedPhotoAsset(photoAsset: photoAsset)
-                        if let cell = getCell(for: photoAsset) {
+                        if let cell = cell {
                             cell.updateSelectedState(
                                 isSelected: isSelected,
                                 animated: false
@@ -307,7 +308,7 @@ extension PhotoPickerViewController {
                         showHUD = true
                     }
                 }
-                if let pickerCell = getCell(for: item) as? PhotoPickerViewCell {
+                if let pickerCell = cell as? PhotoPickerViewCell {
                     if photoAsset.downloadStatus != .succeed {
                         let inICloud = pickerCell.checkICloundStatus(
                             allowSyncPhoto: pickerController.config.allowSyncICloudWhenSelectPhoto
@@ -336,7 +337,7 @@ extension PhotoPickerViewController {
                 }
             }else {
                 pickerController.removePhotoAsset(photoAsset: photoAsset)
-                if let cell = getCell(for: item) {
+                if let cell = cell {
                     cell.updateSelectedState(isSelected: isSelected, animated: false)
                 }
             }

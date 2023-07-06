@@ -72,9 +72,7 @@ public struct PhotoListConfiguration {
     public var allowSwipeToSelect: Bool = false
     
     /// Allow automatic up/down scrolling when swiping to select
-    /// When allowSyncICloudWhenSelectPhoto = true, automatic scrolling is disabled
     /// 滑动选择时允许自动向上/下滚动
-    /// 当 allowSyncICloudWhenSelectPhoto = true 时，自动滚动失效
     public var swipeSelectAllowAutoScroll: Bool = true
     
     /// Rate when scrolling up/down automatically
