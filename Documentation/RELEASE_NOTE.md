@@ -1,5 +1,23 @@
 # Release Notes
 
+## 4.0.3
+
+### Added
+
+- Picker
+  - `PhotoManager.shared.isConverHEICToPNG = true`Automatically convert HEIC format to PNG format internally
+  - `config.isSelectedOriginal`Control whether to select the original image button
+  - `config.isDeselectVideoRemoveEdited`Whether to clear the edited content when the video is deselected
+  - When adding network resources, images support configuration `Kingfisher.ImageDownloader`:`PhotoManager.shared.imageDownloader`, video uses `AVURLAsset` to set `options`
+
+### Optimizer
+
+- Picker
+  - Internal logic optimization when `async/await` gets
+  - Swipe selection effect optimization
+- Editor
+  - Optimizing the continuous sliding logic of the angle ruler
+
 ## 4.0.2
 
 ### Added

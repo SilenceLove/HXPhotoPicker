@@ -1,5 +1,23 @@
 # 更新日志
 
+## 4.0.3
+
+### 新增
+
+- Picker
+  - `PhotoManager.shared.isConverHEICToPNG = true`内部自动将HEIC格式转换成PNG格式
+  - `config.isSelectedOriginal`控制是否选中原图按钮
+  - `config.isDeselectVideoRemoveEdited`取消选择视频时，是否清空已编辑的内容
+  - 添加网络资源时，图片支持配置`Kingfisher.ImageDownloader`:`PhotoManager.shared.imageDownloader`、视频使用`AVURLAsset`可设置`options`
+
+### 优化
+
+- Picker
+  - `async/await`获取时内部逻辑优化
+  - 滑动选择效果优化
+- Editor
+  - 角度尺连续滑动逻辑优化
+
 ## 4.0.2
 
 ### 新增
