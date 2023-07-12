@@ -681,7 +681,7 @@ extension EditorConfigurationViewController {
                 handler: { [weak self] (action) in
                     guard let self = self else { return }
             let textFiled = alert.textFields?.first
-            let time = Int(textFiled?.text ?? "0")!
+            let time = Int(textFiled?.text ?? "0") ?? 0
             self.config.video.cropTime.maximumTime = TimeInterval(time)
             self.tableView.reloadRows(at: [indexPath], with: .fade)
         }))
