@@ -93,7 +93,7 @@ extension EditorViewController: EditorToolsViewDelegate {
             self.toolsView.alpha = 1
             self.cancelButton.alpha = 1
             self.finishButton.alpha = 1
-            if !UIDevice.isPortrait {
+            if !UIDevice.isPortrait || self.config.buttonPostion == .top {
                 self.topMaskView.alpha = 1
             }
             self.bottomMaskView.alpha = 1
@@ -404,6 +404,7 @@ extension EditorViewController: EditorToolsViewDelegate {
             self.mirrorHorizontallyButton.alpha = 1
             self.maskListButton.alpha = 1
             self.toolsView.alpha = 0
+            self.hideMasks()
         } completion: {
             if $0 {
                 self.toolsView.isHidden = true
@@ -430,6 +431,7 @@ extension EditorViewController: EditorToolsViewDelegate {
             self.mirrorHorizontallyButton.alpha = 0
             self.maskListButton.alpha = 0
             self.toolsView.alpha = 1
+            self.showMasks()
         } completion: {
             if $0 {
                 if !self.config.cropSize.aspectRatios.isEmpty {

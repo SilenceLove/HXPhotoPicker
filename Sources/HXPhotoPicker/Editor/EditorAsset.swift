@@ -10,9 +10,11 @@ import AVFoundation
 
 public struct EditorAsset {
     
+    /// edit object
     /// 编辑对象
     public let type: `Type`
     
+    /// edit result
     /// 编辑结果
     public var result: EditedResult?
     

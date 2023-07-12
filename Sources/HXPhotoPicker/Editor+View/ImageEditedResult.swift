@@ -9,10 +9,13 @@ import UIKit
 
 public struct ImageEditedResult {
     
+    /// The edited thumbnail image, or the cover image if gif
+    /// Suitable for multi-image list display, please use imageURL to preview the original image or larger image
     /// 编辑后的缩略图片，如果为gif则为封面图片
     /// 适合在多图列表展示，预览原图或者大图请使用 imageURL
     public let image: UIImage
     
+    /// The local url of the edited image
     /// 编辑后的图片本地地址
     public var url: URL {
         urlConfig.url
@@ -24,6 +27,7 @@ public struct ImageEditedResult {
     public let imageType: ImageType
     
     public enum ImageType: Int, Codable {
+        /// static image
         /// 静态图
         case normal
         /// 动图

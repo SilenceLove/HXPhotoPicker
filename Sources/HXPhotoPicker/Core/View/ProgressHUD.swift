@@ -563,6 +563,9 @@ class ProgressIndefiniteView: UIView {
     func startAnimating() {
         if isAnimating { return }
         isAnimating = true
+        circleLayer.removeAllAnimations()
+        maskLayer.removeAllAnimations()
+        
         let duration: CFTimeInterval = 0.4
         let animation = CABasicAnimation(keyPath: "transform.rotation")
         animation.fromValue = 0

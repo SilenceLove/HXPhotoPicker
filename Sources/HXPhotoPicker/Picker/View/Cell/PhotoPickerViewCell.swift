@@ -146,6 +146,8 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         guard let id = syncICloudRequestID else {
             return
         }
+        loaddingView.isHidden = true
+        loaddingView.stopAnimating()
         PHImageManager.default().cancelImageRequest(id)
         syncICloudRequestID = nil
     }
@@ -175,11 +177,7 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         cancelSyncICloud()
         disableMaskLayer.isHidden = true
         loaddingView.isHidden = false
-        if photoAsset.downloadProgress > 0 {
-            loaddingView.progress = photoAsset.downloadProgress
-        }else {
-            loaddingView.startAnimating()
-        }
+        loaddingView.startAnimating()
         syncICloudRequestID = photoAsset.syncICloud { [weak self] in
             guard let self = self, $0 == self.photoAsset else {
                 return

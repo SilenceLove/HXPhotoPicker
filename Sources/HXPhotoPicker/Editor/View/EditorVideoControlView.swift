@@ -443,6 +443,9 @@ class EditorVideoControlView: UIView {
 extension EditorVideoControlView {
     @objc
     func progressLinePanGestureClick(pan: UIPanGestureRecognizer) {
+        if isHidden {
+            return
+        }
         let point = pan.translation(in: progressLineView)
         switch pan.state {
         case .began:

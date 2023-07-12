@@ -204,10 +204,12 @@ class PhotoPickerFilterViewController: UITableViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let contentHeight = tableView.contentSize.height
-        if contentHeight < view.height - tableView.adjustedContentInset.top {
-            bottomView.y = view.height - bottomView.height
-        }else {
-            bottomView.y = contentHeight - bottomView.height + 20
+        if #available(iOS 11.0, *) {
+            if contentHeight < view.height - tableView.adjustedContentInset.top {
+                bottomView.y = view.height - bottomView.height
+            }else {
+                bottomView.y = contentHeight - bottomView.height + 20
+            }
         }
         numberView.frame = .init(x: 0, y: 0, width: view.width, height: 20)
         filterLb.frame = .init(x: 0, y: 20, width: view.width, height: 20)

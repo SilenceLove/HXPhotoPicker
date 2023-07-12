@@ -150,6 +150,7 @@ class EditorToolsView: UIView {
             }else {
                 shadeView.y = 0
             }
+            shadeView.x = 0
             shadeView.width = 50
             shadeView.height = min(toolsHeight, maxHeight)
         }

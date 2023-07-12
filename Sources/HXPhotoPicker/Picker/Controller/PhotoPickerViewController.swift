@@ -762,7 +762,9 @@ extension PhotoPickerViewController {
             videoCount = allVideoCount
             setupEmptyView()
             collectionView.reloadData()
-            scrollToAppropriatePlace(photoAsset: nil)
+            DispatchQueue.main.async {
+                self.scrollToAppropriatePlace(photoAsset: nil)
+            }
             return
         }
         var photoCount: Int = 0

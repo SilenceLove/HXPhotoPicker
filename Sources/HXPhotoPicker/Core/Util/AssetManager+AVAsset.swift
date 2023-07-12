@@ -43,8 +43,8 @@ public extension AssetManager {
             version: version,
             deliveryMode: deliveryMode,
             isNetworkAccessAllowed: false,
-            progressHandler:
-                progressHandler) { (result) in
+            progressHandler: nil
+        ) { (result) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let avResult):

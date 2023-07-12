@@ -99,7 +99,7 @@ extension EditorAdjusterView {
             drawLayer: contentView.drawView.count > 0 ? contentView.drawView.layer : nil,
             mosaicLayer: contentView.mosaicView.count > 0 ? contentView.mosaicView.layer : nil,
             stickersLayer: contentView.stickerView.count > 0 ? contentView.stickerView.layer : nil,
-            isCropImage: canReset,
+            isCropImage: isCropImage,
             isRound: isCropRund,
             maskImage: maskImage,
             angle: currentAngle,
@@ -110,6 +110,20 @@ extension EditorAdjusterView {
             waterCenterRatio: .zero
         )
         return cropFactor.allowCroped
+    }
+    
+    var isCropImage: Bool {
+        var isCropImage = canReset
+        if !isCropImage, state == .edit {
+            if isFixedRatio && !isResetIgnoreFixedRatio {
+                let fromSize = getExactnessSize(contentView.size)
+                let toSize = getExactnessSize(frameView.controlView.size)
+                if !fromSize.equalTo(toSize) {
+                    isCropImage = true
+                }
+            }
+        }
+        return isCropImage
     }
     
     func cropImage(completion: @escaping (Result<ImageEditedResult, EditorError>) -> Void) {
@@ -127,7 +141,7 @@ extension EditorAdjusterView {
             drawLayer: contentView.drawView.count > 0 ? contentView.drawView.layer : nil,
             mosaicLayer: contentView.mosaicView.count > 0 ? contentView.mosaicView.layer : nil,
             stickersLayer: contentView.stickerView.count > 0 ? contentView.stickerView.layer : nil,
-            isCropImage: canReset,
+            isCropImage: isCropImage,
             isRound: isCropRund,
             maskImage: maskImage,
             angle: currentAngle,

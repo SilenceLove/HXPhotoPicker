@@ -12,6 +12,7 @@ public enum EditedResult {
     case image(ImageEditedResult, ImageEditedData)
     case video(VideoEditedResult, VideoEditedData)
     
+    /// edited url
     /// 编辑后的地址
     public var url: URL {
         switch self {
@@ -33,11 +34,18 @@ public enum EditedResult {
 }
 
 public struct ImageEditedData: Codable {
+    
+    /// Last filter parameters
+    /// The corresponding filter will be obtained internally through the delegate
     /// 上一次滤镜参数
     /// 内部会通过 delegate 来获取对应的滤镜
     let filter: PhotoEditorFilter?
+    
+    /// Screen Adjustment Parameters
     /// 画面调整参数
     let filterEdit: EditorFilterEditFator?
+    
+    /// clipping parameters
     /// 裁剪参数
     let cropSize: EditorCropSizeFator?
     
@@ -54,19 +62,25 @@ public struct ImageEditedData: Codable {
 
 public struct VideoEditedData {
     
+    /// audio parameters
     /// 音频参数
     public let music: VideoEditedMusic?
     
+    /// Clipping Duration Parameters
     /// 裁剪时长参数
     public let cropTime: EditorVideoCropTime?
     
+    /// Screen Adjustment Parameters
     /// 画面调整参数
     let filterEdit: EditorFilterEditFator?
     
+    /// last filter effect
+    /// The corresponding filter will be obtained internally through the delegate
     /// 上一次滤镜效果
     /// 内部会通过 delegate 来获取对应的滤镜
     let filter: VideoEditorFilter?
     
+    /// clipping parameters
     /// 裁剪参数
     let cropSize: EditorCropSizeFator?
     
@@ -100,12 +114,15 @@ public struct VideoEditedData {
 
 public struct VideoEditedMusic: Codable {
     
+    /// Whether to include the original video audio
     /// 是否包含原视频音频
     public let hasOriginalSound: Bool
     
+    /// Original video volume
     /// 原视频音量
     public let videoSoundVolume: Float
     
+    /// background music url
     /// 背景音乐地址
     public let backgroundMusicURL: VideoEditorMusicURL?
     
@@ -114,6 +131,7 @@ public struct VideoEditedMusic: Codable {
     
     let musicIdentifier: String?
     
+    /// Soundtrack parameters
     /// 配乐参数
     let music: VideoEditorMusic?
     
@@ -136,9 +154,11 @@ public struct VideoEditedMusic: Codable {
 
 public struct EditorVideoCropTime: Codable {
     
+    /// Edit start time
     /// 编辑的开始时间
     public let startTime: TimeInterval
     
+    /// edit end time
     /// 编辑的结束时间
     public let endTime: TimeInterval
     

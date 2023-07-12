@@ -292,12 +292,35 @@ open class EditorViewController: BaseViewController {
     
     lazy var editorView: EditorView = {
         let view = EditorView()
-        view.editContentInset = { _ in
+        view.editContentInset = { [weak self] _ in
+            guard let self = self else {
+                return .zero
+            }
             if UIDevice.isPortrait {
-                let top = UIDevice.isPad ? 30 : UIDevice.topMargin + 10
+                let top: CGFloat
+                let bottom: CGFloat
+                if self.config.buttonPostion == .bottom {
+                    top = UIDevice.isPad ? 30 : UIDevice.topMargin + 10
+                    bottom = UIDevice.bottomMargin + 50 + 140
+                }else {
+                    let isFullScreen: Bool
+                    if let nav = self.navigationController {
+                        isFullScreen = nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom
+                    }else {
+                        isFullScreen = self.modalPresentationStyle == .fullScreen || self.modalPresentationStyle == .custom
+                    }
+                    let navHeight = self.navigationController?.navigationBar.height ?? UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
+                    if isFullScreen {
+                        let navY = self.navigationController?.navigationBar.y ?? UIDevice.generalStatusBarHeight
+                        top = navY + navHeight + 10
+                    }else {
+                        top = navHeight + 10
+                    }
+                    bottom = UIDevice.bottomMargin + 140
+                }
                 let left = UIDevice.isPad ? 30 : UIDevice.leftMargin + 15
                 let right = UIDevice.isPad ? 30 : UIDevice.rightMargin + 15
-                return .init(top: top, left: left, bottom: UIDevice.bottomMargin + 50 + 140, right: right)
+                return .init(top: top, left: left, bottom: bottom, right: right)
             }else {
                 return .init(top: UIDevice.topMargin + 55, left: UIDevice.leftMargin + 165, bottom: UIDevice.bottomMargin + 15, right: UIDevice.rightMargin + 165)
             }
@@ -504,13 +527,15 @@ open class EditorViewController: BaseViewController {
         }
     }
     
+    var navFrame: CGRect?
+    
     var firstAppear = true
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         editorView.frame = view.bounds
         
-        let buttonHeight: CGFloat = UIDevice.isPortrait ? 50 : 44
+        let buttonHeight: CGFloat = UIDevice.isPortrait ? (config.buttonPostion == .bottom ? 50 : 44) : 44
         
         let cancelWidth = cancelButton.currentTitle?.width(
                             ofFont: cancelButton.titleLabel!.font,
@@ -542,30 +567,75 @@ open class EditorViewController: BaseViewController {
             bottomMaskLayer = PhotoTools.getGradientShadowLayer(false)
             bottomMaskView.layer.addSublayer(bottomMaskLayer)
             if isToolsDisplay {
-                topMaskView.alpha = 0
-                topMaskView.isHidden = true
+                if config.buttonPostion == .bottom {
+                    topMaskView.alpha = 0
+                    topMaskView.isHidden = true
+                }else {
+                    if isTransitionCompletion && !isPopTransition {
+                        topMaskView.alpha = 1
+                    }
+                    topMaskView.isHidden = false
+                }
                 if isTransitionCompletion && !isPopTransition {
                     bottomMaskView.alpha = 1
                 }
                 bottomMaskView.isHidden = false
             }
             
-            cancelButton.y = view.height - UIDevice.bottomMargin - buttonHeight
-            finishButton.centerY = cancelButton.centerY
-            resetButton.centerY = cancelButton.centerY
-            
-            toolsView.frame = CGRect(
-                x: cancelButton.frame.maxX,
-                y: view.height - UIDevice.bottomMargin - buttonHeight,
-                width: finishButton.x - cancelButton.frame.maxX,
-                height: buttonHeight + UIDevice.bottomMargin
-            )
-            if !config.cropSize.aspectRatios.isEmpty {
-                ratioToolView.frame = .init(x: 0, y: toolsView.y - 40, width: view.width, height: 40)
-                rotateScaleView.frame = .init(x: 0, y: ratioToolView.y - 45, width: view.width, height: 45)
+            if config.buttonPostion == .bottom {
+                cancelButton.y = view.height - UIDevice.bottomMargin - buttonHeight
+                finishButton.centerY = cancelButton.centerY
+                resetButton.centerY = cancelButton.centerY
+                
+                toolsView.frame = CGRect(
+                    x: cancelButton.frame.maxX,
+                    y: view.height - UIDevice.bottomMargin - buttonHeight,
+                    width: finishButton.x - cancelButton.frame.maxX,
+                    height: buttonHeight + UIDevice.bottomMargin
+                )
+                if !config.cropSize.aspectRatios.isEmpty {
+                    ratioToolView.frame = .init(x: 0, y: toolsView.y - 40, width: view.width, height: 40)
+                    rotateScaleView.frame = .init(x: 0, y: ratioToolView.y - 45, width: view.width, height: 45)
+                }else {
+                    rotateScaleView.frame = .init(x: 0, y: toolsView.y - 45, width: view.width, height: 45)
+                }
             }else {
-                rotateScaleView.frame = .init(x: 0, y: toolsView.y - 45, width: view.width, height: 45)
+                let isFullScreen: Bool
+                if let nav = navigationController {
+                    isFullScreen = nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom
+                }else {
+                    isFullScreen = modalPresentationStyle == .fullScreen || modalPresentationStyle == .custom
+                }
+                if navFrame == nil {
+                    navFrame = navigationController?.navigationBar.frame
+                }
+                if isFullScreen {
+                    let navY = navFrame?.minY ?? UIDevice.generalStatusBarHeight
+                    let navHeight = navFrame?.height ?? UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
+                    cancelButton.centerY = navY + navHeight / 2
+                    topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: navY + navHeight + 10)
+                }else {
+                    let navHeight = navFrame?.height ?? UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
+                    cancelButton.centerY = navHeight / 2
+                    topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: navHeight)
+                }
+                finishButton.centerY = cancelButton.centerY
+                resetButton.centerY = cancelButton.centerY
+                
+                toolsView.frame = CGRect(
+                    x: 0,
+                    y: view.height - UIDevice.bottomMargin - buttonHeight,
+                    width: view.width,
+                    height: buttonHeight + UIDevice.bottomMargin
+                )
+                if !config.cropSize.aspectRatios.isEmpty {
+                    ratioToolView.frame = .init(x: 0, y: view.height - UIDevice.bottomMargin - 40, width: view.width, height: 40)
+                    rotateScaleView.frame = .init(x: 0, y: ratioToolView.y - 45, width: view.width, height: 45)
+                }else {
+                    rotateScaleView.frame = .init(x: 0, y: view.height - UIDevice.bottomMargin - 45, width: view.width, height: 45)
+                }
             }
+            
             filtersView.frame = .init(x: 0, y: toolsView.y - 120, width: view.width, height: 120)
             brushColorView.frame = .init(x: 0, y: toolsView.y - 65, width: view.width, height: 65)
             brushSizeView.x = view.width - 45 - UIDevice.rightMargin
@@ -1489,13 +1559,13 @@ extension EditorViewController {
         }
         ProgressHUD.hide(forView: view)
         removeVideo()
-        if let assetRequestID = assetRequestID {
-            PHImageManager.default().cancelImageRequest(assetRequestID)
-        }
         if isCancel {
             isDismissed = true
             delegate?.editorViewController(didCancel: self)
             cancelHandler?(self)
+        }
+        if let assetRequestID = assetRequestID {
+            PHImageManager.default().cancelImageRequest(assetRequestID)
         }
         if config.isAutoBack {
             if let navigationController = navigationController, navigationController.viewControllers.count > 1 {
@@ -1625,23 +1695,41 @@ extension EditorViewController {
             return
         }
         cancelButton.alpha = 1
+        finishButton.alpha = 1
         if !isCropSize {
             toolsView.alpha = 1
+            showMasks()
         }
-        finishButton.alpha = 1
-        showMasks()
     }
     
     func showMasks() {
         if UIDevice.isPortrait {
             if isToolsDisplay {
-                topMaskView.alpha = 0
+                if config.buttonPostion == .bottom {
+                    topMaskView.alpha = 0
+                }else {
+                    topMaskView.alpha = 1
+                }
                 bottomMaskView.alpha = 1
             }
         }else {
             if isToolsDisplay {
                 topMaskView.alpha = 1
                 bottomMaskView.alpha = 1
+            }
+        }
+    }
+    
+    func hideMasks() {
+        if UIDevice.isPortrait {
+            if isToolsDisplay {
+                topMaskView.alpha = 0
+                bottomMaskView.alpha = 0
+            }
+        }else {
+            if isToolsDisplay {
+                topMaskView.alpha = 0
+                bottomMaskView.alpha = 0
             }
         }
     }

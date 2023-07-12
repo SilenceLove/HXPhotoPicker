@@ -8,24 +8,14 @@
 import UIKit
 import AVFoundation
 
-/// 层级结构
-/// - EditorView (self)
-/// - adjusterView
-///     - containerView (容器)
-///         - mirrorView (镜像处理)
-///             - rotateView (旋转处理)
-///             - scrollView (滚动视图)
-///                 - contentView (内容视图)
-///                     - imageView/videoView (图片/视频层)
-///                     - drawView (画笔绘图层)
-///                     - mosaic (马赛克涂抹图层)
-///                     - stickers (贴图图层)
-///         - frameView (遮罩、控制裁剪范围)
 open class EditorView: UIScrollView {
     
     // MARK: public
     public weak var editDelegate: EditorViewDelegate?
     
+    /// The address configuration after editing, the default is under tmp
+    /// Please set a different address each time you edit to prevent the existing data from being overwritten
+    /// If editing a GIF, please set the address of the gif suffix
     /// 编辑之后的地址配置，默认在tmp下
     /// 每次编辑时请设置不同地址，防止之前存在的数据被覆盖
     /// 如果编辑的是GIF，请设置gif后缀的地址
@@ -33,6 +23,8 @@ open class EditorView: UIScrollView {
         didSet { adjusterView.urlConfig = urlConfig }
     }
     
+    /// Content margins (enter/exit editing state, there will be no shrink/zoom animation)
+    /// Edits are reset every time you set
     /// 内容边距（进入/退出 编辑状态，不会有 缩小/放大 动画）
     /// 每次设置都会重置编辑内容
     open override var contentInset: UIEdgeInsets {
@@ -42,6 +34,8 @@ open class EditorView: UIScrollView {
         }
     }
     
+    /// Margin in editing state (entering/exiting editing state, there will be shrink/enlarge animation)
+    /// Edits are reset every time you set
     /// 编辑状态下的边距（进入/退出 编辑状态，会有 缩小/放大 动画）
     /// 每次设置都会重置编辑内容 
     public var editContentInset: ((EditorView) -> UIEdgeInsets)? {
@@ -51,6 +45,7 @@ open class EditorView: UIScrollView {
         }
     }
     
+    /// Mask color, must be consistent with the background of the parent view
     /// 遮罩颜色，必须与父视图的背景一致
     public var maskColor: UIColor = .black {
         didSet {

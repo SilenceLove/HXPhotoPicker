@@ -45,7 +45,7 @@ public extension AssetManager {
             for: asset,
             version: version,
             isNetworkAccessAllowed: false,
-            progressHandler: progressHandler
+            progressHandler: nil
         ) { (result) in
             DispatchQueue.main.async {
                 switch result {

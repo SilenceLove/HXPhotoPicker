@@ -993,6 +993,9 @@ extension EditorViewController {
     }
     
     func loadFailure(message: String = "视频获取失败!".localized) {
+        if isDismissed {
+            return
+        }
         PhotoTools.showConfirm(
             viewController: self,
             title: "提示".localized,
