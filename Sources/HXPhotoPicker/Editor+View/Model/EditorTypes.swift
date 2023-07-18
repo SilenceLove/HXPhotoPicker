@@ -52,7 +52,7 @@ public class EditorStickersItemBaseView: UIView {
     var item: EditorStickerItem!
 }
 
-public enum EditorError: LocalizedError {
+public enum EditorError: LocalizedError, CustomStringConvertible {
     
     public enum `Type` {
         case exportFailed
@@ -85,6 +85,10 @@ public extension EditorError {
         case let .error(_, message):
             return message
         }
+    }
+    
+    var description: String {
+        errorDescription ?? "nil"
     }
 }
 

@@ -297,18 +297,22 @@ open class EditorViewController: BaseViewController {
                 return .zero
             }
             if UIDevice.isPortrait {
+                let isFullScreen: Bool
+                if let nav = self.navigationController {
+                    isFullScreen = nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom
+                }else {
+                    isFullScreen = self.modalPresentationStyle == .fullScreen || self.modalPresentationStyle == .custom
+                }
                 let top: CGFloat
                 let bottom: CGFloat
                 if self.config.buttonPostion == .bottom {
-                    top = UIDevice.isPad ? 30 : UIDevice.topMargin + 10
+                    if isFullScreen {
+                        top = UIDevice.isPad ? 30 : UIDevice.topMargin + 10
+                    }else {
+                        top = 30
+                    }
                     bottom = UIDevice.bottomMargin + 50 + 140
                 }else {
-                    let isFullScreen: Bool
-                    if let nav = self.navigationController {
-                        isFullScreen = nav.modalPresentationStyle == .fullScreen || nav.modalPresentationStyle == .custom
-                    }else {
-                        isFullScreen = self.modalPresentationStyle == .fullScreen || self.modalPresentationStyle == .custom
-                    }
                     let navHeight = self.navigationController?.navigationBar.height ?? UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
                     if isFullScreen {
                         let navY = self.navigationController?.navigationBar.y ?? UIDevice.generalStatusBarHeight

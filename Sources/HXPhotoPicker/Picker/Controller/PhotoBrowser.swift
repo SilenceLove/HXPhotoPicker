@@ -694,6 +694,7 @@ open class PhotoBrowserPageControlIndicator: UIView, PhotoBrowserPageIndicator {
     public lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.addTarget(self, action: #selector(pageControlDidChanged), for: .valueChanged)
+        pageControl.hidesForSinglePage = true
         return pageControl
     }()
     

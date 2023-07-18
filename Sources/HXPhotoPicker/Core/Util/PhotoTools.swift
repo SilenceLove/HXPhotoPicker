@@ -393,7 +393,8 @@ public struct PhotoTools {
         while data.count > maxLength && data.count != lastDataLength {
             let dataCount = data.count
             lastDataLength = dataCount
-            let ratio = max(CGFloat(maxLength) / CGFloat(dataCount), compression)
+            let maxRatio = min(5000 / resultImage.width, 5000 / resultImage.height)
+            let ratio = min(max(CGFloat(maxLength) / CGFloat(dataCount), compression), maxRatio)
             let size = CGSize(
                 width: Int(resultImage.width * ratio),
                 height: Int(resultImage.height * ratio)
