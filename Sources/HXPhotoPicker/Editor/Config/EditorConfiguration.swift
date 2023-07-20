@@ -94,8 +94,8 @@ public struct EditorConfiguration: IndicatorTypeConfig {
     /// 固定裁剪状态
     public var isFixedCropSizeState: Bool = false
     
-    /// Ignore video cropping time when fixed crop size state
-    /// 固定裁剪大小状态时忽略视频裁剪时间
+    /// Ignore video cropping duration when fixed crop size state
+    /// 固定裁剪大小状态时忽略视频裁剪时长
     public var isIgnoreCropTimeWhenFixedCropSizeState: Bool = true
     
     /// Tool View Configuration

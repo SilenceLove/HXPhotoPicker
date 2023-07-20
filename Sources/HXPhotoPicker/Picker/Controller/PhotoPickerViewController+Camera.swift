@@ -31,6 +31,7 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
                 type = .video
             }
             camerConfig.languageType = pickerController.config.languageType
+            camerConfig.isSaveSystemAlbum = false
             let vc = CameraController(
                 config: camerConfig,
                 type: type,

@@ -8,6 +8,7 @@
 import UIKit
 import CoreLocation
 import AVFoundation
+import Photos
 
 open class CameraController: UINavigationController {
     
@@ -69,6 +70,7 @@ open class CameraController: UINavigationController {
     }
     
     public typealias CaptureCompletion = (Result, CLLocation?) -> Void
+    public typealias CapturePHAssetCompletion = (Result, PHAsset, CLLocation?) -> Void
     
     /// 跳转相机
     /// - Parameters:
@@ -94,6 +96,30 @@ open class CameraController: UINavigationController {
     
     public var completion: CaptureCompletion?
     
+    public var phAssetcompletion: CapturePHAssetCompletion?
+    
+    /// 跳转相机 config.isSaveSystemAlbum = true 时才会触发闭包
+    /// - Parameters:
+    ///   - config: 相机配置
+    ///   - type: 相机类型
+    ///   - completion: 拍摄完成
+    /// - Returns: 相机对应的 CameraController
+    @discardableResult
+    public class func captureAsset(
+        config: CameraConfiguration,
+        type: CaptureType = .all,
+        fromVC: UIViewController? = nil,
+        completion: @escaping CapturePHAssetCompletion
+    ) -> CameraController {
+        let controller = CameraController(
+            config: config,
+            type: type
+        )
+        controller.phAssetcompletion = completion
+        (fromVC ?? UIViewController.topViewController)?.present(controller, animated: true)
+        return controller
+    }
+    
     open override var prefersStatusBarHidden: Bool {
         config.prefersStatusBarHidden
     }
@@ -118,6 +144,20 @@ extension CameraController: CameraViewControllerDelegate {
         cameraDelegate?.cameraController(
             self,
             didFinishWithResult: result,
+            location: location
+        )
+    }
+    public func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didFinishWithResult result: Result,
+        phAsset: PHAsset,
+        location: CLLocation?
+    ) {
+        phAssetcompletion?(result, phAsset, location)
+        cameraDelegate?.cameraController(
+            self,
+            didFinishWithResult: result,
+            phAsset: phAsset,
             location: location
         )
     }

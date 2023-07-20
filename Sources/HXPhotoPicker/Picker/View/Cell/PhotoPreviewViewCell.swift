@@ -72,6 +72,14 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     func initView() {
         contentView.addSubview(scrollView)
     }
+    func checkContentSize() {
+        if !UIDevice.isPortrait {
+            return
+        }
+        if scrollContentView.width != width {
+            setupPortraitContentSize()
+        }
+    }
     func setupScrollViewContentSize() {
         scrollView.zoomScale = 1
         if UIDevice.isPortrait {
@@ -178,7 +186,7 @@ open class PhotoPreviewViewCell: UICollectionViewCell, UIScrollViewDelegate {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        if scrollView.frame.equalTo(bounds) == false {
+        if !scrollView.frame.equalTo(bounds) {
             scrollView.frame = bounds
         }
     }

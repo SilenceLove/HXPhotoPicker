@@ -368,7 +368,45 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 }
             }
             previewView.scrollContentView.isBacking = true
-            let toVC = self.transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
+            let fromVC = transitionContext?.viewController(forKey: .from) as? PhotoPreviewViewController
+            let toVC = transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
+            backgroundView.isUserInteractionEnabled = false
+            previewView.isUserInteractionEnabled = false
+            fromVC?.view.isUserInteractionEnabled = false
+            if type == .pop {
+                UIView.animate(
+                    withDuration: 0.2,
+                    delay: 0,
+                    options: [.layoutSubviews, .curveEaseOut]
+                ) {
+                    self.backgroundView.alpha = 0
+                    if !previewViewController.statusBarShouldBeHidden {
+                        previewViewController.bottomView.alpha = 0
+                        let maskWidth = previewViewController.bottomView.width
+                        if previewViewController.bottomView.mask != nil {
+                            let maskHeight = previewViewController.bottomView.height - 70
+                            previewViewController.bottomView.mask?.frame = CGRect(
+                                x: 0,
+                                y: 70,
+                                width: maskWidth,
+                                height: maskHeight
+                            )
+                        }
+                        if toVC?.bottomView.mask != nil {
+                            let maskHeight = UIDevice.bottomMargin + 120
+                            toVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight)
+                        }
+                    }else {
+                        toVC?.bottomView.alpha = 1
+                        toVC?.navigationController?.navigationBar.alpha = 1
+                    }
+                } completion: { _ in
+                    self.backgroundView.removeFromSuperview()
+                    toVC?.collectionView.layer.removeAllAnimations()
+                    self.transitionContext?.completeTransition(true)
+                    self.transitionContext = nil
+                }
+            }
             
             UIView.animate(
                 withDuration: 0.45,
@@ -389,32 +427,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     previewView.alpha = 0
                     previewView.transform = CGAffineTransform.init(scaleX: 0.1, y: 0.1)
                 }
-                self.backgroundView.alpha = 0
                 if !previewViewController.statusBarShouldBeHidden {
                     previewViewController.bottomView.alpha = 0
-                    if self.type == .pop {
-                        let maskWidth = previewViewController.bottomView.width
-                        if previewViewController.bottomView.mask != nil {
-                            let maskHeight = previewViewController.bottomView.height - 70
-                            previewViewController.bottomView.mask?.frame = CGRect(
-                                x: 0,
-                                y: 70,
-                                width: maskWidth,
-                                height: maskHeight
-                            )
-                        }
-                        if toVC?.bottomView.mask != nil {
-                            let maskHeight = UIDevice.bottomMargin + 120
-                            toVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight)
-                        }
-                    }else {
-                        previewViewController.navigationController?.navigationBar.alpha = 0
-                    }
-                }else {
-                    if self.type == .pop {
-                        toVC?.bottomView.alpha = 1
-                        toVC?.navigationController?.navigationBar.alpha = 1
-                    }
+                    previewViewController.navigationController?.navigationBar.alpha = 0
                 }
                 if let picker = self.pickerController {
                     picker.pickerDelegate?
@@ -427,22 +442,22 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 UIView.animate(withDuration: 0.2) {
                     previewView.alpha = 0
                 } completion: { (isFinished) in
-                    self.backgroundView.removeFromSuperview()
+                    previewView.isUserInteractionEnabled = true
                     previewView.removeFromSuperview()
                     if self.type == .dismiss, let pickerController = self.pickerController {
                         pickerController.pickerDelegate?.pickerController(
                             pickerController,
                             previewDismissComplete: previewViewController.currentPreviewIndex
                         )
-                    }else if self.type == .pop {
-                        toVC?.collectionView.layer.removeAllAnimations()
                     }
                     self.previewView = nil
                     self.previewViewController = nil
                     self.toView = nil
                     self.panGestureRecognizer.isEnabled = true
-                    self.transitionContext?.completeTransition(true)
-                    self.transitionContext = nil
+                    if self.type != .pop {
+                        self.transitionContext?.completeTransition(true)
+                        self.transitionContext = nil
+                    }
                 }
             }
         }else {
@@ -459,10 +474,17 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         }
     }
     func popTransition(_ transitionContext: UIViewControllerContextTransitioning) {
-        let previewViewController = transitionContext.viewController(forKey: .from) as! PhotoPreviewViewController
+        guard let previewViewController = transitionContext.viewController(forKey: .from) as? PhotoPreviewViewController,
+              let pickerViewController = transitionContext.viewController(forKey: .to) as? PhotoPickerViewController else {
+            canInteration = false
+            beganInterPercent = false
+            cancel()
+            transitionContext.completeTransition(false)
+            return
+        }
+        
         previewBackgroundColor = previewViewController.view.backgroundColor
         previewViewController.view.backgroundColor = .clear
-        let pickerViewController = transitionContext.viewController(forKey: .to) as! PhotoPickerViewController
         
         let containerView = transitionContext.containerView
         containerView.addSubview(pickerViewController.view)

@@ -315,7 +315,7 @@ open class EditorViewController: BaseViewController {
                 }else {
                     let navHeight = self.navigationController?.navigationBar.height ?? UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
                     if isFullScreen {
-                        let navY = self.navigationController?.navigationBar.y ?? UIDevice.generalStatusBarHeight
+                        let navY = UIDevice.isPad ? UIDevice.generalStatusBarHeight : (self.navigationController?.navigationBar.y ?? UIDevice.generalStatusBarHeight)
                         top = navY + navHeight + 10
                     }else {
                         top = navHeight + 10
@@ -614,7 +614,7 @@ open class EditorViewController: BaseViewController {
                     navFrame = navigationController?.navigationBar.frame
                 }
                 if isFullScreen {
-                    let navY = navFrame?.minY ?? UIDevice.generalStatusBarHeight
+                    let navY = UIDevice.isPad ? UIDevice.generalStatusBarHeight : (navFrame?.minY ?? UIDevice.generalStatusBarHeight)
                     let navHeight = navFrame?.height ?? UIDevice.navigationBarHeight - UIDevice.generalStatusBarHeight
                     cancelButton.centerY = navY + navHeight / 2
                     topMaskView.frame = .init(x: 0, y: 0, width: view.width, height: navY + navHeight + 10)

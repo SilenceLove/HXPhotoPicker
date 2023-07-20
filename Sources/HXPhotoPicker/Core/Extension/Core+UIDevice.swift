@@ -31,6 +31,9 @@ extension UIDevice {
         return statusBarHeight + 44
     }
     class var generalStatusBarHeight: CGFloat {
+        if isPad {
+            return 24
+        }
         if isIPhoneXR || isIPhone11 {
             return 48
         }

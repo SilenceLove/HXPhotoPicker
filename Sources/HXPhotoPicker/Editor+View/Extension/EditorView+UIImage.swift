@@ -10,7 +10,7 @@ import UIKit
 import Kingfisher
 #endif
 
-extension UIImage: HXPickerCompatible {
+extension UIImage {
     var ci_Image: CIImage? {
         guard let cgImage = self.cgImage else {
             return nil

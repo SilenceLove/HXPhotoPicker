@@ -218,14 +218,42 @@ class EditorStickerTextView: UIView {
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 12 + UIDevice.rightMargin)
         textButton.frame = CGRect(
             x: UIDevice.leftMargin,
-            y: height - (
-                keyboardFrame.equalTo(.zero) ?
-                UIDevice.bottomMargin + 50 :
-                    50 + keyboardFrame.height
-            ),
+            y: height,
             width: 50,
             height: 50
         )
+        if keyboardFrame.isEmpty {
+            if UIDevice.isPad {
+                if config.modalPresentationStyle == .fullScreen {
+                    textButton.y = height - (UIDevice.bottomMargin + 50)
+                }else {
+                    textButton.y = height - 50
+                }
+            }else {
+                textButton.y = height - (UIDevice.bottomMargin + 50)
+            }
+        }else {
+            if UIDevice.isPad {
+                let firstTextButtonY: CGFloat
+                if config.modalPresentationStyle == .fullScreen {
+                    firstTextButtonY = height - UIDevice.bottomMargin - 50
+                }else {
+                    firstTextButtonY = height - 50
+                }
+                let buttonRect = convert(.init(x: 0, y: firstTextButtonY, width: 50, height: 50), to: UIApplication._keyWindow)
+                if buttonRect.maxY > keyboardFrame.minY {
+                    textButton.y = height - (buttonRect.maxY - keyboardFrame.minY + 50)
+                }else {
+                    if config.modalPresentationStyle == .fullScreen {
+                        textButton.y = height - (UIDevice.bottomMargin + 50)
+                    }else {
+                        textButton.y = height - 50
+                    }
+                }
+            }else {
+                textButton.y = height - (50 + keyboardFrame.height)
+            }
+        }
         collectionView.frame = CGRect(
             x: textButton.frame.maxX,
             y: textButton.y,

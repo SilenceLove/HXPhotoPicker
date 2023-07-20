@@ -11,7 +11,7 @@ import UIKit
 extension PhotoPreviewViewController: UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return assetCount
+        assetCount
     }
     
     public func collectionView(
@@ -69,6 +69,7 @@ extension PhotoPreviewViewController: UICollectionViewDelegate {
         if myCell.photoAsset.mediaType == .video {
             myCell.scrollView.zoomScale = 1
         }
+        myCell.checkContentSize()
         if let pickerController = pickerController {
             pickerController.pickerDelegate?.pickerController(
                 pickerController,
@@ -168,15 +169,15 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         delegate?.previewViewController(self, requestFailed: cell.photoAsset)
     }
     func cell(singleTap cell: PhotoPreviewViewCell) {
-        if navigationController == nil {
+        guard let navigationController = navigationController else {
             return
         }
-        let isHidden = navigationController!.navigationBar.isHidden
+        let isHidden = navigationController.navigationBar.isHidden
         statusBarShouldBeHidden = !isHidden
         if self.modalPresentationStyle == .fullScreen {
-            navigationController?.setNeedsStatusBarAppearanceUpdate()
+            navigationController.setNeedsStatusBarAppearanceUpdate()
         }
-        navigationController!.setNavigationBarHidden(statusBarShouldBeHidden, animated: true)
+        navigationController.setNavigationBarHidden(statusBarShouldBeHidden, animated: true)
         let currentCell = getCell(for: currentPreviewIndex)
         currentCell?.statusBarShouldBeHidden = statusBarShouldBeHidden
         let videoCell = currentCell as? PreviewVideoViewCell

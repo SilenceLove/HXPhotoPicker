@@ -50,6 +50,10 @@ public struct CameraConfiguration: IndicatorTypeConfig {
         }
     }
     
+    /// After the photo is completed, save it to the system album
+    /// 拍照完成后保存到系统相册
+    public var isSaveSystemAlbum: Bool = false
+    
     /// 相机类型
     public var cameraType: CameraController.CameraType = .normal
     

@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension CIImage: HXPickerCompatible {
+extension CIImage {
     
     var image: UIImage? {
         if let cgImage = cg_Image {
@@ -61,12 +61,5 @@ extension CIImage: HXPickerCompatible {
         }
         let retVal = CIImage(cgImage: cgImage)
         return retVal
-    }
-}
-
-public extension HXPickerWrapper where Base: CIImage {
-    
-    func filter(name: String, parameters: [String: Any]) -> CIImage? {
-        base.filter(name: name, parameters: parameters)
     }
 }

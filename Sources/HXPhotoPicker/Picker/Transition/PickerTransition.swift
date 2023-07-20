@@ -90,7 +90,13 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         if type == .push {
             containerView.addSubview(fromVC.view)
             containerView.addSubview(toVC.view)
-            fromVC.view.insertSubview(contentView, at: 1)
+            if fromVC.view.subviews.count > 2, fromVC.view.subviews[2] is PreviewPhotoViewCell {
+                fromVC.view.insertSubview(contentView, at: 3)
+            }else if fromVC.view.subviews.count > 1, fromVC.view.subviews[1] is PreviewPhotoViewCell {
+                fromVC.view.insertSubview(contentView, at: 2)
+            }else {
+                fromVC.view.insertSubview(contentView, at: 1)
+            }
             contentView.backgroundColor = backgroundColor.withAlphaComponent(0)
             contentView.addSubview(pushImageView)
             

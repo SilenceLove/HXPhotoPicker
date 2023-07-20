@@ -23,7 +23,7 @@ public class EditorVideoTool {
     let cropFactor: EditorAdjusterView.CropFactor
     let maskType: EditorView.MaskType
     let filter: VideoCompositionFilter?
-    
+    let videoOrientation: AVCaptureVideoOrientation
     init(
         avAsset: AVAsset,
         outputURL: URL,
@@ -35,6 +35,7 @@ public class EditorVideoTool {
         filter: VideoCompositionFilter? = nil
     ) {
         self.avAsset = avAsset
+        videoOrientation = avAsset.videoOrientation
         self.outputURL = outputURL
         self.factor = factor
         self.watermark = watermark
@@ -52,6 +53,7 @@ public class EditorVideoTool {
         filter: VideoCompositionFilter?
     ) {
         self.avAsset = avAsset
+        videoOrientation = avAsset.videoOrientation
         self.outputURL = outputURL
         self.factor = factor
         self.watermark = .init(layers: [], images: [])
@@ -68,10 +70,45 @@ public class EditorVideoTool {
     ) {
         self.progressHandler = progressHandler
         self.completionHandler = completionHandler
-        exprotHandler()
+        if #available(iOS 15, *) {
+            Task {
+                do {
+                    let _ = try await avAsset.load(.duration)
+                    let status = avAsset.status(of: .duration)
+                    await MainActor.run {
+                        switch status {
+                        case .loaded(_):
+                            exprotHandler()
+                        case .failed(let error):
+                            self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：" + error.localizedDescription)))
+                        default:
+                            self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败")))
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败")))
+                    }
+                }
+            }
+        } else {
+            avAsset.loadValuesAsynchronously(forKeys: ["duration"]) { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                DispatchQueue.main.async {
+                    if self.avAsset.statusOfValue(forKey: "duration", error: nil) != .loaded {
+                        self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败")))
+                        return
+                    }
+                    self.exprotHandler()
+                }
+            }
+        }
     }
     
     public func cancelExport() {
+        avAsset.cancelLoading()
         progressTimer?.invalidate()
         progressTimer = nil
         exportSession?.cancelExport()
@@ -151,7 +188,7 @@ public class EditorVideoTool {
             if timeRang != .zero {
                 exportSession.timeRange = timeRang
             }
-            if factor.quality > 0 {
+            if factor.quality > 0 && factor.quality < 10 {
                 let seconds = timeRang != .zero ? timeRang.duration.seconds : videoTotalSeconds
                 var maxSize: Int?
                 if let urlAsset = avAsset as? AVURLAsset {
@@ -244,7 +281,7 @@ public class EditorVideoTool {
                 sourceTrackIDs: sourceTrackIDs,
                 watermarkTrackID: watermarkLayerTrackID,
                 timeRange: instruction.timeRange,
-                videoOrientation: avAsset.videoOrientation,
+                videoOrientation: videoOrientation,
                 watermark: watermark,
                 cropFactor: cropFactor,
                 maskType: maskType,
@@ -259,7 +296,7 @@ public class EditorVideoTool {
                 sourceTrackIDs: sourceTrackIDs,
                 watermarkTrackID: watermarkLayerTrackID,
                 timeRange: videoTrack.timeRange,
-                videoOrientation: avAsset.videoOrientation,
+                videoOrientation: videoOrientation,
                 watermark: watermark,
                 cropFactor: cropFactor,
                 maskType: maskType,
@@ -429,15 +466,15 @@ public class EditorVideoTool {
             duration: duration
         )
         var audioInputParams: [AVMutableAudioMixInputParameters] = []
-        
         for audioTrack in audioTracks {
             guard let track = mixComposition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
                 continue
             }
+            let audioTimeRange: CMTimeRange = .init(start: .zero, duration: .init(seconds: audioTrack.timeRange.duration.seconds, preferredTimescale: audioTrack.timeRange.duration.timescale))
+            try track.insertTimeRange(audioTimeRange, of: audioTrack, at: .zero)
             track.preferredTransform = audioTrack.preferredTransform
-            try track.insertTimeRange(videoTimeRange, of: audioTrack, at: .zero)
             let audioInputParam = AVMutableAudioMixInputParameters(track: track)
-            audioInputParam.setVolumeRamp(fromStartVolume: factor.volume, toEndVolume: factor.volume, timeRange: .init(start: .zero, duration: duration))
+            audioInputParam.setVolumeRamp(fromStartVolume: factor.volume, toEndVolume: factor.volume, timeRange: audioTimeRange)
             audioInputParam.trackID = track.trackID
             audioInputParams.append(audioInputParam)
         }
@@ -521,7 +558,7 @@ public class EditorVideoTool {
                     )
                 }
             }
-            let audioInputParam = AVMutableAudioMixInputParameters.init(track: audioTrack)
+            let audioInputParam = AVMutableAudioMixInputParameters(track: audioTrack)
             audioInputParam.setVolumeRamp(fromStartVolume: audio.volume, toEndVolume: audio.volume, timeRange: .init(start: .zero, duration: duration))
             audioInputParam.trackID = audioTrack.trackID
             audioInputParams.append(audioInputParam)
@@ -557,7 +594,7 @@ public class EditorVideoTool {
     }()
     
     func adjustVideoOrientation() {
-        let assetOrientation = avAsset.videoOrientation
+        let assetOrientation = videoOrientation
         guard assetOrientation != .landscapeRight else {
             return
         }

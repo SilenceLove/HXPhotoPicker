@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreLocation
+import Photos
 
 extension CameraViewController: CameraResultViewControllerDelegate {
     func cameraResultViewController(
@@ -29,29 +30,73 @@ extension CameraViewController: CameraResultViewControllerDelegate {
         #if HXPICKER_ENABLE_CAMERA_LOCATION
         location = currentLocation
         #endif
-        delegate?.cameraViewController(
-            self,
-            didFinishWithResult: .image(image),
-            location: location
-        )
-        if autoDismiss {
-            dismiss(animated: true, completion: nil)
+        let result = CameraController.Result.image(image)
+        if config.isSaveSystemAlbum {
+            navigationController?.view.hx.show()
+            AssetManager.saveSystemAlbum(type: .image(image), location: location) {
+                self.navigationController?.view.hx.hide()
+                switch $0 {
+                case .success(let phAsset):
+                    self.didFinish(result, phAsset: phAsset, location: location)
+                case .failure(_):
+                    ProgressHUD.showWarning(
+                        addedTo: self.navigationController?.view,
+                        text: "保存失败".localized,
+                        animated: true,
+                        delayHide: 1.5
+                    )
+                }
+            }
+            return
         }
+        didFinish(result, location: location)
     }
     func didFinish(withVideo videoURL: URL) {
         var location: CLLocation?
         #if HXPICKER_ENABLE_CAMERA_LOCATION
         location = currentLocation
         #endif
+        let result = CameraController.Result.video(videoURL)
+        if config.isSaveSystemAlbum {
+            navigationController?.view.hx.show()
+            AssetManager.saveSystemAlbum(type: .videoURL(videoURL), location: location) {
+                self.navigationController?.view.hx.hide()
+                switch $0 {
+                case .success(let phAsset):
+                    self.didFinish(result, phAsset: phAsset, location: location)
+                case .failure(_):
+                    ProgressHUD.showWarning(
+                        addedTo: self.navigationController?.view,
+                        text: "保存失败".localized,
+                        animated: true,
+                        delayHide: 1.5
+                    )
+                }
+            }
+            return
+        }
+        didFinish(result, location: location)
+    }
+    
+    func didFinish(_ result: CameraController.Result, phAsset: PHAsset? = nil, location: CLLocation?) {
         delegate?.cameraViewController(
             self,
-            didFinishWithResult: .video(videoURL),
+            didFinishWithResult: result,
             location: location
         )
+        if let phAsset = phAsset {
+            delegate?.cameraViewController(
+                self,
+                didFinishWithResult: result,
+                phAsset: phAsset,
+                location: location
+            )
+        }
         if autoDismiss {
             dismiss(animated: true, completion: nil)
         }
     }
+    
     func saveCameraImage(_ image: UIImage) {
         let previewSize = previewView.size
         DispatchQueue.global().async {

@@ -8,6 +8,7 @@
 import UIKit
 import CoreLocation
 import AVFoundation
+import Photos
 
 public protocol CameraControllerDelegate: AnyObject {
     
@@ -19,6 +20,19 @@ public protocol CameraControllerDelegate: AnyObject {
     func cameraController(
         _ cameraController: CameraController,
         didFinishWithResult result: CameraController.Result,
+        location: CLLocation?
+    )
+    
+    /// 拍摄完成，config.isSaveSystemAlbum = true 时才会触发
+    /// - Parameters:
+    ///   - cameraController: 对应的 CameraController
+    ///   - result: 拍摄结果
+    ///   - phAsset: 保存到相册的 PHAsset 对象
+    ///   - locatoin: 定位信息
+    func cameraController(
+        _ cameraController: CameraController,
+        didFinishWithResult result: CameraController.Result,
+        phAsset: PHAsset,
         location: CLLocation?
     )
     
@@ -56,6 +70,14 @@ public extension CameraControllerDelegate {
             cameraController.dismiss(animated: true)
         }
     }
+    func cameraController(
+        _ cameraController: CameraController,
+        didFinishWithResult result: CameraController.Result,
+        phAsset: PHAsset,
+        location: CLLocation?
+    ) {
+        
+    }
     func cameraController(didCancel cameraController: CameraController) {
         if !cameraController.autoDismiss {
             cameraController.dismiss(animated: true)
@@ -85,6 +107,19 @@ public protocol CameraViewControllerDelegate: AnyObject {
     func cameraViewController(
         _ cameraViewController: CameraViewController,
         didFinishWithResult result: CameraController.Result,
+        location: CLLocation?
+    )
+    
+    /// 拍摄完成，config.isSaveSystemAlbum = true 时才会触发
+    /// - Parameters:
+    ///   - cameraViewController: 对应的 CameraViewController
+    ///   - result: 拍摄结果
+    ///   - phAsset: 保存到相册的 PHAsset 对象
+    ///   - locatoin: 定位信息
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didFinishWithResult result: CameraController.Result,
+        phAsset: PHAsset,
         location: CLLocation?
     )
     
@@ -120,6 +155,14 @@ public extension CameraViewControllerDelegate {
         if !cameraViewController.autoDismiss {
             cameraViewController.dismiss(animated: true)
         }
+    }
+    func cameraViewController(
+        _ cameraViewController: CameraViewController,
+        didFinishWithResult result: CameraController.Result,
+        phAsset: PHAsset,
+        location: CLLocation?
+    ) {
+        
     }
     func cameraViewController(didCancel cameraViewController: CameraViewController) {
         if !cameraViewController.autoDismiss {
