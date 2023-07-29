@@ -10,7 +10,7 @@ import UIKit
 
 protocol PhotoPreviewSelectedViewDelegate: AnyObject {
     func selectedView(_ selectedView: PhotoPreviewSelectedView, didSelectItemAt photoAsset: PhotoAsset)
-    func selectedView(_ selectedView: PhotoPreviewSelectedView, moveItemAt fromIndex: Int , toIndex: Int)
+    func selectedView(_ selectedView: PhotoPreviewSelectedView, moveItemAt fromIndex: Int, toIndex: Int)
 }
 
 class PhotoPreviewSelectedView: UIView,
@@ -270,7 +270,7 @@ extension PhotoPreviewSelectedView: UICollectionViewDragDelegate, UICollectionVi
                 photoAssetArray.insert(sourceAsset, at: destinationIndexPath.item)
                 collectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
                 delegate?.selectedView(self, moveItemAt: sourceIndexPath.item, toIndex: destinationIndexPath.item)
-            } completion: { (isFinish) in
+            } completion: { _ in
                 collectionView.isUserInteractionEnabled = true
             }
             if let dragItem = coordinator.items.first?.dragItem {

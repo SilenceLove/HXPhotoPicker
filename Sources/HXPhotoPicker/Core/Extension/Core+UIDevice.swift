@@ -37,7 +37,9 @@ extension UIDevice {
         if isIPhoneXR || isIPhone11 {
             return 48
         }
-        if isIPhone12 || isIPhone12Pro || isIPhone12ProMax || isIPhone13 || isIPhone13Pro || isIPhone13ProMax || isIPhone14 || isIPhone14Plus {
+        if isIPhone12 || isIPhone12Pro || isIPhone12ProMax ||
+            isIPhone13 || isIPhone13Pro || isIPhone13ProMax ||
+            isIPhone14 || isIPhone14Plus {
             return 47
         }
         if isIPhone12Mini || isIPhone13Mini {
@@ -109,46 +111,46 @@ extension UIDevice {
     }
     
     class var isIPhoneXR: Bool {
-        switch phoneIdentifier { case "iPhone11,8": return true default: return false }
+        phoneIdentifier == "iPhone11,8"
     }
     class var isIPhone11: Bool {
-        switch phoneIdentifier { case "iPhone12,1": return true default: return false }
+        phoneIdentifier == "iPhone12,1"
     }
     class var isIPhone12Mini: Bool {
-        switch phoneIdentifier { case "iPhone13,1": return true default: return false }
+        phoneIdentifier == "iPhone13,1"
     }
     class var isIPhone12: Bool {
-        switch phoneIdentifier { case "iPhone13,2": return true default: return false }
+        phoneIdentifier == "iPhone13,2"
     }
     class var isIPhone12Pro: Bool {
-        switch phoneIdentifier { case "iPhone13,3": return true default: return false }
+        phoneIdentifier == "iPhone13,3"
     }
     class var isIPhone12ProMax: Bool {
-        switch phoneIdentifier { case "iPhone13,4": return true default: return false }
+        phoneIdentifier == "iPhone13,4"
     }
     class var isIPhone13: Bool {
-        switch phoneIdentifier { case "iPhone14,5": return true default: return false }
+        phoneIdentifier == "iPhone14,5"
     }
     class var isIPhone13Mini: Bool {
-        switch phoneIdentifier { case "iPhone14,4": return true default: return false }
+        phoneIdentifier == "iPhone14,4"
     }
     class var isIPhone13Pro: Bool {
-        switch phoneIdentifier { case "iPhone14,2": return true default: return false }
+        phoneIdentifier == "iPhone14,2"
     }
     class var isIPhone13ProMax: Bool {
-        switch phoneIdentifier { case "iPhone14,3": return true default: return false }
+        phoneIdentifier == "iPhone14,3"
     }
     class var isIPhone14: Bool {
-        switch phoneIdentifier { case "iPhone14,7": return true default: return false }
+        phoneIdentifier == "iPhone14,7"
     }
     class var isIPhone14Plus: Bool {
-        switch phoneIdentifier { case "iPhone14,8": return true default: return false }
+        phoneIdentifier == "iPhone14,8"
     }
     class var isIPhone14Pro: Bool {
-        switch phoneIdentifier { case "iPhone15,2": return true default: return false }
+        phoneIdentifier == "iPhone15,2"
     }
     class var isIPhone14ProMax: Bool {
-        switch phoneIdentifier { case "iPhone15,3": return true default: return false }
+        phoneIdentifier == "iPhone15,3"
     }
     
     class var belowIphone7: Bool {

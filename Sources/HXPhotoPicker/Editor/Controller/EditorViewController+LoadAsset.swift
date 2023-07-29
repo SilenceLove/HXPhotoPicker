@@ -123,7 +123,7 @@ extension EditorViewController {
                             self.lastMusicDownloadTask = PhotoManager.shared.downloadTask(
                                 with: url,
                                 toFile: audioTmpURL
-                            ) { [weak self] audioURL, error, ext in
+                            ) { [weak self] audioURL, _, _ in
                                 guard let self = self, let audioURL = audioURL else { return }
                                 self.musicPlayer?.play(audioURL)
                                 self.musicPlayer?.volume = self.musicVolume
@@ -165,7 +165,7 @@ extension EditorViewController {
                 isSame = true
             }
             if audioInfo.url == url || isSame {
-                audioInfo.contentsHandler =  { [weak self] in
+                audioInfo.contentsHandler = { [weak self] in
                     guard let self = self,
                           let musicPlayer = self.musicPlayer,
                           let music = musicPlayer.music,
@@ -225,23 +225,70 @@ extension EditorViewController {
         guard let result = selectedAsset.result else {
             return
         }
-        func loadImageData(_ filter: PhotoEditorFilter?) {
-            var filterInfo: PhotoEditorFilterInfo?
-            var selectedIndex: Int = -1
-            var selectedParameters: [PhotoEditorFilterParameterInfo] = []
-            if let filter = filter {
-                if filter.identifier == "hx_editor_default" {
-                    selectedIndex = filter.sourceIndex + 1
-                    selectedParameters = filter.parameters
-                    filterInfo = config.photo.filter.infos[filter.sourceIndex]
-                }else {
-                    filterInfo = delegate?.editorViewcOntroller(self, fetchLastImageFilterInfo: filter)
+        switch result {
+        case .image(_, let editedData):
+            loadImageFilterData(editedData.filter)
+        case .video(_, let editedData):
+            loadVideoFilterData(editedData.filter)
+        }
+        filtersViewDidLoad()
+    }
+    
+    private func loadImageFilterData(_ filter: PhotoEditorFilter?) {
+        var filterInfo: PhotoEditorFilterInfo?
+        var selectedIndex: Int = -1
+        var selectedParameters: [PhotoEditorFilterParameterInfo] = []
+        if let filter = filter {
+            if filter.identifier == "hx_editor_default" {
+                selectedIndex = filter.sourceIndex + 1
+                selectedParameters = filter.parameters
+                filterInfo = config.photo.filter.infos[filter.sourceIndex]
+            }else {
+                filterInfo = delegate?.editorViewcOntroller(self, fetchLastImageFilterInfo: filter)
+            }
+        }
+        let originalImage = selectedOriginalImage
+        if let filter = filter, let handler = filterInfo?.filterHandler {
+            imageFilter = filter
+            let lastImage = editorView.image
+            imageFilterQueue.cancelAllOperations()
+            let operation = BlockOperation()
+            operation.addExecutionBlock { [unowned operation] in
+                if operation.isCancelled { return }
+                var ciImage = originalImage?.ci_Image
+                if self.filterEditFator.isApply {
+                    ciImage = ciImage?.apply(self.filterEditFator)
+                }
+                if let ciImage = ciImage,
+                   let newImage = handler(ciImage, lastImage, filter.parameters, false),
+                   let cgImage = self.imageFilterContext.createCGImage(newImage, from: newImage.extent) {
+                    let image = UIImage(cgImage: cgImage)
+                    if operation.isCancelled { return }
+                    DispatchQueue.main.async {
+                        self.editorView.updateImage(image)
+                    }
+                    if let mosaicImage = newImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
+                        let mosaicResultImage = self.imageFilterContext.createCGImage(
+                            mosaicImage,
+                            from: mosaicImage.extent
+                        )
+                        if operation.isCancelled { return }
+                        DispatchQueue.main.async {
+                            self.editorView.mosaicCGImage = mosaicResultImage
+                        }
+                    }
                 }
             }
-            let originalImage = selectedOriginalImage
-            if let filter = filter, let handler = filterInfo?.filterHandler {
-                imageFilter = filter
-                let lastImage = editorView.image
+            imageFilterQueue.addOperation(operation)
+            if filtersView.didLoad {
+                filtersView.updateFilters(selectedIndex: selectedIndex, selectedParameters: selectedParameters)
+            }else {
+                filtersView.loadCompletion = {
+                    $0.updateFilters(selectedIndex: selectedIndex, selectedParameters: selectedParameters)
+                }
+            }
+        }else {
+            if filterEditFator.isApply {
                 imageFilterQueue.cancelAllOperations()
                 let operation = BlockOperation()
                 operation.addExecutionBlock { [unowned operation] in
@@ -251,15 +298,17 @@ extension EditorViewController {
                         ciImage = ciImage?.apply(self.filterEditFator)
                     }
                     if let ciImage = ciImage,
-                       let newImage = handler(ciImage, lastImage, filter.parameters, false),
-                       let cgImage = self.imageFilterContext.createCGImage(newImage, from: newImage.extent) {
+                       let cgImage = self.imageFilterContext.createCGImage(ciImage, from: ciImage.extent) {
                         let image = UIImage(cgImage: cgImage)
                         if operation.isCancelled { return }
                         DispatchQueue.main.async {
                             self.editorView.updateImage(image)
                         }
-                        if let mosaicImage = newImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
-                            let mosaicResultImage = self.imageFilterContext.createCGImage(mosaicImage, from: mosaicImage.extent)
+                        if let mosaicImage = ciImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
+                            let mosaicResultImage = self.imageFilterContext.createCGImage(
+                                mosaicImage,
+                                from: mosaicImage.extent
+                            )
                             if operation.isCancelled { return }
                             DispatchQueue.main.async {
                                 self.editorView.mosaicCGImage = mosaicResultImage
@@ -275,74 +324,41 @@ extension EditorViewController {
                         $0.updateFilters(selectedIndex: selectedIndex, selectedParameters: selectedParameters)
                     }
                 }
-            }else {
-                if filterEditFator.isApply {
-                    imageFilterQueue.cancelAllOperations()
-                    let operation = BlockOperation()
-                    operation.addExecutionBlock { [unowned operation] in
-                        if operation.isCancelled { return }
-                        var ciImage = originalImage?.ci_Image
-                        if self.filterEditFator.isApply {
-                            ciImage = ciImage?.apply(self.filterEditFator)
-                        }
-                        if let ciImage = ciImage,
-                           let cgImage = self.imageFilterContext.createCGImage(ciImage, from: ciImage.extent) {
-                            let image = UIImage(cgImage: cgImage)
-                            if operation.isCancelled { return }
-                            DispatchQueue.main.async {
-                                self.editorView.updateImage(image)
-                            }
-                            if let mosaicImage = ciImage.applyMosaic(level: self.config.mosaic.mosaicWidth) {
-                                let mosaicResultImage = self.imageFilterContext.createCGImage(mosaicImage, from: mosaicImage.extent)
-                                if operation.isCancelled { return }
-                                DispatchQueue.main.async {
-                                    self.editorView.mosaicCGImage = mosaicResultImage
-                                }
-                            }
-                        }
-                    }
-                    imageFilterQueue.addOperation(operation)
-                    if filtersView.didLoad {
-                        filtersView.updateFilters(selectedIndex: selectedIndex, selectedParameters: selectedParameters)
-                    }else {
-                        filtersView.loadCompletion = {
-                            $0.updateFilters(selectedIndex: selectedIndex, selectedParameters: selectedParameters)
-                        }
-                    }
-                }
             }
         }
-        func loadVideoData(_ data: VideoEditorFilter?) {
-            guard let data = data else {
-                return
+    }
+    
+    private func loadVideoFilterData(_ data: VideoEditorFilter?) {
+        guard let data = data else {
+            return
+        }
+        if data.identifier == "hx_editor_default" {
+            videoFilterInfo = config.video.filter.infos[data.index]
+            videoFilter = data
+            if filtersView.didLoad {
+                filtersView.updateFilters(
+                    selectedIndex: data.index + 1,
+                    selectedParameters: data.parameters,
+                    isVideo: true
+                )
+            }else {
+                filtersView.loadCompletion = {
+                    $0.updateFilters(
+                        selectedIndex: data.index + 1,
+                        selectedParameters: data.parameters,
+                        isVideo: true
+                    )
+                }
             }
-            if data.identifier == "hx_editor_default" {
-                videoFilterInfo = config.video.filter.infos[data.index]
+        }else {
+            if let filterInfo = delegate?.editorViewcOntroller(self, fetchLastVideoFilterInfo: data) {
+                videoFilterInfo = filterInfo
                 videoFilter = data
                 if filtersView.didLoad {
-                    filtersView.updateFilters(selectedIndex: data.index + 1, selectedParameters: data.parameters, isVideo: true)
-                }else {
-                    filtersView.loadCompletion = {
-                        $0.updateFilters(selectedIndex: data.index + 1, selectedParameters: data.parameters, isVideo: true)
-                    }
-                }
-            }else {
-                if let filterInfo = delegate?.editorViewcOntroller(self, fetchLastVideoFilterInfo: data) {
-                    videoFilterInfo = filterInfo
-                    videoFilter = data
-                    if filtersView.didLoad {
-                        filtersView.updateFilters(selectedIndex: -1, isVideo: true)
-                    }
+                    filtersView.updateFilters(selectedIndex: -1, isVideo: true)
                 }
             }
         }
-        switch result {
-        case .image(_, let editedData):
-            loadImageData(editedData.filter)
-        case .video(_, let editedData):
-            loadVideoData(editedData.filter)
-        }
-        filtersViewDidLoad()
     }
     
     func loadCorpSizeData() {
@@ -357,7 +373,7 @@ extension EditorViewController {
             }
             ratioToolView.deselected()
             finishRatioIndex = -1
-            for (index, aspectRatio) in config.cropSize.aspectRatios.enumerated()  {
+            for (index, aspectRatio) in config.cropSize.aspectRatios.enumerated() {
                 if data.isFixedRatio {
                     if aspectRatio.ratio.equalTo(.init(width: -1, height: -1)) || aspectRatio.ratio.equalTo(.zero) {
                         continue
@@ -418,7 +434,7 @@ extension EditorViewController {
             videoControlView.loadData(.init(url: videoURL))
             updateVideoTimeRange()
             isLoadVideoControl = true
-        case .networkVideo(_):
+        case .networkVideo:
             if let avAsset = editorView.avAsset {
                 videoControlView.layoutSubviews()
                 videoControlView.loadData(avAsset)
@@ -426,7 +442,7 @@ extension EditorViewController {
                 isLoadVideoControl = true
             }
         #if HXPICKER_ENABLE_PICKER
-        case .photoAsset(_):
+        case .photoAsset:
             if let avAsset = editorView.avAsset {
                 videoControlView.layoutSubviews()
                 videoControlView.loadData(avAsset)
@@ -463,7 +479,7 @@ extension EditorViewController {
         }
         PhotoManager.shared.downloadTask(
             with: videoURL
-        ) { [weak self] (progress, task) in
+        ) { [weak self] (progress, _) in
             if progress > 0 {
                 self?.assetLoadingView?.mode = .circleProgress
                 self?.assetLoadingView?.progress = CGFloat(progress)
@@ -512,7 +528,10 @@ extension EditorViewController {
         }else {
             loadAssetStatus = .loadding(true)
         }
-        PhotoTools.downloadNetworkImage(with: url, options: [.backgroundDecode]) { [weak self] (receiveSize, totalSize) in
+        PhotoTools.downloadNetworkImage(
+            with: url,
+            options: [.backgroundDecode]
+        ) { [weak self] (receiveSize, totalSize) in
             let progress = CGFloat(receiveSize) / CGFloat(totalSize)
             if progress > 0 {
                 self?.assetLoadingView?.mode = .circleProgress
@@ -702,7 +721,7 @@ extension EditorViewController {
         }
         photoAsset.requestImageData(
             filterEditor: true
-        ) { [weak self] asset, result in
+        ) { [weak self] _, result in
             guard let self = self else { return }
             switch result {
             case .success(let dataResult):
@@ -808,7 +827,7 @@ extension EditorViewController {
                         return
                     }
                 }
-            case .failure(_):
+            case .failure:
                 if !self.isTransitionCompletion {
                     self.loadAssetStatus = .failure
                     return
@@ -837,11 +856,11 @@ extension EditorViewController {
         assetRequestID = photoAsset.requestAVAsset(
             filterEditor: true,
             deliveryMode: .highQualityFormat
-        ) { [weak self] (photoAsset, requestID) in
+        ) { [weak self] (_, requestID) in
             self?.assetRequestID = requestID
             self?.assetLoadingView?.mode = .circleProgress
             self?.assetLoadingView?.text = "正在同步iCloud".localized + "..."
-        } progressHandler: { [weak self] (photoAsset, progress) in
+        } progressHandler: { [weak self] (_, progress) in
             if progress > 0 {
                 self?.assetLoadingView?.progress = CGFloat(progress)
             }
@@ -858,7 +877,7 @@ extension EditorViewController {
             self.editorView.loadVideo(isPlay: false)
             self.loadCompletion()
             self.loadLastEditedData()
-        } failure: { [weak self] (photoAsset, info, error) in
+        } failure: { [weak self] (_, info, _) in
             guard let self = self else { return }
             self.assetLoadingView = nil
             if !self.isTransitionCompletion {
@@ -929,11 +948,22 @@ extension EditorViewController {
             }
         }else if editorView.type == .video {
             if let avAsset = editorView.avAsset {
-                avAsset.getImage(at: 0.1) { _, image, _ in
-                    guard let image = image else {
+                avAsset.getImage(at: 0.1) { [weak self] _, image, _ in
+                    guard let self = self,
+                          let image = image else {
                         return
                     }
-                    self.filtersView.loadFilters(originalImage: image, selectedIndex: self.videoFilter != nil ? -1 : 0, isVideo: true)
+                    let selectedIndex: Int
+                    if self.videoFilter != nil {
+                        selectedIndex = -1
+                    }else {
+                        selectedIndex = 0
+                    }
+                    self.filtersView.loadFilters(
+                        originalImage: image,
+                        selectedIndex: selectedIndex,
+                        isVideo: true
+                    )
                 }
             }
         }

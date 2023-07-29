@@ -25,12 +25,17 @@ class EditorVideoControlMaskView: UIView {
             rightControl.frame = CGRect(x: validRect.maxX, y: 0, width: controlWidth, height: height)
             rightImageView.center = .init(x: rightControl.width / 2, y: rightControl.height / 2)
             topView.frame = .init(x: leftControl.frame.maxX, y: 0, width: validRect.width, height: 4)
-            bottomView.frame = .init(x: leftControl.frame.maxX, y: leftControl.frame.maxY - 4, width: validRect.width, height: 4)
+            bottomView.frame = .init(
+                x: leftControl.frame.maxX,
+                y: leftControl.frame.maxY - 4,
+                width: validRect.width,
+                height: 4
+            )
             drawMaskLayer()
-            
-            if #available(iOS 11.0, *) { }else {
+            guard #available(iOS 11.0, *) else {
                 leftControl.cornersRound(radius: 4, corner: [.topLeft, .bottomLeft])
                 rightControl.cornersRound(radius: 4, corner: [.topRight, .bottomRight])
+                return
             }
         }
     }
@@ -171,7 +176,12 @@ class EditorVideoControlMaskView: UIView {
                 if rightRect.origin.x - leftRect.maxX <= minWidth {
                     leftRect.origin.x = rightRect.origin.x - minWidth - leftRect.width
                 }
-                validRect = .init(x: leftRect.maxX, y: validRect.minY, width: rightRect.origin.x - leftRect.maxX, height: leftRect.height)
+                validRect = .init(
+                    x: leftRect.maxX,
+                    y: validRect.minY,
+                    width: rightRect.origin.x - leftRect.maxX,
+                    height: leftRect.height
+                )
                 delegate?.frameMaskView(leftValidRectDidChanged: self)
             case 1:
                 rightRect.origin.x += point.x
@@ -181,7 +191,12 @@ class EditorVideoControlMaskView: UIView {
                 if rightRect.origin.x - leftRect.maxX <= minWidth {
                     rightRect.origin.x = leftRect.maxX + minWidth
                 }
-                validRect = .init(x: leftRect.maxX, y: validRect.minY, width: rightRect.origin.x - leftRect.maxX, height: leftRect.height)
+                validRect = .init(
+                    x: leftRect.maxX,
+                    y: validRect.minY,
+                    width: rightRect.origin.x - leftRect.maxX,
+                    height: leftRect.height
+                )
                 delegate?.frameMaskView(rightValidRectDidChanged: self)
             default:
                 break
@@ -190,7 +205,12 @@ class EditorVideoControlMaskView: UIView {
         case .ended, .failed, .cancelled:
             let leftRect = leftControl.frame
             let rightRect = rightControl.frame
-            validRect = .init(x: leftRect.maxX, y: validRect.minY, width: rightRect.origin.x - leftRect.maxX, height: leftRect.height)
+            validRect = .init(
+                x: leftRect.maxX,
+                y: validRect.minY,
+                width: rightRect.origin.x - leftRect.maxX,
+                height: leftRect.height
+            )
             switch panGR.view?.tag {
             case 0:
                 delegate?.frameMaskView(leftValidRectEndChanged: self)

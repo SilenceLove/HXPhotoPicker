@@ -102,7 +102,7 @@ public class PhotoEditorFilterParameterInfo: Equatable, Codable {
     /// 对应的参数类型
     public let parameter: PhotoEditorFilterParameter
     
-    let sliderType:  ParameterSliderView.`Type`
+    let sliderType: ParameterSliderView.`Type`
     var isNormal: Bool
     
     init(
@@ -151,7 +151,13 @@ public struct EditorFilterEditFator: Codable {
     var vignette: Float
     
     var isApply: Bool {
-        brightness != 0 || contrast != 1 || exposure != 0 || saturation != 1 || warmth != 0 || sharpen != 0 || vignette != 0
+        brightness != 0 ||
+        contrast != 1 ||
+        exposure != 0 ||
+        saturation != 1 ||
+        warmth != 0 ||
+        sharpen != 0 ||
+        vignette != 0
     }
     
     public init(

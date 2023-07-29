@@ -61,7 +61,13 @@ class EditorVideoPlayerView: VideoPlayerView {
             let startSeconds = timeRange.start.seconds
             let durationSeconds = timeRange.duration.seconds
             let bufferSeconds = startSeconds + durationSeconds
-            delegate?.playerView(self, didChangedBuffer: .init(seconds: bufferSeconds, preferredTimescale: timeRange.duration.timescale))
+            delegate?.playerView(
+                self,
+                didChangedBuffer: .init(
+                    seconds: bufferSeconds,
+                    preferredTimescale: timeRange.duration.timescale
+                )
+            )
         }
     }
     var endTime: CMTime? {
@@ -72,7 +78,13 @@ class EditorVideoPlayerView: VideoPlayerView {
             let startSeconds = timeRange.start.seconds
             let durationSeconds = timeRange.duration.seconds
             let bufferSeconds = startSeconds + durationSeconds
-            delegate?.playerView(self, didChangedBuffer: .init(seconds: bufferSeconds, preferredTimescale: timeRange.duration.timescale))
+            delegate?.playerView(
+                self,
+                didChangedBuffer: .init(
+                    seconds: bufferSeconds,
+                    preferredTimescale: timeRange.duration.timescale
+                )
+            )
         }
     }
     convenience init(videoURL: URL, isPlay: Bool) {
@@ -147,7 +159,7 @@ class EditorVideoPlayerView: VideoPlayerView {
             .observe(
                 \.status,
                 options: [.new, .old]
-            ) { [weak self] playerItem, change in
+            ) { [weak self] playerItem, _ in
                 guard let self = self else { return }
                 switch playerItem.status {
                 case .readyToPlay:
@@ -178,7 +190,7 @@ class EditorVideoPlayerView: VideoPlayerView {
             .observe(
                 \.isReadyForDisplay,
                 options: [.new, .old]
-            ) { [weak self] playerLayer, change in
+            ) { [weak self] playerLayer, _ in
                 guard let self = self else { return }
                 if playerLayer.isReadyForDisplay {
                     self.coverImageView.isHidden = true
@@ -192,7 +204,7 @@ class EditorVideoPlayerView: VideoPlayerView {
             .observe(
                 \.loadedTimeRanges,
                 options: [.new],
-                changeHandler: { [weak self] playerItem, change in
+                changeHandler: { [weak self] playerItem, _ in
             guard let self = self,
                   let timeRange = playerItem.loadedTimeRanges.first?.timeRangeValue else {
                 return
@@ -200,13 +212,18 @@ class EditorVideoPlayerView: VideoPlayerView {
             let startSeconds = CMTimeGetSeconds(timeRange.start)
             let durationSeconds = CMTimeGetSeconds(timeRange.duration)
             let bufferSeconds = startSeconds + durationSeconds
-            self.delegate?.playerView(self, didChangedBuffer: .init(seconds: bufferSeconds, preferredTimescale: timeRange.duration.timescale))
+            self.delegate?.playerView(
+                self, didChangedBuffer: .init(
+                    seconds: bufferSeconds,
+                    preferredTimescale: timeRange.duration.timescale
+                )
+            )
         })
         playbackLikelyToKeepUpObservation = playerItem
             .observe(
                 \.isPlaybackLikelyToKeepUp,
                 options: [.new],
-                changeHandler: { [weak self] playerItem, change in
+                changeHandler: { [weak self] playerItem, _ in
             guard let self = self else { return }
             let isPlaybackLikelyToKeepUp = playerItem.isPlaybackLikelyToKeepUp
             self.delegate?.playerView(self, isPlaybackLikelyToKeepUp: isPlaybackLikelyToKeepUp)
@@ -218,7 +235,12 @@ class EditorVideoPlayerView: VideoPlayerView {
         ) { [weak self] request in
             let sourceImage = request.sourceImage
             guard let self = self,
-                  let ciImage = self.delegate?.playerView(self, applyFilter: sourceImage, at: request.compositionTime) else {
+                  let ciImage = self.delegate?.playerView(
+                    self,
+                    applyFilter: sourceImage,
+                    at: request.compositionTime
+                  )
+            else {
                 request.finish(
                     with: NSError(
                         domain: "videoComposition filter error：ciImage is nil",

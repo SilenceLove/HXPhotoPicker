@@ -486,7 +486,6 @@ extension EditorViewController: EditorToolsViewDelegate {
     }
 }
 
-
 extension EditorViewController: EditorMaskListViewControllerDelegate {
     
     func editorMaskListViewController(
@@ -498,7 +497,7 @@ extension EditorViewController: EditorMaskListViewControllerDelegate {
         editorView.setMaskImage(image, animated: true)
         editorView.setAspectRatio(imageAspectRatio, animated: true)
         ratioToolView.deselected()
-        for (index, aspectRatio) in ratioToolView.ratios.enumerated()  {
+        for (index, aspectRatio) in ratioToolView.ratios.enumerated() {
             if aspectRatio.ratio.equalTo(.init(width: -1, height: -1)) || aspectRatio.ratio.equalTo(.zero) {
                 continue
             }

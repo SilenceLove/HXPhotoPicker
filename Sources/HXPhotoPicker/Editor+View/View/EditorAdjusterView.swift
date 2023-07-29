@@ -12,7 +12,6 @@ class EditorAdjusterView: UIView {
     
     weak var delegate: EditorAdjusterViewDelegate?
     
-    
     var state: EditorView.State = .normal {
         didSet {
             frameView.state = state
@@ -384,7 +383,15 @@ extension EditorAdjusterView {
             return
         }
         superContentInset = contentInset
-        frameView.setMaskBgFrame(.init(x: -contentInset.left, y: -contentInset.top, width: maxRect.width, height: maxRect.height), insets: contentInset)
+        frameView.setMaskBgFrame(
+            .init(
+                x: -contentInset.left,
+                y: -contentInset.top,
+                width: maxRect.width,
+                height: maxRect.height
+            ),
+            insets: contentInset
+        )
         frameView.frame = containerView.bounds
         let insets = setContentInsets?() ?? .zero
         let anchorX: CGFloat
@@ -408,7 +415,15 @@ extension EditorAdjusterView {
     }
     
     func setCustomMaskFrame(_ rect: CGRect, maxRect: CGRect, contentInset: UIEdgeInsets) {
-        frameView.setCustomMaskFrame(.init(x: -contentInset.left, y: -contentInset.top, width: maxRect.width, height: maxRect.height), insets: contentInset)
+        frameView.setCustomMaskFrame(
+            .init(
+                x: -contentInset.left,
+                y: -contentInset.top,
+                width: maxRect.width,
+                height: maxRect.height
+            ),
+            insets: contentInset
+        )
     }
     
     func setScrollViewContentInset(_ rect: CGRect) {
@@ -518,7 +533,7 @@ extension EditorAdjusterView {
         }else {
             maskHeight = maxWidth / aspectRatio.width * aspectRatio.height
             if maskHeight > maxHeight {
-                maskWidth = maskWidth * (maxHeight / maskHeight)
+                maskWidth *= maxHeight / maskHeight
                 maskHeight = maxHeight
             }
         }
@@ -598,7 +613,7 @@ extension EditorAdjusterView {
         if !isOriginalRatio {
             let maskRect = getInitializationRatioMaskRect()
             if imageHeight < maskRect.height {
-                imageWidth = imageWidth * (maskRect.height / imageHeight)
+                imageWidth *= maskRect.height / imageHeight
             }
             if imageWidth < maskRect.width {
                 imageWidth = maskRect.width
@@ -722,7 +737,11 @@ extension EditorAdjusterView {
         }else {
             let rotate_Rect = getControlInRotateRect(rect)
             if isRoundMask {
-                rotateRect = .init(x: rotate_Rect.midX - rect.width * 0.5, y: rotate_Rect.midY - rect.height * 0.5, width: rect.width, height: rect.height)
+                rotateRect = .init(
+                    x: rotate_Rect.midX - rect.width * 0.5,
+                    y: rotate_Rect.midY - rect.height * 0.5,
+                    width: rect.width, height: rect.height
+                )
             }else {
                 rotateRect = rotate_Rect
             }
@@ -762,7 +781,7 @@ extension EditorAdjusterView {
             maskHeight = maskWidth * (aspectRatio.height / aspectRatio.width)
         }
         if maskHeight > maxHeight {
-            maskWidth = maskWidth * (maxHeight / maskHeight)
+            maskWidth *= maxHeight / maskHeight
             maskHeight = maxHeight
         }
         let maskX = (maxWidth - maskWidth) * 0.5 + contentInsets.left
@@ -812,7 +831,11 @@ extension EditorAdjusterView {
         }else {
             widthScale *= scrollView.zoomScale
         }
-        return isMaxZoom ? scrollView.zoomScale : widthScale
+        if isMaxZoom {
+            return scrollView.zoomScale
+        }else {
+            return widthScale
+        }
     }
     
     func getExactnessSize(_ size: CGSize) -> CGSize {
@@ -842,7 +865,6 @@ extension EditorAdjusterView {
     
     func getData() -> EditAdjustmentData {
         let adjustedData = getCurrentAdjusted()
-        let maskImage = oldMaskImage
         var adjusted: EditAdjustmentData.Content.Adjusted?
         if let factor = adjustedData.0 {
             let ratioFactor: EditorControlView.Factor?
@@ -866,6 +888,12 @@ extension EditorAdjusterView {
                 ratioFactor: ratioFactor
             )
         }
+        let maskImage: UIImage?
+        if let image = adjustedData.0?.maskImage {
+            maskImage = image
+        }else {
+            maskImage = oldMaskImage
+        }
         return .init(
             content: .init(
                 editSize: adjustedData.1,
@@ -879,7 +907,7 @@ extension EditorAdjusterView {
                 controlScale: frameView.controlView.size.height / frameView.controlView.size.width,
                 adjustedFactor: adjusted
             ),
-            maskImage: adjustedData.0?.maskImage ?? maskImage,
+            maskImage: maskImage,
             drawView: contentView.drawView.getBrushData(),
             mosaicView: contentView.mosaicView.getMosaicData(),
             stickersView: contentView.stickerView.getStickerItem()
@@ -888,104 +916,17 @@ extension EditorAdjusterView {
     
     func setData(_ factor: EditAdjustmentData) {
         let contentData = factor.content
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        mirrorView.transform = .identity
-        rotateView.transform = .identity
-        scrollView.transform = .identity
-        CATransaction.commit()
-        scrollView.minimumZoomScale = 1
-        scrollView.zoomScale = 1
+        resetOldViewData()
         
         editSize = factor.content.editSize
-        oldMaskImage = factor.maskImage
-        if oldMaskImage != nil {
-            maskImage = oldMaskImage
-            frameView.showCustomMaskView(false)
-            frameView.hideImageMaskView(false)
-        }
-        if let adjustedFactor = contentData.adjustedFactor {
-            oldAdjustedFactor = .init(
-                angle: adjustedFactor.angle,
-                zoomScale: adjustedFactor.zoomScale,
-                contentOffset: adjustedFactor.contentOffset,
-                contentInset: adjustedFactor.contentInset,
-                maskRect: adjustedFactor.maskRect,
-                transform: adjustedFactor.transform,
-                rotateTransform: adjustedFactor.rotateTransform,
-                mirrorTransform: adjustedFactor.mirrorTransform,
-                maskImage: factor.maskImage,
-                contentOffsetScale: adjustedFactor.contentOffsetScale,
-                min_zoom_scale: adjustedFactor.min_zoom_scale,
-                isRoundMask: adjustedFactor.isRoundMask
-            )
-            oldAdjustedFactor?.maskImage = factor.maskImage
-            oldRatioFactor = adjustedFactor.ratioFactor
-            if let oldFactor = oldRatioFactor {
-                isFixedRatio = oldFactor.fixedRatio
-                frameView.aspectRatio = oldFactor.aspectRatio
-            }
-            self.adjustedFactor = oldAdjustedFactor!
-        }
+        resetMaskImageData(factor.maskImage)
+        resetOldAdjustedFactor(factor)
         setContent(state == .edit)
-        
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        mirrorView.transform = contentData.mirrorViewTransform
-        rotateView.transform = contentData.rotateViewTransform
-        scrollView.transform = contentData.scrollViewTransform
-        CATransaction.commit()
+        resetOldTransformData(contentData)
         
         let controlScale = contentData.controlScale
         let beforeZoomScale = contentData.scrollViewZoomScale
-        var maxWidth = containerView.width
-        var maxHeight = containerView.height
-        if state == .edit {
-            maxWidth -= contentInsets.left + contentInsets.right
-            maxHeight -= contentInsets.top + contentInsets.bottom
-            var maskWidth = maxWidth
-            var maskHeight = maskWidth * controlScale
-            if maskHeight > maxHeight {
-                maskWidth = maskWidth * (maxHeight / maskHeight)
-                maskHeight = maxHeight
-            }
-            let maskRect = CGRect(
-                x: contentInsets.left + (maxWidth - maskWidth) * 0.5,
-                y: contentInsets.top + (maxHeight - maskHeight) * 0.5,
-                width: maskWidth,
-                height: maskHeight
-            )
-            updateMaskRect(to: maskRect, animated: false)
-        }else {
-            let rectW = maxWidth
-            let rectH = maxWidth * controlScale
-            var rectY: CGFloat = 0
-            if rectH < maxHeight {
-                rectY = (maxHeight - rectH) * 0.5
-            }
-            let maskRect = CGRect(x: 0, y: rectY, width: rectW, height: rectH)
-            updateMaskRect(to: maskRect, animated: false)
-        }
-        if let oldData = oldAdjustedFactor {
-            let controlScale = oldData.maskRect.height / oldData.maskRect.width
-            let maxWidth = containerView.width - contentInsets.left - contentInsets.right
-            let maxHeight = containerView.height - contentInsets.top - contentInsets.bottom
-            var maskWidth = maxWidth
-            var maskHeight = maskWidth * controlScale
-            if maskHeight > maxHeight {
-                maskWidth = maskWidth * (maxHeight / maskHeight)
-                maskHeight = maxHeight
-            }
-            let maskRect = CGRect(
-                x: contentInsets.left + (maxWidth - maskWidth) * 0.5,
-                y: contentInsets.top + (maxHeight - maskHeight) * 0.5,
-                width: maskWidth,
-                height: maskHeight
-            )
-            oldAdjustedFactor?.maskRect = maskRect
-            let zoomScale = getScrollViewMinimumZoomScale(maskRect) * oldData.min_zoom_scale
-            oldAdjustedFactor?.zoomScale = zoomScale
-        }
+        resetOldMaskRectData(controlScale)
         
         let controlView = frameView.controlView
         setScrollViewContentInset(controlView.frame)
@@ -1052,6 +993,114 @@ extension EditorAdjusterView {
         contentView.stickerView.setStickerItem(factor.stickersView, viewSize: contentView.bounds.size)
     }
     
+    private func resetOldViewData() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        mirrorView.transform = .identity
+        rotateView.transform = .identity
+        scrollView.transform = .identity
+        CATransaction.commit()
+        scrollView.minimumZoomScale = 1
+        scrollView.zoomScale = 1
+    }
+    
+    private func resetOldAdjustedFactor(_ factor: EditAdjustmentData) {
+        guard let adjustedFactor = factor.content.adjustedFactor else {
+            return
+        }
+        oldAdjustedFactor = .init(
+            angle: adjustedFactor.angle,
+            zoomScale: adjustedFactor.zoomScale,
+            contentOffset: adjustedFactor.contentOffset,
+            contentInset: adjustedFactor.contentInset,
+            maskRect: adjustedFactor.maskRect,
+            transform: adjustedFactor.transform,
+            rotateTransform: adjustedFactor.rotateTransform,
+            mirrorTransform: adjustedFactor.mirrorTransform,
+            maskImage: factor.maskImage,
+            contentOffsetScale: adjustedFactor.contentOffsetScale,
+            min_zoom_scale: adjustedFactor.min_zoom_scale,
+            isRoundMask: adjustedFactor.isRoundMask
+        )
+        oldAdjustedFactor?.maskImage = factor.maskImage
+        oldRatioFactor = adjustedFactor.ratioFactor
+        if let oldFactor = oldRatioFactor {
+            isFixedRatio = oldFactor.fixedRatio
+            frameView.aspectRatio = oldFactor.aspectRatio
+        }
+        self.adjustedFactor = oldAdjustedFactor!
+    }
+    
+    private func resetMaskImageData(_ image: UIImage?) {
+        oldMaskImage = image
+        if oldMaskImage != nil {
+            maskImage = oldMaskImage
+            frameView.showCustomMaskView(false)
+            frameView.hideImageMaskView(false)
+        }
+    }
+    
+    private func resetOldTransformData(_ content: EditAdjustmentData.Content) {
+        
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        mirrorView.transform = content.mirrorViewTransform
+        rotateView.transform = content.rotateViewTransform
+        scrollView.transform = content.scrollViewTransform
+        CATransaction.commit()
+    }
+    
+    private func resetOldMaskRectData(_ controlScale: CGFloat) {
+        var maxWidth = containerView.width
+        var maxHeight = containerView.height
+        if state == .edit {
+            maxWidth -= contentInsets.left + contentInsets.right
+            maxHeight -= contentInsets.top + contentInsets.bottom
+            var maskWidth = maxWidth
+            var maskHeight = maskWidth * controlScale
+            if maskHeight > maxHeight {
+                maskWidth *= maxHeight / maskHeight
+                maskHeight = maxHeight
+            }
+            let maskRect = CGRect(
+                x: contentInsets.left + (maxWidth - maskWidth) * 0.5,
+                y: contentInsets.top + (maxHeight - maskHeight) * 0.5,
+                width: maskWidth,
+                height: maskHeight
+            )
+            updateMaskRect(to: maskRect, animated: false)
+        }else {
+            let rectW = maxWidth
+            let rectH = maxWidth * controlScale
+            var rectY: CGFloat = 0
+            if rectH < maxHeight {
+                rectY = (maxHeight - rectH) * 0.5
+            }
+            let maskRect = CGRect(x: 0, y: rectY, width: rectW, height: rectH)
+            updateMaskRect(to: maskRect, animated: false)
+        }
+        if let oldData = oldAdjustedFactor {
+            let controlScale = oldData.maskRect.height / oldData.maskRect.width
+            let maxWidth = containerView.width - contentInsets.left - contentInsets.right
+            let maxHeight = containerView.height - contentInsets.top - contentInsets.bottom
+            var maskWidth = maxWidth
+            var maskHeight = maskWidth * controlScale
+            if maskHeight > maxHeight {
+                maskWidth *= maxHeight / maskHeight
+                maskHeight = maxHeight
+            }
+            let maskRect = CGRect(
+                x: contentInsets.left + (maxWidth - maskWidth) * 0.5,
+                y: contentInsets.top + (maxHeight - maskHeight) * 0.5,
+                width: maskWidth,
+                height: maskHeight
+            )
+            oldAdjustedFactor?.maskRect = maskRect
+            let zoomScale = getScrollViewMinimumZoomScale(maskRect) * oldData.min_zoom_scale
+            oldAdjustedFactor?.zoomScale = zoomScale
+        }
+    }
+    
     func getOldContentInsert() -> UIEdgeInsets {
         guard let data = oldAdjustedFactor else {
             return .zero
@@ -1082,7 +1131,11 @@ extension EditorAdjusterView {
         let rotateRect: CGRect
         let rotate_Rect = getControlRotateRect(rect)
         if data.isRoundMask {
-            rotateRect = .init(x: rotate_Rect.midX - rect.width * 0.5, y: rotate_Rect.midY - rect.height * 0.5, width: rect.width, height: rect.height)
+            rotateRect = .init(
+                x: rotate_Rect.midX - rect.width * 0.5,
+                y: rotate_Rect.midY - rect.height * 0.5,
+                width: rect.width, height: rect.height
+            )
         }else {
             rotateRect = rotate_Rect
         }

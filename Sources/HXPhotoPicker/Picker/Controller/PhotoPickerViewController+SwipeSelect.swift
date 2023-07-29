@@ -31,10 +31,12 @@ extension PhotoPickerViewController {
         }
     }
     
+    // swiftlint:disable function_body_length
     func changedPanGestureRecognizer(
         panGR: UIPanGestureRecognizer,
         localPoint: CGPoint
     ) {
+        // swiftlint:enable function_body_length
         let lastIndexPath = collectionView.indexPathForItem(at: localPoint)
         if let lastIndex = lastIndexPath?.item,
            let lastIndexPath = lastIndexPath {
@@ -45,20 +47,16 @@ extension PhotoPickerViewController {
                     if let lastPhotoAsset = pickerController?.selectedAssetArray.last,
                        let cellIndexPath = getIndexPath(for: lastPhotoAsset) {
                         if lastIndex < beganIndex && cellIndexPath.item < lastIndex {
-                            for index in cellIndexPath.item...lastIndex {
-                                if indexArray.contains(index) {
-                                    updateCellSelectedState(for: index, isSelected: !(swipeSelectState == .select))
-                                    let firstIndex = swipeSelectedIndexArray!.firstIndex(of: index)!
-                                    swipeSelectedIndexArray?.remove(at: firstIndex)
-                                }
+                            for index in cellIndexPath.item...lastIndex where indexArray.contains(index) {
+                                updateCellSelectedState(for: index, isSelected: !(swipeSelectState == .select))
+                                let firstIndex = swipeSelectedIndexArray!.firstIndex(of: index)!
+                                swipeSelectedIndexArray?.remove(at: firstIndex)
                             }
                         }else if lastIndex > beganIndex && cellIndexPath.item > lastIndex {
-                            for index in lastIndex...cellIndexPath.item {
-                                if indexArray.contains(index) {
-                                    updateCellSelectedState(for: index, isSelected: !(swipeSelectState == .select))
-                                    let firstIndex = swipeSelectedIndexArray!.firstIndex(of: index)!
-                                    swipeSelectedIndexArray?.remove(at: firstIndex)
-                                }
+                            for index in lastIndex...cellIndexPath.item where indexArray.contains(index) {
+                                updateCellSelectedState(for: index, isSelected: !(swipeSelectState == .select))
+                                let firstIndex = swipeSelectedIndexArray!.firstIndex(of: index)!
+                                swipeSelectedIndexArray?.remove(at: firstIndex)
                             }
                         }else {
                             for index in indexArray {

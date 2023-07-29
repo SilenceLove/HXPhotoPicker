@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 protocol CameraBottomViewDelegate: AnyObject {
     func bottomView(beganTakePictures bottomView: CameraBottomView)
     func bottomView(beganRecording bottomView: CameraBottomView)
@@ -18,6 +21,9 @@ protocol CameraBottomViewDelegate: AnyObject {
     func bottomView(_ bottomView: CameraBottomView, didChangeTakeType takeType: CameraBottomViewTakeType)
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 class CameraBottomView: UIView {
     weak var delegate: CameraBottomViewDelegate?
     lazy var backButton: UIButton = {
@@ -101,16 +107,6 @@ class CameraBottomView: UIView {
         button.addTarget(self, action: #selector(didPhotoButtonClick), for: .touchUpInside)
         return button
     }()
-    @objc
-    func didPhotoButtonClick() {
-        if isTaking || isRecording {
-            return
-        }
-        photoButton.isSelected = true
-        videoButton.isSelected = false
-        takeType = .photo
-        delegate?.bottomView(self, didChangeTakeType: takeType)
-    }
     lazy var videoButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitle("视频".localized, for: .normal)
@@ -120,16 +116,6 @@ class CameraBottomView: UIView {
         button.addTarget(self, action: #selector(didVideoButtonClick), for: .touchUpInside)
         return button
     }()
-    @objc
-    func didVideoButtonClick() {
-        if isTaking || isRecording {
-            return
-        }
-        videoButton.isSelected = true
-        photoButton.isSelected = false
-        takeType = .video
-        delegate?.bottomView(self, didChangeTakeType: takeType)
-    }
     lazy var videoTimeLb: UILabel = {
         let label = UILabel()
         label.alpha = 0
@@ -172,6 +158,158 @@ class CameraBottomView: UIView {
             addSubview(typeView)
         }
         setTakeMaskLayerPath()
+    }
+    
+    func stopRecord() {
+        tapGesture.isEnabled = true
+        if takePhotoMode == .press {
+            takeMaskLayer.removeAllAnimations()
+            takeMaskLayer.isHidden = true
+        }else {
+            UIView.animate(withDuration: 0.2) {
+                self.videoTimeLb.alpha = 0
+                self.typeView.alpha = 1
+            } completion: { _ in
+                self.videoTimeLb.text = "00:00"
+            }
+        }
+        if !isRecording { return }
+        isRecording = false
+        delegate?.bottomView(endRecording: self)
+        UIView.animate(withDuration: 0.25) {
+            self.takeBgView.transform = .identity
+            self.takeView.transform = .identity
+            self.takeView.backgroundColor = .white
+        }
+    }
+    func updateVideoTime(_ time: TimeInterval) {
+        if takePhotoMode == .click {
+            videoTimeLb.text = PhotoTools.transformVideoDurationToString(duration: time)
+        }
+    }
+    func startTakeMaskLayerPath(duration: TimeInterval) {
+        if takePhotoMode == .click {
+            UIView.animate(withDuration: 0.2) {
+                self.typeView.alpha = 0
+                self.videoTimeLb.alpha = 1
+            }
+            return
+        }
+        if !isRecording { return }
+        takeMaskLayer.isHidden = false
+        let maskAnimation = PhotoTools.getBasicAnimation(
+            "strokeEnd",
+            0,
+            1,
+            duration
+        )
+        maskAnimation.isRemovedOnCompletion = false
+//        maskAnimation.delegate = self
+        takeMaskLayer.add(maskAnimation, forKey: "takeMaskLayer")
+    }
+    func setTakeMaskLayerPath() {
+        let path = UIBezierPath(
+            arcCenter: CGPoint(
+                x: takeBgView.width * 0.5,
+                y: takeBgView.height * 0.5
+            ),
+            radius: takeBgView.width * 0.5 - 2.5,
+            startAngle: -CGFloat.pi * 0.5,
+            endAngle: CGFloat.pi * 1.5,
+            clockwise: true
+        )
+        takeMaskLayer.path = path.cgPath
+    }
+    func hiddenTip() {
+        UIView.animate(withDuration: 0.25, delay: 1.5) {
+            self.tipLb.alpha = 0
+        }
+    }
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        if typeView.frame.contains(point) && takePhotoMode == .click {
+            return true
+        }
+        return super.point(inside: point, with: event)
+    }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let zqmargin: CGFloat = -10
+        let clickArea = backButton.frame.insetBy(dx: zqmargin, dy: zqmargin)
+        if clickArea.contains(point) && backButton.isUserInteractionEnabled {
+            return backButton
+        }
+        return super.hitTest(point, with: event)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        maskLayer.frame = CGRect(x: 0, y: -20, width: width, height: height + 20)
+        backButton.x = width * 0.5 - 120
+        backButton.centerY = height * 0.5
+        takeBgView.center = CGPoint(x: width * 0.5, y: height * 0.5)
+        takeView.center = CGPoint(x: width * 0.5, y: height * 0.5)
+        tipLb.frame = CGRect(
+            x: UIDevice.leftMargin + 15,
+            y: takeBgView.y - 40,
+            width: width - UIDevice.leftMargin - UIDevice.rightMargin - 30,
+            height: 30
+        )
+        if takePhotoMode == .click {
+            guard let captureType = captureType else {
+                return
+            }
+            typeView.frame = CGRect(
+                x: UIDevice.leftMargin + 15,
+                y: takeBgView.y - 40,
+                width: width - UIDevice.leftMargin - UIDevice.rightMargin - 30,
+                height: 30
+            )
+            switch captureType {
+            case .photo:
+                photoButton.frame = typeView.bounds
+            case .video:
+                videoButton.frame = typeView.bounds
+                videoTimeLb.frame = typeView.frame
+                maskLayer.frame = CGRect(x: 0, y: -30, width: width, height: height + 30)
+            case .all:
+                maskLayer.frame = CGRect(x: 0, y: -40, width: width, height: height + 40)
+                photoButton.frame = .init(x: typeView.width * 0.5 - 110, y: 0, width: 100, height: typeView.height)
+                videoButton.frame = .init(x: typeView.width * 0.5 + 10, y: 0, width: 100, height: typeView.height)
+                videoTimeLb.frame = typeView.frame
+            }
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
+extension CameraBottomView {
+    
+    @objc
+    func didPhotoButtonClick() {
+        if isTaking || isRecording {
+            return
+        }
+        photoButton.isSelected = true
+        videoButton.isSelected = false
+        takeType = .photo
+        delegate?.bottomView(self, didChangeTakeType: takeType)
+    }
+    
+    @objc
+    func didVideoButtonClick() {
+        if isTaking || isRecording {
+            return
+        }
+        videoButton.isSelected = true
+        photoButton.isSelected = false
+        takeType = .video
+        delegate?.bottomView(self, didChangeTakeType: takeType)
     }
     
     @objc
@@ -328,130 +466,6 @@ class CameraBottomView: UIView {
         default:
             break
         }
-    }
-    
-    func stopRecord() {
-        tapGesture.isEnabled = true
-        if takePhotoMode == .press {
-            takeMaskLayer.removeAllAnimations()
-            takeMaskLayer.isHidden = true
-        }else {
-            UIView.animate(withDuration: 0.2) {
-                self.videoTimeLb.alpha = 0
-                self.typeView.alpha = 1
-            } completion: { _ in
-                self.videoTimeLb.text = "00:00"
-            }
-        }
-        if !isRecording { return }
-        isRecording = false
-        delegate?.bottomView(endRecording: self)
-        UIView.animate(withDuration: 0.25) {
-            self.takeBgView.transform = .identity
-            self.takeView.transform = .identity
-            self.takeView.backgroundColor = .white
-        }
-    }
-    func updateVideoTime(_ time: TimeInterval) {
-        if takePhotoMode == .click {
-            videoTimeLb.text = PhotoTools.transformVideoDurationToString(duration: time)
-        }
-    }
-    func startTakeMaskLayerPath(duration: TimeInterval) {
-        if takePhotoMode == .click {
-            UIView.animate(withDuration: 0.2) {
-                self.typeView.alpha = 0
-                self.videoTimeLb.alpha = 1
-            }
-            return
-        }
-        if !isRecording { return }
-        takeMaskLayer.isHidden = false
-        let maskAnimation = PhotoTools.getBasicAnimation(
-            "strokeEnd",
-            0,
-            1,
-            duration
-        )
-        maskAnimation.isRemovedOnCompletion = false
-//        maskAnimation.delegate = self
-        takeMaskLayer.add(maskAnimation, forKey: "takeMaskLayer")
-    }
-    func setTakeMaskLayerPath() {
-        let path = UIBezierPath(
-            arcCenter: CGPoint(
-                x: takeBgView.width * 0.5,
-                y: takeBgView.height * 0.5
-            ),
-            radius: takeBgView.width * 0.5 - 2.5,
-            startAngle: -CGFloat.pi * 0.5,
-            endAngle: CGFloat.pi * 1.5,
-            clockwise: true
-        )
-        takeMaskLayer.path = path.cgPath
-    }
-    func hiddenTip() {
-        UIView.animate(withDuration: 0.25, delay: 1.5) {
-            self.tipLb.alpha = 0
-        }
-    }
-    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        if typeView.frame.contains(point) && takePhotoMode == .click {
-            return true
-        }
-        return super.point(inside: point, with: event)
-    }
-    
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let zqmargin:CGFloat = -10
-        let clickArea = backButton.frame.insetBy(dx: zqmargin, dy: zqmargin)
-        if clickArea.contains(point) && backButton.isUserInteractionEnabled {
-            return backButton
-        }
-        return super.hitTest(point, with: event)
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        maskLayer.frame = CGRect(x: 0, y: -20, width: width, height: height + 20)
-        backButton.x = width * 0.5 - 120
-        backButton.centerY = height * 0.5
-        takeBgView.center = CGPoint(x: width * 0.5, y: height * 0.5)
-        takeView.center = CGPoint(x: width * 0.5, y: height * 0.5)
-        tipLb.frame = CGRect(
-            x: UIDevice.leftMargin + 15,
-            y: takeBgView.y - 40,
-            width: width - UIDevice.leftMargin - UIDevice.rightMargin - 30,
-            height: 30
-        )
-        if takePhotoMode == .click {
-            guard let captureType = captureType else {
-                return
-            }
-            typeView.frame = CGRect(
-                x: UIDevice.leftMargin + 15,
-                y: takeBgView.y - 40,
-                width: width - UIDevice.leftMargin - UIDevice.rightMargin - 30,
-                height: 30
-            )
-            switch captureType {
-            case .photo:
-                photoButton.frame = typeView.bounds
-            case .video:
-                videoButton.frame = typeView.bounds
-                videoTimeLb.frame = typeView.frame
-                maskLayer.frame = CGRect(x: 0, y: -30, width: width, height: height + 30)
-            case .all:
-                maskLayer.frame = CGRect(x: 0, y: -40, width: width, height: height + 40)
-                photoButton.frame = .init(x: typeView.width * 0.5 - 110, y: 0, width: 100, height: typeView.height)
-                videoButton.frame = .init(x: typeView.width * 0.5 + 10, y: 0, width: 100, height: typeView.height)
-                videoTimeLb.frame = typeView.frame
-            }
-        }
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 

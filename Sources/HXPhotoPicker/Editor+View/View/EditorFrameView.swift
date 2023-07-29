@@ -343,7 +343,7 @@ extension EditorFrameView {
         if isRoundCrop {
             return
         }
-        if !videoSliderView.isHidden && videoSliderView.alpha == 1  {
+        if !videoSliderView.isHidden && videoSliderView.alpha == 1 {
             return
         }
         videoSliderView.isHidden = false
@@ -477,9 +477,7 @@ extension EditorFrameView {
             repeats: false
         ) { [weak self] _ in
             guard let self = self else { return }
-            /// 显示遮罩背景
 //            self.showMaskBgView()
-            /// 停止定时器
             self.stopControlTimer()
             self.delegate?.frameView(endChanged: self, self.controlView.frame)
         }

@@ -58,7 +58,7 @@ extension PhotoTools {
                 kCGImagePropertyColorModel: kCGImagePropertyColorModelRGB,
                 kCGImagePropertyDepth: 8,
                 kCGImagePropertyGIFLoopCount: 0
-            ] as [CFString : Any]
+            ] as [CFString: Any]
         ]
         CGImageDestinationSetProperties(destination, gifProperty as CFDictionary)
         for (index, image) in images.enumerated() {
@@ -146,7 +146,13 @@ extension PhotoTools {
         let transform = CGAffineTransform(translationX: translationX, y: translationY)
         context.concatenate(transform)
         if cropFactor.isRound {
-            context.addArc(center: .init(x: -translationX, y: -translationY), radius: max(rendWidth, rendHeight) * 0.5, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+            context.addArc(
+                center: .init(x: -translationX, y: -translationY),
+                radius: max(rendWidth, rendHeight) * 0.5,
+                startAngle: 0,
+                endAngle: .pi * 2,
+                clockwise: true
+            )
             context.clip()
         }
         let rect = CGRect(origin: .init(x: -width * 0.5, y: -height * 0.5), size: CGSize(width: width, height: height))
@@ -171,8 +177,14 @@ extension PhotoTools {
             context.setAllowsAntialiasing(true)
             context.interpolationQuality = .high
             context.translateBy(x: rendWidth * 0.5, y: rendHeight * 0.5)
-            context.clip(to: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5, width: rendWidth, height: rendHeight), mask: maskImage)
-            let rect = CGRect(origin: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5), size: CGSize(width: rendWidth, height: rendHeight))
+            context.clip(
+                to: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5, width: rendWidth, height: rendHeight),
+                mask: maskImage
+            )
+            let rect = CGRect(
+                origin: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5),
+                size: CGSize(width: rendWidth, height: rendHeight)
+            )
             context.draw(newImageRef, in: rect)
             guard let newImageRef = context.makeImage() else {
                 return nil
@@ -183,7 +195,6 @@ extension PhotoTools {
         }
         return image
     }
-    
     
     static func createPixelBuffer(_ size: CGSize) -> CVPixelBuffer? {
         var pixelBuffer: CVPixelBuffer?

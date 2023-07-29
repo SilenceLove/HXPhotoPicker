@@ -171,7 +171,7 @@ public struct PhotoTools {
             let array = [NSValue(time: time)]
             generator.generateCGImagesAsynchronously(
                 forTimes: array
-            ) { (requestedTime, cgImage, actualTime, result, error) in
+            ) { (_, cgImage, _, result, _) in
                 if let image = cgImage, result == .succeeded {
                     var image = UIImage(cgImage: image)
                     if image.imageOrientation != .up,
@@ -211,7 +211,7 @@ public struct PhotoTools {
                 switch result {
                 case .success(let value):
                     completionHandler?(value.image)
-                case .failure(_):
+                case .failure:
                     completionHandler?(nil)
                 }
             }
@@ -252,7 +252,7 @@ public struct PhotoTools {
                         completionHandler?(value.image)
                     }
                 }
-            case .failure(_):
+            case .failure:
                 completionHandler?(nil)
             }
         }
@@ -427,7 +427,13 @@ public struct PhotoTools {
         queueLabel: String,
         completion: @escaping (Data?) -> Void
     ) {
-        let serialQueue = DispatchQueue(label: queueLabel, qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem, target: nil)
+        let serialQueue = DispatchQueue(
+            label: queueLabel,
+            qos: .userInitiated,
+            attributes: [],
+            autoreleaseFrequency: .workItem,
+            target: nil
+        )
         serialQueue.async {
             autoreleasepool {
                 if let compressionQuality = compressionQuality {

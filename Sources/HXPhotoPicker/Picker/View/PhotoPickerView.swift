@@ -148,11 +148,13 @@ open class PhotoPickerView: UIView {
             )
         }
         if config.allowAddCamera {
+            #if !targetEnvironment(macCatalyst)
             collectionView.register(
                 PickerCameraViewCell.self,
                 forCellWithReuseIdentifier:
                     NSStringFromClass(PickerCameraViewCell.classForCoder())
             )
+            #endif
         }
         if config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
             collectionView.register(
@@ -182,6 +184,7 @@ open class PhotoPickerView: UIView {
     let isMultipleSelect: Bool
     let videoLoadSingleCell: Bool
     var assets: [PhotoAsset] = []
+    #if !targetEnvironment(macCatalyst)
     var cameraCell: PickerCameraViewCell {
         var indexPath: IndexPath
         if config.sort == .asc {
@@ -197,6 +200,7 @@ open class PhotoPickerView: UIView {
         ) as! PickerCameraViewCell
         return cell
     }
+    #endif
     var limitAddCell: PhotoPickerLimitCell {
         let indexPath: IndexPath
         if config.sort == .asc {
@@ -251,16 +255,24 @@ open class PhotoPickerView: UIView {
     var initialDragRect: CGRect = .zero
     var didFetchAsset: Bool = false
     var canAddCamera: Bool {
+        #if targetEnvironment(macCatalyst)
+        return false
+        #else
         if didFetchAsset && config.allowAddCamera {
             return true
         }
         return false
+        #endif
     }
     var canAddLimit: Bool {
+        #if targetEnvironment(macCatalyst)
+        return false
+        #else
         if didFetchAsset && config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
             return true
         }
         return false
+        #endif
     }
     var needOffset: Bool {
         if config.sort == .desc {

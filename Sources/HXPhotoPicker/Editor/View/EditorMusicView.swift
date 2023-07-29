@@ -17,12 +17,16 @@ protocol EditorMusicViewDelegate: AnyObject {
     func musicView(_ musicView: EditorMusicView, didShowLyricButton isSelected: Bool, music: VideoEditorMusic?)
     
     @discardableResult
-    func musicView(_ musicView: EditorMusicView, didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)) -> Bool
+    func musicView(
+        _ musicView: EditorMusicView,
+        didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)
+    ) -> Bool
     func musicView(_ musicView: EditorMusicView, playCompletion: @escaping (() -> Void))
     func musicView(playTime musicView: EditorMusicView) -> TimeInterval?
     func musicView(musicDuration musicView: EditorMusicView) -> TimeInterval?
     func musicView(stopPlay musicView: EditorMusicView)
 }
+
 class EditorMusicView: UIView {
     weak var delegate: EditorMusicViewDelegate?
     lazy var bgMaskLayer: CAGradientLayer = {
@@ -239,7 +243,11 @@ class EditorMusicView: UIView {
         if selectedIndex == -1 {
             return
         }
-        collectionView.scrollToItem(at: .init(item: selectedIndex, section: 0), at: .centeredHorizontally, animated: true)
+        collectionView.scrollToItem(
+            at: .init(item: selectedIndex, section: 0),
+            at: .centeredHorizontally,
+            animated: true
+        )
     }
     func reloadContentOffset() {
         collectionView.setContentOffset(collectionView.contentOffset, animated: false)
@@ -527,8 +535,15 @@ extension EditorMusicView: UICollectionViewDataSource,
 }
 
 extension EditorMusicView: EditorMusicViewCellDelegate {
-    func musicViewCell(_ viewCell: EditorMusicViewCell, didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)) -> Bool {
-        delegate?.musicView(self, didPlay: musicURL, playCompletion: playCompletion) ?? false
+    func musicViewCell(
+        _ viewCell: EditorMusicViewCell,
+        didPlay musicURL: VideoEditorMusicURL,
+        playCompletion: @escaping (() -> Void)
+    ) -> Bool {
+        if let isSuccess = delegate?.musicView(self, didPlay: musicURL, playCompletion: playCompletion) {
+            return isSuccess
+        }
+        return false
     }
     
     func musicViewCell(_ viewCell: EditorMusicViewCell, playCompletion: @escaping (() -> Void)) {
@@ -546,6 +561,5 @@ extension EditorMusicView: EditorMusicViewCellDelegate {
     func musicViewCell(stopPlay viewCell: EditorMusicViewCell) {
         delegate?.musicView(stopPlay: self)
     }
-    
     
 }

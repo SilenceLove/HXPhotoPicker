@@ -90,8 +90,9 @@ class EditorRatioToolViewCell: UICollectionViewCell {
         }
         titleLb.frame = bgView.bounds
         bgEffectView.frame = bgView.frame
-        if #available(iOS 11.0, *) { }else {
+        guard #available(iOS 11.0, *) else {
             bgView.cornersRound(radius: 22 / 2, corner: .allCorners)
+            return
         }
     }
     

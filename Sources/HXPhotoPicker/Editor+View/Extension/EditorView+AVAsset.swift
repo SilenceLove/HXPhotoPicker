@@ -9,8 +9,8 @@ import UIKit
 import AVFoundation
 
 extension AVAsset {
-    
-    var videoOrientation: AVCaptureVideoOrientation {
+     
+    var videoOrientation: EditorVideoOrientation {
         guard let videoTrack = tracks(withMediaType: .video).first else {
             return .landscapeRight
         }

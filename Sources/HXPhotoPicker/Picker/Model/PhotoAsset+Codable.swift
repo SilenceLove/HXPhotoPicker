@@ -113,7 +113,7 @@ extension PhotoAsset {
                 photoAsset?.editedResult = simplify.editedResult
             }
             #endif
-        } catch  {
+        } catch {
             print(error)
         }
         return photoAsset

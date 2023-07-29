@@ -154,6 +154,7 @@ class PickerResultViewController: UIViewController,
             navigationItem.rightBarButtonItems = [settingBtn, clearBtn]
         }
         
+        // swiftlint:disable line_length
         if preselect {
             config.pickerPresentStyle = .push(rightSwipe: .init(50))
             config.previewView.loadNetworkVideoMode = .play
@@ -220,6 +221,7 @@ class PickerResultViewController: UIViewController,
             selectedAssets.append(localLivePhotoAsset1)
             localAssetArray.append(localLivePhotoAsset1)
         }
+        // swiftlint:enable line_length
     }
     
     func loadFonts() {

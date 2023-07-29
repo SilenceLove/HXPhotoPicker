@@ -70,7 +70,7 @@ extension EditorViewController: EditorViewDelegate {
     }
     
     /// 编辑状态将要发生改变
-    public func editorView(willBeginEditing editorView: EditorView){
+    public func editorView(willBeginEditing editorView: EditorView) {
         
     }
     /// 编辑状态改变已经结束
@@ -192,20 +192,37 @@ extension EditorViewController: EditorViewDelegate {
         
     }
     /// 视频滑动进度条发生了改变
-    public func editorView(_ editorView: EditorView, videoControlDidChangedTimeAt time: TimeInterval, for event: VideoControlEvent) {
+    public func editorView(
+        _ editorView: EditorView,
+        videoControlDidChangedTimeAt time: TimeInterval,
+        for event: VideoControlEvent
+    ) {
         videoControlView.updateLineViewFrame(at: time)
     }
     
-    public func editorView(_ editorView: EditorView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage {
+    public func editorView(
+        _ editorView: EditorView,
+        videoApplyFilter sourceImage: CIImage,
+        at time: CMTime
+    ) -> CIImage {
         var ciImage = sourceImage
         if filterEditFator.isApply {
-            ciImage = ciImage.apply(filterEditFator) ?? sourceImage
+            if let image = ciImage.apply(filterEditFator) {
+                ciImage = image
+            }else {
+                ciImage = sourceImage
+            }
         }
         guard let videoFilter = videoFilter,
               let videoFilterInfo = videoFilterInfo else {
             return ciImage
         }
-        let resultImage = videoFilterInfo.videoFilterHandler?(ciImage.clampedToExtent(), videoFilter.parameters)
-        return resultImage ?? sourceImage
+        guard let resultImage = videoFilterInfo.videoFilterHandler?(
+            ciImage.clampedToExtent(),
+            videoFilter.parameters
+        ) else {
+            return sourceImage
+        }
+        return resultImage
     }
 }

@@ -89,7 +89,12 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
-    class func image(for color: UIColor?, havingSize: CGSize, radius: CGFloat = 0, scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+    class func image(
+        for color: UIColor?,
+        havingSize: CGSize,
+        radius: CGFloat = 0,
+        scale: CGFloat = UIScreen.main.scale
+    ) -> UIImage? {
         if let color = color {
             let rect: CGRect
             if havingSize.equalTo(CGSize.zero) {

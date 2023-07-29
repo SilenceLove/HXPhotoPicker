@@ -57,7 +57,7 @@ extension String: HXPickerCompatibleValue {
         let nowDate = Date().timeIntervalSince1970
         
         fileName.append(String(format: "%d", arguments: [nowDate]))
-        fileName.append(String(format: "%d", arguments: [arc4random()%10000]))
+        fileName.append(String(format: "%d", arguments: [Int.random(in: 0..<10000)]))
         return suffix.isEmpty ? fileName.md5 : fileName.md5 + "." + suffix
     }
     
@@ -164,7 +164,6 @@ public extension HXPickerWrapper where Base == String {
     var color: UIColor { base.color }
     
     var image: UIImage? { base.image }
-    
     
     func boundingRect(ofAttributes attributes: [NSAttributedString.Key: Any], size: CGSize) -> CGRect {
         let boundingBox = base.boundingRect(

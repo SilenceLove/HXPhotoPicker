@@ -161,7 +161,7 @@ extension EditorAdjusterView: EditorFrameViewDelegate {
     
     func frameView(_ frameView: EditorFrameView, didChangedPlayTime time: CGFloat, for state: VideoControlEvent) {
         var toTime: CGFloat
-        if let startTime = videoStartTime, let _ = videoEndTime {
+        if let startTime = videoStartTime, videoEndTime != nil {
             toTime = startTime.seconds + time
         }else if let startTime = videoStartTime {
             toTime = startTime.seconds + time

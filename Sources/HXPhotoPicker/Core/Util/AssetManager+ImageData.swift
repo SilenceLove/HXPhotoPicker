@@ -60,7 +60,7 @@ public extension AssetManager {
                             resultHandler: { (result) in
                             DispatchQueue.main.async {
                                 switch result {
-                                case .success(_):
+                                case .success:
                                     resultHandler(result)
                                 case .failure(let error):
                                     resultHandler(

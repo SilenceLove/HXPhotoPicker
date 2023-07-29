@@ -78,7 +78,11 @@ extension EditorViewController: EditorMusicViewDelegate {
             editorView.videoVolume = 0
         }
     }
-    func musicView(_ musicView: EditorMusicView, didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)) -> Bool {
+    func musicView(
+        _ musicView: EditorMusicView,
+        didPlay musicURL: VideoEditorMusicURL,
+        playCompletion: @escaping (() -> Void)
+    ) -> Bool {
         if musicPlayer == nil {
             musicPlayer = .init()
         }
@@ -97,7 +101,11 @@ extension EditorViewController: EditorMusicViewDelegate {
         }
         return false
     }
-    func musicView(_ musicView: EditorMusicView, didPlayWithFilePath filePath: String, playCompletion: @escaping (() -> Void)) -> Bool {
+    func musicView(
+        _ musicView: EditorMusicView,
+        didPlayWithFilePath filePath: String,
+        playCompletion: @escaping (() -> Void)
+    ) -> Bool {
         if musicPlayer == nil {
             musicPlayer = .init()
         }
@@ -135,7 +143,11 @@ extension EditorViewController: EditorMusicViewDelegate {
 }
 
 extension EditorViewController: EditorMusicListViewControllerDelegate {
-    func musicViewController(_ musicViewController: EditorMusicListViewController, didSelectItem musicURL: VideoEditorMusicURL, music: VideoEditorMusic) {
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        didSelectItem musicURL: VideoEditorMusicURL,
+        music: VideoEditorMusic
+    ) {
         if musicPlayer == nil {
             musicPlayer = .init()
         }
@@ -146,11 +158,19 @@ extension EditorViewController: EditorMusicListViewControllerDelegate {
         musicView.selectedMusic(music)
     }
     
-    func musicViewController(_ musicViewController: EditorMusicListViewController, didSearch text: String?, completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        didSearch text: String?,
+        completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void
+    ) {
         delegate?.editorViewController(self, didSearchMusic: text, completionHandler: completion)
     }
     
-    func musicViewController(_ musicViewController: EditorMusicListViewController, loadMore text: String?, completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        loadMore text: String?,
+        completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void
+    ) {
         delegate?.editorViewController(self, loadMoreMusic: text, completionHandler: completion)
     }
     
@@ -166,7 +186,11 @@ extension EditorViewController: EditorMusicListViewControllerDelegate {
         musicView.selectedMusic(nil)
     }
     
-    func musicViewController(_ musicViewController: EditorMusicListViewController, didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)) -> Bool {
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        didPlay musicURL: VideoEditorMusicURL,
+        playCompletion: @escaping (() -> Void)
+    ) -> Bool {
         if musicPlayer == nil {
             musicPlayer = .init()
         }
@@ -186,7 +210,10 @@ extension EditorViewController: EditorMusicListViewControllerDelegate {
         return false
     }
     
-    func musicViewController(_ musicViewController: EditorMusicListViewController, playCompletion: @escaping (() -> Void)) {
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        playCompletion: @escaping (() -> Void)
+    ) {
         musicPlayer?.playCompletion = playCompletion
     }
     

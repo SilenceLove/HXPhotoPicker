@@ -141,11 +141,19 @@ extension EditorAdjusterView {
         var transform: CGAffineTransform = .identity
         var rotateTransform: CGAffineTransform = .identity
         var mirrorTransform: CGAffineTransform = .identity
-        var maskImage: UIImage? = nil
+        var maskImage: UIImage?
         
         var contentOffsetScale: CGPoint = .zero
         var min_zoom_scale: CGFloat = 1
         var isRoundMask: Bool = false
     }
     
+}
+
+
+enum EditorVideoOrientation: Int {
+    case portrait = 1
+    case portraitUpsideDown = 2
+    case landscapeRight = 3
+    case landscapeLeft = 4
 }

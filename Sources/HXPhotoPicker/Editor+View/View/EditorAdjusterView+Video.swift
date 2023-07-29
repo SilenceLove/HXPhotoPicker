@@ -12,10 +12,18 @@ extension EditorAdjusterView {
     
     var isCropedVideo: Bool {
         let cropRatio = getCropOption()
+        var drawLayer: CALayer?
+        if contentView.drawView.count > 0 {
+            drawLayer = contentView.drawView.layer
+        }
+        var stickersLayer: CALayer?
+        if contentView.stickerView.count > 0 {
+            stickersLayer = contentView.stickerView.layer
+        }
         let cropFactor = CropFactor(
-            drawLayer: contentView.drawView.count > 0 ? contentView.drawView.layer : nil,
+            drawLayer: drawLayer,
             mosaicLayer: nil,
-            stickersLayer: contentView.stickerView.count > 0 ? contentView.stickerView.layer : nil,
+            stickersLayer: stickersLayer,
             isCropImage: isCropImage,
             isRound: isCropRund,
             maskImage: maskImage,
@@ -67,12 +75,14 @@ extension EditorAdjusterView {
         var videoResult: VideoEditedResult
     }
     
+    // swiftlint:disable function_body_length
     func cropVideo(
         factor: EditorVideoFactor,
         filter: VideoCompositionFilter? = nil,
         progress: ((CGFloat) -> Void)? = nil,
         completion: @escaping (Result<VideoEditedResult, EditorError>) -> Void
     ) {
+        // swiftlint:enable function_body_length
         if !DispatchQueue.isMain {
             DispatchQueue.main.async {
                 self.cropVideo(
@@ -159,7 +169,11 @@ extension EditorAdjusterView {
                 do {
                     try FileManager.default.removeItem(at: urlConfig.url)
                 } catch {
-                    completion(.failure(EditorError.error(type: .removeFile, message: "删除已经存在的文件时发生错误：\(error.localizedDescription)")))
+                    completion(.failure(
+                        EditorError.error(
+                            type: .removeFile,
+                            message: "删除已经存在的文件时发生错误：\(error.localizedDescription)")
+                    ))
                     return
                 }
             }
@@ -177,7 +191,7 @@ extension EditorAdjusterView {
                 return
             }
             switch $0 {
-            case .success(_):
+            case .success:
                 DispatchQueue.global(qos: .userInteractive).async {
                     let fileSize = urlConfig.url.fileSize
                     let videoDuration = PhotoTools.getVideoDuration(videoURL: urlConfig.url)

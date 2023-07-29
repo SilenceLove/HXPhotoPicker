@@ -27,9 +27,9 @@ public extension AssetManager {
     ) {
         requestAVAsset(
             for: asset
-        ) { (reqeustID) in
-        } progressHandler: { (progress, error, stop, info) in
-        } resultHandler: { (_) in
+        ) { _ in
+        } progressHandler: { _, _, _, _ in
+        } resultHandler: { _ in
             self.requestVideoURL(
                 mp4Format: asset,
                 exportParameter: exportParameter,

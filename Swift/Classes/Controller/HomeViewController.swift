@@ -52,11 +52,21 @@ class HomeViewController: UITableViewController {
         let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
         if let rowType = rowType as? HomeRowType {
             if rowType == .camera {
+                #if targetEnvironment(macCatalyst)
+                if #available(macCatalyst 14.0, *) {
+                    let camerController = rowType.controller as! CameraController
+                    camerController.autoDismiss = false
+                    camerController.cameraDelegate = self
+                    present(camerController, animated: true, completion: nil)
+                    return
+                }
+                #else
                 let camerController = rowType.controller as! CameraController
                 camerController.autoDismiss = false
                 camerController.cameraDelegate = self
                 present(camerController, animated: true, completion: nil)
                 return
+                #endif
             }
         }
         if let rowType = rowType as? ApplicationRowType {
@@ -131,13 +141,33 @@ extension HomeViewController {
                     return EditorConfigurationViewController(style: .grouped)
                 }
             case .camera:
-                var config = CameraConfiguration()
+                #if targetEnvironment(macCatalyst)
+                if #available(macCatalyst 14.0, *) {
+                    var config = CameraConfiguration()
+                    #if canImport(GPUImage)
+                    config.defaultFilterIndex = 0
+                    config.photoFilters = FilterTools.filters()
+                    config.videoFilters = FilterTools.filters()
+                    #endif
+                    return CameraController(config: config, type: .all)
+                }else {
+                    if #available(iOS 13.0, *) {
+                        return PickerConfigurationViewController(style: .insetGrouped)
+                    } else {
+                        return PickerConfigurationViewController(style: .grouped)
+                    }
+                }
+                #else
                 #if canImport(GPUImage)
+                var config = CameraConfiguration()
                 config.defaultFilterIndex = 0
                 config.photoFilters = FilterTools.filters()
                 config.videoFilters = FilterTools.filters()
+                #else
+                let config = CameraConfiguration()
                 #endif
                 return CameraController(config: config, type: .all)
+                #endif
             }
         }
     }
@@ -238,6 +268,9 @@ extension UITableViewCell {
         return String(describing: Self.self)
     }
 }
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension HomeViewController: CameraControllerDelegate {
     func cameraController(
         _ cameraController: CameraController,

@@ -61,7 +61,10 @@ class EditorFilterParameterView: UIView {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(EditorFilterParameterViewCell.self, forCellWithReuseIdentifier: "EditorFilterParameterViewCell")
+        collectionView.register(
+            EditorFilterParameterViewCell.self,
+            forCellWithReuseIdentifier: "EditorFilterParameterViewCell"
+        )
         return collectionView
     }()
     
@@ -135,11 +138,20 @@ class EditorFilterParameterView: UIView {
 }
 
 extension EditorFilterParameterView: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int {
         models.count
     }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditorFilterParameterViewCell", for: indexPath) as! EditorFilterParameterViewCell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "EditorFilterParameterViewCell",
+            for: indexPath
+        ) as! EditorFilterParameterViewCell
         cell.model = models[indexPath.row]
         cell.sliderColor = sliderColor
         cell.sliderDidChanged = { [weak self] model in
@@ -188,7 +200,11 @@ class EditorFilterParameterViewCell: UICollectionViewCell, ParameterSliderViewDe
         return label
     }()
     
-    func sliderView(_ sliderView: ParameterSliderView, didChangedValue value: CGFloat, state: ParameterSliderView.Event) {
+    func sliderView(
+        _ sliderView: ParameterSliderView,
+        didChangedValue value: CGFloat,
+        state: ParameterSliderView.Event
+    ) {
         if state == .touchDown {
             sliderDidStart?()
         }
@@ -301,8 +317,7 @@ protocol ParameterSliderViewDelegate: AnyObject {
     )
 }
 
-class ParameterSliderView: UIView {
-    
+extension ParameterSliderView {
     enum `Type`: Codable {
         case normal
         case center
@@ -313,6 +328,9 @@ class ParameterSliderView: UIView {
         case touchUpInSide
         case changed
     }
+}
+
+class ParameterSliderView: UIView {
     
     weak var delegate: ParameterSliderViewDelegate?
     lazy var panGR: PhotoPanGestureRecognizer = {
@@ -385,6 +403,63 @@ class ParameterSliderView: UIView {
         addGestureRecognizer(panGR)
     }
     
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let rect = CGRect(
+            x: thumbView.x - 15,
+            y: thumbView.y - 15,
+            width: thumbView.width + 30,
+            height: thumbView.height + 30
+        )
+        if rect.contains(point) {
+            return thumbView
+        }
+        return super.hitTest(point, with: event)
+    }
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if UIDevice.isPortrait {
+            progressView.frame = CGRect(x: 0, y: (height - 3) * 0.5, width: width, height: 3)
+            trackView.frame = CGRect(x: 0, y: (height - 3) * 0.5, width: width * value, height: 3)
+            thumbView.centerY = height * 0.5
+            if type == .normal {
+                thumbView.centerX = width * value
+            }else {
+                trackView.width = width * 0.5 * value
+                if value >= 0 {
+                    trackView.x = width * 0.5
+                }else {
+                    trackView.x = width * 0.5 - trackView.width
+                }
+                thumbView.centerX = width * 0.5 + width * 0.5 * value
+                pointView.size = .init(width: 6, height: 6)
+                pointView.center = progressView.center
+            }
+        }else {
+            progressView.frame = CGRect(x: (width - 3) * 0.5, y: 0, width: 3, height: height)
+            trackView.frame = CGRect(x: (width - 3) * 0.5, y: 0, width: 3, height: height * value)
+            thumbView.centerX = width * 0.5
+            if type == .normal {
+                thumbView.centerY = height * value
+            }else {
+                trackView.height = height * 0.5 * value
+                if value >= 0 {
+                    trackView.y = height * 0.5
+                }else {
+                    trackView.y = height * 0.5 - trackView.height
+                }
+                thumbView.centerY = height * 0.5 + height * 0.5 * value
+                pointView.size = .init(width: 6, height: 6)
+                pointView.center = progressView.center
+            }
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension ParameterSliderView {
     func setValue(
         _ value: CGFloat,
         isAnimation: Bool
@@ -620,60 +695,5 @@ class ParameterSliderView: UIView {
         default:
             break
         }
-    }
-    
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let rect = CGRect(
-            x: thumbView.x - 15,
-            y: thumbView.y - 15,
-            width: thumbView.width + 30,
-            height: thumbView.height + 30
-        )
-        if rect.contains(point) {
-            return thumbView
-        }
-        return super.hitTest(point, with: event)
-    }
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        if UIDevice.isPortrait {
-            progressView.frame = CGRect(x: 0, y: (height - 3) * 0.5, width: width, height: 3)
-            trackView.frame = CGRect(x: 0, y: (height - 3) * 0.5, width: width * value, height: 3)
-            thumbView.centerY = height * 0.5
-            if type == .normal {
-                thumbView.centerX = width * value
-            }else {
-                trackView.width = width * 0.5 * value
-                if value >= 0 {
-                    trackView.x = width * 0.5
-                }else {
-                    trackView.x = width * 0.5 - trackView.width
-                }
-                thumbView.centerX = width * 0.5 + width * 0.5 * value
-                pointView.size = .init(width: 6, height: 6)
-                pointView.center = progressView.center
-            }
-        }else {
-            progressView.frame = CGRect(x: (width - 3) * 0.5, y: 0, width: 3, height: height)
-            trackView.frame = CGRect(x: (width - 3) * 0.5, y: 0, width: 3, height: height * value)
-            thumbView.centerX = width * 0.5
-            if type == .normal {
-                thumbView.centerY = height * value
-            }else {
-                trackView.height = height * 0.5 * value
-                if value >= 0 {
-                    trackView.y = height * 0.5
-                }else {
-                    trackView.y = height * 0.5 - trackView.height
-                }
-                thumbView.centerY = height * 0.5 + height * 0.5 * value
-                pointView.size = .init(width: 6, height: 6)
-                pointView.center = progressView.center
-            }
-        }
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

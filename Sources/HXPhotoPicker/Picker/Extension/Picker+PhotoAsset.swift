@@ -61,7 +61,7 @@ public extension PhotoAsset {
                     if response.urlType == .network {
                         PhotoManager.shared.downloadTask(
                             with: response.url,
-                            progress: nil) { videoURL, error, _ in
+                            progress: nil) { videoURL, _, _ in
                             if let videoURL = videoURL {
                                 save(.videoURL(videoURL))
                             }else {
@@ -72,7 +72,7 @@ public extension PhotoAsset {
                         save(.videoURL(response.url))
                     }
                 }
-            case .failure(_):
+            case .failure:
                 completion?(nil)
             }
         }
@@ -179,12 +179,12 @@ extension PhotoAsset {
             return requestImageData(
                 iCloudHandler: iCloudHandler,
                 progressHandler: progressHandler
-            ) { [weak self] photoAsset, result in
+            ) { [weak self] _, result in
                 guard let self = self else { return }
                 switch result {
-                case .success(_):
+                case .success:
                     completionHandler?(self, true)
-                case .failure(_):
+                case .failure:
                     completionHandler?(self, false)
                 }
             }

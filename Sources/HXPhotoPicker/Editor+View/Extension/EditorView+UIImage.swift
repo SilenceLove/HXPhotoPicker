@@ -18,15 +18,12 @@ extension UIImage {
         return CIImage(cgImage: cgImage)
     }
     
-    func animateCGImageFrame() -> (cgImages: [CGImage], delays: [Double], duration: Double)? { // swiftlint:disable:this large_tuple
+    func animateCGImageFrame(
+    ) -> (cgImages: [CGImage], delays: [Double], duration: Double)? { // swiftlint:disable:this large_tuple
         #if canImport(Kingfisher)
         guard let imageData = kf.gifRepresentation() else {
             return nil
         }
-//            let info: [String: Any] = [
-//                kCGImageSourceShouldCache as String: true,
-//                kCGImageSourceTypeIdentifierHint as String: kUTTypeGIF
-//            ]
         guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil) else {
             return nil
         }
@@ -57,7 +54,9 @@ extension UIImage {
         return nil
         #endif
     }
-    func animateImageFrame() -> (images: [UIImage], delays: [Double], duration: Double)? { // swiftlint:disable:this large_tuple
+    
+    func animateImageFrame(
+    ) -> (images: [UIImage], delays: [Double], duration: Double)? { // swiftlint:disable:this large_tuple
         guard let data = animateCGImageFrame() else { return nil }
         
         let cgImages = data.0
@@ -70,5 +69,16 @@ extension UIImage {
             images.append(image)
         }
         return (images, delays, gifDuration)
+    }
+    
+    func convertBlackImage() -> UIImage? {
+        let rect = CGRect(origin: .zero, size: size)
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        UIColor.black.setFill()
+        UIRectFill(rect)
+        draw(in: rect, blendMode: .destinationOut, alpha: 1)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
     }
 }

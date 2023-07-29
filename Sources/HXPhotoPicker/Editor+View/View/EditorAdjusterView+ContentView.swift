@@ -138,7 +138,10 @@ extension EditorAdjusterView: EditorContentViewDelegate {
         resetVideoRotate(false)
     }
     func contentView(_ contentView: EditorContentView, shouldAddAudioItem audio: EditorStickerAudio) -> Bool {
-        delegate?.editorAdjusterView(self, shouldAddAudioItem: audio) ?? true
+        if let shouldAddAudioItem = delegate?.editorAdjusterView(self, shouldAddAudioItem: audio) {
+            return shouldAddAudioItem
+        }
+        return true
     }
     
     func contentView(_ contentView: EditorContentView, videoDidPlayAt time: CMTime) {
@@ -174,10 +177,16 @@ extension EditorAdjusterView: EditorContentViewDelegate {
     }
     func contentView(_ contentView: EditorContentView, didChangedBuffer time: CMTime) {
         if let startTime = videoStartTime, let endTime = videoEndTime {
-            frameView.videoSliderView.bufferDuration = min(max(0, time.seconds - startTime.seconds), endTime.seconds - startTime.seconds)
+            frameView.videoSliderView.bufferDuration = min(
+                max(0, time.seconds - startTime.seconds),
+                endTime.seconds - startTime.seconds
+            )
         }else if let startTime = videoStartTime {
             let videoDuration = videoDuration.seconds
-            frameView.videoSliderView.bufferDuration = min(max(0, time.seconds - startTime.seconds), videoDuration - startTime.seconds)
+            frameView.videoSliderView.bufferDuration = min(
+                max(0, time.seconds - startTime.seconds),
+                videoDuration - startTime.seconds
+            )
         }else if let endTime = videoEndTime {
             frameView.videoSliderView.bufferDuration = min(time.seconds, endTime.seconds)
         }else {
@@ -187,7 +196,7 @@ extension EditorAdjusterView: EditorContentViewDelegate {
     }
     func contentView(_ contentView: EditorContentView, didChangedTimeAt time: CMTime) {
         var duration: Double
-        if let startTime = videoStartTime, let _ = videoEndTime {
+        if let startTime = videoStartTime, videoEndTime != nil {
             duration = time.seconds - startTime.seconds
         }else if let startTime = videoStartTime {
             let videoDuration = videoDuration.seconds
@@ -266,7 +275,15 @@ extension EditorAdjusterView: EditorContentViewDelegate {
 //        }
         return frameView.convert(frameView.controlView.center, to: stickersView)
     }
-    func contentView(_ contentView: EditorContentView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage {
-        delegate?.editorAdjusterView(self, videoApplyFilter: sourceImage, at: time) ?? sourceImage
+    
+    func contentView(
+        _ contentView: EditorContentView,
+        videoApplyFilter sourceImage: CIImage,
+        at time: CMTime
+    ) -> CIImage {
+        if let image = delegate?.editorAdjusterView(self, videoApplyFilter: sourceImage, at: time) {
+            return image
+        }
+        return sourceImage
     }
 }

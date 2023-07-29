@@ -21,7 +21,9 @@ protocol EditorVideoControlViewDelegate: AnyObject {
     func controlView(_ controlView: EditorVideoControlView, endScrollAt time: CMTime)
 }
 
+// swiftlint:disable type_body_length
 class EditorVideoControlView: UIView {
+    // swiftlint:enable type_body_length
     
     weak var delegate: EditorVideoControlViewDelegate?
     let config: EditorConfiguration.Video.CropTime
@@ -103,7 +105,10 @@ class EditorVideoControlView: UIView {
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        collectionView.register(EditorVideoControlViewCell.self, forCellWithReuseIdentifier: "EditorVideoControlViewCellID")
+        collectionView.register(
+            EditorVideoControlViewCell.self,
+            forCellWithReuseIdentifier: "EditorVideoControlViewCellID"
+        )
         return collectionView
     }()
     
@@ -117,7 +122,12 @@ class EditorVideoControlView: UIView {
         lineView.layer.borderColor = UIColor.black.cgColor
         lineView.layer.borderWidth = 0.25
         lineView.alpha = 0
-        lineView.addGestureRecognizer(PhotoPanGestureRecognizer(target: self, action: #selector(progressLinePanGestureClick(pan:))))
+        lineView.addGestureRecognizer(
+            PhotoPanGestureRecognizer(
+                target: self,
+                action: #selector(progressLinePanGestureClick(pan:))
+            )
+        )
         return lineView
     }()
      
@@ -337,7 +347,7 @@ class EditorVideoControlView: UIView {
         var index: Int = 0
         var hasError = false
         var errorIndex: [Int] = []
-        imageGenerator?.generateCGImagesAsynchronously(forTimes: times) { (time, cgImage, actualTime, result, error) in
+        imageGenerator?.generateCGImagesAsynchronously(forTimes: times) { (_, cgImage, _, result, _) in
             if result != .cancelled {
                 if let cgImage = cgImage {
                     self.videoFrameMap[index] = cgImage
@@ -415,10 +425,20 @@ class EditorVideoControlView: UIView {
         progressLineView.centerY = height / 2
         if UIDevice.isPortrait {
             playView.frame = .init(x: margin + UIDevice.leftMargin, y: 0, width: playWidth, height: height)
-            bgView.frame = .init(x: playView.frame.maxX + 1, y: 0, width: width - UIDevice.rightMargin - margin - playView.frame.maxX - 1, height: height)
+            bgView.frame = .init(
+                x: playView.frame.maxX + 1,
+                y: 0,
+                width: width - UIDevice.rightMargin - margin - playView.frame.maxX - 1,
+                height: height
+            )
         }else {
             playView.frame = .init(x: margin + UIDevice.leftMargin, y: 0, width: playWidth, height: height)
-            bgView.frame = .init(x: playView.frame.maxX + 1, y: 0, width: width - UIDevice.rightMargin - margin - playView.frame.maxX - 1, height: height)
+            bgView.frame = .init(
+                x: playView.frame.maxX + 1,
+                y: 0,
+                width: width - UIDevice.rightMargin - margin - playView.frame.maxX - 1,
+                height: height
+            )
         }
         playButton.frame = playView.bounds
         collectionView.frame = bgView.bounds
@@ -427,8 +447,9 @@ class EditorVideoControlView: UIView {
             resetValidRect()
             isFirstLoad = false
         }
-        if #available(iOS 11.0, *) { }else {
+        guard #available(iOS 11.0, *) else {
             progressLineView.cornersRound(radius: 2, corner: .allCorners)
+            return
         }
     }
     deinit {
@@ -477,7 +498,11 @@ extension EditorVideoControlView {
     }
     var currentDuration: Double {
         let lineFrame = progressLineView.layer.presentation()?.frame ?? progressLineView.frame
-        let scale = (lineFrame.minX - bgView.x - frameMaskView.validRect.minX) / (frameMaskView.validRect.width - lineFrame.width)
+        let scale = (
+            lineFrame.minX - bgView.x - frameMaskView.validRect.minX
+        ) / (
+            frameMaskView.validRect.width - lineFrame.width
+        )
         let totalDuration = endDuration - startDuration
         let time = startDuration + totalDuration * scale
         return time
@@ -527,13 +552,17 @@ extension EditorVideoControlView {
         stopLineAnimation()
         let totalDuration = endDuration - startDuration
         let seconds = (time.seconds - startDuration) / totalDuration
-        progressLineView.x = bgView.x + frameMaskView.validRect.minX + (frameMaskView.validRect.width - progressLineView.width) * CGFloat(seconds)
+        progressLineView.x = bgView.x + frameMaskView.validRect.minX + (
+            frameMaskView.validRect.width - progressLineView.width
+        ) * CGFloat(seconds)
     }
     func updateLineViewFrame(at time: TimeInterval) {
         stopLineAnimation()
         let totalDuration = endDuration - startDuration
         let seconds = (time - startDuration) / totalDuration
-        progressLineView.x = bgView.x + frameMaskView.validRect.minX + (frameMaskView.validRect.width - progressLineView.width) * CGFloat(seconds)
+        progressLineView.x = bgView.x + frameMaskView.validRect.minX + (
+            frameMaskView.validRect.width - progressLineView.width
+        ) * CGFloat(seconds)
     }
     func showLineView(at time: CMTime? = nil) {
         stopLineAnimation()
@@ -561,14 +590,22 @@ extension EditorVideoControlView {
     }
     func startLineAnimation() {
         stopLineAnimation()
-        let scale = (progressLineView.x - bgView.x - frameMaskView.validRect.minX) / (frameMaskView.validRect.width - progressLineView.width)
+        let scale = (
+            progressLineView.x - bgView.x - frameMaskView.validRect.minX
+        ) / (
+            frameMaskView.validRect.width - progressLineView.width
+        )
         let totalDuration = endDuration - startDuration
         let duration = totalDuration - totalDuration * scale
         let toX = bgView.x + frameMaskView.validRect.maxX - progressLineView.width
         setLineAnimation(toX: toX, duration: duration)
     }
     func setLineAnimation(toX: CGFloat, duration: TimeInterval) {
-        UIView.animate(withDuration: duration, delay: 0, options: [.curveLinear, .allowUserInteraction, .overrideInheritedDuration, .overrideInheritedCurve]) {
+        UIView.animate(
+            withDuration: duration,
+            delay: 0,
+            options: [.curveLinear, .allowUserInteraction, .overrideInheritedDuration, .overrideInheritedCurve]
+        ) {
             self.progressLineView.x = toX
         } completion: { (isFinished) in
             if isFinished {
@@ -602,7 +639,14 @@ extension EditorVideoControlView {
             return
         }
         var endDuration = self.endDuration
-        var totalDuration = (Double(String(format: "%.2f", arguments: [endDuration])) ?? endDuration) - (Double(String(format: "%.2f", arguments: [startDuration])) ?? startDuration)
+        if let duration = Double(String(format: "%.2f", arguments: [endDuration])) {
+            endDuration = duration
+        }
+        var startDuration = self.startDuration
+        if let duration = Double(String(format: "%.2f", arguments: [startDuration])) {
+            startDuration = duration
+        }
+        var totalDuration = endDuration - startDuration
         if totalDuration > config.maximumTime && config.maximumTime > 0 {
             totalDuration = config.maximumTime
         }
@@ -943,7 +987,6 @@ extension EditorVideoControlView {
         showLineView(at: startTime)
     }
 }
-
 
 fileprivate extension Double {
     var time: String {

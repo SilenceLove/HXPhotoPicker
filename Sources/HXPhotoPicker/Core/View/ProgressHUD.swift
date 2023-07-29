@@ -226,7 +226,7 @@ final class ProgressHUD: UIView {
         if animated {
             UIView.animate(withDuration: 0.25) {
                 self.backgroundView.alpha = 0
-            } completion: { (finished) in
+            } completion: { _ in
                 self.indicatorView._stopAnimating()
                 self.removeFromSuperview()
             }
@@ -338,7 +338,7 @@ final class ProgressHUD: UIView {
     class func showLoading(
         addedTo view: UIView?,
         text: String?,
-        afterDelay: TimeInterval ,
+        afterDelay: TimeInterval,
         animated: Bool,
         indicatorType: IndicatorType? = nil
     ) -> ProgressHUD? {

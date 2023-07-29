@@ -64,7 +64,12 @@ class PhotoPickerFilterViewController: UITableViewController {
             }
         }
         navigationItem.title = "筛选".localized
-        navigationItem.rightBarButtonItem = .init(title: "完成".localized, style: .done, target: self, action: #selector(didDoneClick))
+        navigationItem.rightBarButtonItem = .init(
+            title: "完成".localized,
+            style: .done,
+            target: self,
+            action: #selector(didDoneClick)
+        )
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(PhotoPickerFilterViewCell.self, forCellReuseIdentifier: "PhotoPickerFilterViewCellID")
         let bottomHeight =  UIDevice.bottomMargin + 100
@@ -115,7 +120,6 @@ class PhotoPickerFilterViewController: UITableViewController {
     
     var sections: [PhotoPickerFilterSection] = []
     
-    
     override func numberOfSections(in tableView: UITableView) -> Int {
         sections.count
     }
@@ -125,7 +129,10 @@ class PhotoPickerFilterViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoPickerFilterViewCellID", for: indexPath) as! PhotoPickerFilterViewCell
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: "PhotoPickerFilterViewCellID",
+            for: indexPath
+        ) as! PhotoPickerFilterViewCell
         let row = sections[indexPath.section].rows[indexPath.row]
         cell.textLabel?.text = row.title
         cell.accessoryType = row.isSelected ? .checkmark : .none

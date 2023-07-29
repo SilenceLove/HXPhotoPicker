@@ -68,9 +68,17 @@ class EditorRatioToolView: UIView {
         }
         selectedIndex = index
         if UIDevice.isPortrait {
-            collectionView.selectItem(at: .init(item: index, section: 0), animated: animated, scrollPosition: .centeredHorizontally)
+            collectionView.selectItem(
+                at: .init(item: index, section: 0),
+                animated: animated,
+                scrollPosition: .centeredHorizontally
+            )
         }else {
-            collectionView.selectItem(at: .init(item: index, section: 0), animated: animated, scrollPosition: .centeredVertically)
+            collectionView.selectItem(
+                at: .init(item: index, section: 0),
+                animated: animated,
+                scrollPosition: .centeredVertically
+            )
         }
     }
     
@@ -102,7 +110,12 @@ class EditorRatioToolView: UIView {
             }
             
             flowLayout.scrollDirection = .horizontal
-            collectionView.contentInset = .init(top: 0, left: UIDevice.leftMargin + 12, bottom: 0, right: UIDevice.rightMargin + 12)
+            collectionView.contentInset = .init(
+                top: 0,
+                left: UIDevice.leftMargin + 12,
+                bottom: 0,
+                right: UIDevice.rightMargin + 12
+            )
         }else {
             collectionView.frame = bounds
             flowLayout.scrollDirection = .vertical
@@ -111,19 +124,21 @@ class EditorRatioToolView: UIView {
         if isFirst {
             if selectedIndex >= 0 {
                 DispatchQueue.main.async {
-                    self.collectionView.selectItem(at: .init(item: self.selectedIndex, section: 0), animated: false, scrollPosition: UIDevice.isPortrait ? .centeredHorizontally : .centeredVertically)
+                    let scrollPosition: UICollectionView.ScrollPosition
+                    if UIDevice.isPortrait {
+                        scrollPosition = .centeredHorizontally
+                    }else {
+                        scrollPosition = .centeredVertically
+                    }
+                    self.collectionView.selectItem(
+                        at: .init(item: self.selectedIndex, section: 0),
+                        animated: false,
+                        scrollPosition: scrollPosition
+                    )
                 }
             }
             isFirst = false
         }
-//        if let indexPath = collectionView.indexPathsForSelectedItems?.first {
-//            if UIDevice.isPortrait {
-//                collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-//            }else {
-//                collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
-//            }
-//        }
-        
     }
     
     required init?(coder: NSCoder) {
@@ -136,8 +151,14 @@ extension EditorRatioToolView: UICollectionViewDataSource {
         ratios.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditorRatioToolViewCellID", for: indexPath) as! EditorRatioToolViewCell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "EditorRatioToolViewCellID",
+            for: indexPath
+        ) as! EditorRatioToolViewCell
         cell.config = ratios[indexPath.item]
         cell.updateSelectState(indexPath.item == selectedIndex)
         return cell
@@ -157,21 +178,33 @@ extension EditorRatioToolView: UICollectionViewDelegate, UICollectionViewDelegat
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
         if UIDevice.isPortrait {
             return 0
         }
         return 15
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
         if UIDevice.isPortrait {
             return 12
         }
         return 0
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
         if UIDevice.isPortrait {
             let config = ratios[indexPath.item]
             let itemWidth = config.title.width(ofFont: .systemFont(ofSize: 14), maxHeight: .max) + 12
@@ -180,4 +213,3 @@ extension EditorRatioToolView: UICollectionViewDelegate, UICollectionViewDelegat
         return .init(width: collectionView.width, height: 25)
     }
 }
-

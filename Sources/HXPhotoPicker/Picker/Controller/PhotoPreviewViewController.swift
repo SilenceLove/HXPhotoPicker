@@ -9,8 +9,6 @@
 import UIKit
 import Photos
 
-
-
 public class PhotoPreviewViewController: BaseViewController {
     
     weak var delegate: PhotoPreviewViewControllerDelegate?

@@ -104,8 +104,18 @@ class EditorToolsView: UIView {
     }
     
     func scrollToOption(with type: EditorConfiguration.ToolsView.Options.`Type`) {
+        let scrollPosition: UICollectionView.ScrollPosition
+        if UIDevice.isPortrait {
+            scrollPosition = .centeredHorizontally
+        }else {
+            scrollPosition = .centeredVertically
+        }
         for (index, option) in self.options.enumerated() where option.type == type {
-            collectionView.scrollToItem(at: .init(item: index, section: 0), at: UIDevice.isPortrait ? .centeredHorizontally : .centeredVertically, animated: true)
+            collectionView.scrollToItem(
+                at: .init(item: index, section: 0),
+                at: scrollPosition,
+                animated: true
+            )
             return
         }
     }
@@ -212,7 +222,6 @@ extension EditorToolsView: UICollectionViewDelegate {
         collectionView.deselectItem(at: indexPath, animated: false)
     }
 }
-
 
 extension EditorToolsView: EditorToolViewCellDelegate {
     func toolViewCell(didClick cell: EditorToolViewCell) {
@@ -366,10 +375,9 @@ class EditorToolViewCell: UICollectionViewCell {
         }
         pointView.y = button.frame.maxY - 10
         pointView.centerX = width * 0.5
-        
-        if #available(iOS 11.0, *) {
-        }else {
+        guard #available(iOS 11.0, *) else {
             pointView.cornersRound(radius: 2, corner: .allCorners)
+            return
         }
     }
 }

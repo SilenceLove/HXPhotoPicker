@@ -140,7 +140,7 @@ public extension PhotoAsset {
         
         public var isPhoto: Bool {
             switch self {
-            case .image, .imageAnimated, .livePhoto, .localImage, .localLivePhoto, .localGifImage, .networkImage(_):
+            case .image, .imageAnimated, .livePhoto, .localImage, .localLivePhoto, .localGifImage, .networkImage:
                 return true
             default:
                 return false
@@ -189,7 +189,7 @@ public extension PhotoAsset {
         
         public var isNetwork: Bool {
             switch self {
-            case .networkImage(_), .networkVideo:
+            case .networkImage, .networkVideo:
                 return true
             default:
                 return false

@@ -9,6 +9,9 @@ import UIKit
 import CoreLocation
 import Photos
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraViewController: CameraResultViewControllerDelegate {
     func cameraResultViewController(
         didDone cameraResultViewController: CameraResultViewController
@@ -38,7 +41,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
                 switch $0 {
                 case .success(let phAsset):
                     self.didFinish(result, phAsset: phAsset, location: location)
-                case .failure(_):
+                case .failure:
                     ProgressHUD.showWarning(
                         addedTo: self.navigationController?.view,
                         text: "保存失败".localized,
@@ -64,7 +67,7 @@ extension CameraViewController: CameraResultViewControllerDelegate {
                 switch $0 {
                 case .success(let phAsset):
                     self.didFinish(result, phAsset: phAsset, location: location)
-                case .failure(_):
+                case .failure:
                     ProgressHUD.showWarning(
                         addedTo: self.navigationController?.view,
                         text: "保存失败".localized,

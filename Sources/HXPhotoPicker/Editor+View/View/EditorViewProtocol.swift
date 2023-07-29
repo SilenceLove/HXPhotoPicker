@@ -52,7 +52,11 @@ public protocol EditorViewDelegate: AnyObject {
     /// 视频播放时间发生了改变
     func editorView(_ editorView: EditorView, videoDidChangedTimeAt time: CMTime)
     /// 视频滑动进度条发生了改变
-    func editorView(_ editorView: EditorView, videoControlDidChangedTimeAt time: TimeInterval, for event: VideoControlEvent)
+    func editorView(
+        _ editorView: EditorView,
+        videoControlDidChangedTimeAt time: TimeInterval,
+        for event: VideoControlEvent
+    )
     
     /// 视频添加滤镜
     func editorView(_ editorView: EditorView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage
@@ -80,6 +84,14 @@ public extension EditorViewDelegate {
     func editorView(_ editorView: EditorView, videoReadyToPlay duration: CMTime) { }
     func editorView(_ editorView: EditorView, videoDidChangedBufferAt time: CMTime) { }
     func editorView(_ editorView: EditorView, videoDidChangedTimeAt time: CMTime) { }
-    func editorView(_ editorView: EditorView, videoControlDidChangedTimeAt time: CMTime, for event: VideoControlEvent) { }
-    func editorView(_ editorView: EditorView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage { sourceImage }
+    func editorView(
+        _ editorView: EditorView,
+        videoControlDidChangedTimeAt time: CMTime,
+        for event: VideoControlEvent
+    ) { }
+    func editorView(
+        _ editorView: EditorView,
+        videoApplyFilter sourceImage: CIImage,
+        at time: CMTime
+    ) -> CIImage { sourceImage }
 }

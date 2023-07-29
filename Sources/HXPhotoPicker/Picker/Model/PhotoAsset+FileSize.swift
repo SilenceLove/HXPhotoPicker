@@ -98,8 +98,7 @@ extension PhotoAsset {
                 resources[resource.type] = resource
             }
             if photoAsset.mediaType == .image {
-                if let _ = resources[.photo],
-                   let fullPhoto = resources[.fullSizePhoto] {
+                if let fullPhoto = resources[.fullSizePhoto], resources[.photo] != nil {
                     if let photoFileSize = fullPhoto.value(forKey: "fileSize") as? Int {
                         fileSize += photoFileSize
                     }
@@ -109,8 +108,7 @@ extension PhotoAsset {
                     }
                 }
             }else if photoAsset.mediaType == .video {
-                if let _ = resources[.video],
-                   let fullVideo = resources[.fullSizeVideo] {
+                if let fullVideo = resources[.fullSizeVideo], resources[.video] != nil {
                     if let photoFileSize = fullVideo.value(forKey: "fileSize") as? Int {
                         fileSize += photoFileSize
                     }

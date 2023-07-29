@@ -50,7 +50,7 @@ extension PhotoPickerViewController: AlbumViewDelegate {
             self.albumBackgroudView.alpha = 0
             self.updateAlbumViewFrame()
             self.titleView.arrowView.transform = .init(rotationAngle: .pi * 2)
-        } completion: { (isFinish) in
+        } completion: { _ in
             if self.albumBackgroudView.alpha == 0 {
                 self.albumBackgroudView.isHidden = true
             }

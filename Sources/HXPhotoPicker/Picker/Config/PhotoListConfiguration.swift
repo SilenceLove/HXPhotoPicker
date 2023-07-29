@@ -145,7 +145,7 @@ public struct PhotoListConfiguration {
     public var emptyView: EmptyViewConfiguration = .init()
     
     public init() {
-        #if HXPICKER_ENABLE_CAMERA
+        #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
         cameraType = .custom(.init())
         #else
         cameraType = .system(.init())
@@ -158,7 +158,7 @@ extension PhotoListConfiguration {
         /// system camera
         /// 系统相机
         case system(SystemCameraConfiguration)
-        #if HXPICKER_ENABLE_CAMERA
+        #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
         /// The frame comes with a camera
         /// 自带相机
         case custom(CameraConfiguration)
@@ -168,14 +168,14 @@ extension PhotoListConfiguration {
             switch self {
             case .system(let config):
                 return config
-            #if HXPICKER_ENABLE_CAMERA
+            #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
             default:
                 return nil
             #endif
             }
         }
         
-        #if HXPICKER_ENABLE_CAMERA
+        #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
         public var customConfig: CameraConfiguration? {
             switch self {
             case .custom(let config):

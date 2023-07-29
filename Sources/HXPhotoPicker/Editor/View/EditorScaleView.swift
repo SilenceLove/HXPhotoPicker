@@ -165,7 +165,10 @@ class EditorScaleView: UIView {
             collectionView.contentOffset.y = offsetY - collectionView.contentInset.top
         }
         collectionView.isCenter = angle == 0
-        let point = centerLineView.convert(.init(x: centerLineView.width * 0.5, y: centerLineView.height * 0.5), to: collectionView)
+        let point = centerLineView.convert(
+            .init(x: centerLineView.width * 0.5, y: centerLineView.height * 0.5),
+            to: collectionView
+        )
         if let indexPath = collectionView.indexPathForItem(at: point) {
             currentIndex = indexPath.section
         }else {
@@ -173,9 +176,13 @@ class EditorScaleView: UIView {
         }
         valueLb.text = String(scale)
         if UIDevice.isPortrait {
-            currentOffsetScale = (collectionView.contentInset.left + collectionView.contentOffset.x) / collectionView.contentSize.width
+            currentOffsetScale = (
+                collectionView.contentInset.left + collectionView.contentOffset.x
+            ) / collectionView.contentSize.width
         }else {
-            currentOffsetScale = (collectionView.contentInset.top + collectionView.contentOffset.y) / collectionView.contentSize.height
+            currentOffsetScale = (
+                collectionView.contentInset.top + collectionView.contentOffset.y
+            ) / collectionView.contentSize.height
         }
     }
     
@@ -244,21 +251,25 @@ class EditorScaleView: UIView {
             valueLb.height = height
         }
         DispatchQueue.main.async {
+            var contentOffset = self.collectionView.contentOffset
+            let contentSize = self.collectionView.contentSize
+            let contentInset = self.collectionView.contentInset
             if UIDevice.isPortrait {
                 if let currentOffsetScale = self.currentOffsetScale {
-                    self.collectionView.contentOffset.x = self.collectionView.contentSize.width * currentOffsetScale - self.collectionView.contentInset.left
+                    contentOffset.x = contentSize.width * currentOffsetScale - contentInset.left
                 }else {
                     self.collectionView.isCenter = true
-                    self.collectionView.contentOffset.x = self.centerOffsetX
+                    contentOffset.x = self.centerOffsetX
                 }
             }else {
                 if let currentOffsetScale = self.currentOffsetScale {
-                    self.collectionView.contentOffset.y = self.collectionView.contentSize.height * currentOffsetScale - self.collectionView.contentInset.top
+                    contentOffset.y = contentSize.height * currentOffsetScale - contentInset.top
                 }else {
                     self.collectionView.isCenter = true
-                    self.collectionView.contentOffset.y = self.centerOffsetX
+                    contentOffset.y = self.centerOffsetX
                 }
             }
+            self.collectionView.contentOffset = contentOffset
         }
     }
 }
@@ -271,25 +282,43 @@ extension EditorScaleView: UICollectionViewDataSource, UICollectionViewDelegate,
         1
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditorScaleViewCellId", for: indexPath) as! EditorScaleViewCell
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "EditorScaleViewCellId",
+            for: indexPath
+        ) as! EditorScaleViewCell
         cell.isShowPoint = indexPath.section == centerIndex
         cell.isOriginal = (indexPath.section == centerIndex ||
                            indexPath.section == 0 ||
                            indexPath.section == count - 1)
-        cell.isBold = cell.isOriginal ? true : (indexPath.section + 2) % 5 == 0
+        if cell.isOriginal {
+            cell.isBold = true
+        }else {
+            cell.isBold = (indexPath.section + 2) % 5 == 0
+        }
         cell.update()
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
         if UIDevice.isPortrait {
             return .init(width: 1, height: 20)
         }
         return .init(width: 20, height: 1)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
         if section == 0 || section == count - 1 {
             return .zero
         }
@@ -299,16 +328,27 @@ extension EditorScaleView: UICollectionViewDataSource, UICollectionViewDelegate,
         return .init(top: padding, left: 0, bottom: padding, right: 0)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
         0
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
         0
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let point = centerLineView.convert(.init(x: centerLineView.width * 0.5, y: centerLineView.height * 0.5), to: collectionView)
+        let point = centerLineView.convert(
+            .init(x: centerLineView.width * 0.5, y: centerLineView.height * 0.5),
+            to: collectionView
+        )
         if let indexPath = collectionView.indexPathForItem(at: point) {
             if currentIndex != indexPath.section && isAngleChange {
                 let shake = UIImpactFeedbackGenerator(style: .light)
@@ -375,9 +415,13 @@ extension EditorScaleView: UICollectionViewDataSource, UICollectionViewDelegate,
             centerCell?.hidePoint()
         }
         if UIDevice.isPortrait {
-            currentOffsetScale = (collectionView.contentInset.left + collectionView.contentOffset.x) / collectionView.contentSize.width
+            currentOffsetScale = (
+                collectionView.contentInset.left + collectionView.contentOffset.x
+            ) / collectionView.contentSize.width
         }else {
-            currentOffsetScale = (collectionView.contentInset.top + collectionView.contentOffset.y) / collectionView.contentSize.height
+            currentOffsetScale = (
+                collectionView.contentInset.top + collectionView.contentOffset.y
+            ) / collectionView.contentSize.height
         }
     }
 }

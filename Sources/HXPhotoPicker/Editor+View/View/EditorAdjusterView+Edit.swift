@@ -206,7 +206,10 @@ extension EditorAdjusterView {
             self.clipsToBounds = true
             self.frameView.hideVideoSilder(true)
             if let oldAdjustedFactor = self.oldAdjustedFactor {
-                self.contentView.stickerMirrorScale = .init(x: oldAdjustedFactor.mirrorTransform.a, y: oldAdjustedFactor.mirrorTransform.d)
+                self.contentView.stickerMirrorScale = .init(
+                    x: oldAdjustedFactor.mirrorTransform.a,
+                    y: oldAdjustedFactor.mirrorTransform.d
+                )
             }else {
                 self.contentView.stickerMirrorScale = .init(x: 1, y: 1)
             }

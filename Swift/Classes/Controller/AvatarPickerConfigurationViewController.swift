@@ -36,6 +36,7 @@ class AvatarPickerConfigurationViewController: UITableViewController {
     }
     
     @objc func openPickerController() {
+        #if !targetEnvironment(macCatalyst)
         var cameraConfig = CameraConfiguration()
         cameraConfig.editor.isFixedCropSizeState = config.editor.isFixedCropSizeState
         cameraConfig.editor.cropSize.isRoundCrop = config.editor.cropSize.isRoundCrop
@@ -43,6 +44,7 @@ class AvatarPickerConfigurationViewController: UITableViewController {
         cameraConfig.editor.cropSize.isFixedRatio = config.editor.cropSize.isFixedRatio
         cameraConfig.editor.cropSize.isResetToOriginal = config.editor.cropSize.isResetToOriginal
         config.photoList.cameraType = .custom(cameraConfig)
+        #endif
         let vc = PhotoPickerController.init(config: config)
         vc.pickerDelegate = self
         vc.autoDismiss = false

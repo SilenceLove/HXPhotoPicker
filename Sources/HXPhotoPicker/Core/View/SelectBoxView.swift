@@ -117,7 +117,11 @@ public final class SelectBoxView: UIControl {
         )
         textLayer.font = CGFont(font.fontName as CFString)
         textLayer.fontSize = config.titleFontSize
-        textLayer.foregroundColor = PhotoManager.isDark ? config.titleDarkColor.cgColor : config.titleColor.cgColor
+        if PhotoManager.isDark {
+            textLayer.foregroundColor = config.titleDarkColor.cgColor
+        }else {
+            textLayer.foregroundColor = config.titleColor.cgColor
+        }
     }
     
     private func tickPath() -> CGPath {
@@ -135,7 +139,11 @@ public final class SelectBoxView: UIControl {
         tickLayer.isHidden = !isSelected
         tickLayer.path = tickPath()
         tickLayer.lineWidth = config.tickWidth
-        tickLayer.strokeColor = PhotoManager.isDark ? config.tickDarkColor.cgColor : config.tickColor.cgColor
+        if PhotoManager.isDark {
+            tickLayer.strokeColor = config.tickDarkColor.cgColor
+        }else {
+            tickLayer.strokeColor = config.tickColor.cgColor
+        }
         tickLayer.fillColor = UIColor.clear.cgColor
     }
     

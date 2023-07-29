@@ -79,12 +79,14 @@ extension PhotoTools {
         completion(jpgURL)
     }
     
+    // swiftlint:disable function_body_length
     static func getLivePhotoVideoMovURL(
         _ originMovURL: URL,
         cacheKey: String?,
         header: (AVAssetWriter?, AVAssetWriterInput?, AVAssetReader?, AVAssetWriterInput?, AVAssetReader?) -> Void,
         completion: (URL?) -> Void
     ) {
+        // swiftlint:enable function_body_length
         let key: String
         if let cacheKey = cacheKey {
             key = cacheKey

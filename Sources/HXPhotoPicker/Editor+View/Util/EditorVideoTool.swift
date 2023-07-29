@@ -10,11 +10,6 @@ import AVKit
 
 public class EditorVideoTool {
     
-    struct Watermark {
-        let layers: [CALayer]
-        let images: [UIImage]
-    }
-    
     let avAsset: AVAsset
     let outputURL: URL
     let factor: EditorVideoFactor
@@ -23,7 +18,7 @@ public class EditorVideoTool {
     let cropFactor: EditorAdjusterView.CropFactor
     let maskType: EditorView.MaskType
     let filter: VideoCompositionFilter?
-    let videoOrientation: AVCaptureVideoOrientation
+    let videoOrientation: EditorVideoOrientation
     init(
         avAsset: AVAsset,
         outputURL: URL,
@@ -63,7 +58,6 @@ public class EditorVideoTool {
         self.filter = filter
     }
     
-   
     public func export(
         progressHandler: ((CGFloat) -> Void)? = nil,
         completionHandler: @escaping (Result<URL, EditorError>) -> Void
@@ -73,21 +67,30 @@ public class EditorVideoTool {
         if #available(iOS 15, *) {
             Task {
                 do {
-                    let _ = try await avAsset.load(.duration)
+                    _ = try await avAsset.load(.duration)
                     let status = avAsset.status(of: .duration)
                     await MainActor.run {
                         switch status {
-                        case .loaded(_):
+                        case .loaded:
                             exprotHandler()
                         case .failed(let error):
-                            self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：" + error.localizedDescription)))
+                            self.completionHandler?(
+                                .failure(EditorError.error(
+                                    type: .exportFailed,
+                                    message: "导出失败：" + error.localizedDescription
+                                ))
+                            )
                         default:
-                            self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败")))
+                            self.completionHandler?(
+                                .failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败"))
+                            )
                         }
                     }
                 } catch {
                     await MainActor.run {
-                        self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败")))
+                        self.completionHandler?(
+                            .failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败"))
+                        )
                     }
                 }
             }
@@ -98,7 +101,12 @@ public class EditorVideoTool {
                 }
                 DispatchQueue.main.async {
                     if self.avAsset.statusOfValue(forKey: "duration", error: nil) != .loaded {
-                        self.completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：时长获取失败")))
+                        self.completionHandler?(
+                            .failure(EditorError.error(
+                                type: .exportFailed,
+                                message: "导出失败：时长获取失败"
+                            ))
+                        )
                         return
                     }
                     self.exprotHandler()
@@ -231,7 +239,12 @@ public class EditorVideoTool {
             })
             self.exportSession = exportSession
         } catch {
-            completionHandler?(.failure(EditorError.error(type: .exportFailed, message: "导出失败：" + error.localizedDescription)))
+            completionHandler?(
+                .failure(EditorError.error(
+                    type: .exportFailed,
+                    message: "导出失败：" + error.localizedDescription)
+                )
+            )
         }
     }
     
@@ -239,6 +252,28 @@ public class EditorVideoTool {
         let mixComposition = AVMutableComposition()
         return mixComposition
     }()
+    
+    func cropSize() {
+        if !cropFactor.isClip {
+            return
+        }
+        let width = videoComposition.renderSize.width * cropFactor.sizeRatio.x
+        let height = videoComposition.renderSize.height * cropFactor.sizeRatio.y
+        videoComposition.renderSize = .init(width: width, height: height)
+    }
+    
+    lazy var videoComposition: AVMutableVideoComposition = {
+        let videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
+        return videoComposition
+    }()
+    
+    lazy var audioMix: AVMutableAudioMix = {
+        let audioMix = AVMutableAudioMix()
+        return audioMix
+    }()
+}
+
+fileprivate extension EditorVideoTool {
     
     func insertVideoTrack(
         for videoTrack: AVAssetTrack,
@@ -308,15 +343,6 @@ public class EditorVideoTool {
         videoComposition.instructions = newInstructions
         videoComposition.renderScale = 1
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
-    }
-    
-    func cropSize() {
-        if !cropFactor.isClip {
-            return
-        }
-        let width = videoComposition.renderSize.width * cropFactor.sizeRatio.x
-        let height = videoComposition.renderSize.height * cropFactor.sizeRatio.y
-        videoComposition.renderSize = .init(width: width, height: height)
     }
     
     func addWatermark(
@@ -431,7 +457,10 @@ public class EditorVideoTool {
             let centerY = renderSize.height * cropFactor.waterCenterRatio.y
             let x = centerX - width / 2
             let y = centerY - height / 2
-            bgLayer.anchorPoint = .init(x: (x + overlaySize.width * 0.5) / bounds.width, y: (y + overlaySize.height * 0.5) / bounds.height)
+            bgLayer.anchorPoint = .init(
+                x: (x + overlaySize.width * 0.5) / bounds.width,
+                y: (y + overlaySize.height * 0.5) / bounds.height
+            )
             bgLayer.frame = .init(
                 x: -x, y: -y,
                 width: bounds.width, height: bounds.height
@@ -467,20 +496,36 @@ public class EditorVideoTool {
         )
         var audioInputParams: [AVMutableAudioMixInputParameters] = []
         for audioTrack in audioTracks {
-            guard let track = mixComposition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            guard let track = mixComposition.addMutableTrack(
+                withMediaType: .audio,
+                preferredTrackID: kCMPersistentTrackID_Invalid
+            ) else {
                 continue
             }
-            let audioTimeRange: CMTimeRange = .init(start: .zero, duration: .init(seconds: audioTrack.timeRange.duration.seconds, preferredTimescale: audioTrack.timeRange.duration.timescale))
+            let audioTimeRange: CMTimeRange = .init(
+                start: .zero,
+                duration: .init(
+                    seconds: audioTrack.timeRange.duration.seconds,
+                    preferredTimescale: audioTrack.timeRange.duration.timescale
+                )
+            )
             try track.insertTimeRange(audioTimeRange, of: audioTrack, at: .zero)
             track.preferredTransform = audioTrack.preferredTransform
             let audioInputParam = AVMutableAudioMixInputParameters(track: track)
-            audioInputParam.setVolumeRamp(fromStartVolume: factor.volume, toEndVolume: factor.volume, timeRange: audioTimeRange)
+            audioInputParam.setVolumeRamp(
+                fromStartVolume: factor.volume,
+                toEndVolume: factor.volume,
+                timeRange: audioTimeRange
+            )
             audioInputParam.trackID = track.trackID
             audioInputParams.append(audioInputParam)
         }
         
         for audio in factor.audios {
-            guard let audioTrack = mixComposition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            guard let audioTrack = mixComposition.addMutableTrack(
+                withMediaType: .audio,
+                preferredTrackID: kCMPersistentTrackID_Invalid
+            ) else {
                 continue
             }
             let audioAsset = AVURLAsset(url: audio.url)
@@ -559,12 +604,37 @@ public class EditorVideoTool {
                 }
             }
             let audioInputParam = AVMutableAudioMixInputParameters(track: audioTrack)
-            audioInputParam.setVolumeRamp(fromStartVolume: audio.volume, toEndVolume: audio.volume, timeRange: .init(start: .zero, duration: duration))
+            audioInputParam.setVolumeRamp(
+                fromStartVolume: audio.volume,
+                toEndVolume: audio.volume,
+                timeRange: .init(start: .zero, duration: duration)
+            )
             audioInputParam.trackID = audioTrack.trackID
             audioInputParams.append(audioInputParam)
         }
         audioMix.inputParameters = audioInputParams
     }
+    
+    func adjustVideoOrientation() {
+        let assetOrientation = videoOrientation
+        guard assetOrientation != .landscapeRight else {
+            return
+        }
+        guard let videoTrack = mixComposition.tracks(withMediaType: .video).first else {
+            return
+        }
+        let naturalSize = videoTrack.naturalSize
+        if assetOrientation == .portrait {
+            videoComposition.renderSize = CGSize(width: naturalSize.height, height: naturalSize.width)
+        } else if assetOrientation == .landscapeLeft {
+            videoComposition.renderSize = CGSize(width: naturalSize.width, height: naturalSize.height)
+        } else if assetOrientation == .portraitUpsideDown {
+            videoComposition.renderSize = CGSize(width: naturalSize.height, height: naturalSize.width)
+        }
+    }
+}
+
+fileprivate extension EditorVideoTool {
     
     func fileLengthLimit(
         seconds: Double,
@@ -587,37 +657,6 @@ public class EditorVideoTool {
         }
         return 0
     }
-    
-    lazy var videoComposition: AVMutableVideoComposition = {
-        let videoComposition = AVMutableVideoComposition(propertiesOf: mixComposition)
-        return videoComposition
-    }()
-    
-    func adjustVideoOrientation() {
-        let assetOrientation = videoOrientation
-        guard assetOrientation != .landscapeRight else {
-            return
-        }
-        guard let videoTrack = mixComposition.tracks(withMediaType: .video).first else {
-            return
-        }
-        let naturalSize = videoTrack.naturalSize
-        if assetOrientation == .portrait {
-            videoComposition.renderSize = CGSize(width: naturalSize.height, height: naturalSize.width)
-        } else if assetOrientation == .landscapeLeft {
-            videoComposition.renderSize = CGSize(width: naturalSize.width, height: naturalSize.height)
-        } else if assetOrientation == .portraitUpsideDown {
-            videoComposition.renderSize = CGSize(width: naturalSize.height, height: naturalSize.width)
-        }
-    }
-    
-    lazy var audioMix: AVMutableAudioMix = {
-        let audioMix = AVMutableAudioMix()
-        return audioMix
-    }()
-}
-
-fileprivate extension EditorVideoTool {
     
     func textAnimationLayer(
         audioContent: EditorStickerAudioContent,
@@ -782,5 +821,12 @@ fileprivate extension EditorVideoTool {
         group.repeatCount = MAXFLOAT
         animationLayer.add(group, forKey: nil)
         return animationLayer
+    }
+}
+
+extension EditorVideoTool {
+    struct Watermark {
+        let layers: [CALayer]
+        let images: [UIImage]
     }
 }

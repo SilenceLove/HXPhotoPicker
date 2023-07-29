@@ -11,14 +11,15 @@ import Kingfisher
 
 public struct NetworkImageAsset: Codable {
     
-    public enum loadMode: Codable {
+    public enum LoadMode: Codable {
         /// List: use the original image if the original image has a cache, use the thumbnail if there is no cache
         /// Large preview image: display the original image
         /// 列表：如果原图有缓存则使用原图，没有缓存则使用缩略图
         /// 预览大图：显示原图
         case varied
         
-        /// If the original image is not cached, the thumbnail image will always be used, and the original image will not be actively loaded internally
+        /// If the original image is not cached, the thumbnail image will always be used,
+        /// and the original image will not be actively loaded internally
         /// You can call loadNetworkOriginalImage() of the PhotoAsset object to load the original image
         /// 如果原图没有缓存则一直使用缩略图，内部不会主动加载原图
         /// 可以调用 PhotoAsset 对象的 loadNetworkOriginalImage() 加载原图
@@ -46,13 +47,13 @@ public struct NetworkImageAsset: Codable {
     
     /// The way the list Cell loads pictures
     /// 列表Cell加载图片的方式
-    public let thumbnailLoadMode: loadMode
+    public let thumbnailLoadMode: LoadMode
     
     /// How to load images when previewing large images
     /// Call loadNetworkOriginalImage() of the PhotoAsset object to load the original image
     /// 预览大图时加载图片的方式
     /// 调用 PhotoAsset 对象的 loadNetworkOriginalImage() 加载原图
-    public let originalLoadMode: loadMode
+    public let originalLoadMode: LoadMode
     
     /// Whether the display effect is fade in and fade out after the image is downloaded
     /// 图片下载完后显示效果是否为淡入淡出
@@ -69,8 +70,8 @@ public struct NetworkImageAsset: Codable {
     public init(
         thumbnailURL: URL,
         originalURL: URL,
-        thumbnailLoadMode: loadMode = .alwaysThumbnail,
-        originalLoadMode: loadMode = .varied,
+        thumbnailLoadMode: LoadMode = .alwaysThumbnail,
+        originalLoadMode: LoadMode = .varied,
         isFade: Bool = true,
         thumbnailSize: CGSize = .zero,
         placeholder: String? = nil,

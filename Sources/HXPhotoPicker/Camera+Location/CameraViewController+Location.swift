@@ -9,6 +9,9 @@
 import UIKit
 import CoreLocation
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraViewController: CLLocationManagerDelegate {
     
     var allowLocation: Bool {

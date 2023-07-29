@@ -10,6 +10,9 @@ import CoreLocation
 import AVFoundation
 import Photos
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 public protocol CameraControllerDelegate: AnyObject {
     
     /// 拍摄完成
@@ -59,6 +62,9 @@ public protocol CameraControllerDelegate: AnyObject {
     )
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 public extension CameraControllerDelegate {
     
     func cameraController(
@@ -97,6 +103,9 @@ public extension CameraControllerDelegate {
     ) { }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 public protocol CameraViewControllerDelegate: AnyObject {
     
     /// 拍摄完成
@@ -146,6 +155,9 @@ public protocol CameraViewControllerDelegate: AnyObject {
     )
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 public extension CameraViewControllerDelegate {
     func cameraViewController(
         _ cameraViewController: CameraViewController,
@@ -183,6 +195,9 @@ public extension CameraViewControllerDelegate {
     ) { }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 protocol CameraResultViewControllerDelegate: AnyObject {
     func cameraResultViewController(didDone cameraResultViewController: CameraResultViewController)
 }

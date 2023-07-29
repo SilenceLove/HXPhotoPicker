@@ -133,7 +133,8 @@ public class EditorBrushColorView: UIView {
             }else {
                 colorCount =  CGFloat(brushColors.count)
             }
-            let colorsWidth: CGFloat = 37 * colorCount + (colorCount - 1) * 5 + UIDevice.leftMargin + UIDevice.rightMargin + 12 + cHeight
+            let margin = UIDevice.leftMargin + UIDevice.rightMargin
+            let colorsWidth: CGFloat = 37 * colorCount + (colorCount - 1) * 5 + margin + 12 + cHeight
             let maxWidth = width
             if colorsWidth < maxWidth {
                 shadeView.x = (maxWidth - colorsWidth) * 0.5
@@ -146,7 +147,11 @@ public class EditorBrushColorView: UIView {
             if colorsWidth < maxWidth {
                 maskLayer.frame = CGRect(x: 0, y: 0, width: shadeView.width, height: shadeView.height)
             }else {
-                maskLayer.frame = CGRect(x: 0, y: 0, width: shadeView.width - 50 - UIDevice.rightMargin, height: shadeView.height)
+                maskLayer.frame = CGRect(
+                    x: 0, y: 0,
+                    width: shadeView.width - 50 - UIDevice.rightMargin,
+                    height: shadeView.height
+                )
             }
             flowLayout.sectionInset = UIEdgeInsets(
                 top: 0,
@@ -171,7 +176,12 @@ public class EditorBrushColorView: UIView {
                 height: height
             )
             collectionView.frame = shadeView.bounds
-            maskLayer.frame = CGRect(x: 0, y: UIDevice.topMargin + 44, width: shadeView.width, height: shadeView.height - UIDevice.topMargin - 44)
+            maskLayer.frame = CGRect(
+                x: 0,
+                y: UIDevice.topMargin + 44,
+                width: shadeView.width,
+                height: shadeView.height - UIDevice.topMargin - 44
+            )
             flowLayout.sectionInset = UIEdgeInsets(
                 top: UIDevice.topMargin + 44 + 5,
                 left: 0,

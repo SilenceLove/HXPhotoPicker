@@ -15,7 +15,9 @@ public enum EditorTransitionMode {
 //    case dismiss
 }
 
+// swiftlint:disable type_body_length
 class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
+    // swiftlint:enable type_body_length
     let mode: EditorTransitionMode
     var requestID: PHImageRequestID?
     lazy var previewView: UIImageView = {
@@ -78,7 +80,13 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             containerView.addSubview(fromVC.view)
             #if HXPICKER_ENABLE_PICKER
             if let pickerVC = toVC as? PhotoPickerViewController {
-                pickerVC.bottomView.alpha = 0
+                if pickerVC.isMultipleSelect {
+                    pickerVC.bottomView.alpha = 0
+                }else {
+                    if pickerVC.allowShowPrompt {
+                        pickerVC.bottomPromptView.alpha = 0
+                    }
+                }
                 toVC.view.insertSubview(contentView, at: 1)
             }else if let previewVC = toVC as? PhotoPreviewViewController {
                 previewVC.bottomView.alpha = 0
@@ -221,7 +229,13 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             if self.mode == .push {
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = fromVC as? PhotoPickerViewController {
-                    pickerVC.bottomView.alpha = 0
+                    if pickerVC.isMultipleSelect {
+                        pickerVC.bottomView.alpha = 0
+                    }else {
+                        if pickerVC.allowShowPrompt {
+                            pickerVC.bottomPromptView.alpha = 0
+                        }
+                    }
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
                     previewVC.bottomView.alpha = 0
                 }
@@ -229,7 +243,13 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }else if self.mode == .pop {
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = toVC as? PhotoPickerViewController {
-                    pickerVC.bottomView.alpha = 1
+                    if pickerVC.isMultipleSelect {
+                        pickerVC.bottomView.alpha = 1
+                    }else {
+                        if pickerVC.allowShowPrompt {
+                            pickerVC.bottomPromptView.alpha = 1
+                        }
+                    }
                 }else if let previewVC = toVC as? PhotoPreviewViewController {
                     previewVC.bottomView.alpha = 1
                 }
@@ -268,7 +288,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
             if let subView = self.previewView.subviews.first {
                 subView.frame = CGRect(origin: .zero, size: toRect.size)
             }
-        } completion: { [weak self] isFinished in
+        } completion: { [weak self] _ in
             guard let self = self else {
                 contentView.removeFromSuperview()
                 transitionContext.completeTransition(true)
@@ -282,7 +302,13 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
                 #if HXPICKER_ENABLE_PICKER
                 if let pickerVC = fromVC as? PhotoPickerViewController {
-                    pickerVC.bottomView.alpha = 1
+                    if pickerVC.isMultipleSelect {
+                        pickerVC.bottomView.alpha = 1
+                    }else {
+                        if pickerVC.allowShowPrompt {
+                            pickerVC.bottomPromptView.alpha = 1
+                        }
+                    }
                 }else if let previewVC = fromVC as? PhotoPreviewViewController {
                     previewVC.bottomView.alpha = 1
                 }
@@ -307,7 +333,7 @@ class EditorTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     delay: 0,
                     options: [.allowUserInteraction]) {
                     self.previewView.alpha = 0
-                } completion: { (isFinished) in
+                } completion: { _ in
                     self.previewView.removeFromSuperview()
                     contentView.removeFromSuperview()
                     transitionContext.completeTransition(true)

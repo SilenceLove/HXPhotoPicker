@@ -30,6 +30,26 @@ extension PhotoTools {
         rightActionTitle: String?,
         rightHandler: ((UIAlertAction) -> Void)?
     ) {
+        showAlert(
+            viewController: viewController,
+            title: title,
+            message: message,
+            leftActionTitle: leftActionTitle,
+            rightActionTitle: rightActionTitle,
+            leftHandler: leftHandler,
+            rightHandler: rightHandler
+        )
+    }
+    
+    public static func showAlert(
+        viewController: UIViewController?,
+        title: String?,
+        message: String? = nil,
+        leftActionTitle: String? = nil,
+        rightActionTitle: String? = nil,
+        leftHandler: ((UIAlertAction) -> Void)? = nil,
+        rightHandler: ((UIAlertAction) -> Void)? = nil
+    ) {
         guard let viewController = viewController else { return }
         let alertController = UIAlertController(
             title: title,
@@ -68,7 +88,7 @@ extension PhotoTools {
     
     static func showConfirm(
         viewController: UIViewController?,
-        title: String? ,
+        title: String?,
         message: String?,
         actionTitle: String?,
         actionHandler: ((UIAlertAction) -> Void)?
@@ -98,8 +118,7 @@ extension PhotoTools {
             alertController.addAction(action)
             viewController?.present(
                 alertController,
-                animated: true,
-                completion: nil
+                animated: true
             )
         }
     }
@@ -115,11 +134,10 @@ extension PhotoTools {
             title: "无法使用相机功能".localized,
             message: "请前往系统设置中，允许访问「相机」。".localized,
             leftActionTitle: "取消".localized,
-            leftHandler: { _ in
-                cancelHandler?()
-            },
             rightActionTitle: "前往系统设置".localized
-        ) { (alertAction) in
+        ) { _ in
+            cancelHandler?()
+        } rightHandler: { _ in
             openSettingsURL()
         }
     }

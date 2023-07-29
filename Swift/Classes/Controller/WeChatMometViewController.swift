@@ -31,6 +31,7 @@ class WeChatMometViewController: UIViewController {
         config.editor.cropSize.aspectRatios = []
         config.editor.cropSize.isResetToOriginal = false
         config.editor.isFixedCropSizeState = true
+        #if !targetEnvironment(macCatalyst)
         var cameraConfig = CameraConfiguration()
         cameraConfig.editor.cropSize.aspectRatio = .init(width: 1, height: 1)
         cameraConfig.editor.cropSize.isFixedRatio = true
@@ -38,6 +39,7 @@ class WeChatMometViewController: UIViewController {
         cameraConfig.editor.cropSize.isResetToOriginal = false
         cameraConfig.editor.isFixedCropSizeState = true
         config.photoList.cameraType = .custom(cameraConfig)
+        #endif
         
         presentPicker(config)
     }

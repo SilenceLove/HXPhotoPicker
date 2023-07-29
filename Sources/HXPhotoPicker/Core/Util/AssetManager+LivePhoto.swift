@@ -25,8 +25,8 @@ public extension AssetManager {
     static func requestLivePhoto(
         for asset: PHAsset,
         targetSize: CGSize,
-        iCloudHandler: @escaping (PHImageRequestID) -> Void,
-        progressHandler: @escaping PHAssetImageProgressHandler,
+        iCloudHandler: ((PHImageRequestID) -> Void)? = nil,
+        progressHandler: PHAssetImageProgressHandler? = nil,
         resultHandler: @escaping (PHLivePhoto?, [AnyHashable: Any]?, Bool) -> Void
     ) -> PHImageRequestID {
         return requestLivePhoto(
@@ -56,7 +56,7 @@ public extension AssetManager {
                         }
                     }
                     DispatchQueue.main.async {
-                        iCloudHandler(iCloudRequestID)
+                        iCloudHandler?(iCloudRequestID)
                     }
                 }else {
                     DispatchQueue.main.async {
@@ -73,7 +73,7 @@ public extension AssetManager {
         for asset: PHAsset,
         targetSize: CGSize,
         isNetworkAccessAllowed: Bool,
-        progressHandler: @escaping PHAssetImageProgressHandler,
+        progressHandler: PHAssetImageProgressHandler? = nil,
         resultHandler: @escaping LivePhotoResultHandler
     ) -> PHImageRequestID {
         let options = PHLivePhotoRequestOptions.init()

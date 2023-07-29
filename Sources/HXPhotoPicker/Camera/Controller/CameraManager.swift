@@ -8,6 +8,9 @@
 import UIKit
 import AVFoundation
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 class CameraManager: NSObject {
     var config: CameraConfiguration
     
@@ -220,6 +223,9 @@ class CameraManager: NSObject {
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraManager {
     
     func discoverySession(
@@ -370,6 +376,9 @@ extension CameraManager {
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraManager {
     
     func switchCameras() throws {
@@ -446,6 +455,9 @@ extension CameraManager {
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraManager: AVCapturePhotoCaptureDelegate {
     
     func flashModeContains(_ mode: AVCaptureDevice.FlashMode) -> Bool {
@@ -533,9 +545,11 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         bracketSettings: AVCaptureBracketedStillImageSettings?,
         error: Error?
     ) {
+        #if !targetEnvironment(macCatalyst)
         if #available(iOS 11.0, *) {
             return
         }
+        #endif
         let sampleBuffer: CMSampleBuffer
         if let previewPhotoSampleBuffer = previewPhotoSampleBuffer {
             sampleBuffer = previewPhotoSampleBuffer
@@ -557,7 +571,9 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
         finishProcessingPhoto(photoPixelBuffer, metaData)
     }
     
+    #if !targetEnvironment(macCatalyst)
     @available(iOS 11.0, *)
+    #endif
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let photoPixelBuffer = photo.previewPixelBuffer else {
             photoCompletion?(nil)
@@ -613,6 +629,9 @@ extension CameraManager: AVCapturePhotoCaptureDelegate {
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraManager {
     enum CaptureState {
         case start
@@ -636,6 +655,9 @@ extension CameraManager {
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
                          AVCaptureAudioDataOutputSampleBufferDelegate {
     func captureOutput(
@@ -813,6 +835,10 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
 //        ]
         let videoCodecType: Any
         let videoH264Type: Any
+        #if targetEnvironment(macCatalyst)
+        videoH264Type = AVVideoCodecType.h264
+        videoCodecType = config.videoCodecType
+        #else
         if #available(iOS 11.0, *) {
             videoH264Type = AVVideoCodecType.h264
         } else {
@@ -824,10 +850,10 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
             if #available(iOS 11.0, *) {
                 videoCodecType = config.videoCodecType
             } else {
-                // Fallback on earlier versions
                 videoCodecType = AVVideoCodecH264
             }
         }
+        #endif
         let videoInput = AVAssetWriterInput(
             mediaType: .video,
             outputSettings: [
@@ -883,6 +909,9 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate,
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraManager {
     
     func startRecording(
@@ -918,7 +947,7 @@ extension CameraManager {
         let timer = Timer.scheduledTimer(
             withTimeInterval: 1,
             repeats: true,
-            block: { [weak self] timer in
+            block: { [weak self] _ in
                 guard let self = self else { return }
                 let timeElapsed = Date().timeIntervalSince(self.dateVideoStarted)
                 let progress = Float(timeElapsed) / Float(max(1, self.config.videoMaximumDuration))

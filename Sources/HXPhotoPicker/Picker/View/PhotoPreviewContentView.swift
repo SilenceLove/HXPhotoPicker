@@ -101,7 +101,7 @@ open class PhotoPreviewContentView: UIView {
                 }
             case .localImage:
                 requestCompletion = true
-            case .networkImage(_), .networkVideo:
+            case .networkImage, .networkVideo:
                 networkVideoLoading = false
                 requestNetworkCompletion = false
                 requestNetworkImage()
@@ -309,7 +309,7 @@ extension PhotoPreviewContentView {
             }
         } downloadTask: { [weak self] downloadTask in
             self?.imageTask = downloadTask
-        } completionHandler: { [weak self] (image, error, photoAsset) in
+        } completionHandler: { [weak self] (image, _, photoAsset) in
             guard let self = self else { return }
             completion?(photoAsset)
             if isLoaclLivePhoto {
@@ -383,7 +383,7 @@ extension PhotoPreviewContentView {
             networkVideoLoading = true
             PhotoManager.shared.downloadTask(
                 with: videoURL
-            ) { [weak self] (progress, task) in
+            ) { [weak self] (progress, _) in
                 self?.requestUpdateProgress(progress: progress, isICloud: false)
             } completionHandler: { [weak self] (url, error, _) in
                 guard let self = self else { return }
@@ -440,7 +440,7 @@ extension PhotoPreviewContentView {
     
     func requestPreviewAsset() {
         switch photoAsset.mediaSubType {
-        case .localImage, .networkImage(_):
+        case .localImage, .networkImage:
             return
         case .networkVideo:
             requestNetworkVideo()
@@ -610,7 +610,7 @@ extension PhotoPreviewContentView {
             if asset == self.photoAsset && asset.downloadStatus != .succeed {
                 self.requestUpdateProgress(progress: progress, isICloud: true)
             }
-        }, success: { [weak self] (asset, livePhoto, info) in
+        }, success: { [weak self] (asset, livePhoto, _) in
             guard let self = self else { return }
             if asset == self.photoAsset {
                 self.requestSucceed()
@@ -625,7 +625,7 @@ extension PhotoPreviewContentView {
                 self.requestID = nil
                 self.requestCompletion = true
             }
-        }, failure: { [weak self] (asset, info, error) in
+        }, failure: { [weak self] (asset, info, _) in
             guard let self = self else { return }
             if asset == self.photoAsset {
                 self.requestFailed(info: info, isICloud: true)
@@ -662,7 +662,7 @@ extension PhotoPreviewContentView {
                 self.localLivePhotoRequest = nil
                 self.requestCompletion = true
             }
-        }, failure: { [weak self] (asset, info, error) in
+        }, failure: { [weak self] (asset, info, _) in
             guard let self = self else { return }
             if asset == self.photoAsset {
                 self.localLivePhotoRequest = nil
@@ -685,7 +685,7 @@ extension PhotoPreviewContentView {
             if asset == self.photoAsset && asset.downloadStatus != .succeed {
                 self.requestUpdateProgress(progress: progress, isICloud: true)
             }
-        }, success: { [weak self] (asset, avAsset, info) in
+        }, success: { [weak self] (asset, avAsset, _) in
             guard let self = self else { return }
             if asset == self.photoAsset {
                 self.requestSucceed()
@@ -699,7 +699,7 @@ extension PhotoPreviewContentView {
                 self.requestID = nil
                 self.requestCompletion = true
             }
-        }, failure: { [weak self] (asset, info, error) in
+        }, failure: { [weak self] (asset, info, _) in
             guard let self = self else { return }
             if asset == self.photoAsset {
                 self.requestFailed(info: info, isICloud: true)
@@ -777,7 +777,7 @@ extension PhotoPreviewContentView {
             photoAsset.playerTime = 0
         }
         switch photoAsset.mediaSubType {
-        case .localImage, .networkImage(_):
+        case .localImage, .networkImage:
             requestCompletion = false
             requestNetworkCompletion = false
             return

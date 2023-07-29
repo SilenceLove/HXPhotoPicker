@@ -141,7 +141,6 @@ public class VideoPlaySliderView: UIView, SliderViewDelegate {
         delegate?.videoSliderView(self, didChangedPlayDuration: videoDuration * value, state: state)
     }
     
-    
     var isSliderChanged: Bool = false
     
     func sliderView(_ sliderView: SliderView, didChangedAt rect: CGRect, state: VideoControlEvent) {

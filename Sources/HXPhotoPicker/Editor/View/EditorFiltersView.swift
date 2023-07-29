@@ -46,7 +46,7 @@ class EditorFiltersView: UIView {
         return collectionView
     }()
     
-    var image: UIImage? = nil
+    var image: UIImage?
     
     var filters: [PhotoEditorFilter] = []
     var currentSelectedIndex: Int = 0
@@ -186,7 +186,12 @@ class EditorFiltersView: UIView {
         }
     }
     func currentSelectedCell() -> EditorFiltersViewCell? {
-        didLoad ? collectionView.cellForItem(at: IndexPath(item: currentSelectedIndex, section: 0)) as? EditorFiltersViewCell : nil
+        if !didLoad {
+            return nil
+        }
+        return collectionView.cellForItem(
+            at: IndexPath(item: currentSelectedIndex, section: 0)
+        ) as? EditorFiltersViewCell
     }
     override func layoutSubviews() {
         super.layoutSubviews()

@@ -9,7 +9,7 @@
 import UIKit
 import Photos
 
-public class AlbumViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate {
+public class AlbumViewController: BaseViewController {
     
     public lazy var tableView: UITableView = {
         let tableView = UITableView(
@@ -104,9 +104,7 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
             canFetchAssetCollections = true
             titleLabel.text = "相册".localized
         }else {
-            pickerController?
-                .fetchCameraAssetCollectionCompletion = { [weak self] (assetCollection) in
-                
+            pickerController?.fetchCameraAssetCollectionCompletion = { [weak self] (assetCollection) in
                 var cameraAssetCollection = assetCollection
                 if cameraAssetCollection == nil {
                     cameraAssetCollection = PhotoAssetCollection(
@@ -116,9 +114,9 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
                 }
                 self?.canFetchAssetCollections = true
                 self?.titleLabel.text = "相册".localized
-                if self?.navigationController?.topViewController is PhotoPickerViewController {
-                    let vc = self?.navigationController?.topViewController as! PhotoPickerViewController
-                    vc.changedAssetCollection(
+                
+                if let topViewController = self?.navigationController?.topViewController as? PhotoPickerViewController {
+                    topViewController.changedAssetCollection(
                         collection: cameraAssetCollection
                     )
                     return
@@ -171,39 +169,6 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
     
     @objc func didCancelItemClick() {
         pickerController?.cancelCallback()
-    }
-    
-    public func tableView(
-        _ tableView: UITableView,
-        numberOfRowsInSection section: Int
-    ) -> Int {
-        assetCollectionsArray.count
-    }
-    public func tableView(
-        _ tableView: UITableView,
-        cellForRowAt indexPath: IndexPath
-    ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: "cellId"
-        ) as! AlbumViewCell
-        let assetCollection = assetCollectionsArray[indexPath.row]
-        cell.assetCollection = assetCollection
-        cell.config = config
-        return cell
-    }
-    public func tableView(
-        _ tableView: UITableView,
-        heightForRowAt indexPath: IndexPath
-    ) -> CGFloat {
-        config.cellHeight
-    }
-    public func tableView(
-        _ tableView: UITableView,
-        didSelectRowAt indexPath: IndexPath
-    ) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let assetCollection = assetCollectionsArray[indexPath.row]
-        pushPhotoPickerController(assetCollection: assetCollection, animated: true)
     }
     
     private func changeSubviewFrame() {
@@ -280,5 +245,44 @@ public class AlbumViewController: BaseViewController, UITableViewDataSource, UIT
                 configColor()
             }
         }
+    }
+}
+
+extension AlbumViewController: UITableViewDataSource {
+    public func tableView(
+        _ tableView: UITableView,
+        numberOfRowsInSection section: Int
+    ) -> Int {
+        assetCollectionsArray.count
+    }
+    public func tableView(
+        _ tableView: UITableView,
+        cellForRowAt indexPath: IndexPath
+    ) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: "cellId"
+        ) as! AlbumViewCell
+        let assetCollection = assetCollectionsArray[indexPath.row]
+        cell.assetCollection = assetCollection
+        cell.config = config
+        return cell
+    }
+}
+
+extension AlbumViewController: UITableViewDelegate {
+    
+    public func tableView(
+        _ tableView: UITableView,
+        heightForRowAt indexPath: IndexPath
+    ) -> CGFloat {
+        config.cellHeight
+    }
+    public func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let assetCollection = assetCollectionsArray[indexPath.row]
+        pushPhotoPickerController(assetCollection: assetCollection, animated: true)
     }
 }

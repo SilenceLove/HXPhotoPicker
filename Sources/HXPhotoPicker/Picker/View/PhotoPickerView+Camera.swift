@@ -13,7 +13,7 @@ import Photos
 extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func presentCameraViewController() {
-        #if HXPICKER_ENABLE_CAMERA
+        #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
         switch config.cameraType {
         case .custom(var camerConfig):
             let type: CameraController.CaptureType
@@ -228,6 +228,9 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
 }
 
 #if HXPICKER_ENABLE_CAMERA
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension PhotoPickerView: CameraControllerDelegate {
     public func cameraController(
         _ cameraController: CameraController,

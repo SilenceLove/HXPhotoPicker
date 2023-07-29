@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 extension String {
     
     subscript(_ indexs: ClosedRange<Int>) -> String {

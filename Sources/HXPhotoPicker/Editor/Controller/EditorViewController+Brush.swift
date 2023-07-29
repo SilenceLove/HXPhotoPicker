@@ -36,7 +36,11 @@ extension EditorViewController: EditorBrushColorViewDelegate {
     }
     
     func showBrushBlockView() {
-        UIViewController.cancelPreviousPerformRequests(withTarget: self, selector: #selector(hideBrushBlockView), object: nil)
+        UIViewController.cancelPreviousPerformRequests(
+            withTarget: self,
+            selector: #selector(hideBrushBlockView),
+            object: nil
+        )
         if brushBlockView.superview == view {
             return
         }

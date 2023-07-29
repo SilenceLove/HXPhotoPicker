@@ -23,7 +23,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
     let type: PickerTransitionType
     var requestID: PHImageRequestID?
     lazy var pushImageView: UIImageView = {
-        let imageView = UIImageView.init()
+        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -34,7 +34,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         super.init()
     }
     
-    public func transitionDuration(
+    func transitionDuration(
         using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         if type == .dismiss {
             return 0.65
@@ -42,7 +42,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         return 0.5
     }
     
-    public func animateTransition(
+    func animateTransition(
         using transitionContext: UIViewControllerContextTransitioning) {
         if type == .push || type == .pop {
             pushTransition(using: transitionContext)
@@ -65,7 +65,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         var pickerVC: PhotoPickerViewController?
         
         let containerView = transitionContext.containerView
-        let contentView = UIView.init(frame: fromVC.view.bounds)
+        let contentView = UIView(frame: fromVC.view.bounds)
         if type == .push {
             pickerVC = fromVC as? PhotoPickerViewController
             previewVC = toVC as? PhotoPreviewViewController
@@ -76,6 +76,18 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         guard let previewVC = previewVC else {
             transitionContext.completeTransition(true)
             return
+        }
+        
+        var isMultipleBottom: Bool = false
+        var isPromptBottom: Bool = false
+        if let pickerVC = pickerVC {
+            if pickerVC.isMultipleSelect {
+                isMultipleBottom = true
+            }else {
+                if pickerVC.allowShowPrompt {
+                    isPromptBottom = true
+                }
+            }
         }
 
         let backgroundColor = PhotoManager.isDark ?
@@ -90,9 +102,10 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         if type == .push {
             containerView.addSubview(fromVC.view)
             containerView.addSubview(toVC.view)
-            if fromVC.view.subviews.count > 2, fromVC.view.subviews[2] is PreviewPhotoViewCell {
+            let fromViewCount = fromVC.view.subviews.count
+            if fromViewCount > 2, fromVC.view.subviews[2] is PreviewPhotoViewCell {
                 fromVC.view.insertSubview(contentView, at: 3)
-            }else if fromVC.view.subviews.count > 1, fromVC.view.subviews[1] is PreviewPhotoViewCell {
+            }else if fromViewCount > 1, fromVC.view.subviews[1] is PreviewPhotoViewCell {
                 fromVC.view.insertSubview(contentView, at: 2)
             }else {
                 fromVC.view.insertSubview(contentView, at: 1)
@@ -135,10 +148,10 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             
             let cell = previewVC.getCell(for: previewVC.currentPreviewIndex)
             fromView = cell?.scrollContentView
-            fromView?.frame = cell?.scrollContentView.convert(
-                cell?.scrollContentView.bounds ?? CGRect.zero,
-                to: containerView
-            ) ?? CGRect.zero
+            if let contentBounds = cell?.scrollContentView.bounds,
+               let rect = cell?.scrollContentView.convert(contentBounds, to: containerView) {
+                fromView?.frame = rect
+            }
             contentView.addSubview(fromView!)
             if let pickerVC = pickerVC, let photoAsset = photoAsset {
                 toView = pickerVC.getCell(for: photoAsset)
@@ -160,13 +173,22 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             
             previewVC.collectionView.isHidden = true
             previewVC.view.backgroundColor = UIColor.clear
+            if isPromptBottom {
+                pickerVC?.bottomPromptView.alpha = 0
+            }
         }
         
         var rect: CGRect = .zero
         if type == .push {
+            let imageSize: CGSize
+            if let size = photoAsset?.imageSize {
+                imageSize = size
+            }else {
+                imageSize = .zero
+            }
             if UIDevice.isPad && photoAsset?.mediaType == .video {
                 rect = PhotoTools.transformImageSize(
-                    photoAsset?.imageSize ?? .zero,
+                    imageSize,
                     toViewSize: toVC.view.size,
                     directions: [.horizontal]
                 )
@@ -178,17 +200,21 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }
             }else {
                 rect = PhotoTools.transformImageSize(
-                    photoAsset?.imageSize ?? .zero,
+                    imageSize,
                     to: toVC.view
                 )
             }
             fromView?.isHidden = true
         }else if type == .pop {
-            rect = toView?.convert(toView?.bounds ?? CGRect.zero, to: containerView) ?? .zero
-            toView?.isHidden = true
+            if let toView = toView {
+                rect = toView.convert(toView.bounds, to: containerView)
+                toView.isHidden = true
+            }
         }
         var pickerShowParompt = false
-        if AssetManager.authorizationStatusIsLimited() && pickerVC?.config.bottomView.isShowPrompt ?? false {
+        if let isShowPrompt = pickerVC?.config.bottomView.isShowPrompt,
+           isShowPrompt,
+           AssetManager.authorizationStatusIsLimited() {
             pickerShowParompt = true
         }
         let pickerController = previewVC.pickerController
@@ -200,8 +226,15 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             if pickerController.selectedAssetArray.isEmpty == false {
                 previewShowSelectedView = true
                 if !pickerShowParompt {
-                    let maskY: CGFloat = type == .push ? 70 : 0
-                    let maskHeight: CGFloat = type == .push ? 50 + UIDevice.bottomMargin : 120 + UIDevice.bottomMargin
+                    let maskY: CGFloat
+                    let maskHeight: CGFloat
+                    if type == .push {
+                        maskY = 70
+                        maskHeight = 50 + UIDevice.bottomMargin
+                    }else {
+                        maskY = 0
+                        maskHeight = 120 + UIDevice.bottomMargin
+                    }
                     let maskView = UIView(
                         frame: CGRect(
                             x: 0, y: maskY,
@@ -214,11 +247,20 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }
         }
         if pickerShowParompt && !previewShowSelectedView {
-            let maskY: CGFloat = type == .push ? 0 : 70
-            let maskHeight: CGFloat = type == .push ? 120 + UIDevice.bottomMargin : 70 + UIDevice.bottomMargin
-            let maskView = UIView.init(frame: CGRect(x: 0, y: maskY, width: contentView.width, height: maskHeight))
+            let maskY: CGFloat
+            let maskHeight: CGFloat
+            if type == .push {
+                maskY = 0
+                maskHeight = 120 + UIDevice.bottomMargin
+            }else {
+                maskY = 70
+                maskHeight = 70 + UIDevice.bottomMargin
+            }
+            let maskView = UIView(frame: CGRect(x: 0, y: maskY, width: contentView.width, height: maskHeight))
             maskView.backgroundColor = .white
-            pickerVC?.bottomView.mask = maskView
+            if isMultipleBottom {
+                pickerVC?.bottomView.mask = maskView
+            }
         }
         let duration = transitionDuration(using: transitionContext)
         UIView.animate(withDuration: duration - 0.15) {
@@ -236,13 +278,21 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         width: contentView.width, height: maskHeight + 70
                     )
                 }
-                if pickerVC?.bottomView.mask != nil {
+                if isMultipleBottom && pickerVC?.bottomView.mask != nil {
                     pickerVC?.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: contentView.width, height: maskHeight)
                 }
             }
-            let alphaDuration = previewVC.bottomView.mask == nil ? duration - 0.15 : 0.15
+            let alphaDuration: TimeInterval
+            if previewVC.bottomView.mask == nil {
+                alphaDuration = duration - 0.15
+            }else {
+                alphaDuration = 0.15
+            }
             UIView.animate(withDuration: alphaDuration) {
                 previewVC.bottomView.alpha = 1
+                if isPromptBottom {
+                    pickerVC?.bottomPromptView.alpha = 0
+                }
             }
         }else if type == .pop {
             UIView.animate(withDuration: duration - 0.2, delay: 0, options: [.curveLinear]) {
@@ -252,15 +302,21 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         width: contentView.width, height: maskHeight + 70
                     )
                 }
-                if pickerVC?.bottomView.mask != nil {
+                if isMultipleBottom && pickerVC?.bottomView.mask != nil {
                     pickerVC?.bottomView.mask?.frame = CGRect(
                         x: 0, y: 0,
                         width: contentView.width, height: maskHeight + 70
                     )
                 }
+                if isPromptBottom {
+                    previewVC.bottomView.alpha = 0
+                    pickerVC?.bottomPromptView.alpha = 1
+                }
             }
-            UIView.animate(withDuration: duration - 0.15, delay: 0.125, options: []) {
-                previewVC.bottomView.alpha = 0
+            if isMultipleBottom {
+                UIView.animate(withDuration: duration - 0.15, delay: 0.125, options: []) {
+                    previewVC.bottomView.alpha = 0
+                }
             }
         }
         
@@ -285,8 +341,10 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 picker.pickerDelegate?
                     .pickerController(picker, animateTransition: self.type)
             }
-        } completion: { (isFinished) in
-            pickerVC?.bottomView.mask = nil
+        } completion: { _ in
+            if isMultipleBottom {
+                pickerVC?.bottomView.mask = nil
+            }
             previewVC.bottomView.mask = nil
             if self.type == .push {
                 if let requestID = self.requestID {
@@ -300,6 +358,9 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 self.pushImageView.removeFromSuperview()
                 contentView.removeFromSuperview()
                 transitionContext.completeTransition(true)
+                if isPromptBottom {
+                    pickerVC?.bottomPromptView.alpha = 1
+                }
             }else if self.type == .pop {
                 toView?.isHidden = false
                 UIView.animate(
@@ -307,7 +368,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     delay: 0,
                     options: [.allowUserInteraction]) {
                     fromView?.alpha = 0
-                } completion: { (isFinished) in
+                } completion: { _ in
                     contentView.removeFromSuperview()
                     transitionContext.completeTransition(true)
                 }
@@ -315,10 +376,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }
     }
     // swiftlint:disable function_body_length
+    // swiftlint:disable cyclomatic_complexity
     func presentTransition(
         using transitionContext: UIViewControllerContextTransitioning
     ) {
         // swiftlint:enable function_body_length
+        // swiftlint:enable cyclomatic_complexity
         guard let fromVC = transitionContext.viewController(forKey: .from),
               let toVC = transitionContext.viewController(forKey: .to) else {
             transitionContext.completeTransition(true)
@@ -352,7 +415,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             previewViewController?.bottomView.alpha = 0
             previewViewController?.collectionView.isHidden = true
             fromView = pushImageView
-            let currentPreviewIndex = previewViewController?.currentPreviewIndex ?? 0
+            let currentPreviewIndex: Int
+            if let index = previewViewController?.currentPreviewIndex {
+                currentPreviewIndex = index
+            }else {
+                currentPreviewIndex = 0
+            }
             if let view = pickerController.pickerDelegate?.pickerController(
                 pickerController,
                 presentPreviewViewForIndexAt: currentPreviewIndex) {
@@ -459,7 +527,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             previewViewController?.collectionView.isHidden = true
             pickerController.view.backgroundColor = .clear
             contentView.backgroundColor = backgroundColor
-            let currentPreviewIndex = previewViewController?.currentPreviewIndex ?? 0
+            let currentPreviewIndex: Int
+            if let index = previewViewController?.currentPreviewIndex {
+                currentPreviewIndex = index
+            }else {
+                currentPreviewIndex = 0
+            }
             var hasCornerRadius = false
             if let view = pickerController.pickerDelegate?.pickerController(
                 pickerController,
@@ -497,11 +570,19 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             previewView?.isHidden = true
         }
         contentView.addSubview(fromView)
-        let duration = (self.type == .dismiss && !toRect.isEmpty) ?
-            transitionDuration(using: transitionContext) - 0.2 :
-            transitionDuration(using: transitionContext)
+        let duration: TimeInterval
+        if type == .dismiss && !toRect.isEmpty {
+            duration = transitionDuration(using: transitionContext) - 0.2
+        }else {
+            duration = transitionDuration(using: transitionContext)
+        }
         let colorDuration = duration - 0.15
-        let colorDelay = type == .present ? 0.05 : 0
+        let colorDelay: TimeInterval
+        if type == .present {
+            colorDelay = 0.05
+        }else {
+            colorDelay = 0
+        }
         UIView.animate(withDuration: colorDuration, delay: colorDelay, options: [ .curveLinear]) {
             if self.type == .present {
                 previewViewController?.bottomView.alpha = 1
@@ -510,6 +591,12 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 previewViewController?.bottomView.alpha = 0
                 contentView.backgroundColor = backgroundColor.withAlphaComponent(0)
             }
+        }
+        let currentPreviewIndex: Int
+        if let index = previewViewController?.currentPreviewIndex {
+            currentPreviewIndex = index
+        }else {
+            currentPreviewIndex = 0
         }
         UIView.animate(
             withDuration: duration,
@@ -538,14 +625,13 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
             }
             pickerController.pickerDelegate?
                 .pickerController(pickerController, animateTransition: self.type)
-        } completion: { (isFinished) in
+        } completion: { _ in
             previewView?.isHidden = false
             if self.type == .present {
                 if let requestID = self.requestID {
                     PHImageManager.default().cancelImageRequest(requestID)
                     self.requestID = nil
                 }
-                let currentPreviewIndex = previewViewController?.currentPreviewIndex ?? 0
                 pickerController.pickerDelegate?.pickerController(
                     pickerController,
                     previewPresentComplete: currentPreviewIndex
@@ -559,7 +645,6 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 contentView.removeFromSuperview()
                 transitionContext.completeTransition(true)
             }else {
-                let currentPreviewIndex = previewViewController?.currentPreviewIndex ?? 0
                 pickerController.pickerDelegate?.pickerController(
                     pickerController,
                     previewDismissComplete: currentPreviewIndex
@@ -570,7 +655,7 @@ class PickerTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 }else {
                     UIView.animate(withDuration: 0.2, delay: 0, options: [.allowUserInteraction]) {
                         fromView.alpha = 0
-                    } completion: { (isFinished) in
+                    } completion: { _ in
                         contentView.removeFromSuperview()
                         transitionContext.completeTransition(true)
                     }

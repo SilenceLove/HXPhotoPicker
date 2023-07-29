@@ -8,6 +8,9 @@
 import UIKit
 import AVFoundation
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 protocol CameraPreviewViewDelegate: AnyObject {
     func previewView(didPreviewing previewView: CameraPreviewView)
     func previewView(_ previewView: CameraPreviewView, pinchGestureScale scale: CGFloat)
@@ -16,6 +19,9 @@ protocol CameraPreviewViewDelegate: AnyObject {
     func previewView(didRightSwipe previewView: CameraPreviewView)
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 class CameraPreviewView: UIView {
     weak var delegate: CameraPreviewViewDelegate?
     
@@ -258,6 +264,9 @@ class CameraPreviewView: UIView {
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraPreviewView: UIGestureRecognizerDelegate {
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer is UIPinchGestureRecognizer {
@@ -326,6 +335,9 @@ class CameraFocusView: UIView {
     }
 }
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension PreviewMetalView.Rotation {
     init?(
         with interfaceOrientation: UIInterfaceOrientation,

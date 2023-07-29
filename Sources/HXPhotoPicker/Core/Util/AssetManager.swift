@@ -46,7 +46,7 @@ public struct AssetManager {
             switch $0 {
             case .success(let phAsset):
                 completion(phAsset)
-            case .failure(_):
+            case .failure:
                 completion(nil)
             }
         }

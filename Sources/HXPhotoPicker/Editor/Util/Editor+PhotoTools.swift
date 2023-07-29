@@ -6,9 +6,6 @@
 //
 
 import UIKit
-import ImageIO
-import CoreImage
-import CoreServices
 
 extension PhotoTools {
     
@@ -68,22 +65,22 @@ extension PhotoTools {
         filters.append(contentsOf: [
             PhotoEditorFilterInfo(
                 filterName: "唯美".localized
-            ) { image, _, parameters, _ in
+            ) { image, _, _, _ in
                 nashvilleFilter(image)
             },
             PhotoEditorFilterInfo(
                 filterName: "梦幻".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 toasterFilter(image)
             },
             PhotoEditorFilterInfo(
                 filterName: "1977"
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 apply1977Filter(image)
             },
             PhotoEditorFilterInfo(
                 filterName: "怀旧".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectInstant",
                     parameters: [:]
@@ -91,7 +88,7 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "岁月".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectTransfer",
                     parameters: [:]
@@ -105,7 +102,7 @@ extension PhotoTools {
             }),
             PhotoEditorFilterInfo(
                 filterName: "褪色".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectFade",
                     parameters: [:]
@@ -113,7 +110,7 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "冲印".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectProcess",
                     parameters: [:]
@@ -121,7 +118,7 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "铬黄".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectChrome",
                     parameters: [:]
@@ -130,12 +127,12 @@ extension PhotoTools {
             PhotoEditorFilterInfo(
                 filterName: "老电影".localized,
                 parameters: [.init(defaultValue: 1)],
-                filterHandler: { image, _, parameters , isCover in
+                filterHandler: { image, _, parameters, isCover in
                     return oldMovie(image, value: isCover ? 1 : parameters[0].value)
             }),
             PhotoEditorFilterInfo(
                 filterName: "色调".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectTonal",
                     parameters: [:]
@@ -143,7 +140,7 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "单色".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectMono",
                     parameters: [:]
@@ -151,7 +148,7 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "黑白".localized
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 image.filter(
                     name: "CIPhotoEffectNoir",
                     parameters: [:]
@@ -179,7 +176,7 @@ extension PhotoTools {
             },
             PhotoEditorFilterInfo(
                 filterName: "1977"
-            ) { (image, _, parameters, _) in
+            ) { (image, _, _, _) in
                 apply1977Filter(image)
             } videoFilterHandler: { ciImage, _ in
                 apply1977Filter(ciImage)

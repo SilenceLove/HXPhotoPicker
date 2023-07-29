@@ -69,7 +69,7 @@ public extension PhotoAsset {
                         ),
                         self
                     )
-                case .failure(_):
+                case .failure:
                     completion?(nil, self)
                 }
             }
@@ -116,7 +116,7 @@ public extension PhotoAsset {
                 )?
                 .normalizedImage()
                 completion?(image, self)
-            case .failure(_):
+            case .failure:
                 completion?(nil, self)
             }
         }
@@ -241,7 +241,7 @@ public extension PhotoAsset {
         let isGif = phAsset.isImageAnimated
         return AssetManager.requestImageData(for: phAsset, version: version) { iCloudRequestID in
             iCloudHandler?(self, iCloudRequestID)
-        } progressHandler: { progress, error, stop, info in
+        } progressHandler: { progress, _, _, _ in
             self.downloadProgress = progress
             DispatchQueue.main.async {
                 progressHandler?(self, progress)
@@ -324,7 +324,7 @@ public extension PhotoAsset {
             targetSize: targetSize
         ) { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
-        } progressHandler: { (progress, error, stop, info) in
+        } progressHandler: { (progress, _, _, _) in
             self.downloadProgress = progress
             DispatchQueue.main.async {
                 progressHandler?(self, progress)
@@ -387,114 +387,128 @@ public extension PhotoAsset {
                     completion(.failure(.exportLivePhotoVideoURLFailed(error)))
                 }
             }else {
-                func completionFunc(_ image_URL: URL?, _ video_URL: URL?) {
-                    if let image_URL = image_URL,
-                       let video_URL = video_URL {
-                        completion(
-                            .success(
-                                .init(
-                                    url: image_URL,
-                                    urlType: .local,
-                                    mediaType: .photo,
-                                    livePhoto: .init(
-                                        imageURL: image_URL,
-                                        videoURL: video_URL
-                                    )
-                                )
+                self.requestLivePhotoURLSuccess(
+                    imageURL: imageURL,
+                    videoURL: videoURL,
+                    compression: compression,
+                    completion: completion
+                )
+            }
+        }
+    }
+     
+    private func requestLivePhotoURLSuccess(
+        imageURL: URL?,
+        videoURL: URL?,
+        compression: Compression?,
+        completion: @escaping AssetURLCompletion
+    ) {
+        func completionFunc(_ image_URL: URL?, _ video_URL: URL?) {
+            if let image_URL = image_URL,
+               let video_URL = video_URL {
+                completion(
+                    .success(
+                        .init(
+                            url: image_URL,
+                            urlType: .local,
+                            mediaType: .photo,
+                            livePhoto: .init(
+                                imageURL: image_URL,
+                                videoURL: video_URL
                             )
                         )
-                    }else if image_URL != nil {
-                        completion(.failure(.exportLivePhotoVideoURLFailed(nil)))
-                    }else if video_URL != nil {
-                        completion(.failure(.exportLivePhotoImageURLFailed(nil)))
-                    }else {
-                        completion(.failure(.exportLivePhotoURLFailed(nil, nil)))
-                    }
+                    )
+                )
+            }else if image_URL != nil {
+                completion(.failure(.exportLivePhotoVideoURLFailed(nil)))
+            }else if video_URL != nil {
+                completion(.failure(.exportLivePhotoImageURLFailed(nil)))
+            }else {
+                completion(.failure(.exportLivePhotoURLFailed(nil, nil)))
+            }
+        }
+        func imageCompressor(_ url: URL, _ compressionQuality: CGFloat) -> URL? {
+            guard let imageData = try? Data(contentsOf: url) else {
+                return nil
+            }
+            if FileManager.default.fileExists(atPath: url.path) {
+                try? FileManager.default.removeItem(at: url)
+            }
+            if let data = PhotoTools.imageCompress(
+                imageData,
+                compressionQuality: compressionQuality
+            ) {
+                return PhotoTools.write(imageData: data)
+            }
+            return nil
+        }
+        func videoCompressor(
+            _ url: URL,
+            _ exportParameter: VideoExportParameter,
+            completionHandler: ((URL?, Error?) -> Void)?
+        ) {
+            let avAsset = AVAsset(url: url)
+            avAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+                if avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
+                    completionHandler?(nil, nil)
+                    return
                 }
-                func imageCompressor(_ url: URL, _ compressionQuality: CGFloat) -> URL? {
-                    guard let imageData = try? Data(contentsOf: url) else {
-                        return nil
+                AssetManager.exportVideoURL(
+                    forVideo: avAsset,
+                    toFile: PhotoTools.getVideoTmpURL(),
+                    exportParameter: exportParameter
+                ) { video_URL, error in
+                        if FileManager.default.fileExists(atPath: url.path) {
+                            try? FileManager.default.removeItem(at: url)
+                        }
+                        completionHandler?(video_URL, error)
                     }
-                    if FileManager.default.fileExists(atPath: url.path) {
-                        try? FileManager.default.removeItem(at: url)
-                    }
-                    if let data = PhotoTools.imageCompress(
-                        imageData,
-                        compressionQuality: compressionQuality
-                    ) {
-                        return PhotoTools.write(imageData: data)
-                    }
-                    return nil
+            }
+        }
+        if let imageCompression = compression?.imageCompressionQuality,
+           let videoExportParameter = compression?.videoExportParameter {
+            let group = DispatchGroup()
+            let imageQueue = DispatchQueue(label: "HXPhotoPicker.request.livephoto.imageurl")
+            var image_URL: URL?
+            var video_URL: URL?
+            imageQueue.async(group: group, execute: DispatchWorkItem(block: {
+                image_URL = imageCompressor(imageURL!, imageCompression)
+            }))
+            let videoQueue = DispatchQueue(label: "HXPhotoPicker.request.livephoto.videourl")
+            let semaphore = DispatchSemaphore(value: 0)
+            videoQueue.async(group: group, execute: DispatchWorkItem(block: {
+                videoCompressor(
+                    videoURL!,
+                    videoExportParameter
+                ) { url, _ in
+                    video_URL = url
+                    semaphore.signal()
                 }
-                func videoCompressor(
-                    _ url: URL,
-                    _ exportParameter: VideoExportParameter,
-                    completionHandler: ((URL?, Error?) -> Void)?
-                ) {
-                    let avAsset = AVAsset(url: url)
-                    avAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
-                        if avAsset.statusOfValue(forKey: "tracks", error: nil) != .loaded {
-                            completionHandler?(nil, nil)
-                            return
-                        }
-                        AssetManager.exportVideoURL(
-                            forVideo: avAsset,
-                            toFile: PhotoTools.getVideoTmpURL(),
-                            exportParameter: exportParameter
-                        ) { video_URL, error in
-                                if FileManager.default.fileExists(atPath: url.path) {
-                                    try? FileManager.default.removeItem(at: url)
-                                }
-                                completionHandler?(video_URL, error)
-                            }
-                    }
-                }
-                if let imageCompression = compression?.imageCompressionQuality,
-                   let videoExportParameter = compression?.videoExportParameter {
-                    let group = DispatchGroup()
-                    let imageQueue = DispatchQueue(label: "HXPhotoPicker.request.livephoto.imageurl")
-                    var image_URL: URL?
-                    var video_URL: URL?
-                    imageQueue.async(group: group, execute: DispatchWorkItem(block: {
-                        image_URL = imageCompressor(imageURL!, imageCompression)
-                    }))
-                    let videoQueue = DispatchQueue(label: "HXPhotoPicker.request.livephoto.videourl")
-                    let semaphore = DispatchSemaphore(value: 0)
-                    videoQueue.async(group: group, execute: DispatchWorkItem(block: {
-                        videoCompressor(
-                            videoURL!,
-                            videoExportParameter
-                        ) { url, error in
-                            video_URL = url
-                            semaphore.signal()
-                        }
-                        semaphore.wait()
-                    }))
-                    group.notify(queue: .main, work: DispatchWorkItem(block: {
-                        completionFunc(image_URL, video_URL)
-                    }))
-                }else if let imageCompression = compression?.imageCompressionQuality {
-                    DispatchQueue.global().async {
-                        let url = imageCompressor(imageURL!, imageCompression)
-                        DispatchQueue.main.async {
-                            completionFunc(url, videoURL)
-                        }
-                    }
-                }else if let videoExportParameter = compression?.videoExportParameter  {
-                    DispatchQueue.global().async {
-                        videoCompressor(
-                            videoURL!,
-                            videoExportParameter
-                        ) { url, error in
-                            DispatchQueue.main.async {
-                                completionFunc(imageURL, url)
-                            }
-                        }
-                    }
-                }else {
-                    completionFunc(imageURL, videoURL)
+                semaphore.wait()
+            }))
+            group.notify(queue: .main, work: DispatchWorkItem(block: {
+                completionFunc(image_URL, video_URL)
+            }))
+        }else if let imageCompression = compression?.imageCompressionQuality {
+            DispatchQueue.global().async {
+                let url = imageCompressor(imageURL!, imageCompression)
+                DispatchQueue.main.async {
+                    completionFunc(url, videoURL)
                 }
             }
+        }else if let videoExportParameter = compression?.videoExportParameter {
+            DispatchQueue.global().async {
+                videoCompressor(
+                    videoURL!,
+                    videoExportParameter
+                ) { url, _ in
+                    DispatchQueue.main.async {
+                        completionFunc(imageURL, url)
+                    }
+                }
+            }
+        }else {
+            completionFunc(imageURL, videoURL)
         }
     }
     
@@ -550,119 +564,47 @@ public extension PhotoAsset {
         let imageIdentifier = livePhoto.imageIdentifier
         let videoIdentifier = livePhoto.videoIdentifier
         let request = LocalLivePhotoRequest(videoURL: videoURL)
-        func mergeToLivePhoto(imageURL: URL, videoURL: URL) {
-            if success == nil && failure == nil {
-                return
-            }
-            let image = UIImage(contentsOfFile: imageURL.path)
-            request.requestID = PHLivePhoto.request(
-                withResourceFileURLs: [videoURL, imageURL],
-                placeholderImage: image,
-                targetSize: .zero,
-                contentMode: .aspectFill
-            ) { phLivePhoto, info in
-                guard let phLivePhoto = phLivePhoto else {
-                    DispatchQueue.main.async {
-                        failure?(self, nil, .localLivePhotoWriteVideoFailed)
-                    }
-                    return
-                }
-                let isDegraded = info[PHLivePhotoInfoIsDegradedKey] as? Int
-                let isCancel = info[PHLivePhotoInfoCancelledKey] as? Int
-                DispatchQueue.main.async {
-                    if let isDegraded = isDegraded {
-                        if isDegraded == 0 {
-                            success?(self, phLivePhoto)
-                        }
-                    }else if let isCancel = isCancel {
-                        if isCancel == 0 {
-                            success?(self, phLivePhoto)
-                        }else {
-                            failure?(self, info, .localLivePhotoRequestFailed)
-                        }
-                    }
-                }
-            }
-        }
         if livePhoto.isCache {
             DispatchQueue.main.async {
                 URLHandler?(livePhoto.jpgURL, livePhoto.movURL)
             }
-            mergeToLivePhoto(imageURL: livePhoto.jpgURL, videoURL: livePhoto.movURL)
+            request.requestID = mergeToLivePhoto(
+                imageURL: livePhoto.jpgURL,
+                videoURL: livePhoto.movURL,
+                success: success,
+                failure: failure
+            )
             return request
         }
-        func write(
-            imageURL:URL,
-            imageCacheKey: String?,
-            videoURL: URL,
-            videoCacheKey: String?
-        ) {
-            DispatchQueue.global().async {
-                PhotoTools.getLivePhotoJPGURL(
-                    imageURL,
-                    cacheKey: imageCacheKey
-                ) { url in
-                    guard let imageURL = url else {
-                        DispatchQueue.main.async {
-                            URLHandler?(nil, nil)
-                            failure?(self, nil, .localLivePhotoWriteImageFailed)
-                        }
-                        return
-                    }
-                    if request.isCancel {
-                        DispatchQueue.main.async {
-                            URLHandler?(imageURL, nil)
-                            failure?(self, nil, .localLivePhotoCancelWrite)
-                        }
-                        return
-                    }
-                    PhotoTools.getLivePhotoVideoMovURL(
-                        videoURL,
-                        cacheKey: videoCacheKey
-                    ) { writer, videoInput, videoReader, audioInput, audioReader in
-                        request.writer = writer
-                        request.videoInput = videoInput
-                        request.videoReader = videoReader
-                        request.audioInput = audioInput
-                        request.audioReader = audioReader
-                    } completion: { url in
-                        guard let videoURL = url else {
-                            DispatchQueue.main.async {
-                                URLHandler?(imageURL, nil)
-                                failure?(self, nil, .localLivePhotoWriteVideoFailed)
-                            }
-                            return
-                        }
-                        DispatchQueue.main.async {
-                            URLHandler?(imageURL, videoURL)
-                        }
-                        mergeToLivePhoto(imageURL: imageURL, videoURL: videoURL)
-                    }
-                }
-            }
-        }
-        
         if imageURL.isFileURL && videoURL.isFileURL {
-            write(
+            writeLivePhoto(
+                request: request,
                 imageURL: imageURL,
                 imageCacheKey: imageIdentifier,
                 videoURL: videoURL,
-                videoCacheKey: videoIdentifier
+                videoCacheKey: videoIdentifier,
+                URLHandler: URLHandler,
+                success: success,
+                failure: failure
             )
         }else if !imageURL.isFileURL && videoURL.isFileURL {
             #if canImport(Kingfisher)
             request.imageTask = KingfisherManager.shared.retrieveImage(with: imageURL) { result in
                 switch result {
-                case .success(_):
+                case .success:
                     let cachePath = ImageCache.default.cachePath(forKey: imageURL.cacheKey)
                     let cacheURL = URL(fileURLWithPath: cachePath)
-                    write(
+                    self.writeLivePhoto(
+                        request: request,
                         imageURL: cacheURL,
                         imageCacheKey: imageURL.absoluteString,
                         videoURL: videoURL,
-                        videoCacheKey: videoIdentifier
+                        videoCacheKey: videoIdentifier,
+                        URLHandler: URLHandler,
+                        success: success,
+                        failure: failure
                     )
-                case .failure(_):
+                case .failure:
                     URLHandler?(nil, nil)
                     failure?(self, nil, .imageDownloadFailed)
                 }
@@ -673,41 +615,49 @@ public extension PhotoAsset {
                 "下载网络图片请导入 Kingfisher"
             )
             #endif
-        }else if imageURL.isFileURL && !videoURL.isFileURL  {
-            PhotoManager.shared.downloadTask(with: videoURL) { url, error, ext in
+        }else if imageURL.isFileURL && !videoURL.isFileURL {
+            PhotoManager.shared.downloadTask(with: videoURL) { url, _, _ in
                 guard let video_URL = url else {
                     URLHandler?(nil, nil)
                     failure?(self, nil, .videoDownloadFailed)
                     return
                 }
-                write(
+                self.writeLivePhoto(
+                    request: request,
                     imageURL: imageURL,
                     imageCacheKey: imageIdentifier,
                     videoURL: video_URL,
-                    videoCacheKey: videoURL.absoluteString
+                    videoCacheKey: videoURL.absoluteString,
+                    URLHandler: URLHandler,
+                    success: success,
+                    failure: failure
                 )
             }
         }else {
             #if canImport(Kingfisher)
             request.imageTask = KingfisherManager.shared.retrieveImage(with: imageURL) { result in
                 switch result {
-                case .success(_):
+                case .success:
                     let cachePath = ImageCache.default.cachePath(forKey: imageURL.cacheKey)
                     let cacheURL = URL(fileURLWithPath: cachePath)
-                    PhotoManager.shared.downloadTask(with: videoURL) { url, error, ext in
+                    PhotoManager.shared.downloadTask(with: videoURL) { url, _, _ in
                         guard let video_URL = url else {
                             URLHandler?(nil, nil)
                             failure?(self, nil, .videoDownloadFailed)
                             return
                         }
-                        write(
+                        self.writeLivePhoto(
+                            request: request,
                             imageURL: cacheURL,
                             imageCacheKey: imageURL.absoluteString,
                             videoURL: video_URL,
-                            videoCacheKey: videoURL.absoluteString
+                            videoCacheKey: videoURL.absoluteString,
+                            URLHandler: URLHandler,
+                            success: success,
+                            failure: failure
                         )
                     }
-                case .failure(_):
+                case .failure:
                     URLHandler?(nil, nil)
                     failure?(self, nil, .imageDownloadFailed)
                 }
@@ -720,6 +670,106 @@ public extension PhotoAsset {
             #endif
         }
         return request
+    }
+    
+    private func mergeToLivePhoto(
+        imageURL: URL,
+        videoURL: URL,
+        success: ((PhotoAsset, PHLivePhoto) -> Void)? = nil,
+        failure: PhotoAssetFailureHandler? = nil
+    ) -> PHLivePhotoRequestID? {
+        if success == nil && failure == nil {
+            return nil
+        }
+        let image = UIImage(contentsOfFile: imageURL.path)
+        return PHLivePhoto.request(
+            withResourceFileURLs: [videoURL, imageURL],
+            placeholderImage: image,
+            targetSize: .zero,
+            contentMode: .aspectFill
+        ) { phLivePhoto, info in
+            guard let phLivePhoto = phLivePhoto else {
+                DispatchQueue.main.async {
+                    failure?(self, nil, .localLivePhotoWriteVideoFailed)
+                }
+                return
+            }
+            let isDegraded = info[PHLivePhotoInfoIsDegradedKey] as? Int
+            let isCancel = info[PHLivePhotoInfoCancelledKey] as? Int
+            DispatchQueue.main.async {
+                if let isDegraded = isDegraded {
+                    if isDegraded == 0 {
+                        success?(self, phLivePhoto)
+                    }
+                }else if let isCancel = isCancel {
+                    if isCancel == 0 {
+                        success?(self, phLivePhoto)
+                    }else {
+                        failure?(self, info, .localLivePhotoRequestFailed)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func writeLivePhoto(
+        request: LocalLivePhotoRequest,
+        imageURL: URL,
+        imageCacheKey: String?,
+        videoURL: URL,
+        videoCacheKey: String?,
+        URLHandler: ((URL?, URL?) -> Void)? = nil,
+        success: ((PhotoAsset, PHLivePhoto) -> Void)? = nil,
+        failure: PhotoAssetFailureHandler? = nil
+    ) {
+        DispatchQueue.global().async {
+            PhotoTools.getLivePhotoJPGURL(
+                imageURL,
+                cacheKey: imageCacheKey
+            ) { url in
+                guard let imageURL = url else {
+                    DispatchQueue.main.async {
+                        URLHandler?(nil, nil)
+                        failure?(self, nil, .localLivePhotoWriteImageFailed)
+                    }
+                    return
+                }
+                if request.isCancel {
+                    DispatchQueue.main.async {
+                        URLHandler?(imageURL, nil)
+                        failure?(self, nil, .localLivePhotoCancelWrite)
+                    }
+                    return
+                }
+                PhotoTools.getLivePhotoVideoMovURL(
+                    videoURL,
+                    cacheKey: videoCacheKey
+                ) { writer, videoInput, videoReader, audioInput, audioReader in
+                    request.writer = writer
+                    request.videoInput = videoInput
+                    request.videoReader = videoReader
+                    request.audioInput = audioInput
+                    request.audioReader = audioReader
+                } completion: { url in
+                    guard let videoURL = url else {
+                        DispatchQueue.main.async {
+                            URLHandler?(imageURL, nil)
+                            failure?(self, nil, .localLivePhotoWriteVideoFailed)
+                        }
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        URLHandler?(imageURL, videoURL)
+                    }
+                    request.requestID = self.mergeToLivePhoto(
+                        imageURL: imageURL,
+                        videoURL: videoURL,
+                        success: success,
+                        failure: failure
+                    )
+                }
+            }
+        }
     }
     
     func requestLocalLivePhotoURL(
@@ -828,7 +878,7 @@ public extension PhotoAsset {
             deliveryMode: deliveryMode
         ) { (iCloudRequestID) in
             iCloudHandler?(self, iCloudRequestID)
-        } progressHandler: { (progress, error, stop, info) in
+        } progressHandler: { (progress, _, _, _) in
             self.downloadProgress = progress
             DispatchQueue.main.async {
                 progressHandler?(self, progress)

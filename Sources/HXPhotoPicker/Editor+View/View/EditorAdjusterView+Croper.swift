@@ -9,71 +9,6 @@ import UIKit
 
 extension EditorAdjusterView {
     
-    struct CropFactor {
-        let drawLayer: CALayer?
-        let mosaicLayer: CALayer?
-        let stickersLayer: CALayer?
-        let isCropImage: Bool
-        let isRound: Bool
-        let maskImage: UIImage?
-        let angle: CGFloat
-        let mirrorScale: CGPoint
-        let centerRatio: CGPoint
-        let sizeRatio: CGPoint
-        let waterSizeRatio: CGPoint
-        let waterCenterRatio: CGPoint
-        
-        var allowCroped: Bool {
-            if isEmpty {
-                return false
-            }
-            return !(!isCropImage &&
-              !isRound &&
-              maskImage == nil &&
-              mirrorScale.x * mirrorScale.y > 0 &&
-              drawLayer == nil &&
-              mosaicLayer == nil &&
-              stickersLayer == nil)
-        }
-        
-        var isClip: Bool {
-            isCropImage || isRound || maskImage != nil
-        }
-        
-        func isEqual(_ facotr: CropFactor) -> Bool {
-            if isCropImage != facotr.isCropImage {
-                return false
-            }
-            if isRound != facotr.isRound {
-                return false
-            }
-            if maskImage != facotr.maskImage {
-                return false
-            }
-            if angle != facotr.angle {
-                return false
-            }
-            if !mirrorScale.equalTo(facotr.mirrorScale) {
-                return false
-            }
-            if !centerRatio.equalTo(facotr.centerRatio) {
-                return false
-            }
-            if !sizeRatio.equalTo(facotr.sizeRatio) {
-                return false
-            }
-            return true
-        }
-        
-        var isEmpty: Bool {
-            drawLayer == nil && mosaicLayer == nil && stickersLayer == nil && !isCropImage && !isRound && maskImage == nil && angle == 0 && mirrorScale == .zero && centerRatio == .zero && sizeRatio == .zero && waterSizeRatio == .zero && waterCenterRatio == .zero
-        }
-        
-        static var empty: CropFactor {
-            .init(drawLayer: nil, mosaicLayer: nil, stickersLayer: nil, isCropImage: false, isRound: false, maskImage: nil, angle: 0, mirrorScale: .zero, centerRatio: .zero, sizeRatio: .zero, waterSizeRatio: .zero, waterCenterRatio: .zero)
-        }
-    }
-    
     var isCropRund: Bool {
         if state == .normal {
             return oldAdjustedFactor?.isRoundMask ?? false
@@ -280,7 +215,7 @@ extension EditorAdjusterView {
                     let fileName = String.fileName(suffix: data.isGif ? "gif" : "png")
                     urlConfig = .init(fileName: fileName, type: .temp)
                 }
-                guard let _ = PhotoTools.write(toFile: urlConfig.url, imageData: data) else {
+                if PhotoTools.write(toFile: urlConfig.url, imageData: data) == nil {
                     DispatchQueue.main.async {
                         completion(.failure(.error(type: .writeFileFailed, message: "图片写入文件失败：\(urlConfig.url)")))
                     }
@@ -311,8 +246,6 @@ extension EditorAdjusterView {
             }
         }
     }
-    
-    
 }
 
 extension EditorAdjusterView {
@@ -482,4 +415,123 @@ extension EditorAdjusterView {
         }
         return UIImage.merge(images: images)?.scaleToFillSize(size: imageSize)
     }
+}
+
+extension EditorAdjusterView {
+    
+    struct CropFactor {
+        let drawLayer: CALayer?
+        let mosaicLayer: CALayer?
+        let stickersLayer: CALayer?
+        let isCropImage: Bool
+        let isRound: Bool
+        let maskImage: UIImage?
+        let angle: CGFloat
+        let mirrorScale: CGPoint
+        let centerRatio: CGPoint
+        let sizeRatio: CGPoint
+        let waterSizeRatio: CGPoint
+        let waterCenterRatio: CGPoint
+        
+        let allowCroped: Bool
+        let isClip: Bool
+        let isEmpty: Bool
+        
+        init(
+            drawLayer: CALayer?,
+            mosaicLayer: CALayer?,
+            stickersLayer: CALayer?,
+            isCropImage: Bool,
+            isRound: Bool,
+            maskImage: UIImage?,
+            angle: CGFloat,
+            mirrorScale: CGPoint,
+            centerRatio: CGPoint,
+            sizeRatio: CGPoint,
+            waterSizeRatio: CGPoint,
+            waterCenterRatio: CGPoint
+        ) {
+            self.drawLayer = drawLayer
+            self.mosaicLayer = mosaicLayer
+            self.stickersLayer = stickersLayer
+            self.isCropImage = isCropImage
+            self.isRound = isRound
+            self.maskImage = maskImage
+            self.angle = angle
+            self.mirrorScale = mirrorScale
+            self.centerRatio = centerRatio
+            self.sizeRatio = sizeRatio
+            self.waterSizeRatio = waterSizeRatio
+            self.waterCenterRatio = waterCenterRatio
+            
+            isEmpty = drawLayer == nil
+            && mosaicLayer == nil
+            && stickersLayer == nil
+            && !isCropImage
+            && !isRound
+            && maskImage == nil
+            && angle == 0
+            && mirrorScale == .zero
+            && centerRatio == .zero
+            && sizeRatio == .zero
+            && waterSizeRatio == .zero
+            && waterCenterRatio == .zero
+            
+            if isEmpty {
+                allowCroped = true
+            }else {
+                allowCroped = !(!isCropImage &&
+                                !isRound &&
+                                maskImage == nil &&
+                                mirrorScale.x * mirrorScale.y > 0 &&
+                                drawLayer == nil &&
+                                mosaicLayer == nil &&
+                                stickersLayer == nil)
+            }
+            isClip = isCropImage || isRound || maskImage != nil
+        }
+        
+        func isEqual(_ facotr: CropFactor) -> Bool {
+            if isCropImage != facotr.isCropImage {
+                return false
+            }
+            if isRound != facotr.isRound {
+                return false
+            }
+            if maskImage != facotr.maskImage {
+                return false
+            }
+            if angle != facotr.angle {
+                return false
+            }
+            if !mirrorScale.equalTo(facotr.mirrorScale) {
+                return false
+            }
+            if !centerRatio.equalTo(facotr.centerRatio) {
+                return false
+            }
+            if !sizeRatio.equalTo(facotr.sizeRatio) {
+                return false
+            }
+            return true
+        }
+        
+        static var empty: CropFactor {
+            .init(
+                drawLayer: nil,
+                mosaicLayer: nil,
+                stickersLayer: nil,
+                isCropImage: false,
+                isRound: false,
+                maskImage: nil,
+                angle: 0,
+                mirrorScale: .zero,
+                centerRatio: .zero,
+                sizeRatio: .zero,
+                waterSizeRatio: .zero,
+                waterCenterRatio: .zero
+            )
+        }
+    }
+    
 }

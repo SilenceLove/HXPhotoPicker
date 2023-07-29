@@ -134,8 +134,8 @@ class EditorMosaicView: UIView {
                     point.y + 2,
                     point.y
                 ]
-                let pointX = pointXArray[Int(arc4random() % 6)]
-                let pointY = pointYArray[Int(arc4random() % 6)]
+                let pointX = pointXArray[Int.random(in: 0..<6)]
+                let pointY = pointYArray[Int.random(in: 0..<6)]
                 let newPoint = CGPoint(x: pointX, y: pointY)
                 if let lastPoint = mosaicPoints.last,
                    (abs(newPoint.x - lastPoint.x * width) <= 2 || abs(newPoint.y - lastPoint.y * width) <= 2) {

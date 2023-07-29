@@ -28,7 +28,6 @@ extension Data {
         imageContentType == .gif
     }
     
-    
     var fileType: FileType {
         guard let firstByte = first else {
             return .unknown

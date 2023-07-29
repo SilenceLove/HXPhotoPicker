@@ -26,10 +26,9 @@ extension PhotoTools {
                 title: "无法访问相册中照片".localized,
                 message: "当前无照片访问权限，建议前往系统设置，\n允许访问「照片」中的「所有照片」。".localized,
                 leftActionTitle: "取消".localized,
-                leftHandler: {_ in
-                },
+                leftHandler: nil,
                 rightActionTitle: "前往系统设置".localized
-            ) { (alertAction) in
+            ) { _ in
                 openSettingsURL()
             }
         }
@@ -114,7 +113,7 @@ extension PhotoTools {
                 }
             }
             if let url = url {
-                getVideoThumbnailImage(url: url, atTime: 0.1) { (videoURL, coverImage, result) in
+                getVideoThumbnailImage(url: url, atTime: 0.1) { (_, coverImage, _) in
                     if photoAsset.isNetworkAsset {
                         photoAsset.networkVideoAsset?.coverImage = coverImage
                     }else {
@@ -277,7 +276,9 @@ extension PhotoTools {
         return nil
     }
     
+    // swiftlint:disable superfluous_disable_command
     /// 获取和微信主题一致的配置
+    // swiftlint:enable superfluous_disable_command
     // swiftlint:disable function_body_length
     public static func getWXPickerConfig(
         isMoment: Bool = false
@@ -379,8 +380,11 @@ extension PhotoTools {
         config.previewView.bottomView.originalSelectBox.borderColor = .white
         config.previewView.bottomView.originalSelectBox.tickColor = .white
         config.previewView.bottomView.originalSelectBox.selectedBackgroundColor = wxColor
+        #if targetEnvironment(macCatalyst)
+        config.previewView.bottomView.originalLoadingStyle = UIActivityIndicatorView.Style.medium
+        #else
         config.previewView.bottomView.originalLoadingStyle = .white
-        
+        #endif
         config.previewView.bottomView.finishButtonTitleColor = .white
         config.previewView.bottomView.finishButtonBackgroundColor = wxColor
         config.previewView.bottomView.finishButtonDisableBackgroundColor = "#666666".color.withAlphaComponent(0.3)
@@ -393,7 +397,7 @@ extension PhotoTools {
         config.editor.video.cropTime.maximumTime = 60
         #endif
         
-        #if HXPICKER_ENABLE_CAMERA
+        #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
         var cameraConfig = CameraConfiguration()
         cameraConfig.videoMaximumDuration = 60
         cameraConfig.tintColor = wxColor

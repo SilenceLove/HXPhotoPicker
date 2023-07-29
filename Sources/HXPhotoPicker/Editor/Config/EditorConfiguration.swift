@@ -501,7 +501,6 @@ public extension EditorConfiguration {
         public init() { }
     }
 
-    
     struct ToolsView {
         /// 工具栏item选项
         public var toolOptions: [Options]
@@ -563,7 +562,6 @@ public extension EditorConfiguration {
                 case cropSize
             }
         }
-        
         
         public static var `default`: ToolsView {
             let time = Options(

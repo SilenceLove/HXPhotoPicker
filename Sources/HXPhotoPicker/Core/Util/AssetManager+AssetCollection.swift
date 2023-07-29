@@ -17,7 +17,7 @@ public extension AssetManager {
     static func fetchSmartAlbums(
         options: PHFetchOptions?
     ) -> PHFetchResult<PHAssetCollection> {
-        return PHAssetCollection.fetchAssetCollections(
+        PHAssetCollection.fetchAssetCollections(
             with: .smartAlbum,
             subtype: .any,
             options: options
@@ -30,7 +30,7 @@ public extension AssetManager {
     static func fetchUserAlbums(
         options: PHFetchOptions?
     ) -> PHFetchResult<PHAssetCollection> {
-        return PHAssetCollection.fetchAssetCollections(
+        PHAssetCollection.fetchAssetCollections(
             with: .album,
             subtype: .any,
             options: options
@@ -45,7 +45,7 @@ public extension AssetManager {
     static func enumerateAllAlbums(
         filterInvalid: Bool,
         options: PHFetchOptions?,
-        usingBlock :@escaping (PHAssetCollection, Int, UnsafeMutablePointer<ObjCBool>) -> Void
+        usingBlock: @escaping (PHAssetCollection, Int, UnsafeMutablePointer<ObjCBool>) -> Void
     ) {
         let smartAlbums = fetchSmartAlbums(options: nil)
         let userAlbums = fetchUserAlbums(options: nil)
@@ -83,7 +83,7 @@ public extension AssetManager {
     ) -> PHAssetCollection? {
         let smartAlbums = fetchSmartAlbums(options: options)
         var assetCollection: PHAssetCollection?
-        smartAlbums.enumerateObjects { (collection, index, stop) in
+        smartAlbums.enumerateObjects { (collection, _, stop) in
             if  !collection.isKind(of: PHAssetCollection.self) ||
                 collection.estimatedAssetCount <= 0 {
                 return
@@ -108,7 +108,7 @@ public extension AssetManager {
             options: nil
         )
         var assetCollection: PHAssetCollection?
-        collections.enumerateObjects { (collection, index, stop) in
+        collections.enumerateObjects { (collection, _, stop) in
             if collection.localizedTitle == collectionName {
                 assetCollection = collection
                 stop.pointee = true

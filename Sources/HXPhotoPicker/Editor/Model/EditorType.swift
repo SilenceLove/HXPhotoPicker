@@ -52,7 +52,11 @@ extension EditedResult: Codable {
             self = .video(videoEditedResult, videoEditedData)
             return
         }
-        throw DecodingError.dataCorruptedError(forKey: CodingKeys.error, in: container, debugDescription: "Invalid type")
+        throw DecodingError.dataCorruptedError(
+            forKey: CodingKeys.error,
+            in: container,
+            debugDescription: "Invalid type"
+        )
     }
     
     public func encode(to encoder: Encoder) throws {

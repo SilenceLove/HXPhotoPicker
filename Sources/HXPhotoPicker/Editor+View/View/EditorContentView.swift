@@ -26,13 +26,21 @@ protocol EditorContentViewDelegate: AnyObject {
     func contentView(_ contentView: EditorContentView, resetItemViews itemViews: [EditorStickersItemBaseView])
     func contentView(_ contentView: EditorContentView, shouldAddAudioItem audio: EditorStickerAudio) -> Bool
     
-    func contentView(_ contentView: EditorContentView, stickersView: EditorStickersView, moveToCenter itemView: EditorStickersItemView) -> Bool
+    func contentView(
+        _ contentView: EditorContentView,
+        stickersView: EditorStickersView,
+        moveToCenter itemView: EditorStickersItemView
+    ) -> Bool
     func contentView(_ contentView: EditorContentView, stickerMaxScale itemSize: CGSize) -> CGFloat
     func contentView(_ contentView: EditorContentView, stickerItemCenter stickersView: EditorStickersView) -> CGPoint?
     func contentView(rotateVideo contentView: EditorContentView)
     func contentView(resetVideoRotate contentView: EditorContentView)
     
-    func contentView(_ contentView: EditorContentView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage
+    func contentView(
+        _ contentView: EditorContentView,
+        videoApplyFilter sourceImage: CIImage,
+        at time: CMTime
+    ) -> CIImage
     
 }
 
@@ -363,9 +371,15 @@ extension EditorContentView: EditorVideoPlayerViewDelegate {
         set {
             videoView.startTime = newValue
             if let startTime = videoView.startTime, let endTime = videoView.endTime {
-                delegate?.contentView(self, readyToPlay: .init(seconds: endTime.seconds - startTime.seconds, preferredTimescale: 1000))
+                delegate?.contentView(
+                    self,
+                    readyToPlay: .init(seconds: endTime.seconds - startTime.seconds, preferredTimescale: 1000)
+                )
             }else if let startTime = videoView.startTime {
-                delegate?.contentView(self, readyToPlay: .init(seconds: duration.seconds - startTime.seconds, preferredTimescale: 1000))
+                delegate?.contentView(
+                    self,
+                    readyToPlay: .init(seconds: duration.seconds - startTime.seconds, preferredTimescale: 1000)
+                )
             }else if let endTime = videoView.endTime {
                 delegate?.contentView(self, readyToPlay: endTime)
             }else {
@@ -378,9 +392,15 @@ extension EditorContentView: EditorVideoPlayerViewDelegate {
         set {
             videoView.endTime = newValue
             if let startTime = videoView.startTime, let endTime = videoView.endTime {
-                delegate?.contentView(self, readyToPlay: .init(seconds: endTime.seconds - startTime.seconds, preferredTimescale: 1000))
+                delegate?.contentView(
+                    self,
+                    readyToPlay: .init(seconds: endTime.seconds - startTime.seconds, preferredTimescale: 1000)
+                )
             }else if let startTime = videoView.startTime {
-                delegate?.contentView(self, readyToPlay: .init(seconds: duration.seconds - startTime.seconds, preferredTimescale: 1000))
+                delegate?.contentView(
+                    self,
+                    readyToPlay: .init(seconds: duration.seconds - startTime.seconds, preferredTimescale: 1000)
+                )
             }else if let endTime = videoView.endTime {
                 delegate?.contentView(self, readyToPlay: endTime)
             }else {
@@ -478,7 +498,10 @@ extension EditorContentView: EditorStickersViewDelegate {
     }
     
     func stickerView(_ stickerView: EditorStickersView, shouldAddAudioItem audio: EditorStickerAudio) -> Bool {
-        delegate?.contentView(self, shouldAddAudioItem: audio) ?? true
+        if let shouldAddAudioItem = delegate?.contentView(self, shouldAddAudioItem: audio) {
+            return shouldAddAudioItem
+        }
+        return true
     }
     
     func stickerView(touchBegan stickerView: EditorStickersView) {

@@ -202,9 +202,17 @@ extension EditorView {
         var contentY: CGFloat = 0
         if contentHeight < viewHeight {
             contentY = (viewHeight - contentHeight) * 0.5
-            adjusterView.setFrame(CGRect(x: 0, y: -contentY, width: viewWidth, height: viewHeight), maxRect: bounds, contentInset: contentInset)
+            adjusterView.setFrame(
+                CGRect(x: 0, y: -contentY, width: viewWidth, height: viewHeight),
+                maxRect: bounds,
+                contentInset: contentInset
+            )
         }else {
-            adjusterView.setFrame(.init(x: 0, y: 0, width: viewWidth, height: viewHeight), maxRect: bounds, contentInset: contentInset)
+            adjusterView.setFrame(
+                .init(x: 0, y: 0, width: viewWidth, height: viewHeight),
+                maxRect: bounds,
+                contentInset: contentInset
+            )
         }
         contentSize = CGSize(width: contentWidth, height: contentHeight)
         adjusterView.frame = CGRect(x: contentX, y: contentY, width: contentWidth, height: contentHeight)
@@ -223,12 +231,24 @@ extension EditorView {
         var contentY: CGFloat = 0
         if contentHeight < viewHeight {
             contentY = (viewHeight - contentHeight) * 0.5
-            adjusterView.setCustomMaskFrame(CGRect(x: 0, y: -contentY, width: viewWidth, height: viewHeight), maxRect: bounds, contentInset: contentInset)
+            adjusterView.setCustomMaskFrame(
+                CGRect(x: 0, y: -contentY, width: viewWidth, height: viewHeight),
+                maxRect: bounds,
+                contentInset: contentInset
+            )
         }else {
             if !isReset {
-                adjusterView.setCustomMaskFrame(.init(x: 0, y: 0, width: viewWidth, height: contentHeight), maxRect: .init(x: 0, y: 0, width: width, height: contentHeight), contentInset: contentInset)
+                adjusterView.setCustomMaskFrame(
+                    .init(x: 0, y: 0, width: viewWidth, height: contentHeight),
+                    maxRect: .init(x: 0, y: 0, width: width, height: contentHeight),
+                    contentInset: contentInset
+                )
             }else {
-                adjusterView.setCustomMaskFrame(.init(x: 0, y: 0, width: viewWidth, height: viewHeight), maxRect: bounds, contentInset: contentInset)
+                adjusterView.setCustomMaskFrame(
+                    .init(x: 0, y: 0, width: viewWidth, height: viewHeight),
+                    maxRect: bounds,
+                    contentInset: contentInset
+                )
             }
         }
     }
@@ -372,5 +392,3 @@ extension EditorView {
         editSize = .init(width: rectW, height: rectH)
     }
 }
-
-

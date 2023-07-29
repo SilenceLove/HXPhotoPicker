@@ -28,6 +28,7 @@ protocol EditorStickersViewDelegate: AnyObject {
     func stickerView(rotateVideo stickerView: EditorStickersView)
     func stickerView(resetVideoRotate stickerView: EditorStickersView)
 }
+
 class EditorStickersView: UIView {
     weak var delegate: EditorStickersViewDelegate?
     var scale: CGFloat = 1 {
@@ -491,7 +492,10 @@ extension EditorStickersView {
         isVideoMark = false
         for subView in subviews {
             if let itemView = subView as? EditorStickersItemView {
-                let transform = CGAffineTransform(scaleX: itemView.editMirrorScale.x, y: itemView.editMirrorScale.y).scaledBy(x: scale.x, y: scale.y)
+                let transform = CGAffineTransform(
+                    scaleX: itemView.editMirrorScale.x,
+                    y: itemView.editMirrorScale.y
+                ).scaledBy(x: scale.x, y: scale.y)
                 itemView.editMirrorScale = .init(x: transform.a, y: transform.d)
             }
         }
@@ -499,7 +503,10 @@ extension EditorStickersView {
     func initialMirror(_ scale: CGPoint) {
         for subView in subviews {
             if let itemView = subView as? EditorStickersItemView {
-                let transform = CGAffineTransform(scaleX: itemView.editMirrorScale.x, y: itemView.editMirrorScale.y).scaledBy(x: scale.x, y: scale.y)
+                let transform = CGAffineTransform(
+                    scaleX: itemView.editMirrorScale.x,
+                    y: itemView.editMirrorScale.y
+                ).scaledBy(x: scale.x, y: scale.y)
                 itemView.editMirrorScale = .init(x: transform.a, y: transform.d)
             }
         }
@@ -631,7 +638,10 @@ extension EditorStickersView: EditorStickersItemViewDelegate {
         }
     }
     
-    func stickerItemView(_ itemView: EditorStickersItemView, panGestureRecognizerChanged panGR: UIPanGestureRecognizer) {
+    func stickerItemView(
+        _ itemView: EditorStickersItemView,
+        panGestureRecognizerChanged panGR: UIPanGestureRecognizer
+    ) {
         if !isShowTrash && !itemView.item.isAudio {
             return
         }

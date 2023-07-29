@@ -9,7 +9,9 @@
 import UIKit
 import AVKit
 
+#if !targetEnvironment(macCatalyst)
 class PickerCameraViewCell: UICollectionViewCell {
+    
     lazy var captureView: CaptureVideoPreviewView = {
         let view = CaptureVideoPreviewView(isCell: true)
         return view
@@ -118,3 +120,4 @@ class PickerCameraViewCell: UICollectionViewCell {
         stopSession()
     }
 }
+#endif

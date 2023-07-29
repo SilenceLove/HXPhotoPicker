@@ -17,7 +17,7 @@ class EditorMaskView: UIView {
         case .customColor(let color):
             view.backgroundColor = color
             customMaskEffectView.alpha = 0
-        case .blurEffect(_):
+        case .blurEffect:
             customMaskEffectView.alpha = 1
         }
         view.addSubview(customMaskEffectView)
@@ -145,7 +145,6 @@ class EditorMaskView: UIView {
         layer.shadowOpacity = 0.5
         return layer
     }()
-    
     
     lazy var gridGraylinesView: UIView = {
         let view = UIView()
@@ -280,9 +279,8 @@ class EditorMaskView: UIView {
             case .customColor(let color):
                 backgroundColor = color
                 visualEffectView.alpha = 0
-            case .blurEffect(_):
+            case .blurEffect:
                 visualEffectView.alpha = 1
-                break
             }
             addSubview(visualEffectView)
             layer.mask = maskLayer
@@ -295,6 +293,203 @@ class EditorMaskView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    var maskViewIsHidden = false
+    
+    func updateBlackMask(isShow: Bool, animated: Bool, completion: (() -> Void)? = nil) {
+        if animated {
+            if isShow {
+                blackMaskView.isHidden = false
+            }
+            UIView.animate {
+                self.blackMaskView.alpha = isShow ? 1 : 0
+            } completion: {
+                if !$0 { return }
+                if !isShow {
+                    self.blackMaskView.isHidden = true
+                }
+                completion?()
+            }
+        }else {
+            blackMaskView.alpha = isShow ? 1 : 0
+            blackMaskView.isHidden = !isShow
+            completion?()
+        }
+    }
+    
+    var maskRect: CGRect = .zero
+    var layersRect: CGRect = .zero
+    
+    func updateLayers(_ rect: CGRect, _ animated: Bool) {
+        layersRect = rect
+        switch type {
+        case .frame:
+            updateFrameLayer(rect, animated)
+        case .mask:
+            let maskPath = UIBezierPath(rect: bounds)
+            let maskRect = CGRect(
+                x: rect.minX + maskInsets.left,
+                y: rect.minY + maskInsets.top,
+                width: rect.width, height: rect.height
+            )
+            maskPath.append(UIBezierPath(
+                roundedRect: maskRect,
+                cornerRadius: isRoundCrop ? min(rect.width, rect.height) * 0.5 : 0.1
+            ).reversing())
+            if animated {
+                maskLayer.removeAnimation(forKey: "maskAnimation")
+                let maskAnimation = PhotoTools.getBasicAnimation(
+                    "path",
+                    maskLayer.path,
+                    maskPath.cgPath
+                )
+                maskLayer.add(maskAnimation, forKey: "maskAnimation")
+            }
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            maskLayer.path = maskPath.cgPath
+            CATransaction.commit()
+        case .customMask:
+            let maskRect = CGRect(
+                x: rect.minX + maskInsets.left,
+                y: rect.minY + maskInsets.top,
+                width: rect.width, height: rect.height
+            )
+            self.maskRect = maskRect
+            if animated {
+                UIView.animate {
+                    self.maskImageView.image = self.maskImage
+                    self.maskImageView.frame = maskRect
+                    self.customMaskEffectView.frame = maskRect
+                }
+            }else {
+                maskImageView.image = maskImage
+                maskImageView.frame = maskRect
+                customMaskEffectView.frame = maskRect
+            }
+        }
+    }
+    
+    private func updateFrameLayer(_ rect: CGRect, _ animated: Bool) {
+        var framePath: UIBezierPath
+        let frameRect = CGRect(
+            x: rect.minX - frameLayer.lineWidth * 0.5,
+            y: rect.minY - frameLayer.lineWidth * 0.5,
+            width: rect.width + frameLayer.lineWidth,
+            height: rect.height + frameLayer.lineWidth
+        )
+        framePath = UIBezierPath(
+            roundedRect: frameRect,
+            cornerRadius: isRoundCrop ? min(frameRect.width, frameRect.height) * 0.5 : 0.1
+        )
+        let gridlinePath = getGridlinePath(rect)
+        let gridGraylinePath = getGridGraylinePath(rect)
+        let dotsPath = getDotsPath(
+            CGRect(
+                x: rect.minX - frameLayer.lineWidth,
+                y: rect.minY - frameLayer.lineWidth,
+                width: rect.width + frameLayer.lineWidth * 2,
+                height: rect.height + frameLayer.lineWidth * 2
+            )
+        )
+        if animated {
+            frameLayer.removeAnimation(forKey: "frameAnimation")
+            gridGraylinesLayer.removeAnimation(forKey: "gridGraylinesAnimation")
+            gridlinesLayer.removeAnimation(forKey: "gridlinesAnimation")
+            dotsLayer.removeAnimation(forKey: "dotsGroupAnimation")
+            dotsLayer.removeAnimation(forKey: "dotsAnimation")
+            let frameAnimation = PhotoTools.getBasicAnimation(
+                "path",
+                frameLayer.path,
+                framePath.cgPath
+            )
+            frameLayer.add(frameAnimation, forKey: "frameAnimation")
+            let gridlinesAnimation = PhotoTools.getBasicAnimation(
+                "path",
+                gridlinesLayer.path,
+                isRoundCrop ? nil : gridlinePath.cgPath
+            )
+            gridlinesLayer.add(gridlinesAnimation, forKey: "gridlinesAnimation")
+            let gridGraylinesAnimation = PhotoTools.getBasicAnimation(
+                "path",
+                gridGraylinesLayer.path,
+                isRoundCrop ? nil : gridGraylinePath.cgPath
+            )
+            gridGraylinesLayer.add(gridGraylinesAnimation, forKey: "gridGraylinesAnimation")
+            
+            let dotsAnimation = PhotoTools.getBasicAnimation(
+                "path",
+                dotsLayer.path,
+                isRoundCrop ? nil : dotsPath.cgPath
+            )
+            let addDostOpactyAimation: Bool
+            if isRoundCrop {
+                addDostOpactyAimation = dotsLayer.opacity != 0
+            }else {
+                addDostOpactyAimation = dotsLayer.opacity != 1
+            }
+            if addDostOpactyAimation {
+                let dotsOpacityAnimation = PhotoTools.getBasicAnimation(
+                    "opacity",
+                    dotsLayer.opacity,
+                    isRoundCrop ? 0 : 1
+                )
+                let dotsGroupAnimation = CAAnimationGroup()
+                dotsGroupAnimation.animations = [dotsAnimation, dotsOpacityAnimation]
+                dotsLayer.add(dotsGroupAnimation, forKey: "dotsGroupAnimation")
+            }else {
+                dotsLayer.add(dotsAnimation, forKey: "dotsAnimation")
+            }
+            let beforCenter = sizeLb.center
+            sizeLb.width = frameRect.width - 2
+            sizeLb.center = beforCenter
+            UIView.animate {
+                self.sizeLb.center = .init(x: frameRect.midX, y: frameRect.midY)
+            }
+        }else {
+            sizeLb.width = frameRect.width - 2
+            sizeLb.height = frameRect.height
+            sizeLb.center = .init(x: frameRect.midX, y: frameRect.midY)
+        }
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        frameLayer.path = framePath.cgPath
+        if !isRoundCrop {
+            gridlinesLayer.path = gridlinePath.cgPath
+            gridGraylinesLayer.path = gridGraylinePath.cgPath
+            dotsLayer.path = dotsPath.cgPath
+            dotsLayer.opacity = 1
+        }else {
+            gridlinesLayer.path = nil
+            gridGraylinesLayer.path = nil
+            dotsLayer.path = nil
+            dotsLayer.opacity = 0
+        }
+        CATransaction.commit()
+    }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        switch type {
+        case .frame:
+            frameView.frame = bounds
+            frameLayer.frame = frameView.bounds
+            dotsLayer.frame = frameView.bounds
+            gridlinesView.frame = bounds
+            gridlinesLayer.frame = gridlinesView.bounds
+            gridGraylinesView.frame = bounds
+            gridGraylinesLayer.frame = gridGraylinesView.bounds
+        case .mask:
+            visualEffectView.frame = bounds
+            blackMaskView.frame = bounds
+            maskLayer.frame = bounds
+        case .customMask:
+            customMaskView.frame = bounds
+        }
+    }
+}
+
+extension EditorMaskView {
     
     func show(_ animated: Bool) {
         switch type {
@@ -330,7 +525,6 @@ class EditorMaskView: UIView {
         }
     }
     
-    var maskViewIsHidden = false
     func showMaskView(_ animated: Bool = true) {
         maskViewIsHidden = false
         func animationHnadler() {
@@ -375,7 +569,7 @@ class EditorMaskView: UIView {
                     backgroundColor = .black.withAlphaComponent(0.3)
                 }
                 switch maskType {
-                case .customColor(_):
+                case .customColor:
                     break
                 default:
                     visualEffectView.alpha = 0
@@ -383,7 +577,7 @@ class EditorMaskView: UIView {
             case .customMask:
                 customMaskView.backgroundColor = .black.withAlphaComponent(0.3)
                 switch maskType {
-                case .customColor(_):
+                case .customColor:
                     break
                 default:
                     customMaskEffectView.alpha = 0
@@ -402,27 +596,6 @@ class EditorMaskView: UIView {
             }
         }else {
             animationHnadler()
-        }
-    }
-    
-    func updateBlackMask(isShow: Bool, animated: Bool, completion: (() -> Void)? = nil) {
-        if animated {
-            if isShow {
-                blackMaskView.isHidden = false
-            }
-            UIView.animate {
-                self.blackMaskView.alpha = isShow ? 1 : 0
-            } completion: {
-                if !$0 { return }
-                if !isShow {
-                    self.blackMaskView.isHidden = true
-                }
-                completion?()
-            }
-        }else {
-            blackMaskView.alpha = isShow ? 1 : 0
-            blackMaskView.isHidden = !isShow
-            completion?()
         }
     }
     
@@ -449,7 +622,7 @@ class EditorMaskView: UIView {
         func animationHandler() {
             customMaskView.backgroundColor = maskColor
             switch maskType {
-            case .customColor(_):
+            case .customColor:
                 break
             default:
                 customMaskEffectView.alpha = 0
@@ -461,138 +634,6 @@ class EditorMaskView: UIView {
             }
         }else {
             animationHandler()
-        }
-    }
-    
-    var maskRect: CGRect = .zero
-    var layersRect: CGRect = .zero
-    func updateLayers(_ rect: CGRect, _ animated: Bool) {
-        layersRect = rect
-        switch type {
-        case .frame:
-            var framePath: UIBezierPath
-            let frameRect = CGRect(
-                x: rect.minX - frameLayer.lineWidth * 0.5,
-                y: rect.minY - frameLayer.lineWidth * 0.5,
-                width: rect.width + frameLayer.lineWidth,
-                height: rect.height + frameLayer.lineWidth
-            )
-            framePath = UIBezierPath(roundedRect: frameRect, cornerRadius: isRoundCrop ? min(frameRect.width, frameRect.height) * 0.5 : 0.1)
-            let gridlinePath = getGridlinePath(rect)
-            let gridGraylinePath = getGridGraylinePath(rect)
-            let dotsPath = getDotsPath(
-                CGRect(
-                    x: rect.minX - frameLayer.lineWidth,
-                    y: rect.minY - frameLayer.lineWidth,
-                    width: rect.width + frameLayer.lineWidth * 2,
-                    height: rect.height + frameLayer.lineWidth * 2
-                )
-            )
-            if animated {
-                frameLayer.removeAnimation(forKey: "frameAnimation")
-                gridGraylinesLayer.removeAnimation(forKey: "gridGraylinesAnimation")
-                gridlinesLayer.removeAnimation(forKey: "gridlinesAnimation")
-                dotsLayer.removeAnimation(forKey: "dotsGroupAnimation")
-                dotsLayer.removeAnimation(forKey: "dotsAnimation")
-                let frameAnimation = PhotoTools.getBasicAnimation(
-                    "path",
-                    frameLayer.path,
-                    framePath.cgPath
-                )
-                frameLayer.add(frameAnimation, forKey: "frameAnimation")
-                let gridlinesAnimation = PhotoTools.getBasicAnimation(
-                    "path",
-                    gridlinesLayer.path,
-                    isRoundCrop ? nil : gridlinePath.cgPath
-                )
-                gridlinesLayer.add(gridlinesAnimation, forKey: "gridlinesAnimation")
-                let gridGraylinesAnimation = PhotoTools.getBasicAnimation(
-                    "path",
-                    gridGraylinesLayer.path,
-                    isRoundCrop ? nil : gridGraylinePath.cgPath
-                )
-                gridGraylinesLayer.add(gridGraylinesAnimation, forKey: "gridGraylinesAnimation")
-                
-                let dotsAnimation = PhotoTools.getBasicAnimation(
-                    "path",
-                    dotsLayer.path,
-                    isRoundCrop ? nil : dotsPath.cgPath
-                )
-                let addDostOpactyAimation: Bool
-                if isRoundCrop {
-                    addDostOpactyAimation = dotsLayer.opacity != 0
-                }else {
-                    addDostOpactyAimation = dotsLayer.opacity != 1
-                }
-                if addDostOpactyAimation {
-                    let dotsOpacityAnimation = PhotoTools.getBasicAnimation(
-                        "opacity",
-                        dotsLayer.opacity,
-                        isRoundCrop ? 0 : 1
-                    )
-                    let dotsGroupAnimation = CAAnimationGroup()
-                    dotsGroupAnimation.animations = [dotsAnimation, dotsOpacityAnimation]
-                    dotsLayer.add(dotsGroupAnimation, forKey: "dotsGroupAnimation")
-                }else {
-                    dotsLayer.add(dotsAnimation, forKey: "dotsAnimation")
-                }
-                let beforCenter = sizeLb.center
-                sizeLb.width = frameRect.width - 2
-                sizeLb.center = beforCenter
-                UIView.animate {
-                    self.sizeLb.center = .init(x: frameRect.midX, y: frameRect.midY)
-                }
-            }else {
-                sizeLb.width = frameRect.width - 2
-                sizeLb.height = frameRect.height
-                sizeLb.center = .init(x: frameRect.midX, y: frameRect.midY)
-            }
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            frameLayer.path = framePath.cgPath
-            if !isRoundCrop {
-                gridlinesLayer.path = gridlinePath.cgPath
-                gridGraylinesLayer.path = gridGraylinePath.cgPath
-                dotsLayer.path = dotsPath.cgPath
-                dotsLayer.opacity = 1
-            }else {
-                gridlinesLayer.path = nil
-                gridGraylinesLayer.path = nil
-                dotsLayer.path = nil
-                dotsLayer.opacity = 0
-            }
-            CATransaction.commit()
-        case .mask:
-            let maskPath = UIBezierPath(rect: bounds)
-            let maskRect = CGRect(x: rect.minX + maskInsets.left, y: rect.minY + maskInsets.top, width: rect.width, height: rect.height)
-            maskPath.append(UIBezierPath(roundedRect: maskRect, cornerRadius: isRoundCrop ? min(rect.width, rect.height) * 0.5 : 0.1).reversing())
-            if animated {
-                maskLayer.removeAnimation(forKey: "maskAnimation")
-                let maskAnimation = PhotoTools.getBasicAnimation(
-                    "path",
-                    maskLayer.path,
-                    maskPath.cgPath
-                )
-                maskLayer.add(maskAnimation, forKey: "maskAnimation")
-            }
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            maskLayer.path = maskPath.cgPath
-            CATransaction.commit()
-        case .customMask:
-            let maskRect = CGRect(x: rect.minX + maskInsets.left, y: rect.minY + maskInsets.top, width: rect.width, height: rect.height)
-            self.maskRect = maskRect
-            if animated {
-                UIView.animate {
-                    self.maskImageView.image = self.maskImage
-                    self.maskImageView.frame = maskRect
-                    self.customMaskEffectView.frame = maskRect
-                }
-            }else {
-                maskImageView.image = maskImage
-                maskImageView.frame = maskRect
-                customMaskEffectView.frame = maskRect
-            }
         }
     }
     
@@ -659,7 +700,9 @@ class EditorMaskView: UIView {
             gridGraylinesView.alpha = 0
         }
     }
-    
+}
+
+extension EditorMaskView {
     func getDotsPath(
         _ rect: CGRect
     ) -> UIBezierPath {
@@ -762,37 +805,4 @@ class EditorMaskView: UIView {
         return path
     }
     
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        switch type {
-        case .frame:
-            frameView.frame = bounds
-            frameLayer.frame = frameView.bounds
-            dotsLayer.frame = frameView.bounds
-            gridlinesView.frame = bounds
-            gridlinesLayer.frame = gridlinesView.bounds
-            gridGraylinesView.frame = bounds
-            gridGraylinesLayer.frame = gridGraylinesView.bounds
-        case .mask:
-            visualEffectView.frame = bounds
-            blackMaskView.frame = bounds
-            maskLayer.frame = bounds
-        case .customMask:
-            customMaskView.frame = bounds
-        }
-    }
-}
-
-
-extension UIImage {
-    func convertBlackImage() -> UIImage? {
-        let rect = CGRect(origin: .zero, size: size)
-        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
-        UIColor.black.setFill()
-        UIRectFill(rect)
-        draw(in: rect, blendMode: .destinationOut, alpha: 1)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return image
-    }
 }

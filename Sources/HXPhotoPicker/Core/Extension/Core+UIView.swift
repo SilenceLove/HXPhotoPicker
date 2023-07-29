@@ -97,7 +97,7 @@ extension UIView: HXPickerCompatible {
         return image
     }
     
-    func cornersRound(radius:CGFloat, corner: UIRectCorner) {
+    func cornersRound(radius: CGFloat, corner: UIRectCorner) {
         if #available(iOS 11.0, *) {
             layer.cornerRadius = radius
             layer.maskedCorners = corner.mask

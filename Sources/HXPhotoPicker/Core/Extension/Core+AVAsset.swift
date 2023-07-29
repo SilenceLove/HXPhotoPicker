@@ -51,7 +51,7 @@ extension AVAsset: HXPickerCompatibleValue {
             let array = [NSValue(time: time)]
             generator.generateCGImagesAsynchronously(
                 forTimes: array
-            ) { (requestedTime, cgImage, actualTime, result, error) in
+            ) { (_, cgImage, _, result, _) in
                 if let image = cgImage, result == .succeeded {
                     var image = UIImage(cgImage: image)
                     if image.imageOrientation != .up,

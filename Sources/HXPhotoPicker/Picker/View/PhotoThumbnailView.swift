@@ -115,10 +115,10 @@ open class PhotoThumbnailView: UIView {
                 for: photoAsset,
                 urlType: .thumbnail,
                 indicatorColor: kf_indicatorColor,
-                downloadTask: { [weak self] downloadTask in
-                    self?.task = downloadTask
-                }
-            ) { [weak self] (image, error, photoAsset) in
+                progressBlock: nil
+            ) { [weak self] downloadTask in
+                self?.task = downloadTask
+            } completionHandler: { [weak self] (image, error, photoAsset) in
                 guard let self = self else { return }
                 if self.photoAsset == photoAsset {
                     self._image = image

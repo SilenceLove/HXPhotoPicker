@@ -306,7 +306,10 @@ extension PhotoAsset {
                     }else {
                         #if canImport(Kingfisher)
                         if ImageCache.default.isCached(forKey: livePhoto.imageURL.cacheKey) {
-                            return ImageCache.default.retrieveImageInMemoryCache(forKey: livePhoto.imageURL.cacheKey, options: [])
+                            return ImageCache.default.retrieveImageInMemoryCache(
+                                forKey: livePhoto.imageURL.cacheKey,
+                                options: []
+                            )
                         }
                         #endif
                         return nil
@@ -450,7 +453,7 @@ extension PhotoAsset {
         resultHandler: @escaping AssetURLCompletion
     ) {
         let coverURL = fileURL ?? PhotoTools.getImageTmpURL(.jpg)
-        requestImageData { photoAsset, result in
+        requestImageData { _, result in
             switch result {
             case .success(let dataResult):
                 let imageData = dataResult.imageData
@@ -481,6 +484,7 @@ extension PhotoAsset {
             }
         }
     }
+    
     func requestAssetImageURL(
         toFile fileURL: URL? = nil,
         compressionQuality: CGFloat? = nil,
@@ -531,111 +535,131 @@ extension PhotoAsset {
         ) { (result) in
             switch result {
             case .success(let imageURL):
-                func resultSuccess(_ url: URL) {
-                    DispatchQueue.main.async {
-                        resultHandler(
-                            .success(
-                                .init(
-                                    url: url,
-                                    urlType: .local,
-                                    mediaType: .photo
-                                )
-                            )
-                        )
-                    }
-                }
-                func converImageURL(_ url: URL) -> URL {
-                    let imageURL: URL
-                    if url.pathExtension.uppercased() == "HEIC" {
-                        let path = url.path.replacingOccurrences(of: url.pathExtension, with: imageFileURL.pathExtension)
-                        imageURL = .init(fileURLWithPath: path)
-                    }else {
-                        imageURL = url
-                    }
-                    return imageURL
-                }
-                if isGif && self.mediaSubType != .imageAnimated {
-                    DispatchQueue.global().async {
-                        // 本质上是gif，需要变成静态图
-                        guard let imageData = try? Data(contentsOf: imageURL),
-                              let image = UIImage(data: imageData) else {
-                            DispatchQueue.main.async {
-                                resultHandler(.failure(.fileWriteFailed))
-                            }
-                            return
-                        }
-                        if let compressionQuality = compressionQuality {
-                            if FileManager.default.fileExists(atPath: imageURL.path) {
-                                try? FileManager.default.removeItem(at: imageURL)
-                            }
-                            let toURL = converImageURL(imageURL)
-                            if let data = PhotoTools.imageCompress(
-                                imageData,
-                                compressionQuality: compressionQuality
-                            ),
-                               let url = PhotoTools.write(
-                                toFile: toURL,
-                                imageData: data
-                            ) {
-                                resultSuccess(url)
-                            }else {
-                                DispatchQueue.main.async {
-                                    resultHandler(.failure(.imageCompressionFailed))
-                                }
-                            }
-                            return
-                        }
-                        do {
-                            let toURL = converImageURL(imageURL)
-                            let imageData = PhotoTools.getImageData(for: image)
-                            if FileManager.default.fileExists(atPath: imageURL.path) {
-                                try FileManager.default.removeItem(at: imageURL)
-                            }
-                            try imageData?.write(to: toURL)
-                            resultSuccess(toURL)
-                        } catch {
-                            DispatchQueue.main.async {
-                                resultHandler(.failure(.fileWriteFailed))
-                            }
-                        }
-                    }
-                    return
-                }else if !isGif {
-                    if let compressionQuality = compressionQuality {
-                        DispatchQueue.global().async {
-                            guard let imageData = try? Data(contentsOf: imageURL) else {
-                                DispatchQueue.main.async {
-                                    resultHandler(.failure(.imageCompressionFailed))
-                                }
-                                return
-                            }
-                            if FileManager.default.fileExists(atPath: imageURL.path) {
-                                try? FileManager.default.removeItem(at: imageURL)
-                            }
-                            let toURL = converImageURL(imageURL)
-                            if let data = PhotoTools.imageCompress(
-                                imageData,
-                                compressionQuality: compressionQuality
-                            ),
-                               let url = PhotoTools.write(
-                                toFile: toURL,
-                                imageData: data
-                            ) {
-                                resultSuccess(url)
-                            }else {
-                                DispatchQueue.main.async {
-                                    resultHandler(.failure(.imageCompressionFailed))
-                                }
-                            }
-                        }
-                        return
-                    }
-                }
-                resultSuccess(imageURL)
+                self.requestAssetImageURL(
+                    imageFileURL: imageFileURL,
+                    resultURL: imageURL,
+                    isGif: isGif,
+                    compressionQuality: compressionQuality,
+                    resultHandler: resultHandler
+                )
             case .failure(let error):
                 resultHandler(.failure(error))
             }
         }
+    }
+    
+    private func requestAssetImageURL(
+        imageFileURL: URL,
+        resultURL: URL,
+        isGif: Bool,
+        compressionQuality: CGFloat?,
+        resultHandler: @escaping AssetURLCompletion
+    ) {
+        let imageURL = resultURL
+        func resultSuccess(_ url: URL) {
+            DispatchQueue.main.async {
+                resultHandler(
+                    .success(
+                        .init(
+                            url: url,
+                            urlType: .local,
+                            mediaType: .photo
+                        )
+                    )
+                )
+            }
+        }
+        func converImageURL(_ url: URL) -> URL {
+            let imageURL: URL
+            if url.pathExtension.uppercased() == "HEIC" {
+                let path = url.path.replacingOccurrences(
+                    of: url.pathExtension,
+                    with: imageFileURL.pathExtension
+                )
+                imageURL = .init(fileURLWithPath: path)
+            }else {
+                imageURL = url
+            }
+            return imageURL
+        }
+        if isGif && self.mediaSubType != .imageAnimated {
+            DispatchQueue.global().async {
+                // 本质上是gif，需要变成静态图
+                guard let imageData = try? Data(contentsOf: imageURL),
+                      let image = UIImage(data: imageData) else {
+                    DispatchQueue.main.async {
+                        resultHandler(.failure(.fileWriteFailed))
+                    }
+                    return
+                }
+                if let compressionQuality = compressionQuality {
+                    if FileManager.default.fileExists(atPath: imageURL.path) {
+                        try? FileManager.default.removeItem(at: imageURL)
+                    }
+                    let toURL = converImageURL(imageURL)
+                    if let data = PhotoTools.imageCompress(
+                        imageData,
+                        compressionQuality: compressionQuality
+                    ),
+                       let url = PhotoTools.write(
+                        toFile: toURL,
+                        imageData: data
+                    ) {
+                        resultSuccess(url)
+                    }else {
+                        DispatchQueue.main.async {
+                            resultHandler(.failure(.imageCompressionFailed))
+                        }
+                    }
+                    return
+                }
+                do {
+                    let toURL = converImageURL(imageURL)
+                    let imageData = PhotoTools.getImageData(for: image)
+                    if FileManager.default.fileExists(atPath: imageURL.path) {
+                        try FileManager.default.removeItem(at: imageURL)
+                    }
+                    try imageData?.write(to: toURL)
+                    resultSuccess(toURL)
+                } catch {
+                    DispatchQueue.main.async {
+                        resultHandler(.failure(.fileWriteFailed))
+                    }
+                }
+            }
+            return
+        }else if !isGif {
+            if let compressionQuality = compressionQuality {
+                DispatchQueue.global().async {
+                    guard let imageData = try? Data(contentsOf: imageURL) else {
+                        DispatchQueue.main.async {
+                            resultHandler(.failure(.imageCompressionFailed))
+                        }
+                        return
+                    }
+                    if FileManager.default.fileExists(atPath: imageURL.path) {
+                        try? FileManager.default.removeItem(at: imageURL)
+                    }
+                    let toURL = converImageURL(imageURL)
+                    if let data = PhotoTools.imageCompress(
+                        imageData,
+                        compressionQuality: compressionQuality
+                    ),
+                       let url = PhotoTools.write(
+                        toFile: toURL,
+                        imageData: data
+                    ) {
+                        resultSuccess(url)
+                    }else {
+                        DispatchQueue.main.async {
+                            resultHandler(.failure(.imageCompressionFailed))
+                        }
+                    }
+                }
+                return
+            }
+        }
+        resultSuccess(imageURL)
     }
     
     func requestAssetVideoURL(
@@ -687,7 +711,10 @@ extension PhotoAsset {
                     resultHandler(.failure(.exportFailed(error)))
                 }
             }
-            AssetManager.requestLivePhoto(videoURL: phAsset, toFile: toFile) { (videoURL, error) in
+            AssetManager.requestLivePhoto(
+                videoURL: phAsset,
+                toFile: toFile
+            ) { (videoURL, _) in
                 assetHandler(videoURL, nil)
             }
         }else {

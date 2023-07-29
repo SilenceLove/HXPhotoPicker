@@ -94,7 +94,7 @@ class EditorChartletViewCell: UICollectionViewCell {
                 options: options
             ) { [weak self] result in
                 switch result {
-                case .success(_):
+                case .success:
                     self?.downloadCompletion = true
                 default:
                     break

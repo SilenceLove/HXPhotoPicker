@@ -9,10 +9,16 @@ import Foundation
 
 extension FileManager: HXPickerCompatible {
     class var documentPath: String {
-        NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last ?? ""
+        guard let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last else {
+            return ""
+        }
+        return documentPath
     }
     class var cachesPath: String {
-        NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last ?? ""
+        guard let cachesPath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last else {
+            return ""
+        }
+        return cachesPath
     }
     class var tempPath: String {
         NSTemporaryDirectory()

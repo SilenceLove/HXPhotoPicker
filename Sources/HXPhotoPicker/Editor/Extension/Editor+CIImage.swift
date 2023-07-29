@@ -59,7 +59,12 @@ extension CIImage {
         if editFator.vignette != 0 {
             guard let vignetteFilter = CIFilter(name: "CIVignette") else { return inputImage }
             vignetteFilter.setValue(inputImage, forKey: kCIInputImageKey)
-            vignetteFilter.setValue(min(max(extent.width / extent.height, extent.height / extent.width), 1), forKey: kCIInputRadiusKey)
+            vignetteFilter.setValue(
+                min(
+                    max(extent.width / extent.height, extent.height / extent.width), 1
+                ),
+                forKey: kCIInputRadiusKey
+            )
             vignetteFilter.setValue(editFator.vignette, forKey: kCIInputIntensityKey)
             inputImage = vignetteFilter.outputImage ?? inputImage
         }
@@ -81,7 +86,6 @@ extension CIImage {
             return inputImage
 //        }
     }
-    
     
     /// 生成马赛克图片
     func applyMosaic(level: CGFloat) -> CIImage? {

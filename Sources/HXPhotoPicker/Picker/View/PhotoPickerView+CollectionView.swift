@@ -22,14 +22,18 @@ extension PhotoPickerView: UICollectionViewDataSource {
         if canAddCamera && canAddLimit {
             if config.sort == .asc {
                 if indexPath.item == assets.count + 1 {
+                    #if !targetEnvironment(macCatalyst)
                     return cameraCell
+                    #endif
                 }
                 if indexPath.item == assets.count {
                     return limitAddCell
                 }
             }else {
                 if indexPath.item == 0 {
+                    #if !targetEnvironment(macCatalyst)
                     return cameraCell
+                    #endif
                 }
                 if indexPath.item == 1 {
                     return limitAddCell
@@ -38,11 +42,21 @@ extension PhotoPickerView: UICollectionViewDataSource {
         }else if canAddCamera || canAddLimit {
             if config.sort == .asc {
                 if indexPath.item == assets.count {
-                    return canAddCamera ? cameraCell : limitAddCell
+                    if canAddCamera {
+                        #if !targetEnvironment(macCatalyst)
+                        return cameraCell
+                        #endif
+                    }
+                    return limitAddCell
                 }
             }else {
                 if indexPath.item == 0 {
-                    return canAddCamera ? cameraCell : limitAddCell
+                    if canAddCamera {
+                        #if !targetEnvironment(macCatalyst)
+                        return cameraCell
+                        #endif
+                    }
+                    return limitAddCell
                 }
             }
         }
@@ -53,6 +67,7 @@ extension PhotoPickerView: UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         if let cell = getAdditiveCell(indexPath) {
+            #if !targetEnvironment(macCatalyst)
             if let cell = cell as? PickerCameraViewCell {
                 cell.allowPreview = allowPreview
                 cell.config = config.cameraCell
@@ -60,6 +75,7 @@ extension PhotoPickerView: UICollectionViewDataSource {
                     cell.stopSession()
                 }
             }
+            #endif
             return cell
         }
         let cell: PhotoPickerBaseViewCell
@@ -178,7 +194,14 @@ extension PhotoPickerView: UICollectionViewDelegate {
         guard let cell = collectionView.cellForItem(at: indexPath) else {
             return
         }
-        if cell is PickerCameraViewCell {
+        let isCameraCell: Bool
+        #if !targetEnvironment(macCatalyst)
+        isCameraCell = cell is PickerCameraViewCell
+        #else
+        isCameraCell = false
+        #endif
+        if isCameraCell {
+            #if !targetEnvironment(macCatalyst)
             if !UIImagePickerController.isSourceTypeAvailable(.camera) {
                 ProgressHUD.showWarning(
                     addedTo: UIApplication.shared.keyWindow,
@@ -195,6 +218,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
                     PhotoTools.showNotCameraAuthorizedAlert(viewController: self.viewController)
                 }
             }
+            #endif
         }else if cell is PhotoPickerLimitCell {
             guard let vc = UIViewController.topViewController else {
                 return
@@ -349,6 +373,18 @@ extension PhotoPickerView: UICollectionViewDelegate {
               config.allowHapticTouchPreview else {
             return nil
         }
+        let isCameraCell: Bool
+        let isAuthorized: Bool
+        let isSourceTypeAvailable: Bool
+        #if !targetEnvironment(macCatalyst)
+        isCameraCell = sCell is PickerCameraViewCell
+        isAuthorized = AssetManager.cameraAuthorizationStatus() == .authorized
+        isSourceTypeAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
+        #else
+        isCameraCell = false
+        isAuthorized = false
+        isSourceTypeAvailable = false
+        #endif
         let viewSize = size
         return .init(
             identifier: indexPath as NSCopying
@@ -375,25 +411,35 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 vc.delegate = self
                 vc.preferredContentSize = CGSize(width: width, height: height)
                 return vc
-            }else if sCell is PickerCameraViewCell &&
-                     UIImagePickerController.isSourceTypeAvailable(.camera) &&
-                     AssetManager.cameraAuthorizationStatus() == .authorized {
+            }else if isCameraCell && isSourceTypeAvailable && isAuthorized {
                 let vc = PhotoPeekViewController(isCamera: true)
                 return vc
             }
             return nil
-        } actionProvider: { menuElements in
+        } actionProvider: { _ in
             guard let cell = sCell as? PhotoPickerBaseViewCell,
                   let photoAsset = cell.photoAsset,
                   self.config.allowAddMenuElements else { return nil }
             var menus: [UIMenuElement] = []
             
             if self.manager.config.selectMode == .multiple {
+                let title: String
+                let image: UIImage?
+                let attributes: UIMenuElement.Attributes
+                if photoAsset.isSelected {
+                    title = "取消选择".localized
+                    image = UIImage(systemName: "minus.circle")
+                    attributes = [.destructive]
+                }else {
+                    title = "选择".localized
+                    image = UIImage(systemName: "checkmark.circle")
+                    attributes = []
+                }
                 let select = UIAction(
-                    title: photoAsset.isSelected ? "取消选择".localized : "选择".localized,
-                    image: photoAsset.isSelected ? UIImage(systemName: "minus.circle") : UIImage(systemName: "checkmark.circle"),
-                    attributes: photoAsset.isSelected ? [.destructive] : []
-                ) { action in
+                    title: title,
+                    image: image,
+                    attributes: attributes
+                ) { _ in
                     self.updateCellSelectedState(
                         for: indexPath.item,
                         isSelected: !photoAsset.isSelected
@@ -413,7 +459,7 @@ extension PhotoPickerView: UICollectionViewDelegate {
                 let edit = UIAction(
                     title: "编辑".localized,
                     image: UIImage(systemName: "slider.horizontal.3")
-                ) { action in
+                ) { _ in
                     self.openEditor(
                         photoAsset,
                         cell,

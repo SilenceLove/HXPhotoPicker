@@ -185,9 +185,9 @@ class EditorVolumeView: UIView {
         if originalTitleLb.frame.maxX > originalVolumeSlider.x {
             originalTitleLb.width = originalVolumeSlider.x - originalTitleLb.x - 5
         }
-        
-        if #available(iOS 11.0, *) { }else {
+        guard #available(iOS 11.0, *) else {
             bgColorView.cornersRound(radius: 12, corner: .allCorners)
+            return
         }
     }
     

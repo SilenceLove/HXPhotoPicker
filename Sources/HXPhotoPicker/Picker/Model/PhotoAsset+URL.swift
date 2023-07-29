@@ -36,7 +36,8 @@ public extension PhotoAsset {
                                 imageData,
                                   compressionQuality: compressionQuality
                               ),
-                              let image = UIImage(data: data)?.normalizedImage() else {
+                              let image = UIImage(data: data)?.normalizedImage()
+                        else {
                             DispatchQueue.main.async {
                                 completion(nil)
                             }
@@ -204,7 +205,10 @@ public protocol PhotoAssetObject {
 @available(iOS 13.0, *)
 extension URL: PhotoAssetObject {
     
-    public static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self {
+    public static func fetchObject(
+        _ photoAsset: PhotoAsset,
+        compression: PhotoAsset.Compression?
+    ) async throws -> Self {
         try await withCheckedThrowingContinuation { continuation in
             photoAsset.getURL(compression: compression) {
                 switch $0 {
@@ -221,14 +225,20 @@ extension URL: PhotoAssetObject {
 @available(iOS 13.0, *)
 extension UIImage: PhotoAssetObject {
     
-    public static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self {
+    public static func fetchObject(
+        _ photoAsset: PhotoAsset,
+        compression: PhotoAsset.Compression?
+    ) async throws -> Self {
         try await photoAsset.image(compression?.imageCompressionQuality) as! Self
     }
 }
 
 @available(iOS 13.0, *)
 extension AssetURLResult: PhotoAssetObject {
-    public static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self {
+    public static func fetchObject(
+        _ photoAsset: PhotoAsset,
+        compression: PhotoAsset.Compression?
+    ) async throws -> Self {
         try await withCheckedThrowingContinuation { continuation in
             photoAsset.getURL(compression: compression) {
                 switch $0 {

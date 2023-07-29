@@ -205,7 +205,6 @@ open class PhotoPickerViewCell: PhotoPickerBaseViewCell {
         }
     }
     
-    
     /// 布局
     open override func layoutView() {
         super.layoutView()
@@ -310,7 +309,9 @@ extension PhotoPickerViewCell {
                 assetTypeLb.text = videoTime
             }else {
                 assetTypeLb.text = nil
-                videoDurationAsset = PhotoTools.getVideoDuration(for: photoAsset) { [weak self] (asset, duration) in
+                videoDurationAsset = PhotoTools.getVideoDuration(
+                    for: photoAsset
+                ) { [weak self] (asset, _) in
                     guard let self = self else { return }
                     if self.photoAsset == asset {
                         self.assetTypeLb.text = asset.videoTime

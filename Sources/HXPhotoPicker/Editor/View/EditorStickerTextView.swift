@@ -14,7 +14,12 @@ class EditorStickerTextView: UIView {
         textView.backgroundColor = .clear
         textView.delegate = self
         textView.layoutManager.delegate = self
-        textView.textContainerInset = UIEdgeInsets(top: 15, left: 15 + UIDevice.leftMargin, bottom: 15, right: 15 + UIDevice.rightMargin)
+        textView.textContainerInset = UIEdgeInsets(
+            top: 15,
+            left: 15 + UIDevice.leftMargin,
+            bottom: 15,
+            right: 15 + UIDevice.rightMargin
+        )
         textView.contentInset = .zero
         
         textView.becomeFirstResponder()
@@ -240,7 +245,10 @@ class EditorStickerTextView: UIView {
                 }else {
                     firstTextButtonY = height - 50
                 }
-                let buttonRect = convert(.init(x: 0, y: firstTextButtonY, width: 50, height: 50), to: UIApplication._keyWindow)
+                let buttonRect = convert(
+                    .init(x: 0, y: firstTextButtonY, width: 50, height: 50),
+                    to: UIApplication._keyWindow
+                )
                 if buttonRect.maxY > keyboardFrame.minY {
                     textButton.y = height - (buttonRect.maxY - keyboardFrame.minY + 50)
                 }else {
@@ -261,7 +269,12 @@ class EditorStickerTextView: UIView {
             height: 50
         )
         textView.frame = CGRect(x: 10, y: 0, width: width - 20, height: textButton.y)
-        textView.textContainerInset = UIEdgeInsets(top: 15, left: 15 + UIDevice.leftMargin, bottom: 15, right: 15 + UIDevice.rightMargin)
+        textView.textContainerInset = UIEdgeInsets(
+            top: 15,
+            left: 15 + UIDevice.leftMargin,
+            bottom: 15,
+            right: 15 + UIDevice.rightMargin
+        )
     }
     
     required init?(coder: NSCoder) {

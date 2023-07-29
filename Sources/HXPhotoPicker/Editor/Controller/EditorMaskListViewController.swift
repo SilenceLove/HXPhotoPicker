@@ -10,7 +10,10 @@ import CoreGraphics
 import CoreText
 
 protocol EditorMaskListViewControllerDelegate: AnyObject {
-    func editorMaskListViewController(_ editorMaskListViewController: EditorMaskListViewController, didSelected image: UIImage)
+    func editorMaskListViewController(
+        _ editorMaskListViewController: EditorMaskListViewController,
+        didSelected image: UIImage
+    )
 }
 
 class EditorMaskListViewController: BaseViewController {
@@ -97,10 +100,17 @@ class EditorMaskListViewController: BaseViewController {
         
         let spacing = flowLayout.minimumInteritemSpacing
         let rowCount = UIDevice.isPortrait ? config.maskRowCount: config.maskLandscapeRowNumber
-        let itemWidth = (view.width - UIDevice.leftMargin - UIDevice.rightMargin - 24 - spacing * (rowCount - 1)) / rowCount
+        let itemWidth = (
+            view.width - UIDevice.leftMargin - UIDevice.rightMargin - 24 - spacing * (rowCount - 1)
+        ) / rowCount
         flowLayout.itemSize = .init(width: itemWidth, height: itemWidth)
         
-        collectionView.contentInset = .init(top: 12, left: 12 + UIDevice.leftMargin, bottom: 12 + UIDevice.bottomMargin, right: 12 + UIDevice.rightMargin)
+        collectionView.contentInset = .init(
+            top: 12,
+            left: 12 + UIDevice.leftMargin,
+            bottom: 12 + UIDevice.bottomMargin,
+            right: 12 + UIDevice.rightMargin
+        )
         
         let navHeight = navigationController?.navigationBar.frame.maxY ?? UIDevice.navigationBarHeight
         collectionView.frame = .init(x: 0, y: navHeight, width: view.width, height: view.height - navHeight)
@@ -160,7 +170,12 @@ extension EditorMaskListViewController: UICollectionViewDataSource, UICollection
                         self.dismiss(animated: true)
                         self.delegate?.editorMaskListViewController(self, didSelected: image)
                     }else {
-                        ProgressHUD.showWarning(addedTo: self.view, text: "处理失败".localized, animated: true, delayHide: 1.5)
+                        ProgressHUD.showWarning(
+                            addedTo: self.view,
+                            text: "处理失败".localized,
+                            animated: true,
+                            delayHide: 1.5
+                        )
                     }
                 }
             }

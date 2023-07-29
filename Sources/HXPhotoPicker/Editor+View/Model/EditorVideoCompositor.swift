@@ -10,7 +10,16 @@ import AVKit
 import VideoToolbox
 
 class EditorVideoCompositor: NSObject, AVVideoCompositing {
-    
+    #if targetEnvironment(macCatalyst)
+    var sourcePixelBufferAttributes: [String: Any]? = [
+        String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_32BGRA,
+        String(kCVPixelBufferMetalCompatibilityKey): true
+    ]
+    var requiredPixelBufferAttributesForRenderContext: [String: Any] = [
+        String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_32BGRA,
+        String(kCVPixelBufferMetalCompatibilityKey): true
+    ]
+    #else
     var sourcePixelBufferAttributes: [String: Any]? = [
         String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_32BGRA,
         String(kCVPixelBufferOpenGLESCompatibilityKey): true,
@@ -21,9 +30,12 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
         String(kCVPixelBufferOpenGLESCompatibilityKey): true,
         String(kCVPixelBufferMetalCompatibilityKey): true
     ]
+    #endif
     
     private let context = CIContext(options: nil)
-    private let renderContextQueue: DispatchQueue = DispatchQueue(label: "com.HXPhotoPicker.videoeditorrendercontextqueue")
+    private let renderContextQueue: DispatchQueue = DispatchQueue(
+        label: "com.HXPhotoPicker.videoeditorrendercontextqueue"
+    )
     private let renderingQueue: DispatchQueue = DispatchQueue(label: "com.HXPhotoPicker.videoeditorrenderingqueue")
     private var renderContextDidChange = false
     private var shouldCancelAllRequests = false
@@ -109,7 +121,7 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
     
     func fixOrientation(
         _ pixelBuffer: CVPixelBuffer,
-        _ videoOrientation: AVCaptureVideoOrientation,
+        _ videoOrientation: EditorVideoOrientation,
         _ cropFactor: EditorAdjusterView.CropFactor
     ) -> CVPixelBuffer? {
         var ciImage = CIImage(cvPixelBuffer: pixelBuffer)
@@ -144,11 +156,12 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
                 ciImage = ciImage.oriented(forExifOrientation: 3)
             }
             isFixOrientation = true
-        @unknown default:
-            break
         }
         if cropFactor.allowCroped {
-            guard let cgImage = context.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: size.width, height: size.height)) else {
+            guard let cgImage = context.createCGImage(
+                ciImage,
+                from: CGRect(x: 0, y: 0, width: size.width, height: size.height)
+            ) else {
                 return pixelBuffer
             }
 //            let maxWidth = max(size.width, size.height)
@@ -291,8 +304,14 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
         let rendWidth = CGFloat(imageRef.width)
         let rendHeight = CGFloat(imageRef.height)
         context.translateBy(x: rendWidth * 0.5, y: rendHeight * 0.5)
-        context.clip(to: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5, width: rendWidth, height: rendHeight), mask: maskImage)
-        let rect = CGRect(origin: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5), size: CGSize(width: rendWidth, height: rendHeight))
+        context.clip(
+            to: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5, width: rendWidth, height: rendHeight),
+            mask: maskImage
+        )
+        let rect = CGRect(
+            origin: .init(x: -rendWidth * 0.5, y: -rendHeight * 0.5),
+            size: CGSize(width: rendWidth, height: rendHeight)
+        )
         context.draw(imageRef, in: rect)
         return context.makeImage()
     }
@@ -342,7 +361,10 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
                 width: CVPixelBufferGetWidth(pixelBuffer),
                 height: CVPixelBufferGetHeight(pixelBuffer)
             )
-            let cgImage = context.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+            let cgImage = context.createCGImage(
+                ciImage,
+                from: CGRect(x: 0, y: 0, width: size.width, height: size.height)
+            )
             if let cgImage = cgImage,
                let blurredImage = blurredImage,
                let outputImage = cropMask(cgImage, cropFactor: cropFactor),
@@ -365,7 +387,15 @@ class EditorVideoCompositor: NSObject, AVVideoCompositing {
         let bytesPerRow = cgImage.bytesPerRow
         let colorSpace = cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = cgImage.bitmapInfo
-        let context = CGContext(data: nil, width: newWidth, height: newHeight, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo.rawValue)
+        let context = CGContext(
+            data: nil,
+            width: newWidth,
+            height: newHeight,
+            bitsPerComponent: bitsPerComponent,
+            bytesPerRow: bytesPerRow,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo.rawValue
+        )
         context?.scaleBy(x: scale, y: scale)
         context?.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
         return context?.makeImage()
@@ -386,7 +416,7 @@ class VideoCompositionInstruction: NSObject, AVVideoCompositionInstructionProtoc
     var passthroughTrackID: CMPersistentTrackID
     
     let watermarkTrackID: CMPersistentTrackID?
-    let videoOrientation: AVCaptureVideoOrientation
+    let videoOrientation: EditorVideoOrientation
     let watermark: EditorVideoTool.Watermark
     let cropFactor: EditorAdjusterView.CropFactor
     let maskType: EditorView.MaskType
@@ -395,7 +425,7 @@ class VideoCompositionInstruction: NSObject, AVVideoCompositionInstructionProtoc
         sourceTrackIDs: [NSValue],
         watermarkTrackID: CMPersistentTrackID?,
         timeRange: CMTimeRange,
-        videoOrientation: AVCaptureVideoOrientation,
+        videoOrientation: EditorVideoOrientation,
         watermark: EditorVideoTool.Watermark,
         cropFactor: EditorAdjusterView.CropFactor,
         maskType: EditorView.MaskType,

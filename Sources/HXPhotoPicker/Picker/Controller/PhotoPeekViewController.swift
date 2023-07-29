@@ -52,10 +52,12 @@ public class PhotoPeekViewController: UIViewController {
         return view
     }()
     
+    #if !targetEnvironment(macCatalyst)
     lazy var captureView: CaptureVideoPreviewView = {
         let view = CaptureVideoPreviewView()
         return view
     }()
+    #endif
     
     var photoAsset: PhotoAsset!
     fileprivate var progress: CGFloat = 0
@@ -77,9 +79,11 @@ public class PhotoPeekViewController: UIViewController {
             view.addSubview(contentView)
             view.addSubview(progressView)
         }
+        #if !targetEnvironment(macCatalyst)
         if isCamera {
             view.addSubview(captureView)
         }
+        #endif
     }
     
     public override func viewDidAppear(_ animated: Bool) {
@@ -87,9 +91,11 @@ public class PhotoPeekViewController: UIViewController {
         if photoAsset != nil {
             contentView.requestPreviewAsset()
         }
+        #if !targetEnvironment(macCatalyst)
         if isCamera {
             captureView.startSession()
         }
+        #endif
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
@@ -97,9 +103,11 @@ public class PhotoPeekViewController: UIViewController {
         if photoAsset != nil {
             contentView.cancelRequest()
         }
+        #if !targetEnvironment(macCatalyst)
         if isCamera {
             captureView.stopSession()
         }
+        #endif
     }
     
     public override func viewDidLayoutSubviews() {
@@ -110,9 +118,11 @@ public class PhotoPeekViewController: UIViewController {
             progressView.y = view.height - progressView.height
             progressView.width = view.width * progress
         }
+        #if !targetEnvironment(macCatalyst)
         if isCamera {
             captureView.frame = view.bounds
         }
+        #endif
     }
     
     required init?(coder: NSCoder) {

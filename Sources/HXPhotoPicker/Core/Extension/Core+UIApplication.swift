@@ -9,11 +9,11 @@ import UIKit
 
 extension UIApplication {
     class var _keyWindow: UIWindow? {
-        var window: UIWindow?
         if #available(iOS 13.0, *) {
-            window = shared.windows.filter({ $0.isKeyWindow }).last
-        } else {
-            window = shared.delegate?.window ?? shared.keyWindow
+            return shared.windows.filter({ $0.isKeyWindow }).last
+        }
+        guard let window = shared.delegate?.window else {
+            return shared.keyWindow
         }
         return window
     }

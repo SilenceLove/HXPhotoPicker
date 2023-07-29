@@ -219,7 +219,13 @@ public extension PhotoTools {
         return nil
     }
     static func getImageData(_ image: UIImage, queueLabel: String, completion: @escaping (Data?) -> Void) {
-        let serialQueue = DispatchQueue(label: queueLabel, qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem, target: nil)
+        let serialQueue = DispatchQueue(
+            label: queueLabel,
+            qos: .userInitiated,
+            attributes: [],
+            autoreleaseFrequency: .workItem,
+            target: nil
+        )
         serialQueue.async {
             autoreleasepool {
                 guard let imageData = self.getImageData(for: image) else {

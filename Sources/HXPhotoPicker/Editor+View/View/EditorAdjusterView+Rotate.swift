@@ -55,7 +55,7 @@ extension EditorAdjusterView {
             var maskWidth = maxWidth
             var maskHeight = controlView.width * (maxWidth / controlView.height)
             if maskHeight > maxHeight {
-                maskWidth = maskWidth * (maxHeight / maskHeight)
+                maskWidth *= maxHeight / maskHeight
                 maskHeight = maxHeight
             }
             let maskRect = CGRect(

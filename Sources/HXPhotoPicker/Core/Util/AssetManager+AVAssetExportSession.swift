@@ -75,8 +75,8 @@ public extension AssetManager {
         deliveryMode: PHVideoRequestOptionsDeliveryMode,
         isNetworkAccessAllowed: Bool,
         progressHandler: PHAssetVideoProgressHandler?,
-        resultHandler:
-            @escaping AVAssetExportSessionResultHandler) -> PHImageRequestID {
+        resultHandler: @escaping AVAssetExportSessionResultHandler
+    ) -> PHImageRequestID {
         let options = PHVideoRequestOptions.init()
         options.version = version
         options.deliveryMode = deliveryMode

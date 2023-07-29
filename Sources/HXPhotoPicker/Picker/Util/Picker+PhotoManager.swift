@@ -69,7 +69,7 @@ extension PhotoManager {
             AssetManager.enumerateAllAlbums(
                 filterInvalid: true,
                 options: nil
-            ) { (collection, index, stop) in
+            ) { (collection, _, stop) in
                 if completion == nil {
                     stop.pointee = true
                     return
@@ -106,7 +106,7 @@ extension PhotoManager {
         AssetManager.enumerateAllAlbums(
             filterInvalid: true,
             options: nil
-        ) { (collection, index, stop) in
+        ) { (collection, _, stop) in
             let assetCollection = PhotoAssetCollection(
                 collection: collection,
                 options: options

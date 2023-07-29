@@ -68,15 +68,14 @@ public extension Array where Element: PhotoAsset {
                 execute: DispatchWorkItem(block: {
                     let semaphore = DispatchSemaphore(value: 0)
                     photoAsset.getVideoURL(
-                        exportParameter: exportParameter,
-                        exportSession: { session in
-                            exportSession?(session, photoAsset, index)
-                        }
-                    ) {
+                        exportParameter: exportParameter
+                    ) { session in
+                        exportSession?(session, photoAsset, index)
+                    } completion: {
                         switch $0 {
                         case .success(let response):
                             videoURLs.append(response.url)
-                        case .failure(_):
+                        case .failure:
                             break
                         }
                         videoURLHandler?($0, photoAsset, index)
@@ -106,13 +105,13 @@ public extension Array where Element: PhotoAsset {
         getURLs(
             options: options,
             compression: compression
-        ) { result, photoAsset, index in
+        ) { result, _, _ in
             switch result {
             case .success(let response):
                 if response.urlType == .local {
                     urls.append(response.url)
                 }
-            case .failure(_):
+            case .failure:
                 break
             }
         } completionHandler: { _ in
@@ -163,7 +162,7 @@ public extension Array where Element: PhotoAsset {
                         switch result {
                         case .success(let respone):
                             urls.append(respone.url)
-                        case .failure(_):
+                        case .failure:
                             break
                         }
                         handler?(result, photoAsset, index)

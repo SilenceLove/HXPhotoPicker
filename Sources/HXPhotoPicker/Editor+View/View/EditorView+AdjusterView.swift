@@ -10,7 +10,10 @@ import AVFoundation
 
 extension EditorView: EditorAdjusterViewDelegate {
     func editorAdjusterView(_ adjusterView: EditorAdjusterView, shouldAddAudioItem audio: EditorStickerAudio) -> Bool {
-        editDelegate?.editorView(self, shouldAddAudioItem: audio) ?? true
+        if let shouldAddAudioItem = editDelegate?.editorView(self, shouldAddAudioItem: audio) {
+            return shouldAddAudioItem
+        }
+        return true
     }
     
     func editorAdjusterView(willBeginEditing adjusterView: EditorAdjusterView) {
@@ -54,7 +57,10 @@ extension EditorView: EditorAdjusterViewDelegate {
     func editorAdjusterView(_ adjusterView: EditorAdjusterView, shouldRemoveItem itemView: EditorStickersItemView) {
         editDelegate?.editorView(self, shouldRemoveStickerItem: itemView)
     }
-    func editorAdjusterView(_ adjusterView: EditorAdjusterView, resetItemViews itemViews: [EditorStickersItemBaseView]) {
+    func editorAdjusterView(
+        _ adjusterView: EditorAdjusterView,
+        resetItemViews itemViews: [EditorStickersItemBaseView]
+    ) {
         editDelegate?.editorView(self, resetItemViews: itemViews)
     }
     
@@ -87,10 +93,21 @@ extension EditorView: EditorAdjusterViewDelegate {
     func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoDidChangedTimeAt time: CMTime) {
         editDelegate?.editorView(self, videoDidChangedTimeAt: time)
     }
-    func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoControlDidChangedTimeAt time: TimeInterval, for event: VideoControlEvent) {
+    func editorAdjusterView(
+        _ editorAdjusterView: EditorAdjusterView,
+        videoControlDidChangedTimeAt time: TimeInterval,
+        for event: VideoControlEvent
+    ) {
         editDelegate?.editorView(self, videoControlDidChangedTimeAt: time, for: event)
     }
-    func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage {
-        editDelegate?.editorView(self, videoApplyFilter: sourceImage, at: time) ?? sourceImage
+    func editorAdjusterView(
+        _ editorAdjusterView: EditorAdjusterView,
+        videoApplyFilter sourceImage: CIImage,
+        at time: CMTime
+    ) -> CIImage {
+        if let image = editDelegate?.editorView(self, videoApplyFilter: sourceImage, at: time) {
+            return image
+        }
+        return sourceImage
     }
 }

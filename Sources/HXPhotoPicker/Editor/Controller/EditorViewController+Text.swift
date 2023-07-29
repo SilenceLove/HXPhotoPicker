@@ -8,7 +8,10 @@
 import UIKit
 
 extension EditorViewController: EditorStickerTextViewControllerDelegate {
-    func stickerTextViewController(_ controller: EditorStickerTextViewController, didFinish stickerText: EditorStickerText) {
+    func stickerTextViewController(
+        _ controller: EditorStickerTextViewController,
+        didFinish stickerText: EditorStickerText
+    ) {
         deselectedDrawTool()
         if let tool = selectedTool,
            tool.type == .graffiti || tool.type == .graffiti {

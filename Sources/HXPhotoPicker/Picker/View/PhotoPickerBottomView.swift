@@ -26,20 +26,21 @@ extension PhotoPickerBottomViewDelegate {
     func bottomView(_ bottomView: PhotoPickerBottomView, moveItemAt fromIndex: Int, toIndex: Int) {}
 }
 
-class PhotoPickerBottomView: UIToolbar {
+extension PhotoPickerBottomView {
     
     enum SourceType {
         case picker
         case preview
         case browser
     }
+}
+
+class PhotoPickerBottomView: UIToolbar {
     weak var hx_delegate: PhotoPickerBottomViewDelegate?
-    
     let config: PickerBottomViewConfiguration
     let sourceType: SourceType
     let allowLoadPhotoLibrary: Bool
     let isMultipleSelect: Bool
-    
     init(
         config: PickerBottomViewConfiguration,
         allowLoadPhotoLibrary: Bool,
@@ -119,9 +120,6 @@ class PhotoPickerBottomView: UIToolbar {
         )
         return promptView
     }()
-    @objc func didPromptViewClick() {
-        PhotoTools.openSettingsURL()
-    }
     lazy var promptLb: UILabel = {
         let promptLb = UILabel.init(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
         promptLb.text = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」".localized
@@ -170,10 +168,6 @@ class PhotoPickerBottomView: UIToolbar {
         return previewBtn
     }()
     
-    @objc func didPreviewButtonClick(button: UIButton) {
-        hx_delegate?.bottomView(didPreviewButtonClick: self)
-    }
-    
     #if HXPICKER_ENABLE_EDITOR
     lazy var editBtn: UIButton = {
         let editBtn = UIButton.init(type: .custom)
@@ -205,6 +199,117 @@ class PhotoPickerBottomView: UIToolbar {
         originalBtn.isHidden = config.isHiddenOriginalButton
         return originalBtn
     }()
+    lazy var originalTitleLb: UILabel = {
+        let originalTitleLb = UILabel.init()
+        originalTitleLb.text = "原图".localized
+        originalTitleLb.font = UIFont.systemFont(ofSize: 17)
+        originalTitleLb.lineBreakMode = .byTruncatingHead
+        return originalTitleLb
+    }()
+    
+    lazy var boxControl: SelectBoxView = {
+        let boxControl = SelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
+        boxControl.config = config.originalSelectBox
+        boxControl.backgroundColor = .clear
+        return boxControl
+    }()
+    var showOriginalLoadingView: Bool = false
+    var originalLoadingDelayTimer: Timer?
+    lazy var originalLoadingView: UIActivityIndicatorView = {
+        let originalLoadingView = UIActivityIndicatorView.init(style: .white)
+        originalLoadingView.hidesWhenStopped = true
+        return originalLoadingView
+    }()
+    
+    lazy var finishBtn: UIButton = {
+        let finishBtn = UIButton.init(type: .custom)
+        finishBtn.setTitle("完成".localized, for: .normal)
+        finishBtn.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
+        finishBtn.layer.cornerRadius = 3
+        finishBtn.layer.masksToBounds = true
+        finishBtn.isEnabled = false
+        finishBtn.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
+        return finishBtn
+    }()
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if sourceType != .browser {
+            contentView.width = width
+            contentView.height = 50 + UIDevice.bottomMargin
+            contentView.y = height - contentView.height
+            previewBtn.x = 12 + UIDevice.leftMargin
+            #if HXPICKER_ENABLE_EDITOR
+            editBtn.x = previewBtn.x
+            #endif
+            updateFinishButtonFrame()
+            updateOriginalButtonFrame()
+        }
+        if config.isShowPrompt &&
+            AssetManager.authorizationStatusIsLimited() &&
+            allowLoadPhotoLibrary &&
+            sourceType == .picker {
+            promptView.width = width
+            promptIcon.x = 12 + UIDevice.leftMargin
+            promptIcon.centerY = promptView.height * 0.5
+            promptArrow.x = width - 12 - promptArrow.width - UIDevice.rightMargin
+            promptLb.x = promptIcon.frame.maxX + 12
+            promptLb.width = promptArrow.x - promptLb.x - 12
+            promptLb.centerY = promptView.height * 0.5
+            promptArrow.centerY = promptView.height * 0.5
+        }
+        if sourceType == .browser {
+            #if HXPICKER_ENABLE_EDITOR
+            editBtn.x = 12 + UIDevice.leftMargin
+            #endif
+            if config.isShowSelectedView {
+                #if HXPICKER_ENABLE_EDITOR
+                if !config.isHiddenEditButton {
+                    selectedView.x = editBtn.frame.maxX + 12
+                    selectedView.width = width - selectedView.x
+                    selectedView.collectionViewLayout.sectionInset = UIEdgeInsets(
+                        top: 10,
+                        left: 0,
+                        bottom: 5,
+                        right: 12 + UIDevice.rightMargin
+                    )
+                }else {
+                    selectedView.width = width
+                }
+                editBtn.centerY = selectedView.centerY
+                #else
+                selectedView.width = width
+                #endif
+            }
+        }else {
+            if config.isShowSelectedView && isMultipleSelect {
+                selectedView.width = width
+            }
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 13.0, *) {
+            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+                configColor()
+            }
+        }
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension PhotoPickerBottomView {
+    
+    @objc func didPromptViewClick() {
+        PhotoTools.openSettingsURL()
+    }
+    
+    @objc func didPreviewButtonClick(button: UIButton) {
+        hx_delegate?.bottomView(didPreviewButtonClick: self)
+    }
     
     @objc func didOriginalButtonClick() {
         boxControl.isSelected = !boxControl.isSelected
@@ -289,41 +394,12 @@ class PhotoPickerBottomView: UIToolbar {
         originalTitleLb.text = "原图".localized
         updateOriginalButtonFrame()
     }
-    lazy var originalTitleLb: UILabel = {
-        let originalTitleLb = UILabel.init()
-        originalTitleLb.text = "原图".localized
-        originalTitleLb.font = UIFont.systemFont(ofSize: 17)
-        originalTitleLb.lineBreakMode = .byTruncatingHead
-        return originalTitleLb
-    }()
-    
-    lazy var boxControl: SelectBoxView = {
-        let boxControl = SelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 17, height: 17))
-        boxControl.config = config.originalSelectBox
-        boxControl.backgroundColor = .clear
-        return boxControl
-    }()
-    var showOriginalLoadingView: Bool = false
-    var originalLoadingDelayTimer: Timer?
-    lazy var originalLoadingView: UIActivityIndicatorView = {
-        let originalLoadingView = UIActivityIndicatorView.init(style: .white)
-        originalLoadingView.hidesWhenStopped = true
-        return originalLoadingView
-    }()
-    
-    lazy var finishBtn: UIButton = {
-        let finishBtn = UIButton.init(type: .custom)
-        finishBtn.setTitle("完成".localized, for: .normal)
-        finishBtn.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
-        finishBtn.layer.cornerRadius = 3
-        finishBtn.layer.masksToBounds = true
-        finishBtn.isEnabled = false
-        finishBtn.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
-        return finishBtn
-    }()
     @objc func didFinishButtonClick(button: UIButton) {
         hx_delegate?.bottomView(didFinishButtonClick: self)
     }
+}
+
+extension PhotoPickerBottomView {
     func updatePromptView() {
         if config.isShowPrompt &&
             AssetManager.authorizationStatusIsLimited() &&
@@ -445,6 +521,9 @@ class PhotoPickerBottomView: UIToolbar {
             promptArrow.tintColor = isDark ? config.promptArrowDarkColor : config.promptArrowColor
         }
     }
+}
+
+extension PhotoPickerBottomView {
     func updateFinishButtonTitle() {
         guard let picker = viewController?.pickerController,
               sourceType != .browser else {
@@ -551,73 +630,6 @@ class PhotoPickerBottomView: UIToolbar {
         originalLoadingView.x = originalTitleLb.frame.maxX + 3
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        if sourceType != .browser {
-            contentView.width = width
-            contentView.height = 50 + UIDevice.bottomMargin
-            contentView.y = height - contentView.height
-            previewBtn.x = 12 + UIDevice.leftMargin
-            #if HXPICKER_ENABLE_EDITOR
-            editBtn.x = previewBtn.x
-            #endif
-            updateFinishButtonFrame()
-            updateOriginalButtonFrame()
-        }
-        if config.isShowPrompt &&
-            AssetManager.authorizationStatusIsLimited() &&
-            allowLoadPhotoLibrary &&
-            sourceType == .picker {
-            promptView.width = width
-            promptIcon.x = 12 + UIDevice.leftMargin
-            promptIcon.centerY = promptView.height * 0.5
-            promptArrow.x = width - 12 - promptArrow.width - UIDevice.rightMargin
-            promptLb.x = promptIcon.frame.maxX + 12
-            promptLb.width = promptArrow.x - promptLb.x - 12
-            promptLb.centerY = promptView.height * 0.5
-            promptArrow.centerY = promptView.height * 0.5
-        }
-        if sourceType == .browser {
-            #if HXPICKER_ENABLE_EDITOR
-            editBtn.x = 12 + UIDevice.leftMargin
-            #endif
-            if config.isShowSelectedView {
-                #if HXPICKER_ENABLE_EDITOR
-                if !config.isHiddenEditButton {
-                    selectedView.x = editBtn.frame.maxX + 12
-                    selectedView.width = width - selectedView.x
-                    selectedView.collectionViewLayout.sectionInset = UIEdgeInsets(
-                        top: 10,
-                        left: 0,
-                        bottom: 5,
-                        right: 12 + UIDevice.rightMargin
-                    )
-                }else {
-                    selectedView.width = width
-                }
-                editBtn.centerY = selectedView.centerY
-                #else
-                selectedView.width = width
-                #endif
-            }
-        }else {
-            if config.isShowSelectedView && isMultipleSelect {
-                selectedView.width = width
-            }
-        }
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if #available(iOS 13.0, *) {
-            if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                configColor()
-            }
-        }
-    }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
 
 // MARK: PhotoPreviewSelectedViewDelegate

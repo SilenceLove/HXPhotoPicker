@@ -109,8 +109,18 @@ class EditorMosaicToolView: UIView {
             undoButton.frame = CGRect(x: width - UIDevice.rightMargin - height, y: 0, width: height, height: height)
         }else {
             undoButton.frame = CGRect(x: 0, y: UIDevice.topMargin, width: width, height: 44)
-            mosaicButton.frame = .init(x: 0, y: undoButton.frame.maxY, width: width, height: (height - undoButton.height) / 2)
-            smearButton.frame = .init(x: 0, y: mosaicButton.frame.maxY, width: width, height: (height - undoButton.height) / 2)
+            mosaicButton.frame = .init(
+                x: 0,
+                y: undoButton.frame.maxY,
+                width: width,
+                height: (height - undoButton.height) / 2
+            )
+            smearButton.frame = .init(
+                x: 0,
+                y: mosaicButton.frame.maxY,
+                width: width,
+                height: (height - undoButton.height) / 2
+            )
         }
     }
 }

@@ -91,7 +91,7 @@ public extension PhotoAsset {
                 switch result {
                 case .success(let result):
                     resultHandler(result.image)
-                case .failure(_):
+                case .failure:
                     resultHandler(nil)
                 }
             }

@@ -13,9 +13,7 @@ protocol AlbumViewDelegate: AnyObject {
 }
 
 class AlbumView: UIView, UITableViewDataSource, UITableViewDelegate {
-    
     weak var delegate: AlbumViewDelegate?
-    
     lazy var tableView: UITableView = {
         let tableView = UITableView.init(frame: CGRect.init(), style: .plain)
         if AssetManager.authorizationStatusIsLimited() {

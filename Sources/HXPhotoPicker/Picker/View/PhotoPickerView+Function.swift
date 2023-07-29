@@ -331,7 +331,7 @@ extension PhotoPickerView {
                 }
                 UIView.animate(withDuration: 0.25) {
                     self.dragView.frame = self.initialDragRect
-                } completion: { isFinished in
+                } completion: { _ in
                     if pan.state == .began || pan.state == .changed {
                         return
                     }

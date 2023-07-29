@@ -9,22 +9,34 @@ import UIKit
 import AVFoundation
 
 protocol EditorMusicListViewControllerDelegate: AnyObject {
-    func musicViewController(_ musicViewController: EditorMusicListViewController,
-                         didSelectItem musicURL: VideoEditorMusicURL,
-                         music: VideoEditorMusic)
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        didSelectItem musicURL: VideoEditorMusicURL,
+        music: VideoEditorMusic
+    )
     func musicViewController(clearSearch musicViewController: EditorMusicListViewController)
-    func musicViewController(_ musicViewController: EditorMusicListViewController,
-                         didSearch text: String?,
-                         completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void)
-    func musicViewController(_ musicViewController: EditorMusicListViewController,
-                         loadMore text: String?,
-                         completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void)
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        didSearch text: String?,
+        completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void
+    )
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        loadMore text: String?,
+        completion: @escaping ([VideoEditorMusicInfo], Bool) -> Void
+    )
     func musicViewController(deselectItem musicViewController: EditorMusicListViewController)
     
-    
     @discardableResult
-    func musicViewController(_ musicViewController: EditorMusicListViewController, didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)) -> Bool
-    func musicViewController(_ musicViewController: EditorMusicListViewController, playCompletion: @escaping (() -> Void))
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        didPlay musicURL: VideoEditorMusicURL,
+        playCompletion: @escaping (() -> Void)
+    ) -> Bool
+    func musicViewController(
+        _ musicViewController: EditorMusicListViewController,
+        playCompletion: @escaping (() -> Void)
+    )
     func musicViewController(playTime musicViewController: EditorMusicListViewController) -> TimeInterval?
     func musicViewController(musicDuration musicViewController: EditorMusicListViewController) -> TimeInterval?
     func musicViewController(stopPlay musicViewController: EditorMusicListViewController)
@@ -403,8 +415,15 @@ extension EditorMusicListViewController: UICollectionViewDataSource,
     }
 }
 extension EditorMusicListViewController: EditorMusicViewCellDelegate {
-    func musicViewCell(_ viewCell: EditorMusicViewCell, didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)) -> Bool {
-        delegate?.musicViewController(self, didPlay: musicURL, playCompletion: playCompletion) ?? false
+    func musicViewCell(
+        _ viewCell: EditorMusicViewCell,
+        didPlay musicURL: VideoEditorMusicURL,
+        playCompletion: @escaping (() -> Void)
+    ) -> Bool {
+        if let isSuccess = delegate?.musicViewController(self, didPlay: musicURL, playCompletion: playCompletion) {
+            return isSuccess
+        }
+        return false
     }
     
     func musicViewCell(_ viewCell: EditorMusicViewCell, playCompletion: @escaping (() -> Void)) {

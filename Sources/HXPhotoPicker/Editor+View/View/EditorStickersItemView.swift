@@ -54,10 +54,20 @@ class EditorStickersItemView: EditorStickersItemBaseView {
         return button
     }()
     lazy var scaleBtn: UIImageView = {
-        let image = !item.isAudio ? "hx_editor_view_sticker_item_scale".image : "hx_editor_view_sticker_item_rotate".image
+        let image: UIImage?
+        if !item.isAudio {
+            image = "hx_editor_view_sticker_item_scale".image
+        }else {
+            image = "hx_editor_view_sticker_item_rotate".image
+        }
         let button = UIImageView(image: image)
         button.isUserInteractionEnabled = true
-        button.addGestureRecognizer(PhotoPanGestureRecognizer(target: self, action: #selector(dragScaleButtonClick(pan:))))
+        button.addGestureRecognizer(
+            PhotoPanGestureRecognizer(
+                target: self,
+                action: #selector(dragScaleButtonClick(pan:))
+            )
+        )
         button.isHidden = true
         return button
     }()
@@ -221,9 +231,19 @@ extension EditorStickersItemView {
             let r = sqrt(p.x * p.x + p.y * p.y)
             let arg = atan2(p.y, p.x)
             if !item.isAudio {
-                update(pinchScale: initialScale * r / scaleR, rotation: initialRadian + arg - scaleA, isPinch: true, isWindow: true)
+                update(
+                    pinchScale: initialScale * r / scaleR,
+                    rotation: initialRadian + arg - scaleA,
+                    isPinch: true,
+                    isWindow: true
+                )
             }else {
-                update(pinchScale: initialScale, rotation: initialRadian + arg - scaleA, isPinch: true, isWindow: true)
+                update(
+                    pinchScale: initialScale,
+                    rotation: initialRadian + arg - scaleA,
+                    isPinch: true,
+                    isWindow: true
+                )
             }
         case .ended, .cancelled, .failed:
             if !touching {
@@ -510,7 +530,10 @@ extension EditorStickersItemView {
         }else {
             deleteBtn.size = .init(width: 40 / scale, height: 40 / scale)
             scaleBtn.size = .init(width: 40 / scale, height: 40 / scale)
-            let mirrorScale = CGPoint(x: self.mirrorScale.x * editMirrorScale.x, y: self.mirrorScale.y * editMirrorScale.y)
+            let mirrorScale = CGPoint(
+                x: self.mirrorScale.x * editMirrorScale.x,
+                y: self.mirrorScale.y * editMirrorScale.y
+            )
             if mirrorScale.x == -1 && mirrorScale.y == -1 {
                 scaleBtn.center = .init(x: -margin * 0.5, y: -margin * 0.5)
                 deleteBtn.center = .init(x: bounds.width + margin * 0.5, y: bounds.height + margin * 0.5)
@@ -605,7 +628,6 @@ extension EditorStickersItemView {
             lastMirrorTransform = mirrorView.transform
             lastScaleTransform = contentView.transform
         }
-        
         
         transform = .identity
         mirrorView.transform = .identity

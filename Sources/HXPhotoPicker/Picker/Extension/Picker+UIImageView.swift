@@ -14,6 +14,7 @@ import Kingfisher
 extension UIImageView {
     
     #if canImport(Kingfisher)
+    // swiftlint:disable function_body_length
     @discardableResult
     func setImage(
         for asset: PhotoAsset,
@@ -24,6 +25,7 @@ extension UIImageView {
         downloadTask: ((Kingfisher.DownloadTask?) -> Void)? = nil,
         completionHandler: ImageView.ImageCompletion? = nil
     ) -> Any? {
+        // swiftlint:enable function_body_length
         #if HXPICKER_ENABLE_EDITOR
         if asset.editedResult != nil {
             getEditedImage(asset, urlType: urlType, completionHandler: completionHandler)
@@ -49,7 +51,10 @@ extension UIImageView {
                 if imageAsset.thumbnailLoadMode == .varied {
                     if ImageCache.default.isCached(forKey: imageAsset.originalURL.cacheKey) {
                         if ImageCache.default.isCached(forKey: imageAsset.thumbnailURL.cacheKey) {
-                            placeholderImage = ImageCache.default.retrieveImageInMemoryCache(forKey: imageAsset.thumbnailURL.cacheKey, options: [])
+                            placeholderImage = ImageCache.default.retrieveImageInMemoryCache(
+                                forKey: imageAsset.thumbnailURL.cacheKey,
+                                options: []
+                            )
                             (kf.indicator?.view as? UIActivityIndicatorView)?.color = .white
                         }else {
                             placeholderImage = UIImage.image(for: imageAsset.placeholder)
@@ -167,7 +172,7 @@ extension UIImageView {
             switch result {
             case .success(let value):
                 switch asset.mediaSubType {
-                case .networkImage(_):
+                case .networkImage:
                     let cacheKey = value.originalSource.cacheKey
                     if let networkAsset = asset.networkImageAsset, networkAsset.imageSize.equalTo(.zero) {
                         ImageCache.default.retrieveImage(forKey: cacheKey, options: []) { [weak asset] result in
@@ -175,20 +180,8 @@ extension UIImageView {
                             switch result {
                             case .success(let value):
                                 guard let image = value.image else { return }
-    //                            if asset.localImageAsset == nil {
-    //                                let localImageAsset = LocalImageAsset(image: image)
-    //                                asset.localImageAsset = localImageAsset
-    //                            }
                                 asset.networkImageAsset?.imageSize = image.size
-//                                if asset.localImageType != .original && !isThumbnail {
-//                                    DispatchQueue.global().async {
-//                                        if let imageData = image.kf.data(format: asset.mediaSubType.isGif ? .GIF : .unknown) {
-//                                            asset.networkImageAsset?.fileSize = imageData.count
-//                                        }
-//                                    }
-//                                    asset.localImageType = urlType
-//                                }
-                            case .failure(_):
+                            case .failure:
                                 return
                             }
                         }
@@ -209,6 +202,7 @@ extension UIImageView {
             }
         }
     }
+    
     #if HXPICKER_ENABLE_EDITOR
     private func getEditedImage(
         _ photoAsset: PhotoAsset,
@@ -274,15 +268,16 @@ extension UIImageView {
                 return nil
             }
             videoURL = videoAsset.videoURL
-        }else {
+        }
+        guard let videoURL = videoURL else {
             completionHandler?(nil, asset)
             return nil
         }
         return PhotoTools.getVideoThumbnailImage(
-            url: videoURL!,
+            url: videoURL,
             atTime: 0.1,
             imageGenerator: imageGenerator
-        ) { videoURL, image, result in
+        ) { _, image, result in
             if let image = image {
                 if asset.isNetworkAsset {
                     asset.networkVideoAsset?.videoSize = image.size

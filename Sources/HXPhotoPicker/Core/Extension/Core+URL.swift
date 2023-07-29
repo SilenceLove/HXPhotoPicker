@@ -15,10 +15,10 @@ extension URL: HXPickerCompatibleValue {
         absoluteString.hasSuffix("gif") || absoluteString.hasSuffix("GIF")
     }
     var fileSize: Int {
-        guard let fileSize = try? resourceValues(forKeys: [.fileSizeKey]) else {
+        guard let fileSize = try? resourceValues(forKeys: [.fileSizeKey]).fileSize else {
             return 0
         }
-        return fileSize.fileSize ?? 0
+        return fileSize
     }
     
     #if canImport(Kingfisher)
@@ -34,7 +34,6 @@ extension URL: HXPickerCompatibleValue {
         return fileData.fileType
     }
 }
-
 
 public extension HXPickerWrapper where Base == URL {
     #if canImport(Kingfisher)

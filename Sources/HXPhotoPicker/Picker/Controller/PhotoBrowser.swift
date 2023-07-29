@@ -10,7 +10,7 @@ import UIKit
 open class PhotoBrowser: PhotoPickerController {
     
     /// 当前页面
-    public var pageIndex : Int {
+    public var pageIndex: Int {
         get { currentPreviewIndex }
         set { previewViewController?.scrollToItem(newValue) }
     }
@@ -474,15 +474,24 @@ extension PhotoBrowser: PhotoPickerControllerDelegate {
         viewWillAppear?(self)
     }
     
-    public func pickerController(_ pickerController: PhotoPickerController, viewControllersDidAppear viewController: UIViewController) {
+    public func pickerController(
+        _ pickerController: PhotoPickerController,
+        viewControllersDidAppear viewController: UIViewController
+    ) {
         viewDidAppear?(self)
     }
     
-    public func pickerController(_ pickerController: PhotoPickerController, viewControllersWillDisappear viewController: UIViewController) {
+    public func pickerController(
+        _ pickerController: PhotoPickerController,
+        viewControllersWillDisappear viewController: UIViewController
+    ) {
         viewWillDisappear?(self)
     }
     
-    public func pickerController(_ pickerController: PhotoPickerController, viewControllersDidDisappear viewController: UIViewController) {
+    public func pickerController(
+        _ pickerController: PhotoPickerController,
+        viewControllersDidDisappear viewController: UIViewController
+    ) {
         viewDidDisappear?(self)
     }
     

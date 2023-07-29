@@ -85,7 +85,7 @@ class EditorChartletPreviewView: UIView {
                     imageSize: imageResult.image.size
                 )
                 self?.bgLayer.path = self?.bgLayerPath()
-            case .failure(_):
+            case .failure:
                 break
             }
         }

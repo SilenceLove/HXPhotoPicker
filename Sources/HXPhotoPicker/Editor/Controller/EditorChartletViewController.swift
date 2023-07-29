@@ -21,7 +21,11 @@ protocol EditorChartletViewControllerDelegate: AnyObject {
         titleIndex: Int,
         loadChartletList response: @escaping EditorChartletListResponse
     )
-    func chartletViewController(_ chartletViewController: EditorChartletViewController, didSelectImage image: UIImage, imageData: Data?)
+    func chartletViewController(
+        _ chartletViewController: EditorChartletViewController,
+        didSelectImage image: UIImage,
+        imageData: Data?
+    )
 }
 
 class EditorChartletViewController: BaseViewController {
@@ -257,7 +261,12 @@ class EditorChartletViewController: BaseViewController {
         }
         titleBgView.frame = CGRect(x: 0, y: viewY, width: view.width, height: 50)
         backButton.frame = CGRect(x: view.width - 50 - UIDevice.rightMargin, y: viewY, width: 50, height: 50)
-        bgView.frame = CGRect(x: 0, y: titleBgView.frame.maxY, width: view.width, height: view.height - titleBgView.height)
+        bgView.frame = CGRect(
+            x: 0,
+            y: titleBgView.frame.maxY,
+            width: view.width,
+            height: view.height - titleBgView.height
+        )
         titleView.frame = CGRect(x: 0, y: viewY, width: view.width, height: 50)
         titleView.contentInset = UIEdgeInsets(
             top: 5,
@@ -395,7 +404,7 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                 pickerConfig.editor.languageType =  editorConfig.languageType
                 pickerConfig.editor.indicatorType =  editorConfig.indicatorType
                 pickerConfig.isAutoBack = false
-                #if HXPICKER_ENABLE_CAMERA
+                #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
                 switch pickerConfig.photoList.cameraType {
                 case .custom(var camerConfig):
                     camerConfig.languageType = editorConfig.languageType
@@ -418,7 +427,11 @@ extension EditorChartletViewController: UICollectionViewDataSource,
                                 switch $0 {
                                 case .success(let result):
                                     if let imageData = try? Data(contentsOf: result.url) {
-                                        self.delegate?.chartletViewController(self, didSelectImage: .init(), imageData: imageData)
+                                        self.delegate?.chartletViewController(
+                                            self,
+                                            didSelectImage: .init(),
+                                            imageData: imageData
+                                        )
                                     }
                                 default:
                                     break

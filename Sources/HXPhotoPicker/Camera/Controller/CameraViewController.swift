@@ -12,6 +12,9 @@ import CoreLocation
 import AVFoundation
 
 /// 需要有导航栏
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 open class CameraViewController: BaseViewController {
     public weak var delegate: CameraViewControllerDelegate?
     
@@ -153,181 +156,6 @@ open class CameraViewController: BaseViewController {
             object: nil
         )
     }
-    
-    @objc
-    func willEnterForeground() { 
-    }
-    @objc
-    func didEnterBackground() {
-        previewView.clearMeatalPixelBuffer()
-        cameraManager.resetFilter()
-    }
-    
-    @objc
-    public func didSwitchCameraClick() {
-        previewView.metalView.isPaused = true
-        previewView.pixelBuffer = nil
-        if config.cameraType == .normal {
-            do {
-                try cameraManager.switchCameras()
-            } catch {
-                print(error)
-                switchCameraFailed()
-            }
-            delegate?.cameraViewController(
-                self,
-                didSwitchCameraCompletion: cameraManager.activeCamera?.position ?? .unspecified
-            )
-            if !cameraManager.setFlashMode(config.flashMode) {
-                cameraManager.setFlashMode(.off)
-            }
-        }
-        resetZoom()
-        previewView.resetOrientation()
-        cameraManager.resetFilter()
-        previewView.metalView.isPaused = false
-    }
-    
-    func switchCameraFailed() {
-        ProgressHUD.showWarning(
-            addedTo: view,
-            text: "摄像头切换失败!".localized,
-            animated: true,
-            delayHide: 1.5
-        )
-    }
-    
-    func resetZoom() {
-        if config.cameraType == .normal {
-            cameraManager.zoomFacto = 1
-            previewView.effectiveScale = 1
-        }
-    }
-    
-    func setupCamera() {
-        DeviceOrientationHelper
-            .shared
-            .startDeviceOrientationNotifier()
-        if config.cameraType == .normal {
-            view.addSubview(previewView)
-        }
-        view.addSubview(bottomView)
-        DispatchQueue.global().async {
-            do {
-                self.sessionCommitConfiguration = false
-                self.cameraManager.session.beginConfiguration()
-                try self.cameraManager.startSession()
-                var needAddAudio = false
-                switch self.type {
-                case .photo:
-                    try self.cameraManager.addPhotoOutput()
-                case .video:
-                    needAddAudio = true
-                case .all:
-                    try self.cameraManager.addPhotoOutput()
-                    needAddAudio = true
-                }
-                self.cameraManager.addVideoOutput()
-                if !needAddAudio {
-                    self.addOutputCompletion()
-                }else {
-                    self.addAudioInput()
-                }
-            } catch {
-                self.cameraManager.session.commitConfiguration()
-                DispatchQueue.main.async {
-                    PhotoTools.showConfirm(
-                        viewController: self,
-                        title: "相机初始化失败!".localized,
-                        message: nil,
-                        actionTitle: "确定".localized
-                    ) { _ in
-                        self.dismiss(animated: true)
-                    }
-                }
-            }
-        }
-    }
-    
-    func addAudioInput() {
-        AVCaptureDevice.requestAccess(for: .audio) { isGranted in
-            DispatchQueue.global().async {
-                if isGranted {
-                    do {
-                        try self.cameraManager.addAudioInput()
-                        self.cameraManager.addAudioOutput()
-                    } catch {
-                        DispatchQueue.main.async {
-                            self.addAudioInputFailed()
-                        }
-                    }
-                }else {
-                    DispatchQueue.main.async {
-                        PhotoTools.showAlert(
-                            viewController: self,
-                            title: "无法使用麦克风".localized,
-                            message: "请在设置-隐私-相机中允许访问麦克风".localized,
-                            leftActionTitle: "取消".localized,
-                        leftHandler: { alertAction in
-                            self.addAudioInputFailed()
-                        },
-                            rightActionTitle: "设置".localized
-                        ) { alertAction in
-                            PhotoTools.openSettingsURL()
-                        }
-                    }
-                }
-                self.addOutputCompletion()
-            }
-        }
-    }
-    
-    func addAudioInputFailed() {
-        ProgressHUD.showWarning(
-            addedTo: self.view,
-            text: "麦克风添加失败，录制视频会没有声音哦!".localized,
-            animated: true,
-            delayHide: 1.5
-        )
-    }
-    
-    func addOutputCompletion() {
-        cameraManager.session.commitConfiguration()
-        sessionCommitConfiguration = true
-        if config.cameraType == .normal {
-            cameraManager.startRunning()
-        }
-        requestCameraSuccess = true
-        DispatchQueue.main.async {
-            self.previewView.resetOrientation()
-            self.sessionCompletion()
-        }
-    }
-    
-    func sessionCompletion() {
-        if config.cameraType == .normal {
-            if cameraManager.canSwitchCameras() {
-                addSwithCameraButton()
-            }
-            previewView.setupGestureRecognizer()
-        }else {
-            addSwithCameraButton()
-        }
-        bottomView.addGesture(for: type)
-        #if HXPICKER_ENABLE_CAMERA_LOCATION
-        startLocation()
-        #endif
-    }
-    
-    func addSwithCameraButton() {
-        view.layer.addSublayer(topMaskLayer)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: "hx_camera_overturn".image,
-            style: .plain,
-            target: self,
-            action: #selector(didSwitchCameraClick)
-        )
-    }
     open override func deviceOrientationWillChanged(notify: Notification) {
         didLayoutPreview = false
     }
@@ -458,5 +286,185 @@ open class CameraViewController: BaseViewController {
         }
         #endif
         DeviceOrientationHelper.shared.stopDeviceOrientationNotifier()
+    }
+}
+
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
+extension CameraViewController {
+    
+    @objc
+    func willEnterForeground() {
+    }
+    @objc
+    func didEnterBackground() {
+        previewView.clearMeatalPixelBuffer()
+        cameraManager.resetFilter()
+    }
+    
+    @objc
+    public func didSwitchCameraClick() {
+        previewView.metalView.isPaused = true
+        previewView.pixelBuffer = nil
+        if config.cameraType == .normal {
+            do {
+                try cameraManager.switchCameras()
+            } catch {
+                print(error)
+                switchCameraFailed()
+            }
+            delegate?.cameraViewController(
+                self,
+                didSwitchCameraCompletion: cameraManager.activeCamera?.position ?? .unspecified
+            )
+            if !cameraManager.setFlashMode(config.flashMode) {
+                cameraManager.setFlashMode(.off)
+            }
+        }
+        resetZoom()
+        previewView.resetOrientation()
+        cameraManager.resetFilter()
+        previewView.metalView.isPaused = false
+    }
+    
+    func switchCameraFailed() {
+        ProgressHUD.showWarning(
+            addedTo: view,
+            text: "摄像头切换失败!".localized,
+            animated: true,
+            delayHide: 1.5
+        )
+    }
+    
+    func resetZoom() {
+        if config.cameraType == .normal {
+            cameraManager.zoomFacto = 1
+            previewView.effectiveScale = 1
+        }
+    }
+    
+    func setupCamera() {
+        DeviceOrientationHelper
+            .shared
+            .startDeviceOrientationNotifier()
+        if config.cameraType == .normal {
+            view.addSubview(previewView)
+        }
+        view.addSubview(bottomView)
+        DispatchQueue.global().async {
+            do {
+                self.sessionCommitConfiguration = false
+                self.cameraManager.session.beginConfiguration()
+                try self.cameraManager.startSession()
+                var needAddAudio = false
+                switch self.type {
+                case .photo:
+                    try self.cameraManager.addPhotoOutput()
+                case .video:
+                    needAddAudio = true
+                case .all:
+                    try self.cameraManager.addPhotoOutput()
+                    needAddAudio = true
+                }
+                self.cameraManager.addVideoOutput()
+                if !needAddAudio {
+                    self.addOutputCompletion()
+                }else {
+                    self.addAudioInput()
+                }
+            } catch {
+                self.cameraManager.session.commitConfiguration()
+                DispatchQueue.main.async {
+                    PhotoTools.showConfirm(
+                        viewController: self,
+                        title: "相机初始化失败!".localized,
+                        message: nil,
+                        actionTitle: "确定".localized
+                    ) { _ in
+                        self.dismiss(animated: true)
+                    }
+                }
+            }
+        }
+    }
+    
+    func addAudioInput() {
+        AVCaptureDevice.requestAccess(for: .audio) { isGranted in
+            DispatchQueue.global().async {
+                if isGranted {
+                    do {
+                        try self.cameraManager.addAudioInput()
+                        self.cameraManager.addAudioOutput()
+                    } catch {
+                        DispatchQueue.main.async {
+                            self.addAudioInputFailed()
+                        }
+                    }
+                }else {
+                    DispatchQueue.main.async {
+                        PhotoTools.showAlert(
+                            viewController: self,
+                            title: "无法使用麦克风".localized,
+                            message: "请在设置-隐私-相机中允许访问麦克风".localized,
+                            leftActionTitle: "取消".localized,
+                            rightActionTitle: "前往系统设置".localized
+                        ) { _ in
+                            self.addAudioInputFailed()
+                        } rightHandler: { _ in
+                            PhotoTools.openSettingsURL()
+                        }
+                    }
+                }
+                self.addOutputCompletion()
+            }
+        }
+    }
+    
+    func addAudioInputFailed() {
+        ProgressHUD.showWarning(
+            addedTo: self.view,
+            text: "麦克风添加失败，录制视频会没有声音哦!".localized,
+            animated: true,
+            delayHide: 1.5
+        )
+    }
+    
+    func addOutputCompletion() {
+        cameraManager.session.commitConfiguration()
+        sessionCommitConfiguration = true
+        if config.cameraType == .normal {
+            cameraManager.startRunning()
+        }
+        requestCameraSuccess = true
+        DispatchQueue.main.async {
+            self.previewView.resetOrientation()
+            self.sessionCompletion()
+        }
+    }
+    
+    func sessionCompletion() {
+        if config.cameraType == .normal {
+            if cameraManager.canSwitchCameras() {
+                addSwithCameraButton()
+            }
+            previewView.setupGestureRecognizer()
+        }else {
+            addSwithCameraButton()
+        }
+        bottomView.addGesture(for: type)
+        #if HXPICKER_ENABLE_CAMERA_LOCATION
+        startLocation()
+        #endif
+    }
+    
+    func addSwithCameraButton() {
+        view.layer.addSublayer(topMaskLayer)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: "hx_camera_overturn".image,
+            style: .plain,
+            target: self,
+            action: #selector(didSwitchCameraClick)
+        )
     }
 }

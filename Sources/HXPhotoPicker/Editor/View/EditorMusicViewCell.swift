@@ -10,7 +10,11 @@ import AVFoundation
 
 protocol EditorMusicViewCellDelegate: AnyObject {
     @discardableResult
-    func musicViewCell(_ viewCell: EditorMusicViewCell, didPlay musicURL: VideoEditorMusicURL, playCompletion: @escaping (() -> Void)) -> Bool
+    func musicViewCell(
+        _ viewCell: EditorMusicViewCell,
+        didPlay musicURL: VideoEditorMusicURL,
+        playCompletion: @escaping (() -> Void)
+    ) -> Bool
     func musicViewCell(_ viewCell: EditorMusicViewCell, playCompletion: @escaping (() -> Void))
     func musicViewCell(playTime viewCell: EditorMusicViewCell) -> TimeInterval?
     func musicViewCell(musicDuration viewCell: EditorMusicViewCell) -> TimeInterval?
@@ -131,7 +135,7 @@ class EditorMusicViewCell: UICollectionViewCell {
     func playMusic(completion: @escaping (VideoEditorMusicURL, VideoEditorMusic) -> Void) {
         hideLoading()
         switch music.audioURL {
-        case .network(_):
+        case .network:
             playNetworkMusic(completion: completion)
         default:
             playLocalMusic(completion: completion)
@@ -164,11 +168,10 @@ class EditorMusicViewCell: UICollectionViewCell {
             with: url,
             toFile: audioTmpURL,
             ext: music
-        ) { [weak self] audioURL, error, ext in
+        ) { [weak self] audioURL, _, ext in
             guard let self = self else { return }
             self.hideLoading()
-            if let _ = audioURL,
-               let music = ext as? VideoEditorMusic {
+            if let music = ext as? VideoEditorMusic, audioURL != nil {
                 if music == self.music {
                     self.didPlay(audioURL: music.audioURL)
                     music.isSelected = true

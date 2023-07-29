@@ -88,17 +88,20 @@ extension EditorAsset {
         
         public var contentType: EditorContentViewType {
             switch self {
-            case .image(_), .imageData(_):
+            case .image, .imageData:
                 return .image
             #if canImport(Kingfisher)
-            case .networkImage(_):
+            case .networkImage:
                 return .image
             #endif
-            case .video(_), .networkVideo(_):
+            case .video, .networkVideo:
                 return .video
             #if HXPICKER_ENABLE_PICKER
             case .photoAsset(let asset):
-                return asset.mediaType == .photo ? .image : .video
+                if asset.mediaType == .photo {
+                    return .image
+                }
+                return .video
             #endif
             default:
                 return .unknown

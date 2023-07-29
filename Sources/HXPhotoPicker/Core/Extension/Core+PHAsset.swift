@@ -76,7 +76,9 @@ extension PHAsset: HXPickerCompatible {
             return false
         }
         let resourceArray = PHAssetResource.assetResources(for: self)
-        let isLocallayAvailable = resourceArray.first?.value(forKey: "locallyAvailable") as? Bool ?? true
+        guard let isLocallayAvailable = resourceArray.first?.value(forKey: "locallyAvailable") as? Bool else {
+            return true
+        }
         return isLocallayAvailable
     }
     

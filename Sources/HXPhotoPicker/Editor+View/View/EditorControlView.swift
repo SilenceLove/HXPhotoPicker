@@ -99,6 +99,88 @@ class EditorControlView: UIView {
             (control as? UIPanGestureRecognizer)?.isEnabled = enabled
         }
     }
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if !isUserInteractionEnabled {
+            return nil
+        }
+        return canUserEnabled(point)
+    }
+    
+    func canUserEnabled(_ point: CGPoint) -> UIView? {
+        if topControl.frame.contains(point) {
+            return topControl
+        }else if leftControl.frame.contains(point) {
+            return leftControl
+        }else if rightControl.frame.contains(point) {
+            return rightControl
+        }else if bottomControl.frame.contains(point) {
+            return bottomControl
+        }else if leftTopControl.frame.contains(point) {
+            return leftTopControl
+        }else if leftBottomControl.frame.contains(point) {
+            return leftBottomControl
+        }else if rightTopControl.frame.contains(point) {
+            return rightTopControl
+        }else if rightBottomControl.frame.contains(point) {
+            return rightBottomControl
+        }
+        return nil
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let lineMarign: CGFloat = 20
+        topControl.frame = CGRect(x: lineMarign, y: -lineMarign, width: width - lineMarign * 2, height: lineMarign * 2)
+        leftControl.frame = CGRect(
+            x: -lineMarign,
+            y: lineMarign,
+            width: lineMarign * 2,
+            height: height - lineMarign * 2
+        )
+        rightControl.frame = CGRect(
+            x: width - lineMarign,
+            y: lineMarign,
+            width: lineMarign * 2,
+            height: height - lineMarign * 2
+        )
+        bottomControl.frame = CGRect(
+            x: lineMarign,
+            y: height - lineMarign,
+            width: width - lineMarign * 2,
+            height: lineMarign * 2
+        )
+        leftTopControl.frame = CGRect(
+            x: -lineMarign,
+            y: -lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
+        leftBottomControl.frame = CGRect(
+            x: -lineMarign,
+            y: height - lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
+        rightTopControl.frame = CGRect(
+            x: width - lineMarign,
+            y: -lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
+        rightBottomControl.frame = CGRect(
+            x: width - lineMarign,
+            y: height - lineMarign,
+            width: lineMarign * 2,
+            height: lineMarign * 2
+        )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension EditorControlView {
     func topControlHandler(_ point: CGPoint) {
         let fixedRatio = factor.fixedRatio
         let aspectRatio = factor.aspectRatio
@@ -582,84 +664,5 @@ class EditorControlView: UIView {
             panning = false
             changeControl(enabled: true, index: controls.firstIndex(of: pan)!)
         }
-    }
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if !isUserInteractionEnabled {
-            return nil
-        }
-        return canUserEnabled(point)
-    }
-    
-    func canUserEnabled(_ point: CGPoint) -> UIView? {
-        if topControl.frame.contains(point) {
-            return topControl
-        }else if leftControl.frame.contains(point) {
-            return leftControl
-        }else if rightControl.frame.contains(point) {
-            return rightControl
-        }else if bottomControl.frame.contains(point) {
-            return bottomControl
-        }else if leftTopControl.frame.contains(point) {
-            return leftTopControl
-        }else if leftBottomControl.frame.contains(point) {
-            return leftBottomControl
-        }else if rightTopControl.frame.contains(point) {
-            return rightTopControl
-        }else if rightBottomControl.frame.contains(point) {
-            return rightBottomControl
-        }
-        return nil
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        let lineMarign: CGFloat = 20
-        topControl.frame = CGRect(x: lineMarign, y: -lineMarign, width: width - lineMarign * 2, height: lineMarign * 2)
-        leftControl.frame = CGRect(
-            x: -lineMarign,
-            y: lineMarign,
-            width: lineMarign * 2,
-            height: height - lineMarign * 2
-        )
-        rightControl.frame = CGRect(
-            x: width - lineMarign,
-            y: lineMarign,
-            width: lineMarign * 2,
-            height: height - lineMarign * 2
-        )
-        bottomControl.frame = CGRect(
-            x: lineMarign,
-            y: height - lineMarign,
-            width: width - lineMarign * 2,
-            height: lineMarign * 2
-        )
-        leftTopControl.frame = CGRect(
-            x: -lineMarign,
-            y: -lineMarign,
-            width: lineMarign * 2,
-            height: lineMarign * 2
-        )
-        leftBottomControl.frame = CGRect(
-            x: -lineMarign,
-            y: height - lineMarign,
-            width: lineMarign * 2,
-            height: lineMarign * 2
-        )
-        rightTopControl.frame = CGRect(
-            x: width - lineMarign,
-            y: -lineMarign,
-            width: lineMarign * 2,
-            height: lineMarign * 2
-        )
-        rightBottomControl.frame = CGRect(
-            x: width - lineMarign,
-            y: height - lineMarign,
-            width: lineMarign * 2,
-            height: lineMarign * 2
-        )
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

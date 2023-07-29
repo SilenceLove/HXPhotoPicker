@@ -8,6 +8,7 @@
 import UIKit
 import AVKit
 
+#if !targetEnvironment(macCatalyst)
 class CaptureVideoPreviewView: UIView {
     override class var layerClass: AnyClass {
         return AVCaptureVideoPreviewLayer.self
@@ -152,3 +153,4 @@ extension CaptureVideoPreviewView: AVCaptureVideoDataOutputSampleBufferDelegate 
         }
     }
 }
+#endif

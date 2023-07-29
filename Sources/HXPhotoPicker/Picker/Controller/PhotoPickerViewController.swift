@@ -69,11 +69,13 @@ public class PhotoPickerViewController: BaseViewController {
             )
         }
         if config.allowAddCamera {
+            #if !targetEnvironment(macCatalyst)
             collectionView.register(
                 PickerCameraViewCell.self,
                 forCellWithReuseIdentifier:
                     NSStringFromClass(PickerCameraViewCell.classForCoder())
             )
+            #endif
         }
         if #available(iOS 14.0, *), config.allowAddLimit {
             collectionView.register(
@@ -196,6 +198,7 @@ public class PhotoPickerViewController: BaseViewController {
         cell.config = config.limitCell
         return cell
     }
+    #if !targetEnvironment(macCatalyst)
     var cameraCell: PickerCameraViewCell {
         let indexPath: IndexPath
         if config.sort == .asc {
@@ -212,18 +215,27 @@ public class PhotoPickerViewController: BaseViewController {
         cell.config = config.cameraCell
         return cell
     }
+    #endif
     var didFetchAsset: Bool = false
     var canAddCamera: Bool {
+        #if targetEnvironment(macCatalyst)
+        return false
+        #else
         if didFetchAsset && config.allowAddCamera {
             return true
         }
         return false
+        #endif
     }
     var canAddLimit: Bool {
+        #if targetEnvironment(macCatalyst)
+        return false
+        #else
         if didFetchAsset && config.allowAddLimit && AssetManager.authorizationStatusIsLimited() {
             return true
         }
         return false
+        #endif
     }
     var needOffset: Bool {
         if config.sort == .desc {
@@ -245,6 +257,16 @@ public class PhotoPickerViewController: BaseViewController {
             return 1
         }
     }
+    var allowShowPrompt: Bool {
+        config.bottomView.isShowPrompt &&
+            AssetManager.authorizationStatusIsLimited() &&
+            allowLoadPhotoLibrary
+    }
+    
+    lazy var bottomPromptView: PhotoPickerBottomPromptView = {
+        let view = PhotoPickerBottomPromptView(config: config.bottomView)
+        return view
+    }()
     
     // MARK: UIScrollView滚动相关
     var scrollToTop = false
@@ -318,10 +340,11 @@ public class PhotoPickerViewController: BaseViewController {
                 titleLabel.size = CGSize(width: titleWidth, height: 30)
             }
         }
+        var promptHeight: CGFloat = 0
         if isMultipleSelect {
-            let promptHeight: CGFloat = (AssetManager.authorizationStatusIsLimited() &&
-                                            config.bottomView.isShowPrompt &&
-                                            allowLoadPhotoLibrary) ? 70 : 0
+            if allowShowPrompt {
+                promptHeight = 70
+            }
             let bottomHeight: CGFloat = 50 + UIDevice.bottomMargin + promptHeight
             bottomView.frame = CGRect(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
             collectionView.contentInset = UIEdgeInsets(
@@ -337,10 +360,15 @@ public class PhotoPickerViewController: BaseViewController {
                 right: 0
             )
         }else {
+            if allowShowPrompt {
+                promptHeight = 55
+                let bottomHeight = UIDevice.bottomMargin + promptHeight
+                bottomPromptView.frame = .init(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
+            }
             collectionView.contentInset = UIEdgeInsets(
                 top: collectionTop,
                 left: 0,
-                bottom: UIDevice.bottomMargin,
+                bottom: UIDevice.bottomMargin + promptHeight,
                 right: 0
             )
         }
@@ -422,6 +450,10 @@ extension PhotoPickerViewController {
         if isMultipleSelect {
             view.addSubview(bottomView)
             bottomView.updateFinishButtonTitle()
+        }else {
+            if allowShowPrompt {
+                view.addSubview(bottomPromptView)
+            }
         }
         if picker.config.albumShowMode == .popup {
             view.addSubview(albumBackgroudView)
@@ -431,8 +463,18 @@ extension PhotoPickerViewController {
     func initNavItems(_ addFilter: Bool = true) {
         guard let picker = pickerController else { return }
         
-        let filterImageName: String = filterOptions == .any ? "hx_picker_photolist_nav_filter_normal" : "hx_picker_photolist_nav_filter_selected"
-        let filterItem = UIBarButtonItem(image: filterImageName.image, style: .done, target: self, action: #selector(didFilterItemClick))
+        let filterImageName: String
+        if filterOptions == .any {
+            filterImageName = "hx_picker_photolist_nav_filter_normal"
+        }else {
+            filterImageName = "hx_picker_photolist_nav_filter_selected"
+        }
+        let filterItem = UIBarButtonItem(
+            image: filterImageName.image,
+            style: .done,
+            target: self,
+            action: #selector(didFilterItemClick)
+        )
         if picker.config.albumShowMode == .popup {
             var cancelItem: UIBarButtonItem
             if config.cancelType == .text {
@@ -696,6 +738,12 @@ extension PhotoPickerViewController {
     func updateBottomPromptView() {
         if isMultipleSelect {
             bottomView.updatePromptView()
+        }else {
+            if allowShowPrompt {
+                if bottomPromptView.superview != view {
+                    view.addSubview(bottomPromptView)
+                }
+            }
         }
     }
     func updateCellSelectedTitle() {

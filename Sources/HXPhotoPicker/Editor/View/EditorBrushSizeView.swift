@@ -26,7 +26,10 @@ class EditorBrushSizeView: UIView {
         view.layer.shadowOffset = CGSize(width: 0, height: 0)
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOpacity = 0.5
-        view.addGestureRecognizer(UIPanGestureRecognizer.init(target: self, action: #selector(blockViewPanGestureRecognizerClick(_:))))
+        view.addGestureRecognizer(UIPanGestureRecognizer(
+            target: self,
+            action: #selector(blockViewPanGestureRecognizerClick(_:))
+        ))
         view.center = .init(x: 12.5, y: 5)
         return view
     }()
@@ -56,7 +59,11 @@ class EditorBrushSizeView: UIView {
         path.addLine(to: .init(x: 18, y: 5))
         path.addCurve(to: .init(x: 20, y: 7), controlPoint1: .init(x: 18, y: 5), controlPoint2: .init(x: 20, y: 5))
         path.addLine(to: .init(x: 13.5, y: 200))
-        path.addCurve(to: .init(x: 11.5, y: 200), controlPoint1: .init(x: 13.5, y: 200), controlPoint2: .init(x: 12.5, y: 202))
+        path.addCurve(
+            to: .init(x: 11.5, y: 200),
+            controlPoint1: .init(x: 13.5, y: 200),
+            controlPoint2: .init(x: 12.5, y: 202)
+        )
         path.addLine(to: .init(x: 5, y: 7))
         sizeLayer.path = path.cgPath
     }
@@ -64,7 +71,13 @@ class EditorBrushSizeView: UIView {
     var currentBlockCenter: CGPoint = .zero
     
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        if CGRect(x: blockView.x - 5, y: blockView.y - 5, width: blockView.width + 10, height: blockView.height + 10).contains(point) {
+        let rect = CGRect(
+            x: blockView.x - 5,
+            y: blockView.y - 5,
+            width: blockView.width + 10,
+            height: blockView.height + 10
+        )
+        if rect.contains(point) {
             return true
         }
         return super.point(inside: point, with: event)
@@ -77,7 +90,6 @@ class EditorBrushSizeView: UIView {
         case .began:
             currentBlockCenter = blockView.center
             blockBeganChanged?(1 - value)
-            break
         case .changed:
             let blockCenterY = currentBlockCenter.y + point.y
             var value = (blockCenterY - 5.0) / 195.0
@@ -88,10 +100,8 @@ class EditorBrushSizeView: UIView {
             }
             self.value = 1 - value
             blockDidChanged?(1 - value)
-            break
         case .ended, .failed, .cancelled:
             blockEndedChanged?(1 - value)
-            break
         default:
             break
         }

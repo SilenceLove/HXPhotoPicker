@@ -21,10 +21,8 @@ public extension AssetManager {
             requestLivePhoto(
                 for: asset,
                 targetSize: PHImageManagerMaximumSize
-            ) { (ID) in
-            } progressHandler: { (progress, error, stop, info) in
-            } resultHandler: { (livePhoto, info, downloadSuccess) in
-                if livePhoto == nil {
+            ) { livePhoto, _, _ in
+                guard let livePhoto = livePhoto else {
                     completionHandler(
                         .allError(
                             PhotoError.error(
@@ -39,7 +37,7 @@ public extension AssetManager {
                     )
                     return
                 }
-                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto!)
+                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
                 if assetResources.isEmpty {
                     completionHandler(
                         .allError(
@@ -153,10 +151,8 @@ public extension AssetManager {
             requestLivePhoto(
                 for: forAsset,
                 targetSize: PHImageManagerMaximumSize
-            ) { (ID) in
-            } progressHandler: { (progress, error, stop, info) in
-            } resultHandler: { (livePhoto, info, downloadSuccess) in
-                if livePhoto == nil {
+            ) { livePhoto, _, _ in
+                guard let livePhoto = livePhoto else {
                     completionHandler(
                         nil,
                         .allError(
@@ -171,7 +167,7 @@ public extension AssetManager {
                     )
                     return
                 }
-                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto!)
+                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
                 if assetResources.isEmpty {
                     completionHandler(
                         nil,
@@ -260,10 +256,11 @@ public extension AssetManager {
         completionHandler: @escaping (LivePhotoError?) -> Void
     ) {
         if #available(iOS 9.1, *) {
-            requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize) { (ID) in
-            } progressHandler: { (progress, error, stop, info) in
-            } resultHandler: { (livePhoto, info, downloadSuccess) in
-                if livePhoto == nil {
+            requestLivePhoto(
+                for: asset,
+                targetSize: PHImageManagerMaximumSize
+            ) { livePhoto, _, _ in
+                guard let livePhoto = livePhoto else {
                     completionHandler(
                         .allError(
                             PhotoError.error(
@@ -278,7 +275,7 @@ public extension AssetManager {
                     )
                     return
                 }
-                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto!)
+                let assetResources: [PHAssetResource] = PHAssetResource.assetResources(for: livePhoto)
                 if assetResources.isEmpty {
                     completionHandler(
                         .allError(

@@ -82,7 +82,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             .observe(
                 \.isReadyForDisplay,
                 options: [.new, .old]
-            ) { [weak self] playerLayer, change in
+            ) { [weak self] playerLayer, _ in
             guard let self = self else { return }
             if playerLayer.isReadyForDisplay {
                 self.delegate?.videoView(readyForDisplay: self)
@@ -249,7 +249,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             .observe(
                 \.status,
                 options: [.new, .old],
-                changeHandler: { [weak self] playerItem, change in
+                changeHandler: { [weak self] playerItem, _ in
             guard let self = self else { return }
             switch playerItem.status {
             case AVPlayerItem.Status.readyToPlay:
@@ -283,7 +283,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             .observe(
                 \.loadedTimeRanges,
                 options: [.new],
-                changeHandler: { [weak self] playerItem, change in
+                changeHandler: { [weak self] playerItem, _ in
             guard let self = self,
                   let timeRange = playerItem.loadedTimeRanges.first?.timeRangeValue else {
                 return
@@ -298,7 +298,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             .observe(
                 \.isPlaybackLikelyToKeepUp,
                 options: [.new],
-                changeHandler: { [weak self] playerItem, change in
+                changeHandler: { [weak self] playerItem, _ in
             guard let self = self else { return }
             let isPlaybackLikelyToKeepUp = playerItem.isPlaybackLikelyToKeepUp
             self.delegate?.videoView(self, isPlaybackLikelyToKeepUp: isPlaybackLikelyToKeepUp)
@@ -318,7 +318,7 @@ class PhotoPreviewVideoView: VideoPlayerView {
             .currentItem?.observe(
                 \.presentationSize,
                  options: [.old, .new],
-                 changeHandler: { [weak self] playerItem, change in
+                 changeHandler: { [weak self] playerItem, _ in
                      guard let self = self else { return }
              if playerItem.presentationSize.equalTo(.zero) {
                  return

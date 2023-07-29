@@ -33,7 +33,6 @@ protocol EditorAdjusterViewDelegate: AnyObject {
     func editorAdjusterView(_ adjusterView: EditorAdjusterView, resetItemViews itemViews: [EditorStickersItemBaseView])
     func editorAdjusterView(_ adjusterView: EditorAdjusterView, shouldAddAudioItem audio: EditorStickerAudio) -> Bool
       
-    
     func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoDidPlayAt time: CMTime)
     func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoDidPauseAt time: CMTime)
     func editorAdjusterView(videoReadyForDisplay editorAdjusterView: EditorAdjusterView)
@@ -42,7 +41,15 @@ protocol EditorAdjusterViewDelegate: AnyObject {
     func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoReadyToPlay duration: CMTime)
     func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoDidChangedBufferAt time: CMTime)
     func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoDidChangedTimeAt time: CMTime)
-    func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoControlDidChangedTimeAt time: TimeInterval, for event: VideoControlEvent)
+    func editorAdjusterView(
+        _ editorAdjusterView: EditorAdjusterView,
+        videoControlDidChangedTimeAt time: TimeInterval,
+        for event: VideoControlEvent
+    )
     
-    func editorAdjusterView(_ editorAdjusterView: EditorAdjusterView, videoApplyFilter sourceImage: CIImage, at time: CMTime) -> CIImage
+    func editorAdjusterView(
+        _ editorAdjusterView: EditorAdjusterView,
+        videoApplyFilter sourceImage: CIImage,
+        at time: CMTime
+    ) -> CIImage
 }

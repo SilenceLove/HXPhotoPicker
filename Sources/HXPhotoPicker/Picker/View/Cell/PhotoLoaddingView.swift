@@ -15,7 +15,6 @@ class PhotoLoaddingView: UIView {
         return view
     }()
     
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .black.withAlphaComponent(0.6)

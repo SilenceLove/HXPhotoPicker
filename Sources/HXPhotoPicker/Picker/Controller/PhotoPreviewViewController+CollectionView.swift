@@ -204,7 +204,7 @@ extension PhotoPreviewViewController: PhotoPreviewViewCellDelegate {
         if config.isShowBottomView {
             UIView.animate(withDuration: 0.25) {
                 self.bottomView.alpha = self.statusBarShouldBeHidden ? 0 : 1
-            } completion: { (finish) in
+            } completion: { _ in
                 self.bottomView.isHidden = self.statusBarShouldBeHidden
             }
         }

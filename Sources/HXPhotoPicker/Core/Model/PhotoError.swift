@@ -117,7 +117,9 @@ extension AssetError: LocalizedError, CustomStringConvertible {
         case .exportLivePhotoVideoURLFailed(let error):
             return "导出livePhoto里的视频地址失败: \(String(describing: error))"
         case .exportLivePhotoURLFailed(let imageError, let videoError):
-            return "导出livePhoto里的地址失败（图片失败信息: \(String(describing: imageError)), 视频失败信息: \(String(describing: videoError))）"
+            return "导出livePhoto里的地址失败（图片失败信息:" +
+            String(describing: imageError) + ", 视频失败信息:" +
+            String(describing: videoError)
         case .imageCompressionFailed:
             return "图片压缩失败"
         case .imageDownloadFailed:
@@ -136,6 +138,9 @@ extension AssetError: LocalizedError, CustomStringConvertible {
     }
     
     public var description: String {
-        errorDescription ?? "nil"
+        if let errorDescription = errorDescription {
+            return errorDescription
+        }
+        return "nil"
     }
 }

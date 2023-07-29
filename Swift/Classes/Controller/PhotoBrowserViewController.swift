@@ -48,6 +48,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
         let networkVideoAsset = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL))
         previewAssets.append(networkVideoAsset)
         
+        // swiftlint:disable line_length
         let networkVideoURL1 = URL.init(string: "https://vd4.bdstatic.com/mda-niumk6kecunfhcqw/sc/cae_h264/1664464908581666807/mda-niumk6kecunfhcqw.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1671876955-0-0-d5348c926143621c0bab7727cb920cb7&bcevod_channel=searchbox_feed&pd=1&cd=0&pt=3&logid=2755343050&vid=4949060647341250402&abtest=106570_1-106693_2&klogid=2755343050")!
         let networkVideoAsset1 = PhotoAsset.init(networkVideoAsset: .init(videoURL: networkVideoURL1))
         previewAssets.append(networkVideoAsset1)
@@ -97,6 +98,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
             thumbnailLoadMode: .alwaysThumbnail,
             originalLoadMode: .alwaysThumbnail
         ))
+        // swiftlint:enable line_length
         previewAssets.append(networkImageAsset3)
     }
     override func viewDidLayoutSubviews() {
@@ -184,7 +186,7 @@ class PhotoBrowserViewController: UIViewController, UICollectionViewDataSource, 
             .init(
                 title: "保存",
                 style: .default,
-                handler: { alertAction in
+                handler: { _ in
                     photoBrowser.view.hx.show(animated: true)
                     photoAsset.saveToSystemAlbum { phAsset in
                         photoBrowser.view.hx.hide(animated: true)

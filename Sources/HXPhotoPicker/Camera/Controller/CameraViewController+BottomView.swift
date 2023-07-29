@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if targetEnvironment(macCatalyst)
+@available(macCatalyst 14.0, *)
+#endif
 extension CameraViewController: CameraBottomViewDelegate {
     func bottomView(beganTakePictures bottomView: CameraBottomView) {
         if !cameraManager.session.isRunning {
@@ -17,7 +20,7 @@ extension CameraViewController: CameraBottomViewDelegate {
             
         } completion: { [weak self] data in
             guard let self = self else { return }
-            if let data = data ,
+            if let data = data,
                let image = UIImage(data: data) {
                 self.capturePhotoCompletion(image: image)
             }else {
@@ -56,7 +59,7 @@ extension CameraViewController: CameraBottomViewDelegate {
     func bottomView(beganRecording bottomView: CameraBottomView) {
         cameraManager.startRecording { [weak self] duration in
             self?.bottomView.startTakeMaskLayerPath(duration: duration)
-        } progress: { [weak self] progress, time in
+        } progress: { [weak self] _, time in
             self?.bottomView.updateVideoTime(time)
         } completion: { [weak self] videoURL, error in
             guard let self = self else { return }

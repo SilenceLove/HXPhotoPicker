@@ -288,7 +288,11 @@ extension VideoEditorMusicURL: Codable {
             self = .network(url: url)
             return
         }
-        throw DecodingError.dataCorruptedError(forKey: CodingKeys.error, in: container, debugDescription: "Invalid type")
+        throw DecodingError.dataCorruptedError(
+            forKey: CodingKeys.error,
+            in: container,
+            debugDescription: "Invalid type"
+        )
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -310,7 +314,6 @@ extension VideoEditorMusicURL: Codable {
         }
     }
 }
-
 
 struct EditorStickerItem: Codable {
     
@@ -376,7 +379,7 @@ public enum EditorStickerItemType {
     
     var isText: Bool {
         switch self {
-        case .text(_):
+        case .text:
             return true
         default:
             return false
@@ -394,7 +397,7 @@ public enum EditorStickerItemType {
     
     var isAudio: Bool {
         switch self {
-        case .audio(_):
+        case .audio:
             return true
         default:
             return false
@@ -536,8 +539,11 @@ extension EditorStickerItemType: Codable {
             self = .audio(audio)
             return
         }
-        throw DecodingError.dataCorruptedError(forKey: CodingKeys.error, in: container, debugDescription: "Invalid type")
-
+        throw DecodingError.dataCorruptedError(
+            forKey: CodingKeys.error,
+            in: container,
+            debugDescription: "Invalid type"
+        )
     }
 }
 
@@ -653,7 +659,6 @@ extension VideoEditedResult: Codable {
     }
 }
 
-
 extension EditAdjustmentData {
     struct Content: Codable {
         let editSize: CGSize
@@ -684,7 +689,6 @@ extension EditAdjustmentData {
         }
     }
 }
-
 
 extension EditAdjustmentData: Codable {
     enum CodingKeys: CodingKey {

@@ -169,7 +169,11 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         )
     }
     
-    public func editorViewController(_ editorViewController: EditorViewController, loadMoreMusic text: String?, completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void) {
+    public func editorViewController(
+        _ editorViewController: EditorViewController,
+        loadMoreMusic text: String?,
+        completionHandler: @escaping ([VideoEditorMusicInfo], Bool) -> Void
+    ) {
         guard let pickerController = pickerController,
               let pickerDelegate = pickerController.pickerDelegate else {
             completionHandler([], false)
@@ -183,11 +187,16 @@ extension PhotoPreviewViewController: EditorViewControllerDelegate {
         )
     }
     
-    public func editorViewController(transitionPreviewImage editorViewController: EditorViewController) -> UIImage? {
+    public func editorViewController(
+        transitionPreviewImage editorViewController: EditorViewController
+    ) -> UIImage? {
         getCell(for: currentPreviewIndex)?.scrollContentView.imageView.image
     }
     
-    public func editorViewController(_ editorViewController: EditorViewController, transitionDuration mode: EditorTransitionMode) -> TimeInterval {
+    public func editorViewController(
+        _ editorViewController: EditorViewController,
+        transitionDuration mode: EditorTransitionMode
+    ) -> TimeInterval {
         0.35
     }
     

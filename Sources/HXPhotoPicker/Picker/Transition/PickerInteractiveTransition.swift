@@ -195,6 +195,17 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             }
             backgroundView.alpha = alpha
             let toVC = transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
+            var isMultipleBottom: Bool = false
+            var isPromptBottom: Bool = false
+            if let toVC = toVC {
+                if toVC.isMultipleSelect {
+                    isMultipleBottom = true
+                }else {
+                    if toVC.allowShowPrompt {
+                        isPromptBottom = true
+                    }
+                }
+            }
             if !previewViewController.statusBarShouldBeHidden {
                 let hasPreviewMask = previewViewController.bottomView.mask != nil
                 if hasPreviewMask {
@@ -222,12 +233,15 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                             height: maskHeight
                         )
                     }
-                    if toVC?.bottomView.mask != nil {
+                    if isMultipleBottom && toVC?.bottomView.mask != nil {
                         let maskY = 70 * maskScale
                         let maskWidth = previewViewController.bottomView.width
                         let maskHeight = 50 + UIDevice.bottomMargin + 70 * (1 - maskScale)
                         toVC?.bottomView.mask?.frame = CGRect(x: 0, y: maskY, width: maskWidth, height: maskHeight)
                         
+                    }
+                    if isPromptBottom {
+                        toVC?.bottomPromptView.alpha = 1 - alpha
                     }
                 }else {
                     previewViewController.navigationController?.navigationBar.alpha = alpha
@@ -236,7 +250,12 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             }else {
                 if type == .pop {
                     toVC?.navigationController?.navigationBar.alpha = 1 - alpha
-                    toVC?.bottomView.alpha = 1 - alpha
+                    if isMultipleBottom {
+                        toVC?.bottomView.alpha = 1 - alpha
+                    }
+                    if isPromptBottom {
+                        toVC?.bottomPromptView.alpha = 1 - alpha
+                    }
                 }
             }
             if let picker = pickerController {
@@ -279,6 +298,17 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             panGestureRecognizer.isEnabled = false
             previewViewController.navigationController?.view.isUserInteractionEnabled = false
             let toVC = self.transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
+            var isMultipleBottom: Bool = false
+            var isPromptBottom: Bool = false
+            if let toVC = toVC {
+                if toVC.isMultipleSelect {
+                    isMultipleBottom = true
+                }else {
+                    if toVC.allowShowPrompt {
+                        isPromptBottom = true
+                    }
+                }
+            }
             UIView.animate(withDuration: 0.25) {
                 previewView.transform = .identity
                 previewView.center = self.previewCenter
@@ -297,9 +327,12 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                                 )
                             )
                         }
-                        if toVC?.bottomView.mask != nil {
+                        if isMultipleBottom && toVC?.bottomView.mask != nil {
                             let maskHeight = 50 + UIDevice.bottomMargin
                             toVC?.bottomView.mask?.frame = CGRect(x: 0, y: 70, width: maskWidth, height: maskHeight)
+                        }
+                        if isPromptBottom {
+                            toVC?.bottomPromptView.alpha = 0
                         }
                     }else {
                         previewViewController.navigationController?.navigationBar.alpha = 1
@@ -307,25 +340,37 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 }else {
                     if self.type == .pop {
                         toVC?.navigationController?.navigationBar.alpha = 0
-                        toVC?.bottomView.alpha = 0
+                        if isMultipleBottom {
+                            toVC?.bottomView.alpha = 0
+                        }
+                        if isPromptBottom {
+                            toVC?.bottomPromptView.alpha = 0
+                        }
                     }
                 }
                 if let picker = self.pickerController {
                     picker.pickerDelegate?
                         .pickerController(picker, interPercentDidCancelAnimation: self.type)
                 }
-            } completion: { (isFinished) in
+            } completion: { _ in
                 previewViewController.bottomView.mask = nil
-                toVC?.bottomView.mask = nil
+                if isMultipleBottom {
+                    toVC?.bottomView.mask = nil
+                }
                 self.toView?.isHidden = false
                 let toVC = self.transitionContext?.viewController(forKey: .to) as? PhotoPickerViewController
                 if previewViewController.statusBarShouldBeHidden {
                     if self.type == .pop {
                         previewViewController.navigationController?.setNavigationBarHidden(true, animated: false)
                         toVC?.navigationController?.setNavigationBarHidden(true, animated: false)
-                        toVC?.bottomView.alpha = 1
+                        if isMultipleBottom {
+                            toVC?.bottomView.alpha = 1
+                        }
                         toVC?.navigationController?.navigationBar.alpha = 1
                     }
+                }
+                if self.type == .pop && isPromptBottom {
+                    toVC?.bottomPromptView.alpha = 1
                 }
                 self.resetScrollView(for: true)
                 previewView.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -373,9 +418,20 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
             backgroundView.isUserInteractionEnabled = false
             previewView.isUserInteractionEnabled = false
             fromVC?.view.isUserInteractionEnabled = false
+            var isMultipleBottom: Bool = false
+            var isPromptBottom: Bool = false
+            if let toVC = toVC {
+                if toVC.isMultipleSelect {
+                    isMultipleBottom = true
+                }else {
+                    if toVC.allowShowPrompt {
+                        isPromptBottom = true
+                    }
+                }
+            }
             if type == .pop {
                 UIView.animate(
-                    withDuration: 0.2,
+                    withDuration: 0.175,
                     delay: 0,
                     options: [.layoutSubviews, .curveEaseOut]
                 ) {
@@ -392,13 +448,18 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                                 height: maskHeight
                             )
                         }
-                        if toVC?.bottomView.mask != nil {
+                        if isMultipleBottom && toVC?.bottomView.mask != nil {
                             let maskHeight = UIDevice.bottomMargin + 120
                             toVC?.bottomView.mask?.frame = CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight)
                         }
                     }else {
-                        toVC?.bottomView.alpha = 1
+                        if isMultipleBottom {
+                            toVC?.bottomView.alpha = 1
+                        }
                         toVC?.navigationController?.navigationBar.alpha = 1
+                    }
+                    if isPromptBottom {
+                        toVC?.bottomPromptView.alpha = 1
                     }
                 } completion: { _ in
                     self.backgroundView.removeFromSuperview()
@@ -427,6 +488,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     previewView.alpha = 0
                     previewView.transform = CGAffineTransform.init(scaleX: 0.1, y: 0.1)
                 }
+                if self.type != .pop {
+                    self.backgroundView.alpha = 0
+                }
                 if !previewViewController.statusBarShouldBeHidden {
                     previewViewController.bottomView.alpha = 0
                     previewViewController.navigationController?.navigationBar.alpha = 0
@@ -435,13 +499,15 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     picker.pickerDelegate?
                         .pickerController(picker, interPercentDidFinishAnimation: self.type)
                 }
-            } completion: { (isFinished) in
+            } completion: { _ in
                 previewViewController.bottomView.mask = nil
-                toVC?.bottomView.mask = nil
+                if isMultipleBottom {
+                    toVC?.bottomView.mask = nil
+                }
                 self.toView?.isHidden = false
                 UIView.animate(withDuration: 0.2) {
                     previewView.alpha = 0
-                } completion: { (isFinished) in
+                } completion: { _ in
                     previewView.isUserInteractionEnabled = true
                     previewView.removeFromSuperview()
                     if self.type == .dismiss, let pickerController = self.pickerController {
@@ -455,6 +521,7 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     self.toView = nil
                     self.panGestureRecognizer.isEnabled = true
                     if self.type != .pop {
+                        self.backgroundView.removeFromSuperview()
                         self.transitionContext?.completeTransition(true)
                         self.transitionContext = nil
                     }
@@ -474,8 +541,13 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         }
     }
     func popTransition(_ transitionContext: UIViewControllerContextTransitioning) {
-        guard let previewViewController = transitionContext.viewController(forKey: .from) as? PhotoPreviewViewController,
-              let pickerViewController = transitionContext.viewController(forKey: .to) as? PhotoPickerViewController else {
+        guard let previewViewController = transitionContext.viewController(
+            forKey: .from
+        ) as? PhotoPreviewViewController,
+              let pickerViewController = transitionContext.viewController(
+                forKey: .to
+              ) as? PhotoPickerViewController
+        else {
             canInteration = false
             beganInterPercent = false
             cancel()
@@ -486,6 +558,19 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         previewBackgroundColor = previewViewController.view.backgroundColor
         previewViewController.view.backgroundColor = .clear
         
+        var isMultipleBottom: Bool = false
+        var isPromptBottom: Bool = false
+        if pickerViewController.isMultipleSelect {
+            isMultipleBottom = true
+        }else {
+            if pickerViewController.allowShowPrompt {
+                isPromptBottom = true
+            }
+        }
+        
+        if isPromptBottom {
+            pickerViewController.bottomPromptView.alpha = 0
+        }
         let containerView = transitionContext.containerView
         containerView.addSubview(pickerViewController.view)
         containerView.addSubview(previewViewController.view)
@@ -499,7 +584,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                     previewViewController.bottomView.alpha = 1
                     if AssetManager.authorizationStatusIsLimited() &&
                         pickerViewController.config.bottomView.isShowPrompt {
-                        pickerViewController.bottomView.alpha = 0
+                        if isMultipleBottom {
+                            pickerViewController.bottomView.alpha = 0
+                        }
                     }
                 }
             } completion: { (_) in
@@ -546,7 +633,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
         var pickerShowParompt = false
         var previewShowSelectedView = false
         if previewViewController.statusBarShouldBeHidden {
-            pickerViewController.bottomView.alpha = 0
+            if isMultipleBottom {
+                pickerViewController.bottomView.alpha = 0
+            }
             pickerViewController.navigationController?.navigationBar.alpha = 0
             previewViewController.navigationController?.setNavigationBarHidden(false, animated: false)
         }else {
@@ -582,7 +671,9 @@ class PickerInteractiveTransition: UIPercentDrivenInteractiveTransition, UIGestu
                 )
             )
             maskView.backgroundColor = .white
-            pickerViewController.bottomView.mask = maskView
+            if isMultipleBottom {
+                pickerViewController.bottomView.mask = maskView
+            }
         }
         resetScrollView(for: false)
         toView?.isHidden = true

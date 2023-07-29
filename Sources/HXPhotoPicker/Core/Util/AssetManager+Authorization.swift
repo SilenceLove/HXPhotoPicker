@@ -25,6 +25,9 @@ public extension AssetManager {
     
     /// 获取相机权限
     /// - Parameter completionHandler: 获取结果
+    #if targetEnvironment(macCatalyst)
+    @available(macCatalyst 14.0, *)
+    #endif
     static func requestCameraAccess(
         completionHandler: @escaping (Bool) -> Void
     ) {
@@ -39,6 +42,9 @@ public extension AssetManager {
     
     /// 当前相机权限状态
     /// - Returns: 权限状态
+    #if targetEnvironment(macCatalyst)
+    @available(macCatalyst 14.0, *)
+    #endif
     static func cameraAuthorizationStatus() -> AVAuthorizationStatus {
         AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
     }

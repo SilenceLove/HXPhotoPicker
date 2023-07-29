@@ -156,7 +156,7 @@ public extension AssetManager {
         options.isNetworkAccessAllowed = true
         return asset.requestContentEditingInput(
             with: options
-        ) { (input, info) in
+        ) { (input, _) in
             DispatchQueue.main.async {
                 resultHandler(
                     input?.fullSizeImageURL,

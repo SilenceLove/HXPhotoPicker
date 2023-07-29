@@ -223,7 +223,7 @@ public struct PickerConfiguration: IndicatorTypeConfig {
         PhotoManager.shared.isCacheCameraAlbum = isCacheCameraAlbum
     }
     
-    public static var `default`: PickerConfiguration  {
+    public static var `default`: PickerConfiguration {
         PhotoTools.getWXPickerConfig()
     }
 }

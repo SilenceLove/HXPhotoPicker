@@ -50,7 +50,13 @@ public enum Photo {
         controller.selectedAssetArray = selectedAssets
         controller.finishHandler = finish
         controller.cancelHandler = cancel
-        (sender ?? UIViewController.topViewController)?.present(
+        var presentVC: UIViewController?
+        if let sender = sender {
+            presentVC = sender
+        }else {
+            presentVC = UIViewController.topViewController
+        }
+        presentVC?.present(
             controller,
             animated: true
         )
@@ -85,7 +91,13 @@ public enum Photo {
             finish: finished,
             cancel: cancelled
         )
-        (sender ?? UIViewController.topViewController)?.present(
+        var presentVC: UIViewController?
+        if let sender = sender {
+            presentVC = sender
+        }else {
+            presentVC = UIViewController.topViewController
+        }
+        presentVC?.present(
             vc,
             animated: true
         )
@@ -94,6 +106,9 @@ public enum Photo {
     #endif
     
     #if HXPICKER_ENABLE_CAMERA
+    #if targetEnvironment(macCatalyst)
+    @available(macCatalyst 14.0, *)
+    #endif
     @discardableResult
     public static func capture(
         _ config: CameraConfiguration,
