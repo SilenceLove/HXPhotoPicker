@@ -65,7 +65,7 @@ class SwiftPickerResult: NSObject {
             switch result {
             case .success(let urlResult):
                 videoURLHandler?(urlResult.toOC, index)
-            case .failure(_):
+            case .failure:
                 videoURLHandler?(nil, index)
             }
         } completionHandler: {
@@ -99,7 +99,7 @@ class SwiftPickerResult: NSObject {
             switch result {
             case .success(let urlResult):
                 handler?(urlResult.toOC, index)
-            case .failure(_):
+            case .failure:
                 handler?(nil, index)
             }
         } completionHandler: {
@@ -159,7 +159,12 @@ extension AssetURLResult {
             case .network:
                 livePhotoVideoUrlType = .network
             }
-            livePhoto = .init(imageURL: _livePhoto.imageURL, imageURLType: livePhotoImageUrlType, videoURL: _livePhoto.videoURL, videoURLType: livePhotoVideoUrlType)
+            livePhoto = .init(
+                imageURL: _livePhoto.imageURL,
+                imageURLType: livePhotoImageUrlType,
+                videoURL: _livePhoto.videoURL,
+                videoURLType: livePhotoVideoUrlType
+            )
         }
         
         return .init(url: urlResult.url, urlType: urlType, mediaType: mediaType, livePhoto: livePhoto)
@@ -210,7 +215,10 @@ class SwiftCompression: NSObject {
     
     var toHX: PhotoAsset.Compression? {
         if let videoExportParameter = videoExportParameter, imageCompressionQuality >= 0 {
-            return .init(imageCompressionQuality: imageCompressionQuality, videoExportParameter: videoExportParameter.toHX)
+            return .init(
+                imageCompressionQuality: imageCompressionQuality,
+                videoExportParameter: videoExportParameter.toHX
+            )
         }else if let videoExportParameter = videoExportParameter {
             return .init(videoExportParameter: videoExportParameter.toHX)
         }else if imageCompressionQuality >= 0 {
@@ -269,7 +277,6 @@ enum SwiftExportPreset: Int {
     case ratio_640x480
     case ratio_960x540
     case ratio_1280x720
-    
     
     var name: String {
         switch self {

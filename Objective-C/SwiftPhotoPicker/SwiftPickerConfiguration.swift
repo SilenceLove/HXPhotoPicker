@@ -98,4 +98,3 @@ class SwiftPickerConfiguration: NSObject {
         return config
     }
 }
-

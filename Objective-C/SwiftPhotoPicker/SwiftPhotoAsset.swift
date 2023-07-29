@@ -45,7 +45,7 @@ class SwiftPhotoAsset: NSObject {
             switch result {
             case .success(let urlResult):
                 completion(urlResult.toOC)
-            case .failure(_):
+            case .failure:
                 completion(nil)
             }
         }
@@ -60,7 +60,7 @@ class SwiftPhotoAsset: NSObject {
             switch result {
             case .success(let urlResult):
                 completion(urlResult.toOC)
-            case .failure(_):
+            case .failure:
                 completion(nil)
             }
         }
@@ -80,7 +80,7 @@ class SwiftPhotoAsset: NSObject {
             switch result {
             case .success(let urlResult):
                 completion(urlResult.toOC)
-            case .failure(_):
+            case .failure:
                 completion(nil)
             }
         }
@@ -104,7 +104,7 @@ class SwiftPhotoAsset: NSObject {
             switch result {
             case .success(let urlResult):
                 completion(urlResult.toOC)
-            case .failure(_):
+            case .failure:
                 completion(nil)
             }
         }
@@ -123,7 +123,7 @@ class SwiftPhotoAsset: NSObject {
             switch result {
             case .success(let urlResult):
                 completion(urlResult.toOC)
-            case .failure(_):
+            case .failure:
                 completion(nil)
             }
         }

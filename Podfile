@@ -1,17 +1,16 @@
 source 'https://github.com/CocoaPods/Specs.git'
+platform:ios,'12.0'
 
-def commonPods
-  platform:ios,'12.0'
-  use_frameworks!
-  pod 'HXPhotoPicker', :path => './'
-#  pod 'GDPerformanceView-Swift'
-#  pod 'GPUImage'
-end
+install! 'cocoapods',
+disable_input_output_paths: true,
+warn_for_unused_master_specs_repo: false
+
+use_frameworks!
 
 target "HXPhotoPickerExample" do
-  commonPods
-end
-
-target "HXPHPickerExample" do
-  commonPods
+  pod 'HXPhotoPicker', :path => './'
+  
+#  pod 'SwiftLint' Run Script "${PODS_ROOT}/SwiftLint/swiftlint"
+#  pod 'GDPerformanceView-Swift'
+#  pod 'GPUImage'
 end
