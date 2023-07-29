@@ -1,0 +1,27 @@
+disabled_rules:
+  - trailing_whitespace
+  - statement_position
+  - identifier_name
+  - force_cast
+  - large_tuple
+  - function_parameter_count
+  - nesting
+  - notification_center_detachment
+  - type_body_length
+
+excluded:
+  - Carthage
+  - Pods
+  - Package.swift
+  - Package.swift
+  - Swift
+   
+function_body_length:
+    warning: 130
+    error: 150
+    
+file_length:
+    warning: 1200
+    error: 1500
+    
+cyclomatic_complexity: 40
