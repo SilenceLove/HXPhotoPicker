@@ -1,5 +1,29 @@
 # 更新日志
 
+## 4.0.4
+
+### 新增
+  
+- Editor
+  - `config.buttonPostion`添加配置：竖屏时，取消/完成按钮的位置
+- Camera
+  - `config.isSaveSystemAlbum`添加配置：拍照完成后保存到系统相册
+
+### 优化
+
+- Picker
+  - 预览界面手势返回优化
+- Editor 
+  - 布局优化
+
+### 修复
+
+- [#553](https://github.com/SilenceLove/HXPhotoPicker/issues/553)
+- [#558](https://github.com/SilenceLove/HXPhotoPicker/issues/558)
+- [#562](https://github.com/SilenceLove/HXPhotoPicker/issues/562)
+- [#567](https://github.com/SilenceLove/HXPhotoPicker/issues/567)
+- [#568](https://github.com/SilenceLove/HXPhotoPicker/issues/568)
+
 ## 4.0.3
 
 ### 新增

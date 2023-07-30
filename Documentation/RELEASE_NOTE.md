@@ -1,5 +1,29 @@
 # Release Notes
 
+## 4.0.4
+
+### Added
+  
+- Editor
+  - `config.buttonPostion` adds configuration: the position of the cancel/finish button when the screen is vertical
+- Camera
+  - `config.isSaveSystemAlbum` added configuration: save to the system album after taking pictures
+
+### Optimizer
+
+- Picker
+  - Preview interface gesture return optimization
+- Editor 
+  - layout optimization
+
+### Resolved
+
+- [#553](https://github.com/SilenceLove/HXPhotoPicker/issues/553)
+- [#558](https://github.com/SilenceLove/HXPhotoPicker/issues/558)
+- [#562](https://github.com/SilenceLove/HXPhotoPicker/issues/562)
+- [#567](https://github.com/SilenceLove/HXPhotoPicker/issues/567)
+- [#568](https://github.com/SilenceLove/HXPhotoPicker/issues/568)
+
 ## 4.0.3
 
 ### Added
