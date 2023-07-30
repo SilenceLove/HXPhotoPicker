@@ -64,7 +64,11 @@ extension PhotoPickerViewController: AlbumViewDelegate {
                 UIDevice.isPortrait {
                 self.albumView.y = UIDevice.navigationBarHeight
             }else {
-                self.albumView.y = self.navigationController?.navigationBar.height ?? 0
+                if let barHeight = self.navigationController?.navigationBar.height {
+                    self.albumView.y = barHeight
+                }else {
+                    self.albumView.y = 0
+                }
             }
         }else {
             self.albumView.y = -self.albumView.height

@@ -14,9 +14,15 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
         guard let photoAsset = asset.type.photoAsset else {
             return
         }
+        let atIndex: Int
+        if let index = assets.firstIndex(of: photoAsset) {
+            atIndex = index
+        }else {
+            atIndex = 0
+        }
         if let result = asset.result {
             photoAsset.editedResult = result
-            picker.didEditAsset(photoAsset: photoAsset, atIndex: assets.firstIndex(of: photoAsset) ?? 0)
+            picker.didEditAsset(photoAsset: photoAsset, atIndex: atIndex)
             if (photoAsset.mediaType == .video && videoLoadSingleCell) || !isMultipleSelect {
                 if picker.canSelectAsset(for: photoAsset, showHUD: true) {
                     picker.singleFinishCallback(for: photoAsset)
@@ -38,7 +44,7 @@ extension PhotoPickerViewController: EditorViewControllerDelegate {
             let beforeHasEdit = photoAsset.editedResult != nil
             photoAsset.editedResult = nil
             if beforeHasEdit {
-                picker.didEditAsset(photoAsset: photoAsset, atIndex: assets.firstIndex(of: photoAsset) ?? 0)
+                picker.didEditAsset(photoAsset: photoAsset, atIndex: atIndex)
             }
             if (photoAsset.mediaType == .video && videoLoadSingleCell) || !isMultipleSelect {
                 if picker.canSelectAsset(for: photoAsset, showHUD: true) {

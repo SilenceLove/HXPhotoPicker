@@ -61,7 +61,12 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             videoEditorConfig.languageType = pickerConfig.languageType
             videoEditorConfig.indicatorType = pickerConfig.indicatorType
             videoEditorConfig.chartlet.albumPickerConfigHandler = { [weak self] in
-                var pickerConfig = self?.pickerController?.config ?? .init()
+                var pickerConfig: PickerConfiguration
+                if let config = self?.pickerController?.config {
+                    pickerConfig = config
+                }else {
+                    pickerConfig = .init()
+                }
                 pickerConfig.selectOptions = [.gifPhoto]
                 pickerConfig.photoList.bottomView.isHiddenOriginalButton = true
                 pickerConfig.previewView.bottomView.isHiddenOriginalButton = true
@@ -113,7 +118,12 @@ extension PhotoPreviewViewController: PhotoPickerBottomViewDelegate {
             photoEditorConfig.languageType = pickerConfig.languageType
             photoEditorConfig.indicatorType = pickerConfig.indicatorType
             photoEditorConfig.chartlet.albumPickerConfigHandler = { [weak self] in
-                var pickerConfig = self?.pickerController?.config ?? .init()
+                var pickerConfig: PickerConfiguration
+                if let config = self?.pickerController?.config {
+                    pickerConfig = config
+                }else {
+                    pickerConfig = .init()
+                }
                 pickerConfig.selectOptions = [.photo]
                 pickerConfig.photoList.bottomView.isHiddenOriginalButton = true
                 pickerConfig.previewView.bottomView.isHiddenOriginalButton = true

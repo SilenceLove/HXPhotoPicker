@@ -24,7 +24,10 @@ public class PhotoPreviewViewController: BaseViewController {
     
     var assetCount: Int {
         if previewAssets.isEmpty {
-            return numberOfPages?() ?? 0
+            if let pages = numberOfPages?() {
+                return pages
+            }
+            return 0
         }
         return previewAssets.count
     }
@@ -172,7 +175,11 @@ public class PhotoPreviewViewController: BaseViewController {
         super.viewDidLoad()
         title = ""
         isMultipleSelect = pickerController?.config.selectMode == .multiple
-        allowLoadPhotoLibrary = pickerController?.config.allowLoadPhotoLibrary ?? true
+        if let isLoadPhotoLibrary = pickerController?.config.allowLoadPhotoLibrary {
+            allowLoadPhotoLibrary = isLoadPhotoLibrary
+        }else {
+            allowLoadPhotoLibrary = true
+        }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = .all
         view.clipsToBounds = true
@@ -249,7 +256,10 @@ public class PhotoPreviewViewController: BaseViewController {
         if PhotoManager.isDark {
             return .lightContent
         }
-        return pickerController?.config.statusBarStyle ?? .default
+        if let statusBarStyle = pickerController?.config.statusBarStyle {
+            return statusBarStyle
+        }
+        return .default
     }
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -380,7 +390,15 @@ extension PhotoPreviewViewController {
         }
         var bottomHeight: CGFloat = 0
         if isExternalPreview {
-            bottomHeight = (pickerController?.selectedAssetArray.isEmpty ?? true) ? 0 : UIDevice.bottomMargin + 70
+            if let isEmpty = pickerController?.selectedAssetArray.isEmpty {
+                if isEmpty {
+                    bottomHeight = 0
+                }else {
+                    bottomHeight = UIDevice.bottomMargin + 70
+                }
+            }else {
+                bottomHeight = 0
+            }
             #if HXPICKER_ENABLE_EDITOR
             if !config.bottomView.isShowSelectedView && config.bottomView.isHiddenEditButton {
                 if config.bottomView.isHiddenEditButton {

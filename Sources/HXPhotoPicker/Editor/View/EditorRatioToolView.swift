@@ -122,7 +122,7 @@ class EditorRatioToolView: UIView {
             collectionView.contentInset = .init(top: 12, left: 0, bottom: UIDevice.bottomMargin + 12, right: 0)
         }
         if isFirst {
-            if selectedIndex >= 0 {
+            if selectedIndex >= 0 && !ratios.isEmpty {
                 DispatchQueue.main.async {
                     let scrollPosition: UICollectionView.ScrollPosition
                     if UIDevice.isPortrait {

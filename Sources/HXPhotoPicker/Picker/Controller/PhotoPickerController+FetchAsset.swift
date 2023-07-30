@@ -232,7 +232,13 @@ extension PhotoPickerController {
             localAssets.append(contentsOf: self.localCameraAssetArray.reversed())
             localAssets.append(contentsOf: self.localAssetArray)
             var photoAssets = [PhotoAsset]()
-            photoAssets.reserveCapacity(assetCollection?.count ?? 10)
+            let collectionCount: Int
+            if let count = assetCollection?.count {
+                collectionCount = count
+            }else {
+                collectionCount = 10
+            }
+            photoAssets.reserveCapacity(collectionCount)
             var lastAsset: PhotoAsset?
             assetCollection?.enumerateAssets( usingBlock: { [weak self] (photoAsset, index, stop) in
                 guard let self = self,

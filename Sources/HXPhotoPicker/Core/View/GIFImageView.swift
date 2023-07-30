@@ -92,7 +92,12 @@ class GIFImage {
     func getFrame(index: Int) -> UIImage? {
         guard index < frameTotalCount else { return nil }
         // 取当前帧图片
-        let currentImage = self.frameImages[index] ?? self.image
+        let currentImage: UIImage?
+        if let image = self.frameImages[index] {
+            currentImage = image
+        }else {
+            currentImage = self.image
+        }
         // 如果总帧数大于预加载数，需要加载后面未加载的帧图片
         if frameTotalCount > GlobalSetting.prefetchNumber {
             // 清除当前帧图片缓存数据，空出内存
@@ -242,9 +247,17 @@ class GIFImageView: UIImageView {
             return
         }
         if let animatedImage = self.animatedImage {
-            guard self.currentFrameIndex < animatedImage.frameTotalCount else { return }
-            self.accumulator += min(1.0, displayLink!.duration)
-            var frameDuration = animatedImage.frameDurations[self.currentFrameIndex] ?? displayLink!.duration
+            guard let displayLink = displayLink,
+                  self.currentFrameIndex < animatedImage.frameTotalCount else {
+                return
+            }
+            self.accumulator += min(1.0, displayLink.duration)
+            var frameDuration: TimeInterval
+            if let duration = animatedImage.frameDurations[self.currentFrameIndex] {
+                frameDuration = duration
+            }else {
+                frameDuration = displayLink.duration
+            }
             while self.accumulator >= frameDuration {
                 self.accumulator -= frameDuration
                 self.currentFrameIndex += 1
@@ -256,7 +269,7 @@ class GIFImageView: UIImageView {
                 }
                 self.layer.setNeedsDisplay()
                 if let newFrameDuration = animatedImage.frameDurations[self.currentFrameIndex] {
-                    frameDuration = min(displayLink!.duration, newFrameDuration)
+                    frameDuration = min(displayLink.duration, newFrameDuration)
                 }
             }
         } else {

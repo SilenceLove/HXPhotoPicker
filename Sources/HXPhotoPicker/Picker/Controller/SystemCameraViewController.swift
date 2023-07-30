@@ -28,7 +28,9 @@ class SystemCameraViewController: UIImagePickerController {
         var imageScrollView: UIScrollView?
         getSubviewsOfView(v: view).forEach { (subView) in
             if NSStringFromClass(subView.classForCoder) == "PLCropOverlayCropView" {
-                subView.frame = subView.superview?.bounds ?? subView.frame
+                if let superBounds = subView.superview?.bounds {
+                    subView.frame = superBounds
+                }
             }else if subView is UIScrollView && NSStringFromClass(subView.classForCoder) == "PLImageScrollView" {
                 let isNewImageScrollView = imageScrollView == nil
                 imageScrollView = subView as? UIScrollView

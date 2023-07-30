@@ -175,7 +175,10 @@ public class AlbumViewController: BaseViewController {
         if AssetManager.authorizationStatusIsLimited() {
             promptLb.width = view.width
         }
-        var titleWidth = titleLabel.text?.width(ofFont: titleLabel.font, maxHeight: 30) ?? 0
+        var titleWidth: CGFloat = 0
+        if let labelWidth = titleLabel.text?.width(ofFont: titleLabel.font, maxHeight: 30) {
+            titleWidth = labelWidth
+        }
         if titleWidth > view.width * 0.6 {
             titleWidth = view.width * 0.6
         }
@@ -200,9 +203,15 @@ public class AlbumViewController: BaseViewController {
             }
         }
         if orientationDidChange {
+            let indexPath: IndexPath
+            if let index_Path = beforeOrientationIndexPath {
+                indexPath = index_Path
+            }else {
+                indexPath = .init(row: 0, section: 0)
+            }
             if !assetCollectionsArray.isEmpty {
                 tableView.scrollToRow(
-                    at: beforeOrientationIndexPath ?? IndexPath.init(row: 0, section: 0),
+                    at: indexPath,
                     at: .top, animated: false
                 )
             }

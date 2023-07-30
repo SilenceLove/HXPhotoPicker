@@ -112,10 +112,16 @@ class DeniedAuthorizationView: UIView {
         }
         navigationBar.frame = CGRect(x: 0, y: barY, width: width, height: barHeight)
         
-        let titleHeight = titleLb.text?.height(ofFont: titleLb.font, maxWidth: width) ?? 0
+        var titleHeight: CGFloat = 0
+        if let labelWidth = titleLb.text?.height(ofFont: titleLb.font, maxWidth: width) {
+            titleHeight = labelWidth
+        }
         titleLb.frame = CGRect(x: 0, y: 0, width: width, height: titleHeight)
         
-        let subTitleHeight = subTitleLb.text?.height(ofFont: subTitleLb.font, maxWidth: width - 40) ?? 0
+        var subTitleHeight: CGFloat = 0
+        if let labelWidth = subTitleLb.text?.height(ofFont: subTitleLb.font, maxWidth: width - 40) {
+            subTitleHeight = labelWidth
+        }
         let subTitleY: CGFloat
         if barHeight == 0 {
             subTitleY = height / 2 - subTitleHeight
@@ -131,7 +137,10 @@ class DeniedAuthorizationView: UIView {
         titleLb.y = subTitleLb.y - 15 - titleHeight
         
         let jumpBtnBottomMargin: CGFloat = UIDevice.isProxy() ? 120 : 50
-        var jumpBtnWidth = (jumpBtn.currentTitle?.width(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) ?? 0 ) + 10
+        var jumpBtnWidth: CGFloat = 10
+        if let labelWidth = jumpBtn.currentTitle?.width(ofFont: jumpBtn.titleLabel!.font, maxHeight: 40) {
+            jumpBtnWidth = labelWidth + 10
+        }
         if jumpBtnWidth < 150 {
             jumpBtnWidth = 150
         }

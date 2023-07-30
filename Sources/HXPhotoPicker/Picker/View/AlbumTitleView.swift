@@ -31,7 +31,10 @@ class AlbumTitleView: UIControl {
        }
     }
     func updateTitleFrame() {
-       var titleWidth = title?.width(ofFont: titleLb.font, maxHeight: height) ?? 0
+        var titleWidth: CGFloat = 0
+        if let labelWidth = title?.width(ofFont: titleLb.font, maxHeight: height) {
+            titleWidth = labelWidth
+        }
        if titleWidth > width - 40 {
            titleWidth = width - 45
        }

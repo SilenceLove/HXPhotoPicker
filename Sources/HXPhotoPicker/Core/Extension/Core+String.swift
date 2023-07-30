@@ -243,7 +243,12 @@ public extension HXPickerWrapper where Base == String {
 
 // array of bytes, little-endian representation
 func arrayOfBytes<T>(_ value: T, length: Int? = nil) -> [UInt8] {
-    let totalBytes = length ?? (MemoryLayout<T>.size * 8)
+    let totalBytes: Int
+    if let length = length {
+        totalBytes = length
+    }else {
+        totalBytes = (MemoryLayout<T>.size * 8)
+    }
 
     let valuePointer = UnsafeMutablePointer<T>.allocate(capacity: 1)
     valuePointer.pointee = value

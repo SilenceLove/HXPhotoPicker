@@ -291,7 +291,12 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
               photoAsset.mediaType == .photo else {
             return false
         }
-        let editIndex = assets.firstIndex(of: photoAsset) ?? 0
+        let editIndex: Int
+        if let index = assets.firstIndex(of: photoAsset) {
+            editIndex = index
+        }else {
+            editIndex = 0
+        }
         if !pickerController.shouldEditAsset(photoAsset: photoAsset, atIndex: editIndex) {
             return false
         }
@@ -308,8 +313,11 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             config.indicatorType = pickerController.config.indicatorType
              
             config.chartlet.albumPickerConfigHandler = { [weak self] in
-                guard var pickerConfig = self?.pickerController?.config else {
-                    return .init()
+                var pickerConfig: PickerConfiguration
+                if let config = self?.pickerController?.config {
+                    pickerConfig = config
+                }else {
+                    pickerConfig = .init()
                 }
                 pickerConfig.selectOptions = [.photo]
                 pickerConfig.photoList.bottomView.isHiddenOriginalButton = true
@@ -349,7 +357,12 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
               photoAsset.mediaType == .video else {
             return false
         }
-        let editIndex = assets.firstIndex(of: photoAsset) ?? 0
+        let editIndex: Int
+        if let index = assets.firstIndex(of: photoAsset) {
+            editIndex = index
+        }else {
+            editIndex = 0
+        }
         if !pickerController.shouldEditAsset(photoAsset: photoAsset, atIndex: editIndex) {
             return false
         }
@@ -373,8 +386,11 @@ extension PhotoPickerViewController: UICollectionViewDelegate {
             config.languageType = pickerController.config.languageType
             config.indicatorType = pickerController.config.indicatorType
             config.chartlet.albumPickerConfigHandler = { [weak self] in
-                guard var pickerConfig = self?.pickerController?.config else {
-                    return .init()
+                var pickerConfig: PickerConfiguration
+                if let config = self?.pickerController?.config {
+                    pickerConfig = config
+                }else {
+                    pickerConfig = .init()
                 }
                 pickerConfig.selectOptions = [.gifPhoto]
                 pickerConfig.photoList.bottomView.isHiddenOriginalButton = true

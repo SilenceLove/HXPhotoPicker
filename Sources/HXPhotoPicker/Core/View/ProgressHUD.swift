@@ -481,8 +481,14 @@ final class ProgressHUD: UIView {
     }
     override func layoutSubviews() {
         super.layoutSubviews()
-        if !frame.equalTo(superview?.bounds ?? frame) {
-            frame = superview?.bounds ?? frame
+        let superRect: CGRect
+        if let superBounds = superview?.bounds {
+            superRect = superBounds
+        }else {
+            superRect = frame
+        }
+        if !frame.equalTo(superRect) {
+            frame = superRect
             updateFrame()
         }
     }

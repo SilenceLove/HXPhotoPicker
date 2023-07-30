@@ -89,12 +89,18 @@ open class PhotoPickerController: UINavigationController {
     
     /// 预览界面的数据
     public var previewAssets: [PhotoAsset] {
-        previewViewController?.previewAssets ?? []
+        if let assets = previewViewController?.previewAssets {
+            return assets
+        }
+        return []
     }
     
     /// 预览界面当前显示的页数
     public var currentPreviewIndex: Int {
-        previewViewController?.currentPreviewIndex ?? 0
+        if let index = previewViewController?.currentPreviewIndex {
+            return index
+        }
+        return 0
     }
     
     /// 获取预览界面当前显示的 image 视图
@@ -389,7 +395,10 @@ open class PhotoPickerController: UINavigationController {
         if config.prefersStatusBarHidden {
             return config.prefersStatusBarHidden
         }else {
-            return topViewController?.prefersStatusBarHidden ?? false
+            if let prefersStatusBarHidden = topViewController?.prefersStatusBarHidden {
+                return prefersStatusBarHidden
+            }
+            return false
         }
     }
     open override var shouldAutorotate: Bool {
@@ -399,7 +408,10 @@ open class PhotoPickerController: UINavigationController {
         return config.supportedInterfaceOrientations
     }
     public override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return topViewController?.preferredStatusBarUpdateAnimation ?? UIStatusBarAnimation.fade
+        if let animation = topViewController?.preferredStatusBarUpdateAnimation {
+            return animation
+        }
+        return .fade
     }
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -617,7 +629,12 @@ public extension PhotoPickerController {
         delegate: PhotoPickerControllerDelegate? = nil,
         fromVC: UIViewController? = nil
     ) -> PhotoPickerController {
-        let topVC = fromVC ?? UIViewController.topViewController
+        let topVC: UIViewController?
+        if let fromVC = fromVC {
+            topVC = fromVC
+        }else {
+            topVC = UIViewController.topViewController
+        }
         let pickerController = PhotoPickerController(picker: config, delegate: delegate)
         topVC?.present(pickerController, animated: true)
         return pickerController

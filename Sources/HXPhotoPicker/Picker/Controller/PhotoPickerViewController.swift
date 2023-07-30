@@ -333,7 +333,10 @@ public class PhotoPickerViewController: BaseViewController {
                 albumBackgroudView.frame = view.bounds
                 updateAlbumViewFrame()
             }else {
-                var titleWidth = titleLabel.text?.width(ofFont: titleLabel.font, maxHeight: 30) ?? 0
+                var titleWidth: CGFloat = 0
+                if let labelWidth = titleLabel.text?.width(ofFont: titleLabel.font, maxHeight: 30) {
+                    titleWidth = labelWidth
+                }
                 if titleWidth > view.width * 0.6 {
                     titleWidth = view.width * 0.6
                 }
@@ -603,9 +606,15 @@ extension PhotoPickerViewController {
         if assets.isEmpty {
             return
         }
-        var item = config.sort == .asc ? assets.count - 1 : 0
-        if let photoAsset = photoAsset {
-            item = assets.firstIndex(of: photoAsset) ?? item
+        var item: Int
+        if config.sort == .asc {
+            item = assets.count - 1
+        }else {
+            item = 0
+        }
+        if let photoAsset = photoAsset,
+           let index = assets.firstIndex(of: photoAsset) {
+            item = index
         }
         if config.sort == .asc {
             if canAddCamera && canAddLimit {

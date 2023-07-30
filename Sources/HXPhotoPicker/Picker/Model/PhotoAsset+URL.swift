@@ -62,9 +62,11 @@ public extension PhotoAsset {
     /// 获取url
     /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
+    ///   - fileURL: 指定地址，只支持本地、系统相册里的资源
     ///   - compression: 压缩参数，nil - 原图
     ///   - completion: 获取完成
     func getURL(
+        toFile fileURL: URL? = nil,
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
@@ -73,6 +75,7 @@ public extension PhotoAsset {
     
     /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     func getAssetURL(
+        toFile fileURL: URL? = nil,
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
@@ -85,11 +88,13 @@ public extension PhotoAsset {
                 return
             }
             getImageURL(
+                toFile: fileURL,
                 compressionQuality: compression?.imageCompressionQuality,
                 completion: completion
             )
         }else {
             getVideoURL(
+                toFile: fileURL,
                 exportParameter: compression?.videoExportParameter,
                 completion: completion
             )
@@ -99,9 +104,11 @@ public extension PhotoAsset {
     /// 获取图片url
     /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
+    ///   - fileURL: 指定地址，只支持本地、系统相册里的资源
     ///   - compressionQuality: 压缩比例，不传就是原图。gif不会压缩
     ///   - completion: 获取完成
     func getImageURL(
+        toFile fileURL: URL? = nil,
         compressionQuality: CGFloat? = nil,
         completion: @escaping AssetURLCompletion
     ) {
@@ -114,6 +121,7 @@ public extension PhotoAsset {
         }
         #endif
         requestImageURL(
+            toFile: fileURL,
             compressionQuality: compressionQuality,
             resultHandler: completion
         )
@@ -121,10 +129,12 @@ public extension PhotoAsset {
     
     /// 获取视频url
     /// - Parameters:
+    ///   - fileURL: 指定地址，只支持本地、系统相册里的资源
     ///   - exportParameter: 导出参数，nil 为原始视频
     ///   - exportSession: 导出视频时对应的 AVAssetExportSession
     ///   - completion: 获取完成
     func getVideoURL(
+        toFile fileURL: URL? = nil,
         exportParameter: VideoExportParameter? = nil,
         exportSession: ((AVAssetExportSession) -> Void)? = nil,
         completion: @escaping AssetURLCompletion
@@ -136,6 +146,7 @@ public extension PhotoAsset {
             return
         }
         requestVideoURL(
+            toFile: fileURL,
             exportParameter: exportParameter,
             exportSession: exportSession,
             resultHandler: completion

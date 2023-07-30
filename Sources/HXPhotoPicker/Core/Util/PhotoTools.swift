@@ -113,10 +113,22 @@ public struct PhotoTools {
             separatedBy: CharacterSet.init(charactersIn: ":.")
         )
         if components.count >= 2 {
-            m = Int(components[0]) ?? 0
-            s = Int(components[1]) ?? 0
+            if let i = Int(components[0]) {
+                m = i
+            }else {
+                m = 0
+            }
+            if let i = Int(components[1]) {
+                s = i
+            }else {
+                s = 0
+            }
             if components.count == 3 {
-                ms = Int(components[2]) ?? 0
+                if let i = Int(components[2]) {
+                    ms = i
+                }else {
+                    ms = 0
+                }
             }
         }else {
             s = Int(INT_MAX)

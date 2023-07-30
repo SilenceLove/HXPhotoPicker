@@ -18,7 +18,10 @@ open class PhotoBrowser: PhotoPickerController {
     /// 页面数
     public var pageCount: Int {
         if previewAssets.isEmpty {
-            return numberOfPages?() ?? 0
+            if let pages = numberOfPages?() {
+                return pages
+            }
+            return 0
         }else {
             return previewAssets.count
         }
@@ -216,7 +219,13 @@ open class PhotoBrowser: PhotoPickerController {
         animated flag: Bool = true,
         completion: (() -> Void)? = nil
     ) {
-        (fromVC ?? UIViewController.topViewController)?.present(
+        let vc: UIViewController?
+        if let fromVC = fromVC {
+            vc = fromVC
+        }else {
+            vc = UIViewController.topViewController
+        }
+        vc?.present(
             self,
             animated: flag,
             completion: completion
@@ -275,7 +284,12 @@ open class PhotoBrowser: PhotoPickerController {
         pConfig.livePhotoMark.imageColor = "#ffffff".color
         pConfig.livePhotoMark.textColor = "#ffffff".color
         
-        let browserConfig: Configuration = config ?? .init()
+        let browserConfig: Configuration
+        if let config = config {
+            browserConfig = config
+        }else {
+            browserConfig = .init()
+        }
         pConfig.loadNetworkVideoMode = browserConfig.loadNetworkVideoMode
         pConfig.customVideoCellClass = browserConfig.customVideoCellClass
         pConfig.backgroundColor = browserConfig.backgroundColor

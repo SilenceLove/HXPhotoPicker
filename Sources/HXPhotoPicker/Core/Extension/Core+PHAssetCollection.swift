@@ -18,7 +18,12 @@ extension PHAssetCollection: HXPickerCompatible {
         }else if versionStr.count <= 2 {
             versionStr.append("0")
         }
-        let version = Int(versionStr) ?? 0
+        let version: Int
+        if let index = Int(versionStr) {
+            version = index
+        }else {
+            version = 0
+        }
         if version >= 800 && version <= 802 {
             return assetCollectionSubtype == .smartAlbumRecentlyAdded
         }else {

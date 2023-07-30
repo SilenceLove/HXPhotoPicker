@@ -89,7 +89,12 @@ extension PhotoPickerViewController: UIImagePickerControllerDelegate, UINavigati
         }
     }
     func pickingImage(info: [UIImagePickerController.InfoKey: Any]) {
-        var image: UIImage? = (info[.editedImage] ?? info[.originalImage]) as? UIImage
+        var image: UIImage?
+        if let pickerImage = info[.editedImage] as? UIImage {
+            image = pickerImage
+        }else if let pickerImage = info[.originalImage] as? UIImage {
+            image = pickerImage
+        }
         image = image?.scaleSuitableSize()
         if let image = image {
             if config.isSaveSystemAlbum {

@@ -89,7 +89,9 @@ extension UIDevice {
     
     class var safeAreaInsets: UIEdgeInsets {
         if #available(iOS 11.0, *) {
-            return UIApplication._keyWindow?.safeAreaInsets ?? .zero
+            if let safeAreaInsets = UIApplication._keyWindow?.safeAreaInsets {
+                return safeAreaInsets
+            }
         }
         return .zero
     }
