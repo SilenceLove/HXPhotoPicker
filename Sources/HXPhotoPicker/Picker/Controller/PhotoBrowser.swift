@@ -49,7 +49,7 @@ open class PhotoBrowser: PhotoPickerController {
     public var longPressHandler: AssetHandler?
     
     /// 页面指示器布局的位置
-    public var pageIndicatorLocal: PageIndicatorLocal = .bottom
+    public var pageIndicatorType: PageIndicatorType = .bottom
     
     /// 页面指示器，nil则不显示
     public lazy var pageIndicator: PhotoBrowserPageIndicator? = {
@@ -262,6 +262,10 @@ open class PhotoBrowser: PhotoPickerController {
         )
     }
     
+    public func addRightItem(customView: UIView) {
+        previewViewController?.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: customView)
+    }
+    
     @objc
     func didRightItemClick() {
         rightItemHandler?(self)
@@ -362,9 +366,9 @@ open class PhotoBrowser: PhotoPickerController {
         view.insertSubview(gradualShadowImageView, belowSubview: navigationBar)
         if let pageIndicator = pageIndicator {
             pageIndicator.reloadData(numberOfPages: pageCount, pageIndex: currentPreviewIndex)
-            if pageIndicatorLocal == .titleView {
+            if pageIndicatorType == .titleView {
                 previewViewController?.navigationItem.titleView = pageIndicator
-            }else if pageIndicatorLocal == .bottom {
+            }else if pageIndicatorType == .bottom {
                 pageIndicator.alpha = 0
                 view.addSubview(pageIndicator)
             }
@@ -412,7 +416,7 @@ open class PhotoBrowser: PhotoPickerController {
         super.viewDidLayoutSubviews()
         let imageHeight = navigationBar.frame.maxY + 20
         gradualShadowImageView.frame = CGRect(origin: .zero, size: CGSize(width: view.width, height: imageHeight))
-        if let pageIndicator = pageIndicator, pageIndicatorLocal == .bottom {
+        if let pageIndicator = pageIndicator, pageIndicatorType == .bottom {
             pageIndicator.width = view.width
             pageIndicator.y = view.height - UIDevice.bottomMargin - pageIndicator.height
         }
@@ -469,7 +473,7 @@ extension PhotoBrowser {
         public init() { }
     }
     
-    public enum PageIndicatorLocal {
+    public enum PageIndicatorType {
         case titleView
         case bottom
     }

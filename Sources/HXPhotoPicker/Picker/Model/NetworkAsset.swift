@@ -33,6 +33,7 @@ public struct NetworkImageAsset: Codable {
     /// 缩略图，列表cell展示
     /// PhotoManager.shared.imageDownloader
     public let thumbnailURL: URL
+    public let thumbailCacheKey: String?
     
     /// Size set by DownsamplingImageProcessor when Kingfisher downloads thumbnails
     /// .zero defaults to imageView.size
@@ -44,6 +45,7 @@ public struct NetworkImageAsset: Codable {
     /// 原图，预览大图展示
     /// PhotoManager.shared.imageDownloader
     public let originalURL: URL
+    public let originalCacheKey: String?
     
     /// The way the list Cell loads pictures
     /// 列表Cell加载图片的方式
@@ -70,6 +72,8 @@ public struct NetworkImageAsset: Codable {
     public init(
         thumbnailURL: URL,
         originalURL: URL,
+        thumbailCacheKey: String? = nil,
+        originalCacheKey: String? = nil,
         thumbnailLoadMode: LoadMode = .alwaysThumbnail,
         originalLoadMode: LoadMode = .varied,
         isFade: Bool = true,
@@ -80,6 +84,8 @@ public struct NetworkImageAsset: Codable {
     ) {
         self.thumbnailURL = thumbnailURL
         self.originalURL = originalURL
+        self.thumbailCacheKey = thumbailCacheKey
+        self.originalCacheKey = originalCacheKey
         self.thumbnailLoadMode = thumbnailLoadMode
         self.originalLoadMode = originalLoadMode
         self.isFade = isFade

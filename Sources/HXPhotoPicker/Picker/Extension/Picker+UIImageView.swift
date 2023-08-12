@@ -46,26 +46,27 @@ extension UIImageView {
             options += [.downloader(imageDonwloader)]
         }
         var loadVideoCover: Bool = false
+        var cacheKey: String?
         if let imageAsset = asset.networkImageAsset {
+            let originalCacheKey = imageAsset.originalCacheKey ?? imageAsset.originalURL.cacheKey
             if isThumbnail {
-                if imageAsset.thumbnailLoadMode == .varied {
-                    if ImageCache.default.isCached(forKey: imageAsset.originalURL.cacheKey) {
-                        if ImageCache.default.isCached(forKey: imageAsset.thumbnailURL.cacheKey) {
-                            placeholderImage = ImageCache.default.retrieveImageInMemoryCache(
-                                forKey: imageAsset.thumbnailURL.cacheKey,
-                                options: []
-                            )
-                            (kf.indicator?.view as? UIActivityIndicatorView)?.color = .white
-                        }else {
-                            placeholderImage = UIImage.image(for: imageAsset.placeholder)
-                        }
-                        url = imageAsset.originalURL
+                if imageAsset.thumbnailLoadMode == .varied,
+                   ImageCache.default.isCached(forKey: originalCacheKey) {
+                    let thumbnailCacheKey = imageAsset.thumbailCacheKey ?? imageAsset.thumbnailURL.cacheKey
+                    if ImageCache.default.isCached(forKey: thumbnailCacheKey) {
+                        placeholderImage = ImageCache.default.retrieveImageInMemoryCache(
+                            forKey: thumbnailCacheKey,
+                            options: []
+                        )
+                        (kf.indicator?.view as? UIActivityIndicatorView)?.color = .white
                     }else {
-                        url = imageAsset.thumbnailURL
                         placeholderImage = UIImage.image(for: imageAsset.placeholder)
                     }
+                    url = imageAsset.originalURL
+                    cacheKey = imageAsset.originalCacheKey
                 }else {
                     url = imageAsset.thumbnailURL
+                    cacheKey = imageAsset.thumbailCacheKey
                     placeholderImage = UIImage.image(for: imageAsset.placeholder)
                 }
                 let processor: DownsamplingImageProcessor
@@ -86,15 +87,18 @@ extension UIImageView {
             }else {
                 if imageAsset.originalLoadMode == .alwaysThumbnail,
                    !forciblyOriginal {
-                    if ImageCache.default.isCached(forKey: imageAsset.originalURL.cacheKey) {
+                    if ImageCache.default.isCached(forKey: originalCacheKey) {
                         url = imageAsset.originalURL
+                        cacheKey = imageAsset.originalCacheKey
                     }else {
                         url = imageAsset.thumbnailURL
+                        cacheKey = imageAsset.thumbailCacheKey
                     }
                     placeholderImage = UIImage.image(for: imageAsset.placeholder)
                 }else {
                     placeholderImage = image
                     url = imageAsset.originalURL
+                    cacheKey = imageAsset.originalCacheKey
                 }
                 options = [.transition(.fade(0.2))]
             }
@@ -131,7 +135,11 @@ extension UIImageView {
                     !livePhotoAsset.imageURL.isFileURL {
             url = livePhotoAsset.imageURL
         }
-        if let url = url, loadVideoCover {
+        guard let url = url else {
+            completionHandler?(nil, nil, asset)
+            return nil
+        }
+        if loadVideoCover {
             let provider = AVAssetImageDataProvider(assetURL: url, seconds: 0.1)
             provider.assetImageGenerator.appliesPreferredTrackTransform = true
             let task = KF.dataProvider(provider)
@@ -162,8 +170,9 @@ extension UIImageView {
                 .set(to: self)
             return task
         }
+        let imageResource = KF.ImageResource(downloadURL: url, cacheKey: cacheKey)
         return kf.setImage(
-            with: url,
+            with: imageResource,
             placeholder: placeholderImage,
             options: options,
             progressBlock: progressBlock

@@ -86,7 +86,6 @@ public extension PickerResult {
 public extension PickerResult {
     
     /// Get the address of the selected resource / 获取已选资源的地址
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// Does not include network resources, if the network resources are edited, they will be obtained / 不包括网络资源，如果网络资源编辑过则会获取
     /// - Parameters:
     ///   - options: type of get / 获取的类型
@@ -104,12 +103,9 @@ public extension PickerResult {
     }
     
     /// Get the address of the selected resource / 获取已选资源的地址
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// Include web images / 包括网络图片
     /// - Parameters:
     ///   - options: type of get / 获取的类型
-    ///   - compression: compression parameter, nil - original image / 压缩参数，nil - 原图
-    ///   - handler: Get the callback of the url / 获取到url的回调
     ///   - completionHandler: All acquisition completed / 全部获取完成
     func getURLs(
         options: Options = .any,
@@ -161,23 +157,23 @@ public extension PickerResult {
     }
     
     /// 获取 URL 对象数组
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
-    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
-    /// - Returns: URL 对象数组
+    /// - Parameters:
+    ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    ///   - Returns: URL 对象数组
     func urls(_ compression: PhotoAsset.Compression? = nil) async throws -> [URL] {
         try await objects(compression)
     }
     
     /// 获取 AssetURLResult 对象数组
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
-    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
-    /// - Returns: AssetURLResult 对象数组
+    /// - Parameters:
+    ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    ///   - Returns: AssetURLResult 对象数组
     func urlResults(_ compression: PhotoAsset.Compression? = nil) async throws -> [AssetURLResult] {
         try await objects(compression)
     }
     
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
-    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    /// - Parameters:
+    ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
     func objects<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
         let _compression: PhotoAsset.Compression?
         if let compression = compression {

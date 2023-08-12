@@ -69,11 +69,15 @@ public struct PhotoListConfiguration {
     
     /// Allow swipe selection
     /// 允许滑动选择
-    public var allowSwipeToSelect: Bool = false
+    public var allowSwipeToSelect: Bool = true
     
     /// Allow automatic up/down scrolling when swiping to select
     /// 滑动选择时允许自动向上/下滚动
     public var swipeSelectAllowAutoScroll: Bool = true
+    
+    /// When pickerPresentStyle != .none, the area to the left of the swipe gesture is ignored
+    /// 当 pickerPresentStyle != .none 时，滑动手势左边忽略的区域
+    public var swipeSelectIgnoreLeftArea: CGFloat = 40
     
     /// Rate when scrolling up/down automatically
     /// 自动向上/下滚动时的速率

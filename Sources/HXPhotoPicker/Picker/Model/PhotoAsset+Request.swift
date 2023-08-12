@@ -347,12 +347,15 @@ public extension PhotoAsset {
     }
     
     func requestLivePhotoURL(
+        imageFileURL: URL? = nil,
+        videoFileURL: URL? = nil,
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
         #if HXPICKER_ENABLE_EDITOR
         if photoEditedResult != nil {
             getEditedImageURL(
+                toFile: imageFileURL,
                 compressionQuality: compression?.imageCompressionQuality,
                 resultHandler: completion
             )
@@ -362,6 +365,8 @@ public extension PhotoAsset {
         guard let phAsset = phAsset else {
             if mediaSubType == .localLivePhoto {
                 requestLocalLivePhotoURL(
+                    imageFileURL: imageFileURL,
+                    videoFileURL: videoFileURL,
                     compression: compression,
                     completion: completion
                 )
@@ -372,34 +377,43 @@ public extension PhotoAsset {
         }
         var imageURL: URL?
         var videoURL: URL?
-        AssetManager.requestLivePhoto(contentURL: phAsset) { url in
+        AssetManager.requestLivePhoto(
+            contentURL: phAsset,
+            imageFileURL: imageFileURL,
+            videoFileURL: videoFileURL
+        ) { url in
             imageURL  = url
         } videoHandler: { url in
             videoURL  = url
         } completionHandler: { error in
-            if let error = error {
-                switch error {
-                case .allError(let imageError, let videoError):
-                    completion(.failure(.exportLivePhotoURLFailed(imageError, videoError)))
-                case .imageError(let error):
-                    completion(.failure(.exportLivePhotoImageURLFailed(error)))
-                case .videoError(let error):
-                    completion(.failure(.exportLivePhotoVideoURLFailed(error)))
+            guard let imageURL = imageURL,
+                  let videoURL = videoURL else {
+                if let error = error {
+                    switch error {
+                    case .allError(let imageError, let videoError):
+                        completion(.failure(.exportLivePhotoURLFailed(imageError, videoError)))
+                    case .imageError(let error):
+                        completion(.failure(.exportLivePhotoImageURLFailed(error)))
+                    case .videoError(let error):
+                        completion(.failure(.exportLivePhotoVideoURLFailed(error)))
+                    }
+                }else {
+                    completion(.failure(.exportLivePhotoURLFailed(nil, nil)))
                 }
-            }else {
-                self.requestLivePhotoURLSuccess(
-                    imageURL: imageURL,
-                    videoURL: videoURL,
-                    compression: compression,
-                    completion: completion
-                )
+                return
             }
+            self.requestLivePhotoURLSuccess(
+                imageURL: imageURL,
+                videoURL: videoURL,
+                compression: compression,
+                completion: completion
+            )
         }
     }
      
     private func requestLivePhotoURLSuccess(
-        imageURL: URL?,
-        videoURL: URL?,
+        imageURL: URL,
+        videoURL: URL,
         compression: Compression?,
         completion: @escaping AssetURLCompletion
     ) {
@@ -438,7 +452,7 @@ public extension PhotoAsset {
                 imageData,
                 compressionQuality: compressionQuality
             ) {
-                return PhotoTools.write(imageData: data)
+                return PhotoTools.write(toFile: url, imageData: data)
             }
             return nil
         }
@@ -458,11 +472,20 @@ public extension PhotoAsset {
                     toFile: PhotoTools.getVideoTmpURL(),
                     exportParameter: exportParameter
                 ) { video_URL, error in
-                        if FileManager.default.fileExists(atPath: url.path) {
-                            try? FileManager.default.removeItem(at: url)
-                        }
-                        completionHandler?(video_URL, error)
+                    guard let video_URL = video_URL else {
+                        completionHandler?(nil, error)
+                        return
                     }
+                    do {
+                        if FileManager.default.fileExists(atPath: url.path) {
+                            try FileManager.default.removeItem(at: url)
+                        }
+                        try FileManager.default.moveItem(at: video_URL, to: url)
+                        completionHandler?(url, error)
+                    } catch {
+                        completionHandler?(nil, error)
+                    }
+                }
             }
         }
         if let imageCompression = compression?.imageCompressionQuality,
@@ -472,13 +495,13 @@ public extension PhotoAsset {
             var image_URL: URL?
             var video_URL: URL?
             imageQueue.async(group: group, execute: DispatchWorkItem(block: {
-                image_URL = imageCompressor(imageURL!, imageCompression)
+                image_URL = imageCompressor(imageURL, imageCompression)
             }))
             let videoQueue = DispatchQueue(label: "HXPhotoPicker.request.livephoto.videourl")
             let semaphore = DispatchSemaphore(value: 0)
             videoQueue.async(group: group, execute: DispatchWorkItem(block: {
                 videoCompressor(
-                    videoURL!,
+                    videoURL,
                     videoExportParameter
                 ) { url, _ in
                     video_URL = url
@@ -491,7 +514,7 @@ public extension PhotoAsset {
             }))
         }else if let imageCompression = compression?.imageCompressionQuality {
             DispatchQueue.global().async {
-                let url = imageCompressor(imageURL!, imageCompression)
+                let url = imageCompressor(imageURL, imageCompression)
                 DispatchQueue.main.async {
                     completionFunc(url, videoURL)
                 }
@@ -499,7 +522,7 @@ public extension PhotoAsset {
         }else if let videoExportParameter = compression?.videoExportParameter {
             DispatchQueue.global().async {
                 videoCompressor(
-                    videoURL!,
+                    videoURL,
                     videoExportParameter
                 ) { url, _ in
                     DispatchQueue.main.async {
@@ -773,12 +796,15 @@ public extension PhotoAsset {
     }
     
     func requestLocalLivePhotoURL(
+        imageFileURL: URL? = nil,
+        videoFileURL: URL? = nil,
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
         #if HXPICKER_ENABLE_EDITOR
         if photoEditedResult != nil {
             getEditedImageURL(
+                toFile: imageFileURL,
                 compressionQuality: compression?.imageCompressionQuality,
                 resultHandler: completion
             )
@@ -789,19 +815,53 @@ public extension PhotoAsset {
             completion(.failure(.localLivePhotoIsEmpty))
             return
         }
-        let imageURL = localLivePhoto.imageURL
-        let videoURL = localLivePhoto.videoURL
+        var imageURL = localLivePhoto.imageURL
+        var videoURL = localLivePhoto.videoURL
+        let imageURLType: AssetURLResult.URLType
+        if imageURL.isFileURL {
+            imageURLType = .local
+            if let imageFileURL = imageFileURL {
+                if PhotoTools.copyFile(
+                    at: imageURL,
+                    to: imageFileURL
+                ) {
+                    imageURL = imageFileURL
+                }else {
+                    completion(.failure(.fileWriteFailed))
+                    return
+                }
+            }
+        }else {
+            imageURLType = .network
+        }
+        let videoURLType: AssetURLResult.URLType
+        if videoURL.isFileURL {
+            videoURLType = .local
+            if let videoFileURL = videoFileURL {
+                if PhotoTools.copyFile(
+                    at: videoURL,
+                    to: videoFileURL
+                ) {
+                    videoURL = videoFileURL
+                }else {
+                    completion(.failure(.fileWriteFailed))
+                    return
+                }
+            }
+        }else {
+            videoURLType = .network
+        }
         completion(
             .success(
                 .init(
                     url: imageURL,
-                    urlType: .local,
+                    urlType: imageURLType,
                     mediaType: .photo,
                     livePhoto: .init(
                         imageURL: imageURL,
-                        imageURLType: .local,
+                        imageURLType: imageURLType,
                         videoURL: videoURL,
-                        videoURLType: videoURL.isFileURL ? .local : .network
+                        videoURLType: videoURLType
                     )
                 )
             )

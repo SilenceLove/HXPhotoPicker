@@ -751,6 +751,20 @@ open class EditorViewController: BaseViewController {
                     height: 45
                 )
             }
+            if UIDevice.isPad {
+                leftRotateButton.centerY = cancelButton.centerY
+                leftRotateButton.x = cancelButton.frame.maxX + 20
+                rightRotateButton.centerY = leftRotateButton.centerY
+                rightRotateButton.x = leftRotateButton.frame.maxX + 20
+                
+                mirrorHorizontallyButton.x = finishButton.x - mirrorHorizontallyButton.width - 20
+                mirrorVerticallyButton.x = mirrorHorizontallyButton.x - 20 - mirrorVerticallyButton.width
+                mirrorHorizontallyButton.centerY = leftRotateButton.centerY
+                mirrorVerticallyButton.centerY = mirrorHorizontallyButton.centerY
+                
+                maskListButton.y = rotateScaleView.y - maskListButton.height - 10
+                maskListButton.centerX = view.width / 2
+            }
         }
         
         filtersView.frame = .init(x: 0, y: toolsView.y - 120, width: view.width, height: 120)
@@ -758,18 +772,20 @@ open class EditorViewController: BaseViewController {
         brushSizeView.x = view.width - 45 - UIDevice.rightMargin
         mosaicToolView.frame =  .init(x: 0, y: toolsView.y - 65, width: view.width, height: 65)
         
-        leftRotateButton.y = rotateScaleView.y - leftRotateButton.height - 10
-        leftRotateButton.x = UIDevice.leftMargin + 20
-        rightRotateButton.centerY = leftRotateButton.centerY
-        rightRotateButton.x = leftRotateButton.frame.maxX + 15
-        
-        mirrorHorizontallyButton.x = view.width - UIDevice.rightMargin - mirrorHorizontallyButton.width - 20
-        mirrorVerticallyButton.x = mirrorHorizontallyButton.x - 15 - mirrorVerticallyButton.width
-        mirrorHorizontallyButton.centerY = leftRotateButton.centerY
-        mirrorVerticallyButton.centerY = mirrorHorizontallyButton.centerY
-        
-        maskListButton.centerY = mirrorVerticallyButton.centerY
-        maskListButton.centerX = view.width / 2
+        if !UIDevice.isPad || config.buttonPostion == .bottom {
+            leftRotateButton.y = rotateScaleView.y - leftRotateButton.height - 10
+            leftRotateButton.x = UIDevice.leftMargin + 20
+            rightRotateButton.centerY = leftRotateButton.centerY
+            rightRotateButton.x = leftRotateButton.frame.maxX + 15
+            
+            mirrorHorizontallyButton.x = view.width - UIDevice.rightMargin - mirrorHorizontallyButton.width - 20
+            mirrorVerticallyButton.x = mirrorHorizontallyButton.x - 15 - mirrorVerticallyButton.width
+            mirrorHorizontallyButton.centerY = leftRotateButton.centerY
+            mirrorVerticallyButton.centerY = mirrorHorizontallyButton.centerY
+            
+            maskListButton.centerY = mirrorVerticallyButton.centerY
+            maskListButton.centerX = view.width / 2
+        }
         
         if orientationDidChange || firstAppear {
             videoControlView.frame = .init(x: 0, y: toolsView.y - 80, width: view.width, height: 50)

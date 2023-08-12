@@ -393,11 +393,14 @@ class EditorVideoControlView: UIView {
     }
     
     var margin: CGFloat {
-        if UIDevice.isPortrait {
-            return 15
-        }else {
-            return 100
+        var leftMargin: CGFloat = 15 + UIDevice.leftMargin
+        var rightMargin: CGFloat = UIDevice.rightMargin + 15
+        if (width - leftMargin - rightMargin) > 450 {
+            let maxWidth = max(width * 0.5, 450)
+            leftMargin = (width - maxWidth) * 0.5
+            rightMargin = leftMargin
         }
+        return leftMargin - UIDevice.leftMargin
     }
     
     var bgWidth: CGFloat {
@@ -424,11 +427,13 @@ class EditorVideoControlView: UIView {
         progressLineView.size = .init(width: 4, height: height - 4)
         progressLineView.centerY = height / 2
         if UIDevice.isPortrait {
-            playView.frame = .init(x: margin + UIDevice.leftMargin, y: 0, width: playWidth, height: height)
+            let leftMargin: CGFloat = margin + UIDevice.leftMargin
+            let rightMargin: CGFloat = UIDevice.rightMargin + margin
+            playView.frame = .init(x: leftMargin, y: 0, width: playWidth, height: height)
             bgView.frame = .init(
                 x: playView.frame.maxX + 1,
                 y: 0,
-                width: width - UIDevice.rightMargin - margin - playView.frame.maxX - 1,
+                width: width - rightMargin - playView.frame.maxX - 1,
                 height: height
             )
         }else {

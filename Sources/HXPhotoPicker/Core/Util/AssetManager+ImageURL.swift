@@ -46,7 +46,6 @@ public extension AssetManager {
     }
     
     /// 获取原始图片地址
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
     ///   - asset: 对应的 PHAsset 数据
     ///   - fileURL: 指定本地地址
@@ -86,7 +85,8 @@ public extension AssetManager {
         }
         let imageURL: URL
         let isHEIC = imageResource.uniformTypeIdentifier.uppercased().hasSuffix("HEIC")
-        if isHEIC, fileURL.pathExtension.uppercased() != "HEIC" {
+        let sourceIsHEIC = fileURL.pathExtension.uppercased() == "HEIC"
+        if isHEIC, !sourceIsHEIC {
             let path = fileURL.path.replacingOccurrences(of: fileURL.pathExtension, with: "HEIC")
             imageURL = .init(fileURLWithPath: path)
         }else {
@@ -100,17 +100,7 @@ public extension AssetManager {
             options: options
         ) { error in
             #if HXPICKER_ENABLE_PICKER
-            if isHEIC && PhotoManager.shared.isConverHEICToPNG {
-                var pngPath = imageURL.path.replacingOccurrences(of: imageURL.pathExtension, with: "PNG")
-                if FileManager.default.fileExists(atPath: pngPath) {
-                    if let range = pngPath.range(of: ".PNG") {
-                        pngPath.removeSubrange(range)
-                        pngPath += "\(Int(Date().timeIntervalSince1970))" + ".PNG"
-                    }else {
-                        try? FileManager.default.removeItem(atPath: pngPath)
-                    }
-                }
-                let pngURL = URL(fileURLWithPath: pngPath)
+            if isHEIC, !sourceIsHEIC {
                 let image = UIImage(contentsOfFile: imageURL.path)?.normalizedImage()
                 try? FileManager.default.removeItem(at: imageURL)
                 guard let data = PhotoTools.getImageData(for: image) else {
@@ -120,9 +110,9 @@ public extension AssetManager {
                     return
                 }
                 do {
-                    try data.write(to: pngURL)
+                    try data.write(to: fileURL)
                     DispatchQueue.main.async {
-                        resultHandler(.success(pngURL))
+                        resultHandler(.success(fileURL))
                     }
                 } catch {
                     DispatchQueue.main.async {

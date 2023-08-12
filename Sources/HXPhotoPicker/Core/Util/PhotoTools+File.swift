@@ -250,7 +250,8 @@ public extension PhotoTools {
     @discardableResult
     static func write(
         toFile fileURL: URL? = nil,
-        imageData: Data) -> URL? {
+        imageData: Data
+    ) -> URL? {
         let imageURL = fileURL == nil ? getImageTmpURL(imageData.isGif ? .gif : .png) : fileURL!
         do {
             if FileManager.default.fileExists(atPath: imageURL.path) {

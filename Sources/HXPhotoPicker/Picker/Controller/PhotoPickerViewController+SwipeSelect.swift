@@ -8,6 +8,19 @@
 import UIKit
 
 // MARK: 滑动选择
+extension PhotoPickerViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer != swipeSelectPanGR {
+            return true
+        }
+        guard var config = pickerController?.config else {
+            return true
+        } 
+        let point = gestureRecognizer.location(in: view)
+        return point.x > config.photoList.swipeSelectIgnoreLeftArea
+    }
+}
+
 extension PhotoPickerViewController {
     enum SwipeSelectState {
         case select
@@ -15,7 +28,8 @@ extension PhotoPickerViewController {
     }
     func beganPanGestureRecognizer(
         panGR: UIPanGestureRecognizer,
-        localPoint: CGPoint) {
+        localPoint: CGPoint
+    ) {
         if let indexPath = collectionView.indexPathForItem(at: localPoint),
            let photoAsset = getCell(for: indexPath.item)?.photoAsset,
            let pickerController = pickerController {
@@ -42,7 +56,7 @@ extension PhotoPickerViewController {
            let lastIndexPath = lastIndexPath {
             if let beganIndex = swipeSelectBeganIndexPath?.item,
                let swipeSelectState = swipeSelectState,
-               let indexArray = swipeSelectedIndexArray {
+               var indexArray = swipeSelectedIndexArray {
                 if swipeSelectState == .select {
                     if let lastPhotoAsset = pickerController?.selectedAssetArray.last,
                        let cellIndexPath = getIndexPath(for: lastPhotoAsset) {
@@ -73,6 +87,15 @@ extension PhotoPickerViewController {
                         }
                     }
                 }else {
+                    let photoAsset = pickerController?.selectedAssetArray.first
+                    if let lastPhotoAsset = photoAsset,
+                       let cellIndexPath = getIndexPath(for: lastPhotoAsset) {
+                        if lastIndex > cellIndexPath.item {
+                            indexArray.sort { $0 < $1 }
+                        }else {
+                            indexArray.sort { $0 > $1 }
+                        }
+                    }
                     for index in indexArray {
                         if lastIndex < beganIndex {
                             if index < lastIndex || index > beganIndex {

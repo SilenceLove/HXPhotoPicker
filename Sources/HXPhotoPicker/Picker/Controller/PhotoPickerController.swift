@@ -601,7 +601,6 @@ extension PhotoPickerController {
 @available(iOS 13.0.0, *)
 public extension PhotoPickerController {
     
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
     static func picker<T: PhotoAssetObject>(
         _ config: PickerConfiguration,
@@ -656,7 +655,6 @@ public extension PhotoPickerController {
         }
     }
     
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
      func pickerObject<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
         try await withCheckedThrowingContinuation { continuation in

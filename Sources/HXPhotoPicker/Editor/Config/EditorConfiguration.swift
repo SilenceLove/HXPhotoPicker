@@ -51,8 +51,9 @@ public struct EditorConfiguration: IndicatorTypeConfig {
     public var isWhetherFinishButtonDisabledInUneditedState: Bool = false
     
     /// The position of the Cancel/Done button when the screen is vertical
+    /// iPad：.top
     /// 竖屏时，取消/完成按钮的位置
-    public var buttonPostion: ButtonPostion = .bottom
+    public var buttonPostion: ButtonPostion
     
     /// The address configuration after editing, the default is under tmp
     /// Please set a different address each time you edit to prevent the existing data from being overwritten
@@ -107,6 +108,11 @@ public struct EditorConfiguration: IndicatorTypeConfig {
             modalPresentationStyle = .automatic
         } else {
             modalPresentationStyle = .fullScreen
+        }
+        if UIDevice.isPad {
+            buttonPostion = .top
+        }else {
+            buttonPostion = .bottom
         }
     }
 }

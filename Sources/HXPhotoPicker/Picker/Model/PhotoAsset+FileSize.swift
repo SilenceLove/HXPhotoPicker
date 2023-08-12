@@ -134,8 +134,18 @@ extension PhotoAsset {
             }
             #endif
             if let livePhoto = localLivePhoto {
-                fileSize += PhotoTools.fileSize(atPath: livePhoto.imageURL.path)
-                fileSize += PhotoTools.fileSize(atPath: livePhoto.videoURL.path)
+                if livePhoto.imageURL.isFileURL {
+                    fileSize += PhotoTools.fileSize(atPath: livePhoto.imageURL.path)
+                }
+                if livePhoto.videoURL.isFileURL {
+                    fileSize += PhotoTools.fileSize(atPath: livePhoto.videoURL.path)
+                }else {
+                    let key = livePhoto.videoURL.absoluteString
+                    if PhotoTools.isCached(forVideo: key) {
+                        let videoURL = PhotoTools.getVideoCacheURL(for: key)
+                        fileSize += videoURL.fileSize
+                    }
+                }
                 return fileSize
             }
             if let imageData = getLocalImageData() {

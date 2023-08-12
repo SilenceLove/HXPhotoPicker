@@ -295,6 +295,12 @@ public class PhotoPickerViewController: BaseViewController {
                 target: self,
                 action: #selector(panGestureRecognizer(panGR:))
             )
+            switch picker.config.pickerPresentStyle {
+            case .none:
+                break
+            default:
+                swipeSelectPanGR?.delegate = self
+            }
             view.addGestureRecognizer(swipeSelectPanGR!)
         }
     }
@@ -623,14 +629,31 @@ extension PhotoPickerViewController {
                 item += 1
             }
         }
-        collectionView.scrollToItem(
-            at: IndexPath(
-                item: item,
-                section: 0
-            ),
-            at: config.sort == .asc ? .bottom : .top,
-            animated: false
-        )
+        let scrollPosition: UICollectionView.ScrollPosition
+        if config.sort == .asc {
+            scrollPosition = .bottom
+        }else {
+            scrollPosition = .top
+        }
+        let indexPath = IndexPath(item: item, section: 0)
+        DispatchQueue.main.async {
+            if AssetManager.authorizationStatusIsLimited() {
+                self.collectionView.layoutIfNeeded()
+                DispatchQueue.main.async {
+                    self.collectionView.scrollToItem(
+                        at: indexPath,
+                        at: scrollPosition,
+                        animated: false
+                    )
+                }
+            }else {
+                self.collectionView.scrollToItem(
+                    at: indexPath,
+                    at: scrollPosition,
+                    animated: false
+                )
+            }
+        }
     }
     func getCell(
         for item: Int
@@ -819,9 +842,7 @@ extension PhotoPickerViewController {
             videoCount = allVideoCount
             setupEmptyView()
             collectionView.reloadData()
-            DispatchQueue.main.async {
-                self.scrollToAppropriatePlace(photoAsset: nil)
-            }
+            scrollToAppropriatePlace(photoAsset: nil)
             return
         }
         var photoCount: Int = 0

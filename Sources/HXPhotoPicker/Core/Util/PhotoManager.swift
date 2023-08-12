@@ -56,10 +56,6 @@ public final class PhotoManager: NSObject {
     
     #if HXPICKER_ENABLE_PICKER
     
-    /// 获取原图时，是否将HEIC格式的图片转换成PNG格式
-    /// HEIC转换成PNG之后图片大小会变大
-    public var isConverHEICToPNG: Bool = false
-    
     #if canImport(Kingfisher)
     public var imageDownloader: Kingfisher.ImageDownloader?
     #endif

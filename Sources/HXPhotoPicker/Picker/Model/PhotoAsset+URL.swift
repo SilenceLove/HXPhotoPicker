@@ -29,26 +29,26 @@ public extension PhotoAsset {
         #endif
         if isNetworkAsset && !hasEdited {
             getNetworkImage { image in
-                if let compressionQuality {
-                    DispatchQueue.global().async {
-                        guard let imageData = PhotoTools.getImageData(for: image),
-                              let data = PhotoTools.imageCompress(
-                                imageData,
-                                  compressionQuality: compressionQuality
-                              ),
-                              let image = UIImage(data: data)?.normalizedImage()
-                        else {
-                            DispatchQueue.main.async {
-                                completion(nil)
-                            }
-                            return
-                        }
-                        DispatchQueue.main.async {
-                            completion(image)
-                        }
-                    }
-                }else {
+                guard let compressionQuality = compressionQuality else {
                     completion(image)
+                    return
+                }
+                DispatchQueue.global().async {
+                    guard let imageData = PhotoTools.getImageData(for: image),
+                          let data = PhotoTools.imageCompress(
+                            imageData,
+                              compressionQuality: compressionQuality
+                          ),
+                          let image = UIImage(data: data)?.normalizedImage()
+                    else {
+                        DispatchQueue.main.async {
+                            completion(nil)
+                        }
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        completion(image)
+                    }
                 }
             }
             return
@@ -60,22 +60,29 @@ public extension PhotoAsset {
     }
     
     /// 获取url
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
-    ///   - fileURL: 指定地址，只支持本地、系统相册里的资源
+    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
     ///   - compression: 压缩参数，nil - 原图
     ///   - completion: 获取完成
     func getURL(
-        toFile fileURL: URL? = nil,
+        toFile fileConfig: FileConfig? = nil,
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
-        getAssetURL(compression: compression, completion: completion)
+        getAssetURL(
+            toFile: fileConfig,
+            compression: compression,
+            completion: completion
+        )
     }
     
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
+    /// 获取url
+    /// - Parameters:
+    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
+    ///   - compressionQuality: 压缩比例，不传就是原图。gif不会压缩
+    ///   - completion: 获取完成
     func getAssetURL(
-        toFile fileURL: URL? = nil,
+        toFile fileConfig: FileConfig? = nil,
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
@@ -83,18 +90,21 @@ public extension PhotoAsset {
             if mediaSubType == .livePhoto ||
                 mediaSubType == .localLivePhoto {
                 getLivePhotoURL(
+                    imageFileURL: fileConfig?.imageURL,
+                    videoFileURL: fileConfig?.videoURL,
+                    compression: compression,
                     completion: completion
                 )
                 return
             }
             getImageURL(
-                toFile: fileURL,
+                toFile: fileConfig?.imageURL,
                 compressionQuality: compression?.imageCompressionQuality,
                 completion: completion
             )
         }else {
             getVideoURL(
-                toFile: fileURL,
+                toFile: fileConfig?.videoURL,
                 exportParameter: compression?.videoExportParameter,
                 completion: completion
             )
@@ -102,9 +112,8 @@ public extension PhotoAsset {
     }
     
     /// 获取图片url
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
     /// - Parameters:
-    ///   - fileURL: 指定地址，只支持本地、系统相册里的资源
+    ///   - fileURL: 指定地址（如果为网络资源则忽略）
     ///   - compressionQuality: 压缩比例，不传就是原图。gif不会压缩
     ///   - completion: 获取完成
     func getImageURL(
@@ -129,7 +138,7 @@ public extension PhotoAsset {
     
     /// 获取视频url
     /// - Parameters:
-    ///   - fileURL: 指定地址，只支持本地、系统相册里的资源
+    ///   - fileURL: 指定地址（如果为网络资源则忽略）
     ///   - exportParameter: 导出参数，nil 为原始视频
     ///   - exportSession: 导出视频时对应的 AVAssetExportSession
     ///   - completion: 获取完成
@@ -155,16 +164,42 @@ public extension PhotoAsset {
     
     /// 获取LivePhoto里的图片和视频URL
     /// - Parameters:
+    ///   - imageFileURL: 指定图片地址（如果为网络资源则忽略）
+    ///   - videoFileURL: 指定视频地址（如果为网络资源则忽略）
     ///   - compression: 压缩参数，nil - 原图
     ///   - completion: 获取完成
     func getLivePhotoURL(
+        imageFileURL: URL? = nil,
+        videoFileURL: URL? = nil,
         compression: Compression? = nil,
         completion: @escaping AssetURLCompletion
     ) {
         requestLivePhotoURL(
+            imageFileURL: imageFileURL,
+            videoFileURL: videoFileURL,
             compression: compression,
             completion: completion
         )
+    }
+    
+    struct FileConfig {
+        public let imageURL: URL?
+        public let videoURL: URL?
+        
+        public init(imageURL: URL) {
+            self.imageURL = imageURL
+            self.videoURL = nil
+        }
+        
+        public init(videoURL: URL) {
+            self.imageURL = nil
+            self.videoURL = videoURL
+        }
+        
+        public init(imageURL: URL, videoURL: URL) {
+            self.imageURL = imageURL
+            self.videoURL = videoURL
+        }
     }
 }
 
@@ -210,7 +245,11 @@ public extension PhotoAsset {
 
 @available(iOS 13.0, *)
 public protocol PhotoAssetObject {
-    static func fetchObject(_ photoAsset: PhotoAsset, compression: PhotoAsset.Compression?) async throws -> Self
+    static func fetchObject(
+        _ photoAsset: PhotoAsset,
+        toFile fileConfig: PhotoAsset.FileConfig?,
+        compression: PhotoAsset.Compression?
+    ) async throws -> Self
 }
 
 @available(iOS 13.0, *)
@@ -218,10 +257,14 @@ extension URL: PhotoAssetObject {
     
     public static func fetchObject(
         _ photoAsset: PhotoAsset,
+        toFile fileConfig: PhotoAsset.FileConfig?,
         compression: PhotoAsset.Compression?
     ) async throws -> Self {
         try await withCheckedThrowingContinuation { continuation in
-            photoAsset.getURL(compression: compression) {
+            photoAsset.getURL(
+                toFile: fileConfig,
+                compression: compression
+            ) {
                 switch $0 {
                 case .success(let result):
                     continuation.resume(with: .success(result.url))
@@ -238,6 +281,7 @@ extension UIImage: PhotoAssetObject {
     
     public static func fetchObject(
         _ photoAsset: PhotoAsset,
+        toFile fileConfig: PhotoAsset.FileConfig?,
         compression: PhotoAsset.Compression?
     ) async throws -> Self {
         try await photoAsset.image(compression?.imageCompressionQuality) as! Self
@@ -248,10 +292,14 @@ extension UIImage: PhotoAssetObject {
 extension AssetURLResult: PhotoAssetObject {
     public static func fetchObject(
         _ photoAsset: PhotoAsset,
+        toFile fileConfig: PhotoAsset.FileConfig?,
         compression: PhotoAsset.Compression?
     ) async throws -> Self {
         try await withCheckedThrowingContinuation { continuation in
-            photoAsset.getURL(compression: compression) {
+            photoAsset.getURL(
+                toFile: fileConfig,
+                compression: compression
+            ) {
                 switch $0 {
                 case .success(let reuslt):
                     continuation.resume(with: .success(reuslt))
@@ -266,24 +314,49 @@ extension AssetURLResult: PhotoAssetObject {
 @available(iOS 13.0, *)
 extension PhotoAsset {
     
+    /// 获取 UIImage
     /// - Parameter compression: 压缩参数
-    public func image(_ compression: PhotoAsset.Compression? = nil) async throws -> UIImage {
-        try await .fetchObject(self, compression: compression)
+    /// - Returns: 获取结果
+    public func image(
+        _ compression: PhotoAsset.Compression? = nil
+    ) async throws -> UIImage {
+        try await .fetchObject(self, toFile: nil, compression: compression)
     }
     
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
-    public func url(_ compression: PhotoAsset.Compression? = nil) async throws -> URL {
-        try await .fetchObject(self, compression: compression)
+    /// 获取 URL
+    /// - Parameters:
+    ///   - compression: 压缩参数
+    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
+    /// - Returns: 获取结果
+    public func url(
+        _ compression: PhotoAsset.Compression? = nil,
+        toFile fileConfig: PhotoAsset.FileConfig? = nil
+    ) async throws -> URL {
+        try await .fetchObject(self, toFile: fileConfig, compression: compression)
     }
     
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
-    public func urlResult(_ compression: PhotoAsset.Compression? = nil) async throws -> AssetURLResult {
-        try await .fetchObject(self, compression: compression)
+    /// 获取 AssetURLResult
+    /// - Parameters:
+    ///   - compression: 压缩参数
+    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
+    /// - Returns: 获取结果
+    public func urlResult(
+        _ compression: PhotoAsset.Compression? = nil,
+        toFile fileConfig: PhotoAsset.FileConfig? = nil
+    ) async throws -> AssetURLResult {
+        try await .fetchObject(self, toFile: fileConfig, compression: compression)
     }
     
-    /// PhotoManager.shared.isConverHEICToPNG = true 内部自动将HEIC格式转换成PNG格式
-    public func object<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> T {
-        try await T.fetchObject(self, compression: compression)
+    /// 获取 指定对象
+    /// - Parameters:
+    ///   - compression: 压缩参数
+    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
+    /// - Returns: 获取结果
+    public func object<T: PhotoAssetObject>(
+        _ compression: PhotoAsset.Compression? = nil,
+        toFile fileConfig: PhotoAsset.FileConfig? = nil
+    ) async throws -> T {
+        try await T.fetchObject(self, toFile: fileConfig, compression: compression)
     }
     
     fileprivate func image(_ compressionQuality: CGFloat?) async throws -> UIImage {
