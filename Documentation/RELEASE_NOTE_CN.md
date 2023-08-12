@@ -1,5 +1,20 @@
 # 更新日志
 
+## 4.0.5
+
+### 新增
+
+- Picker
+  - `NetworkImageAsset`增加`CacheKey`属性
+  - 获取URL支持指定路径
+
+### 优化
+
+- Picker
+  - 默认开启手势滑动选择，滑动选择功能优化
+- Editor
+  - iPad界面布局调整
+
 ## 4.0.4
 
 ### 新增

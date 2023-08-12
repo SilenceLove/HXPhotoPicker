@@ -1,5 +1,20 @@
 # Release Notes
 
+## 4.0.5
+
+### Added
+
+- Picker
+  - `NetworkImageAsset` adds `CacheKey` property
+  - Obtaining the URL supports specifying the path
+
+### Optimizer
+
+- Picker
+  - Gesture sliding selection is enabled by default, and the sliding selection function is optimized
+- Editor
+  - iPad interface layout adjustment
+
 ## 4.0.4
 
 ### Added
