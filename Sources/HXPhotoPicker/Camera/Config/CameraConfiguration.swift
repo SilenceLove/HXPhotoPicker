@@ -9,9 +9,7 @@ import UIKit
 import AVFoundation
 
 // MARK: 相机配置类
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 public struct CameraConfiguration: IndicatorTypeConfig {
     
     public var modalPresentationStyle: UIModalPresentationStyle
@@ -72,15 +70,11 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     /// 录制视频时设置的 `AVVideoCodecType`
     /// iPhone7 以下为 `.h264`
     public var videoCodecType: AVVideoCodecType = {
-        #if targetEnvironment(macCatalyst)
-        return .h264
-        #else
         if #available(iOS 11.0, *) {
             return .h264
         } else {
             return .init(rawValue: AVVideoCodecH264)
         }
-        #endif
     }()
     
     /// 视频最大录制时长
@@ -138,21 +132,14 @@ public struct CameraConfiguration: IndicatorTypeConfig {
     #endif
     
     public init() {
-        #if targetEnvironment(macCatalyst)
-        modalPresentationStyle = .automatic
-        #else
         if #available(iOS 13.0, *) {
             modalPresentationStyle = .automatic
         } else {
             modalPresentationStyle = .fullScreen
         }
-        #endif
     }
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 extension CameraConfiguration {
     
     public enum DevicePosition {
@@ -207,3 +194,5 @@ extension CameraConfiguration {
         }
     }
 }
+
+#endif

@@ -601,17 +601,25 @@ extension PhotoPickerController {
 @available(iOS 13.0.0, *)
 public extension PhotoPickerController {
     
-    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    /// 选择资源
+    /// - Parameters:
+    ///   - config: 选择器配置
+    ///   - delegate: 选择器代理回调
+    ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    ///   - fromVC: 来源控制器
+    ///   - fileConfig: 指定获取URL的路径
+    /// - Returns: 获取对应的对象数组
     static func picker<T: PhotoAssetObject>(
         _ config: PickerConfiguration,
         delegate: PhotoPickerControllerDelegate? = nil,
         compression: PhotoAsset.Compression? = nil,
-        fromVC: UIViewController? = nil
+        fromVC: UIViewController? = nil,
+        toFile fileConfig: PickerResult.FileConfigHandler? = nil
     ) async throws -> [T] {
         var config = config
         config.isAutoBack = false
         let vc = show(config, delegate: delegate, fromVC: fromVC)
-        return try await vc.pickerObject(compression)
+        return try await vc.pickerObject(compression, toFile: fileConfig)
     }
     
     static func picker(
@@ -655,34 +663,41 @@ public extension PhotoPickerController {
         }
     }
     
-    /// - Parameter compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
-     func pickerObject<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
-        try await withCheckedThrowingContinuation { continuation in
-            finishHandler = { [weak self] result, controller in
-                guard let self = self else { return }
-                ProgressHUD.showLoading(addedTo: self.view)
-                self.pickerTask = Task {
-                    do {
-                        let objects: [T] = try await result.objects(compression)
-                        if !Task.isCancelled {
-                            continuation.resume(with: .success(objects))
-                        }else {
-                            self.pickerTask = nil
-                            continuation.resume(with: .failure(PickerError.canceled))
-                            return
-                        }
-                    } catch {
-                        continuation.resume(with: .failure(error))
-                    }
-                    self.pickerTask = nil
-                    ProgressHUD.hide(forView: self.view)
-                    controller.dismiss(true)
-                }
-            }
-            cancelHandler = { controller in
-                controller.dismiss(true)
-                continuation.resume(with: .failure(PickerError.canceled))
-            }
-        }
-    }
+    /// 获取资源
+    /// - Parameters:
+    ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    ///   - fileConfig: 指定获取URL的路径
+    /// - Returns: 获取对应的对象数组
+    func pickerObject<T: PhotoAssetObject>(
+       _ compression: PhotoAsset.Compression? = nil,
+       toFile fileConfig: PickerResult.FileConfigHandler? = nil
+    ) async throws -> [T] {
+       try await withCheckedThrowingContinuation { continuation in
+           finishHandler = { [weak self] result, controller in
+               guard let self = self else { return }
+               ProgressHUD.showLoading(addedTo: self.view)
+               self.pickerTask = Task {
+                   do {
+                       let objects: [T] = try await result.objects(compression, toFile: fileConfig)
+                       if !Task.isCancelled {
+                           continuation.resume(with: .success(objects))
+                       }else {
+                           self.pickerTask = nil
+                           continuation.resume(with: .failure(PickerError.canceled))
+                           return
+                       }
+                   } catch {
+                       continuation.resume(with: .failure(error))
+                   }
+                   self.pickerTask = nil
+                   ProgressHUD.hide(forView: self.view)
+                   controller.dismiss(true)
+               }
+           }
+           cancelHandler = { controller in
+               controller.dismiss(true)
+               continuation.resume(with: .failure(PickerError.canceled))
+           }
+       }
+   }
 }

@@ -12,9 +12,7 @@ import CoreLocation
 import AVFoundation
 
 /// 需要有导航栏
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 open class CameraViewController: BaseViewController {
     public weak var delegate: CameraViewControllerDelegate?
     
@@ -289,9 +287,6 @@ open class CameraViewController: BaseViewController {
     }
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 extension CameraViewController {
     
     @objc
@@ -468,3 +463,4 @@ extension CameraViewController {
         )
     }
 }
+#endif

@@ -7,9 +7,7 @@
 
 import UIKit
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 extension CameraViewController: CameraPreviewViewDelegate {
     func previewView(didPreviewing previewView: CameraPreviewView) {
         bottomView.hiddenTip()
@@ -56,3 +54,4 @@ extension CameraViewController: CameraPreviewViewDelegate {
         }
     }
 }
+#endif

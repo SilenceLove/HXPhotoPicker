@@ -125,15 +125,15 @@ class TestEditorViewController: BaseViewController {
             alert.addAction(.init(title: "使用编辑器继续编辑", style: .default, handler: { [weak self] _ in
                 guard let self = self else { return }
                 let edtiorAsset: EditorAsset
-                if editorView.type == .image {
+                if self.editorView.type == .image {
                     var result: EditedResult?
-                    if editorView.isCropedImage {
-                        result = .image(.init(data: editorView.adjustmentData), .init(cropSize: .init(isFixedRatio: editorView.isFixedRatio, aspectRatio: editorView.aspectRatio, angle: 0)))
+                    if self.editorView.isCropedImage {
+                        result = .image(.init(data: self.editorView.adjustmentData), .init(cropSize: .init(isFixedRatio: self.editorView.isFixedRatio, aspectRatio: self.editorView.aspectRatio, angle: 0)))
                     }
-                    edtiorAsset = .init(type: .image(image!), result: result)
-                }else if editorView.type == .video {
+                    edtiorAsset = .init(type: .image(self.image!), result: result)
+                }else if self.editorView.type == .video {
                     var result: EditedResult?
-                    if editorView.isCropedVideo {
+                    if self.editorView.isCropedVideo {
                         var music: VideoEditedMusic?
                         if let player = self.audioPlayers.first {
                             music = .init(
@@ -145,9 +145,9 @@ class TestEditorViewController: BaseViewController {
                                 music: .init(audioURL: player.audio.url, lrc: player.audioLrc.lrc)
                             )
                         }
-                        result = .video(.init(data: editorView.adjustmentData), .init(music: music,cropSize: .init(isFixedRatio: editorView.isFixedRatio, aspectRatio: editorView.aspectRatio, angle: 0)))
+                        result = .video(.init(data: self.editorView.adjustmentData), .init(music: music,cropSize: .init(isFixedRatio: self.editorView.isFixedRatio, aspectRatio: self.editorView.aspectRatio, angle: 0)))
                     }
-                    edtiorAsset = .init(type: .video(videoURL), result: result)
+                    edtiorAsset = .init(type: .video(self.videoURL), result: result)
                 }else {
                     return
                 }
@@ -167,7 +167,7 @@ class TestEditorViewController: BaseViewController {
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
                 self.present(vc, animated: true)
-                editorView.pauseVideo()
+                self.editorView.pauseVideo()
                 for audioPlayer in self.audioPlayers {
                     audioPlayer.stopPlay()
                 }

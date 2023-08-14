@@ -313,7 +313,7 @@ public extension AssetManager {
             var imageError: Error?
             var videoCompletion = false
             var videoError: Error?
-            let imageURL = imageFileURL ?? PhotoTools.getImageTmpURL()
+            let imageURL = imageFileURL ?? PhotoTools.getImageTmpURL(.png)
             let videoURL = videoFileURL ?? PhotoTools.getVideoTmpURL()
             let callback = {(imageError: Error?, videoError: Error?) in
                 if imageError != nil && videoError != nil {

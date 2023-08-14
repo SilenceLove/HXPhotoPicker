@@ -58,7 +58,8 @@ class SwiftPickerResult: NSObject {
         completionHandler: @escaping ([URL]) -> Void
     ) {
         assets.getVideoURL(
-            exportParameter: isOriginal ? nil : compression?.videoExportParameter?.toHX
+            exportParameter: isOriginal ? nil : compression?.videoExportParameter?.toHX,
+            toFile: nil
         ) { session, _, index in
             exportSession?(session, index)
         } videoURLHandler: { result, _, index in
@@ -94,7 +95,8 @@ class SwiftPickerResult: NSObject {
     ) {
         assets.getURLs(
             options: options.toHX,
-            compression: isOriginal ? nil : compression?.toHX
+            compression: isOriginal ? nil : compression?.toHX,
+            toFile: nil
         ) { result, _, index in
             switch result {
             case .success(let urlResult):

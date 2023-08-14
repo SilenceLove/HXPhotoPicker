@@ -467,7 +467,8 @@ class PickerResultViewController: UIViewController,
             }
         } else {
             selectedAssets.getURLs(
-                compression: nil
+                compression: nil,
+                toFile: nil
             ) { result, photoAsset, index in
                 print("第" + String(index + 1) + "个")
                 switch result {

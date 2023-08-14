@@ -8,9 +8,7 @@
 import UIKit
 import AVFoundation
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 class CameraResultViewController: UIViewController {
     enum ResultType {
         case photo
@@ -179,9 +177,6 @@ class CameraResultViewController: UIViewController {
     }
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 class CameraResultVideoView: VideoPlayerView {
     override var avAsset: AVAsset? {
         didSet {
@@ -212,3 +207,4 @@ class CameraResultVideoView: VideoPlayerView {
         NotificationCenter.default.removeObserver(self)
     }
 }
+#endif

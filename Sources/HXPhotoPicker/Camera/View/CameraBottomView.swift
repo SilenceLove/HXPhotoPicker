@@ -7,9 +7,7 @@
 
 import UIKit
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 protocol CameraBottomViewDelegate: AnyObject {
     func bottomView(beganTakePictures bottomView: CameraBottomView)
     func bottomView(beganRecording bottomView: CameraBottomView)
@@ -21,9 +19,6 @@ protocol CameraBottomViewDelegate: AnyObject {
     func bottomView(_ bottomView: CameraBottomView, didChangeTakeType takeType: CameraBottomViewTakeType)
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 class CameraBottomView: UIView {
     weak var delegate: CameraBottomViewDelegate?
     lazy var backButton: UIButton = {
@@ -285,9 +280,6 @@ class CameraBottomView: UIView {
     }
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 extension CameraBottomView {
     
     @objc
@@ -483,3 +475,5 @@ public enum CameraBottomViewTakeType {
 //            }
 //        }
 //    }
+
+#endif

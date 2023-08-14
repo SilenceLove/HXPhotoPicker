@@ -524,7 +524,11 @@ extension PhotoAsset {
             if mediaSubType == .imageAnimated {
                 suffix = "gif"
             }else {
-                suffix = "png"
+                if let photoFormat = photoFormat {
+                    suffix = photoFormat
+                }else {
+                    suffix = "png"
+                }
             }
             imageFileURL = PhotoTools.getTmpURL(for: suffix)
         }

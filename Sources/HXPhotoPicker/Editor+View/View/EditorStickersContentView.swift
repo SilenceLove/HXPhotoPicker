@@ -155,7 +155,7 @@ class EditorStickersContentAudioView: EditorStickersContentView {
               let font = textLayer.font as? UIFont else {
             return
         }
-        let textSize = text.size(ofFont: font, maxWidth: ceil(width * scale), maxHeight: CGFloat(CGFLOAT_MAX))
+        let textSize = text.size(ofFont: font, maxWidth: ceil(width * scale), maxHeight: .max)
         if !textLayer.frame.size.equalTo(textSize) {
             textLayer.frame = CGRect(
                 origin: .init(x: 0, y: animationView.frame.maxY + 3),

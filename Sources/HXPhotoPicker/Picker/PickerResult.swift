@@ -65,16 +65,19 @@ public extension PickerResult {
     
     /// Get video address / 获取视频地址
     /// - Parameters:
+    ///   - videoURLConfig: 指定视频路径
     ///   - exportSession: The corresponding AVAssetExportSession when exporting video, triggered when exportPreset is not nil / 导出视频时对应的 AVAssetExportSession，exportPreset不为nil时触发
     ///   - videoURLHandler: Triggered every time the video address is obtained / 每一次获取视频地址都会触发
     ///   - completionHandler: All acquisitions are completed (failures will not be added) / 全部获取完成(失败的不会添加)
     func getVideoURL(
+        toFile videoURLConfig: ((PhotoAsset, Int) -> URL)? = nil,
         exportSession: AVAssetExportSessionHandler? = nil,
         videoURLHandler: URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         photoAssets.getVideoURL(
             exportParameter: isOriginal ? nil : compression?.videoExportParameter,
+            toFile: videoURLConfig,
             exportSession: exportSession,
             videoURLHandler: videoURLHandler,
             completionHandler: completionHandler
@@ -93,11 +96,13 @@ public extension PickerResult {
     ///   - completion: result
     func getURLs(
         options: Options = .any,
+        toFileConfigHandler fileConfig: FileConfigHandler? = nil,
         completion: @escaping ([URL]) -> Void
     ) {
         photoAssets.getURLs(
             options: options,
             compression: isOriginal ? nil : compression,
+            toFileConfigHandler: fileConfig,
             completion: completion
         )
     }
@@ -106,15 +111,18 @@ public extension PickerResult {
     /// Include web images / 包括网络图片
     /// - Parameters:
     ///   - options: type of get / 获取的类型
+    ///   - fileConfig: 指定文件路径配置回调
     ///   - completionHandler: All acquisition completed / 全部获取完成
     func getURLs(
         options: Options = .any,
+        toFileConfigHandler fileConfig: FileConfigHandler? = nil,
         urlReceivedHandler handler: URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         photoAssets.getURLs(
             options: options,
             compression: isOriginal ? nil : compression,
+            toFile: fileConfig,
             urlReceivedHandler: handler,
             completionHandler: completionHandler
         )
@@ -122,12 +130,14 @@ public extension PickerResult {
     
     func getURLs(
         compression: PhotoAsset.Compression? = nil,
+        toFileConfigHandler fileConfig: FileConfigHandler? = nil,
         urlReceivedHandler handler: URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
         photoAssets.getURLs(
             options: .any,
             compression: compression,
+            toFile: fileConfig,
             urlReceivedHandler: handler,
             completionHandler: completionHandler
         )
@@ -144,6 +154,8 @@ extension PickerResult {
     /// (Result of getting URL, PhotoAsset object, index)
     /// (获取URL的结果、PhotoAsset 对象, 索引)
     public typealias URLHandler = (Result<AssetURLResult, AssetError>, PhotoAsset, Int) -> Void
+    /// (PhotoAsset 对象, 索引)
+    public typealias FileConfigHandler = (PhotoAsset, Int) -> PhotoAsset.FileConfig
 }
 
 @available(iOS 13.0.0, *)
@@ -159,22 +171,27 @@ public extension PickerResult {
     /// 获取 URL 对象数组
     /// - Parameters:
     ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    ///   - fileConfig: 指定路径
     ///   - Returns: URL 对象数组
-    func urls(_ compression: PhotoAsset.Compression? = nil) async throws -> [URL] {
-        try await objects(compression)
+    func urls(_ compression: PhotoAsset.Compression? = nil, toFile fileConfig: FileConfigHandler? = nil) async throws -> [URL] {
+        try await objects(compression, toFile: fileConfig)
     }
     
     /// 获取 AssetURLResult 对象数组
     /// - Parameters:
     ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
+    ///   - fileConfig: 指定路径
     ///   - Returns: AssetURLResult 对象数组
-    func urlResults(_ compression: PhotoAsset.Compression? = nil) async throws -> [AssetURLResult] {
-        try await objects(compression)
+    func urlResults(_ compression: PhotoAsset.Compression? = nil, toFile fileConfig: FileConfigHandler? = nil) async throws -> [AssetURLResult] {
+        try await objects(compression, toFile: fileConfig)
     }
     
+    /// 获取对应资源
     /// - Parameters:
     ///   - compression: 压缩参数，不传则根据内部 isOriginal 判断是否压缩
-    func objects<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil) async throws -> [T] {
+    ///   - fileConfig: 指定路径
+    /// - Returns: 对应的对象数组
+    func objects<T: PhotoAssetObject>(_ compression: PhotoAsset.Compression? = nil, toFile fileConfig: FileConfigHandler? = nil) async throws -> [T] {
         let _compression: PhotoAsset.Compression?
         if let compression = compression {
             _compression = compression
@@ -185,7 +202,11 @@ public extension PickerResult {
         for (index, photoAsset) in photoAssets.enumerated() {
             if Task.isCancelled { throw PickerError.canceled }
             do {
-                let result: T = try await photoAsset.object(_compression)
+                var toFileConfig: PhotoAsset.FileConfig?
+                if let fileConfig = fileConfig?(photoAsset, index) {
+                    toFileConfig = fileConfig
+                }
+                let result: T = try await photoAsset.object(_compression, toFile: toFileConfig)
                 results.append(result)
             } catch {
                 throw PickerError.objsFetchFaild(photoAsset, index, error)

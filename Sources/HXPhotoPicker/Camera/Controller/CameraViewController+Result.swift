@@ -9,9 +9,7 @@ import UIKit
 import CoreLocation
 import Photos
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 extension CameraViewController: CameraResultViewControllerDelegate {
     func cameraResultViewController(
         didDone cameraResultViewController: CameraResultViewController
@@ -118,3 +116,4 @@ extension CameraViewController: CameraResultViewControllerDelegate {
         }
     }
 }
+#endif

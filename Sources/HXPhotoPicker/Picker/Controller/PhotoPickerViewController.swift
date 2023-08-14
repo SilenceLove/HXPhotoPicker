@@ -221,6 +221,9 @@ public class PhotoPickerViewController: BaseViewController {
         #if targetEnvironment(macCatalyst)
         return false
         #else
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            return false
+        }
         if didFetchAsset && config.allowAddCamera {
             return true
         }

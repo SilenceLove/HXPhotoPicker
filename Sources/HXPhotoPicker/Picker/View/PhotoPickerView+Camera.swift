@@ -227,10 +227,7 @@ extension PhotoPickerView: UIImagePickerControllerDelegate, UINavigationControll
     }
 }
 
-#if HXPICKER_ENABLE_CAMERA
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
 extension PhotoPickerView: CameraControllerDelegate {
     public func cameraController(
         _ cameraController: CameraController,

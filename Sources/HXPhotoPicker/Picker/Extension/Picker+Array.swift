@@ -47,6 +47,7 @@ public extension Array where Element: PhotoAsset {
     /// 获取视频地址
     /// - Parameters:
     ///   - exportParameter: 导出参数，nil 为原始视频
+    ///   - videoURLConfig: 指定视频路径
     ///   - exportSession: 导出视频时对应的 AVAssetExportSession，exportPreset不为nil时触发
     ///   - videoURLHandler: 每一次获取视频地址都会触发
     ///   - completionHandler: 全部获取完成(失败的不会添加)
@@ -55,6 +56,7 @@ public extension Array where Element: PhotoAsset {
             preset: .ratio_960x540,
             quality: 6
         ),
+        toFile videoURLConfig: ((PhotoAsset, Int) -> URL)? = nil,
         exportSession: PickerResult.AVAssetExportSessionHandler? = nil,
         videoURLHandler: PickerResult.URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
@@ -67,7 +69,12 @@ public extension Array where Element: PhotoAsset {
                 group: group,
                 execute: DispatchWorkItem(block: {
                     let semaphore = DispatchSemaphore(value: 0)
+                    var toVideoURL: URL?
+                    if let videoURL = videoURLConfig?(photoAsset, index) {
+                        toVideoURL = videoURL
+                    }
                     photoAsset.getVideoURL(
+                        toFile: toVideoURL,
                         exportParameter: exportParameter
                     ) { session in
                         exportSession?(session, photoAsset, index)
@@ -95,16 +102,19 @@ public extension Array where Element: PhotoAsset {
     /// - Parameters:
     ///   - options: 获取的类型
     ///   - compression: 压缩参数，nil - 原图
+    ///   - fileConfig: 指定文件路径配置回调
     ///   - completion: result
     func getURLs(
         options: PickerResult.Options = .any,
         compression: PhotoAsset.Compression? = nil,
+        toFileConfigHandler fileConfig: PickerResult.FileConfigHandler? = nil,
         completion: @escaping ([URL]) -> Void
     ) {
         var urls: [URL] = []
         getURLs(
             options: options,
-            compression: compression
+            compression: compression,
+            toFile: fileConfig
         ) { result, _, _ in
             switch result {
             case .success(let response):
@@ -123,6 +133,7 @@ public extension Array where Element: PhotoAsset {
     /// - Parameters:
     ///   - options: 获取的类型
     ///   - compression: 压缩参数，nil - 原图
+    ///   - fileConfigHandler: 指定文件路径配置回调
     ///   - urlReceivedHandler: 获取到url的回调
     ///     - result: 获取的结果
     ///     - photoAsset: 对应的 PhotoAsset 对象
@@ -132,6 +143,7 @@ public extension Array where Element: PhotoAsset {
     func getURLs(
         options: PickerResult.Options = .any,
         compression: PhotoAsset.Compression? = nil,
+        toFile fileConfigHandler: PickerResult.FileConfigHandler? = nil,
         urlReceivedHandler handler: PickerResult.URLHandler? = nil,
         completionHandler: @escaping ([URL]) -> Void
     ) {
@@ -168,16 +180,25 @@ public extension Array where Element: PhotoAsset {
                         handler?(result, photoAsset, index)
                         semaphore.signal()
                     }
+                    var toImageURL: URL?
+                    var toVideoURL: URL?
+                    if let fileConfig = fileConfigHandler?(photoAsset, index) {
+                        toImageURL = fileConfig.imageURL
+                        toVideoURL = fileConfig.videoURL
+                    }
                     if mediatype == .photo {
                         if photoAsset.mediaSubType == .livePhoto ||
                             photoAsset.mediaSubType == .localLivePhoto {
                             photoAsset.getLivePhotoURL(
+                                imageFileURL: toImageURL,
+                                videoFileURL: toVideoURL,
                                 compression: compression
                             ) {
                                 resultHandler($0)
                             }
                         }else {
                             photoAsset.getImageURL(
+                                toFile: toImageURL,
                                 compressionQuality: compression?.imageCompressionQuality
                             ) {
                                 resultHandler($0)
@@ -185,6 +206,7 @@ public extension Array where Element: PhotoAsset {
                         }
                     }else {
                         photoAsset.getVideoURL(
+                            toFile: toImageURL,
                             exportParameter: compression?.videoExportParameter
                         ) {
                             resultHandler($0)

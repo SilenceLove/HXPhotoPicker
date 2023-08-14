@@ -398,11 +398,14 @@ extension PhotoTools {
         #endif
         
         #if HXPICKER_ENABLE_CAMERA && !targetEnvironment(macCatalyst)
-        var cameraConfig = CameraConfiguration()
-        cameraConfig.videoMaximumDuration = 60
-        cameraConfig.tintColor = wxColor
-        cameraConfig.modalPresentationStyle = .fullScreen
-        config.photoList.cameraType = .custom(cameraConfig)
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+        }else {
+            var cameraConfig = CameraConfiguration()
+            cameraConfig.videoMaximumDuration = 60
+            cameraConfig.tintColor = wxColor
+            cameraConfig.modalPresentationStyle = .fullScreen
+            config.photoList.cameraType = .custom(cameraConfig)
+        }
         #endif
         
         config.notAuthorized.closeButtonImageName = "hx_picker_notAuthorized_close_dark"

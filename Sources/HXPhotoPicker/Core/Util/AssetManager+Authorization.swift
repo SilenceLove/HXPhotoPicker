@@ -25,12 +25,10 @@ public extension AssetManager {
     
     /// 获取相机权限
     /// - Parameter completionHandler: 获取结果
-    #if targetEnvironment(macCatalyst)
-    @available(macCatalyst 14.0, *)
-    #endif
     static func requestCameraAccess(
         completionHandler: @escaping (Bool) -> Void
     ) {
+        #if !targetEnvironment(macCatalyst)
         AVCaptureDevice.requestAccess(
             for: .video
         ) { (granted) in
@@ -38,24 +36,28 @@ public extension AssetManager {
                 completionHandler(granted)
             }
         }
+        #else
+        completionHandler(false)
+        #endif
     }
     
     /// 当前相机权限状态
     /// - Returns: 权限状态
-    #if targetEnvironment(macCatalyst)
-    @available(macCatalyst 14.0, *)
-    #endif
+    #if !targetEnvironment(macCatalyst)
     static func cameraAuthorizationStatus() -> AVAuthorizationStatus {
         AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
     }
+    #endif
     
     /// 当前相册权限状态是否是Limited
     static func authorizationStatusIsLimited() -> Bool {
+        #if !targetEnvironment(macCatalyst)
         if #available(iOS 14, *) {
             if authorizationStatus() == .limited {
                 return true
             }
         }
+        #endif
         return false
     }
     

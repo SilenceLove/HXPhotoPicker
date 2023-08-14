@@ -7,9 +7,7 @@
 
 import UIKit
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 extension CameraViewController: CameraBottomViewDelegate {
     func bottomView(beganTakePictures bottomView: CameraBottomView) {
         if !cameraManager.session.isRunning {
@@ -148,3 +146,4 @@ extension CameraViewController: CameraBottomViewDelegate {
         navigationController?.pushViewController(vc, animated: false)
     }
 }
+#endif

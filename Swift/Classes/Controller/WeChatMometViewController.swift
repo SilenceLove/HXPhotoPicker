@@ -32,13 +32,17 @@ class WeChatMometViewController: UIViewController {
         config.editor.cropSize.isResetToOriginal = false
         config.editor.isFixedCropSizeState = true
         #if !targetEnvironment(macCatalyst)
-        var cameraConfig = CameraConfiguration()
-        cameraConfig.editor.cropSize.aspectRatio = .init(width: 1, height: 1)
-        cameraConfig.editor.cropSize.isFixedRatio = true
-        cameraConfig.editor.cropSize.aspectRatios = []
-        cameraConfig.editor.cropSize.isResetToOriginal = false
-        cameraConfig.editor.isFixedCropSizeState = true
-        config.photoList.cameraType = .custom(cameraConfig)
+        if #available(iOS 14.0, *), ProcessInfo.processInfo.isiOSAppOnMac {
+            
+        }else {
+            var cameraConfig = CameraConfiguration()
+            cameraConfig.editor.cropSize.aspectRatio = .init(width: 1, height: 1)
+            cameraConfig.editor.cropSize.isFixedRatio = true
+            cameraConfig.editor.cropSize.aspectRatios = []
+            cameraConfig.editor.cropSize.isResetToOriginal = false
+            cameraConfig.editor.isFixedCropSizeState = true
+            config.photoList.cameraType = .custom(cameraConfig)
+        }
         #endif
         
         presentPicker(config)

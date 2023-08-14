@@ -5,13 +5,10 @@
 //  Created by Slience on 2021/9/1.
 //
 
-#if HXPICKER_ENABLE_CAMERA_LOCATION
+#if HXPICKER_ENABLE_CAMERA_LOCATION && !targetEnvironment(macCatalyst)
 import UIKit
 import CoreLocation
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 extension CameraViewController: CLLocationManagerDelegate {
     
     var allowLocation: Bool {

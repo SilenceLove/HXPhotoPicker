@@ -61,7 +61,7 @@ public extension PhotoAsset {
     
     /// 获取url
     /// - Parameters:
-    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
+    ///   - fileConfig: 指定地址，若为heic格式的图片，可以设置图片地址为png / jpeg，内部会自动转换（如果为网络资源则忽略）
     ///   - compression: 压缩参数，nil - 原图
     ///   - completion: 获取完成
     func getURL(
@@ -78,7 +78,7 @@ public extension PhotoAsset {
     
     /// 获取url
     /// - Parameters:
-    ///   - fileConfig: 指定地址（如果为网络资源则忽略）
+    ///   - fileConfig: 指定地址，若为heic格式的图片，可以设置图片地址为png / jpeg，内部会自动转换（如果为网络资源则忽略）
     ///   - compressionQuality: 压缩比例，不传就是原图。gif不会压缩
     ///   - completion: 获取完成
     func getAssetURL(
@@ -113,7 +113,7 @@ public extension PhotoAsset {
     
     /// 获取图片url
     /// - Parameters:
-    ///   - fileURL: 指定地址（如果为网络资源则忽略）
+    ///   - fileURL: 指定地址，若为heic格式的图片，可以设置图片地址为png / jpeg，内部会自动转换（如果为网络资源则忽略）
     ///   - compressionQuality: 压缩比例，不传就是原图。gif不会压缩
     ///   - completion: 获取完成
     func getImageURL(
@@ -164,7 +164,7 @@ public extension PhotoAsset {
     
     /// 获取LivePhoto里的图片和视频URL
     /// - Parameters:
-    ///   - imageFileURL: 指定图片地址（如果为网络资源则忽略）
+    ///   - imageFileURL: 指定图片地址，若为heic格式的图片，可以设置图片地址为png / jpeg，内部会自动转换（如果为网络资源则忽略）
     ///   - videoFileURL: 指定视频地址（如果为网络资源则忽略）
     ///   - compression: 压缩参数，nil - 原图
     ///   - completion: 获取完成

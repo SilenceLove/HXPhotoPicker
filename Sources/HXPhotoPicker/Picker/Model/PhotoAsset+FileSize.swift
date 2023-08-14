@@ -121,6 +121,31 @@ extension PhotoAsset {
         }
         return fileSize
     }
+    
+    var photoFormat: String? {
+        guard let photoAsset = phAsset else {
+            return nil
+        }
+        let assetResources = PHAssetResource.assetResources(for: photoAsset)
+        if photoAsset.isLivePhoto {
+            var livePhotoType: PHAssetResourceType = .photo
+            for assetResource in assetResources where
+                assetResource.type == .adjustmentData {
+                livePhotoType = .fullSizePhoto
+                break
+            }
+            for assetResource in assetResources where
+                assetResource.type == livePhotoType {
+                return assetResource.originalFilename.assetFormat
+            }
+        }else {
+            for resource in assetResources {
+                return resource.originalFilename.assetFormat
+            }
+        }
+        return nil
+    }
+    
     func getLocalFileSize() -> Int {
         var fileSize = 0
         if mediaType == .photo {

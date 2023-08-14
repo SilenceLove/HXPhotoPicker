@@ -375,11 +375,22 @@ public extension PhotoAsset {
             completion(.failure(.invalidPHAsset))
             return
         }
+        let toImageURL: URL
+        if let imageFileURL = imageFileURL {
+            toImageURL = imageFileURL
+        }else {
+            if let photoFormat = photoFormat {
+                toImageURL = PhotoTools.getTmpURL(for: photoFormat)
+            }else {
+                toImageURL = PhotoTools.getImageTmpURL()
+            }
+        }
+        
         var imageURL: URL?
         var videoURL: URL?
         AssetManager.requestLivePhoto(
             contentURL: phAsset,
-            imageFileURL: imageFileURL,
+            imageFileURL: toImageURL,
             videoFileURL: videoFileURL
         ) { url in
             imageURL  = url

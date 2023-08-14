@@ -7,10 +7,7 @@
 
 import UIKit
 
-#if HXPICKER_ENABLE_EDITOR
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if HXPICKER_ENABLE_EDITOR && !targetEnvironment(macCatalyst)
 extension CameraViewController: EditorViewControllerDelegate {
     public func editorViewController(_ editorViewController: EditorViewController, didFinish asset: EditorAsset) {
         guard let result = asset.result else {
@@ -33,9 +30,6 @@ extension CameraViewController: EditorViewControllerDelegate {
     }
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 extension CameraViewController {
     func openPhotoEditor(_ image: UIImage) {
         config.editor.isAutoBack = autoDismiss
@@ -48,9 +42,6 @@ extension CameraViewController {
     }
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 extension CameraViewController {
     func openVideoEditor(_ videoURL: URL) {
         config.editor.isAutoBack = autoDismiss

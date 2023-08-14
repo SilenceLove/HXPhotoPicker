@@ -8,6 +8,8 @@
 
 import UIKit
 import CommonCrypto
+import CoreServices
+import UniformTypeIdentifiers
 
 extension String: HXPickerCompatibleValue {
     
@@ -150,6 +152,23 @@ extension String: HXPickerCompatibleValue {
     subscript(_ indexs: PartialRangeUpTo<Int>) -> String {
         let endIndex = index(startIndex, offsetBy: indexs.upperBound)
         return String(self[startIndex..<endIndex])
+    }
+    
+    var assetFormat: String? {
+        let lowercased = lowercased()
+        if lowercased.hasSuffix("heic") {
+            return "heic"
+        }
+        if lowercased.hasSuffix("jpg") || lowercased.hasSuffix("jpeg") {
+            return "jpeg"
+        }
+        if lowercased.hasSuffix("png") {
+            return "png"
+        }
+        if lowercased.hasSuffix("gif") {
+            return "gif"
+        }
+        return nil
     }
 }
 

@@ -10,9 +10,7 @@ import CoreLocation
 import AVFoundation
 import Photos
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
+#if !targetEnvironment(macCatalyst)
 open class CameraController: UINavigationController {
     
     public enum CameraType {
@@ -137,9 +135,6 @@ open class CameraController: UINavigationController {
     }
 }
 
-#if targetEnvironment(macCatalyst)
-@available(macCatalyst 14.0, *)
-#endif
 extension CameraController: CameraViewControllerDelegate {
     public func cameraViewController(
         _ cameraViewController: CameraViewController,
@@ -189,3 +184,5 @@ extension CameraController: CameraViewControllerDelegate {
         cameraDelegate?.cameraController(self, didChangeTakeType: takeType)
     }
 }
+
+#endif
