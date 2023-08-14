@@ -1,5 +1,11 @@
 # Release Notes
 
+## 4.0.5.1
+
+### Resolved
+
+- Low version Xcode compilation error [[571]](https://github.com/SilenceLove/HXPhotoPicker/issues/571)
+
 ## 4.0.5
 
 ### Added
@@ -33,11 +39,11 @@
 
 ### Resolved
 
-- [#553](https://github.com/SilenceLove/HXPhotoPicker/issues/553)
-- [#558](https://github.com/SilenceLove/HXPhotoPicker/issues/558)
-- [#562](https://github.com/SilenceLove/HXPhotoPicker/issues/562)
-- [#567](https://github.com/SilenceLove/HXPhotoPicker/issues/567)
-- [#568](https://github.com/SilenceLove/HXPhotoPicker/issues/568)
+- [[553]](https://github.com/SilenceLove/HXPhotoPicker/issues/553)
+- [[558]](https://github.com/SilenceLove/HXPhotoPicker/issues/558)
+- [[562]](https://github.com/SilenceLove/HXPhotoPicker/issues/562)
+- [[567]](https://github.com/SilenceLove/HXPhotoPicker/issues/567)
+- [[568]](https://github.com/SilenceLove/HXPhotoPicker/issues/568)
 
 ## 4.0.3
 

@@ -1,5 +1,11 @@
 # 更新日志
 
+## 4.0.5.1
+
+### 修复
+
+- 低版本Xcode编译报错 [[571]](https://github.com/SilenceLove/HXPhotoPicker/issues/571)
+
 ## 4.0.5
 
 ### 新增
@@ -33,11 +39,11 @@
 
 ### 修复
 
-- [#553](https://github.com/SilenceLove/HXPhotoPicker/issues/553)
-- [#558](https://github.com/SilenceLove/HXPhotoPicker/issues/558)
-- [#562](https://github.com/SilenceLove/HXPhotoPicker/issues/562)
-- [#567](https://github.com/SilenceLove/HXPhotoPicker/issues/567)
-- [#568](https://github.com/SilenceLove/HXPhotoPicker/issues/568)
+- [[553]](https://github.com/SilenceLove/HXPhotoPicker/issues/553)
+- [[558]](https://github.com/SilenceLove/HXPhotoPicker/issues/558)
+- [[562]](https://github.com/SilenceLove/HXPhotoPicker/issues/562)
+- [[567]](https://github.com/SilenceLove/HXPhotoPicker/issues/567)
+- [[568]](https://github.com/SilenceLove/HXPhotoPicker/issues/568)
 
 ## 4.0.3
 

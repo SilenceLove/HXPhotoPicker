@@ -54,6 +54,7 @@
 - [x] Multi-platform support
     - [x] iOS
     - [x] iPadOS
+    - [x] Mac Catalyst
 - [x] Internationalization support
     - [x] 🇨🇳 Chinese, Simplified (zh-Hans)
     - [x] 🇬🇧 English (en)
