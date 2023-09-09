@@ -1,5 +1,22 @@
 # 更新日志
 
+## 4.0.6
+
+### 新增
+
+- Editor
+  - 选中原始比例时，可以切换横竖状态
+
+### 修复
+
+- Picker
+  - 相册权限未授权时，取消回调没有触发 
+- Mac Catalyst 上的一些问题
+
+### 优化
+
+- Release下编译时间过长的问题 [[564]](https://github.com/SilenceLove/HXPhotoPicker/issues/564)
+
 ## 4.0.5.1
 
 ### 修复

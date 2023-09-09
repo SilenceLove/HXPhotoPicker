@@ -1,5 +1,22 @@
 # Release Notes
 
+## 4.0.6
+
+### Added
+
+- Editor
+  - When the original ratio is selected, you can switch between horizontal and vertical states.
+
+### Resolved
+
+- Picker
+  - When the album permission is not authorized, the cancellation callback is not triggered.
+- Some issues on Mac Catalyst
+
+### Optimizer
+
+- The problem of long compilation time under Release [[564]](https://github.com/SilenceLove/HXPhotoPicker/issues/564)
+
 ## 4.0.5.1
 
 ### Resolved

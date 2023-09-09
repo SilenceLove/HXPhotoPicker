@@ -85,7 +85,7 @@
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.5"))
+    .package(url: "https://github.com/SilenceLove/HXPhotoPicker.git", .upToNextMajor(from: "4.0.6"))
 ]
 ```
 
@@ -140,10 +140,19 @@ import HXPhotoPicker
 class ViewController: UIViewController {
 
     func presentPickerController() {
-        // Set the configuration consistent with the WeChat theme
-        let config = PickerConfiguration.default
+        let config = PickerConfiguration()
+                
+        // Method 1：async/await
+        let images: [UIImage] = try await Photo.picker(config)
+        let urls: [URL] = try await Photo.picker(config)
+        let urlResult: [AssetURLResult] = try await Photo.picker(config)
         
-        // Method 1：
+        let pickerResult = try await Photo.picker(config)
+        let images: [UIImage] = try await pickerResult.objects()
+        let urls: [URL] = try await pickerResult.objects()
+        let urlResults: [AssetURLResult] = try await pickerResult.objects()
+        
+        // Method 2：
         let pickerController = PhotoPickerController(picker: config)
         pickerController.pickerDelegate = self
         // The array of PhotoAsset objects corresponding to the currently selected asset
@@ -152,7 +161,7 @@ class ViewController: UIViewController {
         pickerController.isOriginal = isOriginal
         present(pickerController, animated: true, completion: nil)
         
-        // Method 2：
+        // Method 3：
         Photo.picker(
             config
         ) { result, pickerController in
@@ -178,6 +187,11 @@ extension ViewController: PhotoPickerControllerDelegate {
     ///     result.isOriginal   Whether to select the original image
     func pickerController(_ pickerController: PhotoPickerController, 
                             didFinishSelection result: PickerResult) {
+        // async/await
+        let images: [UIImage] = try await result.objects()
+        let urls: [URL] = try await result.objects()
+        let urlResults: [AssetURLResult] = try await result.objects()
+        
         result.getImage { (image, photoAsset, index) in
             if let image = image {
                 print("success", image)
@@ -203,7 +217,12 @@ extension ViewController: PhotoPickerControllerDelegate {
 
 ```swift
 /// If it is a video, get the cover of the video
-/// compressionQuality: Compress parameters, if not passed, no compression
+
+// async/await
+// compression: if not passed, no compression 
+let image: UIImage = try await photoAsset.object(compression)
+
+// compressionQuality: Compress parameters, if not passed, no compression 
 photoAsset.getImage(compressionQuality: compressionQuality) { image in
     print(image)
 }
@@ -212,6 +231,11 @@ photoAsset.getImage(compressionQuality: compressionQuality) { image in
 #### Get URL
 
 ```swift
+// async/await 
+// compression: if not passed, no compression
+let url: URL = try await photoAsset.object(compression)
+let result: AssetURLResult = try await photoAsset.object(compression)
+
 /// compression: Compress parameters, if not passed, no compression
 photoAsset.getURL(compression: compression) { result in
     switch result {
@@ -246,6 +270,7 @@ photoAsset.getURL(compression: compression) { result in
 
 | Version | Release Date | Xcode | Swift | iOS |
 | ---- | ----  | ---- | ---- | ---- |
+| [v4.0.6](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#406) | 2023-09-09 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.5](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#405) | 2023-08-12 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.4](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#404) | 2023-07-30 | 14.3.0 | 5.7.0 | 12.0+ |
 | [v4.0.3](https://github.com/SilenceLove/HXPhotoPicker/blob/master/Documentation/RELEASE_NOTE.md#403) | 2023-07-06 | 14.3.0 | 5.7.0 | 12.0+ |
